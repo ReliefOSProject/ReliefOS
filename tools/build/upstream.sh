@@ -20,6 +20,12 @@ rm -rf "$work/source" "$work/build"
 mkdir -p "$work/source" "$work/build"
 tar -xf "$archive" -C "$work/source" --no-same-owner
 source=$work/source/$directory
+# Keep the pinned ALSA direct-plugin behavior reproducible for ReliefOS's
+# single physical HDA endpoint leases.  The patch is applied only after the
+# verified archive has been unpacked and before configure compiles it.
+if [ "$pkg" = alsa-lib ]; then
+    patch -d "$source" -p1 < "$src/patches/alsa-lib/0001-reliefos-dmix-server.patch"
+fi
 resource=$("$cc" -print-resource-dir)
 CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -isystem $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib"
 case $pkg in libbsd|shadow) CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -idirafter $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib" ;; esac
@@ -49,6 +55,11 @@ e2fsprogs) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS
  set -- "$@" --sbindir=/usr/sbin --with-root-prefix=/usr --disable-libuuid --disable-libblkid --disable-elf-shlibs --disable-fsck --disable-uuidd --disable-nls --disable-fuse2fs --without-libarchive --with-udev-rules-dir=no --with-systemd-unit-dir=no --with-crond-dir=no ;;
 dosfstools) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS; set -- "$@" --sbindir=/usr/sbin --enable-compat-symlinks ;;
 exfatprogs) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS; set -- "$@" --sbindir=/usr/sbin --disable-shared --enable-static ;;
+alsa-lib) set -- "$@" --enable-shared --disable-static --disable-python ;;
+alsa-utils) set -- "$@" --disable-alsatest --enable-alsa-topology --disable-alsamixer --disable-bat \
+ --disable-alsaconf --disable-alsaloop --disable-nhlt --disable-nls \
+ --disable-xmlto --disable-rst2man --disable-rpath \
+ --with-udev-rules-dir=/usr/lib/udev/rules.d ;;
 *) echo "unsupported upstream package: $pkg" >&2; exit 2 ;;
 esac
 tmp=$(mktemp -d "$stage.new.XXXXXX")
@@ -57,6 +68,22 @@ cd "$work/build"
 "$source/configure" "$@"
 if [ "$pkg" = exfatprogs ]; then make "LDFLAGS=$LDFLAGS -all-static" "BLKID_LIBS=$auth/usr/lib/libblkid.a"; else make; fi
 if [ "$pkg" = sudo ]; then make install "DESTDIR=$tmp" INSTALL_OWNER=; else make install "DESTDIR=$tmp"; fi
+# alsa-lib 1.2.14 forbids shared/static in one configure (upstream INSTALL).
+# Use two private builds of the same verified source; publish just the static
+# archive from the second build alongside the complete shared installation.
+if [ "$pkg" = alsa-lib ]; then
+    rm -rf "$work/build-static"
+    mkdir -p "$work/build-static"
+    cd "$work/build-static"
+    "$source/configure" --host="$target" --prefix=/usr --sysconfdir=/etc \
+        --localstatedir=/var --libdir=/usr/lib --disable-shared --enable-static \
+        --disable-python
+    make
+    cp "$work/build-static/src/.libs/libasound.a" "$tmp/usr/lib/"
+    # Installed libtool archives encode /usr/lib and redirect downstream
+    # links to the host. Target ELF libraries and pkg-config are sufficient.
+    rm "$tmp/usr/lib/libasound.la" "$tmp/usr/lib/libatopology.la"
+fi
 case $pkg in
 libbsd) sed 's@GROUP(/lib/@GROUP(@' "$tmp/lib/libbsd.so" > "$tmp/lib/libbsd.so.new"; mv "$tmp/lib/libbsd.so.new" "$tmp/lib/libbsd.so"; rm "$tmp/lib/libbsd.la" ;;
 libmd) rm "$tmp/lib/libmd.la" ;;

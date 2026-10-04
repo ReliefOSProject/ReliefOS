@@ -791,6 +791,25 @@ endmenu
 
 menu "System applications"
 
+config RELIEFOS_COMPONENT_APP_SOUNDCTL_BUILD
+    bool "Build Sound controls"
+    default y
+
+config RELIEFOS_COMPONENT_APP_SOUNDCTL_IMAGE
+    bool "Include Sound controls in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_SOUNDCTL_BUILD
+
+config RELIEFOS_COMPONENT_APP_SOUNDCTL_ENTRY
+    bool "Generate a desktop entry for Sound controls"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_SOUNDCTL_BUILD
+
+config RELIEFOS_COMPONENT_APP_SOUNDCTL_SDK
+    bool "Include Sound controls in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_SOUNDCTL_BUILD
+
 config RELIEFOS_COMPONENT_APP_SERVICEMGR_BUILD
     bool "Build Service control"
     default y
