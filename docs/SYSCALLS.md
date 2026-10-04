@@ -66,6 +66,9 @@ The kernel-side numbers and errno constants are in:
 | 11 | `munmap` | `munmap` | Supports whole and partial unmapping of existing VMAs. |
 | 16 | `ioctl` | `ioctl` | Device-ABI extension point: Linux fbdev/block/evdev/OSS/termios requests, `LEONOS_FBIOBLIT`, GPU extensions on `/dev/gpu`, net control on an AF_INET fd, and driver control on `/dev/driverctl`. |
 | 24 | `sched_yield` | `sched_yield` | Yields the current task if another task can run. |
+| 29 | `shmget` | `shmget` | Native keyed/private SysV segment creation and lookup; finite limits via IPC_INFO. |
+| 30 | `shmat` | `shmat` | Native shared PTE references; RDONLY/RND/REMAP and readonly EXEC; W^X policy applies. |
+| 31 | `shmctl` | `shmctl` | LP64 STAT/SET/RMID, INFO/STAT_ANY, owner/capability and memlock checks; native guest probe passes 83 checks. |
 | 35 | `nanosleep` | `sleep_ms` | libc passes milliseconds; kernel also accepts a Linux-like timespec pointer. |
 | 39 | `getpid` | `getpid` | Returns the current scheduler PID. |
 | 57 | `fork` | `fork` | Creates a copy-on-write child; the child receives zero. |
@@ -73,6 +76,7 @@ The kernel-side numbers and errno constants are in:
 | 59 | `execve` | `execve` | Replaces the current process image with an ELF program. |
 | 60 | `exit` | `exit` | Releases process-owned files, windows, PTYs, and exits with a code. |
 | 61 | `wait4` | `wait4` | Waits for a child and writes a Linux-style shifted status. |
+| 67 | `shmdt` | `shmdt` | Detaches remaining split pieces by original attach identity; final RMID release returns backing pages. |
 | 79 | `getcwd` | `getcwd` | Copies the task current directory. |
 | 80 | `chdir` | `chdir` | Changes the task current directory after path lookup. |
 | 82 | `rename` | `rename` | Renames exFAT, FAT32, ext4, or legacy ext2 files/directories within one filesystem. |
@@ -214,11 +218,23 @@ or AF_UNIX service protocols. What the kernel still accepts, keyed by the
   `EVIOCGPHYS`, `EVIOCGBIT`, `EVIOCGKEY`, and no-op `EVIOCGRAB`, plus
   `O_NONBLOCK` and `poll(POLLIN)`. Text-input methods are the imd daemon's
   AF_UNIX service at `/run/leonos/input-method.sock`, not a device node.
-- `/dev/dsp` (aliased `/dev/audio`): OSS requests from `<linux/soundcard.h>` —
-  set `AFMT_S16_LE`, two channels and the desired 8-48 kHz rate with
-  `SNDCTL_DSP_*`, then use `write(2)`. The subset includes format/rate/channel
-  setup, `GETFMTS`, `GETCAPS`, `GETBLKSIZE`, `GETOSPACE`, `GETODELAY`,
-  `NONBLOCK`, and `poll(POLLOUT)`.
+- `/dev/snd/controlC<N>` and `pcmC<N>D<M>p/c`: registered-card Linux v6.14
+  ALSA control/PCM requests, read/write/poll and shared PCM mmap. Nodes and
+  negotiation reflect supported hardware directions and capabilities. The
+  implemented request list, unsupported operations and deferred guest/upstream
+  runtime validation are documented in the Audio ABI section of `docs/ABI.md`.
+  The same public headers are exercised by the A6 standard-libc probe; its
+  fixed ioctl/access/errno/mmap matrix is maintained in
+  `docs/audio-abi-support.json`.
+- `/dev/dsp` (aliased `/dev/audio`): OSS format/rate/channel negotiation,
+  `GETFMTS`, `GETCAPS`, `GETBLKSIZE`, `SETFRAGMENT`, `GETISPACE/GETOSPACE`,
+  `GETIPTR/GETOPTR`, `GETODELAY`, `GETTRIGGER/SETTRIGGER`, `SETDUPLEX`,
+  `NONBLOCK`, `RESET` and blocking `SYNC`. Registered-card read/write/poll use
+  real PCM state; `/dev/mixer` exposes the same controls as ALSA. `/dev/audio`
+  retains its PCM compatibility alias rather than a mu-law default.
+  The ABI-v1 AC97/ES1371 backend is stereo S16_LE playback only, with an
+  exclusive generation-bound OFD. It advertises no DSP capabilities and does
+  not implement capture, RESET, hardware pointer queries or output disabling.
 - `/dev/ptmx`, `/dev/pts/<id>`, `/dev/tty`: standard Linux termios ioctls
   (`TCGETS`/`TCSETS`, `TIOCGWINSZ`, `TIOCSCTTY`, `TIOCGPGRP`, `TIOCSPGRP`,
   `TIOCGSID`, `TIOCNOTTY`, `TIOCSPTLCK`, `TIOCGPTLCK`); PTY users call
