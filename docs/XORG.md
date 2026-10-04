@@ -15,6 +15,45 @@ starts `xterm`, and keeps `twm` in the foreground. Exiting TWM returns control
 to XDM; exiting XDM lets tty1's console session fall back to text login. tty2
 through tty6 remain text consoles.
 
+## TWM theme, menus and keys
+
+The session ships one TWM configuration, `system/xorg/twmrc`, staged to
+`/etc/reliefos/twmrc`. The "Light" theme uses only the guest misc bitmap fonts
+(`fixed` 6x13 for menus and the icon manager list, `9x15` for title bars) with a
+light blue palette: `#dce4f5` title bars with `#1a1b26` text, `#8aa0d6` borders,
+white menus and a `#eceef4` desktop grey. `xdm-session` starts xterm in the same
+colours (`#f7f8fb` background, `#22242e` text, `#3b62a6` cursor).
+
+Window decoration keeps the stock TWM buttons: the default logo button on the
+left and the resize button on the right of every title bar, with no custom title
+buttons. The TWM icon manager is a vertical strip pinned to the right edge
+(`IconManagerGeometry "192x800-0+0"`; TWM sizes its height to the entry count).
+Its title bar is symmetric: "TWM Icon Manager" sits between equal 9px gaps
+between the two default buttons.
+
+The root menu, titled `ReliefOS`, opens from any root-button press or
+Super+Space and offers new-xterm, window operations, `xeyes`, `About` and
+`Exit session`. TWM menus are hold-to-open: keep the button or key pressed,
+drag onto an entry and release on it to run it. Note that this TWM build only
+delivers key bindings while the pointer is over a window; over the bare root
+background, use the mouse to open the menu.
+
+| Keys | Action |
+| --- | --- |
+| Super+Return | new themed xterm |
+| Super+Space | root menu (hold) |
+| Super+Q | delete window |
+| Super+M | iconify window |
+| Super+A | toggle auto-raise for window |
+| Alt+Tab / Alt+Shift+Tab | window ring next / previous |
+| Super+Up / Down / Left / Right | zoom window to top / bottom / left / right half |
+| Super+Z | zoom window to full screen |
+
+The root background is a retro pixel-art wallpaper
+(`system/xorg/wallpaper.png`, 1280x800) that `xdm-session` applies with
+`xwallpaper --focus` before TWM starts; when xwallpaper is missing or fails the
+X server keeps its default background.
+
 Packages come from the pinned Alpine v3.24 x86_64/musl main and community
 indexes. The lock file marks only the Xorg closure entries with `feature=xorg`.
 `make fetch` is the only network operation; ordinary builds use the verified
