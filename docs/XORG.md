@@ -15,6 +15,12 @@ starts `xterm`, and keeps `twm` in the foreground. Exiting TWM returns control
 to XDM; exiting XDM lets tty1's console session fall back to text login. tty2
 through tty6 remain text consoles.
 
+`make fetch` downloads the official Alpine community `dillo` 3.3.0-r2 browser
+and its runtime dependencies. Dillo uses FLTK's X11 frontend and links directly
+to `libX11.so.6`; it does not select a Wayland display backend. The framebuffer
+and GTK NetSurf packages were removed after failing to run in the VMware SVGA
+QEMU session.
+
 ## TWM theme, menus and keys
 
 The session ships one TWM configuration, `system/xorg/twmrc`, staged to
@@ -32,9 +38,11 @@ Its title bar is symmetric: "TWM Icon Manager" sits between equal 9px gaps
 between the two default buttons.
 
 The root menu, titled `ReliefOS`, opens from any root-button press or
-Super+Space and offers new-xterm, window operations, `xeyes`, `About` and
-`Exit session`. TWM menus are hold-to-open: keep the button or key pressed,
-drag onto an entry and release on it to run it. Note that this TWM build only
+Super+Space and offers new-xterm, window operations, `xeyes`, Dillo, NEdit,
+`About` and `Exit session`. TWM menus are hold-to-open: keep the button or key pressed,
+drag onto an entry and release on it to run it. The `NEdit` entry opens the
+NEdit text editor, installed with its Motif dependencies from the official
+Alpine APK repository by `make fetch`. Note that this TWM build only
 delivers key bindings while the pointer is over a window; over the bare root
 background, use the mouse to open the menu.
 

@@ -73,6 +73,8 @@ menu "defops"
 "Delete"        f.delete
 ""              f.nop
 "xeyes"         f.exec "xeyes &"
+"Dillo"         f.exec "dillo &"
+"NEdit"         f.exec "nedit &"
 "About"         f.exec "xterm -title About -geometry 62x10 -e sh -c 'echo ReliefOS Xorg session; echo TWM theme: Light; uname -a; echo; echo Press ENTER to close; read' &"
 ""              f.nop
 "Exit session"  f.quit
