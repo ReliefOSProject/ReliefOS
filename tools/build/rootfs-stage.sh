@@ -55,6 +55,7 @@ if [ "$desktop_backend" = xorg ]; then
     file "$src/system/xorg/xdm-Xservers" etc/reliefos/xdm-Xservers 0644 product-policy override
     file "$src/system/xorg/xdm-session" etc/reliefos/xdm-session 0755 reliefos-apps override
     file "$src/system/xorg/xdm-session" usr/lib/reliefos/xdm-session 0755 reliefos-apps override
+    file "$src/system/xorg/xdm-setup" usr/lib/reliefos/xdm-setup 0755 reliefos-apps override
     file "$src/system/xorg/twmrc" etc/reliefos/twmrc 0644 product-policy override
     file "$src/system/xorg/wallpaper.png" etc/reliefos/wallpaper.png 0644 product-policy override
     file "$src/system/xorg/pam-xdm" etc/pam.d/xdm 0644 product-policy override
