@@ -83,34 +83,67 @@ def _bright_panel_bbox(frame):
     def bright(pixel):
         return min(pixel[:3]) >= 220
 
+    # A bright wallpaper band (the pale sky) is bright too, but it runs edge
+    # to edge.  Only rows whose widest bright run keeps a margin on both
+    # sides can belong to the centered panel.
+    edge = width * 0.08
     row_hits = []
     for y in range(height):
-        if sum(bright(pixels[x, y]) for x in range(width)) >= width * 0.40:
+        if sum(bright(pixels[x, y]) for x in range(width)) < width * 0.40:
+            continue
+        runs = []
+        start = None
+        for x in range(width):
+            if bright(pixels[x, y]):
+                if start is None:
+                    start = x
+            elif start is not None:
+                runs.append((start, x))
+                start = None
+        if start is not None:
+            runs.append((start, width))
+        left, right = max(runs, key=lambda run: run[1] - run[0], default=(0, 0))
+        if left >= edge and right <= width - edge:
             row_hits.append(y)
     if len(row_hits) < max(20, height // 20):
         return None
-    y0, y1 = row_hits[0], row_hits[-1] + 1
-    # Text and the separator split individual rows.  Aggregate the whole
-    # panel so a single row cannot select only half of the white surface.
-    min_hits = int(len(row_hits) * .70)
-    xs = [x for x in range(width)
-          if sum(bright(pixels[x, y]) for y in row_hits) >= min_hits]
-    x_runs = []
-    for x in xs:
-        if not x_runs or x != x_runs[-1][-1] + 1:
-            x_runs.append([x])
+    # Text and the separator split individual rows.  Group rows into bands
+    # tolerating short gaps, then aggregate each band so a single row cannot
+    # select only half of the white surface.  The panel is the largest band.
+    gap = max(4, height // 100)
+    bands = [[row_hits[0]]]
+    for y in row_hits[1:]:
+        if y - bands[-1][-1] <= gap:
+            bands[-1].append(y)
         else:
-            x_runs[-1].append(x)
-    columns = max(x_runs, key=len, default=[])
-    if len(columns) < width * 0.40:
-        return None
-    # xlogin's panel is centered with a margin on every side.  A running
-    # xterm is also a bright rectangle, but it touches the display edge and
-    # must not keep the session probe in the greeter state.
-    if (columns[0] < width * 0.10 or columns[-1] >= width * 0.90 or
-            y0 < height * 0.10 or y1 >= height * 0.90):
-        return None
-    return (columns[0], y0, columns[-1] + 1, y1)
+            bands.append([y])
+    best = None
+    for band in bands:
+        if len(band) < max(20, height // 20):
+            continue
+        min_hits = int(len(band) * .70)
+        xs = [x for x in range(width)
+              if sum(bright(pixels[x, y]) for y in band) >= min_hits]
+        x_runs = []
+        for x in xs:
+            if not x_runs or x != x_runs[-1][-1] + 1:
+                x_runs.append([x])
+            else:
+                x_runs[-1].append(x)
+        columns = max(x_runs, key=len, default=[])
+        if len(columns) < width * 0.40:
+            continue
+        # xlogin's panel is centered with a margin on every side.  A running
+        # xterm is also a bright rectangle, but it touches the display edge
+        # and must not keep the session probe in the greeter state.
+        if (columns[0] < width * 0.10 or columns[-1] >= width * 0.90 or
+                band[0] < height * 0.10 or band[-1] >= height * 0.90):
+            continue
+        bbox = (columns[0], band[0], columns[-1] + 1, band[-1] + 1)
+        area = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
+        if best is None or area > best[0]:
+            best = (area, bbox)
+    return best[1] if best else None
 
 
 def greeter_ocr(frame):
@@ -230,18 +263,29 @@ def wait_greeter_stage(probe, process, expected, name, timeout=45):
     raise AssertionError(f"XDM greeter did not reach {expected!r}; observed {observed!r}")
 
 
+def _session_xterm_visible(frame):
+    """Return True once the session xterm has mapped its window.
+
+    The pale wallpaper alone already passes any brightness floor on the bare
+    root window the moment xdm kills the greeter, long before twm/xterm have
+    mapped.  The xterm started by xdm-session fills its window with #f7f8fb
+    and the wallpaper palette contains no pixel of that exact color, so only
+    a mapped terminal can put it on screen -- the readiness signal needed
+    before typing the marker command.
+    """
+    colors = frame.getcolors(1 << 20) or []
+    return sum(count for count, rgb in colors if rgb == (247, 248, 251)) >= 20000
+
+
 def wait_session(probe, process, name, timeout=45):
-    """Require a non-greeter graphical frame before sending an xterm probe."""
+    """Require a mapped session window before sending an xterm probe."""
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         assert process.poll() is None, "QEMU exited while waiting for the session"
         frame = probe.frame(name)
-        if _bright_panel_bbox(frame) is None:
-            sample = frame.convert("L").resize((160, 90))
-            bright = sum(1 for y in range(90) for x in range(160)
-                         if sample.getpixel((x, y)) > 200)
-            if bright > 160 * 90 * 2 // 100:
-                return
+        if (_bright_panel_bbox(frame) is None and
+                _session_xterm_visible(frame)):
+            return
         time.sleep(.5)
     raise AssertionError(f"TWM/xterm session never became visible on {name}")
 
@@ -250,6 +294,11 @@ def xterm_marker(probe, serial, process, marker, command=None):
     """Prove that input reached the xterm shell by observing its serial marker."""
     command = command or f"echo {marker} >/dev/ttyS0"
     offset = len(serial.read_text(errors="replace")) if serial.exists() else 0
+    # TWM keeps the keyboard focus with the pointer, and the greeter login
+    # clicks leave the pointer outside the session xterm that xdm-session
+    # places at +0+0.  Click the terminal first, the same way greeter_login
+    # focuses the login field before typing.
+    probe.click(300, 200)
     probe.text(command)
     probe.key("ret")
     wait_serial_after(serial, marker, process, offset, timeout=20)
@@ -267,7 +316,9 @@ def switch_vt(probe, serial, process, number):
         # wait for that handoff and let the signal handler settle before typing.
         wait_serial_after(serial, "VT acquire signal sent for vt=1",
                           process, offset, timeout=20)
-        time.sleep(1.0)
+    # Let the console's input path settle on every switch: typing straight
+    # after the active trace can drop individual keys.
+    time.sleep(1.0)
 
 
 def frame_distance(first, second):
