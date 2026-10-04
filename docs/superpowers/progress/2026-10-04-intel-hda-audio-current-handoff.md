@@ -92,4 +92,4 @@ WAV节拍对照ds133因不支持ADC而在abi原cold raw-null capture阻塞，使
 
 原生 VMware 8 声道两次各60秒 Doom 都退出0，close/reopen0、XRUN0，每次音乐2/SFX354/攻击57；AB17X 软件录音左声道非零，**已知右声道仍零，严格分离单次录音未证明**。QEMU HDA 立体声两次各60秒同样退出0/XRUN0，波形另行记录；不关闭 U6 完整有限流 EOF gate。新交付 `out/audio-hda-u6/images/reliefos-vmware-hda-fix-r6.vmdk`，SHA256 `2ed813419bea40057f084403c1d2b85f92d44bfc129ca165c94b3d37c178a11e`，check/compare、完整root、实际组件和 source/image SHA通过，交付没有QA服务。
 
-详细交接 `2026-10-05-vmware-doom-audio-handoff.md`，证据 `out/audio-hda-u6/qa/vmware-doom-20261004/`。用户 VM/R5 VMDK 未操作；自己的 QA VM 已挂起保留。Doom 听感待用户复测，launcher GUI 未运行；GUI/Xorg deferred，physical not_run。U6 仍暂停18/19，标准 arecord、raw-null/raw-file、controls 和600秒本轮未恢复，候选几何未接受，无子代理/提交/推送/reset/归档/源码证据清理。
+详细交接 `2026-10-05-vmware-doom-audio-handoff.md`，证据 `out/audio-hda-u6/qa/vmware-doom-20261004/`。用户 VM/R5 VMDK 未操作；自己的 QA VM 已挂起保留。用户已确认 R6 在 VMware 实际有声音；右声道录音和完整波形问题仍单独保留。launcher GUI 未运行；GUI/Xorg deferred，physical not_run。U6 仍暂停18/19，标准 arecord、raw-null/raw-file、controls 和600秒本轮未恢复，候选几何未接受，无子代理/提交/推送/reset/归档/源码证据清理。

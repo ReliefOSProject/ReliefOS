@@ -41,4 +41,4 @@ doom.elf:    c90744abbd3b97bc4a3883c646594ddc5200427c4326b075511135231b6a3459
 launcher:    53a5f2ae0e18131cbdb79f4732c803afa51a798d4dc043b087b196fbd6294f96
 ```
 
-用户已确认 wavplay 实际有声，只关闭该应用的听感复测项。Doom 实际听感仍待用户复测，launcher GUI 仅完成镜像内容/入口静态核验。GUI gate **deferred until Xorg**，物理 codec gate **not_run**。本轮 Doom 的两次 60 秒验证不等于原 600 秒长测、标准 arecord/raw-null/raw-file 生命周期、controls 或完整波形 gate。U6 仍暂停、18/19 未闭环、候选几何未接受，原失败证据全部保留。
+用户已确认 wavplay 实际有声，并于 2026-10-05 确认 R6 的 VMware Doom 也实际有声。实际听感 gate 已由用户关闭；右声道软件录音为零、完整波形仍未闭环。launcher GUI 仅完成镜像内容/入口静态核验。GUI gate **deferred until Xorg**，物理 codec gate **not_run**。本轮 Doom 的两次 60 秒验证不等于原 600 秒长测、标准 arecord/raw-null/raw-file 生命周期、controls 或完整波形 gate。U6 仍暂停、18/19 未闭环、候选几何未接受，原失败证据全部保留。
