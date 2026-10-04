@@ -124,6 +124,12 @@ def test_kernel_descriptor_table(directory: Path) -> None:
         "kernel/reliefnt/kernel/reliefnt/syscall_sysv_msg.c",
         "kernel/reliefnt/kernel/reliefnt/syscall_sysv_sem.c",
         "kernel/reliefnt/kernel/reliefnt/syscall_locks.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/core.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/pcm.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/device.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/alsa_control.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/mixer.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/oss.c",
     ]
     run([
         "clang", "-std=c11", "-g", "-O1", "-ffunction-sections", "-fdata-sections",
@@ -141,16 +147,16 @@ def test_kernel_descriptor_table(directory: Path) -> None:
 # Host stage 3: the raw-syscall probe on the host Linux reference kernel.
 # --------------------------------------------------------------------------- #
 
-def sdk_compiler() -> Path:
-    compiler = ROOT / "out/x86_64/release/sdk/reliefos-musl-sdk/bin/reliefos-musl-cc"
+def sdk_compiler(sdk: Path | None = None) -> Path:
+    compiler = (sdk if sdk is not None else ROOT / "out/x86_64/release/sdk/reliefos-musl-sdk") / "bin/reliefos-musl-cc"
     if not compiler.is_file():
         raise SystemExit("missing SDK; run: make -j8 sdk")
     return compiler
 
 
-def build_probe(binary: Path) -> Path:
+def build_probe(binary: Path, sdk: Path | None = None) -> Path:
     binary.parent.mkdir(parents=True, exist_ok=True)
-    run([sdk_compiler(), "-static", "-O2", "-pthread", "-Wall", "-Wextra",
+    run([sdk_compiler(sdk), "-static", "-O2", "-pthread", "-Wall", "-Wextra",
          "tools/tests/linux_ioctl_cloexec_test.c", "-o", str(binary)])
     return binary
 
@@ -380,7 +386,7 @@ def boot_guest(iso: Path, serial: Path, timeout: float, terminal: bool = False) 
 def test_guest_iso(args: argparse.Namespace) -> None:
     work = ROOT / "build/ioctl-cloexec"
     work.mkdir(parents=True, exist_ok=True)
-    probe = build_probe(work / "linux-ioctl-cloexec.elf")
+    probe = build_probe(work / "linux-ioctl-cloexec.elf", args.sdk)
     root = args.root if args.root.is_absolute() else ROOT / args.root
     image = work / "root.ext2"
     stage_root(root, probe, image)
@@ -434,9 +440,11 @@ def preserved_guest_evidence(path: Path) -> str:
 
 
 def write_evidence(host_output: str, host: dict, guest_text: str | None,
-                   iso: Path | None, serial: Path | None) -> Path:
+                   iso: Path | None, serial: Path | None, *,
+                   output: Path | None = None, kernel: Path | None = None) -> Path:
     """Record the four evidence levels separately: source, host, guest, pending."""
-    path = ROOT / "build/ioctl-cloexec/evidence.txt"
+    path = output if output is not None else ROOT / "build/ioctl-cloexec/evidence.txt"
+    kernel_path = kernel if kernel is not None else ROOT / "out/x86_64/release/generated/system/kernel.sys"
     path.parent.mkdir(parents=True, exist_ok=True)
     commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
                             stdout=subprocess.PIPE, text=True, check=True).stdout.strip()
@@ -444,7 +452,7 @@ def write_evidence(host_output: str, host: dict, guest_text: str | None,
         "ioctl(FIOCLEX/FIONCLEX) close-on-exec regression evidence",
         f"format: {FORMAT}",
         f"commit: {commit}",
-        f"kernel.sys sha256: {digest(ROOT / 'out/x86_64/release/generated/system/kernel.sys')}",
+        f"kernel.sys sha256: {digest(kernel_path)}",
         f"probe sha256: {digest(ROOT / 'build/ioctl-cloexec/linux-ioctl-cloexec.elf')}",
         "",
         f"[host] host Linux raw-syscall reference: checks={host['checks']} "
@@ -454,7 +462,7 @@ def write_evidence(host_output: str, host: dict, guest_text: str | None,
         "--- host reference probe output ---",
         host_output.strip(),
     ]
-    kernel_hash = digest(ROOT / "out/x86_64/release/generated/system/kernel.sys")
+    kernel_hash = digest(kernel_path)
     previous_guest = preserved_guest_evidence(path)
     if guest_text is not None and iso is not None and serial is not None:
         guest = parse_probe(guest_text)
@@ -490,12 +498,16 @@ def write_evidence(host_output: str, host: dict, guest_text: str | None,
         "[pending] i386/x32 compat ioctl and the remaining per-device ioctl "
         "requests are out of scope here.",
     ]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    with path.open("x" if output is not None else "w", encoding="utf-8") as evidence:
+        evidence.write("\n".join(lines) + "\n")
     return path
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--sdk", type=Path, help="SDK prefix produced by the selected O= build")
+    parser.add_argument("--kernel", type=Path, help="kernel.sys used for evidence hashing")
+    parser.add_argument("--evidence", type=Path, help="create a new evidence file without overwriting it")
     parser.add_argument("--guest", action="store_true",
                         help="also build the diagnostic ISO and boot it under QEMU/KVM")
     parser.add_argument("--terminal", action="store_true",
@@ -513,7 +525,7 @@ def main() -> int:
     test_kernel_dispatch_contract()
     with tempfile.TemporaryDirectory(prefix="reliefos-ioctl-cloexec-") as directory:
         test_kernel_descriptor_table(Path(directory))
-        probe = build_probe(ROOT / "build/ioctl-cloexec/linux-ioctl-cloexec.elf")
+        probe = build_probe(ROOT / "build/ioctl-cloexec/linux-ioctl-cloexec.elf", args.sdk)
         host_output = subprocess.run([str(probe)], cwd=ROOT, stdout=subprocess.PIPE,
                                      stderr=subprocess.STDOUT, text=True,
                                      timeout=120).stdout
@@ -526,7 +538,8 @@ def main() -> int:
     serial = None
     if args.guest:
         guest_text, iso, serial = test_guest_iso(args)
-    evidence = write_evidence(host_output, host, guest_text, iso, serial)
+    evidence = write_evidence(host_output, host, guest_text, iso, serial,
+                              output=args.evidence, kernel=args.kernel)
     print(f"  evidence: {evidence.relative_to(ROOT)}")
     print("PASS ioctl close-on-exec: host Linux reference and kernel unit test; "
           + ("guest ISO verified" if args.guest else "guest ISO not requested"))

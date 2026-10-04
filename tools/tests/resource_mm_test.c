@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#include "sysv_shm_fixture_stubs.h"
 
 uint32_t sched_task_vma_capacity(const struct task *task) { (void)task; return SCHED_TASK_VMA_MAX; }
 struct task_vma *sched_task_vma_at(struct task *task, uint32_t index) { return &task->vmas[index]; }

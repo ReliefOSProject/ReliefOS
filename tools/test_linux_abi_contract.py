@@ -2,6 +2,7 @@
 """Host-side contract checks for the native x86-64 Linux syscall ABI."""
 
 from pathlib import Path
+import json
 import re
 
 
@@ -54,10 +55,43 @@ def test_contract_fixes_are_present() -> None:
     assert "return -RELIEFOS_EBADF" in syscall
 
 
+def test_audio_export_closure() -> None:
+    # Host /usr/include can conceal a missing dependency. Both root and kernel
+    # export lists must publish the complete public sound include closure.
+    needed = {"include/uapi/sound/asound.h", "include/uapi/sound/tlv.h",
+              "include/uapi/linux/soundcard.h", "include/uapi/linux/patchkey.h",
+              "include/uapi/linux/time.h", "include/uapi/linux/types.h",
+              "include/uapi/linux/ioctl.h"}
+    for path in ("configs/header-export.list", "kernel/reliefnt/configs/header-export.list"):
+        exported = {line.strip() for line in read(path).splitlines() if not line.startswith("#")}
+        assert needed <= exported, f"{path}: missing sound closure {needed - exported}"
+
+
+def test_audio_support_manifest() -> None:
+    manifest = json.loads(read("docs/audio-abi-support.json"))
+    assert manifest["uapi"] == "Linux v6.14 native x86-64"
+    expected = set(re.findall(r"^#define\s+(SNDRV_(?:PCM|CTL)_IOCTL_\w+)",
+                              read("kernel/reliefnt/include/uapi/sound/asound.h"), re.M))
+    expected |= set(re.findall(r"^#define\s+((?:SNDCTL_DSP|SOUND_PCM_(?:READ|WRITE))_\w+)",
+                              read("kernel/reliefnt/include/uapi/linux/soundcard.h"), re.M))
+    assert expected == set(manifest["ioctls"]), f"manifest ioctl set differs: {expected ^ set(manifest['ioctls'])}"
+    for name, entry in manifest["ioctls"].items():
+        assert isinstance(entry["supported"], bool), name
+        for field in ("access", "state", "errno", "mmap", "evidence"):
+            assert entry[field], (name, field)
+    for path in re.findall(r"tools/(?:test_\w+\.py|tests/\w+\.c)", json.dumps(manifest)):
+        assert (ROOT / path).is_file(), f"manifest evidence file missing: {path}"
+    for category in ("guest_runtime", "upstream_alsa", "physical_hardware"):
+        assert manifest["validation"][category] is False, category
+    assert manifest["ioctls"]["SNDRV_PCM_IOCTL_WRITEN_FRAMES"]["supported"] is False
+    assert manifest["ioctls"]["SNDRV_CTL_IOCTL_RAWMIDI_INFO"]["supported"] is False
+
+
 if __name__ == "__main__":
     tests = [test_linux_numbers_and_flags,
              test_native_syscall_entry_and_stack_protocol,
-             test_contract_fixes_are_present]
+             test_contract_fixes_are_present, test_audio_export_closure,
+             test_audio_support_manifest]
     for test in tests:
         test()
         print(f"PASS {test.__name__}")

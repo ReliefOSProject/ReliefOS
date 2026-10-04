@@ -132,5 +132,17 @@ int main(void)
         (uintptr_t)&value, 0, 0) == 0);
     assert(process_resource_limit(LINUX_SYS_PRLIMIT64, -1, LINUX_RLIMIT_STACK, 0, 1) == -LINUX_ESRCH);
     assert(process_resource_limit(LINUX_SYS_GETRLIMIT, -1, 1, 0, 0) == -LINUX_EINVAL);
-    puts("PASS native rlimit helpers: shared state, hard limits, widths, ID checks, alias, stack and output-fault commit");
+    caller.cap_effective = 0;
+    caller.limits.memlock = (struct linux_rlimit64){65536, 65536};
+    value = (struct linux_rlimit64){4096, 65536};
+    assert(process_resource_limit(LINUX_SYS_PRLIMIT64, 7, LINUX_RLIMIT_MEMLOCK,
+        (uintptr_t)&value, (uintptr_t)&old) == 0);
+    assert(old.rlim_cur == 65536 && target.shared_limits->memlock.rlim_cur == 4096);
+    value.rlim_max = 65537;
+    assert(process_resource_limit(LINUX_SYS_SETRLIMIT, LINUX_RLIMIT_MEMLOCK,
+        (uintptr_t)&value, 0, 0) == -LINUX_EPERM);
+    value = (struct linux_rlimit64){0, 65536};
+    assert(process_resource_limit(LINUX_SYS_SETRLIMIT, LINUX_RLIMIT_MEMLOCK,
+        (uintptr_t)&value, 0, 0) == 0 && !target.shared_limits->memlock.rlim_cur);
+    puts("PASS native rlimit helpers: shared state, hard limits, widths, ID checks, alias, stack/memlock and output-fault commit");
 }
