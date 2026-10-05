@@ -21,11 +21,11 @@ EVENTS = [
 def source_check():
     errors = []
     required = {
-        "docs/XORG.md": ["CONFIG_DESKTOP_BACKEND_XORG", "make fetch", "PCManFM", "QEMU"],
+        "docs/XORG.md": ["CONFIG_DESKTOP_BACKEND_XORG", "make fetch", "Dillo", "QEMU"],
         "docs/APK_PREPARATION.md": ["feature=xorg", "xdm", "v3.24"],
         "system/xorg/xdm-Xservers": ["/usr/lib/reliefos/xorg-tty-wrapper", "vt1", "-keeptty"],
         "system/xorg/xdm-session": ["/usr/bin/twm", "/usr/bin/xterm"],
-        "system/xorg/twmrc": ["PCManFM", "pcmanfm --desktop-off"],
+        "system/xorg/twmrc": ["xeyes", "Dillo", "NEdit"],
     }
     for relative, needles in required.items():
         path = ROOT / relative
@@ -39,14 +39,14 @@ def source_check():
     lock_path = ROOT / "configs/dependencies.lock.json"
     try:
         lock = json.loads(lock_path.read_text())
-        pcmanfm = next(item for item in lock["dependencies"] if item["id"] == "alpine-pcmanfm")
-    except (OSError, KeyError, StopIteration, json.JSONDecodeError):
-        errors.append("configs/dependencies.lock.json: missing alpine-pcmanfm package lock")
+        ids = {item["id"] for item in lock["dependencies"]}
+    except (OSError, KeyError, json.JSONDecodeError):
+        errors.append("configs/dependencies.lock.json: unreadable package lock")
     else:
-        if pcmanfm.get("feature") != "xorg":
-            errors.append("alpine-pcmanfm must be restricted to feature=xorg")
-        if not pcmanfm.get("url", "").startswith("https://dl-cdn.alpinelinux.org/alpine/v3.24/"):
-            errors.append("alpine-pcmanfm must come from the official Alpine v3.24 repository")
+        if "alpine-pcmanfm" in ids:
+            errors.append("alpine-pcmanfm must stay out of the fetch lock")
+        if "coreutils" not in ids:
+            errors.append("configs/dependencies.lock.json: missing coreutils package lock for dd")
     session_path = ROOT / "system/xorg/xdm-session"
     if session_path.is_file() and "/var/log/" in session_path.read_text():
         errors.append("xdm-session must not write root-only logs")

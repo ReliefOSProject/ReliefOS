@@ -15,12 +15,13 @@ starts `xterm`, and keeps `twm` in the foreground. Exiting TWM returns control
 to XDM; exiting XDM lets tty1's console session fall back to text login. tty2
 through tty6 remain text consoles.
 
-`make fetch` downloads the official Alpine community `dillo` 3.3.0-r2 browser
-and PCManFM 1.3.2-r2 file manager, with their locked runtime dependencies from
+`make fetch` downloads the official Alpine community `dillo` 3.3.0-r2 browser,
+with its locked runtime dependencies from
 the official Alpine v3.24 main and community repositories. Dillo uses FLTK's
-X11 frontend and links directly to `libX11.so.6`; PCManFM uses GTK 3's X11
-display backend in this session. The framebuffer and GTK NetSurf packages were
-removed after failing to run in the VMware SVGA QEMU session.
+X11 frontend and links directly to `libX11.so.6`. The framebuffer and GTK
+NetSurf packages were
+removed after failing to run in the VMware SVGA QEMU session; PCManFM was
+dropped from the fetch list after it kept exiting silently without a window.
 
 ## TWM theme, menus and keys
 
@@ -41,12 +42,7 @@ between the two default buttons.
 The root menu, titled `ReliefOS`, opens from any root-button press or
 Super+Space and offers an `Applications` submenu, window operations, `About`
 and `Exit session`. The `Applications` submenu contains new-xterm, `xeyes`,
-PCManFM, Dillo and NEdit. The PCManFM command targets the authenticated user's
-home folder without taking over TWM's desktop background. In the current QEMU
-XDM smoke test, `pcmanfm --help` exits successfully, but launching
-`pcmanfm --desktop-off /root` ends in a user-mode write fault at address `0x8`
-(SIGSEGV, exit status 139), so it is packaged but not yet runtime-validated
-successfully. TWM menus
+Dillo and NEdit. TWM menus
 are hold-to-open: keep the button or key pressed, drag onto an entry and
 release on it to run it. The `NEdit` entry opens the Motif text editor,
 installed with its dependencies from the official Alpine APK repository by
