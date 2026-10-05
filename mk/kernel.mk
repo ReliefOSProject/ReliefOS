@@ -60,7 +60,7 @@ RELIEFOS_KERNEL_SYS := $(O_GENERATED)/system/kernel.sys
 RELIEFOS_KERNEL_DEBUG := $(O_GENERATED)/system/kernel.debug
 RELIEFNT_LOADER_ELF := $(O_GENERATED)/boot/loader.elf
 RELIEFNT_KERNELDEBUG_SYS := $(O_GENERATED)/system/kerneldebug.sys
-RELIEFNT_DRIVER_NAMES := mouse serial e1000 ac97 es1371
+RELIEFNT_DRIVER_NAMES := mouse serial e1000 ac97 es1371 hda
 RELIEFNT_DRIVER_OUTPUTS := $(addprefix $(O_GENERATED)/drivers/,$(addsuffix .drv,$(RELIEFNT_DRIVER_NAMES)))
 
 # "legacy path below generated/:installed file name" per product; the sub-make's
@@ -69,7 +69,7 @@ RELIEFNT_PUBLISH_PAIRS := system/kernel.sys:kernel.sys system/kernel.debug:kerne
 	system/kerneldebug.sys:kerneldebug.sys boot/loader.elf:loader.elf \
 	drivers/mouse.drv:mouse.drv drivers/serial.drv:serial.drv \
 	drivers/e1000.drv:e1000.drv drivers/ac97.drv:ac97.drv \
-	drivers/es1371.drv:es1371.drv
+	drivers/es1371.drv:es1371.drv drivers/hda.drv:hda.drv
 
 RELIEFNT_PUBLISHED := $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_DEBUG) \
 	$(RELIEFNT_KERNELDEBUG_SYS) $(RELIEFNT_LOADER_ELF) $(RELIEFNT_DRIVER_OUTPUTS)

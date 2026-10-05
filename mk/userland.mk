@@ -20,7 +20,9 @@ USERLAND_DIR := $(O)/userland
 USERLAND_FLAGS := $(RUNTIME_FLAGS) -fPIE -nostdinc -isystem $(if $(RELIEFOS_PASSIVE),deferred,$(shell $(TARGET_CC) -print-resource-dir 2>/dev/null))/include -D_POSIX_C_SOURCE=200809L
 USERLAND_CFLAGS ?=
 USERLAND_LDFLAGS ?=
-USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric
+USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric -I$(AUDIO_OPL_ROOT)/usr/include
+USERLAND_LIBS_doom = $(AUDIO_OPL_ROOT)/usr/lib/libopl3.so.1 $(RUNTIME_BUILTINS)
+USERLAND_DEPS_doom = $(upstream_nuked-opl3_products)
 USERLAND_EXTRA_mp3play := -I$(RELIEFOS_SRC)/third_party/minimp3
 USERLAND_EXTRA_glxgears = -I$(RELIEFOS_SRC)/third_party/portablegl -I$(RELIEFOS_SRC)/userland/apps/glxgears -I$(dir $(GLXGEARS_SOURCE))
 PORTABLEGL_SO ?= $(O)/userland/libportablegl.so.1
@@ -38,23 +40,23 @@ USERLAND_LINK_FLAGS := $(RELIEFOS_LINK_POLICY_FLAGS) --gc-sections -z max-page-s
 define RELIEFOS_APP
 USERLAND_SOURCES_$(1) := $$(call userland_sources,$(2))
 USERLAND_OBJECTS_$(1) := $$(addprefix $(O_OBJ)/app-$(1)/,$$(addsuffix .o,$$(USERLAND_SOURCES_$(1))))
-RELIEFOS_SIG_app-$(1)-cc := cc=$(TARGET_CC)|identity=$$(shell $(TARGET_CC) --version 2>/dev/null | head -n1)|flags=$(USERLAND_FLAGS) $(USERLAND_CFLAGS) $$(USERLAND_EXTRA_$(2))|config=$(4)
-RELIEFOS_SIG_app-$(1)-ld := ld=$(TARGET_LD)|identity=$$(shell $(TARGET_LD) --version 2>/dev/null | head -n1)|flags=$(USERLAND_LINK_FLAGS) $(USERLAND_LDFLAGS)|sources=$$(USERLAND_SOURCES_$(1))|libs=$(5) $$(USERLAND_LIBS_$(2))
+RELIEFOS_SIG_app-$(1)-cc := cc=$(TARGET_CC)|identity=$$(shell $(TARGET_CC) --version 2>/dev/null | head -n1)|flags=$(USERLAND_FLAGS) $(USERLAND_CFLAGS) $(if $(filter installer-%,$(1)),-DRELIEFOS_INSTALLER,) $$(USERLAND_EXTRA_$(1)) $(if $(filter installer-%,$(1)),,$(USERLAND_EXTRA_$(2)))|config=$(4)
+RELIEFOS_SIG_app-$(1)-ld := ld=$(TARGET_LD)|identity=$$(shell $(TARGET_LD) --version 2>/dev/null | head -n1)|flags=$(USERLAND_LINK_FLAGS) $(USERLAND_LDFLAGS)|sources=$$(USERLAND_SOURCES_$(1))|libs=$(5) $$(USERLAND_LIBS_$(1)) $(if $(filter installer-%,$(1)),,$(USERLAND_LIBS_$(2)))
 $$(if $$(RELIEFOS_PASSIVE),,$$(eval $$(call RELIEFOS_SIGNATURE_RULE,app-$(1)-cc)))
 $$(if $$(RELIEFOS_PASSIVE),,$$(eval $$(call RELIEFOS_SIGNATURE_RULE,app-$(1)-ld)))
 $(O_OBJ)/app-$(1)/%.c.o: $(RELIEFOS_SRC)/%.c $(4) $(MUSL_STAMP) $(PNG_CONFIG) $(HEADER_EXPORT_MANIFEST) $$(USERLAND_DEPS_$(2)) $(O_META)/app-$(1)-cc.sig
 	$$(Q)mkdir -p $$(dir $$@)
 	$$(call RELIEFOS_LOG,CC,$$<)
-	$$(Q)$$(TARGET_CC) $$(USERLAND_FLAGS) $$(USERLAND_CFLAGS) $$(USERLAND_EXTRA_$(2)) -include $(4) -MMD -MP -MF $$@.d -MT $$@ -c $$< -o $$@.tmp
+	$$(Q)$$(TARGET_CC) $$(USERLAND_FLAGS) $$(USERLAND_CFLAGS) $(if $(filter installer-%,$(1)),-DRELIEFOS_INSTALLER,) $$(USERLAND_EXTRA_$(1)) $(if $(filter installer-%,$(1)),,$(USERLAND_EXTRA_$(2))) -include $(4) -MMD -MP -MF $$@.d -MT $$@ -c $$< -o $$@.tmp
 	$$(Q)mv $$@.tmp $$@
 $(O_OBJ)/app-$(1)/%.S.o: $(RELIEFOS_SRC)/%.S $(4) $(HEADER_EXPORT_MANIFEST) $(O_META)/app-$(1)-cc.sig
 	$$(Q)mkdir -p $$(dir $$@)
 	$$(Q)$$(TARGET_CC) --target=$$(TRIPLE_USER) -fPIC -I$$(HEADER_EXPORT_INCLUDE) -MMD -MP -MF $$@.d -MT $$@ -c $$< -o $$@.tmp
 	$$(Q)mv $$@.tmp $$@
-$(3): $$(USERLAND_OBJECTS_$(1)) $(5) $$(USERLAND_LIBS_$(2)) $(USERLAND_CRT) $(MUSL_SYSROOT)/lib/libc.so $(MUSL_SYSROOT)/lib/libmimalloc.so.3 $(O_META)/app-$(1)-ld.sig
+$(3): $$(USERLAND_OBJECTS_$(1)) $(5) $$(USERLAND_LIBS_$(1)) $(if $(filter installer-%,$(1)),,$(USERLAND_LIBS_$(2))) $(USERLAND_CRT) $(MUSL_SYSROOT)/lib/libc.so $(MUSL_SYSROOT)/lib/libmimalloc.so.3 $(O_META)/app-$(1)-ld.sig
 	$$(Q)mkdir -p $$(dir $$@)
 	$$(call RELIEFOS_LOG,LD,$$@)
-	$$(Q)$$(TARGET_LD) $$(USERLAND_LINK_FLAGS) $$(USERLAND_LDFLAGS) -o $$@.tmp $(MUSL_SYSROOT)/lib/Scrt1.o $(MUSL_SYSROOT)/lib/crti.o $$(USERLAND_OBJECTS_$(1)) -L$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 --start-group $(5) $$(USERLAND_LIBS_$(2)) -lc --end-group $(MUSL_SYSROOT)/lib/crtn.o
+	$$(Q)$$(TARGET_LD) $$(USERLAND_LINK_FLAGS) $$(USERLAND_LDFLAGS) -o $$@.tmp $(MUSL_SYSROOT)/lib/Scrt1.o $(MUSL_SYSROOT)/lib/crti.o $$(USERLAND_OBJECTS_$(1)) -L$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 --start-group $(5) $$(USERLAND_LIBS_$(1)) $(if $(filter installer-%,$(1)),,$(USERLAND_LIBS_$(2))) -lc --end-group $(MUSL_SYSROOT)/lib/crtn.o
 	$$(Q)mv $$@.tmp $$@
 .PHONY: app-$(1)
 app-$(1): $(3)

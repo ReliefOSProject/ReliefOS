@@ -68,6 +68,9 @@ include/uapi/linux/signalfd.h
 include/uapi/linux/signal.h
 include/uapi/linux/socket.h
 include/uapi/linux/soundcard.h
+include/uapi/linux/patchkey.h
+include/uapi/sound/asound.h
+include/uapi/sound/tlv.h
 include/uapi/linux/statfs.h
 include/uapi/linux/stat.h
 include/uapi/linux/syscall.h
@@ -82,3 +85,16 @@ include/uapi/linux/types.h
 include/uapi/linux/uio.h
 include/uapi/linux/utsname.h
 include/uapi/linux/vt.h
+include/uapi/linux/shm.h
+include/uapi/linux/posix_types.h
+include/uapi/linux/stddef.h
+include/uapi/asm/shmbuf.h
+include/uapi/asm/ipcbuf.h
+include/uapi/asm/posix_types.h
+include/uapi/asm/posix_types_64.h
+include/uapi/asm/bitsperlong.h
+include/uapi/asm-generic/shmbuf.h
+include/uapi/asm-generic/ipcbuf.h
+include/uapi/asm-generic/posix_types.h
+include/uapi/asm-generic/bitsperlong.h
+include/uapi/asm-generic/hugetlb_encode.h

@@ -1,0 +1,63 @@
+[
+  {
+    "path": "linux/shm.h",
+    "sha256": "b3641da9c14fa0f3d075d46486f537790e8cf7dbbc84a1337211e8d865db2ed8",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/include/uapi/linux/shm.h"
+  },
+  {
+    "path": "linux/ipc.h",
+    "sha256": "1ec1a9091e5fb18d759d469552b21413adaf353aec4cfc3f5982f67e3c63d392",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/include/uapi/linux/ipc.h"
+  },
+  {
+    "path": "asm/shmbuf.h",
+    "sha256": "9ec8618f0af773256c4d056ecdefb68ae44bdd18241a331f2905503a8f3394c8",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/arch/x86/include/uapi/asm/shmbuf.h"
+  },
+  {
+    "path": "asm-generic/shmbuf.h",
+    "sha256": "3f016cacf2912b6590be96104b0f3f85672e0ada4563a7aaa7dde7f27fe78238",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/include/uapi/asm-generic/shmbuf.h"
+  },
+  {
+    "path": "asm-generic/ipcbuf.h",
+    "sha256": "e827d13174fcc3957db6746c9994fadd1f308461310d9de9e19d52e7390595c9",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/include/uapi/asm-generic/ipcbuf.h"
+  },
+  {
+    "path": "asm/posix_types.h",
+    "sha256": "c7273fd75b14e5e029619af15bf176f5c676bf3ac0cf71ec7de9e1b3586acd19",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/arch/x86/include/uapi/asm/posix_types.h"
+  },
+  {
+    "path": "asm/posix_types_64.h",
+    "sha256": "5cdabc01dac0a3e9731ac16353210a615ca44e85b6ec9eafd2e79206e0b26c76",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/arch/x86/include/uapi/asm/posix_types_64.h"
+  },
+  {
+    "path": "asm-generic/posix_types.h",
+    "sha256": "059c34f03abc8247a9ad9fbbfc86b12f56b9b620a81fa3b84c0c7dd9214068ab",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/include/uapi/asm-generic/posix_types.h"
+  },
+  {
+    "path": "asm/bitsperlong.h",
+    "sha256": "8ef5efeb3f25ae47ce03ba892f5caf77631b1257715fc12de72c21e61db17e43",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/arch/x86/include/uapi/asm/bitsperlong.h"
+  },
+  {
+    "path": "asm-generic/bitsperlong.h",
+    "sha256": "fa25db88dc972820b72f8baf9cea6f39ca7f5bd0cf39182089409f6676fa90b6",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/include/uapi/asm-generic/bitsperlong.h"
+  },
+  {
+    "path": "asm-generic/hugetlb_encode.h",
+    "sha256": "5729768670c725f24359cea8da0e5520fbdff157c3303a54b1e00797a96aa943",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/include/uapi/asm-generic/hugetlb_encode.h"
+  },
+  {
+    "path": "asm/ipcbuf.h",
+    "sha256": "7d7b26fc15cfa914dc6e03d976570242ea37377491f3619ab287e6169025df66",
+    "url": "https://raw.githubusercontent.com/torvalds/linux/v6.14/include/uapi/asm-generic/ipcbuf.h",
+    "adaptation": "x86 generated header wrapper"
+  }
+]

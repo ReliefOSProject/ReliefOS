@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-03",
+  "worktree": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan",
+  "execution": "inline-only",
+  "git_actions": {
+    "commit": false,
+    "push": false,
+    "archive": false
+  },
+  "build": {
+    "command": "TMPDIR=out/audio-hda-u6/tmp-build make O=out/audio-hda-u6 -j8 app-doom image-vmdk",
+    "exit": 0,
+    "image": "out/audio-hda-u6/images/reliefos.vmdk",
+    "image_sha256": "58b536c9edcc2ef9adc8c8ddb9d451ea531af7cc5a38e6e4673c73cc19ebb8af",
+    "doom_elf": "out/audio-hda-u6/userland/doom.elf",
+    "doom_elf_sha256": "8d837f0bc9bede370385c92c793078507ee0c911ba0f7ef0196ccbf11cb6a70d"
+  },
+  "host_tests": {
+    "command": "TMPDIR=out/audio-hda-u6/tmp-build python3 tools/test_audio_userland.py controls settings doom-output doom-mixer doom-music",
+    "exit": 0,
+    "scope": ["controls", "settings", "doom-output", "doom-mixer", "doom-music"]
+  },
+  "qemu": {
+    "command": "TMPDIR=out/audio-hda-u6/tmp-build python3 tools/test_hda_qemu.py --image out/audio-hda-u6/images/reliefos.vmdk --output out/audio-hda-u6/qa/std17-final --probe out/audio-hda-u6/qa/audio-guest-timer-accepted --standard-probe docs/superpowers/audio-validation/u6-standard-probe-20261003.sh --audio-backend alsa-file --timeout 180",
+    "exit": 0,
+    "result": "out/audio-hda-u6/qa/std17-final/result.json",
+    "result_sha256": "d4340c75c6038fdab23f0820294d0bdd41a37b3646bd9bd975b1bf2e3bd3007c",
+    "serial": "out/audio-hda-u6/qa/std17-final/serial.log",
+    "serial_sha256": "24360f18c8513823ce4592e33eebfe6b611cda1313dd943a87a15ab5bb6c91a5",
+    "guest_probe_pass": true,
+    "waveform_verified": true,
+    "capture_data_verified": true,
+    "shm_guest_verified": true,
+    "doom_pcm_failure_logged": false,
+    "standard_failures": 0
+  },
+  "audio_metrics": {
+    "playback_rate": 48000,
+    "playback_channels": 2,
+    "playback_tones_hz": [1000, 2000],
+    "playback_active_seconds": 1.9999791666666666,
+    "playback_max_period_error": 1,
+    "capture_frames": 4096,
+    "capture_bytes": 16384,
+    "capture_matched_frames": 4095,
+    "capture_input_tones_hz": [400, 800],
+    "capture_sample_tolerance": 2,
+    "native_shm_checks": 83
+  },
+  "remaining_explicit_boundaries": [
+    "visible GUI deferred to the later Xorg work",
+    "physical codec gate not runnable in the current environment",
+    "600-second pressure run not executed"
+  ]
+}

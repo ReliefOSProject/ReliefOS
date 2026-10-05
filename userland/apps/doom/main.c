@@ -2,10 +2,12 @@
 #include <reliefos/syscall.h>
 #include <reliefos/ui.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "doomgeneric.h"
 #include "doomkeys.h"
 #include "i_system.h"
+#include "i_sound.h"
 #include "m_argv.h"
 #include <reliefos/layout.h>
 
@@ -22,6 +24,7 @@ static struct doom_key_event key_queue[DOOM_KEY_QUEUE_CAP];
 static uint32_t key_read;
 static uint32_t key_write;
 static uint32_t window_id;
+static uint8_t headless_mode;
 static uint32_t frame[DOOM_WINDOW_WIDTH * DOOM_WINDOW_HEIGHT];
 static struct reliefos_ui_surface ui;
 
@@ -136,6 +139,13 @@ static void pump_events(void)
 void DG_Init(void)
 {
     uint32_t flags = RELIEFOS_GUI_WINDOW_FULLSCREEN;
+    headless_mode = M_CheckParm("-headless") > 0;
+    if (headless_mode) {
+        /* Keep the normal Doom/WAD/audio initialization while making the
+         * runner independent of the framebuffer/Xorg presentation path. */
+        I_AtExit(restore_mouse, true);
+        return;
+    }
     if (M_CheckParm("-windowed") > 0) {
         flags = RELIEFOS_GUI_WINDOW_NO_RESIZE;
     }
@@ -185,8 +195,12 @@ void DG_DrawFrame(void)
 
 void DG_SleepMs(uint32_t ms)
 {
+    /* Game pacing and screen wipes can spend many tics in this callback.
+     * Keep the hardware-fed PCM alive while the outer game tick is waiting. */
+    I_UpdateSound();
     pump_events();
     sleep_ms(ms);
+    I_UpdateSound();
 }
 
 uint32_t DG_GetTicksMs(void)
@@ -215,14 +229,33 @@ int main(int argc, char **argv, char **envp)
     static char *default_argv[] = {
         "doom.elf", "-iwad", RELIEFOS_LAYOUT_RELIEFOS_APPS "/doom/freedoom1.wad", 0
     };
+    uint32_t headless_deadline;
     (void)envp;
     if (argc <= 1 || !argv || !argv[0]) {
         argc = (int)(sizeof(default_argv) / sizeof(default_argv[0])) - 1;
         argv = default_argv;
     }
     doomgeneric_Create(argc, argv);
+    if (headless_mode) {
+        uint32_t seconds = 45U;
+        int parameter = M_CheckParmWithArgs("-headless-seconds", 1);
+        if (parameter > 0) {
+            int requested = atoi(myargv[parameter + 1]);
+            if (requested > 0 && requested < 3600) {
+                seconds = (uint32_t)requested;
+            }
+        }
+        headless_deadline = DG_GetTicksMs() + seconds * 1000U;
+    } else {
+        headless_deadline = 0U;
+    }
     for (;;) {
         doomgeneric_Tick();
+        if (headless_deadline &&
+            (int32_t)(DG_GetTicksMs() - headless_deadline) >= 0) {
+            printf("[doom] headless demo timeout\n");
+            I_Quit();
+        }
     }
     reliefos_gui_set_mouse_visible(window_id, 1);
     reliefos_gui_destroy_app_window(window_id);

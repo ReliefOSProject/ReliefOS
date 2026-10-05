@@ -13,6 +13,13 @@ with tempfile.TemporaryDirectory(prefix="reliefos-descriptors-") as directory:
         "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include", "-Wl,--gc-sections",
         "tools/tests/descriptor_table_test.c", "kernel/reliefnt/kernel/reliefnt/sched/sched.c",
         "kernel/reliefnt/kernel/reliefnt/wait.c", "kernel/reliefnt/kernel/reliefnt/syscall_sysv_msg.c",
-        "kernel/reliefnt/kernel/reliefnt/syscall_sysv_sem.c", "kernel/reliefnt/kernel/reliefnt/syscall_locks.c", "-o", binary,
+        "kernel/reliefnt/kernel/reliefnt/syscall_sysv_sem.c", "kernel/reliefnt/kernel/reliefnt/syscall_locks.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/core.c", "kernel/reliefnt/kernel/reliefnt/audio/pcm.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/device.c", "kernel/reliefnt/kernel/reliefnt/audio/alsa_control.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/mixer.c", "kernel/reliefnt/kernel/reliefnt/audio/oss.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/alsa_pcm.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/timer.c",
+        "kernel/reliefnt/fs/object.c",
+        "-o", binary,
     ], cwd=ROOT, check=True)
     subprocess.run([binary], cwd=ROOT, check=True, timeout=20)

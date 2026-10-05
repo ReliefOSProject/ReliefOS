@@ -14,13 +14,17 @@
 #include "m_argv.h"
 #include "w_wad.h"
 #include "z_zone.h"
+#include "audio_output.h"
+#include "music.h"
+#include "music_opl.h"
 
 #define RELIEFOS_DOOM_AUDIO_RATE 48000U
 #define RELIEFOS_DOOM_AUDIO_CHANNELS 2U
 #define RELIEFOS_DOOM_AUDIO_BITS 16U
 #define RELIEFOS_DOOM_AUDIO_TICK_HZ 35U
 #define RELIEFOS_DOOM_AUDIO_FRAMES (RELIEFOS_DOOM_AUDIO_RATE / RELIEFOS_DOOM_AUDIO_TICK_HZ)
-#define RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES 5120U /* just over 100 ms at 48 kHz */
+/* One bounded 32 KiB PCM write; reduces catch-up syscall scheduling overhead. */
+#define RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES 8192U
 #define RELIEFOS_DOOM_AUDIO_MIX_CHANNELS 16U
 #define RELIEFOS_DOOM_AUDIO_MAX_SAMPLE_FRAMES (RELIEFOS_DOOM_AUDIO_RATE * 8U)
 #define RELIEFOS_DOOM_AUDIO_MUS_CHANNELS 16U
@@ -37,8 +41,8 @@ struct reliefos_doom_sample {
 
 struct reliefos_doom_channel {
     struct reliefos_doom_sample *sample;
-    uint32_t position;
-    uint32_t step;
+    uint64_t position;
+    uint64_t step;
     uint16_t volume;
     uint16_t separation;
     uint8_t active;
@@ -47,6 +51,7 @@ struct reliefos_doom_channel {
 struct reliefos_doom_music_handle {
     const uint8_t *data;
     uint32_t length;
+    struct doom_music_song *player_song;
 };
 
 struct reliefos_doom_music_voice {
@@ -91,28 +96,35 @@ struct reliefos_doom_music_state {
     struct reliefos_doom_music_voice voices[RELIEFOS_DOOM_AUDIO_MUS_VOICES];
 };
 
-static int reliefos_doom_dsp_fd = -1;
+static struct doom_audio_output *reliefos_doom_output;
 static uint8_t reliefos_doom_audio_available;
+static uint8_t reliefos_doom_audio_open_attempted;
 static uint8_t reliefos_doom_audio_reported;
+static uint8_t reliefos_doom_missing_sfx_reported;
 static uint8_t reliefos_doom_sound_initialized;
 static uint8_t reliefos_doom_music_only;
 static uint8_t reliefos_doom_use_sfx_prefix;
 static uint8_t reliefos_doom_mix_reported;
 static uint8_t reliefos_doom_music_reported;
 static uint8_t reliefos_doom_song_reported;
+static uint8_t reliefos_doom_submit_reported;
 static uint8_t reliefos_doom_midi_note_reported;
 static uint8_t reliefos_doom_midi_activity_reported;
 static int16_t reliefos_doom_mix[RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES * 2U];
 static int32_t reliefos_doom_mix_left[RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES];
 static int32_t reliefos_doom_mix_right[RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES];
-static uint8_t reliefos_doom_pending[RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES * 4U];
-static uint32_t reliefos_doom_pending_bytes;
 static struct reliefos_doom_channel reliefos_doom_channels[RELIEFOS_DOOM_AUDIO_MIX_CHANNELS];
 static struct reliefos_doom_sample *reliefos_doom_sample_cache[RELIEFOS_DOOM_AUDIO_SAMPLE_CACHE];
 static uint32_t reliefos_doom_sample_cache_count;
 static struct reliefos_doom_music_state reliefos_doom_music;
+static struct doom_music_opl reliefos_doom_opl;
+static uint8_t reliefos_doom_opl_ready;
 static uint32_t reliefos_doom_last_audio_ms;
 static uint32_t reliefos_doom_audio_frame_remainder;
+static uint32_t reliefos_doom_music_starts;
+static uint32_t reliefos_doom_sfx_starts;
+static uint32_t reliefos_doom_attack_starts;
+static uint32_t reliefos_doom_max_sfx_voices;
 
 /* Kept for the shared DOOM configuration ABI; ReliefOS uses nearest-neighbour
  * conversion in this backend and never links libsamplerate. */
@@ -131,33 +143,25 @@ static void reliefos_doom_audio_log_once(uint8_t *flag, const char *message)
 {
     if (!*flag) {
         printf("%s\n", message);
+        fflush(stdout);
         *flag = 1U;
     }
 }
 
 static int reliefos_doom_configure_audio(void)
 {
-    int format = AFMT_S16_LE;
-    int channels = RELIEFOS_DOOM_AUDIO_CHANNELS;
-    int rate = RELIEFOS_DOOM_AUDIO_RATE;
-    if (reliefos_doom_dsp_fd < 0) {
-        reliefos_doom_dsp_fd = open("/dev/dsp", O_WRONLY | O_NONBLOCK, 0);
+    uint32_t rate = 0;
+    if (reliefos_doom_output) {
+        return 0;
     }
-    if (reliefos_doom_dsp_fd < 0 ||
-        ioctl(reliefos_doom_dsp_fd, SNDCTL_DSP_SETFMT, &format) < 0 ||
-        format != AFMT_S16_LE ||
-        ioctl(reliefos_doom_dsp_fd, SNDCTL_DSP_CHANNELS, &channels) < 0 ||
-        channels != RELIEFOS_DOOM_AUDIO_CHANNELS ||
-        ioctl(reliefos_doom_dsp_fd, SNDCTL_DSP_SPEED, &rate) < 0 ||
+    reliefos_doom_audio_open_attempted = 1U;
+    if (doom_audio_open(&reliefos_doom_output, "/dev/dsp", &rate) < 0 ||
         rate != RELIEFOS_DOOM_AUDIO_RATE) {
+        doom_audio_close(reliefos_doom_output);
+        reliefos_doom_output = NULL;
         return -1;
     }
     return 0;
-}
-
-static long reliefos_doom_write_audio(const void *data, uint32_t length)
-{
-    return write(reliefos_doom_dsp_fd, data, length);
 }
 
 static int16_t reliefos_doom_clamp16(int32_t value)
@@ -237,7 +241,7 @@ static struct reliefos_doom_sample *reliefos_doom_sample_load(sfxinfo_t *sfx)
     data += 24U;
     for (i = 0; i < output_frames; ++i) {
         uint32_t source = (uint32_t)(((uint64_t)i * source_frames) / output_frames);
-        int32_t value = ((int32_t)data[source] - 128) << 8;
+        int32_t value = ((int32_t)data[source] - 128) * 256;
         sample->pcm[i] = (int16_t)value;
     }
     if (reliefos_doom_sample_cache_count < RELIEFOS_DOOM_AUDIO_SAMPLE_CACHE) {
@@ -264,32 +268,39 @@ static void reliefos_doom_sfx_name(sfxinfo_t *sfx, char *name, size_t capacity)
 static int reliefos_doom_get_sfx_lump(sfxinfo_t *sfx)
 {
     char name[16];
+    int lump;
     reliefos_doom_sfx_name(sfx, name, sizeof(name));
-    return W_GetNumForName(name);
+    lump = W_CheckNumForName(name);
+    if (lump < 0) {
+        reliefos_doom_audio_log_once(&reliefos_doom_missing_sfx_reported,
+                                   "[doom] missing SFX lump skipped");
+    }
+    return lump;
 }
 
 static boolean reliefos_doom_init_sound(boolean use_sfx_prefix)
 {
-    int ret;
     reliefos_doom_use_sfx_prefix = use_sfx_prefix ? 1U : 0U;
     reliefos_doom_sound_initialized = 1U;
     reliefos_doom_music_only = 0U;
-    ret = reliefos_doom_configure_audio();
-    if (ret < 0) {
-        printf("[doom] PCM configure failed ret=%d rate=%u\n", ret,
-               RELIEFOS_DOOM_AUDIO_RATE);
-        reliefos_doom_audio_available = 0;
-        reliefos_doom_audio_log_unavailable();
-        return true;
-    }
-    reliefos_doom_audio_available = 1;
-    printf("[doom] PCM audio enabled: 48000 Hz stereo signed-16\n");
+    reliefos_doom_music_starts = 0U;
+    reliefos_doom_sfx_starts = 0U;
+    reliefos_doom_attack_starts = 0U;
+    reliefos_doom_max_sfx_voices = 0U;
+    /* Open on the first mixed block, after WAD/level setup, so the hardware
+     * stream cannot underrun while Doom is still initializing. */
+    reliefos_doom_audio_available = 0;
+    reliefos_doom_audio_open_attempted = 0;
     return true;
 }
 
+/** @brief Report actual audio scenes and release cached voices/output. */
 static void reliefos_doom_shutdown_sound(void)
 {
     uint32_t i;
+    printf("[doom-audio] scenes music_starts=%u sfx_starts=%u attack_starts=%u max_sfx_voices=%u\n",
+           reliefos_doom_music_starts, reliefos_doom_sfx_starts,
+           reliefos_doom_attack_starts, reliefos_doom_max_sfx_voices);
     for (i = 0; i < RELIEFOS_DOOM_AUDIO_MIX_CHANNELS; ++i) {
         reliefos_doom_channels[i].sample = NULL;
         reliefos_doom_channels[i].active = 0;
@@ -301,13 +312,12 @@ static void reliefos_doom_shutdown_sound(void)
     reliefos_doom_sample_cache_count = 0;
     reliefos_doom_sound_initialized = 0;
     reliefos_doom_audio_available = 0;
-    if (reliefos_doom_dsp_fd >= 0) {
-        close(reliefos_doom_dsp_fd);
-        reliefos_doom_dsp_fd = -1;
-    }
+    reliefos_doom_audio_open_attempted = 0;
+    doom_audio_close(reliefos_doom_output);
+    reliefos_doom_output = NULL;
+    reliefos_doom_opl_ready = 0;
     reliefos_doom_last_audio_ms = 0;
     reliefos_doom_audio_frame_remainder = 0;
-    reliefos_doom_pending_bytes = 0;
 }
 
 static void reliefos_doom_cache_sounds(sfxinfo_t *sounds, int count)
@@ -337,10 +347,20 @@ static int reliefos_doom_start_sound(sfxinfo_t *sfx, int channel, int volume, in
     out = &reliefos_doom_channels[channel];
     out->sample = sample;
     out->position = 0;
-    out->step = 1U << 16;
+    out->step = 1ULL << 32;
     out->volume = (uint16_t)(volume < 0 ? 0 : volume > 127 ? 127 : volume);
     out->separation = (uint16_t)(separation < 0 ? 0 : separation > 254 ? 254 : separation);
     out->active = 1;
+    ++reliefos_doom_sfx_starts;
+    if (!strcmp(sfx->name, "pistol") || !strcmp(sfx->name, "shotgn") ||
+        !strcmp(sfx->name, "dshtgn") || !strcmp(sfx->name, "plasma") ||
+        !strcmp(sfx->name, "bfg") || !strcmp(sfx->name, "rlaunc") ||
+        !strcmp(sfx->name, "sawful")) ++reliefos_doom_attack_starts;
+    uint32_t active = 0;
+    for (uint32_t i = 0; i < RELIEFOS_DOOM_AUDIO_MIX_CHANNELS; ++i)
+        active += reliefos_doom_channels[i].active != 0;
+    if (active > reliefos_doom_max_sfx_voices)
+        reliefos_doom_max_sfx_voices = active;
     return channel;
 }
 
@@ -887,74 +907,14 @@ static void reliefos_doom_mix_music(int32_t *left, int32_t *right, uint32_t fram
     }
 }
 
-static int reliefos_doom_flush_pending(void)
-{
-    while (reliefos_doom_pending_bytes) {
-        long written = reliefos_doom_write_audio(reliefos_doom_pending,
-                                                reliefos_doom_pending_bytes);
-        if (written == 0 || written == -EAGAIN) {
-            return 1;
-        }
-        if (written < 0) {
-            return -1;
-        }
-        if ((uint32_t)written > reliefos_doom_pending_bytes) {
-            return -1;
-        }
-        reliefos_doom_pending_bytes -= (uint32_t)written;
-        if (reliefos_doom_pending_bytes) {
-            memmove(reliefos_doom_pending, reliefos_doom_pending + written,
-                    reliefos_doom_pending_bytes);
-        }
-    }
-    return 0;
-}
-
-static void reliefos_doom_update_sound(void)
+static void reliefos_doom_mix_frames(uint32_t frames)
 {
     int32_t *left = reliefos_doom_mix_left;
     int32_t *right = reliefos_doom_mix_right;
     uint32_t channel;
     uint32_t frame;
-    uint32_t now;
-    uint32_t frames;
-    uint32_t elapsed;
-    uint32_t output_bytes;
-    long written;
+    int submit;
     uint8_t mixed = 0;
-    /* Keep unsent data until the device has room.  Dropping a short write
-     * produces exactly the symptom of a running DMA engine with silence. */
-    if (reliefos_doom_audio_available && reliefos_doom_pending_bytes) {
-        int flush = reliefos_doom_flush_pending();
-        if (flush < 0) {
-            reliefos_doom_audio_available = 0;
-            reliefos_doom_audio_log_unavailable();
-            return;
-        }
-        if (flush > 0) {
-            return;
-        }
-    }
-    now = DG_GetTicksMs();
-    if (reliefos_doom_last_audio_ms == 0U) {
-        frames = RELIEFOS_DOOM_AUDIO_FRAMES * 2U;
-    } else {
-        elapsed = (uint32_t)(now - reliefos_doom_last_audio_ms);
-        if (elapsed > 100U) {
-            elapsed = 100U;
-        }
-        uint64_t frame_time = (uint64_t)elapsed * RELIEFOS_DOOM_AUDIO_RATE +
-                              reliefos_doom_audio_frame_remainder;
-        frames = (uint32_t)(frame_time / 1000ULL);
-        if (frames < 256U) {
-            return;
-        }
-        reliefos_doom_audio_frame_remainder = (uint32_t)(frame_time % 1000ULL);
-    }
-    if (frames > RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES) {
-        frames = RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES;
-    }
-    reliefos_doom_last_audio_ms = now;
     memset(left, 0, sizeof(reliefos_doom_mix_left));
     memset(right, 0, sizeof(reliefos_doom_mix_right));
     reliefos_doom_music_advance(frames);
@@ -962,19 +922,43 @@ static void reliefos_doom_update_sound(void)
         struct reliefos_doom_channel *source = &reliefos_doom_channels[channel];
         if (!source->active || !source->sample) continue;
         for (frame = 0; frame < frames; ++frame) {
-            uint32_t index = source->position >> 16;
-            int32_t value;
+            uint32_t index = (uint32_t)(source->position >> 32);
+            uint32_t fraction = (uint32_t)source->position;
+            int64_t value;
+            int64_t next;
             if (index >= source->sample->frames) {
                 source->active = 0;
                 break;
             }
-            value = source->sample->pcm[index] * (int32_t)source->volume / 127;
-            left[frame] += value * (254 - source->separation) / 254;
-            right[frame] += value * source->separation / 254;
+            next = index + 1U < source->sample->frames ?
+                source->sample->pcm[index + 1U] : source->sample->pcm[index];
+            value = source->sample->pcm[index] +
+                    ((next - source->sample->pcm[index]) * fraction >> 32);
+            value *= source->volume;
+            left[frame] += (int32_t)(value * (254U - source->separation) /
+                                     (127LL * 254LL));
+            right[frame] += (int32_t)(value * source->separation /
+                                      (127LL * 254LL));
             source->position += source->step;
         }
     }
-    reliefos_doom_mix_music(left, right, frames);
+    if (reliefos_doom_music.handle && reliefos_doom_music.handle->player_song) {
+        doom_music_render(reliefos_doom_mix, frames, RELIEFOS_DOOM_AUDIO_RATE);
+        for (frame = 0; frame < frames; ++frame) {
+            left[frame] += reliefos_doom_mix[frame * 2U] / 2;
+            right[frame] += reliefos_doom_mix[frame * 2U + 1U] / 2;
+        }
+    } else {
+        reliefos_doom_mix_music(left, right, frames);
+        if (reliefos_doom_opl_ready) {
+            uint32_t opl_frame;
+            doom_music_opl_generate(&reliefos_doom_opl, reliefos_doom_mix, frames);
+            for (opl_frame = 0; opl_frame < frames; ++opl_frame) {
+                left[opl_frame] += reliefos_doom_mix[opl_frame * 2U] / 2;
+                right[opl_frame] += reliefos_doom_mix[opl_frame * 2U + 1U] / 2;
+            }
+        }
+    }
     for (frame = 0; frame < frames; ++frame) {
         if (left[frame] || right[frame]) {
             mixed = 1U;
@@ -987,26 +971,75 @@ static void reliefos_doom_update_sound(void)
                                    "[doom] first nonzero mixed PCM block");
     }
     if (reliefos_doom_audio_available) {
-        output_bytes = frames * 4U;
-        written = reliefos_doom_write_audio(reliefos_doom_mix, output_bytes);
-        if ((written < 0 && written != -EAGAIN) ||
-            (written > 0 && (uint32_t)written > output_bytes)) {
+        submit = doom_audio_submit(reliefos_doom_output, reliefos_doom_mix, frames);
+        if (submit != 0 && submit != -EAGAIN) {
             reliefos_doom_audio_available = 0;
-            reliefos_doom_audio_log_once(&reliefos_doom_song_reported,
-                                       "[doom] PCM submission failed");
+            if (!reliefos_doom_submit_reported) {
+                printf("[doom] PCM submission failed ret=%d\n", submit);
+                reliefos_doom_submit_reported = 1U;
+            }
             reliefos_doom_audio_log_unavailable();
-        } else if ((uint32_t)(written > 0 ? written : 0) < output_bytes) {
-            uint32_t submitted = written > 0 ? (uint32_t)written : 0;
-            reliefos_doom_pending_bytes = output_bytes - submitted;
-            memcpy(reliefos_doom_pending, (uint8_t *)reliefos_doom_mix + submitted,
-                   reliefos_doom_pending_bytes);
         }
     }
+}
+
+static void reliefos_doom_update_sound(void)
+{
+    if (!reliefos_doom_audio_open_attempted && reliefos_doom_sound_initialized) {
+        if (reliefos_doom_configure_audio() == 0) {
+            reliefos_doom_audio_available = 1U;
+            printf("[doom] PCM audio enabled: 48000 Hz stereo signed-16\n");
+            fflush(stdout);
+        } else {
+            reliefos_doom_audio_log_unavailable();
+        }
+    }
+    if (reliefos_doom_audio_available) {
+        uint32_t frames = 0;
+        int ret = doom_audio_flush(reliefos_doom_output);
+        if (ret == 0 || ret == -EAGAIN)
+            ret = doom_audio_writable_frames(reliefos_doom_output, &frames);
+        if (ret) {
+            reliefos_doom_audio_available = 0;
+            printf("[doom] PCM space query failed ret=%d\n", ret);
+            reliefos_doom_audio_log_unavailable();
+            return;
+        }
+        /* PIT uptime can lose ticks under VM/CPU load.  Refill the hardware's
+         * actual consumed frames instead of accumulating that clock drift.
+         * Snapshot once so this update has bounded work even as DMA advances.
+         * Include partial blocks: a sub-256-frame gap must not strand a
+         * PREPARED ring below its full startup watermark. */
+        while (frames && reliefos_doom_audio_available) {
+            uint32_t block = frames > RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES
+                ? RELIEFOS_DOOM_AUDIO_MAX_MIX_FRAMES : frames;
+            reliefos_doom_mix_frames(block);
+            frames -= block;
+        }
+        return;
+    }
+    /* Preserve the silent backend's music progression without hardware. */
+    uint32_t now = DG_GetTicksMs();
+    uint32_t frames = RELIEFOS_DOOM_AUDIO_FRAMES * 2U;
+    if (reliefos_doom_last_audio_ms) {
+        uint32_t elapsed = (uint32_t)(now - reliefos_doom_last_audio_ms);
+        if (elapsed > 100U) elapsed = 100U;
+        uint64_t frame_time = (uint64_t)elapsed * RELIEFOS_DOOM_AUDIO_RATE +
+                              reliefos_doom_audio_frame_remainder;
+        frames = (uint32_t)(frame_time / 1000ULL);
+        if (frames < 256U) return;
+        reliefos_doom_audio_frame_remainder = (uint32_t)(frame_time % 1000ULL);
+    }
+    reliefos_doom_last_audio_ms = now;
+    reliefos_doom_mix_frames(frames);
 }
 
 static boolean reliefos_doom_music_init(void)
 {
     reliefos_doom_music.volume = 127U;
+    if (doom_music_opl_init(&reliefos_doom_opl, RELIEFOS_DOOM_AUDIO_RATE) == 0) {
+        reliefos_doom_opl_ready = 1U;
+    }
     if (M_CheckParm("-nosound") > 0) {
         reliefos_doom_music_only = 0;
         return true;
@@ -1026,21 +1059,26 @@ static void reliefos_doom_music_shutdown(void)
 {
     reliefos_doom_music.active = 0;
     reliefos_doom_music_stop_voices();
+    doom_music_stop();
+    reliefos_doom_opl_ready = 0;
 }
 
 static void reliefos_doom_music_set_volume(int volume)
 {
     reliefos_doom_music.volume = (uint8_t)(volume < 0 ? 0 : volume > 127 ? 127 : volume);
+    doom_music_set_volume(reliefos_doom_music.volume);
 }
 
 static void reliefos_doom_music_pause(void)
 {
     reliefos_doom_music.paused = 1;
+    doom_music_pause(1);
 }
 
 static void reliefos_doom_music_resume(void)
 {
     reliefos_doom_music.paused = 0;
+    doom_music_pause(0);
 }
 
 static void *reliefos_doom_music_register(void *data, int length)
@@ -1052,6 +1090,26 @@ static void *reliefos_doom_music_register(void *data, int length)
     if (!handle) return NULL;
     handle->data = (const uint8_t *)data;
     handle->length = (uint32_t)length;
+    handle->player_song = doom_music_register(handle->data, handle->length,
+                                              RELIEFOS_DOOM_AUDIO_RATE);
+    if (!handle->player_song) {
+        free(handle);
+        reliefos_doom_audio_log_once(&reliefos_doom_song_reported,
+                                   "[doom] registered song rejected");
+        return NULL;
+    }
+    {
+        int genmidi_lump = W_CheckNumForName("GENMIDI");
+        if (genmidi_lump >= 0) {
+            const uint8_t *bank = (const uint8_t *)W_CacheLumpNum((unsigned int)genmidi_lump,
+                                                                   PU_STATIC);
+            uint32_t bank_length = (uint32_t)W_LumpLength((unsigned int)genmidi_lump);
+            if (bank) {
+                (void)doom_music_set_genmidi(bank, bank_length);
+                W_ReleaseLumpNum((unsigned int)genmidi_lump);
+            }
+        }
+    }
     valid_type = reliefos_doom_music_valid(handle) ?
                  (memcmp(handle->data, "MThd", 4) == 0 ? 2 : 1) : 0;
     if (!valid_type) {
@@ -1073,7 +1131,9 @@ static void reliefos_doom_music_unregister(void *opaque)
     if (reliefos_doom_music.handle == handle) {
         reliefos_doom_music.active = 0;
         reliefos_doom_music.handle = NULL;
+        doom_music_stop();
     }
+    doom_music_unregister(handle->player_song);
     free(handle);
 }
 
@@ -1081,7 +1141,14 @@ static void reliefos_doom_music_play(void *opaque, boolean looping)
 {
     reliefos_doom_music.handle = (struct reliefos_doom_music_handle *)opaque;
     reliefos_doom_music.looping = looping ? 1U : 0U;
-    reliefos_doom_music_reset();
+    if (!reliefos_doom_music.handle || !reliefos_doom_music.handle->player_song ||
+        doom_music_play(reliefos_doom_music.handle->player_song, looping ? 1 : 0) < 0) {
+        reliefos_doom_music_reset();
+    } else {
+        reliefos_doom_music.active = 1U;
+        reliefos_doom_music.paused = 0U;
+        ++reliefos_doom_music_starts;
+    }
     reliefos_doom_audio_log_once(&reliefos_doom_song_reported,
                                "[doom] song playback requested");
 }
@@ -1090,10 +1157,13 @@ static void reliefos_doom_music_stop(void)
 {
     reliefos_doom_music.active = 0;
     reliefos_doom_music_stop_voices();
+    doom_music_stop();
 }
 
 static boolean reliefos_doom_music_playing(void)
 {
+    if (reliefos_doom_music.handle && reliefos_doom_music.handle->player_song)
+        return doom_music_playing() ? true : false;
     return reliefos_doom_music.active && !reliefos_doom_music.paused;
 }
 

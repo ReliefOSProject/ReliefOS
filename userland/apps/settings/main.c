@@ -9,6 +9,7 @@
 #include "../locale_settings.h"
 #include <locale.h>
 #include <reliefos/layout.h>
+#include "sound_page.h"
 #include <reliefos/environment.h>
 #include <reliefos/text_input.h>
 #include <reliefos/launch.h>
@@ -25,7 +26,7 @@
 #define SETTINGS_DROPDOWN_ROW_H 28
 #define SETTINGS_MODE_COUNT 5
 #define SETTINGS_SCALE_COUNT 3
-#define SETTINGS_TAB_COUNT 7
+#define SETTINGS_TAB_COUNT 8
 #define SETTINGS_USER_ROWS 7
 #define SETTINGS_ASSOC_ROWS 6
 #define SETTINGS_SERVICE_ROWS 5
@@ -54,6 +55,7 @@ enum {
     PAGE_SERVICES = 4,
     PAGE_ACTIVATION = 5,
     PAGE_INPUT_METHODS = 6,
+    PAGE_SOUND = 7,
 };
 
 enum {
@@ -81,6 +83,7 @@ static uint32_t selected_user;
 static uint8_t active_page;
 static uint8_t active_drop;
 static struct reliefos_ui_tab_state settings_tabs;
+static struct settings_sound_model sound_model;
 static char status_text[160] = "Ready";
 static char ntp_runtime_state[16] = "unknown";
 static char ntp_runtime_detail[96] = "runtime state unavailable";
@@ -1618,6 +1621,7 @@ static void draw_settings(struct reliefos_ui_surface *ui)
         {T("Services"), PAGE_SERVICES, 0},
         {T("Activation"), PAGE_ACTIVATION, 0},
         {T("Input Method"), PAGE_INPUT_METHODS, 0},
+        {T("Sound"), PAGE_SOUND, 0},
     };
     reliefos_ui_rect(ui, 0, 0, SETTINGS_W, SETTINGS_H, RELIEFOS_UI_GRAY);
     settings_tabs.selected_id = active_page;
@@ -1636,6 +1640,8 @@ static void draw_settings(struct reliefos_ui_surface *ui)
         draw_services_page(ui);
     } else if (active_page == PAGE_INPUT_METHODS) {
         draw_input_methods_page(ui);
+    } else if (active_page == PAGE_SOUND) {
+        settings_sound_draw(ui, &sound_model);
     } else {
         draw_activation_page(ui);
     }
@@ -2197,6 +2203,7 @@ static void handle_click(int32_t x, int32_t y)
         {T("Services"), PAGE_SERVICES, 0},
         {T("Activation"), PAGE_ACTIVATION, 0},
         {T("Input Method"), PAGE_INPUT_METHODS, 0},
+        {T("Sound"), PAGE_SOUND, 0},
     };
     if (reliefos_ui_tab_control_handle_mouse(&settings_tabs, x, y, 18,
                                            SETTINGS_TAB_Y, SETTINGS_W - 36,
@@ -2217,6 +2224,8 @@ static void handle_click(int32_t x, int32_t y)
         handle_services_click(x, y);
     } else if (active_page == PAGE_INPUT_METHODS) {
         handle_input_methods_click(x, y);
+    } else if (active_page == PAGE_SOUND) {
+        settings_sound_click(x, y, &sound_model);
     }
 }
 
@@ -2245,6 +2254,8 @@ int main(void)
     refresh_appearance_state();
     refresh_users();
     inputm_load_settings();
+    (void)settings_sound_init();
+    settings_sound_poll(&sound_model);
     load_services_config();
     refresh_ntp_runtime_state();
     draw_settings(&ui);
@@ -2257,6 +2268,7 @@ int main(void)
         event.window_id = (uint32_t)window_id;
         if (reliefos_gui_wait_app_event(&event, RELIEFOS_GUI_IDLE_WAIT_MS) > 0) {
             if (event.type == RELIEFOS_GUI_APP_EVENT_CLOSE) {
+                settings_sound_shutdown();
                 return 0;
             }
             if (event.type == RELIEFOS_GUI_APP_EVENT_THEME_CHANGED) {
@@ -2285,6 +2297,7 @@ int main(void)
             }
             if (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN && event.pressed &&
                 event.keycode == SETTINGS_KEY_ESCAPE) {
+                settings_sound_shutdown();
                 return 0;
             }
             if (event.type == RELIEFOS_GUI_APP_EVENT_FOCUS || event.type == RELIEFOS_GUI_APP_EVENT_RESIZE) {
@@ -2292,6 +2305,7 @@ int main(void)
                 refresh_appearance_state();
                 refresh_users();
                 inputm_load_settings();
+                settings_sound_poll(&sound_model);
                 refresh_ntp_runtime_state();
                 draw_settings(&ui);
                 reliefos_gui_present_window((uint32_t)window_id, SETTINGS_W, SETTINGS_H, SETTINGS_W, pixels);
@@ -2302,6 +2316,7 @@ int main(void)
                 refresh_display_state();
                 refresh_appearance_state();
                 refresh_users();
+                settings_sound_poll(&sound_model);
                 draw_settings(&ui);
                 reliefos_gui_present_window((uint32_t)window_id, SETTINGS_W, SETTINGS_H, SETTINGS_W, pixels);
                 last_refresh = now;

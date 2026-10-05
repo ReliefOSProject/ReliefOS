@@ -87,6 +87,17 @@ int main(void)
         .gid = 300, .egid = 300, .fsgid = 300};
     struct task root = {.cap_effective = (1ULL << (CAP_LAST_CAP + 1)) - 1,
         .cap_permitted = (1ULL << (CAP_LAST_CAP + 1)) - 1};
+    struct storage_node recording = {.type = RELIEFOS_FS_TYPE_DEVICE,
+        .flags = STORAGE_NODE_FLAG_DEV_NODE | STORAGE_NODE_FLAG_AUDIO_PCM,
+        .first_cluster = STORAGE_DEV_KIND_AUDIO, .volume_id = 0x123401};
+    assert(!fs_permissions_chmod(&root, "/dev/snd/pcmC0D0c", &recording, 0660));
+    assert(!fs_permissions_chown(&root, "/dev/snd/pcmC0D0c", &recording, 100, 200));
+    assert(!check_node(&owner, "/dev/snd/pcmC0D0c", &recording, FS_ACCESS_READ, false));
+    assert(!check_node(&group, "/dev/snd/pcmC0D0c", &recording, FS_ACCESS_READ, false));
+    assert(check_node(&other, "/dev/snd/pcmC0D0c", &recording, FS_ACCESS_READ, false) == -EACCES);
+    assert(fs_permissions_chmod(&other, "/dev/snd/pcmC0D0c", &recording, 0666) == -EPERM);
+    assert(!check_node(&root, "/dev/snd/pcmC0D0c", &recording, FS_ACCESS_READ, false));
+    puts("PASS recording node uses actual owner/group DAC and refuses unrelated users");
     entries[2].value.mode = 0755;
     fixture_mount_flags = MS_NOEXEC;
     assert(fs_permissions_check(&root, "/data/file", FS_ACCESS_EXEC, false) == -RELIEFOS_EACCES);

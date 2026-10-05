@@ -40,7 +40,18 @@ def main():
                      "MEMLOCK", "AS", "LOCKS", "SIGPENDING", "MSGQUEUE", "NICE", "RTPRIO", "RTTIME"):
             checks += [f'_Static_assert(RLIMIT_{name} == LINUX_RLIMIT_{name}, "RLIMIT_{name} drift");']
         checks += ["#include <signal.h>", "#include <ucontext.h>", "#include <linux/signal.h>"]
-        checks += ["#include <sys/msg.h>", "#include <linux/msg.h>",
+        ipc_names = ("IPC_PRIVATE", "IPC_CREAT", "IPC_EXCL", "IPC_NOWAIT", "IPC_RMID",
+                     "IPC_SET", "IPC_STAT", "IPC_INFO", "MSG_NOERROR", "MSG_EXCEPT",
+                     "MSG_STAT", "MSG_INFO", "MSG_STAT_ANY")
+        checks += ["#include <sys/msg.h>"]
+        checks += [f"enum {{ MUSL_{name} = {name} }};" for name in ipc_names]
+        # Canonical Linux ipc.h also publishes the obsolete libc5 ipc_perm tag
+        # and unprefixed IPC macros. Isolate that legacy tag in this comparison
+        # TU while retaining musl's independent modern LP64 expectations above.
+        # Real applications use sys/ipc.h, not both legacy and libc definitions.
+        checks += [f"#undef {name}" for name in ipc_names if name.startswith("IPC_")]
+        checks += ["#define ipc_perm linux_legacy_ipc_perm", "#include <linux/msg.h>",
+                   "#undef ipc_perm",
                    '_Static_assert(sizeof(struct ipc_perm) == sizeof(struct linux_ipc64_perm), "IPC permission size");',
                    '_Static_assert(sizeof(struct msqid_ds) == sizeof(struct linux_msqid64_ds), "message queue size");',
                    '_Static_assert(sizeof(struct msginfo) == sizeof(struct linux_msginfo), "message info size");']
@@ -51,10 +62,8 @@ def main():
         for field in ("uid", "gid", "cuid", "cgid", "mode"):
             checks += [f'_Static_assert(offsetof(struct ipc_perm, {field}) == '
                        f'offsetof(struct linux_ipc64_perm, {field}), "ipc {field} offset");']
-        for name in ("IPC_PRIVATE", "IPC_CREAT", "IPC_EXCL", "IPC_NOWAIT", "IPC_RMID",
-                     "IPC_SET", "IPC_STAT", "IPC_INFO", "MSG_NOERROR", "MSG_EXCEPT",
-                     "MSG_STAT", "MSG_INFO", "MSG_STAT_ANY"):
-            checks += [f'_Static_assert({name} == LINUX_{name}, "{name} drift");']
+        for name in ipc_names:
+            checks += [f'_Static_assert(MUSL_{name} == LINUX_{name}, "{name} drift");']
         # musl sys/msg.h does not publish Linux's checkpoint/restore extension.
         checks += ['_Static_assert(LINUX_MSG_COPY == 040000, "Linux MSG_COPY encoding");']
         checks += ["#include <sys/sem.h>", "#include <linux/sem.h>",

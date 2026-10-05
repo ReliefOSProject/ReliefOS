@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-04",
+  "worktree": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan",
+  "execution": "inline-only",
+  "git_actions": {
+    "commit": false,
+    "push": false,
+    "archive": false
+  },
+  "repair": {
+    "pcm_buffer_bytes": 524288,
+    "doom_fragment_count": 64,
+    "doom_fragment_exponent": 13,
+    "doom_fragment_bytes": 8192,
+    "doom_start_watermark": "full ring for the largest fragment ring",
+    "generic_start_watermark": "one-period wakeup slack retained",
+    "diagnostic_markers_removed": [
+      "hda-debug",
+      "pcm-debug",
+      "PCM_DEBUG",
+      "serial_write"
+    ],
+    "source_sha256": {
+      "kernel/reliefnt/kernel/reliefnt/audio/pcm.c": "6fe1e39c31f7fa7dc53efc0491c3747c9baa3a8334ead7644846854134c39cbe",
+      "kernel/reliefnt/kernel/reliefnt/audio/oss.c": "29634e8de359939ae9914729ab83e54034659011d96dc814b2f69a5a757a7ba3",
+      "kernel/reliefnt/drivers/hda/stream.c": "1243c2fe0da907ac3141e07344e1cedb406c1f610ce8ffe313e5eb13fd5319d5",
+      "tools/tests/audio_oss_wait_test.c": "68be734bf7b1cc5030988fb3bca1a4d1be81238b81e9dd714b55a64f124f1eaa",
+      "tools/tests/doom_audio_output_test.c": "1ff29f756ed0142177033a183dbd73c4274ad9d8e2f5d375fc754ca218849fa2",
+      "userland/apps/doom/audio_output.h": "7c583c636044fc556c0bef5cde1c6c1cc49bc8ed94501e9f0be63d1d213d6103",
+      "userland/apps/doom/reliefos_audio.c": "22c32978b79fa912e2aed03d5bbd66e9eaca3c4c41024c408077c297f4c49b08"
+    }
+  },
+  "host_tests": {
+    "pcm_oss": {
+      "command": "python3 tools/test_linux_audio.py pcm oss",
+      "log": "out/audio-hda-u6/qa/final-host-pcm-oss-20261004.log",
+      "exit": 0,
+      "sha256": "67324a7448e4752f6f73de9623ee1a355b5fc92397be689a7d43b991f5134637",
+      "coverage": "PCM state/transfer/XRUN/drain/LINK/lifetime; OSS controls, queue, fragment, and all real interruptible waits including full-prefill"
+    },
+    "doom": {
+      "command": "python3 tools/test_audio_userland.py doom-output doom-mixer doom-music",
+      "log": "out/audio-hda-u6/qa/final-host-doom-20261004.log",
+      "exit": 0,
+      "sha256": "7661b2a422b4df5cf16d73edfbd179c4370572078cffceae088520d6385e1b3b",
+      "coverage": "ASan/UBSan Doom output queue, mixer, and music parser/OPL3"
+    }
+  },
+  "build": {
+    "command": "TMPDIR=out/audio-hda-u6/tmp-build make O=out/audio-hda-u6 -j8 kernel drivers image-vmdk iso installer",
+    "exit": 0,
+    "image": "out/audio-hda-u6/images/reliefos.vmdk",
+    "image_sha256": "0da07364d997aba7c6f304883788d76f0307186f663f999bd36c63f0cfb363a9",
+    "log": "out/audio-hda-u6/qa/final-image-build-512k-20261004.log",
+    "log_sha256": "d36d3990f29fa92967212267deb3f02a16bb54a3e0a19ebbe1bc87337fccda28"
+  },
+  "qemu": {
+    "command": "TMPDIR=out/audio-hda-u6/tmp-build python3 tools/test_audio_e2e_qemu.py --image out/audio-hda-u6/images/reliefos.vmdk --output out/ds13 --probe out/audio-hda-u6/qa/audio-guest-u6-capture-final --duration 5 --load-seconds 0 --timeout 90",
+    "output": "out/ds13",
+    "e2e_result": "out/ds13/e2e-result.json",
+    "e2e_result_sha256": "43fd818f482e11650ae3243e6147d5cca4f4b3668c159a9da9817ae57caee5a8",
+    "result_sha256": "35d635f47a86f27384c7b763f0acf7cb4d2ee72176462032339c5ca97bc94693",
+    "serial_sha256": "3688a21012320f796092b98fc3544f5b0c93b7f1bdc5acf8a73ee52454efed2e",
+    "exit": 0,
+    "preflight": {
+      "boot_complete": true,
+      "hda_card_registered": true,
+      "guest_probe": true,
+      "capture": "4096 frames / 16384 bytes; known 400/800 Hz input matched",
+      "waveform": "48 kHz S16 stereo; 1000/2000 Hz; active_seconds=1.9999791666666666; max_period_error=1",
+      "sysv_shm_checks": 83,
+      "standard_probe_failures": 0
+    },
+    "doom": {
+      "requested_seconds": 5,
+      "written_bytes": 994008,
+      "startup_recoveries": 0,
+      "xrun_recoveries": 0,
+      "suspend_recoveries": 0,
+      "doom_pcm_clean": true,
+      "doom_xrun_clean": true
+    },
+    "physical_codec_matrix": false,
+    "visible_gui_xorg": false
+  },
+  "preserved_boundaries": {
+    "gui": "deferred to the later Xorg work per user direction",
+    "physical_codec": "not run; current environment did not native-boot ReliefOS or detach/pass through PCI",
+    "all_serial_xrun_clean": false,
+    "all_serial_xrun_note": "The strict Doom interval is clean; the separate all-serial field retains historical non-Doom lifetime-capture overrun markers."
+  },
+  "tmp_backup": {
+    "path": "out/audio-hda-u6/tmp-backup-20261003",
+    "verification": "preserved SHA256SUMS check passed after reboot"
+  }
+}

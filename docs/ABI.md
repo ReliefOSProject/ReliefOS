@@ -60,6 +60,26 @@ supports whole or partial unmapping.
 
 ## Shared POSIX porting surface
 
+Native x86-64 SysV shared memory uses `shmget`/`shmat`/`shmdt`/`shmctl`
+and the Linux v6.14 LP64 wire records. Key lookup, generation IDs, DAC,
+IPC_SET/STAT/RMID, IPC_INFO, SHM_INFO/STAT/STAT_ANY and LOCK/UNLOCK have
+production host-fixture and build evidence. Registry pages and each mapped PTE
+own separate references; RMID hides the key but retains an attached ID until
+the final VMA is released. Split VMAs count in `shm_nattch`, matching the native
+Linux reference; `shmdt` retires the selected original attachment's remaining
+pieces. Fork obtains independent shared references; CLONE_VM shares its MM.
+
+The current registry reports finite limits through IPC_INFO: 4096 segments,
+256 MiB per segment and 65536 total pages. Pages are eagerly zeroed/resident;
+SHM_NORESERVE does not add demand paging. SHM_HUGETLB returns ENOSYS, as in
+Linux without CONFIG_HUGETLBFS. The existing W^X policy permits readonly
+SHM_EXEC mappings and rejects writable executable attachment with EACCES.
+SHM_LOCK enforces owner/CAP_IPC_LOCK and the process-wide RLIMIT_MEMLOCK
+(initial soft/hard defaults 8 MiB); residency does not imply a swap subsystem.
+Namespaces, IPC sysctl and `/proc/sysvipc/shm` are outside this implementation.
+The same musl probe has run on Linux only; ReliefOS guest and upstream
+dmix/dsnoop acceptance remain H6/U1/U6 gates.
+
 `libreliefos.so.2` provides the ANSI curses subset used by `sl`; the same
 implementation is also exported by the compatible `libleonos.so.2`.
 Applications include `<curses.h>` or `<ncurses.h>` from the SDK. This is a
@@ -123,11 +143,9 @@ namespace. System applications query the complete hardware inventory through
 `leonos_device_list()`, which talks to the devmand service over its AF_UNIX
 protocol (`LEONOS_DEVMAND_MSG_DEVICE_LIST`); there is no device-list ioctl.
 
-PCM applications use OSS `/dev/dsp` with `<linux/soundcard.h>`. The current
-device accepts 16-bit little-endian stereo output and provides normal
-`write`, `O_NONBLOCK`, and `poll(POLLOUT)` behavior plus the basic
-`SNDCTL_DSP_*` format and queue ioctls. `/dev/audio` is a compatibility
-alias for the same node.
+PCM interfaces and their current verification limits are described in the Audio
+ABI section below. `/dev/audio` remains a compatibility alias for `/dev/dsp`;
+it does not select the traditional OSS mu-law default.
 
 ## Driver Module ABI
 
@@ -348,10 +366,63 @@ management are still out of scope for this ABI version.
 
 ## Audio ABI
 
-PCM audio reaches userland through OSS `/dev/dsp` (see the Device model
-section); the private `LEONOS_IOCTL_AUDIO_*` ioctls were removed and the
+The registered-card audio path implements the Linux v6.14 native x86-64 sound
+UAPI exported through the SDK. `/dev/snd/controlC<N>` and
+`pcmC<N>D<M>p/c` are generated from live card capabilities (N=0..31, M=0..7);
+unsupported devices or directions are absent. Character major 116 uses control
+minor `N*32`, playback `N*32+16+M`, and capture `N*32+24+M`. Device access uses
+the existing owner/group/other DAC rules. A sound open owns its PCM/control
+state through an open-file description; dup, fork, SCM_RIGHTS and in-flight I/O
+retain it until the final release.
+
+PCM supports interleaved read/write and shared data/status/control mmap,
+HW_REFINE/HW_PARAMS/HW_FREE, SW_PARAMS, INFO/CHANNEL_INFO, STATUS/DELAY,
+protocol/timestamp requests, PREPARE/START/DROP/DRAIN, RESET/XRUN,
+SYNC_PTR/HWSYNC, REWIND/FORWARD and direct-fd LINK/UNLINK. Formats, rates,
+channels and geometry come from hardware caps; noninterleaved access, PAUSE
+and synchronized start are not advertised. Mapped data prevents destructive
+HW_PARAMS/HW_FREE. Status pages are read-only; control updates are validated
+against the actual ring boundary. Unknown PCM/control commands return ENOTTY
+before examining their encoded argument. Known requests retain their documented
+state and user-memory errors.
+
+Control supports card/PCM enumeration, fixed ELEM_LIST/INFO/READ/WRITE,
+OFD-owned LOCK/UNLOCK, SUBSCRIBE_EVENTS and DB_SCALE TLV_READ. Each subscribed
+description retains a merged pending mask for every fixed element in notification
+order. User-defined ELEM_ADD/REPLACE/REMOVE return EOPNOTSUPP; TLV_WRITE/COMMAND
+return ENXIO. Raw MIDI and hwdep are outside this implemented interface.
+`/dev/mixer` reads/writes the same registered controls through OSS masks and
+stereo percentages. `/dev/dsp` provides negotiated S16_LE/S8/U8 where supported,
+capture/playback and hardware-backed queue/fragment/pointer/trigger operations,
+RESET, blocking SYNC and NONBLOCK. The adapter preserves partial-frame byte tails,
+uses DROP when disabling a trigger, and retains hardware leases until OFD close.
+It does not advertise OSS mmap or software format/rate converters.
+
+When `/dev/dsp` binds to an ABI-v1 AC97/ES1371 backend, it holds an exclusive
+backend-generation lease through OFD close. This path provides stereo S16_LE
+playback, real rate negotiation, short writes, queue queries and SYNC; GETCAPS
+returns zero. Capture, RESET, hardware pointer queries and disabling output
+trigger are unsupported. Loading a replacement module does not redirect an
+already-open description, and v1 registration creates no ALSA card.
+
+These paths have source, production host-fixture and root kernel/runtime/SDK build
+evidence. Standard-libc HDA guest playback, capture, mapped lifetime and control
+restoration have also passed in isolated QEMU runs. This covers those probe
+modes; the complete guest contract, unmodified upstream ALSA applications and
+physical audio remain H6/U1/U6 gates. See
+`docs/superpowers/progress/2026-10-02-intel-hda-audio-status.md` for the audit.
+
+The A6 standard-libc probe is built for the host and the relocatable musl SDK
+with `python3 tools/test_linux_audio.py --build-guest`. It prints ABI layouts
+without DMA addresses, uses a global ten-second deadline, preserves short
+byte/frame transfers across `EINTR`/`EAGAIN`, rejects zero progress, and logs
+control restoration attempts on normal and error exits. The fixed support and
+unsupported-operation matrix is in `docs/audio-abi-support.json`; it does not
+turn a host build into guest or physical audio evidence.
+
+The private `LEONOS_IOCTL_AUDIO_*` ioctls were removed and the
 `include/leonos/audio.h` wrapper declarations no longer have libc
-implementations. Audio is backed by autoloaded driver modules: `ac97.drv`
+implementations. Existing autoloaded driver modules include `ac97.drv`, which
 supports QEMU's Intel ICH AC'97 controller, while `es1371.drv` supports
 VMware's Ensoniq AudioPCI ES1371 controller. Both accept 16-bit,
 stereo PCM at 8000–48000 Hz selected with `SNDCTL_DSP_SETFMT`,

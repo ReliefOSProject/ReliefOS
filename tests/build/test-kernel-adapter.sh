@@ -209,14 +209,14 @@ fi
 pass 'the baseline kernel build succeeds'
 expected_manifest="$work/expected-products"
 actual_manifest="$work/actual-products"
-printf '%s\n' ac97.drv e1000.drv es1371.drv kernel.debug kernel.sys \
+printf '%s\n' ac97.drv e1000.drv es1371.drv hda.drv kernel.debug kernel.sys \
     kerneldebug.sys loader.elf mouse.drv serial.drv | LC_ALL=C sort > "$expected_manifest"
 awk '/^artifacts:$/ { artifacts=1; next } artifacts { print $2 }' \
     "$O/kernel-install/manifest.txt" | LC_ALL=C sort > "$actual_manifest"
 if cmp -s "$expected_manifest" "$actual_manifest"; then
-    pass 'kernel manifest contains the nine unchanged product names'
+    pass 'kernel manifest contains the ten required product names'
 else
-    fail 'kernel manifest contains the nine unchanged product names' \
+    fail 'kernel manifest contains the ten required product names' \
         "want: $(tr '\n' ' ' < "$expected_manifest")" \
         "have: $(tr '\n' ' ' < "$actual_manifest")"
 fi

@@ -21,6 +21,7 @@ static int deferred_error;
 static uint64_t lazy_page;
 static unsigned demand_faults;
 static unsigned drained_io;
+static uint64_t clock_ticks = 100;
 void power_reboot(void) { abort(); }
 void power_shutdown(void) { abort(); }
 void storage_drain_task_io(uint32_t pid) { assert(pid==target.pid); ++drained_io; }
@@ -41,7 +42,12 @@ uint64_t task_socket_cancel_receive(struct task *task)
 int task_socket_message_error(struct task_file *file, int error, bool setting)
 { (void)file; assert(setting); deferred_error = error; return 0; }
 int time_clock_get(int32_t id, struct linux_timespec *out)
-{ assert(id == LINUX_CLOCK_MONOTONIC); *out = (struct linux_timespec){1, 0}; return 0; }
+{
+    assert(id == LINUX_CLOCK_MONOTONIC);
+    *out = (struct linux_timespec){clock_ticks / RELIEFNT_TICK_HZ,
+        clock_ticks % RELIEFNT_TICK_HZ * (1000000000ULL / RELIEFNT_TICK_HZ)};
+    return 0;
+}
 void task_release_syscall_file(struct task *task) { memset(&task->regular_io,0,sizeof(task->regular_io)); }
 struct task *sched_find(uint32_t pid) { (void)pid; return &target; }
 void sched_exit_group(uint32_t pid, uint64_t code)
@@ -122,7 +128,9 @@ int main(void)
     assert(!target.pending_signals && (target.blocked_signals & (1u << (2 - 1))));
     target.blocked_signals = 0;
     target.restart_syscall = __NR_nanosleep + 1;
-    target.nanosleep_deadline = 120;
+    target.nanosleep_clock = LINUX_CLOCK_MONOTONIC;
+    clock_ticks = 140; /* Disciplined clock is ahead of the raw 100 ticks. */
+    target.nanosleep_deadline = 160;
     target.nanosleep_remaining = STACK_ADDRESS + 64;
     target.signal_actions[2].flags = LINUX_SA_RESTART;
     frame = (struct trap_frame){.rsp = saved_rsp, .rip = 0x430000, .cs = 0x23};
@@ -134,6 +142,7 @@ int main(void)
     memcpy(&remaining, target_pages + 64, sizeof(remaining));
     assert(remaining.tv_sec == 0 && remaining.tv_nsec == 200000000);
     assert(!target.nanosleep_deadline && !target.nanosleep_remaining);
+    clock_ticks = 100;
     target.blocked_signals = 0;
     target.sigsuspend_saved_mask = 1ULL << 1;
     target.sigsuspend_active = 1;
@@ -201,7 +210,8 @@ int main(void)
     assert(kernel_signal_dequeue(&target, signalfd_file.aux, &consumed) == 2);
     target.signalfd_waiting = false;
     target.syscall_file = NULL;
-    const uint64_t vector_calls[] = {__NR_readv, __NR_preadv, __NR_preadv2};
+    const uint64_t vector_calls[] = {__NR_readv, __NR_preadv, __NR_preadv2,
+                                    __NR_read, __NR_write, __NR_ioctl};
     for (unsigned i = 0; i < sizeof(vector_calls) / sizeof(vector_calls[0]); ++i) {
         for (unsigned restart = 0; restart < 2; ++restart) {
             target.blocked_signals = 0;

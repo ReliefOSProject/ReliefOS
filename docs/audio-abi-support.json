@@ -1,0 +1,918 @@
+{
+  "schema_version": 1,
+  "uapi": "Linux v6.14 native x86-64",
+  "validation": {
+    "source_host_fixture": true,
+    "guest_binary_build": true,
+    "guest_runtime": true,
+    "guest_probe_modes_verified": "Actual QEMU HDA ABI/playback/capture/mapped lifetime/control metadata and permission DAC verified at the listed run boundaries; complete ioctl/errno matrix and finite-stream EOF remain open.",
+    "guest_probe_evidence": "out/ds103-r7-dual-status/result.json; out/ds107-r8-permissions/result.json; out/ds109-r8-controls-wave/result.json; out/ds112-r8-no-audio-doom/result.json",
+    "upstream_alsa": true,
+    "upstream_alsa_scope": "Standard playback/capture, concurrent dmix/dsnoop, speaker-test, controls and repeated raw-null/raw-file lifecycles passed in R10 ds125-127; all 2883584 known capture frames matched. Complete native finite output failed in every completed case. R9 ds124 scene/load600 recovered from two XRUNs; R10 WAV120 diagnostic had zero XRUNs but finite EOF failed and capture was not_run. R6 ds100 remains a counterexample; controls strict duration remains open. U6 not accepted.",
+    "physical_hardware": false
+  },
+  "common": {
+    "invalid_ofd": "EBADF",
+    "usercopy": "Known commands validate input/output/nested buffers and return EFAULT; unsupported-command precedence is stated per row",
+    "dac": "Owner/group/other DAC at open; capture permission independently tested",
+    "multicard": "N=0..31 M=0..7; sparse live capability-derived nodes, generation-token card isolation; absent direction has no node",
+    "disconnect": "Hardware operations return ENODEV and poll ERR/HUP; protocol/state snapshots can remain readable; fd/VMA hold backing through final reference",
+    "mmap": "ALSA MAP_SHARED data at 0; native OLD/NEW status/control offsets; status READ only, control READ|WRITE, playback DATA WRITE and capture DATA READ required; no EXEC; no HW_FREE/HW_PARAMS while DATA held",
+    "io_units": "read/write bytes; READI/WRITEI/REWIND/FORWARD frames; pointer and queue arithmetic use actual hardware frame progress",
+    "oss_backend_scope": "The OSS rows below describe registered-card PCM. ABI-v1 AC97/ES1371 uses an exclusive backend-generation lease with stereo S16_LE playback and GETCAPS=0; capture, RESET, hardware pointer queries and disabling output trigger are unsupported. Native v1 registration does not create an ALSA card. AC97 guest write/SYNC passed, continuous waveform quality is not accepted."
+  },
+  "ioctls": {
+    "SNDRV_PCM_IOCTL_PVERSION": {
+      "family": "pcm",
+      "supported": true,
+      "access": "any PCM OFD; user int in/out",
+      "state": "any; protocol version is OFD-local",
+      "errno": "EFAULT",
+      "mmap": "no restriction",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_USER_PVERSION": {
+      "family": "pcm",
+      "supported": true,
+      "access": "any PCM OFD; user int in/out",
+      "state": "any; protocol version is OFD-local",
+      "errno": "EFAULT",
+      "mmap": "no restriction",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_TSTAMP": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; compatibility no-op, argument unused",
+      "state": "any",
+      "errno": "EBADF for invalid OFD",
+      "mmap": "no restriction",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_INFO": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; writable native structure; STATUS_EXT is in/out",
+      "state": "snapshots; INFO requires live registry",
+      "errno": "EFAULT, ENODEV where identity requires live card",
+      "mmap": "snapshots valid while mapped",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_STATUS": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; writable native structure; STATUS_EXT is in/out",
+      "state": "Readable snapshots including XRUN; availability preserves modulo-boundary counts beyond one ring, delay is zero unless RUNNING or playback DRAINING; running playback deficit is signed.",
+      "errno": "EFAULT, ENODEV where identity requires live card",
+      "mmap": "snapshots valid while mapped",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_STATUS_EXT": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; writable native structure; STATUS_EXT is in/out",
+      "state": "Readable snapshots including XRUN; availability preserves modulo-boundary counts beyond one ring, delay is zero unless RUNNING or playback DRAINING; running playback deficit is signed.",
+      "errno": "EFAULT, ENODEV where identity requires live card",
+      "mmap": "snapshots valid while mapped",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_TTSTAMP": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; input clock selector",
+      "state": "live stream, realtime/monotonic/raw",
+      "errno": "EINVAL, ENODEV, EFAULT",
+      "mmap": "no restriction",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_HW_REFINE": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; in/out masks and intervals",
+      "state": "live hardware constraints; fixed-point; only interleaved modes",
+      "errno": "EINVAL for empty/unsupported constraints, EFAULT, ENODEV",
+      "mmap": "refinement allowed with data mapping",
+      "evidence": "tools/tests/audio_alsa_params_test.c"
+    },
+    "SNDRV_PCM_IOCTL_HW_PARAMS": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; exact feasible in/out parameters",
+      "state": "OPEN/SETUP/PREPARED",
+      "errno": "EINVAL, EBADFD, ENODEV, hardware error, EFAULT",
+      "mmap": "EBADFD while data mapped",
+      "evidence": "tools/tests/audio_alsa_params_test.c; tools/tests/audio_mmap_test.c"
+    },
+    "SNDRV_PCM_IOCTL_HW_FREE": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; no argument",
+      "state": "SETUP/PREPARED",
+      "errno": "EBADFD, ENODEV, hardware stop error",
+      "mmap": "EBADFD while data mapped",
+      "evidence": "tools/tests/audio_mmap_test.c"
+    },
+    "SNDRV_PCM_IOCTL_SW_PARAMS": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; in/out thresholds, boundary returned",
+      "state": "configured, not OPEN; bounded silence and valid timestamp/avail",
+      "errno": "EINVAL, EBADFD, ENODEV, EFAULT",
+      "mmap": "control/status metadata updated",
+      "evidence": "tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_CHANNEL_INFO": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; in/out channel index/layout",
+      "state": "configured, channel within range",
+      "errno": "EINVAL, EBADFD, ENODEV, EFAULT",
+      "mmap": "interleaved channel layout",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_HWSYNC": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; DELAY writes signed frame count",
+      "state": "PREPARED/RUNNING/PAUSED; playback DRAINING",
+      "errno": "EPIPE for XRUN; EBADFD, ENODEV, EFAULT, hardware error",
+      "mmap": "imports validated control and reads progress",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_DELAY": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; DELAY writes signed frame count",
+      "state": "PREPARED/RUNNING/PAUSED; playback DRAINING",
+      "errno": "EPIPE for XRUN; EBADFD, ENODEV, EFAULT, hardware error",
+      "mmap": "imports validated control and reads progress",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_SYNC_PTR": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; in/out snapshot; APPL/AVAIL_MIN set means read, clear means commit",
+      "state": "configured; flags/pointers/thresholds validated; HWSYNC optional",
+      "errno": "EINVAL, EBADFD, EPIPE with HWSYNC, ENODEV, EFAULT",
+      "mmap": "OLD/NEW LP64 native layouts and data/status/control offsets supported",
+      "evidence": "tools/tests/audio_mmap_test.c; tools/tests/audio_vma_test.c"
+    },
+    "SNDRV_PCM_IOCTL_PREPARE": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; no argument",
+      "state": "SETUP/XRUN",
+      "errno": "EBADFD, ENODEV, hardware error",
+      "mmap": "mapping may remain; does not discard pinned backing",
+      "evidence": "tools/tests/audio_pcm_state_test.c"
+    },
+    "SNDRV_PCM_IOCTL_START": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; no argument",
+      "state": "PREPARED",
+      "errno": "EBUSY when RUNNING; EBADFD, ENODEV, hardware error",
+      "mmap": "records actual trigger timestamp",
+      "evidence": "tools/tests/audio_pcm_state_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_DROP": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; no argument",
+      "state": "live; stops active stream, returns SETUP",
+      "errno": "ENODEV, hardware stop error",
+      "mmap": "does not invalidate mapped pages",
+      "evidence": "tools/tests/audio_pcm_state_test.c; tools/tests/audio_mmap_test.c"
+    },
+    "SNDRV_PCM_IOCTL_DRAIN": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; no argument; O_NONBLOCK honored",
+      "state": "playback PREPARED/RUNNING/DRAINING; capture drops",
+      "errno": "EAGAIN while draining nonblocking, EINTR with no progress, EBADFD, EPIPE, ENODEV, hardware error",
+      "mmap": "backing retained while draining",
+      "evidence": "tools/tests/audio_pcm_state_test.c; tools/tests/audio_device_test.c"
+    },
+    "SNDRV_PCM_IOCTL_RESET": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; no argument",
+      "state": "PREPARED/RUNNING/PAUSED",
+      "errno": "EBADFD, ENODEV",
+      "mmap": "resets pointers, preserves state/backing",
+      "evidence": "tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_XRUN": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; no argument",
+      "state": "live; stops hardware and publishes XRUN",
+      "errno": "ENODEV, hardware stop error",
+      "mmap": "status metadata publishes EPIPE",
+      "evidence": "tools/tests/audio_pcm_state_test.c"
+    },
+    "SNDRV_PCM_IOCTL_PAUSE": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PAUSE reads int; RESUME currently unpauses, not power recovery",
+      "state": "pause RUNNING; unpause PAUSED; backend must support trigger",
+      "errno": "EBADFD, EOPNOTSUPP when backend unsupported, ENODEV, hardware error, EFAULT",
+      "mmap": "HDA does not advertise PAUSE or power resume",
+      "evidence": "tools/tests/audio_pcm_state_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_RESUME": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PAUSE reads int; RESUME currently unpauses, not power recovery",
+      "state": "pause RUNNING; unpause PAUSED; backend must support trigger",
+      "errno": "EBADFD, EOPNOTSUPP when backend unsupported, ENODEV, hardware error, EFAULT",
+      "mmap": "HDA does not advertise PAUSE or power resume",
+      "evidence": "tools/tests/audio_pcm_state_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_REWIND": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; in/out frame count; zero succeeds without moving",
+      "state": "nonzero uses HWSYNC states; bounded actual move returned",
+      "errno": "EBADFD, EPIPE, ENODEV, EFAULT",
+      "mmap": "control appl_ptr is updated",
+      "evidence": "tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_FORWARD": {
+      "family": "pcm",
+      "supported": true,
+      "access": "PCM OFD; in/out frame count; zero succeeds without moving",
+      "state": "nonzero uses HWSYNC states; bounded actual move returned",
+      "errno": "EBADFD, EPIPE, ENODEV, EFAULT",
+      "mmap": "control appl_ptr is updated",
+      "evidence": "tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_WRITEI_FRAMES": {
+      "family": "pcm",
+      "supported": true,
+      "access": "matching node direction and OFD write/read; validated nested sample buffer",
+      "state": "PREPARED/RUNNING/PAUSED/DRAINING; transfer result is frames",
+      "errno": "EBADF wrong direction/access; EAGAIN, EINTR, EPIPE, EBADFD, ENODEV, EINVAL overflow, EFAULT",
+      "mmap": "same pinned ring; preserves short transfer progress",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_guest_transport_test.c"
+    },
+    "SNDRV_PCM_IOCTL_READI_FRAMES": {
+      "family": "pcm",
+      "supported": true,
+      "access": "matching node direction and OFD write/read; validated nested sample buffer",
+      "state": "PREPARED/RUNNING/PAUSED/DRAINING; transfer result is frames",
+      "errno": "EBADF wrong direction/access; EAGAIN, EINTR, EPIPE, EBADFD, ENODEV, EINVAL overflow, EFAULT",
+      "mmap": "same pinned ring; preserves short transfer progress",
+      "evidence": "tools/tests/audio_device_test.c; tools/tests/audio_guest_transport_test.c"
+    },
+    "SNDRV_PCM_IOCTL_LINK": {
+      "family": "pcm",
+      "supported": true,
+      "access": "LINK argument is direct fd, not int pointer; distinct PCM on same card",
+      "state": "live, no existing link; synchronized hardware start not advertised",
+      "errno": "EBADF bad target fd; EINVAL self/cross-card; EBUSY already linked",
+      "mmap": "OFD and VMA retention unchanged",
+      "evidence": "tools/tests/descriptor_table_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_UNLINK": {
+      "family": "pcm",
+      "supported": true,
+      "access": "LINK argument is direct fd, not int pointer; distinct PCM on same card",
+      "state": "live, no existing link; synchronized hardware start not advertised",
+      "errno": "EBADF bad target fd; EINVAL self/cross-card; EBUSY already linked",
+      "mmap": "OFD and VMA retention unchanged",
+      "evidence": "tools/tests/descriptor_table_test.c; tools/tests/audio_alsa_ioctl_test.c"
+    },
+    "SNDRV_PCM_IOCTL_WRITEN_FRAMES": {
+      "family": "pcm",
+      "supported": false,
+      "access": "unsupported; argument is not consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "noninterleaved access not advertised",
+      "evidence": "tools/tests/audio_device_test.c"
+    },
+    "SNDRV_PCM_IOCTL_READN_FRAMES": {
+      "family": "pcm",
+      "supported": false,
+      "access": "unsupported; argument is not consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "noninterleaved access not advertised",
+      "evidence": "tools/tests/audio_device_test.c"
+    },
+    "SNDRV_CTL_IOCTL_PVERSION": {
+      "family": "control",
+      "supported": true,
+      "access": "control OFD, output int",
+      "state": "any OFD",
+      "errno": "EFAULT",
+      "mmap": "no control mappings",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_CARD_INFO": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open; in/out identity or index; preference accepted single-substream hint",
+      "state": "live card for registry lookup; sparse device/direction enumeration",
+      "errno": "ENODEV, ENXIO absent PCM, EFAULT",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_PCM_NEXT_DEVICE": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open; in/out int previous/next device; copy-in despite the Linux _IOR encoding",
+      "state": "live card for registry lookup; sparse device/direction enumeration",
+      "errno": "ENODEV, ENXIO absent PCM, EFAULT",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_PCM_INFO": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open; in/out identity or index; preference accepted single-substream hint",
+      "state": "live card for registry lookup; sparse device/direction enumeration",
+      "errno": "ENODEV, ENXIO absent PCM, EFAULT",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_PCM_PREFER_SUBDEVICE": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open; in/out identity or index; preference accepted single-substream hint",
+      "state": "live card for registry lookup; sparse device/direction enumeration",
+      "errno": "ENODEV, ENXIO absent PCM, EFAULT",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_ELEM_LIST": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open; validated output/nested pids; exact public layouts",
+      "state": "fixed actual hardware controls; enum item within bounds",
+      "errno": "ENOENT, EINVAL, ENODEV, EFAULT",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_ELEM_INFO": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open; validated output/nested pids; exact public layouts",
+      "state": "fixed actual hardware controls; enum item within bounds",
+      "errno": "ENOENT, EINVAL, ENODEV, EFAULT",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_ELEM_READ": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open, element READ/WRITE access; 1224-byte in/out value; indirect rejected",
+      "state": "live actual element; writer must own any held lock; values/count validated",
+      "errno": "EACCES, EPERM foreign lock, ENOENT, ERANGE, EINVAL, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_ELEM_WRITE": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open, element READ/WRITE access; 1224-byte in/out value; indirect rejected",
+      "state": "live actual element; writer must own any held lock; values/count validated",
+      "errno": "EACCES, EPERM foreign lock, ENOENT, ERANGE, EINVAL, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_ELEM_LOCK": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open; element id; lock follows OFD across dup/fork/SCM_RIGHTS",
+      "state": "live element; lock ownership checked; released at final OFD close",
+      "errno": "EBUSY held lock; EPERM foreign unlock; EINVAL unlocked; ENOENT, ENODEV, ENFILE, EFAULT",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_ELEM_UNLOCK": {
+      "family": "control",
+      "supported": true,
+      "access": "DAC at open; element id; lock follows OFD across dup/fork/SCM_RIGHTS",
+      "state": "live element; lock ownership checked; released at final OFD close",
+      "errno": "EBUSY held lock; EPERM foreign unlock; EINVAL unlocked; ENOENT, ENODEV, ENFILE, EFAULT",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_SUBSCRIBE_EVENTS": {
+      "family": "control",
+      "supported": true,
+      "access": "control OFD, in/out int; negative query, positive enable, zero disable",
+      "state": "fixed controls; repeat enable keeps pending queue; read requires subscribed",
+      "errno": "EFAULT; event read EBADFD unsubscribed, EAGAIN, EINTR, ENODEV",
+      "mmap": "read events merge by numid with first-notification FIFO",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_TLV_READ": {
+      "family": "control",
+      "supported": true,
+      "access": "valid numid; writable flexible payload, capacity at least 16 for DB_SCALE",
+      "state": "actual integer gain with dB metadata",
+      "errno": "EINVAL, ENOMEM short capacity, ENXIO no TLV, ENOENT, ENODEV, EFAULT",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_ELEM_ADD": {
+      "family": "control",
+      "supported": false,
+      "access": "known request validates encoded user argument before refusal",
+      "state": "fixed registered controls",
+      "errno": "EOPNOTSUPP; EFAULT invalid argument",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_ELEM_REPLACE": {
+      "family": "control",
+      "supported": false,
+      "access": "known request validates encoded user argument before refusal",
+      "state": "fixed registered controls",
+      "errno": "EOPNOTSUPP; EFAULT invalid argument",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_ELEM_REMOVE": {
+      "family": "control",
+      "supported": false,
+      "access": "known request validates encoded user argument before refusal",
+      "state": "fixed registered controls",
+      "errno": "EOPNOTSUPP; EFAULT invalid argument",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_TLV_WRITE": {
+      "family": "control",
+      "supported": false,
+      "access": "known request validates encoded user argument before refusal",
+      "state": "read-only hardware TLV",
+      "errno": "ENXIO; EFAULT invalid argument",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_TLV_COMMAND": {
+      "family": "control",
+      "supported": false,
+      "access": "known request validates encoded user argument before refusal",
+      "state": "read-only hardware TLV",
+      "errno": "ENXIO; EFAULT invalid argument",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_HWDEP_NEXT_DEVICE": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_HWDEP_INFO": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_RAWMIDI_NEXT_DEVICE": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_RAWMIDI_INFO": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_RAWMIDI_PREFER_SUBDEVICE": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_UMP_NEXT_DEVICE": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_UMP_ENDPOINT_INFO": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_UMP_BLOCK_INFO": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_POWER": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDRV_CTL_IOCTL_POWER_STATE": {
+      "family": "control",
+      "supported": false,
+      "access": "unimplemented command; no argument consumed",
+      "state": "any",
+      "errno": "ENOTTY before pointer checks",
+      "mmap": "no hwdep/rawmidi/UMP/power capability advertised",
+      "evidence": "tools/tests/audio_control_test.c; tools/tests/descriptor_table_test.c"
+    },
+    "SNDCTL_DSP_RESET": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD",
+      "state": "live backend; DROP and release configuration/tails",
+      "errno": "ENODEV, hardware error",
+      "mmap": "OSS mmap not advertised",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SYNC": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS playback OFD, O_NONBLOCK honored",
+      "state": "submit partial/full byte tails then actually drain",
+      "errno": "EAGAIN, EINTR, EPIPE, ENODEV, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_NONBLOCK": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD",
+      "state": "sets shared O_NONBLOCK, even if backend gone",
+      "errno": "EBADF invalid OFD",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SPEED": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; validated writable int and negotiated result",
+      "state": "live actual caps; geometry uses whole frames and integral periods; query formats accepted",
+      "errno": "EINVAL, EBUSY active reconfiguration where checked, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_STEREO": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; validated writable int and negotiated result",
+      "state": "live actual caps; geometry uses whole frames and integral periods; query formats accepted",
+      "errno": "EINVAL, EBUSY active reconfiguration where checked, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_CHANNELS": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; validated writable int and negotiated result",
+      "state": "live actual caps; geometry uses whole frames and integral periods; query formats accepted",
+      "errno": "EINVAL, EBUSY active reconfiguration where checked, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SETFMT": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; validated writable int and negotiated result",
+      "state": "live actual caps; geometry uses whole frames and integral periods; query formats accepted",
+      "errno": "EINVAL, EBUSY active reconfiguration where checked, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SAMPLESIZE": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; validated writable int and negotiated result",
+      "state": "live actual caps; geometry uses whole frames and integral periods; query formats accepted",
+      "errno": "EINVAL, EBUSY active reconfiguration where checked, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SOUND_PCM_WRITE_CHANNELS": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; validated writable int and negotiated result",
+      "state": "live actual caps; geometry uses whole frames and integral periods; query formats accepted",
+      "errno": "EINVAL, EBUSY active reconfiguration where checked, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SOUND_PCM_WRITE_BITS": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; validated writable int and negotiated result",
+      "state": "live actual caps; geometry uses whole frames and integral periods; query formats accepted",
+      "errno": "EINVAL, EBUSY active reconfiguration where checked, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SOUND_PCM_WRITE_RATE": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; validated writable int and negotiated result",
+      "state": "live actual caps; geometry uses whole frames and integral periods; query formats accepted",
+      "errno": "EINVAL, EBUSY active reconfiguration where checked, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SETFRAGMENT": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; validated writable int and negotiated result",
+      "state": "live actual caps; geometry uses whole frames and integral periods; query formats accepted",
+      "errno": "EINVAL, EBUSY active reconfiguration where checked, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETFMTS": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable int",
+      "state": "live caps/current negotiation/trigger",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "no OSS mmap or software converter capabilities",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETCAPS": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable int",
+      "state": "live caps/current negotiation/trigger",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "no OSS mmap or software converter capabilities",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETBLKSIZE": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable int",
+      "state": "live caps/current negotiation/trigger",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "no OSS mmap or software converter capabilities",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SOUND_PCM_READ_RATE": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable int",
+      "state": "live caps/current negotiation/trigger",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "no OSS mmap or software converter capabilities",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SOUND_PCM_READ_CHANNELS": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable int",
+      "state": "live caps/current negotiation/trigger",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "no OSS mmap or software converter capabilities",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETTRIGGER": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable int",
+      "state": "live caps/current negotiation/trigger",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "no OSS mmap or software converter capabilities",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETOSPACE": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable buffer/count structure or int",
+      "state": "live negotiated directions; bytes/blocks/pointer use hardware frames and boundary",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETISPACE": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable buffer/count structure or int",
+      "state": "live negotiated directions; bytes/blocks/pointer use hardware frames and boundary",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETODELAY": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable buffer/count structure or int",
+      "state": "live negotiated directions; bytes/blocks/pointer use hardware frames and boundary",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETOPTR": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable buffer/count structure or int",
+      "state": "live negotiated directions; bytes/blocks/pointer use hardware frames and boundary",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETIPTR": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; writable buffer/count structure or int",
+      "state": "live negotiated directions; bytes/blocks/pointer use hardware frames and boundary",
+      "errno": "ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SETTRIGGER": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS OFD; input/output flags masked by permitted OFD directions",
+      "state": "disable DROP/HW_FREE; enable prepare/start actual stream",
+      "errno": "EINVAL invalid flags, ENODEV, EFAULT, hardware error",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SETDUPLEX": {
+      "family": "oss",
+      "supported": true,
+      "access": "OSS O_RDWR with both real directions",
+      "state": "live playback and capture caps",
+      "errno": "EIO if duplex unavailable, ENODEV",
+      "mmap": "not applicable",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_POST": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SUBDIVIDE": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_MAPINBUF": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_MAPOUTBUF": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SETSYNCRO": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETCHANNELMASK": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_BIND_CHANNEL": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_SETSPDIF": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_GETSPDIF": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SNDCTL_DSP_PROFILE": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SOUND_PCM_WRITE_FILTER": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SOUND_PCM_READ_BITS": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    },
+    "SOUND_PCM_READ_FILTER": {
+      "family": "oss",
+      "supported": false,
+      "access": "no unsupported argument consumed after live-backend check",
+      "state": "live OSS OFD",
+      "errno": "ENOTTY; ENODEV takes precedence if backend absent",
+      "mmap": "OSS mmap unsupported",
+      "evidence": "tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c"
+    }
+  },
+  "mixer": {
+    "supported": "SOUND_MIXER_READ_* and SOUND_MIXER_WRITE_* for live hardware-backed controls, DEVMASK/RECMASK/STEREODEVS/CAPS/RECSRC/INFO; real masks and stereo percentage translation",
+    "unsupported": "SOUND_OLD_MIXER_INFO returns ENOTTY; unsupported channel/capability returns EOPNOTSUPP where stated by the hardware control mapping",
+    "access": "DAC at open plus actual element access and OFD lock ownership",
+    "state": "live actual controls; no fabricated controls",
+    "errno": "ENODEV absent card/control, EACCES read-only, EPERM locked by another OFD, ENOTTY unknown, EFAULT argument",
+    "mmap": "not applicable",
+    "evidence": "tools/tests/audio_mixer_test.c"
+  },
+  "requirements": {
+    "uapi": "tools/test_linux_audio.py abi; tools/test_header_export.py; tools/test_linux_abi_contract.py",
+    "node_dac_multicard": "tools/tests/audio_devfs_test.c; tools/tests/linux_permissions_test.c; tools/tests/audio_device_test.c",
+    "pcm_state_refine": "tools/tests/audio_pcm_state_test.c; tools/tests/audio_alsa_params_test.c; tools/tests/audio_alsa_ioctl_test.c",
+    "ofd_signal_short_io": "tools/tests/descriptor_table_test.c; tools/tests/process_signal_queue_test.c; tools/tests/audio_device_test.c; tools/tests/audio_guest_transport_test.c",
+    "mmap_lifetime": "tools/tests/audio_mmap_test.c; tools/tests/audio_vma_test.c",
+    "controls_oss": "tools/tests/audio_control_test.c; tools/tests/audio_oss_test.c; tools/tests/audio_oss_wait_test.c; tools/tests/audio_mixer_test.c",
+    "sysv_dmix_dependency": "tools/tests/sysv_shm_test.c; tools/tests/sysv_shm_native_probe.c; tools/tests/sysv_sem_test.c",
+    "guest_upstream_physical": "Actual R10 image five component SHAs match build outputs. Full standard matrix currently running; complete native EOF failed in first three cases. R9 600-second scene/load failed two XRUNs, R10 ALSA-file600 pending. GUI deferred to Xorg; physical codec gate not_run."
+  }
+}

@@ -122,6 +122,18 @@ class InstallerInputTests(unittest.TestCase):
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
+    def test_keyboard_irq_rejects_empty_and_auxiliary_output(self):
+        with tempfile.TemporaryDirectory(prefix="reliefos-keyboard-irq-") as tmp:
+            executable = str(Path(tmp) / "keyboard-irq")
+            subprocess.run([
+                "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
+                "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "tools/tests/keyboard_irq_ready_test.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
+
     def test_mouse_parameters_reach_auxiliary_port(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-mouse-") as tmp:
             executable = str(Path(tmp) / "mouse-init")

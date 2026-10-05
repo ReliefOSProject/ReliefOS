@@ -175,6 +175,7 @@ include $(RELIEFOS_SRC)/mk/third-party.mk
 include $(RELIEFOS_SRC)/mk/pam.mk
 include $(RELIEFOS_SRC)/mk/runtime.mk
 include $(RELIEFOS_SRC)/mk/upstream.mk
+include $(RELIEFOS_SRC)/mk/components/audio.mk
 include $(RELIEFOS_SRC)/mk/userland.mk
 include $(RELIEFOS_SRC)/mk/resources.mk
 include $(RELIEFOS_SRC)/mk/nls.mk
