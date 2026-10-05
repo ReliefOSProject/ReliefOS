@@ -38,8 +38,9 @@ Its title bar is symmetric: "TWM Icon Manager" sits between equal 9px gaps
 between the two default buttons.
 
 The root menu, titled `ReliefOS`, opens from any root-button press or
-Super+Space and offers new-xterm, window operations, `xeyes`, Dillo, NEdit,
-`About` and `Exit session`. TWM menus are hold-to-open: keep the button or key pressed,
+Super+Space and offers an `Applications` submenu, window operations, `About`
+and `Exit session`. The `Applications` submenu contains new-xterm, `xeyes`,
+Dillo and NEdit. TWM menus are hold-to-open: keep the button or key pressed,
 drag onto an entry and release on it to run it. The `NEdit` entry opens the
 NEdit text editor, installed with its Motif dependencies from the official
 Alpine APK repository by `make fetch`. Note that this TWM build only
