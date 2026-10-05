@@ -65,6 +65,7 @@ menu "applications"
 "Applications"  f.title
 "New xterm"     f.exec "xterm -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' &"
 "xeyes"         f.exec "xeyes &"
+"PCManFM"       f.exec "pcmanfm --desktop-off $HOME &"
 "Dillo"         f.exec "dillo &"
 "NEdit"         f.exec "nedit &"
 }
