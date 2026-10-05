@@ -28,7 +28,7 @@ tree() { record t "$1" "/$2" 0755 "$3" "${4:-unique}"; }
 link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
 # Independent upstream installations never share a destination during builds.
-for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs; do
+for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils; do
     for directory in bin sbin lib usr etc; do
         input=$out/upstream/$package/root/$directory
         if [ -d "$input" ]; then tree "$input" "$directory" "$package"; fi

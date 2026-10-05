@@ -1,7 +1,7 @@
 # Include after third-party.mk, pam.mk and runtime.mk. Each package owns an isolated root.
 UPSTREAM_ROOT := $(O)/upstream
 UPSTREAM_SCRIPT := $(RELIEFOS_SRC)/tools/build/upstream.sh
-UPSTREAM_PACKAGES := libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs
+UPSTREAM_PACKAGES := libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils
 upstream_libmd_outputs := lib/libmd.so.0 usr/include/md5.h
 upstream_libbsd_outputs := lib/libbsd.so.0 usr/include/bsd/stdlib.h
 upstream_util-linux_outputs := usr/lib/libuuid.a usr/lib/libblkid.a bin/su usr/sbin/fdisk bin/mount bin/lsblk
@@ -10,6 +10,7 @@ upstream_shadow_outputs := bin/login usr/sbin/useradd usr/sbin/usermod usr/sbin/
 upstream_e2fsprogs_outputs := usr/sbin/mkfs.ext4 usr/sbin/fsck.ext4 usr/sbin/mkfs.ext2 usr/sbin/fsck.ext2
 upstream_dosfstools_outputs := usr/sbin/mkfs.fat usr/sbin/fsck.fat
 upstream_exfatprogs_outputs := usr/sbin/mkfs.exfat usr/sbin/fsck.exfat
+upstream_coreutils_outputs := usr/bin/dd
 upstream_ncurses_outputs := usr/lib/libncursesw.a usr/lib/libtinfow.a usr/include/curses.h
 $(foreach package,$(UPSTREAM_PACKAGES) ncurses,$(eval upstream_$(package)_primary := $(upstream_$(package)_outputs)))
 upstream_libbsd_deps := libmd

@@ -49,6 +49,7 @@ e2fsprogs) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS
  set -- "$@" --sbindir=/usr/sbin --with-root-prefix=/usr --disable-libuuid --disable-libblkid --disable-elf-shlibs --disable-fsck --disable-uuidd --disable-nls --disable-fuse2fs --without-libarchive --with-udev-rules-dir=no --with-systemd-unit-dir=no --with-crond-dir=no ;;
 dosfstools) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS; set -- "$@" --sbindir=/usr/sbin --enable-compat-symlinks ;;
 exfatprogs) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS; set -- "$@" --sbindir=/usr/sbin --disable-shared --enable-static ;;
+coreutils) set -- "$@" --disable-nls --disable-acl --disable-xattr --without-gmp --without-libsigsegv --disable-dependency-tracking ;;
 *) echo "unsupported upstream package: $pkg" >&2; exit 2 ;;
 esac
 tmp=$(mktemp -d "$stage.new.XXXXXX")
@@ -60,6 +61,9 @@ if [ "$pkg" = sudo ]; then make install "DESTDIR=$tmp" INSTALL_OWNER=; else make
 case $pkg in
 libbsd) sed 's@GROUP(/lib/@GROUP(@' "$tmp/lib/libbsd.so" > "$tmp/lib/libbsd.so.new"; mv "$tmp/lib/libbsd.so.new" "$tmp/lib/libbsd.so"; rm "$tmp/lib/libbsd.la" ;;
 libmd) rm "$tmp/lib/libmd.la" ;;
+# Ship GNU dd only: BusyBox has no dd applet here and its dd lacks
+# status=progress, while the rest of coreutils must not shadow BusyBox applets.
+coreutils) find "$tmp" \( -type f -o -type l \) ! -path "$tmp/usr/bin/dd" -delete; find "$tmp" -mindepth 1 -type d -empty -delete ;;
 esac
 license=$(get license_in_source)
 mkdir -p "$tmp/usr/share/licenses/$pkg"

@@ -53,6 +53,13 @@
       "alpine_candidates": ["findutils"],
       "reason": "Use the official Alpine findutils implementation for find and xargs; do not duplicate these commands in BusyBox."
     },
+    "coreutils": {
+      "destination": "alpine-after-validation",
+      "components": [],
+      "paths": ["usr/bin/dd", "usr/share/licenses/coreutils"],
+      "alpine_candidates": ["coreutils"],
+      "reason": "Ship GNU dd only: this BusyBox has no dd applet and its dd lacks status=progress. Do not duplicate the remaining coreutils commands against BusyBox applets."
+    },
     "authentication": {
       "destination": "alpine-after-validation",
       "components": ["sudo", "su"],
