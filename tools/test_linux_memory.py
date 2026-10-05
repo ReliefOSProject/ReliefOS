@@ -10,9 +10,18 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class LinuxMemoryTests(unittest.TestCase):
+    def test_mprotect_linux_reference(self):
+        with tempfile.TemporaryDirectory(prefix="reliefos-mprotect-reference-") as tmp:
+            executable = str(Path(tmp) / "mprotect-runtime")
+            subprocess.run(["cc", "-std=c11", "-O1", "-pthread",
+                            "tools/tests/mprotect_runtime_probe.c", "-o", executable],
+                           cwd=ROOT, check=True)
+            subprocess.run([executable], cwd=ROOT, check=True, timeout=30)
+
     def test_memory_ownership_and_elf_page_boundaries(self):
         cases = (("physical_pages", []), ("paging_protection", []), ("private_anon_fault", []), ("elf_interpreter", []),
-                 ("elf_file_page", ["kernel/reliefnt/mm/page_cache.c"]), ("user_mmap_arena", []))
+                 ("elf_file_page", ["kernel/reliefnt/mm/page_cache.c"]), ("user_mmap_arena", []),
+                 ("mprotect_vma_growth", ["kernel/reliefnt/kernel/reliefnt/sched/sched.c"]))
         for name, sources in cases:
             with self.subTest(name=name), tempfile.TemporaryDirectory(prefix="reliefos-mm-") as tmp:
                 executable = str(Path(tmp) / name)
