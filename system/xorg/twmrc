@@ -60,7 +60,7 @@ Button2 = : icon : f.iconify
 Button1 = : iconmgr : f.iconify
 Button2 = : iconmgr : f.iconify
 
-menu "applications"
+menu "apps"
 {
 "Applications"  f.title
 "New xterm"     f.exec "xterm -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' &"
@@ -72,7 +72,7 @@ menu "applications"
 menu "defops"
 {
 "ReliefOS"      f.title
-"Applications"  f.menu "applications"
+"Apps"  f.menu "apps"
 ""              f.nop
 "Raise"         f.raise
 "Lower"         f.lower
