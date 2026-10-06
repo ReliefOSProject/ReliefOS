@@ -23,7 +23,7 @@ ldflags="--target=x86_64-linux-musl -nostdlib -fuse-ld=lld -Wl,--gc-sections -Wl
 for flag in ${UPSTREAM_LDFLAGS-}; do ldflags="$ldflags -Wl,$flag"; done
 startup="-Wl,$musl/lib/crt1.o -Wl,$musl/lib/crti.o -Wl,$musl/lib/mimalloc.o -Wl,$musl/lib/crtn.o"
 make -C "$work/source" O="$work/build" "CC=$cc" ARCH=x86_64 "CFLAGS=$cflags" "LDFLAGS=$ldflags" LDLIBS=c "EXTRA_LDFLAGS=$startup" busybox_unstripped busybox.links
-for applet in /bin/sh /bin/ash /bin/false; do grep -Fx "$applet" "$work/build/busybox.links" >/dev/null; done
+sh "$src/tools/build/busybox-check.sh" "$work/build/.config" "$work/build/busybox.links"
 cp "$work/build/busybox_unstripped" "$output/busybox.elf.tmp"
 chmod 755 "$output/busybox.elf.tmp"
 mv "$output/busybox.elf.tmp" "$output/busybox.elf"

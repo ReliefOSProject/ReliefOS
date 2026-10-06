@@ -25,5 +25,9 @@ done
 for library in sqlite.so.3; do
  readelf -d "$apps/$library" | grep -q '(SONAME)'
 done
-for applet in /bin/sh /bin/ash /bin/false; do grep -Fx "$applet" "$apps/busybox.links" >/dev/null; done
+src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+sh "$src/tools/build/busybox-check.sh" "$root/busybox/build/.config" "$apps/busybox.links"
+if readelf -l -d "$apps/busybox.elf" | grep -E 'INTERP|\(NEEDED\)'; then
+    echo "BusyBox is not static: $apps/busybox.elf" >&2; exit 1
+fi
 printf '%s\n' 'upstream app ELF/SONAME/applet checks: PASS'

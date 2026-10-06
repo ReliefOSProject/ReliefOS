@@ -99,7 +99,7 @@ BUSYBOX_LINKS := $(UPSTREAM_APP_DIR)/busybox.links
 UPSTREAM_EPOCH := $(if $(SOURCE_DATE_EPOCH),$(SOURCE_DATE_EPOCH),$(shell git -C $(RELIEFOS_SRC) log -1 --format=%ct))
 RELIEFOS_SIG_upstream-busybox := cc=$(TARGET_CC)|identity=$(shell $(TARGET_CC) --version 2>/dev/null | head -n1)|flags=$(RELIEFOS_OPTIMIZATION_FLAGS)|ldflags=$(RELIEFOS_LINK_POLICY_FLAGS)|epoch=$(UPSTREAM_EPOCH)
 $(if $(RELIEFOS_PASSIVE),,$(eval $(call RELIEFOS_SIGNATURE_RULE,upstream-busybox)))
-$(BUSYBOX_ELF) $(BUSYBOX_LINKS) &: $(RELIEFOS_SRC)/tools/build/upstream-busybox.sh $(RELIEFOS_SRC)/userland/busybox/leonos.config $(O_META)/upstream-busybox.sig $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(MUSL_STAMP) $(RELIEFOS_MUSL_ARTIFACTS) $(AUTH_STAMP) $(RELIEFOS_AUTH_ARTIFACTS)
+$(BUSYBOX_ELF) $(BUSYBOX_LINKS) &: $(RELIEFOS_SRC)/tools/build/upstream-busybox.sh $(RELIEFOS_SRC)/tools/build/busybox-check.sh $(RELIEFOS_SRC)/userland/busybox/leonos.config $(O_META)/upstream-busybox.sig $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(MUSL_STAMP) $(RELIEFOS_MUSL_ARTIFACTS) $(AUTH_STAMP) $(RELIEFOS_AUTH_ARTIFACTS)
 	$(Q)mkdir -p $(O_LOGS)
 	+$(Q)case "$${MAKEFLAGS%% *}" in *n*) exit 0;; esac; UPSTREAM_CFLAGS='$(RELIEFOS_OPTIMIZATION_FLAGS)' UPSTREAM_LDFLAGS='$(RELIEFOS_LINK_POLICY_FLAGS)' sh $(RELIEFOS_SRC)/tools/build/upstream-busybox.sh $(RELIEFOS_SRC) $(abspath $(UPSTREAM_ROOT))/busybox $(abspath $(UPSTREAM_APP_DIR)) $(abspath $(MUSL_SYSROOT)) $(abspath $(AUTH_ROOT))/usr/include $(TARGET_CC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(UPSTREAM_EPOCH) >$(O_LOGS)/upstream-busybox.log 2>&1 || { tail -n 50 $(O_LOGS)/upstream-busybox.log >&2; exit 1; }
 .PHONY: upstream-busybox
