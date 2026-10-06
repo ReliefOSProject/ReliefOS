@@ -98,10 +98,6 @@ msgstr ""
 msgid " source limit reached"
 msgstr ""
 
-#: userland/apps/ping/main.c:222
-msgid " while pinging "
-msgstr ""
-
 #: userland/runtime/src/ui.c:1767
 msgid "(none)"
 msgstr ""
@@ -140,10 +136,6 @@ msgstr ""
 
 #: userland/apps/apiapp/main.c:624
 msgid "API Installer"
-msgstr ""
-
-#: userland/apps/ping/main.c:239
-msgid "ARP + IPv4 + ICMP Echo over Intel e1000"
 msgstr ""
 
 #: userland/apps/browser/util.c:158
@@ -428,10 +420,6 @@ msgstr ""
 
 #: userland/apps/browser/util.c:186
 msgid "Bad socket"
-msgstr ""
-
-#: userland/apps/ping/main.c:144
-msgid "Bad target address"
 msgstr ""
 
 #: userland/apps/notepad/main.c:683
@@ -896,10 +884,6 @@ msgstr ""
 
 #: userland/apps/imageview/main.c:398
 msgid "Could not read image."
-msgstr ""
-
-#: userland/apps/ping/main.c:173
-msgid "Could not read network configuration."
 msgstr ""
 
 #: userland/apps/osver/main.c:231
@@ -1870,10 +1854,6 @@ msgstr ""
 msgid "Host:"
 msgstr ""
 
-#: userland/apps/ping/main.c:265
-msgid "ICMP Echo test"
-msgstr ""
-
 #: userland/apps/netctl/main.c:628
 msgid "IPv4:"
 msgstr ""
@@ -2020,10 +2000,6 @@ msgstr ""
 
 #: userland/apps/netctl/main.c:616
 msgid "Intel e1000 Network"
-msgstr ""
-
-#: userland/apps/ping/main.c:198
-msgid "Invalid IPv4 address"
 msgstr ""
 
 #: userland/apps/fileman/model.c:810
@@ -2390,10 +2366,6 @@ msgstr ""
 msgid "Mode Value"
 msgstr ""
 
-#: userland/apps/ping/main.c:238
-msgid "Mode:"
-msgstr ""
-
 #: userland/apps/drvmgr/main.c:188
 msgid "Modules run in Ring 0. Changes take effect immediately."
 msgstr ""
@@ -2510,14 +2482,6 @@ msgstr ""
 msgid "Network failure"
 msgstr ""
 
-#: userland/apps/ping/main.c:207
-msgid "Network ioctl failed"
-msgstr ""
-
-#: userland/apps/ping/main.c:234
-msgid "Network:"
-msgstr ""
-
 #: userland/apps/notepad/main.c:677
 msgid "New"
 msgstr ""
@@ -2620,10 +2584,6 @@ msgstr ""
 
 #: userland/apps/browser/util.c:156
 msgid "No e1000 adapter"
-msgstr ""
-
-#: userland/apps/ping/main.c:138
-msgid "No e1000 adapter is active"
 msgstr ""
 
 #: userland/apps/login/main.c:125
@@ -3042,14 +3002,6 @@ msgstr ""
 msgid "Personalize"
 msgstr ""
 
-#: userland/apps/ping/main.c:233
-msgid "Ping"
-msgstr ""
-
-#: userland/apps/ping/main.c:219
-msgid "Ping completed"
-msgstr ""
-
 #: userland/apps/fileman/actions.c:135
 msgid "Place shortcut on Desktop? No creates it here."
 msgstr ""
@@ -3286,14 +3238,6 @@ msgstr ""
 msgid "Replace boot, system, EFI and bundled docs. Then choose changed or missing system apps."
 msgstr ""
 
-#: userland/apps/ping/main.c:214
-msgid "Reply from "
-msgstr ""
-
-#: userland/apps/ping/main.c:142
-msgid "Request timed out"
-msgstr ""
-
 #: userland/apps/sysconfdialog/main.c:71
 msgid "Requesting application"
 msgstr ""
@@ -3388,10 +3332,6 @@ msgstr ""
 
 #: userland/apps/dynlinkerror/main.c:39
 msgid "Restore the library from the system image, then try again."
-msgstr ""
-
-#: userland/apps/ping/main.c:236
-msgid "Result:"
 msgstr ""
 
 #: userland/apps/browser/navigation.c:528
@@ -3640,10 +3580,6 @@ msgstr ""
 
 #: userland/apps/httpget/main.c:250
 msgid "Sending HTTPS GET..."
-msgstr ""
-
-#: userland/apps/ping/main.c:203
-msgid "Sending ICMP Echo request..."
 msgstr ""
 
 #: userland/apps/devmgr/main.c:93
@@ -4038,10 +3974,6 @@ msgstr ""
 msgid "Tar finalize failed"
 msgstr ""
 
-#: userland/apps/ping/main.c:231
-msgid "Target IPv4:"
-msgstr ""
-
 #: userland/apps/installer/main.c:3260
 msgid "Target disk is ready."
 msgstr ""
@@ -4172,10 +4104,6 @@ msgstr ""
 
 #: userland/apps/installer/main.c:1218
 msgid "The installed system will use the same language."
-msgstr ""
-
-#: userland/apps/ping/main.c:208
-msgid "The kernel rejected the ping request."
 msgstr ""
 
 #: userland/apps/installer/main.c:1460
@@ -4452,10 +4380,6 @@ msgstr ""
 
 #: userland/apps/settings/main.c:1390
 msgid "Use as default"
-msgstr ""
-
-#: userland/apps/ping/main.c:199
-msgid "Use dotted decimal form, for example 10.0.2.2."
 msgstr ""
 
 #: userland/apps/browser/navigation.c:812

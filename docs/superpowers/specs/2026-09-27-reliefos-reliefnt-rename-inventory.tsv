@@ -723,7 +723,6 @@ main	userland/apps/oschinpt/main.c	40	0	0	0	0	0
 main	userland/apps/oshlp/main.c	80	0	0	0	0	0
 main	userland/apps/osver/main.c	79	0	1	0	0	0
 main	userland/apps/paint/main.c	58	0	0	0	0	0
-main	userland/apps/ping/main.c	44	0	0	0	0	0
 main	userland/apps/pleditor/platform_leonos.c	10	0	0	0	1	0
 main	userland/apps/rcctl/main.c	2	0	0	0	0	0
 main	userland/apps/rprfetch/main.c	3	0	0	0	0	0

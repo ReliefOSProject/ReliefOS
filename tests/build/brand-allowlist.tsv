@@ -288,6 +288,7 @@ main	compatibility	tests/build/brand-allowlist.tsv	audit data itself
 main	compatibility	tests/build/test-apk-ownership.sh	针对 test-apk-ownership 的旧配置/旧变量/头库/路径/目标输入与新 canonical 共存回归；旧临时前缀可独立规范化
 main	compatibility	tests/build/test-auth-stage.sh	主动验证旧 leonos-auth make 别名和 LEONOS_* 构建变量兼容输入
 main	compatibility	tests/build/test-brand-identity.sh	audit tool itself
+main	compatibility	tests/build/test-busybox-profile.sh	读取现行 BusyBox profile 的历史文件名 leonos.config，验证官方 applet 清单
 main	compatibility	tests/build/test-config-migrate.sh	legacy configuration backup compatibility
 main	compatibility	tests/build/test-deps.sh	针对 test-deps 的旧配置/旧变量/头库/路径/目标输入与新 canonical 共存回归；旧临时前缀可独立规范化
 main	compatibility	tests/build/test-header-boundary.sh	旧 NTCLKS_DIR 输入回退，并验证新旧公共头同时导出
@@ -453,7 +454,6 @@ main	compatibility	userland/apps/oschinpt/main.c	旧 leonos 输入词条仍解�
 main	compatibility	userland/apps/oshlp/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/osver/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/paint/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/ping/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/run/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/servicemgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/settings/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌

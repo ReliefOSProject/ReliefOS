@@ -11,13 +11,13 @@ END {exit bad}' "$links"
 for name in find xargs dd mount umount fdisk sfdisk blkid lsblk fsck runuser \
     su login passwd sulogin chpasswd adduser addgroup deluser delgroup \
     cryptpw mkpasswd chattr lsattr tune2fs mke2fs mkfs.ext2 mkdosfs mkfs.vfat nologin \
-    ping ping6 clear reset resize less wget xxd start-stop-daemon; do
+    clear reset resize less wget xxd start-stop-daemon; do
     if awk -F / -v name="$name" '$NF==name {found=1} END {exit !found}' "$links"; then
         echo "BusyBox owns externally provided applet: $name" >&2
         exit 1
     fi
 done
-for name in sh ash false df free top dmesg hexdump killall nc netstat \
+for name in sh ash false ping ping6 df free top dmesg hexdump killall nc netstat \
     traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod \
     unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch; do
     awk -F / -v name="$name" '$NF==name {found=1} END {exit !found}' "$links" || {

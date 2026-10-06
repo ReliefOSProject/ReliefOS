@@ -243,19 +243,6 @@ def icon_bugtest(c: list[list[tuple[int, int, int, int]]]) -> None:
     text3(c, 7, 7, "!", BLACK)
 
 
-def icon_ping(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 2, 7, 3, 2, GREEN)
-    fill(c, 11, 7, 3, 2, GREEN)
-    rect(c, 2, 7, 3, 2, DARK)
-    rect(c, 11, 7, 3, 2, DARK)
-    line(c, 5, 8, 7, 6, BLUE)
-    line(c, 7, 6, 9, 6, BLUE)
-    line(c, 9, 6, 11, 8, BLUE)
-    line(c, 5, 8, 7, 10, CYAN)
-    line(c, 7, 10, 9, 10, CYAN)
-    line(c, 9, 10, 11, 8, CYAN)
-
-
 def icon_netctl(c: list[list[tuple[int, int, int, int]]]) -> None:
     fill(c, 2, 3, 12, 10, WHITE)
     rect(c, 2, 3, 12, 10, DARK)
@@ -433,8 +420,6 @@ def draw_icon(name: str) -> list[list[tuple[int, int, int, int]]]:
         icon_memtest(c)
     elif name == "bugtest":
         icon_bugtest(c)
-    elif name == "ping":
-        icon_ping(c)
     elif name == "netctl":
         icon_netctl(c)
     elif name in {"sessiond", "device-agent"}:

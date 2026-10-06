@@ -15,7 +15,7 @@ applet directly:
 The profile adds process and filesystem diagnostics (`df`, `free`, `top`,
 `dmesg`, `lsof`, `pgrep`, `pstree`), text tools (`hexdump`, `od`, `tree`, `bc`,
 `dc`), archive tools (`cpio`, `unzip`, `bzip2`, XZ/LZMA decompression, `lzop`),
-network tools (`nc`, `netstat`, `traceroute`, `telnet`, FTP/TFTP tools), and
+network tools (`ping`, `ping6`, `nc`, `netstat`, `traceroute`, `telnet`, FTP/TFTP tools), and
 administration applets (`crond`, `crontab`, `mdev`, module tools). `ls`, `cp`,
 `diff` and `tar` include their usual extended options. BusyBox's `xz` and
 `lzma` applets decompress only; they do not provide compression.
@@ -39,7 +39,12 @@ excluded from this profile:
 - ncurses supplies `clear` and `reset`; xterm supplies `resize`.
 - The official Alpine packages supply `less` and `xxd`. GNU `wget` is supplied
   with the Xorg backend; the BusyBox wget/TLS implementations remain disabled.
-- OpenRC supplies `start-stop-daemon`; ReliefOS supplies the native `ping`.
+- OpenRC supplies `start-stop-daemon`.
+
+BusyBox supplies `/bin/ping` and `/bin/ping6` as command-line applets using
+ICMP sockets. Raw sockets require the kernel's applicable permissions; no
+setuid mode is added to BusyBox. IPv6 requires support in the target kernel.
+For example, run `ping -c 3 -W 2 10.0.2.2` from a terminal.
 
 Rootfs staging inspects files, symlinks and selected directory trees in its
 plan before adding BusyBox links. A command already provided in any of
