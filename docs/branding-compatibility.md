@@ -113,11 +113,18 @@ SourceHut 同步和 GitHub Actions Secret 的外部状态仍需在对应服务�
 
 下列材料保留编写时使用的品牌、仓库名和技术标识，以维持历史证据与第三方
 归属的真实性；新文档和当前实现应以本文及新规范路径为准。
+`docs/superpowers/` 下的内部设计、计划与验证记录不发布到 Pages；以下引用
+保留完整仓库路径，请在源码仓库中查阅。
 
 - 作者说明：根目录 `BY_AUTHOR.md`
-- 旧 NTCLKS 分离设计：[2026-09-24-ntclks-separation-design.md](superpowers/specs/2026-09-24-ntclks-separation-design.md)、[09-m1-authority-design-review.md](superpowers/ntclks-separation/09-m1-authority-design-review.md)
+- 旧 NTCLKS 分离设计：`docs/superpowers/specs/2026-09-24-ntclks-separation-design.md`、
+  `docs/superpowers/ntclks-separation/09-m1-authority-design-review.md`
 - 历史安全审计：[2026-07-07.md](security/2026-07-07.md)、[2026-08-04.md](security/2026-08-04.md)、[2026-08-30.md](security/2026-08-30.md)、[2026-09-11.md](security/2026-09-11.md)
 - Linux ABI 现状审计：[LINUX_ABI_AUDIT_2026-09-07.md](LINUX_ABI_AUDIT_2026-09-07.md)
-- 本次迁移的基线、设计和执行计划：[基线](superpowers/specs/2026-09-27-reliefos-reliefnt-rename-baseline.md)、[设计规格](superpowers/specs/2026-09-27-reliefos-reliefnt-rename-design.md)、[实施计划](superpowers/plans/2026-09-27-reliefos-reliefnt-rename.md)
+- 本次迁移的基线、设计和执行计划：基线
+  `docs/superpowers/specs/2026-09-27-reliefos-reliefnt-rename-baseline.md`、设计规格
+  `docs/superpowers/specs/2026-09-27-reliefos-reliefnt-rename-design.md`、实施计划
+  `docs/superpowers/plans/2026-09-27-reliefos-reliefnt-rename.md`
 
-任务 11 的分层证据、最终制品校验和及未运行环境见 [本地验证记录](superpowers/task11-verification.md)。本地 QEMU 通过不代表上述外部服务门禁通过。
+任务 11 的分层证据、最终制品校验和及未运行环境见本地验证记录
+`docs/superpowers/task11-verification.md`。本地 QEMU 通过不代表上述外部服务门禁通过。
