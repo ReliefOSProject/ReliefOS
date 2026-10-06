@@ -3,23 +3,44 @@
 set -eu
 . "$(CDPATH= cd -- "$(dirname "$0")/../../scripts" && pwd)/logging.sh"
 
-if [ "$#" -ne 10 ]; then
-    echo 'usage: apk-stage.sh SRC RAW_ROOT OUTPUT_ROOT WORK APK UPSTREAM POLICY OWN_TOOL KEY VERSION' >&2
+if [ "$#" -ne 12 ]; then
+    echo 'usage: apk-stage.sh SRC RAW_ROOT OUTPUT_ROOT WORK APK UPSTREAM DEPS LOCK POLICY OWN_TOOL KEY VERSION' >&2
     exit 2
 fi
-src=$1 raw=$2 output=$3 work=$4 apk=$5 upstream=$6 policy=$7 own=$8 key=$9
+src=$1 raw=$2 output=$3 work=$4 apk=$5 upstream=$6 deps=$7 lock=$8 policy=$9
 shift 9
+own=$1 key=$2
+shift 2
 version=$1
 
 case $version in *[!A-Za-z0-9._+-]*|'') echo "invalid APK version: $version" >&2; exit 2;; esac
-for item in "$src" "$raw" "$work" "$apk" "$upstream" "$policy" "$own"; do
+for item in "$src" "$raw" "$work" "$apk" "$upstream" "$deps" "$lock" "$policy" "$own"; do
     case $item in *"	"*|*"
 "*) echo 'APK paths may not contain tabs or newlines' >&2; exit 2;; esac
 done
 [ -d "$raw" ] || { echo "raw APK root is missing: $raw" >&2; exit 1; }
 [ -x "$apk" ] || { echo "verified apk is missing: $apk" >&2; exit 1; }
+[ -x "$deps" ] || { echo "dependency query tool is missing: $deps" >&2; exit 1; }
+[ -f "$lock" ] || { echo "dependency lock is missing: $lock" >&2; exit 1; }
 [ -x "$own" ] || { echo "ownership tool is missing: $own" >&2; exit 1; }
 [ -d "$upstream/packages" ] || { echo "verified upstream package directory is missing: $upstream/packages" >&2; exit 1; }
+
+# The desktop backend marker is a plain single-line value; never source it.
+# Unknown, empty, multi-line or missing markers abort before any staging work.
+backend_file=$raw/etc/reliefos/desktop-backend
+[ -f "$backend_file" ] || { echo "desktop backend marker is missing: $backend_file" >&2; exit 1; }
+backend=
+backend_lines=0
+while IFS= read -r marker_line || [ -n "$marker_line" ]; do
+    backend_lines=$((backend_lines + 1))
+    [ "$backend_lines" -gt 1 ] || backend=$marker_line
+    marker_line=
+done <"$backend_file"
+[ "$backend_lines" = 1 ] || { echo "desktop backend marker must be exactly one line: $backend_file" >&2; exit 1; }
+case $backend in
+    reliefos|xorg) ;;
+    *) echo "invalid desktop backend marker: $backend_file" >&2; exit 1 ;;
+esac
 
 mkdir -p "$work" "$(dirname "$output")"
 scratch=$(mktemp -d "$work/.apk-stage.XXXXXX")
@@ -29,6 +50,31 @@ repository=$scratch/repository
 managed=$scratch/managed
 mkdir -p "$tree" "$repository" "$managed"
 : >"$scratch/upstream-requests"
+
+# Select upstream archives by their lock feature before any staging step can
+# see a filtered package: repository copy, raw overlay deletion, ownership
+# scan, the APK transaction and the index all consume this list. Selection is
+# driven by the dependency lock, never by archive or package names.
+: >"$scratch/kept-archives"
+for archive in "$upstream"/packages/*.apk; do
+    [ -f "$archive" ] || continue
+    tar --ignore-zeros -xOf "$archive" .PKGINFO >"$scratch/upstream-pkginfo" 2>/dev/null ||
+        { echo "invalid APK metadata: $archive" >&2; exit 1; }
+    upstream_name=$(sed -n 's/^pkgname = //p' "$scratch/upstream-pkginfo")
+    [ -n "$upstream_name" ] || { echo "invalid APK metadata: $archive" >&2; exit 1; }
+    if ! feature=$("$deps" --lock "$lock" --id "alpine-$upstream_name" --print feature); then
+        echo "dependency lock entry is missing for APK package: $upstream_name (lock: $lock)" >&2
+        exit 1
+    fi
+    case $feature in
+        base) ;;
+        xorg) [ "$backend" = xorg ] || continue ;;
+        *) echo "invalid dependency feature for APK package: $upstream_name (lock: $lock): $feature" >&2; exit 1 ;;
+    esac
+    printf '%s\n' "$archive" >>"$scratch/kept-archives"
+done
+reliefos_log APK "selected $(wc -l <"$scratch/kept-archives") upstream archives for the $backend desktop backend"
+
 cp -a "$raw"/. "$tree"/
 
 # Media-only payloads are copied back after the transaction and never claimed
@@ -61,8 +107,7 @@ fi
 # Files from pinned official archives retain their upstream signatures and
 # package ownership. The verified APK archive member list is the authority for
 # their file paths; metadata members are not root payload.
-for archive in "$upstream"/packages/*.apk; do
-    [ -f "$archive" ] || continue
+while IFS= read -r archive; do
     cp "$archive" "$repository/"
     tar --ignore-zeros -xOf "$archive" .PKGINFO >"$scratch/upstream-pkginfo" 2>/dev/null
     upstream_name=$(sed -n 's/^pkgname = //p' "$scratch/upstream-pkginfo")
@@ -75,7 +120,7 @@ for archive in "$upstream"/packages/*.apk; do
         case $path in /*|*../*|../*|*"	"*) echo "unsafe upstream APK path: $path" >&2; exit 1;; esac
         rm -f "$tree/$path"
     done <"$scratch/upstream-members"
-done
+done <"$scratch/kept-archives"
 
 # These optional applets are unowned fallbacks supplied by the package trigger.
 # Shipping them as package files conflicts with an already installed binutils.

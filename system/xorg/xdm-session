@@ -1,0 +1,109 @@
+#!/bin/sh
+# XDM invokes this script as the authenticated user.
+#
+# The lifecycle events below are written to the write-only descriptor the root
+# launcher exported as RELIEFOS_XORG_EVENT_FD, never to a path the session can
+# read or truncate.  Each event is recorded only after the corresponding child
+# really started, so the recorded order matches the real session lifetime.
+set -u
+umask 077
+
+if test -z "${HOME:-}" || test -z "${DISPLAY:-}"; then
+    exit 1
+fi
+
+uid=$(id -u 2>/dev/null || printf '%s' unknown)
+
+event_fd=${RELIEFOS_XORG_EVENT_FD:-}
+event() {
+    printf '%s\n' "$1"
+    case "$event_fd" in
+        ''|*[!0-9]*) ;;
+        *) printf '%s\n' "$1" >&"$event_fd" 2>/dev/null || : ;;
+    esac
+}
+
+# XDM has already authenticated the account and set its uid/home.  Root is a
+# valid local desktop account in ReliefOS, so keep the authenticated uid here
+# instead of rejecting it and making the greeter loop forever.
+case "$uid" in
+    ''|unknown)
+        event 'xdm-session: authenticated uid unavailable'
+        exit 1
+        ;;
+esac
+
+session_log=$HOME/.xsession-errors
+: > "$session_log" 2>/dev/null || session_log=${XDG_CACHE_HOME:-/tmp}/reliefos-xsession-errors."$uid"
+exec >> "$session_log" 2>&1
+
+# Start a program in the background and leave its pid in child_pid only when it
+# is really running.  A missing or non-executable program is refused up front;
+# a program that dies immediately is reported instead of being called "started".
+child_pid=
+start_child() {
+    start_name=$1
+    shift
+    child_pid=
+    if ! test -x "$1"; then
+        event "$start_name failed to start"
+        return 1
+    fi
+    "$@" &
+    child_pid=$!
+    start_tries=0
+    while test "$start_tries" -lt 64; do
+        # Waiting on a throwaway child forces the shell through its job reaping,
+        # so a child that died right after exec is seen as gone instead of as an
+        # unreaped zombie that kill -0 still accepts.
+        ( : ) & wait $! 2>/dev/null
+        if ! kill -0 "$child_pid" 2>/dev/null; then
+            wait "$child_pid" 2>/dev/null
+            child_pid=
+            event "$start_name failed to start"
+            return 1
+        fi
+        start_tries=$((start_tries + 1))
+    done
+    return 0
+}
+
+event 'PAM authentication accepted'
+
+twm_pid=
+xterm_pid=
+cleanup() {
+    for pid in $xterm_pid $twm_pid; do
+        kill "$pid" 2>/dev/null || :
+    done
+    for pid in $xterm_pid $twm_pid; do
+        wait "$pid" 2>/dev/null || :
+    done
+}
+trap cleanup EXIT HUP INT TERM
+
+# Retro pixel-art root background matching the TWM Light theme.  This is a
+# best-effort one-shot: on failure the X server keeps its default background.
+if test -x /usr/bin/xwallpaper; then
+    /usr/bin/xwallpaper --focus /etc/reliefos/wallpaper.png 2>/dev/null || :
+fi
+
+start_child twm /usr/bin/twm -f /etc/reliefos/twmrc || exit 1
+twm_pid=$child_pid
+event "twm started for uid=$uid"
+
+start_child xterm /usr/bin/xterm -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' || exit 1
+xterm_pid=$child_pid
+event 'xterm started'
+
+# The window manager owns the session lifetime; xterm is torn down with it.
+wait "$twm_pid"
+status=$?
+twm_pid=
+if test -n "$xterm_pid"; then
+    kill "$xterm_pid" 2>/dev/null || :
+fi
+wait "$xterm_pid" 2>/dev/null || :
+xterm_pid=
+event 'xdm session ended'
+exit "$status"

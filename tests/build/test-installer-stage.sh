@@ -23,9 +23,13 @@ printf 'menuentry reliefos\n' > "$w/esp/grub/grub.cfg"
 cat > "$w/src/tools/build/apk-stage.sh" <<'ADAPTER'
 #!/bin/sh
 set -eu
+[ "$#" = 12 ] || { echo "adapter: expected 12 arguments, got $#" >&2; exit 2; }
+[ "$7" = fixture-deps ] || { echo "adapter: wrong dependency tool: $7" >&2; exit 2; }
+[ "$8" = fixture-lock ] || { echo "adapter: wrong dependency lock: $8" >&2; exit 2; }
 cp -a "$2" "$3"
 ADAPTER
-APK_TOOL=fixture APK_UPSTREAM=fixture APK_OWN_TOOL=fixture APK_KEY=fixture APK_VERSION=fixture \
+APK_TOOL=fixture APK_UPSTREAM=fixture APK_DEPS_TOOL=fixture-deps APK_LOCK=fixture-lock \
+ APK_OWN_TOOL=fixture APK_KEY=fixture APK_VERSION=fixture \
  sh "$src/tools/build/installer-stage.sh" "$w/src" "$w/out" "$w/raw" "$w/esp" "$w/stage" 1700000000
 program=usr/lib/reliefos/apps/installer/installer.elf
 [ -x "$w/stage/$program" ] || { echo 'FAIL - installer executable missing from runtime package'; exit 1; }
@@ -33,6 +37,12 @@ cmp "$w/out/userland/installer.elf" "$w/stage/$program"
 [ "$(readlink "$w/stage/usr/bin/installer")" = ../lib/reliefos/apps/installer/installer.elf ]
 [ -f "$w/stage/usr/lib/reliefos/libreliefos.so.2" ]
 [ -f "$w/stage/usr/lib/leonos/libleonos.so.2" ]
+[ "$(cat "$w/stage/etc/reliefos/desktop-backend")" = reliefos ]
+[ -L "$w/stage/etc/runlevels/default/reliefos-windowd" ]
+[ -L "$w/stage/etc/runlevels/default/reliefos-session" ]
+[ ! -e "$w/stage/etc/reliefos/xdm.conf" ]
+[ ! -e "$w/stage/etc/reliefos/xdm-session" ]
+[ ! -e "$w/stage/etc/reliefos/twmrc" ]
 [ ! -e "$w/stage/install/root/$program" ]
 [ -f "$w/stage/install/esp/reliefos/loader.elf" ]
 [ -f "$w/stage/install/esp/reliefos/kernel.sys" ]

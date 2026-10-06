@@ -20,7 +20,7 @@ class SvgaTests(unittest.TestCase):
                 "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
                 "-fsanitize=address,undefined", "-fno-omit-frame-pointer",
                 "-DSVGA_HOST_TEST", "-Ikernel/reliefnt/kernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                "-Idrivers/bootstrap/svga", "tools/tests/svga_test.c",
+                "-Ikernel/reliefnt/drivers/bootstrap/svga", "tools/tests/svga_test.c",
                 *(str(path) for path in SOURCES), "-o", str(executable),
             ], cwd=ROOT, check=True)
             subprocess.run([str(executable)], cwd=ROOT, check=True, timeout=30)

@@ -1,7 +1,11 @@
 #include <assert.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "../../kernel/reliefnt/drivers/bootstrap/console.c"
+
+void *kernel_malloc(size_t size) { return malloc(size); }
+void kernel_free(void *ptr) { free(ptr); }
 
 static uint32_t pixels[80 * 48];
 static const struct framebuffer display = {

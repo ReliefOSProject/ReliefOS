@@ -46,12 +46,12 @@ def main() -> int:
         (root / "src").mkdir()
         (root / "build").mkdir()
         (root / "skip").mkdir()
-        (root / "third_party" / "cmd").mkdir(parents=True)
+        (root / "third_party" / "vendored").mkdir(parents=True)
         (root / "third_party" / "keep").mkdir(parents=True)
         (root / "src" / "main.c").write_text("int main(void) { return 0; }\n", encoding="utf-8")
         (root / "build" / "generated.c").write_text("int generated;\n", encoding="utf-8")
         (root / "skip" / "ignored.py").write_text("print(1)\n", encoding="utf-8")
-        (root / "third_party" / "cmd" / "cmd.c").write_text("int cmd;\n", encoding="utf-8")
+        (root / "third_party" / "vendored" / "vendored.c").write_text("int vendored;\n", encoding="utf-8")
         (root / "third_party" / "keep" / "keep.c").write_text("int keep;\n", encoding="utf-8")
 
         summary = run(str(root), "--no-config", "--exclude", "third_party",
@@ -71,7 +71,7 @@ def main() -> int:
 
         config_path = root / ".codecount-config.json"
         config_path.write_text(json.dumps({
-            "exclude": ["third_party/cmd"],
+            "exclude": ["third_party/vendored"],
             "exclude_dirs": ["skip"],
             "exclude_files": [".codecount-config.json"],
             "exclude_languages": [],
@@ -79,7 +79,7 @@ def main() -> int:
         }), encoding="utf-8")
         configured = run(str(root), "--config", str(config_path), "--jobs", "1")
         assert configured["total"]["files"] == 2
-        assert "third_party/cmd" not in configured["parts"]
+        assert "third_party/vendored" not in configured["parts"]
         assert "third_party" in configured["parts"]
         assert configured["parts"]["third_party"]["files"] == 1
 
@@ -100,16 +100,16 @@ def main() -> int:
         git(history_root, "config", "user.email", "test@example.invalid")
         git(history_root, "config", "user.name", "Code Count Test")
         (history_root / "src").mkdir()
-        (history_root / "third_party" / "cmd").mkdir(parents=True)
+        (history_root / "third_party" / "vendored").mkdir(parents=True)
         (history_root / "src" / "main.c").write_text("int main;\n", encoding="utf-8")
-        (history_root / "third_party" / "cmd" / "cmd.c").write_text("int cmd;\n", encoding="utf-8")
+        (history_root / "third_party" / "vendored" / "vendored.c").write_text("int vendored;\n", encoding="utf-8")
         git(history_root, "add", ".")
         git(history_root, "commit", "-q", "-m", "initial")
         (history_root / "src" / "main.c").write_text("int main;\nint next;\n", encoding="utf-8")
         git(history_root, "add", ".")
         git(history_root, "commit", "-q", "-m", "grow")
         history = run(str(history_root), "--history", "--no-config",
-                      "--exclude", "third_party/cmd", "--no-progress")
+                      "--exclude", "third_party/vendored", "--no-progress")
         assert history["method"] == "git-numstat"
         assert history["total_commits"] == 2
         assert history["commits"][0]["lines"] == 1
@@ -117,7 +117,7 @@ def main() -> int:
         assert history["final_lines"] == 2
 
         history_markdown = run_markdown(str(history_root), "--history", "--no-config",
-                                        "--exclude", "third_party/cmd", "--no-progress")
+                                        "--exclude", "third_party/vendored", "--no-progress")
         assert history_markdown.startswith("# ReliefOS Code Growth History")
         assert "Cumulative lines" in history_markdown
 

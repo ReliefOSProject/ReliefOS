@@ -525,6 +525,16 @@ static void test_fifo(void)
     setup(SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
           SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE, SVGA3D_HWVERSION_WS8_B1);
     assert(svga.available && configured_guest == SVGA3D_HWVERSION_WS8_B1);
+    /* A normal scanout update is asynchronous: a stalled host must not turn
+     * the framebuffer present path into a bounded BUSY wait. */
+    stalled = true;
+    fifo[SVGA_FIFO_NEXT_CMD] = fifo[SVGA_FIFO_STOP] = svga.min;
+    uint32_t busy_before = busy_reads;
+    assert(svga_update(1, 2, 3, 4) == 0);
+    assert(busy_reads == busy_before);
+    assert(fifo[SVGA_FIFO_NEXT_CMD] != fifo[SVGA_FIFO_STOP]);
+    stalled = false;
+    consume();
     for (uint32_t reserve = 0; reserve < 2; ++reserve) {
         svga.fifo_caps = SVGA_FIFO_CAP_FENCE | (reserve ? SVGA_FIFO_CAP_RESERVE : 0);
         for (uint32_t tail = 4; tail <= 20; tail += 4) {
@@ -1088,7 +1098,9 @@ static void test_gb_recovery(void)
     assert(svga3d_init() == SVGA_ETIMEDOUT && svga.gb_active && !svga.available);
     assert(live_pages == baseline && svga.min == 1164);
     assert(svga_configure_locked(false) == SVGA_EBUSY);
-    assert(svga_update(0, 0, 8, 8) == SVGA_ETIMEDOUT);
+    uint32_t busy_before = busy_reads;
+    assert(svga_update(0, 0, 8, 8) == 0);
+    assert(busy_reads == busy_before);
     stalled = false; consume();
     assert(!svga3d_init() && svga.available && live_pages == baseline);
     assert(!svga3d_shutdown() && !live_pages);

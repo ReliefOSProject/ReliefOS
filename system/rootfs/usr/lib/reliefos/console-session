@@ -5,6 +5,11 @@ case "$1" in
     *) exit 2 ;;
 esac
 
+start_getty() {
+    exec \
+        /sbin/getty -n -l /usr/lib/reliefos/apps/login/login.elf 115200 "$1"
+}
+
 if test "$1" = tty1; then
     # The kernel keeps only the /proc/cmdline mechanism; the installer UI
     # selection is decided here from the exact boot command line token.
@@ -14,11 +19,43 @@ if test "$1" = tty1; then
         cd "$HOME" || exit 1
         exec /usr/lib/reliefos/apps/login/login.elf --installer-shell
     fi
-    if test -f /etc/reliefos/desktop-session &&
+    desktop_backend=
+    if test -f /etc/reliefos/desktop-backend; then
+        # The marker is data, not shell syntax.  Require exactly one line and
+        # reject missing, empty, unknown, or multi-line values without a
+        # native-desktop fallback.
+        desktop_backend=$(awk '
+            NR == 1 { value = $0 }
+            NR > 1 { invalid = 1 }
+            END {
+                if (NR != 1 || invalid || (value != "reliefos" && value != "xorg")) exit 1
+                print value
+            }
+        ' /etc/reliefos/desktop-backend 2>/dev/null) || {
+            printf '%s\n' 'console-session: invalid desktop backend marker; using text login' >&2
+            start_getty "$1"
+        }
+    else
+        printf '%s\n' 'console-session: missing desktop backend marker; using text login' >&2
+        start_getty "$1"
+    fi
+    if test "$desktop_backend" = xorg &&
        test ! -e /run/reliefos/graphical-session-started; then
         : > /run/reliefos/graphical-session-started
+        # XDM is the foreground, final child of this console session: no extra
+        # text getty or shell owns tty1 while the graphical session runs.  It
+        # returns here and the single text getty handoff below takes over.
+        /usr/lib/reliefos/reliefos-xdm >>/var/log/xorg-session.log 2>&1
+        xdm_status=$?
+        printf '%s\n' "console-session: xdm exit status=$xdm_status" \
+            >>/var/log/xorg-session.log
+        printf '%s\n' 'tty1 restored to text login' >>/var/log/xorg-session.log
+    elif test "$desktop_backend" = reliefos &&
+         test -f /etc/reliefos/desktop-session &&
+         test ! -e /run/reliefos/graphical-session-started; then
+        : > /run/reliefos/graphical-session-started
         /usr/lib/reliefos/apps/login/login.elf --graphical-session \
-            >>/var/log/desktop.log 2>&1
+            >>/var/log/desktop.log 2>&1 || :
     fi
 fi
 # Installation media has locked account passwords; offer the same local
@@ -28,4 +65,5 @@ if test -f /etc/reliefos/installer-runtime; then
     cd "$HOME" || exit 1
     exec /usr/lib/reliefos/apps/login/login.elf --installer-shell
 fi
-exec /sbin/getty -n -l /usr/lib/reliefos/apps/login/login.elf 115200 "$1"
+# exec /sbin/getty -n -l is the final text-login handoff.
+start_getty "$1"

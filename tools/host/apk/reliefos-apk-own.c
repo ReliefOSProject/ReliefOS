@@ -167,7 +167,6 @@ static int load_rules(struct state *state, const char *policy_path, json_value *
             {"reliefos-fastfetch", "etc/skel/.config/hyfetch.json"},
             {"reliefos-apps", "usr/share/licenses/pleditor"},
             {"busybox", "bin/busybox"}, {"busybox", "bin/sh"}, {"busybox", "usr/share/licenses/busybox"},
-            {"reliefos-apps", "opt/cmd"}, {"reliefos-apps", "usr/bin/cmd"}, {"reliefos-apps", "usr/share/licenses/cmd"},
             {"ncurses", "usr/share/terminfo"}, {"ncurses", "etc/terminfo"},
             {"ncurses", "usr/share/licenses/ncurses"}, {"sl", "usr/bin/sl"}, {"sl", "usr/share/licenses/sl"}
         };

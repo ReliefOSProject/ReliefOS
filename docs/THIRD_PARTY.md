@@ -40,7 +40,6 @@ commits are the revisions recorded by the ReliefOS checkout.
 | Path | Upstream | Pinned commit |
 | --- | --- | --- |
 | `third_party/busybox` | `https://github.com/mirror/busybox.git` | `1a64f6a20aaf6ea4dbba68bbfa8cc1ab7e5c57c4` |
-| `third_party/cmd` | `https://github.com/ChenPi11/cmd.git` | `2290c38bc9da54db53aa56161a7204a27b388e21` |
 | `third_party/libpng` | `https://github.com/pnggroup/libpng.git` | `3061454d980de7d53608f594194cfac722721d2a` |
 | `third_party/litehtml` | `https://github.com/litehtml/litehtml.git` | `b9e89f0b9494ff9a5f008800af35503efabddf59` |
 | `third_party/mbedtls` | `https://github.com/Mbed-TLS/mbedtls.git` | `5a764e5555c64337ed17444410269ff21cb617b1` |
@@ -264,27 +263,6 @@ multi-encoding file persistence. It is launched through Terminal and supports
 syntax highlighting, search, undo/redo, line numbers, automatic bracket
 completion, CRLF preservation, wrapped welcome messages and the fork's
 extended syntax set.
-
-## ChenPi11 cmd
-
-- Path: `third_party/cmd`
-- Upstream: `https://github.com/ChenPi11/cmd`
-- Version: `0.1.0`
-- Pinned commit: `2290c38bc9da54db53aa56161a7204a27b388e21`
-- License: GPL-3.0-only; the complete upstream `LICENSE` is staged at
-  `/opt/cmd/LICENSE` beside the executable.
-
-ReliefOS builds the interpreter at `/opt/cmd/cmd.elf`. From the BusyBox
-Ash prompt, enter `cmd` to use it. The port keeps the upstream interpreter,
-built-ins, batch files, variables and redirection, and executes enabled
-BusyBox applets or supported ReliefOS terminal programs through the shared COW
-`fork`/`execve`/`waitpid` path. Foreground pipelines use inherited anonymous
-pipes and support per-stage redirection. `cmd` also supports `command &`,
-external pipelines ending in `&`, plus `jobs`, `fg`, and `bg`; those background
-jobs remain limited to external commands without per-stage redirection. BusyBox
-Ash is the interactive POSIX-style shell and uses the same native COW process
-path for full pipeline, redirection, process-group, and terminal job-control
-semantics.
 
 ## file / libmagic
 

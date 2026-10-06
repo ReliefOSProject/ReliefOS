@@ -22,8 +22,8 @@ kind = "program-app"
 default = true
 required = false
 [[components]]
-id = "cmd"
-symbol = "CMD"
+id = "tool"
+symbol = "TOOL"
 kind = "tool"
 default = false
 required = false
@@ -104,9 +104,9 @@ rm "$one"
 run app-one
 test "$(cat "$one")" = main-one
 printf 'CONFIG_RELIEFOS_COMPONENT_ONE_BUILD=n\n' >"$tmp/out/config/.config"
-printf 'upstream tool\n' >"$tmp/out/userland/cmd.elf"
+printf 'upstream tool\n' >"$tmp/out/userland/tool.elf"
 run userland-prune
 test ! -e "$one"
 test -e "$two"
-test -e "$tmp/out/userland/cmd.elf"
+test -e "$tmp/out/userland/tool.elf"
 printf 'userland graph tests passed\n'

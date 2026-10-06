@@ -53,6 +53,18 @@ dependencies and library providers. The real musl loader also has the
 `/lib/libc.musl-x86_64.so.1` filename required by Alpine libraries. No dummy
 Alpine package versions, blanket `provides`, or `replaces` declarations are used.
 
+The optional Xorg desktop uses the same offline transaction path. Alpine v3.24
+x86_64/musl packages for `xorg-server`, `xorg-server-common`, `twm`, `xdm`,
+`xterm`, `xf86-video-fbdev`, `xf86-input-evdev`, `xkeyboard-config`,
+`font-cursor-misc` and `font-misc-misc`, together with every dependency and
+shared-object provider, are pinned in `configs/dependencies.lock.json` with
+`feature=xorg`. Entries without that field are `feature=base`. `apk-stage.sh`
+reads the raw `/etc/reliefos/desktop-backend` marker and asks `reliefos-deps`
+for each entry's feature; a native root installs only base entries, while an
+Xorg root installs both sets. The package cache may contain both sets, but a
+native managed root never does. Missing archives name the dependency and point
+to `make fetch`; normal builds never resolve packages from the network.
+
 `leonos-fastfetch` owns the custom LeonOS Logo binary and depends on
 `!fastfetch`. It is installed in world. An ordinary `apk add fastfetch@alpine`
 cannot replace it; root can deliberately remove the local package first.

@@ -41,6 +41,48 @@ class ConsoleBootPolicyTests(unittest.TestCase):
         self.assertNotIn("RELIEFOS_BOOT_MODE", script)
         self.assertNotIn("/bin/sleep", script)
 
+    def test_xorg_session_is_selected_by_raw_marker(self):
+        script = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
+        self.assertIn("/etc/reliefos/desktop-backend", script)
+        self.assertIn("reliefos-xdm", (ROOT / "system/xorg/reliefos-xdm").read_text())
+        self.assertIn("xdm -nodaemon -config", (ROOT / "system/xorg/reliefos-xdm").read_text())
+        self.assertNotIn("source ", script)
+        self.assertNotIn(". /etc/reliefos/desktop-backend", script)
+        self.assertNotIn("-novtswitch", (ROOT / "system/xorg/xdm-Xservers").read_text())
+
+    def test_xorg_server_is_attached_to_tty1_before_vt_initialization(self):
+        servers = (ROOT / "system/xorg/xdm-Xservers").read_text()
+        wrapper = (ROOT / "system/xorg/xorg-tty-wrapper").read_text()
+        self.assertIn("/usr/lib/reliefos/xorg-tty-wrapper", servers)
+        self.assertIn("exec <\"$tty\" >\"$tty\" 2>&1", wrapper)
+        self.assertIn("exec /usr/bin/Xorg \"$@\"", wrapper)
+        self.assertNotIn("setsid", wrapper)
+
+    def test_invalid_backend_marker_never_falls_back_to_native_desktop(self):
+        script = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
+        self.assertIn("exactly one line", script)
+        self.assertIn("invalid desktop backend", script)
+        self.assertNotIn("desktop_backend=reliefos", script)
+
+    def test_xorg_evidence_events_are_safe_and_orderable(self):
+        launcher = (ROOT / "system/xorg/reliefos-xdm").read_text()
+        session = (ROOT / "system/xorg/xdm-session").read_text()
+        console = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
+        for event in ("desktop-backend=xorg", "xdm started on vt1"):
+            self.assertIn(event, launcher)
+        for event in ("PAM authentication accepted", "twm started for uid=", "xterm started", "xdm session ended"):
+            self.assertIn(event, session)
+        self.assertIn("/var/log/xdm.log", launcher)
+        self.assertIn("state_dir=/run/reliefos/xdm", launcher)
+        self.assertIn("sink=$state_dir/events", launcher)
+        self.assertIn("RELIEFOS_XORG_EVENT_FD=3", launcher)
+        self.assertIn('>&"$event_fd"', session)
+        self.assertNotIn("/run/reliefos/xorg-events.log", launcher + session)
+        self.assertNotIn("chmod 0622", launcher)
+        self.assertIn("xdm exit status=", launcher)
+        self.assertIn("tty1 restored to text login", console)
+        self.assertNotIn("password", launcher.lower() + session.lower())
+
     def test_graphical_and_installer_sessions_claim_a_controlling_terminal(self):
         source = (ROOT / "userland/apps/login/main.c").read_text()
         for item in ("setsid()", "TIOCSCTTY", "tcsetpgrp", "VT_ACTIVATE",

@@ -1,0 +1,18 @@
+#!/bin/sh
+# Run Xorg with tty1 attached to all standard descriptors.
+#
+# xdm keeps the server in the foreground but does not guarantee that its
+# server child inherits the console descriptors.  Xorg's Linux VT backend
+# uses its standard console descriptor when it enters VT_PROCESS/KD_GRAPHICS.
+# Keep this process in xdm's session; Xorg can then perform its normal
+# console setup without a second launcher session competing for tty1.
+set -eu
+
+tty=/dev/tty1
+if test ! -r "$tty" || test ! -w "$tty"; then
+    printf '%s\n' "xorg-tty-wrapper: cannot access $tty" >&2
+    exit 1
+fi
+
+exec <"$tty" >"$tty" 2>&1
+exec /usr/bin/Xorg "$@"

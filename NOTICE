@@ -63,7 +63,6 @@ Runtime, libraries, and applications
   Source/build recipes: https://github.com/dyne/musl/tree/2.2.0.
 * less: GPL-3.0-or-later OR BSD-2-Clause. Installed from the signed Alpine APK;
   package license metadata is in .PKGINFO.
-* ChenPi11/cmd: GPL-3.0-only. See third_party/cmd/LICENSE.
 * Fastfetch 2.68.1 (VasilyZa/fastfetch release): MIT. See userland/fastfetch/LICENSE.
 * file/libmagic: BSD-2-Clause. Installed from signed Alpine APKs; package
   license metadata is in .PKGINFO.

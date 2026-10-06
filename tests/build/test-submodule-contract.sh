@@ -129,6 +129,8 @@ cp "$repo_root/tools/build/reliefnt-release-guard.sh" "$clone/tools/build/" || e
 cp "$repo_root/mk/rpr.mk" "$clone/mk/rpr.mk" || exit 1
 cp "$repo_root/mk/kernel.mk" "$clone/mk/kernel.mk" || exit 1
 cp "$repo_root/mk/headers.mk" "$clone/mk/headers.mk" || exit 1
+mkdir -p "$clone/mk/components"
+cp "$repo_root/mk/components/audio.mk" "$clone/mk/components/audio.mk" || exit 1
 cp "$repo_root/Makefile" "$clone/Makefile" || exit 1
 if [ -z "${other:-}" ]; then
     printf 'skip - gitlink mismatch case: the kernel repository has no older\n'

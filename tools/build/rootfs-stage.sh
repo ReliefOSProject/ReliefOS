@@ -4,6 +4,16 @@
 set -eu
 [ "$#" = 9 ] || { echo 'usage: rootfs-stage SRC O CONFIG METADATA STAGE_TOOL LAYOUT_TOOL DEST MANIFEST EPOCH' >&2; exit 2; }
 src=$1 out=$2 config=$3 metadata=$4 stage_tool=$5 layout_tool=$6 dest=$7 manifest=$8 epoch=$9
+reliefos_enabled=$(grep -Fxc 'CONFIG_DESKTOP_BACKEND_RELIEFOS=y' "$config" || true)
+xorg_enabled=$(grep -Fxc 'CONFIG_DESKTOP_BACKEND_XORG=y' "$config" || true)
+case "$reliefos_enabled:$xorg_enabled" in
+    1:0) desktop_backend=reliefos ;;
+    0:1) desktop_backend=xorg ;;
+    *)
+        echo 'rootfs-stage: exactly one desktop backend must be enabled' >&2
+        exit 2
+        ;;
+esac
 mkdir -p "$(dirname "$dest")"
 work=$(mktemp -d "$dest.new.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -18,7 +28,7 @@ tree() { record t "$1" "/$2" 0755 "$3" "${4:-unique}"; }
 link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
 # Independent upstream installations never share a destination during builds.
-for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs alsa-lib alsa-utils nuked-opl3; do
+for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3; do
     for directory in bin sbin lib usr etc; do
         input=$out/upstream/$package/root/$directory
         if [ -d "$input" ]; then tree "$input" "$directory" "$package"; fi
@@ -32,6 +42,24 @@ for spec in auth pam; do
 done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
+printf '%s\n' "$desktop_backend" > "$work/data/desktop-backend"
+file "$work/data/desktop-backend" etc/reliefos/desktop-backend 0644 product-policy override
+if [ "$desktop_backend" = xorg ]; then
+    for service in reliefos-windowd reliefos-session; do
+        record x - "/etc/runlevels/default/$service" 0000 product-policy override
+    done
+    file "$src/system/xorg/xorg.conf" etc/X11/xorg.conf 0644 product-policy override
+    file "$src/system/xorg/reliefos-xdm" usr/lib/reliefos/reliefos-xdm 0755 reliefos-apps override
+    file "$src/system/xorg/xorg-tty-wrapper" usr/lib/reliefos/xorg-tty-wrapper 0755 reliefos-apps override
+    file "$src/system/xorg/xdm.conf" etc/reliefos/xdm.conf 0644 product-policy override
+    file "$src/system/xorg/xdm-Xservers" etc/reliefos/xdm-Xservers 0644 product-policy override
+    file "$src/system/xorg/xdm-session" etc/reliefos/xdm-session 0755 reliefos-apps override
+    file "$src/system/xorg/xdm-session" usr/lib/reliefos/xdm-session 0755 reliefos-apps override
+    file "$src/system/xorg/xdm-setup" usr/lib/reliefos/xdm-setup 0755 reliefos-apps override
+    file "$src/system/xorg/twmrc" etc/reliefos/twmrc 0644 product-policy override
+    file "$src/system/xorg/wallpaper.png" etc/reliefos/wallpaper.png 0644 product-policy override
+    file "$src/system/xorg/pam-xdm" etc/pam.d/xdm 0644 product-policy override
+fi
 legacy=$src/system/rootfs/var/lib/leonos/users.db
 if [ -e "$legacy" ] || [ -L "$legacy" ]; then
     [ ! -L "$legacy" ] && [ "$(od -An -tx1 "$legacy" | tr -d ' \n')" = 3253554100000000 ] || { echo 'populated legacy account seed requires recovery' >&2; exit 1; }
@@ -56,7 +84,7 @@ file "$out/sysroot/musl/lib/libc.so" lib/libc.so 0755 musl
 file "$out/sysroot/musl/lib/libmimalloc.so.3" lib/libmimalloc.so.3 0755 reliefos-mimalloc
 file "$out/system/lib/libreliefos.so.2" usr/lib/reliefos/libreliefos.so.2 0755 reliefos-apps
 file "$out/system/lib/libleonos.so.2" usr/lib/leonos/libleonos.so.2 0755 reliefos-apps
-if enabled soundctl; then
+if enabled settings || enabled soundctl; then
     file "$out/system/lib/libreliefos-audio.so.1" usr/lib/libreliefos-audio.so.1 0755 reliefos-audio
 fi
 for package in musl mimalloc; do tree "$out/sysroot/musl/share/licenses/$package" "usr/share/licenses/$package" "$package"; done
@@ -69,7 +97,7 @@ file "$out/userland/dynlinkerror.elf" usr/lib/reliefos/apps/dynlinkerror/dynlink
 # awk reads TSV without collapsing empty label/extension fields. No data is
 # interpreted as a command; only validated component IDs are used in paths.
 awk -F '\t' -v dir="$work/manifests" -v src="$src" '
-$4==1 && ($2 ~ /-app$/ || $1 ~ /^(busybox|cmd|sl)$/) {
+$4==1 && ($2 ~ /-app$/ || $1 ~ /^(busybox|sl)$/) {
   terminal=0; ini=src "/userland/apps/" $1 "/" $1 ".app.ini";
   while ((getline line < ini)>0) {split(line,a,"="); if(a[1]=="terminal" && a[2]~/^(1|true|yes)$/) terminal=1} close(ini);
   ini=src "/userland/" $1 "/" $1 ".app.ini";
@@ -103,7 +131,7 @@ if enabled doom; then
 fi
 # Tool executables keep their native locations; registry entries use a local
 # symlink so the registry's relative exec contract remains the same as apps.
-for app in busybox cmd sl; do
+for app in busybox sl; do
     if enabled "$app"; then
         file "$work/manifests/$app.ini" "usr/lib/reliefos/apps/$app/manifest.ini" 0644 "$app"
         target=/usr/bin/$app
@@ -125,12 +153,6 @@ done
 for app in fastfetch sl; do
     if enabled "$app"; then file "$out/userland/$app.elf" "usr/bin/$app" 0755 "$app" override; fi
 done
-for app in cmd; do
-    if enabled "$app"; then
-        file "$out/userland/$app.elf" "opt/$app/$app.elf" 0755 "$app"
-        link "usr/bin/$app" "../../opt/$app/$app.elf" "$app"
-    fi
-done
 for spec in 'sqlite sqlite.so.3'; do
     set -- $spec
     if enabled "$1"; then file "$out/userland/$2" "usr/lib/$2" 0755 "$1"; fi
@@ -141,7 +163,7 @@ if enabled fastfetch; then
     file "$src/userland/fastfetch/leonos-ascii.txt" usr/share/fastfetch/leonos-ascii.txt 0644 fastfetch
     file "$src/userland/fastfetch/hyfetch.json" etc/skel/.config/hyfetch.json 0644 fastfetch
 fi
-for spec in 'busybox third_party/busybox/LICENSE' 'cmd third_party/cmd/LICENSE' 'sl third_party/sl/LICENSE' 'pleditor third_party/pl_editor/LICENSE'; do
+for spec in 'busybox third_party/busybox/LICENSE' 'sl third_party/sl/LICENSE' 'pleditor third_party/pl_editor/LICENSE'; do
     set -- $spec
     if enabled "$1"; then file "$src/$2" "usr/share/licenses/$1/${2##*/}" 0644 "$1" override; fi
 done

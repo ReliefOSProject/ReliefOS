@@ -1,8 +1,7 @@
 {
   "exclude": [
     "third_party/llama2.c",
-    "third_party/llama2.c/**",
-    "third_party/cmd"
+    "third_party/llama2.c/**"
   ],
   "exclude_dirs": [],
   "exclude_files": [],

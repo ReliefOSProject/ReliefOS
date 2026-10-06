@@ -1,7 +1,7 @@
 # Include after third-party.mk, pam.mk and runtime.mk. Each package owns an isolated root.
 UPSTREAM_ROOT := $(O)/upstream
 UPSTREAM_SCRIPT := $(RELIEFOS_SRC)/tools/build/upstream.sh
-UPSTREAM_PACKAGES := libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs alsa-lib alsa-utils nuked-opl3
+UPSTREAM_PACKAGES := libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3
 upstream_libmd_outputs := lib/libmd.so.0 usr/include/md5.h
 upstream_libbsd_outputs := lib/libbsd.so.0 usr/include/bsd/stdlib.h
 upstream_util-linux_outputs := usr/lib/libuuid.a usr/lib/libblkid.a bin/su usr/sbin/fdisk bin/mount bin/lsblk
@@ -10,6 +10,7 @@ upstream_shadow_outputs := bin/login usr/sbin/useradd usr/sbin/usermod usr/sbin/
 upstream_e2fsprogs_outputs := usr/sbin/mkfs.ext4 usr/sbin/fsck.ext4 usr/sbin/mkfs.ext2 usr/sbin/fsck.ext2
 upstream_dosfstools_outputs := usr/sbin/mkfs.fat usr/sbin/fsck.fat
 upstream_exfatprogs_outputs := usr/sbin/mkfs.exfat usr/sbin/fsck.exfat
+upstream_coreutils_outputs := usr/bin/dd
 upstream_ncurses_outputs := usr/lib/libncursesw.a usr/lib/libtinfow.a usr/include/curses.h
 upstream_alsa-lib_outputs := usr/lib/libasound.so.2 usr/lib/libasound.a usr/include/alsa/asoundlib.h usr/share/alsa/alsa.conf
 upstream_alsa-utils_outputs := usr/bin/aplay usr/bin/arecord usr/bin/amixer usr/sbin/alsactl usr/bin/speaker-test
@@ -114,10 +115,6 @@ $(FASTFETCH_ELF): $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(RELIEFOS_SRC)/mk/upst
 	$(Q)mkdir -p $(dir $@)
 	$(Q)set -eu; url=$$($(RELIEFOS_DEPS_TOOL) --lock $(RELIEFOS_LOCK) --id fastfetch --print url); digest=$$($(RELIEFOS_DEPS_TOOL) --lock $(RELIEFOS_LOCK) --id fastfetch --print sha256); source=$(RELIEFOS_CACHE)/$${url##*/}; test -f "$$source" || { echo 'missing fastfetch: run make fetch' >&2; exit 1; }; test "$$(sha256sum "$$source" | cut -d' ' -f1)" = "$$digest"; readelf -h "$$source" | grep -q 'Advanced Micro Devices X86-64'; if readelf -l -d "$$source" | grep -E 'INTERP|\(NEEDED\)'; then exit 1; fi; cp "$$source" $@.tmp; chmod 755 $@.tmp; mv $@.tmp $@
 reliefos-upstream: $(FASTFETCH_ELF)
-upstream_app_cmd_outputs := cmd.elf
-$(eval $(call RELIEFOS_UPSTREAM_APP,cmd))
-$(UPSTREAM_APP_DIR)/cmd.elf: $(RELIEFOS_SRC)/tools/build/upstream-cmd-patch.sh
-reliefos-upstream: upstream-app-cmd
 
 # A content/presence signature avoids creating thousands of grouped peer nodes
 # for terminfo/manpages, while detecting deletion of every installed product.

@@ -793,20 +793,6 @@ sdk = false
 api = false
 
 [[components]]
-id = "cmd"
-symbol = "TOOL_CMD"
-label = "ChenPi11 cmd shell"
-category = "Developer applications"
-kind = "tool"
-default = true
-required = false
-stage = true
-entry = false
-sdk = false
-api = false
-depends = ["busybox"]
-
-[[components]]
 id = "stardustui"
 symbol = "LIB_STARDUSTUI"
 label = "StardustUI library"

@@ -17,7 +17,7 @@ done
 "$root/apk/apk.static" --version
 printf '%s\n' 'upstream production ELF/archive checks: PASS'
 apps=${2:-$root/userland}
-for app in busybox sl cmd pleditor; do
+for app in busybox sl pleditor; do
  test -f "$apps/$app.elf"
  readelf -h "$apps/$app.elf" | grep -q 'Advanced Micro Devices X86-64'
  if readelf -d "$apps/$app.elf" | grep -E 'libc\.so\.6|ld-linux'; then exit 1; fi

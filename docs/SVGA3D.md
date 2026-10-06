@@ -72,7 +72,12 @@ readbacks delivered to the caller. When diagnosing load, compare guest CPU usage
 with glxgears running and closed, and include these logs and whether the gears
 rotate.
 
-Normal 2D/resource packets still publish with an explicit SYNC. A glxgears
+Normal 2D/resource packets still publish with an explicit SYNC. An ordinary
+framebuffer present (`SVGA_CMD_UPDATE`) is asynchronous: the packet is written
+and the SYNC doorbell is rung, and the device lock is released without reading
+SVGA_REG_BUSY, so a 2D present never serializes guest CPU behind host FIFO
+progress. The bounded BUSY wait survives only where progress must be proven:
+explicit fence waits, mode transitions and shutdown. A glxgears
 frame is deferred as one batch: its vertex upload, state, draw and readback
 packets are written before a single SYNC at the frame Fence. This avoids one
 SYNC port write per packet while preserving the earlier explicit-notification

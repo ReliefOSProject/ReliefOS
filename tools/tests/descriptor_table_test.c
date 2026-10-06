@@ -87,8 +87,8 @@ int net_socket_recv(struct reliefos_net_socket_io *request, uint32_t owner)
 int net_socket_send(struct reliefos_net_socket_io *request, uint32_t owner)
 { (void)request; (void)owner; abort(); }
 uint64_t time_ticks(void) { return 100; }
-void input_evdev_release(uint32_t kind, uint64_t token, uint32_t pid)
-{ (void)kind; (void)token; (void)pid; }
+void input_evdev_release(uint32_t kind, uint64_t token)
+{ (void)kind; (void)token; }
 void pty_reap_hungup(uint32_t id) { (void)id; }
 int pty_is_active(uint32_t id) { return id == 7; }
 int pty_slave_open_allowed(uint32_t id) { return id == 7; }

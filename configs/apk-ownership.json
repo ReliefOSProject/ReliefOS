@@ -11,7 +11,7 @@
     },
     "reliefos-apps": {
       "destination": "reliefos",
-      "components": ["imd", "windowd", "desktop", "installer", "login", "sessiond", "device-agent", "rcctl", "shell", "fileman", "taskmgr", "settings", "terminal", "run", "osver", "netctl", "servicemgr", "diskmgr", "devmgr", "drvmgr", "sysconfdialog", "apiapp", "sudod", "hello", "uidemo", "cjktest", "notepad", "calc", "paint", "minesweeper", "snake", "matrix", "memtest", "smptest", "abittest", "ipctest", "bugtest", "ping", "httpget", "rprfetch", "downloadmgr", "browser", "imageview", "wavplay", "mp3play", "oshlp", "helloworld", "guitest", "pleditor", "stardusthello", "stardustlayout", "stardustshowcase", "doomlauncher", "doom", "oschinpt", "cmd", "stardustui", "portablegl", "glxgears", "leonmmcoset", "xiaobai"],
+      "components": ["imd", "windowd", "desktop", "installer", "login", "sessiond", "device-agent", "rcctl", "shell", "fileman", "taskmgr", "settings", "terminal", "run", "osver", "netctl", "servicemgr", "diskmgr", "devmgr", "drvmgr", "sysconfdialog", "apiapp", "sudod", "hello", "uidemo", "cjktest", "notepad", "calc", "paint", "minesweeper", "snake", "matrix", "memtest", "smptest", "abittest", "ipctest", "bugtest", "ping", "httpget", "rprfetch", "downloadmgr", "browser", "imageview", "wavplay", "mp3play", "oshlp", "helloworld", "guitest", "pleditor", "stardusthello", "stardustlayout", "stardustshowcase", "doomlauncher", "doom", "oschinpt", "stardustui", "portablegl", "glxgears", "leonmmcoset", "xiaobai"],
       "paths": ["usr/lib/leonos", "usr/lib/reliefos", "usr/share/reliefos", "usr/share/fonts/reliefos", "etc/reliefos", "usr/sbin/leonos-rpr-apkcheck", "usr/sbin/leonos-rpr-ping", "usr/sbin/leonos-kernel-update", "usr/sbin/leonos-check-update", "usr/sbin/reliefos-rpr-apkcheck", "usr/sbin/reliefos-rpr-ping", "usr/sbin/reliefos-kernel-update", "usr/sbin/reliefos-check-update", "usr/lib/libportablegl.so.1"],
       "reason": "Native desktop, service, graphics and application interfaces. Embedded dependencies remain part of their actual consumers."
     },
@@ -52,6 +52,13 @@
       "paths": ["usr/bin/find", "usr/bin/xargs"],
       "alpine_candidates": ["findutils"],
       "reason": "Use the official Alpine findutils implementation for find and xargs; do not duplicate these commands in BusyBox."
+    },
+    "coreutils": {
+      "destination": "alpine-after-validation",
+      "components": [],
+      "paths": ["usr/bin/dd", "usr/share/licenses/coreutils"],
+      "alpine_candidates": ["coreutils"],
+      "reason": "Ship GNU dd only: this BusyBox has no dd applet and its dd lacks status=progress. Do not duplicate the remaining coreutils commands against BusyBox applets."
     },
     "authentication": {
       "destination": "alpine-after-validation",

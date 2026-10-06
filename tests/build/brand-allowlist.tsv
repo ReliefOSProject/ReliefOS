@@ -347,7 +347,7 @@ main	compatibility	tools/build/rootfs-stage.sh	旧数据库拒绝策略、双 SO
 main	compatibility	tools/build/rpr-apps.sh	APK metadata 显式 replaces:leonos-* 升级旧包
 main	compatibility	tools/build/rpr-pages.sh	旧 RSA key 下载名、health marker 与旧世界包替换说明供已安装客户端
 main	compatibility	tools/build/standalone-root.sh	PROFILE 字节值 leonos-standalone-test-v1 明确冻结，目录已 canonical
-main	compatibility	tools/build/upstream-app.sh	构建仍保留的 leonos_cmd_shim.c 与 leonos_sqlite_vfs.c 源文件路径
+main	compatibility	tools/build/upstream-app.sh	构建仍保留的 leonos_sqlite_vfs.c 源文件路径
 main	compatibility	tools/build/upstream-busybox.sh	读取保留的 leonos.config 并过滤旧 CONFIG_LEONOS_* 端口选项
 main	compatibility	tools/build/verify-pages.sh	验证已发布旧 RPR 公钥文件名同时存在
 main	compatibility	tools/build_api.py	冻结 leonos-api 格式字段；显式双接受旧应用安装路径
@@ -406,7 +406,6 @@ main	compatibility	tools/test_uapi.py	验证旧 syscall 转发头仍存在以兼
 main	compatibility	tools/test_uinxed_guest.py	计算实际打包的旧 ESP 回滚内核载荷哈希
 main	compatibility	tools/test_upstream_tools_runtime.py	旧环境变量输入兼容，禁止引入旧 libleonos SONAME 的依赖负向断言
 main	compatibility	tools/tests/abi_layout_golden.json	旧 UAPI sizeof/offsetof/常量布局 golden，值级对比基线不得随意改写
-main	compatibility	tools/tests/cmd_fdisk_dispatch_test.c	验证现有公开 leonos-grub-installer 命令仍分派到 usr/sbin 兼容入口。
 main	compatibility	tools/tests/installer_accounts_test.c	LEONOS_TEST_PASSWORD_HASH 是既有宿主测试驱动与 C fixture 共享输入键
 main	history	tools/tests/legacy_authd/accounts.c	文件声明 Historical regression fixture only；已退役 authd 实现仅保留历史回归，不入产品
 main	history	tools/tests/legacy_authd/accounts.h	文件声明 Historical regression fixture only；已退役 authd 实现仅保留历史回归，不入产品
@@ -469,7 +468,6 @@ main	compatibility	userland/busybox/README.md	仅已发布 leonos-grub-installer
 main	compatibility	userland/busybox/block_storage.c	保留旧 BusyBox 端口 CONFIG_LEONOS_* 开关/旧 grub applet 入口及旧 ESP 回滚路径；当前诊断显示 ReliefOS
 main	compatibility	userland/busybox/leonos.config	保留既有 BusyBox profile 输入文件名；生产 upstream-busybox.sh 明确过滤 CONFIG_LEONOS_* 与 CONFIG_EXTRA_LDLIBS。
 main	compatibility	userland/busybox/leonos_shim.c	保留端口源文件名与已发布 leonos-grub-installer 命令分发入口
-main	compatibility	userland/cmd/leonos_cmd_shim.c	保留端口源文件名与已发布 leonos-grub-installer 命令分发入口
 main	compatibility	userland/dynamic-linker.ld	保留已发布 .note.leonos ELF note 段，避免剥离协议元数据
 main	compatibility	userland/fastfetch/README.md	锁定第三方目录/Logo alias/ASCII 文件名；Kernel: ntclks 4.6.2-3523 明确位于历史验证证据段，非当前默认值。
 main	compatibility	userland/fastfetch/config.jsonc	锁定 Fastfetch 发行物内 LeonOS logo alias；展示图案已按任务9更新

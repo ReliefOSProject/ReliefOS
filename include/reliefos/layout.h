@@ -66,7 +66,6 @@
 #define RELIEFOS_LAYOUT_LOCALE "/usr/share/locale"
 
 /* Third-party suites retained under /opt with /usr/bin command entries. */
-#define RELIEFOS_LAYOUT_OPT_CMD "/opt/cmd"
 #define RELIEFOS_LAYOUT_OPT_DYNE "/opt/dyne"
 #define RELIEFOS_LAYOUT_OPT_PYTHON "/opt/python"
 

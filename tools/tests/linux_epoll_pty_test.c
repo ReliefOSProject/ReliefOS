@@ -4,10 +4,13 @@
 #include <limits.h>
 #include <pty.h>
 #include <stdio.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/epoll.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <sys/syscall.h>
 #include <termios.h>
 #include <time.h>
@@ -68,6 +71,81 @@ int main(void)
     CHECK(syscall(SYS_epoll_ctl, ep, EPOLL_CTL_DEL, 2, NULL) == 0);
     CHECK(close(ep) == 0 && dup2(saved_stderr, 2) == 2);
     CHECK(close(saved_stderr) == 0 && close(slave) == 0 && close(master) == 0);
+    int sockets[2];
+    CHECK(socketpair(AF_UNIX, SOCK_STREAM, 0, sockets) == 0);
+    ep = syscall(SYS_epoll_create1, EPOLL_CLOEXEC);
+    CHECK(ep >= 0);
+    event = (struct epoll_event){.events = EPOLLIN | EPOLLOUT | EPOLLET,
+                                 .data.u64 = 0x13579bdf2468ace0ULL};
+    CHECK(syscall(SYS_epoll_ctl, ep, EPOLL_CTL_ADD, sockets[0], &event) == 0);
+    CHECK(syscall(SYS_epoll_wait, ep, output, 1, 0) == 1);
+    CHECK(output[0].events & EPOLLOUT);
+    CHECK(write(sockets[1], "a", 1) == 1);
+    CHECK(syscall(SYS_epoll_wait, ep, output, 1, 0) == 1);
+    CHECK(output[0].events & EPOLLIN);
+    CHECK(read(sockets[0], buffer, 1) == 1 && buffer[0] == 'a');
+    CHECK(write(sockets[1], "b", 1) == 1);
+    /* Refill before the next readiness probe.  ET must report the new input
+     * generation even though the previous EPOLLIN bit was never observed
+     * clear by epoll_wait. */
+    CHECK(syscall(SYS_epoll_wait, ep, output, 1, 0) == 1);
+    CHECK(output[0].events & EPOLLIN);
+    CHECK(read(sockets[0], buffer, 1) == 1 && buffer[0] == 'b');
+    CHECK(syscall(SYS_epoll_wait, ep, output, 1, 0) == 0);
+    CHECK(close(ep) == 0 && close(sockets[0]) == 0 && close(sockets[1]) == 0);
+    puts("[epoll-pty] PASS ET socket: persistent EPOLLOUT does not mask EPOLLIN edges");
+    const char *tmpdir = getenv("TMPDIR");
+    if (!tmpdir || !*tmpdir) tmpdir = "/tmp";
+    char listener_path[PATH_MAX];
+    CHECK(snprintf(listener_path, sizeof(listener_path), "%s/epoll-listener-%ld",
+                   tmpdir, (long)getpid()) > 0);
+    (void)unlink(listener_path);
+    int listener = socket(AF_UNIX, SOCK_STREAM, 0);
+    CHECK(listener >= 0);
+    struct sockaddr_un listener_address = {.sun_family = AF_UNIX};
+    CHECK(snprintf(listener_address.sun_path, sizeof(listener_address.sun_path), "%s",
+                   listener_path) > 0);
+    socklen_t listener_length = (socklen_t)(offsetof(struct sockaddr_un, sun_path) +
+                                             strlen(listener_address.sun_path) + 1);
+    CHECK(bind(listener, (struct sockaddr *)&listener_address, listener_length) == 0);
+    CHECK(listen(listener, 4) == 0);
+    ep = syscall(SYS_epoll_create1, EPOLL_CLOEXEC);
+    CHECK(ep >= 0);
+    event = (struct epoll_event){.events = EPOLLIN | EPOLLET,
+                                 .data.u64 = 0x2468ace013579bdfULL};
+    CHECK(syscall(SYS_epoll_ctl, ep, EPOLL_CTL_ADD, listener, &event) == 0);
+    int first_client = socket(AF_UNIX, SOCK_STREAM, 0);
+    CHECK(first_client >= 0);
+    CHECK(connect(first_client, (struct sockaddr *)&listener_address, listener_length) == 0);
+    CHECK(syscall(SYS_epoll_wait, ep, output, 1, 0) == 1);
+    int accepted = accept(listener, NULL, NULL);
+    CHECK(accepted >= 0);
+    int second_client = socket(AF_UNIX, SOCK_STREAM, 0);
+    CHECK(second_client >= 0);
+    CHECK(connect(second_client, (struct sockaddr *)&listener_address, listener_length) == 0);
+    /* The first EPOLLIN bit was never observed clear by epoll_wait.  A new
+     * pending connection must still produce an edge via rx_written. */
+    CHECK(syscall(SYS_epoll_wait, ep, output, 1, 0) == 1);
+    CHECK(close(second_client) == 0 && close(first_client) == 0 && close(accepted) == 0);
+    CHECK(close(ep) == 0 && close(listener) == 0 && unlink(listener_path) == 0);
+    puts("[epoll-pty] PASS ET listener: pending connections produce fresh edges");
+    int stale[2], replacement[2];
+    CHECK(pipe(stale) == 0);
+    ep = syscall(SYS_epoll_create1, EPOLL_CLOEXEC);
+    CHECK(ep >= 0);
+    event = (struct epoll_event){.events = EPOLLIN, .data.u64 = 0x1111222233334444ULL};
+    CHECK(syscall(SYS_epoll_ctl, ep, EPOLL_CTL_ADD, stale[0], &event) == 0);
+    int stale_fd = stale[0];
+    CHECK(close(stale[0]) == 0 && pipe(replacement) == 0 && replacement[0] == stale_fd);
+    event.data.u64 = 0x5555666677778888ULL;
+    CHECK(syscall(SYS_epoll_ctl, ep, EPOLL_CTL_ADD, replacement[0], &event) == 0);
+    CHECK(write(replacement[1], "r", 1) == 1);
+    CHECK(syscall(SYS_epoll_wait, ep, output, 1, 0) == 1);
+    CHECK(output[0].events == EPOLLIN && output[0].data.u64 == event.data.u64);
+    CHECK(read(replacement[0], buffer, 1) == 1);
+    CHECK(close(ep) == 0 && close(replacement[0]) == 0 && close(replacement[1]) == 0 &&
+          close(stale[1]) == 0);
+    puts("[epoll-pty] PASS close/reopen removes stale fd callbacks");
     int pipes[2], on = -1, off = 0;
     CHECK(pipe2(pipes, O_CLOEXEC) == 0);
     int copy = dup(pipes[0]);
@@ -82,7 +160,9 @@ int main(void)
     CHECK((fcntl(pipes[0], F_GETFL) & O_NONBLOCK) == 0);
     CHECK(close(copy) == 0 && close(pipes[0]) == 0 && close(pipes[1]) == 0);
     CHECK(syscall(SYS_ioctl, copy, FIONBIO, NULL) == -1 && errno == EBADF);
-    char filename[] = "/tmp/epoll-fionbio-XXXXXX";
+    char filename[PATH_MAX];
+    int filename_length = snprintf(filename, sizeof(filename), "%s/epoll-fionbio-XXXXXX", tmpdir);
+    CHECK(filename_length > 0 && (size_t)filename_length < sizeof(filename));
     int regular = mkostemp(filename, O_APPEND | O_CLOEXEC);
     CHECK(regular >= 0);
     CHECK(syscall(SYS_ioctl, regular, FIONBIO, &on) == 0);

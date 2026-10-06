@@ -1,0 +1,1 @@
+:0 local /usr/lib/reliefos/xorg-tty-wrapper :0 -config /etc/X11/xorg.conf -nolisten tcp vt1 -keeptty

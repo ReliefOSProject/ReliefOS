@@ -76,6 +76,7 @@ leonos-test-tools-sanitised: reliefos-test-tools-sanitised
 
 test-build: test-tools $(RELIEFOS_HOST_TOOLS)
 	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_BUILD_TESTS))
+	@$(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_xorg_qemu.py --source-only
 
 test-long: $(RELIEFOS_HOST_TOOLS)
 	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_LONG_TESTS))

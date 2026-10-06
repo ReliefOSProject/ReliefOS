@@ -21,10 +21,27 @@ rm -f "$work/installed-raw/etc/license.conf" "$work/installed-raw/etc/install.id
 package_root() {
     reliefos_log APK "$3"
     SOURCE_DATE_EPOCH=$epoch APK_MUSL_SYSROOT=$out/sysroot/musl sh "$src/tools/build/apk-stage.sh" "$src" "$1" "$2" "$3" \
-        "$APK_TOOL" "$APK_UPSTREAM" "$src/configs/apk-ownership.json" "$APK_OWN_TOOL" "$APK_KEY" "$APK_VERSION"
+        "$APK_TOOL" "$APK_UPSTREAM" "${APK_DEPS_TOOL:-$out/host/bin/reliefos-deps}" \
+        "${APK_LOCK:-$src/configs/dependencies.lock.json}" \
+        "$src/configs/apk-ownership.json" "$APK_OWN_TOOL" "$APK_KEY" "$APK_VERSION"
+}
+restore_native_desktop_policy() {
+    runtime_root=$1
+    mkdir -p "$runtime_root/etc/reliefos" "$runtime_root/etc/runlevels/default"
+    printf 'reliefos\n' > "$runtime_root/etc/reliefos/desktop-backend"
+    for service in reliefos-windowd reliefos-session; do
+        rm -f "$runtime_root/etc/runlevels/default/$service"
+        ln -s "../../init.d/$service" "$runtime_root/etc/runlevels/default/$service"
+    done
+    rm -f "$runtime_root/etc/reliefos/xdm.conf" "$runtime_root/etc/reliefos/xdm-Xservers" \
+        "$runtime_root/etc/X11/xorg.conf" "$runtime_root/etc/pam.d/xdm" \
+        "$runtime_root/etc/reliefos/xdm-session" "$runtime_root/etc/reliefos/twmrc" \
+        "$runtime_root/usr/lib/reliefos/reliefos-xdm" "$runtime_root/usr/lib/reliefos/xdm-session" \
+        "$runtime_root/usr/lib/reliefos/xorg-tty-wrapper"
 }
 package_root "$work/installed-raw" "$work/installed" "$out/packages/apk-installed"
 cp -a "$raw" "$work/runtime-raw"
+restore_native_desktop_policy "$work/runtime-raw"
 mkdir -p "$work/runtime-raw/usr/lib/reliefos/apps/installer"
 cp "$out/userland/installer.elf" "$work/runtime-raw/usr/lib/reliefos/apps/installer/installer.elf"
 chmod 755 "$work/runtime-raw/usr/lib/reliefos/apps/installer/installer.elf"

@@ -54,6 +54,7 @@ static void usage(void)
 {
     fputs("usage: reliefos-deps --lock PATH [--root DIR]"
         " (--check | --list | --fetch-list | --id ID --print FIELD)\n", stderr);
+    fputs("       --print feature returns base when an entry omits feature\n", stderr);
 }
 
 /* Relative paths in the lock file are joined onto the repository root, so an
@@ -143,6 +144,7 @@ static const char *field(const json_value *entry, const char *name)
 static const char *const known_fields[] = {
     "id", "kind", "version", "commit", "url", "sha256", "directory", "patches",
     "script", "license", "license_in_source", "target", "checksum_source", "note",
+    "feature",
 };
 
 static int is_known_field(const char *name)
@@ -213,6 +215,15 @@ static int validate_entry(const json_value *entry, const char *root_dir, int ind
 
         if (!is_known_field(key)) {
             return report("%s: unknown field \"%s\"", id, key);
+        }
+    }
+    {
+        const json_value *feature = json_member(entry, "feature");
+
+        if (feature != NULL && (feature->type != JSON_STRING
+                || (strcmp(feature->text, "base") != 0
+                    && strcmp(feature->text, "xorg") != 0))) {
+            return report("%s: \"feature\" must be base or xorg", id);
         }
     }
     if (is_downloaded(kind)) {
@@ -431,8 +442,16 @@ static int print_field(const json_value *lock, const char *id, const char *name)
         (void)fprintf(stderr, "no dependency named \"%s\"\n", id);
         return 2;
     }
+    if (!is_known_field(name)) {
+        (void)fprintf(stderr, "%s: no \"%s\" field is recorded\n", id, name);
+        return 2;
+    }
     value = json_member(entry, name);
-    if (value == NULL || !is_known_field(name)) {
+    if (value == NULL && strcmp(name, "feature") == 0) {
+        puts("base");
+        return 0;
+    }
+    if (value == NULL) {
         (void)fprintf(stderr, "%s: no \"%s\" field is recorded\n", id, name);
         return 2;
     }

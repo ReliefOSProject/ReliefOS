@@ -15,6 +15,6 @@ sl -F       Make the train fly diagonally
 sl -c       Draw the C51 locomotive
 ```
 
-The command is installed as `/usr/bin/sl` and is available from both
-BusyBox Ash and the `cmd` shell. The upstream copyright and license are kept
+The command is installed as `/usr/bin/sl` and is available from
+BusyBox Ash. The upstream copyright and license are kept
 in the adjacent `LICENSE` file.

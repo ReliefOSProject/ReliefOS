@@ -1,0 +1,82 @@
+#!/bin/sh
+# Root-owned XDM launcher used only by tty1's foreground console session.
+#
+# Everything outside the authenticated user session runs as root.  The
+# lifecycle record lives in /var/log/xdm.log, which is root-only: the session
+# can neither read nor truncate it.  The session is never given that path; it
+# only receives a write-only descriptor for a scratch sink that this script
+# drains afterwards.  Every exit path — success or failure — merges the sink,
+# records the server return code and hands tty1 back to the text getty.
+set -u
+
+log=/var/log/xdm.log
+xorg_log=/var/log/Xorg.0.log
+state_dir=/run/reliefos/xdm
+sink=$state_dir/events
+
+umask 077
+mkdir -p /var/lib/xdm /run/reliefos "$state_dir" || exit 1
+
+# Preserve the very first Xorg log so later sessions cannot rotate over the
+# evidence of the failure being diagnosed.
+if test -f "$xorg_log" && test ! -f "$xorg_log.first"; then
+    cp -p "$xorg_log" "$xorg_log.first" 2>/dev/null || :
+fi
+
+# Root-only log and root-only scratch sink.  The sink is never exported as a
+# path, so a session cannot open it for reading or truncation.
+touch "$log" 2>/dev/null || exit 1
+chmod 0600 "$log"
+
+stage() {
+    printf '%s\n' "reliefos-xdm: $1" >> "$log"
+}
+
+for path in /usr/bin/xdm /etc/reliefos/xdm.conf /etc/reliefos/xdm-Xservers \
+    /etc/X11/xorg.conf /usr/lib/reliefos/xorg-tty-wrapper \
+    /usr/lib/reliefos/xdm-session; do
+    if test ! -r "$path"; then
+        stage "missing $path"
+        stage 'tty1 restored to text login'
+        exit 1
+    fi
+done
+
+stage 'starting xdm on vt1'
+printf '%s\n' 'desktop-backend=xorg' >> "$log"
+printf '%s\n' 'xdm started on vt1' >> "$log"
+
+# Hand the session a write-only append descriptor instead of a file name.  It
+# can record fixed event text but cannot read back or rewrite the root record.
+# The sink exists only for the lifetime of the server, so no exit path can leave
+# it behind.
+: > "$sink"
+chmod 0600 "$sink"
+RELIEFOS_XORG_EVENT_FD=3
+export RELIEFOS_XORG_EVENT_FD
+exec 3>>"$sink"
+/usr/bin/xdm -nodaemon -config /etc/reliefos/xdm.conf
+status=$?
+exec 3>&-
+
+# Preserve a log produced by this launch when Xorg failed before the next
+# session could start.  Never replace the first captured failure.
+if test -f "$xorg_log" && test ! -f "$xorg_log.first"; then
+    cp -p "$xorg_log" "$xorg_log.first" 2>/dev/null || :
+fi
+
+# Merge the session's events and report the real server status on every path.
+if test -s "$sink"; then
+    while IFS= read -r line; do
+        printf '%s\n' "$line" >> "$log"
+    done < "$sink"
+fi
+rm -f "$sink"
+stage "xdm exit status=$status"
+if test -f "$xorg_log"; then
+    stage "xorg log present bytes=$(wc -c < "$xorg_log" 2>/dev/null | tr -d ' ')"
+else
+    stage 'xorg log missing'
+fi
+stage 'tty1 restored to text login'
+exit "$status"

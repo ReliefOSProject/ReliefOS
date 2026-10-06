@@ -83,7 +83,6 @@ LOCALE = "usr/share/locale"
 EXAMPLES = "usr/share/examples"
 
 OPT = "opt"
-OPT_CMD = "opt/cmd"
 OPT_DYNE = "opt/dyne"
 OPT_LUA = "opt/lua"
 OPT_PYTHON = "opt/python"
@@ -269,7 +268,6 @@ _PAYLOAD_PATHS: dict[str, tuple[str, ...]] = {
                   "usr/share/fastfetch/leonos-ascii.txt", "etc/skel/.config/hyfetch.json"),
     "pleditor": (f"{LICENSES}/pleditor",),
     "busybox": (f"{BIN}/busybox", f"{BIN}/sh", f"{LICENSES}/busybox"),
-    "cmd": (OPT_CMD, f"{USR_BIN}/cmd", f"{LICENSES}/cmd"),
     "ncurses": (f"{TERMINFO}", "etc/terminfo",
                 *tuple(f"{USR_BIN}/{name}" for name in NCURSES_COMMANDS),
                 f"{LICENSES}/ncurses"),
@@ -328,16 +326,10 @@ def builtin_command_links(enabled=None) -> list[tuple[str, str]]:
         enabled = lambda _package: True  # noqa: E731
     entries: list[tuple[str, str]] = []
 
-    def add(command: str, target: str) -> None:
-        link, relative = command_symlink(command, target)
-        entries.append((link, relative))
-
     # Alpine keeps the Bourne shell and BusyBox applets in /bin.
     if enabled("busybox"):
         link = f"{BIN}/sh"
         entries.append((link, relative_symlink_target(link, f"{BIN}/busybox")))
-    if enabled("cmd"):
-        add("cmd", OPT_CMD + "/cmd.elf")
     return entries
 
 

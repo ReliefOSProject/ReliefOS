@@ -119,7 +119,6 @@ upstream options: in particular **FAT32 requires `-F 32`**, including when using
 the `mkfs.fat32` alias; dosfstools otherwise selects FAT width by volume size.
 The former private `--force` syntax is not emulated.
 
-ChenPi cmd resolves storage commands directly to those external paths.
 `/bin`, `/sbin`, `/lib`, `/usr/bin`, `/usr/sbin` remain real separate directories;
 this is not a usr-merge. Normal, installer-runtime and installed-payload roots
 consume the same staging tree. Repeated storage staging replaces owned files

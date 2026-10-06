@@ -128,7 +128,6 @@ static int test_evdev(void)
     unsigned char bits[KEY_CNT / 8 + 1];
     unsigned char keys[16];
     char name[64];
-    int grab = 1;
 
     if (first < 0 || second < 0) {
         printf("[abittest] evdev FAIL open first=%d second=%d\n", first, second);
@@ -140,23 +139,28 @@ static int test_evdev(void)
         printf("[abittest] evdev FAIL capability query errno=%d\n", errno);
         return -1;
     }
-    if (syscall3(SYS_ioctl, first, EVIOCGRAB, (long)&grab) < 0) {
+    if (syscall3(SYS_ioctl, second, EVIOCGRAB, 0) >= 0 || errno != EINVAL) {
+        printf("[abittest] evdev FAIL unowned release errno=%d\n", errno);
+        return -1;
+    }
+    if (syscall3(SYS_ioctl, first, EVIOCGRAB, 2) < 0) {
         printf("[abittest] evdev FAIL first grab errno=%d\n", errno);
         return -1;
     }
-    grab = 1;
-    if (syscall3(SYS_ioctl, second, EVIOCGRAB, (long)&grab) >= 0 ||
+    if (syscall3(SYS_ioctl, first, EVIOCGRAB, 1) >= 0 || errno != EBUSY) {
+        printf("[abittest] evdev FAIL repeated grab errno=%d\n", errno);
+        return -1;
+    }
+    if (syscall3(SYS_ioctl, second, EVIOCGRAB, 1) >= 0 ||
         errno != EBUSY) {
         printf("[abittest] evdev FAIL second grab errno=%d\n", errno);
         return -1;
     }
-    grab = 0;
-    if (syscall3(SYS_ioctl, first, EVIOCGRAB, (long)&grab) < 0) {
+    if (syscall3(SYS_ioctl, first, EVIOCGRAB, 0) < 0) {
         printf("[abittest] evdev FAIL release grab errno=%d\n", errno);
         return -1;
     }
-    grab = 1;
-    if (syscall3(SYS_ioctl, second, EVIOCGRAB, (long)&grab) < 0) {
+    if (syscall3(SYS_ioctl, second, EVIOCGRAB, 1) < 0) {
         printf("[abittest] evdev FAIL re-grab errno=%d\n", errno);
         return -1;
     }

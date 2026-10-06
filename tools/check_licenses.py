@@ -36,7 +36,6 @@ SUBMODULE_LICENSES: dict[str, tuple[str, ...]] = {
     "zlib": ("LICENSE",),
     "libpng": ("LICENSE",),
     "stardustui": ("LICENSE",),
-    "cmd": ("LICENSE", "COPYING"),
     "sl": ("LICENSE",),
     "sqlite": ("LICENSE.md", "LICENSE", "COPYING"),
     "portablegl": ("LICENSE",),
@@ -48,7 +47,6 @@ SUBMODULE_LICENSES: dict[str, tuple[str, ...]] = {
 # notices travel with the package metadata in /lib/apk/db/installed instead.
 IMAGE_LICENSES: dict[str, tuple[str, ...]] = {
     "busybox": ("LICENSE",),
-    "cmd": ("LICENSE",),
     "fastfetch": ("LICENSE",),
     "sl": ("LICENSE",),
     "pleditor": ("LICENSE",),

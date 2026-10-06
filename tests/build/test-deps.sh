@@ -7,6 +7,11 @@
 # unit-tested in tests/host/test_json.c.
 set -u
 
+# The tool reports lock order as byte order; sort(1) collation must not depend
+# on the caller's locale for the comparison to mean anything.
+LC_ALL=C
+export LC_ALL
+
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd -P)
 cd "$repo_root" || exit 1
 
@@ -146,6 +151,17 @@ fi
 
 # --- rejected lock files ------------------------------------------------------
 D='0000000000000000000000000000000000000000000000000000000000000000'
+
+expect_output_is 'xorg entry reports feature' xorg \
+    "$deps" --lock "$lock" --id alpine-xdm --print feature
+expect_output_is 'xterm entry reports pinned version' 410-r0 \
+    "$deps" --lock "$lock" --id alpine-xterm --print version
+expect_output_is 'xterm entry reports feature' xorg \
+    "$deps" --lock "$lock" --id alpine-xterm --print feature
+expect_output_is 'unmarked entry defaults to base' base \
+    "$deps" --lock "$lock" --id alpine-openrc --print feature
+expect_failure 'invalid feature is rejected' \
+    "$deps" --lock "$(entry_lock '{"id":"a","kind":"apk","version":"1","url":"https://x/a.apk","sha256":"'$D'","directory":"a-1","license_in_source":".PKGINFO","feature":"desktop"}')" --check
 
 expect_failure 'an entry missing required fields is rejected' \
     "$deps" --lock "$(entry_lock '{"id":"a","kind":"tarball"}')" --check

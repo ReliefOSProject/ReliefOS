@@ -58,7 +58,7 @@ BusyBox 在 `/bin/busybox`，按实际编译配置生成 applet 链接，分别�
 | `/var/cache`、`/var/log`、`/var/local`、`/var/opt` | 缓存、日志及可变数据 |
 | `/var/spool`、`/var/mail` | 队列和邮件位置 |
 | `/var/empty` | 空目录，0555 |
-| `/opt/{dyne,python,tcc,lua,cmd}` | 自包含工具套件，命令入口在 `/usr/bin` |
+| `/opt/{dyne,python,tcc,lua}` | 自包含工具套件，命令入口在 `/usr/bin` |
 | `/media/{cdrom,floppy,usb}`、`/mnt`、`/srv` | 介质挂载、临时挂载和服务数据位置 |
 
 `/run` 和 `/dev/shm` 当前由 ext2 承载，**没有伪称 tmpfs**。启动清理不递归调用，

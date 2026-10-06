@@ -26,20 +26,6 @@ staticlib() { name=$1; shift; rm -f "$output/$name.tmp"; "$ar" rcs "$output/$nam
 executable() { "$ld" ${UPSTREAM_LDFLAGS-} --gc-sections -z max-page-size=0x1000 -pie --hash-style=both --dynamic-linker /lib/ld-musl-x86_64.so.1 -rpath /usr/lib/reliefos:/lib:/usr/lib -o "$output/$pkg.elf.tmp" "$musl/lib/Scrt1.o" "$musl/lib/crti.o" "$@" -L "$musl/lib" -l:libmimalloc.so.3 --start-group "$runtime" -lc --end-group "$musl/lib/crtn.o"; mv "$output/$pkg.elf.tmp" "$output/$pkg.elf"; }
 staticexe() { "$ld" ${UPSTREAM_LDFLAGS-} --gc-sections -z max-page-size=0x1000 -static --image-base=0x4000000 -o "$output/$pkg.elf.tmp" "$musl/lib/crt1.o" "$musl/lib/crti.o" "$@" "$musl/lib/mimalloc.o" --start-group "$archive" "$musl/lib/libc.a" --end-group "$musl/lib/crtn.o"; mv "$output/$pkg.elf.tmp" "$output/$pkg.elf"; }
 case $pkg in
-cmd)
- cp -R "$source" "$work/generated/source"
- source=$work/generated/source
- sh "$src/tools/build/upstream-cmd-patch.sh" "$source"
- flags="$flags -std=c99 -fno-pic -fno-pie -D_DEFAULT_SOURCE -I$port/include -I$source -I$port"
- for path in "$source"/*.c; do
-  name=${path##*/}
-  case $name in lexec.c|llinenoise.c|lpath.c|lreadline.c|lsysport.c) continue ;; esac
-  compile -c "$path" -o "$work/objects/${name%.c}.o"
- done
- sed 's/char node_name\[_UTSNAME_LENGTH\];/char node_name[sizeof(name->nodename)];/' "$port/leonos_cmd_shim.c" > "$work/generated/shim.c"
- compile -Ustat -Ufstat -Ulstat -c "$work/generated/shim.c" -o "$work/objects/shim.o"
- staticexe "$work"/objects/*.o
- ;;
 pleditor)
  source=$src/third_party/pl_editor
  cp -R "$source/src" "$work/generated/src"

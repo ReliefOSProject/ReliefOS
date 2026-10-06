@@ -5,9 +5,9 @@
 # no fetch cache). This test runs against the real worktree checkout:
 #
 #   1. detach the kernel submodule at an older published SHA (the documented
-#      daily-dev state) and build the full nine-product kernel set from that
-#      pin into a fresh output directory. A pure kernel build must not require
-#      a UAPI whitelist newer than the pinned kernel provides;
+#      daily-dev state) and build the complete product set declared by that pin
+#      into a fresh output directory. A pure kernel build must not require a
+#      UAPI whitelist newer than the pinned kernel provides;
 #   2. while rolled back, refuse release flows: `make rpr-pages` must fail
 #      with a message naming both the gitlink SHA and the rolled-back SHA;
 #   3. restore the original checkout on every exit path.
@@ -94,15 +94,31 @@ else
 fi
 missing=
 for product in system/kernel.sys system/kernel.debug system/kerneldebug.sys \
-        boot/loader.elf drivers/mouse.drv drivers/serial.drv \
-        drivers/e1000.drv drivers/ac97.drv drivers/es1371.drv; do
+        boot/loader.elf; do
     [ -f "$work/out/generated/$product" ] || missing="$missing $product"
 done
-if [ -z "$missing" ]; then
-    pass "all nine kernel products are published from the rollback build"
+rollback_drivers=
+if [ -f "$reliefnt/mk/boot.mk" ]; then
+    rollback_drivers=$(sed -n 's/^DRIVER_NAMES[[:space:]]*:=\(.*\)$/\1/p' \
+        "$reliefnt/mk/boot.mk" | tr '\n' ' ')
+fi
+for driver in $rollback_drivers; do
+    product="drivers/$driver.drv"
+    [ -f "$work/out/generated/$product" ] || missing="$missing $product"
+done
+if [ -z "$rollback_drivers" ]; then
+    fail "the rollback pin declares a driver product set" \
+        "could not read DRIVER_NAMES from $reliefnt/mk/boot.mk"
+elif [ -z "$missing" ]; then
+    pass "all kernel products declared by the rollback pin are published"
 else
-    fail "all nine kernel products are published from the rollback build" \
-        "missing:$missing"
+    fail "all kernel products declared by the rollback pin are published" \
+        "missing:$missing" "drivers:$rollback_drivers"
+fi
+if printf '%s\n' "$rollback_drivers" | grep -qw hda; then
+    pass "the rollback pin publishes the HDA driver"
+else
+    printf 'note - rollback pin predates HDA; its declared product set is accepted without hda.drv\n'
 fi
 
 printf '\n=== (2) release flows refuse the rolled-back state (gitlink mismatch) ===\n'

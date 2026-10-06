@@ -19,9 +19,6 @@
 [submodule "third_party/stardustui"]
 	path = third_party/stardustui
 	url = https://github.com/xingji-studio/StardustUI.git
-[submodule "third_party/cmd"]
-	path = third_party/cmd
-	url = https://github.com/ChenPi11/cmd.git
 [submodule "third_party/sqlite"]
 	path = third_party/sqlite
 	url = https://github.com/sqlite/sqlite.git

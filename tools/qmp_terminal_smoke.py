@@ -73,7 +73,6 @@ def main() -> int:
     start_menu_smoke = False
     iso9660_smoke = False
     dynlinkerror_smoke = False
-    cmd_pipeline_smoke = False
     fancy_prompt_smoke = False
     abittest_smoke = False
     if arguments and arguments[0] == "--skip-oobe":
@@ -109,9 +108,6 @@ def main() -> int:
     if arguments and arguments[0] == "--dynlinkerror":
         dynlinkerror_smoke = True
         arguments = arguments[1:]
-    if arguments and arguments[0] == "--cmd-pipeline":
-        cmd_pipeline_smoke = True
-        arguments = arguments[1:]
     if arguments and arguments[0] == "--fancy-prompt":
         fancy_prompt_smoke = True
         arguments = arguments[1:]
@@ -132,7 +128,7 @@ def main() -> int:
     if desktop_app is not None and (not desktop_app.isascii() or not desktop_app.isalnum()):
         return 2
     if desktop_app is not None and (fastfetch_smoke or fastfetch_single or hyfetch_smoke or sl_smoke or start_menu_smoke or iso9660_smoke or
-                                    dynlinkerror_smoke or cmd_pipeline_smoke or fancy_prompt_smoke or abittest_smoke or exit_only):
+                                    dynlinkerror_smoke or fancy_prompt_smoke or abittest_smoke or exit_only):
         return 2
     if len(arguments) != 1 or (login_password is not None and not skip_oobe):
         return 2
@@ -313,20 +309,6 @@ def main() -> int:
         send_keys(sock, text_keys("pleditor") + ("ret",))
         time.sleep(5.0)
         hmp(sock, "screendump build/images/dynlinkerror-qmp-smoke.ppm", 0.4)
-        send(sock, {"execute": "quit"}, 0.2)
-        return 0
-
-    if cmd_pipeline_smoke:
-        # cmd executes every pipeline stage through the common COW
-        # fork/exec path. printf and wc are BusyBox applets, so both stages
-        # also validate the argv transformation used by cmd's resolver.
-        send_keys(sock, text_keys("cmd") + ("ret",))
-        time.sleep(2.0)
-        send_keys(sock, text_keys("printf hello | wc -c") + ("ret",))
-        # Both pipeline stages cold-start BusyBox from the FAT image.  Allow
-        # their lazy page-ins and the final EOF-driven wc flush to complete.
-        time.sleep(30.0)
-        hmp(sock, "screendump build/images/cmd-pipeline-qmp-smoke.ppm", 0.4)
         send(sock, {"execute": "quit"}, 0.2)
         return 0
 

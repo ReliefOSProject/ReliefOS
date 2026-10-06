@@ -1,0 +1,100 @@
+# ReliefOS TWM configuration - "Light" theme (2026-10)
+# Guest provides misc bitmap fonts only: fixed (6x13), 9x15, 10x20.
+TitleFont "9x15"
+ResizeFont "9x15"
+MenuFont "fixed"
+IconFont "fixed"
+IconManagerFont "fixed"
+
+RandomPlacement
+RestartPreviousState
+DecorateTransients
+NoGrabServer
+OpaqueMove
+AutoRelativeResize
+BorderWidth 2
+MoveDelta 3
+
+Color
+{
+    DefaultBackground "#eceef4"
+    DefaultForeground "#22242e"
+    TitleBackground "#dce4f5"
+    TitleForeground "#1a1b26"
+    BorderColor "#8aa0d6"
+    MenuBackground "#ffffff"
+    MenuForeground "#22242e"
+    MenuTitleBackground "#dce4f5"
+    MenuTitleForeground "#1a1b26"
+    MenuShadowColor "#9aa0b0"
+    MenuBorderColor "#8a8f9e"
+    IconBackground "#f2f3f8"
+    IconForeground "#22242e"
+    IconBorderColor "#8aa0d6"
+    IconManagerBackground "#eceef4"
+    IconManagerForeground "#22242e"
+    IconManagerHighlight "#3b62a6"
+    PointerForeground "#22242e"
+    PointerBackground "#ffffff"
+}
+
+# Title buttons stay at the twm defaults (logo on the left, resize on the right).
+IconManagerGeometry "192x800-0+0"
+ShowIconManager
+SortIconManager
+
+Function "move-or-lower" { f.move f.deltastop f.lower }
+Function "move-or-raise" { f.move f.deltastop f.raise }
+Function "move-or-iconify" { f.move f.deltastop f.iconify }
+
+Button1 = : root : f.menu "defops"
+Button2 = : root : f.menu "defops"
+Button3 = : root : f.menu "defops"
+Button1 = m : window|icon : f.function "move-or-lower"
+Button2 = m : window|icon : f.iconify
+Button3 = m : window|icon : f.function "move-or-raise"
+Button1 = : title : f.function "move-or-raise"
+Button2 = : title : f.raiselower
+Button1 = : icon : f.function "move-or-iconify"
+Button2 = : icon : f.iconify
+Button1 = : iconmgr : f.iconify
+Button2 = : iconmgr : f.iconify
+
+menu "applications"
+{
+"Applications"  f.title
+"New xterm"     f.exec "xterm -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' &"
+"xeyes"         f.exec "xeyes &"
+"Dillo"         f.exec "dillo &"
+"NEdit"         f.exec "nedit &"
+}
+
+menu "defops"
+{
+"ReliefOS"      f.title
+"Applications"  f.menu "applications"
+""              f.nop
+"Raise"         f.raise
+"Lower"         f.lower
+"Move"          f.move
+"Resize"        f.resize
+"Iconify"       f.iconify
+"Delete"        f.delete
+""              f.nop
+"About"         f.exec "xterm -title About -geometry 62x10 -e sh -c 'echo ReliefOS Xorg session; echo TWM theme: Light; uname -a; echo; echo Press ENTER to close; read' &"
+""              f.nop
+"Exit session"  f.quit
+}
+
+"Return" = m4 : root|window|title : f.exec "xterm -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' &"
+"space" = m4 : root|window|title : f.menu "defops"
+"q" = m4 : window|title : f.delete
+"m" = m4 : window|title : f.iconify
+"a" = m4 : window|title : f.autoraise
+"Tab" = m : root|window|title : f.warpring "next"
+"Tab" = m|s : root|window|title : f.warpring "prev"
+"Up" = m4 : window|title : f.topzoom
+"Down" = m4 : window|title : f.bottomzoom
+"Left" = m4 : window|title : f.leftzoom
+"Right" = m4 : window|title : f.rightzoom
+"z" = m4 : window|title : f.fullzoom

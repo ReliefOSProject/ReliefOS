@@ -121,7 +121,8 @@ private control.
 
 The runtime exposes a synthetic devfs namespace. Common nodes are
 `/dev/null`, `/dev/zero`, `/dev/full`, `/dev/random`, `/dev/urandom`,
-`/dev/tty` (`tty1`–`tty6`), `/dev/console`, `/dev/kmsg`,
+`/dev/tty` (`tty1`–`tty6`), `/dev/tty0` (the active virtual terminal),
+`/dev/console`, `/dev/kmsg`,
 `/dev/ptmx` and `/dev/pts/<id>`, `/dev/fb0`, `/dev/gpu`, `/dev/dsp` (aliased
 `/dev/audio`), `/dev/serial0` (aliased `/dev/ttyS0`), `/dev/ethernet0`,
 `/dev/rtc`, `/dev/driverctl`, `/dev/shm0`, Linux-style storage nodes such as
@@ -494,7 +495,8 @@ and `FBIOPUT_VSCREENINFO` requests from `<linux/fb.h>`.
 ### Fixed virtual consoles and atomic presentation
 
 See [Console, VT and sessions](TTY_VT.md) for tty1–tty6, VT_GETSTATE,
-VT_ACTIVATE, VT_WAITACTIVE, KDGETMODE/KDSETMODE, controlling-terminal permissions,
+VT_OPENQRY, VT_GETMODE/VT_SETMODE, VT_RELDISP, VT_ACTIVATE, VT_WAITACTIVE,
+KDGKBMODE/KDSKBMODE, KDGETMODE/KDSETMODE, controlling-terminal permissions,
 and the bounded text history. `<leonos/fb.h>` adds LEONOS_FBIOBLIT (0x46f2),
 using the fixed 32-byte leonos_fb_present record. Inactive graphical callers
 receive EAGAIN. `<leonos/device.h>` adds LEONOS_EVIOCSVT (0x400445f0), a uint32
@@ -502,6 +504,13 @@ graphical-origin filter shared by an evdev open file description; zero keeps
 the raw stream. LEONOS_VT_GETGENERATION (0x800856f0) returns a uint64 display
 generation so a compositor can detect switches that happened while it was
 paused. These three requests are ReliefOS extensions, not Linux ioctl ABI.
+
+`/dev/tty0` resolves to the currently active VT and does not introduce a
+ReliefOS-specific device name. Xorg may claim that terminal with standard
+`VT_PROCESS` mode, acknowledge release requests with `VT_RELDISP`, and restore
+`VT_AUTO` and `KD_TEXT` before exit. `VT_OPENQRY` reports an available VT in the
+tty1–tty6 range; keyboard mode changes use the public Linux `KDGKBMODE` and
+`KDSKBMODE` requests.
 
 The userspace IPC library retains at most one partially transmitted frame per
 nonblocking connection. A successful send means the frame is accepted; event
