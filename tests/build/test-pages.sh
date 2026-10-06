@@ -168,6 +168,26 @@ else
     ok 'docs index has no script markers'
 fi
 
+# Internal handoff/audit documents stay outside Pages; public references must
+# retain their repository paths without linking to unpublished HTML pages.
+brand_page="$tmp/pages/docs/branding-compatibility/index.html"
+for internal in superpowers/specs/2026-09-24-ntclks-separation-design.md \
+                superpowers/ntclks-separation/09-m1-authority-design-review.md \
+                superpowers/specs/2026-09-27-reliefos-reliefnt-rename-baseline.md \
+                superpowers/specs/2026-09-27-reliefos-reliefnt-rename-design.md \
+                superpowers/plans/2026-09-27-reliefos-reliefnt-rename.md \
+                superpowers/task11-verification.md; do
+    internal_name=${internal##*/}
+    internal_name=${internal_name%.md}
+    if [ ! -e "$tmp/pages/docs/$internal_name" ] \
+        && grep -Fq "<code>docs/$internal</code>" "$brand_page" \
+        && ! grep -Fq "href=\"../$internal_name/index.html" "$brand_page"; then
+        ok "internal reference stays readable without a Pages link: $internal"
+    else
+        bad "internal reference leaked or lost its repository path: $internal"
+    fi
+done
+
 # 5c. md2html.awk escaping discipline: raw <tag>, javascript: link, and onX=
 #     attribute must not survive the converter as live HTML/JS.
 inj="$tmp/inj.md"
