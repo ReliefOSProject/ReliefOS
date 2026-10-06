@@ -57,6 +57,11 @@ done
     done < "$FAKE_OWN_LOG"
 } > "$output"
 : > "$elf"
+while IFS= read -r path; do
+    if readelf -h "$root/$path" >/dev/null 2>&1; then
+        printf 'reliefos-base\tfile\t0644\t%s\t-\n' "$path" >> "$elf"
+    fi
+done < "$FAKE_OWN_LOG"
 OWN
 
 cat > "$w/bin/fake-apk" <<'APK'
@@ -264,5 +269,29 @@ expect_grep "$w/ghost/stderr" 'ghost'
 expect_grep "$w/ghost/stderr" "$w/lock.json"
 expect_grep "$w/broken-feature/stderr" 'broken-feature'
 
-printf '%s\n' 'apk stage selection: base and xorg features filter every staging step'
+# A real local ELF may depend on a SONAME advertised by a selected upstream APK.
+printf 'int fixture_value(void) { return 7; }\n' > "$w/library.c"
+"$hostcc" -shared -fPIC -nostdlib -Wl,-soname,libfixture.so.1 "$w/library.c" -o "$w/libfixture.so.1"
+printf 'extern int fixture_value(void); int main(void) { return fixture_value(); }\n' > "$w/client.c"
+"$hostcc" -nostdlib -Wl,-e,main "$w/client.c" "$w/libfixture.so.1" -o "$w/raw/usr/bin/library-client"
+cp "$w/libfixture.so.1" "$w/pack.xterm/libfixture.so.1"
+printf 'provides = so:libfixture.so.1=1\n' >> "$w/pack.xterm/.PKGINFO"
+(cd "$w/pack.xterm" && tar -czf "$w/upstream/packages/xterm-0.1.apk" .PKGINFO usr/bin/xterm libfixture.so.1)
+set_marker "xorg
+"
+if ! stage upstream-library; then
+    cat "$w/upstream-library/stderr" >&2
+    echo 'FAIL - local ELF dependency on selected upstream provider was rejected' >&2
+    exit 1
+fi
+expect_grep "$w/upstream-library/apk.log" 'depends:.*so:libfixture.so.1'
+set_marker "reliefos
+"
+if stage filtered-library; then
+    echo 'FAIL - filtered upstream provider satisfied a local dependency' >&2
+    exit 1
+fi
+expect_grep "$w/filtered-library/stderr" 'unresolved ELF dependency.*libfixture.so.1'
+
+printf '%s\n' 'apk stage selection: base and xorg features filter every staging step; upstream ELF providers resolve only when selected'
 

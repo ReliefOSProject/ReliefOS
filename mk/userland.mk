@@ -20,6 +20,21 @@ USERLAND_DIR := $(O)/userland
 USERLAND_FLAGS := $(RUNTIME_FLAGS) -fPIE -nostdinc -isystem $(if $(RELIEFOS_PASSIVE),deferred,$(shell $(TARGET_CC) -print-resource-dir 2>/dev/null))/include -D_POSIX_C_SOURCE=200809L
 USERLAND_CFLAGS ?=
 USERLAND_LDFLAGS ?=
+
+ifeq ($(KCONFIG_CONFIG_DESKTOP_BACKEND_XORG),y)
+X11_DEVELOPMENT_ROOT := $(O)/upstream/x11-development
+X11_DEVELOPMENT_PRODUCTS := $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/Xm/Xm.h usr/include/X11/Intrinsic.h usr/include/X11/X.h usr/lib/libXm.so usr/lib/libXt.so usr/lib/libX11.so)
+$(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK)
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(X11_DEVELOPMENT_ROOT))
+	$(Q)touch $(X11_DEVELOPMENT_PRODUCTS)
+$(foreach app,calc osver,$(eval USERLAND_EXTRA_$(app) := -I$(X11_DEVELOPMENT_ROOT)/usr/include))
+$(foreach app,calc osver,$(eval USERLAND_LIBS_$(app) := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libXm.so libXt.so libX11.so)))
+$(foreach app,calc osver,$(eval USERLAND_DEPS_$(app) := $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
+USERLAND_DEPS_osver += $(BUILD_INFO_HEADER)
+.PHONY: x11-development
+x11-development: $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)
+endif
+
 USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric -I$(AUDIO_OPL_ROOT)/usr/include
 USERLAND_LIBS_doom = $(AUDIO_OPL_ROOT)/usr/lib/libopl3.so.1 $(RUNTIME_BUILTINS)
 USERLAND_DEPS_doom = $(upstream_nuked-opl3_products)
@@ -31,7 +46,7 @@ USERLAND_LIBS_glxgears = $(PORTABLEGL_SO)
 USERLAND_DEPS_glxgears = $(GLXGEARS_SOURCE)
 USERLAND_DOOM_EXCLUDE := doomgeneric_allegro.c doomgeneric_emscripten.c doomgeneric_linuxvt.c doomgeneric_sdl.c doomgeneric_soso.c doomgeneric_sosox.c doomgeneric_win.c doomgeneric_xlib.c i_allegromusic.c i_allegrosound.c i_sdlsound.c i_sdlmusic.c i_cdmus.c mus2mid.c
 USERLAND_DOOM_SOURCES := $(filter-out $(addprefix third_party/doomgeneric/doomgeneric/,$(USERLAND_DOOM_EXCLUDE)),$(patsubst $(RELIEFOS_SRC)/%,%,$(wildcard $(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric/*.c)))
-userland_sources = $(sort $(patsubst $(RELIEFOS_SRC)/%,%,$(wildcard $(RELIEFOS_SRC)/userland/apps/$(1)/*.c $(RELIEFOS_SRC)/userland/apps/$(1)/*.S)) $(if $(filter doom,$(1)),$(USERLAND_DOOM_SOURCES)))
+userland_sources = $(filter-out $(if $(filter calc osver,$(1)),userland/apps/$(1)/$(if $(filter y,$(KCONFIG_CONFIG_DESKTOP_BACKEND_XORG)),native,main).c),$(sort $(patsubst $(RELIEFOS_SRC)/%,%,$(wildcard $(RELIEFOS_SRC)/userland/apps/$(1)/*.c $(RELIEFOS_SRC)/userland/apps/$(1)/*.S)) $(if $(filter doom,$(1)),$(USERLAND_DOOM_SOURCES))))
 USERLAND_CRT := $(MUSL_SYSROOT)/lib/Scrt1.o $(MUSL_SYSROOT)/lib/crti.o $(MUSL_SYSROOT)/lib/crtn.o
 USERLAND_LINK_FLAGS := $(RELIEFOS_LINK_POLICY_FLAGS) --gc-sections -z max-page-size=0x1000 -pie --hash-style=both --dynamic-linker /lib/ld-musl-x86_64.so.1 -rpath /usr/lib/reliefos:/lib:/usr/lib
 

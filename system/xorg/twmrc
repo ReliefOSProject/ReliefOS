@@ -67,6 +67,8 @@ menu "apps"
 "xeyes"         f.exec "xeyes &"
 "Dillo"         f.exec "dillo &"
 "NEdit"         f.exec "nedit &"
+"Calculator"    f.exec "calc &"
+"System information" f.exec "osver &"
 }
 
 menu "defops"

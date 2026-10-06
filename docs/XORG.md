@@ -23,6 +23,23 @@ NetSurf packages were
 removed after failing to run in the VMware SVGA QEMU session; PCManFM was
 dropped from the fetch list after it kept exiting silently without a window.
 
+## Motif applications
+
+The Xorg backend builds `calc` and `osver` as Motif X11 clients. Calculator
+supports signed 64-bit integer expressions, parentheses, normal arithmetic
+precedence, keyboard input and on-screen buttons. Division by zero, overflow
+and malformed expressions display an error. System information shows the
+ReliefOS logo and the ReliefNT kernel name, version, build time and copyright;
+five left clicks on the logo within two seconds retain the kernel-debug
+activation shortcut. Both windows support the TWM delete action. The native
+desktop backend continues to build the original frontends from `native.c`.
+
+The build extracts X11, Xt and Motif development headers and linker libraries
+from checksum-pinned, signature-verified Alpine APKs into
+`out/<profile>/upstream/x11-development`. These inputs use the same versions as
+the guest runtime libraries. Development headers are build-only and are not
+staged into the guest.
+
 ## TWM theme, menus and keys
 
 The session ships one TWM configuration, `system/xorg/twmrc`, staged to
@@ -42,7 +59,7 @@ between the two default buttons.
 The root menu, titled `ReliefOS`, opens from any root-button press or
 Super+Space and offers an `Applications` submenu, window operations, `About`
 and `Exit session`. The `Applications` submenu contains new-xterm, `xeyes`,
-Dillo and NEdit. TWM menus
+Dillo, NEdit, Calculator and System information. TWM menus
 are hold-to-open: keep the button or key pressed, drag onto an entry and
 release on it to run it. The `NEdit` entry opens the Motif text editor,
 installed with its dependencies from the official Alpine APK repository by

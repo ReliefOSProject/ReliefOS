@@ -21,7 +21,8 @@ config DESKTOP_BACKEND_XORG
     bool "Xorg + twm + xdm"
     help
       Use Alpine's Xorg server, twm window manager and xdm display manager
-      for a minimal X11 login session. ReliefOS native GUI applications are
+      for a minimal X11 login session. Calculator and System information
+      use Motif X11 frontends; other ReliefOS native GUI applications are
       not X11 clients in this mode.
 
 endchoice

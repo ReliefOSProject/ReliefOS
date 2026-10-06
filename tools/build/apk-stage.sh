@@ -50,6 +50,7 @@ repository=$scratch/repository
 managed=$scratch/managed
 mkdir -p "$tree" "$repository" "$managed"
 : >"$scratch/upstream-requests"
+: >"$scratch/upstream-sonames"
 
 # Select upstream archives by their lock feature before any staging step can
 # see a filtered package: repository copy, raw overlay deletion, ownership
@@ -114,6 +115,7 @@ while IFS= read -r archive; do
     upstream_version=$(sed -n 's/^pkgver = //p' "$scratch/upstream-pkginfo")
     [ -n "$upstream_name" ] && [ -n "$upstream_version" ] || { echo "invalid APK metadata: $archive" >&2; exit 1; }
     printf '%s=%s\n' "$upstream_name" "$upstream_version" >>"$scratch/upstream-requests"
+    sed -n 's/^provides = so:\([^= ]*\)=.*/\1/p' "$scratch/upstream-pkginfo" >>"$scratch/upstream-sonames"
     tar --ignore-zeros -tzf "$archive" >"$scratch/upstream-members" 2>/dev/null
     while IFS= read -r path; do
         case $path in ''|.*|*/) continue;; esac
@@ -284,6 +286,9 @@ while IFS= read -r group; do
         while IFS="$(printf '\t')" read -r consumer soname; do
             [ "$consumer" = "$package" ] || continue
             provider=$(awk -F '\t' -v so="$soname" '$1 == so { print $2; exit }' "$scratch/providers")
+            if [ -z "$provider" ] && grep -Fxq "$soname" "$scratch/upstream-sonames"; then
+                provider=so:$soname
+            fi
             [ -n "$provider" ] || { echo "unresolved ELF dependency: $package: $soname" >&2; exit 1; }
             [ "$provider" = "$package" ] || dependencies="$dependencies $provider"
         done <"$scratch/needed"

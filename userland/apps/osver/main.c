@@ -1,283 +1,290 @@
-#include <reliefos/gui.h>
+#include "debug_click.h"
+#include <generated/build_info.h>
 #include <libintl.h>
 #include <locale.h>
 #include <reliefos/layout.h>
 #include <reliefos/png.h>
-#include <reliefos/psf_font.h>
-#include <reliefos/stdio.h>
 #include <reliefos/system.h>
-#include <reliefos/syscall.h>
-#include <reliefos/ui.h>
-#include <reliefos/layout.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/utsname.h>
+#include <X11/Xutil.h>
+#include <X11/keysym.h>
+#include <Xm/Form.h>
+#include <Xm/Label.h>
+#include <Xm/MessageB.h>
+#include <Xm/Protocols.h>
+#include <Xm/PushB.h>
+#include <Xm/Separator.h>
+#include <Xm/TextF.h>
+#include <Xm/Text.h>
 
-#define OSVER_W 720
-#define OSVER_H 460
-#define OSVER_LOGO_PATH RELIEFOS_PATH_LOGO_PNG
-#define OSVER_LOGO_BOX 196U
 #define T(s) gettext(s)
+#define LOGO_SIZE 180U
 
-static uint32_t pixels[OSVER_W * OSVER_H];
-static struct reliefos_system_info info;
-static char status_text[96];
-static uint32_t *logo_pixels;
-static uint32_t logo_width;
-static uint32_t logo_height;
-static uint32_t logo_clicks;
-static unsigned long logo_click_window_ms;
+static XtAppContext app;
+static Widget status_label, shell, logo;
+static struct osver_debug_click clicks;
+static Pixmap logo_pixmap;
+static unsigned logo_x, logo_y, logo_w, logo_h;
 
-static void copy_text(char *dst, uint32_t cap, const char *src);
-
-static int osver_logo_rect(uint32_t *left, uint32_t *top,
-                           uint32_t *width, uint32_t *height)
+static void set_label(Widget widget, const char *text)
 {
-    const uint32_t box_x = 16U + 35U;
-    const uint32_t box_y = 88U + 58U;
-    const uint32_t box_size = OSVER_LOGO_BOX - 16U;
-    uint32_t draw_w;
-    uint32_t draw_h;
-    if (!logo_pixels || !logo_width || !logo_height) return 0;
-    draw_w = box_size;
-    draw_h = (uint32_t)(((uint64_t)box_size * logo_height) / logo_width);
-    if (draw_h > box_size) {
-        draw_h = box_size;
-        draw_w = (uint32_t)(((uint64_t)box_size * logo_width) / logo_height);
-    }
-    if (!draw_w || !draw_h) return 0;
-    if (left) *left = box_x + (box_size - draw_w) / 2U;
-    if (top) *top = box_y + (box_size - draw_h) / 2U;
-    if (width) *width = draw_w;
-    if (height) *height = draw_h;
-    return 1;
+    XmString value = XmStringCreateLocalized((char *)text);
+    XtVaSetValues(widget, XmNlabelString, value, NULL);
+    XmStringFree(value);
 }
 
-static void osver_kernel_debug_click(uint32_t x, uint32_t y)
+static unsigned long color_component(unsigned value, unsigned long mask)
 {
-    uint32_t left;
-    uint32_t top;
-    uint32_t width;
-    uint32_t height;
-    const uint32_t now = (uint32_t)reliefos_uptime_ms();
+    unsigned shift = 0;
+    if (!mask) return 0;
+    while (!(mask & 1UL)) {
+        mask >>= 1;
+        ++shift;
+    }
+    return ((value * mask + 127UL) / 255UL) << shift;
+}
+
+static Pixmap load_logo(Display *display)
+{
+    uint32_t *pixels = NULL, width = 0, height = 0;
+    if (reliefos_png_decode_file(RELIEFOS_PATH_LOGO_PNG, &pixels, &width, &height) < 0 ||
+        !pixels || !width || !height) {
+        reliefos_png_free(pixels);
+        return None;
+    }
+    logo_w = LOGO_SIZE;
+    logo_h = (unsigned)((uint64_t)LOGO_SIZE * height / width);
+    if (logo_h > LOGO_SIZE) {
+        logo_h = LOGO_SIZE;
+        logo_w = (unsigned)((uint64_t)LOGO_SIZE * width / height);
+    }
+    if (!logo_w || !logo_h) {
+        reliefos_png_free(pixels);
+        return None;
+    }
+    logo_x = (LOGO_SIZE - logo_w) / 2;
+    logo_y = (LOGO_SIZE - logo_h) / 2;
+    int screen = DefaultScreen(display);
+    Visual *visual = DefaultVisual(display, screen);
+    if (visual->class != TrueColor) {
+        reliefos_png_free(pixels);
+        return None;
+    }
+    XImage *image = XCreateImage(display, visual, DefaultDepth(display, screen),
+                                ZPixmap, 0, NULL, LOGO_SIZE, LOGO_SIZE, 32, 0);
+    if (!image) {
+        reliefos_png_free(pixels);
+        return None;
+    }
+    image->data = calloc(LOGO_SIZE, image->bytes_per_line);
+    if (!image->data) {
+        XDestroyImage(image);
+        reliefos_png_free(pixels);
+        return None;
+    }
+    for (unsigned y = 0; y < LOGO_SIZE; ++y) {
+        for (unsigned x = 0; x < LOGO_SIZE; ++x) {
+            uint32_t rgb = 0xffffff;
+            if (x >= logo_x && x < logo_x + logo_w && y >= logo_y && y < logo_y + logo_h) {
+                unsigned sx = (unsigned)((uint64_t)(x - logo_x) * width / logo_w);
+                unsigned sy = (unsigned)((uint64_t)(y - logo_y) * height / logo_h);
+                rgb = pixels[sy * width + sx];
+            }
+            unsigned long pixel = color_component((rgb >> 16) & 255, visual->red_mask) |
+                                  color_component((rgb >> 8) & 255, visual->green_mask) |
+                                  color_component(rgb & 255, visual->blue_mask);
+            XPutPixel(image, x, y, pixel);
+        }
+    }
+    reliefos_png_free(pixels);
+    Pixmap pixmap = XCreatePixmap(display, RootWindow(display, screen), LOGO_SIZE,
+                                  LOGO_SIZE, DefaultDepth(display, screen));
+    GC gc = XCreateGC(display, pixmap, 0, NULL);
+    XPutImage(display, pixmap, gc, image, 0, 0, 0, 0, LOGO_SIZE, LOGO_SIZE);
+    XFreeGC(display, gc);
+    XDestroyImage(image);
+    return pixmap;
+}
+
+static void enable_debug(void)
+{
     uint32_t flags = 0;
-    if (!osver_logo_rect(&left, &top, &width, &height) ||
-        x < left || y < top || x >= left + width || y >= top + height) {
-        logo_clicks = 0;
-        logo_click_window_ms = now;
-        return;
-    }
-    if (logo_clicks == 0U || now - logo_click_window_ms > 2000U) {
-        logo_clicks = 0U;
-        logo_click_window_ms = now;
-    }
-    ++logo_clicks;
-    if (logo_clicks < 5U) return;
-    logo_clicks = 0U;
-    if (reliefos_kernel_debug_get_state(&flags) < 0 ||
-        (flags & RELIEFOS_KERNEL_DEBUG_STATE_ENABLED) == 0U) {
-        if (reliefos_kernel_debug_set_enabled(1) == 0) {
-            copy_text(status_text, sizeof(status_text),
-                      T("Kernel debug mode enabled"));
-            (void)reliefos_ui_show_message_box(
-                T("Kernel debug mode"),
-                T("Kernel debug mode enabled. Use Start > Power to reboot into it."),
-                T("OK"));
-        } else {
-            (void)reliefos_ui_show_message_box(
-                T("Kernel debug mode"),
-                T("Could not persist kernel debug mode."),
-                T("OK"));
-        }
-    }
+    if (reliefos_kernel_debug_get_state(&flags) == 0 &&
+        (flags & RELIEFOS_KERNEL_DEBUG_STATE_ENABLED)) return;
+    int success = reliefos_kernel_debug_set_enabled(1) == 0;
+    if (success) set_label(status_label, T("Kernel debug mode enabled"));
+    Widget dialog = XmCreateInformationDialog(shell, "kernelDebug", NULL, 0);
+    set_label(XmMessageBoxGetChild(dialog, XmDIALOG_OK_BUTTON), T("OK"));
+    XmString message = XmStringCreateLocalized(success ?
+        T("Kernel debug mode enabled. Reboot to enter it.") :
+        T("Could not persist kernel debug mode."));
+    XmString title = XmStringCreateLocalized(T("Kernel debug mode"));
+    XtVaSetValues(dialog, XmNmessageString, message, XmNdialogTitle, title, NULL);
+    XmStringFree(message);
+    XmStringFree(title);
+    XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_CANCEL_BUTTON));
+    XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
+    XtManageChild(dialog);
 }
 
-static void copy_text(char *dst, uint32_t cap, const char *src)
+static void logo_click(Widget widget, XtPointer data, XEvent *event, Boolean *dispatch)
 {
-    uint32_t i = 0;
-    if (!dst || cap == 0) {
-        return;
-    }
-    while (src && src[i] && i + 1 < cap) {
-        dst[i] = src[i];
-        ++i;
-    }
-    dst[i] = 0;
+    (void)data;
+    (void)dispatch;
+    if (event->type != ButtonPress || event->xbutton.button != Button1) return;
+    Dimension width, height;
+    XtVaGetValues(widget, XmNwidth, &width, XmNheight, &height, NULL);
+    int x = event->xbutton.x - ((int)width - (int)LOGO_SIZE) / 2;
+    int y = event->xbutton.y - ((int)height - (int)LOGO_SIZE) / 2;
+    int inside = logo_pixmap && x >= (int)logo_x && y >= (int)logo_y &&
+        x < (int)(logo_x + logo_w) && y < (int)(logo_y + logo_h);
+    struct timespec now;
+    if (clock_gettime(CLOCK_MONOTONIC, &now) < 0) return;
+    uint32_t milliseconds = (uint32_t)((uint64_t)now.tv_sec * 1000 + now.tv_nsec / 1000000);
+    if (osver_debug_click(&clicks, milliseconds, inside)) enable_debug();
 }
 
-static void draw_logo(struct reliefos_ui_surface *ui, uint32_t x, uint32_t y,
-                      uint32_t w, uint32_t h)
+static void close_window(Widget widget, XtPointer data, XtPointer call)
 {
-    uint32_t draw_w;
-    uint32_t draw_h;
-    uint32_t draw_x;
-    uint32_t draw_y;
-
-    if (!logo_pixels || !logo_width || !logo_height || !w || !h) {
-        reliefos_ui_rect(ui, x, y, w, h, RELIEFOS_UI_WHITE);
-        reliefos_ui_text_resized_clipped(ui, x + 12, y + h / 2U - 8U,
-                                       w > 24U ? w - 24U : w,
-                                       T("Logo unavailable"),
-                                       RELIEFOS_UI_DARK, RELIEFOS_UI_WHITE,
-                                       RELIEFOS_FONT_W, RELIEFOS_FONT_H);
-        return;
-    }
-
-    draw_w = w;
-    draw_h = (uint32_t)(((uint64_t)w * logo_height) / logo_width);
-    if (draw_h > h) {
-        draw_h = h;
-        draw_w = (uint32_t)(((uint64_t)h * logo_width) / logo_height);
-    }
-    if (!draw_w || !draw_h) {
-        return;
-    }
-    draw_x = x + (w - draw_w) / 2U;
-    draw_y = y + (h - draw_h) / 2U;
-    for (uint32_t dy = 0; dy < draw_h; ++dy) {
-        uint32_t sy = (uint32_t)(((uint64_t)dy * logo_height) / draw_h);
-        if (sy >= logo_height) {
-            sy = logo_height - 1U;
-        }
-        for (uint32_t dx = 0; dx < draw_w; ++dx) {
-            uint32_t sx = (uint32_t)(((uint64_t)dx * logo_width) / draw_w);
-            if (sx >= logo_width) {
-                sx = logo_width - 1U;
-            }
-            if (draw_x + dx < ui->width && draw_y + dy < ui->height) {
-                ui->pixels[(draw_y + dy) * ui->stride + draw_x + dx] =
-                    logo_pixels[sy * logo_width + sx];
-            }
-        }
-    }
+    (void)widget;
+    (void)data;
+    (void)call;
+    XtAppSetExitFlag(app);
 }
 
-static void draw_osver(struct reliefos_ui_surface *ui)
+static Widget label(Widget parent, const char *name, const char *text,
+                    Widget above, int height)
 {
-    struct reliefos_ui_property_item props[] = {
-        {T("Kernel"), info.kernel_name, 0},
-        {T("Kernel version"), info.kernel_version, 0},
-        {T("Build time"), info.build_time, 0},
-        {T("Copyright"), info.copyright, 0},
-    };
-    const uint32_t hero_x = 16U;
-    const uint32_t hero_y = 88U;
-    const uint32_t hero_w = 250U;
-    const uint32_t content_h = 328U;
-    const uint32_t info_x = 282U;
-    const uint32_t info_w = OSVER_W - info_x - 16U;
-
-    reliefos_ui_rect(ui, 0, 0, OSVER_W, OSVER_H, RELIEFOS_UI_GRAY);
-    reliefos_ui_toolbar(ui, 0, 0, OSVER_W, 68U);
-    reliefos_ui_rect(ui, 0, 0, 8U, 68U, RELIEFOS_UI_ACTIVE_TITLE);
-    reliefos_ui_text_resized_clipped(ui, 28U, 12U, 300U, "ReliefOS",
-                                   RELIEFOS_UI_BLACK, RELIEFOS_UI_GRAY, 12U, 24U);
-    reliefos_ui_text(ui, 29U, 43U,
-                   T("About this operating system"),
-                   RELIEFOS_UI_DARK, RELIEFOS_UI_GRAY);
-
-    reliefos_ui_panel(ui, hero_x, hero_y, hero_w, content_h, RELIEFOS_UI_LIGHT);
-    reliefos_ui_text(ui, hero_x + 16U, hero_y + 14U,
-                   T("ReliefOS"), RELIEFOS_UI_BLACK, RELIEFOS_UI_LIGHT);
-    reliefos_ui_rect(ui, hero_x + 16U, hero_y + 38U, hero_w - 32U, 1U,
-                   RELIEFOS_UI_WHITE);
-    reliefos_ui_panel(ui, hero_x + 27U, hero_y + 50U, OSVER_LOGO_BOX,
-                    OSVER_LOGO_BOX, RELIEFOS_UI_WHITE);
-    draw_logo(ui, hero_x + 35U, hero_y + 58U, OSVER_LOGO_BOX - 16U,
-              OSVER_LOGO_BOX - 16U);
-    reliefos_ui_text_resized_clipped(ui, hero_x + 16U, hero_y + 260U,
-                                   hero_w - 32U, "ReliefOS", RELIEFOS_UI_BLACK,
-                                   RELIEFOS_UI_LIGHT, 10U, 20U);
-    reliefos_ui_text(ui, hero_x + 16U, hero_y + 287U,
-                   T("A compact desktop OS"),
-                   RELIEFOS_UI_DARK, RELIEFOS_UI_LIGHT);
-
-    reliefos_ui_panel(ui, info_x, hero_y, info_w, content_h, RELIEFOS_UI_LIGHT);
-    reliefos_ui_rect(ui, info_x + 1U, hero_y + 1U, info_w - 2U, 54U,
-                   RELIEFOS_UI_WHITE);
-    reliefos_ui_text(ui, info_x + 16U, hero_y + 10U,
-                   T("System information"), RELIEFOS_UI_BLACK,
-                   RELIEFOS_UI_WHITE);
-    reliefos_ui_text(ui, info_x + 16U, hero_y + 31U,
-                   T("Build and runtime components"),
-                   RELIEFOS_UI_DARK, RELIEFOS_UI_WHITE);
-    reliefos_ui_property_grid(ui, info_x + 12U, hero_y + 68U, info_w - 24U,
-                            props, sizeof(props) / sizeof(props[0]), 122U, 28U);
-    reliefos_ui_text(ui, info_x + 16U, hero_y + 260U,
-                   T("This window reports the version embedded in the running kernel."),
-                   RELIEFOS_UI_DARK, RELIEFOS_UI_LIGHT);
-    reliefos_ui_text(ui, info_x + 16U, hero_y + 282U,
-                   T("ReliefOS is free software for learning and experimentation."),
-                   RELIEFOS_UI_DARK, RELIEFOS_UI_LIGHT);
-    reliefos_ui_statusbar(ui, OSVER_H - 28, 28, status_text);
+    XmString value = XmStringCreateLocalized((char *)text);
+    Widget widget = XtVaCreateManagedWidget(name, xmLabelWidgetClass, parent,
+        XmNlabelString, value, XmNalignment, XmALIGNMENT_BEGINNING,
+        XmNheight, height, XmNleftAttachment, XmATTACH_FORM,
+        XmNrightAttachment, XmATTACH_FORM,
+        XmNtopAttachment, above ? XmATTACH_WIDGET : XmATTACH_FORM,
+        XmNtopWidget, above, NULL);
+    XmStringFree(value);
+    return widget;
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
     bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
     textdomain("leonos");
-    struct reliefos_ui_surface ui;
-    struct reliefos_gui_app_event event;
-    int window_id;
-    int ret;
-
-    puts("[osver.elf] system version viewer starting");
-    (void)reliefos_png_decode_file(OSVER_LOGO_PATH, &logo_pixels, &logo_width,
-                                 &logo_height);
-    if (!logo_pixels) {
-        copy_text(status_text, sizeof(status_text),
-                  T("System information (logo unavailable)"));
+    XtSetLanguageProc(NULL, NULL, NULL);
+    char *fallback[] = {
+        "*fontList: fixed", "*background: #eceef4", "*foreground: #22242e",
+        "*TextField.background: white", "*highlightColor: #3b62a6", NULL
+    };
+    shell = XtVaAppInitialize(&app, "ReliefOSSystemInformation", NULL, 0,
+        &argc, argv, fallback, XtNtitle, T("About ReliefOS"),
+        XtNwidth, 760, XtNheight, 380, NULL);
+    struct reliefos_system_info info = {0};
+    const char *status = T("System version information");
+    if (reliefos_system_info(&info) < 0) {
+        snprintf(info.kernel_name, sizeof(info.kernel_name), "%s", "unknown");
+        snprintf(info.kernel_version, sizeof(info.kernel_version), "%s", "unknown");
+        snprintf(info.build_time, sizeof(info.build_time), "%s", "unknown");
+        status = T("Could not read system version information");
     }
-    ret = reliefos_system_info(&info);
-    if (ret < 0) {
-        copy_text(status_text, sizeof(status_text), T("Could not read system version information"));
-        copy_text(info.kernel_name, sizeof(info.kernel_name), "unknown");
-        copy_text(info.kernel_version, sizeof(info.kernel_version), "0.0.0-0000");
-        copy_text(info.build_time, sizeof(info.build_time), "unknown");
-        copy_text(info.copyright, sizeof(info.copyright),
-                  "Copyright LeonMMcoset 2021-2026. All rights reserved.");
-    }
-
-    if (!status_text[0]) {
-        copy_text(status_text, sizeof(status_text), T("System version information"));
-    }
-    {
-        uint32_t debug_flags = 0;
-        if (reliefos_kernel_debug_get_state(&debug_flags) == 0 &&
-            (debug_flags & RELIEFOS_KERNEL_DEBUG_STATE_ENABLED) != 0U) {
-            copy_text(status_text, sizeof(status_text),
-                      T("Kernel debug mode enabled"));
+    if (!info.build_time[0]) {
+        struct utsname uts;
+        if (uname(&uts) == 0) {
+            snprintf(info.build_time, sizeof(info.build_time), "%.*s",
+                     (int)sizeof(info.build_time) - 1, uts.version);
         }
+        if (!info.build_time[0]) snprintf(info.build_time, sizeof(info.build_time), "%s", T("Unavailable"));
     }
-    window_id = reliefos_gui_create_app_window_ex(T("About ReliefOS"), T("System version"),
-                                                OSVER_W, OSVER_H, RELIEFOS_GUI_WINDOW_NO_RESIZE);
-    if (window_id <= 0) {
-        printf("[osver.elf] create window failed=%d\n", window_id);
-        return 1;
+    if (!info.copyright[0]) {
+        snprintf(info.copyright, sizeof(info.copyright), "%s", RELIEFOS_COPYRIGHT);
     }
-
-    reliefos_ui_bind(&ui, pixels, OSVER_W, OSVER_H, OSVER_W);
-    draw_osver(&ui);
-    reliefos_gui_present_window((uint32_t)window_id, OSVER_W, OSVER_H, OSVER_W, pixels);
-
-    for (;;) {
-        event.window_id = (uint32_t)window_id;
-        while (reliefos_gui_wait_app_event(&event, RELIEFOS_GUI_IDLE_WAIT_MS) > 0) {
-            if (event.type == RELIEFOS_GUI_APP_EVENT_CLOSE) {
-                reliefos_png_free(logo_pixels);
-                return 0;
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN && event.pressed && event.keycode == 1) {
-                reliefos_png_free(logo_pixels);
-                return 0;
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_MOUSE_BUTTON && (event.buttons & 1U)) {
-                osver_kernel_debug_click((uint32_t)event.x, (uint32_t)event.y);
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_RESIZE ||
-                event.type == RELIEFOS_GUI_APP_EVENT_FOCUS) {
-                draw_osver(&ui);
-                reliefos_gui_present_window((uint32_t)window_id, OSVER_W, OSVER_H, OSVER_W, pixels);
-            }
+    info.kernel_name[sizeof(info.kernel_name) - 1] = 0;
+    info.kernel_version[sizeof(info.kernel_version) - 1] = 0;
+    info.build_time[sizeof(info.build_time) - 1] = 0;
+    info.copyright[sizeof(info.copyright) - 1] = 0;
+    uint32_t flags = 0;
+    if (reliefos_kernel_debug_get_state(&flags) == 0 &&
+        (flags & RELIEFOS_KERNEL_DEBUG_STATE_ENABLED)) status = T("Kernel debug mode enabled");
+    Widget form = XtVaCreateWidget("about", xmFormWidgetClass, shell,
+        XmNwidth, 760, XmNheight, 380, XmNresizePolicy, XmRESIZE_NONE,
+        XmNmarginWidth, 16, XmNmarginHeight, 12, NULL);
+    Widget heading = label(form, "heading", "ReliefOS", NULL, 30);
+    Widget subtitle = label(form, "subtitle", T("About this operating system"), heading, 24);
+    Widget separator = XtVaCreateManagedWidget("separator", xmSeparatorWidgetClass, form,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, subtitle,
+        XmNleftAttachment, XmATTACH_FORM, XmNrightAttachment, XmATTACH_FORM, NULL);
+    Widget close = XtVaCreateManagedWidget("close", xmPushButtonWidgetClass, form,
+        XmNbottomAttachment, XmATTACH_FORM, XmNrightAttachment, XmATTACH_FORM,
+        XmNwidth, 90, XmNheight, 32, XmNrecomputeSize, False, NULL);
+    set_label(close, T("Close"));
+    XtAddCallback(close, XmNactivateCallback, close_window, NULL);
+    status_label = XtVaCreateManagedWidget("status", xmLabelWidgetClass, form,
+        XmNalignment, XmALIGNMENT_BEGINNING,
+        XmNbottomAttachment, XmATTACH_FORM, XmNleftAttachment, XmATTACH_FORM,
+        XmNrightAttachment, XmATTACH_WIDGET, XmNrightWidget, close, XmNheight, 32, NULL);
+    set_label(status_label, status);
+    logo_pixmap = load_logo(XtDisplay(shell));
+    logo = XtVaCreateManagedWidget("logo", xmLabelWidgetClass, form,
+        XmNwidth, LOGO_SIZE, XmNheight, LOGO_SIZE,
+        XmNmarginWidth, 0, XmNmarginHeight, 0, XmNhighlightThickness, 0,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, separator, XmNtopOffset, 20,
+        XmNleftAttachment, XmATTACH_FORM, NULL);
+    if (logo_pixmap) XtVaSetValues(logo, XmNlabelType, XmPIXMAP, XmNlabelPixmap, logo_pixmap, NULL);
+    else set_label(logo, T("Logo unavailable"));
+    Widget details = XtVaCreateManagedWidget("details", xmFormWidgetClass, form,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, separator, XmNtopOffset, 16,
+        XmNleftAttachment, XmATTACH_WIDGET, XmNleftWidget, logo, XmNleftOffset, 20,
+        XmNrightAttachment, XmATTACH_FORM,
+        XmNbottomAttachment, XmATTACH_WIDGET, XmNbottomWidget, close, XmNbottomOffset, 16, NULL);
+    const char *names[] = {T("Kernel"), T("Kernel version"), T("Build time"), T("Copyright")};
+    const char *values[] = {info.kernel_name, info.kernel_version, info.build_time, info.copyright};
+    Widget previous = NULL;
+    for (unsigned i = 0; i < 4; ++i) {
+        Widget row = XtVaCreateWidget("row", xmFormWidgetClass, details,
+            XmNheight, i == 3 ? 52 : 36, XmNresizePolicy, XmRESIZE_NONE,
+            XmNleftAttachment, XmATTACH_FORM, XmNrightAttachment, XmATTACH_FORM,
+            XmNtopAttachment, previous ? XmATTACH_WIDGET : XmATTACH_FORM,
+            XmNtopWidget, previous, XmNtopOffset, 4, NULL);
+        Widget name = XtVaCreateManagedWidget("name", xmLabelWidgetClass, row,
+            XmNalignment, XmALIGNMENT_BEGINNING, XmNleftAttachment, XmATTACH_FORM,
+            XmNtopAttachment, XmATTACH_FORM, XmNbottomAttachment, XmATTACH_FORM,
+            XmNrightAttachment, XmATTACH_POSITION, XmNrightPosition, 27, NULL);
+        set_label(name, names[i]);
+        Widget value = XtVaCreateManagedWidget("value",
+            i == 3 ? xmTextWidgetClass : xmTextFieldWidgetClass, row,
+            XmNvalue, values[i], XmNeditable, False, XmNcursorPositionVisible, False,
+            XmNtopAttachment, XmATTACH_FORM, XmNbottomAttachment, XmATTACH_FORM,
+            XmNleftAttachment, XmATTACH_POSITION, XmNleftPosition, 28,
+            XmNrightAttachment, XmATTACH_FORM, NULL);
+        if (i == 3) XtVaSetValues(value, XmNeditMode, XmMULTI_LINE_EDIT, XmNwordWrap, True, NULL);
+        XtManageChild(row);
+        previous = row;
+    }
+    label(details, "note", T("Build and runtime components"), previous, 30);
+    XtAddEventHandler(logo, ButtonPressMask, False, logo_click, NULL);
+    XtManageChild(form);
+    XtRealizeWidget(shell);
+    Atom delete_window = XInternAtom(XtDisplay(shell), "WM_DELETE_WINDOW", False);
+    XmAddWMProtocolCallback(shell, delete_window, close_window, NULL);
+    puts("[osver.elf] Motif system information ready");
+    printf("[osver.elf] kernel=%s version=%s build=%s\n", info.kernel_name, info.kernel_version, info.build_time);
+    fflush(stdout);
+    while (!XtAppGetExitFlag(app)) {
+        XEvent event;
+        XtAppNextEvent(app, &event);
+        if (event.type == ButtonPress && event.xbutton.button == Button1 &&
+            event.xbutton.window != XtWindow(logo)) {
+            (void)osver_debug_click(&clicks, 0, 0);
         }
-        sleep_ms(20);
+        if (event.type == KeyPress && XLookupKeysym(&event.xkey, 0) == XK_Escape) XtAppSetExitFlag(app);
+        XtDispatchEvent(&event);
     }
+    if (logo_pixmap) XFreePixmap(XtDisplay(shell), logo_pixmap);
+    XtDestroyWidget(shell);
+    XtDestroyApplicationContext(app);
+    return 0;
 }
