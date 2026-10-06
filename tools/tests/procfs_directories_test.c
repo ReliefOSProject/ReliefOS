@@ -1,6 +1,10 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include "../../kernel/reliefnt/kernel/reliefnt/include/reliefnt/audio.h"
+int audio_card_snapshot(uint32_t index, uint32_t *out_id,
+                        struct audio_card_identity *identity)
+{ (void)index; (void)out_id; (void)identity; return -2; }
 #include "../../kernel/reliefnt/fs/procfs.c"
 
 static struct task current = {.pid = 42, .name = "test", .uid = 1000};

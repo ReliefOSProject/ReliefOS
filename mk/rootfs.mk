@@ -18,6 +18,7 @@ $(O_META)/rootfs-sources.sig: FORCE $(RELIEFOS_SRC)/tools/build/tree-signature.s
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/tree-signature.sh $@ $(ROOTFS_SOURCE_DIRS)
 ROOTFS_UPSTREAM_PRODUCTS = $(foreach package,$(UPSTREAM_PACKAGES) ncurses,$(UPSTREAM_ROOT)/$(package)/root/.complete $(upstream_$(package)_products))
 ROOTFS_APP_PRODUCTS = $(USERLAND_DIR)/motd.elf $(addprefix $(USERLAND_DIR)/,$(addsuffix .elf,$(RELIEFOS_COMPONENT_APPS))) $(USERLAND_DIR)/dynlinkerror.elf $(BUSYBOX_ELF) $(BUSYBOX_LINKS) $(SQLITE_SO) $(PORTABLEGL_SO) $(USERLAND_DIR)/sl.elf
+ROOTFS_APP_PRODUCTS += $(if $(filter settings soundctl,$(RELIEFOS_COMPONENT_APPS)),$(AUDIO_CONTROL_SO))
 $(ROOTFS_RAW_STAMP) $(ROOTFS_MANIFEST): $(NLS_MO) $(NLS_MUSL_MO) $(RELIEFOS_SRC)/configs/nls/LINGUAS
 RELIEFOS_SIG_rootfs := epoch=$(SOURCE_DATE_EPOCH)|sources=$(O_META)/rootfs-sources.sig|components=$(RELIEFOS_COMPONENTS_ENABLED)
 $(if $(RELIEFOS_PASSIVE),,$(eval $(call RELIEFOS_SIGNATURE_RULE,rootfs)))

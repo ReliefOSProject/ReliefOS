@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+Subject: [PATCH] pcm: keep dmix and dsnoop on one ReliefOS hardware lease
+
+ReliefOS exposes one physical HDA stream lease for each logical playback
+and capture endpoint.  The direct plugins' legacy server mode is the ALSA
+mechanism for sharing that lease between independent clients; without it,
+newer PCM protocol versions make every secondary client reopen the hardware
+PCM and receive EBUSY from the endpoint lease.
+
+---
+ src/pcm/pcm_direct.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/pcm/pcm_direct.c b/src/pcm/pcm_direct.c
+--- a/src/pcm/pcm_direct.c
++++ b/src/pcm/pcm_direct.c
+@@ -1452,8 +1452,11 @@
+ 	{
+ 		int ver = 0;
+ 		ioctl(spcm->poll_fd, SNDRV_PCM_IOCTL_PVERSION, &ver);
+-		if (ver < SNDRV_PROTOCOL_VERSION(2, 0, 8))
+-			dmix->shmptr->use_server = 1;
++		/* ReliefOS keeps one physical HDA lease per endpoint.  Use the
++		 * upstream direct server so secondary dmix/dsnoop clients share that
++		 * lease instead of reopening the hardware PCM. */
++		if (ver >= 0)
++			dmix->shmptr->use_server = 1;
+ 	}

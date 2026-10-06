@@ -7,7 +7,7 @@
 # published files into existence (and fail if the adapter cannot produce them).
 
 LOADER_ELF := $(O_GENERATED)/boot/loader.elf
-DRIVER_NAMES := mouse serial e1000 ac97 es1371
+DRIVER_NAMES := mouse serial e1000 ac97 es1371 hda
 DRIVER_OUTPUTS := $(addprefix $(O_GENERATED)/drivers/,$(addsuffix .drv,$(DRIVER_NAMES)))
 KERNELDEBUG_SYS := $(O_GENERATED)/system/kerneldebug.sys
 

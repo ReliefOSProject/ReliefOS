@@ -2307,6 +2307,40 @@
       "script": "build.py:archive:zlib",
       "target": "musl-runtime",
       "license": "third_party/zlib/LICENSE"
+    },
+    {
+      "id": "alsa-lib",
+      "kind": "tarball",
+      "version": "1.2.14",
+      "url": "https://www.alsa-project.org/files/pub/lib/alsa-lib-1.2.14.tar.bz2",
+      "sha256": "be9c88a0b3604367dd74167a2b754a35e142f670292ae47a2fdef27a2ee97a32",
+      "directory": "alsa-lib-1.2.14",
+      "script": "tools/build/upstream.sh",
+      "target": "upstream-alsa-lib",
+      "license_in_source": "COPYING"
+    },
+    {
+      "id": "alsa-utils",
+      "kind": "tarball",
+      "version": "1.2.14",
+      "url": "https://www.alsa-project.org/files/pub/utils/alsa-utils-1.2.14.tar.bz2",
+      "sha256": "0794c74d33fed943e7c50609c13089e409312b6c403d6ae8984fc429c0960741",
+      "directory": "alsa-utils-1.2.14",
+      "script": "tools/build/upstream.sh",
+      "target": "upstream-alsa-utils",
+      "license_in_source": "COPYING"
+    },
+    {
+      "id": "nuked-opl3",
+      "kind": "tarball",
+      "version": "1.8",
+      "commit": "765ec962e473aeb767e4cba74ffdc8f588ffbfe8",
+      "url": "https://codeload.github.com/nukeykt/Nuked-OPL3/tar.gz/765ec962e473aeb767e4cba74ffdc8f588ffbfe8",
+      "sha256": "2fad908c3904d3ef51b55e0d6a8980c7142942e2d0baa7e99bf038cf0a41199d",
+      "directory": "Nuked-OPL3-765ec962e473aeb767e4cba74ffdc8f588ffbfe8",
+      "script": "tools/build/opl3.sh",
+      "target": "upstream-nuked-opl3",
+      "license_in_source": "LICENSE"
     }
   ]
 }

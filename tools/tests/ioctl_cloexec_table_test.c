@@ -18,6 +18,9 @@
 static int fail_allocation;
 void *kernel_malloc(size_t size) { return fail_allocation ? NULL : malloc(size); }
 void kernel_free(void *memory) { free(memory); }
+/* This table test opens no OSS lease; hardware release would be a bug. */
+void driver_manager_audio_release(uint32_t generation)
+{ (void)generation; abort(); }
 /* These synthetic device/O_PATH nodes have no ext2 backing in this table test. */
 int storage_inode_get(const struct storage_node *node, struct storage_inode_ref **out)
 { assert(!(node->flags & STORAGE_NODE_FLAG_EXT2)); *out = NULL; return 0; }
@@ -30,6 +33,9 @@ void task_socket_collect(void) {}
 void input_evdev_release(uint32_t kind, uint64_t token)
 { (void)kind; (void)token; }
 uint32_t smp_current_cpu(void) { return 0; }
+/* Hardware clock edge; PCM and descriptor cleanup stay production code. */
+int time_clock_get(int32_t clock, struct linux_timespec *value)
+{ (void)clock; *value = (struct linux_timespec){0}; return 0; }
 void pty_reap_hungup(uint32_t id) { (void)id; }
 void pty_transfer_put(uint32_t id, uint32_t endpoint) { (void)id; (void)endpoint; }
 void kernel_spin_init(struct kernel_spinlock *lock) { lock->state = 0; }

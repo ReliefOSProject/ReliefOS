@@ -81,6 +81,14 @@ test-build: test-tools $(RELIEFOS_HOST_TOOLS)
 test-long: $(RELIEFOS_HOST_TOOLS)
 	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_LONG_TESTS))
 
+# Audio userland is an explicit host gate because it needs the staged ALSA and
+# Nuked OPL3 products.  Keep it separate from the generic shell suite so a
+# missing audio staging tree is reported as a real prerequisite failure rather
+# than silently skipped.
+.PHONY: test-audio
+test-audio:
+	@python3 $(RELIEFOS_SRC)/tools/test_audio_userland.py controls settings doom-output doom-mixer doom-music
+
 test: test-tools test-build
 
 $(O_HOST)/obj/tests/host/%.c.o: $(RELIEFOS_SRC)/tests/host/%.c $(O_META)/host-cc.sig

@@ -28,7 +28,7 @@ tree() { record t "$1" "/$2" 0755 "$3" "${4:-unique}"; }
 link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
 # Independent upstream installations never share a destination during builds.
-for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils; do
+for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3; do
     for directory in bin sbin lib usr etc; do
         input=$out/upstream/$package/root/$directory
         if [ -d "$input" ]; then tree "$input" "$directory" "$package"; fi
@@ -84,6 +84,9 @@ file "$out/sysroot/musl/lib/libc.so" lib/libc.so 0755 musl
 file "$out/sysroot/musl/lib/libmimalloc.so.3" lib/libmimalloc.so.3 0755 reliefos-mimalloc
 file "$out/system/lib/libreliefos.so.2" usr/lib/reliefos/libreliefos.so.2 0755 reliefos-apps
 file "$out/system/lib/libleonos.so.2" usr/lib/leonos/libleonos.so.2 0755 reliefos-apps
+if enabled settings || enabled soundctl; then
+    file "$out/system/lib/libreliefos-audio.so.1" usr/lib/libreliefos-audio.so.1 0755 reliefos-audio
+fi
 for package in musl mimalloc; do tree "$out/sysroot/musl/share/licenses/$package" "usr/share/licenses/$package" "$package"; done
 printf '/lib:/usr/local/lib:/usr/lib:/usr/lib/reliefos:/usr/lib/leonos\n' > "$work/data/ld.path"
 file "$work/data/ld.path" etc/ld-musl-x86_64.path 0644 musl
@@ -119,6 +122,13 @@ while read -r app entry; do
     fi
     link "usr/bin/$app" "../lib/reliefos/apps/$app/$app.elf" "$app"
 done < "$work/apps"
+# Doom's image payload is deliberately opt-in with the app image switch.  Keep
+# the WAD beside the executable so the guest launcher can use its configured
+# default path, and carry the Freedoom notice into the same rootfs manifest.
+if enabled doom; then
+    file "$src/third_party/doomgeneric/freedoom1.wad" usr/lib/reliefos/apps/doom/freedoom1.wad 0644 doom
+    file "$src/third_party/doomgeneric/FREEDOOM-COPYING.txt" usr/share/doc/reliefos/FREEDOOM-COPYING.txt 0644 doom
+fi
 # Tool executables keep their native locations; registry entries use a local
 # symlink so the registry's relative exec contract remains the same as apps.
 for app in busybox sl; do
@@ -228,7 +238,7 @@ if enabled busybox; then
         if awk -F '\t' -v path="$guest" '$3==path{found=1} END{exit !found}' "$plan"; then continue; fi
         # Tree rules also own actual paths; ask whether the original stage has it.
         claimed=0
-        for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs ncurses; do
+        for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs alsa-lib alsa-utils nuked-opl3 ncurses; do
             case $package in ncurses) enabled "$package" || continue ;; esac
             if [ -e "$out/upstream/$package/root$guest" ] || [ -L "$out/upstream/$package/root$guest" ]; then claimed=1; break; fi
         done

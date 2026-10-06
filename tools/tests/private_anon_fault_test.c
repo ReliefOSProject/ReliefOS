@@ -4,6 +4,7 @@
 #include <string.h>
 #include "../../kernel/reliefnt/arch/x86_64/paging.c"
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#include "sysv_shm_fixture_stubs.h"
 
 static unsigned allocated;
 static bool fail_alloc;

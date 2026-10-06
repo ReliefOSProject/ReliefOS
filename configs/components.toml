@@ -1,5 +1,18 @@
 version = 1
 
+[[components]]
+id = "soundctl"
+symbol = "APP_SOUNDCTL"
+label = "Sound controls"
+category = "System applications"
+kind = "system-app"
+default = true
+required = false
+stage = true
+entry = false
+sdk = false
+api = false
+
 # The component manifest is the source for optional build, image and entry
 # switches. Core services remain explicit in Kconfig and cannot be disabled.
 

@@ -1,7 +1,7 @@
 # Include after third-party.mk, pam.mk and runtime.mk. Each package owns an isolated root.
 UPSTREAM_ROOT := $(O)/upstream
 UPSTREAM_SCRIPT := $(RELIEFOS_SRC)/tools/build/upstream.sh
-UPSTREAM_PACKAGES := libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils
+UPSTREAM_PACKAGES := libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3
 upstream_libmd_outputs := lib/libmd.so.0 usr/include/md5.h
 upstream_libbsd_outputs := lib/libbsd.so.0 usr/include/bsd/stdlib.h
 upstream_util-linux_outputs := usr/lib/libuuid.a usr/lib/libblkid.a bin/su usr/sbin/fdisk bin/mount bin/lsblk
@@ -12,24 +12,31 @@ upstream_dosfstools_outputs := usr/sbin/mkfs.fat usr/sbin/fsck.fat
 upstream_exfatprogs_outputs := usr/sbin/mkfs.exfat usr/sbin/fsck.exfat
 upstream_coreutils_outputs := usr/bin/dd
 upstream_ncurses_outputs := usr/lib/libncursesw.a usr/lib/libtinfow.a usr/include/curses.h
+upstream_alsa-lib_outputs := usr/lib/libasound.so.2 usr/lib/libasound.a usr/include/alsa/asoundlib.h usr/share/alsa/alsa.conf
+upstream_alsa-utils_outputs := usr/bin/aplay usr/bin/arecord usr/bin/amixer usr/sbin/alsactl usr/bin/speaker-test
+upstream_nuked-opl3_outputs := usr/lib/libopl3.so.1 usr/include/opl3.h
+upstream_nuked-opl3_script := $(RELIEFOS_SRC)/tools/build/opl3.sh
 $(foreach package,$(UPSTREAM_PACKAGES) ncurses,$(eval upstream_$(package)_primary := $(upstream_$(package)_outputs)))
 upstream_libbsd_deps := libmd
 upstream_shadow_deps := libmd libbsd
 upstream_e2fsprogs_deps := util-linux
 upstream_exfatprogs_deps := util-linux
+upstream_alsa-utils_deps := alsa-lib
+upstream_alsa-lib_patches := $(wildcard $(RELIEFOS_SRC)/patches/alsa-lib/*.patch)
 # Install manifests register every published file, so deleting a non-primary
 # header, library link or manual page also invalidates the package group.
 
 define RELIEFOS_UPSTREAM_RULE
+upstream_$(1)_script ?= $$(UPSTREAM_SCRIPT)
 RELIEFOS_SIG_upstream-$(1) := cc=$(TARGET_CC)|triple=$(TRIPLE_USER)|lock=$(RELIEFOS_LOCK_DIGEST)|identity=$(shell $(TARGET_CC) --version 2>/dev/null | head -n1)
 $$(if $$(RELIEFOS_PASSIVE),,$$(eval $$(call RELIEFOS_SIGNATURE_RULE,upstream-$(1))))
 upstream_$(1)_products := $$(addprefix $$(UPSTREAM_ROOT)/$(1)/root/,$$(sort $$(upstream_$(1)_outputs)))
-$$(UPSTREAM_ROOT)/$(1)/root/.complete $$(upstream_$(1)_products) &: $$(UPSTREAM_SCRIPT) $$(RELIEFOS_LOCK) $$(RELIEFOS_DEPS_TOOL) $$(O_META)/upstream-$(1).sig $$(AUTH_STAMP) $$(RELIEFOS_AUTH_ARTIFACTS) $$(PAM_STAMP) $$(PAM_LIB) $$(PAM_HEADER) $$(foreach dep,$$(upstream_$(1)_deps),$$(UPSTREAM_ROOT)/$$(dep)/root/.complete $$(upstream_$$(dep)_products))
+$$(UPSTREAM_ROOT)/$(1)/root/.complete $$(upstream_$(1)_products) &: $$(upstream_$(1)_script) $$(upstream_$(1)_patches) $$(RELIEFOS_SRC)/mk/upstream.mk $$(RELIEFOS_LOCK) $$(RELIEFOS_DEPS_TOOL) $$(O_META)/upstream-$(1).sig $$(AUTH_STAMP) $$(RELIEFOS_AUTH_ARTIFACTS) $$(PAM_STAMP) $$(PAM_LIB) $$(PAM_HEADER) $$(foreach dep,$$(upstream_$(1)_deps),$$(UPSTREAM_ROOT)/$$(dep)/root/.complete $$(upstream_$$(dep)_products))
 	$$(Q)rm -rf $$(UPSTREAM_ROOT)/$(1)/deps
 	$$(Q)mkdir -p $$(UPSTREAM_ROOT)/$(1)/deps $$(O_LOGS)
 	$$(Q)cp -a $$(AUTH_ROOT)/. $$(UPSTREAM_ROOT)/$(1)/deps/
 	$$(Q)$$(foreach dep,$$(upstream_$(1)_deps),cp -a $$(UPSTREAM_ROOT)/$$(dep)/root/. $$(UPSTREAM_ROOT)/$(1)/deps/;)
-	+$$(Q)case "$$$${MAKEFLAGS%% *}" in *n*) exit 0;; esac; sh $$(UPSTREAM_SCRIPT) $(1) $$(RELIEFOS_SRC) $$(abspath $$(RELIEFOS_DEPS_TOOL)) $$(RELIEFOS_LOCK) $$(RELIEFOS_CACHE) $$(abspath $$(UPSTREAM_ROOT))/$(1)/work $$(abspath $$(UPSTREAM_ROOT))/$(1)/root $$(abspath $$(MUSL_SYSROOT)) $$(abspath $$(UPSTREAM_ROOT))/$(1)/deps $$(abspath $$(PAM_ROOT)) $$(TARGET_CC) $$(TRIPLE_USER) >$$(O_LOGS)/upstream-$(1).log 2>&1 || { tail -n 50 $$(O_LOGS)/upstream-$(1).log >&2; exit 1; }
+	+$$(Q)case "$$$${MAKEFLAGS%% *}" in *n*) exit 0;; esac; sh $$(upstream_$(1)_script) $(1) $$(RELIEFOS_SRC) $$(abspath $$(RELIEFOS_DEPS_TOOL)) $$(RELIEFOS_LOCK) $$(RELIEFOS_CACHE) $$(abspath $$(UPSTREAM_ROOT))/$(1)/work $$(abspath $$(UPSTREAM_ROOT))/$(1)/root $$(abspath $$(MUSL_SYSROOT)) $$(abspath $$(UPSTREAM_ROOT))/$(1)/deps $$(abspath $$(PAM_ROOT)) $$(TARGET_CC) $$(TRIPLE_USER) >$$(O_LOGS)/upstream-$(1).log 2>&1 || { tail -n 50 $$(O_LOGS)/upstream-$(1).log >&2; exit 1; }
 	$$(Q)for product in $$(addprefix $$(UPSTREAM_ROOT)/$(1)/root/,$$(upstream_$(1)_primary)); do test -e "$$$$product" || { echo "missing upstream product: $$$$product" >&2; exit 1; }; touch "$$$$product"; done
 	$$(Q)touch $$(UPSTREAM_ROOT)/$(1)/root/.complete
 .PHONY: upstream-$(1)

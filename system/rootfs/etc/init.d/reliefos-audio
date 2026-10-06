@@ -1,0 +1,26 @@
+#!/sbin/openrc-run
+description="ReliefOS ALSA state"
+depend() { after reliefos-runtime; }
+state=/var/lib/alsa/asound.state
+start() {
+    if [ -r "$state" ]; then
+        alsactl -f "$state" restore || eerror "alsactl restore failed"
+    fi
+    return 0
+}
+stop() {
+    checkpath --directory --mode 0755 /var/lib/alsa || return 1
+    tmp="$state.tmp.$$"
+    rm -f "$tmp"
+    if ! alsactl -f "$tmp" store; then
+        rm -f "$tmp"
+        eerror "alsactl store failed; retaining $state"
+        return 1
+    fi
+    if ! mv -f "$tmp" "$state"; then
+        rm -f "$tmp"
+        eerror "cannot atomically publish $state"
+        return 1
+    fi
+    return 0
+}

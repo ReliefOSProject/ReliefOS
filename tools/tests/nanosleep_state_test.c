@@ -5,6 +5,7 @@
 static struct task current;
 static uint64_t ticks = 100;
 static uint64_t wall_offset = 100000;
+static int64_t monotonic_offset;
 static unsigned blocked;
 struct task *sched_current_task(void) { return &current; }
 struct task *sched_find(uint32_t pid) { (void)pid; return &current; }
@@ -26,7 +27,8 @@ void sched_sleep_current_until(uint64_t until)
 { current.wake_tick = until; ++blocked; }
 int time_clock_get(int32_t clock, struct linux_timespec *value)
 {
-    uint64_t now = ticks + (clock == LINUX_CLOCK_REALTIME ? wall_offset : 0);
+    uint64_t now = clock == LINUX_CLOCK_REALTIME ? ticks + wall_offset :
+        (uint64_t)((int64_t)ticks + monotonic_offset);
     *value = (struct linux_timespec){now / RELIEFNT_TICK_HZ,
                                    (now % RELIEFNT_TICK_HZ) * (1000000000 / RELIEFNT_TICK_HZ)};
     return 0;
@@ -64,5 +66,20 @@ int main(void)
     value = (struct linux_timespec){INT64_MAX, 999999999};
     assert(call(1, 0, &value, NULL) == KERNEL_SYSCALL_BLOCKED);
     assert(current.nanosleep_deadline > ticks && current.nanosleep_deadline < UINT64_MAX / 2);
+    /* NTP disciplines CLOCK_MONOTONIC independently of raw scheduler ticks.
+     * A relative wait must neither vanish nor gain that accumulated offset. */
+    current.nanosleep_deadline = 0;
+    ticks = 4000;
+    monotonic_offset = 4;
+    value = (struct linux_timespec){0, 5000000};
+    assert(call(1, 0, &value, NULL) == KERNEL_SYSCALL_BLOCKED);
+    assert(current.wake_tick == ticks + 1);
+    ++ticks;
+    assert(call(1, 0, &value, NULL) == 0);
+    monotonic_offset = -4;
+    assert(call(1, 0, &value, NULL) == KERNEL_SYSCALL_BLOCKED);
+    assert(current.wake_tick == ticks + 1);
+    ++ticks;
+    assert(call(1, 0, &value, NULL) == 0);
     puts("PASS nanosleep: raw pointers, timespec validation, zero, rounding, retained deadline, realtime absolute, overflow");
 }

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#include "sysv_shm_fixture_stubs.h"
 
 static uint32_t fake_cpu;
 static uint64_t fake_time;

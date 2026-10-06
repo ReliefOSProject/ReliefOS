@@ -1,0 +1,2958 @@
+{
+  "date": "2026-10-04",
+  "finished_utc": "2026-10-04T06:38:48.718712+00:00",
+  "worktree": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan",
+  "execution": "inline-only; no subagents",
+  "git": {
+    "root_head": "bafaa59081f8c998037524fd5aea8865dd0468bd",
+    "kernel_head": "f8f5a4908807e81cca7ed766fb6c60e7829767dc",
+    "commit": false,
+    "push": false,
+    "archive": false,
+    "reset": false,
+    "cleanup": false
+  },
+  "gates": {
+    "changed_contracts_host_strict": "passed",
+    "related_host_sanitizers": "passed",
+    "qemu_default_lifecycle_software": "passed",
+    "qemu_matrix": "passed",
+    "doom600_load60_long": "passed",
+    "final_source_matches_tested_image_inputs": true,
+    "gui": {
+      "status": "deferred",
+      "until": "Xorg",
+      "user_requested": true
+    },
+    "physical_codec": {
+      "status": "not_run",
+      "reliefos_native_boot": false,
+      "exclusive_pci_passthrough": false
+    },
+    "original_small_native_buffer_unflushed_eof": {
+      "status": "not_closed",
+      "evidence": [
+        "out/ds69-r4-intel4on",
+        "out/ds73-r4-pc1off"
+      ],
+      "note": "New waveform fixture uses explicit silent tail and 512/8192; no production EOF/DAC-drain repair claim."
+    },
+    "overall_project": "not_complete; formal ledger remains 18/19"
+  },
+  "default_geometry": {
+    "period_frames": 8192,
+    "buffer_frames": 65536,
+    "period_ms": 170.66666666666666,
+    "buffer_seconds": 1.3653333333333333,
+    "hda_period_count": 8,
+    "period_bytes": 32768,
+    "buffer_bytes": 262144,
+    "status": "accepted_for_tested_default_software_scope",
+    "generic_arecord_client": "8192/24576",
+    "generic_arecord_dsnoop_slave": "8192/65536",
+    "latency_tradeoff": "Explicitly recorded; not a minimum-latency or real-time guarantee."
+  },
+  "repairs": [
+    {
+      "path": "QA capture probe",
+      "finding": "Old raw-null read succeeded; write8192 returned4096 errno0, synthesized EIO before counting frames; cold and post-arecord reproduction preserved.",
+      "change": "Retry positive short writes/EINTR; zero/negative errors remain fatal. Kernel null semantics unchanged."
+    },
+    {
+      "path": "kernel/reliefnt/kernel/reliefnt/audio/pcm.c",
+      "change": "XRUN PREPARE synchronously STOPs before resetting DMA, consumes old stopped-run period notification, preserves DMA/state on failed STOP or fatal disconnect."
+    },
+    {
+      "path": "kernel/reliefnt/drivers/hda/stream.c",
+      "change": "Actual WALLCLK full-ring guard remains; coarse system ticks guard only the complete32-bit WALLCLK alias.",
+      "evidence": "ds51 WALLCLK delta0x3be71 ~10.2ms with tick gap9 nominal90ms; false coarse rejection."
+    },
+    {
+      "path": "kernel/reliefnt/kernel/reliefnt/audio/device.c",
+      "change": "CHANNEL_INFO explicitly copies in its input channel despite _IOR direction; stereo offsets no longer duplicate channel0."
+    },
+    {
+      "path": "kernel/reliefnt/kernel/reliefnt/audio/pcm.c",
+      "change": "HWSYNC/SYNC_PTR query pinned driver position for RUNNING/playbackDRAINING; cumulative driver-frame high-water prevents older IRQ regression and preserves public ALSA boundary wrapping."
+    },
+    {
+      "path": "tools/test_hda_qemu.py",
+      "change": "Known capture input covers max180/Doom+180 seconds; avoids fixture EOF during expanded capture."
+    },
+    {
+      "path": "tools/test_audio_e2e_qemu.py",
+      "change": "Strict software exit gate plus whole-serial XRUN check; GUIdeferred and physicalnot_run remain separate explicit statuses."
+    }
+  ],
+  "red_green": [
+    {
+      "reason": "actual sink helper short writes/EINTR/zero-write",
+      "red": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/sink-red.log",
+        "sha256": "4341f9233311fb0874e195577e677a4e93627a252b1d2f9f23a2273930fe75ed",
+        "bytes": 169
+      },
+      "green": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/sink-green.log",
+        "sha256": "d5345fdfba60bc7fb74f8479893555b77bab4ccf5eaefafe231a4baa8b101a30",
+        "bytes": 71
+      }
+    },
+    {
+      "reason": "pending old period and IRQ XRUN reprepare",
+      "red": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/pcm-reprepare-red.log",
+        "sha256": "35954441b3b49e4a7cbd7938eccbc6747490c97173de3e7a16a34d8d179e7c3d",
+        "bytes": 1325
+      },
+      "green": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/pcm-reprepare-green.log",
+        "sha256": "9069ec5b1caccf6a94ce064702a099f9d94e486a8eb5cb1565e4eefd03b421ea",
+        "bytes": 3512
+      }
+    },
+    {
+      "reason": "controller WALLCLK versus coarse timer drift",
+      "red": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/wallclk-drift-red.log",
+        "sha256": "27f4baa9f15bd5901e7b07809fe5885c59582e02a82f99222fa5d24fc2ecb5f4",
+        "bytes": 150
+      },
+      "green": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/wallclk-drift-green.log",
+        "sha256": "c01fbba1b471c72a74c85f3f88737896eb57b73958af7743963ae47d50c3066e",
+        "bytes": 916
+      }
+    },
+    {
+      "reason": "CHANNEL_INFO channel selector through device usercopy",
+      "red": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/channel-adapter-red.log",
+        "sha256": "25bb83d5c520db233abfccc5b6511bc778193ea9350944125f78d3f654f86b93",
+        "bytes": 1125
+      },
+      "green": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/channel-adapter-green.log",
+        "sha256": "7a9760047a3226a1ea6f6266885050654d799807de2392f3843c93988810fab4",
+        "bytes": 568
+      }
+    },
+    {
+      "reason": "fresh driver position between period IRQs",
+      "red": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/hwsync-position-red.log",
+        "sha256": "0d6874f375ecbd3b7618b1c33c8f01b75c013c76b48de7fc15357473c54d26ff",
+        "bytes": 1104
+      },
+      "green": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/hwsync-position-green.log",
+        "sha256": "e519346e33951823c5ea8fb2e9dbf5d9db243e2495dc1acb0405f85880e492c7",
+        "bytes": 2267
+      }
+    },
+    {
+      "reason": "cumulative progress across ALSA boundary; older IRQ cannot regress",
+      "red": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/hwsync-boundary-red.log",
+        "sha256": "ec84a218ee90e45481a544e5e4a92a565c07448683e097e33137b04478dd7bdd",
+        "bytes": 1188
+      },
+      "green": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/strict-host-r9.log",
+        "sha256": "31f5ba23e90b90bdf5b8834c233beb3e5ffca587e76476dbd498926d3e8c390c",
+        "bytes": 5557
+      }
+    }
+  ],
+  "host_validation": [
+    {
+      "exit": 0,
+      "scope": "ASan/UBSan, Wall/Wextra/Werror; PCM/device/params/ioctl/mmap; only inherited unused-function helpers suppressed",
+      "log": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/strict-host-r9.log",
+        "sha256": "31f5ba23e90b90bdf5b8834c233beb3e5ffca587e76476dbd498926d3e8c390c",
+        "bytes": 5557
+      }
+    },
+    {
+      "exit": 0,
+      "scope": "Wall/Wextra/Werror with no warning suppressions",
+      "log": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/final-hda-stream-strict-build.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "exit": 0,
+      "scope": "sanitized actual HDA stream, timer drift/full-clock alias",
+      "log": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/final-hda-stream-strict-run.log",
+        "sha256": "1f9de1b6daa5ceea6ad8e26a35b7abd1315431b6c098a62924caffaab27b4124",
+        "bytes": 68
+      }
+    },
+    {
+      "exit": 0,
+      "scope": "sanitized VMA, ALSA control, OSS real waits including non-power-of-two boundary, mixer",
+      "log": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/relevant-hwsync-boundary-green.log",
+        "sha256": "532035ae4cec4cf252756e363dfcad5a31070dc874656fbb0decc55acf16010e",
+        "bytes": 1231
+      }
+    },
+    {
+      "exit": 0,
+      "scope": "sanitized HDA stream/module/controls/lifetime/controller/codec",
+      "log": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/final-hda-regression.log",
+        "sha256": "2991dfd3fb35aa57ce2a6da33994d72c33e2d0448c49783ccb6816681d2b524b",
+        "bytes": 1575
+      }
+    },
+    {
+      "exit": 0,
+      "scope": "8 report-policy tests",
+      "log": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/final-report-policy.log",
+        "sha256": "698d16d7b93c4bd9707d3cfacda6fb1e0fea99ed0cda6e69bedc42772940540a",
+        "bytes": 106
+      }
+    },
+    {
+      "exit": 0,
+      "scope": "controls/settings/Doom output/mixer/music",
+      "log": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/userland-green.log",
+        "sha256": "7bce43e752ebf963ec844ea188e9863008f431865937dc488a996224400dde2b",
+        "bytes": 6983
+      }
+    },
+    {
+      "exit": 0,
+      "scope": "descriptor/OFD/SCM_RIGHTS; source unchanged",
+      "log": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/descriptors-green.log",
+        "sha256": "820fb66e19e8262e23306356c219b3e934389340105fa6013a6b37528b01dfea",
+        "bytes": 1351
+      }
+    }
+  ],
+  "retained_host_limitations": {
+    "extended_strict_warning_failures": [
+      "strict-host-r3.log",
+      "strict-host-r4.log",
+      "strict-hda-r3.log"
+    ],
+    "note": "Preexisting fixture return/indentation/format warnings; broad sanitizer success is not represented as broad strict success.",
+    "fixture_setup_errors": [
+      "strict-host-r6.log",
+      "strict-host-r7.log"
+    ],
+    "setup_error_note": "Compile typo and pinned-callback synchronous unregister fixture timeout; corrected fixture uses IRQ-safe disconnect request. Not production RED."
+  },
+  "rejected_geometry": {
+    "2048/12288": [
+      "out/ds49-minimal-red",
+      "out/ds52-fixed-p2048"
+    ],
+    "4096/12288": [
+      "out/ds53-fixed-p4096"
+    ],
+    "4096/32768": {
+      "r3": [
+        {
+          "output": "out/ds58-r3-intel4off",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r3.vmdk",
+            "--output",
+            "out/ds58-r3-intel4off",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--msi",
+            "off",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 1,
+          "long_capture_exit": 1,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds59-r3-ich9on",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r3.vmdk",
+            "--output",
+            "out/ds59-r3-ich9on",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--controller",
+            "ich9-intel-hda",
+            "--msi",
+            "on",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 0,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds60-r3-ich9off",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r3.vmdk",
+            "--output",
+            "out/ds60-r3-ich9off",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--controller",
+            "ich9-intel-hda",
+            "--msi",
+            "off",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 1,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds61-r3-pc1on",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r3.vmdk",
+            "--output",
+            "out/ds61-r3-pc1on",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--machine",
+            "pc",
+            "--smp",
+            "1",
+            "--msi",
+            "on",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 1,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds62-r3-pc1off",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r3.vmdk",
+            "--output",
+            "out/ds62-r3-pc1off",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--machine",
+            "pc",
+            "--smp",
+            "1",
+            "--msi",
+            "off",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 0,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds63-r3-dual",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r3.vmdk",
+            "--output",
+            "out/ds63-r3-dual",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--dual-codec",
+            "--card",
+            "1",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 1,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds64-r3-output",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r3.vmdk",
+            "--output",
+            "out/ds64-r3-output",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--codec",
+            "hda-output"
+          ],
+          "exit": 0,
+          "long_capture_exit": null,
+          "full_standard": false
+        },
+        {
+          "output": "out/ds65-r3-none",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r3.vmdk",
+            "--output",
+            "out/ds65-r3-none",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--controller",
+            "none",
+            "--boot-only"
+          ],
+          "exit": 0,
+          "long_capture_exit": null,
+          "full_standard": false
+        }
+      ],
+      "r4": [
+        {
+          "output": "out/ds69-r4-intel4on",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r4.vmdk",
+            "--output",
+            "out/ds69-r4-intel4on",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--msi",
+            "on",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 1,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds70-r4-ich9on",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r4.vmdk",
+            "--output",
+            "out/ds70-r4-ich9on",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--controller",
+            "ich9-intel-hda",
+            "--msi",
+            "on",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 0,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds71-r4-ich9off",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r4.vmdk",
+            "--output",
+            "out/ds71-r4-ich9off",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--controller",
+            "ich9-intel-hda",
+            "--msi",
+            "off",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 1,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds72-r4-pc1on",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r4.vmdk",
+            "--output",
+            "out/ds72-r4-pc1on",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--machine",
+            "pc",
+            "--smp",
+            "1",
+            "--msi",
+            "on",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 0,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds73-r4-pc1off",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r4.vmdk",
+            "--output",
+            "out/ds73-r4-pc1off",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--machine",
+            "pc",
+            "--smp",
+            "1",
+            "--msi",
+            "off",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 1,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds74-r4-dual",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r4.vmdk",
+            "--output",
+            "out/ds74-r4-dual",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--dual-codec",
+            "--card",
+            "1",
+            "--standard-probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-candidate-4096x32768.sh"
+          ],
+          "exit": 1,
+          "long_capture_exit": 0,
+          "full_standard": true
+        },
+        {
+          "output": "out/ds75-r4-output",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r4.vmdk",
+            "--output",
+            "out/ds75-r4-output",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--codec",
+            "hda-output"
+          ],
+          "exit": 0,
+          "long_capture_exit": null,
+          "full_standard": false
+        },
+        {
+          "output": "out/ds76-r4-none",
+          "command": [
+            "/usr/bin/python3",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/hda-lifecycle-runner.py",
+            "--image",
+            "out/audio-hda-u6/images/reliefos-lifecycle-r4.vmdk",
+            "--output",
+            "out/ds76-r4-none",
+            "--probe",
+            "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-4096x32768",
+            "--audio-backend",
+            "alsa-file",
+            "--timeout",
+            "300",
+            "--controller",
+            "none",
+            "--boot-only"
+          ],
+          "exit": 0,
+          "long_capture_exit": null,
+          "full_standard": false
+        }
+      ],
+      "diagnostic": "ds67 wav-file overrun with no HDA GAP/SDSTS/PCM-notify error; client backlog remains real."
+    }
+  },
+  "r5_image": {
+    "path": "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+    "sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+    "bytes": 370933760
+  },
+  "source_products": {
+    "utc": "2026-10-04T06:06:47.236683+00:00",
+    "default_geometry_status": "provisional until complete matrix and long gate",
+    "hashes": {
+      "kernel/reliefnt/kernel/reliefnt/audio/pcm.c": {
+        "sha256": "31d88c9d18e0380e931803bd8109f01e03dc85ecfd8097461a79c6a3abf5acd1",
+        "bytes": 65243
+      },
+      "kernel/reliefnt/kernel/reliefnt/audio/device.c": {
+        "sha256": "912b3ef34656fddace82c9ae398ee8c47fdbf756b33948ab7a9f51cd551ff12f",
+        "bytes": 17517
+      },
+      "kernel/reliefnt/drivers/hda/stream.c": {
+        "sha256": "a089303e3dc8f86427b9514eebaa9e55b9cb61995ef356607c90c460493d19b3",
+        "bytes": 33668
+      },
+      "kernel/reliefnt/kernel/reliefnt/include/reliefnt/audio.h": {
+        "sha256": "f78a73732755f47a87bee6cf74aa2ddda17fa55b19a18b7d3d560577f4ee5c3f",
+        "bytes": 36662
+      },
+      "kernel/reliefnt/kernel/reliefnt/audio/alsa_pcm.c": {
+        "sha256": "9182553d6059bb6ea5760cbb0259722d16e6feb206d4a60c077bef217e339a0d",
+        "bytes": 29954
+      },
+      "system/rootfs/etc/asound.conf": {
+        "sha256": "be59ce95dfb09e4a2c53aa0333526270f41f723e08bca2d3b5567a59fcc72ea5",
+        "bytes": 574
+      },
+      "tools/tests/audio_pcm_state_test.c": {
+        "sha256": "048b0599e468ff1c4a3eae280e7ec4da39f7b1056be10a7294c9ead803f4480b",
+        "bytes": 28425
+      },
+      "tools/tests/audio_device_test.c": {
+        "sha256": "07eb29af89c6f1a62b8fc76474a2f7c7dc9178b95ff78e3a520ee47f5f5a4fa1",
+        "bytes": 14215
+      },
+      "tools/tests/hda_stream_test.c": {
+        "sha256": "54d95ca31f7054db494ff6d721e64ed41078d7e57a57ba11724cb25cac1f6116",
+        "bytes": 19900
+      },
+      "tools/tests/hda_module_test.c": {
+        "sha256": "b88b7ca52523ede7d656bb83afd49fb2574207148f826e8445bab1b4abbb0dfe",
+        "bytes": 31006
+      },
+      "tools/test_hda_qemu.py": {
+        "sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "bytes": 23733
+      },
+      "tools/test_audio_e2e_qemu.py": {
+        "sha256": "ced604bf0bd9cee6b021d7be1a106f9263f67f6e4d9eab10a021eacd8a147bcb",
+        "bytes": 11439
+      },
+      "tools/tests/audio_e2e_report_test.py": {
+        "sha256": "9eba5996194533ca3ac20c03d6a00bffbbfe211233e1b476bf8b132948eec3f8",
+        "bytes": 4960
+      },
+      "out/audio-hda-u6/kernel-install/kernel.sys": {
+        "sha256": "7f4539cd46079dc9868c0b0a35a6824759967a8fe9da27713185403b089ead48",
+        "bytes": 6306864
+      },
+      "out/audio-hda-u6/kernel-install/modules/hda.drv": {
+        "missing": true
+      },
+      "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk": {
+        "sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "bytes": 370933760
+      },
+      "out/audio-hda-u6/images/reliefos-lifecycle-r5.raw": {
+        "sha256": "cb2279a09d464ebb00da2ed0eb580eabf414b3fe3b6d7bd11774ff509ae09d01",
+        "bytes": 1073741824
+      },
+      "out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh": {
+        "sha256": "930fb9ab20a76c755545f5e1d99518c20b8d47bbaba41156ecea352ee689ff53",
+        "bytes": 9761
+      },
+      "out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2": {
+        "sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "bytes": 1171904
+      }
+    }
+  },
+  "product_integrity": {
+    "out/audio-hda-u6/kernel-install/hda.drv": "28fd958d647144d56533f7e8b07a9db71cbfcc3b1b007e10c8b688531ee66a38",
+    "out/audio-hda-u6/rootfs/raw/usr/lib/reliefos/drivers/hda.drv": "28fd958d647144d56533f7e8b07a9db71cbfcc3b1b007e10c8b688531ee66a38",
+    "out/audio-hda-u6/rootfs/managed/usr/lib/reliefos/drivers/hda.drv": "28fd958d647144d56533f7e8b07a9db71cbfcc3b1b007e10c8b688531ee66a38",
+    "out/audio-hda-u6/stage/disk-root/usr/lib/reliefos/drivers/hda.drv": "28fd958d647144d56533f7e8b07a9db71cbfcc3b1b007e10c8b688531ee66a38",
+    "system/rootfs/etc/asound.conf": "be59ce95dfb09e4a2c53aa0333526270f41f723e08bca2d3b5567a59fcc72ea5",
+    "out/audio-hda-u6/stage/disk-root/etc/asound.conf": "be59ce95dfb09e4a2c53aa0333526270f41f723e08bca2d3b5567a59fcc72ea5",
+    "kernel/reliefnt/kernel/reliefnt/audio/core.c": "68556732e37f59c0c5ab175b670d0ab0e82a036cc9bd6b2db24cb2e34efe2179",
+    "kernel/reliefnt/kernel/reliefnt/syscall.c": "32c470da6c5ecaca47d1e6a9171f623375cb94c607e6aa1d17586a33f1690236",
+    "tools/tests/descriptor_table_test.c": "1325a1cb98e335da491f12e981c63c85653c998d313814b7f2c546db480262cd",
+    "tools/tests/audio_guest_test.c": "959ab832fd44624265a87f4b9b2b781dd72bb00d85a548d142ce02acc68eee89"
+  },
+  "source_products_missing_entry_note": "Initial manifest tried kernel-install/modules/hda.drv; actual path kernel-install/hda.drv is separately verified in all stages and extracted guest.",
+  "source_match_details": {
+    "kernel/reliefnt/kernel/reliefnt/audio/pcm.c": true,
+    "kernel/reliefnt/kernel/reliefnt/audio/device.c": true,
+    "kernel/reliefnt/drivers/hda/stream.c": true,
+    "kernel/reliefnt/kernel/reliefnt/include/reliefnt/audio.h": true,
+    "kernel/reliefnt/kernel/reliefnt/audio/alsa_pcm.c": true,
+    "system/rootfs/etc/asound.conf": true,
+    "tools/tests/audio_pcm_state_test.c": true,
+    "tools/tests/audio_device_test.c": true,
+    "tools/tests/hda_stream_test.c": true,
+    "tools/tests/hda_module_test.c": true,
+    "tools/test_hda_qemu.py": true,
+    "tools/test_audio_e2e_qemu.py": true,
+    "tools/tests/audio_e2e_report_test.py": true
+  },
+  "extracted_image_components": {
+    "source_guest": "out/ds78-r5-intel4on",
+    "components": [
+      {
+        "actual": "out/audio-hda-u6/qa/u6-lifecycle-20261004/r5-extracted-kernel.sys",
+        "build_source": "out/audio-hda-u6/kernel-install/kernel.sys",
+        "sha256": "7f4539cd46079dc9868c0b0a35a6824759967a8fe9da27713185403b089ead48",
+        "matched": true
+      },
+      {
+        "actual": "out/audio-hda-u6/qa/u6-lifecycle-20261004/r5-extracted-leonos-kernel.sys",
+        "build_source": "out/audio-hda-u6/kernel-install/kernel.sys",
+        "sha256": "7f4539cd46079dc9868c0b0a35a6824759967a8fe9da27713185403b089ead48",
+        "matched": true
+      },
+      {
+        "actual": "out/audio-hda-u6/qa/u6-lifecycle-20261004/r5-extracted-hda.drv",
+        "build_source": "out/audio-hda-u6/kernel-install/hda.drv",
+        "sha256": "28fd958d647144d56533f7e8b07a9db71cbfcc3b1b007e10c8b688531ee66a38",
+        "matched": true
+      },
+      {
+        "actual": "out/audio-hda-u6/qa/u6-lifecycle-20261004/r5-extracted-asound.conf",
+        "build_source": "system/rootfs/etc/asound.conf",
+        "sha256": "be59ce95dfb09e4a2c53aa0333526270f41f723e08bca2d3b5567a59fcc72ea5",
+        "matched": true
+      }
+    ]
+  },
+  "native_probe": {
+    "native_geometry": {
+      "period": 512,
+      "buffer": 8192,
+      "silence_tail": 8192
+    },
+    "default_candidate": {
+      "period": 8192,
+      "buffer": 65536,
+      "bytes": 262144
+    },
+    "pcm_error_recovery": false,
+    "wave_checker_unchanged": true,
+    "prototype_only": true,
+    "hashes": {
+      "audio-native-buffer8192-flush.c": "5ef3d58bd3f920b8b2c3fddf1768cb66a528ee76aa5e44384806cbb81417d4da",
+      "capture-candidate-8192x65536.c": "a52ba62faeaa607b855ef7f644ce51023af5fc3b9fdcb6328b0fef7dfbc09e16",
+      "audio-candidate-8192x65536-flush-r2": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+      "guest-base-8192-flush-r2.o": "45ca96f26ef4e0dc38f191ba767e61eb109c28657506023b1b7ff66d7f310f33",
+      "standard-candidate-8192x65536.sh": "7394991993f4a60b081941ca5f10b5a93c52c88538c3338b5c75b52c6c20fd65"
+    },
+    "generic_default_capture": "raw/wav, null/file, fatal errors, no period/buffer overrides"
+  },
+  "standard_final_probe": {
+    "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh",
+    "sha256": "930fb9ab20a76c755545f5e1d99518c20b8d47bbaba41156ecea352ee689ff53",
+    "bytes": 9761
+  },
+  "waveform_scope": "Complete known96000-frame tone continuity/frequency/amplitude requirements unchanged; explicit8192 silenceframes after tone, native512/8192; original canonical source512/2048 unchanged. Standard actualhwaplay512/2048 still exercised.",
+  "qemu_matrix": [
+    {
+      "output": "out/ds78-r5-intel4on",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds78-r5-intel4on",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "330",
+        "--msi",
+        "on",
+        "--standard-probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh"
+      ],
+      "exit": 0,
+      "long_capture_exit": 0,
+      "full_standard": true,
+      "all_serial_xrun_clean": true,
+      "fatal_pcm_markers": false,
+      "core_done_zero": true,
+      "standard_done_zero": true,
+      "doom_statistics": {
+        "reports": 1,
+        "written_bytes": 4915252,
+        "startup_recoveries": 0,
+        "xrun_recoveries": 0,
+        "suspend_recoveries": 0
+      },
+      "strict_run_pass": true,
+      "runtime_meta": {
+        "command": [
+          "qemu-system-x86_64",
+          "-machine",
+          "q35",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "2048M",
+          "-smp",
+          "4",
+          "-bios",
+          "/usr/share/edk2/x64/OVMF.4m.fd",
+          "-display",
+          "none",
+          "-serial",
+          "file:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds78-r5-intel4on/serial.log",
+          "-drive",
+          "file=/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds78-r5-intel4on/guest.raw,if=none,id=disk0,format=raw,snapshot=off",
+          "-device",
+          "ich9-ahci,id=ahci",
+          "-device",
+          "ide-hd,drive=disk0,bus=ahci.0",
+          "-qmp",
+          "unix:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds78-r5-intel4on/qmp.sock,server=on,wait=off",
+          "-no-reboot",
+          "-no-shutdown",
+          "-audiodev",
+          "alsa,id=snd0,out.dev=qa_output,in.dev=qa_input,out.try-poll=off,in.try-poll=off,out.frequency=48000,in.frequency=48000,out.channels=2,in.channels=2,out.format=s16,in.format=s16",
+          "-device",
+          "intel-hda,id=hda0,msi=on",
+          "-device",
+          "hda-duplex,audiodev=snd0"
+        ],
+        "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "boot_image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds78-r5-intel4on/guest.raw",
+        "snapshot": false,
+        "private_full_copy": true,
+        "audio_backend": "alsa-file",
+        "pcm_backend": "alsa",
+        "capture_enabled": true,
+        "probe_sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "runner_sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "card_ordinal": 0,
+        "shm_probe_sha256": "6ac19e90c6d243ed93978837e5f3c24eee3479b89b6847cbbc417e8817d51476",
+        "controller": "intel-hda",
+        "codec": "hda-duplex",
+        "smp": 4,
+        "msi": "on",
+        "machine": "q35",
+        "standard_doom_seconds": 5,
+        "standard_load_seconds": 0,
+        "audio_input_seconds": 185
+      },
+      "same_final_image": true,
+      "evidence": [
+        {
+          "path": "out/ds78-r5-intel4on/run.json",
+          "sha256": "8847f9de2ddce76594a04b9da8d7409979a82003c7f68375ec8ed8f5cdb9e2bc",
+          "bytes": 2016
+        },
+        {
+          "path": "out/ds78-r5-intel4on/result.json",
+          "sha256": "d92cc5cc68861b4b4e34e3075a0c2ef617f6d7cc3ea78abd7d08d6eaa84ab676",
+          "bytes": 1387
+        },
+        {
+          "path": "out/ds78-r5-intel4on/serial.log",
+          "sha256": "213c2d188dba72aa9ab32d72ad337f530a51d4cd28fec2619ed2324246cf6d30",
+          "bytes": 219348
+        },
+        {
+          "path": "out/ds78-r5-intel4on/long-capture-verification.json",
+          "sha256": "ae9d26661f58c2d8dc1ca6902b65b43fc7cd64e25e22b35af52420aff5a90159",
+          "bytes": 263
+        },
+        {
+          "path": "out/ds78-r5-intel4on/lifecycle-gate-verification.json",
+          "sha256": "d5a5c9a285629a4122867b14795b4fb25cae3afb0c26301134782e9429ae7a5c",
+          "bytes": 2144
+        }
+      ],
+      "lifecycle_gate": {
+        "output": "out/ds78-r5-intel4on",
+        "pass": true,
+        "exact_streaming_completion": true,
+        "lifecycle_streams": [
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-1.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-2.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-long-record.raw",
+            "result": 0,
+            "frames": 2883584,
+            "writes": 352,
+            "exact_completion": true
+          }
+        ],
+        "generic_default_cases": true,
+        "whole_serial_xrun_clean": true,
+        "doom_statistics": {
+          "reports": 1,
+          "written_bytes": 4915252,
+          "startup_recoveries": 0,
+          "xrun_recoveries": 0,
+          "suspend_recoveries": 0
+        },
+        "long_capture": {
+          "frames": 2883584,
+          "bytes": 11534336,
+          "seconds": 60.074666666666666,
+          "phase": 48,
+          "first_mismatch_frame": null,
+          "known_input_continuity": true,
+          "sha256": "259418cd7db2848a4f89ceb8fd3595911f2e84b146b9c7a0e39241aa6ac1d5c0",
+          "input_seconds": 185
+        },
+        "serial_sha256": "213c2d188dba72aa9ab32d72ad337f530a51d4cd28fec2619ed2324246cf6d30"
+      }
+    },
+    {
+      "output": "out/ds79-r5-intel4off",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds79-r5-intel4off",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "330",
+        "--msi",
+        "off",
+        "--standard-probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh"
+      ],
+      "exit": 0,
+      "long_capture_exit": 0,
+      "full_standard": true,
+      "all_serial_xrun_clean": true,
+      "fatal_pcm_markers": false,
+      "core_done_zero": true,
+      "standard_done_zero": true,
+      "doom_statistics": {
+        "reports": 1,
+        "written_bytes": 4933604,
+        "startup_recoveries": 0,
+        "xrun_recoveries": 0,
+        "suspend_recoveries": 0
+      },
+      "strict_run_pass": true,
+      "runtime_meta": {
+        "command": [
+          "qemu-system-x86_64",
+          "-machine",
+          "q35",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "2048M",
+          "-smp",
+          "4",
+          "-bios",
+          "/usr/share/edk2/x64/OVMF.4m.fd",
+          "-display",
+          "none",
+          "-serial",
+          "file:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds79-r5-intel4off/serial.log",
+          "-drive",
+          "file=/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds79-r5-intel4off/guest.raw,if=none,id=disk0,format=raw,snapshot=off",
+          "-device",
+          "ich9-ahci,id=ahci",
+          "-device",
+          "ide-hd,drive=disk0,bus=ahci.0",
+          "-qmp",
+          "unix:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds79-r5-intel4off/qmp.sock,server=on,wait=off",
+          "-no-reboot",
+          "-no-shutdown",
+          "-audiodev",
+          "alsa,id=snd0,out.dev=qa_output,in.dev=qa_input,out.try-poll=off,in.try-poll=off,out.frequency=48000,in.frequency=48000,out.channels=2,in.channels=2,out.format=s16,in.format=s16",
+          "-device",
+          "intel-hda,id=hda0,msi=off",
+          "-device",
+          "hda-duplex,audiodev=snd0"
+        ],
+        "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "boot_image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds79-r5-intel4off/guest.raw",
+        "snapshot": false,
+        "private_full_copy": true,
+        "audio_backend": "alsa-file",
+        "pcm_backend": "alsa",
+        "capture_enabled": true,
+        "probe_sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "runner_sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "card_ordinal": 0,
+        "shm_probe_sha256": "6ac19e90c6d243ed93978837e5f3c24eee3479b89b6847cbbc417e8817d51476",
+        "controller": "intel-hda",
+        "codec": "hda-duplex",
+        "smp": 4,
+        "msi": "off",
+        "machine": "q35",
+        "standard_doom_seconds": 5,
+        "standard_load_seconds": 0,
+        "audio_input_seconds": 185
+      },
+      "same_final_image": true,
+      "evidence": [
+        {
+          "path": "out/ds79-r5-intel4off/run.json",
+          "sha256": "95a51d8451b59c38b62d58e99f389ca58ff7e187eb7b1f7ec490d4132b8518c6",
+          "bytes": 2022
+        },
+        {
+          "path": "out/ds79-r5-intel4off/result.json",
+          "sha256": "95187d8984b74772e21490923c3e2e23de9c13adcdba380deae7259c6cdf876c",
+          "bytes": 1388
+        },
+        {
+          "path": "out/ds79-r5-intel4off/serial.log",
+          "sha256": "5b44e45c484c8bbd203b16657cbd0d66a66548752dfd47349141538bb4e9b946",
+          "bytes": 233583
+        },
+        {
+          "path": "out/ds79-r5-intel4off/long-capture-verification.json",
+          "sha256": "61c884105e42455836f4a084e8965d7eb43a6b701fe8f9e05a652d23114dbb4e",
+          "bytes": 263
+        },
+        {
+          "path": "out/ds79-r5-intel4off/lifecycle-gate-verification.json",
+          "sha256": "fa5d1f677bc37d25aba67fbe70241549f9b72acead404c5c72c07ccde7b4f1c5",
+          "bytes": 2145
+        }
+      ],
+      "lifecycle_gate": {
+        "output": "out/ds79-r5-intel4off",
+        "pass": true,
+        "exact_streaming_completion": true,
+        "lifecycle_streams": [
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-1.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-2.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-long-record.raw",
+            "result": 0,
+            "frames": 2883584,
+            "writes": 352,
+            "exact_completion": true
+          }
+        ],
+        "generic_default_cases": true,
+        "whole_serial_xrun_clean": true,
+        "doom_statistics": {
+          "reports": 1,
+          "written_bytes": 4933604,
+          "startup_recoveries": 0,
+          "xrun_recoveries": 0,
+          "suspend_recoveries": 0
+        },
+        "long_capture": {
+          "frames": 2883584,
+          "bytes": 11534336,
+          "seconds": 60.074666666666666,
+          "phase": 95,
+          "first_mismatch_frame": null,
+          "known_input_continuity": true,
+          "sha256": "e432ff93c1efb949c39e66ebf3eb2487e88dda9acd7c907d7d981346f942bbd2",
+          "input_seconds": 185
+        },
+        "serial_sha256": "5b44e45c484c8bbd203b16657cbd0d66a66548752dfd47349141538bb4e9b946"
+      }
+    },
+    {
+      "output": "out/ds80-r5-ich9on",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds80-r5-ich9on",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "330",
+        "--controller",
+        "ich9-intel-hda",
+        "--msi",
+        "on",
+        "--standard-probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh"
+      ],
+      "exit": 0,
+      "long_capture_exit": 0,
+      "full_standard": true,
+      "all_serial_xrun_clean": true,
+      "fatal_pcm_markers": false,
+      "core_done_zero": true,
+      "standard_done_zero": true,
+      "doom_statistics": {
+        "reports": 1,
+        "written_bytes": 4931760,
+        "startup_recoveries": 0,
+        "xrun_recoveries": 0,
+        "suspend_recoveries": 0
+      },
+      "strict_run_pass": true,
+      "runtime_meta": {
+        "command": [
+          "qemu-system-x86_64",
+          "-machine",
+          "q35",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "2048M",
+          "-smp",
+          "4",
+          "-bios",
+          "/usr/share/edk2/x64/OVMF.4m.fd",
+          "-display",
+          "none",
+          "-serial",
+          "file:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds80-r5-ich9on/serial.log",
+          "-drive",
+          "file=/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds80-r5-ich9on/guest.raw,if=none,id=disk0,format=raw,snapshot=off",
+          "-device",
+          "ich9-ahci,id=ahci",
+          "-device",
+          "ide-hd,drive=disk0,bus=ahci.0",
+          "-qmp",
+          "unix:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds80-r5-ich9on/qmp.sock,server=on,wait=off",
+          "-no-reboot",
+          "-no-shutdown",
+          "-audiodev",
+          "alsa,id=snd0,out.dev=qa_output,in.dev=qa_input,out.try-poll=off,in.try-poll=off,out.frequency=48000,in.frequency=48000,out.channels=2,in.channels=2,out.format=s16,in.format=s16",
+          "-device",
+          "ich9-intel-hda,id=hda0,msi=on",
+          "-device",
+          "hda-duplex,audiodev=snd0"
+        ],
+        "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "boot_image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds80-r5-ich9on/guest.raw",
+        "snapshot": false,
+        "private_full_copy": true,
+        "audio_backend": "alsa-file",
+        "pcm_backend": "alsa",
+        "capture_enabled": true,
+        "probe_sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "runner_sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "card_ordinal": 0,
+        "shm_probe_sha256": "6ac19e90c6d243ed93978837e5f3c24eee3479b89b6847cbbc417e8817d51476",
+        "controller": "ich9-intel-hda",
+        "codec": "hda-duplex",
+        "smp": 4,
+        "msi": "on",
+        "machine": "q35",
+        "standard_doom_seconds": 5,
+        "standard_load_seconds": 0,
+        "audio_input_seconds": 185
+      },
+      "same_final_image": true,
+      "evidence": [
+        {
+          "path": "out/ds80-r5-ich9on/run.json",
+          "sha256": "ba5115b72a0667ead6b0ba45c6a010f15e6b43d902de1f4e0c340dd3f96a4206",
+          "bytes": 2018
+        },
+        {
+          "path": "out/ds80-r5-ich9on/result.json",
+          "sha256": "58021c8be52c208ded91360e57246c438658ee9347055c8ae024f00cd6654e7f",
+          "bytes": 1385
+        },
+        {
+          "path": "out/ds80-r5-ich9on/serial.log",
+          "sha256": "cc4352c0631bad57bbff18540a41a645fdb109bfa7d53907aba0d78f965c231b",
+          "bytes": 218300
+        },
+        {
+          "path": "out/ds80-r5-ich9on/long-capture-verification.json",
+          "sha256": "37a70bfded1f63d5ebce72e5cf3cb3bac62afd45837a8d6858856d9dff0d357d",
+          "bytes": 263
+        },
+        {
+          "path": "out/ds80-r5-ich9on/lifecycle-gate-verification.json",
+          "sha256": "677f5e7dd2dfd3b4bc9acf0e4c5c142ead6da9ad52d888b7e46c34abecbe86bf",
+          "bytes": 2142
+        }
+      ],
+      "lifecycle_gate": {
+        "output": "out/ds80-r5-ich9on",
+        "pass": true,
+        "exact_streaming_completion": true,
+        "lifecycle_streams": [
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-1.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-2.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-long-record.raw",
+            "result": 0,
+            "frames": 2883584,
+            "writes": 352,
+            "exact_completion": true
+          }
+        ],
+        "generic_default_cases": true,
+        "whole_serial_xrun_clean": true,
+        "doom_statistics": {
+          "reports": 1,
+          "written_bytes": 4931760,
+          "startup_recoveries": 0,
+          "xrun_recoveries": 0,
+          "suspend_recoveries": 0
+        },
+        "long_capture": {
+          "frames": 2883584,
+          "bytes": 11534336,
+          "seconds": 60.074666666666666,
+          "phase": 57,
+          "first_mismatch_frame": null,
+          "known_input_continuity": true,
+          "sha256": "597475488583022a11652af94abfa2e464ab29d0afafdff4d861784c186ca4e4",
+          "input_seconds": 185
+        },
+        "serial_sha256": "cc4352c0631bad57bbff18540a41a645fdb109bfa7d53907aba0d78f965c231b"
+      }
+    },
+    {
+      "output": "out/ds81-r5-ich9off",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds81-r5-ich9off",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "330",
+        "--controller",
+        "ich9-intel-hda",
+        "--msi",
+        "off",
+        "--standard-probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh"
+      ],
+      "exit": 0,
+      "long_capture_exit": 0,
+      "full_standard": true,
+      "all_serial_xrun_clean": true,
+      "fatal_pcm_markers": false,
+      "core_done_zero": true,
+      "standard_done_zero": true,
+      "doom_statistics": {
+        "reports": 1,
+        "written_bytes": 4931596,
+        "startup_recoveries": 0,
+        "xrun_recoveries": 0,
+        "suspend_recoveries": 0
+      },
+      "strict_run_pass": true,
+      "runtime_meta": {
+        "command": [
+          "qemu-system-x86_64",
+          "-machine",
+          "q35",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "2048M",
+          "-smp",
+          "4",
+          "-bios",
+          "/usr/share/edk2/x64/OVMF.4m.fd",
+          "-display",
+          "none",
+          "-serial",
+          "file:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds81-r5-ich9off/serial.log",
+          "-drive",
+          "file=/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds81-r5-ich9off/guest.raw,if=none,id=disk0,format=raw,snapshot=off",
+          "-device",
+          "ich9-ahci,id=ahci",
+          "-device",
+          "ide-hd,drive=disk0,bus=ahci.0",
+          "-qmp",
+          "unix:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds81-r5-ich9off/qmp.sock,server=on,wait=off",
+          "-no-reboot",
+          "-no-shutdown",
+          "-audiodev",
+          "alsa,id=snd0,out.dev=qa_output,in.dev=qa_input,out.try-poll=off,in.try-poll=off,out.frequency=48000,in.frequency=48000,out.channels=2,in.channels=2,out.format=s16,in.format=s16",
+          "-device",
+          "ich9-intel-hda,id=hda0,msi=off",
+          "-device",
+          "hda-duplex,audiodev=snd0"
+        ],
+        "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "boot_image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds81-r5-ich9off/guest.raw",
+        "snapshot": false,
+        "private_full_copy": true,
+        "audio_backend": "alsa-file",
+        "pcm_backend": "alsa",
+        "capture_enabled": true,
+        "probe_sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "runner_sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "card_ordinal": 0,
+        "shm_probe_sha256": "6ac19e90c6d243ed93978837e5f3c24eee3479b89b6847cbbc417e8817d51476",
+        "controller": "ich9-intel-hda",
+        "codec": "hda-duplex",
+        "smp": 4,
+        "msi": "off",
+        "machine": "q35",
+        "standard_doom_seconds": 5,
+        "standard_load_seconds": 0,
+        "audio_input_seconds": 185
+      },
+      "same_final_image": true,
+      "evidence": [
+        {
+          "path": "out/ds81-r5-ich9off/run.json",
+          "sha256": "8124ba9195ec1012edd95564e755fa643ed5fb302ee984d2e20585c7f006bd68",
+          "bytes": 2024
+        },
+        {
+          "path": "out/ds81-r5-ich9off/result.json",
+          "sha256": "ada272fd6a1ef8534970a88400c196917f89b522070ccea83eaabaee98b3b11d",
+          "bytes": 1386
+        },
+        {
+          "path": "out/ds81-r5-ich9off/serial.log",
+          "sha256": "84ecbf8fb750fe72b6eb77e284202144d07c2d8769b35624925b17bf5903b90e",
+          "bytes": 233670
+        },
+        {
+          "path": "out/ds81-r5-ich9off/long-capture-verification.json",
+          "sha256": "0f65a9ebd63ffc89fb5b0196b156ce405c8f77b7ebc465fbb299b757edc03059",
+          "bytes": 263
+        },
+        {
+          "path": "out/ds81-r5-ich9off/lifecycle-gate-verification.json",
+          "sha256": "299b13dc3fa729d6bbcbc24673b8ea32382c95befdb7b87c399c3ab5423c4ec5",
+          "bytes": 2143
+        }
+      ],
+      "lifecycle_gate": {
+        "output": "out/ds81-r5-ich9off",
+        "pass": true,
+        "exact_streaming_completion": true,
+        "lifecycle_streams": [
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-1.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-2.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-long-record.raw",
+            "result": 0,
+            "frames": 2883584,
+            "writes": 352,
+            "exact_completion": true
+          }
+        ],
+        "generic_default_cases": true,
+        "whole_serial_xrun_clean": true,
+        "doom_statistics": {
+          "reports": 1,
+          "written_bytes": 4931596,
+          "startup_recoveries": 0,
+          "xrun_recoveries": 0,
+          "suspend_recoveries": 0
+        },
+        "long_capture": {
+          "frames": 2883584,
+          "bytes": 11534336,
+          "seconds": 60.074666666666666,
+          "phase": 24,
+          "first_mismatch_frame": null,
+          "known_input_continuity": true,
+          "sha256": "7e92b80ffe7302e5af56a028734c4595ab306353e70af0f073ab1ee74ab520a5",
+          "input_seconds": 185
+        },
+        "serial_sha256": "84ecbf8fb750fe72b6eb77e284202144d07c2d8769b35624925b17bf5903b90e"
+      }
+    },
+    {
+      "output": "out/ds82-r5-pc1on",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds82-r5-pc1on",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "330",
+        "--machine",
+        "pc",
+        "--smp",
+        "1",
+        "--msi",
+        "on",
+        "--standard-probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh"
+      ],
+      "exit": 0,
+      "long_capture_exit": 0,
+      "full_standard": true,
+      "all_serial_xrun_clean": true,
+      "fatal_pcm_markers": false,
+      "core_done_zero": true,
+      "standard_done_zero": true,
+      "doom_statistics": {
+        "reports": 1,
+        "written_bytes": 4923544,
+        "startup_recoveries": 0,
+        "xrun_recoveries": 0,
+        "suspend_recoveries": 0
+      },
+      "strict_run_pass": true,
+      "runtime_meta": {
+        "command": [
+          "qemu-system-x86_64",
+          "-machine",
+          "pc",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "2048M",
+          "-smp",
+          "1",
+          "-bios",
+          "/usr/share/edk2/x64/OVMF.4m.fd",
+          "-display",
+          "none",
+          "-serial",
+          "file:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds82-r5-pc1on/serial.log",
+          "-drive",
+          "file=/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds82-r5-pc1on/guest.raw,if=none,id=disk0,format=raw,snapshot=off",
+          "-device",
+          "ich9-ahci,id=ahci",
+          "-device",
+          "ide-hd,drive=disk0,bus=ahci.0",
+          "-qmp",
+          "unix:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds82-r5-pc1on/qmp.sock,server=on,wait=off",
+          "-no-reboot",
+          "-no-shutdown",
+          "-audiodev",
+          "alsa,id=snd0,out.dev=qa_output,in.dev=qa_input,out.try-poll=off,in.try-poll=off,out.frequency=48000,in.frequency=48000,out.channels=2,in.channels=2,out.format=s16,in.format=s16",
+          "-device",
+          "intel-hda,id=hda0,msi=on",
+          "-device",
+          "hda-duplex,audiodev=snd0"
+        ],
+        "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "boot_image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds82-r5-pc1on/guest.raw",
+        "snapshot": false,
+        "private_full_copy": true,
+        "audio_backend": "alsa-file",
+        "pcm_backend": "alsa",
+        "capture_enabled": true,
+        "probe_sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "runner_sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "card_ordinal": 0,
+        "shm_probe_sha256": "6ac19e90c6d243ed93978837e5f3c24eee3479b89b6847cbbc417e8817d51476",
+        "controller": "intel-hda",
+        "codec": "hda-duplex",
+        "smp": 1,
+        "msi": "on",
+        "machine": "pc",
+        "standard_doom_seconds": 5,
+        "standard_load_seconds": 0,
+        "audio_input_seconds": 185
+      },
+      "same_final_image": true,
+      "evidence": [
+        {
+          "path": "out/ds82-r5-pc1on/run.json",
+          "sha256": "25405cd2862f33706f0cbbda6c215dcccb14a1f3523b1c4780319642f84c1a14",
+          "bytes": 2002
+        },
+        {
+          "path": "out/ds82-r5-pc1on/result.json",
+          "sha256": "b33a56c193ca94e52172e3560a0b0f0eeaf55936b85f33cfddaa037bad828b95",
+          "bytes": 1384
+        },
+        {
+          "path": "out/ds82-r5-pc1on/serial.log",
+          "sha256": "9d249e015d93038bef5b27658554cfdc94909119dc97c3fd11d360d77fa0e484",
+          "bytes": 231553
+        },
+        {
+          "path": "out/ds82-r5-pc1on/long-capture-verification.json",
+          "sha256": "2d46eefd51242fbef6b12ad66f5f690a923517fd9efefbd62aad30b23a5c7d47",
+          "bytes": 263
+        },
+        {
+          "path": "out/ds82-r5-pc1on/lifecycle-gate-verification.json",
+          "sha256": "4cb7768a28c34a6e2151ff46b333917daf1bc8106f630c00bd4a5e1c3cf9812f",
+          "bytes": 2141
+        }
+      ],
+      "lifecycle_gate": {
+        "output": "out/ds82-r5-pc1on",
+        "pass": true,
+        "exact_streaming_completion": true,
+        "lifecycle_streams": [
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-1.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-2.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-long-record.raw",
+            "result": 0,
+            "frames": 2883584,
+            "writes": 352,
+            "exact_completion": true
+          }
+        ],
+        "generic_default_cases": true,
+        "whole_serial_xrun_clean": true,
+        "doom_statistics": {
+          "reports": 1,
+          "written_bytes": 4923544,
+          "startup_recoveries": 0,
+          "xrun_recoveries": 0,
+          "suspend_recoveries": 0
+        },
+        "long_capture": {
+          "frames": 2883584,
+          "bytes": 11534336,
+          "seconds": 60.074666666666666,
+          "phase": 13,
+          "first_mismatch_frame": null,
+          "known_input_continuity": true,
+          "sha256": "ef546af65993809e0dbebb737c831c918ce68dbe18b929b5999129073c5ae320",
+          "input_seconds": 185
+        },
+        "serial_sha256": "9d249e015d93038bef5b27658554cfdc94909119dc97c3fd11d360d77fa0e484"
+      }
+    },
+    {
+      "output": "out/ds83-r5-pc1off",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds83-r5-pc1off",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "330",
+        "--machine",
+        "pc",
+        "--smp",
+        "1",
+        "--msi",
+        "off",
+        "--standard-probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh"
+      ],
+      "exit": 0,
+      "long_capture_exit": 0,
+      "full_standard": true,
+      "all_serial_xrun_clean": true,
+      "fatal_pcm_markers": false,
+      "core_done_zero": true,
+      "standard_done_zero": true,
+      "doom_statistics": {
+        "reports": 1,
+        "written_bytes": 4956164,
+        "startup_recoveries": 0,
+        "xrun_recoveries": 0,
+        "suspend_recoveries": 0
+      },
+      "strict_run_pass": true,
+      "runtime_meta": {
+        "command": [
+          "qemu-system-x86_64",
+          "-machine",
+          "pc",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "2048M",
+          "-smp",
+          "1",
+          "-bios",
+          "/usr/share/edk2/x64/OVMF.4m.fd",
+          "-display",
+          "none",
+          "-serial",
+          "file:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds83-r5-pc1off/serial.log",
+          "-drive",
+          "file=/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds83-r5-pc1off/guest.raw,if=none,id=disk0,format=raw,snapshot=off",
+          "-device",
+          "ich9-ahci,id=ahci",
+          "-device",
+          "ide-hd,drive=disk0,bus=ahci.0",
+          "-qmp",
+          "unix:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds83-r5-pc1off/qmp.sock,server=on,wait=off",
+          "-no-reboot",
+          "-no-shutdown",
+          "-audiodev",
+          "alsa,id=snd0,out.dev=qa_output,in.dev=qa_input,out.try-poll=off,in.try-poll=off,out.frequency=48000,in.frequency=48000,out.channels=2,in.channels=2,out.format=s16,in.format=s16",
+          "-device",
+          "intel-hda,id=hda0,msi=off",
+          "-device",
+          "hda-duplex,audiodev=snd0"
+        ],
+        "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "boot_image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds83-r5-pc1off/guest.raw",
+        "snapshot": false,
+        "private_full_copy": true,
+        "audio_backend": "alsa-file",
+        "pcm_backend": "alsa",
+        "capture_enabled": true,
+        "probe_sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "runner_sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "card_ordinal": 0,
+        "shm_probe_sha256": "6ac19e90c6d243ed93978837e5f3c24eee3479b89b6847cbbc417e8817d51476",
+        "controller": "intel-hda",
+        "codec": "hda-duplex",
+        "smp": 1,
+        "msi": "off",
+        "machine": "pc",
+        "standard_doom_seconds": 5,
+        "standard_load_seconds": 0,
+        "audio_input_seconds": 185
+      },
+      "same_final_image": true,
+      "evidence": [
+        {
+          "path": "out/ds83-r5-pc1off/run.json",
+          "sha256": "b1ac7cb52ce6334a627892518b193f7417f5f6399bff13f20041ed31b948e423",
+          "bytes": 2008
+        },
+        {
+          "path": "out/ds83-r5-pc1off/result.json",
+          "sha256": "6abda32f1dc0033fb4f5b91e00e8da4e104bd535bcb6a8928319cd38fd79768b",
+          "bytes": 1385
+        },
+        {
+          "path": "out/ds83-r5-pc1off/serial.log",
+          "sha256": "da686b6ee69c69b723f003da4cae7d705c267c8b416995449d77c786e4065477",
+          "bytes": 233822
+        },
+        {
+          "path": "out/ds83-r5-pc1off/long-capture-verification.json",
+          "sha256": "1bf3d19b20cf068173ae5d3ecfdf919a9706ffba2f76b2f93d0139fbb25e8c86",
+          "bytes": 264
+        },
+        {
+          "path": "out/ds83-r5-pc1off/lifecycle-gate-verification.json",
+          "sha256": "24d36d8640460b7144b4b75856b0c7a62fb7b2c1ffd090b4de5df9094f07b5c1",
+          "bytes": 2143
+        }
+      ],
+      "lifecycle_gate": {
+        "output": "out/ds83-r5-pc1off",
+        "pass": true,
+        "exact_streaming_completion": true,
+        "lifecycle_streams": [
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-1.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-2.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-long-record.raw",
+            "result": 0,
+            "frames": 2883584,
+            "writes": 352,
+            "exact_completion": true
+          }
+        ],
+        "generic_default_cases": true,
+        "whole_serial_xrun_clean": true,
+        "doom_statistics": {
+          "reports": 1,
+          "written_bytes": 4956164,
+          "startup_recoveries": 0,
+          "xrun_recoveries": 0,
+          "suspend_recoveries": 0
+        },
+        "long_capture": {
+          "frames": 2883584,
+          "bytes": 11534336,
+          "seconds": 60.074666666666666,
+          "phase": 115,
+          "first_mismatch_frame": null,
+          "known_input_continuity": true,
+          "sha256": "09210f4ae834e3d2936357a0b02e7a5da09b28d7cd5283f7196b024c455f0ab6",
+          "input_seconds": 185
+        },
+        "serial_sha256": "da686b6ee69c69b723f003da4cae7d705c267c8b416995449d77c786e4065477"
+      }
+    },
+    {
+      "output": "out/ds84-r5-dual",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds84-r5-dual",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "330",
+        "--dual-codec",
+        "--card",
+        "1",
+        "--standard-probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh"
+      ],
+      "exit": 0,
+      "long_capture_exit": 0,
+      "full_standard": true,
+      "all_serial_xrun_clean": true,
+      "fatal_pcm_markers": false,
+      "core_done_zero": true,
+      "standard_done_zero": true,
+      "doom_statistics": {
+        "reports": 1,
+        "written_bytes": 4923496,
+        "startup_recoveries": 0,
+        "xrun_recoveries": 0,
+        "suspend_recoveries": 0
+      },
+      "strict_run_pass": true,
+      "runtime_meta": {
+        "command": [
+          "qemu-system-x86_64",
+          "-machine",
+          "q35",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "2048M",
+          "-smp",
+          "4",
+          "-bios",
+          "/usr/share/edk2/x64/OVMF.4m.fd",
+          "-display",
+          "none",
+          "-serial",
+          "file:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds84-r5-dual/serial.log",
+          "-drive",
+          "file=/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds84-r5-dual/guest.raw,if=none,id=disk0,format=raw,snapshot=off",
+          "-device",
+          "ich9-ahci,id=ahci",
+          "-device",
+          "ide-hd,drive=disk0,bus=ahci.0",
+          "-qmp",
+          "unix:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds84-r5-dual/qmp.sock,server=on,wait=off",
+          "-no-reboot",
+          "-no-shutdown",
+          "-audiodev",
+          "alsa,id=snd0,out.dev=qa_output,in.dev=qa_input,out.try-poll=off,in.try-poll=off,out.frequency=48000,in.frequency=48000,out.channels=2,in.channels=2,out.format=s16,in.format=s16",
+          "-device",
+          "intel-hda,id=hda0,msi=on",
+          "-device",
+          "hda-duplex,audiodev=snd0",
+          "-device",
+          "hda-duplex,audiodev=snd0"
+        ],
+        "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "boot_image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds84-r5-dual/guest.raw",
+        "snapshot": false,
+        "private_full_copy": true,
+        "audio_backend": "alsa-file",
+        "pcm_backend": "alsa",
+        "capture_enabled": true,
+        "probe_sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "runner_sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "card_ordinal": 1,
+        "shm_probe_sha256": "6ac19e90c6d243ed93978837e5f3c24eee3479b89b6847cbbc417e8817d51476",
+        "controller": "intel-hda",
+        "codec": "hda-duplex",
+        "smp": 4,
+        "msi": "on",
+        "machine": "q35",
+        "standard_doom_seconds": 5,
+        "standard_load_seconds": 0,
+        "audio_input_seconds": 185
+      },
+      "same_final_image": true,
+      "evidence": [
+        {
+          "path": "out/ds84-r5-dual/run.json",
+          "sha256": "14c533387d5caaa17789dcde4eba49239708df8d3aadc879b9667aefe02bcd24",
+          "bytes": 2047
+        },
+        {
+          "path": "out/ds84-r5-dual/result.json",
+          "sha256": "5dd71c2399771523e843d3e4fc97542160655c208a50ca5ff5418b9d7f390291",
+          "bytes": 1383
+        },
+        {
+          "path": "out/ds84-r5-dual/serial.log",
+          "sha256": "a72023cf3f585b2260850df93b46644c42bae1ed091ce6473316c4b871f500d7",
+          "bytes": 217053
+        },
+        {
+          "path": "out/ds84-r5-dual/long-capture-verification.json",
+          "sha256": "64b5b9a179e7f699c4c2887c694e1d5104ce8ec1b2f1fec0b7c78596f0df8be6",
+          "bytes": 262
+        },
+        {
+          "path": "out/ds84-r5-dual/lifecycle-gate-verification.json",
+          "sha256": "9c9b98e5f7d2d8a08bd4ebf2c435d17b2a3082fa0877ec372d98e9e9ae033eb3",
+          "bytes": 2139
+        }
+      ],
+      "lifecycle_gate": {
+        "output": "out/ds84-r5-dual",
+        "pass": true,
+        "exact_streaming_completion": true,
+        "lifecycle_streams": [
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-1.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-lifecycle-2.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/dev/null",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-reprepare.raw",
+            "result": 0,
+            "frames": 147456,
+            "writes": 18,
+            "exact_completion": true
+          },
+          {
+            "sink": "/tmp/u6-long-record.raw",
+            "result": 0,
+            "frames": 2883584,
+            "writes": 352,
+            "exact_completion": true
+          }
+        ],
+        "generic_default_cases": true,
+        "whole_serial_xrun_clean": true,
+        "doom_statistics": {
+          "reports": 1,
+          "written_bytes": 4923496,
+          "startup_recoveries": 0,
+          "xrun_recoveries": 0,
+          "suspend_recoveries": 0
+        },
+        "long_capture": {
+          "frames": 2883584,
+          "bytes": 11534336,
+          "seconds": 60.074666666666666,
+          "phase": 6,
+          "first_mismatch_frame": null,
+          "known_input_continuity": true,
+          "sha256": "ddaeb38787502ac3f9e8c72c289e747a416813af907a5d1bdf3a5ac6754304bd",
+          "input_seconds": 185
+        },
+        "serial_sha256": "a72023cf3f585b2260850df93b46644c42bae1ed091ce6473316c4b871f500d7"
+      }
+    },
+    {
+      "output": "out/ds85-r5-output",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds85-r5-output",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "330",
+        "--codec",
+        "hda-output"
+      ],
+      "exit": 0,
+      "long_capture_exit": null,
+      "full_standard": false,
+      "all_serial_xrun_clean": true,
+      "fatal_pcm_markers": false,
+      "core_done_zero": true,
+      "standard_done_zero": false,
+      "doom_statistics": null,
+      "strict_run_pass": true,
+      "runtime_meta": {
+        "command": [
+          "qemu-system-x86_64",
+          "-machine",
+          "q35",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "2048M",
+          "-smp",
+          "4",
+          "-bios",
+          "/usr/share/edk2/x64/OVMF.4m.fd",
+          "-display",
+          "none",
+          "-serial",
+          "file:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds85-r5-output/serial.log",
+          "-drive",
+          "file=/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds85-r5-output/guest.raw,if=none,id=disk0,format=raw,snapshot=off",
+          "-device",
+          "ich9-ahci,id=ahci",
+          "-device",
+          "ide-hd,drive=disk0,bus=ahci.0",
+          "-qmp",
+          "unix:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds85-r5-output/qmp.sock,server=on,wait=off",
+          "-no-reboot",
+          "-no-shutdown",
+          "-audiodev",
+          "alsa,id=snd0,out.dev=qa_output,in.dev=qa_input,out.try-poll=off,in.try-poll=off,out.frequency=48000,in.frequency=48000,out.channels=2,in.channels=2,out.format=s16,in.format=s16",
+          "-device",
+          "intel-hda,id=hda0,msi=on",
+          "-device",
+          "hda-output,audiodev=snd0"
+        ],
+        "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "boot_image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds85-r5-output/guest.raw",
+        "snapshot": false,
+        "private_full_copy": true,
+        "audio_backend": "alsa-file",
+        "pcm_backend": "alsa",
+        "capture_enabled": false,
+        "probe_sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "runner_sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "card_ordinal": 0,
+        "shm_probe_sha256": "6ac19e90c6d243ed93978837e5f3c24eee3479b89b6847cbbc417e8817d51476",
+        "controller": "intel-hda",
+        "codec": "hda-output",
+        "smp": 4,
+        "msi": "on",
+        "machine": "q35",
+        "standard_doom_seconds": 5,
+        "standard_load_seconds": 0,
+        "audio_input_seconds": 185
+      },
+      "same_final_image": true,
+      "evidence": [
+        {
+          "path": "out/ds85-r5-output/run.json",
+          "sha256": "54a42ce3a49bd6d91767002bbf6ccb6545a0ea2b17cb63aca2b4121bdfe3fecd",
+          "bytes": 2009
+        },
+        {
+          "path": "out/ds85-r5-output/result.json",
+          "sha256": "e7f940776c7c376913e7798ef513c795399f1444f4de40dbd1d883d6c4c23be7",
+          "bytes": 1088
+        },
+        {
+          "path": "out/ds85-r5-output/serial.log",
+          "sha256": "bd2171756f3b8c2145519db8bc1d88f08de698369f44947db83661963abffc2a",
+          "bytes": 89140
+        }
+      ]
+    },
+    {
+      "output": "out/ds86-r5-none",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds86-r5-none",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "330",
+        "--controller",
+        "none",
+        "--boot-only"
+      ],
+      "exit": 0,
+      "long_capture_exit": null,
+      "full_standard": false,
+      "all_serial_xrun_clean": true,
+      "fatal_pcm_markers": false,
+      "core_done_zero": false,
+      "standard_done_zero": false,
+      "doom_statistics": null,
+      "strict_run_pass": true,
+      "runtime_meta": {
+        "command": [
+          "qemu-system-x86_64",
+          "-machine",
+          "q35",
+          "-enable-kvm",
+          "-cpu",
+          "host",
+          "-m",
+          "2048M",
+          "-smp",
+          "4",
+          "-bios",
+          "/usr/share/edk2/x64/OVMF.4m.fd",
+          "-display",
+          "none",
+          "-serial",
+          "file:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds86-r5-none/serial.log",
+          "-drive",
+          "file=/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk,if=none,id=disk0,format=vmdk,snapshot=on",
+          "-device",
+          "ich9-ahci,id=ahci",
+          "-device",
+          "ide-hd,drive=disk0,bus=ahci.0",
+          "-qmp",
+          "unix:/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds86-r5-none/qmp.sock,server=on,wait=off",
+          "-no-reboot",
+          "-no-shutdown",
+          "-audiodev",
+          "alsa,id=snd0,out.dev=qa_output,in.dev=qa_input,out.try-poll=off,in.try-poll=off,out.frequency=48000,in.frequency=48000,out.channels=2,in.channels=2,out.format=s16,in.format=s16"
+        ],
+        "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+        "boot_image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "snapshot": true,
+        "private_full_copy": false,
+        "audio_backend": "alsa-file",
+        "pcm_backend": "alsa",
+        "capture_enabled": false,
+        "probe_sha256": null,
+        "runner_sha256": "3d396ae57db7eedf49ae939b9749e14db85967cb4536ba02acd30ba57b4dd5ea",
+        "card_ordinal": 0,
+        "shm_probe_sha256": null,
+        "controller": "none",
+        "codec": "hda-duplex",
+        "smp": 4,
+        "msi": "on",
+        "machine": "q35",
+        "standard_doom_seconds": 5,
+        "standard_load_seconds": 0,
+        "audio_input_seconds": 185
+      },
+      "same_final_image": true,
+      "evidence": [
+        {
+          "path": "out/ds86-r5-none/run.json",
+          "sha256": "09c05ffc26328e215145be401c2c09b85c93a7105a99edf7ec18a8957cc83548",
+          "bytes": 1826
+        },
+        {
+          "path": "out/ds86-r5-none/result.json",
+          "sha256": "f2c6ac493e256485718dc0491938312f7f26374f6440474a61bd40b9c6ba3441",
+          "bytes": 652
+        },
+        {
+          "path": "out/ds86-r5-none/serial.log",
+          "sha256": "563154ec782f81c013bb68b887af7b3753b70b8099ee60af3f4d29bbd71b1644",
+          "bytes": 6999
+        }
+      ]
+    }
+  ],
+  "long_run": {
+    "command": {
+      "command": [
+        "/usr/bin/python3",
+        "tools/test_audio_e2e_qemu.py",
+        "--image",
+        "out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "out/ds87-r5-long600",
+        "--duration",
+        "600",
+        "--load-seconds",
+        "60",
+        "--timeout",
+        "90",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--standard-probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh"
+      ],
+      "exit": 0,
+      "long_capture_exit": 0,
+      "lifecycle_count_exit": 0,
+      "software_gate_pass": true
+    },
+    "report": {
+      "started_utc": "2026-10-04T06:25:41.877908+00:00",
+      "image": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+      "image_sha256": "6eecf87ec056307d635efe17524b005601bc48d11aab76921e4111111413cf73",
+      "duration_requested_seconds": 600,
+      "load_requested_seconds": 60,
+      "preflight_timeout_seconds": 90.0,
+      "runner_timeout_seconds": 900,
+      "standard_probe": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh",
+      "guest_probe_binary": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+      "command": [
+        "/usr/bin/python3",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/tools/test_hda_qemu.py",
+        "--image",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/images/reliefos-lifecycle-r5.vmdk",
+        "--output",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds87-r5-long600",
+        "--probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/audio-candidate-8192x65536-flush-r2",
+        "--controller",
+        "intel-hda",
+        "--codec",
+        "hda-duplex",
+        "--machine",
+        "q35",
+        "--smp",
+        "4",
+        "--msi",
+        "on",
+        "--audio-backend",
+        "alsa-file",
+        "--timeout",
+        "900",
+        "--standard-probe",
+        "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004/standard-final-8192x65536.sh",
+        "--standard-doom-seconds",
+        "600",
+        "--standard-load-seconds",
+        "60"
+      ],
+      "long_run": {
+        "status": "passed",
+        "requested_seconds": 600,
+        "load_seconds": 60,
+        "standard_done": true,
+        "doom_pass": true,
+        "load_pass": true,
+        "doom_pcm_clean": true,
+        "doom_xrun_clean": true,
+        "doom_throughput_clean": true,
+        "minimum_written_bytes": 112896000,
+        "doom_audio_statistics": {
+          "reports": 1,
+          "written_bytes": 164659280,
+          "startup_recoveries": 0,
+          "xrun_recoveries": 0,
+          "suspend_recoveries": 0
+        },
+        "doom_load_io_statistics": {
+          "bytes": 7839744,
+          "cycles": 29
+        },
+        "all_serial_xrun_clean": true
+      },
+      "physical_codec": {
+        "status": "not_run",
+        "reason": "ReliefOS native boot or exclusive PCI passthrough was not run"
+      },
+      "gui": {
+        "status": "deferred",
+        "reason": "Visible GUI validation is deferred to Xorg per user direction"
+      },
+      "finished_utc": "2026-10-04T06:38:10.133982+00:00",
+      "preflight_exit": 0,
+      "preflight": {
+        "boot_complete": true,
+        "guest_probe": true,
+        "hda_card_registered": true,
+        "shared_shm": true,
+        "capture": true,
+        "waveform": true,
+        "wave_error": null,
+        "capture_error": null,
+        "result_path": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/ds87-r5-long600/result.json"
+      },
+      "gates": {
+        "alsa_guest_preflight": true,
+        "soundctl_amixer_settings": true,
+        "doom_freedoom_long_run": true,
+        "visible_gui_xorg": false,
+        "physical_codec_matrix": false
+      },
+      "software_gate_pass": true
+    },
+    "capture": {
+      "frames": 2883584,
+      "bytes": 11534336,
+      "seconds": 60.074666666666666,
+      "phase": 88,
+      "first_mismatch_frame": null,
+      "known_input_continuity": true,
+      "sha256": "87c8d9cf63a1cb6410cd8a2e832425f72eb4223f0c32118d5d6912980b9dc771",
+      "input_seconds": 780
+    },
+    "lifecycle": {
+      "output": "out/ds87-r5-long600",
+      "pass": true,
+      "exact_streaming_completion": true,
+      "lifecycle_streams": [
+        {
+          "sink": "/dev/null",
+          "result": 0,
+          "frames": 147456,
+          "writes": 18,
+          "exact_completion": true
+        },
+        {
+          "sink": "/dev/null",
+          "result": 0,
+          "frames": 147456,
+          "writes": 18,
+          "exact_completion": true
+        },
+        {
+          "sink": "/tmp/u6-lifecycle-1.raw",
+          "result": 0,
+          "frames": 147456,
+          "writes": 18,
+          "exact_completion": true
+        },
+        {
+          "sink": "/dev/null",
+          "result": 0,
+          "frames": 147456,
+          "writes": 18,
+          "exact_completion": true
+        },
+        {
+          "sink": "/tmp/u6-lifecycle-2.raw",
+          "result": 0,
+          "frames": 147456,
+          "writes": 18,
+          "exact_completion": true
+        },
+        {
+          "sink": "/dev/null",
+          "result": 0,
+          "frames": 147456,
+          "writes": 18,
+          "exact_completion": true
+        },
+        {
+          "sink": "/dev/null",
+          "result": 0,
+          "frames": 147456,
+          "writes": 18,
+          "exact_completion": true
+        },
+        {
+          "sink": "/tmp/u6-reprepare.raw",
+          "result": 0,
+          "frames": 147456,
+          "writes": 18,
+          "exact_completion": true
+        },
+        {
+          "sink": "/tmp/u6-reprepare.raw",
+          "result": 0,
+          "frames": 147456,
+          "writes": 18,
+          "exact_completion": true
+        },
+        {
+          "sink": "/tmp/u6-long-record.raw",
+          "result": 0,
+          "frames": 2883584,
+          "writes": 352,
+          "exact_completion": true
+        }
+      ],
+      "generic_default_cases": true,
+      "whole_serial_xrun_clean": true,
+      "doom_statistics": {
+        "reports": 1,
+        "written_bytes": 164659280,
+        "startup_recoveries": 0,
+        "xrun_recoveries": 0,
+        "suspend_recoveries": 0
+      },
+      "long_capture": {
+        "frames": 2883584,
+        "bytes": 11534336,
+        "seconds": 60.074666666666666,
+        "phase": 88,
+        "first_mismatch_frame": null,
+        "known_input_continuity": true,
+        "sha256": "87c8d9cf63a1cb6410cd8a2e832425f72eb4223f0c32118d5d6912980b9dc771",
+        "input_seconds": 780
+      },
+      "serial_sha256": "8be3a4151dc0d9d88ee0f6f59e75875da4b26b28e29531542e6865ad3f262e66"
+    },
+    "evidence": [
+      {
+        "path": "out/ds87-r5-long600/run.json",
+        "sha256": "ed16a2f7fd51138d88772da88d033648bd2bdeeefd55055a3226332829af7da7",
+        "bytes": 2015
+      },
+      {
+        "path": "out/ds87-r5-long600/result.json",
+        "sha256": "e092ae7b20a6fcf661b736213d3ea205af32f051f3b8bde8d76a3169789750d9",
+        "bytes": 1386
+      },
+      {
+        "path": "out/ds87-r5-long600/e2e-result.json",
+        "sha256": "8d3d323246f3d01c2cc8bf580ffddeab7d0060bb88bf0950b35ed8041896e710",
+        "bytes": 3217
+      },
+      {
+        "path": "out/ds87-r5-long600/serial.log",
+        "sha256": "8be3a4151dc0d9d88ee0f6f59e75875da4b26b28e29531542e6865ad3f262e66",
+        "bytes": 238629
+      },
+      {
+        "path": "out/ds87-r5-long600/long-capture-verification.json",
+        "sha256": "ae5403c4ad5baef0d505358b5cfefc4b1abcd0c569c9a8cb7e6c53dde37258da",
+        "bytes": 263
+      },
+      {
+        "path": "out/ds87-r5-long600/lifecycle-gate-verification.json",
+        "sha256": "52b0be9be0c60be04b269e14e365c8c8fc24515e729d5328975b75eb06b09298",
+        "bytes": 2145
+      }
+    ]
+  },
+  "capture_signal_limit": "All retained samples checked at tolerance2 against400/800Hz knownstereo.120-frame repeating input cannot detect skipped integer multiples of120frames.",
+  "original_images": [
+    {
+      "path": "out/audio-hda-u6/images/reliefos.vmdk",
+      "sha256": "d8c7a584dbf252bb02a02973ba7d9966cdc9323df862804bd88a5cbfbb5eeb67",
+      "bytes": 370933760,
+      "expected_sha256": "d8c7a584dbf252bb02a02973ba7d9966cdc9323df862804bd88a5cbfbb5eeb67",
+      "unchanged": true
+    },
+    {
+      "path": "out/audio-hda-u6/images/reliefos-fractional-time.vmdk",
+      "sha256": "8d0ea8569638864411d5a6834e3f228d98c4897875895c2c3d69cbd769b45fb1",
+      "bytes": 370933760,
+      "expected_sha256": "8d0ea8569638864411d5a6834e3f228d98c4897875895c2c3d69cbd769b45fb1",
+      "unchanged": true
+    }
+  ],
+  "review": {
+    "type": "inline; no agents",
+    "path": "docs/superpowers/progress/2026-10-04-u6-lifecycle-repair-review.md",
+    "pending_hardware_eof_limitation": true
+  },
+  "old_audits_preserved": [
+    {
+      "path": "docs/superpowers/progress/2026-10-04-u6-final-audit.json",
+      "sha256": "87c494fddcac4f8c34819a1257c5dc60e8c5d0faf04278acd6d93ab4672a00ac",
+      "bytes": 4536
+    },
+    {
+      "path": "docs/superpowers/progress/2026-10-04-u6-resume-audit.json",
+      "sha256": "477ad6b06692f52ef222215d959428b6c53b00286af6336692069ffa5009f292",
+      "bytes": 12288
+    },
+    {
+      "path": "docs/superpowers/progress/2026-10-04-u6-batch-repair-review.md",
+      "sha256": "39f22b92d0489550acf907ddd1b4dab637ea12befb08cbf17a97b1c865a969f2",
+      "bytes": 4150
+    }
+  ],
+  "evidence_directory": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan/out/audio-hda-u6/qa/u6-lifecycle-20261004",
+  "final_verification": {
+    "utc": "2026-10-04T06:41:28.415349+00:00",
+    "backup_files_checked": 70,
+    "backup_gate": "passed",
+    "backup_log": {
+      "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/final-preserved-backup-check-r2.log",
+      "sha256": "1dfec24c4d438edb939c7a51edbb686d5206aef75cecf5ca2bb7f2581bec8e89",
+      "bytes": 2015
+    },
+    "retained_backup_invocation_error": {
+      "log": {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/final-preserved-backup-check.log",
+        "sha256": "a2e095d20dd4ecc76523f195c425c2b2aa353e985efb189d4b3d4349376d84cb",
+        "bytes": 7654
+      },
+      "reason": "Initial checksum call used root cwd for backup-relative filenames; corrected cwd passed. Not content mismatch."
+    },
+    "extracted_long_run_probe": [
+      {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/r5-long-extracted-probe",
+        "sha256": "6b050654b1a62096c8ef25e27b80735156e8f4659978de0291d9d668fadb5949",
+        "bytes": 1171904
+      },
+      {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/r5-long-extracted-standard.sh",
+        "sha256": "930fb9ab20a76c755545f5e1d99518c20b8d47bbaba41156ecea352ee689ff53",
+        "bytes": 9761
+      }
+    ],
+    "document_evidence": [
+      {
+        "path": "docs/superpowers/progress/2026-10-04-intel-hda-audio-current-handoff.md",
+        "sha256": "eebd6985f622f525cd1c4c66b8bba92f9164c76ed677844f7255822e6c2a5a21",
+        "bytes": 7351
+      },
+      {
+        "path": "docs/superpowers/progress/2026-10-04-u6-lifecycle-repair-review.md",
+        "sha256": "d79122f3e67f63ad60ae6bc3f55b53d1592218f38a8a2b83bbea435fe99cf7f6",
+        "bytes": 14986
+      },
+      {
+        "path": "docs/superpowers/progress/2026-10-02-intel-hda-audio-status.md",
+        "sha256": "f806fef842438436942eca1b0c79e6459b2bf6176922631e95fa2acfcbe7fd97",
+        "bytes": 36896
+      }
+    ],
+    "git_status_evidence": [
+      {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/final-root-status.log",
+        "sha256": "17987696a8637ac6e0a7812a858381ab5317556e8849ce872794fc7fefd39e9e",
+        "bytes": 4164
+      },
+      {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/final-kernel-status.log",
+        "sha256": "7baf1363136cb735233adf32ae0ce172b277c21eef9d7e296244fd91a86e9d2f",
+        "bytes": 1894
+      }
+    ],
+    "snapshot_evidence": [
+      {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/current-handoff.before.md",
+        "sha256": "fdc65c8e5312e067c3c36dba97962043939c8dc051289af7adbbdf77b655dd5e",
+        "bytes": 15253
+      },
+      {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/status.before.md",
+        "sha256": "03fa56a877e8e241f7d1e76ace1e43d8d4d748ff1b10fbd1b4526608004c78cc",
+        "bytes": 34668
+      },
+      {
+        "path": "out/audio-hda-u6/qa/u6-lifecycle-20261004/r5-source-diffs.patch",
+        "sha256": "af8aafd78c2467c0b095211ff92ffa9c1f2ded5173e84117ca6a966132334f31",
+        "bytes": 26837
+      }
+    ]
+  }
+}

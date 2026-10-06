@@ -11,6 +11,9 @@ static struct { uint64_t address; unsigned refs; } pages[1024];
 
 uint64_t mm_alloc_page(void)
 {
+#ifdef RELIEFNT_TEST_PAGE_ALLOC_GATE
+    if (!RELIEFNT_TEST_PAGE_ALLOC_GATE()) return 0;
+#endif
     for (unsigned i = 0; i < 1024; ++i) if (!pages[i].refs) {
         void *p = aligned_alloc(4096, 4096);
         assert(p);

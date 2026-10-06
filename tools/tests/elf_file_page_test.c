@@ -5,6 +5,7 @@
 #include <string.h>
 #include <reliefnt/lock.h>
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#include "sysv_shm_fixture_stubs.h"
 
 static unsigned char file_bytes[8192];
 static uint64_t mapped;

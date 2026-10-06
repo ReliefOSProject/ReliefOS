@@ -33,6 +33,23 @@ cp "$PNG_CONFIG" "$tmp/include/pnglibconf.h"
 mkdir -p "$tmp/share/licenses/linux-pam" "$tmp/share/licenses/libxcrypt"
 cp "$pam/share/licenses/linux-pam/LICENSE" "$tmp/share/licenses/linux-pam/"
 cp "$auth/share/licenses/libxcrypt/LICENSE" "$tmp/share/licenses/libxcrypt/"
+# Optional inputs keep the standalone SDK-stage fixture useful; the real root
+# build always supplies both trees and declares their target products as deps.
+if [ -n "${AUDIO_ALSA_ROOT-}" ] || [ -n "${AUDIO_OPL_ROOT-}" ]; then
+    : "${AUDIO_ALSA_ROOT:?ALSA stage required}" "${AUDIO_OPL_ROOT:?OPL stage required}"
+    cp -a "$AUDIO_ALSA_ROOT/usr/include/alsa" "$tmp/include/"
+    cp -P "$AUDIO_ALSA_ROOT"/usr/lib/libasound.so* "$AUDIO_ALSA_ROOT/usr/lib/libasound.a" "$tmp/lib/"
+    cp "$AUDIO_OPL_ROOT/usr/include/opl3.h" "$tmp/include/"
+    cp -P "$AUDIO_OPL_ROOT"/usr/lib/libopl3.so* "$tmp/lib/"
+    cp -a "$AUDIO_ALSA_ROOT/usr/share/alsa" "$tmp/share/"
+    for spec in "alsa-lib:$AUDIO_ALSA_ROOT" "nuked-opl3:$AUDIO_OPL_ROOT"; do
+        cp -a "${spec#*:}/usr/share/licenses/${spec%%:*}" "$tmp/share/licenses/"
+    done
+fi
+if [ -n "${AUDIO_CONTROL_SO-}" ]; then
+    cp "$AUDIO_CONTROL_SO" "$tmp/lib/libreliefos-audio.so.1"
+    ln -s libreliefos-audio.so.1 "$tmp/lib/libreliefos-audio.so"
+fi
 printf '%s\n' "$epoch" > "$tmp/.source-date-epoch"
 if [ -d "$stage.previous" ] && [ ! -e "$stage" ]; then mv "$stage.previous" "$stage"; fi
 rm -rf "$stage.previous"

@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "updated_utc": "2026-10-04T11:51:07.192350+00:00",
+  "worktree": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan",
+  "u6": "open",
+  "ledger": "18/19",
+  "geometry": "8192/65536 candidate; original native512/2048 without tail remains required",
+  "image_manifest": "out/audio-hda-u6/qa/u6-closeout-20261004/r10-source-products.json",
+  "minimal_repairs": [
+    "PCM full unsubmitted drain silence",
+    "nonblocking DRAIN STATUS_SETUP",
+    "HDA mixer restore after format bind",
+    "Linux STATUS availability and signed running delay",
+    "IRQ position XRUN quiesces DMA before notification"
+  ],
+  "evidence": {
+    "r9_e2e_exit": 1,
+    "r9_doom_xrun_recoveries": 2,
+    "r9_long_capture_known_input_continuity": true,
+    "r9_native_timer_tail_cut_frames": 386,
+    "r10_build_exit": 0,
+    "r10_affected_host_strict": "passed scoped subsets",
+    "whole_module_strict": "failed inherited warnings",
+    "root_make_test_exit": 2,
+    "root_make_test_failure": "six inherited branding-compatibility docs links",
+    "r10_standard_matrix": "running; first three standard lifecycle gates pass, full native EOF fails",
+    "r10_doom_wav120": {
+      "run": "out/ds134-r10-doom-wav-pacing",
+      "diagnostic_scope": "output only; capture not_run",
+      "seconds": 120,
+      "load_seconds": 60,
+      "xrun_recoveries": 0,
+      "scene_counters": [
+        2,
+        429,
+        71,
+        8
+      ],
+      "finite_wave_pass": false,
+      "timer_tail_cut_frames": 819
+    },
+    "r10_alsa_file600": "not_run",
+    "r10_actual_image_components": "five actual components extracted, all SHA matched",
+    "r10_standard_matrix_results": "out/audio-hda-u6/qa/u6-closeout-20261004/r10-standard-matrix-results.json",
+    "r10_doom_wav_first_attempt": {
+      "run": "out/ds133-r10-doom-wav-pacing",
+      "doom": "not_run",
+      "reason": "unsupported ADC capture blocked; own QMP quit retained"
+    }
+  },
+  "gui": {
+    "status": "deferred",
+    "reason": "user requested Xorg"
+  },
+  "physical_codec_gate": {
+    "status": "not_run"
+  },
+  "preservation": {
+    "no_agents": true,
+    "no_git_mutations": true,
+    "all_original_failure_evidence_retained": true,
+    "storage_maintenance": "zero holes/exact-block dedup with equal before-after SHA"
+  }
+}

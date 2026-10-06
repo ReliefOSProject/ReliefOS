@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#include "sysv_shm_fixture_stubs.h"
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall_time.c"
 #include "../../kernel/reliefnt/kernel/reliefnt/signal_queue.c"
 

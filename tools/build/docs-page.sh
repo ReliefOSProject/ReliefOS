@@ -44,7 +44,9 @@ doc_title() {
 # Render every Markdown document to docs/<NAME>/index.html. Filenames must be
 # plain so they are safe to place in a path and an href; anything unusual is
 # rejected rather than emitted (matching the RPR filename discipline).
-for md in $(find "$docs" -name '*.md' | LC_ALL=C sort); do
+# Superpowers handoff/audit records are internal evidence, not public site
+# documents; their relative links intentionally target the audit directory.
+for md in $(find "$docs" -path "$docs/superpowers" -prune -o -name '*.md' -print | LC_ALL=C sort); do
     base=${md##*/}
     name=${base%.md}
     case $name in
@@ -68,7 +70,7 @@ done
 
 # Copy every non-Markdown asset (tables in .csv, plain .txt notes) verbatim so
 # in-text links to them resolve. Basenames are unique across the tree.
-for asset in $(find "$docs" -type f ! -name '*.md' | LC_ALL=C sort); do
+for asset in $(find "$docs" -path "$docs/superpowers" -prune -o -type f ! -name '*.md' -print | LC_ALL=C sort); do
     fname=${asset##*/}
     case $fname in
         ''|*[!a-zA-Z0-9._-]*) continue ;;
@@ -90,7 +92,7 @@ done
     printf '</section>\n'
 
     group=
-    for md in $(find "$docs" -name '*.md' | LC_ALL=C sort); do
+    for md in $(find "$docs" -path "$docs/superpowers" -prune -o -name '*.md' -print | LC_ALL=C sort); do
         rel=${md#"$docs"/}
         if [ "$rel" = "$md" ]; then rel=$md; fi
         case $rel in

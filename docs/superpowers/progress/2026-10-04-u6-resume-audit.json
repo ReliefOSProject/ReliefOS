@@ -1,0 +1,185 @@
+{
+  "date": "2026-10-04",
+  "worktree": "/home/xiaobai/Projects/Projects/ReliefOS-intel-hda-audio-plan",
+  "execution": "inline-only",
+  "git_actions": {
+    "commit": false,
+    "push": false,
+    "archive": false
+  },
+  "image": {
+    "path": "out/audio-hda-u6/images/reliefos.vmdk",
+    "sha256": "fe47bff3c733f1283ae8f6334dfecb3c1e26c3d0205704761e1e9620701966d0",
+    "rootfs_pcm_geometry": "dmix/dsnoop S16_LE 48kHz stereo; period 768, buffer 12288; default hw_ptr_alignment"
+  },
+  "repair_changes": {
+    "tools/test_hda_qemu.py": {
+      "change": "Generate deterministic QEMU capture input for max(60, requested Doom seconds + 60) seconds and record audio_input_seconds in run.json.",
+      "sha256": "c75a91e0b3928a984fda0b2360f26dfc10c8844c5e295eb360beb59f8161bc3e"
+    },
+    "tools/test_audio_e2e_qemu.py": {
+      "change": "Classify XRUN markers within the Doom standard-probe interval; report all-serial XRUN state separately.",
+      "sha256": "e277cad0f30ef68ad7d15473ff17363048477b68aba039708c9265cb9d4767db"
+    },
+    "docs/superpowers/audio-validation/u6-standard-probe-20261003.sh": {
+      "sha256": "045bf17f5e5259468889db878b2c0740a5128754049628348c30e475063e90fd",
+      "lifetime_capture": "--start-delay=1; fixed-duration 1 second; output must be nonempty"
+    },
+    "tools/test_linux_audio.py": {
+      "sha256": "cef5da6f5ed81a0ca729e6d3ea03bffc97fe15a0461e1c47610d4c21a8e33312",
+      "change": "Add validated --guest-period-frames and --guest-buffer-frames build options; default geometry remains 512/2048 frames."
+    },
+    "tools/tests/audio_guest_test.c": {
+      "sha256": "eec0b19bac45ca1baa5956d8e9ba51a2e90f1268469c8e086ea51940f38f235d",
+      "change": "Keep 512/2048 default geometry, collect a bounded capture burst in allocated memory, DROP the PCM before writing the capture file, and preserve actual XRUN/errno failures."
+    },
+    "system/rootfs/etc/asound.conf": {
+      "sha256": "459d4c708b4949abb8a8ec9b74f1f5c0d87742f2146f8eaafbd59461cef20bd2"
+    },
+    "tools/tests/audio_guest_transport_test.c": {
+      "sha256": "99a0ebc0d1750e5ca81be9825e316e3f4874c7cc27b88c680d5897abec55df20",
+      "change": "Exercise the actual capture function with a simulated 100ms disk write; old capture loop fails EPIPE, fixed loop retains all 4096 frames and writes after DROP."
+    }
+  },
+  "short_guest_run": {
+    "output": "out/audio-hda-u6/qa/lts28",
+    "image_sha256": "fe47bff3c733f1283ae8f6334dfecb3c1e26c3d0205704761e1e9620701966d0",
+    "probe": "out/audio-hda-u6/qa/audio-guest-u6-buffer8192",
+    "probe_sha256": "e0faceae776e83595454f2217d7171dcef22014d7cd3a2aca2bcacf7ea150eb1",
+    "probe_geometry": "period 512, buffer 8192 frames; 32768-byte ring, within the 65536-byte core PCM limit",
+    "result_sha256": "dcff307f5e7f1f6e8b7f1049e7227a9da0290627d8f7367eede4ca25e1970cef",
+    "serial_sha256": "fb6089dd92b5fe73f306a71f6ed29002e79fa78dde00e8471f25a184d87ac065",
+    "core_audio_qa": "pass; zero failures",
+    "standard_probe": "abi, 5-second headless Doom, playback, capture, lifetime, concurrent clients, and controls all pass; DONE failures=0",
+    "guest_waveform": "48kHz S16 stereo; 1000/2000Hz; 1.999979 seconds; maximum period error 1",
+    "guest_capture": "4096 frames / 16384 bytes; 4095 frames matched known 400/800Hz input",
+    "whole_serial_xrun_clean": false,
+    "whole_serial_xrun_note": "One zero-duration overrun marker occurred in the standalone lifetime capture mode; arecord completed and the standard suite passed."
+  },
+  "long_guest_run": {
+    "command": "TMPDIR=out/audio-hda-u6/tmp-build python3 tools/test_audio_e2e_qemu.py --image out/audio-hda-u6/images/reliefos.vmdk --output out/audio-hda-u6/qa/e2e660d --duration 600 --load-seconds 60 --timeout 90",
+    "output": "out/audio-hda-u6/qa/e2e660d",
+    "image_sha256": "fe47bff3c733f1283ae8f6334dfecb3c1e26c3d0205704761e1e9620701966d0",
+    "input_source_seconds": 660,
+    "input_source_bytes": 126720000,
+    "input_source_sha256": "18a7e86fd97382faf55e62e34a3fac6ef785e97fd36df5988041a00a2a8239cc",
+    "serial_sha256": "d5edcf34964c95a79cf11a5c34571e488ae85d94bb1deb7f4ff184f090d9ffe8",
+    "qemu_result_sha256": "abba5c2c9157022b34f1497021a70d0f95417984755e294d15e129c48443ff11",
+    "waveform_sha256": "b28d2c3df43742fe6ae8aed4c4a11a56a989b892bcfdbbf45e731ee068c53b5e",
+    "doom_serial_section_sha256": "e1dc323d4e466e9f19bfaf700281647cf10e52b535297abac7d5b3d0f10e3752",
+    "doom_serial_section_bytes": 11360,
+    "doom_duration_requested_seconds": 600,
+    "doom_and_cpu_io_load": "PASS standard-doom-load cpu-io-workers-active; PASS standard-doom headless-freedoom-level-audio",
+    "doom_pcm_clean": true,
+    "doom_xrun_clean": true,
+    "all_serial_xrun_clean": false,
+    "post_doom_xrun_markers": 2,
+    "post_doom_xrun_mode": "lifetime capture, after the Doom mode ended",
+    "standard_done": true,
+    "qemu_exit": 0,
+    "core_preflight": {
+      "status": "failed",
+      "failure": "READI_FRAMES errno=32 (Broken pipe); extracted capture contained 4096 rather than 16384 bytes",
+      "result_sha256": "abba5c2c9157022b34f1497021a70d0f95417984755e294d15e129c48443ff11"
+    },
+    "interpretation": "The 600-second Doom/load gate passes when XRUN detection is scoped to the Doom interval. The same long run's default 2048-frame core capture preflight is flaky and failed; lts28 on the identical image passed core capture with a valid 8192-frame ring. Keep U6 open until the default probe's capture behavior is made repeatable."
+  },
+  "verified_qemu_long_run": {
+    "command": "TMPDIR=out/audio-hda-u6/tmp-build python3 tools/test_audio_e2e_qemu.py --image out/audio-hda-u6/images/reliefos.vmdk --output out/audio-hda-u6/qa/e2e660b --duration 600 --load-seconds 60 --timeout 90 --probe out/audio-hda-u6/qa/audio-guest-u6-buffer4096",
+    "output": "out/audio-hda-u6/qa/e2e660b",
+    "image_sha256": "fe47bff3c733f1283ae8f6334dfecb3c1e26c3d0205704761e1e9620701966d0",
+    "probe_sha256": "2eace0e3f2bc536df1493ff075a1b15ee413f17fc808fb4041ddd78838c3e393",
+    "probe_reproducibility": "The exact run used audio-guest-u6-buffer4096. The CLI-built audio-guest-u6-buffer4096-final has the identical SHA-256; its build command below is separate reproduction evidence.",
+    "probe_build_command": "python3 tools/test_linux_audio.py --build-guest --guest-period-frames 512 --guest-buffer-frames 4096 --output out/audio-hda-u6/qa/audio-guest-u6-buffer4096-final --sdk out/audio-hda-u6/sdk/reliefos-musl-sdk",
+    "probe_build_metadata_sha256": "e7d28fd25bf8d9d9e4c2f89fad34df28d7b28518d7689a1482109f7ecc490fd9",
+    "probe_geometry": "period 512, buffer 4096 frames; 16384-byte ring; 85.3ms at 48kHz",
+    "input_source_seconds": 660,
+    "input_source_bytes": 126720000,
+    "input_source_sha256": "18a7e86fd97382faf55e62e34a3fac6ef785e97fd36df5988041a00a2a8239cc",
+    "serial_sha256": "e5321c2d0d35b310ac6e267b5d7a77a15243236f0b1ff45482f29abc6909f133",
+    "qemu_result_sha256": "7a776db072bf5a9180c1f229267d07d35da007566e312734756900d8c5d93219",
+    "e2e_result_sha256": "6a4493e564b1221af0c985722a60e53eae5480874006a08856e778bb926ae2a8",
+    "waveform_sha256": "e050a254889116dacab2fb09923ed9522e057fda0ee3eb6e9624a39f074f3cf2",
+    "doom_serial_section_sha256": "a4be2f0e4f75f87f6d5329048aa87ee03d58b54fea3e3a986d4906154c83e993",
+    "doom_serial_section_bytes": 11360,
+    "preflight_exit": 0,
+    "core_audio_qa": "PASS; zero failures; known input capture 4096 frames / 16384 bytes",
+    "waveform": "48kHz S16 stereo, 1000/2000Hz, active 1.999979 seconds, max period error 1",
+    "standard_modes": "ABI, Doom, playback, capture, lifetime, concurrent clients, controls all pass; DONE failures=0",
+    "doom_duration_requested_seconds": 600,
+    "cpu_io_load_seconds": 60,
+    "doom_pcm_clean": true,
+    "doom_xrun_clean": true,
+    "all_serial_xrun_clean": false,
+    "post_doom_xrun_markers": 1,
+    "post_doom_xrun_mode": "lifetime capture; zero-duration startup marker, arecord completed",
+    "qemu_exit": 0,
+    "software_gates": {
+      "alsa_guest_preflight": true,
+      "soundctl_amixer_settings": true,
+      "doom_freedoom_long_run": true
+    }
+  },
+  "physical_host_inventory": {
+    "pci_audio": [
+      "AMD Navi 21/23 HDMI/DP Audio Controller [1002:ab28]",
+      "AMD Starship/Matisse HD Audio Controller [1022:1487]"
+    ],
+    "analog_codec": "Realtek ALC897 Analog, host ALSA card 1",
+    "host_pcm_nodes_present": true,
+    "reliefos_physical_driver_run": false,
+    "reason": "The host exposes physical HDA hardware, but the ReliefOS image was not booted natively or given exclusive PCI passthrough. Host Linux enumeration is not ReliefOS codec validation."
+  },
+  "restart_tmp_backup": {
+    "path": "out/audio-hda-u6/tmp-backup-20261003",
+    "size": "9.6G",
+    "manifest": "SHA256SUMS",
+    "verification": "sha256sum -c SHA256SUMS passed for every entry after reboot"
+  },
+  "remaining": [
+    "Investigate the standalone post-Doom lifetime capture overrun and the upstream speaker-test default/native geometry boundary.",
+    "Run ReliefOS on at least two different physical codecs for the approved physical matrix; the current host exposes ALC897 but no ReliefOS native/passthrough run has occurred.",
+    "Visible Xorg GUI is deferred per user direction."
+  ],
+  "project_status": {
+    "formal_progress": "18/19 (about 95%)",
+    "A3_A5": "closed at their documented local source/host/build boundary",
+    "U6": "600-second Doom/60-second load passed on unchanged image with the earlier 4096-frame probe. Default 2048-frame capture probe now has a slow-disk RED/GREEN fix and one complete QEMU short preflight pass; further targeted validation is in progress. Physical matrix remains not run.",
+    "gui_xorg": "deferred"
+  },
+  "capture_probe_repair": {
+    "before_snapshot": ".superpowers/sdd/2026-09-30-intel-hda-audio/u6-capture-before-20261004/before.json",
+    "diagnostic_source": "out/audio-hda-u6/qa/audio-guest-u6-diagnostic.c",
+    "diagnostic_run": "out/audio-hda-u6/qa/dg3",
+    "observed_failure": {
+      "state": "XRUN (4)",
+      "hw_ptr": 3590,
+      "appl_ptr": 1024,
+      "pending_frames": 2566,
+      "buffer_frames": 2048,
+      "errno": 32
+    },
+    "finding": "The observed failure had valid hardware progress but the client fell behind while writing each 512-frame block to disk. This identifies that run's capture backlog; it does not retroactively prove the cause of every historical EPIPE.",
+    "red_log": "out/audio-hda-u6/qa/capture-disk-red-20261004.log",
+    "red_log_sha256": "20d378ab572cb501465978caa51e4b19cf2886d9c8347d7616e144d410da8b0d",
+    "red_result": "Compile exit 0; actual capture test aborts on READI EPIPE after simulated disk latency (exit -6). Other printed FAIL lines are deliberate existing error injections.",
+    "green_build_log": "out/audio-hda-u6/qa/capture-disk-green-build-20261004.log",
+    "green_build_log_sha256": "0c09a4fa4c4a35c58b2bcf99cfba64cb09b37c64356510fa4a42664bc6474f89",
+    "green_result": "Exit 0; ASan/UBSan transport/capture fixture, host/reference/musl ABI, invalid arguments, SDK include orders and target probe build pass.",
+    "guest_probe": "out/audio-hda-u6/qa/audio-guest-u6-capture-fixed",
+    "guest_probe_sha256": "14747b4a433d14a6738e51cbd06c9d9809665a0296caf33b3ac5f64b842cebdd",
+    "geometry": "period 512, buffer 2048 frames (default unchanged)",
+    "first_guest_rerun": {
+      "output": "out/audio-hda-u6/qa/cf1",
+      "command_log": "out/audio-hda-u6/qa/cf1-command.log",
+      "core_preflight_exit": 0,
+      "e2e_wrapper_exit": 1,
+      "result_sha256": "57137172d3eccfe00331d3978000dea91c1834c9a2685d1bf29202d901870927",
+      "e2e_result_sha256": "c1c90f4649aa1213aef6d267debe4e3d021da319f71a0c3d7ee7670cee3777b0",
+      "serial_sha256": "b7b485f54ecbb351362bcc93490c4c2bda8a0ad4348bb964428fde7f379e96e6",
+      "known_capture": "4096 frames / 16384 bytes; 4095 frames match known 400/800Hz input",
+      "remaining_serial_xrun": "A later standalone lifetime capture overrun remains; Doom mode is clean."
+    },
+    "diagnostic_run_limits": "dg1/dg2 captured the expected samples. Their waveform gate counts the additional one-second timer tone without a standard probe and reports about three seconds; those reports remain failures and are not selected as full preflight passes."
+  }
+}
