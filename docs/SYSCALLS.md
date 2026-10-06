@@ -316,7 +316,7 @@ with per-call timeouts. Closing uses standard `close(2)` on the fd.
 The client uses the socket wrappers, follows bounded redirects, decodes chunked
 transfer responses, exposes response headers, content type, body length, final
 URL, redirect count, and truncation flags. It sends plain `HTTP/1.1` for
-`http://`, and uses Mbed TLS 2.28.8 for TLS 1.2, CA-chain, hostname, and clock
+`http://`, and uses Mbed TLS 3.6.7 for TLS 1.2, CA-chain, hostname, and clock
 validation of `https://`. `httpget.elf` and `browser.elf` use this library for
 both schemes. The older fixed-buffer `leonos_net_http_get` helper remains as a
 compatibility wrapper for small diagnostic callers.

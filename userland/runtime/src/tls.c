@@ -9,7 +9,6 @@
 
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/entropy.h>
-#include <mbedtls/entropy_poll.h>
 #include <mbedtls/net_sockets.h>
 #include <mbedtls/platform_util.h>
 #include <mbedtls/ssl.h>
@@ -410,10 +409,8 @@ int reliefos_tls_http_exchange(int socket, const char *hostname,
         printf("[tls] exchange config failed host=%s ret=%d\n", hostname, ret);
         goto cleanup;
     }
-    mbedtls_ssl_conf_min_version(&config, MBEDTLS_SSL_MAJOR_VERSION_3,
-                                 MBEDTLS_SSL_MINOR_VERSION_3);
-    mbedtls_ssl_conf_max_version(&config, MBEDTLS_SSL_MAJOR_VERSION_3,
-                                 MBEDTLS_SSL_MINOR_VERSION_3);
+    mbedtls_ssl_conf_min_tls_version(&config, MBEDTLS_SSL_VERSION_TLS1_2);
+    mbedtls_ssl_conf_max_tls_version(&config, MBEDTLS_SSL_VERSION_TLS1_2);
     mbedtls_ssl_conf_authmode(&config, MBEDTLS_SSL_VERIFY_REQUIRED);
     mbedtls_ssl_conf_ca_chain(&config, &reliefos_tls_roots, 0);
     mbedtls_ssl_conf_rng(&config, mbedtls_ctr_drbg_random, &drbg);
@@ -564,10 +561,8 @@ int reliefos_tls_http_stream(int socket, const char *hostname,
         printf("[tls] stream config failed host=%s ret=%d\n", hostname, ret);
         goto cleanup;
     }
-    mbedtls_ssl_conf_min_version(&config, MBEDTLS_SSL_MAJOR_VERSION_3,
-                                 MBEDTLS_SSL_MINOR_VERSION_3);
-    mbedtls_ssl_conf_max_version(&config, MBEDTLS_SSL_MAJOR_VERSION_3,
-                                 MBEDTLS_SSL_MINOR_VERSION_3);
+    mbedtls_ssl_conf_min_tls_version(&config, MBEDTLS_SSL_VERSION_TLS1_2);
+    mbedtls_ssl_conf_max_tls_version(&config, MBEDTLS_SSL_VERSION_TLS1_2);
     mbedtls_ssl_conf_authmode(&config, MBEDTLS_SSL_VERIFY_REQUIRED);
     mbedtls_ssl_conf_ca_chain(&config, &reliefos_tls_roots, 0);
     mbedtls_ssl_conf_rng(&config, mbedtls_ctr_drbg_random, &drbg);

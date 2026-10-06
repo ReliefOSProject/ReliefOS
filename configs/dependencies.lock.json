@@ -2156,7 +2156,7 @@
     {
       "id": "mbedtls",
       "kind": "submodule",
-      "commit": "5a764e5555c64337ed17444410269ff21cb617b1",
+      "commit": "068ff080b369adfac81509f9b57b2afabaf82dc5",
       "directory": "third_party/mbedtls",
       "script": "build.py:kernel",
       "target": "kernel",

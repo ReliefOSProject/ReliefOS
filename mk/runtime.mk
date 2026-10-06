@@ -11,10 +11,11 @@ RUNTIME_INSTALLER_COMPAT_ARCHIVE := $(O)/musl/lib/libleonos-installer.a
 GBK_TABLE := $(O_INCLUDE)/generated/reliefos_gbk_table.h
 PNG_CONFIG := $(O_INCLUDE)/libpng/pnglibconf.h
 
-RUNTIME_MBEDTLS_NAMES := aes asn1parse asn1write base64 bignum cipher cipher_wrap \
- constant_time ctr_drbg ecdh ecdsa ecp ecp_curves entropy gcm md oid pem pk \
- pkparse pk_wrap pkcs5 platform platform_util rsa rsa_internal sha1 sha256 sha512 \
- ssl_ciphersuites ssl_cli ssl_msg ssl_tls x509 x509_crt
+RUNTIME_MBEDTLS_NAMES := aes asn1parse asn1write base64 bignum bignum_core bignum_mod \
+ bignum_mod_raw block_cipher cipher cipher_wrap constant_time ctr_drbg ecdh ecdsa ecp \
+ ecp_curves entropy entropy_poll error gcm md oid pem pk pk_ecc pk_wrap pkcs5 pkparse \
+ pkwrite platform platform_util rsa rsa_alt_helpers sha1 sha256 sha512 \
+ ssl_ciphersuites ssl_client ssl_msg ssl_tls ssl_tls12_client x509 x509_crt
 RUNTIME_ZLIB_NAMES := adler32 compress crc32 deflate infback inffast inflate inftrees trees uncompr zutil
 RUNTIME_PNG_NAMES := png pngerror pngget pngmem pngpread pngread pngrio pngrtran pngrutil \
  pngset pngtrans pngwio pngwrite pngwtran pngwutil

@@ -17,7 +17,6 @@ int64_t reliefos_mbedtls_time(int64_t *seconds);
 
 #define MBEDTLS_CIPHER_MODE_CBC
 #define MBEDTLS_CIPHER_MODE_CTR
-#define MBEDTLS_CIPHER_MODE_GCM
 #define MBEDTLS_PKCS1_V15
 #define MBEDTLS_PKCS1_V21
 #define MBEDTLS_ECP_DP_SECP256R1_ENABLED
@@ -63,7 +62,8 @@ int64_t reliefos_mbedtls_time(int64_t *seconds);
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM 0
 #define MBEDTLS_ECP_NIST_OPTIM
 #define MBEDTLS_ENTROPY_MAX_SOURCES 1
-#define MBEDTLS_SSL_MAX_CONTENT_LEN 16384
+#define MBEDTLS_SSL_IN_CONTENT_LEN 16384
+#define MBEDTLS_SSL_OUT_CONTENT_LEN 16384
 #define MBEDTLS_SSL_CIPHERSUITES \
     MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, \
     MBEDTLS_TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, \
@@ -72,7 +72,5 @@ int64_t reliefos_mbedtls_time(int64_t *seconds);
     MBEDTLS_TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, \
     MBEDTLS_TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA, \
     0
-
-#include <mbedtls/check_config.h>
 
 #endif

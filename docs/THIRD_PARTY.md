@@ -42,7 +42,7 @@ commits are the revisions recorded by the ReliefOS checkout.
 | `third_party/busybox` | `https://github.com/mirror/busybox.git` | `1a64f6a20aaf6ea4dbba68bbfa8cc1ab7e5c57c4` |
 | `third_party/libpng` | `https://github.com/pnggroup/libpng.git` | `3061454d980de7d53608f594194cfac722721d2a` |
 | `third_party/litehtml` | `https://github.com/litehtml/litehtml.git` | `b9e89f0b9494ff9a5f008800af35503efabddf59` |
-| `third_party/mbedtls` | `https://github.com/Mbed-TLS/mbedtls.git` | `5a764e5555c64337ed17444410269ff21cb617b1` |
+| `third_party/mbedtls` | `https://github.com/Mbed-TLS/mbedtls.git` | `068ff080b369adfac81509f9b57b2afabaf82dc5` |
 | `third_party/ncurses` | `https://github.com/ThomasDickey/ncurses-snapshots.git` | `0096bd402c4a9c8f39bd7ed266e1b8920327e4d8` |
 | `third_party/musl` | `https://git.musl-libc.org/git/musl` | `9fa28ece75d8a2191de7c5bb53bed224c5947417` |
 | `third_party/mimalloc` | `https://github.com/microsoft/mimalloc` | `34fbd7e7cd4627424490afe19b20f8066bfc537d` |
@@ -57,8 +57,8 @@ commits are the revisions recorded by the ReliefOS checkout.
 
 - Path: `third_party/mbedtls`
 - Upstream: `https://github.com/Mbed-TLS/mbedtls.git`
-- Version: `2.28.8`
-- Git submodule commit: `5a764e5555c64337ed17444410269ff21cb617b1` (`v2.28.8`)
+- Version: `3.6.7`
+- Git submodule commit: `068ff080b369adfac81509f9b57b2afabaf82dc5` (`v3.6.7`)
 - License: Apache-2.0 (selected from the upstream dual Apache-2.0 or
   GPL-2.0-or-later terms; see `third_party/mbedtls/LICENSE`).
 

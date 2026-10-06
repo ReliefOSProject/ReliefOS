@@ -21,7 +21,7 @@ Runtime, libraries, and applications
 ------------------------------------
 
 * GNU GRUB 2: GPL-3.0-or-later. See the GRUB source and boot artifacts.
-* Mbed TLS 2.28.8: Apache-2.0 OR GPL-2.0-or-later. See
+* Mbed TLS 3.6.7: Apache-2.0 OR GPL-2.0-or-later. See
   third_party/mbedtls/LICENSE.
 * musl 1.2.6: MIT and upstream notices; see third_party/musl/COPYRIGHT.
 * mimalloc 3.5.1: MIT; see third_party/mimalloc/LICENSE.
