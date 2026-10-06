@@ -359,8 +359,9 @@ It follows bounded redirects, reports final URL/status/content type, copies
 response headers, decodes chunked transfer bodies, and returns truncation flags
 for callers with small buffers. `httpget.elf`, `browser.elf`, and
 `downloadmgr.elf` use this library for `http://` and `https://` traffic;
-lower-level tools such as `ping.elf` and `netctl.elf` continue to use
-ICMP/DHCP/DNS/socket status APIs directly. HTTPS uses a TLS 1.2 Mbed TLS client
+`netctl.elf` continues to use DHCP/DNS/socket status APIs directly.
+The BusyBox `ping` command uses the Linux ICMP socket interface. HTTPS uses a
+TLS 1.2 Mbed TLS client
 profile, a bundled CA store, hostname validation, and a valid system clock. TCP
 server/listener sockets, UDP sockets, cookies, cache, and full TCP window
 management are still out of scope for this ABI version.

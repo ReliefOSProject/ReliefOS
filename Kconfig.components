@@ -653,25 +653,6 @@ config RELIEFOS_COMPONENT_APP_NETCTL_SDK
     default n
     depends on RELIEFOS_COMPONENT_APP_NETCTL_BUILD
 
-config RELIEFOS_COMPONENT_APP_PING_BUILD
-    bool "Build Ping"
-    default y
-
-config RELIEFOS_COMPONENT_APP_PING_IMAGE
-    bool "Include Ping in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_PING_BUILD
-
-config RELIEFOS_COMPONENT_APP_PING_ENTRY
-    bool "Generate a desktop entry for Ping"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_PING_BUILD
-
-config RELIEFOS_COMPONENT_APP_PING_SDK
-    bool "Include Ping in the developer SDK"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_PING_BUILD
-
 config RELIEFOS_COMPONENT_APP_HTTPGET_BUILD
     bool "Build HTTP client"
     default y

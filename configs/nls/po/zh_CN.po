@@ -106,10 +106,6 @@ msgstr "，解析 "
 msgid " source limit reached"
 msgstr " 源码已截断"
 
-#: userland/apps/ping/main.c:222
-msgid " while pinging "
-msgstr "，目标 "
-
 #: userland/runtime/src/ui.c:1767
 msgid "(none)"
 msgstr "(无)"
@@ -149,10 +145,6 @@ msgstr "ABI"
 #: userland/apps/apiapp/main.c:624
 msgid "API Installer"
 msgstr "API 安装程序"
-
-#: userland/apps/ping/main.c:239
-msgid "ARP + IPv4 + ICMP Echo over Intel e1000"
-msgstr "Intel e1000 上的 ARP + IPv4 + ICMP Echo"
 
 #: userland/apps/browser/util.c:158
 msgid "ARP timeout"
@@ -437,10 +429,6 @@ msgstr "参数无效"
 #: userland/apps/browser/util.c:186
 msgid "Bad socket"
 msgstr "Socket 无效"
-
-#: userland/apps/ping/main.c:144
-msgid "Bad target address"
-msgstr "目标地址无效"
 
 #: userland/apps/notepad/main.c:683
 msgid "Beginning"
@@ -905,10 +893,6 @@ msgstr "无法保存内核调试模式状态。"
 #: userland/apps/imageview/main.c:398
 msgid "Could not read image."
 msgstr "无法读取图片。"
-
-#: userland/apps/ping/main.c:173
-msgid "Could not read network configuration."
-msgstr "无法读取网络配置。"
 
 #: userland/apps/osver/main.c:231
 msgid "Could not read system version information"
@@ -1878,10 +1862,6 @@ msgstr "主页"
 msgid "Host:"
 msgstr "主机:"
 
-#: userland/apps/ping/main.c:265
-msgid "ICMP Echo test"
-msgstr "ICMP Echo 测试"
-
 #: userland/apps/netctl/main.c:628
 msgid "IPv4:"
 msgstr "IPv4:"
@@ -2029,10 +2009,6 @@ msgstr "整数计算器"
 #: userland/apps/netctl/main.c:616
 msgid "Intel e1000 Network"
 msgstr "Intel e1000 网络"
-
-#: userland/apps/ping/main.c:198
-msgid "Invalid IPv4 address"
-msgstr "IPv4 地址无效"
 
 #: userland/apps/fileman/model.c:810
 msgid "Invalid UID or GID"
@@ -2398,10 +2374,6 @@ msgstr "模式"
 msgid "Mode Value"
 msgstr "权限数值"
 
-#: userland/apps/ping/main.c:238
-msgid "Mode:"
-msgstr "模式:"
-
 #: userland/apps/drvmgr/main.c:188
 msgid "Modules run in Ring 0. Changes take effect immediately."
 msgstr "模块运行于 Ring 0，修改立即生效。"
@@ -2518,14 +2490,6 @@ msgstr "网络失败"
 msgid "Network failure"
 msgstr "网络失败"
 
-#: userland/apps/ping/main.c:207
-msgid "Network ioctl failed"
-msgstr "网络 ioctl 失败"
-
-#: userland/apps/ping/main.c:234
-msgid "Network:"
-msgstr "网络:"
-
 #: userland/apps/notepad/main.c:677
 msgid "New"
 msgstr "新建"
@@ -2629,10 +2593,6 @@ msgstr "没有文档"
 #: userland/apps/browser/util.c:156
 msgid "No e1000 adapter"
 msgstr "没有 e1000 网卡"
-
-#: userland/apps/ping/main.c:138
-msgid "No e1000 adapter is active"
-msgstr "没有活动的 e1000 网卡"
 
 #: userland/apps/login/main.c:125
 msgid "No enabled accounts"
@@ -3050,14 +3010,6 @@ msgstr "个性化设置已更新"
 msgid "Personalize"
 msgstr "个性化"
 
-#: userland/apps/ping/main.c:233
-msgid "Ping"
-msgstr "Ping"
-
-#: userland/apps/ping/main.c:219
-msgid "Ping completed"
-msgstr "Ping 完成"
-
 #: userland/apps/fileman/actions.c:135
 msgid "Place shortcut on Desktop? No creates it here."
 msgstr "是否放到桌面？选择“否”则放在当前目录。"
@@ -3294,14 +3246,6 @@ msgstr "重新打开应用后生效"
 msgid "Replace boot, system, EFI and bundled docs. Then choose changed or missing system apps."
 msgstr "替换 boot、system、EFI 和内置文档，然后选择变化或缺失的系统程序。"
 
-#: userland/apps/ping/main.c:214
-msgid "Reply from "
-msgstr "来自 "
-
-#: userland/apps/ping/main.c:142
-msgid "Request timed out"
-msgstr "请求超时"
-
 #: userland/apps/sysconfdialog/main.c:71
 msgid "Requesting application"
 msgstr "申请应用"
@@ -3397,10 +3341,6 @@ msgstr "还原失败"
 #: userland/apps/dynlinkerror/main.c:39
 msgid "Restore the library from the system image, then try again."
 msgstr "请从系统镜像恢复该库，然后重试。"
-
-#: userland/apps/ping/main.c:236
-msgid "Result:"
-msgstr "结果:"
 
 #: userland/apps/browser/navigation.c:528
 msgid "Retrying form submission..."
@@ -3649,10 +3589,6 @@ msgstr "正在发送 HTTP GET..."
 #: userland/apps/httpget/main.c:250
 msgid "Sending HTTPS GET..."
 msgstr "正在发送 HTTPS GET..."
-
-#: userland/apps/ping/main.c:203
-msgid "Sending ICMP Echo request..."
-msgstr "正在发送 ICMP Echo 请求..."
 
 #: userland/apps/devmgr/main.c:93
 msgid "Serial"
@@ -4046,10 +3982,6 @@ msgstr "Tar解压成功"
 msgid "Tar finalize failed"
 msgstr "Tar收尾失败"
 
-#: userland/apps/ping/main.c:231
-msgid "Target IPv4:"
-msgstr "目标 IPv4:"
-
 #: userland/apps/installer/main.c:3260
 msgid "Target disk is ready."
 msgstr "目标硬盘已准备就绪。"
@@ -4181,10 +4113,6 @@ msgstr "无法把表单提交地址解析为 HTTP。"
 #: userland/apps/installer/main.c:1218
 msgid "The installed system will use the same language."
 msgstr "安装后的操作系统将使用相同语言。"
-
-#: userland/apps/ping/main.c:208
-msgid "The kernel rejected the ping request."
-msgstr "内核拒绝了 ping 请求。"
 
 #: userland/apps/installer/main.c:1460
 msgid "The selected disk will be erased and formatted with a FAT32 ESP and ext2 system root."
@@ -4461,10 +4389,6 @@ msgstr "请使用打开、文件资源管理器、运行或命令行打开 BMP �
 #: userland/apps/settings/main.c:1390
 msgid "Use as default"
 msgstr "设为默认"
-
-#: userland/apps/ping/main.c:199
-msgid "Use dotted decimal form, for example 10.0.2.2."
-msgstr "请输入类似 10.0.2.2 的 IPv4 地址。"
 
 #: userland/apps/browser/navigation.c:812
 msgid "Use http://, https://, about:, or a ReliefOS file path such as /file.html."

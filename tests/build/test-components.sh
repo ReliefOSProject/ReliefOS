@@ -12,6 +12,10 @@ grep '^RELIEFOS_COMPONENT_APPS :=.* desktop ' "$tmp/out"
 cp "$tmp/out" "$tmp/before"
 "$tmp/parser" --input "$root/configs/components.toml" --config "$tmp/config" --output "$tmp/out"
 cmp "$tmp/out" "$tmp/before"
+if grep -E '^RELIEFOS_COMPONENT_(APPS|ENTRY_APPS) :=.*(^|[[:space:]])ping([[:space:]]|$)' "$tmp/out"; then
+    echo 'standalone network command was included as an application' >&2
+    exit 1
+fi
 printf 'version = 1\n[[components]]\nid = "../escape"\n' > "$tmp/bad"
 if "$tmp/parser" --input "$tmp/bad" --config "$tmp/config" --output "$tmp/out"; then exit 1; fi
 cmp "$tmp/out" "$tmp/before"

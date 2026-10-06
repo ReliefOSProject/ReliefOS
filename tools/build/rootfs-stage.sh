@@ -40,6 +40,17 @@ for spec in auth pam; do
         if [ -d "$input" ]; then tree "$input" "$directory" "$spec"; fi
     done
 done
+for package in ncurses; do
+    if enabled "$package"; then
+        # Only runtime data and commands belong in the root (development static
+        # archives/headers are exported by SDK rules instead).
+        for directory in bin share; do
+            input=$out/upstream/$package/root/usr/$directory
+            if [ -d "$input" ]; then tree "$input" "usr/$directory" "$package"; fi
+        done
+        tree "$out/upstream/ncurses/root/usr/share/terminfo" etc/terminfo ncurses
+    fi
+done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
 printf '%s\n' "$desktop_backend" > "$work/data/desktop-backend"
@@ -139,17 +150,6 @@ for app in busybox sl; do
         link "usr/lib/reliefos/apps/$app/$app.elf" "$target" "$app"
     fi
 done
-for package in ncurses; do
-    if enabled "$package"; then
-        # Only runtime data and commands belong in the root (development static
-        # archives/headers are exported by SDK rules instead).
-        for directory in bin share; do
-            input=$out/upstream/$package/root/usr/$directory
-            if [ -d "$input" ]; then tree "$input" "usr/$directory" "$package"; fi
-        done
-        tree "$out/upstream/ncurses/root/usr/share/terminfo" etc/terminfo ncurses
-    fi
-done
 for app in fastfetch sl; do
     if enabled "$app"; then file "$out/userland/$app.elf" "usr/bin/$app" 0755 "$app" override; fi
 done
@@ -231,21 +231,9 @@ done
 if enabled busybox; then
     file "$out/userland/busybox.elf" bin/busybox 0755 busybox
     link bin/sh busybox busybox override
-    # Append only unclaimed applets; upstream commands and explicit links win.
-    while IFS= read -r guest; do
-        case $guest in /bin/*|/sbin/*|/usr/bin/*|/usr/sbin/*) ;; *) echo "invalid BusyBox link: $guest" >&2; exit 1 ;; esac
-        case $guest in */../*|*/./*|*/busybox) echo 'unsafe BusyBox path' >&2; exit 1 ;; esac
-        if awk -F '\t' -v path="$guest" '$3==path{found=1} END{exit !found}' "$plan"; then continue; fi
-        # Tree rules also own actual paths; ask whether the original stage has it.
-        claimed=0
-        for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs alsa-lib alsa-utils nuked-opl3 ncurses; do
-            case $package in ncurses) enabled "$package" || continue ;; esac
-            if [ -e "$out/upstream/$package/root$guest" ] || [ -L "$out/upstream/$package/root$guest" ]; then claimed=1; break; fi
-        done
-        [ "$claimed" = 0 ] || continue
-        case $guest in /bin/*) target=busybox ;; /sbin/*) target=../bin/busybox ;; *) target=../../bin/busybox ;; esac
-        link "${guest#/}" "$target" busybox
-    done < "$out/userland/busybox.links"
+    # The selected plan owns commands across all four executable directories.
+    sh "$src/tools/build/busybox-links.sh" "$plan" "$out/userland/busybox.links" > "$work/busybox.plan"
+    cat "$work/busybox.plan" >> "$plan"
 fi
 # Generated inputs retain stable, inspectable source paths in the JSON manifest.
 inputs=$(dirname "$dest")/inputs

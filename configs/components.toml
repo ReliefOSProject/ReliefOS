@@ -478,19 +478,6 @@ sdk = false
 api = false
 
 [[components]]
-id = "ping"
-symbol = "APP_PING"
-label = "Ping"
-category = "Network and multimedia"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = false
-sdk = false
-api = false
-
-[[components]]
 id = "httpget"
 symbol = "APP_HTTPGET"
 label = "HTTP client"
