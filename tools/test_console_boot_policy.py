@@ -70,7 +70,7 @@ class ConsoleBootPolicyTests(unittest.TestCase):
         console = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
         for event in ("desktop-backend=xorg", "xdm started on vt1"):
             self.assertIn(event, launcher)
-        for event in ("PAM authentication accepted", "twm started for uid=", "xterm started", "xdm session ended"):
+        for event in ("PAM authentication accepted", "icewm started for uid=", "xterm started", "xdm session ended"):
             self.assertIn(event, session)
         self.assertIn("/var/log/xdm.log", launcher)
         self.assertIn("state_dir=/run/reliefos/xdm", launcher)

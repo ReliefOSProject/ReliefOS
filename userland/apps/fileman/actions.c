@@ -34,14 +34,7 @@ void open_selected_entry(void)
         extract_tar_with_path(path);
         return;
     }
-#ifdef CONFIG_DESKTOP_BACKEND_XORG
     pid = fileman_launch_path(path);
-#else
-    {
-        char *argv[] = {path, 0};
-        pid = reliefos_launch_argv(argv);
-    }
-#endif
     if (pid < 0) {
         if (pid == LAUNCH_RESULT_NO_ASSOCIATION) {
             show_open_with_for_path(path, 0);
@@ -92,14 +85,10 @@ void create_new_folder(void)
         set_status(T("Folder name is empty"));
         return;
     }
-#ifdef CONFIG_DESKTOP_BACKEND_XORG
     if (!fileman_name_valid(name) || fileman_join_path(path, sizeof(path), current_path, name) < 0) {
         set_status(T("Invalid folder name or path too long"));
         return;
     }
-#else
-    build_child_path(path, sizeof(path), name);
-#endif
     ret = mkdir(path, 0777);
     if (ret < 0) {
         uint32_t elevated_count = 0;
@@ -206,7 +195,6 @@ void rename_selected_entry(void)
         return;
     }
     build_child_path(old_path, sizeof(old_path), entries[file_list.selected].name);
-#ifdef CONFIG_DESKTOP_BACKEND_XORG
     if (!fileman_name_valid(name) || fileman_join_path(new_path, sizeof(new_path), current_path, name) < 0) {
         set_status(T("Invalid file name or path too long"));
         return;
@@ -217,9 +205,6 @@ void rename_selected_entry(void)
         set_status(T("Rename canceled"));
         return;
     }
-#else
-    build_child_path(new_path, sizeof(new_path), name);
-#endif
     ret = rename(old_path, new_path);
     if (ret < 0) {
         uint32_t elevated_count = 0;

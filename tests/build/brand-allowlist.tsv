@@ -206,6 +206,8 @@ main	history	docs/superpowers/plans/2026-09-24-ntclks-separation-agent-prompt.md
 main	history	docs/superpowers/plans/2026-09-27-ext4-driver.md	historical material
 main	history	docs/superpowers/plans/2026-09-28-reliefos-ext4.md	historical ext4 implementation plan; superseded and excluded from current driver work
 main	history	docs/superpowers/plans/2026-09-27-reliefos-reliefnt-rename.md	migration plan quotes old names
+main	history	docs/superpowers/progress/2026-10-04-u6-lifecycle-audit.json	audit evidence records historical artifact paths
+main	history	docs/superpowers/progress/2026-10-04-vmware-hda-wavplay-handoff.md	historical handoff quotes the user VM name
 main	history	docs/superpowers/specs/2026-09-24-ntclks-separation-design.md	historical material
 main	history	docs/superpowers/specs/2026-09-27-ext4-driver-design.md	historical material
 main	history	docs/superpowers/specs/2026-09-27-reliefos-reliefnt-rename-baseline.md	pre-migration scan evidence

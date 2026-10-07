@@ -4,16 +4,6 @@
 set -eu
 [ "$#" = 9 ] || { echo 'usage: rootfs-stage SRC O CONFIG METADATA STAGE_TOOL LAYOUT_TOOL DEST MANIFEST EPOCH' >&2; exit 2; }
 src=$1 out=$2 config=$3 metadata=$4 stage_tool=$5 layout_tool=$6 dest=$7 manifest=$8 epoch=$9
-reliefos_enabled=$(grep -Fxc 'CONFIG_DESKTOP_BACKEND_RELIEFOS=y' "$config" || true)
-xorg_enabled=$(grep -Fxc 'CONFIG_DESKTOP_BACKEND_XORG=y' "$config" || true)
-case "$reliefos_enabled:$xorg_enabled" in
-    1:0) desktop_backend=reliefos ;;
-    0:1) desktop_backend=xorg ;;
-    *)
-        echo 'rootfs-stage: exactly one desktop backend must be enabled' >&2
-        exit 2
-        ;;
-esac
 mkdir -p "$(dirname "$dest")"
 work=$(mktemp -d "$dest.new.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -62,24 +52,25 @@ for spec in auth pam; do
 done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
-printf '%s\n' "$desktop_backend" > "$work/data/desktop-backend"
+# Runtime marker: the installer media rewrites it to reliefos for its native
+# session; product images always boot the X11 session.
+printf '%s\n' xorg > "$work/data/desktop-backend"
 file "$work/data/desktop-backend" etc/reliefos/desktop-backend 0644 product-policy override
-if [ "$desktop_backend" = xorg ]; then
-    for service in reliefos-windowd reliefos-session; do
-        record x - "/etc/runlevels/default/$service" 0000 product-policy override
-    done
-    file "$src/system/xorg/xorg.conf" etc/X11/xorg.conf 0644 product-policy override
-    file "$src/system/xorg/reliefos-xdm" usr/lib/reliefos/reliefos-xdm 0755 reliefos-apps override
-    file "$src/system/xorg/xorg-tty-wrapper" usr/lib/reliefos/xorg-tty-wrapper 0755 reliefos-apps override
-    file "$src/system/xorg/xdm.conf" etc/reliefos/xdm.conf 0644 product-policy override
-    file "$src/system/xorg/xdm-Xservers" etc/reliefos/xdm-Xservers 0644 product-policy override
-    file "$src/system/xorg/xdm-session" etc/reliefos/xdm-session 0755 reliefos-apps override
-    file "$src/system/xorg/xdm-session" usr/lib/reliefos/xdm-session 0755 reliefos-apps override
-    file "$src/system/xorg/xdm-setup" usr/lib/reliefos/xdm-setup 0755 reliefos-apps override
-    file "$src/system/xorg/twmrc" etc/reliefos/twmrc 0644 product-policy override
-    file "$src/system/xorg/wallpaper.png" etc/reliefos/wallpaper.png 0644 product-policy override
-    file "$src/system/xorg/pam-xdm" etc/pam.d/xdm 0644 product-policy override
-fi
+for service in reliefos-windowd reliefos-session; do
+    record x - "/etc/runlevels/default/$service" 0000 product-policy override
+done
+file "$src/system/xorg/xorg.conf" etc/X11/xorg.conf 0644 product-policy override
+file "$src/system/xorg/reliefos-xdm" usr/lib/reliefos/reliefos-xdm 0755 reliefos-apps override
+file "$src/system/xorg/xorg-tty-wrapper" usr/lib/reliefos/xorg-tty-wrapper 0755 reliefos-apps override
+file "$src/system/xorg/xdm.conf" etc/reliefos/xdm.conf 0644 product-policy override
+file "$src/system/xorg/xdm-Xservers" etc/reliefos/xdm-Xservers 0644 product-policy override
+file "$src/system/xorg/xdm-session" etc/reliefos/xdm-session 0755 reliefos-apps override
+file "$src/system/xorg/xdm-session" usr/lib/reliefos/xdm-session 0755 reliefos-apps override
+file "$src/system/xorg/xdm-setup" usr/lib/reliefos/xdm-setup 0755 reliefos-apps override
+# IceWM reads its whole configuration from this directory (ICEWM_PRIVCFG).
+tree "$src/system/xorg/icewm" etc/reliefos/icewm product-policy override
+file "$src/system/xorg/wallpaper.png" etc/reliefos/wallpaper.png 0644 product-policy override
+file "$src/system/xorg/pam-xdm" etc/pam.d/xdm 0644 product-policy override
 legacy=$src/system/rootfs/var/lib/leonos/users.db
 if [ -e "$legacy" ] || [ -L "$legacy" ]; then
     [ ! -L "$legacy" ] && [ "$(od -An -tx1 "$legacy" | tr -d ' \n')" = 3253554100000000 ] || { echo 'populated legacy account seed requires recovery' >&2; exit 1; }

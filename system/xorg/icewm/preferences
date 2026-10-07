@@ -1,0 +1,37 @@
+# ReliefOS IceWM preferences (2026-10).
+#
+# xdm-session starts icewm with ICEWM_PRIVCFG=/etc/reliefos/icewm, so this
+# directory is the single configuration source: the selected theme lives in the
+# "theme" file, the application/menu/toolbar/key definitions in menu, toolbar
+# and keys.  Only values that differ from the IceWM defaults are listed.
+
+Look="nice"
+
+# One workspace and a taskbar along the bottom edge.
+Workspaces=1
+TaskBarAtTop=0
+TaskbarAutoHide=0
+ShowTaskBar=1
+TaskBarClock=1
+TaskBarWorkspacesLeft=1
+TaskBarShowCPUStatus=0
+TaskBarShowNetStatus=0
+TaskBarShowMailboxStatus=0
+
+# A click focuses and raises a window; the pointer alone never steals focus.
+ClickToFocus=1
+AutoRaise=0
+
+# Key table of the previous session: Super+Return opens a terminal (see the
+# keys file), Super+Space the root menu, Super+Q closes, Super+M minimises,
+# Super+Z maximises, Super+arrows tile to one screen half.
+KeySysMenu="Super+space"
+KeySysSwitchNext="Alt+Tab"
+KeySysSwitchLast="Alt+Shift+Tab"
+KeyWinClose="Super+q"
+KeyWinMinimize="Super+m"
+KeyWinMaximize="Super+z"
+KeyWinTileTop="Super+Up"
+KeyWinTileBottom="Super+Down"
+KeyWinTileLeft="Super+Left"
+KeyWinTileRight="Super+Right"

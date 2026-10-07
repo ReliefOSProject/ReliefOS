@@ -15,13 +15,11 @@
 #include <sys/stat.h>
 #include "boundary.h"
 
-#ifdef CONFIG_DESKTOP_BACKEND_XORG
 int fileman_input_dialog(const char *title, const char *prompt, char *value, uint32_t capacity);
 int fileman_confirm_dialog(const char *title, const char *message, uint32_t default_yes);
 int fileman_launch_path(const char *path);
 #define reliefos_ui_show_input_dialog fileman_input_dialog
 #define reliefos_ui_show_confirm_dialog fileman_confirm_dialog
-#endif
 
 #define FILEMAN_W 560
 #define FILEMAN_H 360
@@ -120,8 +118,6 @@ struct fileman_tree_node {
     uint8_t has_children;
 };
 
-extern uint32_t pixels[FILEMAN_MAX_W * FILEMAN_MAX_H];
-extern uint32_t details_pixels[FILEMAN_DETAILS_W * FILEMAN_DETAILS_H];
 extern struct reliefos_dir_entry entries[FILEMAN_MAX_ENTRIES];
 extern char current_path[RELIEFOS_FS_PATH_LEN];
 extern char home_path[RELIEFOS_AUTH_HOME_LEN];

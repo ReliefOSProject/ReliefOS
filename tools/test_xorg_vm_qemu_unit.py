@@ -66,22 +66,22 @@ class EvidenceTests(unittest.TestCase):
     def test_lifecycle_events_require_real_order(self):
         log = "\n".join([
             "PAM authentication accepted",
-            "twm started for uid=1000",
+            "icewm started for uid=1000",
             "xterm started",
             "xdm session ended",
             "tty1 restored to text login",
         ])
         self.assertEqual(lifecycle_events(log), [
             "PAM authentication accepted",
-            "twm started for uid",
+            "icewm started for uid",
             "xterm started",
             "xdm session ended",
             "tty1 restored to text login",
         ])
         require_event_order(log)
 
-    def test_lifecycle_order_rejects_missing_or_root_twm(self):
-        root_log = "PAM authentication accepted\ntwm started for uid=0\nxterm started\n"
+    def test_lifecycle_order_rejects_missing_or_root_icewm(self):
+        root_log = "PAM authentication accepted\nicewm started for uid=0\nxterm started\n"
         with self.assertRaises(AssertionError):
             require_event_order(root_log)
         missing = "PAM authentication accepted\nxterm started\n"

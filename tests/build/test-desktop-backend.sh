@@ -7,20 +7,18 @@ work=${TMPDIR:-/tmp}/reliefos-desktop-backend.$$
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 mkdir -p "$work"
 
-grep -q '^config DESKTOP_BACKEND_RELIEFOS$' Kconfig
-grep -q '^config DESKTOP_BACKEND_XORG$' Kconfig
-grep -q '^CONFIG_DESKTOP_BACKEND_RELIEFOS=y$' configs/default.conf
-! grep -q '^CONFIG_DESKTOP_BACKEND_XORG=y$' configs/default.conf
+# The Motif X11 frontend is the only desktop frontend; the backend choice is
+# gone from the configuration.
+if grep -q 'DESKTOP_BACKEND' Kconfig configs/default.conf; then
+    echo 'desktop backend choice is still configurable' >&2
+    exit 1
+fi
 
 make -s O="$work/default" defconfig
-grep -q '^CONFIG_DESKTOP_BACKEND_RELIEFOS=y$' "$work/default/config/.config"
-! grep -q '^CONFIG_DESKTOP_BACKEND_XORG=y$' "$work/default/config/.config"
-
-mkdir -p "$work/xorg/config"
-printf '%s\n' 'CONFIG_DESKTOP_BACKEND_XORG=y' > "$work/xorg/config/.config"
-make -s O="$work/xorg" olddefconfig
-grep -q '^CONFIG_DESKTOP_BACKEND_XORG=y$' "$work/xorg/config/.config"
-! grep -q '^CONFIG_DESKTOP_BACKEND_RELIEFOS=y$' "$work/xorg/config/.config"
+if grep -q 'DESKTOP_BACKEND' "$work/default/config/.config"; then
+    echo 'defconfig still emits desktop backend symbols' >&2
+    exit 1
+fi
 
 hostcc=${HOSTCC:-cc}
 mkdir -p "$work/src/system" "$work/out"
@@ -92,30 +90,17 @@ printf '%s\n' /bin/sh /bin/ash /bin/false /bin/ping /bin/ping6 /bin/hexdump \
 "$hostcc" -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
     "$repo_root/tools/host/manifest/reliefos-layout.c" -o "$work/layout"
 
-run_rootfs_stage() {
-    backend=$1
-    config=$work/$backend.config
-    dest=$work/$backend-root
-    manifest=$work/$backend-manifest.json
-    cat > "$config" <<CONFIG
-CONFIG_DESKTOP_BACKEND_RELIEFOS=$(test "$backend" = reliefos && printf y || printf n)
-CONFIG_DESKTOP_BACKEND_XORG=$(test "$backend" = xorg && printf y || printf n)
+cat > "$work/rootfs.config" <<CONFIG
 CONFIG_RPR_BASE_URL="https://example.invalid/rpr"
 CONFIG_VMDK_DEFAULT_LANG="zh_CN.UTF-8"
 CONFIG
-    ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux ncurses fixture-provider' \
-    sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
-        "$config" "$work/metadata" "$work/stage" "$work/layout" \
-        "$dest" "$manifest" 1700000000
-    printf '%s\n' "$dest"
-}
+ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux ncurses fixture-provider' \
+sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
+    "$work/rootfs.config" "$work/metadata" "$work/stage" "$work/layout" \
+    "$work/root" "$work/manifest.json" 1700000000
+xorg_root=$work/root
 
-reliefos_root=$(run_rootfs_stage reliefos)
-xorg_root=$(run_rootfs_stage xorg)
-grep -qx reliefos "$reliefos_root/etc/reliefos/desktop-backend"
 grep -qx xorg "$xorg_root/etc/reliefos/desktop-backend"
-test -L "$reliefos_root/etc/runlevels/default/reliefos-windowd"
-test -L "$reliefos_root/etc/runlevels/default/reliefos-session"
 test ! -e "$xorg_root/etc/runlevels/default/reliefos-windowd"
 test ! -e "$xorg_root/etc/runlevels/default/reliefos-session"
 test -f "$xorg_root/etc/X11/xorg.conf"
@@ -126,8 +111,15 @@ test -x "$xorg_root/usr/lib/reliefos/reliefos-xdm"
 test -x "$xorg_root/usr/lib/reliefos/xorg-tty-wrapper"
 test -x "$xorg_root/usr/lib/reliefos/xdm-session"
 test -f "$xorg_root/etc/pam.d/xdm"
-test ! -e "$reliefos_root/etc/X11/xorg.conf"
-test ! -e "$reliefos_root/etc/reliefos/xdm.conf"
+# IceWM is the only window manager: its configuration is staged and no old
+# window manager file may survive in the product root.
+test -f "$xorg_root/etc/reliefos/icewm/preferences"
+test -f "$xorg_root/etc/reliefos/icewm/menu"
+test -f "$xorg_root/etc/reliefos/icewm/keys"
+test -f "$xorg_root/etc/reliefos/icewm/themes/light/default.theme"
+test ! -e "$xorg_root/etc/reliefos/twmrc"
+test ! -e "$xorg_root/usr/bin/twm"
+test ! -e "$xorg_root/usr/bin/twm.real"
 test -f "$xorg_root/bin/busybox"
 test -L "$xorg_root/bin/sh"
 test -L "$xorg_root/bin/ash"
@@ -158,18 +150,4 @@ test ! -e "$xorg_root/bin/passwd"
 test -L "$xorg_root/usr/bin/tree"
 test "$(readlink "$xorg_root/usr/bin/tree")" = ../../bin/busybox
 
-cat > "$work/invalid.config" <<'CONFIG'
-CONFIG_DESKTOP_BACKEND_RELIEFOS=n
-CONFIG_DESKTOP_BACKEND_XORG=n
-CONFIG_RPR_BASE_URL="https://example.invalid/rpr"
-CONFIG_VMDK_DEFAULT_LANG="zh_CN.UTF-8"
-CONFIG
-if sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
-    "$work/invalid.config" "$work/metadata" "$work/stage" "$work/layout" \
-    "$work/invalid-root" "$work/invalid-manifest.json" 1700000000 \
-    >/dev/null 2>&1; then
-    echo 'rootfs-stage accepted an invalid desktop backend' >&2
-    exit 1
-fi
-
-printf '%s\n' 'ok - desktop backend Kconfig and rootfs policy'
+printf '%s\n' 'ok - X11 session policy and upstream staging'

@@ -43,4 +43,33 @@ fi
 printf '%s\n' /bin/ash /usr/bin/tree > "$work/empty-links"
 sh "$src/tools/build/busybox-links.sh" "$work/empty-plan" "$work/empty-links" > "$work/empty-generated"
 [ "$(wc -l < "$work/empty-generated")" = 2 ]
+
+# busybox-check contract: the resolved profile is validated too, including the
+# generated .config, because a suppressed link still leaves `busybox NAME`
+# callable when the applet is compiled in.
+for name in sh ash false ping ping6 df free top dmesg hexdump killall nc netstat \
+    traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod \
+    unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch; do
+    printf '/bin/%s\n' "$name"
+done > "$work/check-links"
+: > "$work/check-config"
+sh "$src/tools/build/busybox-check.sh" "$work/check-config" "$work/check-links" > "$work/check-out"
+grep -q 'ownership contract: PASS' "$work/check-out"
+for spec in CONFIG_DD=y CONFIG_CLEAR=y CONFIG_START_STOP_DAEMON=y; do
+    printf '%s\n' "$spec" > "$work/check-bad-config"
+    if sh "$src/tools/build/busybox-check.sh" "$work/check-bad-config" "$work/check-links" > "$work/check-rejected" 2>&1; then
+        echo "busybox-check accepted enabled external applet: $spec" >&2; exit 1
+    fi
+done
+grep -v '^/bin/sh$' "$work/check-links" > "$work/check-no-sh"
+if sh "$src/tools/build/busybox-check.sh" "$work/check-config" "$work/check-no-sh" > "$work/check-rejected" 2>&1; then
+    echo 'busybox-check accepted a profile without /bin/sh' >&2; exit 1
+fi
+grep -v '^/bin/tree$' "$work/check-links" > "$work/check-no-tree"
+if sh "$src/tools/build/busybox-check.sh" "$work/check-config" "$work/check-no-tree" > "$work/check-rejected" 2>&1; then
+    echo 'busybox-check accepted a profile without a required applet' >&2; exit 1
+fi
+if sh "$src/tools/build/busybox-check.sh" "$work/check-config" "$work/links" > "$work/check-rejected" 2>&1; then
+    echo 'busybox-check accepted links owned by other providers' >&2; exit 1
+fi
 printf '%s\n' 'busybox staging ownership and path checks: PASS'

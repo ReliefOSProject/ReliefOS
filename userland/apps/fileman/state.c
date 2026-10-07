@@ -1,9 +1,5 @@
 #include "fileman.h"
 
-#ifndef CONFIG_DESKTOP_BACKEND_XORG
-uint32_t pixels[FILEMAN_MAX_W * FILEMAN_MAX_H];
-uint32_t details_pixels[FILEMAN_DETAILS_W * FILEMAN_DETAILS_H];
-#endif
 struct reliefos_dir_entry entries[FILEMAN_MAX_ENTRIES];
 char current_path[RELIEFOS_FS_PATH_LEN] = "/";
 char home_path[RELIEFOS_AUTH_HOME_LEN];

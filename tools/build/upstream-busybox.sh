@@ -9,6 +9,10 @@ revision=$("$deps" --lock "$lock" --id busybox --print commit)
 mkdir -p "$work/source" "$work/build" "$output"
 git -C "$src/third_party/busybox" archive "$revision" > "$work/source.tar"
 tar -xf "$work/source.tar" -C "$work/source"
+for patch in "$src"/patches/busybox/*.patch; do
+    [ -e "$patch" ] || continue
+    patch -d "$work/source" -p1 < "$patch"
+done
 # Command line overrides from the outer Make must not replace the configured CC.
 SOURCE_DATE_EPOCH=$epoch KBUILD_BUILD_TIMESTAMP=$(date -u -d "@$epoch" '+%Y-%m-%d %H:%M:%S') KBUILD_BUILD_USER=reliefos KBUILD_BUILD_HOST=builder
 export SOURCE_DATE_EPOCH KBUILD_BUILD_TIMESTAMP KBUILD_BUILD_USER KBUILD_BUILD_HOST

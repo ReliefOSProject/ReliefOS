@@ -1,5 +1,11 @@
 # Xorg + TWM + XDM 桌面后端实现计划
 
+> **历史记录（2026-10-02）**：本文是 Xorg 桌面后端首次落地时的设计/实现记录，
+> 文中描述的 TWM 会话与 Kconfig 后端选择均已不再是当前系统。当前默认窗口管理器为
+> **IceWM**，会话与配置见 [`docs/XORG.md`](../../XORG.md)（`system/xorg/icewm/`、
+> `ICEWM_PRIVCFG=/etc/reliefos/icewm`）。本文仅保留作历史存档。
+
+
 > **面向 AI 代理的工作者：** 必需子技能：使用 subagent-driven-development（推荐）或 executing-plans 逐任务实现此计划。步骤使用复选框（`- [ ]`）语法来跟踪进度。
 
 **目标：** 在 `feature/xorg` 分支为 ReliefOS 增加默认原生桌面与 Alpine 官方 Xorg + TWM + XDM 后端的互斥选择，并让 XDM 登录成功后进入 TWM。
@@ -8,7 +14,7 @@
 
 **技术栈：** Kconfig/kconfig-frontends、GNU Make、POSIX `/bin/sh`、Alpine v3.24 x86_64/musl APK、BusyBox init/OpenRC/PAM、Linux fbdev/evdev/VT UAPI、C ABI probes、QEMU/UEFI。
 
-**规格：** `docs/superpowers/specs/2026-10-02-xorg-twm-xdm-design.md`
+**规格：** `docs/superpowers/specs/2026-10-02-xorg-desktop-design.md`
 
 ## 全局约束
 

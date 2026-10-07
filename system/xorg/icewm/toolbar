@@ -1,0 +1,6 @@
+# ReliefOS toolbar shortcuts.
+prog "Terminal" xterm sh /etc/reliefos/icewm/terminal.sh
+prog "File Manager" folder fileman
+prog "Calculator" app calc
+prog "Text editor" file nedit
+prog "Web browser" app dillo

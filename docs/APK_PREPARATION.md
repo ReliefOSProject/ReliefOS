@@ -54,11 +54,12 @@ dependencies and library providers. The real musl loader also has the
 Alpine package versions, blanket `provides`, or `replaces` declarations are used.
 
 The optional Xorg desktop uses the same offline transaction path. Alpine v3.24
-x86_64/musl packages for `xorg-server`, `xorg-server-common`, `twm`, `xdm`,
+x86_64/musl packages for `xorg-server`, `xorg-server-common`, `icewm`, `xdm`,
 `xterm`, `xf86-video-fbdev`, `xf86-input-evdev`, `xkeyboard-config`,
-`font-cursor-misc` and `font-misc-misc`, together with every dependency and
-shared-object provider, are pinned in `configs/dependencies.lock.json` with
-`feature=xorg`. Entries without that field are `feature=base`. `apk-stage.sh`
+`font-cursor-misc` and `font-misc-misc`, together with IceWM's image and sound
+libraries (`imlib2`, `librsvg`, `libao`, `libsndfile` and their providers),
+every other dependency and shared-object provider, are pinned in
+`configs/dependencies.lock.json` with `feature=xorg`. Entries without that field are `feature=base`. `apk-stage.sh`
 reads the raw `/etc/reliefos/desktop-backend` marker and asks `reliefos-deps`
 for each entry's feature; a native root installs only base entries, while an
 Xorg root installs both sets. The package cache may contain both sets, but a

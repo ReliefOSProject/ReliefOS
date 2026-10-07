@@ -11,7 +11,7 @@ EVENTS = [
     re.compile(r"desktop-backend=xorg\b"),
     re.compile(r"xdm started on vt1\b"),
     re.compile(r"PAM authentication accepted\b"),
-    re.compile(r"twm started for uid=(?!0\b)\d+\b"),
+    re.compile(r"icewm started for uid=(?!0\b)\d+\b"),
     re.compile(r"xterm started\b"),
     re.compile(r"xdm session ended\b"),
     re.compile(r"tty1 restored to text login\b"),
@@ -21,11 +21,12 @@ EVENTS = [
 def source_check():
     errors = []
     required = {
-        "docs/XORG.md": ["CONFIG_DESKTOP_BACKEND_XORG", "make fetch", "Dillo", "QEMU"],
+        "docs/XORG.md": ["IceWM", "make fetch", "Dillo", "QEMU"],
         "docs/APK_PREPARATION.md": ["feature=xorg", "xdm", "v3.24"],
         "system/xorg/xdm-Xservers": ["/usr/lib/reliefos/xorg-tty-wrapper", "vt1", "-keeptty"],
-        "system/xorg/xdm-session": ["/usr/bin/twm", "/usr/bin/xterm"],
-        "system/xorg/twmrc": ["xeyes", "Dillo", "NEdit"],
+        "system/xorg/xdm-session": ["/usr/bin/icewm", "/usr/bin/xterm"],
+        "system/xorg/icewm/menu": ["fileman", "calc", "dillo", "nedit"],
+        "system/xorg/icewm/theme": ["Theme="],
     }
     for relative, needles in required.items():
         path = ROOT / relative
@@ -45,11 +46,19 @@ def source_check():
     else:
         if "alpine-pcmanfm" in ids:
             errors.append("alpine-pcmanfm must stay out of the fetch lock")
+        if "alpine-icewm" not in ids:
+            errors.append("configs/dependencies.lock.json: missing alpine-icewm")
+        if "alpine-twm" in ids:
+            errors.append("alpine-twm must stay out of the fetch lock")
         if "coreutils" not in ids:
             errors.append("configs/dependencies.lock.json: missing coreutils package lock for dd")
     session_path = ROOT / "system/xorg/xdm-session"
     if session_path.is_file() and "/var/log/" in session_path.read_text():
         errors.append("xdm-session must not write root-only logs")
+    if (ROOT / "system/xorg/twmrc").exists():
+        errors.append("system/xorg/twmrc must not exist")
+    if session_path.is_file() and re.search(r"\btwm\b", session_path.read_text()):
+        errors.append("xdm-session must not reference twm")
     return errors
 
 
@@ -65,8 +74,8 @@ def log_check(path):
         cursor = match.end()
     if re.search(r"(?i)(password|passwd|cookie|authorization)\s*[:=]", text):
         errors.append("log contains password or authorization material")
-    if re.search(r"twm started for uid=0\b", text):
-        errors.append("TWM must run as a non-root user")
+    if re.search(r"icewm started for uid=0\b", text):
+        errors.append("IceWM must run as a non-root user")
     return errors
 
 

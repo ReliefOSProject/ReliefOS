@@ -24,17 +24,19 @@ include $(ROOT)/mk/userland.mk
 .PHONY: sources
 sources:
 	@printf '%s\n' '$(call userland_sources,calc)' '$(call userland_sources,osver)' '$(call userland_sources,fileman)'
+	@printf '%s\n' '$(USERLAND_LIBS_fileman)'
 MAKE
-for backend in n y; do
-    make -s -f "$work/sources.mk" ROOT="$src" WORK="$work" \
-        KCONFIG_CONFIG_DESKTOP_BACKEND_XORG="$backend" sources >"$work/sources"
-    if [ "$backend" = y ]; then selected=main; excluded=native; else selected=native; excluded=main; fi
-    for app in calc osver fileman; do
-        grep -q "userland/apps/$app/$selected.c" "$work/sources"
-        if grep -q "userland/apps/$app/$excluded.c" "$work/sources"; then
-            printf 'FAIL - %s includes both desktop frontends\n' "$app" >&2
+make -s -f "$work/sources.mk" ROOT="$src" WORK="$work" sources >"$work/sources"
+for app in calc osver fileman; do
+    grep -q "userland/apps/$app/main.c" "$work/sources"
+    for removed in native.c input.c view.c; do
+        if grep -q "userland/apps/$app/$removed" "$work/sources"; then
+            printf 'FAIL - %s still selects native frontend source %s\n' "$app" "$removed" >&2
             exit 1
         fi
     done
 done
-printf 'ok - native and Xorg builds select exactly one frontend per application\n'
+grep -q 'userland/apps/fileman/motif.c' "$work/sources"
+grep -q 'userland/apps/fileman/motif_dialogs.c' "$work/sources"
+grep -q 'libXm.so' "$work/sources"
+printf 'ok - applications build only the Motif X11 frontend\n'

@@ -70,36 +70,42 @@ start_child() {
 
 event 'PAM authentication accepted'
 
-twm_pid=
+icewm_pid=
 xterm_pid=
 cleanup() {
-    for pid in $xterm_pid $twm_pid; do
+    for pid in $xterm_pid $icewm_pid; do
         kill "$pid" 2>/dev/null || :
     done
-    for pid in $xterm_pid $twm_pid; do
+    for pid in $xterm_pid $icewm_pid; do
         wait "$pid" 2>/dev/null || :
     done
 }
 trap cleanup EXIT HUP INT TERM
 
-# Retro pixel-art root background matching the TWM Light theme.  This is a
+# Retro pixel-art root background matching the IceWM Light theme.  This is a
 # best-effort one-shot: on failure the X server keeps its default background.
 if test -x /usr/bin/xwallpaper; then
     /usr/bin/xwallpaper --focus /etc/reliefos/wallpaper.png 2>/dev/null || :
 fi
 
-start_child twm /usr/bin/twm -f /etc/reliefos/twmrc || exit 1
-twm_pid=$child_pid
-event "twm started for uid=$uid"
+# ICEWM_PRIVCFG is the first directory IceWM searches for its configuration, so
+# the session always gets the shipped theme, menu, toolbar and key bindings
+# instead of a user or upstream default.
+ICEWM_PRIVCFG=/etc/reliefos/icewm
+export ICEWM_PRIVCFG
+
+start_child icewm /usr/bin/icewm || exit 1
+icewm_pid=$child_pid
+event "icewm started for uid=$uid"
 
 start_child xterm /usr/bin/xterm -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' || exit 1
 xterm_pid=$child_pid
 event 'xterm started'
 
 # The window manager owns the session lifetime; xterm is torn down with it.
-wait "$twm_pid"
+wait "$icewm_pid"
 status=$?
-twm_pid=
+icewm_pid=
 if test -n "$xterm_pid"; then
     kill "$xterm_pid" 2>/dev/null || :
 fi

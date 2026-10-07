@@ -1,3 +1,8 @@
+> **历史记录（2026-10-02）**：本文是 Xorg 桌面后端首次落地时的设计/实现记录，
+> 文中描述的 TWM 会话与 Kconfig 后端选择均已不再是当前系统。当前默认窗口管理器为
+> **IceWM**，会话与配置见 [`docs/XORG.md`](docs/XORG.md)（`system/xorg/icewm/`、
+> `ICEWM_PRIVCFG=/etc/reliefos/icewm`）。本文仅保留作历史存档。
+
 # ReliefOS Xorg/VMware 图形会话任务 — 交接文档
 
 > 交接时间:2026-10-02(内核版本串 `ReliefNT reliefos 5.0.0 2026-10-02 06:36:36`)

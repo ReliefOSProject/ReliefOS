@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Run the real XDM launcher and session scripts against stub XDM/TWM/xterm.
+"""Run the real XDM launcher and session scripts against stub XDM/IceWM/xterm.
 
 The fixtures execute the unmodified POSIX shell scripts inside a chroot built in
 an unprivileged user namespace, so their absolute guest paths resolve normally
 and the assertions cover the behaviour a booting tty1 would observe: the
 launcher must merge the lifecycle events, record the server return code, drop
 its scratch sink and hand tty1 back to the text getty on every exit path, and
-the session must record PAM -> TWM -> xterm -> session end in that order without
+the session must record PAM -> IceWM -> xterm -> session end in that order without
 ever claiming an "append-only" file that the user could truncate.
 """
 from pathlib import Path
@@ -86,7 +86,8 @@ def build_sandbox(work: Path) -> Path:
     (sandbox / "etc/reliefos/xdm-Xservers").write_text(
         (XORG / "xdm-Xservers").read_text())
     (sandbox / "etc/X11/xorg.conf").write_text("Section \"Device\"\nEndSection\n")
-    (sandbox / "etc/reliefos/twmrc").write_text("randomstr\n")
+    (sandbox / "etc/reliefos/icewm").mkdir(parents=True, exist_ok=True)
+    (sandbox / "etc/reliefos/icewm/preferences").write_text("Theme=\"light/light.theme\"\n")
     return sandbox
 
 
@@ -114,11 +115,18 @@ class XdmLauncherTests(unittest.TestCase):
         return [line.strip() for line in self.log().splitlines()]
 
     def install_session_stubs(self, uid: str = "1000",
-                              twm: str = "exec sleep 2\n",
+                              wm: str = "exec sleep 2\n",
                               xterm: str = "exec sleep 4\n") -> None:
         write_stub(self.sandbox / "usr/bin/id", f'if test "$1" = -u; then echo {uid}; else echo tester; fi\n')
-        write_stub(self.sandbox / "usr/bin/twm", twm)
+        # The stub records its configuration environment so the session can be
+        # held to pointing IceWM at the shipped configuration directory.  No
+        # twm stub exists: a session that still execs /usr/bin/twm fails.
+        write_stub(self.sandbox / "usr/bin/icewm",
+                   'printf \'%s\\n\' "$ICEWM_PRIVCFG" > /run/icewm.privcfg\n' + wm)
         write_stub(self.sandbox / "usr/bin/xterm", xterm)
+
+    def wm_config(self) -> str:
+        return (self.sandbox / "run/icewm.privcfg").read_text()
 
     def install_xdm(self, status: int, run_session: bool = True) -> None:
         # Real xdm runs the session script and then terminates with its own
@@ -149,7 +157,7 @@ class XdmLauncherTests(unittest.TestCase):
                          "the temporary evidence sink must be removed")
         # The real server return code is what console-session observes.
         self.assertIn("PAM authentication accepted", log)
-        self.assertIn("twm started for uid=1000", log)
+        self.assertIn("icewm started for uid=1000", log)
         self.assertIn("xterm started", log)
         self.assertIn("xdm session ended", log)
 
@@ -170,39 +178,42 @@ class XdmLauncherTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         lines = self.events()
         wanted = ["PAM authentication accepted",
-                  "twm started for uid=1000",
+                  "icewm started for uid=1000",
                   "xterm started",
                   "xdm session ended"]
         positions = [lines.index(item) for item in wanted]
         self.assertEqual(positions, sorted(positions),
                          f"event order is {lines}")
         # A launch attempt must never be recorded before the child exists.
-        self.assertNotIn("twm failed to start", "\n".join(lines))
-        self.assertLess(lines.index("twm started for uid=1000"),
+        self.assertNotIn("icewm failed to start", "\n".join(lines))
+        self.assertLess(lines.index("icewm started for uid=1000"),
                         lines.index("xterm started"))
+        # The session must point IceWM at the shipped configuration instead of
+        # letting it fall back to a user or upstream default.
+        self.assertEqual(self.wm_config().strip(), "/etc/reliefos/icewm")
 
     def test_immediate_child_death_is_not_recorded_as_started(self):
-        self.install_session_stubs(twm="exit 3\n")
+        self.install_session_stubs(wm="exit 3\n")
         self.install_xdm(0)
         result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         log = self.log()
-        self.assertIn("twm failed to start", log)
-        self.assertNotIn("twm started for uid=", log)
+        self.assertIn("icewm failed to start", log)
+        self.assertNotIn("icewm started for uid=", log)
         self.assertNotIn("xterm started", log)
         self.assertIn("tty1 restored to text login", log)
 
-    def test_session_runs_twm_and_xterm_for_root_after_authentication(self):
+    def test_session_runs_icewm_and_xterm_for_root_after_authentication(self):
         self.install_session_stubs(uid="0")
         self.install_xdm(0)
         result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         log = self.log()
-        self.assertIn("twm started for uid=0", log)
+        self.assertIn("icewm started for uid=0", log)
         self.assertIn("xterm started", log)
 
     def test_window_manager_exit_terminates_the_remaining_terminal(self):
-        self.install_session_stubs(twm="exec sleep 1\n",
+        self.install_session_stubs(wm="exec sleep 1\n",
                                    xterm="echo $$ > /run/xterm.pid\nexec sleep 4\n")
         self.install_xdm(0)
         started = time.monotonic()

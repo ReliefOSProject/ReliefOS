@@ -42,6 +42,7 @@ cmp "$w/out/userland/installer.elf" "$w/stage/$program"
 [ -L "$w/stage/etc/runlevels/default/reliefos-session" ]
 [ ! -e "$w/stage/etc/reliefos/xdm.conf" ]
 [ ! -e "$w/stage/etc/reliefos/xdm-session" ]
+[ ! -e "$w/stage/etc/reliefos/icewm" ]
 [ ! -e "$w/stage/etc/reliefos/twmrc" ]
 [ ! -e "$w/stage/install/root/$program" ]
 [ -f "$w/stage/install/esp/reliefos/loader.elf" ]

@@ -12,6 +12,14 @@ for name in find xargs dd mount umount fdisk sfdisk blkid lsblk fsck runuser \
     su login passwd sulogin chpasswd adduser addgroup deluser delgroup \
     cryptpw mkpasswd chattr lsattr tune2fs mke2fs mkfs.ext2 mkdosfs mkfs.vfat nologin \
     clear reset resize less wget xxd start-stop-daemon; do
+    # The applet must not even be compiled in: a suppressed link still leaves
+    # `busybox NAME` callable. Alias names like mkfs.ext2 are covered through
+    # their primary symbol (MKE2FS).
+    symbol=$(printf '%s' "$name" | tr 'a-z.-' 'A-Z__')
+    if grep -Eq "^CONFIG_${symbol}=[ym]" "$config"; then
+        echo "BusyBox enables externally provided applet: $name (CONFIG_$symbol)" >&2
+        exit 1
+    fi
     if awk -F / -v name="$name" '$NF==name {found=1} END {exit !found}' "$links"; then
         echo "BusyBox owns externally provided applet: $name" >&2
         exit 1
