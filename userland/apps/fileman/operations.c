@@ -1,14 +1,14 @@
 #include "fileman.h"
+#include "filesystem.h"
+#include <errno.h>
 
 #define FILEMAN_CLIPBOARD_MAX FILEMAN_MAX_ENTRIES
 #define FILEMAN_COPY_BUFFER_SIZE 1024U
 #define FILEMAN_COPY_MAX_DEPTH 16U
-#define FILEMAN_RECYCLE_MAP ".leon-recycle-map"
 
 static char clipboard_paths[FILEMAN_CLIPBOARD_MAX][RELIEFOS_FS_PATH_LEN];
 static uint32_t clipboard_count;
 static uint8_t clipboard_cut;
-static char recycle_map[4096];
 
 static void operation_set(uint32_t percent, const char *text)
 {
@@ -32,15 +32,6 @@ static void operation_finish(const char *text)
     fileman_present_progress();
     fileman_operation_active = 0;
     set_status(text);
-}
-
-static int build_recycle_dir(char *dst, uint32_t cap)
-{
-    if (!home_path[0] && !refresh_home_path()) {
-        return -1;
-    }
-    build_path_join(dst, cap, home_path, "recycle-bin");
-    return mkdir(dst, 0777) < 0 && reliefos_stat_legacy(dst, &(struct reliefos_stat){0}) < 0 ? -1 : 0;
 }
 
 static void build_path_in_dir(char *dst, uint32_t cap, const char *dir,
@@ -137,39 +128,6 @@ static int choose_free_target_path(const char *dir, const char *name,
         }
     }
     return -1;
-}
-
-static int remove_tree(const char *path, uint32_t depth)
-{
-    struct reliefos_stat st;
-    int fd;
-    int ret;
-    if (depth > FILEMAN_COPY_MAX_DEPTH || reliefos_stat_legacy(path, &st) < 0) {
-        return -1;
-    }
-    if (st.type != RELIEFOS_FS_TYPE_DIR) {
-        return unlink(path);
-    }
-    fd = open(path, RELIEFOS_O_RDONLY, 0);
-    if (fd < 0) {
-        return fd;
-    }
-    for (;;) {
-        struct reliefos_dir_entry entry;
-        char child[RELIEFOS_FS_PATH_LEN];
-        ret = reliefos_readdir(fd, &entry);
-        if (ret <= 0) {
-            break;
-        }
-        build_path_in_dir(child, sizeof(child), path, entry.name);
-        ret = remove_tree(child, depth + 1U);
-        if (ret < 0) {
-            close(fd);
-            return ret;
-        }
-    }
-    close(fd);
-    return ret < 0 ? ret : rmdir(path);
 }
 
 static int copy_file(const char *src, const char *dst, uint64_t total,
@@ -341,7 +299,7 @@ void paste_clipboard(void)
             continue;
         }
         if (conflict > 0) {
-            ret = remove_tree(target, 0);
+            ret = fileman_remove_tree(target);
             if (ret < 0) {
                 ++failed;
                 continue;
@@ -354,7 +312,7 @@ void paste_clipboard(void)
             } else {
                 ret = copy_tree(clipboard_paths[i], target, total, &done, 0, 100, 0);
                 if (ret == 0) {
-                    ret = remove_tree(clipboard_paths[i], 0);
+                    ret = fileman_remove_tree(clipboard_paths[i]);
                 }
             }
         } else {
@@ -391,258 +349,47 @@ void paste_clipboard(void)
     }
 }
 
-static int recycle_map_load(const char *dir)
+void delete_selected_entries(void)
 {
-    char path[RELIEFOS_FS_PATH_LEN];
-    uint32_t len = 0;
-    int fd;
-    build_path_in_dir(path, sizeof(path), dir, FILEMAN_RECYCLE_MAP);
-    recycle_map[0] = 0;
-    fd = open(path, RELIEFOS_O_RDONLY, 0);
-    if (fd < 0) {
-        return 0;
-    }
-    while (len + 1U < sizeof(recycle_map)) {
-        long got = read(fd, recycle_map + len, sizeof(recycle_map) - len - 1U);
-        if (got <= 0) {
-            break;
+    char paths[FILEMAN_MAX_ENTRIES][RELIEFOS_FS_PATH_LEN];
+    uint32_t count = 0, removed = 0, failed = 0;
+    uint32_t marked = fileman_selected_count();
+    int error = 0;
+    for (uint32_t i = 0; i < entry_count && i < FILEMAN_MAX_ENTRIES; ++i) {
+        if (!(marked ? fileman_entry_marked(i) : i == (uint32_t)file_list.selected) ||
+            fileman_entry_is_device(i)) continue;
+        if (fileman_join_path(paths[count], sizeof(paths[count]), current_path, entries[i].name) < 0) {
+            set_status(T("Invalid file name or path too long"));
+            return;
         }
-        len += (uint32_t)got;
+        ++count;
     }
-    close(fd);
-    recycle_map[len] = 0;
-    return 0;
-}
-
-static void recycle_map_save(const char *dir)
-{
-    char path[RELIEFOS_FS_PATH_LEN];
-    int fd;
-    build_path_in_dir(path, sizeof(path), dir, FILEMAN_RECYCLE_MAP);
-    fd = open(path, RELIEFOS_O_WRONLY | RELIEFOS_O_CREAT | RELIEFOS_O_TRUNC, 0666);
-    if (fd >= 0) {
-        (void)write(fd, recycle_map, text_len(recycle_map));
-        close(fd);
-    }
-}
-
-static void recycle_map_append(const char *name, const char *origin)
-{
-    uint32_t pos = text_len(recycle_map);
-    append_text(recycle_map, &pos, sizeof(recycle_map), name);
-    append_char(recycle_map, &pos, sizeof(recycle_map), '\t');
-    append_text(recycle_map, &pos, sizeof(recycle_map), origin);
-    append_char(recycle_map, &pos, sizeof(recycle_map), '\n');
-}
-
-static int recycle_map_origin(const char *name, char *origin, uint32_t cap)
-{
-    for (uint32_t pos = 0; recycle_map[pos];) {
-        uint32_t start = pos;
-        uint32_t tab = 0;
-        while (recycle_map[pos] && recycle_map[pos] != '\n' &&
-               recycle_map[pos] != '\r') {
-            if (recycle_map[pos] == '\t') {
-                tab = pos;
-            }
-            ++pos;
-        }
-        if (tab > start && (uint32_t)(tab - start) == text_len(name)) {
-            uint32_t i = 0;
-            while (i < tab - start && recycle_map[start + i] == name[i]) {
-                ++i;
-            }
-            if (i == tab - start) {
-                uint32_t out = 0;
-                for (uint32_t at = tab + 1U; at < pos && out + 1U < cap; ++at) {
-                    origin[out++] = recycle_map[at];
-                }
-                origin[out] = 0;
-                return origin[0] != 0;
-            }
-        }
-        while (recycle_map[pos] == '\r' || recycle_map[pos] == '\n') {
-            ++pos;
-        }
-    }
-    return 0;
-}
-
-static void recycle_map_remove(const char *name)
-{
-    char next[sizeof(recycle_map)];
-    uint32_t out = 0;
-    for (uint32_t pos = 0; recycle_map[pos];) {
-        uint32_t start = pos;
-        uint32_t end = pos;
-        uint32_t tab = 0;
-        while (recycle_map[end] && recycle_map[end] != '\n' &&
-               recycle_map[end] != '\r') {
-            if (recycle_map[end] == '\t') {
-                tab = end;
-            }
-            ++end;
-        }
-        uint32_t same = tab > start && (uint32_t)(tab - start) == text_len(name);
-        for (uint32_t i = 0; same && i < tab - start; ++i) {
-            if (recycle_map[start + i] != name[i]) {
-                same = 0;
-            }
-        }
-        if (!same) {
-            for (uint32_t i = start; i < end; ++i) {
-                append_char(next, &out, sizeof(next), recycle_map[i]);
-            }
-            append_char(next, &out, sizeof(next), '\n');
-        }
-        pos = end;
-        while (recycle_map[pos] == '\r' || recycle_map[pos] == '\n') {
-            ++pos;
-        }
-    }
-    copy_text(recycle_map, sizeof(recycle_map), next);
-}
-
-void recycle_selected_entries(void)
-{
-    char recycle[RELIEFOS_FS_PATH_LEN];
-    uint32_t moved = 0;
-    if (fileman_is_recycle_dir()) {
-        set_status(T("Items are already in the Recycle Bin"));
-        return;
-    }
-    if (build_recycle_dir(recycle, sizeof(recycle)) < 0) {
-        set_status(T("Recycle Bin is unavailable"));
-        return;
-    }
-    recycle_map_load(recycle);
-    operation_set(0, T("Moving items to Recycle Bin..."));
-    for (uint32_t i = 0; i < entry_count; ++i) {
-        char src[RELIEFOS_FS_PATH_LEN];
-        char dst[RELIEFOS_FS_PATH_LEN];
-        int selected = fileman_entry_marked(i) ||
-            (!fileman_selected_count() && i == (uint32_t)file_list.selected);
-        if (!selected || fileman_entry_is_device(i)) {
-            continue;
-        }
-        build_child_path(src, sizeof(src), entries[i].name);
-        if (choose_free_target_path(recycle, entries[i].name, dst, sizeof(dst)) != 0) {
-            continue;
-        }
-        if (rename(src, dst) == 0) {
-            recycle_map_append(path_basename(dst), src);
-            ++moved;
-        }
-        operation_set((i + 1U) * 100U / (entry_count ? entry_count : 1U),
-                      T("Moving items to Recycle Bin..."));
-    }
-    recycle_map_save(recycle);
-    reload_dir();
-    selected_mask = 0;
-    operation_finish(moved ? T("Moved to Recycle Bin")
-                           : T("No items moved"));
-}
-
-void restore_selected_entry(void)
-{
-    char recycle[RELIEFOS_FS_PATH_LEN];
-    char src[RELIEFOS_FS_PATH_LEN];
-    char origin[RELIEFOS_FS_PATH_LEN];
-    if (!fileman_is_recycle_dir() || !selected_entry_valid()) {
-        set_status(T("Select an item in Recycle Bin"));
-        return;
-    }
-    build_recycle_dir(recycle, sizeof(recycle));
-    recycle_map_load(recycle);
-    if (!recycle_map_origin(entries[file_list.selected].name, origin, sizeof(origin))) {
-        set_status(T("Original location is unavailable"));
-        return;
-    }
-    build_child_path(src, sizeof(src), entries[file_list.selected].name);
-    if (reliefos_stat_legacy(origin, &(struct reliefos_stat){0}) == 0 &&
-        !reliefos_ui_show_confirm_dialog(T("Restore Conflict"),
-                                       T("Original path exists. Replace it?"), 0)) {
-        return;
-    }
-    if (reliefos_stat_legacy(origin, &(struct reliefos_stat){0}) == 0 && remove_tree(origin, 0) < 0) {
-        set_status(T("Could not replace original item"));
-        return;
-    }
-    if (rename(src, origin) < 0) {
-        set_status(T("Restore failed"));
-        return;
-    }
-    recycle_map_remove(entries[file_list.selected].name);
-    recycle_map_save(recycle);
-    reload_dir();
-    operation_finish(T("Item restored"));
-}
-
-void empty_recycle_bin(void)
-{
-    uint32_t removed = 0;
-    if (!fileman_is_recycle_dir()) {
-        return;
-    }
-    if (!reliefos_ui_show_confirm_dialog(T("Empty Recycle Bin"),
-                                       T("Delete all Recycle Bin items permanently?"), 0)) {
-        return;
-    }
-    operation_set(0, T("Emptying Recycle Bin..."));
-    for (uint32_t i = 0; i < entry_count; ++i) {
-        char path[RELIEFOS_FS_PATH_LEN];
-        if (text_eq(entries[i].name, FILEMAN_RECYCLE_MAP)) {
-            continue;
-        }
-        build_child_path(path, sizeof(path), entries[i].name);
-        if (remove_tree(path, 0) == 0) {
-            ++removed;
-        }
-        operation_set((i + 1U) * 100U / (entry_count ? entry_count : 1U),
-                      T("Emptying Recycle Bin..."));
-    }
-    recycle_map[0] = 0;
-    recycle_map_save(current_path);
-    reload_dir();
-    operation_finish(removed ? T("Recycle Bin emptied")
-                             : T("Recycle Bin is empty"));
-}
-
-void permanent_delete_selected_entries(void)
-{
-    uint32_t removed = 0;
-    uint32_t failed = 0;
-    if (!selected_entry_valid()) {
-        set_status(T("Select an item"));
-        return;
-    }
-    if (!reliefos_ui_show_confirm_dialog(T("Delete Permanently"),
-                                       T("Selected items cannot be restored. Continue?"), 0)) {
+    if (!count) { set_status(T("Select an item")); return; }
+    if (!reliefos_ui_show_confirm_dialog(T("Delete"),
+            T("Permanently delete the selected items and all folder contents? This cannot be undone."), 0)) {
+        set_status(T("Delete canceled"));
         return;
     }
     operation_set(0, T("Deleting items..."));
-    for (uint32_t i = 0; i < entry_count; ++i) {
-        char path[RELIEFOS_FS_PATH_LEN];
-        int selected = fileman_entry_marked(i) ||
-            (!fileman_selected_count() && i == (uint32_t)file_list.selected);
-        if (!selected || fileman_entry_is_device(i)) {
-            continue;
+    for (uint32_t i = 0; i < count; ++i) {
+        int result = fileman_remove_tree(paths[i]);
+        if (permission_error(result)) {
+            struct stat status;
+            uint32_t elevated_count = 0;
+            if (lstat(paths[i], &status) == 0 &&
+                fileman_delete_elevated(paths[i], S_ISDIR(status.st_mode), entries,
+                    FILEMAN_MAX_ENTRIES, &elevated_count) == 0) result = 0;
         }
-        build_child_path(path, sizeof(path), entries[i].name);
-        if (remove_tree(path, 0) == 0) {
-            ++removed;
-        } else {
-            ++failed;
-        }
-        operation_set((i + 1U) * 100U / (entry_count ? entry_count : 1U),
-                      T("Deleting items..."));
+        if (!result) ++removed;
+        else { ++failed; error = result; }
+        operation_set((i + 1U) * 100U / count, T("Deleting items..."));
     }
     reload_dir();
     selected_mask = 0;
     if (failed) {
-        operation_finish(T("Some items could not be deleted"));
-    } else {
-        operation_finish(removed ? T("Items deleted permanently")
-                                 : T("No items deleted"));
-    }
+        char message[160];
+        snprintf(message, sizeof(message), "%u %s; %u %s: %s", removed,
+            T("item(s) deleted"), failed, T("failed"), strerror(-error));
+        operation_finish(message);
+    } else operation_finish(T("Items deleted"));
 }

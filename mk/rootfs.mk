@@ -23,7 +23,7 @@ $(ROOTFS_RAW_STAMP) $(ROOTFS_MANIFEST): $(NLS_MO) $(NLS_MUSL_MO) $(RELIEFOS_SRC)
 RELIEFOS_SIG_rootfs := epoch=$(SOURCE_DATE_EPOCH)|sources=$(O_META)/rootfs-sources.sig|components=$(RELIEFOS_COMPONENTS_ENABLED)
 $(if $(RELIEFOS_PASSIVE),,$(eval $(call RELIEFOS_SIGNATURE_RULE,rootfs)))
 $(ROOTFS_RAW_STAMP) $(ROOTFS_MANIFEST) &: $(RELIEFOS_SRC)/tools/build/rootfs-stage.sh $(RELIEFOS_SRC)/tools/build/busybox-links.sh $(RELIEFOS_STAGE_TOOL) $(RELIEFOS_LAYOUT_TOOL) $(O_META)/rootfs-sources.sig $(ROOTFS_UPSTREAM_PRODUCTS) $(ROOTFS_APP_PRODUCTS) $(RUNTIME_SO) $(RUNTIME_COMPAT_SO) $(KERNELDEBUG_SYS) $(DRIVER_OUTPUTS) $(COMPONENT_METADATA) $(UI_METRO_FONT) $(UI_WIN95_FONT) $(RELIEFOS_CONFIG_FILE) $(O_META)/rootfs.sig $(wildcard $(RELIEFOS_SRC)/system/xorg/*)
-	$(Q)sh $(RELIEFOS_SRC)/tools/build/rootfs-stage.sh $(RELIEFOS_SRC) $(abspath $(O)) $(abspath $(RELIEFOS_CONFIG_FILE)) $(abspath $(COMPONENT_METADATA)) $(abspath $(RELIEFOS_STAGE_TOOL)) $(abspath $(RELIEFOS_LAYOUT_TOOL)) $(abspath $(ROOTFS_RAW)) $(abspath $(ROOTFS_MANIFEST)) $(SOURCE_DATE_EPOCH)
+	$(Q)ROOTFS_UPSTREAM_PACKAGES='$(UPSTREAM_PACKAGES) ncurses' sh $(RELIEFOS_SRC)/tools/build/rootfs-stage.sh $(RELIEFOS_SRC) $(abspath $(O)) $(abspath $(RELIEFOS_CONFIG_FILE)) $(abspath $(COMPONENT_METADATA)) $(abspath $(RELIEFOS_STAGE_TOOL)) $(abspath $(RELIEFOS_LAYOUT_TOOL)) $(abspath $(ROOTFS_RAW)) $(abspath $(ROOTFS_MANIFEST)) $(SOURCE_DATE_EPOCH)
 	$(Q)touch $(ROOTFS_RAW_STAMP)
 .PHONY: rootfs-raw
 rootfs-raw: $(ROOTFS_RAW_STAMP) $(ROOTFS_MANIFEST)

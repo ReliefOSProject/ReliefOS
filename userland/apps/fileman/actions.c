@@ -1,4 +1,6 @@
 #include "fileman.h"
+#include "archive.h"
+#include <errno.h>
 #include <reliefos/launch_result.h>
 
 /* Land the cursor on `name` after a refresh, scrolling it into view. */
@@ -30,13 +32,16 @@ void open_selected_entry(void)
     }
     if (ends_with(entries[file_list.selected].name, ".tar")) {
         extract_tar_with_path(path);
-        reload_dir();
         return;
     }
+#ifdef CONFIG_DESKTOP_BACKEND_XORG
+    pid = fileman_launch_path(path);
+#else
     {
         char *argv[] = {path, 0};
         pid = reliefos_launch_argv(argv);
     }
+#endif
     if (pid < 0) {
         if (pid == LAUNCH_RESULT_NO_ASSOCIATION) {
             show_open_with_for_path(path, 0);
@@ -87,7 +92,14 @@ void create_new_folder(void)
         set_status(T("Folder name is empty"));
         return;
     }
+#ifdef CONFIG_DESKTOP_BACKEND_XORG
+    if (!fileman_name_valid(name) || fileman_join_path(path, sizeof(path), current_path, name) < 0) {
+        set_status(T("Invalid folder name or path too long"));
+        return;
+    }
+#else
     build_child_path(path, sizeof(path), name);
+#endif
     ret = mkdir(path, 0777);
     if (ret < 0) {
         uint32_t elevated_count = 0;
@@ -194,7 +206,20 @@ void rename_selected_entry(void)
         return;
     }
     build_child_path(old_path, sizeof(old_path), entries[file_list.selected].name);
+#ifdef CONFIG_DESKTOP_BACKEND_XORG
+    if (!fileman_name_valid(name) || fileman_join_path(new_path, sizeof(new_path), current_path, name) < 0) {
+        set_status(T("Invalid file name or path too long"));
+        return;
+    }
+    struct stat existing;
+    if (!text_eq(old_path, new_path) && lstat(new_path, &existing) == 0 &&
+        !fileman_confirm_dialog(T("Rename Conflict"), T("The destination exists. Replace it?"), 0)) {
+        set_status(T("Rename canceled"));
+        return;
+    }
+#else
     build_child_path(new_path, sizeof(new_path), name);
+#endif
     ret = rename(old_path, new_path);
     if (ret < 0) {
         uint32_t elevated_count = 0;
@@ -222,62 +247,6 @@ void rename_selected_entry(void)
     set_status(T("Renamed"));
 }
 
-void delete_selected_entry(void)
-{
-    char path[RELIEFOS_FS_PATH_LEN];
-    char message[96];
-    uint32_t pos = 0;
-    int ret;
-    if (!selected_entry_valid()) {
-        set_status(T("Select an item"));
-        return;
-    }
-    message[0] = 0;
-    append_text(message, &pos, sizeof(message), T("Delete "));
-    append_text(message, &pos, sizeof(message), entries[file_list.selected].name);
-    append_char(message, &pos, sizeof(message), '?');
-    if (!reliefos_ui_show_confirm_dialog(T("Delete"), message, 0)) {
-        set_status(T("Delete canceled"));
-        return;
-    }
-    {
-        uint8_t is_dir = entries[file_list.selected].type == RELIEFOS_FS_TYPE_DIR;
-        uint32_t elevated_count = 0;
-        build_child_path(path, sizeof(path), entries[file_list.selected].name);
-        ret = is_dir ? rmdir(path) : unlink(path);
-        if (ret < 0 && permission_error(ret)) {
-            /* Protected parent directory: the broker removes it, and demands
-             * an explicit confirmation word for a directory because that
-             * removal is unrecoverable. */
-            if (is_dir && !reliefos_ui_show_confirm_dialog(
-                    T("Delete Folder"),
-                    T("This permanently deletes the folder and everything inside it. Continue?"),
-                    0)) {
-                set_status(T("Delete canceled"));
-                return;
-            }
-            if (fileman_delete_elevated(path, is_dir, entries,
-                                        FILEMAN_MAX_ENTRIES,
-                                        &elevated_count) == 0) {
-                present_directory(elevated_count, T("Items "),
-                                  " in ");
-                set_status(T("Deleted (elevated)"));
-                return;
-            }
-        }
-    }
-    if (ret < 0) {
-        if (ret == -39) {
-            set_status(T("Delete failed: directory not empty"));
-        } else {
-            set_status_error("Delete failed ", ret);
-        }
-        return;
-    }
-    reload_dir();
-    set_status(T("Deleted"));
-}
-
 void execute_action(uint32_t action)
 {
     context_menu_set_active(0);
@@ -301,7 +270,7 @@ void execute_action(uint32_t action)
         rename_selected_entry();
         break;
     case FILEMAN_ACTION_DELETE:
-        delete_selected_entry();
+        delete_selected_entries();
         break;
     case FILEMAN_ACTION_COPY:
         copy_selected_entries(0);
@@ -320,18 +289,6 @@ void execute_action(uint32_t action)
         break;
     case FILEMAN_ACTION_CLEAR_SELECTION:
         fileman_clear_selection();
-        break;
-    case FILEMAN_ACTION_RECYCLE:
-        recycle_selected_entries();
-        break;
-    case FILEMAN_ACTION_DELETE_PERMANENT:
-        permanent_delete_selected_entries();
-        break;
-    case FILEMAN_ACTION_RESTORE:
-        restore_selected_entry();
-        break;
-    case FILEMAN_ACTION_EMPTY_RECYCLE:
-        empty_recycle_bin();
         break;
     case FILEMAN_ACTION_EXTRACT_TAR:
         extract_tar_selected();
@@ -359,150 +316,95 @@ void execute_action(uint32_t action)
 void extract_tar_with_path(const char *tar_path)
 {
     char dest_dir[RELIEFOS_FS_PATH_LEN];
-    uint32_t plen;
-    const char *ext;
-    if (!tar_path || !tar_path[0]) {
+    if (!tar_path || !ends_with(tar_path, ".tar") || text_len(tar_path) >= sizeof(dest_dir)) {
+        set_status(T("Select a tar file"));
         return;
     }
     copy_text(dest_dir, sizeof(dest_dir), tar_path);
-    plen = (uint32_t)text_len(dest_dir);
-    ext = 0;
-    if (plen > 4U && dest_dir[plen - 4U] == '.') {
-        ext = dest_dir + plen - 4U;
+    dest_dir[text_len(dest_dir) - 4U] = 0;
+    if (!fileman_name_valid(path_basename(dest_dir))) {
+        set_status(T("Invalid extraction folder name"));
+        return;
     }
-    if (ext && text_eq(ext, ".tar")) {
-        dest_dir[plen - 4U] = 0;
-    }
-    if (mkdir(dest_dir, 0777) < 0) {
-        struct reliefos_stat st;
-        if (reliefos_stat_legacy(dest_dir, &st) != 0 || st.type != RELIEFOS_FS_TYPE_DIR) {
-            set_status_code("Extract mkdir failed ", -1);
+    int created = mkdir(dest_dir, 0777) == 0;
+    if (!created) {
+        struct stat status;
+        if (lstat(dest_dir, &status) < 0 || !S_ISDIR(status.st_mode)) {
+            set_status(T("Cannot create extraction folder"));
+            return;
+        }
+        if (!reliefos_ui_show_confirm_dialog(T("Extract tar"),
+                T("The extraction folder exists. Existing files may be replaced. Continue?"), 0)) {
+            set_status(T("Extraction canceled"));
             return;
         }
     }
-    if (!reliefos_tar_extract_all(tar_path, dest_dir)) {
-        set_status(T("Tar extract failed"));
-        return;
-    }
-    set_status(T("Tar extracted successfully"));
+    fileman_operation_active = 1;
+    fileman_operation_percent = 0;
+    copy_text(fileman_operation_text, sizeof(fileman_operation_text), T("Extracting tar..."));
+    fileman_present_progress();
+    int result = fileman_tar_extract(tar_path, dest_dir);
+    if (result < 0 && created) (void)rmdir(dest_dir);
+    fileman_operation_active = 0;
+    fileman_operation_percent = result ? 0 : 100;
+    reload_dir();
+    set_status(result ? T("Tar extraction failed; check the archive and destination permissions") :
+                        T("Tar extracted successfully"));
 }
 
 void extract_tar_selected(void)
 {
     char tar_path[RELIEFOS_FS_PATH_LEN];
-    if (!selected_entry_valid()) {
+    if (!selected_entry_is_file() || !ends_with(entries[file_list.selected].name, ".tar")) {
         set_status(T("Select a tar file"));
         return;
     }
-    build_child_path(tar_path, sizeof(tar_path),
-                     entries[file_list.selected].name);
-    fileman_operation_active = 1;
-    fileman_operation_percent = 0;
-    copy_text(fileman_operation_text, sizeof(fileman_operation_text),
-              T("Extracting tar..."));
-    fileman_present_progress();
+    build_child_path(tar_path, sizeof(tar_path), entries[file_list.selected].name);
     extract_tar_with_path(tar_path);
-    fileman_operation_active = 0;
-    reload_dir();
 }
 
 void compress_selected_to_tar(void)
 {
-    char tar_path[RELIEFOS_FS_PATH_LEN];
-    char src_path[RELIEFOS_FS_PATH_LEN];
-    uint32_t count;
-    uint32_t i;
-    uint32_t has_any = 0;
-    uint32_t packed_count = 0;
-    int failed = 0;
-    char base_name[RELIEFOS_FS_NAME_LEN];
-    int tar_fd;
-    count = fileman_selected_count();
-    if (count == 0) {
-        if (!selected_entry_valid()) {
-            set_status(T("Mark files first"));
-            return;
-        }
-        count = 1;
+    const char *members[FILEMAN_MAX_ENTRIES];
+    uint32_t indices[FILEMAN_MAX_ENTRIES], count = 0;
+    uint32_t marked = fileman_selected_count();
+    for (uint32_t i = 0; i < entry_count && i < FILEMAN_MAX_ENTRIES; ++i) {
+        if (!(marked ? fileman_entry_marked(i) : i == (uint32_t)file_list.selected) ||
+            fileman_entry_is_device(i)) continue;
+        indices[count] = i;
+        members[count++] = entries[i].name;
     }
-    if (count == 1 && selected_entry_valid()) {
-        copy_text(base_name, sizeof(base_name),
-                  entries[file_list.selected].name);
-    } else {
-        copy_text(base_name, sizeof(base_name), "archive");
-    }
-    {
-        uint32_t nlen = (uint32_t)text_len(base_name);
-        uint32_t clen = (uint32_t)text_len(current_path);
-        if (clen + nlen + 6U >= sizeof(tar_path)) {
-            set_status(T("Path too long"));
-            return;
-        }
-        memcpy(tar_path, current_path, clen);
-        tar_path[clen] = '/';
-        memcpy(tar_path + clen + 1U, base_name, nlen);
-        memcpy(tar_path + clen + 1U + nlen, ".tar", 5U);
-    }
-    tar_fd = open(tar_path, RELIEFOS_O_WRONLY | RELIEFOS_O_CREAT | RELIEFOS_O_TRUNC, 0666);
-    if (tar_fd < 0) {
-        set_status(T("Cannot create tar"));
+    if (!count) { set_status(T("Select an item")); return; }
+    char name[RELIEFOS_FS_NAME_LEN + 5], tar_path[RELIEFOS_FS_PATH_LEN];
+    char source[RELIEFOS_FS_PATH_LEN];
+    snprintf(name, sizeof(name), "%s.tar", count == 1 ? members[0] : "archive");
+    if (fileman_join_path(tar_path, sizeof(tar_path), current_path, name) < 0) {
+        set_status(T("Path too long"));
         return;
+    }
+    struct stat existing;
+    if (lstat(tar_path, &existing) == 0 &&
+        !reliefos_ui_show_confirm_dialog(T("Archive Conflict"), T("The archive exists. Replace it?"), 0)) {
+        set_status(T("Compression canceled"));
+        return;
+    }
+    copy_text(source, sizeof(source), current_path);
+    if (count == 1 && entries[indices[0]].type == RELIEFOS_FS_TYPE_DIR) {
+        struct stat status;
+        if (fileman_join_path(source, sizeof(source), current_path, members[0]) < 0) {
+            set_status(T("Path too long")); return;
+        }
+        if (lstat(source, &status) == 0 && S_ISDIR(status.st_mode)) members[0] = ".";
+        else copy_text(source, sizeof(source), current_path);
     }
     fileman_operation_active = 1;
     fileman_operation_percent = 0;
-    copy_text(fileman_operation_text, sizeof(fileman_operation_text),
-              T("Compressing to tar..."));
+    copy_text(fileman_operation_text, sizeof(fileman_operation_text), T("Compressing to tar..."));
     fileman_present_progress();
-    for (i = 0; i < entry_count && i < FILEMAN_MAX_ENTRIES; ++i) {
-        if (count > 1 && !fileman_entry_marked(i)) {
-            continue;
-        }
-        if (count == 1 && (uint32_t)file_list.selected != i) {
-            continue;
-        }
-        build_child_path(src_path, sizeof(src_path), entries[i].name);
-        if (entries[i].type == RELIEFOS_FS_TYPE_DIR) {
-            if (!reliefos_tar_pack_dir_append(tar_fd, src_path)) {
-                set_status_code("Tar pack dir failed on ", -1);
-                failed = 1;
-                break;
-            }
-        } else {
-            if (!reliefos_tar_pack_file_append(tar_fd, src_path,
-                                              entries[i].name)) {
-                set_status_code("Tar pack file failed on ", -1);
-                failed = 1;
-                break;
-            }
-        }
-        has_any = 1;
-        ++packed_count;
-        fileman_operation_percent =
-            (uint32_t)(((uint64_t)packed_count * 100U) / count);
-    }
-    if (failed) {
-        close(tar_fd);
-        unlink(tar_path);
-        fileman_operation_active = 0;
-        reload_dir();
-        return;
-    }
-    if (has_any) {
-        if (!reliefos_tar_finalize(tar_fd)) {
-            close(tar_fd);
-            unlink(tar_path);
-            fileman_operation_active = 0;
-            set_status(T("Tar finalize failed"));
-            reload_dir();
-            return;
-        }
-        close(tar_fd);
-        set_status(T("Tar created successfully"));
-    } else {
-        close(tar_fd);
-        unlink(tar_path);
-        set_status(T("No files compressed"));
-    }
+    int result = fileman_tar_create(tar_path, source, members, count);
     fileman_operation_active = 0;
+    fileman_operation_percent = result ? 0 : 100;
     reload_dir();
+    if (result < 0) set_status_error(T("Tar creation failed"), result);
+    else set_status(T("Tar created successfully"));
 }

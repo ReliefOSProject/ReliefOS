@@ -6,7 +6,6 @@ int handle_menu_click(int32_t x, int32_t y)
         {T("File"), FILEMAN_MENU_FILE, 54, 0},
         {T("View"), FILEMAN_MENU_VIEW, 54, 0},
         {T("Edit"), FILEMAN_MENU_EDIT, 54, 0},
-        {T("Recycle"), FILEMAN_MENU_RECYCLE, 70, 0},
     };
     uint32_t action = 0;
     if (reliefos_ui_menubar_hit(x, y, 0, 0, menu_items,
@@ -75,24 +74,6 @@ int handle_menu_click(int32_t x, int32_t y)
                                     FILEMAN_MENU_EDIT, &r);
         if (reliefos_ui_menu_popup_hit(x, y, (uint32_t)r.x, MENU_BAR_H, 190,
                                      items, FILEMAN_EDIT_MENU_COUNT, &action)) {
-            menu_open = FILEMAN_MENU_NONE;
-            if (action) {
-                execute_action(action);
-            }
-            return 1;
-        }
-        menu_open = FILEMAN_MENU_NONE;
-        return 1;
-    }
-    if (menu_open == FILEMAN_MENU_RECYCLE) {
-        struct reliefos_ui_context_menu_item items[FILEMAN_RECYCLE_MENU_COUNT];
-        struct reliefos_ui_rect r;
-        build_recycle_menu_items(items, FILEMAN_RECYCLE_MENU_COUNT);
-        reliefos_ui_menubar_item_rect(0, 0, menu_items,
-                                    sizeof(menu_items) / sizeof(menu_items[0]),
-                                    FILEMAN_MENU_RECYCLE, &r);
-        if (reliefos_ui_menu_popup_hit(x, y, (uint32_t)r.x, MENU_BAR_H, 204,
-                                     items, FILEMAN_RECYCLE_MENU_COUNT, &action)) {
             menu_open = FILEMAN_MENU_NONE;
             if (action) {
                 execute_action(action);
@@ -318,6 +299,10 @@ void handle_key(uint8_t keycode, uint8_t pressed)
         return;
     }
     if (!pressed) {
+        return;
+    }
+    if (keycode == RELIEFOS_KEY_DELETE) {
+        execute_action(FILEMAN_ACTION_DELETE);
         return;
     }
     if (reliefos_ui_listview_state_handle_key(&file_list, keycode, &activate)) {

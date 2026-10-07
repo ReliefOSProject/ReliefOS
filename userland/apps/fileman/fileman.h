@@ -11,9 +11,17 @@
 #include <reliefos/psf_font.h>
 #include <reliefos/stdio.h>
 #include <reliefos/syscall.h>
-#include <reliefos/tar.h>
 #include <reliefos/ui.h>
 #include <sys/stat.h>
+#include "boundary.h"
+
+#ifdef CONFIG_DESKTOP_BACKEND_XORG
+int fileman_input_dialog(const char *title, const char *prompt, char *value, uint32_t capacity);
+int fileman_confirm_dialog(const char *title, const char *message, uint32_t default_yes);
+int fileman_launch_path(const char *path);
+#define reliefos_ui_show_input_dialog fileman_input_dialog
+#define reliefos_ui_show_confirm_dialog fileman_confirm_dialog
+#endif
 
 #define FILEMAN_W 560
 #define FILEMAN_H 360
@@ -34,10 +42,9 @@
 #define FILEMAN_KEY_UP 72U
 #define FILEMAN_KEY_DOWN 80U
 #define FILEMAN_CONTEXT_MENU_W 206
-#define FILEMAN_CONTEXT_MENU_COUNT 14
+#define FILEMAN_CONTEXT_MENU_COUNT 13
 #define FILEMAN_FILE_MENU_COUNT 9
-#define FILEMAN_EDIT_MENU_COUNT 7
-#define FILEMAN_RECYCLE_MENU_COUNT 4
+#define FILEMAN_EDIT_MENU_COUNT 8
 #define FILEMAN_DETAILS_W 560
 #define FILEMAN_DETAILS_H 360
 #define FILEMAN_FOLDER_SIZE_MAX_DEPTH 16
@@ -51,7 +58,6 @@ enum {
     FILEMAN_MENU_FILE = 1,
     FILEMAN_MENU_VIEW = 2,
     FILEMAN_MENU_EDIT = 3,
-    FILEMAN_MENU_RECYCLE = 4,
 };
 
 enum {
@@ -73,10 +79,6 @@ enum {
     FILEMAN_ACTION_TOGGLE_MARK = 16,
     FILEMAN_ACTION_SELECT_ALL = 17,
     FILEMAN_ACTION_CLEAR_SELECTION = 18,
-    FILEMAN_ACTION_RECYCLE = 19,
-    FILEMAN_ACTION_DELETE_PERMANENT = 20,
-    FILEMAN_ACTION_RESTORE = 21,
-    FILEMAN_ACTION_EMPTY_RECYCLE = 22,
     FILEMAN_ACTION_EXTRACT_TAR = 23,
     FILEMAN_ACTION_COMPRESS_TAR = 24,
     FILEMAN_ACTION_COMPRESS_SELECTED = 25,
@@ -175,7 +177,6 @@ uint32_t fileman_selected_count(void);
 void fileman_toggle_selected(void);
 void fileman_select_all(void);
 void fileman_clear_selection(void);
-int fileman_is_recycle_dir(void);
 int fileman_entry_is_hidden(const struct reliefos_dir_entry *entry);
 int list_index_at(int32_t x, int32_t y);
 void format_size_text(char *buf, uint32_t cap, uint64_t bytes);
@@ -193,7 +194,6 @@ const char *entry_type_name(const struct reliefos_dir_entry *entry);
 void build_context_menu_items(struct reliefos_ui_context_menu_item *items, uint32_t count);
 void build_file_menu_items(struct reliefos_ui_context_menu_item *items, uint32_t count);
 void build_edit_menu_items(struct reliefos_ui_context_menu_item *items, uint32_t count);
-void build_recycle_menu_items(struct reliefos_ui_context_menu_item *items, uint32_t count);
 void format_contains_text(char *buf, uint32_t cap, const struct folder_size_info *info);
 int accumulate_folder_size(const char *path, struct folder_size_info *info, uint32_t depth);
 void show_details_selected(void);
@@ -242,14 +242,10 @@ void navigate_root(void);
 void create_new_folder(void);
 void create_shortcut_for_selected(void);
 void rename_selected_entry(void);
-void delete_selected_entry(void);
+void delete_selected_entries(void);
 void copy_selected_entries(uint8_t cut);
 void paste_clipboard(void);
 int fileman_clipboard_available(void);
-void recycle_selected_entries(void);
-void restore_selected_entry(void);
-void empty_recycle_bin(void);
-void permanent_delete_selected_entries(void);
 void extract_tar_selected(void);
 void compress_selected_to_tar(void);
 void extract_tar_with_path(const char *tar_path);

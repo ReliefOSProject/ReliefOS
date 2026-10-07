@@ -69,6 +69,7 @@ menu "apps"
 "NEdit"         f.exec "nedit &"
 "Calculator"    f.exec "calc &"
 "System information" f.exec "osver &"
+"File Manager"  f.exec "fileman &"
 }
 
 menu "defops"

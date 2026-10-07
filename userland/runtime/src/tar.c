@@ -530,13 +530,17 @@ static int tar_pack_dir_recursive_to_fd(int tar_fd, const char *dir_path,
         return 0;
     }
     if (reliefos_list_dir(dir_path, entries, RELIEFOS_FS_MAX_ENTRIES,
-                        &count) != 0) {
+                         &count) != 0) {
         return 0;
     }
     dir_len = (uint32_t)strlen(dir_path);
     prefix_len = arc_prefix ? (uint32_t)strlen(arc_prefix) : 0;
     for (i = 0; i < count; ++i) {
         uint32_t name_len;
+        if (!strcmp(entries[i].name, ".") ||
+            !strcmp(entries[i].name, "..")) {
+            continue;
+        }
         name_len = (uint32_t)strlen(entries[i].name);
         if (dir_len + 1U + name_len >= sizeof(full_path)) {
             continue;

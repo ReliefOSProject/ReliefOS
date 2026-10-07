@@ -65,7 +65,25 @@ for locale in $(cat configs/nls/LINGUAS); do
     mkdir -p "$work/out/generated/nls/$locale/LC_MESSAGES"
     printf '%s\n' fixture > "$work/out/generated/nls/$locale/LC_MESSAGES/${legacy_brand}.mo"
 done
-printf '%s\n' 'component metadata fixture' > "$work/metadata"
+printf 'busybox\ttool\t1\t1\t0\t0\t0\tBusyBox\tTools\t\t0\n' > "$work/metadata"
+printf 'ncurses\tlibrary\t1\t1\t0\t1\t0\tncurses\tLibraries\t\t0\n' >> "$work/metadata"
+mkdir -p "$work/out/upstream/ncurses/root/usr/bin" \
+    "$work/out/upstream/ncurses/root/usr/share/terminfo" \
+    "$work/out/upstream/ncurses/root/usr/include" \
+    "$work/out/upstream/fixture-provider/root/usr/bin" \
+    "$work/out/upstream/fixture-provider/root/usr/sbin" \
+    "$work/out/upstream/inactive/root/usr/bin"
+printf 'ncurses clear\n' > "$work/out/upstream/ncurses/root/usr/bin/clear"
+ln -s clear "$work/out/upstream/ncurses/root/usr/bin/reset"
+printf 'terminal data\n' > "$work/out/upstream/ncurses/root/usr/share/terminfo/fixture"
+printf 'development header\n' > "$work/out/upstream/ncurses/root/usr/include/curses.h"
+printf 'selected provider\n' > "$work/out/upstream/fixture-provider/root/usr/bin/hexdump"
+printf 'external ping provider\n' > "$work/out/upstream/fixture-provider/root/usr/bin/ping"
+printf 'storage provider\n' > "$work/out/upstream/fixture-provider/root/usr/sbin/mkfs.ext4"
+printf 'inactive provider\n' > "$work/out/upstream/inactive/root/usr/bin/tree"
+printf 'BusyBox fixture\n' > "$work/out/userland/busybox.elf"
+printf '%s\n' /bin/sh /bin/ash /bin/false /bin/ping /bin/ping6 /bin/hexdump \
+    /usr/bin/clear /usr/bin/reset /sbin/mkfs.ext4 /bin/passwd /usr/bin/tree > "$work/out/userland/busybox.links"
 
 "$hostcc" -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
     "$repo_root/tools/host/manifest/reliefos-stage.c" \
@@ -85,6 +103,7 @@ CONFIG_DESKTOP_BACKEND_XORG=$(test "$backend" = xorg && printf y || printf n)
 CONFIG_RPR_BASE_URL="https://example.invalid/rpr"
 CONFIG_VMDK_DEFAULT_LANG="zh_CN.UTF-8"
 CONFIG
+    ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux ncurses fixture-provider' \
     sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
         "$config" "$work/metadata" "$work/stage" "$work/layout" \
         "$dest" "$manifest" 1700000000
@@ -109,6 +128,35 @@ test -x "$xorg_root/usr/lib/reliefos/xdm-session"
 test -f "$xorg_root/etc/pam.d/xdm"
 test ! -e "$reliefos_root/etc/X11/xorg.conf"
 test ! -e "$reliefos_root/etc/reliefos/xdm.conf"
+test -f "$xorg_root/bin/busybox"
+test -L "$xorg_root/bin/sh"
+test -L "$xorg_root/bin/ash"
+test -L "$xorg_root/bin/false"
+test -L "$xorg_root/bin/ping6"
+test "$(readlink "$xorg_root/bin/ping6")" = busybox
+# Commands claimed by a staged upstream root keep their provider and never
+# grow a BusyBox link, even under a different directory.
+cmp "$work/out/upstream/fixture-provider/root/usr/bin/hexdump" "$xorg_root/usr/bin/hexdump"
+cmp "$work/out/upstream/fixture-provider/root/usr/bin/ping" "$xorg_root/usr/bin/ping"
+cmp "$work/out/upstream/fixture-provider/root/usr/sbin/mkfs.ext4" "$xorg_root/usr/sbin/mkfs.ext4"
+test ! -e "$xorg_root/bin/hexdump"
+test ! -e "$xorg_root/bin/ping"
+# /sbin/mkfs.ext4 stays the storage compatibility alias to the upstream
+# provider; BusyBox must not claim the command.
+test -L "$xorg_root/sbin/mkfs.ext4"
+test "$(readlink "$xorg_root/sbin/mkfs.ext4")" = ../usr/sbin/mkfs.ext4
+cmp "$work/out/upstream/ncurses/root/usr/bin/clear" "$xorg_root/usr/bin/clear"
+test -L "$xorg_root/usr/bin/reset"
+test "$(readlink "$xorg_root/usr/bin/reset")" = clear
+test -f "$xorg_root/usr/share/terminfo/fixture"
+test -f "$xorg_root/etc/terminfo/fixture"
+test ! -e "$xorg_root/usr/include/curses.h"
+cmp "$work/out/upstream/shadow/root/usr/bin/passwd" "$xorg_root/usr/bin/passwd"
+test ! -e "$xorg_root/bin/passwd"
+# Roots outside ROOTFS_UPSTREAM_PACKAGES never reach the rootfs: the command
+# stays a generated BusyBox link instead of the inactive provider file.
+test -L "$xorg_root/usr/bin/tree"
+test "$(readlink "$xorg_root/usr/bin/tree")" = ../../bin/busybox
 
 cat > "$work/invalid.config" <<'CONFIG'
 CONFIG_DESKTOP_BACKEND_RELIEFOS=n

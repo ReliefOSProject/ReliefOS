@@ -25,7 +25,7 @@ dropped from the fetch list after it kept exiting silently without a window.
 
 ## Motif applications
 
-The Xorg backend builds `calc` and `osver` as Motif X11 clients. Calculator
+The Xorg backend builds `calc`, `osver` and `fileman` as Motif X11 clients. Calculator
 supports signed 64-bit integer expressions, parentheses, normal arithmetic
 precedence, keyboard input and on-screen buttons. Division by zero, overflow
 and malformed expressions display an error. System information shows the
@@ -33,6 +33,25 @@ ReliefOS logo and the ReliefNT kernel name, version, build time and copyright;
 five left clicks on the logo within two seconds retain the kernel-debug
 activation shortcut. Both windows support the TWM delete action. The native
 desktop backend continues to build the original frontends from `native.c`.
+
+File Manager provides an editable address bar, expandable folder list,
+multiple selection, context menus, copy/cut/paste, new folders, rename,
+shortcuts, direct deletion and tar creation/extraction through `/bin/tar`.
+Deletion asks for confirmation, removes directory contents recursively and
+removes symbolic links without following their targets. There is no Recycle
+Bin or restore action. Tar runs with an argument array, without a shell, and
+reports success only after the command exits successfully. A single directory
+archive contains that directory's contents; multiple selections preserve each
+selected entry's name. Extraction creates a folder named after the archive.
+Its properties dialog displays file or directory size and edits mode, UID and
+GID using the current user's permissions. Text files open in NEdit and HTML
+files in Dillo; Open With accepts an installed X11 executable's absolute path.
+The native desktop's administrator password helper is not an X11 client, so
+protected operations report permission errors rather than opening that helper.
+The native frontend is retained as `fileman/native.c`, and both backends share
+the existing file-operation code. Ctrl+L focuses the address bar, F5 refreshes,
+Alt+Up goes to the parent, F2 renames, Ctrl+C/X/V copies/cuts/pastes, and both
+Delete and Shift+Delete request direct deletion after confirmation.
 
 The build extracts X11, Xt and Motif development headers and linker libraries
 from checksum-pinned, signature-verified Alpine APKs into
@@ -59,7 +78,7 @@ between the two default buttons.
 The root menu, titled `ReliefOS`, opens from any root-button press or
 Super+Space and offers an `Applications` submenu, window operations, `About`
 and `Exit session`. The `Applications` submenu contains new-xterm, `xeyes`,
-Dillo, NEdit, Calculator and System information. TWM menus
+Dillo, NEdit, Calculator, System information and File Manager. TWM menus
 are hold-to-open: keep the button or key pressed, drag onto an entry and
 release on it to run it. The `NEdit` entry opens the Motif text editor,
 installed with its dependencies from the official Alpine APK repository by

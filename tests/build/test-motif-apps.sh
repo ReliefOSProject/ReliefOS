@@ -23,13 +23,13 @@ O := $(WORK)/out
 include $(ROOT)/mk/userland.mk
 .PHONY: sources
 sources:
-	@printf '%s\n' '$(call userland_sources,calc)' '$(call userland_sources,osver)'
+	@printf '%s\n' '$(call userland_sources,calc)' '$(call userland_sources,osver)' '$(call userland_sources,fileman)'
 MAKE
 for backend in n y; do
     make -s -f "$work/sources.mk" ROOT="$src" WORK="$work" \
         KCONFIG_CONFIG_DESKTOP_BACKEND_XORG="$backend" sources >"$work/sources"
     if [ "$backend" = y ]; then selected=main; excluded=native; else selected=native; excluded=main; fi
-    for app in calc osver; do
+    for app in calc osver fileman; do
         grep -q "userland/apps/$app/$selected.c" "$work/sources"
         if grep -q "userland/apps/$app/$excluded.c" "$work/sources"; then
             printf 'FAIL - %s includes both desktop frontends\n' "$app" >&2

@@ -27,8 +27,28 @@ file() { record f "$1" "/$2" "${3:-0644}" "${4:-reliefos-base}" "${5:-unique}" "
 tree() { record t "$1" "/$2" 0755 "$3" "${4:-unique}"; }
 link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
-# Independent upstream installations never share a destination during builds.
-for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3; do
+# Every enabled upstream root is passed by the build graph. The default keeps
+# standalone callers compatible with the complete product package set.
+rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ncurses'}
+for package in $rootfs_upstream_packages; do
+    case $package in
+        ''|*[!A-Za-z0-9._-]*)
+            echo "rootfs-stage: invalid upstream package id: $package" >&2
+            exit 2
+            ;;
+    esac
+    if [ "$package" = ncurses ]; then
+        if enabled "$package"; then
+            # Only runtime data and commands belong in the root (development static
+            # archives/headers are exported by SDK rules instead).
+            for directory in bin share; do
+                input=$out/upstream/$package/root/usr/$directory
+                if [ -d "$input" ]; then tree "$input" "usr/$directory" "$package"; fi
+            done
+            tree "$out/upstream/ncurses/root/usr/share/terminfo" etc/terminfo ncurses
+        fi
+        continue
+    fi
     for directory in bin sbin lib usr etc; do
         input=$out/upstream/$package/root/$directory
         if [ -d "$input" ]; then tree "$input" "$directory" "$package"; fi
@@ -39,17 +59,6 @@ for spec in auth pam; do
         input=$out/$spec/root/$directory
         if [ -d "$input" ]; then tree "$input" "$directory" "$spec"; fi
     done
-done
-for package in ncurses; do
-    if enabled "$package"; then
-        # Only runtime data and commands belong in the root (development static
-        # archives/headers are exported by SDK rules instead).
-        for directory in bin share; do
-            input=$out/upstream/$package/root/usr/$directory
-            if [ -d "$input" ]; then tree "$input" "usr/$directory" "$package"; fi
-        done
-        tree "$out/upstream/ncurses/root/usr/share/terminfo" etc/terminfo ncurses
-    fi
 done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override

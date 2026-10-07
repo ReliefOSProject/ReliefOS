@@ -7,7 +7,6 @@ void draw_fileman(struct reliefos_ui_surface *ui)
         {T("File"), FILEMAN_MENU_FILE, 54, 0},
         {T("View"), FILEMAN_MENU_VIEW, 54, 0},
         {T("Edit"), FILEMAN_MENU_EDIT, 54, 0},
-        {T("Recycle"), FILEMAN_MENU_RECYCLE, 70, 0},
     };
     struct reliefos_ui_list_column cols[] = {
         {T("Type"), 58},
@@ -127,15 +126,6 @@ void draw_fileman(struct reliefos_ui_surface *ui)
                                     FILEMAN_MENU_EDIT, &r);
         reliefos_ui_menu_popup(ui, (uint32_t)r.x, MENU_BAR_H, 190,
                              items, FILEMAN_EDIT_MENU_COUNT, 0);
-    } else if (menu_open == FILEMAN_MENU_RECYCLE) {
-        struct reliefos_ui_context_menu_item items[FILEMAN_RECYCLE_MENU_COUNT];
-        struct reliefos_ui_rect r;
-        build_recycle_menu_items(items, FILEMAN_RECYCLE_MENU_COUNT);
-        reliefos_ui_menubar_item_rect(0, 0, menu_items,
-                                    sizeof(menu_items) / sizeof(menu_items[0]),
-                                    FILEMAN_MENU_RECYCLE, &r);
-        reliefos_ui_menu_popup(ui, (uint32_t)r.x, MENU_BAR_H, 204,
-                             items, FILEMAN_RECYCLE_MENU_COUNT, 0);
     }
     if (context_menu_active || context_menu_animating) {
         struct reliefos_ui_context_menu_item items[FILEMAN_CONTEXT_MENU_COUNT];

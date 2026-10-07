@@ -89,16 +89,6 @@ void fileman_clear_selection(void)
     set_status(T("Marks cleared"));
 }
 
-int fileman_is_recycle_dir(void)
-{
-    char recycle[RELIEFOS_FS_PATH_LEN];
-    if (!home_path[0] && !refresh_home_path()) {
-        return 0;
-    }
-    build_path_join(recycle, sizeof(recycle), home_path, "recycle-bin");
-    return text_eq(current_path, recycle);
-}
-
 int fileman_entry_is_hidden(const struct reliefos_dir_entry *entry)
 {
     return entry && entry->name[0] == '.';
@@ -353,11 +343,17 @@ int permission_error(int value)
 
 void set_status_error(const char *prefix, int value)
 {
+#ifdef CONFIG_DESKTOP_BACKEND_XORG
+    char message[160];
+    snprintf(message, sizeof(message), "%s: %s", prefix, strerror(value == -1 ? errno : -value));
+    set_status(message);
+#else
     if (permission_error(value)) {
         set_status(T("Permission denied"));
     } else {
         set_status_code(prefix, value);
     }
+#endif
 }
 
 int refresh_home_path(void)
@@ -483,18 +479,15 @@ void build_context_menu_items(struct reliefos_ui_context_menu_item *items,
         T("Rename"), FILEMAN_ACTION_RENAME,
         has_mutable && fileman_selected_count() <= 1U ? 0 : RELIEFOS_UI_MENU_DISABLED};
     items[8] = (struct reliefos_ui_context_menu_item){
-        T("Move to Recycle Bin"), FILEMAN_ACTION_RECYCLE,
+        T("Delete"), FILEMAN_ACTION_DELETE,
         has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
     items[9] = (struct reliefos_ui_context_menu_item){
-        T("Delete Permanently"), FILEMAN_ACTION_DELETE_PERMANENT,
-        has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[10] = (struct reliefos_ui_context_menu_item){
         T("Details"), FILEMAN_ACTION_DETAILS,
         has_item ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[11] = (struct reliefos_ui_context_menu_item){
+    items[10] = (struct reliefos_ui_context_menu_item){
         T("Refresh"), FILEMAN_ACTION_REFRESH, 0};
-    items[12] = (struct reliefos_ui_context_menu_item){"", 0, RELIEFOS_UI_MENU_SEPARATOR};
-    items[13] = (struct reliefos_ui_context_menu_item){
+    items[11] = (struct reliefos_ui_context_menu_item){"", 0, RELIEFOS_UI_MENU_SEPARATOR};
+    items[12] = (struct reliefos_ui_context_menu_item){
         has_file && ends_with(entries[file_list.selected].name, ".tar")
             ? T("Extract tar")
             : T("Compress to .tar"),
@@ -550,24 +543,8 @@ void build_edit_menu_items(struct reliefos_ui_context_menu_item *items, uint32_t
                                                      entry_count ? 0 : RELIEFOS_UI_MENU_DISABLED};
     items[6] = (struct reliefos_ui_context_menu_item){T("Clear Marks"), FILEMAN_ACTION_CLEAR_SELECTION,
                                                      fileman_selected_count() ? 0 : RELIEFOS_UI_MENU_DISABLED};
-}
-
-void build_recycle_menu_items(struct reliefos_ui_context_menu_item *items, uint32_t count)
-{
-    uint32_t has_item = selected_entry_valid();
-    uint32_t has_mutable = selected_entry_is_mutable();
-    uint32_t recycle = fileman_is_recycle_dir();
-    if (!items || count < FILEMAN_RECYCLE_MENU_COUNT) {
-        return;
-    }
-    items[0] = (struct reliefos_ui_context_menu_item){T("Move to Recycle Bin"), FILEMAN_ACTION_RECYCLE,
-                                                     !recycle && has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[1] = (struct reliefos_ui_context_menu_item){T("Restore"), FILEMAN_ACTION_RESTORE,
-                                                     recycle && has_item ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[2] = (struct reliefos_ui_context_menu_item){T("Delete Permanently"), FILEMAN_ACTION_DELETE_PERMANENT,
+    items[7] = (struct reliefos_ui_context_menu_item){T("Delete"), FILEMAN_ACTION_DELETE,
                                                      has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[3] = (struct reliefos_ui_context_menu_item){T("Empty Recycle Bin"), FILEMAN_ACTION_EMPTY_RECYCLE,
-                                                     recycle && entry_count ? 0 : RELIEFOS_UI_MENU_DISABLED};
 }
 
 void format_contains_text(char *buf, uint32_t cap, const struct folder_size_info *info)
@@ -635,6 +612,7 @@ int accumulate_folder_size(const char *path, struct folder_size_info *info, uint
     return 0;
 }
 
+#ifndef CONFIG_DESKTOP_BACKEND_XORG
 static void draw_permissions_page(struct reliefos_ui_surface *ui,
                                   const struct stat *st, const char *message)
 {
@@ -918,6 +896,8 @@ void show_open_with_for_path(const char *path, uint8_t set_default_only)
     }
 }
 
+#endif
+
 void show_open_with_selected(void)
 {
     char path[RELIEFOS_FS_PATH_LEN];
@@ -1001,9 +981,6 @@ static void sort_directory_entries(uint32_t count)
  * directory contents, so the same filters apply to both sources. */
 static int entry_passes_filters(const struct reliefos_dir_entry *entry)
 {
-    if (fileman_is_recycle_dir() && text_eq(entry->name, ".leon-recycle-map")) {
-        return 0;
-    }
     if (!fileman_show_hidden && fileman_entry_is_hidden(entry)) {
         return 0;
     }
@@ -1168,7 +1145,9 @@ void fileman_tree_reset(void)
 /** Refresh the root tree so new /mnt and /media mounts become visible. */
 static void fileman_tree_refresh_mounts(void)
 {
+#ifndef CONFIG_DESKTOP_BACKEND_XORG
     fileman_tree_reset();
+#endif
 }
 
 static void tree_init_if_needed(void)
