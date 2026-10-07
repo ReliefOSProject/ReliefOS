@@ -13,6 +13,10 @@ starts `xterm`, and keeps `icewm` in the foreground. Exiting IceWM returns
 control to XDM; exiting XDM lets tty1's console session fall back to text
 login. tty2 through tty6 remain text consoles.
 
+The XDM resource override keeps the packaged greeter appearance while changing
+the heading to `Login into <hostname>`; XDM expands `CLIENTHOST` to the local
+display host name.
+
 `make fetch` downloads the official Alpine community `dillo` 3.3.0-r2 browser,
 with its locked runtime dependencies from
 the official Alpine v3.24 main and community repositories. Dillo uses FLTK's
@@ -75,7 +79,10 @@ terminal.
 
 The root menu opens with Super+Space and offers Terminal, File Manager,
 Calculator, System information, Text editor (NEdit), Web browser (Dillo),
-`xeyes`, `About` and `Log out`. The `About` entry opens the session identity in
+`xeyes`, the dynamic Programs menu, `About` and `Log out`. IceWM's packaged
+`icewm-menu-fdo` scans `/usr/share/applications`; the migrated Calculator,
+System information and File manager provide desktop entries there when their
+components are staged. The `About` entry opens the session identity in
 a terminal window. `Log out` ends the session by terminating IceWM, which hands
 control back to XDM.
 

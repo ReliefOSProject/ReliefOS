@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=File manager
+Name[zh_CN]=文件管理器
+Exec=/usr/bin/fileman
+TryExec=/usr/bin/fileman
+Icon=folder
+Terminal=false
+Categories=System;FileTools;FileManager;

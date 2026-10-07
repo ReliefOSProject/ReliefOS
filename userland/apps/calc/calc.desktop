@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Calculator
+Name[zh_CN]=计算器
+Exec=/usr/bin/calc
+TryExec=/usr/bin/calc
+Icon=app
+Terminal=false
+Categories=Utility;Calculator;

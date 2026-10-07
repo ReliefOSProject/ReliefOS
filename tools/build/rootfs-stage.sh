@@ -130,6 +130,9 @@ while read -r app entry; do
         for ini in "$src/userland/apps/$app/$app.app.ini" "$src/userland/$app/$app.app.ini"; do
             if [ -f "$ini" ]; then file "$ini" "usr/lib/reliefos/apps/$app/$app.app.ini" 0644 "$app"; break; fi
         done
+        for desktop in "$src/userland/apps/$app/$app.desktop" "$src/userland/$app/$app.desktop"; do
+            if [ -f "$desktop" ]; then file "$desktop" "usr/share/applications/reliefos-$app.desktop" 0644 "$app"; break; fi
+        done
     fi
     link "usr/bin/$app" "../lib/reliefos/apps/$app/$app.elf" "$app"
 done < "$work/apps"

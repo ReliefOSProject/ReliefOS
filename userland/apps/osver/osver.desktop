@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=System information
+Name[zh_CN]=系统信息
+Exec=/usr/bin/osver
+TryExec=/usr/bin/osver
+Icon=help
+Terminal=false
+Categories=System;
