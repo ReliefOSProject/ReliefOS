@@ -61,12 +61,12 @@ staged into the guest.
 
 ## IceWM theme, taskbar, menu and keys
 
-The session ships one IceWM configuration, `system/xorg/icewm`, staged to
+The session ships supplemental IceWM files from `system/xorg/icewm`, staged to
 `/etc/reliefos/icewm`. `xdm-session` exports `ICEWM_PRIVCFG=/etc/reliefos/icewm`
-before starting the window manager, and that directory is the first one IceWM
-searches, so the shipped `theme`, `preferences`, `menu`, `toolbar`, `keys` and
-`winoptions` are the only configuration in effect; no user or upstream default
-can take over. The `theme` file selects `themes/light/default.theme`, the
+before starting the window manager. The packaged IceWM defaults provide the
+menu and dynamic Programs submenu; the ReliefOS directory supplies any local
+scripts and theme overrides that are present, without restoring removed config
+files. The `theme` file selects `themes/light/default.theme`, the
 "Light" theme, which keeps the previous palette on IceWM's `nice` look:
 `#dce4f5` title bars with `#1a1b26` text, `#8aa0d6` active borders, white menus
 with a `#3b62a6` selection, and an `#eceef4` taskbar and borders.

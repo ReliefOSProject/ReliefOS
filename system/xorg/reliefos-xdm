@@ -33,6 +33,7 @@ stage() {
 }
 
 for path in /usr/bin/xdm /etc/reliefos/xdm.conf /etc/reliefos/xdm-Xservers \
+    /etc/reliefos/xdm-Xresources \
     /etc/X11/xorg.conf /usr/lib/reliefos/xorg-tty-wrapper \
     /usr/lib/reliefos/xdm-session; do
     if test ! -r "$path"; then

@@ -1,2 +1,2 @@
 #include "/etc/X11/xdm/Xresources"
-xlogin*greeting: Login into CLIENTHOST
+xlogin*greeting: Login into ReliefOS
