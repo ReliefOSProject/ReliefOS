@@ -172,7 +172,7 @@ int main(int argc, char **argv)
     setvbuf(stdout, NULL, _IONBF, 0);
     puts("[xiaobai.elf] step enter");
     char *fallback[] = {
-        "*fontList: fixed", "*background: #000000", "*foreground: #ffffff", NULL
+        "*background: #000000", "*foreground: #ffffff", NULL
     };
     Widget shell = XtVaAppInitialize(&app, "ReliefOSXiaobai", NULL, 0,
                                      &argc, argv, fallback,

@@ -55,6 +55,27 @@ for app in taskmgr minesweeper leonmmcoset xiaobai; do
         exit 1
     fi
 done
+# XmNfontList string resources can only describe core X fonts; pinning one
+# disables Motif's Xft renditions and its per-codepoint fallback, so translated
+# CJK labels cannot render. Widgets must inherit the default Xft render table.
+for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai; do
+    if grep -q '\*fontList:' "$src/userland/apps/$app"/*.c; then
+        printf 'FAIL - %s pins a core font with *fontList: and cannot render CJK\n' "$app" >&2
+        exit 1
+    fi
+done
+# Apps that show translated text must route the shell font lists to the
+# CJK-capable Xft rendition; the vendor shell resolves them to core "fixed"
+# otherwise and translated labels render as empty boxes.
+for app in calc osver fileman taskmgr minesweeper; do
+    for resource in XmNlabelFontList XmNbuttonFontList XmNtextFontList; do
+        if ! grep -q "$resource" "$src/userland/apps/$app/main.c"; then
+            printf 'FAIL - %s does not route %s to a CJK-capable Xft font\n' \
+                "$app" "$resource" >&2
+            exit 1
+        fi
+    done
+done
 grep -q 'libXm.so' "$work/sources"
 for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai; do
     desktop="$src/userland/apps/$app/$app.desktop"

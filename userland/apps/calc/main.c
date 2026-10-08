@@ -70,6 +70,21 @@ static void close_window(Widget widget, XtPointer data, XtPointer call)
     XtAppSetExitFlag(app);
 }
 
+/* The XmNfontList string resource can only describe core fonts, which have no
+ * CJK glyphs; route widgets to a CJK-capable Xft rendition instead. */
+static XmFontList app_font_list(Widget shell)
+{
+    Arg args[3];
+    XmRendition rendition;
+    XtSetArg(args[0], XmNfontName, "SimSun");
+    XtSetArg(args[1], XmNfontType, XmFONT_IS_XFT);
+    XtSetArg(args[2], XmNloadModel, XmLOAD_IMMEDIATE);
+    rendition = XmRenditionCreate(shell, XmFONTLIST_DEFAULT_TAG, args, 3);
+    XmFontList list = XmRenderTableAddRenditions(NULL, &rendition, 1, XmDUPLICATE);
+    XmRenditionFree(rendition);
+    return list;
+}
+
 int main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
@@ -77,12 +92,17 @@ int main(int argc, char **argv)
     textdomain("leonos");
     XtSetLanguageProc(NULL, NULL, NULL);
     char *fallback[] = {
-        "*fontList: fixed", "*background: #eceef4", "*foreground: #22242e",
+        "*background: #eceef4", "*foreground: #22242e",
         "*expression.background: white", "*highlightColor: #3b62a6", NULL
     };
     Widget shell = XtVaAppInitialize(&app, "ReliefOSCalculator", NULL, 0,
                                     &argc, argv, fallback, XtNtitle, T("Calculator"),
                                     XtNwidth, 320, XtNheight, 340, NULL);
+    {
+        XmFontList fonts = app_font_list(shell);
+        XtVaSetValues(shell, XmNlabelFontList, fonts,
+                      XmNbuttonFontList, fonts, XmNtextFontList, fonts, NULL);
+    }
     Widget form = XtVaCreateWidget("calculator", xmFormWidgetClass, shell,
         XmNwidth, 320, XmNheight, 340, XmNresizePolicy, XmRESIZE_NONE,
         XmNmarginWidth, 12, XmNmarginHeight, 12, NULL);
