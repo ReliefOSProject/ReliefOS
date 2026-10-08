@@ -1,51 +1,35 @@
-#include <reliefos/gui.h>
-#include <libintl.h>
-#include <locale.h>
-#include <reliefos/layout.h>
-#include <reliefos/auth.h>
-#include <reliefos/psf_font.h>
-#include <reliefos/startup.h>
-#include <reliefos/launch.h>
-#include <reliefos/stdio.h>
-#include <reliefos/system.h>
-#include <reliefos/syscall.h>
-#include <reliefos/ui.h>
-
+#include "model.h"
 #include "gpu_sample.h"
 
-#define TASKMGR_W 720
-#define TASKMGR_H 560
-#define TASKMGR_MAX_W RELIEFOS_GUI_MAX_WINDOW_WIDTH
-#define TASKMGR_MAX_H RELIEFOS_GUI_MAX_WINDOW_HEIGHT
-#define TASKMGR_DETAILS_W 430
-#define TASKMGR_DETAILS_H 380
-#define TASKMGR_STATUS_H 28
-#define TASKMGR_MENU_BAR_H 28
-#define TASKMGR_MENU_ITEM_H (RELIEFOS_FONT_H + 8)
-#define TASKMGR_CONTEXT_MENU_W 140
-#define TASKMGR_CONTEXT_MENU_COUNT 3
-#define TASKMGR_STARTUP_USER_ROW_H 24U
-#define TASKMGR_PERF_HISTORY 120U
-#define TASKMGR_PERF_MISSING 255U
-#define TASKMGR_KEY_ESCAPE 1U
-#define RELIEFOS_KEY_DELETE 83U
+#include <libintl.h>
+#include <locale.h>
+#include <reliefos/auth.h>
+#include <reliefos/gui.h>
+#include <reliefos/layout.h>
+#include <reliefos/startup.h>
+#include <reliefos/system.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
+#include <Xm/CascadeB.h>
+#include <Xm/ComboBox.h>
+#include <Xm/DrawingA.h>
+#include <Xm/Form.h>
+#include <Xm/Label.h>
+#include <Xm/List.h>
+#include <Xm/MessageB.h>
+#include <Xm/Protocols.h>
+#include <Xm/PushB.h>
+#include <Xm/RowColumn.h>
+#include <Xm/Separator.h>
+#include <Xm/TabStack.h>
+
 #define T(s) gettext(s)
-
-enum {
-    TASKMGR_ACTION_END = 1,
-    TASKMGR_ACTION_DETAILS = 2,
-    TASKMGR_ACTION_REFRESH = 3,
-    TASKMGR_ACTION_ABOUT = 4,
-    TASKMGR_ACTION_PROCESSES = 5,
-    TASKMGR_ACTION_PERFORMANCE = 6,
-    TASKMGR_ACTION_STARTUP = 7,
-};
-
-enum {
-    TASKMGR_MENU_NONE = 0,
-    TASKMGR_MENU_FILE = 1,
-    TASKMGR_MENU_OPTIONS = 2,
-};
 
 enum {
     TASKMGR_TAB_PROCESSES = 0,
@@ -53,802 +37,51 @@ enum {
     TASKMGR_TAB_STARTUP = 2,
 };
 
-static uint32_t pixels[TASKMGR_MAX_W * TASKMGR_MAX_H];
-static uint32_t details_pixels[TASKMGR_DETAILS_W * TASKMGR_DETAILS_H];
+static XtAppContext app;
+static Widget shell, status_label;
+static Widget tab_stack, page_processes, page_performance, page_startup;
+static Widget process_list, process_popup;
+static Widget perf_area;
+static Widget startup_combo, startup_list_widget, startup_user_label;
+static Widget button_end_task, button_startup_toggle, button_startup_remove;
+static Widget menu_end_task, popup_end_task, popup_details;
+
 static struct reliefos_task_info tasks[RELIEFOS_TASK_MAX];
 static struct reliefos_task_info previous_tasks[RELIEFOS_TASK_MAX];
-static struct reliefos_ui_treeview_item process_tree_items[RELIEFOS_TASK_MAX];
-static const char *process_tree_cells[RELIEFOS_TASK_MAX][7];
-static char process_tree_pid[RELIEFOS_TASK_MAX][16];
-static char process_tree_cpu[RELIEFOS_TASK_MAX][16];
-static char process_tree_memory[RELIEFOS_TASK_MAX][24];
-static uint32_t task_count;
-static uint32_t previous_task_count;
-static uint64_t task_tick;
-static uint64_t previous_task_tick;
 static uint32_t task_cpu_percent[RELIEFOS_TASK_MAX];
 static uint32_t previous_task_cpu_percent[RELIEFOS_TASK_MAX];
+static uint32_t task_count, previous_task_count;
+static uint64_t previous_sample_total;
+static struct taskmgr_tree_row tree_rows[RELIEFOS_TASK_MAX];
+static uint32_t tree_count;
+static uint32_t selected_pid;
+
+static struct taskmgr_perf_history history;
 static struct reliefos_perf_info perf_info;
-static uint64_t last_busy_ticks;
-static uint64_t last_idle_ticks;
-static uint64_t last_cpu_busy_ticks[RELIEFOS_PERF_MAX_CPUS];
-static uint64_t last_cpu_idle_ticks[RELIEFOS_PERF_MAX_CPUS];
+static uint64_t last_busy_ticks, last_idle_ticks;
+static uint64_t last_cpu_busy[RELIEFOS_PERF_MAX_CPUS];
+static uint64_t last_cpu_idle[RELIEFOS_PERF_MAX_CPUS];
 static uint32_t cpu_percent_by_core[RELIEFOS_PERF_MAX_CPUS];
-static uint8_t cpu_snapshot_valid;
-static uint32_t cpu_percent;
-static uint32_t mem_percent;
-static uint8_t perf_valid;
-static uint8_t perf_mem_history[TASKMGR_PERF_HISTORY];
-static uint8_t perf_gpu_history[TASKMGR_PERF_HISTORY];
-static uint8_t perf_core_history[RELIEFOS_PERF_MAX_CPUS][TASKMGR_PERF_HISTORY];
+static uint32_t cpu_percent, mem_percent;
+static int cpu_snapshot_valid, perf_valid;
 static struct taskmgr_gpu_sample gpu_sample;
-static uint32_t perf_history_head;
-static uint32_t perf_history_count;
-static struct reliefos_ui_treeview_state process_tree;
+
 static struct reliefos_startup_entry startup_entries[RELIEFOS_STARTUP_MAX_ENTRIES];
 static uint32_t startup_entry_count;
-static struct reliefos_ui_listview_state startup_list;
-static struct reliefos_user_info *startup_users;
-static uint32_t startup_user_count;
-static uint32_t startup_selected_uid;
-static uint8_t startup_user_dropdown_open;
-static uint32_t startup_user_dropdown_scroll;
-static uint8_t active_tab = TASKMGR_TAB_PROCESSES;
-static struct reliefos_ui_tab_state taskmgr_tabs;
-static uint8_t menu_open;
-static uint8_t context_menu_active;
-static uint8_t context_menu_animating;
-static uint8_t context_menu_opening;
-static unsigned long context_menu_anim_start;
-static uint32_t context_menu_x;
-static uint32_t context_menu_y;
+static struct reliefos_user_info startup_users[16];
+static uint32_t startup_user_count, startup_selected_uid;
+static int startup_available;
+static int selected_startup = -1;
+static int active_tab = TASKMGR_TAB_PROCESSES;
+static int updating;
 
-static void taskmgr_tab_items(struct reliefos_ui_tab_item items[3])
-{
-    items[0] = (struct reliefos_ui_tab_item){T("Processes"), TASKMGR_TAB_PROCESSES, 0};
-    items[1] = (struct reliefos_ui_tab_item){T("Performance"), TASKMGR_TAB_PERFORMANCE, 0};
-    items[2] = (struct reliefos_ui_tab_item){T("Service Manager"), TASKMGR_TAB_STARTUP, 0};
-}
-static uint32_t view_w = TASKMGR_W;
-static uint32_t view_h = TASKMGR_H;
-static char status_text[96] = "Ready";
+/* Performance plotting state; the GC and colors are created once the
+ * drawing area has a window, like any other X11 client. */
+static GC perf_gc;
+static Font perf_font;
+static unsigned long perf_pixels[256];
+static unsigned long color_white, color_border, color_muted, color_text, color_accent;
 
-static void perf_history_push(uint32_t memory)
-{
-    if (memory > 100U) {
-        memory = 100U;
-    }
-    perf_mem_history[perf_history_head] = (uint8_t)memory;
-    perf_gpu_history[perf_history_head] = gpu_sample.valid
-                                            ? (uint8_t)gpu_sample.percent
-                                            : TASKMGR_PERF_MISSING;
-    perf_history_head = (perf_history_head + 1U) % TASKMGR_PERF_HISTORY;
-    if (perf_history_count < TASKMGR_PERF_HISTORY) {
-        ++perf_history_count;
-    }
-}
-
-static uint32_t visible_rows(void)
-{
-    uint32_t h = view_h > 102 + TASKMGR_STATUS_H + 8 ? view_h - 102 - TASKMGR_STATUS_H - 8 : 24;
-    uint32_t rows = h / 24;
-    return rows ? rows : 1;
-}
-
-static uint32_t startup_visible_rows(void)
-{
-    uint32_t h = view_h > 142 + TASKMGR_STATUS_H + 8 ?
-                     view_h - 142 - TASKMGR_STATUS_H - 8 : 24;
-    uint32_t rows = h / 24;
-    return rows ? rows : 1;
-}
-
-static uint32_t toolbar_tab_width(void)
-{
-    uint32_t available = view_w > 104 ? view_w - 104 : 0;
-    return available > 340 ? 340 : available;
-}
-
-static uint32_t toolbar_action_x(void)
-{
-    return 104 + toolbar_tab_width() + 8;
-}
-
-static void context_menu_set_active(uint8_t active)
-{
-    if (context_menu_active == active && !context_menu_animating) {
-        return;
-    }
-    context_menu_active = active;
-    context_menu_opening = active;
-    context_menu_animating = 1;
-    context_menu_anim_start = reliefos_uptime_ms();
-}
-
-static void append_char(char *buf, uint32_t *pos, uint32_t cap, char ch)
-{
-    if (*pos + 1 < cap) {
-        buf[(*pos)++] = ch;
-        buf[*pos] = 0;
-    }
-}
-
-static void append_text(char *buf, uint32_t *pos, uint32_t cap, const char *text)
-{
-    for (uint32_t i = 0; text && text[i]; ++i) {
-        append_char(buf, pos, cap, text[i]);
-    }
-}
-
-static void append_dec(char *buf, uint32_t *pos, uint32_t cap, uint64_t value)
-{
-    char tmp[20];
-    uint32_t n = 0;
-    if (value == 0) {
-        append_char(buf, pos, cap, '0');
-        return;
-    }
-    while (value && n < sizeof(tmp)) {
-        tmp[n++] = (char)('0' + (value % 10));
-        value /= 10;
-    }
-    while (n) {
-        append_char(buf, pos, cap, tmp[--n]);
-    }
-}
-
-static void append_hex_fixed(char *buf, uint32_t *pos, uint32_t cap, uint64_t value, uint32_t digits)
-{
-    const char *hex = "0123456789abcdef";
-    append_text(buf, pos, cap, "0x");
-    for (int32_t shift = (int32_t)(digits * 4); shift > 0; shift -= 4) {
-        append_char(buf, pos, cap, hex[(value >> (uint32_t)(shift - 4)) & 0xf]);
-    }
-}
-
-static int hit_rect_i(int32_t x, int32_t y, int32_t rx, int32_t ry, int32_t rw, int32_t rh)
-{
-    return x >= rx && y >= ry && x < rx + rw && y < ry + rh;
-}
-
-static const char *state_name(uint32_t state)
-{
-    switch (state) {
-    case 0:
-        return "ready";
-    case 1:
-        return "run";
-    case 2:
-        return "sleep";
-    case 3:
-        return "exit";
-    default:
-        return "?";
-    }
-}
-
-static const char *kind_name(uint32_t kind)
-{
-    return kind == 1 ? "user" : "kern";
-}
-
-static const char *task_user_name(const struct reliefos_task_info *task)
-{
-    if (task && task->username[0]) {
-        return task->username;
-    }
-    return task && task->uid ? T("Unknown") : T("System");
-}
-
-static const char *task_privilege_name(const struct reliefos_task_info *task)
-{
-    if (!task || !task->uid) {
-        return T("System");
-    }
-    if (task->flags & RELIEFOS_TASK_SNAPSHOT_FLAG_ELEVATED_ADMIN) {
-        return T("Elevated");
-    }
-    if (task->role == RELIEFOS_AUTH_ROLE_ADMIN) {
-        return T("Admin");
-    }
-    return T("Standard");
-}
-
-static int task_index_by_pid(const struct reliefos_task_info *list,
-                             uint32_t count, uint32_t pid)
-{
-    for (uint32_t i = 0; i < count; ++i) {
-        if (list[i].pid == pid) {
-            return (int)i;
-        }
-    }
-    return -1;
-}
-
-static void format_process_cpu(char *buf, uint32_t cap, uint32_t percent)
-{
-    uint32_t pos = 0;
-    buf[0] = 0;
-    append_dec(buf, &pos, cap, percent);
-    append_text(buf, &pos, cap, "%");
-}
-
-static void format_process_memory(char *buf, uint32_t cap, uint32_t kib)
-{
-    static const char *const units[] = {"B", "KB", "MB", "GB", "TB"};
-    uint64_t bytes = (uint64_t)kib * 1024ULL;
-    uint64_t unit_size = 1ULL;
-    uint64_t whole;
-    uint64_t fraction;
-    uint32_t unit = 0;
-    uint32_t pos = 0;
-
-    while (unit + 1U < sizeof(units) / sizeof(units[0]) &&
-           bytes >= unit_size * 1024ULL) {
-        unit_size *= 1024ULL;
-        ++unit;
-    }
-    whole = bytes / unit_size;
-    /* Keep one useful decimal place for small non-integral values without
-     * making the process list jump in width on every refresh. */
-    fraction = ((bytes % unit_size) * 10ULL + unit_size / 2ULL) / unit_size;
-    if (fraction == 10ULL) {
-        ++whole;
-        fraction = 0;
-    }
-
-    buf[0] = 0;
-    append_dec(buf, &pos, cap, whole);
-    if (unit != 0 && whole < 10ULL && fraction != 0) {
-        append_char(buf, &pos, cap, '.');
-        append_dec(buf, &pos, cap, fraction);
-    }
-    append_char(buf, &pos, cap, ' ');
-    append_text(buf, &pos, cap, units[unit]);
-}
-
-static void rebuild_process_tree_items(void)
-{
-    for (uint32_t i = 0; i < task_count; ++i) {
-        uint32_t pos = 0;
-        process_tree_pid[i][0] = 0;
-        append_dec(process_tree_pid[i], &pos, sizeof(process_tree_pid[i]), tasks[i].pid);
-        format_process_cpu(process_tree_cpu[i], sizeof(process_tree_cpu[i]), task_cpu_percent[i]);
-        format_process_memory(process_tree_memory[i], sizeof(process_tree_memory[i]),
-                              tasks[i].memory_kib);
-        process_tree_cells[i][0] = tasks[i].name;
-        process_tree_cells[i][1] = process_tree_pid[i];
-        process_tree_cells[i][2] = process_tree_cpu[i];
-        process_tree_cells[i][3] = process_tree_memory[i];
-        process_tree_cells[i][4] = state_name(tasks[i].state);
-        process_tree_cells[i][5] = task_user_name(&tasks[i]);
-        process_tree_cells[i][6] = task_privilege_name(&tasks[i]);
-        process_tree_items[i].id = tasks[i].pid;
-        process_tree_items[i].parent_id = tasks[i].parent_pid;
-        process_tree_items[i].cells = process_tree_cells[i];
-        process_tree_items[i].flags = 0;
-    }
-    reliefos_ui_treeview_state_sync(&process_tree, process_tree_items, task_count);
-}
-
-static void refresh_tasks(void)
-{
-    uint64_t next_tick = 0;
-    uint64_t tick_delta = 0;
-    uint64_t sample_total;
-    int count;
-    count = reliefos_task_snapshot(tasks, RELIEFOS_TASK_MAX, &next_tick);
-    task_count = count > 0 ? (uint32_t)count : 0;
-    /* cpu_ticks is charged by every CPU's local scheduling tick.  The BSP
-     * wall-clock tick is not necessarily phase- or frequency-identical to
-     * the AP LAPIC ticks, so `wall_ticks * cpu_count` can report a runnable
-     * process as 0% on SMP.  Use the aggregate accounting denominator from
-     * the same per-CPU sources that charged the task instead. */
-    sample_total = perf_info.busy_ticks + perf_info.idle_ticks;
-    if (previous_task_tick && sample_total > previous_task_tick) {
-        tick_delta = sample_total - previous_task_tick;
-    }
-    for (uint32_t i = 0; i < task_count; ++i) {
-        int previous = task_index_by_pid(previous_tasks, previous_task_count, tasks[i].pid);
-        uint64_t used_ticks = 0;
-        if (previous >= 0 && tasks[i].cpu_ticks >= previous_tasks[previous].cpu_ticks) {
-            used_ticks = tasks[i].cpu_ticks - previous_tasks[previous].cpu_ticks;
-        }
-        if (tick_delta) {
-            task_cpu_percent[i] = (uint32_t)((used_ticks * 100ULL) / tick_delta);
-        } else if (previous >= 0) {
-            task_cpu_percent[i] = previous_task_cpu_percent[previous];
-        } else {
-            task_cpu_percent[i] = 0;
-        }
-        if (task_cpu_percent[i] > 100U) {
-            task_cpu_percent[i] = 100U;
-        }
-    }
-    rebuild_process_tree_items();
-    previous_task_count = task_count;
-    previous_task_tick = sample_total;
-    for (uint32_t i = 0; i < task_count; ++i) {
-        previous_task_cpu_percent[i] = task_cpu_percent[i];
-        previous_tasks[i] = tasks[i];
-    }
-    task_tick = sample_total;
-}
-
-static void refresh_startup_users(void)
-{
-    struct reliefos_user_info current;
-    uint32_t count = 0;
-    current = (struct reliefos_user_info){0};
-    startup_user_count = 0;
-    if (reliefos_auth_current(&current) < 0) {
-        startup_selected_uid = 0;
-        return;
-    }
-    if (current.role == RELIEFOS_AUTH_ROLE_ADMIN &&
-        reliefos_auth_users_alloc(&startup_users, 0, &count) == 0) {
-        startup_user_count = count;
-    } else {
-        if (!startup_users) startup_users = calloc(1, sizeof(*startup_users));
-        if (!startup_users) return;
-        startup_users[0] = current;
-        startup_user_count = 1;
-    }
-    for (uint32_t i = 0; i < startup_user_count; ++i) {
-        if (startup_users[i].uid == startup_selected_uid) {
-            return;
-        }
-    }
-    startup_selected_uid = startup_user_count ? startup_users[0].uid : 0;
-}
-
-static const char *startup_selected_username(void)
-{
-    for (uint32_t i = 0; i < startup_user_count; ++i) {
-        if (startup_users[i].uid == startup_selected_uid) {
-            return startup_users[i].username;
-        }
-    }
-    return "";
-}
-
-static void refresh_startup_entries(void)
-{
-    uint32_t count = 0;
-    if (!startup_user_count) {
-        startup_entry_count = 0;
-        return;
-    }
-    if (reliefos_startup_list(startup_selected_uid, startup_entries,
-                            RELIEFOS_STARTUP_MAX_ENTRIES, &count) < 0) {
-        count = 0;
-    }
-    startup_entry_count = count > RELIEFOS_STARTUP_MAX_ENTRIES ?
-                              RELIEFOS_STARTUP_MAX_ENTRIES : count;
-    reliefos_ui_listview_state_set_count(&startup_list, startup_entry_count);
-    if (startup_list.selected < 0 && startup_entry_count) {
-        startup_list.selected = 0;
-    }
-}
-
-static void refresh_startup(void)
-{
-    refresh_startup_users();
-    refresh_startup_entries();
-}
-
-static void set_status(const char *text)
-{
-    uint32_t i = 0;
-    while (text && text[i] && i + 1 < sizeof(status_text)) {
-        status_text[i] = text[i];
-        ++i;
-    }
-    status_text[i] = 0;
-}
-
-static void open_service_manager(void)
-{
-    const char *path = reliefos_launch_builtin_path("servicemgr");
-    char *argv[] = {(char *)path, 0};
-    int pid = reliefos_launch_argv(argv);
-    if (pid < 0) {
-        set_status(T("Could not open Service Manager"));
-        return;
-    }
-    set_status(T("Service Manager opened"));
-}
-
-static void refresh_performance(void)
-{
-    struct reliefos_perf_info next;
-    gpu_sdk_info_t next_gpu = {
-        .size = sizeof(gpu_sdk_info_t),
-        .version = GPU_SDK_ABI_VERSION,
-    };
-    uint64_t old_total;
-    uint64_t new_total;
-    uint64_t delta_total;
-    uint64_t delta_busy;
-    uint32_t cpu_count;
-    uint32_t core_slot;
-    int gpu_result = gpu_sdk_info(&next_gpu);
-    if (taskmgr_gpu_sample_update(&gpu_sample, gpu_result < 0 ? 0 : &next_gpu)) {
-        for (uint32_t i = 0; i < TASKMGR_PERF_HISTORY; ++i) {
-            perf_gpu_history[i] = TASKMGR_PERF_MISSING;
-        }
-    }
-    if (reliefos_perf_info(&next) < 0) {
-        perf_valid = 0;
-        set_status(T("Performance data unavailable"));
-        return;
-    }
-    old_total = last_busy_ticks + last_idle_ticks;
-    new_total = next.busy_ticks + next.idle_ticks;
-    if (old_total && new_total > old_total) {
-        delta_total = new_total - old_total;
-        delta_busy = next.busy_ticks >= last_busy_ticks ? next.busy_ticks - last_busy_ticks : 0;
-        cpu_percent = delta_total ? (uint32_t)((delta_busy * 100ULL) / delta_total) : 0;
-    } else if (!cpu_snapshot_valid) {
-        cpu_percent = new_total ? (uint32_t)((next.busy_ticks * 100ULL) / new_total) : 0;
-    }
-    if (cpu_percent > 100) {
-        cpu_percent = 100;
-    }
-    if (next.total_memory_kib && next.total_memory_kib >= next.free_memory_kib) {
-        uint64_t used = next.total_memory_kib - next.free_memory_kib;
-        mem_percent = (uint32_t)((used * 100ULL) / next.total_memory_kib);
-    } else {
-        mem_percent = 0;
-    }
-    if (mem_percent > 100) {
-        mem_percent = 100;
-    }
-    /* All plots advance together; unavailable GPU samples leave a gap. */
-    perf_history_push(mem_percent);
-    cpu_count = next.cpu_count;
-    if (cpu_count > RELIEFOS_PERF_MAX_CPUS) {
-        cpu_count = RELIEFOS_PERF_MAX_CPUS;
-    }
-    /* perf_history_push already advanced the head; every core shares this
-     * same ring slot so the per-core lines stay aligned with the CPU plot. */
-    core_slot = (perf_history_head + TASKMGR_PERF_HISTORY - 1U) % TASKMGR_PERF_HISTORY;
-    for (uint32_t i = 0; i < RELIEFOS_PERF_MAX_CPUS; ++i) {
-        uint64_t old_cpu_total = last_cpu_busy_ticks[i] + last_cpu_idle_ticks[i];
-        uint64_t new_cpu_total = next.cpus[i].busy_ticks + next.cpus[i].idle_ticks;
-        uint64_t cpu_delta_total;
-        uint64_t cpu_delta_busy;
-        if (i >= cpu_count || !next.cpus[i].online) {
-            cpu_percent_by_core[i] = 0;
-            /* Offline cores have no signal to plot; leave a gap. */
-            perf_core_history[i][core_slot] = TASKMGR_PERF_MISSING;
-        } else if (cpu_snapshot_valid && old_cpu_total && new_cpu_total > old_cpu_total) {
-            cpu_delta_total = new_cpu_total - old_cpu_total;
-            cpu_delta_busy = next.cpus[i].busy_ticks >= last_cpu_busy_ticks[i]
-                                 ? next.cpus[i].busy_ticks - last_cpu_busy_ticks[i] : 0;
-            cpu_percent_by_core[i] = cpu_delta_total
-                                         ? (uint32_t)((cpu_delta_busy * 100ULL) / cpu_delta_total)
-                                         : 0;
-            perf_core_history[i][core_slot] = (uint8_t)cpu_percent_by_core[i];
-        } else if (!cpu_snapshot_valid) {
-            cpu_percent_by_core[i] = new_cpu_total
-                                         ? (uint32_t)((next.cpus[i].busy_ticks * 100ULL) /
-                                                      new_cpu_total)
-                                         : 0;
-            perf_core_history[i][core_slot] = (uint8_t)cpu_percent_by_core[i];
-        } else {
-            perf_core_history[i][core_slot] = (uint8_t)cpu_percent_by_core[i];
-        }
-        if (cpu_percent_by_core[i] > 100) {
-            cpu_percent_by_core[i] = 100;
-        }
-        last_cpu_busy_ticks[i] = next.cpus[i].busy_ticks;
-        last_cpu_idle_ticks[i] = next.cpus[i].idle_ticks;
-    }
-    perf_info = next;
-    last_busy_ticks = next.busy_ticks;
-    last_idle_ticks = next.idle_ticks;
-    cpu_snapshot_valid = 1;
-    perf_valid = 1;
-}
-
-static void refresh_all(void)
-{
-    refresh_performance();
-    refresh_tasks();
-    if (active_tab == TASKMGR_TAB_STARTUP) {
-        refresh_startup();
-    }
-}
-
-static struct reliefos_task_info *selected_task(void)
-{
-    int index;
-    if (active_tab != TASKMGR_TAB_PROCESSES) {
-        return 0;
-    }
-    if (!process_tree.has_selection) {
-        return 0;
-    }
-    index = task_index_by_pid(tasks, task_count, process_tree.selected_id);
-    return index >= 0 ? &tasks[index] : 0;
-}
-
-static struct reliefos_startup_entry *selected_startup_entry(void)
-{
-    if (active_tab != TASKMGR_TAB_STARTUP || startup_list.selected < 0 ||
-        (uint32_t)startup_list.selected >= startup_entry_count) {
-        return 0;
-    }
-    return &startup_entries[startup_list.selected];
-}
-
-static void toggle_selected_startup_entry(void)
-{
-    struct reliefos_startup_entry *entry = selected_startup_entry();
-    if (!entry) {
-        set_status(T("No startup app selected"));
-        return;
-    }
-    if (reliefos_startup_set_enabled(startup_selected_uid, entry->id, !entry->enabled) < 0) {
-        set_status(T("Could not change startup app"));
-        return;
-    }
-    set_status(entry->enabled ? T("Startup app disabled")
-                              : T("Startup app enabled"));
-    refresh_startup_entries();
-}
-
-static void remove_selected_startup_entry(void)
-{
-    struct reliefos_startup_entry *entry = selected_startup_entry();
-    if (!entry) {
-        set_status(T("No startup app selected"));
-        return;
-    }
-    if (!reliefos_ui_show_confirm_dialog(T("Remove Startup App"),
-                                       T("Remove the selected startup app?"), 0)) {
-        return;
-    }
-    if (reliefos_startup_remove(startup_selected_uid, entry->id) < 0) {
-        set_status(T("Could not remove startup app"));
-        return;
-    }
-    set_status(T("Startup app removed"));
-    refresh_startup_entries();
-}
-
-static int selected_task_killable(void)
-{
-    struct reliefos_task_info *task = selected_task();
-    if (!task || task->pid == 0 || task->kind != 1 || task->state == 3 ||
-        (task->flags & 1u) || task->pid == (uint32_t)getpid()) {
-        return 0;
-    }
-    return 1;
-}
-
-static void kill_selected_task(void)
-{
-    struct reliefos_task_info *task = selected_task();
-    uint32_t pid;
-    if (!task) {
-        set_status(T("No task selected"));
-        return;
-    }
-    if (!selected_task_killable()) {
-        set_status(T("Cannot end protected or non-user task"));
-        return;
-    }
-    pid = task->pid;
-    if (reliefos_task_kill(pid) < 0) {
-        set_status(T("End Task failed"));
-        return;
-    }
-    set_status(T("Task ended"));
-    refresh_all();
-}
-
-static void build_context_menu_items(struct reliefos_ui_context_menu_item *items)
-{
-    items[0] = (struct reliefos_ui_context_menu_item){T("End Task"), TASKMGR_ACTION_END,
-                                                    selected_task_killable() ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[1] = (struct reliefos_ui_context_menu_item){T("Details"), TASKMGR_ACTION_DETAILS,
-                                                    selected_task() ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[2] = (struct reliefos_ui_context_menu_item){T("Refresh"), TASKMGR_ACTION_REFRESH, 0};
-}
-
-static void show_task_details(void)
-{
-    struct reliefos_task_info *task = selected_task();
-    struct reliefos_task_info snapshot;
-    struct reliefos_ui_surface ui;
-    struct reliefos_gui_app_event event;
-    char pid[24];
-    char ppid[24];
-    char cr3[24];
-    char entry[24];
-    char wake[24];
-    char cpu_ticks[24];
-    char memory[24];
-    uint32_t pos;
-    int window_id;
-    if (!task) {
-        set_status(T("No task selected"));
-        return;
-    }
-    snapshot = *task;
-    pos = 0;
-    pid[0] = 0;
-    append_dec(pid, &pos, sizeof(pid), snapshot.pid);
-    pos = 0;
-    ppid[0] = 0;
-    append_dec(ppid, &pos, sizeof(ppid), snapshot.parent_pid);
-    pos = 0;
-    cr3[0] = 0;
-    append_hex_fixed(cr3, &pos, sizeof(cr3), snapshot.cr3, 12);
-    pos = 0;
-    entry[0] = 0;
-    append_hex_fixed(entry, &pos, sizeof(entry), snapshot.entry, 12);
-    pos = 0;
-    wake[0] = 0;
-    append_dec(wake, &pos, sizeof(wake), snapshot.wake_tick);
-    pos = 0;
-    cpu_ticks[0] = 0;
-    append_dec(cpu_ticks, &pos, sizeof(cpu_ticks), snapshot.cpu_ticks);
-    append_text(cpu_ticks, &pos, sizeof(cpu_ticks), " ticks");
-    format_process_memory(memory, sizeof(memory), snapshot.memory_kib);
-
-    window_id = reliefos_gui_create_app_window_ex(T("Task Details"), snapshot.name,
-                                                TASKMGR_DETAILS_W, TASKMGR_DETAILS_H,
-                                                RELIEFOS_GUI_WINDOW_NO_RESIZE);
-    if (window_id <= 0) {
-        set_status(T("Details failed"));
-        return;
-    }
-    reliefos_ui_bind(&ui, details_pixels, TASKMGR_DETAILS_W, TASKMGR_DETAILS_H,
-                   TASKMGR_DETAILS_W);
-    for (;;) {
-        struct reliefos_ui_property_item props[] = {
-            {T("Name:"), snapshot.name, 0},
-            {"PID:", pid, 0},
-            {T("Parent PID:"), ppid, 0},
-            {T("State:"), state_name(snapshot.state), 0},
-            {T("Kind:"), kind_name(snapshot.kind), 0},
-            {T("User:"), task_user_name(&snapshot), 0},
-            {T("Privileges:"), task_privilege_name(&snapshot), 0},
-            {T("CPU time:"), cpu_ticks, 0},
-            {T("Memory:"), memory, 0},
-            {"CR3:", cr3, 0},
-            {"Entry:", entry, 0},
-            {T("Wake tick:"), wake, 0},
-        };
-        reliefos_ui_rect(&ui, 0, 0, TASKMGR_DETAILS_W, TASKMGR_DETAILS_H,
-                       RELIEFOS_UI_GRAY);
-        reliefos_ui_property_grid(&ui, 16, 16, TASKMGR_DETAILS_W - 32,
-                                props, sizeof(props) / sizeof(props[0]),
-                                110, 23);
-        reliefos_ui_button(&ui, TASKMGR_DETAILS_W - 90, TASKMGR_DETAILS_H - 38,
-                         72, RELIEFOS_UI_BUTTON_H, "OK", 0);
-        reliefos_gui_present_window((uint32_t)window_id, TASKMGR_DETAILS_W,
-                                  TASKMGR_DETAILS_H, TASKMGR_DETAILS_W,
-                                  details_pixels);
-        event.window_id = (uint32_t)window_id;
-        if (reliefos_gui_wait_app_event(&event, RELIEFOS_GUI_IDLE_WAIT_MS) > 0) {
-            if (event.type == RELIEFOS_GUI_APP_EVENT_CLOSE) {
-                break;
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN &&
-                (event.keycode == RELIEFOS_KEY_ENTER || event.keycode == TASKMGR_KEY_ESCAPE)) {
-                break;
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_MOUSE_BUTTON && (event.buttons & 1u) &&
-                hit_rect_i(event.x, event.y, TASKMGR_DETAILS_W - 90,
-                           TASKMGR_DETAILS_H - 38, 72,
-                           (int32_t)RELIEFOS_UI_BUTTON_H)) {
-                break;
-            }
-        } else {
-            sleep_ms(10);
-        }
-    }
-    reliefos_gui_destroy_app_window((uint32_t)window_id);
-}
-
-static void execute_context_action(uint32_t action)
-{
-    context_menu_set_active(0);
-    if (action == TASKMGR_ACTION_END) {
-        kill_selected_task();
-    } else if (action == TASKMGR_ACTION_DETAILS) {
-        show_task_details();
-    } else if (action == TASKMGR_ACTION_REFRESH) {
-        refresh_all();
-    }
-}
-
-static void format_percent(char *buf, uint32_t cap, uint32_t value)
-{
-    uint32_t pos = 0;
-    buf[0] = 0;
-    append_dec(buf, &pos, cap, value);
-    append_text(buf, &pos, cap, "%");
-}
-
-static void format_kib(char *buf, uint32_t cap, uint64_t kib)
-{
-    uint32_t pos = 0;
-    buf[0] = 0;
-    append_dec(buf, &pos, cap, kib);
-    append_text(buf, &pos, cap, " KiB");
-}
-
-static void format_uptime(char *buf, uint32_t cap, uint64_t ms)
-{
-    uint64_t seconds = ms / 1000ULL;
-    uint64_t hours = seconds / 3600ULL;
-    uint64_t minutes = (seconds / 60ULL) % 60ULL;
-    uint64_t secs = seconds % 60ULL;
-    uint32_t pos = 0;
-    buf[0] = 0;
-    append_dec(buf, &pos, cap, hours);
-    append_text(buf, &pos, cap, ":");
-    if (minutes < 10) {
-        append_text(buf, &pos, cap, "0");
-    }
-    append_dec(buf, &pos, cap, minutes);
-    append_text(buf, &pos, cap, ":");
-    if (secs < 10) {
-        append_text(buf, &pos, cap, "0");
-    }
-    append_dec(buf, &pos, cap, secs);
-}
-
-static void draw_perf_text_line(struct reliefos_ui_surface *ui, uint32_t x, uint32_t y,
-                                const char *label, const char *value)
-{
-    if (y + RELIEFOS_FONT_H > view_h - TASKMGR_STATUS_H - 8U) {
-        return;
-    }
-    reliefos_ui_text_clipped(ui, x, y, 146U, label, RELIEFOS_UI_BLACK, RELIEFOS_UI_WHITE);
-    reliefos_ui_text_clipped(ui, x + 150, y, view_w > x + 174 ? view_w - x - 174 : 80,
-                           value ? value : "", RELIEFOS_UI_BLACK, RELIEFOS_UI_WHITE);
-}
-
-static void draw_perf_segment(struct reliefos_ui_surface *ui, int32_t x0, int32_t y0,
-                              int32_t x1, int32_t y1, uint32_t color)
-{
-    int32_t dx = x1 >= x0 ? x1 - x0 : x0 - x1;
-    int32_t sx = x0 < x1 ? 1 : -1;
-    int32_t dy = y1 >= y0 ? y0 - y1 : y1 - y0;
-    int32_t sy = y0 < y1 ? 1 : -1;
-    int32_t error = dx + dy;
-    for (;;) {
-        if (x0 >= 0 && y0 >= 0) {
-            reliefos_ui_pixel(ui, (uint32_t)x0, (uint32_t)y0, color);
-        }
-        if (x0 == x1 && y0 == y1) {
-            break;
-        }
-        {
-            int32_t twice = error * 2;
-            if (twice >= dy) {
-                error += dy;
-                x0 += sx;
-            }
-            if (twice <= dx) {
-                error += dx;
-                y0 += sy;
-            }
-        }
-    }
-}
-
-/* KDE-style CPU graph: every core is drawn as its own colored polyline in
- * one shared coordinate system.  The first entries are pairwise maximally
- * distinct so small machines get obvious per-core colors; machines with
- * more cores than palette entries cycle.  Colors are mid-brightness so
- * every line stays readable on the white plot background. */
 #define TASKMGR_CORE_PALETTE_SIZE 32U
 static const uint32_t core_palette[TASKMGR_CORE_PALETTE_SIZE] = {
     0x00B81C1C, 0x001CB89E, 0x00000080, 0x007AB800,
@@ -861,967 +94,1146 @@ static const uint32_t core_palette[TASKMGR_CORE_PALETTE_SIZE] = {
     0x00398068, 0x00263580, 0x006A8000, 0x00803939,
 };
 
-static uint32_t core_color(uint32_t core)
+static unsigned long alloc_color(Display *display, uint32_t rgb)
 {
-    return core_palette[core % TASKMGR_CORE_PALETTE_SIZE];
+    XColor color;
+    Colormap colormap = DefaultColormap(display, DefaultScreen(display));
+    color.red = (unsigned short)(((rgb >> 16) & 0xffu) * 0x0101u);
+    color.green = (unsigned short)(((rgb >> 8) & 0xffu) * 0x0101u);
+    color.blue = (unsigned short)((rgb & 0xffu) * 0x0101u);
+    color.flags = DoRed | DoGreen | DoBlue;
+    if (!XAllocColor(display, colormap, &color)) {
+        return BlackPixel(display, DefaultScreen(display));
+    }
+    return color.pixel;
 }
 
-struct perf_plot_rect {
-    uint32_t x;
-    uint32_t y;
-    uint32_t w;
-    uint32_t h;
-};
-
-static struct perf_plot_rect perf_plot_rect_at(uint32_t x, uint32_t y,
-                                               uint32_t w, uint32_t h)
+static unsigned long core_color(uint32_t core)
 {
-    struct perf_plot_rect plot;
-    if (h < 64U && w >= 280U) {
-        uint32_t label_w = w / 2U;
-        plot.x = x + label_w;
-        plot.y = y + 4U;
-        plot.w = w - label_w - 8U;
-        plot.h = h - 8U;
-    } else {
-        plot.x = x + 8U;
-        plot.y = y + 26U;
-        plot.w = w - 16U;
-        plot.h = h - 34U;
-    }
-    return plot;
+    return perf_pixels[core % TASKMGR_CORE_PALETTE_SIZE];
 }
 
-/* Draw one history ring as a polyline; TASKMGR_PERF_MISSING samples leave
- * gaps exactly like the single-series graphs. */
-static void draw_perf_history_line(struct reliefos_ui_surface *ui,
-                                   const struct perf_plot_rect *plot,
-                                   const uint8_t *history, uint32_t color)
+static void set_label(Widget widget, const char *text)
 {
-    uint32_t count = perf_history_count;
-    if (!count) {
-        return;
-    }
-    for (uint32_t i = 0; i < count; ++i) {
-        uint32_t history_index = (perf_history_head + TASKMGR_PERF_HISTORY - count + i) %
-                                  TASKMGR_PERF_HISTORY;
-        if (history[history_index] == TASKMGR_PERF_MISSING) {
-            continue;
-        }
-        /* Use the complete history width as the time axis.  While the ring
-         * fills, samples enter at the right; after it fills, advancing the
-         * head shifts every point one slot to the left like Task Manager. */
-        uint32_t slot = TASKMGR_PERF_HISTORY - count + i;
-        uint32_t px = plot->x + 1U +
-                      (slot * (plot->w - 3U)) / (TASKMGR_PERF_HISTORY - 1U);
-        uint32_t value = history[history_index] > 100U ? 100U : history[history_index];
-        uint32_t py = plot->y + plot->h - 2U -
-                      (value * (plot->h - 3U)) / 100U;
-        if (i) {
-            uint32_t previous_index = (perf_history_head + TASKMGR_PERF_HISTORY - count + i - 1U) %
-                                       TASKMGR_PERF_HISTORY;
-            if (history[previous_index] == TASKMGR_PERF_MISSING) {
-                reliefos_ui_pixel(ui, px, py, color);
-                continue;
-            }
-            uint32_t previous_value = history[previous_index] > 100U ? 100U : history[previous_index];
-            uint32_t previous_slot = TASKMGR_PERF_HISTORY - count + i - 1U;
-            uint32_t previous_x = plot->x + 1U +
-                                  (previous_slot * (plot->w - 3U)) /
-                                      (TASKMGR_PERF_HISTORY - 1U);
-            uint32_t previous_y = plot->y + plot->h - 2U -
-                                  (previous_value * (plot->h - 3U)) / 100U;
-            draw_perf_segment(ui, (int32_t)previous_x, (int32_t)previous_y,
-                              (int32_t)px, (int32_t)py, color);
-        }
-        reliefos_ui_pixel(ui, px, py, color);
-    }
+    XmString label = XmStringCreateLocalized((char *)text);
+    XtVaSetValues(widget, XmNlabelString, label, NULL);
+    XmStringFree(label);
 }
 
-static void draw_perf_graph_frame(struct reliefos_ui_surface *ui, uint32_t x, uint32_t y,
-                                  uint32_t w, uint32_t h, const char *title,
-                                  const char *current, int available,
-                                  struct perf_plot_rect *plot)
+static void set_status(const char *text)
 {
-    uint32_t grid_color = reliefos_ui_color(RELIEFOS_UI_COLOR_BORDER);
-    uint32_t muted_color = reliefos_ui_color(RELIEFOS_UI_COLOR_MUTED);
-    uint32_t text_color = available ? RELIEFOS_UI_BLACK : muted_color;
-    if (h < 64U && w >= 280U) {
-        uint32_t label_w = w / 2U;
-        reliefos_ui_text_clipped(ui, x + 8U, y + 6U, label_w - 62U, title,
-                               text_color, RELIEFOS_UI_WHITE);
-        reliefos_ui_text_clipped(ui, x + label_w - 48U, y + 6U, 44U, current,
-                               text_color, RELIEFOS_UI_WHITE);
-    } else {
-        reliefos_ui_text_clipped(ui, x + 8U, y + 6U, w - 76U, title,
-                               text_color, RELIEFOS_UI_WHITE);
-        reliefos_ui_text_clipped(ui, x + w - 60U, y + 6U, 52U, current,
-                               text_color, RELIEFOS_UI_WHITE);
-    }
-    *plot = perf_plot_rect_at(x, y, w, h);
-    reliefos_ui_inset(ui, plot->x, plot->y, plot->w, plot->h, RELIEFOS_UI_WHITE);
-    if (plot->w < 4U || plot->h < 4U) {
-        return;
-    }
-    for (uint32_t step = 1U; step < 4U; ++step) {
-        uint32_t gy = plot->y + ((plot->h - 1U) * step) / 4U;
-        reliefos_ui_rect(ui, plot->x + 1U, gy, plot->w - 2U, 1U, grid_color);
-    }
-    if (plot->h >= 40U) {
-        reliefos_ui_text_clipped(ui, plot->x + 3U, plot->y + 2U, 34U, "100%",
-                               muted_color, RELIEFOS_UI_WHITE);
-        reliefos_ui_text_clipped(ui, plot->x + 3U,
-                               plot->y + plot->h - RELIEFOS_FONT_H - 2U,
-                               34U, "0%", muted_color, RELIEFOS_UI_WHITE);
-    }
+    if (status_label) set_label(status_label, text);
 }
 
-static void draw_perf_graph_core(struct reliefos_ui_surface *ui, uint32_t x, uint32_t y,
-                                 uint32_t w, uint32_t h, const char *title,
-                                 const char *current, uint32_t core_count)
+static int task_index_by_pid(uint32_t pid)
 {
-    struct perf_plot_rect plot;
-    if (w < 96U || h < 32U || (h < 48U && w < 280U)) {
-        return;
+    for (uint32_t i = 0; i < task_count; ++i) {
+        if (tasks[i].pid == pid) return (int)i;
     }
-    draw_perf_graph_frame(ui, x, y, w, h, title, current, 1, &plot);
-    if (plot.w < 4U || plot.h < 4U || !perf_history_count) {
-        return;
-    }
-    if (core_count > RELIEFOS_PERF_MAX_CPUS) {
-        core_count = RELIEFOS_PERF_MAX_CPUS;
-    }
-    /* Core 0 first so later lines overdraw earlier ones; each core keeps
-     * its stable palette color regardless of the draw order. */
-    for (uint32_t core = 0; core < core_count; ++core) {
-        draw_perf_history_line(ui, &plot, perf_core_history[core], core_color(core));
-    }
-    /* The color-to-core mapping is shown by the swatches in the per-core
-     * usage list below the graphs; an in-plot legend cannot fit 32+
-     * entries at these sizes. */
+    return -1;
 }
 
-static void draw_perf_graph(struct reliefos_ui_surface *ui, uint32_t x, uint32_t y,
-                            uint32_t w, uint32_t h, const char *title,
-                            const char *current, const uint8_t *history, uint32_t color)
+static int previous_index_by_pid(uint32_t pid)
 {
-    struct perf_plot_rect plot;
-    if (w < 96U || h < 32U || (h < 48U && w < 280U)) {
-        return;
+    for (uint32_t i = 0; i < previous_task_count; ++i) {
+        if (previous_tasks[i].pid == pid) return (int)i;
     }
-    draw_perf_graph_frame(ui, x, y, w, h, title, current, history != 0, &plot);
-    if (!history || plot.w < 4U || plot.h < 4U) {
-        return;
-    }
-    draw_perf_history_line(ui, &plot, history, color);
+    return -1;
 }
 
-static void draw_performance(struct reliefos_ui_surface *ui)
+static const char *task_user_name(const struct reliefos_task_info *task)
 {
-    char value[64];
-    char value2[64];
-    char core_label[24];
-    uint32_t y = 80U;
-    uint32_t content_w = view_w > 40U ? view_w - 40U : 1U;
-    uint32_t content_bottom = view_h - TASKMGR_STATUS_H - 8U;
-    uint32_t graph_gap = 8U;
-    uint32_t graph_columns = content_w >= 600U ? 3U : 1U;
-    uint32_t graph_rows = 3U / graph_columns;
-    uint32_t graph_w;
-    uint32_t graph_h;
-    uint32_t graph_bottom;
-    uint32_t cpu_count = perf_info.cpu_count;
-    uint32_t columns;
-    uint32_t rows;
-    uint32_t cpu_start_y;
-    uint64_t used_kib = perf_info.total_memory_kib >= perf_info.free_memory_kib
-                            ? perf_info.total_memory_kib - perf_info.free_memory_kib
-                            : 0;
-    reliefos_ui_panel(ui, 8, 72, view_w > 16 ? view_w - 16 : view_w,
-                    view_h > 112 ? view_h - 108 : 96, RELIEFOS_UI_WHITE);
-    if (!perf_valid) {
-        reliefos_ui_text_clipped(ui, 24, y + 20, content_w,
-                               T("Performance data unavailable"),
-                               RELIEFOS_UI_BLACK, RELIEFOS_UI_WHITE);
-        return;
-    }
-
-    /* All three metrics remain visible at the minimum client size. */
-    graph_w = (content_w - graph_gap * (graph_columns - 1U)) / graph_columns;
-    graph_h = graph_columns == 1U ? 90U :
-                  (view_h > 700U ? 160U : (view_h > 420U ? 120U : 96U));
-    if (graph_rows * graph_h + (graph_rows - 1U) * graph_gap > content_bottom - y) {
-        graph_gap = 4U;
-        graph_h = (content_bottom - y - (graph_rows - 1U) * graph_gap) / graph_rows;
-    }
-    for (uint32_t i = 0; i < 3U; ++i) {
-        uint32_t x = 20U + (i % graph_columns) * (graph_w + graph_gap);
-        uint32_t graph_y = y + (i / graph_columns) * (graph_h + graph_gap);
-        const char *title;
-        const uint8_t *history;
-        uint32_t color;
-        if (i == 0U) {
-            title = T("CPU Usage");
-            format_percent(value, sizeof(value), cpu_percent);
-            /* KDE-style: one colored line per core in a shared plot; the
-             * header still shows the aggregate utilization. */
-            draw_perf_graph_core(ui, x, graph_y, graph_w, graph_h, title,
-                                 value, perf_info.cpu_count);
-            continue;
-        } else if (i == 1U) {
-            title = graph_h < 64U ? "RAM" : T("Memory Usage");
-            history = perf_mem_history;
-            color = reliefos_ui_color(RELIEFOS_UI_COLOR_TEXT);
-            format_percent(value, sizeof(value), mem_percent);
-        } else {
-            title = graph_h < 64U || graph_w < 210U ?
-                        T("GPU (est.)") :
-                        T("GPU (estimated)");
-            history = gpu_sample.available ? perf_gpu_history : 0;
-            color = reliefos_ui_color(RELIEFOS_UI_COLOR_ACCENT);
-            if (gpu_sample.valid) {
-                format_percent(value, sizeof(value), gpu_sample.percent);
-            } else {
-                value[0] = 'N';
-                value[1] = '/';
-                value[2] = 'A';
-                value[3] = 0;
-            }
-        }
-        draw_perf_graph(ui, x, graph_y, graph_w, graph_h, title, value, history, color);
-    }
-    graph_bottom = y + graph_rows * graph_h + (graph_rows - 1U) * graph_gap;
-
-    y = graph_bottom + 10U;
-    if (y + RELIEFOS_FONT_H > content_bottom) {
-        return;
-    }
-    if (cpu_count > RELIEFOS_PERF_MAX_CPUS) {
-        cpu_count = RELIEFOS_PERF_MAX_CPUS;
-    }
-    columns = cpu_count > 16U ? 4U : (cpu_count > 8U ? 3U : 2U);
-    if (cpu_count == 1U) {
-        columns = 1U;
-    }
-    if (columns > content_w / 160U) {
-        columns = content_w / 160U;
-    }
-    if (content_w < 340U) {
-        columns = 1U;
-    }
-    rows = cpu_count ? (cpu_count + columns - 1U) / columns : 1U;
-    reliefos_ui_text(ui, 24, y, T("Per-core usage"),
-                   RELIEFOS_UI_BLACK, RELIEFOS_UI_WHITE);
-    cpu_start_y = y + 22U;
-    {
-        uint32_t available_w = content_w;
-        uint32_t column_w = columns ? available_w / columns : available_w;
-        for (uint32_t i = 0; i < cpu_count; ++i) {
-            uint32_t column = i % columns;
-            uint32_t row = i / columns;
-            uint32_t x = 24U + column * column_w;
-            uint32_t row_y = cpu_start_y + row * 30U;
-            uint32_t progress_x = x + 48U;
-            uint32_t progress_w = column_w > 104U ? column_w - 104U : 24U;
-            uint32_t percent_x = x + column_w > 48U ? x + column_w - 48U : x;
-            uint32_t pos = 0;
-            if (row_y + 18U > content_bottom) {
-                break;
-            }
-            core_label[0] = 0;
-            append_text(core_label, &pos, sizeof(core_label), "CPU ");
-            append_dec(core_label, &pos, sizeof(core_label), i);
-            /* Swatch matches this core's line color in the CPU graph. */
-            reliefos_ui_rect(ui, x, row_y + 5U, 6U, 8U, core_color(i));
-            reliefos_ui_text_clipped(ui, x + 10U, row_y + 2U, 36U, core_label,
-                                   RELIEFOS_UI_BLACK, RELIEFOS_UI_WHITE);
-            reliefos_ui_progress(ui, progress_x, row_y, progress_w, 18U,
-                               cpu_percent_by_core[i], 100U);
-            format_percent(value, sizeof(value), cpu_percent_by_core[i]);
-            reliefos_ui_text_clipped(ui, percent_x, row_y + 2U, 46U, value,
-                                   RELIEFOS_UI_BLACK, RELIEFOS_UI_WHITE);
-        }
-    }
-    y = cpu_start_y + rows * 30U + 8U;
-
-    format_kib(value, sizeof(value), perf_info.total_memory_kib);
-    draw_perf_text_line(ui, 24U, y, T("Total memory:"), value);
-    y += 22U;
-    format_kib(value, sizeof(value), used_kib);
-    draw_perf_text_line(ui, 24U, y, T("Used memory:"), value);
-    y += 22U;
-    format_kib(value, sizeof(value), perf_info.free_memory_kib);
-    draw_perf_text_line(ui, 24U, y, T("Free memory:"), value);
-    y += 22U;
-    format_uptime(value, sizeof(value), perf_info.uptime_ms);
-    draw_perf_text_line(ui, 24U, y, T("Uptime:"), value);
-
-    y += 30U;
-    {
-        uint32_t pos = 0U;
-        value[0] = 0;
-        append_text(value, &pos, sizeof(value), T("Tasks "));
-        append_dec(value, &pos, sizeof(value), perf_info.task_count);
-        append_text(value, &pos, sizeof(value), " / ");
-        append_text(value, &pos, sizeof(value), T("Run "));
-        append_dec(value, &pos, sizeof(value), perf_info.running_tasks);
-    }
-    {
-        uint32_t pos = 0U;
-        value2[0] = 0;
-        append_text(value2, &pos, sizeof(value2), T("Ready "));
-        append_dec(value2, &pos, sizeof(value2), perf_info.ready_tasks);
-        append_text(value2, &pos, sizeof(value2), " / ");
-        append_text(value2, &pos, sizeof(value2), T("Sleep "));
-        append_dec(value2, &pos, sizeof(value2), perf_info.sleeping_tasks);
-    }
-    draw_perf_text_line(ui, 24U, y, value, value2);
+    if (task && task->username[0]) return task->username;
+    return task && task->uid ? T("Unknown") : T("System");
 }
 
-static uint32_t startup_dropdown_rows(void)
+static const char *task_privilege_name(const struct reliefos_task_info *task)
 {
-    uint32_t available = view_h > 160 + TASKMGR_STATUS_H ?
-                             view_h - 160 - TASKMGR_STATUS_H : 1;
-    uint32_t rows = available / TASKMGR_STARTUP_USER_ROW_H;
-    if (rows == 0) {
-        rows = 1;
-    }
-    return rows > 12 ? 12 : rows;
+    if (!task || !task->uid) return T("System");
+    if (task->flags & RELIEFOS_TASK_SNAPSHOT_FLAG_ELEVATED_ADMIN) return T("Elevated");
+    if (task->role == RELIEFOS_AUTH_ROLE_ADMIN) return T("Admin");
+    return T("Standard");
+}
+
+static struct reliefos_task_info *selected_task(void)
+{
+    int index = selected_pid ? task_index_by_pid(selected_pid) : -1;
+    return index >= 0 ? &tasks[index] : 0;
+}
+
+static int selected_task_killable(void)
+{
+    struct reliefos_task_info *task = selected_task();
+    if (!task) return 0;
+    return taskmgr_task_killable(task->pid, (uint32_t)getpid(), task->kind,
+                                 task->state, task->flags);
 }
 
 static void startup_command_line(char *text, uint32_t cap,
                                  const struct reliefos_startup_command *command)
 {
-    uint32_t pos = 0;
+    uint32_t used = 0;
     text[0] = 0;
-    append_text(text, &pos, cap, command->path);
-    for (uint32_t i = 0; i < command->argc; ++i) {
-        append_text(text, &pos, cap, " ");
-        append_text(text, &pos, cap, command->args[i]);
+    for (uint32_t i = 0; command && command->path[i] && used + 1 < cap; ++i) {
+        text[used++] = command->path[i];
+    }
+    for (uint32_t a = 0; command && a < command->argc; ++a) {
+        if (used + 1 < cap) text[used++] = ' ';
+        for (uint32_t i = 0; command->args[a][i] && used + 1 < cap; ++i) {
+            text[used++] = command->args[a][i];
+        }
+    }
+    text[used] = 0;
+}
+
+static void update_controls(void)
+{
+    struct reliefos_task_info *task = selected_task();
+    struct reliefos_startup_entry *entry = (active_tab == TASKMGR_TAB_STARTUP &&
+                                            selected_startup >= 0 &&
+                                            (uint32_t)selected_startup < startup_entry_count)
+                                               ? &startup_entries[selected_startup]
+                                               : 0;
+    if (button_end_task) XtSetSensitive(button_end_task, selected_task_killable());
+    if (menu_end_task) XtSetSensitive(menu_end_task, selected_task_killable());
+    if (popup_end_task) XtSetSensitive(popup_end_task, selected_task_killable());
+    if (popup_details) XtSetSensitive(popup_details, task != 0);
+    if (button_startup_toggle) {
+        set_label(button_startup_toggle, entry && entry->enabled ? T("Disable")
+                                                                : T("Enable"));
+        XtSetSensitive(button_startup_toggle, entry != 0 && startup_available);
+    }
+    if (button_startup_remove) {
+        XtSetSensitive(button_startup_remove, entry != 0 && startup_available);
     }
 }
 
-static void draw_startup(struct reliefos_ui_surface *ui)
+/* Refresh one XmList from formatted rows while keeping the visible top row
+ * and the selection stable, so the 500 ms refresh never jumps the view. */
+static void list_rebuild(Widget list, const char **rows, uint32_t count,
+                         int select_position)
 {
-    uint32_t list_w = view_w > 38 ? view_w - 38 : 320;
-    uint32_t list_h = view_h > 112 + TASKMGR_STATUS_H + 4 ?
-                          view_h - 112 - TASKMGR_STATUS_H - 4 : 80;
-    uint32_t scroll_h = list_h > 2 ? list_h - 2 : 24;
-    uint32_t rows = startup_entry_count > startup_list.visible_rows ?
-                        startup_list.visible_rows : startup_entry_count;
-    struct reliefos_ui_list_column cols[] = {
-        {T("STATUS"), 88},
-        {T("COMMAND"), list_w > 88 ? list_w - 88 : 80},
-    };
-
-    startup_list.visible_rows = startup_visible_rows();
-    reliefos_ui_listview_state_set_count(&startup_list, startup_entry_count);
-    reliefos_ui_panel(ui, 8, 72, view_w > 16 ? view_w - 16 : view_w,
-                    view_h > 112 ? view_h - 108 : 96, RELIEFOS_UI_WHITE);
-    reliefos_ui_text(ui, 24, 84, T("User"), RELIEFOS_UI_DARK, RELIEFOS_UI_WHITE);
-    reliefos_ui_combobox(ui, 70, 78, 180, startup_selected_username(),
-                        startup_user_dropdown_open, 0);
-    reliefos_ui_scroll_view_frame(ui, 8, 112, view_w - 16, list_h);
-    reliefos_ui_listview_header(ui, 10, 114, list_w, cols, 2);
-    for (uint32_t row = 0; row < rows; ++row) {
-        uint32_t i = startup_list.scroll + row;
-        const char *cells[2];
-        char command[512];
-        if (i >= startup_entry_count) {
-            break;
-        }
-        cells[0] = startup_entries[i].enabled ? T("Enabled") :
-                                                T("Disabled");
-        startup_command_line(command, sizeof(command), &startup_entries[i].command);
-        cells[1] = command;
-        reliefos_ui_listview_row(ui, 10, 142 + row * 24, list_w, cols, cells, 2,
-                               startup_list.selected == (int32_t)i
-                                   ? RELIEFOS_UI_MENU_SELECTED : 0);
+    int top = 1;
+    XtVaGetValues(list, XmNtopItemPosition, &top, NULL);
+    updating = 1;
+    XmListDeleteAllItems(list);
+    for (uint32_t i = 0; i < count; ++i) {
+        XmString item = XmStringCreateLocalized((char *)rows[i]);
+        XmListAddItemUnselected(list, item, 0);
+        XmStringFree(item);
     }
-    reliefos_ui_vscrollbar(ui, view_w - 26, 114, 18, scroll_h,
-                         startup_list.scroll,
-                         startup_entry_count > startup_list.visible_rows
-                             ? startup_entry_count : startup_list.visible_rows,
-                         startup_list.visible_rows,
-                         startup_entry_count <= startup_list.visible_rows
-                             ? RELIEFOS_UI_SCROLLBAR_DISABLED : 0);
+    if (select_position > 0 && (uint32_t)select_position <= count) {
+        XmListSelectPos(list, select_position, False);
+    }
+    if (top <= (int)count) XmListSetPos(list, top);
+    updating = 0;
+}
 
-    if (startup_user_dropdown_open) {
-        uint32_t visible = startup_dropdown_rows();
-        uint32_t rows_to_draw = startup_user_count > startup_user_dropdown_scroll
-                                    ? startup_user_count - startup_user_dropdown_scroll : 0;
-        uint32_t height;
-        if (rows_to_draw > visible) {
-            rows_to_draw = visible;
+static void refresh_tasks(void)
+{
+    char lines[RELIEFOS_TASK_MAX][192];
+    const char *rows[RELIEFOS_TASK_MAX];
+    uint32_t pids[RELIEFOS_TASK_MAX];
+    uint32_t parents[RELIEFOS_TASK_MAX];
+    uint64_t next_tick = 0;
+    uint64_t sample_total;
+    uint64_t tick_delta = 0;
+    int select_position = 0;
+    int count = reliefos_task_snapshot(tasks, RELIEFOS_TASK_MAX, &next_tick);
+
+    task_count = count > 0 ? (uint32_t)count : 0;
+    sample_total = perf_info.busy_ticks + perf_info.idle_ticks;
+    if (previous_sample_total && sample_total > previous_sample_total) {
+        tick_delta = sample_total - previous_sample_total;
+    }
+    for (uint32_t i = 0; i < task_count; ++i) {
+        int previous = previous_index_by_pid(tasks[i].pid);
+        uint64_t used_ticks = 0;
+        uint32_t fallback = 0;
+        int have_fallback = 0;
+        if (previous >= 0 && (uint32_t)previous < previous_task_count &&
+            tasks[i].cpu_ticks >= previous_tasks[previous].cpu_ticks) {
+            used_ticks = tasks[i].cpu_ticks - previous_tasks[previous].cpu_ticks;
+            fallback = previous_task_cpu_percent[previous];
+            have_fallback = 1;
         }
-        height = rows_to_draw * TASKMGR_STARTUP_USER_ROW_H;
-        reliefos_ui_menu(ui, 70, 102, 180, height);
-        for (uint32_t row = 0; row < rows_to_draw; ++row) {
-            uint32_t i = startup_user_dropdown_scroll + row;
-            reliefos_ui_menu_item(ui, 72, 103 + row * TASKMGR_STARTUP_USER_ROW_H,
-                                156, startup_users[i].username,
-                                startup_users[i].uid == startup_selected_uid
-                                    ? RELIEFOS_UI_MENU_SELECTED : 0);
+        task_cpu_percent[i] = taskmgr_task_cpu_percent(used_ticks, tick_delta,
+                                                       fallback, have_fallback);
+        pids[i] = tasks[i].pid;
+        parents[i] = tasks[i].parent_pid;
+    }
+    tree_count = taskmgr_tree_order(pids, parents, task_count, tree_rows,
+                                    RELIEFOS_TASK_MAX);
+    for (uint32_t i = 0; i < tree_count; ++i) {
+        uint32_t index = tree_rows[i].index;
+        char pid[16], cpu[16], mem[24];
+        taskmgr_format_dec(pid, sizeof(pid), tasks[index].pid);
+        taskmgr_format_percent(cpu, sizeof(cpu), task_cpu_percent[index]);
+        taskmgr_format_memory(mem, sizeof(mem), tasks[index].memory_kib);
+        snprintf(lines[i], sizeof(lines[i]),
+                 "%*s%-14.14s %7s %6s %9s %-5s %-10s %-8s",
+                 (int)(tree_rows[i].depth * 2U), "", tasks[index].name,
+                 pid, cpu, mem, taskmgr_state_name(tasks[index].state),
+                 task_user_name(&tasks[index]),
+                 task_privilege_name(&tasks[index]));
+        rows[i] = lines[i];
+        if (selected_pid && tasks[index].pid == selected_pid) {
+            select_position = (int)i + 1;
         }
-        if (startup_user_count > visible) {
-            reliefos_ui_vscrollbar(ui, 232, 102, 16, height,
-                                 startup_user_dropdown_scroll, startup_user_count,
-                                 visible, 0);
-        }
+    }
+    list_rebuild(process_list, rows, tree_count, select_position);
+    previous_task_count = task_count;
+    previous_sample_total = sample_total;
+    for (uint32_t i = 0; i < task_count; ++i) {
+        previous_task_cpu_percent[i] = task_cpu_percent[i];
+        previous_tasks[i] = tasks[i];
     }
 }
 
-static void draw_taskmgr(struct reliefos_ui_surface *ui)
+static void refresh_startup_users(void)
 {
-    char line[128];
-    uint32_t pos = 0;
-    uint32_t list_w = view_w > 38 ? view_w - 38 : 320;
-    uint32_t list_h = view_h > 72 + TASKMGR_STATUS_H + 4 ? view_h - 72 - TASKMGR_STATUS_H - 4 : 80;
-    uint32_t vis_rows = visible_rows();
-    struct reliefos_ui_list_column cols[] = {
-        {T("PROCESS"), list_w > 382 ? list_w - 382 : 80},
-        {"PID", 44},
-        {T("CPU"), 48},
-        {T("MEM"), 64},
-        {T("STATE"), 58},
-        {T("USER"), 80},
-        {T("PRIV"), 88},
-    };
-    struct reliefos_ui_menubar_item menu_items[] = {
-        {T("File"), TASKMGR_MENU_FILE, 64, 0},
-        {T("Options"), TASKMGR_MENU_OPTIONS, 80, 0},
-    };
-    struct reliefos_ui_tab_item tabs[3];
-    uint32_t tab_w;
-    uint32_t action_x;
-    taskmgr_tab_items(tabs);
-    reliefos_ui_treeview_state_set_viewport(&process_tree, vis_rows);
+    struct reliefos_user_info current;
+    struct reliefos_user_info *allocated = 0;
+    uint32_t count = 0;
 
-    reliefos_ui_rect(ui, 0, 0, view_w, view_h, RELIEFOS_UI_WHITE);
-    reliefos_ui_menubar_draw(ui, 0, 0, view_w, menu_items,
-                           sizeof(menu_items) / sizeof(menu_items[0]),
-                           menu_open);
-    reliefos_ui_toolbar(ui, 0, 28, view_w, 36);
-    reliefos_ui_toolbar_button(ui, 8, 34, 88, T("Refresh"), 0);
-    taskmgr_tabs.selected_id = active_tab;
-    tab_w = toolbar_tab_width();
-    action_x = toolbar_action_x();
-    reliefos_ui_tab_control(ui, 104, 34, tab_w, tabs, 3, &taskmgr_tabs);
-    if (active_tab == TASKMGR_TAB_PROCESSES && action_x + 86 <= view_w) {
-        reliefos_ui_toolbar_button(ui, action_x, 34, 86, T("End Task"),
-                                 selected_task_killable() ? 0 : RELIEFOS_UI_BUTTON_DISABLED);
-    } else if (active_tab == TASKMGR_TAB_STARTUP) {
-        struct reliefos_startup_entry *entry = selected_startup_entry();
-        if (action_x + 92 <= view_w) {
-            reliefos_ui_toolbar_button(ui, action_x, 34, 92,
-                                     entry && entry->enabled ? T("Disable") :
-                                                               T("Enable"),
-                                     entry ? 0 : RELIEFOS_UI_BUTTON_DISABLED);
-        }
-        if (action_x + 192 <= view_w) {
-            reliefos_ui_toolbar_button(ui, action_x + 100, 34, 86, T("Remove"),
-                                     entry ? 0 : RELIEFOS_UI_BUTTON_DISABLED);
-        }
+    startup_user_count = 0;
+    current = (struct reliefos_user_info){0};
+    if (reliefos_auth_current(&current) < 0) {
+        startup_available = 0;
+        return;
     }
-
-    if (active_tab == TASKMGR_TAB_PROCESSES) {
-        line[0] = 0;
-        append_text(line, &pos, sizeof(line), "tick=");
-        append_dec(line, &pos, sizeof(line), task_tick);
-        append_text(line, &pos, sizeof(line), " tasks=");
-        append_dec(line, &pos, sizeof(line), task_count);
-        uint32_t tick_x = action_x + 86 <= view_w ? action_x + 94 : action_x;
-        if (tick_x + 64 < view_w) {
-            reliefos_ui_text_clipped(ui, tick_x, 40, view_w - tick_x - 8, line,
-                                   RELIEFOS_UI_BLACK, RELIEFOS_UI_GRAY);
-        }
-
-        reliefos_ui_scroll_view_frame(ui, 8, 72, view_w - 16, list_h);
-        reliefos_ui_treeview(ui, 10, 74, list_w, cols, 7,
-                            process_tree_items, task_count, &process_tree);
-        reliefos_ui_vscrollbar(ui, view_w - 26, 74, 18, view_h > 104 ? view_h - 104 : 24,
-                             process_tree.scroll,
-                             process_tree.visible_count > process_tree.visible_rows
-                                 ? process_tree.visible_count : process_tree.visible_rows,
-                             process_tree.visible_rows,
-                             process_tree.visible_count <= process_tree.visible_rows
-                                 ? RELIEFOS_UI_SCROLLBAR_DISABLED : 0);
-    } else if (active_tab == TASKMGR_TAB_PERFORMANCE) {
-        draw_performance(ui);
+    if (current.role == RELIEFOS_AUTH_ROLE_ADMIN &&
+        reliefos_auth_users_alloc(&allocated, 0, &count) == 0 &&
+        count && count <= sizeof(startup_users) / sizeof(startup_users[0])) {
+        for (uint32_t i = 0; i < count; ++i) startup_users[i] = allocated[i];
+        startup_user_count = count;
+        free(allocated);
     } else {
-        draw_startup(ui);
+        free(allocated);
+        startup_users[0] = current;
+        startup_user_count = 1;
     }
-    reliefos_ui_statusbar(ui, view_h - TASKMGR_STATUS_H, TASKMGR_STATUS_H, status_text);
-
-    if (menu_open == TASKMGR_MENU_FILE) {
-        struct reliefos_ui_context_menu_item items[] = {
-            {T("Refresh"), TASKMGR_ACTION_REFRESH, 0},
-            {T("End Task"), TASKMGR_ACTION_END,
-             selected_task_killable() ? 0 : RELIEFOS_UI_MENU_DISABLED},
-            {T("About"), TASKMGR_ACTION_ABOUT, 0},
-        };
-        struct reliefos_ui_rect r;
-        reliefos_ui_menubar_item_rect(0, 0, menu_items,
-                                    sizeof(menu_items) / sizeof(menu_items[0]),
-                                    TASKMGR_MENU_FILE, &r);
-        reliefos_ui_menu_popup(ui, (uint32_t)r.x, TASKMGR_MENU_BAR_H, 154,
-                             items, sizeof(items) / sizeof(items[0]), 0);
-    } else if (menu_open == TASKMGR_MENU_OPTIONS) {
-        struct reliefos_ui_context_menu_item items[] = {
-            {T("Processes"), TASKMGR_ACTION_PROCESSES, 0},
-            {T("Performance"), TASKMGR_ACTION_PERFORMANCE, 0},
-            {T("Service Manager"), TASKMGR_ACTION_STARTUP, 0},
-            {T("About"), TASKMGR_ACTION_ABOUT, 0},
-        };
-        struct reliefos_ui_rect r;
-        reliefos_ui_menubar_item_rect(0, 0, menu_items,
-                                    sizeof(menu_items) / sizeof(menu_items[0]),
-                                    TASKMGR_MENU_OPTIONS, &r);
-        reliefos_ui_menu_popup(ui, (uint32_t)r.x, TASKMGR_MENU_BAR_H, 178,
-                              items, sizeof(items) / sizeof(items[0]),
-                              active_tab == TASKMGR_TAB_PROCESSES
-                                  ? TASKMGR_ACTION_PROCESSES
-                                  : active_tab == TASKMGR_TAB_PERFORMANCE
-                                        ? TASKMGR_ACTION_PERFORMANCE
-                                        : TASKMGR_ACTION_STARTUP);
+    for (uint32_t i = 0; i < startup_user_count; ++i) {
+        if (startup_users[i].uid == startup_selected_uid) return;
     }
-    if (context_menu_active || context_menu_animating) {
-        struct reliefos_ui_context_menu_item items[TASKMGR_CONTEXT_MENU_COUNT];
-        uint32_t progress = context_menu_animating
-                                ? reliefos_ui_anim_progress(reliefos_uptime_ms(), context_menu_anim_start, 120)
-                                : 1000;
-        if (progress >= 1000) {
-            context_menu_animating = 0;
-            progress = context_menu_active ? 1000 : 0;
-        } else if (!context_menu_opening) {
-            progress = 1000 - progress;
-        }
-        build_context_menu_items(items);
-        reliefos_ui_context_menu_animated(ui, context_menu_x, context_menu_y,
-                                        TASKMGR_CONTEXT_MENU_W, items,
-                                        TASKMGR_CONTEXT_MENU_COUNT, progress);
-    }
+    startup_selected_uid = startup_user_count ? startup_users[0].uid : 0;
 }
 
-static int handle_menu_click(int32_t x, int32_t y)
+static void refresh_startup_combo(void)
 {
-    struct reliefos_ui_menubar_item menu_items[] = {
-        {T("File"), TASKMGR_MENU_FILE, 64, 0},
-        {T("Options"), TASKMGR_MENU_OPTIONS, 80, 0},
+    /* The user list changes rarely; only touch the items when it does so a
+     * half-open dropdown is never yanked out of the user's hands. */
+    static uint32_t built_count;
+    static uint32_t built_uids[16];
+    int changed = built_count != startup_user_count;
+    for (uint32_t i = 0; !changed && i < startup_user_count; ++i) {
+        if (built_uids[i] != startup_users[i].uid) changed = 1;
+    }
+    if (!changed) return;
+    updating = 1;
+    for (uint32_t i = 0; i < built_count; ++i) XmComboBoxDeletePos(startup_combo, 1);
+    for (uint32_t i = 0; i < startup_user_count; ++i) {
+        XmString name = XmStringCreateLocalized(startup_users[i].username);
+        XmComboBoxAddItem(startup_combo, name, XmLAST_POSITION, False);
+        if (startup_users[i].uid == startup_selected_uid) XmComboBoxSetItem(startup_combo, name);
+        XmStringFree(name);
+        built_uids[i] = startup_users[i].uid;
+    }
+    built_count = startup_user_count;
+    updating = 0;
+}
+
+static void refresh_startup_entries(void)
+{
+    char lines[RELIEFOS_STARTUP_MAX_ENTRIES][528];
+    const char *rows[RELIEFOS_STARTUP_MAX_ENTRIES];
+    uint32_t count = 0;
+    int select_position = selected_startup >= 0 ? selected_startup + 1 : 0;
+
+    if (!startup_user_count ||
+        reliefos_startup_list(startup_selected_uid, startup_entries,
+                              RELIEFOS_STARTUP_MAX_ENTRIES, &count) < 0) {
+        startup_available = 0;
+        startup_entry_count = 0;
+        count = 0;
+    } else {
+        startup_available = 1;
+        startup_entry_count = count > RELIEFOS_STARTUP_MAX_ENTRIES
+                                  ? RELIEFOS_STARTUP_MAX_ENTRIES : count;
+        count = startup_entry_count;
+    }
+    for (uint32_t i = 0; i < count; ++i) {
+        char command[448];
+        startup_command_line(command, sizeof(command), &startup_entries[i].command);
+        snprintf(lines[i], sizeof(lines[i]), "%-8s  %s",
+                 startup_entries[i].enabled ? T("Enabled") : T("Disabled"),
+                 command);
+        rows[i] = lines[i];
+    }
+    if (select_position > (int)count) select_position = 0;
+    list_rebuild(startup_list_widget, rows, count, select_position);
+    if (select_position) selected_startup = select_position - 1;
+    else selected_startup = -1;
+}
+
+static void refresh_startup(void)
+{
+    refresh_startup_users();
+    refresh_startup_combo();
+    refresh_startup_entries();
+    update_controls();
+}
+
+static void redraw_performance(void)
+{
+    if (!perf_area || !XtIsRealized(perf_area)) return;
+    XClearArea(XtDisplay(perf_area), XtWindow(perf_area), 0, 0, 0, 0, True);
+}
+
+static void refresh_performance(void)
+{
+    struct reliefos_perf_info next;
+    gpu_sdk_info_t next_gpu = {
+        .size = sizeof(gpu_sdk_info_t),
+        .version = GPU_SDK_ABI_VERSION,
     };
-    uint32_t action = 0;
-    if (reliefos_ui_menubar_hit(x, y, 0, 0, menu_items,
-                              sizeof(menu_items) / sizeof(menu_items[0]),
-                              &action)) {
-        if (action) {
-            menu_open = menu_open == action ? TASKMGR_MENU_NONE : (uint8_t)action;
-            return 1;
-        }
-        menu_open = TASKMGR_MENU_NONE;
-        return 1;
-    }
-    if (menu_open == TASKMGR_MENU_FILE) {
-        struct reliefos_ui_context_menu_item items[] = {
-            {T("Refresh"), TASKMGR_ACTION_REFRESH, 0},
-            {T("End Task"), TASKMGR_ACTION_END,
-             selected_task_killable() ? 0 : RELIEFOS_UI_MENU_DISABLED},
-            {T("About"), TASKMGR_ACTION_ABOUT, 0},
-        };
-        struct reliefos_ui_rect r;
-        reliefos_ui_menubar_item_rect(0, 0, menu_items,
-                                    sizeof(menu_items) / sizeof(menu_items[0]),
-                                    TASKMGR_MENU_FILE, &r);
-        if (reliefos_ui_menu_popup_hit(x, y, (uint32_t)r.x,
-                                     TASKMGR_MENU_BAR_H, 154,
-                                     items, sizeof(items) / sizeof(items[0]),
-                                     &action)) {
-            menu_open = TASKMGR_MENU_NONE;
-            if (action == TASKMGR_ACTION_REFRESH) {
-                refresh_all();
-            } else if (action == TASKMGR_ACTION_END) {
-                kill_selected_task();
-            } else if (action == TASKMGR_ACTION_ABOUT) {
-                reliefos_ui_show_message_box(T("Task Manager"), T("Live task snapshot from the scheduler."), "OK");
-            }
-            return 1;
-        }
-        menu_open = TASKMGR_MENU_NONE;
-        return 1;
-    }
-    if (menu_open == TASKMGR_MENU_OPTIONS) {
-        struct reliefos_ui_context_menu_item items[] = {
-            {T("Processes"), TASKMGR_ACTION_PROCESSES, 0},
-            {T("Performance"), TASKMGR_ACTION_PERFORMANCE, 0},
-            {T("Service Manager"), TASKMGR_ACTION_STARTUP, 0},
-            {T("About"), TASKMGR_ACTION_ABOUT, 0},
-        };
-        struct reliefos_ui_rect r;
-        reliefos_ui_menubar_item_rect(0, 0, menu_items,
-                                    sizeof(menu_items) / sizeof(menu_items[0]),
-                                    TASKMGR_MENU_OPTIONS, &r);
-        if (reliefos_ui_menu_popup_hit(x, y, (uint32_t)r.x,
-                                     TASKMGR_MENU_BAR_H, 178,
-                                     items, sizeof(items) / sizeof(items[0]),
-                                     &action)) {
-            menu_open = TASKMGR_MENU_NONE;
-            if (action == TASKMGR_ACTION_PROCESSES) {
-                active_tab = TASKMGR_TAB_PROCESSES;
-                taskmgr_tabs.selected_id = active_tab;
-                refresh_all();
-            } else if (action == TASKMGR_ACTION_PERFORMANCE) {
-                active_tab = TASKMGR_TAB_PERFORMANCE;
-                taskmgr_tabs.selected_id = active_tab;
-                refresh_all();
-            } else if (action == TASKMGR_ACTION_STARTUP) {
-                open_service_manager();
-            } else if (action == TASKMGR_ACTION_ABOUT) {
-                reliefos_ui_show_message_box(T("Task Manager"), T("Shows runnable, sleeping, and exited tasks."), "OK");
-            }
-            return 1;
-        }
-        menu_open = TASKMGR_MENU_NONE;
-        return 1;
-    }
-    return 0;
-}
+    int gpu_result = gpu_sdk_info(&next_gpu);
+    uint32_t slot;
+    uint32_t cpu_count;
 
-static int handle_context_menu_click(int32_t x, int32_t y)
-{
-    struct reliefos_ui_context_menu_item items[TASKMGR_CONTEXT_MENU_COUNT];
-    uint32_t action = 0;
-    if (!context_menu_active) {
-        return 0;
+    if (taskmgr_gpu_sample_update(&gpu_sample, gpu_result < 0 ? 0 : &next_gpu)) {
+        taskmgr_perf_history_clear_gpu(&history);
     }
-    build_context_menu_items(items);
-    if (reliefos_ui_context_menu_hit(x, y, context_menu_x, context_menu_y,
-                                   TASKMGR_CONTEXT_MENU_W, items,
-                                   TASKMGR_CONTEXT_MENU_COUNT, &action)) {
-        if (action) {
-            execute_context_action(action);
+    if (reliefos_perf_info(&next) < 0) {
+        perf_valid = 0;
+        set_status(T("Performance data unavailable"));
+        return;
+    }
+    cpu_percent = taskmgr_busy_percent(last_busy_ticks, last_idle_ticks,
+                                       next.busy_ticks, next.idle_ticks,
+                                       cpu_snapshot_valid, cpu_percent);
+    mem_percent = taskmgr_mem_percent(next.total_memory_kib, next.free_memory_kib);
+    slot = taskmgr_perf_history_push(&history, mem_percent,
+                                     gpu_sample.percent, gpu_sample.valid);
+    cpu_count = next.cpu_count;
+    if (cpu_count > RELIEFOS_PERF_MAX_CPUS) cpu_count = RELIEFOS_PERF_MAX_CPUS;
+    for (uint32_t i = 0; i < RELIEFOS_PERF_MAX_CPUS; ++i) {
+        if (i >= cpu_count || !next.cpus[i].online) {
+            cpu_percent_by_core[i] = 0;
+            /* Offline cores have no signal to plot; leave a gap. */
+            history.core[i][slot] = TASKMGR_PERF_MISSING;
         } else {
-            context_menu_set_active(0);
+            cpu_percent_by_core[i] = taskmgr_busy_percent(
+                last_cpu_busy[i], last_cpu_idle[i], next.cpus[i].busy_ticks,
+                next.cpus[i].idle_ticks, cpu_snapshot_valid,
+                cpu_percent_by_core[i]);
+            history.core[i][slot] = (uint8_t)cpu_percent_by_core[i];
         }
-        return 1;
+        last_cpu_busy[i] = next.cpus[i].busy_ticks;
+        last_cpu_idle[i] = next.cpus[i].idle_ticks;
     }
-    context_menu_set_active(0);
-    return 0;
+    perf_info = next;
+    last_busy_ticks = next.busy_ticks;
+    last_idle_ticks = next.idle_ticks;
+    cpu_snapshot_valid = 1;
+    perf_valid = 1;
 }
 
-static void show_context_menu_at(int32_t x, int32_t y)
+static void refresh_all(void)
 {
-    uint32_t menu_h = reliefos_ui_context_menu_height(TASKMGR_CONTEXT_MENU_COUNT);
-    menu_open = TASKMGR_MENU_NONE;
-    if (x < 0) {
-        x = 0;
-    }
-    if (y < 0) {
-        y = 0;
-    }
-    context_menu_x = (uint32_t)x;
-    context_menu_y = (uint32_t)y;
-    if (context_menu_x + TASKMGR_CONTEXT_MENU_W > view_w) {
-        context_menu_x = view_w > TASKMGR_CONTEXT_MENU_W ? view_w - TASKMGR_CONTEXT_MENU_W : 0;
-    }
-    if (context_menu_y + menu_h > view_h - TASKMGR_STATUS_H) {
-        context_menu_y = view_h - TASKMGR_STATUS_H > menu_h
-                             ? view_h - TASKMGR_STATUS_H - menu_h
-                             : 0;
-    }
-    context_menu_set_active(1);
+    refresh_performance();
+    refresh_tasks();
+    if (active_tab == TASKMGR_TAB_STARTUP) refresh_startup();
+    update_controls();
+    redraw_performance();
 }
 
-static void present_taskmgr(uint32_t window_id, struct reliefos_ui_surface *ui)
+static void draw_text(int x, int y, const char *text)
 {
-    reliefos_ui_bind(ui, pixels, view_w, view_h, TASKMGR_MAX_W);
-    draw_taskmgr(ui);
-    reliefos_gui_present_window(window_id, view_w, view_h, TASKMGR_MAX_W, pixels);
+    if (!text) return;
+    XDrawString(XtDisplay(perf_area), XtWindow(perf_area), perf_gc, x, y,
+                text, (int)strlen(text));
 }
 
-/* Keep thumb geometry identical to reliefos_ui_vscrollbar. Capture the drag
- * until release, including motion outside the narrow scrollbar rectangle. */
-static int process_scroll_event(const struct reliefos_gui_app_event *event)
+static void draw_fill(int x, int y, int w, int h, unsigned long pixel)
 {
-    static int dragging;
-    static int32_t grab_offset;
-    uint32_t h = view_h > 104 ? view_h - 104 : 24;
-    uint32_t arrow = 18 < h / 2 ? 18 : h / 2;
-    uint32_t track = h - 2 * arrow;
-    uint32_t page = process_tree.visible_rows;
-    uint32_t count = process_tree.visible_count;
-    if (event->type == RELIEFOS_GUI_APP_EVENT_BLUR ||
-        event->type == RELIEFOS_GUI_APP_EVENT_RESIZE ||
-        active_tab != TASKMGR_TAB_PROCESSES) dragging = 0;
-    if (event->type != RELIEFOS_GUI_APP_EVENT_MOUSE_MOVE &&
-        event->type != RELIEFOS_GUI_APP_EVENT_MOUSE_BUTTON) return 0;
-    if (!(event->buttons & 1U)) { dragging = 0; return 0; }
-    if (count <= page || track < 8) { dragging = 0; return 0; }
-    uint32_t thumb = track * page / count;
-    if (thumb < 12) thumb = 12;
-    if (thumb > track) thumb = track;
-    uint32_t range = track - thumb;
-    uint32_t max = count - page;
-    uint32_t top = 74 + arrow;
-    uint32_t offset = range * process_tree.scroll / max;
-    if (!dragging) {
-        if (event->type != RELIEFOS_GUI_APP_EVENT_MOUSE_BUTTON ||
-            !hit_rect_i(event->x, event->y, view_w - 26, 74, 18, h)) return 0;
-        if (event->y >= (int32_t)(top + offset) &&
-            event->y < (int32_t)(top + offset + thumb)) {
-            grab_offset = event->y - (int32_t)(top + offset);
-            dragging = 1;
+    if (w <= 0 || h <= 0) return;
+    XSetForeground(XtDisplay(perf_area), perf_gc, pixel);
+    XFillRectangle(XtDisplay(perf_area), XtWindow(perf_area), perf_gc, x, y,
+                   (unsigned)w, (unsigned)h);
+    XSetForeground(XtDisplay(perf_area), perf_gc, color_text);
+}
+
+static void draw_box(int x, int y, int w, int h, unsigned long pixel)
+{
+    if (w <= 0 || h <= 0) return;
+    XSetForeground(XtDisplay(perf_area), perf_gc, pixel);
+    XDrawRectangle(XtDisplay(perf_area), XtWindow(perf_area), perf_gc, x, y,
+                   (unsigned)w, (unsigned)h);
+    XSetForeground(XtDisplay(perf_area), perf_gc, color_text);
+}
+
+static void draw_segment(int x0, int y0, int x1, int y1, unsigned long pixel)
+{
+    XSetForeground(XtDisplay(perf_area), perf_gc, pixel);
+    XDrawLine(XtDisplay(perf_area), XtWindow(perf_area), perf_gc, x0, y0, x1, y1);
+    XSetForeground(XtDisplay(perf_area), perf_gc, color_text);
+}
+
+struct perf_plot_rect {
+    int x, y, w, h;
+};
+
+/* Draw one history ring as a polyline; TASKMGR_PERF_MISSING samples leave
+ * gaps exactly like the windowd graphs did. */
+static void draw_history_line(const struct perf_plot_rect *plot,
+                              const uint8_t *history_values, unsigned long color)
+{
+    uint32_t count = history.count;
+    int previous_set = 0;
+    int previous_x = 0, previous_y = 0;
+    if (!count) return;
+    for (uint32_t i = 0; i < count; ++i) {
+        uint32_t history_index =
+            (history.head + TASKMGR_PERF_HISTORY - count + i) % TASKMGR_PERF_HISTORY;
+        uint32_t slot = TASKMGR_PERF_HISTORY - count + i;
+        int px, py;
+        if (history_values[history_index] == TASKMGR_PERF_MISSING) {
+            previous_set = 0;
+            continue;
+        }
+        {
+            uint32_t value = history_values[history_index] > 100U
+                                 ? 100U : history_values[history_index];
+            px = plot->x + 1 + (int)((slot * (uint32_t)(plot->w - 3)) /
+                                     (TASKMGR_PERF_HISTORY - 1U));
+            py = plot->y + plot->h - 2 -
+                 (int)((value * (uint32_t)(plot->h - 3)) / 100U);
+        }
+        if (previous_set) {
+            draw_segment(previous_x, previous_y, px, py, color);
+        }
+        previous_x = px;
+        previous_y = py;
+        previous_set = 1;
+    }
+}
+
+static void draw_graph_frame(int x, int y, int w, int h, const char *title,
+                             const char *current, int available,
+                             struct perf_plot_rect *plot)
+{
+    unsigned long text_color = available ? color_text : color_muted;
+    XSetForeground(XtDisplay(perf_area), perf_gc, text_color);
+    draw_text(x + 8, y + 16, title);
+    if (current) {
+        draw_text(x + w - 60, y + 16, current);
+    }
+    XSetForeground(XtDisplay(perf_area), perf_gc, color_text);
+    plot->x = x + 8;
+    plot->y = y + 26;
+    plot->w = w > 16 ? w - 16 : 1;
+    plot->h = h > 34 ? h - 34 : 1;
+    draw_fill(plot->x, plot->y, plot->w, plot->h, color_white);
+    draw_box(plot->x, plot->y, plot->w, plot->h, color_border);
+    if (plot->w < 4 || plot->h < 4) return;
+    for (uint32_t step = 1U; step < 4U; ++step) {
+        int gy = plot->y + ((plot->h - 1) * (int)step) / 4;
+        draw_segment(plot->x + 1, gy, plot->x + plot->w - 2, gy, color_border);
+    }
+    if (plot->h >= 40) {
+        XSetForeground(XtDisplay(perf_area), perf_gc, color_muted);
+        draw_text(plot->x + 3, plot->y + 14, "100%");
+        draw_text(plot->x + 3, plot->y + plot->h - 4, "0%");
+        XSetForeground(XtDisplay(perf_area), perf_gc, color_text);
+    }
+}
+
+static void draw_graph_core(int x, int y, int w, int h, const char *title,
+                            const char *current, uint32_t core_count)
+{
+    struct perf_plot_rect plot;
+    if (w < 96 || h < 32) return;
+    draw_graph_frame(x, y, w, h, title, current, 1, &plot);
+    if (plot.w < 4 || plot.h < 4 || !history.count) return;
+    if (core_count > RELIEFOS_PERF_MAX_CPUS) core_count = RELIEFOS_PERF_MAX_CPUS;
+    /* Core 0 first so later lines overdraw earlier ones; each core keeps
+     * its stable palette color regardless of the draw order. */
+    for (uint32_t core = 0; core < core_count; ++core) {
+        draw_history_line(&plot, history.core[core], core_color(core));
+    }
+}
+
+static void draw_graph(int x, int y, int w, int h, const char *title,
+                       const char *current, const uint8_t *series,
+                       unsigned long color)
+{
+    struct perf_plot_rect plot;
+    if (w < 96 || h < 32) return;
+    draw_graph_frame(x, y, w, h, title, current, series != 0, &plot);
+    if (!series || plot.w < 4 || plot.h < 4) return;
+    draw_history_line(&plot, series, color);
+}
+
+static void draw_text_line(int x, int y, const char *label, const char *value,
+                           int area_h)
+{
+    if (y > area_h - 4) return;
+    draw_text(x, y, label);
+    draw_text(x + 150, y, value);
+}
+
+static void draw_performance(Widget widget)
+{
+    Dimension width = 0, height = 0;
+    char value[64], value2[64], core_label[24];
+    int content_w, content_bottom, graph_w, graph_h, graph_gap = 8;
+    int graph_columns, y;
+    uint32_t cpu_count = perf_info.cpu_count;
+    uint64_t used_kib;
+
+    if (!perf_gc) return;
+    XtVaGetValues(widget, XmNwidth, &width, XmNheight, &height, NULL);
+    content_w = (int)width > 24 ? (int)width - 24 : 1;
+    content_bottom = (int)height - 8;
+    if (!perf_valid) {
+        XSetForeground(XtDisplay(widget), perf_gc, color_text);
+        draw_text(24, 32, T("Performance data unavailable"));
+        return;
+    }
+
+    used_kib = perf_info.total_memory_kib >= perf_info.free_memory_kib
+                   ? perf_info.total_memory_kib - perf_info.free_memory_kib : 0;
+    graph_columns = content_w >= 600 ? 3 : 1;
+    graph_w = (content_w - graph_gap * (graph_columns - 1)) / graph_columns;
+    graph_h = graph_columns == 1 ? 90 : ((int)height > 420 ? 120 : 96);
+    if (graph_h > content_bottom - 8) graph_h = content_bottom - 8;
+    y = 8;
+    for (uint32_t i = 0; i < 3U; ++i) {
+        int x = 8 + (int)i % graph_columns * (graph_w + graph_gap);
+        int graph_y = y + (int)i / graph_columns * (graph_h + graph_gap);
+        char current[24];
+        if (i == 0U) {
+            taskmgr_format_percent(current, sizeof(current), cpu_percent);
+            draw_graph_core(x, graph_y, graph_w, graph_h, T("CPU Usage"),
+                            current, perf_info.cpu_count);
+        } else if (i == 1U) {
+            taskmgr_format_percent(current, sizeof(current), mem_percent);
+            draw_graph(x, graph_y, graph_w, graph_h, T("Memory Usage"),
+                       current, history.memory, color_text);
         } else {
-            reliefos_ui_vscrollbar_handle_mouse(&process_tree.scroll, count, page,
-                                              view_w - 26, 74, 18, h,
-                                              event->x, event->y);
-            return 1;
+            if (gpu_sample.valid) {
+                taskmgr_format_percent(current, sizeof(current), gpu_sample.percent);
+            } else {
+                snprintf(current, sizeof(current), "%s", "N/A");
+            }
+            draw_graph(x, graph_y, graph_w, graph_h,
+                       graph_w < 210 ? T("GPU (est.)") : T("GPU (estimated)"),
+                       current, gpu_sample.available ? history.gpu : 0,
+                       color_accent);
         }
     }
-    int32_t position = event->y - (int32_t)top - grab_offset;
-    if (position < 0) position = 0;
-    if ((uint32_t)position > range) position = (int32_t)range;
-    if (range) process_tree.scroll = (uint32_t)((uint64_t)position * max / range);
-    return 1;
+    y += graph_h + graph_gap + 18;
+    if (cpu_count > RELIEFOS_PERF_MAX_CPUS) cpu_count = RELIEFOS_PERF_MAX_CPUS;
+    XSetForeground(XtDisplay(widget), perf_gc, color_text);
+    draw_text(24, y, T("Per-core usage"));
+    y += 22;
+    {
+        int columns = cpu_count > 16U ? 3 : (cpu_count > 8U ? 2 : 1);
+        if (cpu_count == 1U) columns = 1;
+        if (columns > content_w / 160 && content_w / 160 > 0) {
+            columns = content_w / 160;
+        }
+        if (content_w < 200) columns = 1;
+        int column_w = columns ? content_w / columns : content_w;
+        for (uint32_t i = 0; i < cpu_count; ++i) {
+            int column = (int)i % columns;
+            int row = (int)i / columns;
+            int x = 24 + column * column_w;
+            int row_y = y + row * 28;
+            int progress_x = x + 48;
+            int progress_w = column_w > 104 ? column_w - 104 : 24;
+            if (row_y + 16 > content_bottom) break;
+            snprintf(core_label, sizeof(core_label), "CPU %u", i);
+            draw_fill(x, row_y + 2, 6, 8, core_color(i));
+            XSetForeground(XtDisplay(widget), perf_gc, color_text);
+            draw_text(x + 10, row_y + 10, core_label);
+            draw_box(progress_x, row_y, progress_w, 16, color_border);
+            draw_fill(progress_x + 1, row_y + 1,
+                      (progress_w - 2) * (int)cpu_percent_by_core[i] / 100, 14,
+                      core_color(i));
+            taskmgr_format_percent(value, sizeof(value), cpu_percent_by_core[i]);
+            XSetForeground(XtDisplay(widget), perf_gc, color_text);
+            draw_text(x + column_w - 44, row_y + 10, value);
+        }
+        y += ((int)((cpu_count + columns - 1) / (columns ? columns : 1))) * 28 + 6;
+    }
+
+    taskmgr_format_kib(value, sizeof(value), perf_info.total_memory_kib);
+    draw_text_line(24, y, T("Total memory:"), value, content_bottom);
+    y += 18;
+    taskmgr_format_kib(value, sizeof(value), used_kib);
+    draw_text_line(24, y, T("Used memory:"), value, content_bottom);
+    y += 18;
+    taskmgr_format_kib(value, sizeof(value), perf_info.free_memory_kib);
+    draw_text_line(24, y, T("Free memory:"), value, content_bottom);
+    y += 18;
+    taskmgr_format_uptime(value, sizeof(value), perf_info.uptime_ms);
+    draw_text_line(24, y, T("Uptime:"), value, content_bottom);
+    y += 24;
+    snprintf(value, sizeof(value), "%s%u / %s%u", T("Tasks "),
+             perf_info.task_count, T("Run "), perf_info.running_tasks);
+    snprintf(value2, sizeof(value2), "%s%u / %s%u", T("Ready "),
+             perf_info.ready_tasks, T("Sleep "), perf_info.sleeping_tasks);
+    draw_text_line(24, y, value, value2, content_bottom);
 }
 
-int main(void)
+static void perf_expose(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)data;
+    (void)call;
+    draw_performance(widget);
+}
+
+static void perf_resize(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)data;
+    (void)call;
+    draw_performance(widget);
+}
+
+static void kill_selected_task(void)
+{
+    struct reliefos_task_info *task = selected_task();
+    if (!task) {
+        set_status(T("No task selected"));
+        return;
+    }
+    if (!selected_task_killable()) {
+        set_status(T("Cannot end protected or non-user task"));
+        return;
+    }
+    if (reliefos_task_kill(task->pid) < 0) {
+        set_status(T("End Task failed"));
+        return;
+    }
+    set_status(T("Task ended"));
+    refresh_all();
+}
+
+static int dialog_answer;
+
+static void dialog_reply(Widget widget, XtPointer answer, XtPointer call)
+{
+    (void)widget;
+    (void)call;
+    dialog_answer = (int)(intptr_t)answer;
+}
+
+static int dialog_wait(Widget dialog)
+{
+    dialog_answer = 0;
+    XtVaSetValues(dialog, XmNdialogStyle, XmDIALOG_FULL_APPLICATION_MODAL,
+                  XmNautoUnmanage, False, NULL);
+    XtVaSetValues(XtParent(dialog), XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Atom close = XInternAtom(XtDisplay(dialog), "WM_DELETE_WINDOW", False);
+    XmAddWMProtocolCallback(XtParent(dialog), close, dialog_reply, (XtPointer)-1);
+    XtManageChild(dialog);
+    while (!dialog_answer && !XtAppGetExitFlag(app)) {
+        XtAppProcessEvent(app, XtIMAll);
+    }
+    XtUnmanageChild(dialog);
+    return dialog_answer == 1;
+}
+
+static int confirm_dialog(const char *title, const char *message)
+{
+    Widget dialog = XmCreateQuestionDialog(shell, "confirmation", NULL, 0);
+    XmString caption = XmStringCreateLocalized((char *)title);
+    XmString body = XmStringCreateLocalized((char *)message);
+    XtVaSetValues(dialog, XmNdialogTitle, caption, XmNmessageString, body,
+                  XmNdefaultButtonType, XmDIALOG_CANCEL_BUTTON, NULL);
+    XmStringFree(caption);
+    XmStringFree(body);
+    XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
+    XtAddCallback(dialog, XmNokCallback, dialog_reply, (XtPointer)1);
+    XtAddCallback(dialog, XmNcancelCallback, dialog_reply, (XtPointer)-1);
+    int accepted = dialog_wait(dialog);
+    XtDestroyWidget(XtParent(dialog));
+    return accepted;
+}
+
+static void show_task_details(void)
+{
+    struct reliefos_task_info *task = selected_task();
+    struct reliefos_task_info snapshot;
+    char body[768];
+    char pid[16], ppid[16], cr3[24], entry[24], wake[16], ticks[32], mem[24];
+    Widget dialog;
+    XmString caption, message;
+
+    if (!task) {
+        set_status(T("No task selected"));
+        return;
+    }
+    snapshot = *task;
+    taskmgr_format_dec(pid, sizeof(pid), snapshot.pid);
+    taskmgr_format_dec(ppid, sizeof(ppid), snapshot.parent_pid);
+    taskmgr_format_hex_fixed(cr3, sizeof(cr3), snapshot.cr3, 12);
+    taskmgr_format_hex_fixed(entry, sizeof(entry), snapshot.entry, 12);
+    taskmgr_format_dec(wake, sizeof(wake), snapshot.wake_tick);
+    {
+        char tick_count[24];
+        taskmgr_format_dec(tick_count, sizeof(tick_count), snapshot.cpu_ticks);
+        snprintf(ticks, sizeof(ticks), "%s %s", tick_count, T("ticks"));
+    }
+    taskmgr_format_memory(mem, sizeof(mem), snapshot.memory_kib);
+    snprintf(body, sizeof(body),
+             "%s %s\nPID: %s\n%s %s\n%s %s\n%s %s\n%s %s\n%s %s\n%s %s\n%s %s\n"
+             "CR3: %s\nEntry: %s",
+             T("Name:"), snapshot.name,
+             pid,
+             T("Parent PID:"), ppid,
+             T("State:"), taskmgr_state_name(snapshot.state),
+             T("Kind:"), taskmgr_kind_name(snapshot.kind),
+             T("User:"), task_user_name(&snapshot),
+             T("Privileges:"), task_privilege_name(&snapshot),
+             T("CPU time:"), ticks,
+             T("Memory:"), mem,
+             T("Wake tick:"), wake,
+             cr3,
+             entry);
+
+    dialog = XmCreateInformationDialog(shell, "taskDetails", NULL, 0);
+    caption = XmStringCreateLocalized((char *)T("Task Details"));
+    message = XmStringCreateLocalized(body);
+    XtVaSetValues(dialog, XmNdialogTitle, caption, XmNmessageString, message, NULL);
+    XmStringFree(caption);
+    XmStringFree(message);
+    XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
+    XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_CANCEL_BUTTON));
+    XtAddCallback(dialog, XmNokCallback, dialog_reply, (XtPointer)1);
+    dialog_wait(dialog);
+    XtDestroyWidget(XtParent(dialog));
+}
+
+static void toggle_selected_startup_entry(void)
+{
+    struct reliefos_startup_entry *entry = (selected_startup >= 0 &&
+                                            (uint32_t)selected_startup < startup_entry_count)
+                                               ? &startup_entries[selected_startup]
+                                               : 0;
+    if (!entry) {
+        set_status(T("No startup app selected"));
+        return;
+    }
+    if (reliefos_startup_set_enabled(startup_selected_uid, entry->id,
+                                     !entry->enabled) < 0) {
+        set_status(T("Could not change startup app"));
+        return;
+    }
+    set_status(entry->enabled ? T("Startup app disabled") : T("Startup app enabled"));
+    refresh_startup_entries();
+    update_controls();
+}
+
+static void remove_selected_startup_entry(void)
+{
+    struct reliefos_startup_entry *entry = (selected_startup >= 0 &&
+                                            (uint32_t)selected_startup < startup_entry_count)
+                                               ? &startup_entries[selected_startup]
+                                               : 0;
+    if (!entry) {
+        set_status(T("No startup app selected"));
+        return;
+    }
+    if (!confirm_dialog(T("Remove Startup App"), T("Remove the selected startup app?"))) {
+        return;
+    }
+    if (reliefos_startup_remove(startup_selected_uid, entry->id) < 0) {
+        set_status(T("Could not remove startup app"));
+        return;
+    }
+    set_status(T("Startup app removed"));
+    refresh_startup_entries();
+    update_controls();
+}
+
+static void show_about(void)
+{
+    Widget dialog = XmCreateInformationDialog(shell, "about", NULL, 0);
+    XmString caption = XmStringCreateLocalized((char *)T("Task Manager"));
+    XmString message = XmStringCreateLocalized(
+        (char *)T("Live task snapshot from the scheduler."));
+    XtVaSetValues(dialog, XmNdialogTitle, caption, XmNmessageString, message, NULL);
+    XmStringFree(caption);
+    XmStringFree(message);
+    XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
+    XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_CANCEL_BUTTON));
+    XtAddCallback(dialog, XmNokCallback, dialog_reply, (XtPointer)1);
+    dialog_wait(dialog);
+    XtDestroyWidget(XtParent(dialog));
+}
+
+static void select_tab(Widget page)
+{
+    if (!page) return;
+    XmTabStackSelectTab(page, True);
+}
+
+static void menu_callback(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)call;
+    switch ((int)(intptr_t)data) {
+    case 1: refresh_all(); break;
+    case 2: kill_selected_task(); break;
+    case 3: show_task_details(); break;
+    case 4: show_about(); break;
+    case 5: select_tab(page_processes); break;
+    case 6: select_tab(page_performance); break;
+    case 7: select_tab(page_startup); break;
+    case 8: toggle_selected_startup_entry(); break;
+    case 9: remove_selected_startup_entry(); break;
+    default: break;
+    }
+}
+
+static void tab_selected(Widget widget, XtPointer data, XtPointer call)
+{
+    XmTabStackCallbackStruct *selection = call;
+    (void)widget;
+    (void)data;
+    if (!selection || !selection->selected_child) return;
+    if (selection->selected_child == page_processes) active_tab = TASKMGR_TAB_PROCESSES;
+    else if (selection->selected_child == page_performance) active_tab = TASKMGR_TAB_PERFORMANCE;
+    else if (selection->selected_child == page_startup) active_tab = TASKMGR_TAB_STARTUP;
+    if (active_tab == TASKMGR_TAB_STARTUP) refresh_startup();
+    update_controls();
+}
+
+static void select_process(Widget widget, XtPointer data, XtPointer call)
+{
+    XmListCallbackStruct *selection = call;
+    (void)widget;
+    (void)data;
+    if (updating || selection->item_position < 1 ||
+        (uint32_t)selection->item_position > tree_count) return;
+    selected_pid = tasks[tree_rows[selection->item_position - 1].index].pid;
+    update_controls();
+}
+
+static void select_startup(Widget widget, XtPointer data, XtPointer call)
+{
+    XmListCallbackStruct *selection = call;
+    (void)widget;
+    (void)data;
+    if (updating || selection->item_position < 1 ||
+        (uint32_t)selection->item_position > startup_entry_count) return;
+    selected_startup = selection->item_position - 1;
+    update_controls();
+}
+
+static void select_user(Widget widget, XtPointer data, XtPointer call)
+{
+    XmComboBoxCallbackStruct *selection = call;
+    char *name = 0;
+    (void)widget;
+    (void)data;
+    if (updating) return;
+    /* Match the chosen name instead of trusting the combo box position
+     * convention: the item list is exactly the user list either way. */
+    if (selection->item_or_text &&
+        XmStringGetLtoR(selection->item_or_text, XmFONTLIST_DEFAULT_TAG, &name)) {
+        for (uint32_t i = 0; i < startup_user_count; ++i) {
+            if (!strcmp(startup_users[i].username, name)) {
+                startup_selected_uid = startup_users[i].uid;
+                break;
+            }
+        }
+        XtFree(name);
+    }
+    selected_startup = -1;
+    refresh_startup_entries();
+    update_controls();
+}
+
+static void popup_details_action(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    show_task_details();
+}
+
+static void right_click(Widget widget, XtPointer data, XEvent *event, Boolean *dispatch)
+{
+    (void)data;
+    (void)dispatch;
+    if (event->type != ButtonPress || event->xbutton.button != Button3) return;
+    if (widget != process_list) return;
+    int position = XmListYToPos(process_list, event->xbutton.y);
+    if (position > 0 && (uint32_t)position <= tree_count) {
+        XmListDeselectAllItems(process_list);
+        XmListSelectPos(process_list, position, False);
+        selected_pid = tasks[tree_rows[position - 1].index].pid;
+    } else {
+        selected_pid = 0;
+    }
+    update_controls();
+    XmMenuPosition(process_popup, &event->xbutton);
+    XtManageChild(process_popup);
+}
+
+static void key(Widget widget, XtPointer data, XEvent *event, Boolean *dispatch)
+{
+    KeySym symbol;
+    (void)data;
+    if (event->type != KeyPress) return;
+    symbol = XLookupKeysym(&event->xkey, 0);
+    if (symbol == XK_F5) {
+        *dispatch = False;
+        refresh_all();
+        return;
+    }
+    if (symbol != XK_Delete) return;
+    *dispatch = False;
+    if (widget == process_list) kill_selected_task();
+    else if (widget == startup_list_widget) remove_selected_startup_entry();
+}
+
+static void close_window(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    XtAppSetExitFlag(app);
+}
+
+static Widget action_button(Widget parent, const char *label, int action)
+{
+    Widget button = XtVaCreateManagedWidget(label, xmPushButtonWidgetClass, parent, NULL);
+    set_label(button, T(label));
+    XtAddCallback(button, XmNactivateCallback, menu_callback, (XtPointer)(intptr_t)action);
+    return button;
+}
+
+static Widget menu(Widget bar, const char *name)
+{
+    Widget pane = XmCreatePulldownMenu(bar, (char *)name, NULL, 0);
+    Widget cascade = XtVaCreateManagedWidget(name, xmCascadeButtonWidgetClass, bar,
+                                             XmNsubMenuId, pane, NULL);
+    set_label(cascade, T(name));
+    return pane;
+}
+
+static void tick(XtPointer data, XtIntervalId *id)
+{
+    (void)data;
+    (void)id;
+    refresh_all();
+    XtAppAddTimeOut(app, 500, tick, NULL);
+}
+
+static Widget tab_page(const char *name, const char *title)
+{
+    XmString label = XmStringCreateLocalized((char *)title);
+    Widget page = XtVaCreateManagedWidget(name, xmFormWidgetClass, tab_stack,
+                                          XmNtabLabelString, label, NULL);
+    XmStringFree(label);
+    return page;
+}
+
+static void build_processes_page(void)
+{
+    Widget heading = XtVaCreateManagedWidget("processColumns", xmLabelWidgetClass,
+                                             page_processes,
+                                             XmNtopAttachment, XmATTACH_FORM,
+                                             XmNleftAttachment, XmATTACH_FORM,
+                                             XmNrightAttachment, XmATTACH_FORM,
+                                             XmNalignment, XmALIGNMENT_BEGINNING,
+                                             NULL);
+    char columns[160];
+    snprintf(columns, sizeof(columns),
+             "%-16s %7s %6s %9s %-5s %-10s %s",
+             T("PROCESS"), "PID", T("CPU"), T("MEM"), T("STATE"), T("USER"),
+             T("PRIV"));
+    set_label(heading, columns);
+    process_list = XmCreateScrolledList(page_processes, "processes", NULL, 0);
+    XtVaSetValues(process_list, XmNselectionPolicy, XmBROWSE_SELECT,
+                  XmNvisibleItemCount, 16, NULL);
+    XtVaSetValues(XtParent(process_list),
+                  XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, heading,
+                  XmNbottomAttachment, XmATTACH_FORM,
+                  XmNleftAttachment, XmATTACH_FORM,
+                  XmNrightAttachment, XmATTACH_FORM, NULL);
+    XtAddCallback(process_list, XmNbrowseSelectionCallback, select_process, NULL);
+    XtAddCallback(process_list, XmNdefaultActionCallback, popup_details_action, NULL);
+    XtInsertEventHandler(process_list, KeyPressMask, False, key, NULL, XtListHead);
+    XtAddEventHandler(process_list, ButtonPressMask, False, right_click, NULL);
+    XtManageChild(process_list);
+    process_popup = XmCreatePopupMenu(process_list, "processContext", NULL, 0);
+    popup_end_task = action_button(process_popup, "End Task", 2);
+    popup_details = action_button(process_popup, "Details", 3);
+    action_button(process_popup, "Refresh", 1);
+}
+
+static void build_performance_page(void)
+{
+    perf_area = XtVaCreateManagedWidget("performance", xmDrawingAreaWidgetClass,
+                                        page_performance,
+                                        XmNtopAttachment, XmATTACH_FORM,
+                                        XmNbottomAttachment, XmATTACH_FORM,
+                                        XmNleftAttachment, XmATTACH_FORM,
+                                        XmNrightAttachment, XmATTACH_FORM,
+                                        NULL);
+    XtAddCallback(perf_area, XmNexposeCallback, perf_expose, NULL);
+    XtAddCallback(perf_area, XmNresizeCallback, perf_resize, NULL);
+}
+
+static void build_startup_page(void)
+{
+    startup_user_label = XtVaCreateManagedWidget("userLabel", xmLabelWidgetClass,
+                                                 page_startup,
+                                                 XmNtopAttachment, XmATTACH_FORM,
+                                                 XmNleftAttachment, XmATTACH_FORM,
+                                                 NULL);
+    set_label(startup_user_label, T("User"));
+    startup_combo = XmCreateDropDownComboBox(page_startup, "userCombo", NULL, 0);
+    XtVaSetValues(startup_combo,
+                  XmNtopAttachment, XmATTACH_FORM,
+                  XmNleftAttachment, XmATTACH_WIDGET, XmNleftWidget, startup_user_label,
+                  XmNrightAttachment, XmATTACH_FORM,
+                  XmNvisibleItemCount, 6, NULL);
+    XtAddCallback(startup_combo, XmNselectionCallback, select_user, NULL);
+    XtManageChild(startup_combo);
+    Widget toolbar = XtVaCreateManagedWidget("startupToolbar", xmRowColumnWidgetClass,
+                                             page_startup,
+                                             XmNorientation, XmHORIZONTAL,
+                                             XmNpacking, XmPACK_TIGHT,
+                                             XmNtopAttachment, XmATTACH_WIDGET,
+                                             XmNtopWidget, startup_combo,
+                                             XmNleftAttachment, XmATTACH_FORM,
+                                             XmNrightAttachment, XmATTACH_FORM, NULL);
+    button_startup_toggle = action_button(toolbar, "Enable", 8);
+    button_startup_remove = action_button(toolbar, "Remove", 9);
+    startup_list_widget = XmCreateScrolledList(page_startup, "startupEntries", NULL, 0);
+    XtVaSetValues(startup_list_widget, XmNselectionPolicy, XmBROWSE_SELECT,
+                  XmNvisibleItemCount, 10, NULL);
+    XtVaSetValues(XtParent(startup_list_widget),
+                  XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, toolbar,
+                  XmNbottomAttachment, XmATTACH_FORM,
+                  XmNleftAttachment, XmATTACH_FORM,
+                  XmNrightAttachment, XmATTACH_FORM, NULL);
+    XtAddCallback(startup_list_widget, XmNbrowseSelectionCallback, select_startup, NULL);
+    XtInsertEventHandler(startup_list_widget, KeyPressMask, False, key, NULL, XtListHead);
+    XtManageChild(startup_list_widget);
+}
+
+static void build_ui(void)
+{
+    Widget form = XtVaCreateWidget("taskManager", xmFormWidgetClass, shell,
+                                   XmNwidth, 720, XmNheight, 560,
+                                   XmNresizePolicy, XmRESIZE_NONE,
+                                   XmNmarginWidth, 8, XmNmarginHeight, 8, NULL);
+    Widget bar = XmCreateMenuBar(form, "menuBar", NULL, 0);
+    XtVaSetValues(bar, XmNtopAttachment, XmATTACH_FORM,
+                  XmNleftAttachment, XmATTACH_FORM,
+                  XmNrightAttachment, XmATTACH_FORM, NULL);
+    Widget file_menu = menu(bar, "File");
+    action_button(file_menu, "Refresh", 1);
+    menu_end_task = action_button(file_menu, "End Task", 2);
+    action_button(file_menu, "About", 4);
+    Widget options_menu = menu(bar, "Options");
+    action_button(options_menu, "Processes", 5);
+    action_button(options_menu, "Performance", 6);
+    action_button(options_menu, "Service Manager", 7);
+    action_button(options_menu, "About", 4);
+    XtManageChild(bar);
+
+    Widget toolbar = XtVaCreateManagedWidget("toolbar", xmRowColumnWidgetClass, form,
+                                             XmNorientation, XmHORIZONTAL,
+                                             XmNpacking, XmPACK_TIGHT,
+                                             XmNtopAttachment, XmATTACH_WIDGET,
+                                             XmNtopWidget, bar,
+                                             XmNleftAttachment, XmATTACH_FORM,
+                                             XmNrightAttachment, XmATTACH_FORM, NULL);
+    action_button(toolbar, "Refresh", 1);
+    button_end_task = action_button(toolbar, "End Task", 2);
+    action_button(toolbar, "Details", 3);
+
+    status_label = XtVaCreateManagedWidget("status", xmLabelWidgetClass, form,
+                                           XmNalignment, XmALIGNMENT_BEGINNING,
+                                           XmNrecomputeSize, False, XmNheight, 26,
+                                           XmNbottomAttachment, XmATTACH_FORM,
+                                           XmNleftAttachment, XmATTACH_FORM,
+                                           XmNrightAttachment, XmATTACH_FORM, NULL);
+    set_status("Ready");
+
+    tab_stack = XmCreateTabStack(form, "tabs", NULL, 0);
+    XtVaSetValues(tab_stack,
+                  XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, toolbar,
+                  XmNbottomAttachment, XmATTACH_WIDGET, XmNbottomWidget, status_label,
+                  XmNleftAttachment, XmATTACH_FORM,
+                  XmNrightAttachment, XmATTACH_FORM, NULL);
+    page_processes = tab_page("processesTab", T("Processes"));
+    page_performance = tab_page("performanceTab", T("Performance"));
+    page_startup = tab_page("startupTab", T("Service Manager"));
+    XtAddCallback(tab_stack, XmNtabSelectedCallback, tab_selected, NULL);
+    XtManageChild(tab_stack);
+
+    build_processes_page();
+    build_performance_page();
+    build_startup_page();
+
+    XtManageChild(form);
+}
+
+int main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
     bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
     textdomain("leonos");
-    struct reliefos_ui_surface ui;
-    struct reliefos_gui_app_event event;
-    unsigned long last_refresh = 0;
-    int window_id;
-
-    puts("[taskmgr.elf] task manager starting");
-    printf("[taskmgr.elf] pid=%d creating GUI window\n", getpid());
-    window_id = reliefos_gui_create_app_window_ex(T("Task Manager"), T("Task snapshot"),
-                                                TASKMGR_W, TASKMGR_H, 0);
-    if (window_id <= 0) {
-        printf("[taskmgr.elf] create window failed=%d\n", window_id);
-        return 1;
-    }
-
-    reliefos_ui_bind(&ui, pixels, view_w, view_h, TASKMGR_MAX_W);
-    reliefos_ui_treeview_state_init(&process_tree, visible_rows(), 24);
-    reliefos_ui_listview_state_init(&startup_list, startup_visible_rows(), 24);
-    reliefos_ui_tab_state_init(&taskmgr_tabs, TASKMGR_TAB_PROCESSES);
-    process_tree.focused = 1;
-    refresh_all();
-    present_taskmgr((uint32_t)window_id, &ui);
-    for (;;) {
-        unsigned long now = reliefos_uptime_ms();
-        event.window_id = (uint32_t)window_id;
-        while (reliefos_gui_wait_app_event(&event,
-                                         context_menu_animating ? 20U : RELIEFOS_GUI_IDLE_WAIT_MS) > 0) {
-            if (event.type == RELIEFOS_GUI_APP_EVENT_CLOSE) {
-                return 0;
-            }
-            if (!menu_open && !context_menu_active && process_scroll_event(&event)) {
-                present_taskmgr((uint32_t)window_id, &ui);
-                continue;
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_MOUSE_BUTTON && (event.buttons & 3u)) {
-                if (event.buttons & 2u) {
-                    if (active_tab == TASKMGR_TAB_PROCESSES) {
-                        uint32_t activate = 0;
-                        reliefos_ui_treeview_state_handle_mouse(&process_tree,
-                                                              process_tree_items, task_count,
-                                                              event.x, event.y, 10, 102,
-                                                              view_w > 38 ? view_w - 38 : 320,
-                                                              &activate);
-                        show_context_menu_at(event.x, event.y);
-                    }
-                    present_taskmgr((uint32_t)window_id, &ui);
-                    continue;
-                }
-                if (handle_context_menu_click(event.x, event.y)) {
-                    present_taskmgr((uint32_t)window_id, &ui);
-                    continue;
-                }
-                if (handle_menu_click(event.x, event.y)) {
-                    context_menu_set_active(0);
-                    present_taskmgr((uint32_t)window_id, &ui);
-                    continue;
-                }
-                menu_open = TASKMGR_MENU_NONE;
-                context_menu_set_active(0);
-                if (hit_rect_i(event.x, event.y, 8, 34, 88, RELIEFOS_UI_BUTTON_H)) {
-                    refresh_all();
-                    present_taskmgr((uint32_t)window_id, &ui);
-                    continue;
-                }
-                {
-                    struct reliefos_ui_tab_item tabs[3];
-                    uint32_t tab_w = toolbar_tab_width();
-                    taskmgr_tab_items(tabs);
-                    if (reliefos_ui_tab_control_handle_mouse(&taskmgr_tabs, event.x, event.y,
-                                                           104, 34, tab_w, tabs, 3)) {
-                        active_tab = (uint8_t)taskmgr_tabs.selected_id;
-                        if (active_tab == TASKMGR_TAB_STARTUP) {
-                            active_tab = TASKMGR_TAB_PROCESSES;
-                            taskmgr_tabs.selected_id = active_tab;
-                            open_service_manager();
-                        } else {
-                            refresh_all();
-                        }
-                        present_taskmgr((uint32_t)window_id, &ui);
-                        continue;
-                    }
-                }
-                uint32_t action_x = toolbar_action_x();
-                if (active_tab == TASKMGR_TAB_PROCESSES &&
-                    action_x + 86 <= view_w &&
-                    hit_rect_i(event.x, event.y, (int32_t)action_x, 34, 86, RELIEFOS_UI_BUTTON_H)) {
-                    kill_selected_task();
-                    present_taskmgr((uint32_t)window_id, &ui);
-                    continue;
-                }
-                if (active_tab == TASKMGR_TAB_STARTUP) {
-                    uint32_t dropdown_rows = startup_dropdown_rows();
-                    uint32_t dropdown_h = dropdown_rows * TASKMGR_STARTUP_USER_ROW_H;
-                    if (startup_user_dropdown_open &&
-                        hit_rect_i(event.x, event.y, 70, 102, 160, (int32_t)dropdown_h)) {
-                        uint32_t row = ((uint32_t)event.y - 102U) / TASKMGR_STARTUP_USER_ROW_H;
-                        uint32_t index = startup_user_dropdown_scroll + row;
-                        if (index < startup_user_count) {
-                            startup_selected_uid = startup_users[index].uid;
-                            startup_user_dropdown_open = 0;
-                            startup_user_dropdown_scroll = 0;
-                            refresh_startup_entries();
-                        }
-                        present_taskmgr((uint32_t)window_id, &ui);
-                        continue;
-                    }
-                    if (startup_user_dropdown_open && startup_user_count > dropdown_rows &&
-                        hit_rect_i(event.x, event.y, 232, 102, 16, (int32_t)dropdown_h)) {
-                        reliefos_ui_vscrollbar_handle_mouse(&startup_user_dropdown_scroll,
-                                                          startup_user_count, dropdown_rows,
-                                                          232, 102, 16, dropdown_h,
-                                                          event.x, event.y);
-                        present_taskmgr((uint32_t)window_id, &ui);
-                        continue;
-                    }
-                    if (hit_rect_i(event.x, event.y, 70, 78, 180, RELIEFOS_UI_BUTTON_H)) {
-                        startup_user_dropdown_open = startup_user_dropdown_open ? 0U : 1U;
-                        present_taskmgr((uint32_t)window_id, &ui);
-                        continue;
-                    }
-                    startup_user_dropdown_open = 0;
-                    if (action_x + 92 <= view_w &&
-                        hit_rect_i(event.x, event.y, (int32_t)action_x, 34, 92, RELIEFOS_UI_BUTTON_H)) {
-                        toggle_selected_startup_entry();
-                        present_taskmgr((uint32_t)window_id, &ui);
-                        continue;
-                    }
-                    if (action_x + 192 <= view_w &&
-                        hit_rect_i(event.x, event.y, (int32_t)action_x + 100, 34, 86,
-                                   RELIEFOS_UI_BUTTON_H)) {
-                        remove_selected_startup_entry();
-                        present_taskmgr((uint32_t)window_id, &ui);
-                        continue;
-                    }
-                    if (event.x >= (int32_t)(view_w - 26) && event.y >= 114 &&
-                        event.y < (int32_t)(view_h - TASKMGR_STATUS_H)) {
-                        reliefos_ui_vscrollbar_handle_mouse(&startup_list.scroll,
-                                                          startup_entry_count > startup_visible_rows()
-                                                              ? startup_entry_count : startup_visible_rows(),
-                                                          startup_visible_rows(),
-                                                          view_w - 26, 114, 18,
-                                                          view_h > 112 + TASKMGR_STATUS_H + 6
-                                                              ? view_h - 112 - TASKMGR_STATUS_H - 6 : 24,
-                                                          event.x, event.y);
-                    } else {
-                        uint32_t activate = 0;
-                        reliefos_ui_listview_state_handle_mouse(&startup_list, event.x, event.y,
-                                                              10, 142,
-                                                              view_w > 38 ? view_w - 38 : 320,
-                                                              &activate);
-                    }
-                    startup_list.focused = 1;
-                }
-                if (active_tab == TASKMGR_TAB_PROCESSES &&
-                    event.x >= (int32_t)(view_w - 26) && event.y >= 74 &&
-                    event.y < (int32_t)(view_h - TASKMGR_STATUS_H)) {
-                    reliefos_ui_vscrollbar_handle_mouse(&process_tree.scroll,
-                                                      process_tree.visible_count > process_tree.visible_rows
-                                                          ? process_tree.visible_count
-                                                          : process_tree.visible_rows,
-                                                      visible_rows(),
-                                                      view_w - 26, 74, 18, view_h > 104 ? view_h - 104 : 24,
-                                                      event.x, event.y);
-                } else if (active_tab == TASKMGR_TAB_PROCESSES) {
-                    uint32_t activate = 0;
-                    reliefos_ui_treeview_state_handle_mouse(&process_tree,
-                                                          process_tree_items, task_count,
-                                                          event.x, event.y, 10, 102,
-                                                          view_w > 38 ? view_w - 38 : 320,
-                                                          &activate);
-                    (void)activate;
-                }
-                process_tree.focused = 1;
-                present_taskmgr((uint32_t)window_id, &ui);
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_MOUSE_WHEEL) {
-                if (active_tab == TASKMGR_TAB_PROCESSES &&
-                    reliefos_ui_treeview_state_handle_wheel(&process_tree, event.dy)) {
-                    present_taskmgr((uint32_t)window_id, &ui);
-                } else if (active_tab == TASKMGR_TAB_STARTUP && startup_user_dropdown_open &&
-                           startup_user_count > startup_dropdown_rows()) {
-                    reliefos_ui_vscrollbar_handle_wheel(&startup_user_dropdown_scroll,
-                                                       startup_user_count, startup_dropdown_rows(),
-                                                       event.dy);
-                    present_taskmgr((uint32_t)window_id, &ui);
-                } else if (active_tab == TASKMGR_TAB_STARTUP &&
-                           reliefos_ui_listview_state_handle_wheel(&startup_list, event.dy)) {
-                    present_taskmgr((uint32_t)window_id, &ui);
-                }
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN) {
-                menu_open = TASKMGR_MENU_NONE;
-                context_menu_set_active(0);
-                uint32_t activate = 0;
-                if (active_tab == TASKMGR_TAB_PROCESSES && event.keycode == RELIEFOS_KEY_DELETE) {
-                    kill_selected_task();
-                    present_taskmgr((uint32_t)window_id, &ui);
-                    continue;
-                }
-                if (active_tab == TASKMGR_TAB_STARTUP && event.keycode == RELIEFOS_KEY_DELETE) {
-                    remove_selected_startup_entry();
-                    present_taskmgr((uint32_t)window_id, &ui);
-                    continue;
-                }
-                if (active_tab == TASKMGR_TAB_PROCESSES &&
-                    reliefos_ui_treeview_state_handle_key(&process_tree, process_tree_items,
-                                                        task_count, event.keycode, &activate)) {
-                    present_taskmgr((uint32_t)window_id, &ui);
-                } else if (active_tab == TASKMGR_TAB_STARTUP &&
-                           reliefos_ui_listview_state_handle_key(&startup_list, event.keycode, &activate)) {
-                    present_taskmgr((uint32_t)window_id, &ui);
-                }
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_RESIZE || event.type == RELIEFOS_GUI_APP_EVENT_FOCUS) {
-                if (event.width >= 360) {
-                    view_w = event.width > TASKMGR_MAX_W ? TASKMGR_MAX_W : event.width;
-                }
-                if (event.height >= 220) {
-                    view_h = event.height > TASKMGR_MAX_H ? TASKMGR_MAX_H : event.height;
-                }
-                reliefos_ui_treeview_state_set_viewport(&process_tree, visible_rows());
-                reliefos_ui_treeview_state_sync(&process_tree, process_tree_items, task_count);
-                startup_list.visible_rows = startup_visible_rows();
-                reliefos_ui_listview_state_set_count(&startup_list, startup_entry_count);
-                present_taskmgr((uint32_t)window_id, &ui);
-            }
-            event.window_id = (uint32_t)window_id;
+    XtSetLanguageProc(NULL, NULL, NULL);
+    char *fallback[] = {
+        "*fontList: fixed", "*background: #eceef4", "*foreground: #22242e",
+        "*highlightColor: #3b62a6", NULL
+    };
+    shell = XtVaAppInitialize(&app, "ReliefOSTaskManager", NULL, 0,
+                              &argc, argv, fallback,
+                              XtNtitle, T("Task Manager"),
+                              XtNwidth, 720, XtNheight, 560, NULL);
+    taskmgr_perf_history_init(&history);
+    build_ui();
+    XtRealizeWidget(shell);
+    {
+        Display *display = XtDisplay(shell);
+        perf_gc = XCreateGC(display, XtWindow(shell), 0, NULL);
+        perf_font = XLoadFont(display, "fixed");
+        if (perf_font) XSetFont(display, perf_gc, perf_font);
+        for (uint32_t i = 0; i < TASKMGR_CORE_PALETTE_SIZE; ++i) {
+            perf_pixels[i] = alloc_color(display, core_palette[i]);
         }
-        if (now - last_refresh >= 500) {
-            refresh_all();
-            present_taskmgr((uint32_t)window_id, &ui);
-            last_refresh = now;
-        } else if (context_menu_animating) {
-            present_taskmgr((uint32_t)window_id, &ui);
-        }
-        sleep_ms(20);
+        color_white = alloc_color(display, 0x00FFFFFF);
+        color_border = alloc_color(display, 0x00B0B4C0);
+        color_muted = alloc_color(display, 0x00808694);
+        color_text = alloc_color(display, 0x0022242E);
+        color_accent = alloc_color(display, 0x003B62A6);
+        XSetForeground(display, perf_gc, color_text);
+        XSetBackground(display, perf_gc,
+                       WhitePixel(display, DefaultScreen(display)));
     }
+    Atom delete_window = XInternAtom(XtDisplay(shell), "WM_DELETE_WINDOW", False);
+    XmAddWMProtocolCallback(shell, delete_window, close_window, NULL);
+    refresh_performance();
+    refresh_tasks();
+    refresh_startup();
+    update_controls();
+    puts("[taskmgr.elf] Motif task manager ready");
+    fflush(stdout);
+    XtAppAddTimeOut(app, 500, tick, NULL);
+    XtAppMainLoop(app);
+    XtDestroyWidget(shell);
+    XtDestroyApplicationContext(app);
+    return 0;
 }
