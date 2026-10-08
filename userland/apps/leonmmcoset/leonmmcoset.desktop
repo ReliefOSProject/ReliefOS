@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Leonmmcoset
+Exec=/usr/bin/leonmmcoset
+TryExec=/usr/bin/leonmmcoset
+Icon=xv
+Terminal=false
+Categories=Utility;

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Xiaobai
+Exec=/usr/bin/xiaobai
+TryExec=/usr/bin/xiaobai
+Icon=xv
+Terminal=false
+Categories=Utility;

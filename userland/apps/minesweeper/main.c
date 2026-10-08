@@ -1,117 +1,98 @@
-#include <reliefos/gui.h>
+#include "model.h"
+#include <fcntl.h>
 #include <libintl.h>
 #include <locale.h>
 #include <reliefos/layout.h>
-#include <reliefos/psf_font.h>
-#include <reliefos/stdio.h>
-#include <reliefos/ui.h>
-#include <reliefos/layout.h>
-#include <fcntl.h>
-#include <poll.h>
-#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+#include <Xm/DrawingA.h>
+#include <Xm/Form.h>
+#include <Xm/Label.h>
+#include <Xm/Protocols.h>
+#include <Xm/PushB.h>
 
-#define MS_COLS 9
-#define MS_ROWS 9
-#define MS_MINES 10
-#define MS_CELLS (MS_COLS * MS_ROWS)
-#define MS_TILE 28
-#define MS_GAP 2
-#define MS_BOARD_X 18
-#define MS_BOARD_Y 76
-#define MS_TOP_H 52
-#define MS_W (MS_BOARD_X * 2 + MS_COLS * MS_TILE)
-#define MS_H (MS_BOARD_Y + MS_ROWS * MS_TILE + 18)
-#define MS_SPRITE_SIZE 20
-#define MS_SPRITE_BMP_MAX_BYTES (MS_SPRITE_SIZE * MS_SPRITE_SIZE * 4U + 128U)
-#define MS_MINE_SPRITE_PATH RELIEFOS_PATH_MINESWEEPER_MINE_BMP
-#define MS_FLAG_SPRITE_PATH RELIEFOS_PATH_MINESWEEPER_FLAG_BMP
-
-#define CELL_MINE 0x01u
-#define CELL_REVEALED 0x02u
-#define CELL_FLAGGED 0x04u
 #define T(s) gettext(s)
 
-static uint32_t pixels[MS_W * MS_H];
-static uint8_t cells[MS_ROWS][MS_COLS];
-static uint8_t adjacent[MS_ROWS][MS_COLS];
-static uint8_t mines_placed;
-static uint8_t game_over;
-static uint8_t won;
-static uint32_t revealed_count;
-static uint32_t flagged_count;
-static uint32_t rng_state;
+#define MS_TILE 28
+#define MS_GAP 2
+#define MS_INNER (MS_TILE - MS_GAP)
+#define MS_BOARD_W (MSW_COLS * MS_TILE)
+#define MS_BOARD_H (MSW_ROWS * MS_TILE)
 
-struct minesweeper_sprite {
-    uint32_t width;
-    uint32_t height;
-    uint32_t pixels[MS_SPRITE_SIZE * MS_SPRITE_SIZE];
-};
+#define TILE_HIDDEN 0x00c0c0c0u
+#define TILE_OPEN 0x00d8d8d8u
+#define TILE_MINE 0x00e8b0b0u
+#define EDGE_LIGHT 0x00ffffffu
+#define EDGE_SHADOW 0x00808080u
+#define EDGE_DARK 0x00404040u
 
-static struct minesweeper_sprite mine_sprite;
-static struct minesweeper_sprite flag_sprite;
+static struct msw_game game;
+static struct msw_sprite mine_sprite;
+static struct msw_sprite flag_sprite;
+static unsigned long mine_pixels[MSW_SPRITE_SIZE * MSW_SPRITE_SIZE];
+static unsigned long flag_pixels[MSW_SPRITE_SIZE * MSW_SPRITE_SIZE];
+static Widget board;
+static Widget mines_label;
+static Widget status_label;
+static XtAppContext app;
+static Display *display;
+static Window board_window;
+static GC gc;
+static XFontStruct *font;
+static unsigned long color_tile_hidden;
+static unsigned long color_tile_open;
+static unsigned long color_tile_mine;
+static unsigned long color_edge_light;
+static unsigned long color_edge_shadow;
+static unsigned long color_edge_dark;
+static unsigned long color_number[9];
 
-static int hit_rect_i(int32_t x, int32_t y, int32_t rx, int32_t ry, int32_t rw, int32_t rh)
+static unsigned long alloc_color(unsigned long rgb)
 {
-    return x >= rx && y >= ry && x < rx + rw && y < ry + rh;
-}
-
-static void copy_text(char *dst, uint32_t cap, const char *src)
-{
-    uint32_t i = 0;
-    if (!dst || cap == 0) {
-        return;
+    XColor color;
+    color.red = (unsigned short)(((rgb >> 16) & 0xffu) * 0x0101u);
+    color.green = (unsigned short)(((rgb >> 8) & 0xffu) * 0x0101u);
+    color.blue = (unsigned short)((rgb & 0xffu) * 0x0101u);
+    color.flags = DoRed | DoGreen | DoBlue;
+    if (!XAllocColor(display, DefaultColormap(display, DefaultScreen(display)), &color)) {
+        return BlackPixel(display, DefaultScreen(display));
     }
-    while (src && src[i] && i + 1 < cap) {
-        dst[i] = src[i];
-        ++i;
+    return color.pixel;
+}
+
+static uint32_t color_for_number(uint8_t n)
+{
+    switch (n) {
+    case 1: return 0x000000bfu;
+    case 2: return 0x00008000u;
+    case 3: return 0x00bf0000u;
+    case 4: return 0x00000080u;
+    case 5: return 0x00800000u;
+    case 6: return 0x00008080u;
+    case 7: return 0x00000000u;
+    default: return 0x00808080u;
     }
-    dst[i] = 0;
 }
 
-static uint32_t text_len(const char *text)
+static void set_label(Widget widget, const char *text)
 {
-    uint32_t n = 0;
-    while (text && text[n]) {
-        ++n;
-    }
-    return n;
+    XmString string = XmStringCreateLocalized((char *)text);
+    XtVaSetValues(widget, XmNlabelString, string, NULL);
+    XmStringFree(string);
 }
 
-static uint16_t read_le16(const uint8_t *p)
+static int load_sprite_file(const char *path, struct msw_sprite *sprite,
+                            unsigned long *pixels)
 {
-    return (uint16_t)p[0] | ((uint16_t)p[1] << 8);
-}
-
-static uint32_t read_le32(const uint8_t *p)
-{
-    return (uint32_t)p[0] | ((uint32_t)p[1] << 8) |
-           ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
-}
-
-static int32_t read_le32s(const uint8_t *p)
-{
-    return (int32_t)read_le32(p);
-}
-
-static int load_sprite_bmp(const char *path, struct minesweeper_sprite *sprite)
-{
-    uint8_t bmp[MS_SPRITE_BMP_MAX_BYTES];
+    uint8_t buffer[MSW_SPRITE_BMP_MAX_BYTES];
     struct stat st;
     uint32_t len = 0;
-    uint32_t pixel_offset;
-    uint32_t row_stride;
-    uint32_t height;
-    int32_t width;
-    int32_t height_signed;
-    int top_down;
     int fd;
-
-    if (!path || !sprite || stat(path, &st) < 0 ||
-        !S_ISREG(st.st_mode) || st.st_size < 54 ||
-        (uint64_t)st.st_size > sizeof(bmp)) {
+    if (stat(path, &st) < 0 || !S_ISREG(st.st_mode) ||
+        (uint64_t)st.st_size > sizeof(buffer)) {
         return 0;
     }
     fd = open(path, O_RDONLY);
@@ -119,7 +100,7 @@ static int load_sprite_bmp(const char *path, struct minesweeper_sprite *sprite)
         return 0;
     }
     while (len < (uint32_t)st.st_size) {
-        long got = read(fd, bmp + len, (uint32_t)st.st_size - len);
+        long got = read(fd, buffer + len, (uint32_t)st.st_size - len);
         if (got <= 0) {
             close(fd);
             return 0;
@@ -127,377 +108,249 @@ static int load_sprite_bmp(const char *path, struct minesweeper_sprite *sprite)
         len += (uint32_t)got;
     }
     close(fd);
-    if (bmp[0] != 'B' || bmp[1] != 'M' || read_le32(bmp + 14) < 40 ||
-        read_le16(bmp + 26) != 1 || read_le32(bmp + 30) != 0 ||
-        read_le16(bmp + 28) != 32) {
+    if (!msw_sprite_parse(buffer, len, sprite)) {
         return 0;
     }
-    pixel_offset = read_le32(bmp + 10);
-    width = read_le32s(bmp + 18);
-    height_signed = read_le32s(bmp + 22);
-    if (width <= 0 || height_signed == 0 || (uint32_t)width > MS_SPRITE_SIZE) {
-        return 0;
+    for (uint32_t i = 0; i < MSW_SPRITE_SIZE * MSW_SPRITE_SIZE; ++i) {
+        uint32_t argb = sprite->pixels[i];
+        pixels[i] = (argb >> 24) ? alloc_color(argb & 0x00ffffffu) : (unsigned long)-1;
     }
-    top_down = height_signed < 0;
-    height = top_down ? (uint32_t)(-height_signed) : (uint32_t)height_signed;
-    if (height > MS_SPRITE_SIZE || pixel_offset >= len) {
-        return 0;
-    }
-    row_stride = (uint32_t)width * 4U;
-    if (height > (len - pixel_offset) / row_stride) {
-        return 0;
-    }
-    for (uint32_t y = 0; y < MS_SPRITE_SIZE; ++y) {
-        for (uint32_t x = 0; x < MS_SPRITE_SIZE; ++x) {
-            sprite->pixels[y * MS_SPRITE_SIZE + x] = 0;
-        }
-    }
-    for (uint32_t y = 0; y < height; ++y) {
-        uint32_t src_y = top_down ? y : height - 1U - y;
-        const uint8_t *row = bmp + pixel_offset + src_y * row_stride;
-        for (uint32_t x = 0; x < (uint32_t)width; ++x) {
-            const uint8_t *pixel = row + x * 4U;
-            sprite->pixels[y * MS_SPRITE_SIZE + x] =
-                ((uint32_t)pixel[3] << 24) | ((uint32_t)pixel[2] << 16) |
-                ((uint32_t)pixel[1] << 8) | pixel[0];
-        }
-    }
-    sprite->width = (uint32_t)width;
-    sprite->height = height;
     return 1;
 }
 
-static int load_game_assets(void)
-{
-    return load_sprite_bmp(MS_MINE_SPRITE_PATH, &mine_sprite) &&
-           load_sprite_bmp(MS_FLAG_SPRITE_PATH, &flag_sprite);
-}
-
-static uint32_t color_for_number(uint8_t n)
-{
-    switch (n) {
-    case 1: return 0x000000bf;
-    case 2: return 0x00008000;
-    case 3: return 0x00bf0000;
-    case 4: return 0x00000080;
-    case 5: return 0x00800000;
-    case 6: return 0x00008080;
-    case 7: return 0x00000000;
-    default: return 0x00808080;
-    }
-}
-
-static void draw_center_text(struct reliefos_ui_surface *ui, uint32_t x, uint32_t y,
-                             uint32_t w, uint32_t h, const char *text,
-                             uint32_t fg, uint32_t bg)
-{
-    uint32_t tw = reliefos_ui_text_width(text);
-    uint32_t tx = x + (w > tw ? (w - tw) / 2 : 0);
-    uint32_t ty = y + (h > RELIEFOS_FONT_H ? (h - RELIEFOS_FONT_H) / 2 : 0);
-    reliefos_ui_text(ui, tx, ty, text, fg, bg);
-}
-
-static uint32_t rng_next(void)
-{
-    rng_state = rng_state * 1664525u + 1013904223u;
-    return rng_state;
-}
-
-static void reset_game(void)
-{
-    for (uint32_t y = 0; y < MS_ROWS; ++y) {
-        for (uint32_t x = 0; x < MS_COLS; ++x) {
-            cells[y][x] = 0;
-            adjacent[y][x] = 0;
-        }
-    }
-    mines_placed = 0;
-    game_over = 0;
-    won = 0;
-    revealed_count = 0;
-    flagged_count = 0;
-    {
-        struct timespec now = {0};
-        (void)clock_gettime(CLOCK_MONOTONIC, &now);
-        rng_state = (uint32_t)now.tv_nsec ^ (uint32_t)now.tv_sec ^ 0xa5c35a1du;
-    }
-    if (!rng_state) {
-        rng_state = 1;
-    }
-}
-
-static int in_board(int x, int y)
-{
-    return x >= 0 && y >= 0 && x < MS_COLS && y < MS_ROWS;
-}
-
-static void add_mine_adjacency(int mine_x, int mine_y)
-{
-    for (int dy = -1; dy <= 1; ++dy) {
-        for (int dx = -1; dx <= 1; ++dx) {
-            int x = mine_x + dx;
-            int y = mine_y + dy;
-            if ((dx || dy) && in_board(x, y)) {
-                ++adjacent[y][x];
-            }
-        }
-    }
-}
-
-static void place_mines(int safe_x, int safe_y)
-{
-    uint8_t candidates[MS_CELLS];
-    uint32_t candidate_count = 0;
-    for (int y = 0; y < MS_ROWS; ++y) {
-        for (int x = 0; x < MS_COLS; ++x) {
-            if (x != safe_x || y != safe_y) {
-                candidates[candidate_count++] = (uint8_t)(y * MS_COLS + x);
-            }
-        }
-    }
-    for (uint32_t placed = 0; placed < MS_MINES; ++placed) {
-        uint32_t selected = placed + rng_next() % (candidate_count - placed);
-        uint8_t index = candidates[selected];
-        int x = (int)(index % MS_COLS);
-        int y = (int)(index / MS_COLS);
-        candidates[selected] = candidates[placed];
-        candidates[placed] = index;
-        cells[y][x] |= CELL_MINE;
-        add_mine_adjacency(x, y);
-    }
-    mines_placed = 1;
-}
-
-static void reveal_all_mines(void)
-{
-    for (uint32_t y = 0; y < MS_ROWS; ++y) {
-        for (uint32_t x = 0; x < MS_COLS; ++x) {
-            if (cells[y][x] & CELL_MINE) {
-                cells[y][x] |= CELL_REVEALED;
-            }
-        }
-    }
-}
-
-static void reveal_cell(int x, int y)
-{
-    uint8_t queue[MS_CELLS];
-    uint32_t head = 0;
-    uint32_t tail = 0;
-    if (!in_board(x, y) ||
-        (cells[y][x] & (CELL_REVEALED | CELL_FLAGGED)) ||
-        game_over) {
-        return;
-    }
-    cells[y][x] |= CELL_REVEALED;
-    ++revealed_count;
-    if (cells[y][x] & CELL_MINE) {
-        game_over = 1;
-        won = 0;
-        reveal_all_mines();
-        return;
-    }
-    queue[tail++] = (uint8_t)(y * MS_COLS + x);
-    while (head < tail) {
-        uint8_t index = queue[head++];
-        int current_x = (int)(index % MS_COLS);
-        int current_y = (int)(index / MS_COLS);
-        if (adjacent[current_y][current_x] != 0) {
-            continue;
-        }
-        for (int dy = -1; dy <= 1; ++dy) {
-            for (int dx = -1; dx <= 1; ++dx) {
-                int next_x = current_x + dx;
-                int next_y = current_y + dy;
-                if ((dx || dy) && in_board(next_x, next_y) &&
-                    !(cells[next_y][next_x] &
-                      (CELL_MINE | CELL_REVEALED | CELL_FLAGGED))) {
-                    cells[next_y][next_x] |= CELL_REVEALED;
-                    ++revealed_count;
-                    queue[tail++] = (uint8_t)(next_y * MS_COLS + next_x);
-                }
-            }
-        }
-    }
-    if (revealed_count >= MS_COLS * MS_ROWS - MS_MINES) {
-        game_over = 1;
-        won = 1;
-        for (uint32_t yy = 0; yy < MS_ROWS; ++yy) {
-            for (uint32_t xx = 0; xx < MS_COLS; ++xx) {
-                if (cells[yy][xx] & CELL_MINE) {
-                    cells[yy][xx] |= CELL_FLAGGED;
-                }
-            }
-        }
-        flagged_count = MS_MINES;
-    }
-}
-
-static void toggle_flag(int x, int y)
-{
-    if (!in_board(x, y) || game_over || (cells[y][x] & CELL_REVEALED)) {
-        return;
-    }
-    if (cells[y][x] & CELL_FLAGGED) {
-        cells[y][x] &= (uint8_t)~CELL_FLAGGED;
-        if (flagged_count) {
-            --flagged_count;
-        }
-    } else if (flagged_count < MS_MINES) {
-        cells[y][x] |= CELL_FLAGGED;
-        ++flagged_count;
-    }
-}
-
-static void draw_sprite(struct reliefos_ui_surface *ui,
-                        const struct minesweeper_sprite *sprite,
-                        uint32_t x, uint32_t y)
+static void draw_sprite(int x, int y, const struct msw_sprite *sprite,
+                        const unsigned long *pixels)
 {
     for (uint32_t yy = 0; yy < sprite->height; ++yy) {
         for (uint32_t xx = 0; xx < sprite->width; ++xx) {
-            uint32_t argb = sprite->pixels[yy * MS_SPRITE_SIZE + xx];
-            if (argb >> 24) {
-                reliefos_ui_pixel(ui, x + xx, y + yy, argb & 0x00ffffffu);
+            unsigned long pixel = pixels[yy * MSW_SPRITE_SIZE + xx];
+            if (pixel == (unsigned long)-1) {
+                continue;
             }
+            XSetForeground(display, gc, pixel);
+            XDrawPoint(display, board_window, gc, (int)(x + xx), (int)(y + yy));
         }
     }
 }
 
-static void draw_tile(struct reliefos_ui_surface *ui, uint32_t gx, uint32_t gy)
+static void draw_tile(uint32_t gx, uint32_t gy)
 {
-    uint32_t x = MS_BOARD_X + gx * MS_TILE;
-    uint32_t y = MS_BOARD_Y + gy * MS_TILE;
-    uint8_t cell = cells[gy][gx];
-    uint32_t inner = MS_TILE > MS_GAP ? MS_TILE - MS_GAP : MS_TILE;
-    if (cell & CELL_REVEALED) {
-        uint32_t fill = (cell & CELL_MINE) ? 0x00e8b0b0 : 0x00d8d8d8;
-        reliefos_ui_inset(ui, x, y, inner, inner, fill);
-        if (cell & CELL_MINE) {
-            draw_sprite(ui, &mine_sprite, x + (inner - mine_sprite.width) / 2U,
-                        y + (inner - mine_sprite.height) / 2U);
-        } else if (adjacent[gy][gx]) {
-            char text[2] = {(char)('0' + adjacent[gy][gx]), 0};
-            draw_center_text(ui, x, y, inner, inner, text,
-                             color_for_number(adjacent[gy][gx]), fill);
+    int x = (int)(gx * MS_TILE);
+    int y = (int)(gy * MS_TILE);
+    uint8_t cell = game.cells[gy][gx];
+    if (cell & MSW_CELL_REVEALED) {
+        unsigned long fill = (cell & MSW_CELL_MINE) ? color_tile_mine : color_tile_open;
+        XSetForeground(display, gc, fill);
+        XFillRectangle(display, board_window, gc, x, y, MS_INNER, MS_INNER);
+        XSetForeground(display, gc, color_edge_shadow);
+        XDrawLine(display, board_window, gc, x, y, x + MS_INNER - 1, y);
+        XDrawLine(display, board_window, gc, x, y, x, y + MS_INNER - 1);
+        XSetForeground(display, gc, color_edge_light);
+        XDrawLine(display, board_window, gc, x, y + MS_INNER - 1, x + MS_INNER - 1, y + MS_INNER - 1);
+        XDrawLine(display, board_window, gc, x + MS_INNER - 1, y, x + MS_INNER - 1, y + MS_INNER - 1);
+        if (cell & MSW_CELL_MINE) {
+            draw_sprite(x + (int)(MS_INNER - mine_sprite.width) / 2,
+                        y + (int)(MS_INNER - mine_sprite.height) / 2,
+                        &mine_sprite, mine_pixels);
+        } else if (game.adjacent[gy][gx]) {
+            char text[2] = {(char)('0' + game.adjacent[gy][gx]), 0};
+            int width = font ? XTextWidth(font, text, 1) : 6;
+            XSetForeground(display, gc, color_number[game.adjacent[gy][gx]]);
+            XDrawString(display, board_window, gc,
+                        x + (int)(MS_INNER - width) / 2,
+                        y + (int)(MS_INNER + (font ? font->ascent : 10) - (font ? font->descent : 2)) / 2,
+                        text, 1);
         }
     } else {
-        reliefos_ui_bevel(ui, x, y, inner, inner, RELIEFOS_UI_GRAY, 0);
-        if (cell & CELL_FLAGGED) {
-            draw_sprite(ui, &flag_sprite, x + (inner - flag_sprite.width) / 2U,
-                        y + (inner - flag_sprite.height) / 2U);
+        XSetForeground(display, gc, color_tile_hidden);
+        XFillRectangle(display, board_window, gc, x, y, MS_INNER, MS_INNER);
+        XSetForeground(display, gc, color_edge_light);
+        XDrawLine(display, board_window, gc, x, y, x + MS_INNER - 1, y);
+        XDrawLine(display, board_window, gc, x, y, x, y + MS_INNER - 1);
+        XSetForeground(display, gc, color_edge_dark);
+        XDrawLine(display, board_window, gc, x, y + MS_INNER - 1, x + MS_INNER - 1, y + MS_INNER - 1);
+        XDrawLine(display, board_window, gc, x + MS_INNER - 1, y, x + MS_INNER - 1, y + MS_INNER - 1);
+        if (cell & MSW_CELL_FLAGGED) {
+            draw_sprite(x + (int)(MS_INNER - flag_sprite.width) / 2,
+                        y + (int)(MS_INNER - flag_sprite.height) / 2,
+                        &flag_sprite, flag_pixels);
         }
     }
 }
 
-static void draw_game(struct reliefos_ui_surface *ui)
+static void draw_board(void)
 {
-    char mines_text[32];
+    for (uint32_t y = 0; y < MSW_ROWS; ++y) {
+        for (uint32_t x = 0; x < MSW_COLS; ++x) {
+            draw_tile(x, y);
+        }
+    }
+}
+
+static void update_labels(void)
+{
+    char value[16];
+    char mines[48];
     const char *status = T("Ready");
-    int mines_left = (int)MS_MINES - (int)flagged_count;
-    reliefos_ui_rect(ui, 0, 0, MS_W, MS_H, RELIEFOS_UI_LIGHT);
-    reliefos_ui_text(ui, 18, 16, T("Minesweeper"), RELIEFOS_UI_BLACK, RELIEFOS_UI_LIGHT);
-    reliefos_ui_button(ui, MS_W - 88, 12, 70, RELIEFOS_UI_BUTTON_H, T("New Game"), 0);
-    if (game_over) {
-        status = won ? T("You won") : T("Boom");
-    } else if (mines_placed) {
+    msw_mines_left_text(&game, value, sizeof(value));
+    snprintf(mines, sizeof(mines), "%s%s", T("Mines: "), value);
+    set_label(mines_label, mines);
+    if (game.game_over) {
+        status = game.won ? T("You won") : T("Boom");
+    } else if (game.mines_placed) {
         status = T("Playing");
     }
-    copy_text(mines_text, sizeof(mines_text), T("Mines: "));
-    if (mines_left < 0) {
-        uint32_t p = text_len(mines_text);
-        mines_text[p] = '-';
-        mines_left = -mines_left;
-        mines_text[p + 1] = (char)('0' + (mines_left / 10) % 10);
-        mines_text[p + 2] = (char)('0' + mines_left % 10);
-        mines_text[p + 3] = 0;
-    } else {
-        uint32_t p = text_len(mines_text);
-        mines_text[p] = (char)('0' + (mines_left / 10) % 10);
-        mines_text[p + 1] = (char)('0' + mines_left % 10);
-        mines_text[p + 2] = 0;
-    }
-    reliefos_ui_text(ui, 18, 42, mines_text, RELIEFOS_UI_BLACK, RELIEFOS_UI_LIGHT);
-    reliefos_ui_text(ui, 130, 42, status, RELIEFOS_UI_DARK, RELIEFOS_UI_LIGHT);
-    reliefos_ui_inset(ui, MS_BOARD_X - 4, MS_BOARD_Y - 4,
-                    MS_COLS * MS_TILE + 6, MS_ROWS * MS_TILE + 6,
-                    RELIEFOS_UI_GRAY);
-    for (uint32_t y = 0; y < MS_ROWS; ++y) {
-        for (uint32_t x = 0; x < MS_COLS; ++x) {
-            draw_tile(ui, x, y);
-        }
-    }
+    set_label(status_label, status);
 }
 
-static int board_pos(int32_t px, int32_t py, int *out_x, int *out_y)
+static void refresh(void)
 {
-    if (px < MS_BOARD_X || py < MS_BOARD_Y ||
-        px >= MS_BOARD_X + MS_COLS * MS_TILE ||
-        py >= MS_BOARD_Y + MS_ROWS * MS_TILE) {
-        return 0;
-    }
-    *out_x = (px - MS_BOARD_X) / MS_TILE;
-    *out_y = (py - MS_BOARD_Y) / MS_TILE;
-    return in_board(*out_x, *out_y);
+    draw_board();
+    update_labels();
 }
 
-int main(void)
+static uint32_t new_seed(void)
+{
+    struct timespec now = {0};
+    uint32_t seed;
+    (void)clock_gettime(CLOCK_MONOTONIC, &now);
+    seed = (uint32_t)now.tv_nsec ^ (uint32_t)now.tv_sec ^ 0xa5c35a1du;
+    return seed ? seed : 1u;
+}
+
+static void new_game(void)
+{
+    msw_reset(&game, new_seed());
+    refresh();
+}
+
+static void board_click(Widget widget, XtPointer data, XEvent *event, Boolean *dispatch)
+{
+    int gx;
+    int gy;
+    (void)widget;
+    (void)data;
+    (void)dispatch;
+    if (event->type != ButtonPress) {
+        return;
+    }
+    gx = event->xbutton.x / MS_TILE;
+    gy = event->xbutton.y / MS_TILE;
+    if (!msw_in_board(gx, gy)) {
+        return;
+    }
+    if (event->xbutton.button == Button3) {
+        msw_toggle_flag(&game, gx, gy);
+    } else if (event->xbutton.button == Button1) {
+        if (!game.mines_placed) {
+            msw_place_mines(&game, gx, gy);
+        }
+        msw_reveal(&game, gx, gy);
+    } else {
+        return;
+    }
+    refresh();
+}
+
+static void board_expose(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    draw_board();
+}
+
+static void button_new_game(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    new_game();
+}
+
+static void close_window(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    XtAppSetExitFlag(app);
+}
+
+int main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
     bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
     textdomain("leonos");
-    struct reliefos_ui_surface ui;
-    struct reliefos_gui_app_event event;
-    int window_id;
+    XtSetLanguageProc(NULL, NULL, NULL);
+    char *fallback[] = {
+        "*fontList: fixed", "*background: #eceef4", "*foreground: #22242e",
+        "*highlightColor: #3b62a6", NULL
+    };
+    Widget shell = XtVaAppInitialize(&app, "ReliefOSMinesweeper", NULL, 0,
+                                     &argc, argv, fallback,
+                                     XtNtitle, T("Minesweeper"),
+                                     XtNwidth, 320, XtNheight, 380, NULL);
+    Widget form = XtVaCreateWidget("minesweeper", xmFormWidgetClass, shell,
+        XmNresizePolicy, XmRESIZE_NONE, XmNmarginWidth, 12, XmNmarginHeight, 12, NULL);
+    XmString title_text = XmStringCreateLocalized(T("Minesweeper"));
+    Widget title = XtVaCreateManagedWidget("title", xmLabelWidgetClass, form,
+        XmNlabelString, title_text,
+        XmNalignment, XmALIGNMENT_BEGINNING,
+        XmNtopAttachment, XmATTACH_FORM,
+        XmNleftAttachment, XmATTACH_FORM, NULL);
+    XmStringFree(title_text);
+    Widget new_game_button = XtVaCreateManagedWidget("newGame", xmPushButtonWidgetClass, form,
+        XmNtopAttachment, XmATTACH_FORM,
+        XmNrightAttachment, XmATTACH_FORM, NULL);
+    XmString button_text = XmStringCreateLocalized(T("New Game"));
+    XtVaSetValues(new_game_button, XmNlabelString, button_text, NULL);
+    XmStringFree(button_text);
+    XtAddCallback(new_game_button, XmNactivateCallback, button_new_game, NULL);
+    mines_label = XtVaCreateManagedWidget("mines", xmLabelWidgetClass, form,
+        XmNalignment, XmALIGNMENT_BEGINNING,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, title,
+        XmNleftAttachment, XmATTACH_FORM, NULL);
+    status_label = XtVaCreateManagedWidget("status", xmLabelWidgetClass, form,
+        XmNalignment, XmALIGNMENT_BEGINNING,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, title,
+        XmNleftAttachment, XmATTACH_WIDGET, XmNleftWidget, mines_label, NULL);
+    board = XtVaCreateManagedWidget("board", xmDrawingAreaWidgetClass, form,
+        XmNwidth, MS_BOARD_W, XmNheight, MS_BOARD_H,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, mines_label,
+        XmNleftAttachment, XmATTACH_FORM, NULL);
+    XtAddCallback(board, XmNexposeCallback, board_expose, NULL);
+    XtAddEventHandler(board, ButtonPressMask, False, board_click, NULL);
+    XtManageChild(form);
+    XtRealizeWidget(shell);
 
-    puts("[minesweeper.elf] starting");
-    if (!load_game_assets()) {
+    display = XtDisplay(shell);
+    board_window = XtWindow(board);
+    gc = XCreateGC(display, board_window, 0, NULL);
+    font = XLoadQueryFont(display, "fixed");
+    if (font) {
+        XSetFont(display, gc, font->fid);
+    }
+    color_tile_hidden = alloc_color(TILE_HIDDEN);
+    color_tile_open = alloc_color(TILE_OPEN);
+    color_tile_mine = alloc_color(TILE_MINE);
+    color_edge_light = alloc_color(EDGE_LIGHT);
+    color_edge_shadow = alloc_color(EDGE_SHADOW);
+    color_edge_dark = alloc_color(EDGE_DARK);
+    for (uint32_t n = 0; n < 9; ++n) {
+        color_number[n] = alloc_color(color_for_number((uint8_t)n));
+    }
+    if (!load_sprite_file(RELIEFOS_PATH_MINESWEEPER_MINE_BMP, &mine_sprite, mine_pixels) ||
+        !load_sprite_file(RELIEFOS_PATH_MINESWEEPER_FLAG_BMP, &flag_sprite, flag_pixels)) {
         puts("[minesweeper.elf] required BMP assets unavailable");
         return 1;
     }
-    window_id = reliefos_gui_create_app_window_ex(T("Minesweeper"), T("ReliefOS Minesweeper"),
-                                                MS_W, MS_H, RELIEFOS_GUI_WINDOW_NO_RESIZE);
-    if (window_id <= 0) {
-        printf("[minesweeper.elf] create window failed=%d\n", window_id);
-        return 1;
-    }
-    reliefos_ui_bind(&ui, pixels, MS_W, MS_H, MS_W);
-    reset_game();
-    draw_game(&ui);
-    reliefos_gui_present_window((uint32_t)window_id, MS_W, MS_H, MS_W, pixels);
-    for (;;) {
-        event.window_id = (uint32_t)window_id;
-        if (reliefos_gui_wait_app_event(&event, RELIEFOS_GUI_IDLE_WAIT_MS) > 0) {
-            if (event.type == RELIEFOS_GUI_APP_EVENT_CLOSE) {
-                break;
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_MOUSE_BUTTON && (event.buttons & 3u)) {
-                int gx = 0;
-                int gy = 0;
-                if ((event.buttons & 1u) &&
-                    hit_rect_i(event.x, event.y, MS_W - 88, 12, 70,
-                               (int32_t)RELIEFOS_UI_BUTTON_H)) {
-                    reset_game();
-                } else if (board_pos(event.x, event.y, &gx, &gy)) {
-                    if (event.buttons & 2u) {
-                        toggle_flag(gx, gy);
-                    } else if (event.buttons & 1u) {
-                        if (!mines_placed) {
-                            place_mines(gx, gy);
-                        }
-                        reveal_cell(gx, gy);
-                    }
-                }
-                draw_game(&ui);
-                reliefos_gui_present_window((uint32_t)window_id, MS_W, MS_H, MS_W, pixels);
-            } else if (event.type == RELIEFOS_GUI_APP_EVENT_RESIZE ||
-                       event.type == RELIEFOS_GUI_APP_EVENT_FOCUS) {
-                draw_game(&ui);
-                reliefos_gui_present_window((uint32_t)window_id, MS_W, MS_H, MS_W, pixels);
-            }
-        } else {
-            (void)poll(0, 0, 10);
-        }
-    }
-    reliefos_gui_destroy_app_window((uint32_t)window_id);
+    Atom delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
+    XmAddWMProtocolCallback(shell, delete_window, close_window, NULL);
+    new_game();
+    puts("[minesweeper.elf] Motif minesweeper ready");
+    fflush(stdout);
+    XtAppMainLoop(app);
+    XtDestroyWidget(shell);
+    XtDestroyApplicationContext(app);
     return 0;
 }

@@ -26,9 +26,9 @@ X11_DEVELOPMENT_PRODUCTS := $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/Xm/
 $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK)
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(X11_DEVELOPMENT_ROOT))
 	$(Q)touch $(X11_DEVELOPMENT_PRODUCTS)
-$(foreach app,calc osver fileman taskmgr,$(eval USERLAND_EXTRA_$(app) := -I$(X11_DEVELOPMENT_ROOT)/usr/include))
-$(foreach app,calc osver fileman taskmgr,$(eval USERLAND_LIBS_$(app) := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libXm.so libXt.so libX11.so)))
-$(foreach app,calc osver fileman taskmgr,$(eval USERLAND_DEPS_$(app) := $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
+$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai,$(eval USERLAND_EXTRA_$(app) := -I$(X11_DEVELOPMENT_ROOT)/usr/include))
+$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai,$(eval USERLAND_LIBS_$(app) := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libXm.so libXt.so libX11.so)))
+$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai,$(eval USERLAND_DEPS_$(app) := $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
 USERLAND_DEPS_osver += $(BUILD_INFO_HEADER)
 .PHONY: x11-development
 x11-development: $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)

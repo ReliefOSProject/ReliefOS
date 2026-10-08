@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Minesweeper
+Name[zh_CN]=扫雷
+Exec=/usr/bin/minesweeper
+TryExec=/usr/bin/minesweeper
+Icon=bomb
+Terminal=false
+Categories=Game;

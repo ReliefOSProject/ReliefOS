@@ -1,22 +1,29 @@
+#include "model.h"
 #include <reliefos/fs.h>
-#include <reliefos/gui.h>
-#include <reliefos/png.h>
-#include <reliefos/stdio.h>
-#include <reliefos/syscall.h>
-#include <reliefos/ui.h>
-#include <stdint.h>
-#include <unistd.h>
 #include <reliefos/layout.h>
+#include <reliefos/png.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <X11/keysym.h>
+#include <Xm/DrawingA.h>
+#include <Xm/Form.h>
+#include <Xm/Protocols.h>
 
-#define XIAOBAI_W 760U
-#define XIAOBAI_H 760U
-#define XIAOBAI_IMAGE_PATH "xiaobai.png"
-#define XIAOBAI_IMAGE_MARGIN 8U
+#define CANVAS_W 760
+#define CANVAS_H 760
+#define IMAGE_MARGIN 8
+#define APP_NAME "xiaobai"
+#define APP_PNG APP_NAME ".png"
 
-static uint32_t pixels[XIAOBAI_W * XIAOBAI_H];
 static uint32_t *image_pixels;
 static uint32_t image_width;
 static uint32_t image_height;
+static Widget canvas;
+static XtAppContext app;
+static Display *display;
+static Window canvas_window;
+static GC gc;
 
 static void copy_text(char *dst, uint32_t capacity, const char *src)
 {
@@ -31,116 +38,173 @@ static void copy_text(char *dst, uint32_t capacity, const char *src)
     dst[index] = 0;
 }
 
-static int change_to_executable_directory(const char *path)
+static int load_image(const char *argv0)
 {
-    char directory[RELIEFOS_FS_PATH_LEN];
-    uint32_t length = 0;
-    uint32_t last_separator = 0;
+    char path[RELIEFOS_FS_PATH_LEN];
 
-    if (!path || !path[0]) {
-        return chdir(RELIEFOS_LAYOUT_RELIEFOS_APPS "/xiaobai");
+    snprintf(path, sizeof(path), RELIEFOS_LAYOUT_RELIEFOS_APPS "/%s/" APP_PNG, APP_NAME);
+    if (reliefos_png_decode_file(path, &image_pixels, &image_width, &image_height) == 0) {
+        printf("[xiaobai.elf] PNG open path=%s size=%dx%d\n",
+               path, (int)image_width, (int)image_height);
+        return 0;
     }
-    while (path[length]) {
-        if (path[length] == '/') {
-            last_separator = length;
+    if (argv0 && argv0[0]) {
+        uint32_t length = 0;
+        uint32_t last_separator = 0;
+        while (argv0[length]) {
+            if (argv0[length] == '/') {
+                last_separator = length;
+            }
+            ++length;
         }
-        ++length;
+        if (last_separator && last_separator + sizeof(APP_PNG) < sizeof(path)) {
+            copy_text(path, sizeof(path), argv0);
+            path[last_separator + 1U] = 0;
+            copy_text(path + last_separator + 1U,
+                      sizeof(path) - last_separator - 1U, APP_PNG);
+            if (reliefos_png_decode_file(path, &image_pixels, &image_width, &image_height) == 0) {
+                printf("[xiaobai.elf] PNG open path=%s size=%dx%d\n",
+                       path, (int)image_width, (int)image_height);
+                return 0;
+            }
+        }
     }
-    if (last_separator == 0 || last_separator >= sizeof(directory)) {
-        return chdir(RELIEFOS_LAYOUT_RELIEFOS_APPS "/xiaobai");
+    if (reliefos_png_decode_file(APP_PNG, &image_pixels, &image_width, &image_height) == 0) {
+        printf("[xiaobai.elf] PNG open path=%s size=%dx%d\n",
+               APP_PNG, (int)image_width, (int)image_height);
+        return 0;
     }
-    copy_text(directory, sizeof(directory), path);
-    directory[last_separator] = 0;
-    return chdir(directory);
+    puts("[xiaobai.elf] PNG open failed path=" APP_PNG);
+    return -1;
 }
 
-static void draw_image(struct reliefos_ui_surface *ui)
+static void draw_image(void)
 {
-    uint32_t draw_width;
-    uint32_t draw_height;
-    uint32_t draw_x;
-    uint32_t draw_y;
+    Dimension width = CANVAS_W;
+    Dimension height = CANVAS_H;
+    struct xiaobai_fit fit;
+    uint32_t *scaled;
+    XImage *image;
 
-    reliefos_ui_rect(ui, 0, 0, XIAOBAI_W, XIAOBAI_H, RELIEFOS_UI_BLACK);
+    if (!display || !canvas_window || !gc) {
+        return;
+    }
+    XtVaGetValues(canvas, XmNwidth, &width, XmNheight, &height, NULL);
+    XSetForeground(display, gc, BlackPixel(display, DefaultScreen(display)));
+    XFillRectangle(display, canvas_window, gc, 0, 0, width, height);
     if (!image_pixels || !image_width || !image_height) {
-        reliefos_ui_text(ui, 24U, XIAOBAI_H / 2U - 16U,
-                       "Could not decode xiaobai.png",
-                       RELIEFOS_UI_WHITE, RELIEFOS_UI_BLACK);
+        XSetForeground(display, gc, WhitePixel(display, DefaultScreen(display)));
+        XDrawString(display, canvas_window, gc, 24, (int)height / 2 - 16,
+                    "Could not decode " APP_PNG, (int)strlen("Could not decode " APP_PNG));
         return;
     }
-
-    draw_width = XIAOBAI_W - XIAOBAI_IMAGE_MARGIN * 2U;
-    draw_height = (uint32_t)(((uint64_t)draw_width * image_height) / image_width);
-    if (draw_height > XIAOBAI_H - XIAOBAI_IMAGE_MARGIN * 2U) {
-        draw_height = XIAOBAI_H - XIAOBAI_IMAGE_MARGIN * 2U;
-        draw_width = (uint32_t)(((uint64_t)draw_height * image_width) / image_height);
-    }
-    if (!draw_width || !draw_height) {
+    xiaobai_fit_rect(&fit, width, height, IMAGE_MARGIN, image_width, image_height);
+    if (!fit.w || !fit.h) {
         return;
     }
-    draw_x = (XIAOBAI_W - draw_width) / 2U;
-    draw_y = (XIAOBAI_H - draw_height) / 2U;
-    for (uint32_t y = 0; y < draw_height; ++y) {
-        uint32_t source_y = (uint32_t)(((uint64_t)y * image_height) / draw_height);
-        for (uint32_t x = 0; x < draw_width; ++x) {
-            uint32_t source_x = (uint32_t)(((uint64_t)x * image_width) / draw_width);
-            ui->pixels[(draw_y + y) * ui->stride + draw_x + x] =
-                image_pixels[source_y * image_width + source_x];
+    scaled = (uint32_t *)malloc((size_t)fit.w * fit.h * sizeof(uint32_t));
+    if (!scaled) {
+        return;
+    }
+    for (uint32_t y = 0; y < fit.h; ++y) {
+        uint32_t source_y = (uint32_t)(((uint64_t)y * image_height) / fit.h);
+        for (uint32_t x = 0; x < fit.w; ++x) {
+            uint32_t source_x = (uint32_t)(((uint64_t)x * image_width) / fit.w);
+            scaled[y * fit.w + x] = image_pixels[source_y * image_width + source_x];
         }
     }
+    image = XCreateImage(display, DefaultVisual(display, DefaultScreen(display)),
+                         DefaultDepth(display, DefaultScreen(display)),
+                         ZPixmap, 0, (char *)scaled, fit.w, fit.h, 32, fit.w * 4);
+    if (!image) {
+        free(scaled);
+        return;
+    }
+    XPutImage(display, canvas_window, gc, image, 0, 0, (int)fit.x, (int)fit.y, fit.w, fit.h);
+    image->data = NULL;
+    XDestroyImage(image);
+    free(scaled);
+}
+
+static void canvas_expose(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    draw_image();
+}
+
+static void canvas_resize(Widget widget, XtPointer data, XtPointer call)
+{
+    Window window = XtWindow(widget);
+    (void)data;
+    (void)call;
+    /* The resize callback can fire while the shell is still realizing,
+     * before the globals below exist; use widget-local state only. */
+    if (window) {
+        XClearArea(XtDisplay(widget), window, 0, 0, 0, 0, True);
+    }
+}
+
+static void canvas_key(Widget widget, XtPointer data, XEvent *event, Boolean *dispatch)
+{
+    (void)widget;
+    (void)data;
+    if (event->type != KeyPress) {
+        return;
+    }
+    if (XLookupKeysym(&event->xkey, 0) == XK_Escape) {
+        XtAppSetExitFlag(app);
+        *dispatch = False;
+    }
+}
+
+static void close_window(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    XtAppSetExitFlag(app);
 }
 
 int main(int argc, char **argv)
 {
-    struct reliefos_ui_surface ui;
-    struct reliefos_gui_app_event event;
-    int window_id;
+    setvbuf(stdout, NULL, _IONBF, 0);
+    puts("[xiaobai.elf] step enter");
+    char *fallback[] = {
+        "*fontList: fixed", "*background: #000000", "*foreground: #ffffff", NULL
+    };
+    Widget shell = XtVaAppInitialize(&app, "ReliefOSXiaobai", NULL, 0,
+                                     &argc, argv, fallback,
+                                     XtNtitle, "Xiaobai",
+                                     XtNwidth, CANVAS_W, XtNheight, CANVAS_H, NULL);
+    puts("[xiaobai.elf] step initialize ok");
+    Widget form = XtVaCreateWidget("xiaobai", xmFormWidgetClass, shell, NULL);
+    canvas = XtVaCreateManagedWidget("canvas", xmDrawingAreaWidgetClass, form,
+        XmNtopAttachment, XmATTACH_FORM, XmNbottomAttachment, XmATTACH_FORM,
+        XmNleftAttachment, XmATTACH_FORM, XmNrightAttachment, XmATTACH_FORM, NULL);
+    XtAddCallback(canvas, XmNexposeCallback, canvas_expose, NULL);
+    XtAddCallback(canvas, XmNresizeCallback, canvas_resize, NULL);
+    XtInsertEventHandler(canvas, KeyPressMask, False, canvas_key, NULL, XtListHead);
+    XtManageChild(form);
+    XtRealizeWidget(shell);
+    puts("[xiaobai.elf] step realize ok");
 
-    if (change_to_executable_directory(argc > 0 ? argv[0] : 0) < 0) {
-        printf("[xiaobai.elf] could not change to executable directory\n");
-    }
-    if (reliefos_png_decode_file(XIAOBAI_IMAGE_PATH, &image_pixels,
-                               &image_width, &image_height) < 0) {
-        printf("[xiaobai.elf] relative PNG open failed path=%s\n", XIAOBAI_IMAGE_PATH);
-    } else {
-        printf("[xiaobai.elf] relative PNG open path=%s size=%dx%d\n",
-               XIAOBAI_IMAGE_PATH, (int)image_width, (int)image_height);
-    }
-
-    window_id = reliefos_gui_create_app_window_ex(
-        "xiaobai", "xiaobai PNG libpng relative-path test",
-        XIAOBAI_W, XIAOBAI_H, RELIEFOS_GUI_WINDOW_NO_RESIZE);
-    if (window_id <= 0) {
-        printf("[xiaobai.elf] create window failed=%d\n", window_id);
-        reliefos_png_free(image_pixels);
-        return 1;
-    }
-
-    reliefos_ui_bind(&ui, pixels, XIAOBAI_W, XIAOBAI_H, XIAOBAI_W);
-    draw_image(&ui);
-    reliefos_gui_present_window((uint32_t)window_id, XIAOBAI_W, XIAOBAI_H,
-                              XIAOBAI_W, pixels);
-
-    for (;;) {
-        event.window_id = (uint32_t)window_id;
-        if (reliefos_gui_wait_app_event(&event, RELIEFOS_GUI_IDLE_WAIT_MS) > 0) {
-            if (event.type == RELIEFOS_GUI_APP_EVENT_CLOSE ||
-                (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN &&
-                 event.pressed && event.keycode == RELIEFOS_KEY_ESCAPE)) {
-                break;
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_RESIZE ||
-                event.type == RELIEFOS_GUI_APP_EVENT_FOCUS ||
-                event.type == RELIEFOS_GUI_APP_EVENT_THEME_CHANGED) {
-                draw_image(&ui);
-                reliefos_gui_present_window((uint32_t)window_id, XIAOBAI_W,
-                                          XIAOBAI_H, XIAOBAI_W, pixels);
-            }
-        } else {
-            sleep_ms(10);
-        }
-    }
-
+    display = XtDisplay(shell);
+    canvas_window = XtWindow(canvas);
+    gc = XCreateGC(display, canvas_window, 0, NULL);
+    puts("[xiaobai.elf] step gc ok");
+    load_image(argc > 0 ? argv[0] : 0);
+    puts("[xiaobai.elf] step image ok");
+    Atom delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
+    XmAddWMProtocolCallback(shell, delete_window, close_window, NULL);
+    draw_image();
+    puts("[xiaobai.elf] step draw ok");
+    puts("[xiaobai.elf] Motif xiaobai ready");
+    fflush(stdout);
+    XtAppMainLoop(app);
+    XtDestroyWidget(shell);
+    XtDestroyApplicationContext(app);
     reliefos_png_free(image_pixels);
     return 0;
 }

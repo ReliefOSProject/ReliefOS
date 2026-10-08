@@ -1,6 +1,9 @@
 #include "engine.h"
 #include "debug_click.h"
 #include "model.h"
+#include "leonmmcoset/model.h"
+#include "minesweeper/model.h"
+#include "xiaobai/model.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdio.h>
@@ -189,7 +192,266 @@ int main(void)
         assert(rows[0].index == 0 && rows[1].index == 1);
     }
 
+    {
+        struct msw_game g;
+        memset(&g, 0xff, sizeof(g));
+        msw_reset(&g, 1234u);
+        for (int y = 0; y < MSW_ROWS; ++y) {
+            for (int x = 0; x < MSW_COLS; ++x) {
+                assert(g.cells[y][x] == 0 && g.adjacent[y][x] == 0);
+            }
+        }
+        assert(g.mines_placed == 0 && g.game_over == 0 && g.won == 0);
+        assert(g.revealed_count == 0 && g.flagged_count == 0 && g.rng_state != 0);
+    }
+    assert(msw_in_board(0, 0) && msw_in_board(8, 8));
+    assert(!msw_in_board(-1, 0) && !msw_in_board(0, -1));
+    assert(!msw_in_board(9, 0) && !msw_in_board(0, 9));
+    {
+        struct msw_game a;
+        struct msw_game b;
+        uint32_t first;
+        msw_reset(&a, 42u);
+        msw_reset(&b, 42u);
+        first = msw_rng_next(&a);
+        assert(first == msw_rng_next(&b));
+        assert(msw_rng_next(&a) != first);
+    }
+    {
+        struct msw_game g;
+        int mines = 0;
+        msw_reset(&g, 7u);
+        msw_place_mines(&g, 4, 4);
+        assert(g.mines_placed == 1);
+        assert(!(g.cells[4][4] & MSW_CELL_MINE));
+        for (int y = 0; y < MSW_ROWS; ++y) {
+            for (int x = 0; x < MSW_COLS; ++x) {
+                if (g.cells[y][x] & MSW_CELL_MINE) {
+                    ++mines;
+                }
+            }
+        }
+        assert(mines == MSW_MINES);
+        for (int y = 0; y < MSW_ROWS; ++y) {
+            for (int x = 0; x < MSW_COLS; ++x) {
+                int count = 0;
+                for (int dy = -1; dy <= 1; ++dy) {
+                    for (int dx = -1; dx <= 1; ++dx) {
+                        if ((dx || dy) && msw_in_board(x + dx, y + dy) &&
+                            (g.cells[y + dy][x + dx] & MSW_CELL_MINE)) {
+                            ++count;
+                        }
+                    }
+                }
+                assert(g.adjacent[y][x] == count);
+            }
+        }
+    }
+    {
+        int found = 0;
+        for (uint32_t seed = 1; seed <= 40 && !found; ++seed) {
+            struct msw_game g;
+            msw_reset(&g, seed);
+            msw_place_mines(&g, 8, 8);
+            for (int y = 0; y < MSW_ROWS && !found; ++y) {
+                for (int x = 0; x < MSW_COLS && !found; ++x) {
+                    if (g.adjacent[y][x] == 0 && !(g.cells[y][x] & MSW_CELL_MINE)) {
+                        msw_reveal(&g, x, y);
+                        assert(g.revealed_count > 1 && g.game_over == 0);
+                        found = 1;
+                    }
+                }
+            }
+        }
+        assert(found);
+    }
+    {
+        struct msw_game g;
+        int mx = -1;
+        int my = -1;
+        msw_reset(&g, 3u);
+        msw_place_mines(&g, 0, 0);
+        for (int y = 0; y < MSW_ROWS && mx < 0; ++y) {
+            for (int x = 0; x < MSW_COLS && mx < 0; ++x) {
+                if (g.cells[y][x] & MSW_CELL_MINE) {
+                    mx = x;
+                    my = y;
+                }
+            }
+        }
+        assert(mx >= 0);
+        msw_reveal(&g, mx, my);
+        assert(g.game_over == 1 && g.won == 0);
+        for (int y = 0; y < MSW_ROWS; ++y) {
+            for (int x = 0; x < MSW_COLS; ++x) {
+                if (g.cells[y][x] & MSW_CELL_MINE) {
+                    assert(g.cells[y][x] & MSW_CELL_REVEALED);
+                }
+            }
+        }
+    }
+    {
+        struct msw_game g;
+        msw_reset(&g, 5u);
+        msw_toggle_flag(&g, 2, 2);
+        assert(g.cells[2][2] & MSW_CELL_FLAGGED && g.flagged_count == 1);
+        msw_toggle_flag(&g, 2, 2);
+        assert(!(g.cells[2][2] & MSW_CELL_FLAGGED) && g.flagged_count == 0);
+        for (int i = 0; i < MSW_MINES; ++i) {
+            msw_toggle_flag(&g, i % MSW_COLS, i / MSW_COLS);
+        }
+        assert(g.flagged_count == MSW_MINES);
+        msw_toggle_flag(&g, 8, 8);
+        assert(g.flagged_count == MSW_MINES && !(g.cells[8][8] & MSW_CELL_FLAGGED));
+        msw_reset(&g, 5u);
+        g.cells[3][3] |= MSW_CELL_REVEALED;
+        msw_toggle_flag(&g, 3, 3);
+        assert(!(g.cells[3][3] & MSW_CELL_FLAGGED) && g.flagged_count == 0);
+        g.game_over = 1;
+        msw_toggle_flag(&g, 4, 4);
+        assert(!(g.cells[4][4] & MSW_CELL_FLAGGED));
+    }
+    {
+        struct msw_game g;
+        msw_reset(&g, 1u);
+        for (int i = 0; i < MSW_MINES; ++i) {
+            int x = i % MSW_COLS;
+            int y = i / MSW_COLS;
+            g.cells[y][x] |= MSW_CELL_MINE;
+        }
+        g.mines_placed = 1;
+        for (int y = 0; y < MSW_ROWS; ++y) {
+            for (int x = 0; x < MSW_COLS; ++x) {
+                int count = 0;
+                for (int dy = -1; dy <= 1; ++dy) {
+                    for (int dx = -1; dx <= 1; ++dx) {
+                        if ((dx || dy) && msw_in_board(x + dx, y + dy) &&
+                            (g.cells[y + dy][x + dx] & MSW_CELL_MINE)) {
+                            ++count;
+                        }
+                    }
+                }
+                g.adjacent[y][x] = (uint8_t)count;
+            }
+        }
+        for (int y = 0; y < MSW_ROWS; ++y) {
+            for (int x = 0; x < MSW_COLS; ++x) {
+                if (!(g.cells[y][x] & MSW_CELL_MINE)) {
+                    msw_reveal(&g, x, y);
+                }
+            }
+        }
+        assert(g.game_over == 1 && g.won == 1);
+        assert(g.flagged_count == MSW_MINES);
+        for (int y = 0; y < MSW_ROWS; ++y) {
+            for (int x = 0; x < MSW_COLS; ++x) {
+                if (g.cells[y][x] & MSW_CELL_MINE) {
+                    assert(g.cells[y][x] & MSW_CELL_FLAGGED);
+                }
+            }
+        }
+    }
+    {
+        struct msw_game g;
+        char buf[32];
+        msw_reset(&g, 1u);
+        msw_mines_left_text(&g, buf, sizeof(buf));
+        assert(strcmp(buf, "10") == 0);
+        g.flagged_count = 3;
+        msw_mines_left_text(&g, buf, sizeof(buf));
+        assert(strcmp(buf, "07") == 0);
+        g.flagged_count = 10;
+        msw_mines_left_text(&g, buf, sizeof(buf));
+        assert(strcmp(buf, "00") == 0);
+        g.flagged_count = 12;
+        msw_mines_left_text(&g, buf, sizeof(buf));
+        assert(strcmp(buf, "-02") == 0);
+    }
+    {
+        uint8_t bmp[54 + 4 * 4 * 4];
+        struct msw_sprite s;
+        uint8_t *pixels = bmp + 54;
+        memset(bmp, 0, sizeof(bmp));
+        bmp[0] = 'B';
+        bmp[1] = 'M';
+        bmp[10] = 54;
+        bmp[14] = 40;
+        bmp[18] = 2;
+        bmp[22] = 2;
+        bmp[26] = 1;
+        bmp[28] = 32;
+        bmp[30] = 0;
+        pixels[0] = 1;
+        pixels[1] = 2;
+        pixels[2] = 3;
+        pixels[3] = 4;
+        pixels[4] = 5;
+        pixels[5] = 6;
+        pixels[6] = 7;
+        pixels[7] = 8;
+        pixels[8] = 9;
+        pixels[9] = 10;
+        pixels[10] = 11;
+        pixels[11] = 12;
+        pixels[12] = 13;
+        pixels[13] = 14;
+        pixels[14] = 15;
+        pixels[15] = 16;
+        assert(msw_sprite_parse(bmp, sizeof(bmp), &s) == 1);
+        assert(s.width == 2 && s.height == 2);
+        assert(s.pixels[0] == (12u << 24 | 11u << 16 | 10u << 8 | 9u));
+        assert(s.pixels[1] == (16u << 24 | 15u << 16 | 14u << 8 | 13u));
+        assert(s.pixels[20] == (4u << 24 | 3u << 16 | 2u << 8 | 1u));
+        assert(s.pixels[21] == (8u << 24 | 7u << 16 | 6u << 8 | 5u));
+        assert(s.pixels[2] == 0);
+        bmp[22] = 0xfe;
+        bmp[23] = 0xff;
+        bmp[24] = 0xff;
+        bmp[25] = 0xff;
+        assert(msw_sprite_parse(bmp, sizeof(bmp), &s) == 1);
+        assert(s.pixels[0] == (4u << 24 | 3u << 16 | 2u << 8 | 1u));
+        assert(s.pixels[20] == (12u << 24 | 11u << 16 | 10u << 8 | 9u));
+        bmp[0] = 'X';
+        assert(msw_sprite_parse(bmp, sizeof(bmp), &s) == 0);
+        bmp[0] = 'B';
+        bmp[28] = 24;
+        assert(msw_sprite_parse(bmp, sizeof(bmp), &s) == 0);
+        bmp[28] = 32;
+        bmp[18] = 21;
+        assert(msw_sprite_parse(bmp, sizeof(bmp), &s) == 0);
+        bmp[18] = 2;
+        assert(msw_sprite_parse(bmp, 60, &s) == 0);
+    }
+    {
+        struct leonmmcoset_fit f;
+        leonmmcoset_fit_rect(&f, 760, 760, 8, 100, 50);
+        assert(f.w == 744 && f.h == 372 && f.x == 8 && f.y == 194);
+        leonmmcoset_fit_rect(&f, 760, 760, 8, 50, 100);
+        assert(f.w == 372 && f.h == 744 && f.x == 194 && f.y == 8);
+        leonmmcoset_fit_rect(&f, 100, 50, 8, 10, 10);
+        assert(f.w == 34 && f.h == 34 && f.x == 33 && f.y == 8);
+        leonmmcoset_fit_rect(&f, 760, 760, 8, 0, 50);
+        assert(f.w == 0 && f.h == 0 && f.x == 0 && f.y == 0);
+        leonmmcoset_fit_rect(&f, 10, 10, 8, 4, 4);
+        assert(f.w == 0 && f.h == 0);
+    }
+    {
+        struct xiaobai_fit f;
+        xiaobai_fit_rect(&f, 760, 760, 8, 100, 50);
+        assert(f.w == 744 && f.h == 372 && f.x == 8 && f.y == 194);
+        xiaobai_fit_rect(&f, 760, 760, 8, 50, 100);
+        assert(f.w == 372 && f.h == 744 && f.x == 194 && f.y == 8);
+        xiaobai_fit_rect(&f, 100, 50, 8, 10, 10);
+        assert(f.w == 34 && f.h == 34 && f.x == 33 && f.y == 8);
+        xiaobai_fit_rect(&f, 760, 760, 8, 0, 50);
+        assert(f.w == 0 && f.h == 0 && f.x == 0 && f.y == 0);
+        xiaobai_fit_rect(&f, 10, 10, 8, 4, 4);
+        assert(f.w == 0 && f.h == 0);
+    }
+
     puts("ok - calculator arithmetic, editing, bounds and logo click timing");
     puts("ok - task manager formatting, utilization, history ring and tree order");
+    puts("ok - minesweeper placement, reveal, flags, win/lose and sprite parsing");
+    puts("ok - easter egg image fitting for leonmmcoset and xiaobai");
     return 0;
 }
