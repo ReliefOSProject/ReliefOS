@@ -165,6 +165,39 @@ static void test_keyboard_led_protocol(void)
     puts("PS/2 LEDs passed: ACK, RESEND, busy controller and bounded timeout recovery");
 }
 
+static void test_absolute_frames_resynchronize(void)
+{
+    struct input_event ev;
+    uint64_t cursor;
+    int saw_x = 0, saw_y = 0, saw_syn = 0;
+    input_init();
+    input_push_mouse(100, 200, 100, 200, 0);
+    /* A reader that misses this frame (a wrapped ring under a VMware-rate
+     * burst) must still resynchronize on the next one: the surviving frame
+     * carries the authoritative absolute position, which is the contract
+     * xorg.conf's IgnoreAbsoluteAxes "false" relies on. A delta-only view of
+     * this frame is (800,500) and can never recover the lost (100,200)
+     * frame. */
+    cursor = input_evdev_cursor_now();
+    input_push_mouse(900, 700, 800, 500, 0);
+    while (input_evdev_read(STORAGE_DEV_KIND_MOUSE, &cursor, &ev, sizeof(ev), 0) ==
+           (int)sizeof(ev)) {
+        if (ev.type == EV_ABS && ev.code == ABS_X) {
+            assert(ev.value == 900);
+            saw_x = 1;
+        }
+        if (ev.type == EV_ABS && ev.code == ABS_Y) {
+            assert(ev.value == 700);
+            saw_y = 1;
+        }
+        if (ev.type == EV_SYN && ev.code == SYN_REPORT) {
+            saw_syn = 1;
+        }
+    }
+    assert(saw_x && saw_y && saw_syn);
+    puts("Absolute resync passed: a lost motion frame heals from the next EV_ABS");
+}
+
 int main(void)
 {
     input_init();
@@ -175,6 +208,7 @@ int main(void)
     test_keyboard_led_protocol();
     test_evdev_damaged_records();
     test_caps_lock_routing();
+    test_absolute_frames_resynchronize();
     input_init();
     input_set_graphical_vt(1);
     read_cursor = input_evdev_cursor_now();

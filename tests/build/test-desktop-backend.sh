@@ -104,6 +104,21 @@ grep -qx xorg "$xorg_root/etc/reliefos/desktop-backend"
 test ! -e "$xorg_root/etc/runlevels/default/reliefos-windowd"
 test ! -e "$xorg_root/etc/runlevels/default/reliefos-session"
 test -f "$xorg_root/etc/X11/xorg.conf"
+# Mouse0 must consume the kernel's authoritative absolute position.
+# xf86-input-evdev drops the absolute axes of a mixed rel/abs mouse
+# ("ignoring absolute axes") and rebuilds the cursor from the relative deltas,
+# which permanently drifts away from the kernel position whenever a motion
+# event is lost (the VMware mouse offset bug).  IgnoreRelativeAxes "true" is
+# not enough: the scrollwheel probe branch re-enables EVDEV_RELATIVE_EVENTS and
+# the relative path wins.  The trinary value IgnoreAbsoluteAxes "false" means
+# "unignore": both axis classes initialize and the absolute position wins every
+# sync frame.
+mouse0=$(awk '/Identifier "Mouse0"/,/^EndSection/' "$xorg_root/etc/X11/xorg.conf")
+if ! printf '%s\n' "$mouse0" | grep -q 'Option "IgnoreAbsoluteAxes" "false"'; then
+    echo 'Mouse0 must unignore the absolute axes (IgnoreAbsoluteAxes "false")' >&2
+    echo 'FAIL - xorg.conf mouse absolute position contract' >&2
+    exit 1
+fi
 test -f "$xorg_root/etc/reliefos/xdm.conf"
 test -f "$xorg_root/etc/reliefos/xdm-Xservers"
 test -f "$xorg_root/etc/reliefos/xdm-session"
