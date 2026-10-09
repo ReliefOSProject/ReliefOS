@@ -5,10 +5,13 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 cc=${HOSTCC:-cc}
 "$cc" -std=c11 -Wall -Wextra -Wpedantic -Werror -Wformat=2 -Wshadow -Wstrict-prototypes -Wmissing-prototypes -I"$root" "$root/tools/host/manifest/reliefos-components.c" "$root/tools/host/common/buffer.c" "$root/tools/host/common/io.c" -o "$tmp/parser"
-printf '# CONFIG_RELIEFOS_COMPONENT_APP_HELLO_BUILD is not set\nCONFIG_RELIEFOS_COMPONENT_APP_DESKTOP_BUILD=n\n' > "$tmp/config"
+printf '# CONFIG_RELIEFOS_COMPONENT_APP_HELLO_BUILD is not set\nCONFIG_RELIEFOS_COMPONENT_APP_INSTALLER_BUILD=n\nCONFIG_RELIEFOS_COMPONENT_APP_DESKTOP_BUILD=n\nCONFIG_RELIEFOS_COMPONENT_APP_WINDOWD_BUILD=n\nCONFIG_RELIEFOS_COMPONENT_APP_IMD_BUILD=n\nCONFIG_RELIEFOS_COMPONENT_APP_SESSIOND_BUILD=n\n' > "$tmp/config"
 "$tmp/parser" --input "$root/configs/components.toml" --config "$tmp/config" --output "$tmp/out"
 grep '^RELIEFOS_COMPONENTS_DISABLED :=.* hello ' "$tmp/out"
-grep '^RELIEFOS_COMPONENT_APPS :=.* desktop ' "$tmp/out"
+grep '^RELIEFOS_COMPONENT_APPS :=.* installer ' "$tmp/out"
+for id in desktop windowd imd sessiond; do
+    grep "^RELIEFOS_COMPONENTS_DISABLED :=.* $id " "$tmp/out"
+done
 cp "$tmp/out" "$tmp/before"
 "$tmp/parser" --input "$root/configs/components.toml" --config "$tmp/config" --output "$tmp/out"
 cmp "$tmp/out" "$tmp/before"

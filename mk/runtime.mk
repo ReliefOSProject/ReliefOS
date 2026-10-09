@@ -4,10 +4,6 @@ RUNTIME_SO := $(RUNTIME_DIR)/libreliefos.so.2
 RUNTIME_COMPAT_SO := $(RUNTIME_DIR)/libleonos.so.2
 RUNTIME_ARCHIVE := $(O)/musl/lib/libreliefos.a
 RUNTIME_COMPAT_ARCHIVE := $(O)/musl/lib/libleonos.a
-RUNTIME_INSTALLER_SO := $(O)/installer/lib/libreliefos.so.2
-RUNTIME_INSTALLER_COMPAT_SO := $(O)/installer/lib/libleonos.so.2
-RUNTIME_INSTALLER_ARCHIVE := $(O)/musl/lib/libreliefos-installer.a
-RUNTIME_INSTALLER_COMPAT_ARCHIVE := $(O)/musl/lib/libleonos-installer.a
 GBK_TABLE := $(O_INCLUDE)/generated/reliefos_gbk_table.h
 PNG_CONFIG := $(O_INCLUDE)/libpng/pnglibconf.h
 
@@ -26,7 +22,6 @@ RUNTIME_SOURCES := $(sort $(patsubst $(RELIEFOS_SRC)/%,%,$(wildcard \
  $(addprefix third_party/zlib/,$(addsuffix .c,$(RUNTIME_ZLIB_NAMES))) \
  $(addprefix third_party/libpng/,$(addsuffix .c,$(RUNTIME_PNG_NAMES))))
 RUNTIME_OBJECTS := $(addprefix $(O_OBJ)/runtime/,$(addsuffix .o,$(RUNTIME_SOURCES)))
-RUNTIME_INSTALLER_OBJECTS := $(addprefix $(O_OBJ)/installer-runtime/,$(addsuffix .o,$(RUNTIME_SOURCES)))
 RUNTIME_FLAGS := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_FLAGS) -std=c11 \
  -ffreestanding -fno-stack-protector -fPIC -ffunction-sections -fdata-sections \
  -Wall -Wextra -DRELIEFOS_USE_MUSL -D_GNU_SOURCE -mno-avx -mno-avx2 \
@@ -70,7 +65,6 @@ $(O_OBJ)/$(1)/%.S.o: $(RELIEFOS_SRC)/%.S $(2) $(HEADER_EXPORT_MANIFEST) $(O_META
 	$$(Q)mv $$@.tmp $$@
 endef
 $(eval $(call RELIEFOS_RUNTIME_COMPILE,runtime,$(AUTOCONF_H)))
-$(eval $(call RELIEFOS_RUNTIME_COMPILE,installer-runtime,$(AUTOCONF_INSTALLER_H)))
 
 define RELIEFOS_RUNTIME_SHARED_RULE
 $(1): $(2) $(RUNTIME_AUTH_LIBS) $(MUSL_SYSROOT)/lib/libc.so $(MUSL_SYSROOT)/lib/libmimalloc.so.3 $(O_META)/runtime-link.sig $(RUNTIME_BUILTINS)
@@ -82,8 +76,6 @@ $(1): $(2) $(RUNTIME_AUTH_LIBS) $(MUSL_SYSROOT)/lib/libc.so $(MUSL_SYSROOT)/lib/
 endef
 $(eval $(call RELIEFOS_RUNTIME_SHARED_RULE,$(RUNTIME_SO),$(RUNTIME_OBJECTS),,libreliefos.so.2))
 $(eval $(call RELIEFOS_RUNTIME_SHARED_RULE,$(RUNTIME_COMPAT_SO),$(RUNTIME_OBJECTS),,libleonos.so.2))
-$(eval $(call RELIEFOS_RUNTIME_SHARED_RULE,$(RUNTIME_INSTALLER_SO),$(RUNTIME_INSTALLER_OBJECTS),-z max-page-size=0x1000,libreliefos.so.2))
-$(eval $(call RELIEFOS_RUNTIME_SHARED_RULE,$(RUNTIME_INSTALLER_COMPAT_SO),$(RUNTIME_INSTALLER_OBJECTS),-z max-page-size=0x1000,libleonos.so.2))
 
 define RELIEFOS_RUNTIME_ARCHIVE_RULE
 $(1): $(2) $(O_META)/runtime-link.sig
@@ -94,10 +86,6 @@ $(1): $(2) $(O_META)/runtime-link.sig
 endef
 $(eval $(call RELIEFOS_RUNTIME_ARCHIVE_RULE,$(RUNTIME_ARCHIVE),$(RUNTIME_OBJECTS)))
 $(eval $(call RELIEFOS_RUNTIME_ARCHIVE_RULE,$(RUNTIME_COMPAT_ARCHIVE),$(RUNTIME_OBJECTS)))
-$(eval $(call RELIEFOS_RUNTIME_ARCHIVE_RULE,$(RUNTIME_INSTALLER_ARCHIVE),$(RUNTIME_INSTALLER_OBJECTS)))
-$(eval $(call RELIEFOS_RUNTIME_ARCHIVE_RULE,$(RUNTIME_INSTALLER_COMPAT_ARCHIVE),$(RUNTIME_INSTALLER_OBJECTS)))
 
-runtime: $(RUNTIME_SO) $(RUNTIME_COMPAT_SO) $(RUNTIME_ARCHIVE) $(RUNTIME_COMPAT_ARCHIVE) \
-	$(RUNTIME_INSTALLER_SO) $(RUNTIME_INSTALLER_COMPAT_SO) \
-	$(RUNTIME_INSTALLER_ARCHIVE) $(RUNTIME_INSTALLER_COMPAT_ARCHIVE)
--include $(addsuffix .d,$(RUNTIME_OBJECTS) $(RUNTIME_INSTALLER_OBJECTS))
+runtime: $(RUNTIME_SO) $(RUNTIME_COMPAT_SO) $(RUNTIME_ARCHIVE) $(RUNTIME_COMPAT_ARCHIVE)
+-include $(addsuffix .d,$(RUNTIME_OBJECTS))

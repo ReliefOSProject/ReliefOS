@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "debug_click.h"
 #include "model.h"
+#include "installer/model.h"
 #include "doomlauncher/model.h"
 #include "imageview/model.h"
 #include "leonmmcoset/model.h"
@@ -583,10 +584,109 @@ int main(void)
         assert(doomlauncher_exit_code(0, 0x200) == -1);
     }
 
+    /* Installer wizard model: page flow, mode branching and disk rows. */
+    {
+        enum installer_page steps[INSTALLER_PAGE_COUNT];
+        char buf[64];
+        int count;
+
+        assert(installer_model_next(INSTALLER_PAGE_LANGUAGE, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_THANKS);
+        assert(installer_model_next(INSTALLER_PAGE_MODE, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_DISK);
+        assert(installer_model_next(INSTALLER_PAGE_DISK, INSTALLER_MODE_UPDATE) ==
+               INSTALLER_PAGE_CONFIRM);
+        assert(installer_model_next(INSTALLER_PAGE_DISK, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_ACCOUNTS);
+        assert(installer_model_next(INSTALLER_PAGE_ACCOUNTS, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_CONFIRM);
+        assert(installer_model_next(INSTALLER_PAGE_CONFIRM, INSTALLER_MODE_UPDATE) ==
+               INSTALLER_PAGE_PROGRESS);
+        assert(installer_model_next(INSTALLER_PAGE_PROGRESS, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_PROGRESS);
+        assert(installer_model_prev(INSTALLER_PAGE_CONFIRM, INSTALLER_MODE_UPDATE) ==
+               INSTALLER_PAGE_DISK);
+        assert(installer_model_prev(INSTALLER_PAGE_CONFIRM, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_ACCOUNTS);
+        assert(installer_model_prev(INSTALLER_PAGE_ACCOUNTS, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_DISK);
+        assert(installer_model_prev(INSTALLER_PAGE_FINISH, INSTALLER_MODE_UPDATE) ==
+               INSTALLER_PAGE_DISK);
+        assert(installer_model_prev(INSTALLER_PAGE_LANGUAGE, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_LANGUAGE);
+        assert(!installer_model_can_go_back(INSTALLER_PAGE_LANGUAGE, 0));
+        assert(installer_model_can_go_back(INSTALLER_PAGE_DISK, 0));
+        assert(!installer_model_can_go_back(INSTALLER_PAGE_PROGRESS, 0));
+        assert(installer_model_can_go_back(INSTALLER_PAGE_FINISH, 0));
+        assert(!installer_model_can_go_back(INSTALLER_PAGE_FINISH, 1));
+        assert(installer_model_can_cancel(INSTALLER_PAGE_CONFIRM, 0));
+        assert(!installer_model_can_cancel(INSTALLER_PAGE_PROGRESS, 0));
+        assert(!installer_model_can_cancel(INSTALLER_PAGE_FINISH, 1));
+        assert(installer_model_action(INSTALLER_PAGE_CONFIRM, INSTALLER_MODE_UPDATE, 0) ==
+               INSTALLER_ACTION_UPDATE);
+        assert(installer_model_action(INSTALLER_PAGE_CONFIRM, INSTALLER_MODE_FRESH, 0) ==
+               INSTALLER_ACTION_INSTALL);
+        assert(installer_model_action(INSTALLER_PAGE_MODE, INSTALLER_MODE_FRESH, 0) ==
+               INSTALLER_ACTION_NEXT);
+        assert(installer_model_action(INSTALLER_PAGE_FINISH, INSTALLER_MODE_FRESH, 1) ==
+               INSTALLER_ACTION_RESTART);
+        assert(installer_model_action(INSTALLER_PAGE_FINISH, INSTALLER_MODE_FRESH, 0) ==
+               INSTALLER_ACTION_CLOSE);
+        assert(strcmp(installer_model_confirm_word(INSTALLER_MODE_UPDATE), "UPDATE") == 0);
+        assert(strcmp(installer_model_confirm_word(INSTALLER_MODE_FRESH), "INSTALL") == 0);
+
+        count = installer_model_steps(INSTALLER_MODE_FRESH, steps, INSTALLER_PAGE_COUNT);
+        assert(count == INSTALLER_PAGE_COUNT);
+        assert(steps[0] == INSTALLER_PAGE_LANGUAGE);
+        assert(steps[count - 1] == INSTALLER_PAGE_FINISH);
+        count = installer_model_steps(INSTALLER_MODE_UPDATE, steps, INSTALLER_PAGE_COUNT);
+        assert(count == INSTALLER_PAGE_COUNT - 1);
+        for (int i = 0; i < count; ++i) assert(steps[i] != INSTALLER_PAGE_ACCOUNTS);
+        count = installer_model_steps(INSTALLER_MODE_FRESH, steps, 2);
+        assert(count == INSTALLER_PAGE_COUNT && steps[1] == INSTALLER_PAGE_THANKS);
+
+        installer_model_format_disk_line(buf, sizeof(buf), 0, "vda", 2048 * 1024, 512);
+        assert(strcmp(buf, "Disk 0  vda  1 GiB") == 0);
+        installer_model_format_disk_line(buf, sizeof(buf), 3, "", 1024, 512);
+        assert(strcmp(buf, "Disk 3  Disk  0 MiB") == 0);
+        installer_model_format_disk_line(buf, sizeof(buf), 7, "sdb", 4096, 1024);
+        assert(strcmp(buf, "Disk 7  sdb  4 MiB") == 0);
+    }
+
+    {
+        char secret[33] = "";
+        assert(installer_model_edit_secret(secret, sizeof(secret), 0, 0, "U!ab", 4));
+        assert(strcmp(secret, "U!ab") == 0);
+        assert(installer_model_edit_secret(secret, sizeof(secret), 2, 4, "c", 1));
+        assert(strcmp(secret, "U!c") == 0);
+        assert(installer_model_edit_secret(secret, sizeof(secret), 1, 2, NULL, 0));
+        assert(strcmp(secret, "Uc") == 0);
+        assert(!installer_model_edit_secret(secret, sizeof(secret), 3, 3, "x", 1));
+        assert(!installer_model_edit_secret(secret, sizeof(secret), 0, 1, " ", 1));
+        assert(!installer_model_edit_secret(secret, sizeof(secret), 0, 1, "\n", 1));
+        assert(strcmp(secret, "Uc") == 0);
+        assert(installer_model_edit_secret(secret, sizeof(secret), 0, 2,
+                                           "12345678901234567890123456789012", 32));
+        assert(strlen(secret) == 32);
+        assert(!installer_model_edit_secret(secret, sizeof(secret), 32, 32, "x", 1));
+        assert(strlen(secret) == 32);
+        assert(installer_model_edit_secret(secret, sizeof(secret), 0, 32, NULL, 0));
+        assert(secret[0] == 0);
+        assert(installer_model_edit_secret(secret, sizeof(secret), 0, 0, "中a文", 7));
+        assert(strcmp(secret, "中a文") == 0);
+        assert(installer_model_edit_secret(secret, sizeof(secret), 1, 2, "🙂", 4));
+        assert(strcmp(secret, "中🙂文") == 0);
+        assert(installer_model_edit_secret(secret, sizeof(secret), 1, 2, NULL, 0));
+        assert(strcmp(secret, "中文") == 0);
+        assert(!installer_model_edit_secret(secret, sizeof(secret), 0, 0, "\xc0\xaf", 2));
+        assert(strcmp(secret, "中文") == 0);
+    }
+
     puts("ok - calculator arithmetic, editing, bounds and logo click timing");
     puts("ok - task manager formatting, utilization, history ring and tree order");
     puts("ok - minesweeper placement, reveal, flags, win/lose and sprite parsing");
     puts("ok - easter egg image fitting for leonmmcoset and xiaobai");
     puts("ok - paint brushes, image viewer scaling and DOOM launcher argv");
+    puts("ok - installer wizard page flow, mode branching and disk rows");
     return 0;
 }

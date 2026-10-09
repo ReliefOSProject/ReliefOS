@@ -11,8 +11,7 @@ depend on `$(RELIEFOS_COMPONENT_TOOL)` and `$(RELIEFOS_GEARS_TOOL)`.
   `RELIEFOS_COMPONENT_APPS` come from `configs/components.toml` plus O/config/.config.
   Required components remain enabled; dependency closure follows the old resolver.
 - Apps: `O/userland/NAME.elf`, aliases `app-NAME` for enabled project applications.
-- Installer: `O/userland-installer-policy/{desktop,settings}.elf` and
-  `O/userland-installer/gptinit.elf`; aggregate `installer-userland`.
+- Installer: `O/userland-installer/gptinit.elf`; aggregate `installer-userland`.
 - Static loader-error GUI: `O/userland/dynlinkerror.elf` (no dynamic section).
 - Graphics exports: `PORTABLEGL_SO`, `PORTABLEGL_ARCHIVE`, `GLXGEARS_SOURCE`,
   `STARDUSTUI_ARCHIVE`. Stardust examples are owned by this fragment too.

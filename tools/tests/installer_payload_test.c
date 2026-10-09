@@ -5,9 +5,7 @@
 #undef MNT_EXPIRE
 #undef UMOUNT_NOFOLLOW
 #define lstat fixture_lstat
-#define main installer_application_main
-#include "../../userland/apps/installer/main.c"
-#undef main
+#include "../../userland/apps/installer/install_ops.c"
 #undef lstat
 
 /* Map guest stat requests into a real, private host filesystem fixture. */

@@ -62,7 +62,7 @@ $(RELIEFOS_DEDUP_TOOL): $(O_HOST)/obj/tools/host/manifest/reliefos-dedup.c.o | $
 	$(Q)$(HOSTCC) $(HOST_CFLAGS) $(HOST_LDFLAGS) $^ -o $@
 tools: $(RELIEFOS_DEDUP_TOOL)
 $(INSTALLER_STAGE_STAMP): $(RELIEFOS_DEDUP_TOOL) $(APK_STAGE_INPUTS)
-$(INSTALLER_STAGE_STAMP): $(ROOTFS_RAW_STAMP) $(ESP_STAMP) $(RUNTIME_INSTALLER_SO) $(RUNTIME_INSTALLER_COMPAT_SO) $(O)/userland-installer-policy/desktop.elf $(O)/userland-installer-policy/settings.elf $(O)/userland-installer/gptinit.elf $(APK_MANAGED_ROOT)/.apk-complete $(RELIEFOS_SRC)/tools/build/installer-stage.sh $(APK_STAGE_SCRIPT) $(RELIEFOS_SRC)/docs/ADVANCED_INSTALL.txt $(O_META)/images.sig
+$(INSTALLER_STAGE_STAMP): $(ROOTFS_RAW_STAMP) $(ESP_STAMP) $(USERLAND_DIR)/installer.elf $(O)/userland-installer/gptinit.elf $(APK_MANAGED_ROOT)/.apk-complete $(RELIEFOS_SRC)/tools/build/installer-stage.sh $(RELIEFOS_SRC)/system/xorg/installer-session $(RELIEFOS_SRC)/userland/apps/installer/installer.desktop $(APK_STAGE_SCRIPT) $(RELIEFOS_SRC)/docs/ADVANCED_INSTALL.txt $(O_META)/images.sig
 	$(Q)mkdir -p $(O_LOGS)
 	$(Q)APK_TOOL=$(abspath $(UPSTREAM_APK)) APK_UPSTREAM=$(abspath $(UPSTREAM_APK_ROOT)) APK_OWN_TOOL=$(abspath $(RELIEFOS_APK_OWN)) APK_KEY='$(APK_SIGNING_KEY)' APK_VERSION='$(APK_BUILD_VERSION)' sh $(RELIEFOS_SRC)/tools/build/run-logged.sh $(O_LOGS)/installer-stage.log sh $(RELIEFOS_SRC)/tools/build/installer-stage.sh $(RELIEFOS_SRC) $(abspath $(O)) $(abspath $(ROOTFS_RAW)) $(abspath $(ESP_STAGE)) $(abspath $(INSTALLER_ROOT)) $(SOURCE_DATE_EPOCH)
 	$(Q)touch $@

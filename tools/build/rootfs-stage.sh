@@ -52,13 +52,10 @@ for spec in auth pam; do
 done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
-# Runtime marker: the installer media rewrites it to reliefos for its native
-# session; product images always boot the X11 session.
+# Runtime marker: the only supported value is xorg.  The installer media keeps
+# it and selects its live session from the installer-runtime marker instead.
 printf '%s\n' xorg > "$work/data/desktop-backend"
 file "$work/data/desktop-backend" etc/reliefos/desktop-backend 0644 product-policy override
-for service in reliefos-windowd reliefos-session; do
-    record x - "/etc/runlevels/default/$service" 0000 product-policy override
-done
 file "$src/system/xorg/xorg.conf" etc/X11/xorg.conf 0644 product-policy override
 file "$src/system/xorg/reliefos-xdm" usr/lib/reliefos/reliefos-xdm 0755 reliefos-apps override
 file "$src/system/xorg/xorg-tty-wrapper" usr/lib/reliefos/xorg-tty-wrapper 0755 reliefos-apps override
@@ -120,10 +117,9 @@ $4==1 && ($2 ~ /-app$/ || $1 ~ /^(busybox|sl)$/) {
 awk -F '\t' '$4==1 && $2 ~ /-app$/ {print $1, $5}' "$metadata" > "$work/apps"
 while read -r app entry; do
     case $app in sudo|su) continue ;; esac
-    # M1 service role gids (kernel LEONOS_GID_*, images.sh re-chown, /etc/group
-    # leonos-window-server/leonos-service): authority rides on the image gid.
+    # Role gid marks are gone with the windowd stack: the kernel keeps its
+    # dormant gid grants but no staged binary is marked any more.
     gid=0
-    case $app in desktop) gid=60001 ;; windowd|imd) gid=60002 ;; esac
     file "$out/userland/$app.elf" "usr/lib/reliefos/apps/$app/$app.elf" 0755 "$app" unique "$gid"
     file "$work/manifests/$app.ini" "usr/lib/reliefos/apps/$app/manifest.ini" 0644 "$app"
     if [ "$entry" = 1 ]; then

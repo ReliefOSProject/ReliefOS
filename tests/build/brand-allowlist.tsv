@@ -273,11 +273,8 @@ main	compatibility	system/rootfs/etc/apk/protected_paths.d/reliefos.list	keep le
 main	compatibility	system/rootfs/etc/group	已安装系统中 GID 60001/60002 的服务角色组名，保持权限配置兼容
 main	compatibility	system/rootfs/etc/init.d/leonos-device	旧文件名调用入口转发/引用新服务或 PAM canonical 配置，需保持旧调用者可用
 main	compatibility	system/rootfs/etc/init.d/leonos-dhcp	旧文件名调用入口转发/引用新服务或 PAM canonical 配置，需保持旧调用者可用
-main	compatibility	system/rootfs/etc/init.d/leonos-imd	旧文件名调用入口转发/引用新服务或 PAM canonical 配置，需保持旧调用者可用
 main	compatibility	system/rootfs/etc/init.d/leonos-ntp	旧文件名调用入口转发/引用新服务或 PAM canonical 配置，需保持旧调用者可用
 main	compatibility	system/rootfs/etc/init.d/leonos-runtime	旧文件名调用入口转发/引用新服务或 PAM canonical 配置，需保持旧调用者可用
-main	compatibility	system/rootfs/etc/init.d/leonos-session	旧文件名调用入口转发/引用新服务或 PAM canonical 配置，需保持旧调用者可用
-main	compatibility	system/rootfs/etc/init.d/leonos-windowd	旧文件名调用入口转发/引用新服务或 PAM canonical 配置，需保持旧调用者可用
 main	compatibility	system/rootfs/etc/init.d/reliefos-runtime	preserve frozen IPC socket paths and legacy hostname fallback
 main	external-url	system/rootfs/etc/motd	全部旧名命中为项目、问题追踪与默认 RPR 的现有真实外部 URL
 main	external-url	system/rootfs/etc/motd.zh_CN	全部旧名命中为项目、问题追踪与默认 RPR 的现有真实外部 URL

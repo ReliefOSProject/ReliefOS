@@ -26,9 +26,9 @@ X11_DEVELOPMENT_PRODUCTS := $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/Xm/
 $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK)
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(X11_DEVELOPMENT_ROOT))
 	$(Q)touch $(X11_DEVELOPMENT_PRODUCTS)
-$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher,$(eval USERLAND_EXTRA_$(app) := -I$(X11_DEVELOPMENT_ROOT)/usr/include))
-$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher,$(eval USERLAND_LIBS_$(app) := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libXm.so libXt.so libX11.so)))
-$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher,$(eval USERLAND_DEPS_$(app) := $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
+$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher installer,$(eval USERLAND_EXTRA_$(app) := -I$(X11_DEVELOPMENT_ROOT)/usr/include))
+$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher installer,$(eval USERLAND_LIBS_$(app) := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libXm.so libXt.so libX11.so)))
+$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher installer,$(eval USERLAND_DEPS_$(app) := $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
 USERLAND_DEPS_osver += $(BUILD_INFO_HEADER)
 .PHONY: x11-development
 x11-development: $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)
@@ -77,8 +77,7 @@ app-$(1): $(3)
 endef
 include $(RELIEFOS_SRC)/mk/components/graphics.mk
 $(foreach app,$(USERLAND_APPS),$(eval $(call RELIEFOS_APP,$(app),$(app),$(USERLAND_DIR)/$(app).elf,$(AUTOCONF_H),$(RUNTIME_SO))))
-$(foreach app,desktop settings,$(eval $(call RELIEFOS_APP,installer-$(app),$(app),$(O)/userland-installer-policy/$(app).elf,$(AUTOCONF_INSTALLER_H),$(RUNTIME_INSTALLER_SO))))
-$(eval $(call RELIEFOS_APP,gptinit,gptinit,$(O)/userland-installer/gptinit.elf,$(AUTOCONF_INSTALLER_H),$(RUNTIME_INSTALLER_SO)))
+$(eval $(call RELIEFOS_APP,gptinit,gptinit,$(O)/userland-installer/gptinit.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
 
 # Only manifest-owned disabled ELF outputs may be removed; arbitrary files in
 # this directory and old build/ images are outside this rule's ownership.
@@ -86,7 +85,7 @@ $(eval $(call RELIEFOS_APP,gptinit,gptinit,$(O)/userland-installer/gptinit.elf,$
 userland-prune:
 	$(Q)$(foreach app,$(RELIEFOS_DISABLED_APPS),rm -f $(USERLAND_DIR)/$(app).elf;) :
 userland: userland-prune $(addprefix $(USERLAND_DIR)/,$(addsuffix .elf,$(RELIEFOS_COMPONENT_APPS)))
-installer-userland: $(O)/userland-installer-policy/desktop.elf $(O)/userland-installer-policy/settings.elf $(O)/userland-installer/gptinit.elf
+installer-userland: $(O)/userland-installer/gptinit.elf
 
 # Loader failures must still display a GUI when a shared library is absent.
 # Keep this helper fully static, with the same mimalloc and musl startup policy.

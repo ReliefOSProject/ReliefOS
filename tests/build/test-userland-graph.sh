@@ -67,7 +67,6 @@ O_HOST := $(O)/host
 RELIEFOS_HOST_BIN := $(O_HOST)/bin
 RELIEFOS_CONFIG_FILE := $(O_CONFIG)/.config
 AUTOCONF_H := $(O_CONFIG)/autoconf.h
-AUTOCONF_INSTALLER_H := $(AUTOCONF_H)
 TARGET_CC := $(FIXTURE)/compiler
 TARGET_CXX := $(FIXTURE)/compiler
 TARGET_AR := ar
@@ -75,7 +74,6 @@ TARGET_LD := $(FIXTURE)/linker
 MUSL_SYSROOT := $(FIXTURE)/musl
 MUSL_STAMP := $(FIXTURE)/musl.stamp
 RUNTIME_SO := $(FIXTURE)/runtime.so
-RUNTIME_INSTALLER_SO := $(RUNTIME_SO)
 PNG_CONFIG := $(FIXTURE)/png.h
 Q := @
 .PHONY: FORCE

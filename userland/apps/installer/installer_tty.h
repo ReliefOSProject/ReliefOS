@@ -18,11 +18,9 @@ struct installer_tty_context {
     uint8_t *install_mode;
     uint8_t *install_success;
     uint8_t *page;
-    uint8_t update_apps_page;
     void (*refresh_disks)(void);
     void (*format_disk_line)(char *buf, uint32_t cap,
                              const struct reliefos_block_disk_info *disk);
-    void (*print_update_packages)(void);
     void (*prepare_update)(void);
     void (*perform_install)(void);
     void (*perform_update)(void);

@@ -58,9 +58,10 @@ class InstallerPayloadTests(unittest.TestCase):
         root = self.root / "target"
         for name in ("bin", "sbin", "lib", "usr/bin", "usr/sbin", "usr/lib",
                      f"etc/{namespace}", f"var/lib/{namespace}",
-                     f"usr/lib/{namespace}/apps/desktop", f"usr/lib/{namespace}/drivers", "boot/EFI"):
+                     f"usr/lib/{namespace}/apps", f"usr/lib/{namespace}/drivers", "boot/EFI"):
             (root / name).mkdir(parents=True, exist_ok=True)
-        for name in (f"usr/lib/{namespace}/apps/desktop/desktop.elf", "boot/loader.elf", f"boot/{namespace}/kernel.sys"):
+        library = "libreliefos.so.2" if namespace == "reliefos" else "libleonos.so.2"
+        for name in (f"usr/lib/{namespace}/{library}", "boot/loader.elf", f"boot/{namespace}/kernel.sys"):
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b"old installed payload")

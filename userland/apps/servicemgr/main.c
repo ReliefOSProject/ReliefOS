@@ -14,7 +14,7 @@
 
 #define SERVICEMGR_W 780U
 #define SERVICEMGR_H 430U
-#define SERVICEMGR_ROWS 5U
+#define SERVICEMGR_ROWS 4U
 #define SERVICEMGR_CONFIG_MAX 512U
 #define SERVICEMGR_STATE_MAX 1024U
 #define SERVICEMGR_ROW_Y 60U
@@ -41,9 +41,8 @@ static char status_text[180] = "Ready";
 static unsigned long last_state_refresh_ms;
 
 static struct service_row service_rows[SERVICEMGR_ROWS] = {
-    {"reliefos-desktop", N_("Desktop"), N_("OpenRC graphical session"), 1, 0, "unknown", "", 0},
+    {"reliefos-audio", N_("Audio"), N_("ALSA state"), 1, 0, "unknown", "", 0},
     {"reliefos-dhcp", N_("DHCP"), N_("BusyBox udhcpc"), 1, 0, "unknown", "", 0},
-    {"reliefos-session", N_("User startup"), N_("Session IPC"), 1, 0, "unknown", "", 0},
     {"reliefos-device", N_("Devices"), N_("ReliefOS device protocol"), 1, 0, "unknown", "", 0},
     {"reliefos-ntp", N_("Time sync"), N_("BusyBox ntpd"), 1, 0, "unknown", "", 0},
 };

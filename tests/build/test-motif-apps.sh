@@ -7,7 +7,7 @@ if [ ! -f "$src/userland/apps/calc/engine.c" ] || [ ! -f "$src/userland/apps/osv
     printf 'FAIL - calculator and system information have no toolkit-independent behavior boundary\n' >&2
     exit 1
 fi
-for app in taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher; do
+for app in taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher installer; do
     if [ ! -f "$src/userland/apps/$app/model.c" ] || [ ! -f "$src/userland/apps/$app/model.h" ]; then
         printf 'FAIL - %s has no toolkit-independent behavior boundary\n' "$app" >&2
         exit 1
@@ -21,6 +21,7 @@ ${HOSTCC:-cc} -std=c11 -Wall -Wextra -Werror -fsanitize=undefined -fno-sanitize-
     "$src/userland/apps/minesweeper/model.c" "$src/userland/apps/leonmmcoset/model.c" \
     "$src/userland/apps/xiaobai/model.c" "$src/userland/apps/paint/model.c" \
     "$src/userland/apps/imageview/model.c" "$src/userland/apps/doomlauncher/model.c" \
+    "$src/userland/apps/installer/model.c" \
     -o "$work/test"
 "$work/test"
 
@@ -34,11 +35,11 @@ O := $(WORK)/out
 include $(ROOT)/mk/userland.mk
 .PHONY: sources
 sources:
-	@printf '%s\n' '$(call userland_sources,calc)' '$(call userland_sources,osver)' '$(call userland_sources,fileman)' '$(call userland_sources,taskmgr)' '$(call userland_sources,minesweeper)' '$(call userland_sources,leonmmcoset)' '$(call userland_sources,xiaobai)' '$(call userland_sources,paint)' '$(call userland_sources,imageview)' '$(call userland_sources,doom)' '$(call userland_sources,doomlauncher)'
-	@printf '%s\n' '$(USERLAND_LIBS_fileman)' '$(USERLAND_LIBS_taskmgr)' '$(USERLAND_LIBS_minesweeper)' '$(USERLAND_LIBS_leonmmcoset)' '$(USERLAND_LIBS_xiaobai)' '$(USERLAND_LIBS_paint)' '$(USERLAND_LIBS_imageview)' '$(USERLAND_LIBS_doomlauncher)' '$(USERLAND_LIBS_doom)'
+	@printf '%s\n' '$(call userland_sources,calc)' '$(call userland_sources,osver)' '$(call userland_sources,fileman)' '$(call userland_sources,taskmgr)' '$(call userland_sources,minesweeper)' '$(call userland_sources,leonmmcoset)' '$(call userland_sources,xiaobai)' '$(call userland_sources,paint)' '$(call userland_sources,imageview)' '$(call userland_sources,doom)' '$(call userland_sources,doomlauncher)' '$(call userland_sources,installer)'
+	@printf '%s\n' '$(USERLAND_LIBS_fileman)' '$(USERLAND_LIBS_taskmgr)' '$(USERLAND_LIBS_minesweeper)' '$(USERLAND_LIBS_leonmmcoset)' '$(USERLAND_LIBS_xiaobai)' '$(USERLAND_LIBS_paint)' '$(USERLAND_LIBS_imageview)' '$(USERLAND_LIBS_doomlauncher)' '$(USERLAND_LIBS_doom)' '$(USERLAND_LIBS_installer)'
 MAKE
 make -s -f "$work/sources.mk" ROOT="$src" WORK="$work" sources >"$work/sources"
-for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher doom; do
+for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher doom installer; do
     grep -q "userland/apps/$app/main.c" "$work/sources"
     for removed in native.c input.c view.c; do
         if grep -q "userland/apps/$app/$removed" "$work/sources"; then
@@ -49,7 +50,7 @@ for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imag
 done
 grep -q 'userland/apps/fileman/motif.c' "$work/sources"
 grep -q 'userland/apps/fileman/motif_dialogs.c' "$work/sources"
-for app in taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher; do
+for app in taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher installer; do
     grep -q "userland/apps/$app/model.c" "$work/sources"
     if grep -q 'reliefos_gui_create_app_window\|reliefos_ui_' \
         "$src/userland/apps/$app/main.c" "$src/userland/apps/$app/model.c"; then
@@ -66,7 +67,7 @@ fi
 # XmNfontList string resources can only describe core X fonts; pinning one
 # disables Motif's Xft renditions and its per-codepoint fallback, so translated
 # CJK labels cannot render. Widgets must inherit the default Xft render table.
-for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher doom; do
+for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher doom installer; do
     if grep -q '\*fontList:' "$src/userland/apps/$app"/*.c; then
         printf 'FAIL - %s pins a core font with *fontList: and cannot render CJK\n' "$app" >&2
         exit 1
@@ -75,7 +76,7 @@ done
 # Apps that show translated text must route the shell font lists to the
 # CJK-capable Xft rendition; the vendor shell resolves them to core "fixed"
 # otherwise and translated labels render as empty boxes.
-for app in calc osver fileman taskmgr minesweeper paint imageview doomlauncher; do
+for app in calc osver fileman taskmgr minesweeper paint imageview doomlauncher installer; do
     for resource in XmNlabelFontList XmNbuttonFontList XmNtextFontList; do
         if ! grep -q "$resource" "$src/userland/apps/$app/main.c"; then
             printf 'FAIL - %s does not route %s to a CJK-capable Xft font\n' \
@@ -85,13 +86,16 @@ for app in calc osver fileman taskmgr minesweeper paint imageview doomlauncher; 
     done
 done
 grep -q 'libXm.so' "$work/sources"
-for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doom doomlauncher; do
+for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doom doomlauncher installer; do
     desktop="$src/userland/apps/$app/$app.desktop"
     if [ ! -f "$desktop" ]; then
         printf 'FAIL - %s has no desktop entry\n' "$app" >&2
         exit 1
     fi
     grep -q '^Type=Application$' "$desktop"
-    grep -q "^Exec=/usr/bin/$app\$" "$desktop"
+    if ! grep -qE "^Exec=/usr/bin/$app( --graphical)?\$" "$desktop"; then
+        printf 'FAIL - %s desktop entry does not launch the app\n' "$app" >&2
+        exit 1
+    fi
 done
 printf 'ok - applications build only the Motif X11 frontend\n'

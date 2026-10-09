@@ -6,14 +6,25 @@ w=$(mktemp -d)
 trap 'rm -rf "$w"' EXIT HUP INT TERM
 ${HOSTCC:-cc} -std=c11 -O2 -Wall -Wextra -Werror "$src/tools/host/manifest/reliefos-dedup.c" -o "$w/dedup"
 export INSTALLER_DEDUP_TOOL="$w/dedup"
-mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/out/userland" "$w/out/userland-installer" "$w/out/userland-installer-policy" "$w/out/installer/lib" "$w/raw/usr/lib/reliefos/apps/desktop" "$w/raw/usr/lib/reliefos/apps/settings" "$w/raw/usr/lib/leonos" "$w/raw/usr/lib/reliefos" "$w/raw/usr/bin" "$w/esp/EFI/BOOT" "$w/esp/reliefos" "$w/esp/leonos" "$w/esp/grub"
+mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/src/userland/apps/installer" "$w/src/system/xorg" \
+    "$w/out/userland" "$w/out/userland-installer" \
+    "$w/raw/usr/lib/reliefos/apps/settings" "$w/raw/usr/lib/leonos" "$w/raw/usr/bin" \
+    "$w/raw/etc/reliefos/icewm" "$w/raw/etc/runlevels/default" \
+    "$w/esp/EFI/BOOT" "$w/esp/reliefos" "$w/esp/leonos" "$w/esp/grub"
 printf 'guide\n' > "$w/src/docs/ADVANCED_INSTALL.txt"
-for app in desktop settings; do printf 'policy\n' > "$w/out/userland-installer-policy/$app.elf"; done
-printf 'canonical runtime\n' > "$w/out/installer/lib/libreliefos.so.2"
-printf 'compat runtime\n' > "$w/out/installer/lib/libleonos.so.2"
+printf '[Desktop Entry]\n' > "$w/src/userland/apps/installer/installer.desktop"
+printf '#!/bin/sh\n' > "$w/src/system/xorg/installer-session"
+printf 'canonical runtime\n' > "$w/raw/usr/lib/reliefos/libreliefos.so.2"
+printf 'compat runtime\n' > "$w/raw/usr/lib/leonos/libleonos.so.2"
+printf 'settings\n' > "$w/raw/usr/lib/reliefos/apps/settings/settings.elf"
+printf 'xorg\n' > "$w/raw/etc/reliefos/desktop-backend"
+printf 'xdm conf\n' > "$w/raw/etc/reliefos/xdm.conf"
+printf 'toolbar\n' > "$w/raw/etc/reliefos/icewm/toolbar"
+printf 'license\n' > "$w/raw/etc/license.conf"
+ln -s ../../init.d/reliefos-audio "$w/raw/etc/runlevels/default/reliefos-audio"
 printf 'gptinit\n' > "$w/out/userland-installer/gptinit.elf"
 printf 'installer\n' > "$w/out/userland/installer.elf"
-chmod 755 "$w/out/userland/installer.elf"
+chmod 755 "$w/out/userland/installer.elf" "$w/out/userland-installer/gptinit.elf"
 printf 'efi\n' > "$w/esp/EFI/BOOT/BOOTX64.EFI"
 printf 'new-loader\n' > "$w/esp/reliefos/loader.elf"
 printf 'new-kernel\n' > "$w/esp/reliefos/kernel.sys"
@@ -35,19 +46,40 @@ program=usr/lib/reliefos/apps/installer/installer.elf
 [ -x "$w/stage/$program" ] || { echo 'FAIL - installer executable missing from runtime package'; exit 1; }
 cmp "$w/out/userland/installer.elf" "$w/stage/$program"
 [ "$(readlink "$w/stage/usr/bin/installer")" = ../lib/reliefos/apps/installer/installer.elf ]
-[ -f "$w/stage/usr/lib/reliefos/libreliefos.so.2" ]
-[ -f "$w/stage/usr/lib/leonos/libleonos.so.2" ]
-[ "$(cat "$w/stage/etc/reliefos/desktop-backend")" = reliefos ]
-[ -L "$w/stage/etc/runlevels/default/reliefos-windowd" ]
-[ -L "$w/stage/etc/runlevels/default/reliefos-session" ]
-[ ! -e "$w/stage/etc/reliefos/xdm.conf" ]
-[ ! -e "$w/stage/etc/reliefos/xdm-session" ]
-[ ! -e "$w/stage/etc/reliefos/icewm" ]
-[ ! -e "$w/stage/etc/reliefos/twmrc" ]
+[ -x "$w/stage/usr/lib/reliefos/apps/gptinit/gptinit.elf" ]
+[ "$(readlink "$w/stage/usr/bin/gptinit")" = ../lib/reliefos/apps/gptinit/gptinit.elf ]
+[ "$(cat "$w/stage/etc/reliefos/installer-runtime")" = installer ]
+[ -x "$w/stage/usr/lib/reliefos/installer-session" ]
+cmp "$w/src/system/xorg/installer-session" "$w/stage/usr/lib/reliefos/installer-session"
+[ -f "$w/stage/usr/share/applications/reliefos-installer.desktop" ]
+cmp "$w/src/userland/apps/installer/installer.desktop" \
+    "$w/stage/usr/share/applications/reliefos-installer.desktop"
+# The runtime root keeps the plain X11 policy of the raw root: the marker is
+# never rewritten and the X session files are never stripped.
+[ "$(cat "$w/stage/etc/reliefos/desktop-backend")" = xorg ]
+[ "$(cat "$w/stage/install/root/etc/reliefos/desktop-backend")" = xorg ]
+[ -f "$w/stage/etc/reliefos/xdm.conf" ]
+[ -f "$w/stage/etc/reliefos/icewm/toolbar" ]
+[ -f "$w/stage/etc/license.conf" ]
+# No windowd stack is staged or revived on either root.
+[ ! -e "$w/stage/etc/runlevels/default/reliefos-windowd" ]
+[ ! -e "$w/stage/etc/runlevels/default/reliefos-session" ]
+[ ! -e "$w/stage/etc/runlevels/default/reliefos-imd" ]
+[ ! -e "$w/stage/usr/lib/reliefos/apps/windowd" ]
+[ ! -e "$w/stage/usr/lib/reliefos/apps/desktop" ]
+[ ! -e "$w/stage/install/root/usr/lib/reliefos/apps/desktop" ]
+# Runtime libraries and installed apps are the raw root's own; nothing is
+# overridden with an installer-policy build.
+cmp "$w/raw/usr/lib/reliefos/libreliefos.so.2" "$w/stage/usr/lib/reliefos/libreliefos.so.2"
+cmp "$w/raw/usr/lib/reliefos/libreliefos.so.2" "$w/stage/install/root/usr/lib/reliefos/libreliefos.so.2"
+cmp "$w/raw/usr/lib/leonos/libleonos.so.2" "$w/stage/install/root/usr/lib/leonos/libleonos.so.2"
+cmp "$w/raw/usr/lib/reliefos/apps/settings/settings.elf" \
+    "$w/stage/install/root/usr/lib/reliefos/apps/settings/settings.elf"
 [ ! -e "$w/stage/install/root/$program" ]
+[ ! -e "$w/stage/install/root/etc/license.conf" ]
 [ -f "$w/stage/install/esp/reliefos/loader.elf" ]
 [ -f "$w/stage/install/esp/reliefos/kernel.sys" ]
 [ -f "$w/stage/install/esp/leonos/kernel.sys" ]
 [ -f "$w/stage/install/esp/loader.elf" ]
 [ -f "$w/stage/install/esp/grub/grub.cfg" ]
-echo 'installer stage: executable, runtime ABI libraries and paired boot layouts are packaged'
+echo 'installer stage: executable, X11 live policy and paired boot layouts are packaged'

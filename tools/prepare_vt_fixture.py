@@ -31,7 +31,7 @@ def prepare(source, output, text_only=False, compiler=None,
             dst.write(chunk)
             remaining -= len(chunk)
     commands = [f'write {probe.resolve()} /tmp/vt-probe', 'set_inode_field /tmp/vt-probe mode 0100755']
-    if text_only: commands.append('rm /etc/reliefos/desktop-session')
+    if text_only: commands.append('rm /etc/reliefos/desktop-backend')
     for command in commands:
         subprocess.run(['debugfs', '-w', '-R', command, str(fs)], check=True)
     with fs.open('rb') as src, disk.open('r+b') as dst:

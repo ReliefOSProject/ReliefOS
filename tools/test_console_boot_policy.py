@@ -31,11 +31,13 @@ class ConsoleBootPolicyTests(unittest.TestCase):
 
     def test_console_session_restores_login_after_graphical_exit(self):
         script = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
-        self.assertIn("login.elf --graphical-session", script)
+        self.assertIn("/usr/lib/reliefos/installer-session", script)
+        self.assertIn("/usr/lib/reliefos/reliefos-xdm", script)
         self.assertIn("/run/reliefos/graphical-session-started", script)
         self.assertIn("login.elf --installer-shell", script)
         self.assertIn("exec /sbin/getty -n -l", script)
-        self.assertLess(script.index("login.elf --graphical-session"),
+        self.assertNotIn("login.elf --graphical-session", script)
+        self.assertLess(script.index("reliefos-xdm"),
                         script.index("exec /sbin/getty"))
         self.assertNotIn("LEONOS_BOOT_MODE", script)
         self.assertNotIn("RELIEFOS_BOOT_MODE", script)
@@ -57,6 +59,16 @@ class ConsoleBootPolicyTests(unittest.TestCase):
         self.assertIn("exec <\"$tty\" >\"$tty\" 2>&1", wrapper)
         self.assertIn("exec /usr/bin/Xorg \"$@\"", wrapper)
         self.assertNotIn("setsid", wrapper)
+
+    def test_installer_media_session_starts_the_installer_without_a_greeter(self):
+        session = (ROOT / "system/xorg/installer-session").read_text()
+        self.assertIn("installer.elf --graphical", session)
+        self.assertIn("/usr/lib/reliefos/xorg-tty-wrapper", session)
+        self.assertIn("/usr/bin/icewm", session)
+        self.assertIn("desktop-backend=xorg", session)
+        self.assertNotIn("reliefos-xdm", session)
+        self.assertNotIn("PAM", session)
+        self.assertNotIn("password", session.lower())
 
     def test_invalid_backend_marker_never_falls_back_to_native_desktop(self):
         script = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
@@ -83,11 +95,12 @@ class ConsoleBootPolicyTests(unittest.TestCase):
         self.assertIn("tty1 restored to text login", console)
         self.assertNotIn("password", launcher.lower() + session.lower())
 
-    def test_graphical_and_installer_sessions_claim_a_controlling_terminal(self):
+    def test_installer_and_text_sessions_claim_a_controlling_terminal(self):
         source = (ROOT / "userland/apps/login/main.c").read_text()
-        for item in ("setsid()", "TIOCSCTTY", "tcsetpgrp", "VT_ACTIVATE",
-                     "KDSETMODE", "KD_GRAPHICS", "KD_TEXT"):
+        for item in ("setsid()", "TIOCSCTTY", "tcsetpgrp"):
             self.assertIn(item, source)
+        self.assertNotIn("--graphical-session", source)
+        self.assertNotIn("--graphical-login", source)
 
     def test_runlevels_do_not_start_the_desktop_as_a_service(self):
         runlevels = ROOTFS / "etc/runlevels"
@@ -96,7 +109,7 @@ class ConsoleBootPolicyTests(unittest.TestCase):
             self.assertFalse((runlevels / name / "reliefos-desktop").exists())
         self.assertFalse((runlevels / "tty").exists())
         self.assertFalse((runlevels / "installer-tty").exists())
-        self.assertTrue((ROOTFS / "etc/reliefos/desktop-session").exists())
+        self.assertFalse((ROOTFS / "etc/reliefos/desktop-session").exists())
         self.assertIn("installer-runtime", (ROOTFS / "usr/lib/reliefos/rc-default").read_text())
 
     def test_grub_uses_only_installer_session_selection(self):

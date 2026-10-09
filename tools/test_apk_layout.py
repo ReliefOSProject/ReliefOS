@@ -189,7 +189,7 @@ def check_images():
             assert hashlib.sha256(debugfs(image, f"cat /{prefix}sbin/apk")).hexdigest() == (
                 "5118a57ae7c07e13268a754f78aa9c7d39a0bed708bb11c101d78e2a884cee5d")
             assert debugfs(image, f"cat /{prefix}usr/share/reliefos/apk/repository/packages.adb")
-            for name in ("usr/lib/reliefos/apps/desktop/desktop.elf", "usr/lib/reliefos/libreliefos.so.2", "usr/lib/leonos/libleonos.so.2",
+            for name in ("usr/lib/reliefos/apps/login/login.elf", "usr/lib/reliefos/libreliefos.so.2", "usr/lib/leonos/libleonos.so.2",
                          "sbin/apk", "usr/bin/vim", "usr/bin/sudo", "lib/ld-musl-x86_64.so.1"):
                 entry = package_files["/" + name]
                 assert hashlib.sha256(debugfs(image, f"cat /{prefix}{name}")).hexdigest() == entry["sha256"], (image, prefix, name)

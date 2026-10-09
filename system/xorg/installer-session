@@ -1,0 +1,128 @@
+#!/bin/sh
+# Root-owned live installer session for installation media.
+#
+# The media locks every account, so there is no greeter: tty1's
+# console session hands the VT straight to this script, which owns the X
+# server on vt1 and runs IceWM with the installer as the single workload.
+# Every line of output is captured by the console session into the root-only
+# /var/log/installer-session.log, and each event is recorded only after the
+# corresponding child really started.
+set -u
+
+xorg_log=/var/log/Xorg.0.log
+
+umask 077
+mkdir -p /run/reliefos || exit 1
+
+stage() {
+    printf '%s\n' "installer-session: $1"
+}
+
+# Preserve the very first Xorg log so later sessions cannot rotate over the
+# evidence of the failure being diagnosed.
+if test -f "$xorg_log" && test ! -f "$xorg_log.first"; then
+    cp -p "$xorg_log" "$xorg_log.first" 2>/dev/null || :
+fi
+
+for path in /etc/X11/xorg.conf /usr/lib/reliefos/xorg-tty-wrapper /usr/bin/icewm \
+    /usr/lib/reliefos/apps/installer/installer.elf; do
+    if test ! -r "$path"; then
+        stage "missing $path"
+        stage 'tty1 restored to rescue shell'
+        exit 1
+    fi
+done
+
+stage 'starting live installer session on vt1'
+printf '%s\n' 'desktop-backend=xorg'
+
+DISPLAY=:0
+ICEWM_PRIVCFG=/etc/reliefos/icewm
+export DISPLAY ICEWM_PRIVCFG
+
+xorg_pid=
+icewm_pid=
+installer_pid=
+cleanup() {
+    for pid in $installer_pid $icewm_pid $xorg_pid; do
+        kill "$pid" 2>/dev/null || :
+    done
+    for pid in $installer_pid $icewm_pid $xorg_pid; do
+        wait "$pid" 2>/dev/null || :
+    done
+}
+trap cleanup EXIT HUP INT TERM
+
+/usr/lib/reliefos/xorg-tty-wrapper :0 -config /etc/X11/xorg.conf -nolisten tcp vt1 -keeptty &
+xorg_pid=$!
+
+tries=0
+while test "$tries" -lt 60; do
+    if test -S /tmp/.X11-unix/X0; then
+        break
+    fi
+    if ! kill -0 "$xorg_pid" 2>/dev/null; then
+        wait "$xorg_pid" 2>/dev/null
+        status=$?
+        xorg_pid=
+        stage "X server failed to start status=$status"
+        stage 'tty1 restored to rescue shell'
+        exit 1
+    fi
+    sleep 1
+    tries=$((tries + 1))
+done
+if test ! -S /tmp/.X11-unix/X0; then
+    stage 'X server failed to start status=timeout'
+    stage 'tty1 restored to rescue shell'
+    exit 1
+fi
+stage 'X server ready on vt1'
+
+# Retro pixel-art root background matching the IceWM Light theme.  This is a
+# best-effort one-shot: on failure the installer window keeps the default root.
+if test -x /usr/bin/xwallpaper && test -r /etc/reliefos/wallpaper.png; then
+    /usr/bin/xwallpaper --focus /etc/reliefos/wallpaper.png 2>/dev/null || :
+fi
+
+/usr/bin/icewm &
+icewm_pid=$!
+sleep 1
+if ! kill -0 "$icewm_pid" 2>/dev/null; then
+    wait "$icewm_pid" 2>/dev/null
+    status=$?
+    icewm_pid=
+    stage "icewm failed to start status=$status"
+    stage 'tty1 restored to rescue shell'
+    exit 1
+fi
+stage "icewm started pid=$icewm_pid"
+
+/usr/lib/reliefos/apps/installer/installer.elf --graphical &
+installer_pid=$!
+sleep 1
+if ! kill -0 "$installer_pid" 2>/dev/null; then
+    wait "$installer_pid" 2>/dev/null
+    status=$?
+    installer_pid=
+    stage "installer failed to start status=$status"
+    stage 'tty1 restored to rescue shell'
+    exit 1
+fi
+stage "installer started pid=$installer_pid"
+
+# The installer owns the session lifetime: when it exits, the window manager
+# and X server are torn down and tty1 is handed back to the rescue shell.
+wait "$installer_pid"
+status=$?
+installer_pid=
+stage "installer exit status=$status"
+
+kill "$icewm_pid" 2>/dev/null || :
+wait "$icewm_pid" 2>/dev/null || :
+icewm_pid=
+kill "$xorg_pid" 2>/dev/null || :
+wait "$xorg_pid" 2>/dev/null || :
+xorg_pid=
+stage 'tty1 restored to rescue shell'
+exit "$status"

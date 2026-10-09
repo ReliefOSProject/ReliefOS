@@ -152,8 +152,6 @@ for pair in \
     'etc/leonos/fileassoc.cfg etc/reliefos/fileassoc.cfg' \
     'etc/leonos/desktop-entries.conf etc/reliefos/desktop-entries.conf' \
     'etc/leonos/lesskey etc/reliefos/lesskey' \
-    'etc/leonos/desktop-profile etc/reliefos/desktop-profile' \
-    'etc/leonos/desktop-session etc/reliefos/desktop-session' \
     'etc/leonos/installer-runtime etc/reliefos/installer-runtime' \
     'etc/leonos/installed etc/reliefos/installed' \
     'var/lib/leonos/users.db var/lib/reliefos/users.db' \

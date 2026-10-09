@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "installer_tty.h"
+#include "model.h"
 
 static int tty_read_line(const char *prompt, char *buffer, uint32_t capacity)
 {
@@ -138,7 +139,7 @@ int installer_tty_main(const struct installer_tty_context *context)
         !context->selected_disk || !context->install_mode ||
         !context->install_success || !context->page ||
         !context->refresh_disks || !context->format_disk_line ||
-        !context->print_update_packages || !context->prepare_update ||
+        !context->prepare_update ||
         !context->perform_install || !context->perform_update) {
         return 1;
     }
@@ -169,10 +170,9 @@ int installer_tty_main(const struct installer_tty_context *context)
 
     if (*context->install_mode == INSTALLER_TTY_MODE_UPDATE) {
         context->prepare_update();
-        if (*context->page != context->update_apps_page) {
+        if (*context->page == INSTALLER_PAGE_FINISH && !*context->install_success) {
             return 1;
         }
-        context->print_update_packages();
         if (!tty_read_line("Type UPDATE to confirm an in-place update: ",
                            input, sizeof(input)) || !tty_line_is(input, "UPDATE")) {
             puts("Update not confirmed. Installation cancelled.");

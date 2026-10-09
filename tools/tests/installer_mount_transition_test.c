@@ -6,15 +6,13 @@
 #undef MNT_DETACH
 #undef MNT_EXPIRE
 #undef UMOUNT_NOFOLLOW
-#define main installer_application_main
 #define mkdir fake_mkdir
 #define lstat fake_lstat
 #define mount fake_mount
 #define umount2 fake_umount2
 #define posix_spawnp fake_posix_spawnp
 #define waitpid fake_waitpid
-#include "../../userland/apps/installer/main.c"
-#undef main
+#include "../../userland/apps/installer/install_ops.c"
 #undef posix_spawnp
 #undef waitpid
 
