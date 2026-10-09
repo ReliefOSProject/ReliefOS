@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Image Viewer
+Name[zh_CN]=图片查看器
+Exec=/usr/bin/imageview
+TryExec=/usr/bin/imageview
+Icon=app
+Terminal=false
+Categories=Graphics;Viewer;

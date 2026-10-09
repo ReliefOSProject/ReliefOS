@@ -1,15 +1,23 @@
 #include <reliefos/gui.h>
+#include <reliefos/layout.h>
 #include <reliefos/syscall.h>
-#include <reliefos/ui.h>
+#include <ctype.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include <X11/Xatom.h>
+#include <X11/XKBlib.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/keysym.h>
 
 #include "doomgeneric.h"
 #include "doomkeys.h"
-#include "i_system.h"
 #include "i_sound.h"
+#include "i_system.h"
 #include "m_argv.h"
-#include <reliefos/layout.h>
 
 #define DOOM_KEY_QUEUE_CAP 64U
 #define DOOM_WINDOW_WIDTH DOOMGENERIC_RESX
@@ -23,93 +31,58 @@ struct doom_key_event {
 static struct doom_key_event key_queue[DOOM_KEY_QUEUE_CAP];
 static uint32_t key_read;
 static uint32_t key_write;
-static uint32_t window_id;
+static Display *display;
+static Window window;
+static GC gc;
+static Atom wm_delete_window;
 static uint8_t headless_mode;
 static uint32_t frame[DOOM_WINDOW_WIDTH * DOOM_WINDOW_HEIGHT];
-static struct reliefos_ui_surface ui;
 
-static void restore_mouse(void)
+static unsigned char doom_key(KeySym symbol)
 {
-    if (window_id) {
-        reliefos_gui_set_mouse_visible(window_id, 1);
+    switch (symbol) {
+    case XK_Return: return KEY_ENTER;
+    case XK_Escape: return KEY_ESCAPE;
+    case XK_BackSpace: return KEY_BACKSPACE;
+    case XK_Tab: return KEY_TAB;
+    case XK_Left: return KEY_LEFTARROW;
+    case XK_Right: return KEY_RIGHTARROW;
+    case XK_Up: return KEY_UPARROW;
+    case XK_Down: return KEY_DOWNARROW;
+    case XK_Control_L:
+    case XK_Control_R: return KEY_FIRE;
+    case XK_space: return KEY_USE;
+    case XK_Shift_L:
+    case XK_Shift_R: return KEY_RSHIFT;
+    case XK_Alt_L:
+    case XK_Alt_R: return KEY_RALT;
+    case XK_F1: return KEY_F1;
+    case XK_F2: return KEY_F2;
+    case XK_F3: return KEY_F3;
+    case XK_F4: return KEY_F4;
+    case XK_F5: return KEY_F5;
+    case XK_F6: return KEY_F6;
+    case XK_F7: return KEY_F7;
+    case XK_F8: return KEY_F8;
+    case XK_F9: return KEY_F9;
+    case XK_F10: return KEY_F10;
+    case XK_F11: return KEY_F11;
+    case XK_F12: return KEY_F12;
+    default: break;
     }
+    /* Letters, digits and US-layout punctuation share their ASCII codes with
+     * their KeySym values, so the doomgeneric convention applies. */
+    if (symbol > 0 && symbol < 128) {
+        return (unsigned char)tolower((int)symbol);
+    }
+    return 0;
 }
 
-static unsigned char doom_key(uint8_t keycode)
+static void queue_key(KeySym symbol, uint8_t pressed)
 {
-    switch (keycode) {
-    case 1: return KEY_ESCAPE;
-    case 14: return KEY_BACKSPACE;
-    case 15: return KEY_TAB;
-    case 28: return KEY_ENTER;
-    case 29: return KEY_FIRE;
-    case 42:
-    case 54: return KEY_RSHIFT;
-    case 56:
-    case 115: return KEY_RALT;
-    case 57: return KEY_USE;
-    case 59: return KEY_F1;
-    case 60: return KEY_F2;
-    case 61: return KEY_F3;
-    case 62: return KEY_F4;
-    case 63: return KEY_F5;
-    case 64: return KEY_F6;
-    case 65: return KEY_F7;
-    case 66: return KEY_F8;
-    case 67: return KEY_F9;
-    case 68: return KEY_F10;
-    case 87: return KEY_F11;
-    case 88: return KEY_F12;
-    case 72:
-    case 103: return KEY_UPARROW;
-    case 75:
-    case 105: return KEY_LEFTARROW;
-    case 77:
-    case 106: return KEY_RIGHTARROW;
-    case 80:
-    case 108: return KEY_DOWNARROW;
-    case 116: return KEY_RCTRL;
-    default:
-        break;
-    }
-    if (keycode >= 2 && keycode <= 11) {
-        return (unsigned char)(keycode == 11 ? '0' : '1' + keycode - 2);
-    }
-    if (keycode == 12) return '-';
-    if (keycode == 13) return '=';
-    if (keycode >= 16 && keycode <= 25) {
-        static const char keys[] = "qwertyuiop";
-        return (unsigned char)keys[keycode - 16];
-    }
-    if (keycode >= 30 && keycode <= 38) {
-        static const char keys[] = "asdfghjkl";
-        return (unsigned char)keys[keycode - 30];
-    }
-    if (keycode >= 44 && keycode <= 50) {
-        static const char keys[] = "zxcvbnm";
-        return (unsigned char)keys[keycode - 44];
-    }
-    switch (keycode) {
-    case 26: return '[';
-    case 27: return ']';
-    case 39: return ';';
-    case 40: return '\'';
-    case 41: return '`';
-    case 43: return '\\';
-    case 51: return ',';
-    case 52: return '.';
-    case 53: return '/';
-    default: return 0;
-    }
-}
-
-static void queue_key(uint8_t keycode, uint8_t pressed)
-{
-    unsigned char key = doom_key(keycode);
+    unsigned char key = doom_key(symbol);
     uint32_t next;
-    if (!key) {
-        return;
-    }
+    if (!key) return;
     next = (key_write + 1U) % DOOM_KEY_QUEUE_CAP;
     if (next == key_read) {
         key_read = (key_read + 1U) % DOOM_KEY_QUEUE_CAP;
@@ -121,76 +94,120 @@ static void queue_key(uint8_t keycode, uint8_t pressed)
 
 static void pump_events(void)
 {
-    struct reliefos_gui_app_event event = {.window_id = window_id};
-    while (reliefos_gui_poll_app_event(&event) > 0) {
-        if (event.type == RELIEFOS_GUI_APP_EVENT_CLOSE) {
-            reliefos_gui_set_mouse_visible(window_id, 1);
-            reliefos_gui_destroy_app_window(window_id);
-            exit(0);
+    if (!display) return;
+    while (XPending(display) > 0) {
+        XEvent event;
+        XNextEvent(display, &event);
+        if (event.type == KeyPress) {
+            queue_key(XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 0), 1);
+        } else if (event.type == KeyRelease) {
+            queue_key(XkbKeycodeToKeysym(display, event.xkey.keycode, 0, 0), 0);
+        } else if (event.type == ClientMessage &&
+                   (Atom)event.xclient.data.l[0] == wm_delete_window) {
+            I_Quit();
         }
-        if (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN ||
-            event.type == RELIEFOS_GUI_APP_EVENT_KEY_UP) {
-            queue_key(event.keycode, event.pressed);
-        }
-        event.window_id = window_id;
     }
+}
+
+/* Wrap the 0x00RRGGBB buffer in a temporary XImage; the pixels belong to the
+ * caller, so detach before freeing the wrapper. */
+static void present(const uint32_t *buffer)
+{
+    XImage *image;
+    if (!display || !buffer) return;
+    image = XCreateImage(display, DefaultVisual(display, DefaultScreen(display)),
+                         DefaultDepth(display, DefaultScreen(display)),
+                         ZPixmap, 0, (char *)buffer,
+                         DOOM_WINDOW_WIDTH, DOOM_WINDOW_HEIGHT, 32, 0);
+    if (!image) return;
+    XPutImage(display, window, gc, image, 0, 0, 0, 0,
+              DOOM_WINDOW_WIDTH, DOOM_WINDOW_HEIGHT);
+    image->data = NULL;
+    XDestroyImage(image);
+    XFlush(display);
 }
 
 void DG_Init(void)
 {
-    uint32_t flags = RELIEFOS_GUI_WINDOW_FULLSCREEN;
+    XColor black = {0};
+    Pixmap blank;
+    Cursor hidden;
     headless_mode = M_CheckParm("-headless") > 0;
     if (headless_mode) {
         /* Keep the normal Doom/WAD/audio initialization while making the
-         * runner independent of the framebuffer/Xorg presentation path. */
-        I_AtExit(restore_mouse, true);
+         * runner independent of the X presentation path. */
         return;
     }
-    if (M_CheckParm("-windowed") > 0) {
-        flags = RELIEFOS_GUI_WINDOW_NO_RESIZE;
-    }
-    window_id = (uint32_t)reliefos_gui_create_app_window_ex("Doom", "DoomGeneric",
-                                                             DOOM_WINDOW_WIDTH,
-                                                             DOOM_WINDOW_HEIGHT,
-                                                             flags);
-    if (!window_id) {
+    display = XOpenDisplay(NULL);
+    if (!display) {
         exit(1);
     }
-    if (flags & RELIEFOS_GUI_WINDOW_FULLSCREEN) {
-        reliefos_gui_set_mouse_visible(window_id, 0);
+    window = XCreateSimpleWindow(display, DefaultRootWindow(display), 0, 0,
+                                 DOOM_WINDOW_WIDTH, DOOM_WINDOW_HEIGHT,
+                                 0, BlackPixel(display, DefaultScreen(display)),
+                                 BlackPixel(display, DefaultScreen(display)));
+    XSelectInput(display, window,
+                 ExposureMask | KeyPressMask | KeyReleaseMask |
+                 StructureNotifyMask);
+    if (M_CheckParm("-windowed") <= 0) {
+        /* EWMH fullscreen; IceWM honors the request before mapping. */
+        Atom state = XInternAtom(display, "_NET_WM_STATE", False);
+        Atom fullscreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
+        XChangeProperty(display, window, state, XA_ATOM, 32, PropModeReplace,
+                        (unsigned char *)&fullscreen, 1);
     }
-    I_AtExit(restore_mouse, true);
+    wm_delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(display, window, &wm_delete_window, 1);
+    XStoreName(display, window, "Doom");
+    XMapWindow(display, window);
+    gc = XCreateGC(display, window, 0, NULL);
+    XkbSetDetectableAutoRepeat(display, 1, 0);
+    blank = XCreateBitmapFromData(display, window, (char *)"\0", 1, 1);
+    hidden = XCreatePixmapCursor(display, blank, blank, &black, &black, 0, 0);
+    XDefineCursor(display, window, hidden);
+    XFreePixmap(display, blank);
+    for (;;) {
+        XEvent event;
+        XNextEvent(display, &event);
+        if (event.type == MapNotify) break;
+    }
 }
 
 void DG_StartupProgress(uint32_t progress, const char *message)
 {
-    if (!window_id) {
-        return;
-    }
+    if (!display) return;
     if (progress > 100U) {
         progress = 100U;
     }
-    reliefos_ui_bind(&ui, frame, DOOM_WINDOW_WIDTH, DOOM_WINDOW_HEIGHT,
-                   DOOM_WINDOW_WIDTH);
-    reliefos_ui_rect(&ui, 0, 0, DOOM_WINDOW_WIDTH, DOOM_WINDOW_HEIGHT, 0x00101814U);
-    reliefos_ui_rect(&ui, 64, 104, DOOM_WINDOW_WIDTH - 128U, 192, 0x001d2c25U);
-    reliefos_ui_text(&ui, 96, 140, "DOOM", 0x00f0f5edU, 0x001d2c25U);
-    reliefos_ui_text(&ui, 96, 184, message ? message : "Loading", 0x00f0f5edU,
-                   0x001d2c25U);
-    reliefos_ui_progress(&ui, 96, 224, DOOM_WINDOW_WIDTH - 192U, 20, progress, 100);
-    reliefos_gui_present_window(window_id, DOOM_WINDOW_WIDTH, DOOM_WINDOW_HEIGHT,
-                               DOOM_WINDOW_WIDTH, frame);
-    sched_yield();
+    for (uint32_t i = 0; i < DOOM_WINDOW_WIDTH * DOOM_WINDOW_HEIGHT; ++i) {
+        frame[i] = 0x00101814U;
+    }
+    for (uint32_t y = 104; y < 296; ++y) {
+        for (uint32_t x = 64; x < DOOM_WINDOW_WIDTH - 64U; ++x) {
+            frame[y * DOOM_WINDOW_WIDTH + x] = 0x001d2c25U;
+        }
+    }
+    for (uint32_t y = 224; y < 244; ++y) {
+        for (uint32_t x = 96; x < DOOM_WINDOW_WIDTH - 96U; ++x) {
+            uint32_t filled = 96U + (uint32_t)((uint64_t)(DOOM_WINDOW_WIDTH - 192U) *
+                                               progress / 100U);
+            frame[y * DOOM_WINDOW_WIDTH + x] =
+                x < filled ? 0x007ab648U : 0x002a3f33U;
+        }
+    }
+    present(frame);
+    XSetForeground(display, gc, 0x00f0f5edU);
+    XDrawString(display, window, gc, 96, 150, "DOOM", 4);
+    if (message) {
+        XDrawString(display, window, gc, 96, 190, message, (int)strlen(message));
+    }
+    XFlush(display);
 }
 
 void DG_DrawFrame(void)
 {
-    if (!window_id || !DG_ScreenBuffer) {
-        return;
-    }
-    reliefos_gui_present_window(window_id, DOOM_WINDOW_WIDTH, DOOM_WINDOW_HEIGHT,
-                               DOOM_WINDOW_WIDTH, DG_ScreenBuffer);
     pump_events();
+    present(DG_ScreenBuffer);
 }
 
 void DG_SleepMs(uint32_t ms)
@@ -221,7 +238,9 @@ int DG_GetKey(int *pressed, unsigned char *key)
 
 void DG_SetWindowTitle(const char *title)
 {
-    (void)title;
+    if (display && window && title) {
+        XStoreName(display, window, title);
+    }
 }
 
 int main(int argc, char **argv, char **envp)
@@ -257,7 +276,5 @@ int main(int argc, char **argv, char **envp)
             I_Quit();
         }
     }
-    reliefos_gui_set_mouse_visible(window_id, 1);
-    reliefos_gui_destroy_app_window(window_id);
     return 0;
 }

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Paint
+Name[zh_CN]=画图
+Exec=/usr/bin/paint
+TryExec=/usr/bin/paint
+Icon=app
+Terminal=false
+Categories=Graphics;

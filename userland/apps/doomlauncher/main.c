@@ -1,43 +1,63 @@
-#include <reliefos/gui.h>
+#include "model.h"
 #include <libintl.h>
 #include <locale.h>
-#include <reliefos/layout.h>
+#include <reliefos/gui.h>
 #include <reliefos/launch.h>
 #include <reliefos/launch_result.h>
-#include <reliefos/psf_font.h>
-#include <reliefos/syscall.h>
-#include <reliefos/ui.h>
-#include <stdint.h>
 #include <reliefos/layout.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <X11/keysym.h>
+#include <Xm/Form.h>
+#include <Xm/Label.h>
+#include <Xm/Protocols.h>
+#include <Xm/PushB.h>
+#include <Xm/Text.h>
+#include <Xm/TextF.h>
+#include <Xm/ToggleB.h>
 
-#define LAUNCHER_W 640U
-#define LAUNCHER_H 320U
 #define DOOM_PATH RELIEFOS_LAYOUT_RELIEFOS_APPS "/doom/doom.elf"
 #define DEFAULT_IWAD RELIEFOS_LAYOUT_RELIEFOS_APPS "/doom/freedoom1.wad"
 #define TASK_STATE_EXITED 3U
+#define DOOM_POLL_MS 250U
 #define T(s) gettext(s)
 
-static uint32_t pixels[LAUNCHER_W * LAUNCHER_H];
-static char iwad_path[RELIEFOS_FS_PATH_LEN] = DEFAULT_IWAD;
-static char extra_args[128];
-static char status_text[160] = "Ready";
-static struct reliefos_ui_edit_state iwad_edit;
-static struct reliefos_ui_edit_state args_edit;
+static char status_text[160];
 static uint32_t doom_pid;
-static uint8_t disable_sound = 1;
-static uint8_t fullscreen;
+static XtAppContext app;
+static Widget shell;
+static Widget iwad_field;
+static Widget args_field;
+static Widget sound_check;
+static Widget fullscreen_check;
+static Widget launch_button;
+static Widget status_label;
 
 static void copy_text(char *dst, uint32_t capacity, const char *src)
 {
     uint32_t i = 0;
-    if (!dst || !capacity) {
-        return;
-    }
+    if (!dst || !capacity) return;
     while (src && src[i] && i + 1U < capacity) {
         dst[i] = src[i];
         ++i;
     }
     dst[i] = 0;
+}
+
+static void set_label(Widget widget, const char *text)
+{
+    XmString value = XmStringCreateLocalized((char *)text);
+    XtVaSetValues(widget, XmNlabelString, value, NULL);
+    XmStringFree(value);
+}
+
+static void set_status(const char *text)
+{
+    copy_text(status_text, sizeof(status_text), text);
+    set_label(status_label, status_text);
 }
 
 static void set_status_code(const char *prefix, int code)
@@ -67,6 +87,7 @@ static void set_status_code(const char *prefix, int code)
         status_text[pos++] = digits[--count];
     }
     status_text[pos] = 0;
+    set_label(status_label, status_text);
 }
 
 static const char *launcher_error_text(int code)
@@ -83,94 +104,76 @@ static const char *launcher_error_text(int code)
     }
 }
 
-static int hit(int32_t x, int32_t y, uint32_t rx, uint32_t ry, uint32_t rw, uint32_t rh)
+static void sync_controls(void)
 {
-    return x >= (int32_t)rx && y >= (int32_t)ry &&
-           x < (int32_t)(rx + rw) && y < (int32_t)(ry + rh);
-}
-
-static void draw_launcher(struct reliefos_ui_surface *ui)
-{
-    uint32_t launch_flags = doom_pid ? RELIEFOS_UI_BUTTON_DISABLED : 0;
-    reliefos_ui_rect(ui, 0, 0, LAUNCHER_W, LAUNCHER_H, RELIEFOS_UI_GRAY);
-    reliefos_ui_rect(ui, 0, 0, LAUNCHER_W, 42, RELIEFOS_UI_ACTIVE_TITLE);
-    reliefos_ui_text(ui, 22, 14, T("DOOM Launcher"), RELIEFOS_UI_WHITE,
-                   RELIEFOS_UI_ACTIVE_TITLE);
-    reliefos_ui_text(ui, 24, 60, T("IWAD path"), RELIEFOS_UI_BLACK,
-                   RELIEFOS_UI_GRAY);
-    reliefos_ui_edit_state_draw(ui, 24, 80, LAUNCHER_W - 48U, &iwad_edit, 0);
-    reliefos_ui_text(ui, 24, 118, T("Extra DOOM arguments"),
-                   RELIEFOS_UI_BLACK, RELIEFOS_UI_GRAY);
-    reliefos_ui_edit_state_draw(ui, 24, 138, LAUNCHER_W - 48U, &args_edit, 0);
-    reliefos_ui_checkbox(ui, 24, 178, T("Disable sound"), disable_sound, 0);
-    reliefos_ui_checkbox(ui, 208, 178, T("Fullscreen"), fullscreen, 0);
-    reliefos_ui_button(ui, 24, 216, 144, RELIEFOS_UI_BUTTON_H, T("Launch"),
-                     launch_flags);
-    reliefos_ui_button(ui, 178, 216, 104, RELIEFOS_UI_BUTTON_H, T("Reset"), 0);
-    if (doom_pid) {
-        reliefos_ui_activity_bar(ui, 24, 258, LAUNCHER_W - 48U, 10,
-                               (uint32_t)((reliefos_uptime_ms() / 4UL) % 1000UL));
-    }
-    reliefos_ui_statusbar(ui, LAUNCHER_H - 28U, 28, status_text);
+    XtVaSetValues(launch_button, XmNsensitive, doom_pid == 0, NULL);
 }
 
 static void reset_settings(void)
 {
-    copy_text(iwad_path, sizeof(iwad_path), DEFAULT_IWAD);
-    extra_args[0] = 0;
-    disable_sound = 1;
-    fullscreen = 0;
-    reliefos_ui_edit_state_sync(&iwad_edit);
-    reliefos_ui_edit_state_sync(&args_edit);
-    copy_text(status_text, sizeof(status_text), T("Settings reset"));
+    struct doomlauncher_options options;
+    doomlauncher_defaults(&options, DEFAULT_IWAD);
+    XmTextFieldSetString(iwad_field, options.iwad);
+    XmTextFieldSetString(args_field, "");
+    XmToggleButtonSetState(sound_check, options.disable_sound != 0, False);
+    XmToggleButtonSetState(fullscreen_check, options.fullscreen != 0, False);
+    set_status(T("Settings reset"));
 }
 
 static void launch_doom(void)
 {
-    char args_copy[sizeof(extra_args)];
-    char *argv[RELIEFOS_LAUNCH_MAX_ARGS + 1];
-    char *extra_argv[RELIEFOS_LAUNCH_MAX_ARGS + 1];
-    uint32_t argc = 0;
-    int extra_count;
+    struct doomlauncher_options options;
+    char *argv[DOOMLAUNCHER_MAX_ARGS];
+    char *extra_argv[DOOMLAUNCHER_MAX_ARGS];
+    char extra_copy[DOOMLAUNCHER_EXTRA_CAP];
+    char *iwad;
+    char *extra;
+    int extra_count = 0;
+    int built;
     int pid;
-
     if (doom_pid) {
         return;
     }
-    if (!iwad_path[0]) {
-        copy_text(status_text, sizeof(status_text), T("An IWAD path is required"));
+    iwad = XmTextGetString(iwad_field);
+    extra = XmTextGetString(args_field);
+    memset(&options, 0, sizeof(options));
+    copy_text(options.iwad, sizeof(options.iwad), iwad ? iwad : "");
+    copy_text(options.extra, sizeof(options.extra), extra ? extra : "");
+    options.disable_sound = XmToggleButtonGetState(sound_check) ? 1U : 0U;
+    options.fullscreen = XmToggleButtonGetState(fullscreen_check) ? 1U : 0U;
+    if (iwad) XtFree(iwad);
+    if (extra) XtFree(extra);
+    if (!options.iwad[0]) {
+        set_status(T("An IWAD path is required"));
         return;
     }
-    argv[argc++] = DOOM_PATH;
-    argv[argc++] = "-iwad";
-    argv[argc++] = iwad_path;
-    if (disable_sound) {
-        argv[argc++] = "-nosound";
-    }
-    if (!fullscreen) {
-        argv[argc++] = "-windowed";
-    }
-    copy_text(args_copy, sizeof(args_copy), extra_args);
-    extra_count = reliefos_cmdline_split(args_copy, extra_argv,
-                                       RELIEFOS_LAUNCH_MAX_ARGS - argc + 1U);
-    if (extra_args[0] && extra_count < 0) {
-        copy_text(status_text, sizeof(status_text), launcher_error_text(extra_count));
-        return;
-    }
-    if (extra_count > 0) {
-        for (int i = 0; i < extra_count; ++i) {
-            argv[argc++] = extra_argv[i];
+    copy_text(extra_copy, sizeof(extra_copy), options.extra);
+    if (options.extra[0]) {
+        extra_count = reliefos_cmdline_split(extra_copy, extra_argv,
+                                             DOOMLAUNCHER_MAX_ARGS);
+        if (extra_count < 0) {
+            set_status(launcher_error_text(extra_count));
+            return;
         }
     }
-    argv[argc] = 0;
+    built = doomlauncher_build_argv(DOOM_PATH, &options, extra_argv,
+                                    extra_count, argv, DOOMLAUNCHER_MAX_ARGS);
+    if (built == DOOMLAUNCHER_ERR_NO_IWAD) {
+        set_status(T("An IWAD path is required"));
+        return;
+    }
+    if (built < 0) {
+        set_status(T("Too many arguments"));
+        return;
+    }
     pid = reliefos_spawn_argv(DOOM_PATH, argv);
     if (pid < 0) {
         set_status_code(T("Launch failed: "), pid);
         return;
     }
     doom_pid = (uint32_t)pid;
-    copy_text(status_text, sizeof(status_text),
-               T("Starting DOOM: the game window shows loading progress"));
+    sync_controls();
+    set_status(T("Starting DOOM: the game window shows loading progress"));
 }
 
 static void update_doom_status(void)
@@ -178,7 +181,6 @@ static void update_doom_status(void)
     struct reliefos_task_info tasks[RELIEFOS_TASK_MAX];
     uint64_t tick;
     int snapshot_count;
-    uint32_t count;
     if (!doom_pid) {
         return;
     }
@@ -186,109 +188,179 @@ static void update_doom_status(void)
     if (snapshot_count < 0) {
         return;
     }
-    count = (uint32_t)snapshot_count;
-    (void)tick;
-    for (uint32_t i = 0; i < count; ++i) {
+    for (uint32_t i = 0; i < (uint32_t)snapshot_count; ++i) {
         if (tasks[i].pid != doom_pid) {
             continue;
         }
         if (tasks[i].state == TASK_STATE_EXITED) {
             int exit_status = 0;
             int reaped = wait4((int)doom_pid, &exit_status, 0, 0);
-            int code = reaped > 0 ? ((exit_status >> 8) & 0xff) : -1;
+            int code = doomlauncher_exit_code(reaped, exit_status);
             doom_pid = 0;
             set_status_code(T("DOOM exited with code "), code);
+            sync_controls();
         }
         return;
     }
     doom_pid = 0;
-    copy_text(status_text, sizeof(status_text), T("DOOM is no longer running"));
+    sync_controls();
+    set_status(T("DOOM is no longer running"));
 }
 
-static int handle_mouse(struct reliefos_gui_app_event *event)
+static void doom_poll_tick(XtPointer data, XtIntervalId *id)
 {
-    int changed = 0;
-    if (!event || !(event->buttons & 3U)) {
-        return 0;
-    }
-    if (hit(event->x, event->y, 24, 80, LAUNCHER_W - 48U, RELIEFOS_FONT_H + 8U)) {
-        args_edit.focused = 0;
-        changed |= reliefos_ui_edit_state_handle_mouse(&iwad_edit, event->x, event->y,
-                                                     24, 80, LAUNCHER_W - 48U,
-                                                     event->buttons);
-    } else if (hit(event->x, event->y, 24, 138, LAUNCHER_W - 48U, RELIEFOS_FONT_H + 8U)) {
-        iwad_edit.focused = 0;
-        changed |= reliefos_ui_edit_state_handle_mouse(&args_edit, event->x, event->y,
-                                                     24, 138, LAUNCHER_W - 48U,
-                                                     event->buttons);
-    } else {
-        iwad_edit.focused = 0;
-        args_edit.focused = 0;
-        if (hit(event->x, event->y, 24, 178, 156, RELIEFOS_UI_BUTTON_H)) {
-            disable_sound = !disable_sound;
-            changed = 1;
-        } else if (hit(event->x, event->y, 208, 178, 136, RELIEFOS_UI_BUTTON_H)) {
-            fullscreen = !fullscreen;
-            changed = 1;
-        } else if (hit(event->x, event->y, 24, 216, 144, RELIEFOS_UI_BUTTON_H)) {
-            launch_doom();
-            changed = 1;
-        } else if (hit(event->x, event->y, 178, 216, 104, RELIEFOS_UI_BUTTON_H)) {
-            reset_settings();
-            changed = 1;
-        }
-    }
-    return changed;
+    (void)data;
+    (void)id;
+    update_doom_status();
+    XtAppAddTimeOut(app, DOOM_POLL_MS, doom_poll_tick, NULL);
 }
 
-int main(void)
+static void field_activate(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    launch_doom();
+}
+
+static void button_launch(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    launch_doom();
+}
+
+static void button_reset(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    reset_settings();
+}
+
+static void close_window(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    XtAppSetExitFlag(app);
+}
+
+static void key(Widget widget, XtPointer data, XEvent *event, Boolean *dispatch)
+{
+    (void)widget;
+    (void)data;
+    if (event->type != KeyPress) return;
+    if (XLookupKeysym(&event->xkey, 0) == XK_Escape) {
+        close_window(widget, data, 0);
+        *dispatch = False;
+    }
+}
+
+/* Xt event handlers do not bubble to ancestors, so every widget that can hold
+ * keyboard focus needs its own registration (fileman/taskmgr do the same). */
+static void watch_keys(Widget widget)
+{
+    XtInsertEventHandler(widget, KeyPressMask, False, key, NULL, XtListHead);
+}
+
+/* The XmNfontList string resource can only describe core fonts, which have no
+ * CJK glyphs; route widgets to a CJK-capable Xft rendition instead. */
+static XmFontList app_font_list(Widget widget_shell)
+{
+    Arg args[3];
+    XmRendition rendition;
+    XtSetArg(args[0], XmNfontName, "SimSun");
+    XtSetArg(args[1], XmNfontType, XmFONT_IS_XFT);
+    XtSetArg(args[2], XmNloadModel, XmLOAD_IMMEDIATE);
+    rendition = XmRenditionCreate(widget_shell, XmFONTLIST_DEFAULT_TAG, args, 3);
+    XmFontList list = XmRenderTableAddRenditions(NULL, &rendition, 1, XmDUPLICATE);
+    XmRenditionFree(rendition);
+    return list;
+}
+
+int main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
     bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
     textdomain("leonos");
-    struct reliefos_ui_surface ui;
-    struct reliefos_gui_app_event event;
-    int window_id;
-
-    copy_text(status_text, sizeof(status_text), T("Ready"));
-    window_id = reliefos_gui_create_app_window_ex(T("DOOM Launcher"),
-                                                 T("Configure and start DOOM"),
-                                                 LAUNCHER_W, LAUNCHER_H,
-                                                 RELIEFOS_GUI_WINDOW_NO_RESIZE);
-    if (window_id <= 0) {
-        return 1;
+    XtSetLanguageProc(NULL, NULL, NULL);
+    char *fallback[] = {
+        "*background: #eceef4", "*foreground: #22242e",
+        "*highlightColor: #3b62a6", NULL
+    };
+    shell = XtVaAppInitialize(&app, "ReliefOSDoomLauncher", NULL, 0, &argc, argv,
+                              fallback, XtNtitle, T("DOOM Launcher"),
+                              XtNwidth, 640, XtNheight, 330, NULL);
+    {
+        XmFontList fonts = app_font_list(shell);
+        XtVaSetValues(shell, XmNlabelFontList, fonts,
+                      XmNbuttonFontList, fonts, XmNtextFontList, fonts, NULL);
     }
-    reliefos_ui_bind(&ui, pixels, LAUNCHER_W, LAUNCHER_H, LAUNCHER_W);
-    reliefos_ui_edit_state_init(&iwad_edit, iwad_path, sizeof(iwad_path));
-    reliefos_ui_edit_state_init(&args_edit, extra_args, sizeof(extra_args));
-    iwad_edit.focused = 1;
-
-    for (;;) {
-        event.window_id = (uint32_t)window_id;
-        if (reliefos_gui_wait_app_event(&event, 40U) > 0) {
-            if (event.type == RELIEFOS_GUI_APP_EVENT_CLOSE) {
-                break;
-            }
-            if (event.type == RELIEFOS_GUI_APP_EVENT_MOUSE_BUTTON) {
-                (void)handle_mouse(&event);
-            } else if (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN ||
-                       event.type == RELIEFOS_GUI_APP_EVENT_KEY_UP) {
-                if (event.pressed && event.keycode == RELIEFOS_KEY_ENTER && !doom_pid) {
-                    launch_doom();
-                } else {
-                    (void)reliefos_ui_edit_state_handle_key(&iwad_edit, event.keycode,
-                                                          event.pressed);
-                    (void)reliefos_ui_edit_state_handle_key(&args_edit, event.keycode,
-                                                          event.pressed);
-                }
-            }
-        }
-        update_doom_status();
-        draw_launcher(&ui);
-        reliefos_gui_present_window((uint32_t)window_id, LAUNCHER_W, LAUNCHER_H,
-                                  LAUNCHER_W, pixels);
-        sleep_ms(10);
-    }
-    reliefos_gui_destroy_app_window((uint32_t)window_id);
+    watch_keys(shell);
+    Widget form = XtVaCreateWidget("doomlauncher", xmFormWidgetClass, shell,
+        XmNresizePolicy, XmRESIZE_NONE, XmNmarginWidth, 12, XmNmarginHeight, 12, NULL);
+    Widget iwad_label = XtVaCreateManagedWidget("iwadLabel", xmLabelWidgetClass, form,
+        XmNalignment, XmALIGNMENT_BEGINNING,
+        XmNtopAttachment, XmATTACH_FORM,
+        XmNleftAttachment, XmATTACH_FORM, NULL);
+    set_label(iwad_label, T("IWAD path"));
+    iwad_field = XtVaCreateManagedWidget("iwadField", xmTextFieldWidgetClass, form,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, iwad_label,
+        XmNleftAttachment, XmATTACH_FORM,
+        XmNrightAttachment, XmATTACH_FORM, NULL);
+    XtAddCallback(iwad_field, XmNactivateCallback, field_activate, NULL);
+    watch_keys(iwad_field);
+    Widget args_label = XtVaCreateManagedWidget("argsLabel", xmLabelWidgetClass, form,
+        XmNalignment, XmALIGNMENT_BEGINNING,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, iwad_field,
+        XmNleftAttachment, XmATTACH_FORM, NULL);
+    set_label(args_label, T("Extra DOOM arguments"));
+    args_field = XtVaCreateManagedWidget("argsField", xmTextFieldWidgetClass, form,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, args_label,
+        XmNleftAttachment, XmATTACH_FORM,
+        XmNrightAttachment, XmATTACH_FORM, NULL);
+    XtAddCallback(args_field, XmNactivateCallback, field_activate, NULL);
+    watch_keys(args_field);
+    sound_check = XtVaCreateManagedWidget("disableSound", xmToggleButtonWidgetClass, form,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, args_field,
+        XmNleftAttachment, XmATTACH_FORM, NULL);
+    set_label(sound_check, T("Disable sound"));
+    fullscreen_check = XtVaCreateManagedWidget("fullscreen", xmToggleButtonWidgetClass, form,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, args_field,
+        XmNleftAttachment, XmATTACH_WIDGET, XmNleftWidget, sound_check, NULL);
+    set_label(fullscreen_check, T("Fullscreen"));
+    launch_button = XtVaCreateManagedWidget("launch", xmPushButtonWidgetClass, form,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, sound_check,
+        XmNleftAttachment, XmATTACH_FORM, NULL);
+    set_label(launch_button, T("Launch"));
+    XtAddCallback(launch_button, XmNactivateCallback, button_launch, NULL);
+    watch_keys(launch_button);
+    Widget reset_button = XtVaCreateManagedWidget("reset", xmPushButtonWidgetClass, form,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, sound_check,
+        XmNleftAttachment, XmATTACH_WIDGET, XmNleftWidget, launch_button, NULL);
+    set_label(reset_button, T("Reset"));
+    XtAddCallback(reset_button, XmNactivateCallback, button_reset, NULL);
+    watch_keys(reset_button);
+    watch_keys(sound_check);
+    watch_keys(fullscreen_check);
+    status_label = XtVaCreateManagedWidget("status", xmLabelWidgetClass, form,
+        XmNalignment, XmALIGNMENT_BEGINNING,
+        XmNbottomAttachment, XmATTACH_FORM,
+        XmNleftAttachment, XmATTACH_FORM,
+        XmNrightAttachment, XmATTACH_FORM, NULL);
+    reset_settings();
+    set_status(T("Ready"));
+    XtManageChild(form);
+    XtRealizeWidget(shell);
+    Atom delete_window = XInternAtom(XtDisplay(shell), "WM_DELETE_WINDOW", False);
+    XmAddWMProtocolCallback(shell, delete_window, close_window, NULL);
+    XtAppAddTimeOut(app, DOOM_POLL_MS, doom_poll_tick, NULL);
+    puts("[doomlauncher.elf] Motif DOOM launcher ready");
+    fflush(stdout);
+    XtAppMainLoop(app);
+    XtDestroyWidget(shell);
+    XtDestroyApplicationContext(app);
     return 0;
 }

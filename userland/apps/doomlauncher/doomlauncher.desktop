@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=DOOM Launcher
+Name[zh_CN]=DOOM 启动器
+Exec=/usr/bin/doomlauncher
+TryExec=/usr/bin/doomlauncher
+Icon=app
+Terminal=false
+Categories=Game;

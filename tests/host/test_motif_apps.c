@@ -1,12 +1,16 @@
 #include "engine.h"
 #include "debug_click.h"
 #include "model.h"
+#include "doomlauncher/model.h"
+#include "imageview/model.h"
 #include "leonmmcoset/model.h"
 #include "minesweeper/model.h"
+#include "paint/model.h"
 #include "xiaobai/model.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int main(void)
@@ -449,9 +453,140 @@ int main(void)
         assert(f.w == 0 && f.h == 0);
     }
 
+    /* Paint model: BMP codec round trip and brush stamping rules. */
+    {
+        uint32_t source[4] = {0x00ff0000u, 0x0000ff00u, 0x000000ffu, 0x00ffffffu};
+        uint8_t *data = 0;
+        uint32_t len = 0;
+        uint32_t *pixels = 0;
+        uint32_t w = 0, h = 0;
+        assert(paint_bmp_encode(source, 2, 2, &data, &len) == 0);
+        assert(data && len == 54 + 2 * 8); /* 24bpp rows pad to 8 bytes */
+        assert(paint_bmp_decode(data, len, &pixels, &w, &h) == 0);
+        assert(w == 2 && h == 2);
+        assert(pixels[0] == source[0] && pixels[1] == source[1]);
+        assert(pixels[2] == source[2] && pixels[3] == source[3]);
+        free(pixels);
+        pixels = 0;
+        assert(paint_bmp_decode(data, 30, &pixels, &w, &h) == -1);
+        data[0] = 'X';
+        assert(paint_bmp_decode(data, len, &pixels, &w, &h) == -1);
+        free(data);
+    }
+    {
+        uint32_t buffer[16 * 16];
+        memset(buffer, 0, sizeof(buffer));
+        paint_draw_point(buffer, 16, 16, 8, 8, 0x00112233u, 3, PAINT_TOOL_PENCIL);
+        assert(buffer[8 * 16 + 8] == 0x00112233u);
+        assert(buffer[7 * 16 + 7] == 0x00112233u); /* square dab */
+        assert(buffer[5 * 16 + 5] == 0);
+        memset(buffer, 0, sizeof(buffer));
+        paint_draw_point(buffer, 16, 16, 8, 8, 0x00112233u, 4, PAINT_TOOL_BRUSH);
+        assert(buffer[8 * 16 + 8] == 0x00112233u);
+        assert(buffer[6 * 16 + 6] == 0); /* circular dab clips the corner */
+        paint_draw_point(buffer, 16, 16, 8, 8, 0x00000000u, 4, PAINT_TOOL_ERASER);
+        assert(buffer[8 * 16 + 8] == 0x00ffffffu); /* eraser paints white */
+        memset(buffer, 0, sizeof(buffer));
+        paint_draw_line(buffer, 16, 16, 1, 1, 14, 14, 0x00aa5500u, 2,
+                        PAINT_TOOL_PENCIL);
+        assert(buffer[1 * 16 + 1] == 0x00aa5500u);
+        assert(buffer[8 * 16 + 8] == 0x00aa5500u); /* interpolation has no gaps */
+        assert(buffer[14 * 16 + 14] == 0x00aa5500u);
+        paint_draw_point(buffer, 16, 16, 0, 0, 0x00000001u, 14, PAINT_TOOL_BRUSH);
+        paint_draw_line(buffer, 16, 16, 15, 15, 0, 15, 0x00000001u, 2,
+                        PAINT_TOOL_PENCIL);
+    }
+
+    /* Image viewer model: extension filter, zoom math, navigation, detail. */
+    {
+        uint32_t w = 0, h = 0;
+        char text[64];
+        assert(imageview_is_supported_path("a/b/c.bmp"));
+        assert(imageview_is_supported_path("C.PNG"));
+        assert(imageview_is_supported_path("x.dib"));
+        assert(!imageview_is_supported_path("x.txt"));
+        assert(!imageview_is_supported_path(""));
+        assert(!imageview_is_supported_path(0));
+        imageview_zoom_dims(100, 50, IMAGEVIEW_ZOOM_FIT, 100, 100, &w, &h);
+        assert(w == 100 && h == 50);
+        imageview_zoom_dims(100, 50, IMAGEVIEW_ZOOM_FIT, 25, 100, &w, &h);
+        assert(w == 25 && h == 12);
+        imageview_zoom_dims(100, 50, IMAGEVIEW_ZOOM_1X, 10, 10, &w, &h);
+        assert(w == 100 && h == 50);
+        imageview_zoom_dims(100, 50, IMAGEVIEW_ZOOM_2X, 10, 10, &w, &h);
+        assert(w == 200 && h == 100);
+        assert(imageview_next_index(0, 3, -1) == 2);
+        assert(imageview_next_index(2, 3, 1) == 0);
+        assert(imageview_next_index(1, 3, 1) == 2);
+        assert(imageview_next_index(1, 3, -1) == 0);
+        assert(imageview_next_index(4, 1, 1) == 0);
+        imageview_format_detail(text, sizeof(text), 800, 600, IMAGEVIEW_ZOOM_FIT, 1, 5);
+        assert(strcmp(text, "800x600  Fit  2/5") == 0);
+        imageview_format_detail(text, sizeof(text), 800, 600, IMAGEVIEW_ZOOM_2X, 0, 0);
+        assert(strcmp(text, "800x600  2x") == 0);
+        imageview_format_detail(text, sizeof(text), 0, 0, IMAGEVIEW_ZOOM_1X, 0, 1);
+        assert(text[0] == 0);
+    }
+    {
+        uint32_t source[4] = {0x00010203u, 0x00040506u, 0x00070809u, 0x000a0b0cu};
+        uint8_t *data = 0;
+        uint32_t len = 0;
+        uint32_t *pixels = 0;
+        uint32_t w = 0, h = 0;
+        assert(paint_bmp_encode(source, 2, 2, &data, &len) == 0);
+        assert(imageview_bmp_decode(data, len, &pixels, &w, &h) == 0);
+        assert(w == 2 && h == 2);
+        assert(pixels[0] == source[0] && pixels[3] == source[3]);
+        free(pixels);
+        data[0] = 'X';
+        pixels = 0;
+        assert(imageview_bmp_decode(data, len, &pixels, &w, &h) == -1);
+        free(data);
+    }
+
+    /* DOOM launcher model: argv assembly, overflow and exit-code mapping. */
+    {
+        struct doomlauncher_options options;
+        char *argv[DOOMLAUNCHER_MAX_ARGS];
+        char *extra[2];
+        int argc;
+        doomlauncher_defaults(&options, "/doom/freedoom1.wad");
+        assert(strcmp(options.iwad, "/doom/freedoom1.wad") == 0);
+        assert(options.disable_sound == 1 && options.fullscreen == 0);
+        argc = doomlauncher_build_argv("/doom/doom.elf", &options, 0, 0, argv,
+                                       DOOMLAUNCHER_MAX_ARGS);
+        assert(argc == 5);
+        assert(strcmp(argv[0], "/doom/doom.elf") == 0);
+        assert(strcmp(argv[1], "-iwad") == 0);
+        assert(strcmp(argv[2], "/doom/freedoom1.wad") == 0);
+        assert(strcmp(argv[3], "-nosound") == 0);
+        assert(strcmp(argv[4], "-windowed") == 0);
+        assert(argv[5] == 0);
+        options.disable_sound = 0;
+        options.fullscreen = 1;
+        extra[0] = "-skill";
+        extra[1] = "4";
+        argc = doomlauncher_build_argv("/doom/doom.elf", &options, extra, 2, argv,
+                                       DOOMLAUNCHER_MAX_ARGS);
+        assert(argc == 5);
+        assert(strcmp(argv[3], "-skill") == 0 && strcmp(argv[4], "4") == 0);
+        assert(argv[5] == 0);
+        options.iwad[0] = 0;
+        assert(doomlauncher_build_argv("/doom/doom.elf", &options, 0, 0, argv,
+                                       DOOMLAUNCHER_MAX_ARGS) ==
+               DOOMLAUNCHER_ERR_NO_IWAD);
+        options.iwad[0] = '/';
+        assert(doomlauncher_build_argv("/doom/doom.elf", &options, extra, 2, argv,
+                                       5) == DOOMLAUNCHER_ERR_TOO_MANY_ARGS);
+        assert(doomlauncher_exit_code(1, 0x200) == 2);
+        assert(doomlauncher_exit_code(1, 0xff) == 0);
+        assert(doomlauncher_exit_code(0, 0x200) == -1);
+    }
+
     puts("ok - calculator arithmetic, editing, bounds and logo click timing");
     puts("ok - task manager formatting, utilization, history ring and tree order");
     puts("ok - minesweeper placement, reveal, flags, win/lose and sprite parsing");
     puts("ok - easter egg image fitting for leonmmcoset and xiaobai");
+    puts("ok - paint brushes, image viewer scaling and DOOM launcher argv");
     return 0;
 }

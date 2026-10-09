@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Doom
+Name[zh_CN]=毁灭战士
+Exec=/usr/bin/doom
+TryExec=/usr/bin/doom
+Icon=app
+Terminal=false
+Categories=Game;

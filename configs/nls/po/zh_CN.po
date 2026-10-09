@@ -1283,6 +1283,10 @@ msgid "Disabled"
 msgstr "已禁用"
 
 #: userland/apps/paint/main.c:467
+msgid "Discard"
+msgstr "放弃"
+
+#: userland/apps/paint/main.c:467
 msgid "Discard changes?"
 msgstr "放弃更改？"
 
@@ -4381,6 +4385,10 @@ msgstr "正在升级已签名的 ReliefOS 软件包"
 #: userland/apps/taskmgr/main.c:1065
 msgid "Uptime:"
 msgstr "运行时间:"
+
+#: userland/apps/imageview/main.c:463
+msgid "Use Open to choose a BMP or PNG image."
+msgstr "用“打开”选择 BMP 或 PNG 图像。"
 
 #: userland/apps/imageview/main.c:463
 msgid "Use Open, File Manager, Run, or the command line to open a BMP or PNG file."

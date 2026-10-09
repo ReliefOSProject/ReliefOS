@@ -26,16 +26,16 @@ X11_DEVELOPMENT_PRODUCTS := $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/Xm/
 $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK)
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(X11_DEVELOPMENT_ROOT))
 	$(Q)touch $(X11_DEVELOPMENT_PRODUCTS)
-$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai,$(eval USERLAND_EXTRA_$(app) := -I$(X11_DEVELOPMENT_ROOT)/usr/include))
-$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai,$(eval USERLAND_LIBS_$(app) := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libXm.so libXt.so libX11.so)))
-$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai,$(eval USERLAND_DEPS_$(app) := $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
+$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher,$(eval USERLAND_EXTRA_$(app) := -I$(X11_DEVELOPMENT_ROOT)/usr/include))
+$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher,$(eval USERLAND_LIBS_$(app) := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libXm.so libXt.so libX11.so)))
+$(foreach app,calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher,$(eval USERLAND_DEPS_$(app) := $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
 USERLAND_DEPS_osver += $(BUILD_INFO_HEADER)
 .PHONY: x11-development
 x11-development: $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)
 
-USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric -I$(AUDIO_OPL_ROOT)/usr/include
-USERLAND_LIBS_doom = $(AUDIO_OPL_ROOT)/usr/lib/libopl3.so.1 $(RUNTIME_BUILTINS)
-USERLAND_DEPS_doom = $(upstream_nuked-opl3_products)
+USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric -I$(AUDIO_OPL_ROOT)/usr/include -I$(X11_DEVELOPMENT_ROOT)/usr/include
+USERLAND_LIBS_doom = $(AUDIO_OPL_ROOT)/usr/lib/libopl3.so.1 $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so $(RUNTIME_BUILTINS)
+USERLAND_DEPS_doom = $(upstream_nuked-opl3_products) $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)
 USERLAND_EXTRA_mp3play := -I$(RELIEFOS_SRC)/third_party/minimp3
 USERLAND_EXTRA_glxgears = -I$(RELIEFOS_SRC)/third_party/portablegl -I$(RELIEFOS_SRC)/userland/apps/glxgears -I$(dir $(GLXGEARS_SOURCE))
 PORTABLEGL_SO ?= $(O)/userland/libportablegl.so.1

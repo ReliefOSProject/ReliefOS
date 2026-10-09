@@ -1275,6 +1275,10 @@ msgid "Disabled"
 msgstr ""
 
 #: userland/apps/paint/main.c:467
+msgid "Discard"
+msgstr ""
+
+#: userland/apps/paint/main.c:467
 msgid "Discard changes?"
 msgstr ""
 
@@ -4372,6 +4376,10 @@ msgstr ""
 
 #: userland/apps/taskmgr/main.c:1065
 msgid "Uptime:"
+msgstr ""
+
+#: userland/apps/imageview/main.c:463
+msgid "Use Open to choose a BMP or PNG image."
 msgstr ""
 
 #: userland/apps/imageview/main.c:463

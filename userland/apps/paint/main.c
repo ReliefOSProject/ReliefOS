@@ -1,92 +1,67 @@
-#include <reliefos/gui.h>
+#include "model.h"
 #include <libintl.h>
 #include <locale.h>
 #include <reliefos/layout.h>
 #include <reliefos/png.h>
-#include <reliefos/stdio.h>
-#include <reliefos/ui.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <poll.h>
 #include <png.h>
-#include <sys/stat.h>
-#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
+#include <X11/keysym.h>
+#include <Xm/Form.h>
+#include <Xm/Label.h>
+#include <Xm/Protocols.h>
+#include <Xm/PushB.h>
+#include <Xm/ToggleB.h>
+#include <Xm/DrawingA.h>
+#include <Xm/FileSB.h>
+#include <Xm/MessageB.h>
+#include <Xm/Text.h>
 
-#define PAINT_W 1000U
-#define PAINT_H 700U
-#define PAINT_MIN_W 560U
-#define PAINT_MIN_H 400U
-#define PAINT_MAX_W RELIEFOS_GUI_MAX_WINDOW_WIDTH
-#define PAINT_MAX_H RELIEFOS_GUI_MAX_WINDOW_HEIGHT
-#define PAINT_MAX_PIXELS (1024U * 1024U)
 #define PAINT_PATH_CAP PATH_MAX
-#define TOOLBAR_H 44U
-#define STATUS_H 26U
-#define CANVAS_MARGIN 10U
 #define T(s) gettext(s)
 
-enum paint_tool {
-    TOOL_PENCIL = 0,
-    TOOL_BRUSH,
-    TOOL_ERASER,
-};
-
-static uint32_t *screen_pixels;
-static uint32_t screen_stride;
-static uint32_t screen_height;
 static uint32_t *canvas;
 static uint32_t canvas_w;
 static uint32_t canvas_h;
-static uint32_t view_w = PAINT_W;
-static uint32_t view_h = PAINT_H;
 static uint32_t color = 0x00000000U;
 static uint32_t brush_size = 4U;
-static uint32_t tool = TOOL_BRUSH;
+static enum paint_tool tool = PAINT_TOOL_BRUSH;
 static uint8_t drawing;
-static uint8_t ctrl_down;
 static uint8_t dirty;
+static uint32_t stroke_x, stroke_y;
 static char current_path[PAINT_PATH_CAP];
-static char status_text[160];
+static XtAppContext app;
+static Widget shell;
+static Widget drawing_area;
+static Widget status_label;
+static Widget tool_buttons[3];
+static Widget size_buttons[3];
+static Widget swatch_buttons[6];
+static Display *display;
+static GC gc;
 
-static int ensure_screen_buffer(void)
-{
-    uint64_t pixel_count = (uint64_t)view_w * view_h;
-    uint32_t *next;
-    if (!view_w || !view_h || pixel_count > (uint64_t)PAINT_MAX_W * PAINT_MAX_H) {
-        return -1;
-    }
-    if (screen_pixels && screen_stride == view_w && screen_height == view_h) {
-        return 0;
-    }
-    next = (uint32_t *)malloc((size_t)pixel_count * sizeof(uint32_t));
-    if (!next) {
-        return -1;
-    }
-    free(screen_pixels);
-    screen_pixels = next;
-    screen_stride = view_w;
-    screen_height = view_h;
-    return 0;
-}
+static const uint32_t swatch_colors[6] = {
+    0x00000000U, 0x00ff0000U, 0x000080ffU,
+    0x0000aa00U, 0x00ffff00U, 0x00ffffffU
+};
+static const uint32_t brush_sizes[3] = {2U, 6U, 14U};
 
 static uint32_t text_len(const char *s)
 {
     uint32_t n = 0;
-    while (s && s[n]) {
-        ++n;
-    }
+    while (s && s[n]) ++n;
     return n;
 }
 
 static void copy_text(char *dst, uint32_t cap, const char *src)
 {
     uint32_t i = 0;
-    if (!dst || cap == 0) {
-        return;
-    }
+    if (!dst || cap == 0) return;
     while (src && src[i] && i + 1U < cap) {
         dst[i] = src[i];
         ++i;
@@ -94,61 +69,31 @@ static void copy_text(char *dst, uint32_t cap, const char *src)
     dst[i] = 0;
 }
 
-static int text_eq_ci(const char *a, const char *b)
-{
-    uint32_t i = 0;
-    while (a && b && a[i] && b[i]) {
-        char ca = a[i];
-        char cb = b[i];
-        if (ca >= 'A' && ca <= 'Z') ca = (char)(ca - 'A' + 'a');
-        if (cb >= 'A' && cb <= 'Z') cb = (char)(cb - 'A' + 'a');
-        if (ca != cb) return 0;
-        ++i;
-    }
-    return (!a || !a[i]) && (!b || !b[i]);
-}
-
 static int ends_ci(const char *path, const char *suffix)
 {
     uint32_t path_len = text_len(path);
     uint32_t suffix_len = text_len(suffix);
-    return suffix_len <= path_len &&
-           text_eq_ci(path + path_len - suffix_len, suffix);
+    if (suffix_len > path_len) return 0;
+    for (uint32_t i = 0; i < suffix_len; ++i) {
+        char a = path[path_len - suffix_len + i];
+        char b = suffix[i];
+        if (a >= 'A' && a <= 'Z') a = (char)(a - 'A' + 'a');
+        if (b >= 'A' && b <= 'Z') b = (char)(b - 'A' + 'a');
+        if (a != b) return 0;
+    }
+    return 1;
 }
 
-static uint32_t read_le16(const uint8_t *p)
+static void set_label(Widget widget, const char *text)
 {
-    return (uint32_t)p[0] | ((uint32_t)p[1] << 8);
-}
-
-static uint32_t read_le32(const uint8_t *p)
-{
-    return (uint32_t)p[0] | ((uint32_t)p[1] << 8) |
-           ((uint32_t)p[2] << 16) | ((uint32_t)p[3] << 24);
-}
-
-static int32_t read_le32s(const uint8_t *p)
-{
-    return (int32_t)read_le32(p);
-}
-
-static void write_le16(uint8_t *p, uint32_t value)
-{
-    p[0] = (uint8_t)value;
-    p[1] = (uint8_t)(value >> 8);
-}
-
-static void write_le32(uint8_t *p, uint32_t value)
-{
-    p[0] = (uint8_t)value;
-    p[1] = (uint8_t)(value >> 8);
-    p[2] = (uint8_t)(value >> 16);
-    p[3] = (uint8_t)(value >> 24);
+    XmString value = XmStringCreateLocalized((char *)text);
+    XtVaSetValues(widget, XmNlabelString, value, NULL);
+    XmStringFree(value);
 }
 
 static void set_status(const char *text)
 {
-    copy_text(status_text, sizeof(status_text), text);
+    set_label(status_label, text);
 }
 
 static void free_canvas(void)
@@ -159,26 +104,44 @@ static void free_canvas(void)
     canvas_h = 0;
 }
 
+static void refresh_canvas(void)
+{
+    XImage *image;
+    if (!canvas || !canvas_w || !canvas_h) return;
+    image = XCreateImage(display, DefaultVisual(display, DefaultScreen(display)),
+                         DefaultDepth(display, DefaultScreen(display)),
+                         ZPixmap, 0, (char *)canvas, canvas_w, canvas_h, 32, 0);
+    if (!image) return;
+    XPutImage(display, XtWindow(drawing_area), gc, image, 0, 0, 0, 0,
+              canvas_w, canvas_h);
+    /* The pixels belong to the canvas; detach before freeing the wrapper. */
+    image->data = NULL;
+    XDestroyImage(image);
+}
+
+static void canvas_expose(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)data;
+    (void)call;
+    refresh_canvas();
+}
+
 static int new_canvas(uint32_t width, uint32_t height)
 {
     uint64_t pixels = (uint64_t)width * height;
     uint32_t *next;
-    if (!width || !height || pixels > PAINT_MAX_PIXELS) {
-        return -1;
-    }
+    if (!width || !height || pixels > PAINT_MAX_PIXELS) return -1;
     next = (uint32_t *)malloc((size_t)pixels * sizeof(uint32_t));
-    if (!next) {
-        return -1;
-    }
-    for (uint64_t i = 0; i < pixels; ++i) {
-        next[i] = 0x00ffffffU;
-    }
+    if (!next) return -1;
+    for (uint64_t i = 0; i < pixels; ++i) next[i] = 0x00ffffffU;
     free_canvas();
     canvas = next;
     canvas_w = width;
     canvas_h = height;
     dirty = 0;
     current_path[0] = 0;
+    XtVaSetValues(drawing_area, XmNwidth, (int)width, XmNheight, (int)height, NULL);
     return 0;
 }
 
@@ -208,44 +171,6 @@ static int read_file(const char *path, uint8_t **out, uint32_t *out_len)
     return 0;
 }
 
-static int decode_bmp(const uint8_t *data, uint32_t len,
-                      uint32_t **out, uint32_t *out_w, uint32_t *out_h)
-{
-    int32_t width_s;
-    int32_t height_s;
-    uint32_t width, height, offset, bpp, compression, stride;
-    uint32_t *pixels;
-    if (!data || len < 54U || data[0] != 'B' || data[1] != 'M') return -1;
-    offset = read_le32(data + 10);
-    if (read_le32(data + 14) < 40U || offset >= len) return -1;
-    width_s = read_le32s(data + 18);
-    height_s = read_le32s(data + 22);
-    bpp = read_le16(data + 28);
-    compression = read_le32(data + 30);
-    if (width_s <= 0 || height_s == 0 || compression != 0U ||
-        (bpp != 24U && bpp != 32U)) return -1;
-    width = (uint32_t)width_s;
-    height = height_s < 0 ? (uint32_t)(-height_s) : (uint32_t)height_s;
-    stride = ((width * bpp + 31U) / 32U) * 4U;
-    if (!width || !height || (uint64_t)width * height > PAINT_MAX_PIXELS ||
-        (uint64_t)offset + (uint64_t)stride * height > len) return -1;
-    pixels = (uint32_t *)malloc((size_t)width * height * sizeof(uint32_t));
-    if (!pixels) return -1;
-    for (uint32_t y = 0; y < height; ++y) {
-        uint32_t sy = height_s < 0 ? y : height - 1U - y;
-        const uint8_t *row = data + offset + (uint64_t)sy * stride;
-        for (uint32_t x = 0; x < width; ++x) {
-            const uint8_t *px = row + x * (bpp / 8U);
-            pixels[y * width + x] = ((uint32_t)px[2] << 16) |
-                                     ((uint32_t)px[1] << 8) | px[0];
-        }
-    }
-    *out = pixels;
-    *out_w = width;
-    *out_h = height;
-    return 0;
-}
-
 static int load_image(const char *path)
 {
     uint32_t *pixels = 0;
@@ -257,7 +182,7 @@ static int load_image(const char *path)
         ret = reliefos_png_decode_file(path, &pixels, &width, &height);
     } else {
         ret = read_file(path, &data, &len);
-        if (ret == 0) ret = decode_bmp(data, len, &pixels, &width, &height);
+        if (ret == 0) ret = paint_bmp_decode(data, len, &pixels, &width, &height);
         free(data);
     }
     if (ret < 0 || !pixels || width == 0 || height == 0) {
@@ -271,6 +196,7 @@ static int load_image(const char *path)
     canvas_h = height;
     copy_text(current_path, sizeof(current_path), path);
     dirty = 0;
+    XtVaSetValues(drawing_area, XmNwidth, (int)width, XmNheight, (int)height, NULL);
     set_status(T("Image opened"));
     return 0;
 }
@@ -289,43 +215,17 @@ static int write_all(int fd, const void *buffer, uint32_t length)
 
 static int save_bmp(const char *path)
 {
-    uint8_t header[54];
-    uint32_t stride = ((canvas_w * 24U + 31U) / 32U) * 4U;
-    uint32_t file_size = 54U + stride * canvas_h;
-    uint8_t *row;
+    uint8_t *data = 0;
+    uint32_t len = 0;
     int fd;
-    memset(header, 0, sizeof(header));
-    header[0] = 'B'; header[1] = 'M';
-    write_le32(header + 2, file_size);
-    write_le32(header + 10, 54U);
-    write_le32(header + 14, 40U);
-    write_le32(header + 18, canvas_w);
-    write_le32(header + 22, canvas_h);
-    write_le16(header + 26, 1U);
-    write_le16(header + 28, 24U);
-    write_le32(header + 34, stride * canvas_h);
+    int ret;
+    if (paint_bmp_encode(canvas, canvas_w, canvas_h, &data, &len) < 0) return -1;
     fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-    if (fd < 0) return fd;
-    row = (uint8_t *)malloc(stride);
-    if (!row || write_all(fd, header, sizeof(header)) < 0) {
-        free(row); close(fd); return -1;
-    }
-    for (uint32_t y = 0; y < canvas_h; ++y) {
-        uint32_t sy = canvas_h - 1U - y;
-        memset(row, 0, stride);
-        for (uint32_t x = 0; x < canvas_w; ++x) {
-            uint32_t pixel = canvas[sy * canvas_w + x];
-            row[x * 3U] = (uint8_t)pixel;
-            row[x * 3U + 1U] = (uint8_t)(pixel >> 8);
-            row[x * 3U + 2U] = (uint8_t)(pixel >> 16);
-        }
-        if (write_all(fd, row, stride) < 0) {
-            free(row); close(fd); return -1;
-        }
-    }
-    free(row);
+    if (fd < 0) { free(data); return fd; }
+    ret = write_all(fd, data, len);
+    free(data);
     close(fd);
-    return 0;
+    return ret;
 }
 
 static int save_png(const char *path)
@@ -369,75 +269,148 @@ static int save_image(const char *path)
     return 0;
 }
 
-static int hit(int32_t x, int32_t y, uint32_t rx, uint32_t ry,
-               uint32_t w, uint32_t h)
-{
-    return x >= (int32_t)rx && y >= (int32_t)ry &&
-           x < (int32_t)(rx + w) && y < (int32_t)(ry + h);
-}
+/* Modal Motif dialogs run a nested event loop until a callback settles them. */
+struct dialog_result {
+    int done;
+    int outcome;
+    char path[PAINT_PATH_CAP];
+};
 
-static uint32_t canvas_x(void) { return CANVAS_MARGIN; }
-static uint32_t canvas_y(void) { return TOOLBAR_H; }
-static uint32_t canvas_view_w(void)
+static void file_ok(Widget widget, XtPointer data, XtPointer call)
 {
-    return view_w > CANVAS_MARGIN * 2U ? view_w - CANVAS_MARGIN * 2U : 1U;
-}
-static uint32_t canvas_view_h(void)
-{
-    return view_h > TOOLBAR_H + STATUS_H + CANVAS_MARGIN
-               ? view_h - TOOLBAR_H - STATUS_H - CANVAS_MARGIN : 1U;
-}
-
-static int point_to_canvas(int32_t x, int32_t y, uint32_t *out_x, uint32_t *out_y)
-{
-    uint32_t vw = canvas_view_w();
-    uint32_t vh = canvas_view_h();
-    if (x < (int32_t)canvas_x() || y < (int32_t)canvas_y() ||
-        x >= (int32_t)(canvas_x() + vw) || y >= (int32_t)(canvas_y() + vh)) return 0;
-    *out_x = (uint32_t)((uint64_t)(x - (int32_t)canvas_x()) * canvas_w / vw);
-    *out_y = (uint32_t)((uint64_t)(y - (int32_t)canvas_y()) * canvas_h / vh);
-    if (*out_x >= canvas_w) *out_x = canvas_w - 1U;
-    if (*out_y >= canvas_h) *out_y = canvas_h - 1U;
-    return 1;
-}
-
-static void paint_point(uint32_t px, uint32_t py)
-{
-    int32_t radius = (int32_t)(brush_size / 2U);
-    uint32_t paint_color = tool == TOOL_ERASER ? 0x00ffffffU : color;
-    if (radius < 1) radius = 1;
-    for (int32_t y = -radius; y <= radius; ++y) {
-        for (int32_t x = -radius; x <= radius; ++x) {
-            int32_t xx = (int32_t)px + x;
-            int32_t yy = (int32_t)py + y;
-            if (tool == TOOL_BRUSH && x * x + y * y > radius * radius) continue;
-            if (xx >= 0 && yy >= 0 && (uint32_t)xx < canvas_w && (uint32_t)yy < canvas_h)
-                canvas[(uint32_t)yy * canvas_w + (uint32_t)xx] = paint_color;
-        }
+    struct dialog_result *result = (struct dialog_result *)data;
+    XmFileSelectionBoxCallbackStruct *cb =
+        (XmFileSelectionBoxCallbackStruct *)call;
+    char *name = 0;
+    if (cb->value) {
+        XmStringGetLtoR(cb->value, XmFONTLIST_DEFAULT_TAG, &name);
     }
-    dirty = 1;
+    if (!name) {
+        name = XmTextGetString(XmFileSelectionBoxGetChild(widget, XmDIALOG_TEXT));
+    }
+    if (name) {
+        copy_text(result->path, sizeof(result->path), name);
+        XtFree(name);
+    }
+    result->outcome = 1;
+    result->done = 1;
 }
 
-static void paint_line(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1)
+static void dialog_settle(Widget widget, XtPointer data, XtPointer call)
 {
-    int32_t dx = (int32_t)x1 - (int32_t)x0;
-    int32_t dy = (int32_t)y1 - (int32_t)y0;
-    int32_t steps = dx < 0 ? -dx : dx;
-    int32_t abs_dy = dy < 0 ? -dy : dy;
-    if (abs_dy > steps) steps = abs_dy;
-    if (steps == 0) { paint_point(x0, y0); return; }
-    for (int32_t i = 0; i <= steps; ++i) {
-        paint_point((uint32_t)((int32_t)x0 + dx * i / steps),
-                    (uint32_t)((int32_t)y0 + dy * i / steps));
+    struct dialog_result *result = (struct dialog_result *)data;
+    (void)widget;
+    (void)call;
+    result->done = 1;
+}
+
+static void dialog_ok(Widget widget, XtPointer data, XtPointer call)
+{
+    struct dialog_result *result = (struct dialog_result *)data;
+    result->outcome = 1;
+    dialog_settle(widget, data, call);
+}
+
+static void dialog_cancel(Widget widget, XtPointer data, XtPointer call)
+{
+    struct dialog_result *result = (struct dialog_result *)data;
+    result->outcome = 0;
+    dialog_settle(widget, data, call);
+}
+
+static void dialog_help(Widget widget, XtPointer data, XtPointer call)
+{
+    struct dialog_result *result = (struct dialog_result *)data;
+    result->outcome = -1;
+    dialog_settle(widget, data, call);
+}
+
+static void pump_until_done(struct dialog_result *result)
+{
+    while (!result->done) {
+        XEvent event;
+        XtAppNextEvent(app, &event);
+        XtDispatchEvent(&event);
     }
+}
+
+/* A modal dialog can map below its transient parent under some window
+ * managers, leaving the app blocked on an invisible question; raise the
+ * dialog shell as soon as it maps. */
+static void raise_dialog(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget;
+    (void)call;
+    Widget shell = (Widget)data;
+    Window window = XtWindow(shell);
+    if (window)
+        XRaiseWindow(XtDisplay(shell), window);
+}
+
+static int run_file_dialog(const char *title, const char *initial, char *path,
+                           uint32_t cap)
+{
+    struct dialog_result result = {0, 0, {0}};
+    Widget dialog = XmCreateFileSelectionDialog(shell, "fileDialog", NULL, 0);
+    XmString title_text = XmStringCreateLocalized((char *)title);
+    XmString initial_text = XmStringCreateLocalized((char *)initial);
+    XtVaSetValues(dialog, XmNdialogTitle, title_text, XmNdirSpec, initial_text,
+                  XmNautoUnmanage, True, NULL);
+    XmStringFree(title_text);
+    XmStringFree(initial_text);
+    XtUnmanageChild(XmFileSelectionBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
+    XtAddCallback(dialog, XmNokCallback, file_ok, &result);
+    XtAddCallback(dialog, XmNcancelCallback, dialog_cancel, &result);
+    XtAddCallback(dialog, XmNmapCallback, raise_dialog, XtParent(dialog));
+    XtManageChild(dialog);
+    pump_until_done(&result);
+    XtUnmanageChild(dialog);
+    XtDestroyWidget(dialog);
+    if (result.outcome > 0 && result.path[0]) {
+        copy_text(path, cap, result.path);
+        return 1;
+    }
+    return result.outcome;
+}
+
+/* OK=1, Cancel=0, Help/abort=-1; pass help_label=NULL for a two-way dialog. */
+static int run_question(const char *title, const char *text,
+                        const char *ok_label, const char *cancel_label,
+                        const char *help_label)
+{
+    struct dialog_result result = {0, 0, {0}};
+    Widget dialog = XmCreateQuestionDialog(shell, "question", NULL, 0);
+    XmString title_text = XmStringCreateLocalized((char *)title);
+    XmString message = XmStringCreateLocalized((char *)text);
+    XtVaSetValues(dialog,
+                  XmNdialogTitle, title_text,
+                  XmNmessageString, message,
+                  XmNdialogStyle, XmDIALOG_FULL_APPLICATION_MODAL,
+                  XmNautoUnmanage, True, NULL);
+    XmStringFree(title_text);
+    XmStringFree(message);
+    set_label(XmMessageBoxGetChild(dialog, XmDIALOG_OK_BUTTON), ok_label);
+    set_label(XmMessageBoxGetChild(dialog, XmDIALOG_CANCEL_BUTTON), cancel_label);
+    if (help_label) {
+        set_label(XmMessageBoxGetChild(dialog, XmDIALOG_HELP_BUTTON), help_label);
+        XtAddCallback(dialog, XmNhelpCallback, dialog_help, &result);
+    } else {
+        XtUnmanageChild(XmMessageBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
+    }
+    XtAddCallback(dialog, XmNokCallback, dialog_ok, &result);
+    XtAddCallback(dialog, XmNcancelCallback, dialog_cancel, &result);
+    XtAddCallback(dialog, XmNmapCallback, raise_dialog, XtParent(dialog));
+    XtManageChild(dialog);
+    pump_until_done(&result);
+    XtUnmanageChild(dialog);
+    XtDestroyWidget(dialog);
+    return result.outcome;
 }
 
 static void open_dialog(void)
 {
     char path[PAINT_PATH_CAP] = {0};
-    if (reliefos_ui_show_open_dialog(T("Open image"), path, sizeof(path),
-                                   T("Images (*.bmp; *.dib; *.png)"),
-                                   ".bmp;.dib;.png") > 0) {
+    if (run_file_dialog(T("Open image"), "", path, sizeof(path)) > 0) {
         (void)load_image(path);
     }
 }
@@ -446,9 +419,7 @@ static void save_as_dialog(void)
 {
     char path[PAINT_PATH_CAP];
     copy_text(path, sizeof(path), current_path[0] ? current_path : "/untitled.bmp");
-    if (reliefos_ui_show_save_dialog_ex(T("Save image"), path, sizeof(path),
-                                      T("Bitmap or PNG (*.bmp; *.png)"),
-                                      ".bmp;.png") > 0) {
+    if (run_file_dialog(T("Save image"), path, path, sizeof(path)) > 0) {
         (void)save_image(path);
     }
 }
@@ -462,178 +433,323 @@ static void save_current(void)
     }
 }
 
+static void sync_toolbar(void)
+{
+    XtVaSetValues(tool_buttons[0], XmNset, tool == PAINT_TOOL_PENCIL, NULL);
+    XtVaSetValues(tool_buttons[1], XmNset, tool == PAINT_TOOL_BRUSH, NULL);
+    XtVaSetValues(tool_buttons[2], XmNset, tool == PAINT_TOOL_ERASER, NULL);
+    for (int i = 0; i < 3; ++i) {
+        XtVaSetValues(size_buttons[i], XmNset, brush_size == brush_sizes[i], NULL);
+    }
+    for (int i = 0; i < 6; ++i) {
+        XtVaSetValues(swatch_buttons[i], XmNset, color == swatch_colors[i], NULL);
+    }
+}
+
 static void new_image(void)
 {
-    if (dirty && !reliefos_ui_show_confirm_dialog(T("Discard changes?"),
-                                                 T("The current drawing has not been saved."), 0)) return;
+    if (dirty && run_question(T("Discard changes?"),
+                              T("The current drawing has not been saved."),
+                              T("Discard"), T("Keep"), 0) <= 0) {
+        return;
+    }
     if (new_canvas(800U, 520U) < 0) {
         set_status(T("Could not create canvas"));
     } else {
         set_status(T("New canvas"));
+        refresh_canvas();
     }
 }
 
-static void draw(struct reliefos_ui_surface *ui, uint32_t window_id)
+static void close_window(Widget widget, XtPointer data, XtPointer call)
 {
-    uint32_t vw = canvas_view_w();
-    uint32_t vh = canvas_view_h();
-    if (ensure_screen_buffer() < 0) {
+    (void)widget;
+    (void)data;
+    (void)call;
+    if (dirty) {
+        int choice = run_question(T("Save changes?"),
+                                  T("Save the current drawing before closing?"),
+                                  T("Save"), T("Discard"), T("Cancel"));
+        if (choice > 0) {
+            save_current();
+            if (dirty) return;
+        } else if (choice < 0) {
+            return;
+        }
+    }
+    XtAppSetExitFlag(app);
+}
+
+static void button_new(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget; (void)data; (void)call;
+    new_image();
+}
+
+static void button_open(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget; (void)data; (void)call;
+    open_dialog();
+    refresh_canvas();
+}
+
+static void button_save(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget; (void)data; (void)call;
+    save_current();
+}
+
+static void button_save_as(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget; (void)data; (void)call;
+    save_as_dialog();
+}
+
+static void select_tool(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget; (void)call;
+    if (!XmToggleButtonGetState(widget)) {
+        XmToggleButtonSetState(widget, True, False);
         return;
     }
-    reliefos_ui_bind(ui, screen_pixels, view_w, view_h, screen_stride);
-    reliefos_ui_rect(ui, 0, 0, view_w, view_h, RELIEFOS_UI_GRAY);
-    reliefos_ui_toolbar(ui, 0, 0, view_w, TOOLBAR_H);
-    reliefos_ui_button(ui, 8, 10, 52, RELIEFOS_UI_BUTTON_H, T("New"), 0);
-    reliefos_ui_button(ui, 66, 10, 58, RELIEFOS_UI_BUTTON_H, T("Open"), 0);
-    reliefos_ui_button(ui, 128, 10, 58, RELIEFOS_UI_BUTTON_H, T("Save"), dirty ? RELIEFOS_UI_BUTTON_ACTIVE : 0);
-    reliefos_ui_button(ui, 190, 10, 76, RELIEFOS_UI_BUTTON_H, T("Save as"), 0);
-    reliefos_ui_button(ui, 274, 10, 58, RELIEFOS_UI_BUTTON_H, T("Pencil"), tool == TOOL_PENCIL ? RELIEFOS_UI_BUTTON_PRESSED : 0);
-    reliefos_ui_button(ui, 336, 10, 58, RELIEFOS_UI_BUTTON_H, T("Brush"), tool == TOOL_BRUSH ? RELIEFOS_UI_BUTTON_PRESSED : 0);
-    reliefos_ui_button(ui, 398, 10, 58, RELIEFOS_UI_BUTTON_H, T("Eraser"), tool == TOOL_ERASER ? RELIEFOS_UI_BUTTON_PRESSED : 0);
-    reliefos_ui_text(ui, 466, 16, T("Brush Size"), RELIEFOS_UI_BLACK, RELIEFOS_UI_GRAY);
-    for (uint32_t i = 0; i < 3; ++i) {
-        uint32_t sizes[3] = {2U, 6U, 14U};
-        uint32_t x = 505U + i * 24U;
-        reliefos_ui_button(ui, x, 10, 20, RELIEFOS_UI_BUTTON_H,
-                         i == 0 ? "S" : (i == 1 ? "M" : "L"),
-                         brush_size == sizes[i] ? RELIEFOS_UI_BUTTON_PRESSED : 0);
-    }
-    {
-        const uint32_t swatches[] = {0x00000000U, 0x00ff0000U, 0x000080ffU,
-                                     0x0000aa00U, 0x00ffff00U, 0x00ffffffU};
-        for (uint32_t i = 0; i < 6; ++i) {
-            uint32_t x = 584U + i * 24U;
-            reliefos_ui_bevel(ui, x, 11, 20, 20, swatches[i], color == swatches[i] ? RELIEFOS_UI_BUTTON_PRESSED : 0);
-        }
-    }
-    reliefos_ui_inset(ui, canvas_x(), canvas_y(), vw, vh, RELIEFOS_UI_WHITE);
-    if (canvas && canvas_w && canvas_h) {
-        if (canvas_w == vw && canvas_h == vh) {
-            for (uint32_t y = 0; y < vh; ++y) {
-                memcpy(screen_pixels + (canvas_y() + y) * screen_stride + canvas_x(),
-                       canvas + y * canvas_w, vw * sizeof(uint32_t));
-            }
-        } else {
-            for (uint32_t y = 0; y < vh; ++y) {
-                uint32_t sy = (uint64_t)y * canvas_h / vh;
-                uint32_t *dst = screen_pixels + (canvas_y() + y) * screen_stride + canvas_x();
-                for (uint32_t x = 0; x < vw; ++x) {
-                    uint32_t sx = (uint64_t)x * canvas_w / vw;
-                    dst[x] = canvas[sy * canvas_w + sx];
-                }
-            }
-        }
-    }
-    /* The status bar stays below the canvas even when the window is resized. */
-    reliefos_ui_statusbar(ui, view_h - STATUS_H, STATUS_H, status_text);
-    reliefos_gui_present_window(window_id, view_w, view_h, screen_stride, screen_pixels);
-    (void)window_id;
+    tool = (enum paint_tool)(uintptr_t)data;
+    sync_toolbar();
 }
 
-static void handle_toolbar(int32_t x, int32_t y)
+static void select_size(Widget widget, XtPointer data, XtPointer call)
 {
-    if (y < 10 || y >= 10 + (int32_t)RELIEFOS_UI_BUTTON_H) return;
-    if (hit(x, y, 8, 10, 52, RELIEFOS_UI_BUTTON_H)) new_image();
-    else if (hit(x, y, 66, 10, 58, RELIEFOS_UI_BUTTON_H)) open_dialog();
-    else if (hit(x, y, 128, 10, 58, RELIEFOS_UI_BUTTON_H)) save_current();
-    else if (hit(x, y, 190, 10, 76, RELIEFOS_UI_BUTTON_H)) save_as_dialog();
-    else if (hit(x, y, 274, 10, 58, RELIEFOS_UI_BUTTON_H)) tool = TOOL_PENCIL;
-    else if (hit(x, y, 336, 10, 58, RELIEFOS_UI_BUTTON_H)) tool = TOOL_BRUSH;
-    else if (hit(x, y, 398, 10, 58, RELIEFOS_UI_BUTTON_H)) tool = TOOL_ERASER;
-    else if (hit(x, y, 505, 10, 20, RELIEFOS_UI_BUTTON_H)) brush_size = 2U;
-    else if (hit(x, y, 529, 10, 20, RELIEFOS_UI_BUTTON_H)) brush_size = 6U;
-    else if (hit(x, y, 553, 10, 20, RELIEFOS_UI_BUTTON_H)) brush_size = 14U;
-    else {
-        const uint32_t swatches[] = {0x00000000U, 0x00ff0000U, 0x000080ffU,
-                                     0x0000aa00U, 0x00ffff00U, 0x00ffffffU};
-        for (uint32_t i = 0; i < 6; ++i) {
-            if (hit(x, y, 584U + i * 24U, 11, 20, 20)) color = swatches[i];
-        }
+    (void)widget; (void)call;
+    if (!XmToggleButtonGetState(widget)) {
+        XmToggleButtonSetState(widget, True, False);
+        return;
+    }
+    brush_size = brush_sizes[(uintptr_t)data];
+    sync_toolbar();
+}
+
+static void select_color(Widget widget, XtPointer data, XtPointer call)
+{
+    (void)widget; (void)call;
+    if (!XmToggleButtonGetState(widget)) {
+        XmToggleButtonSetState(widget, True, False);
+        return;
+    }
+    color = swatch_colors[(uintptr_t)data];
+    sync_toolbar();
+}
+
+/* XmNinputCallback never reports MotionNotify, and dragging the brush is all
+ * motion events, so the drawing interaction is an event handler instead. */
+static void canvas_input(Widget widget, XtPointer data, XEvent *event,
+                         Boolean *dispatch)
+{
+    (void)widget;
+    (void)data;
+    (void)dispatch;
+    if (!canvas || !canvas_w || !canvas_h) return;
+    if (event->type == ButtonPress && event->xbutton.button == Button1) {
+        uint32_t x = (uint32_t)event->xbutton.x;
+        uint32_t y = (uint32_t)event->xbutton.y;
+        if (x >= canvas_w || y >= canvas_h) return;
+        drawing = 1;
+        stroke_x = x;
+        stroke_y = y;
+        paint_draw_point(canvas, canvas_w, canvas_h, x, y, color, brush_size, tool);
+        dirty = 1;
+        refresh_canvas();
+    } else if (event->type == MotionNotify && drawing) {
+        uint32_t x = (uint32_t)event->xmotion.x;
+        uint32_t y = (uint32_t)event->xmotion.y;
+        if (x >= canvas_w) x = canvas_w - 1U;
+        if (y >= canvas_h) y = canvas_h - 1U;
+        paint_draw_line(canvas, canvas_w, canvas_h, stroke_x, stroke_y, x, y,
+                        color, brush_size, tool);
+        stroke_x = x;
+        stroke_y = y;
+        dirty = 1;
+        refresh_canvas();
+    } else if (event->type == ButtonRelease && event->xbutton.button == Button1) {
+        drawing = 0;
     }
 }
 
-int main(int argc, char **argv, char **envp)
+static void key(Widget widget, XtPointer data, XEvent *event, Boolean *dispatch)
 {
+    KeySym symbol;
+    (void)widget;
+    (void)data;
+    if (event->type != KeyPress) return;
+    symbol = XLookupKeysym(&event->xkey, 0);
+    if (symbol == XK_Escape) {
+        close_window(widget, data, 0);
+        *dispatch = False;
+        return;
+    }
+    if (!(event->xkey.state & ControlMask)) return;
+    if (symbol == XK_n || symbol == XK_N) new_image();
+    else if (symbol == XK_o || symbol == XK_O) open_dialog();
+    else if (symbol == XK_s || symbol == XK_S) save_current();
+    else if (symbol == XK_a || symbol == XK_A) save_as_dialog();
+    else return;
+    refresh_canvas();
+    *dispatch = False;
+}
+
+/* Xt event handlers do not bubble to ancestors, so every widget that can hold
+ * keyboard focus needs its own registration (fileman/taskmgr do the same).
+ * The shell is included because the window manager focuses the top-level
+ * window and the canvas never takes X input focus on its own. */
+static void watch_keys(Widget widget)
+{
+    XtInsertEventHandler(widget, KeyPressMask, False, key, NULL, XtListHead);
+}
+
+/* The XmNfontList string resource can only describe core fonts, which have no
+ * CJK glyphs; route widgets to a CJK-capable Xft rendition instead. */
+static XmFontList app_font_list(Widget widget_shell)
+{
+    Arg args[3];
+    XmRendition rendition;
+    XtSetArg(args[0], XmNfontName, "SimSun");
+    XtSetArg(args[1], XmNfontType, XmFONT_IS_XFT);
+    XtSetArg(args[2], XmNloadModel, XmLOAD_IMMEDIATE);
+    rendition = XmRenditionCreate(widget_shell, XmFONTLIST_DEFAULT_TAG, args, 3);
+    XmFontList list = XmRenderTableAddRenditions(NULL, &rendition, 1, XmDUPLICATE);
+    XmRenditionFree(rendition);
+    return list;
+}
+
+int main(int argc, char **argv)
+{
+    static char *tool_names[3] = {"pencil", "brush", "eraser"};
+    static char *size_names[3] = {"sizeS", "sizeM", "sizeL"};
     setlocale(LC_ALL, "");
     bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
     textdomain("leonos");
-    struct reliefos_ui_surface ui;
-    struct reliefos_gui_app_event event;
-    uint32_t last_x = 0, last_y = 0;
-    int window_id;
-    (void)envp;
-    if (new_canvas(800U, 520U) < 0) return 1;
-    set_status(T("Ready"));
-    if (argc > 1 && argv && argv[1] && argv[1][0]) (void)load_image(argv[1]);
-    window_id = reliefos_gui_create_app_window_ex(T("Paint"),
-                                                T("ReliefOS Paint"),
-                                                view_w, view_h, 0);
-    if (window_id <= 0) { free_canvas(); free(screen_pixels); return 1; }
-    draw(&ui, (uint32_t)window_id);
-    for (;;) {
-        event.window_id = (uint32_t)window_id;
-        if (reliefos_gui_wait_app_event(&event, RELIEFOS_GUI_IDLE_WAIT_MS) <= 0) {
-            (void)poll(0, 0, 10);
-            continue;
-        }
-        if (event.type == RELIEFOS_GUI_APP_EVENT_CLOSE ||
-            (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN && event.pressed && event.keycode == RELIEFOS_KEY_ESCAPE)) {
-            if (dirty) {
-                int save = reliefos_ui_show_confirm_dialog(
-                    T("Save changes?"),
-                    T("Save the current drawing before closing?"), 1);
-                if (save > 0) {
-                    save_current();
-                    if (dirty) {
-                        draw(&ui, (uint32_t)window_id);
-                        continue;
-                    }
-                }
-            }
-            free_canvas();
-            free(screen_pixels);
-            screen_pixels = 0;
-            screen_stride = 0;
-            screen_height = 0;
-            return 0;
-        }
-        if (event.type == RELIEFOS_GUI_APP_EVENT_RESIZE) {
-            if (event.width >= PAINT_MIN_W && event.width <= PAINT_MAX_W) view_w = event.width;
-            if (event.height >= PAINT_MIN_H && event.height <= PAINT_MAX_H) view_h = event.height;
-            draw(&ui, (uint32_t)window_id);
-            continue;
-        }
-        if (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN || event.type == RELIEFOS_GUI_APP_EVENT_KEY_UP) {
-            if (event.keycode == RELIEFOS_KEY_LEFT_CTRL || event.keycode == RELIEFOS_KEY_RIGHT_CTRL) ctrl_down = event.pressed;
-            if (event.type == RELIEFOS_GUI_APP_EVENT_KEY_DOWN && event.pressed && ctrl_down) {
-                if (event.keycode == 49U) new_image();
-                else if (event.keycode == 24U) open_dialog();
-                else if (event.keycode == 31U) save_current();
-                else if (event.keycode == 45U) save_as_dialog();
-                draw(&ui, (uint32_t)window_id);
-            }
-            continue;
-        }
-        if (event.type == RELIEFOS_GUI_APP_EVENT_MOUSE_BUTTON) {
-            if (!(event.buttons & 1U)) { drawing = 0; continue; }
-            if (event.y < (int32_t)TOOLBAR_H) {
-                handle_toolbar(event.x, event.y);
-            } else if (point_to_canvas(event.x, event.y, &last_x, &last_y)) {
-                drawing = 1;
-                paint_point(last_x, last_y);
-            }
-            draw(&ui, (uint32_t)window_id);
-            continue;
-        }
-        if (event.type == RELIEFOS_GUI_APP_EVENT_MOUSE_MOVE && (event.buttons & 1U) && drawing) {
-            uint32_t x, y;
-            if (point_to_canvas(event.x, event.y, &x, &y)) {
-                paint_line(last_x, last_y, x, y);
-                last_x = x; last_y = y;
-                draw(&ui, (uint32_t)window_id);
-            }
-            continue;
-        }
-        if (event.type == RELIEFOS_GUI_APP_EVENT_FOCUS) draw(&ui, (uint32_t)window_id);
+    XtSetLanguageProc(NULL, NULL, NULL);
+    char *fallback[] = {
+        "*background: #eceef4", "*foreground: #22242e",
+        "*highlightColor: #3b62a6", NULL
+    };
+    shell = XtVaAppInitialize(&app, "ReliefOSPaint", NULL, 0, &argc, argv,
+                              fallback, XtNtitle, T("Paint"),
+                              XtNwidth, 848, XtNheight, 660, NULL);
+    {
+        XmFontList fonts = app_font_list(shell);
+        XtVaSetValues(shell, XmNlabelFontList, fonts,
+                      XmNbuttonFontList, fonts, XmNtextFontList, fonts, NULL);
     }
+    watch_keys(shell);
+    Widget form = XtVaCreateWidget("paint", xmFormWidgetClass, shell,
+        XmNresizePolicy, XmRESIZE_NONE, XmNmarginWidth, 8, XmNmarginHeight, 8, NULL);
+    Widget bar = XtVaCreateManagedWidget("toolbar", xmFormWidgetClass, form,
+        XmNtopAttachment, XmATTACH_FORM, XmNleftAttachment, XmATTACH_FORM,
+        XmNrightAttachment, XmATTACH_FORM, NULL);
+    Widget previous;
+    {
+        Widget button = XtVaCreateManagedWidget("new", xmPushButtonWidgetClass, bar,
+            XmNtopAttachment, XmATTACH_FORM, XmNleftAttachment, XmATTACH_FORM, NULL);
+        set_label(button, T("New"));
+        XtAddCallback(button, XmNactivateCallback, button_new, NULL);
+        watch_keys(button);
+        previous = button;
+    }
+    {
+        struct { char *name; const char *label; XtCallbackProc callback; }
+        entries[3] = {
+            {"open", T("Open"), button_open},
+            {"save", T("Save"), button_save},
+            {"saveAs", T("Save as"), button_save_as},
+        };
+        for (int i = 0; i < 3; ++i) {
+            Widget button = XtVaCreateManagedWidget(entries[i].name,
+                xmPushButtonWidgetClass, bar,
+                XmNleftAttachment, XmATTACH_WIDGET, XmNleftWidget, previous,
+                XmNtopAttachment, XmATTACH_FORM, NULL);
+            set_label(button, entries[i].label);
+            XtAddCallback(button, XmNactivateCallback, entries[i].callback, NULL);
+            watch_keys(button);
+            previous = button;
+        }
+    }
+    {
+        const char *labels[3];
+        labels[0] = T("Pencil");
+        labels[1] = T("Brush");
+        labels[2] = T("Eraser");
+        for (int i = 0; i < 3; ++i) {
+            tool_buttons[i] = XtVaCreateManagedWidget(tool_names[i],
+                xmToggleButtonWidgetClass, bar,
+                XmNindicatorOn, False,
+                XmNleftAttachment, XmATTACH_WIDGET, XmNleftWidget, previous,
+                XmNtopAttachment, XmATTACH_FORM, NULL);
+            set_label(tool_buttons[i], labels[i]);
+            XtAddCallback(tool_buttons[i], XmNvalueChangedCallback, select_tool,
+                          (XtPointer)(uintptr_t)i);
+            watch_keys(tool_buttons[i]);
+            previous = tool_buttons[i];
+        }
+    }
+    for (int i = 0; i < 3; ++i) {
+        size_buttons[i] = XtVaCreateManagedWidget(size_names[i],
+            xmToggleButtonWidgetClass, bar,
+            XmNindicatorOn, False, XmNrecomputeSize, False, XmNwidth, 28,
+            XmNleftAttachment, XmATTACH_WIDGET, XmNleftWidget, previous,
+            XmNtopAttachment, XmATTACH_FORM, NULL);
+        set_label(size_buttons[i], i == 0 ? "S" : (i == 1 ? "M" : "L"));
+        XtAddCallback(size_buttons[i], XmNvalueChangedCallback, select_size,
+                      (XtPointer)(uintptr_t)i);
+        watch_keys(size_buttons[i]);
+        previous = size_buttons[i];
+    }
+    for (int i = 0; i < 6; ++i) {
+        char name[16];
+        snprintf(name, sizeof(name), "swatch%d", i);
+        swatch_buttons[i] = XtVaCreateManagedWidget(name,
+            xmToggleButtonWidgetClass, bar,
+            XmNindicatorOn, False, XmNrecomputeSize, False, XmNwidth, 26,
+            XmNbackground, (unsigned long)swatch_colors[i],
+            XmNleftAttachment, XmATTACH_WIDGET, XmNleftWidget, previous,
+            XmNtopAttachment, XmATTACH_FORM, NULL);
+        /* Motif would otherwise render the squeezed widget name on the chip. */
+        set_label(swatch_buttons[i], "");
+        XtAddCallback(swatch_buttons[i], XmNvalueChangedCallback, select_color,
+                      (XtPointer)(uintptr_t)i);
+        watch_keys(swatch_buttons[i]);
+        previous = swatch_buttons[i];
+    }
+    drawing_area = XtVaCreateManagedWidget("canvas", xmDrawingAreaWidgetClass, form,
+        XmNwidth, 800, XmNheight, 520,
+        XmNtopAttachment, XmATTACH_WIDGET, XmNtopWidget, bar,
+        XmNleftAttachment, XmATTACH_FORM, NULL);
+    XtAddCallback(drawing_area, XmNexposeCallback, canvas_expose, NULL);
+    XtAddEventHandler(drawing_area,
+                      ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+                      False, canvas_input, NULL);
+    XtInsertEventHandler(drawing_area, KeyPressMask, False, key, NULL, XtListHead);
+    status_label = XtVaCreateManagedWidget("status", xmLabelWidgetClass, form,
+        XmNalignment, XmALIGNMENT_BEGINNING,
+        XmNbottomAttachment, XmATTACH_FORM,
+        XmNleftAttachment, XmATTACH_FORM,
+        XmNrightAttachment, XmATTACH_FORM, NULL);
+    set_status(T("Ready"));
+    if (new_canvas(800U, 520U) < 0) {
+        puts("[paint.elf] canvas allocation failed");
+        return 1;
+    }
+    if (argc > 1 && argv && argv[1] && argv[1][0]) (void)load_image(argv[1]);
+    XtManageChild(form);
+    XtRealizeWidget(shell);
+    display = XtDisplay(shell);
+    gc = XCreateGC(display, XtWindow(drawing_area), 0, NULL);
+    Atom delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
+    XmAddWMProtocolCallback(shell, delete_window, close_window, NULL);
+    sync_toolbar();
+    puts("[paint.elf] Motif paint ready");
+    fflush(stdout);
+    XtAppMainLoop(app);
+    free_canvas();
+    XtDestroyWidget(shell);
+    XtDestroyApplicationContext(app);
+    return 0;
 }
