@@ -6,6 +6,7 @@
 #include <libintl.h>
 #include <locale.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -16,6 +17,7 @@
 #include <Xm/Protocols.h>
 #include <Xm/PushB.h>
 #include <Xm/RowColumn.h>
+#include <Xm/SelectioB.h>
 #include <Xm/ScrolledW.h>
 #include <Xm/Text.h>
 #include <Xm/ToggleB.h>
@@ -42,6 +44,7 @@ static Widget back_button;
 static Widget primary_button;
 static Widget cancel_button;
 static Widget disk_list;
+static Widget partition_list;
 static Widget confirm_field;
 static Widget account_fields[5];
 static Widget account_hint;
@@ -52,6 +55,16 @@ static unsigned long sidebar_bg;
 static unsigned long sidebar_bg_active;
 static unsigned long sidebar_fg;
 static unsigned long sidebar_fg_active;
+
+enum partition_prompt_action {
+    PARTITION_PROMPT_AUTO = 1,
+    PARTITION_PROMPT_INITIALIZE,
+    PARTITION_PROMPT_CREATE,
+    PARTITION_PROMPT_RESIZE,
+    PARTITION_PROMPT_RENAME,
+    PARTITION_PROMPT_FORMAT,
+    PARTITION_PROMPT_DELETE,
+};
 
 static const char acknowledgements_en[] =
     "Acknowledgements\n"
@@ -174,6 +187,7 @@ static const char *page_label(enum installer_page target)
     case INSTALLER_PAGE_WELCOME: return T("Welcome");
     case INSTALLER_PAGE_MODE: return T("Mode");
     case INSTALLER_PAGE_DISK: return T("Disk");
+    case INSTALLER_PAGE_PARTITIONS: return T("Partitions");
     case INSTALLER_PAGE_ACCOUNTS: return T("Accounts");
     case INSTALLER_PAGE_CONFIRM: return T("Confirm");
     case INSTALLER_PAGE_PROGRESS: return mode_action_text();
@@ -200,6 +214,9 @@ static int primary_disabled(void)
     if (install_running) return 1;
     if (page == INSTALLER_PAGE_DISK) {
         return selected_disk < 0 || (uint32_t)selected_disk >= disk_count;
+    }
+    if (page == INSTALLER_PAGE_PARTITIONS) {
+        return !installer_partition_plan_valid();
     }
     if (page == INSTALLER_PAGE_CONFIRM) return !confirmation_ok();
     return 0;
@@ -284,6 +301,9 @@ static void go_primary(void)
     if (page == INSTALLER_PAGE_DISK) {
         refresh_disks();
     }
+    if (page == INSTALLER_PAGE_PARTITIONS) {
+        refresh_partitions();
+    }
     if (page == INSTALLER_PAGE_CONFIRM) {
         reset_confirm();
     }
@@ -301,6 +321,9 @@ static void go_back(Widget widget, XtPointer unused, XtPointer call)
     page = (uint8_t)installer_model_prev(page, install_mode);
     if (page == INSTALLER_PAGE_DISK) {
         refresh_disks();
+    }
+    if (page == INSTALLER_PAGE_PARTITIONS) {
+        refresh_partitions();
     }
     show_page();
 }
@@ -478,8 +501,8 @@ static void build_mode_page(void)
     XtVaSetValues(update, XmNset, install_mode == INSTALLER_MODE_UPDATE ? True : False, NULL);
     XtAddCallback(fresh, XmNvalueChangedCallback, mode_selected, NULL);
     XtAddCallback(update, XmNvalueChangedCallback, mode_selected, NULL);
-    place_label(content, T("Format the selected disk and copy a clean ReliefOS system."), 176, 24);
-    place_label(content, T("Replace boot, system, EFI and bundled docs. Then choose changed or missing system apps."),
+    place_label(content, T("Prepare a clean ReliefOS system with automatic or manual disk partitioning."), 176, 24);
+    place_label(content, T("Choose the target disk, configure its partitions, then replace boot, system and EFI files."),
                 228, 24);
 }
 
@@ -557,6 +580,296 @@ static void build_disk_page(void)
                       XmNbottomAttachment, XmATTACH_FORM, XmNbottomOffset, 36, NULL);
     }
     refresh_disk_list();
+}
+
+static void refresh_partition_list(void)
+{
+    char line[256];
+    XmListDeleteAllItems(partition_list);
+    for (uint32_t i = 0; i < partition_count; ++i) {
+        XmString item;
+        format_partition_line(line, sizeof(line), &partitions[i]);
+        item = XmStringCreateLocalized(line);
+        XmListAddItemUnselected(partition_list, item, 0);
+        XmStringFree(item);
+    }
+    if (selected_partition >= 0 && (uint32_t)selected_partition < partition_count)
+        XmListSelectPos(partition_list, selected_partition + 1, False);
+    update_footer();
+}
+
+static void select_partition(Widget widget, XtPointer unused, XtPointer call)
+{
+    XmListCallbackStruct *selection = call;
+    (void)widget;
+    (void)unused;
+    if (!selection || selection->item_position < 1) return;
+    selected_partition = selection->item_position - 1;
+    update_footer();
+}
+
+static void partition_result(int ret, const char *success)
+{
+    char detail[128];
+    if (ret < 0) {
+        snprintf(detail, sizeof(detail), "%s ret=%d", T("The disk may have been changed"), ret);
+        set_status(T("Partition operation failed"), detail);
+    } else {
+        set_status(T("Partition layout updated"), success);
+    }
+    refresh_partitions();
+    refresh_partition_list();
+}
+
+static uint32_t partition_filesystem(const char *text)
+{
+    if (text_eq(text, "fat32") || text_eq(text, "fat"))
+        return RELIEFOS_BLOCK_FILESYSTEM_FAT32;
+    if (text_eq(text, "ext2")) return RELIEFOS_BLOCK_FILESYSTEM_EXT2;
+    if (text_eq(text, "ext4")) return RELIEFOS_BLOCK_FILESYSTEM_EXT4;
+    if (text_eq(text, "exfat")) return RELIEFOS_BLOCK_FILESYSTEM_EXFAT;
+    return RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
+}
+
+static char *partition_next_word(char **cursor)
+{
+    char *word;
+    if (!cursor || !*cursor) return NULL;
+    while (**cursor == ' ' || **cursor == '\t') ++*cursor;
+    if (!**cursor) return NULL;
+    word = *cursor;
+    while (**cursor && **cursor != ' ' && **cursor != '\t') ++*cursor;
+    if (**cursor) *(*cursor)++ = 0;
+    return word;
+}
+
+static int partition_collect_name(char *out, uint32_t capacity,
+                                  const char *first, char **cursor)
+{
+    char *remainder;
+    size_t length;
+    if (!out || !capacity || !first || !first[0]) return -EINVAL;
+    length = strlen(first);
+    remainder = cursor ? *cursor : NULL;
+    while (remainder && (*remainder == ' ' || *remainder == '\t')) ++remainder;
+    if (length >= capacity) return -ENAMETOOLONG;
+    memcpy(out, first, length);
+    if (remainder && *remainder) {
+        if (length + 1 + strlen(remainder) >= capacity) return -ENAMETOOLONG;
+        out[length++] = ' ';
+        memcpy(out + length, remainder, strlen(remainder) + 1);
+    } else {
+        out[length] = 0;
+    }
+    if (cursor) *cursor = remainder;
+    return 0;
+}
+
+static int partition_number(const char *text, uint32_t *value)
+{
+    char *end;
+    unsigned long parsed;
+    if (!text || !text[0] || !value) return -EINVAL;
+    errno = 0;
+    parsed = strtoul(text, &end, 10);
+    if (errno || end == text || *end || parsed > 0xffffffffUL || !parsed)
+        return -EINVAL;
+    *value = (uint32_t)parsed;
+    return 0;
+}
+
+static void partition_prompt_cancel(Widget widget, XtPointer unused, XtPointer call)
+{
+    (void)unused;
+    (void)call;
+    XtDestroyWidget(widget);
+}
+
+static void partition_prompt_ok(Widget widget, XtPointer data, XtPointer call)
+{
+    XmSelectionBoxCallbackStruct *selection = call;
+    char *value = NULL;
+    char *cursor;
+    char *word;
+    uint32_t number, filesystem;
+    char name[RELIEFOS_BLOCK_NAME_LEN];
+    int ret = -EINVAL;
+    enum partition_prompt_action action = (enum partition_prompt_action)(uintptr_t)data;
+    if (!selection || !XmStringGetLtoR(selection->value, XmFONTLIST_DEFAULT_TAG, &value)) {
+        XtDestroyWidget(widget);
+        return;
+    }
+    cursor = value;
+    word = partition_next_word(&cursor);
+    if (action == PARTITION_PROMPT_AUTO) {
+        if (word && text_eq(word, "AUTO")) ret = installer_partition_auto_layout();
+    } else if (action == PARTITION_PROMPT_INITIALIZE) {
+        if (word && text_eq(word, "INITIALIZE")) ret = installer_partition_initialize();
+    } else if (action == PARTITION_PROMPT_CREATE) {
+        char *filesystem_name = partition_next_word(&cursor);
+        char *name_word = partition_next_word(&cursor);
+        filesystem = partition_filesystem(filesystem_name);
+        if (!name_word) name_word = "ReliefOS Data";
+        if (partition_collect_name(name, sizeof(name), name_word, &cursor) < 0)
+            name[0] = 0;
+        if (!partition_number(word, &number) && filesystem != RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN)
+            if (name[0]) ret = installer_partition_create(filesystem, number, name);
+    } else if (action == PARTITION_PROMPT_RESIZE) {
+        if (!partition_number(word, &number)) ret = installer_partition_resize(number);
+    } else if (action == PARTITION_PROMPT_RENAME) {
+        if (word && !partition_collect_name(name, sizeof(name), word, &cursor))
+            ret = installer_partition_rename(name);
+    } else if (action == PARTITION_PROMPT_FORMAT) {
+        char *label = partition_next_word(&cursor);
+        filesystem = partition_filesystem(word);
+        if (!label) label = "RELIEFOS_DATA";
+        if (filesystem != RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN)
+            ret = installer_partition_format(filesystem, label);
+    } else if (action == PARTITION_PROMPT_DELETE) {
+        if (word && text_eq(word, "DELETE")) ret = installer_partition_delete();
+    }
+    if (value) XtFree(value);
+    XtDestroyWidget(widget);
+    partition_result(ret, T("Review the selected ESP and root before continuing."));
+}
+
+static void open_partition_prompt(enum partition_prompt_action action,
+                                  const char *title, const char *message,
+                                  const char *initial)
+{
+    XmString dialog_title = XmStringCreateLocalized((char *)title);
+    XmString prompt = XmStringCreateLocalized((char *)message);
+    XmString value = XmStringCreateLocalized((char *)initial);
+    Widget dialog = XmCreatePromptDialog(content, "partitionPrompt", NULL, 0);
+    XtVaSetValues(dialog, XmNdialogTitle, dialog_title,
+                  XmNselectionLabelString, prompt, XmNtextString, value, NULL);
+    XtAddCallback(dialog, XmNokCallback, partition_prompt_ok, (XtPointer)(uintptr_t)action);
+    XtAddCallback(dialog, XmNcancelCallback, partition_prompt_cancel, NULL);
+    XtUnmanageChild(XmSelectionBoxGetChild(dialog, XmDIALOG_HELP_BUTTON));
+    XmStringFree(dialog_title);
+    XmStringFree(prompt);
+    XmStringFree(value);
+    XtManageChild(dialog);
+}
+
+static void partition_prompt_pressed(Widget widget, XtPointer data, XtPointer call)
+{
+    enum partition_prompt_action action = (enum partition_prompt_action)(uintptr_t)data;
+    (void)widget;
+    (void)call;
+    switch (action) {
+    case PARTITION_PROMPT_AUTO:
+        open_partition_prompt(action, T("Automatic partitioning"),
+                              T("Type AUTO to erase the disk and create ESP + root:"), "AUTO");
+        break;
+    case PARTITION_PROMPT_INITIALIZE:
+        open_partition_prompt(action, T("Initialize GPT"),
+                              T("Type INITIALIZE to replace the partition table:"), "INITIALIZE");
+        break;
+    case PARTITION_PROMPT_CREATE:
+        open_partition_prompt(action, T("Create partition"),
+                              T("Enter: size_MiB filesystem name (ext4/ext2/fat32/exfat):"),
+                              "1024 ext4 ReliefOS Data");
+        break;
+    case PARTITION_PROMPT_RESIZE:
+        open_partition_prompt(action, T("Resize partition"),
+                              T("Enter the new size in MiB:"), "1024");
+        break;
+    case PARTITION_PROMPT_RENAME:
+        open_partition_prompt(action, T("Rename partition"),
+                              T("Enter the GPT partition name:"), "ReliefOS Data");
+        break;
+    case PARTITION_PROMPT_FORMAT:
+        open_partition_prompt(action, T("Format partition"),
+                              T("Enter: filesystem label (this destroys its files):"), "ext4 RELIEFOS_DATA");
+        break;
+    case PARTITION_PROMPT_DELETE:
+        open_partition_prompt(action, T("Delete partition"),
+                              T("Type DELETE to remove the selected partition:"), "DELETE");
+        break;
+    }
+}
+
+static void partition_refresh_pressed(Widget widget, XtPointer unused, XtPointer call)
+{
+    (void)widget;
+    (void)unused;
+    (void)call;
+    refresh_partitions();
+    refresh_partition_list();
+}
+
+static void partition_role_pressed(Widget widget, XtPointer data, XtPointer call)
+{
+    uint32_t type = (uint32_t)(uintptr_t)data;
+    int ret;
+    (void)widget;
+    (void)call;
+    if (selected_partition < 0 || (uint32_t)selected_partition >= partition_count) {
+        partition_result(-EINVAL, "");
+        return;
+    }
+    ret = installer_partition_set_type(type);
+    partition_result(ret, T("Partition role updated."));
+}
+
+static void build_partition_page(void)
+{
+    Widget action_box;
+    place_label(content, T("Configure partitions"), 16, 24);
+    place_label(content, installer_partition_auto
+                             ? T("Automatic layout will create and format a 128 MiB ESP and an ext4 root.")
+                             : T("Manual layout: select partitions, then assign ESP and root roles."),
+                48, 24);
+    partition_list = XmCreateScrolledList(content, "partitions", NULL, 0);
+    XtVaSetValues(partition_list, XmNselectionPolicy, XmBROWSE_SELECT,
+                  XmNvisibleItemCount, 8, NULL);
+    XtVaSetValues(XtParent(partition_list),
+                  XmNtopAttachment, XmATTACH_FORM, XmNtopOffset, 82,
+                  XmNleftAttachment, XmATTACH_FORM, XmNleftOffset, 24,
+                  XmNrightAttachment, XmATTACH_FORM, XmNrightOffset, 24,
+                  XmNbottomAttachment, XmATTACH_FORM, XmNbottomOffset, 300, NULL);
+    XtAddCallback(partition_list, XmNbrowseSelectionCallback, select_partition, NULL);
+    XtManageChild(partition_list);
+    action_box = XtVaCreateManagedWidget("partitionActions", xmRowColumnWidgetClass, content,
+        XmNtopAttachment, XmATTACH_FORM, XmNtopOffset, 310,
+        XmNleftAttachment, XmATTACH_FORM, XmNleftOffset, 24,
+        XmNrightAttachment, XmATTACH_FORM, XmNrightOffset, 24,
+        XmNpacking, XmPACK_COLUMN, XmNnumColumns, 4, XmNorientation, XmHORIZONTAL, NULL);
+    {
+        const char *const labels[] = {"Refresh", "Automatic", "Initialize GPT", "Create",
+                                      "Resize", "Rename", "Format", "Delete",
+                                      "Set ESP", "Set root", "Data type"};
+        const enum partition_prompt_action prompt_actions[] = {
+            0, PARTITION_PROMPT_AUTO, PARTITION_PROMPT_INITIALIZE, PARTITION_PROMPT_CREATE,
+            PARTITION_PROMPT_RESIZE, PARTITION_PROMPT_RENAME, PARTITION_PROMPT_FORMAT,
+            PARTITION_PROMPT_DELETE
+        };
+        for (unsigned i = 0; i < sizeof(labels) / sizeof(labels[0]); ++i) {
+            Widget button = XtVaCreateManagedWidget("partitionAction", xmPushButtonWidgetClass,
+                                                    action_box, NULL);
+            set_label(button, T(labels[i]));
+            if (i == 0) XtAddCallback(button, XmNactivateCallback, partition_refresh_pressed, NULL);
+            else if (i < 8) XtAddCallback(button, XmNactivateCallback,
+                                           partition_prompt_pressed,
+                                           (XtPointer)(uintptr_t)prompt_actions[i]);
+            else if (i == 8) XtAddCallback(button, XmNactivateCallback,
+                                            partition_role_pressed,
+                                            (XtPointer)(uintptr_t)RELIEFOS_BLOCK_GPT_ESP);
+            else if (i == 9) XtAddCallback(button, XmNactivateCallback,
+                                            partition_role_pressed,
+                                            (XtPointer)(uintptr_t)RELIEFOS_BLOCK_GPT_LINUX);
+            else XtAddCallback(button, XmNactivateCallback, partition_role_pressed,
+                               (XtPointer)(uintptr_t)RELIEFOS_BLOCK_GPT_BASIC_DATA);
+        }
+    }
+    place_label(content, T("Create: size in MiB, filesystem, name. Resize only changes the trailing edge."),
+                490, 24);
+    place_label(content, (installer_partition_auto || installer_partition_table_replaced)
+                             ? T("The final confirmation formats a FAT32 ESP and ext4 root on the selected disk.")
+                             : T("The final confirmation formats only the selected ESP and root partitions."),
+                520, 24);
+    refresh_partition_list();
 }
 
 static void copy_field(char *dst, uint32_t cap, Widget field)
@@ -706,7 +1019,9 @@ static void build_confirm_page(void)
     }
     place_label(content, install_mode == INSTALLER_MODE_UPDATE
                              ? T("Alpine packages and local configuration are retained. Boot files are updated after the package transaction succeeds.")
-                             : T("The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root."),
+                             : (installer_partition_auto || installer_partition_table_replaced)
+                               ? T("The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root.")
+                               : T("Only the selected ESP and root partitions will be formatted; other partitions are preserved."),
                 136, 24);
     place_label(content, install_mode == INSTALLER_MODE_UPDATE
                              ? T("Type UPDATE to enable the Update button.")
@@ -779,6 +1094,7 @@ static void clear_content(void)
         }
     }
     disk_list = NULL;
+    partition_list = NULL;
     confirm_field = NULL;
     account_hint = NULL;
     progress_text_label = NULL;
@@ -799,6 +1115,7 @@ static void show_page(void)
     case INSTALLER_PAGE_WELCOME: build_welcome_page(); break;
     case INSTALLER_PAGE_MODE: build_mode_page(); break;
     case INSTALLER_PAGE_DISK: build_disk_page(); break;
+    case INSTALLER_PAGE_PARTITIONS: build_partition_page(); break;
     case INSTALLER_PAGE_ACCOUNTS: build_accounts_page(); break;
     case INSTALLER_PAGE_CONFIRM: build_confirm_page(); break;
     case INSTALLER_PAGE_PROGRESS: build_progress_page(); break;
@@ -903,12 +1220,29 @@ int main(int argc, char **argv)
         tty_context.setup = &setup;
         tty_context.disks = disks;
         tty_context.disk_count = &disk_count;
+        tty_context.partitions = partitions;
+        tty_context.partition_count = &partition_count;
+        tty_context.selected_partition = &selected_partition;
+        tty_context.root_partition = &installer_root_partition;
+        tty_context.esp_partition = &installer_esp_partition;
+        tty_context.partition_auto = &installer_partition_auto;
         tty_context.selected_disk = &selected_disk;
         tty_context.install_mode = &install_mode;
         tty_context.install_success = &install_success;
         tty_context.page = &page;
         tty_context.refresh_disks = refresh_disks;
         tty_context.format_disk_line = format_disk_line;
+        tty_context.refresh_partitions = refresh_partitions;
+        tty_context.format_partition_line = format_partition_line;
+        tty_context.partition_plan_valid = installer_partition_plan_valid;
+        tty_context.partition_auto_layout = installer_partition_auto_layout;
+        tty_context.partition_initialize = installer_partition_initialize;
+        tty_context.partition_create = installer_partition_create;
+        tty_context.partition_resize = installer_partition_resize;
+        tty_context.partition_rename = installer_partition_rename;
+        tty_context.partition_set_type = installer_partition_set_type;
+        tty_context.partition_delete = installer_partition_delete;
+        tty_context.partition_format = installer_partition_format;
         tty_context.prepare_update = prepare_update_target;
         tty_context.perform_install = perform_install;
         tty_context.perform_update = perform_update;

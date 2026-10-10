@@ -930,6 +930,37 @@ int reliefos_block_gpt_set_name(const char *disk_path, uint32_t index, const cha
     return block_gpt_update(disk_path, block_set_name_entry, &request);
 }
 
+struct block_resize_request { uint32_t index; uint32_t size_mib; };
+static int block_resize_entry(struct block_gpt_table *table, void *context)
+{
+    struct block_resize_request *request = context;
+    struct block_gpt_entry *entry;
+    uint64_t sectors, new_last, next = table->primary.last_usable_lba + 1u;
+    if (request->index >= table->primary.partition_entry_count ||
+        block_guid_empty(table->entries[request->index].type_guid) ||
+        !request->size_mib) return -BLOCK_EINVAL;
+    entry = &table->entries[request->index];
+    sectors = (uint64_t)request->size_mib * 2048u;
+    if (sectors > UINT64_MAX - entry->first_lba) return -BLOCK_EINVAL;
+    new_last = entry->first_lba + sectors - 1u;
+    for (uint32_t i = 0; i < table->primary.partition_entry_count; ++i) {
+        const struct block_gpt_entry *other = &table->entries[i];
+        if (i != request->index && !block_guid_empty(other->type_guid) &&
+            other->first_lba > entry->first_lba && other->first_lba < next)
+            next = other->first_lba;
+    }
+    if (new_last >= next || new_last > table->primary.last_usable_lba)
+        return -BLOCK_ENOSPC;
+    entry->last_lba = new_last;
+    return 0;
+}
+
+int reliefos_block_gpt_resize(const char *disk_path, uint32_t index, uint32_t size_mib)
+{
+    struct block_resize_request request = {index, size_mib};
+    return block_gpt_update(disk_path, block_resize_entry, &request);
+}
+
 static void block_put32(uint8_t *bytes, uint32_t value)
 {
     bytes[0] = value; bytes[1] = value >> 8; bytes[2] = value >> 16; bytes[3] = value >> 24;
@@ -1258,6 +1289,7 @@ extern __typeof__(reliefos_block_gpt_create) leonos_block_gpt_create __attribute
 extern __typeof__(reliefos_block_gpt_delete) leonos_block_gpt_delete __attribute__((alias("reliefos_block_gpt_delete")));
 extern __typeof__(reliefos_block_gpt_initialize) leonos_block_gpt_initialize __attribute__((alias("reliefos_block_gpt_initialize")));
 extern __typeof__(reliefos_block_gpt_set_name) leonos_block_gpt_set_name __attribute__((alias("reliefos_block_gpt_set_name")));
+extern __typeof__(reliefos_block_gpt_resize) leonos_block_gpt_resize __attribute__((alias("reliefos_block_gpt_resize")));
 extern __typeof__(reliefos_block_gpt_set_type) leonos_block_gpt_set_type __attribute__((alias("reliefos_block_gpt_set_type")));
 extern __typeof__(reliefos_block_gpt_type_name) leonos_block_gpt_type_name __attribute__((alias("reliefos_block_gpt_type_name")));
 extern __typeof__(reliefos_block_list_disks) leonos_block_list_disks __attribute__((alias("reliefos_block_list_disks")));

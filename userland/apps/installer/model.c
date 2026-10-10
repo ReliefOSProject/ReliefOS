@@ -83,7 +83,9 @@ enum installer_page installer_model_next(enum installer_page page,
         return INSTALLER_PAGE_DISK;
     case INSTALLER_PAGE_DISK:
         return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_CONFIRM
-                                             : INSTALLER_PAGE_ACCOUNTS;
+                                             : INSTALLER_PAGE_PARTITIONS;
+    case INSTALLER_PAGE_PARTITIONS:
+        return INSTALLER_PAGE_ACCOUNTS;
     case INSTALLER_PAGE_ACCOUNTS:
         return INSTALLER_PAGE_CONFIRM;
     case INSTALLER_PAGE_CONFIRM:
@@ -107,11 +109,13 @@ enum installer_page installer_model_prev(enum installer_page page,
         return INSTALLER_PAGE_WELCOME;
     case INSTALLER_PAGE_DISK:
         return INSTALLER_PAGE_MODE;
+    case INSTALLER_PAGE_PARTITIONS:
+        return INSTALLER_PAGE_DISK;
     case INSTALLER_PAGE_CONFIRM:
         return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_DISK
                                              : INSTALLER_PAGE_ACCOUNTS;
     case INSTALLER_PAGE_ACCOUNTS:
-        return INSTALLER_PAGE_DISK;
+        return INSTALLER_PAGE_PARTITIONS;
     case INSTALLER_PAGE_FINISH:
         return INSTALLER_PAGE_DISK;
     default:
@@ -156,7 +160,8 @@ int installer_model_steps(enum installer_mode mode, enum installer_page *out,
     int count = 0;
     enum installer_page page;
     for (page = INSTALLER_PAGE_LANGUAGE; page < INSTALLER_PAGE_COUNT; ++page) {
-        if (page == INSTALLER_PAGE_ACCOUNTS && mode == INSTALLER_MODE_UPDATE)
+        if ((page == INSTALLER_PAGE_ACCOUNTS || page == INSTALLER_PAGE_PARTITIONS) &&
+            mode == INSTALLER_MODE_UPDATE)
             continue;
         if (count < cap)
             out[count] = page;

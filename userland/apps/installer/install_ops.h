@@ -61,6 +61,13 @@ extern uint8_t installer_theme_explicit;
 extern struct reliefos_block_disk_info disks[RELIEFOS_BLOCK_MAX_DISKS];
 extern uint32_t disk_count;
 extern int32_t selected_disk;
+extern struct reliefos_block_partition partitions[RELIEFOS_BLOCK_MAX_PARTITIONS];
+extern uint32_t partition_count;
+extern int32_t selected_partition;
+extern int32_t installer_root_partition;
+extern int32_t installer_esp_partition;
+extern uint8_t installer_partition_auto;
+extern uint8_t installer_partition_table_replaced;
 extern char confirm_text[16];
 extern struct installer_setup setup;
 extern char status_text[128];
@@ -88,6 +95,19 @@ void format_disk_line(char *buf, uint32_t cap,
 void reset_confirm(void);
 int confirmation_ok(void);
 void refresh_disks(void);
+void refresh_partitions(void);
+void format_partition_line(char *buf, uint32_t cap,
+                           const struct reliefos_block_partition *partition);
+int installer_partition_plan_valid(void);
+int installer_partition_initialize(void);
+int installer_partition_auto_layout(void);
+int installer_partition_create(uint32_t filesystem, uint32_t size_mib,
+                               const char *name);
+int installer_partition_resize(uint32_t size_mib);
+int installer_partition_rename(const char *name);
+int installer_partition_set_type(uint32_t type);
+int installer_partition_delete(void);
+int installer_partition_format(uint32_t filesystem, const char *label);
 
 /* Long-running operations; they drive `page` to PROGRESS then FINISH. */
 void prepare_update_target(void);
