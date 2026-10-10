@@ -1,41 +1,36 @@
-# ReliefNT Driver Modules
+# ReliefNT Drivers
 
 ## Layout
 
 All driver source code lives in the kernel submodule under `kernel/reliefnt/drivers/`.
+Every driver is linked into `kernel.sys` itself; there are no loadable driver
+modules and no driver files on disk.
 
 - `kernel/reliefnt/drivers/bootstrap`: console, framebuffer, VGA, EFI filesystem, storage, and
   USB UHCI/HID implementations that are linked into `kernel.sys`.
 - `kernel/reliefnt/drivers/mouse`, `kernel/reliefnt/drivers/serial`, `kernel/reliefnt/drivers/e1000`, `kernel/reliefnt/drivers/ac97`,
-  `kernel/reliefnt/drivers/es1371`, and `kernel/reliefnt/drivers/hda`: loadable implementations built as `mouse.drv`,
-  `serial.drv`, `e1000.drv`, `ac97.drv`, `es1371.drv`, and `hda.drv` (see `DRIVER_NAMES`
-  in `mk/boot.mk`).
-
-The normal image, normal ISO, installer runtime root, and installed ESP place
-loadable modules in `/usr/lib/reliefos/drivers`; ESP modules use `/drivers`.
+  `kernel/reliefnt/drivers/es1371`, and `kernel/reliefnt/drivers/hda`: device drivers compiled
+  into `kernel.sys` alongside the bootstrap drivers (see `KERNEL_SOURCE_DIRS`
+  in `kernel/reliefnt/mk/kernel.mk`).
 
 ## Module ABI
 
-A `.drv` is an unsigned x86_64 ELF64 `ET_REL` module. The kernel prefers the
-`reliefos_driver_module` descriptor and still accepts the legacy
-`leonos_driver_module` symbol. Both use ABI version
-`RELIEFOS_DRIVER_ABI_VERSION`, bounded allocatable sections, and supported
-local relocations. Modules receive `struct reliefos_driver_kernel_api`; they
-do not link directly against arbitrary kernel symbols.
+Each driver file exports a `const struct reliefos_driver_module` descriptor
+with a unique per-driver symbol name (for example `mouse_driver_module`). The
+descriptor uses ABI version `RELIEFOS_DRIVER_ABI_VERSION`, identifies the
+module, declares its driver kind, and supplies `init` and optional `fini`
+callbacks. Drivers receive `struct reliefos_driver_kernel_api`; they do not
+call arbitrary kernel subsystems directly. The API table binds a mouse input
+provider, serial console provider, e1000 link provider, or audio card.
 
-The descriptor identifies the module, declares its driver kind, and supplies
-`init` and optional `fini` callbacks. The kernel uses the API table to bind a
-mouse input provider, serial console provider, or e1000 link provider.
+## Startup
 
-## Startup and Configuration
-
-After `/` is mounted, the kernel scans the direct files in `/usr/lib/reliefos/drivers`.
-Every valid, enabled `.drv` is loaded in deterministic directory order. A
-failed module is retried once, then recorded as failed while boot continues.
-
-`/etc/reliefos/drivers.conf` is optional. It uses UTF-8 text with a `version=1` line
-and one `disabled=<file>.drv` line per module excluded from automatic startup.
-Absent entries are enabled by default.
+During boot the driver manager initializes every built-in driver in a fixed
+order (serial first so console output moves off the early COM1 path, then the
+remaining drivers). A failed init is rolled back (audio STOP, resource
+release, `fini`) and retried once, then recorded as failed while boot
+continues. There is no runtime load, unload or boot-disable action: the frozen
+driver control ioctl reports `-EOPNOTSUPP` for every action.
 
 ## USB HID
 
@@ -50,23 +45,11 @@ are not implemented yet.
 
 ## Management and Trust Boundary
 
-`drvmgr.elf` lists driver files, ABI versions, loading state, errors, and
-boot-disable state. Every logged-in user may read this state. Loading,
-unloading, forced unloading, rescanning, and changing boot enablement require
-an administrator session; the kernel enforces this before dispatching control
-requests.
-
-Forced unloading removes the module's service binding and runs its cleanup
-callback. A failed audio STOP or reported unsafe DMA teardown retains the
-module image and its resources for a later retry; only safe cleanup frees them.
-Removing `mouse.drv` stops mouse input;
-removing `serial.drv` removes serial console output; removing `e1000.drv`
-stops network links and clears active socket state. A module can be loaded
-again from its file without restarting.
-
-`.drv` files execute in Ring 0 and are intentionally not signed or hashed in
-this version. Only trusted administrators should be allowed to write
-`/usr/lib/reliefos/drivers` or modify its contents.
+`drvmgr.elf` lists the built-in drivers, their ABI versions, loading state and
+errors. Every logged-in user may read this state. The management view is
+read-only: drivers are part of the kernel image, so there is nothing to load,
+unload or disable at runtime, and the frozen driver control ioctl reports
+`-EOPNOTSUPP` for every action.
 
 ## Audio ABI probe boundary
 
@@ -82,8 +65,8 @@ physical speakers/microphones remain separate validation gates.
 
 ## HDA integration evidence
 
-The ordinary root build publishes `hda.drv` alongside the existing five
-modules in VMDK, Live ISO and Installer ISO products. An isolated QEMU q35
+The runs below predate built-in driver linking; at that time the drivers were
+loadable `.drv` modules published in VMDK, Live ISO and Installer ISO products. An isolated QEMU q35
 guest with Intel HDA, a duplex codec, four CPUs and MSI enabled has loaded
 the module and registered a codec card. Its standard-libc probe runs through
 normal OpenRC startup. Playback, mapped lifetime, control restoration, and

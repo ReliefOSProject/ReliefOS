@@ -25,7 +25,6 @@
  *     /run/reliefos                 volatile per-boot IPC and session state
  *     /usr/lib/reliefos             private libraries and loader payload
  *     /usr/lib/reliefos/apps        application packages (manifest + ELF)
- *     /usr/lib/reliefos/drivers     Ring-0 driver modules
  *     /usr/lib/reliefos/tests       diagnostic guest probes
  *     /usr/share/reliefos           desktop resources
  *     /usr/share/fonts/reliefos     ReliefOS UI fonts
@@ -54,7 +53,6 @@
 #define RELIEFOS_LAYOUT_RUN_RELIEFOS "/run/reliefos"
 #define RELIEFOS_LAYOUT_RELIEFOS_LIB "/usr/lib/reliefos"
 #define RELIEFOS_LAYOUT_RELIEFOS_APPS "/usr/lib/reliefos/apps"
-#define RELIEFOS_LAYOUT_RELIEFOS_DRIVERS "/usr/lib/reliefos/drivers"
 #define RELIEFOS_LAYOUT_RELIEFOS_TESTS "/usr/lib/reliefos/tests"
 #define RELIEFOS_LAYOUT_RELIEFOS_SHARE "/usr/share/reliefos"
 #define RELIEFOS_LAYOUT_RELIEFOS_RESOURCES "/usr/share/reliefos/resources"
@@ -72,7 +70,6 @@
 /* Runtime configuration. */
 #define RELIEFOS_PATH_RELIEFOS_CONF RELIEFOS_LAYOUT_ETC_RELIEFOS "/leonos.conf"
 #define RELIEFOS_PATH_DISPLAY_CONF RELIEFOS_LAYOUT_ETC_RELIEFOS "/display.conf"
-#define RELIEFOS_PATH_DRIVERS_CONF RELIEFOS_LAYOUT_ETC_RELIEFOS "/drivers.conf"
 #define RELIEFOS_PATH_TASKBAR_CFG RELIEFOS_LAYOUT_ETC_RELIEFOS "/taskbar.cfg"
 #define RELIEFOS_PATH_NETWORK_CONF RELIEFOS_LAYOUT_ETC_RELIEFOS "/network.conf"
 #define RELIEFOS_PATH_NETWORK_BAK RELIEFOS_LAYOUT_ETC_RELIEFOS "/network.conf.bak"

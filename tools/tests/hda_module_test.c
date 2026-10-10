@@ -254,7 +254,7 @@ static void jack_task_pump(void)
 static void actual_module_jack_publication_and_sparse_events(unsigned mode)
 {
     reset();jack_fixture=mode;senses[0][1]=1u<<31;
-    assert(!reliefos_driver_module.init(&api));assert(card_count==4);
+    assert(!hda_driver_module.init(&api));assert(card_count==4);
     uint32_t count,index=mode==1?2:1;
     assert(!audio_card_control_count(registered[1],&count) && count==index+1);
     struct audio_control_info info;
@@ -281,12 +281,12 @@ static void actual_module_jack_publication_and_sparse_events(unsigned mode)
     assert(!audio_card_control_read(registered[1],index,&value) && !value.values[0]);
     assert(!audio_control_queue_next(&queues[1],&element,&mask,1) && element==index);
     for(unsigned n=0;n<2;n++)assert(!audio_control_queue_close(&queues[n]));
-    reliefos_driver_module.fini();assert(!controllers && !allocation_count && !audio_task_work_pending());
+    hda_driver_module.fini();assert(!controllers && !allocation_count && !audio_task_work_pending());
     printf("actual_module_jack_mode%u_task_only_sparse_id_and_CAD_isolation PASS\n",mode);
 }
 static void fatal_controller_hides_all_codecs_without_irq_teardown(void)
 {
-    reset();assert(!reliefos_driver_module.init(&api));
+    reset();assert(!hda_driver_module.init(&api));
     int error=0;
     struct audio_pcm *pcm=audio_pcm_open(registered[0],0,AUDIO_PLAYBACK,&error);
     assert(pcm && !error);uint32_t stream=pcm->stream;
@@ -320,14 +320,14 @@ static void fatal_controller_hides_all_codecs_without_irq_teardown(void)
     assert(!(audio_fixture_irq_flags&(1ULL<<9)));
     kernel_execution_unlock_irqrestore(flags);
     assert(!audio_stream_close(stream));
-    reliefos_driver_module.fini();assert(!controllers && !allocation_count);
+    hda_driver_module.fini();assert(!controllers && !allocation_count);
     puts("fatal_controller_all_CAD_hidden_other_BDF_live_no_IRQ_teardown PASS");
 }
 
 static void actual_module_auto_mute_running_group_transaction(void)
 {
     reset();jack_fixture=3;gains[0][0][0]=23;gains[0][0][1]=19;
-    assert(!reliefos_driver_module.init(&api));
+    assert(!hda_driver_module.init(&api));
     uint32_t count;assert(!audio_card_control_count(registered[0],&count) && count==5);
     struct audio_control_info info;assert(!audio_card_control_info(registered[0],4,&info));
     assert(!strcmp(info.name,"Auto-Mute") && (info.access&AUDIO_CONTROL_WRITE));
@@ -376,14 +376,14 @@ static void actual_module_auto_mute_running_group_transaction(void)
     assert(speaker->active && !headphone->active && speaker->members[0].stream_tag==tag);
     assert(gains[0][0][0]==23 && gains[0][0][1]==19);
     assert(!audio_stream_trigger(stream,AUDIO_STOP));assert(!audio_stream_close(stream));
-    free_pages(memory,1);reliefos_driver_module.fini();assert(!controllers && !allocation_count);
+    free_pages(memory,1);hda_driver_module.fini();assert(!controllers && !allocation_count);
     puts("auto_mute_actual_module_RUNNING_shared_DAC_group_tag_gain_and_failure_rollback PASS");
 }
 
 static void actual_module_auto_mute_pause_contention_and_fail_closed(void)
 {
     reset();jack_fixture=3;gains[0][0][0]=11;gains[0][0][1]=9;
-    assert(!reliefos_driver_module.init(&api));
+    assert(!hda_driver_module.init(&api));
     struct hda_module_card *card=find_card(registered[0])->opaque;
     uint32_t stream;assert(!audio_stream_open(registered[0],0,AUDIO_PLAYBACK,&stream));
     struct stream_entry *entry=find_stream(stream);struct hda_stream *hw=entry->hw.driver;
@@ -430,14 +430,14 @@ static void actual_module_auto_mute_pause_contention_and_fail_closed(void)
     assert(!audio_card_identity(registered[2],&identity));
     assert(!audio_card_identity(registered[3],&identity));
     jack_task_pump();assert(!audio_stream_close(stream));free_pages(memory,1);
-    reliefos_driver_module.fini();assert(!controllers && !allocation_count && !teardown_error);
+    hda_driver_module.fini();assert(!controllers && !allocation_count && !teardown_error);
     puts("auto_mute_PREPARED_PAUSED_gate_contention_exclusive_HP_and_rollback_failure_BDF_retention PASS");
 }
 
 static void actual_module_prepare_preserves_volume_without_auto_mute(void)
 {
     reset();jack_fixture=1;gains[0][0][0]=23;gains[0][0][1]=19;
-    assert(!reliefos_driver_module.init(&api));
+    assert(!hda_driver_module.init(&api));
     uint32_t count;assert(!audio_card_control_count(registered[0],&count) && count==3);
     uint32_t stream;assert(!audio_stream_open(registered[0],0,AUDIO_PLAYBACK,&stream));
     uint64_t memory=alloc_dma(1,UINT32_MAX);
@@ -480,7 +480,7 @@ static void actual_module_prepare_preserves_volume_without_auto_mute(void)
     assert(!audio_stream_trigger(stream,AUDIO_STOP));assert(!audio_stream_close(stream));
     free_pages(larger_memory,64);
     free_pages(large_memory,32);
-    free_pages(memory,1);reliefos_driver_module.fini();assert(!controllers && !allocation_count);
+    free_pages(memory,1);hda_driver_module.fini();assert(!controllers && !allocation_count);
     puts("actual_module_prepare_preserves_user_volume_without_auto_mute_capability PASS");
 }
 
@@ -492,7 +492,7 @@ int main(void)
     actual_module_jack_publication_and_sparse_events(1);
     actual_module_jack_publication_and_sparse_events(2);
     fatal_controller_hides_all_codecs_without_irq_teardown();
-    reset();assert(!reliefos_driver_module.init(&api));assert(card_count==4);
+    reset();assert(!hda_driver_module.init(&api));assert(card_count==4);
     assert(identities[0].slot==1 && identities[0].codec==0);
     assert(identities[1].slot==1 && identities[1].codec==1);
     assert(strcmp(identities[0].id,identities[1].id));
@@ -514,12 +514,12 @@ int main(void)
     assert(!audio_stream_trigger(p,AUDIO_STOP));assert(phw->controller->active_streams==1);
     assert(!audio_stream_close(p));assert(!audio_stream_close(c));assert(!audio_stream_close(other));
     puts("actual_module_multicodec_BDF_direction_slot_caps_and_idempotent_STOP PASS");
-    destroy_stuck=1;reliefos_driver_module.fini();assert(teardown_error==-EIO && controllers);
-    destroy_stuck=0;teardown_error=0;reliefos_driver_module.fini();assert(!controllers && !allocation_count);
+    destroy_stuck=1;hda_driver_module.fini();assert(teardown_error==-EIO && controllers);
+    destroy_stuck=0;teardown_error=0;hda_driver_module.fini();assert(!controllers && !allocation_count);
     puts("module_fini_reports_retained_controller_and_retries PASS");
     for(unsigned nth=1;nth<=total;nth++){
-        reset();fail_nth=nth;assert(reliefos_driver_module.init(&api)==-ENOMEM);
-        reliefos_driver_module.fini();assert(!controllers && !allocation_count && !teardown_error);
+        reset();fail_nth=nth;assert(hda_driver_module.init(&api)==-ENOMEM);
+        hda_driver_module.fini();assert(!controllers && !allocation_count && !teardown_error);
         for(unsigned n=0;n<CARD_MAX;n++)assert(!cards[n].live);
     }
     fail_nth=0;printf("module_each_Nth_metadata_DMA_allocation_failure_reclaimed %u PASS\n",total);

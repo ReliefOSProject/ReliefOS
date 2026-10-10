@@ -22,9 +22,8 @@ do not collide with third-party Linux software:
     /var/lib/reliefos             persistent mutable state
     /var/cache/reliefos           cache data
     /run/reliefos                 volatile per-boot IPC and session state
-    /usr/lib/reliefos             private libraries, drivers and loader payload
+    /usr/lib/reliefos             private libraries and loader payload
     /usr/lib/reliefos/apps        application packages (manifest + executable)
-    /usr/lib/reliefos/drivers     ReliefOS Ring-0 driver modules
     /usr/lib/reliefos/tests       diagnostic guest probes
     /usr/share/reliefos           desktop resources that are not icon-theme data
     /usr/share/fonts/reliefos     ReliefOS UI fonts
@@ -70,7 +69,6 @@ RUN_RELIEFOS = "run/reliefos"
 
 RELIEFOS_LIB = "usr/lib/reliefos"
 RELIEFOS_APPS = "usr/lib/reliefos/apps"
-RELIEFOS_DRIVERS = "usr/lib/reliefos/drivers"
 RELIEFOS_TESTS = "usr/lib/reliefos/tests"
 RELIEFOS_SHARE = "usr/share/reliefos"
 RELIEFOS_RESOURCES = "usr/share/reliefos/resources"
@@ -140,7 +138,6 @@ P_VAR_CACHE_RELIEFOS = "/var/cache/reliefos"
 P_RUN_RELIEFOS = "/run/reliefos"
 P_RELIEFOS_LIB = "/usr/lib/reliefos"
 P_RELIEFOS_APPS = "/usr/lib/reliefos/apps"
-P_RELIEFOS_DRIVERS = "/usr/lib/reliefos/drivers"
 P_RELIEFOS_TESTS = "/usr/lib/reliefos/tests"
 P_RELIEFOS_SHARE = "/usr/share/reliefos"
 P_RELIEFOS_RESOURCES = "/usr/share/reliefos/resources"
@@ -158,7 +155,6 @@ P_LIBRELIEFOS = "/usr/lib/reliefos/libreliefos.so.2"
 # Configuration files.
 P_RELIEFOS_CONF = P_ETC_RELIEFOS + "/leonos.conf"
 P_DISPLAY_CONF = P_ETC_RELIEFOS + "/display.conf"
-P_DRIVERS_CONF = P_ETC_RELIEFOS + "/drivers.conf"
 P_TASKBAR_CFG = P_ETC_RELIEFOS + "/taskbar.cfg"
 P_NETWORK_CONF = P_ETC_RELIEFOS + "/network.conf"
 P_NETWORK_BAK = P_ETC_RELIEFOS + "/network.conf.bak"

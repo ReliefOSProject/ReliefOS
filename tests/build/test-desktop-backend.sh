@@ -39,7 +39,7 @@ mkdir -p "$work/out/upstream/sudo/root/usr/bin" \
     "$work/out/sysroot/musl/share/licenses/musl" \
     "$work/out/sysroot/musl/share/licenses/mimalloc" \
     "$work/out/system/lib" "$work/out/generated/system" \
-    "$work/out/generated/drivers" "$work/out/generated/fonts" \
+    "$work/out/generated/fonts" \
     "$work/out/userland"
 printf '%s\n' fixture > "$work/out/upstream/sudo/root/usr/bin/sudo"
 printf '%s\n' fixture > "$work/out/upstream/shadow/root/usr/bin/passwd"
@@ -54,7 +54,6 @@ legacy_brand=leon
 legacy_brand=${legacy_brand}os
 printf '%s\n' fixture > "$work/out/system/lib/lib${legacy_brand}.so.2"
 printf '%s\n' fixture > "$work/out/generated/system/kerneldebug.sys"
-printf '%s\n' fixture > "$work/out/generated/drivers/fixture.drv"
 printf '%s\n' fixture > "$work/out/generated/fonts/${legacy_brand}-metro.ttf"
 printf '%s\n' fixture > "$work/out/generated/fonts/${legacy_brand}-win95.ttf"
 printf '%s\n' fixture > "$work/out/userland/motd.elf"

@@ -144,7 +144,6 @@ failed=0
 for pair in \
     'etc/leonos/leonos.conf etc/reliefos/leonos.conf' \
     'etc/leonos/display.conf etc/reliefos/display.conf' \
-    'etc/leonos/drivers.conf etc/reliefos/drivers.conf' \
     'etc/leonos/taskbar.cfg etc/reliefos/taskbar.cfg' \
     'etc/leonos/network.conf etc/reliefos/network.conf' \
     'etc/leonos/locale.conf etc/reliefos/locale.conf' \

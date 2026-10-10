@@ -917,20 +917,18 @@ static int check_update_target_required(void)
         }
     }
     {
-        static const char *const namespaces[][6] = {
+        static const char *const namespaces[][5] = {
             {"/etc/reliefos", "/var/lib/reliefos", "/usr/lib/reliefos",
-             "/usr/lib/reliefos/apps", "/usr/lib/reliefos/drivers",
-             "/usr/lib/reliefos/libreliefos.so.2"},
+             "/usr/lib/reliefos/apps", "/usr/lib/reliefos/libreliefos.so.2"},
             {"/etc/leonos", "/var/lib/leonos", "/usr/lib/leonos",
-             "/usr/lib/leonos/apps", "/usr/lib/leonos/drivers",
-             "/usr/lib/leonos/libleonos.so.2"},
+             "/usr/lib/leonos/apps", "/usr/lib/leonos/libleonos.so.2"},
         };
         int found = 0;
         for (uint32_t n = 0; n < sizeof(namespaces) / sizeof(namespaces[0]); ++n) {
             int complete = 1;
-            for (uint32_t i = 0; i < 6; ++i) {
+            for (uint32_t i = 0; i < 5; ++i) {
                 char path[RELIEFOS_FS_PATH_LEN];
-                int required = i == 5 ? RELIEFOS_FS_TYPE_FILE : RELIEFOS_FS_TYPE_DIR;
+                int required = i == 4 ? RELIEFOS_FS_TYPE_FILE : RELIEFOS_FS_TYPE_DIR;
                 if (path_join(path, sizeof(path), INSTALL_ROOT_MOUNT, namespaces[n][i]) < 0)
                     return -ENAMETOOLONG;
                 if (path_type_nofollow(path) != required) { complete = 0; break; }
@@ -977,7 +975,6 @@ static int check_update_payload_required(void)
         INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_USR_LIB,
         INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_LIB,
         INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_APPS,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_DRIVERS,
         INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_DOC,
         INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_FONTS,
         INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_RESOURCES,

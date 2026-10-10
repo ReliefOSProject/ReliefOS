@@ -73,6 +73,14 @@ void audio_timer_period_elapsed(uint32_t card, uint32_t device,
     (void)card; (void)device; (void)direction; (void)frames; (void)error;
 }
 
+/* stream.c reports periods through the hda.c wrapper; this fixture links the
+ * PCM core directly, so forward to it the way the pre-rename call resolved. */
+void hda_audio_period_elapsed(uint32_t card, uint32_t stream,
+                              uint64_t frames, int error)
+{
+    audio_period_elapsed(card, stream, frames, error);
+}
+
 int hda_stream_test_route_bind(struct hda_route_group *group, uint8_t tag,
                                uint16_t format)
 {

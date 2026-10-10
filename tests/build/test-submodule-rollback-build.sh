@@ -97,28 +97,17 @@ for product in system/kernel.sys system/kernel.debug system/kerneldebug.sys \
         boot/loader.elf; do
     [ -f "$work/out/generated/$product" ] || missing="$missing $product"
 done
-rollback_drivers=
-if [ -f "$reliefnt/mk/boot.mk" ]; then
-    rollback_drivers=$(sed -n 's/^DRIVER_NAMES[[:space:]]*:=\(.*\)$/\1/p' \
-        "$reliefnt/mk/boot.mk" | tr '\n' ' ')
-fi
-for driver in $rollback_drivers; do
-    product="drivers/$driver.drv"
-    [ -f "$work/out/generated/$product" ] || missing="$missing $product"
-done
-if [ -z "$rollback_drivers" ]; then
-    fail "the rollback pin declares a driver product set" \
-        "could not read DRIVER_NAMES from $reliefnt/mk/boot.mk"
-elif [ -z "$missing" ]; then
-    pass "all kernel products declared by the rollback pin are published"
+if [ -z "$missing" ]; then
+    pass "all published kernel products exist at the rolled-back pin"
 else
-    fail "all kernel products declared by the rollback pin are published" \
-        "missing:$missing" "drivers:$rollback_drivers"
+    fail "all published kernel products exist at the rolled-back pin" \
+        "missing:$missing"
 fi
-if printf '%s\n' "$rollback_drivers" | grep -qw hda; then
-    pass "the rollback pin publishes the HDA driver"
-else
-    printf 'note - rollback pin predates HDA; its declared product set is accepted without hda.drv\n'
+# The rolled-back pin may still install legacy loadable driver modules into the
+# sub-make install directory; the current adapter publishes only the four kernel
+# products and leaves those unpublished.
+if find "$work/out/kernel-install" -name '*.drv' 2>/dev/null | grep -q .; then
+    printf 'note - rolled-back pin installs legacy .drv modules; they stay unpublished\n'
 fi
 
 printf '\n=== (2) release flows refuse the rolled-back state (gitlink mismatch) ===\n'

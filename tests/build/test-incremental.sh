@@ -75,7 +75,7 @@ count_label() { printf '%s\n' "$1" | grep -cE "^  $2 " || true; }
 # path + full mtime with nanoseconds, for everything this suite watches:
 # kernel sub-build objects, userland objects, the published products and the
 # exported headers. $(O)/kernel-install is deliberately excluded: the sub-make's
-# `install` recopies its nine products there on every ask.
+# `install` recopies its four products there on every ask.
 snapshot() {
     {
         find "$O/obj" "$reliefnt_o/obj" -name '*.o' -printf '%p %T@\n' 2>/dev/null
@@ -84,11 +84,6 @@ snapshot() {
                        "$O/generated/system/kernel.debug" \
                        "$O/generated/system/kerneldebug.sys" \
                        "$O/generated/boot/loader.elf" \
-                       "$O/generated/drivers/mouse.drv" \
-                       "$O/generated/drivers/serial.drv" \
-                       "$O/generated/drivers/e1000.drv" \
-                       "$O/generated/drivers/ac97.drv" \
-                       "$O/generated/drivers/es1371.drv" \
                        "$O/include/generated/autoconf.h" \
                        "$O/include/generated/build_info.h"; do
             [ -e "$product" ] && printf '%s %s\n' "$product" "$(stat -c %y "$product")"
@@ -159,14 +154,13 @@ fi
 # Every product the rest of the build consumes is published to its legacy path.
 missing=''
 for product in system/kernel.sys system/kernel.debug system/kerneldebug.sys \
-               boot/loader.elf drivers/mouse.drv drivers/serial.drv \
-               drivers/e1000.drv drivers/ac97.drv drivers/es1371.drv; do
+               boot/loader.elf; do
     [ -s "$O/generated/$product" ] || missing="$missing $product"
 done
 if [ -z "$missing" ]; then
-    pass 'all nine kernel products are published to their legacy paths'
+    pass 'all four kernel products are published to their legacy paths'
 else
-    fail 'all nine kernel products are published to their legacy paths' "missing:$missing"
+    fail 'all four kernel products are published to their legacy paths' "missing:$missing"
 fi
 
 # Nothing may be linked in that the deletion-detecting manifest does not list:
@@ -265,14 +259,13 @@ expect_count "$third" CC 1 'changing one C file recompiles exactly one object'
 expect_count "$third" LD 1 'changing one C file relinks once'
 expect_count "$third" IMAGE 2 'changing one C file refreshes exactly the two kernel images'
 expect_contains "$third" "$target_source" 'the recompiled file is the one that changed'
-# Only the affected products take part: the loader and the drivers depend on
-# the kernel only through the integrity chain, and a content-preserving touch
-# does not move it.
-if printf '%s\n' "$third" | grep -qE 'loader\.elf|\.drv'; then
-    fail 'changing one C file leaves loader.elf and the drivers alone' \
-        "$(printf '%s\n' "$third" | grep -E 'loader\.elf|\.drv' | head -2 | tr '\n' ' ')"
+# Only the affected products take part: the loader depends on the kernel only
+# through the integrity chain, and a content-preserving touch does not move it.
+if printf '%s\n' "$third" | grep -qE 'loader\.elf|kerneldebug\.sys'; then
+    fail 'changing one C file leaves loader.elf and kerneldebug.sys alone' \
+        "$(printf '%s\n' "$third" | grep -E 'loader\.elf|kerneldebug\.sys' | head -2 | tr '\n' ' ')"
 else
-    pass 'changing one C file leaves loader.elf and the drivers alone'
+    pass 'changing one C file leaves loader.elf and kerneldebug.sys alone'
 fi
 userland_after=$(userland_snapshot)
 expect_same "$userland_before" "$userland_after" \

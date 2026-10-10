@@ -100,7 +100,6 @@ for package in musl mimalloc; do tree "$out/sysroot/musl/share/licenses/$package
 printf '/lib:/usr/local/lib:/usr/lib:/usr/lib/reliefos:/usr/lib/leonos\n' > "$work/data/ld.path"
 file "$work/data/ld.path" etc/ld-musl-x86_64.path 0644 musl
 file "$out/generated/system/kerneldebug.sys" usr/lib/reliefos/kerneldebug.sys 0755
-for driver in "$out/generated/drivers"/*.drv; do file "$driver" "usr/lib/reliefos/drivers/${driver##*/}" 0755; done
 file "$out/userland/motd.elf" usr/lib/reliefos/motd-status 0755 reliefos-base
 file "$out/userland/dynlinkerror.elf" usr/lib/reliefos/apps/dynlinkerror/dynlinkerror.elf 0755 reliefos-apps
 # awk reads TSV without collapsing empty label/extension fields. No data is

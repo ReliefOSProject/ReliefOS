@@ -148,20 +148,21 @@ PCM interfaces and their current verification limits are described in the Audio
 ABI section below. `/dev/audio` remains a compatibility alias for `/dev/dsp`;
 it does not select the traditional OSS mu-law default.
 
-## Driver Module ABI
+## Driver ABI
 
-Loadable Ring 0 driver modules use the public definitions in
-`include/leonos/driver.h`. Ordinary applications list and control drivers
-through `system_driver_list()`/`system_driver_control()`
-(`include/leonos/devmgr_service.h`), which send versioned requests to the
+Device drivers are linked into `kernel.sys` itself; there is no runtime module
+loader and no driver files on disk. The public definitions in
+`include/leonos/driver.h` remain the frozen driver ABI. Ordinary applications
+list drivers through `system_driver_list()`
+(`include/leonos/devmgr_service.h`), which sends versioned requests to the
 devmand service over its AF_UNIX socket; devmand in turn issues the kernel's
-`LEONOS_DRIVER_CONTROL_IOCTL` on `/dev/driverctl`, and the kernel permits
-control actions only for administrator tasks. There are no legacy
-`LEONOS_IOCTL_DRIVER_*` ioctls.
+`LEONOS_DRIVER_CONTROL_IOCTL` on `/dev/driverctl`. `system_driver_control()`
+and the control ioctl are kept for ABI compatibility, but every control action
+(load, unload, force unload, rescan, boot enablement) now returns
+`-EOPNOTSUPP` because there is no module to change at runtime. There are no
+legacy `LEONOS_IOCTL_DRIVER_*` ioctls.
 
-The kernel loads unsigned ELF64 `ET_REL` files from `/drivers` after the
-root filesystem is mounted. The complete binary format, restricted kernel API,
-and persistent `/etc/reliefos/drivers.conf` policy are documented in
+The built-in driver lifecycle and the restricted kernel API are documented in
 [Drivers](DRIVERS.md).
 
 ## Kernel Debug Module ABI

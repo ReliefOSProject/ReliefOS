@@ -34,7 +34,7 @@ class InstallerPayloadTests(unittest.TestCase):
         # Derived from rootfs-stage.sh and installer-stage.sh, not the validator's arrays.
         for name in (
             "etc/reliefos", "var/lib/reliefos", "usr/lib/reliefos/apps",
-            "usr/lib/reliefos/drivers", "usr/share/doc/reliefos",
+            "usr/share/doc/reliefos",
             "usr/share/fonts/reliefos", "usr/share/reliefos/resources",
             "usr/share/licenses", "etc/ssl/certs",
         ):
@@ -58,7 +58,7 @@ class InstallerPayloadTests(unittest.TestCase):
         root = self.root / "target"
         for name in ("bin", "sbin", "lib", "usr/bin", "usr/sbin", "usr/lib",
                      f"etc/{namespace}", f"var/lib/{namespace}",
-                     f"usr/lib/{namespace}/apps", f"usr/lib/{namespace}/drivers", "boot/EFI"):
+                     f"usr/lib/{namespace}/apps", "boot/EFI"):
             (root / name).mkdir(parents=True, exist_ok=True)
         library = "libreliefos.so.2" if namespace == "reliefos" else "libleonos.so.2"
         for name in (f"usr/lib/{namespace}/{library}", "boot/loader.elf", f"boot/{namespace}/kernel.sys"):

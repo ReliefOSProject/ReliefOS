@@ -16,7 +16,7 @@ when changing the kernel, loader, installer, or user ABI.
   `mmap`/`munmap`, process calls, and ioctl groups.
 - [Filesystem](FILESYSTEM.md): Unix-style root paths, ext4 default root plus legacy ext2, exFAT/FAT32/ISO 9660 support,
   bundled `.hlp` help documents, and current limits.
-- [Drivers](DRIVERS.md): bootstrap drivers, loadable `.drv` modules, ABI, and
+- [Drivers](DRIVERS.md): bootstrap drivers, built-in device drivers, ABI, and
   management policy.
 - [Build system](BUILDSYSTEM.md): GNU Make layout, target graph (kernel /
   userland / runtime / sdk / installer / rpr-pages / pages), incremental and

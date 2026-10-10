@@ -312,7 +312,7 @@ def main() -> int:
     if not a.boot_only and a.controller!='none':
         try:metrics=analyze_wave(tone, None if legacy else 96000);waveform=True
         except (OSError,ValueError,wave.Error,EOFError) as exc:wave_error=str(exc) or type(exc).__name__
-    expected=ready if 'hda' in a.controller else (f'loaded {a.controller}.drv' in text if a.controller!='none' else not ready)
+    expected=ready if 'hda' in a.controller else (f'loaded {a.controller} abi=' in text if a.controller!='none' else not ready)
     shm_match=re.search(r'PASS native SysV SHM checks=(\d+); all owned segments removed',text)
     shm_checks=int(shm_match.group(1)) if shm_match else 0
     capture_verified=False;capture_metrics=None;capture_error=None

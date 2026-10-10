@@ -53,7 +53,7 @@
 | 布局契约 | `include/leonos/layout.h` | `include/reliefos/layout.h`（旧头转发） |
 | 标记/所有权 | 旧 `LEONOS_BUILD_OWNER` 等 marker | 新/旧 marker 均识别，拒绝未知目录 |
 
-`kernel.sys`、`kernel.debug`、`kerneldebug.sys`、`loader.elf`、驱动 `.drv`、
+`kernel.sys`、`kernel.debug`、`kerneldebug.sys`、`loader.elf`、
 `EFI/BOOT/BOOTX64.EFI`、syscall 编号、UAPI 结构布局与 `LEONACL.SYS`
 是引导器/磁盘协议与 ABI 契约，不随品牌改名。
 

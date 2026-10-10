@@ -3,10 +3,11 @@
 # Phase 3 of the kernel/userland separation: this repository no longer compiles
 # any kernel, driver or boot-loader source. The standalone checkout named by
 # RELIEFNT_DIR owns those sources and builds kernel.sys, kernel.debug,
-# kerneldebug.sys, loader.elf and the five .drv files; this fragment drives that
-# build and publishes the results to the legacy locations the rest of the parent
-# build (rootfs, images, rpr) consumes. The parent consumes only the sub-build's
-# `install` output and its exported headers (mk/headers.mk).
+# kerneldebug.sys and loader.elf (the device drivers are linked into kernel.sys);
+# this fragment drives that build and publishes the results to the legacy
+# locations the rest of the parent build (rootfs, images, rpr) consumes. The
+# parent consumes only the sub-build's `install` output and its exported headers
+# (mk/headers.mk).
 #
 # The sub-build is asked on every invocation. A stamp keyed on a git SHA would
 # miss local edits in the checkout, so incrementality is the sub-make's own
@@ -60,19 +61,14 @@ RELIEFOS_KERNEL_SYS := $(O_GENERATED)/system/kernel.sys
 RELIEFOS_KERNEL_DEBUG := $(O_GENERATED)/system/kernel.debug
 RELIEFNT_LOADER_ELF := $(O_GENERATED)/boot/loader.elf
 RELIEFNT_KERNELDEBUG_SYS := $(O_GENERATED)/system/kerneldebug.sys
-RELIEFNT_DRIVER_NAMES := mouse serial e1000 ac97 es1371 hda
-RELIEFNT_DRIVER_OUTPUTS := $(addprefix $(O_GENERATED)/drivers/,$(addsuffix .drv,$(RELIEFNT_DRIVER_NAMES)))
 
 # "legacy path below generated/:installed file name" per product; the sub-make's
-# install writes the nine products flat under $(RELIEFNT_DEST).
+# install writes the four products flat under $(RELIEFNT_DEST).
 RELIEFNT_PUBLISH_PAIRS := system/kernel.sys:kernel.sys system/kernel.debug:kernel.debug \
-	system/kerneldebug.sys:kerneldebug.sys boot/loader.elf:loader.elf \
-	drivers/mouse.drv:mouse.drv drivers/serial.drv:serial.drv \
-	drivers/e1000.drv:e1000.drv drivers/ac97.drv:ac97.drv \
-	drivers/es1371.drv:es1371.drv drivers/hda.drv:hda.drv
+	system/kerneldebug.sys:kerneldebug.sys boot/loader.elf:loader.elf
 
 RELIEFNT_PUBLISHED := $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_DEBUG) \
-	$(RELIEFNT_KERNELDEBUG_SYS) $(RELIEFNT_LOADER_ELF) $(RELIEFNT_DRIVER_OUTPUTS)
+	$(RELIEFNT_KERNELDEBUG_SYS) $(RELIEFNT_LOADER_ELF)
 
 # An explicit command-line tool override is part of the caller's intent and is
 # passed to the sub-make as well (the checkout accepts the same CC/CXX/AR/
@@ -105,7 +101,7 @@ RELIEFNT_VERSION_PASSTHRU := $(strip $(foreach suffix,EXTRAVERSION LOCALVERSION,
 RELIEFNT_HEADER_EXPORT_LIST_FOR_KERNEL := $(if $(strip $(HEADER_EXPORT_LIST)),$(HEADER_EXPORT_LIST),$(RELIEFOS_SRC)/configs/header-export.list)
 RELIEFNT_HEADER_EXPORT_ENTRIES_FOR_KERNEL := $(shell sed -e 's/\#.*//' -e '/^[[:space:]]*$$/d' $(RELIEFNT_HEADER_EXPORT_LIST_FOR_KERNEL))
 RELIEFNT_HEADER_EXPORTS_COMPLETE := $(shell for entry in $(RELIEFNT_HEADER_EXPORT_ENTRIES_FOR_KERNEL); do test -f '$(RELIEFNT_DIR)/'$$entry || exit 1; done; printf yes)
-RELIEFNT_KERNEL_ONLY_GOALS := kernel all loader drivers
+RELIEFNT_KERNEL_ONLY_GOALS := kernel all loader kerneldebug
 RELIEFNT_NON_KERNEL_GOALS := $(filter-out $(RELIEFNT_KERNEL_ONLY_GOALS),$(MAKECMDGOALS))
 RELIEFNT_KERNEL_HEADER_ORDER_ONLY := | $(O)/kernel-export/manifest.txt
 ifeq ($(strip $(RELIEFNT_NON_KERNEL_GOALS)),)

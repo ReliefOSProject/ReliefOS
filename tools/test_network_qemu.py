@@ -207,7 +207,6 @@ def main():
         shutil.copy2(ROOT / "build/live/root.ext2", image)
         subprocess.run(["debugfs", "-w", "-R", "mkdir /usr/lib/reliefos/tests", str(image)], check=True, capture_output=True)
         for source, destination in ((probe, "/usr/lib/reliefos/tests/linux-inventory.elf"),
-                (ROOT / "build/drivers/e1000.drv", "/usr/lib/reliefos/drivers/e1000.drv"),
                 (ROOT / "build/userland/busybox.elf", "/bin/busybox"),
                 (ROOT / "build/system/lib/libleonos.so.2", "/usr/lib/leonos/libleonos.so.2"),
                 (ROOT / "build/userland/netctl.elf", "/usr/lib/reliefos/apps/netctl/netctl.elf"),

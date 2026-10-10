@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: userland/apps/diskmgr/main.c:810
+#: userland/apps/diskmgr/main.c:817
 msgid "   Partitions: "
 msgstr ""
 
@@ -34,7 +34,7 @@ msgstr ""
 msgid "  Truncated"
 msgstr ""
 
-#: userland/apps/fileman/model.c:582
+#: userland/apps/fileman/model.c:551
 msgid " (partial)"
 msgstr ""
 
@@ -54,15 +54,15 @@ msgstr ""
 msgid " controls"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:386
+#: userland/apps/fileman/operations.c:344
 msgid " failed"
 msgstr ""
 
-#: userland/apps/fileman/model.c:578
+#: userland/apps/fileman/model.c:547
 msgid " files, "
 msgstr ""
 
-#: userland/apps/fileman/model.c:580
+#: userland/apps/fileman/model.c:549
 msgid " folders"
 msgstr ""
 
@@ -70,7 +70,7 @@ msgstr ""
 msgid " forms, "
 msgstr ""
 
-#: userland/apps/fileman/operations.c:384
+#: userland/apps/fileman/operations.c:342
 msgid " item(s) completed; "
 msgstr ""
 
@@ -84,10 +84,6 @@ msgstr ""
 
 #: userland/apps/apiapp/main.c:356
 msgid " of "
-msgstr ""
-
-#: userland/apps/installer/main.c:2571
-msgid " program package update(s) found."
 msgstr ""
 
 #: userland/apps/netctl/main.c:572
@@ -126,12 +122,12 @@ msgstr ""
 msgid "< Back"
 msgstr ""
 
-#: userland/apps/osver/main.c:189
-msgid "A compact desktop OS"
+#: userland/apps/drvmgr/main.c:153
+msgid "ABI"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:176
-msgid "ABI"
+#: userland/apps/servicemgr/main.c:44
+msgid "ALSA state"
 msgstr ""
 
 #: userland/apps/apiapp/main.c:624
@@ -142,7 +138,7 @@ msgstr ""
 msgid "ARP timeout"
 msgstr ""
 
-#: userland/apps/fileman/input.c:45
+#: userland/apps/notepad/main.c:688
 msgid "About"
 msgstr ""
 
@@ -150,43 +146,39 @@ msgstr ""
 msgid "About Browser"
 msgstr ""
 
-#: userland/apps/osver/main.c:250
+#: userland/apps/osver/main.c:199
 msgid "About ReliefOS"
 msgstr ""
 
-#: userland/apps/osver/main.c:173
+#: userland/apps/osver/main.c:236
 msgid "About this operating system"
 msgstr ""
 
-#: userland/apps/login/main.c:164
-msgid "Account expired"
-msgstr ""
-
-#: userland/apps/installer/main.c:2260
+#: userland/apps/installer/install_ops.c:847
 msgid "Account setup failed"
 msgstr ""
 
-#: userland/apps/installer/main.c:1139
+#: userland/apps/installer/main.c:177
 msgid "Accounts"
 msgstr ""
 
-#: userland/apps/installer/main.c:1229
+#: userland/apps/installer/main.c:382
 msgid "Acknowledgements for public resources and open-source projects."
 msgstr ""
 
-#: userland/apps/settings/main.c:467
+#: userland/apps/settings/main.c:471
 msgid "Activated"
 msgstr ""
 
-#: userland/apps/settings/main.c:1592
+#: userland/apps/settings/main.c:1596
 msgid "Activation"
 msgstr ""
 
-#: userland/apps/settings/main.c:477
+#: userland/apps/settings/main.c:481
 msgid "Activation denied"
 msgstr ""
 
-#: userland/apps/settings/main.c:1601
+#: userland/apps/settings/main.c:1605
 msgid "Activation mode"
 msgstr ""
 
@@ -218,35 +210,27 @@ msgstr ""
 msgid "Address selected"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:256
+#: userland/apps/taskmgr/main.c:154
 msgid "Admin"
 msgstr ""
 
-#: userland/apps/settings/main.c:387
+#: userland/apps/settings/main.c:391
 msgid "Administrator"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:497
+#: userland/apps/diskmgr/main.c:501
 msgid "Administrator approval is required"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:156
-msgid "Administrator controls enabled"
-msgstr ""
-
-#: userland/apps/drvmgr/main.c:241
-msgid "Administrator permission required"
-msgstr ""
-
-#: userland/apps/settings/main.c:598
+#: userland/apps/settings/main.c:602
 msgid "Administrator rights required"
 msgstr ""
 
-#: userland/apps/installer/main.c:1520
+#: userland/apps/installer/main.c:637
 msgid "Administrator: root"
 msgstr ""
 
-#: userland/apps/settings/main.c:1462
+#: userland/apps/settings/main.c:1466
 msgid "Administrators can create and manage local accounts."
 msgstr ""
 
@@ -256,10 +240,6 @@ msgstr ""
 
 #: userland/apps/desktop/start_menu.c:793
 msgid "All apps"
-msgstr ""
-
-#: userland/apps/installer/main.c:2572
-msgid "All are selected by default."
 msgstr ""
 
 #: userland/runtime/src/ui.c:715
@@ -282,11 +262,11 @@ msgstr ""
 msgid "Allow this app to start a process when you sign in?"
 msgstr ""
 
-#: userland/apps/installer/main.c:3199
+#: userland/apps/installer/install_ops.c:1419
 msgid "Alpine packages and local configuration are preserved."
 msgstr ""
 
-#: userland/apps/installer/main.c:1459
+#: userland/apps/installer/main.c:708
 msgid "Alpine packages and local configuration are retained. Boot files are updated after the package transaction succeeds."
 msgstr ""
 
@@ -294,7 +274,7 @@ msgstr ""
 msgid "Always use this app"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:141
+#: userland/apps/doomlauncher/main.c:147
 msgid "An IWAD path is required"
 msgstr ""
 
@@ -314,6 +294,10 @@ msgstr ""
 msgid "Application download started"
 msgstr ""
 
+#: userland/apps/fileman/motif_dialogs.c:218
+msgid "Application launched"
+msgstr ""
+
 #: userland/apps/desktop/input.c:380
 msgid "Application window"
 msgstr ""
@@ -322,23 +306,23 @@ msgstr ""
 msgid "Application:"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:780
+#: userland/apps/desktop/screen.c:806
 msgid "Applications are still running"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:704
+#: userland/apps/diskmgr/main.c:711
 msgid "Apply"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:704
+#: userland/apps/diskmgr/main.c:711
 msgid "Apply again"
 msgstr ""
 
-#: userland/apps/installer/main.c:1137
-msgid "Apps"
+#: userland/apps/fileman/actions.c:372
+msgid "Archive Conflict"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:76
+#: userland/apps/doomlauncher/main.c:97
 msgid "Arguments are empty"
 msgstr ""
 
@@ -346,11 +330,11 @@ msgstr ""
 msgid "Arrow"
 msgstr ""
 
-#: userland/apps/settings/main.c:1141
+#: userland/apps/settings/main.c:1145
 msgid "At sign-in"
 msgstr ""
 
-#: userland/apps/installer/main.c:1093
+#: userland/apps/installer/install_ops.c:450
 msgid "Attach a disk and click Refresh."
 msgstr ""
 
@@ -360,18 +344,6 @@ msgstr ""
 
 #: userland/apps/sudod/main.c:289
 msgid "Authentication"
-msgstr ""
-
-#: userland/apps/login/main.c:165
-msgid "Authentication canceled"
-msgstr ""
-
-#: userland/apps/login/main.c:166
-msgid "Authentication failed"
-msgstr ""
-
-#: userland/apps/login/main.c:167
-msgid "Authentication service failed"
 msgstr ""
 
 #: userland/apps/oshlp/main.c:983
@@ -394,19 +366,15 @@ msgstr ""
 msgid "Authorizing installation..."
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:214
+#: userland/apps/drvmgr/main.c:185
 msgid "Available"
 msgstr ""
 
-#: userland/apps/installer/main.c:1332
+#: userland/apps/installer/main.c:538
 msgid "Available disks"
 msgstr ""
 
-#: userland/apps/imageview/main.c:619
-msgid "BMP and PNG image viewer"
-msgstr ""
-
-#: userland/apps/settings/main.c:1324
+#: userland/apps/settings/main.c:1328
 msgid "BMP only, up to 1280 x 720."
 msgstr ""
 
@@ -426,19 +394,15 @@ msgstr ""
 msgid "Beginning"
 msgstr ""
 
-#: userland/apps/settings/main.c:1871
+#: userland/apps/settings/main.c:1879
 msgid "Bitmap (*.bmp)"
 msgstr ""
 
-#: userland/apps/settings/main.c:142
+#: userland/apps/settings/main.c:146
 msgid "Bitmap images"
 msgstr ""
 
-#: userland/apps/paint/main.c:450
-msgid "Bitmap or PNG (*.bmp; *.png)"
-msgstr ""
-
-#: userland/apps/settings/main.c:285
+#: userland/apps/settings/main.c:289
 msgid "Blue"
 msgstr ""
 
@@ -450,7 +414,7 @@ msgstr ""
 msgid "Bookmarks"
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:401
+#: userland/apps/minesweeper/main.c:199
 msgid "Boom"
 msgstr ""
 
@@ -458,7 +422,7 @@ msgstr ""
 msgid "Boot"
 msgstr ""
 
-#: userland/apps/settings/main.c:159
+#: userland/apps/settings/main.c:163
 msgid "Boot and service runtime should request an address automatically."
 msgstr ""
 
@@ -466,7 +430,7 @@ msgstr ""
 msgid "Boot disk"
 msgstr ""
 
-#: userland/apps/installer/main.c:3354
+#: userland/apps/installer/install_ops.c:1563
 msgid "Boot update failed"
 msgstr ""
 
@@ -478,31 +442,31 @@ msgstr ""
 msgid "Bottom of page"
 msgstr ""
 
-#: userland/apps/settings/main.c:1314
+#: userland/apps/settings/main.c:1318
 msgid "Browse"
 msgstr ""
 
-#: userland/apps/fileman/input.c:62
-msgid "Browse files and launch apps."
+#: userland/apps/fileman/motif.c:124
+msgid "Browse files, manage folders and launch X11 applications."
 msgstr ""
 
-#: userland/apps/paint/main.c:491
+#: userland/apps/paint/main.c:678
 msgid "Brush"
 msgstr ""
 
-#: userland/apps/paint/main.c:493
-msgid "Brush Size"
-msgstr ""
-
-#: userland/apps/osver/main.c:199
+#: userland/apps/osver/main.c:287
 msgid "Build and runtime components"
 msgstr ""
 
-#: userland/apps/osver/main.c:157
+#: userland/apps/osver/main.c:263
 msgid "Build time"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:48
+#: userland/apps/drvmgr/main.c:217
+msgid "Built-in kernel drivers"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:47
 msgid "BusyBox ntpd"
 msgstr ""
 
@@ -526,23 +490,19 @@ msgstr ""
 msgid "Buttons, inputs, lists, menus, panels, windows"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1122
-msgid "COMMAND"
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:1192
+#: userland/apps/taskmgr/main.c:1059
 msgid "CPU"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:977
+#: userland/apps/taskmgr/main.c:618
 msgid "CPU Usage"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:714
+#: userland/apps/taskmgr/main.c:801
 msgid "CPU time:"
 msgstr ""
 
-#: userland/apps/calc/main.c:537
+#: userland/apps/calc/main.c:99
 msgid "Calculator"
 msgstr ""
 
@@ -550,15 +510,15 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: userland/apps/settings/main.c:1413
+#: userland/apps/settings/main.c:1417
 msgid "Candidates"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:448
-msgid "Cannot create tar"
+#: userland/apps/fileman/actions.c:318
+msgid "Cannot create extraction folder"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:634
+#: userland/apps/taskmgr/main.c:713
 msgid "Cannot end protected or non-user task"
 msgstr ""
 
@@ -566,24 +526,20 @@ msgstr ""
 msgid "Cannot open Desktop folder"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:720
+#: userland/apps/diskmgr/main.c:727
 msgid "Capacity"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:659
+#: userland/apps/diskmgr/main.c:666
 msgid "Capacity:"
 msgstr ""
 
-#: userland/apps/settings/main.c:295
+#: userland/apps/settings/main.c:299
 msgid "Center"
 msgstr ""
 
-#: userland/apps/settings/main.c:1489
+#: userland/apps/settings/main.c:1493
 msgid "Change Password"
-msgstr ""
-
-#: userland/apps/installer/main.c:1400
-msgid "Changed or missing programs are selected; changed drivers are refreshed automatically."
 msgstr ""
 
 #: userland/apps/browser/forms.c:1517
@@ -598,11 +554,11 @@ msgstr ""
 msgid "Checked"
 msgstr ""
 
-#: userland/apps/installer/main.c:3341
+#: userland/apps/installer/install_ops.c:1550
 msgid "Checking dependencies and preserving local configuration"
 msgstr ""
 
-#: userland/apps/installer/main.c:3181
+#: userland/apps/installer/install_ops.c:1401
 msgid "Checking existing ReliefOS"
 msgstr ""
 
@@ -614,11 +570,11 @@ msgstr ""
 msgid "Chinese punctuation"
 msgstr ""
 
-#: userland/apps/installer/main.c:1307
+#: userland/apps/installer/main.c:466
 msgid "Choose Setup Mode"
 msgstr ""
 
-#: userland/apps/installer/main.c:1279
+#: userland/apps/installer/main.c:420
 msgid "Choose UI Style"
 msgstr ""
 
@@ -634,27 +590,31 @@ msgstr ""
 msgid "Choose a text file or PNG image"
 msgstr ""
 
+#: userland/apps/fileman/motif_dialogs.c:202
+msgid "Choose an installed X11 executable using its absolute path"
+msgstr ""
+
 #: userland/apps/notepad/main.c:676
 msgid "Choose file"
 msgstr ""
 
-#: userland/apps/settings/main.c:1503
+#: userland/apps/settings/main.c:1507
 msgid "Choose the default app used by File Manager and desktop shortcuts."
 msgstr ""
 
-#: userland/apps/installer/main.c:1329
+#: userland/apps/installer/main.c:530
 msgid "Choose the disk that already contains ReliefOS."
 msgstr ""
 
-#: userland/apps/installer/main.c:1330
+#: userland/apps/installer/main.c:531
 msgid "Choose the disk that will receive ReliefOS."
 msgstr ""
 
-#: userland/apps/installer/main.c:1212
+#: userland/apps/installer/main.c:358
 msgid "Choose the language for Setup and the installed system."
 msgstr ""
 
-#: userland/apps/settings/main.c:1869
+#: userland/apps/settings/main.c:1877
 msgid "Choose wallpaper"
 msgstr ""
 
@@ -678,19 +638,19 @@ msgstr ""
 msgid "Clear Address"
 msgstr ""
 
-#: userland/apps/fileman/model.c:551
+#: userland/apps/fileman/model.c:536
 msgid "Clear Marks"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:533
+#: userland/apps/diskmgr/main.c:540
 msgid "Click Apply again to continue"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:310
+#: userland/apps/fileman/operations.c:268
 msgid "Clipboard is empty"
 msgstr ""
 
-#: userland/apps/settings/main.c:475
+#: userland/apps/settings/main.c:479
 msgid "Clock failure"
 msgstr ""
 
@@ -698,7 +658,7 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:777
+#: userland/apps/desktop/screen.c:803
 msgid "Closing applications"
 msgstr ""
 
@@ -710,15 +670,19 @@ msgstr ""
 msgid "Cloudflare DNS"
 msgstr ""
 
-#: userland/apps/fileman/model.c:500
+#: userland/apps/fileman/model.c:485
 msgid "Compress to .tar"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:454
+#: userland/apps/fileman/actions.c:387
 msgid "Compressing to tar..."
 msgstr ""
 
-#: userland/apps/settings/main.c:1595
+#: userland/apps/fileman/actions.c:373
+msgid "Compression canceled"
+msgstr ""
+
+#: userland/apps/settings/main.c:1599
 msgid "Computer"
 msgstr ""
 
@@ -730,47 +694,43 @@ msgstr ""
 msgid "Config:"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:255
-msgid "Configure and start DOOM"
-msgstr ""
-
-#: userland/apps/installer/main.c:1141
+#: userland/apps/installer/main.c:178
 msgid "Confirm"
 msgstr ""
 
-#: userland/apps/installer/main.c:1447
+#: userland/apps/installer/main.c:691
 msgid "Confirm Installation"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:784
+#: userland/apps/desktop/screen.c:810
 msgid "Confirm Restart"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:787
+#: userland/apps/desktop/screen.c:813
 msgid "Confirm Shut Down"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:786
+#: userland/apps/desktop/screen.c:812
 msgid "Confirm Sign Out"
 msgstr ""
 
-#: userland/apps/installer/main.c:1446
+#: userland/apps/installer/main.c:691
 msgid "Confirm Update"
 msgstr ""
 
-#: userland/apps/installer/main.c:1518
+#: userland/apps/installer/main.c:628
 msgid "Confirm password"
 msgstr ""
 
-#: userland/apps/installer/main.c:1519
+#: userland/apps/installer/main.c:630
 msgid "Confirm root password"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:701
+#: userland/apps/diskmgr/main.c:708
 msgid "Confirm:"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:528
+#: userland/apps/diskmgr/main.c:535
 msgid "Confirmation word does not match"
 msgstr ""
 
@@ -782,47 +742,39 @@ msgstr ""
 msgid "Connection query failed"
 msgstr ""
 
-#: userland/apps/fileman/model.c:740
-msgid "Contains:"
-msgstr ""
-
-#: userland/apps/fileman/model.c:471
+#: userland/apps/fileman/model.c:459
 msgid "Copy"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:390
+#: userland/apps/fileman/operations.c:348
 msgid "Copy complete"
 msgstr ""
 
-#: userland/apps/installer/main.c:3246
+#: userland/apps/installer/install_ops.c:1466
 msgid "Copy failed"
 msgstr ""
 
-#: userland/apps/installer/main.c:1954
+#: userland/apps/installer/install_ops.c:783
 msgid "Copy path is too long"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:211
+#: userland/apps/fileman/operations.c:169
 msgid "Copying files..."
 msgstr ""
 
-#: userland/apps/installer/main.c:1640
+#: userland/apps/installer/install_ops.c:502
 msgid "Copying system files"
 msgstr ""
 
-#: userland/apps/osver/main.c:158
+#: userland/apps/osver/main.c:263
 msgid "Copyright"
 msgstr ""
 
-#: userland/apps/installer/main.c:2575
-msgid "Core files, bundled docs, and drivers can still be updated."
-msgstr ""
-
-#: userland/apps/installer/main.c:3344
+#: userland/apps/installer/install_ops.c:1553
 msgid "Core update failed"
 msgstr ""
 
-#: userland/apps/settings/main.c:1175
+#: userland/apps/settings/main.c:1179
 msgid "Could not apply personalization"
 msgstr ""
 
@@ -830,7 +782,7 @@ msgstr ""
 msgid "Could not arm the next debug boot."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:588
+#: userland/apps/taskmgr/main.c:832
 msgid "Could not change startup app"
 msgstr ""
 
@@ -838,15 +790,15 @@ msgstr ""
 msgid "Could not choose target file."
 msgstr ""
 
-#: userland/apps/paint/main.c:470
+#: userland/apps/paint/main.c:457
 msgid "Could not create canvas"
 msgstr ""
 
-#: userland/apps/settings/main.c:1770
+#: userland/apps/settings/main.c:1778
 msgid "Could not create user"
 msgstr ""
 
-#: userland/apps/imageview/main.c:387
+#: userland/apps/imageview/main.c:243
 msgid "Could not decode PNG (maximum 1024x1024)."
 msgstr ""
 
@@ -858,14 +810,6 @@ msgstr ""
 msgid "Could not install:"
 msgstr ""
 
-#: userland/apps/fileman/model.c:715
-msgid "Could not load permissions"
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:460
-msgid "Could not open Service Manager"
-msgstr ""
-
 #: userland/apps/oshlp/main.c:1207
 msgid "Could not open help"
 msgstr ""
@@ -874,35 +818,31 @@ msgstr ""
 msgid "Could not open help file."
 msgstr ""
 
-#: userland/apps/paint/main.c:265
+#: userland/apps/paint/main.c:190
 msgid "Could not open image"
 msgstr ""
 
-#: userland/apps/osver/main.c:86
+#: userland/apps/osver/main.c:124
 msgid "Could not persist kernel debug mode."
 msgstr ""
 
-#: userland/apps/imageview/main.c:398
+#: userland/apps/imageview/main.c:253
 msgid "Could not read image."
 msgstr ""
 
-#: userland/apps/osver/main.c:231
+#: userland/apps/osver/main.c:212
 msgid "Could not read system version information"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:608
+#: userland/apps/taskmgr/main.c:854
 msgid "Could not remove startup app"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:568
-msgid "Could not replace original item"
-msgstr ""
-
-#: userland/apps/settings/main.c:1938
+#: userland/apps/settings/main.c:1946
 msgid "Could not save file association"
 msgstr ""
 
-#: userland/apps/fileman/model.c:210
+#: userland/apps/fileman/model.c:200
 msgid "Could not save file manager settings "
 msgstr ""
 
@@ -910,28 +850,32 @@ msgstr ""
 msgid "Could not save file."
 msgstr ""
 
-#: userland/apps/paint/main.c:363
+#: userland/apps/paint/main.c:263
 msgid "Could not save image"
 msgstr ""
 
-#: userland/apps/settings/main.c:2021
+#: userland/apps/settings/main.c:2029
 msgid "Could not save input method"
 msgstr ""
 
-#: userland/apps/settings/main.c:2103
+#: userland/apps/settings/main.c:2111
 msgid "Could not save input method order"
 msgstr ""
 
-#: userland/apps/installer/main.c:3256
+#: userland/apps/installer/install_ops.c:1476
 msgid "Could not save installed preferences"
 msgstr ""
 
-#: userland/apps/settings/main.c:1700
+#: userland/apps/settings/main.c:1708
 msgid "Could not save language settings"
 msgstr ""
 
-#: userland/apps/settings/main.c:630
+#: userland/apps/settings/main.c:634
 msgid "Could not save services."
+msgstr ""
+
+#: userland/apps/fileman/motif_dialogs.c:210
+msgid "Could not save the file association"
 msgstr ""
 
 #: userland/apps/browser/navigation.c:784
@@ -942,7 +886,7 @@ msgstr ""
 msgid "Could not start Download Manager"
 msgstr ""
 
-#: userland/apps/settings/main.c:2184
+#: userland/apps/settings/main.c:2192
 msgid "Could not start dictionary update"
 msgstr ""
 
@@ -950,11 +894,11 @@ msgstr ""
 msgid "Could not start download"
 msgstr ""
 
-#: userland/apps/settings/main.c:1782
+#: userland/apps/settings/main.c:1790
 msgid "Could not start passwd"
 msgstr ""
 
-#: userland/apps/settings/main.c:2173
+#: userland/apps/settings/main.c:2181
 msgid "Could not start provider settings"
 msgstr ""
 
@@ -966,7 +910,7 @@ msgstr ""
 msgid "Create desktop shortcut"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:684
+#: userland/apps/diskmgr/main.c:691
 msgid "Create partition"
 msgstr ""
 
@@ -974,7 +918,7 @@ msgstr ""
 msgid "Create shortcut failed"
 msgstr ""
 
-#: userland/apps/settings/main.c:1757
+#: userland/apps/settings/main.c:1765
 msgid "Create user"
 msgstr ""
 
@@ -994,7 +938,7 @@ msgstr ""
 msgid "Custom DNS"
 msgstr ""
 
-#: userland/apps/fileman/model.c:473
+#: userland/apps/fileman/model.c:461
 msgid "Cut"
 msgstr ""
 
@@ -1010,7 +954,7 @@ msgstr ""
 msgid "DHCP and DNS"
 msgstr ""
 
-#: userland/apps/settings/main.c:159
+#: userland/apps/settings/main.c:163
 msgid "DHCP auto connect"
 msgstr ""
 
@@ -1074,7 +1018,7 @@ msgstr ""
 msgid "DNS:"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:97
+#: userland/apps/doomlauncher/main.c:294
 msgid "DOOM Launcher"
 msgstr ""
 
@@ -1082,43 +1026,47 @@ msgstr ""
 msgid "DOOM exited with code "
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:205
+#: userland/apps/doomlauncher/main.c:207
 msgid "DOOM is no longer running"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:244
+#: userland/apps/diskmgr/main.c:247
 msgid "Data"
 msgstr ""
 
-#: userland/apps/settings/main.c:1316
+#: userland/apps/settings/main.c:1320
 msgid "Default"
 msgstr ""
 
-#: userland/apps/fileman/model.c:869
+#: userland/apps/fileman/motif_dialogs.c:198
 msgid "Default Program"
 msgstr ""
 
-#: userland/apps/fileman/model.c:519
+#: userland/apps/fileman/model.c:504
 msgid "Default Program..."
 msgstr ""
 
-#: userland/apps/settings/main.c:1498
+#: userland/apps/settings/main.c:1502
 msgid "Default app"
 msgstr ""
 
-#: userland/apps/settings/main.c:2082
+#: userland/apps/fileman/motif_dialogs.c:213
+msgid "Default application saved"
+msgstr ""
+
+#: userland/apps/settings/main.c:2090
 msgid "Default input method saved"
 msgstr ""
 
-#: userland/apps/fileman/model.c:944
+#: userland/apps/fileman/model.c:631
 msgid "Default program is for files"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:153
+#: userland/apps/servicemgr/main.c:152
 msgid "Default runlevel updated"
 msgstr ""
 
-#: userland/apps/settings/main.c:1916
+#: userland/apps/settings/main.c:1924
 msgid "Default wallpaper restored"
 msgstr ""
 
@@ -1130,47 +1078,19 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:236
-msgid "Delete "
-msgstr ""
-
 #: userland/apps/browser/bookmarks.c:378
 msgid "Delete Bookmark"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:253
-msgid "Delete Folder"
-msgstr ""
-
-#: userland/apps/fileman/model.c:489
-msgid "Delete Permanently"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:588
-msgid "Delete all Recycle Bin items permanently?"
-msgstr ""
-
-#: userland/apps/fileman/actions.c:240
+#: userland/apps/fileman/operations.c:370
 msgid "Delete canceled"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:271
-msgid "Delete failed: directory not empty"
-msgstr ""
-
-#: userland/apps/diskmgr/main.c:683
+#: userland/apps/diskmgr/main.c:690
 msgid "Delete partition"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:278
-msgid "Deleted"
-msgstr ""
-
-#: userland/apps/fileman/actions.c:264
-msgid "Deleted (elevated)"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:623
+#: userland/apps/fileman/operations.c:373
 msgid "Deleting items..."
 msgstr ""
 
@@ -1182,15 +1102,15 @@ msgstr ""
 msgid "Desktop"
 msgstr ""
 
-#: userland/apps/settings/main.c:1230
+#: userland/apps/settings/main.c:1234
 msgid "Desktop "
 msgstr ""
 
-#: userland/apps/desktop/desktop_run.c:13
+#: userland/apps/desktop/desktop_run.c:27
 msgid "Desktop Server"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:142
+#: userland/apps/fileman/actions.c:143
 msgid "Desktop folder unavailable"
 msgstr ""
 
@@ -1202,20 +1122,16 @@ msgstr ""
 msgid "Desktop session"
 msgstr ""
 
-#: userland/apps/settings/main.c:158
+#: userland/apps/settings/main.c:162
 msgid "Desktop window service"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:228
+#: userland/apps/servicemgr/main.c:227
 msgid "Detail"
 msgstr ""
 
 #: userland/apps/devmgr/main.c:209
 msgid "Details"
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:700
-msgid "Details failed"
 msgstr ""
 
 #: userland/apps/devmgr/main.c:252
@@ -1242,7 +1158,7 @@ msgstr ""
 msgid "Device:"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:47
+#: userland/apps/servicemgr/main.c:46
 msgid "Devices"
 msgstr ""
 
@@ -1250,7 +1166,7 @@ msgstr ""
 msgid "Devices refreshed: "
 msgstr ""
 
-#: userland/apps/settings/main.c:2183
+#: userland/apps/settings/main.c:2191
 msgid "Dictionary update started"
 msgstr ""
 
@@ -1258,15 +1174,11 @@ msgstr ""
 msgid "Dirty redraw reduces flicker"
 msgstr ""
 
-#: userland/apps/settings/main.c:1385
+#: userland/apps/settings/main.c:1389
 msgid "Disable"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:185
-msgid "Disable boot"
-msgstr ""
-
-#: userland/apps/doomlauncher/main.c:105
+#: userland/apps/doomlauncher/main.c:329
 msgid "Disable sound"
 msgstr ""
 
@@ -1274,35 +1186,35 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: userland/apps/paint/main.c:467
+#: userland/apps/paint/main.c:453
 msgid "Discard"
 msgstr ""
 
-#: userland/apps/paint/main.c:467
+#: userland/apps/paint/main.c:451
 msgid "Discard changes?"
 msgstr ""
 
-#: userland/apps/installer/main.c:1135
+#: userland/apps/installer/main.c:176
 msgid "Disk"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:1062
+#: userland/apps/diskmgr/main.c:1069
 msgid "Disk Manager"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:443
+#: userland/apps/diskmgr/main.c:447
 msgid "Disk list refreshed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:423
+#: userland/apps/diskmgr/main.c:427
 msgid "Disk refresh failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:739
+#: userland/apps/diskmgr/main.c:746
 msgid "Disks"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:808
+#: userland/apps/diskmgr/main.c:815
 msgid "Disks: "
 msgstr ""
 
@@ -1310,15 +1222,15 @@ msgstr ""
 msgid "Display"
 msgstr ""
 
-#: userland/apps/settings/main.c:1318
+#: userland/apps/settings/main.c:1322
 msgid "Display mode"
 msgstr ""
 
-#: userland/apps/settings/main.c:1858
+#: userland/apps/settings/main.c:1866
 msgid "Display settings reverted"
 msgstr ""
 
-#: userland/apps/settings/main.c:1853
+#: userland/apps/settings/main.c:1861
 msgid "Display settings saved"
 msgstr ""
 
@@ -1326,7 +1238,7 @@ msgstr ""
 msgid "Do not ask again if I deny this request"
 msgstr ""
 
-#: userland/apps/installer/main.c:1473
+#: userland/apps/installer/main.c:728
 msgid "Do not turn off this machine."
 msgstr ""
 
@@ -1398,24 +1310,20 @@ msgstr ""
 msgid "Drag and resize window"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:174
+#: userland/apps/drvmgr/main.c:151
 msgid "Driver"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:266
+#: userland/apps/drvmgr/main.c:216
 msgid "Driver Manager"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:252
-msgid "Driver operation completed"
-msgstr ""
-
-#: userland/apps/drvmgr/main.c:250
-msgid "Driver operation failed"
-msgstr ""
-
-#: userland/apps/drvmgr/main.c:144
+#: userland/apps/drvmgr/main.c:130
 msgid "Driver refresh failed"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:160
+msgid "Drivers are built into the kernel image. This view is read-only."
 msgstr ""
 
 #: userland/apps/dynlinkerror/main.c:60
@@ -1434,35 +1342,23 @@ msgstr ""
 msgid "Editing form input"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:253
+#: userland/apps/taskmgr/main.c:153
 msgid "Elevated"
 msgstr ""
 
-#: userland/apps/fileman/model.c:1050
+#: userland/apps/fileman/model.c:734
 msgid "Elevated - items "
 msgstr ""
 
-#: userland/apps/settings/main.c:1605
+#: userland/apps/settings/main.c:1609
 msgid "Email hash"
 msgstr ""
 
-#: userland/apps/fileman/model.c:569
-msgid "Empty Recycle Bin"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:591
-msgid "Emptying Recycle Bin..."
-msgstr ""
-
-#: userland/apps/settings/main.c:1358
+#: userland/apps/settings/main.c:1362
 msgid "Enable"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:186
-msgid "Enable boot"
-msgstr ""
-
-#: userland/apps/settings/main.c:1472
+#: userland/apps/settings/main.c:1476
 msgid "Enabled"
 msgstr ""
 
@@ -1474,11 +1370,7 @@ msgstr ""
 msgid "End"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:648
-msgid "End Task"
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:639
+#: userland/apps/taskmgr/main.c:717
 msgid "End Task failed"
 msgstr ""
 
@@ -1494,31 +1386,31 @@ msgstr ""
 msgid "Enter a valid custom IPv4 DNS address."
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:569
+#: userland/apps/diskmgr/main.c:576
 msgid "Enter a valid size in MiB"
 msgstr ""
 
-#: userland/apps/paint/main.c:492
+#: userland/apps/paint/main.c:679
 msgid "Eraser"
 msgstr ""
 
-#: userland/apps/calc/main.c:359
+#: userland/apps/calc/main.c:24
 msgid "Error"
 msgstr ""
 
-#: userland/apps/installer/main.c:2352
+#: userland/apps/installer/install_ops.c:949
 msgid "Existing ReliefOS boot partition was not detected"
 msgstr ""
 
-#: userland/apps/installer/main.c:2341
+#: userland/apps/installer/install_ops.c:939
 msgid "Existing ReliefOS was not detected"
 msgstr ""
 
-#: userland/apps/installer/main.c:3190
+#: userland/apps/installer/install_ops.c:1410
 msgid "Existing system check failed"
 msgstr ""
 
-#: userland/apps/settings/main.c:1496
+#: userland/apps/settings/main.c:1500
 msgid "Extension"
 msgstr ""
 
@@ -1526,19 +1418,23 @@ msgstr ""
 msgid "Extension:"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:102
+#: userland/apps/doomlauncher/main.c:319
 msgid "Extra DOOM arguments"
 msgstr ""
 
-#: userland/apps/fileman/model.c:499
+#: userland/apps/fileman/actions.c:321
 msgid "Extract tar"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:402
+#: userland/apps/fileman/actions.c:329
 msgid "Extracting tar..."
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:88
+#: userland/apps/fileman/actions.c:323
+msgid "Extraction canceled"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:85
 msgid "Failed"
 msgstr ""
 
@@ -1550,7 +1446,7 @@ msgstr ""
 msgid "File"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:107
+#: userland/apps/fileman/operations.c:98
 msgid "File Conflict"
 msgstr ""
 
@@ -1558,23 +1454,23 @@ msgstr ""
 msgid "File Error"
 msgstr ""
 
-#: userland/apps/desktop/desktop_run.c:18
+#: userland/apps/desktop/desktop_run.c:32
 msgid "File Manager"
 msgstr ""
 
-#: userland/apps/fileman/view.c:170
+#: userland/apps/fileman/motif_dialogs.c:103
 msgid "File Manager Settings"
 msgstr ""
 
-#: userland/apps/fileman/model.c:217
+#: userland/apps/fileman/model.c:207
 msgid "File Manager settings saved"
 msgstr ""
 
-#: userland/apps/settings/main.c:1616
+#: userland/apps/settings/main.c:1620
 msgid "File Types"
 msgstr ""
 
-#: userland/apps/settings/main.c:1935
+#: userland/apps/settings/main.c:1943
 msgid "File association saved"
 msgstr ""
 
@@ -1594,11 +1490,11 @@ msgstr ""
 msgid "File not found "
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:726
+#: userland/apps/diskmgr/main.c:733
 msgid "File system"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:690
+#: userland/apps/diskmgr/main.c:697
 msgid "File system:"
 msgstr ""
 
@@ -1618,7 +1514,7 @@ msgstr ""
 msgid "Files:"
 msgstr ""
 
-#: userland/apps/settings/main.c:301
+#: userland/apps/settings/main.c:305
 msgid "Fill"
 msgstr ""
 
@@ -1642,11 +1538,11 @@ msgstr ""
 msgid "Find:"
 msgstr ""
 
-#: userland/apps/installer/main.c:1145
+#: userland/apps/installer/main.c:180
 msgid "Finish"
 msgstr ""
 
-#: userland/apps/settings/main.c:293
+#: userland/apps/settings/main.c:297
 msgid "Fit"
 msgstr ""
 
@@ -1654,43 +1550,43 @@ msgstr ""
 msgid "Flags"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:117
+#: userland/apps/fileman/actions.c:118
 msgid "Folder created"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:101
+#: userland/apps/fileman/actions.c:102
 msgid "Folder created (elevated)"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:87
+#: userland/apps/fileman/actions.c:85
 msgid "Folder name is empty"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:82
+#: userland/apps/fileman/actions.c:80
 msgid "Folder name:"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:800
+#: userland/apps/fileman/motif.c:314
+msgid "Folders (double-click to expand)"
+msgstr ""
+
+#: userland/apps/desktop/screen.c:826
 msgid "Force"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:781
+#: userland/apps/desktop/screen.c:807
 msgid "Force close remaining applications?"
-msgstr ""
-
-#: userland/apps/drvmgr/main.c:184
-msgid "Force stop"
 msgstr ""
 
 #: userland/apps/browser/forms.c:1565
 msgid "Form reset"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:682
+#: userland/apps/diskmgr/main.c:689
 msgid "Format partition"
 msgstr ""
 
-#: userland/apps/installer/main.c:1312
+#: userland/apps/installer/main.c:481
 msgid "Format the selected disk and copy a clean ReliefOS system."
 msgstr ""
 
@@ -1698,19 +1594,19 @@ msgstr ""
 msgid "Forward"
 msgstr ""
 
-#: userland/apps/settings/main.c:1225
+#: userland/apps/settings/main.c:1229
 msgid "Framebuffer "
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1062
+#: userland/apps/taskmgr/main.c:679
 msgid "Free memory:"
 msgstr ""
 
-#: userland/apps/installer/main.c:1309
+#: userland/apps/installer/main.c:475
 msgid "Fresh Install"
 msgstr ""
 
-#: userland/apps/installer/main.c:1307
+#: userland/apps/installer/main.c:467
 msgid "Fresh install erases the disk. Update keeps existing users and extra programs."
 msgstr ""
 
@@ -1718,7 +1614,7 @@ msgstr ""
 msgid "Full-width space"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:106
+#: userland/apps/doomlauncher/main.c:333
 msgid "Fullscreen"
 msgstr ""
 
@@ -1726,11 +1622,11 @@ msgstr ""
 msgid "GET"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:988
+#: userland/apps/taskmgr/main.c:631
 msgid "GPU (est.)"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:989
+#: userland/apps/taskmgr/main.c:631
 msgid "GPU (estimated)"
 msgstr ""
 
@@ -1746,27 +1642,19 @@ msgstr ""
 msgid "Gateway:"
 msgstr ""
 
-#: userland/apps/fileman/model.c:730
-msgid "General"
-msgstr ""
-
 #: userland/apps/browser/view.c:1007
 msgid "Go"
 msgstr ""
 
-#: userland/apps/settings/main.c:281
+#: userland/apps/settings/main.c:285
 msgid "Graphite"
 msgstr ""
 
-#: userland/apps/settings/main.c:275
+#: userland/apps/settings/main.c:279
 msgid "Green"
 msgstr ""
 
-#: userland/apps/fileman/model.c:647
-msgid "Group"
-msgstr ""
-
-#: userland/apps/settings/main.c:140
+#: userland/apps/settings/main.c:144
 msgid "HTML pages"
 msgstr ""
 
@@ -1838,7 +1726,7 @@ msgstr ""
 msgid "Help error"
 msgstr ""
 
-#: userland/apps/settings/main.c:143
+#: userland/apps/settings/main.c:147
 msgid "Help files"
 msgstr ""
 
@@ -1862,39 +1750,35 @@ msgstr ""
 msgid "IPv4:"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:99
+#: userland/apps/doomlauncher/main.c:308
 msgid "IWAD path"
 msgstr ""
 
-#: userland/apps/imageview/main.c:618
+#: userland/apps/imageview/main.c:535
 msgid "Image Viewer"
 msgstr ""
 
-#: userland/apps/imageview/main.c:412
+#: userland/apps/imageview/main.c:271
 msgid "Image loaded"
 msgstr ""
 
-#: userland/apps/paint/main.c:274
+#: userland/apps/paint/main.c:200
 msgid "Image opened"
 msgstr ""
 
-#: userland/apps/paint/main.c:368
+#: userland/apps/paint/main.c:268
 msgid "Image saved"
-msgstr ""
-
-#: userland/apps/imageview/main.c:570
-msgid "Images (*.bmp; *.dib; *.png)"
 msgstr ""
 
 #: userland/apps/devmgr/main.c:87
 msgid "Input"
 msgstr ""
 
-#: userland/apps/settings/main.c:1619
+#: userland/apps/settings/main.c:1623
 msgid "Input Method"
 msgstr ""
 
-#: userland/apps/settings/main.c:1357
+#: userland/apps/settings/main.c:1361
 msgid "Input method"
 msgstr ""
 
@@ -1902,19 +1786,19 @@ msgstr ""
 msgid "Input method could not start"
 msgstr ""
 
-#: userland/apps/settings/main.c:2068
+#: userland/apps/settings/main.c:2076
 msgid "Input method disabled"
 msgstr ""
 
-#: userland/apps/settings/main.c:2067
+#: userland/apps/settings/main.c:2075
 msgid "Input method enabled"
 msgstr ""
 
-#: userland/apps/settings/main.c:2118
+#: userland/apps/settings/main.c:2126
 msgid "Input method moved"
 msgstr ""
 
-#: userland/apps/settings/main.c:2162
+#: userland/apps/settings/main.c:2170
 msgid "Input method setting changed"
 msgstr ""
 
@@ -1926,11 +1810,11 @@ msgstr ""
 msgid "Input method stopped; English restored"
 msgstr ""
 
-#: userland/apps/settings/main.c:1373
+#: userland/apps/settings/main.c:1377
 msgid "Input methods and learning data are isolated for the current user."
 msgstr ""
 
-#: userland/apps/settings/main.c:2041
+#: userland/apps/settings/main.c:2049
 msgid "Input shortcut changed"
 msgstr ""
 
@@ -1946,7 +1830,7 @@ msgstr ""
 msgid "Install Options"
 msgstr ""
 
-#: userland/apps/installer/main.c:1297
+#: userland/apps/installer/main.c:444
 msgid "Install a new system or update an existing ReliefOS disk."
 msgstr ""
 
@@ -1966,19 +1850,19 @@ msgstr ""
 msgid "Installation Failed"
 msgstr ""
 
-#: userland/apps/installer/main.c:2759
+#: userland/apps/installer/install_ops.c:1160
 msgid "Installation completed successfully"
 msgstr ""
 
-#: userland/apps/installer/main.c:736
+#: userland/apps/installer/install_ops.c:172
 msgid "Installation failed"
 msgstr ""
 
-#: userland/apps/installer/main.c:2400
+#: userland/apps/installer/install_ops.c:1005
 msgid "Installation media is incomplete"
 msgstr ""
 
-#: userland/apps/installer/main.c:1448
+#: userland/apps/installer/main.c:694
 msgid "Installed ReliefOS packages will be upgraded."
 msgstr ""
 
@@ -1990,7 +1874,7 @@ msgstr ""
 msgid "Installing Application"
 msgstr ""
 
-#: userland/apps/installer/main.c:849
+#: userland/apps/installer/install_ops.c:202
 msgid "Installing ReliefOS"
 msgstr ""
 
@@ -1998,7 +1882,7 @@ msgstr ""
 msgid "Installing..."
 msgstr ""
 
-#: userland/apps/calc/main.c:436
+#: userland/apps/calc/main.c:117
 msgid "Integer calculator"
 msgstr ""
 
@@ -2006,31 +1890,39 @@ msgstr ""
 msgid "Intel e1000 Network"
 msgstr ""
 
-#: userland/apps/fileman/model.c:810
-msgid "Invalid UID or GID"
-msgstr ""
-
 #: userland/apps/browser/navigation.c:497
 msgid "Invalid URL"
 msgstr ""
 
-#: userland/apps/settings/main.c:471
+#: userland/apps/settings/main.c:475
 msgid "Invalid activation"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:311
+msgid "Invalid extraction folder name"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:199
+msgid "Invalid file name or path too long"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:89
+msgid "Invalid folder name or path too long"
 msgstr ""
 
 #: userland/apps/oshlp/main.c:1213
 msgid "Invalid help file"
 msgstr ""
 
-#: userland/apps/installer/main.c:3210
+#: userland/apps/installer/install_ops.c:1430
 msgid "Invalid installation settings"
 msgstr ""
 
-#: userland/apps/fileman/model.c:824
-msgid "Invalid mode"
+#: userland/apps/fileman/motif_dialogs.c:284
+msgid "Invalid mode, UID or GID"
 msgstr ""
 
-#: userland/apps/installer/main.c:3314
+#: userland/apps/installer/install_ops.c:1531
 msgid "Invalid root layout"
 msgstr ""
 
@@ -2042,60 +1934,52 @@ msgstr ""
 msgid "Item marked"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:578
-msgid "Item restored"
-msgstr ""
-
 #: userland/apps/fileman/model.c:76
 msgid "Item unmarked"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:262
+#: userland/apps/fileman/model.c:768
 msgid "Items "
 msgstr ""
 
-#: userland/apps/fileman/operations.c:511
-msgid "Items are already in the Recycle Bin"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:298
+#: userland/apps/fileman/operations.c:256
 msgid "Items copied. Open a folder and paste."
 msgstr ""
 
-#: userland/apps/fileman/operations.c:297
+#: userland/apps/fileman/operations.c:255
 msgid "Items cut. Open a folder and paste."
 msgstr ""
 
-#: userland/apps/fileman/operations.c:645
-msgid "Items deleted permanently"
+#: userland/apps/fileman/operations.c:394
+msgid "Items deleted"
 msgstr ""
 
-#: userland/apps/settings/main.c:283
+#: userland/apps/settings/main.c:287
 msgid "Kawaii Pink"
 msgstr ""
 
-#: userland/apps/settings/main.c:1254
+#: userland/apps/paint/main.c:453
 msgid "Keep"
 msgstr ""
 
-#: userland/apps/settings/main.c:1249
+#: userland/apps/settings/main.c:1253
 msgid "Keep these display settings? Reverting in "
 msgstr ""
 
-#: userland/apps/osver/main.c:155
+#: userland/apps/osver/main.c:263
 msgid "Kernel"
 msgstr ""
 
-#: userland/apps/osver/main.c:80
+#: userland/apps/osver/main.c:125
 msgid "Kernel debug mode"
 msgstr ""
 
-#: userland/apps/osver/main.c:78
+#: userland/apps/osver/main.c:119
 msgid "Kernel debug mode enabled"
 msgstr ""
 
-#: userland/apps/osver/main.c:81
-msgid "Kernel debug mode enabled. Use Start > Power to reboot into it."
+#: userland/apps/osver/main.c:123
+msgid "Kernel debug mode enabled. Reboot to enter it."
 msgstr ""
 
 #: userland/apps/desktop/start_menu.c:1406
@@ -2106,27 +1990,23 @@ msgstr ""
 msgid "Kernel device list"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:267
-msgid "Kernel driver modules"
-msgstr ""
-
-#: userland/apps/osver/main.c:156
+#: userland/apps/osver/main.c:263
 msgid "Kernel version"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:711
+#: userland/apps/taskmgr/main.c:798
 msgid "Kind:"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:697
+#: userland/apps/diskmgr/main.c:704
 msgid "Label:"
 msgstr ""
 
-#: userland/apps/installer/main.c:1125
+#: userland/apps/installer/main.c:171
 msgid "Language"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:107
+#: userland/apps/doomlauncher/main.c:337
 msgid "Launch"
 msgstr ""
 
@@ -2138,7 +2018,7 @@ msgstr ""
 msgid "Launch failed "
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:168
+#: userland/apps/doomlauncher/main.c:171
 msgid "Launch failed: "
 msgstr ""
 
@@ -2150,75 +2030,19 @@ msgstr ""
 msgid "Lease:"
 msgstr ""
 
-#: userland/apps/installer/main.c:3177
+#: userland/apps/installer/install_ops.c:1397
 msgid "Legacy accounts require recovery before updating"
-msgstr ""
-
-#: userland/apps/osver/main.c:178
-msgid "ReliefOS"
-msgstr ""
-
-#: userland/apps/installer/main.c:1297
-msgid "ReliefOS Setup"
-msgstr ""
-
-#: userland/apps/browser/input.c:290
-msgid "ReliefOS Browser"
-msgstr ""
-
-#: userland/apps/guitest/main.c:120
-msgid "ReliefOS GUI API Tester"
-msgstr ""
-
-#: userland/apps/oshlp/main.c:1860
-msgid "ReliefOS Help"
-msgstr ""
-
-#: userland/apps/minesweeper/main.c:457
-msgid "ReliefOS Minesweeper"
-msgstr ""
-
-#: userland/apps/paint/main.c:569
-msgid "ReliefOS Paint"
-msgstr ""
-
-#: userland/apps/desktop/render.c:31
-msgid "ReliefOS UI Component Library"
-msgstr ""
-
-#: userland/apps/servicemgr/main.c:47
-msgid "ReliefOS device protocol"
-msgstr ""
-
-#: userland/apps/fileman/main.c:14
-msgid "ReliefOS file browser"
-msgstr ""
-
-#: userland/apps/osver/main.c:207
-msgid "ReliefOS is free software for learning and experimentation."
-msgstr ""
-
-#: userland/apps/notepad/main.c:810
-msgid "ReliefOS text viewer"
-msgstr ""
-
-#: userland/apps/installer/main.c:1487
-msgid "ReliefOS was installed to the selected disk."
-msgstr ""
-
-#: userland/apps/installer/main.c:1486
-msgid "ReliefOS was updated on the selected disk."
 msgstr ""
 
 #: userland/apps/browser/view.c:970
 msgid "License Website"
 msgstr ""
 
-#: userland/apps/settings/main.c:1607
+#: userland/apps/settings/main.c:1611
 msgid "License file"
 msgstr ""
 
-#: userland/apps/settings/main.c:1579
+#: userland/apps/settings/main.c:1583
 msgid "License validation is disabled for this build."
 msgstr ""
 
@@ -2230,19 +2054,15 @@ msgstr ""
 msgid "List"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1352
+#: userland/apps/taskmgr/main.c:867
 msgid "Live task snapshot from the scheduler."
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:182
-msgid "Load"
-msgstr ""
-
-#: userland/apps/drvmgr/main.c:84
+#: userland/apps/drvmgr/main.c:81
 msgid "Loaded"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:82
+#: userland/apps/drvmgr/main.c:79
 msgid "Loading"
 msgstr ""
 
@@ -2258,11 +2078,11 @@ msgstr ""
 msgid "Location: "
 msgstr ""
 
-#: userland/apps/settings/main.c:1994
+#: userland/apps/settings/main.c:2002
 msgid "Login startup approval requested"
 msgstr ""
 
-#: userland/apps/osver/main.c:117
+#: userland/apps/osver/main.c:257
 msgid "Logo unavailable"
 msgstr ""
 
@@ -2274,7 +2094,7 @@ msgstr ""
 msgid "MAC:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1193
+#: userland/apps/taskmgr/main.c:1059
 msgid "MEM"
 msgstr ""
 
@@ -2282,7 +2102,7 @@ msgstr ""
 msgid "MP3 audio (*.mp3)"
 msgstr ""
 
-#: userland/apps/settings/main.c:1604
+#: userland/apps/settings/main.c:1608
 msgid "Machine ID"
 msgstr ""
 
@@ -2290,27 +2110,23 @@ msgstr ""
 msgid "Manage Bookmarks..."
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:1063
+#: userland/apps/diskmgr/main.c:1070
 msgid "Manage GPT partitions"
 msgstr ""
 
-#: userland/apps/settings/main.c:1146
+#: userland/apps/settings/main.c:1150
 msgid "Manual"
 msgstr ""
 
-#: userland/apps/fileman/model.c:549
+#: userland/apps/fileman/model.c:534
 msgid "Mark All"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:423
-msgid "Mark files first"
-msgstr ""
-
-#: userland/apps/fileman/model.c:479
+#: userland/apps/fileman/model.c:467
 msgid "Mark for Batch"
 msgstr ""
 
-#: userland/apps/settings/main.c:139
+#: userland/apps/settings/main.c:143
 msgid "Markdown notes"
 msgstr ""
 
@@ -2322,11 +2138,11 @@ msgstr ""
 msgid "Mask:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:982
+#: userland/apps/taskmgr/main.c:622
 msgid "Memory Usage"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:715
+#: userland/apps/taskmgr/main.c:802
 msgid "Memory:"
 msgstr ""
 
@@ -2334,23 +2150,23 @@ msgstr ""
 msgid "Menu"
 msgstr ""
 
-#: userland/apps/settings/main.c:1291
+#: userland/apps/settings/main.c:1295
 msgid "Metro color"
 msgstr ""
 
-#: userland/apps/settings/main.c:1723
+#: userland/apps/settings/main.c:1731
 msgid "Metro color changed"
 msgstr ""
 
-#: userland/apps/installer/main.c:1289
+#: userland/apps/installer/main.c:414
 msgid "Metro uses the modern flat system appearance."
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:405
+#: userland/apps/minesweeper/main.c:196
 msgid "Mines: "
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:398
+#: userland/apps/minesweeper/main.c:306
 msgid "Minesweeper"
 msgstr ""
 
@@ -2358,51 +2174,43 @@ msgstr ""
 msgid "Minimized windows"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:80
+#: userland/apps/doomlauncher/main.c:101
 msgid "Missing closing quote"
 msgstr ""
 
-#: userland/apps/installer/main.c:1133
+#: userland/apps/installer/main.c:175
 msgid "Mode"
 msgstr ""
 
-#: userland/apps/fileman/model.c:662
-msgid "Mode Value"
-msgstr ""
-
-#: userland/apps/drvmgr/main.c:188
-msgid "Modules run in Ring 0. Changes take effect immediately."
-msgstr ""
-
-#: userland/apps/diskmgr/main.c:802
+#: userland/apps/diskmgr/main.c:809
 msgid "Mount"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:823
-msgid "Mount exFAT, FAT32, or ext2 data partitions at stable /mnt paths."
+#: userland/apps/diskmgr/main.c:830
+msgid "Mount exFAT, FAT32, ext4, or legacy ext2 data partitions at stable /mnt paths."
 msgstr ""
 
-#: userland/apps/installer/main.c:3172
+#: userland/apps/installer/install_ops.c:1392
 msgid "Mount failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:604
+#: userland/apps/diskmgr/main.c:611
 msgid "Mount-point creation failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:236
+#: userland/apps/diskmgr/main.c:239
 msgid "Mounted "
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:613
+#: userland/apps/diskmgr/main.c:620
 msgid "Mounted as "
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:232
+#: userland/apps/diskmgr/main.c:235
 msgid "Mounted target"
 msgstr ""
 
-#: userland/apps/installer/main.c:3168
+#: userland/apps/installer/install_ops.c:1388
 msgid "Mounting target filesystems"
 msgstr ""
 
@@ -2410,11 +2218,11 @@ msgstr ""
 msgid "Move"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:389
+#: userland/apps/fileman/operations.c:347
 msgid "Move complete"
 msgstr ""
 
-#: userland/apps/settings/main.c:1403
+#: userland/apps/settings/main.c:1407
 msgid "Move down"
 msgstr ""
 
@@ -2422,35 +2230,23 @@ msgstr ""
 msgid "Move mouse to 320, 240"
 msgstr ""
 
-#: userland/apps/fileman/model.c:486
-msgid "Move to Recycle Bin"
-msgstr ""
-
-#: userland/apps/settings/main.c:1399
+#: userland/apps/settings/main.c:1403
 msgid "Move up"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:542
-msgid "Moved to Recycle Bin"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:316
+#: userland/apps/fileman/operations.c:274
 msgid "Moving files..."
 msgstr ""
 
-#: userland/apps/fileman/operations.c:519
-msgid "Moving items to Recycle Bin..."
-msgstr ""
-
-#: userland/apps/settings/main.c:1557
+#: userland/apps/settings/main.c:1561
 msgid "NTP runtime state:"
 msgstr ""
 
-#: userland/apps/settings/main.c:162
+#: userland/apps/settings/main.c:166
 msgid "NTP time sync"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:718
+#: userland/apps/diskmgr/main.c:725
 msgid "Name"
 msgstr ""
 
@@ -2458,7 +2254,7 @@ msgstr ""
 msgid "Name        State"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:657
+#: userland/apps/diskmgr/main.c:664
 msgid "Name:"
 msgstr ""
 
@@ -2482,7 +2278,7 @@ msgstr ""
 msgid "Network failed"
 msgstr ""
 
-#: userland/apps/settings/main.c:473
+#: userland/apps/settings/main.c:477
 msgid "Network failure"
 msgstr ""
 
@@ -2490,39 +2286,39 @@ msgstr ""
 msgid "New"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:82
+#: userland/apps/fileman/actions.c:80
 msgid "New Folder"
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:399
+#: userland/apps/minesweeper/main.c:325
 msgid "New Game"
 msgstr ""
 
-#: userland/apps/settings/main.c:1480
+#: userland/apps/settings/main.c:1484
 msgid "New User"
 msgstr ""
 
-#: userland/apps/paint/main.c:472
+#: userland/apps/paint/main.c:459
 msgid "New canvas"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:83
+#: userland/apps/fileman/actions.c:81
 msgid "New folder canceled"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:193
+#: userland/apps/fileman/actions.c:194
 msgid "New name is empty"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:188
+#: userland/apps/fileman/actions.c:189
 msgid "New name:"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:793
+#: userland/apps/diskmgr/main.c:800
 msgid "New partition"
 msgstr ""
 
-#: userland/apps/installer/main.c:1189
+#: userland/apps/installer/main.c:192
 msgid "Next"
 msgstr ""
 
@@ -2530,7 +2326,7 @@ msgstr ""
 msgid "Next >"
 msgstr ""
 
-#: userland/apps/imageview/main.c:515
+#: userland/apps/imageview/main.c:561
 msgid "Next Image"
 msgstr ""
 
@@ -2538,7 +2334,7 @@ msgstr ""
 msgid "Next cursor style"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:814
+#: userland/apps/desktop/screen.c:840
 msgid "No"
 msgstr ""
 
@@ -2546,7 +2342,7 @@ msgstr ""
 msgid "No A record"
 msgstr ""
 
-#: userland/apps/installer/main.c:3195
+#: userland/apps/installer/install_ops.c:1415
 msgid "No APK database: reinstall from this media"
 msgstr ""
 
@@ -2562,24 +2358,16 @@ msgstr ""
 msgid "No TCP client sockets."
 msgstr ""
 
-#: userland/apps/login/main.c:152
-msgid "No account available"
-msgstr ""
-
 #: userland/apps/devmgr/main.c:259
 msgid "No device selected"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:665
+#: userland/apps/diskmgr/main.c:672
 msgid "No disk selected."
 msgstr ""
 
-#: userland/apps/installer/main.c:1093
+#: userland/apps/installer/install_ops.c:450
 msgid "No disks were found"
-msgstr ""
-
-#: userland/apps/installer/main.c:1335
-msgid "No disks were found."
 msgstr ""
 
 #: userland/apps/oshlp/main.c:974
@@ -2590,11 +2378,7 @@ msgstr ""
 msgid "No e1000 adapter"
 msgstr ""
 
-#: userland/apps/login/main.c:125
-msgid "No enabled accounts"
-msgstr ""
-
-#: userland/apps/imageview/main.c:529
+#: userland/apps/imageview/main.c:162
 msgid "No file"
 msgstr ""
 
@@ -2602,24 +2386,12 @@ msgstr ""
 msgid "No file association for this item."
 msgstr ""
 
-#: userland/apps/fileman/actions.c:504
-msgid "No files compressed"
-msgstr ""
-
-#: userland/apps/imageview/main.c:352
+#: userland/apps/imageview/main.c:146
 msgid "No image loaded."
 msgstr ""
 
 #: userland/apps/desktop/desktop_items.c:551
 msgid "No item selected."
-msgstr ""
-
-#: userland/apps/fileman/operations.c:646
-msgid "No items deleted"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:543
-msgid "No items moved"
 msgstr ""
 
 #: userland/apps/desktop/start_menu.c:866
@@ -2630,23 +2402,19 @@ msgstr ""
 msgid "No pages"
 msgstr ""
 
-#: userland/apps/installer/main.c:1409
-msgid "No program package differences were found."
-msgstr ""
-
 #: userland/apps/browser/bookmarks.c:230
 msgid "No saved bookmarks"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:584
+#: userland/apps/taskmgr/main.c:827
 msgid "No startup app selected"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:630
+#: userland/apps/taskmgr/main.c:709
 msgid "No task selected"
 msgstr ""
 
-#: userland/apps/installer/main.c:1499
+#: userland/apps/installer/main.c:758
 msgid "No writes will continue after this error."
 msgstr ""
 
@@ -2658,7 +2426,7 @@ msgstr ""
 msgid "Normal item"
 msgstr ""
 
-#: userland/apps/settings/main.c:469
+#: userland/apps/settings/main.c:473
 msgid "Not activated"
 msgstr ""
 
@@ -2666,7 +2434,7 @@ msgstr ""
 msgid "Not allowed"
 msgstr ""
 
-#: userland/apps/settings/main.c:1580
+#: userland/apps/settings/main.c:1584
 msgid "Not required"
 msgstr ""
 
@@ -2686,15 +2454,15 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: userland/apps/settings/main.c:489
+#: userland/apps/settings/main.c:493
 msgid "Offline"
 msgstr ""
 
-#: userland/apps/settings/main.c:1144
+#: userland/apps/settings/main.c:1148
 msgid "On demand"
 msgstr ""
 
-#: userland/apps/settings/main.c:486
+#: userland/apps/settings/main.c:490
 msgid "Online"
 msgstr ""
 
@@ -2722,27 +2490,31 @@ msgstr ""
 msgid "Open Failed"
 msgstr ""
 
-#: userland/apps/run/main.c:69
-msgid "Open ReliefOS program or file path"
-msgstr ""
-
 #: userland/apps/mp3play/main.c:346
 msgid "Open MP3"
 msgstr ""
 
-#: userland/apps/fileman/model.c:869
+#: userland/apps/run/main.c:69
+msgid "Open ReliefOS program or file path"
+msgstr ""
+
+#: userland/apps/fileman/motif_dialogs.c:198
 msgid "Open With"
 msgstr ""
 
-#: userland/apps/fileman/model.c:877
+#: userland/apps/fileman/motif_dialogs.c:200
 msgid "Open With canceled"
 msgstr ""
 
-#: userland/apps/fileman/model.c:929
+#: userland/apps/fileman/motif_dialogs.c:217
+msgid "Open With failed"
+msgstr ""
+
+#: userland/apps/fileman/model.c:616
 msgid "Open With is for files"
 msgstr ""
 
-#: userland/apps/fileman/model.c:469
+#: userland/apps/fileman/model.c:457
 msgid "Open With..."
 msgstr ""
 
@@ -2762,16 +2534,12 @@ msgstr ""
 msgid "Open files from File Manager or Run."
 msgstr ""
 
-#: userland/apps/imageview/main.c:569
+#: userland/apps/imageview/main.c:425
 msgid "Open image"
 msgstr ""
 
-#: userland/apps/settings/main.c:1436
+#: userland/apps/settings/main.c:1440
 msgid "Open provider settings"
-msgstr ""
-
-#: userland/apps/servicemgr/main.c:44
-msgid "OpenRC graphical session"
 msgstr ""
 
 #: userland/runtime/src/ui.c:998
@@ -2782,52 +2550,20 @@ msgstr ""
 msgid "Opening page..."
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:949
+#: userland/apps/diskmgr/main.c:956
 msgid "Operation cancelled"
-msgstr ""
-
-#: userland/apps/fileman/elevation.c:17
-msgid "Operation denied or canceled"
 msgstr ""
 
 #: userland/apps/desktop/desktop_items.c:583
 msgid "Operation failed"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1200
-msgid "Options"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:558
-msgid "Original location is unavailable"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:564
-msgid "Original path exists. Replace it?"
-msgstr ""
-
 #: userland/apps/devmgr/main.c:99
 msgid "Other"
 msgstr ""
 
-#: userland/apps/fileman/model.c:647
-msgid "Other Users"
-msgstr ""
-
 #: userland/runtime/src/ui.c:1031
 msgid "Overwrite canceled for "
-msgstr ""
-
-#: userland/apps/fileman/model.c:647
-msgid "Owner"
-msgstr ""
-
-#: userland/apps/fileman/model.c:660
-msgid "Owner / Group"
-msgstr ""
-
-#: userland/apps/fileman/model.c:797
-msgid "Ownership"
 msgstr ""
 
 #: userland/apps/desktop/render.c:256
@@ -2846,15 +2582,15 @@ msgstr ""
 msgid "PNG preview is unavailable."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1196
+#: userland/apps/taskmgr/main.c:1060
 msgid "PRIV"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1190
+#: userland/apps/taskmgr/main.c:1059
 msgid "PROCESS"
 msgstr ""
 
-#: userland/apps/paint/main.c:568
+#: userland/apps/paint/main.c:635
 msgid "Paint"
 msgstr ""
 
@@ -2862,7 +2598,7 @@ msgstr ""
 msgid "Panel"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:709
+#: userland/apps/taskmgr/main.c:796
 msgid "Parent PID:"
 msgstr ""
 
@@ -2870,55 +2606,55 @@ msgstr ""
 msgid "Parse failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:582
+#: userland/apps/diskmgr/main.c:589
 msgid "Partition created and formatted"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:575
+#: userland/apps/diskmgr/main.c:582
 msgid "Partition creation failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:556
+#: userland/apps/diskmgr/main.c:563
 msgid "Partition deletion failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:562
+#: userland/apps/diskmgr/main.c:569
 msgid "Partition entry deleted"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:544
+#: userland/apps/diskmgr/main.c:551
 msgid "Partition format failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:550
+#: userland/apps/diskmgr/main.c:557
 msgid "Partition formatted"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:608
+#: userland/apps/diskmgr/main.c:615
 msgid "Partition mount failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:389
+#: userland/apps/diskmgr/main.c:393
 msgid "Partition refresh failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:821
+#: userland/apps/diskmgr/main.c:828
 msgid "Partition safety"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:641
+#: userland/apps/diskmgr/main.c:648
 msgid "Partition unmount failed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:646
+#: userland/apps/diskmgr/main.c:653
 msgid "Partition unmounted"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:765
+#: userland/apps/diskmgr/main.c:772
 msgid "Partitions"
 msgstr ""
 
-#: userland/apps/login/main.c:134
+#: userland/apps/settings/main.c:1769
 msgid "Password"
 msgstr ""
 
@@ -2930,87 +2666,91 @@ msgstr ""
 msgid "Password:"
 msgstr ""
 
-#: userland/apps/installer/main.c:1538
+#: userland/apps/installer/main.c:664
 msgid "Passwords: 1-32 characters, no spaces; confirmations must match"
 msgstr ""
 
-#: userland/apps/fileman/model.c:475
+#: userland/apps/fileman/model.c:463
 msgid "Paste"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:438
+#: userland/apps/fileman/motif_dialogs.c:247
+msgid "Path"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:367
 msgid "Path too long"
 msgstr ""
 
-#: userland/apps/fileman/model.c:737
+#: userland/apps/httpget/main.c:297
 msgid "Path:"
 msgstr ""
 
-#: userland/apps/installer/main.c:3185
+#: userland/apps/installer/install_ops.c:1405
 msgid "Payload check failed"
 msgstr ""
 
-#: userland/apps/installer/main.c:1683
+#: userland/apps/installer/install_ops.c:545
 msgid "Payload path is too long"
 msgstr ""
 
-#: userland/apps/installer/main.c:3238
+#: userland/apps/installer/install_ops.c:1458
 msgid "Payload scan failed"
 msgstr ""
 
-#: userland/apps/paint/main.c:490
+#: userland/apps/paint/main.c:677
 msgid "Pencil"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1023
+#: userland/apps/taskmgr/main.c:639
 msgid "Per-core usage"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:109
+#: userland/apps/taskmgr/main.c:1180
 msgid "Performance"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:486
+#: userland/apps/taskmgr/main.c:409
 msgid "Performance data unavailable"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:369
+msgid "Permanently delete the selected items and all folder contents? This cannot be undone."
+msgstr ""
+
+#: userland/apps/fileman/motif_dialogs.c:267
+msgid "Permission changes use the current user's access rights."
 msgstr ""
 
 #: userland/apps/desktop/desktop_items.c:547
 msgid "Permission denied"
 msgstr ""
 
-#: userland/apps/fileman/model.c:753
-msgid "Permission information is unavailable."
+#: userland/apps/fileman/elevation.c:14
+msgid "Permission denied; administrator access requires a terminal in X11"
 msgstr ""
 
-#: userland/apps/fileman/model.c:818
-msgid "Permissions"
-msgstr ""
-
-#: userland/apps/fileman/model.c:844
+#: userland/apps/fileman/motif_dialogs.c:290
 msgid "Permissions saved"
 msgstr ""
 
-#: userland/apps/fileman/model.c:645
-msgid "Permissions:"
-msgstr ""
-
-#: userland/apps/settings/main.c:1283
+#: userland/apps/settings/main.c:1287
 msgid "Personalization is saved for the current user. Metro and Win95 keep separate colors."
 msgstr ""
 
-#: userland/apps/settings/main.c:1172
+#: userland/apps/settings/main.c:1176
 msgid "Personalization updated"
 msgstr ""
 
-#: userland/apps/settings/main.c:1614
+#: userland/apps/settings/main.c:1618
 msgid "Personalize"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:135
+#: userland/apps/fileman/actions.c:136
 msgid "Place shortcut on Desktop? No creates it here."
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:403
+#: userland/apps/minesweeper/main.c:201
 msgid "Playing"
 msgstr ""
 
@@ -3018,7 +2758,7 @@ msgstr ""
 msgid "Please keep this window open until installation completes."
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:719
+#: userland/apps/diskmgr/main.c:726
 msgid "Port"
 msgstr ""
 
@@ -3026,7 +2766,7 @@ msgstr ""
 msgid "Port must be 1-65535"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:658
+#: userland/apps/diskmgr/main.c:665
 msgid "Port:"
 msgstr ""
 
@@ -3034,7 +2774,7 @@ msgstr ""
 msgid "Power"
 msgstr ""
 
-#: userland/apps/desktop/input.c:636
+#: userland/apps/desktop/input.c:644
 msgid "Power request failed"
 msgstr ""
 
@@ -3046,7 +2786,7 @@ msgstr ""
 msgid "Present"
 msgstr ""
 
-#: userland/apps/installer/main.c:2760
+#: userland/apps/installer/install_ops.c:1161
 msgid "Press Restart to boot from the installed disk."
 msgstr ""
 
@@ -3054,36 +2794,28 @@ msgstr ""
 msgid "Pressed"
 msgstr ""
 
-#: userland/apps/installer/main.c:1280
+#: userland/apps/installer/main.c:421
 msgid "Preview a style now and apply it to the installed system."
 msgstr ""
 
-#: userland/apps/imageview/main.c:512
+#: userland/apps/imageview/main.c:560
 msgid "Previous"
 msgstr ""
 
-#: userland/apps/installer/main.c:1201
+#: userland/apps/installer/main.c:986
 msgid "Previous Step"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:713
+#: userland/apps/taskmgr/main.c:800
 msgid "Privileges:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:108
+#: userland/apps/taskmgr/main.c:1179
 msgid "Processes"
-msgstr ""
-
-#: userland/apps/installer/main.c:1399
-msgid "Program and Driver Updates"
 msgstr ""
 
 #: userland/apps/desktop/desktop_items.c:557
 msgid "Program or path not found."
-msgstr ""
-
-#: userland/apps/installer/main.c:1405
-msgid "Programs to replace"
 msgstr ""
 
 #: userland/runtime/src/ui.c:1783
@@ -3098,11 +2830,15 @@ msgstr ""
 msgid "Progress    ready"
 msgstr ""
 
-#: userland/apps/fileman/model.c:718
+#: userland/apps/fileman/motif_dialogs.c:248
 msgid "Properties"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:241
+#: userland/apps/fileman/motif_dialogs.c:235
+msgid "Properties failed"
+msgstr ""
+
+#: userland/apps/diskmgr/main.c:244
 msgid "Protected"
 msgstr ""
 
@@ -3110,11 +2846,11 @@ msgstr ""
 msgid "Protocol unsupported"
 msgstr ""
 
-#: userland/apps/settings/main.c:2172
+#: userland/apps/settings/main.c:2180
 msgid "Provider settings started"
 msgstr ""
 
-#: userland/apps/settings/main.c:277
+#: userland/apps/settings/main.c:281
 msgid "Purple"
 msgstr ""
 
@@ -3122,7 +2858,7 @@ msgstr ""
 msgid "Quick access"
 msgstr ""
 
-#: userland/apps/settings/main.c:161
+#: userland/apps/settings/main.c:165
 msgid "RTC taskbar clock"
 msgstr ""
 
@@ -3134,15 +2870,15 @@ msgstr ""
 msgid "Read failed"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:157
-msgid "Read-only: administrator required"
+#: userland/apps/drvmgr/main.c:142
+msgid "Read-only: drivers are built into the kernel"
 msgstr ""
 
 #: userland/apps/browser/navigation.c:187
 msgid "Ready"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1080
+#: userland/apps/taskmgr/main.c:686
 msgid "Ready "
 msgstr ""
 
@@ -3154,23 +2890,7 @@ msgstr ""
 msgid "Ready to install:"
 msgstr ""
 
-#: userland/apps/fileman/input.c:9
-msgid "Recycle"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:607
-msgid "Recycle Bin emptied"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:608
-msgid "Recycle Bin is empty"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:515
-msgid "Recycle Bin is unavailable"
-msgstr ""
-
-#: userland/apps/settings/main.c:279
+#: userland/apps/settings/main.c:283
 msgid "Red"
 msgstr ""
 
@@ -3182,47 +2902,83 @@ msgstr ""
 msgid "Refresh failed"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:162
+#: userland/apps/servicemgr/main.c:161
 msgid "Refreshing OpenRC..."
 msgstr ""
 
-#: userland/apps/fileman/model.c:758
-msgid "Reload"
+#: userland/apps/browser/input.c:290
+msgid "ReliefOS Browser"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:806
+#: userland/apps/guitest/main.c:120
+msgid "ReliefOS GUI API Tester"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1860
+msgid "ReliefOS Help"
+msgstr ""
+
+#: userland/apps/installer/main.c:443
+msgid "ReliefOS Setup"
+msgstr ""
+
+#: userland/apps/desktop/render.c:31
+msgid "ReliefOS UI Component Library"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:46
+msgid "ReliefOS device protocol"
+msgstr ""
+
+#: userland/apps/notepad/main.c:810
+msgid "ReliefOS text viewer"
+msgstr ""
+
+#: userland/apps/installer/main.c:746
+msgid "ReliefOS was installed to the selected disk."
+msgstr ""
+
+#: userland/apps/installer/main.c:745
+msgid "ReliefOS was updated on the selected disk."
+msgstr ""
+
+#: userland/apps/desktop/screen.c:832
 msgid "Remaining"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1230
-msgid "Remove"
+#: userland/apps/fileman/motif_dialogs.c:206
+msgid "Remember this application for files with the same extension?"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:603
+#: userland/apps/taskmgr/main.c:850
 msgid "Remove Startup App"
 msgstr ""
 
-#: userland/apps/installer/main.c:1488
+#: userland/apps/installer/main.c:748
 msgid "Remove the installation media, then restart."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:604
+#: userland/apps/taskmgr/main.c:850
 msgid "Remove the selected startup app?"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:188
+#: userland/apps/fileman/actions.c:189
 msgid "Rename"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:189
+#: userland/apps/fileman/actions.c:204
+msgid "Rename Conflict"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:190
 msgid "Rename canceled"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:222
+#: userland/apps/fileman/actions.c:232
 msgid "Renamed"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:206
+#: userland/apps/fileman/actions.c:216
 msgid "Renamed (elevated)"
 msgstr ""
 
@@ -3234,11 +2990,11 @@ msgstr ""
 msgid "Renew DHCP"
 msgstr ""
 
-#: userland/apps/settings/main.c:1698
+#: userland/apps/settings/main.c:1706
 msgid "Reopen applications to apply the language"
 msgstr ""
 
-#: userland/apps/installer/main.c:1318
+#: userland/apps/installer/main.c:482
 msgid "Replace boot, system, EFI and bundled docs. Then choose changed or missing system apps."
 msgstr ""
 
@@ -3254,15 +3010,15 @@ msgstr ""
 msgid "Required shared library is missing:"
 msgstr ""
 
-#: userland/apps/settings/main.c:158
+#: userland/apps/settings/main.c:162
 msgid "Required system shell. Cannot be disabled here."
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:109
+#: userland/apps/doomlauncher/main.c:343
 msgid "Reset"
 msgstr ""
 
-#: userland/apps/settings/main.c:1486
+#: userland/apps/settings/main.c:1490
 msgid "Reset Pass"
 msgstr ""
 
@@ -3286,11 +3042,11 @@ msgstr ""
 msgid "Resize window to view all components"
 msgstr ""
 
-#: userland/apps/settings/main.c:1235
+#: userland/apps/settings/main.c:1239
 msgid "Resolution"
 msgstr ""
 
-#: userland/apps/settings/main.c:1677
+#: userland/apps/settings/main.c:1684
 msgid "Resolution changed"
 msgstr ""
 
@@ -3306,11 +3062,11 @@ msgstr ""
 msgid "Restart"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:789
+#: userland/apps/desktop/screen.c:815
 msgid "Restart ReliefOS now?"
 msgstr ""
 
-#: userland/apps/desktop/input.c:671
+#: userland/apps/desktop/input.c:679
 msgid "Restart failed"
 msgstr ""
 
@@ -3318,20 +3074,8 @@ msgstr ""
 msgid "Restart into kernel debugger"
 msgstr ""
 
-#: userland/apps/fileman/model.c:565
-msgid "Restore"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:563
-msgid "Restore Conflict"
-msgstr ""
-
 #: userland/apps/guitest/main.c:146
 msgid "Restore borders"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:572
-msgid "Restore failed"
 msgstr ""
 
 #: userland/apps/dynlinkerror/main.c:39
@@ -3350,7 +3094,7 @@ msgstr ""
 msgid "Return to Setup"
 msgstr ""
 
-#: userland/apps/settings/main.c:1255
+#: userland/apps/settings/main.c:1259
 msgid "Revert"
 msgstr ""
 
@@ -3358,23 +3102,23 @@ msgstr ""
 msgid "Ring-3 desktop shadow blit"
 msgstr ""
 
-#: userland/apps/settings/main.c:1456
+#: userland/apps/settings/main.c:1460
 msgid "Role"
 msgstr ""
 
-#: userland/apps/fileman/input.c:43
+#: userland/runtime/src/ui.c:1119
 msgid "Root"
 msgstr ""
 
-#: userland/apps/installer/main.c:3319
+#: userland/apps/installer/install_ops.c:1536
 msgid "Root and boot payloads"
 msgstr ""
 
-#: userland/apps/installer/main.c:3169
+#: userland/apps/installer/install_ops.c:1389
 msgid "Root: /target; ESP: /target/boot"
 msgstr ""
 
-#: userland/apps/installer/main.c:3243
+#: userland/apps/installer/install_ops.c:1463
 msgid "Root: /target; boot partition: /target/boot"
 msgstr ""
 
@@ -3382,35 +3126,31 @@ msgstr ""
 msgid "Run"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1074
+#: userland/apps/taskmgr/main.c:685
 msgid "Run "
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:203
+#: userland/apps/servicemgr/main.c:202
 msgid "Running"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:223
+#: userland/apps/servicemgr/main.c:222
 msgid "Runtime state is visible. Administrator rights are required to control services."
 msgstr ""
 
-#: userland/apps/installer/main.c:1300
+#: userland/apps/installer/main.c:449
 msgid "SATA/AHCI and IDE/PATA target disks are supported."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1194
+#: userland/apps/taskmgr/main.c:1059
 msgid "STATE"
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:1121
-msgid "STATUS"
 msgstr ""
 
 #: userland/apps/desktop/render.c:44
 msgid "Sample text"
 msgstr ""
 
-#: userland/apps/fileman/model.c:664
+#: userland/apps/notepad/main.c:678
 msgid "Save"
 msgstr ""
 
@@ -3418,7 +3158,7 @@ msgstr ""
 msgid "Save As"
 msgstr ""
 
-#: userland/apps/paint/main.c:489
+#: userland/apps/paint/main.c:662
 msgid "Save as"
 msgstr ""
 
@@ -3438,19 +3178,15 @@ msgstr ""
 msgid "Save changes before opening another file?"
 msgstr ""
 
-#: userland/apps/paint/main.c:583
+#: userland/apps/paint/main.c:470
 msgid "Save changes?"
 msgstr ""
 
-#: userland/apps/fileman/model.c:845
-msgid "Save failed"
-msgstr ""
-
-#: userland/apps/paint/main.c:449
+#: userland/apps/paint/main.c:422
 msgid "Save image"
 msgstr ""
 
-#: userland/apps/paint/main.c:584
+#: userland/apps/paint/main.c:471
 msgid "Save the current drawing before closing?"
 msgstr ""
 
@@ -3462,15 +3198,15 @@ msgstr ""
 msgid "Saved browser pages"
 msgstr ""
 
-#: userland/apps/settings/main.c:1237
+#: userland/apps/settings/main.c:1241
 msgid "Scale"
 msgstr ""
 
-#: userland/apps/settings/main.c:1687
+#: userland/apps/settings/main.c:1694
 msgid "Scale changed"
 msgstr ""
 
-#: userland/apps/installer/main.c:3318
+#: userland/apps/installer/install_ops.c:1535
 msgid "Scanning update payload"
 msgstr ""
 
@@ -3486,31 +3222,23 @@ msgstr ""
 msgid "Search results"
 msgstr ""
 
-#: userland/apps/fileman/model.c:731
-msgid "Security"
-msgstr ""
-
 #: userland/apps/browser/input.c:199
 msgid "Select Address"
 msgstr ""
 
-#: userland/apps/installer/main.c:1327
+#: userland/apps/installer/main.c:527
 msgid "Select Disk to Update"
 msgstr ""
 
-#: userland/apps/installer/main.c:1328
+#: userland/apps/installer/main.c:527
 msgid "Select Installation Disk"
 msgstr ""
 
-#: userland/apps/installer/main.c:1212
+#: userland/apps/installer/main.c:357
 msgid "Select Language"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:245
-msgid "Select a driver first"
-msgstr ""
-
-#: userland/apps/fileman/actions.c:129
+#: userland/apps/fileman/actions.c:130
 msgid "Select a file"
 msgstr ""
 
@@ -3518,48 +3246,40 @@ msgstr ""
 msgid "Select a file in "
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:625
+#: userland/apps/diskmgr/main.c:632
 msgid "Select a mounted data partition"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:394
+#: userland/apps/fileman/actions.c:305
 msgid "Select a tar file"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:23
+#: userland/apps/fileman/actions.c:25
 msgid "Select an item"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:552
-msgid "Select an item in Recycle Bin"
+#: userland/apps/diskmgr/main.c:600
+msgid "Select an unmounted exFAT, FAT32, ext4, or legacy ext2 data partition"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:593
-msgid "Select an unmounted exFAT, FAT32, or ext2 data partition"
-msgstr ""
-
-#: userland/apps/diskmgr/main.c:493
+#: userland/apps/diskmgr/main.c:497
 msgid "Select an unprotected non-boot disk partition"
 msgstr ""
 
-#: userland/apps/installer/main.c:855
+#: userland/apps/installer/install_ops.c:208
 msgid "Select the disk to update"
 msgstr ""
 
-#: userland/apps/installer/main.c:858
+#: userland/apps/installer/install_ops.c:211
 msgid "Select the target disk"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:653
+#: userland/apps/diskmgr/main.c:660
 msgid "Selected disk"
 msgstr ""
 
 #: userland/apps/desktop/render.c:60
 msgid "Selected item"
-msgstr ""
-
-#: userland/apps/fileman/operations.c:620
-msgid "Selected items cannot be restored. Continue?"
 msgstr ""
 
 #: userland/apps/notepad/main.c:368
@@ -3570,7 +3290,7 @@ msgstr ""
 msgid "Selection changed"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:538
+#: userland/apps/diskmgr/main.c:545
 msgid "Selection changed; operation cancelled"
 msgstr ""
 
@@ -3590,36 +3310,28 @@ msgstr ""
 msgid "Serial"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:225
+#: userland/apps/servicemgr/main.c:224
 msgid "Service"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:352
+#: userland/apps/servicemgr/main.c:351
 msgid "Service Manager"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:463
-msgid "Service Manager opened"
-msgstr ""
-
-#: userland/apps/servicemgr/main.c:315
+#: userland/apps/servicemgr/main.c:314
 msgid "Service setting changed"
 msgstr ""
 
-#: userland/apps/settings/main.c:638
+#: userland/apps/settings/main.c:642
 msgid "Service settings saved"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:353
+#: userland/apps/servicemgr/main.c:352
 msgid "Services"
 msgstr ""
 
 #: userland/apps/desktop/start_menu.c:1033
 msgid "Session"
-msgstr ""
-
-#: userland/apps/servicemgr/main.c:46
-msgid "Session IPC"
 msgstr ""
 
 #: userland/runtime/src/ui.c:1819
@@ -3634,27 +3346,23 @@ msgstr ""
 msgid "Set test title"
 msgstr ""
 
-#: userland/apps/desktop/desktop_run.c:19
+#: userland/apps/desktop/desktop_run.c:33
 msgid "Settings"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:125
+#: userland/apps/doomlauncher/main.c:120
 msgid "Settings reset"
 msgstr ""
 
-#: userland/apps/fileman/input.c:44
-msgid "Settings..."
-msgstr ""
-
-#: userland/apps/installer/main.c:1111
+#: userland/apps/installer/main.c:961
 msgid "Setup"
 msgstr ""
 
-#: userland/apps/installer/main.c:1298
+#: userland/apps/installer/main.c:446
 msgid "Setup can copy the full normal system payload"
 msgstr ""
 
-#: userland/apps/installer/main.c:856
+#: userland/apps/installer/install_ops.c:209
 msgid "Setup will check for an existing ReliefOS system."
 msgstr ""
 
@@ -3662,7 +3370,7 @@ msgstr ""
 msgid "Shortcut already exists."
 msgstr ""
 
-#: userland/apps/fileman/actions.c:174
+#: userland/apps/fileman/actions.c:175
 msgid "Shortcut created"
 msgstr ""
 
@@ -3674,15 +3382,15 @@ msgstr ""
 msgid "Show desktop taskbar"
 msgstr ""
 
-#: userland/apps/fileman/view.c:178
+#: userland/apps/fileman/motif_dialogs.c:107
 msgid "Show files and folders starting with a dot"
 msgstr ""
 
-#: userland/apps/settings/main.c:160
+#: userland/apps/settings/main.c:164
 msgid "Show network state in the desktop taskbar."
 msgstr ""
 
-#: userland/apps/settings/main.c:161
+#: userland/apps/settings/main.c:165
 msgid "Show the hardware clock in the taskbar."
 msgstr ""
 
@@ -3690,31 +3398,23 @@ msgstr ""
 msgid "Show window in taskbar"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1386
-msgid "Shows runnable, sleeping, and exited tasks."
-msgstr ""
-
 #: userland/apps/desktop/start_menu.c:1015
 msgid "Shut down"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:792
+#: userland/apps/desktop/screen.c:818
 msgid "Shut down ReliefOS now?"
 msgstr ""
 
-#: userland/apps/desktop/input.c:672
+#: userland/apps/desktop/input.c:680
 msgid "Shutdown failed"
 msgstr ""
 
-#: userland/apps/login/main.c:121
-msgid "Sign in"
-msgstr ""
-
-#: userland/apps/settings/main.c:2049
+#: userland/apps/settings/main.c:2057
 msgid "Sign in to change input methods"
 msgstr ""
 
-#: userland/apps/settings/main.c:1329
+#: userland/apps/settings/main.c:1333
 msgid "Sign in to change personalization."
 msgstr ""
 
@@ -3722,31 +3422,23 @@ msgstr ""
 msgid "Sign out"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:791
+#: userland/apps/desktop/screen.c:817
 msgid "Sign out of ReliefOS now?"
 msgstr ""
 
-#: userland/apps/login/main.c:158
-msgid "Signed in"
-msgstr ""
-
-#: userland/apps/diskmgr/main.c:727
+#: userland/apps/diskmgr/main.c:734
 msgid "Size"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:694
+#: userland/apps/diskmgr/main.c:701
 msgid "Size MiB:"
 msgstr ""
 
-#: userland/apps/fileman/model.c:738
-msgid "Size:"
-msgstr ""
-
-#: userland/apps/drvmgr/main.c:213
+#: userland/apps/drvmgr/main.c:184
 msgid "Skipped at boot"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1083
+#: userland/apps/taskmgr/main.c:687
 msgid "Sleep "
 msgstr ""
 
@@ -3766,35 +3458,35 @@ msgstr ""
 msgid "Some characters are not available in this encoding. Save them as '?'?"
 msgstr ""
 
-#: userland/apps/fileman/operations.c:643
-msgid "Some items could not be deleted"
+#: userland/apps/settings/main.c:1624
+msgid "Sound"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:258
+#: userland/apps/taskmgr/main.c:155
 msgid "Standard"
 msgstr ""
 
-#: userland/apps/installer/main.c:1517
+#: userland/apps/installer/main.c:626
 msgid "Standard user name"
 msgstr ""
 
-#: userland/apps/installer/main.c:1517
+#: userland/apps/installer/main.c:627
 msgid "Standard user password"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:268
+#: userland/apps/servicemgr/main.c:267
 msgid "Start"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:717
+#: userland/apps/desktop/screen.c:743
 msgid "Start Menu"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:212
+#: userland/apps/servicemgr/main.c:211
 msgid "Starting"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:173
+#: userland/apps/doomlauncher/main.c:176
 msgid "Starting DOOM: the game window shows loading progress"
 msgstr ""
 
@@ -3802,7 +3494,7 @@ msgstr ""
 msgid "Starting input method"
 msgstr ""
 
-#: userland/apps/settings/main.c:1359
+#: userland/apps/settings/main.c:1363
 msgid "Startup"
 msgstr ""
 
@@ -3810,19 +3502,19 @@ msgstr ""
 msgid "Startup Application"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:591
+#: userland/apps/taskmgr/main.c:835
 msgid "Startup app disabled"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:592
+#: userland/apps/taskmgr/main.c:835
 msgid "Startup app enabled"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:611
+#: userland/apps/taskmgr/main.c:857
 msgid "Startup app removed"
 msgstr ""
 
-#: userland/apps/settings/main.c:2020
+#: userland/apps/settings/main.c:2028
 msgid "Startup behavior saved"
 msgstr ""
 
@@ -3834,11 +3526,11 @@ msgstr ""
 msgid "Startup permission"
 msgstr ""
 
-#: userland/apps/settings/main.c:1539
+#: userland/apps/settings/main.c:1543
 msgid "Startup policy is saved here; Service Manager shows runtime state."
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:175
+#: userland/apps/drvmgr/main.c:152
 msgid "State"
 msgstr ""
 
@@ -3854,7 +3546,7 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:49
+#: userland/apps/doomlauncher/main.c:69
 msgid "Status "
 msgstr ""
 
@@ -3866,7 +3558,7 @@ msgstr ""
 msgid "Stop"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:206
+#: userland/apps/servicemgr/main.c:205
 msgid "Stopped"
 msgstr ""
 
@@ -3874,11 +3566,11 @@ msgstr ""
 msgid "Storage"
 msgstr ""
 
-#: userland/apps/settings/main.c:299
+#: userland/apps/settings/main.c:303
 msgid "Stretch"
 msgstr ""
 
-#: userland/apps/installer/main.c:1129
+#: userland/apps/installer/main.c:173
 msgid "Style"
 msgstr ""
 
@@ -3898,11 +3590,11 @@ msgstr ""
 msgid "Switch To"
 msgstr ""
 
-#: userland/apps/settings/main.c:1407
+#: userland/apps/settings/main.c:1411
 msgid "Switch shortcut"
 msgstr ""
 
-#: userland/apps/settings/main.c:162
+#: userland/apps/settings/main.c:166
 msgid "Synchronize the system clock through pool.ntp.org."
 msgstr ""
 
@@ -3910,15 +3602,7 @@ msgstr ""
 msgid "System"
 msgstr ""
 
-#: userland/apps/osver/main.c:196
-msgid "System information"
-msgstr ""
-
-#: userland/apps/osver/main.c:227
-msgid "System information (logo unavailable)"
-msgstr ""
-
-#: userland/apps/settings/main.c:1415
+#: userland/apps/settings/main.c:1419
 msgid "System overlay"
 msgstr ""
 
@@ -3926,15 +3610,11 @@ msgstr ""
 msgid "System root view"
 msgstr ""
 
-#: userland/apps/settings/main.c:2234
+#: userland/apps/settings/main.c:2245
 msgid "System settings"
 msgstr ""
 
-#: userland/apps/osver/main.c:250
-msgid "System version"
-msgstr ""
-
-#: userland/apps/osver/main.c:240
+#: userland/apps/osver/main.c:207
 msgid "System version information"
 msgstr ""
 
@@ -3962,23 +3642,23 @@ msgstr ""
 msgid "TLS verification failed"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:500
+#: userland/apps/fileman/actions.c:394
 msgid "Tar created successfully"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:384
-msgid "Tar extract failed"
+#: userland/apps/fileman/actions.c:393
+msgid "Tar creation failed"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:387
+#: userland/apps/fileman/actions.c:337
 msgid "Tar extracted successfully"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:495
-msgid "Tar finalize failed"
+#: userland/apps/fileman/actions.c:336
+msgid "Tar extraction failed; check the archive and destination permissions"
 msgstr ""
 
-#: userland/apps/installer/main.c:3260
+#: userland/apps/installer/install_ops.c:1480
 msgid "Target disk is ready."
 msgstr ""
 
@@ -3994,11 +3674,11 @@ msgstr ""
 msgid "Target path:"
 msgstr ""
 
-#: userland/apps/installer/main.c:1452
+#: userland/apps/installer/main.c:704
 msgid "Target:"
 msgstr ""
 
-#: userland/apps/installer/main.c:3182
+#: userland/apps/installer/install_ops.c:1402
 msgid "Target: /target"
 msgstr ""
 
@@ -4006,31 +3686,27 @@ msgstr ""
 msgid "Task Button"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:696
+#: userland/apps/taskmgr/main.c:808
 msgid "Task Details"
 msgstr ""
 
-#: userland/apps/desktop/desktop_run.c:24
+#: userland/apps/desktop/desktop_run.c:38
 msgid "Task Manager"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:642
+#: userland/apps/taskmgr/main.c:720
 msgid "Task ended"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1506
-msgid "Task snapshot"
-msgstr ""
-
-#: userland/apps/settings/main.c:160
+#: userland/apps/settings/main.c:164
 msgid "Taskbar network icon"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1071
+#: userland/apps/taskmgr/main.c:684
 msgid "Tasks "
 msgstr ""
 
-#: userland/apps/settings/main.c:273
+#: userland/apps/settings/main.c:277
 msgid "Teal"
 msgstr ""
 
@@ -4046,7 +3722,7 @@ msgstr ""
 msgid "Text and PNG (*.txt; *.png)"
 msgstr ""
 
-#: userland/apps/settings/main.c:138
+#: userland/apps/settings/main.c:142
 msgid "Text documents"
 msgstr ""
 
@@ -4070,11 +3746,11 @@ msgstr ""
 msgid "TextField   selected"
 msgstr ""
 
-#: userland/apps/installer/main.c:1228
+#: userland/apps/installer/main.c:381
 msgid "Thank You"
 msgstr ""
 
-#: userland/apps/installer/main.c:1127
+#: userland/apps/installer/main.c:172
 msgid "Thanks"
 msgstr ""
 
@@ -4094,35 +3770,47 @@ msgstr ""
 msgid "The application could not be started."
 msgstr ""
 
-#: userland/apps/paint/main.c:468
+#: userland/apps/fileman/actions.c:372
+msgid "The archive exists. Replace it?"
+msgstr ""
+
+#: userland/apps/paint/main.c:452
 msgid "The current drawing has not been saved."
 msgstr ""
 
-#: userland/apps/fileman/operations.c:108
+#: userland/apps/fileman/actions.c:204
+msgid "The destination exists. Replace it?"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:99
 msgid "The destination exists. Replace it? Choose No to save with another name."
+msgstr ""
+
+#: userland/apps/fileman/actions.c:322
+msgid "The extraction folder exists. Existing files may be replaced. Continue?"
 msgstr ""
 
 #: userland/apps/browser/navigation.c:498
 msgid "The form action could not be parsed as HTTP."
 msgstr ""
 
-#: userland/apps/installer/main.c:1218
+#: userland/apps/installer/main.c:373
 msgid "The installed system will use the same language."
 msgstr ""
 
-#: userland/apps/installer/main.c:1460
-msgid "The selected disk will be erased and formatted with a FAT32 ESP and ext2 system root."
+#: userland/apps/installer/main.c:709
+msgid "The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root."
 msgstr ""
 
-#: userland/apps/installer/main.c:859
+#: userland/apps/installer/install_ops.c:212
 msgid "The selected disk will be erased."
 msgstr ""
 
-#: userland/apps/settings/main.c:1286
+#: userland/apps/settings/main.c:1290
 msgid "Theme style"
 msgstr ""
 
-#: userland/apps/settings/main.c:1712
+#: userland/apps/settings/main.c:1720
 msgid "Theme style changed"
 msgstr ""
 
@@ -4138,23 +3826,15 @@ msgstr ""
 msgid "This help file has no pages."
 msgstr ""
 
-#: userland/apps/settings/main.c:1431
+#: userland/apps/settings/main.c:1435
 msgid "This input method has no configurable options."
 msgstr ""
 
-#: userland/apps/installer/main.c:1449
+#: userland/apps/installer/main.c:695
 msgid "This operation is destructive."
 msgstr ""
 
-#: userland/apps/fileman/actions.c:254
-msgid "This permanently deletes the folder and everything inside it. Continue?"
-msgstr ""
-
-#: userland/apps/fileman/view.c:182
-msgid "This preference is saved for the current user."
-msgstr ""
-
-#: userland/apps/diskmgr/main.c:687
+#: userland/apps/diskmgr/main.c:694
 msgid "This removes the GPT entry. Existing data is not securely erased."
 msgstr ""
 
@@ -4162,15 +3842,11 @@ msgstr ""
 msgid "This window is rendered by the app"
 msgstr ""
 
-#: userland/apps/osver/main.c:204
-msgid "This window reports the version embedded in the running kernel."
-msgstr ""
-
-#: userland/apps/settings/main.c:297
+#: userland/apps/settings/main.c:301
 msgid "Tile"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:48
+#: userland/apps/servicemgr/main.c:47
 msgid "Time sync"
 msgstr ""
 
@@ -4182,7 +3858,7 @@ msgstr ""
 msgid "Toggle borderless"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:78
+#: userland/apps/doomlauncher/main.c:99
 msgid "Too many arguments"
 msgstr ""
 
@@ -4198,7 +3874,7 @@ msgstr ""
 msgid "Top of page"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1056
+#: userland/apps/taskmgr/main.c:673
 msgid "Total memory:"
 msgstr ""
 
@@ -4206,24 +3882,24 @@ msgstr ""
 msgid "Transmit failed"
 msgstr ""
 
-#: userland/apps/fileman/view.c:13
+#: userland/apps/fileman/motif_dialogs.c:246
 msgid "Type"
 msgstr ""
 
-#: userland/apps/installer/main.c:1465
+#: userland/apps/fileman/motif.c:320
+msgid "Type / Name (Ctrl or Shift for multiple selection)"
+msgstr ""
+
+#: userland/apps/installer/main.c:713
 msgid "Type INSTALL to enable the Install button."
 msgstr ""
 
-#: userland/apps/installer/main.c:1464
+#: userland/apps/installer/main.c:712
 msgid "Type UPDATE to enable the Update button."
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:518
+#: userland/apps/diskmgr/main.c:525
 msgid "Type the confirmation word and click Apply twice"
-msgstr ""
-
-#: userland/apps/fileman/model.c:736
-msgid "Type:"
 msgstr ""
 
 #: userland/apps/httpget/main.c:245
@@ -4234,7 +3910,7 @@ msgstr ""
 msgid "URL:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1195
+#: userland/apps/taskmgr/main.c:1059
 msgid "USER"
 msgstr ""
 
@@ -4250,7 +3926,7 @@ msgstr ""
 msgid "Unchecked"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:213
+#: userland/apps/diskmgr/main.c:216
 msgid "Unknown"
 msgstr ""
 
@@ -4262,48 +3938,40 @@ msgstr ""
 msgid "Unknown status"
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:183
-msgid "Unload"
-msgstr ""
-
-#: userland/apps/drvmgr/main.c:90
+#: userland/apps/drvmgr/main.c:87
 msgid "Unloaded"
 msgstr ""
 
-#: userland/apps/fileman/model.c:479
+#: userland/apps/fileman/model.c:467
 msgid "Unmark"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:805
+#: userland/apps/diskmgr/main.c:812
 msgid "Unmount"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:639
+#: userland/apps/diskmgr/main.c:646
 msgid "Unmount blocked: close files and leave the mount first"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:826
+#: userland/apps/diskmgr/main.c:833
 msgid "Unmount requires administrator approval and no task may use the mount."
-msgstr ""
-
-#: userland/apps/fileman/model.c:789
-msgid "Unsaved changes"
 msgstr ""
 
 #: userland/apps/browser/navigation.c:811
 msgid "Unsupported Address"
 msgstr ""
 
-#: userland/apps/imageview/main.c:405
+#: userland/apps/imageview/main.c:259
 msgid "Unsupported BMP. Use uncompressed 24/32-bit BMP."
 msgstr ""
 
-#: userland/apps/imageview/main.c:380
+#: userland/apps/imageview/main.c:237
 msgid "Unsupported image format. Use BMP, DIB, or PNG."
 msgstr ""
 
-#: userland/apps/installer/main.c:2328
-msgid "Unsupported root layout; use a fresh ext2 installation"
+#: userland/apps/installer/install_ops.c:915
+msgid "Unsupported root layout; use a fresh ext4 installation"
 msgstr ""
 
 #: userland/apps/notepad/main.c:408
@@ -4318,7 +3986,7 @@ msgstr ""
 msgid "Untitled Page"
 msgstr ""
 
-#: userland/apps/fileman/view.c:35
+#: userland/runtime/src/ui.c:1116
 msgid "Up"
 msgstr ""
 
@@ -4326,23 +3994,23 @@ msgstr ""
 msgid "Up arrow"
 msgstr ""
 
-#: userland/apps/installer/main.c:843
+#: userland/apps/installer/install_ops.c:196
 msgid "Update"
 msgstr ""
 
-#: userland/apps/installer/main.c:1484
+#: userland/apps/installer/main.c:742
 msgid "Update Complete"
 msgstr ""
 
-#: userland/apps/installer/main.c:1315
+#: userland/apps/installer/main.c:476
 msgid "Update Existing System"
 msgstr ""
 
-#: userland/apps/installer/main.c:1497
+#: userland/apps/installer/main.c:756
 msgid "Update Failed"
 msgstr ""
 
-#: userland/apps/installer/main.c:2758
+#: userland/apps/installer/install_ops.c:1159
 msgid "Update completed successfully"
 msgstr ""
 
@@ -4350,43 +4018,39 @@ msgstr ""
 msgid "Update default program"
 msgstr ""
 
-#: userland/apps/settings/main.c:1437
+#: userland/apps/settings/main.c:1441
 msgid "Update dictionary"
 msgstr ""
 
-#: userland/apps/installer/main.c:3198
+#: userland/apps/installer/install_ops.c:1418
 msgid "Update installed ReliefOS packages"
 msgstr ""
 
-#: userland/apps/installer/main.c:848
-msgid "Updating ReliefOS"
-msgstr ""
-
-#: userland/apps/settings/main.c:605
+#: userland/apps/settings/main.c:609
 msgid "Updating OpenRC..."
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:150
+#: userland/apps/installer/install_ops.c:201
+msgid "Updating ReliefOS"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:149
 msgid "Updating runlevel..."
 msgstr ""
 
-#: userland/apps/installer/main.c:3340
+#: userland/apps/installer/install_ops.c:1549
 msgid "Upgrading signed ReliefOS packages"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1065
+#: userland/apps/taskmgr/main.c:682
 msgid "Uptime:"
 msgstr ""
 
-#: userland/apps/imageview/main.c:463
+#: userland/apps/imageview/main.c:614
 msgid "Use Open to choose a BMP or PNG image."
 msgstr ""
 
-#: userland/apps/imageview/main.c:463
-msgid "Use Open, File Manager, Run, or the command line to open a BMP or PNG file."
-msgstr ""
-
-#: userland/apps/settings/main.c:1390
+#: userland/apps/settings/main.c:1394
 msgid "Use as default"
 msgstr ""
 
@@ -4394,35 +4058,31 @@ msgstr ""
 msgid "Use http://, https://, about:, or a ReliefOS file path such as /file.html."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1059
+#: userland/apps/taskmgr/main.c:676
 msgid "Used memory:"
 msgstr ""
 
-#: userland/apps/settings/main.c:387
+#: userland/apps/settings/main.c:391
 msgid "User"
 msgstr ""
 
-#: userland/apps/settings/main.c:1767
+#: userland/apps/settings/main.c:1775
 msgid "User created"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:46
-msgid "User startup"
-msgstr ""
-
-#: userland/apps/settings/main.c:1807
+#: userland/apps/settings/main.c:1815
 msgid "User state change denied"
 msgstr ""
 
-#: userland/apps/settings/main.c:1805
+#: userland/apps/settings/main.c:1813
 msgid "User state updated"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:712
+#: userland/apps/taskmgr/main.c:799
 msgid "User:"
 msgstr ""
 
-#: userland/apps/settings/main.c:1757
+#: userland/apps/settings/main.c:1765
 msgid "Username"
 msgstr ""
 
@@ -4430,7 +4090,7 @@ msgstr ""
 msgid "Username for this HTTP host:"
 msgstr ""
 
-#: userland/apps/login/main.c:122
+#: userland/apps/settings/main.c:1619
 msgid "Users"
 msgstr ""
 
@@ -4446,7 +4106,7 @@ msgstr ""
 msgid "View"
 msgstr ""
 
-#: userland/apps/servicemgr/main.c:222
+#: userland/apps/servicemgr/main.c:221
 msgid "View service runtime state and control startup services."
 msgstr ""
 
@@ -4458,27 +4118,27 @@ msgstr ""
 msgid "Wait"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:778
+#: userland/apps/desktop/screen.c:804
 msgid "Waiting for applications to close..."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:718
+#: userland/apps/taskmgr/main.c:803
 msgid "Wake tick:"
 msgstr ""
 
-#: userland/apps/settings/main.c:1309
+#: userland/apps/settings/main.c:1313
 msgid "Wallpaper"
 msgstr ""
 
-#: userland/apps/settings/main.c:1877
+#: userland/apps/settings/main.c:1885
 msgid "Wallpaper BMP must be uncompressed 24/32-bit and no larger than 1280 x 720."
 msgstr ""
 
-#: userland/apps/settings/main.c:1882
+#: userland/apps/settings/main.c:1890
 msgid "Wallpaper changed"
 msgstr ""
 
-#: userland/apps/settings/main.c:1745
+#: userland/apps/settings/main.c:1753
 msgid "Wallpaper mode changed"
 msgstr ""
 
@@ -4490,19 +4150,19 @@ msgstr ""
 msgid "Web downloads are saved to the current user's Downloads folder."
 msgstr ""
 
-#: userland/apps/installer/main.c:1131
+#: userland/apps/installer/main.c:174
 msgid "Welcome"
 msgstr ""
 
-#: userland/apps/settings/main.c:1300
+#: userland/apps/settings/main.c:1304
 msgid "Win95 color"
 msgstr ""
 
-#: userland/apps/settings/main.c:1734
+#: userland/apps/settings/main.c:1742
 msgid "Win95 color changed"
 msgstr ""
 
-#: userland/apps/installer/main.c:1290
+#: userland/apps/installer/main.c:415
 msgid "Win95 keeps the classic beveled system appearance."
 msgstr ""
 
@@ -4518,19 +4178,19 @@ msgstr ""
 msgid "Window server v2"
 msgstr ""
 
-#: userland/apps/desktop/screen.c:812
+#: userland/apps/fileman/motif_dialogs.c:199
+msgid "X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"
+msgstr ""
+
+#: userland/apps/desktop/screen.c:838
 msgid "Yes"
 msgstr ""
 
-#: userland/apps/settings/main.c:1463
+#: userland/apps/settings/main.c:1467
 msgid "You can change your password."
 msgstr ""
 
-#: userland/apps/drvmgr/main.c:189
-msgid "You can inspect loaded modules, but cannot change them."
-msgstr ""
-
-#: userland/apps/minesweeper/main.c:401
+#: userland/apps/minesweeper/main.c:199
 msgid "You won"
 msgstr ""
 
@@ -4538,71 +4198,55 @@ msgstr ""
 msgid "boot  system  programs"
 msgstr ""
 
-#: userland/apps/installer/main.c:1402
-msgid "boot, libraries, kerneldebug, EFI, docs, and drivers will be refreshed. Extra target applications and drivers are kept."
+#: userland/apps/installer/install_ops.c:1524
+msgid "exFAT root cannot carry the current symlink layout; use a fresh ext4 install"
 msgstr ""
 
-#: userland/apps/installer/main.c:3307
-msgid "exFAT root cannot carry the current symlink layout; use a fresh ext2 install"
-msgstr ""
-
-#: userland/apps/desktop/draw.c:707
+#: userland/apps/desktop/draw.c:700
 msgid "exit"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:392
+msgid "failed"
 msgstr ""
 
 #: userland/apps/helloworld/main.c:26
 msgid "helloworld"
 msgstr ""
 
-#: userland/apps/installer/main.c:1371
-msgid "icon differs"
+#: userland/apps/fileman/operations.c:392
+msgid "item(s) deleted"
 msgstr ""
 
-#: userland/apps/desktop/draw.c:715
+#: userland/apps/desktop/draw.c:708
 msgid "kern"
-msgstr ""
-
-#: userland/apps/installer/main.c:1365
-msgid "missing on target"
 msgstr ""
 
 #: userland/apps/notepad/main.c:373
 msgid "open failed "
 msgstr ""
 
-#: userland/apps/installer/main.c:1299
-msgid "or replace the boot/leonos and system files on an existing installation."
-msgstr ""
-
-#: userland/apps/installer/main.c:1373
-msgid "package files differ"
-msgstr ""
-
-#: userland/apps/installer/main.c:1367
-msgid "program and icon differ"
-msgstr ""
-
-#: userland/apps/installer/main.c:1369
-msgid "program differs"
+#: userland/apps/installer/main.c:447
+msgid "or replace the boot/reliefos and system files on an existing installation."
 msgstr ""
 
 #: userland/apps/notepad/main.c:388
 msgid "read failed "
 msgstr ""
 
-#: userland/apps/desktop/draw.c:701
+#: userland/apps/desktop/draw.c:694
 msgid "ready"
 msgstr ""
 
-#: userland/apps/installer/main.c:1519
+#: userland/apps/installer/main.c:629
 msgid "root password"
 msgstr ""
 
-#: userland/apps/desktop/draw.c:703
+#: userland/apps/desktop/draw.c:696
 msgid "run"
 msgstr ""
 
-#: userland/apps/settings/main.c:1251
+#: userland/apps/settings/main.c:1255
 msgid "s"
 msgstr ""
 
@@ -4618,7 +4262,7 @@ msgstr ""
 msgid "save write incomplete"
 msgstr ""
 
-#: userland/apps/desktop/draw.c:705
+#: userland/apps/desktop/draw.c:698
 msgid "sleep"
 msgstr ""
 
@@ -4626,10 +4270,11 @@ msgstr ""
 msgid "stat failed "
 msgstr ""
 
-#: userland/apps/desktop/draw.c:715
+#: userland/apps/taskmgr/main.c:788
+msgid "ticks"
+msgstr ""
+
+#: userland/apps/desktop/draw.c:708
 msgid "user"
 msgstr ""
 
-#: userland/apps/installer/main.c:1375
-msgid "will be replaced"
-msgstr ""

@@ -80,7 +80,6 @@ def main():
     run(["resize2fs", "-f", image], capture_output=True)
     run(["debugfs", "-w", "-R", "mkdir /usr/lib/reliefos/tests", image], capture_output=True)
     inject(image, probe, "/usr/lib/reliefos/tests/linux-inventory.elf", "0100755")
-    inject(image, ROOT / "build/drivers/e1000.drv", "/usr/lib/reliefos/drivers/e1000.drv", "0100755")
     repositories = work / "repositories"
     repositories.write_text("ndx /usr/share/reliefos/apk/repository/packages.adb\n"
                             "https://10.0.2.2/packages.adb\n")
@@ -137,7 +136,6 @@ def main():
     result = {"package": package.name, "bytes": package.stat().st_size,
               "install": args.install,
               "kernel_sha256": hashlib.sha256((work / "iso/leonos/kernel.sys").read_bytes()).hexdigest(),
-              "e1000_sha256": hashlib.sha256((ROOT / "build/drivers/e1000.drv").read_bytes()).hexdigest(),
               "complete": "[tcp-download] DONE status=0" in text, "serial_bytes": serial.stat().st_size}
     match = re.search(r"\[tcp-download\] DONE status=\d+ seconds=([0-9.]+)", text)
     if match:
