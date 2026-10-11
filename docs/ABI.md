@@ -281,18 +281,15 @@ The SDK no longer defines ReliefOS-specific disk-management ioctl records.
 
 ## Boot handoff ABI
 
-`include/leonos/boot_handoff.h` describes exactly one thing: the record the EFI
-loader hands to `kernel.sys`. `struct leonos_boot_handoff` carries the Multiboot2
-and framebuffer facts, the memory maps, and the `loader`, `kernel` and
-`installer_root` module ranges. `LEONOS_BOOT_HANDOFF_VERSION` is `7`.
-
-Version 7 removed the second boot module and every table that used to cross it:
-the middlelayer module range and API pointer, the kernel service table, the
-mount-policy record, the VFS resolve record, and the raw-device catalog query.
-Those services are now ordinary kernel-internal calls compiled into
-`kernel.sys`, so no wire format is needed for them. A kernel that sees any other
-handoff version rejects it in `boot_handoff_is_current()` rather than reading a
-layout it does not understand.
+GRUB loads `kernel.sys` as the Multiboot2 OS image and enters
+`kernel_main(magic, multiboot_info)` directly. `kernel.sys` parses the
+Multiboot2 information itself: memory maps, framebuffer facts and module
+ranges all come from the Multiboot2 tags, so there is no private handoff
+record between firmware-side code and the kernel. When GRUB keeps UEFI boot
+services available and supplies no memory-map tag, the kernel calls the EFI
+`GetMemoryMap` boot service itself before memory initialization. A previous
+private handoff record and its version gate were removed together with the
+intermediate boot stage they served.
 
 Kernel code owns hardware probing, interrupts, page tables, physical memory,
 scheduling, user pointer validation, storage block I/O, exFAT/FAT32/ext2

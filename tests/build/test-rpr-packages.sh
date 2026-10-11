@@ -74,18 +74,16 @@ printf package > "$tmp/pages-repository/reliefos-base-1-r0.apk"
 printf package > "$tmp/pages-apps/reliefos-broken.apk"
 printf reliefos-broken.apk > "$tmp/pages-apps/packages.list"
 printf kernel > "$tmp/kernel.sys"
-printf loader > "$tmp/loader.elf"
 kernel_hash=$(sha256sum "$tmp/kernel.sys" | cut -d' ' -f1)
-loader_hash=$(sha256sum "$tmp/loader.elf" | cut -d' ' -f1)
 mkdir -p "$tmp/pages-kernel"
-printf 'format_version: 1\narch: x86_64\nartifacts:\n  %s  kernel.sys\n  %s  loader.elf\n' \
-    "$kernel_hash" "$loader_hash" > "$tmp/pages-kernel/manifest.txt"
+printf 'format_version: 1\narch: x86_64\nartifacts:\n  %s  kernel.sys\n' \
+    "$kernel_hash" > "$tmp/pages-kernel/manifest.txt"
 printf 'kernel_name=ntclks\nrelease_version=4.7.1\n' > "$tmp/pages-version"
 openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 \
     -out "$tmp/pages-key" 2>/dev/null
 chmod 600 "$tmp/pages-key"
 if sh "$src/tools/build/rpr-pages.sh" "$tmp/pages-repository" "$tmp/pages-apps" \
-    "$tmp/kernel.sys" "$tmp/loader.elf" "$tmp/pages-kernel/manifest.txt" \
+    "$tmp/kernel.sys" "$tmp/pages-kernel/manifest.txt" \
     "$tmp/pages-version" "$tmp/fake-bin/apk" "$tmp/pages-key" "$tmp/pages-output" \
     2>"$tmp/pages-error"; then
     echo 'versionless RPR package was accepted' >&2
@@ -99,7 +97,7 @@ test ! -e "$tmp/pages-output"
 rm "$tmp/pages-apps/reliefos-broken.apk" "$tmp/pages-apps/packages.list"
 printf 'app package\n' > "$tmp/pages-apps/reliefos-helloworld-1-r0.apk"
 sh "$src/tools/build/rpr-pages.sh" "$tmp/pages-repository" "$tmp/pages-apps" \
-    "$tmp/kernel.sys" "$tmp/loader.elf" "$tmp/pages-kernel/manifest.txt" \
+    "$tmp/kernel.sys" "$tmp/pages-kernel/manifest.txt" \
     "$tmp/pages-version" "$tmp/fake-bin/apk" "$tmp/pages-key" "$tmp/pages-output"
 cmp "$tmp/pages-output/apk/leonos-rpr.rsa.pub" "$tmp/pages-output/apk/reliefos-rpr.rsa.pub"
 grep -F '"public_key":"reliefos-rpr.rsa.pub"' "$tmp/pages-output/apk/repository.json"

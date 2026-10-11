@@ -44,7 +44,6 @@ def stage_installer_tree(
     stage: Path,
     boot_image: Path,
     boot_efi: Path,
-    loader: Path,
     kernel: Path,
     installer_root: Path,
     grub_font: Path,
@@ -60,8 +59,6 @@ def stage_installer_tree(
     for namespace in ("reliefos", "leonos"):
         (stage / f"{namespace}-installer-iso.marker").write_text("ReliefOS installer ISO volume\n", encoding="ascii")
         copy_file(kernel, stage / namespace / "kernel.sys")
-        copy_file(loader, stage / namespace / "loader.elf")
-    copy_file(loader, stage / "loader.elf")
     copy_file(installer_root, stage / "install/root.fat")
     copy_file(boot_image, stage / "boot/efiboot.img")
 
@@ -92,7 +89,6 @@ def main() -> int:
     parser.add_argument("--out", default="build/images/reliefos-installer.iso")
     parser.add_argument("--stage", default="build/installer-iso")
     parser.add_argument("--boot-image", default="build/install/installer-efiboot.img")
-    parser.add_argument("--loader", default="build/boot/loader.elf")
     parser.add_argument("--kernel", default="build/system/kernel.sys")
     parser.add_argument("--installer-root", default="build/install/root.fat")
     parser.add_argument("--grub-font", default="build/generated/grub/leonos-unicode.pf2")
@@ -105,7 +101,6 @@ def main() -> int:
     out = ROOT / args.out
     stage = ROOT / args.stage
     boot_image = ROOT / args.boot_image
-    loader = ROOT / args.loader
     kernel = ROOT / args.kernel
     installer_root = ROOT / args.installer_root
     grub_font = ROOT / args.grub_font
@@ -120,7 +115,7 @@ def main() -> int:
 
     boot_efi = build_installer_boot_efi(work_dir / "installer-BOOTX64.EFI", grub_efi_dir)
     create_boot_image(boot_image, boot_efi, work_dir / "efi-boot")
-    stage_installer_tree(stage, boot_image, boot_efi, loader, kernel,
+    stage_installer_tree(stage, boot_image, boot_efi, kernel,
                          installer_root, grub_font, ROOT / args.grub_config)
     if args.bios:
         copy_file(ROOT / args.grub_config, stage / "boot/grub/grub.cfg")

@@ -1216,14 +1216,6 @@ static int check_update_target_required(void)
             }
         }
     }
-    {
-        char loader[RELIEFOS_FS_PATH_LEN];
-        if (path_join(loader, sizeof(loader), TARGET_BOOT, "loader.elf") < 0 ||
-            path_has_type(loader, RELIEFOS_FS_TYPE_FILE) < 0) {
-            set_status(T("Existing ReliefOS boot partition was not detected"), loader);
-            return -2;
-        }
-    }
     if (path_has_type(TARGET_ESP_KERNEL, RELIEFOS_FS_TYPE_FILE) < 0 &&
         path_has_type(TARGET_ESP_KERNEL_LEGACY, RELIEFOS_FS_TYPE_FILE) < 0) {
         set_status(T("Existing ReliefOS boot partition was not detected"), TARGET_ESP_KERNEL);
@@ -1258,9 +1250,7 @@ static int check_update_payload_required(void)
         INSTALL_ROOT_PAYLOAD RELIEFOS_PATH_LIBRELIEFOS,
         INSTALL_ROOT_PAYLOAD "/usr/lib/leonos/libleonos.so.2",
         INSTALL_ESP_PAYLOAD "/reliefos/kernel.sys",
-        INSTALL_ESP_PAYLOAD "/reliefos/loader.elf",
         INSTALL_ESP_PAYLOAD "/leonos/kernel.sys",
-        INSTALL_ESP_PAYLOAD "/loader.elf",
         INSTALL_ESP_PAYLOAD "/grub/grub.cfg",
         INSTALL_ESP_PAYLOAD "/EFI/BOOT/BOOTX64.EFI",
     };
@@ -1751,7 +1741,7 @@ void perform_update(void)
             return;
         }
     }
-    /* Publish the new boot menu only after its kernel, loader and EFI image
+    /* Publish the new boot menu only after its kernel and EFI image
      * are present. The config's legacy entry keeps the untouched old payload
      * under /leonos available if a subsequent boot fails. */
     ret = copy_file_path(INSTALL_ESP_PAYLOAD "/grub/grub.cfg",
@@ -1759,6 +1749,19 @@ void perform_update(void)
     if (ret < 0) {
         finish_install(ret, T("Boot update failed"));
         return;
+    }
+    {
+        /* Drop loader.elf left over from the pre-direct-boot layout: the menu
+         * no longer references it and kernel.sys carries its own Multiboot2
+         * header. */
+        static const char *const stale_loader_files[] = {
+            INSTALL_ESP_MOUNT "/loader.elf",
+            INSTALL_ESP_MOUNT "/reliefos/loader.elf",
+            INSTALL_ESP_MOUNT "/leonos/loader.elf",
+        };
+        for (uint32_t i = 0; i < sizeof(stale_loader_files) / sizeof(stale_loader_files[0]); ++i) {
+            (void)unlink(stale_loader_files[i]);
+        }
     }
 
     show_progress(100, T("Update completed successfully"),

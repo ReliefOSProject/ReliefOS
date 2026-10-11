@@ -17,8 +17,8 @@ $(IMAGE_DISPLAY): $(RELIEFOS_CONFIG_FILE) $(RELIEFOS_EMIT)
 RELIEFOS_EXT4_FEATURES := none,filetype,extents,dir_index,metadata_csum,64bit,flex_bg,has_journal,large_file,huge_file,extra_isize
 RELIEFOS_SIG_images := epoch=$(SOURCE_DATE_EPOCH)|root-fs=ext4|ext4-features=$(RELIEFOS_EXT4_FEATURES)|grub=$(GRUB_EFI_DIR)|grub-identity=$(shell grub-mkstandalone --version 2>/dev/null)|mke2fs=$(shell mke2fs -V 2>&1 | head -n1)|mtools=$(shell mcopy -V 2>&1 | head -n1)|disk-size=$(CONFIG_IMAGE_SIZE_MIB)|installer-size=$(CONFIG_INSTALLER_ROOT_SIZE_MIB)|qemu-img=$(shell qemu-img --version 2>/dev/null | head -n1)|xorriso=$(shell xorriso -version 2>/dev/null | head -n1)|sfdisk=$(shell sfdisk --version 2>/dev/null)
 $(if $(RELIEFOS_PASSIVE),,$(eval $(call RELIEFOS_SIGNATURE_RULE,images)))
-$(ESP_STAMP): $(LOADER_ELF) $(O_GENERATED)/system/kernel.sys $(GRUB_FONT) $(IMAGE_DISPLAY) $(RELIEFOS_SRC)/tools/build/efi-stage.sh $(RELIEFOS_SRC)/boot/grub/embedded.cfg $(RELIEFOS_SRC)/boot/grub/grub.cfg $(RELIEFOS_SRC)/boot/grub/theme/theme.txt $(GRUB_EFI_INPUTS) $(O_META)/images.sig
-	$(Q)sh $(RELIEFOS_SRC)/tools/build/efi-stage.sh $(RELIEFOS_SRC) $(GRUB_EFI_DIR) $(LOADER_ELF) $(O_GENERATED)/system/kernel.sys $(GRUB_FONT) $(IMAGE_DISPLAY) $(ESP_STAGE) $(SOURCE_DATE_EPOCH)
+$(ESP_STAMP): $(O_GENERATED)/system/kernel.sys $(GRUB_FONT) $(IMAGE_DISPLAY) $(RELIEFOS_SRC)/tools/build/efi-stage.sh $(RELIEFOS_SRC)/boot/grub/embedded.cfg $(RELIEFOS_SRC)/boot/grub/grub.cfg $(RELIEFOS_SRC)/boot/grub/theme/theme.txt $(GRUB_EFI_INPUTS) $(O_META)/images.sig
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/efi-stage.sh $(RELIEFOS_SRC) $(GRUB_EFI_DIR) $(O_GENERATED)/system/kernel.sys $(GRUB_FONT) $(IMAGE_DISPLAY) $(ESP_STAGE) $(SOURCE_DATE_EPOCH)
 	$(Q)touch $@
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/stage-inventory.sh write $(ESP_STAGE) $(O_META)/esp.files
 .PHONY: esp

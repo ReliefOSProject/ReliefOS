@@ -26,9 +26,7 @@ printf 'gptinit\n' > "$w/out/userland-installer/gptinit.elf"
 printf 'installer\n' > "$w/out/userland/installer.elf"
 chmod 755 "$w/out/userland/installer.elf" "$w/out/userland-installer/gptinit.elf"
 printf 'efi\n' > "$w/esp/EFI/BOOT/BOOTX64.EFI"
-printf 'new-loader\n' > "$w/esp/reliefos/loader.elf"
 printf 'new-kernel\n' > "$w/esp/reliefos/kernel.sys"
-printf 'legacy-loader\n' > "$w/esp/loader.elf"
 printf 'legacy-kernel\n' > "$w/esp/leonos/kernel.sys"
 printf 'menuentry reliefos\n' > "$w/esp/grub/grub.cfg"
 cat > "$w/src/tools/build/apk-stage.sh" <<'ADAPTER'
@@ -77,9 +75,7 @@ cmp "$w/raw/usr/lib/reliefos/apps/settings/settings.elf" \
     "$w/stage/install/root/usr/lib/reliefos/apps/settings/settings.elf"
 [ ! -e "$w/stage/install/root/$program" ]
 [ ! -e "$w/stage/install/root/etc/license.conf" ]
-[ -f "$w/stage/install/esp/reliefos/loader.elf" ]
 [ -f "$w/stage/install/esp/reliefos/kernel.sys" ]
 [ -f "$w/stage/install/esp/leonos/kernel.sys" ]
-[ -f "$w/stage/install/esp/loader.elf" ]
 [ -f "$w/stage/install/esp/grub/grub.cfg" ]
-echo 'installer stage: executable, X11 live policy and paired boot layouts are packaged'
+echo 'installer stage: executable, X11 live policy and canonical/rollback boot kernels are packaged'

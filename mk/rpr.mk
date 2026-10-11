@@ -29,9 +29,9 @@ reliefnt-release-guard:
 # Neither is listed as a rebuild trigger: the published products are (their
 # adapter rule rewrites both before this recipe can run), and a release.txt must
 # not be re-emitted when neither the bytes nor the version moved.
-$(RPR_PAGES)/.complete $(RPR_PAGES)/manifest.json &: $(RPR_APP_PACKAGES) $(APK_MANIFEST) $(APK_REPOSITORY)/packages.adb $(RELIEFOS_KERNEL_SYS) $(LOADER_ELF) $(RELIEFOS_SRC)/tools/build/rpr-pages.sh
+$(RPR_PAGES)/.complete $(RPR_PAGES)/manifest.json &: $(RPR_APP_PACKAGES) $(APK_MANIFEST) $(APK_REPOSITORY)/packages.adb $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_SRC)/tools/build/rpr-pages.sh
 	$(Q)$(RELIEFNT_RELEASE_GUARD_CMD)
-	$(Q)SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH) sh $(RELIEFOS_SRC)/tools/build/rpr-pages.sh $(APK_REPOSITORY) $(RPR_APPS) $(RELIEFOS_KERNEL_SYS) $(LOADER_ELF) $(RELIEFNT_DEST)/manifest.txt $(RELIEFNT_DIR)/configs/build-version $(UPSTREAM_APK) '$(APK_SIGNING_KEY)' $(RPR_PAGES)
+	$(Q)SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH) sh $(RELIEFOS_SRC)/tools/build/rpr-pages.sh $(APK_REPOSITORY) $(RPR_APPS) $(RELIEFOS_KERNEL_SYS) $(RELIEFNT_DEST)/manifest.txt $(RELIEFNT_DIR)/configs/build-version $(UPSTREAM_APK) '$(APK_SIGNING_KEY)' $(RPR_PAGES)
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/stage-inventory.sh write $(RPR_PAGES) $(O_META)/rpr-pages.files
 $(O_META)/rpr-pages-present.sig: FORCE
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/stage-inventory.sh check $(RPR_PAGES) $(O_META)/rpr-pages.files $@

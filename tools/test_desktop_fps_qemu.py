@@ -25,11 +25,9 @@ def main():
     output.mkdir(parents=True)
     disk = output / "scratch.raw"
     subprocess.run(["cp", "--reflink=auto", str(args.disk.resolve()), str(disk)], check=True)
-    for source, target in (("build/boot/loader.elf", "::/loader.elf"),
-                           ("build/system/kernel.sys", "::/leonos/kernel.sys"),
+    for source, target in (("build/system/kernel.sys", "::/leonos/kernel.sys"),
                            ("build/system/kernel.sys", "::/reliefos/kernel.sys"),
-                           ("build/boot/loader.elf", "::/reliefos/loader.elf"),
-                           ("build/boot/loader.elf", "::/leonos/loader.elf")):
+                           ("boot/grub/grub.cfg", "::/grub/grub.cfg")):
         subprocess.run(["mcopy", "-o", "-i", f"{disk}@@1048576", str(ROOT / source), target], check=True)
     filesystem = output / "root.ext2"
     start = root_partition(disk, filesystem)

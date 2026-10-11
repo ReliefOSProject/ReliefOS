@@ -1,6 +1,6 @@
 #!/bin/sh
 # The six device drivers are linked into kernel.sys itself: the build tree must
-# publish exactly the four kernel products and stage no driver modules.
+# publish exactly the three kernel products and stage no driver modules.
 set -eu
 repo=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 audio_out=${AUDIO_OUT:-"$repo/out/audio-hda"}
@@ -15,8 +15,7 @@ for name in kernel.sys kernel.debug; do
     cmp "$audio_out/generated/system/$name" "$audio_out/kernel-install/$name"
 done
 for product in "$audio_out/generated/system/kerneldebug.sys" "$audio_out/kernel-install/kerneldebug.sys" \
-               "$audio_root/usr/lib/reliefos/kerneldebug.sys" \
-               "$audio_out/generated/boot/loader.elf" "$audio_out/kernel-install/loader.elf"; do
+               "$audio_root/usr/lib/reliefos/kerneldebug.sys"; do
     if [ ! -s "$product" ]; then
         echo "FAIL missing product: $product" >&2
         exit 1

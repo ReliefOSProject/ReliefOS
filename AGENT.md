@@ -29,14 +29,13 @@ ReliefOS 是面向 x86_64、UEFI 启动的操作系统项目。正常系统使�
 
 ```text
 UEFI/GRUB
-  -> boot/ loader.elf
-  -> kernel/reliefnt 子仓产物 kernel.sys（Ring 0）
+  -> kernel/reliefnt 子仓产物 kernel.sys（Ring 0，自带 Multiboot2 头，GRUB 直接引导）
   -> userland init.elf
   -> desktop.elf（窗口服务器）
   -> 登录 / OOBE / 服务 / 普通桌面应用
 ```
 
-安装器 ISO 是另一条启动路径：顶层 ISO 只包含启动所需的 loader、内核和
+安装器 ISO 是另一条启动路径：顶层 ISO 只包含启动所需的内核和
 installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 启动载荷）和 `/install/root`（ext2 运行时根载荷）。不要把“安装器运行时
 镜像内容”和“安装后系统内容”混为一谈。
@@ -45,8 +44,8 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 
 | 路径 | 职责 |
 | --- | --- |
-| `boot/` | GRUB 配置与 EFI 模块；loader 源码在内核子仓 `boot/loader/`。 |
-| `kernel/reliefnt/` | ReliefNT 子仓（gitlink，URL 为 github.com/ReliefOSProject/ReliefNT）：内核核心（调度、内存、ELF 进程、syscall、GUI IPC、网络、驱动管理、权限判定与 `lib/` 内部工具）、`drivers/`、`boot/loader/`、`include/uapi` 与内核侧 `include/reliefnt/`。首次使用执行 `git submodule update --init --recursive`，并在子仓内 `make fetch`（其缓存不入库）。 |
+| `boot/` | GRUB 配置与 EFI 模块。 |
+| `kernel/reliefnt/` | ReliefNT 子仓（gitlink，URL 为 github.com/ReliefOSProject/ReliefNT）：内核核心（调度、内存、ELF 进程、syscall、GUI IPC、网络、驱动管理、权限判定与 `lib/` 内部工具）、`drivers/`、`include/uapi` 与内核侧 `include/reliefnt/`。首次使用执行 `git submodule update --init --recursive`，并在子仓内 `make fetch`（其缓存不入库）。 |
 | `userland/runtime/` | ReliefOS libc、syscall 包装、UI/字体、网络/HTTP/TLS、PTY 等公共实现。 |
 | `userland/apps/` | Ring-3 系统与桌面应用；`desktop/` 是窗口服务器，其他应用为它的客户端。 |
 | `userland/{busybox,stardustui}/` | 第三方软件的 ReliefOS 端口、适配层与构建输入。 |

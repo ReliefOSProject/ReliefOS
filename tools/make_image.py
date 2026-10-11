@@ -174,19 +174,18 @@ def write_root_fstab(root: Path, root_uuid: uuid.UUID, esp_uuid: uuid.UUID,
 
 
 def make_boot_tree(staging: Path, destination: Path) -> None:
-    """Stage only files GRUB and the ReliefOS loader need before the root mounts.
+    """Stage only files GRUB and the kernel need before the root mounts.
 
     The canonical ESP namespace is /reliefos. Byte-identical /leonos payloads
     are also staged for the legacy rollback GRUB entry.
     """
     copy_file(staging / "EFI/BOOT/BOOTX64.EFI", destination / "EFI/BOOT/BOOTX64.EFI")
-    copy_file(staging / "loader.elf", destination / "loader.elf")
     shutil.copytree(staging / "grub", destination / "grub", symlinks=True,
                     dirs_exist_ok=True)
     copy_file(staging / ESP_KERNEL.lstrip("/"), destination / ESP_KERNEL.lstrip("/"))
     copy_file(staging / ESP_KERNEL_LEGACY.lstrip("/"),
               destination / ESP_KERNEL_LEGACY.lstrip("/"))
-    # The loader reads the boot theme from the ESP copy before any root
+    # The kernel reads the boot theme from the ESP copy before any root
     # filesystem exists, so the generated display.conf is duplicated at both
     # ESP paths. It comes from the same source as /etc/reliefos/display.conf.
     display = staging / ETC_RELIEFOS / "display.conf"
@@ -206,7 +205,6 @@ def make_root_tree(staging: Path, destination: Path, language: str) -> None:
     shutil.rmtree(destination / "grub", ignore_errors=True)
     shutil.rmtree(destination / "reliefos", ignore_errors=True)
     shutil.rmtree(destination / "leonos", ignore_errors=True)
-    (destination / "loader.elf").unlink(missing_ok=True)
     layout_directories(destination)
     apply_root_symlinks(destination)
     locale = destination / ETC_RELIEFOS / "locale.conf"

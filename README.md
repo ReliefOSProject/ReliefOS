@@ -78,13 +78,13 @@ RPR 子树。`run-iso`、`run-installer` 启动对应镜像，`QEMU_KVM=0` 可�
 根目录中的主要源码、构建输入和工具按职责组织如下：
 
 - `arch/`：各架构相关说明和预留代码（当前主要支持 x86_64）。
-- `boot/`：GRUB 配置与 EFI 模块；loader 源码在内核子仓 `boot/loader/`。
+- `boot/`：GRUB 配置与 EFI 模块。
 - `Makefile` 与 `mk/`：GNU Make 构建入口和依赖规则。
 - `tools/host/`、`tools/build/`：C 数据工具和短上游构建适配器。
 - `configs/`：组件清单、默认配置和可提交的构建 profile。
 - `docs/`：架构、ABI、构建、文件系统、安全和工具文档。
 - `include/`：公共 C 头文件（`reliefos/`，旧 `leonos/` 头转发兼容）与生成头（`generated/`）；UAPI 头在内核子仓 `include/uapi/`。
-- `kernel/reliefnt/`：ReliefNT 内核子仓（gitlink，https://github.com/ReliefOSProject/ReliefNT），含内核核心、`drivers/`、`boot/loader/` 与 `include/uapi`；首次使用执行 `git submodule update --init --recursive` 并在其中 `make fetch`。
+- `kernel/reliefnt/`：ReliefNT 内核子仓（gitlink，https://github.com/ReliefOSProject/ReliefNT），含内核核心、`drivers/` 与 `include/uapi`；首次使用执行 `git submodule update --init --recursive` 并在其中 `make fetch`。
 - `los2w/`：宿主机上的操作系统/Windows 兼容工具和模拟器代码。
 - `system/`：镜像中 staging 的系统配置、字体、证书、壁纸、图标和其他资源。
 - `test/`：测试输入和测试资源。

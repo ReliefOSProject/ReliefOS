@@ -8,8 +8,8 @@ relative to the RPR base URL (by default
 - `<base>/apk` contains signed ReliefOS APK packages, including the optional
   official applications, the signed APK v3 index, and the corresponding public
   key.
-- `<base>/kernel` contains the latest matching `kernel.sys` and `loader.elf`
-  pair plus their version and SHA-256 metadata.
+- `<base>/kernel` contains the latest `kernel.sys` plus its version and
+  SHA-256 metadata.
 
 The Pages site places this machine interface under `/rpr/` and adds
 human-readable HTML pages beside it (package list, per-package pages, kernel
@@ -98,7 +98,6 @@ The published tree, relative to the RPR base URL, is:
 └── kernel/
     ├── index.html
     ├── kernel.sys
-    ├── loader.elf
     ├── release.txt
     ├── release.json
     └── SHA256SUMS
@@ -110,17 +109,14 @@ the base path never has to be baked into the generated HTML.
 
 `release.txt` is the strict line-oriented client protocol. Its
 `image_version` and `version` are both `major.minor.patch`; no build counter or
-numeric build suffix is published. `format_version` is `2` and the record lists
-`kernel_file`/`kernel_sha256` together with `loader_file`/`loader_sha256`.
+numeric build suffix is published. `format_version` is `3` and the record lists
+`kernel_file`/`kernel_sha256`: `kernel.sys` is the single release unit.
 
-The loader ships with the kernel because the boot handoff layout is compiled
-into both images: `kernel.sys` rejects any `loader.elf` that publishes a
-different `LEONOS_BOOT_HANDOFF_VERSION`, so replacing one without the other
-could leave the machine unable to boot. Format 1 advertised a paired
-`middlelayer.sys`, a boot payload this system no longer loads, so
-`reliefos-kernel-update` refuses it instead of installing a half update; the
-legacy `leonos-kernel-update` path remains available. A client
-that predates format 2 refuses the format-2 manifest for the same reason, which
+Format 1 advertised a paired `middlelayer.sys` and format 2 paired `kernel.sys`
+with `loader.elf`; both are boot payloads this system no longer loads, so
+`reliefos-kernel-update` refuses those manifests instead of installing a half
+update; the legacy `leonos-kernel-update` path remains available. A client
+that predates format 3 refuses the format-3 manifest for the same reason, which
 means an installed system first has to receive the newer `reliefos-kernel-update`
 through `apk upgrade` before it can take a kernel release; that ordering is
 deliberate, because a refused manifest leaves the working payload untouched.
@@ -141,12 +137,10 @@ URLs.
   compares only the three-part `major.minor.patch` image version. A newer build
   of the same image version does not trigger an update. Check mode does not
   modify the system.
-- `reliefos-kernel-update` requires root. It downloads `kernel.sys` and
-  `loader.elf`, verifies both SHA-256 values, then swaps
-  `/boot/reliefos/kernel.sys` and `/boot/loader.elf` inside a single commit
-  window, also moving aside any stale `/boot/reliefos/middlelayer.sys` left by an
-  older release. A failed commit restores the previous kernel, loader and
-  retired payload; only a completed commit deletes the backups. Reboot to
+- `reliefos-kernel-update` requires root. It downloads `kernel.sys`,
+  verifies its SHA-256, then swaps `/boot/reliefos/kernel.sys` inside a single
+  commit window. A failed commit restores the previous kernel; only a completed
+  commit deletes the backup. Reboot to
   activate the release. Use
   `reliefos-kernel-update -f` (or `--force`) to repeat the replacement even when
   the local and remote image versions match; the same format, checksum and

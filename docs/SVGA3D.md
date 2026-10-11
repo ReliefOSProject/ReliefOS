@@ -113,7 +113,7 @@ case too, so that older error alone does not identify the failing layer.
 To see the driver initialization log, reboot and select
 `ReliefOS (with boot log)` in GRUB. Alternatively edit the normal GRUB entry
 with `e`, append `bootlog=1 bootlog-pause=1` to its
-`multiboot2 /loader.elf ...` line, and boot with Ctrl+X. In updated kernels,
+`multiboot2 /reliefos/kernel.sys ...` line, and boot with Ctrl+X. In updated kernels,
 `bootlog-pause=1` repeats the SVGA3D initialization summary and waits for Enter
 before starting desktop or TTY processes. Capture all the `[svga3d]` lines
 above `Boot log paused`, then press Enter to continue. The installer ISO's

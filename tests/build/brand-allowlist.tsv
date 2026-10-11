@@ -5,14 +5,12 @@ kernel	history	.github/workflows/build.yml	注释记录已知可用 LeonOS-4 ubu
 kernel	external-url	Kconfig	仅真实既有 Pages/RPR URL；新目标未提供，不修改。
 kernel	compatibility	Makefile	LEONOS_TEST_PYTHON 是旧输入回退，RELIEFOS 优先
 kernel	external-url	README.md	父仓与子仓真实旧 GitHub 地址，未提供新地址
-kernel	compatibility	boot/loader/main.c	旧 ESP 内核/配置/debug marker 与 GRUB tag 双接受，保留已安装盘启动与回滚
 kernel	external-url	configs/default.conf	真实旧 RPR 默认 URL，未获新地址
 kernel	compatibility	configs/header-export.list	同时导出旧 UAPI 转发头与新 canonical 头
 kernel	compatibility	drivers/bootstrap/storage/storage_block.c	识别已有磁盘 GPT 名 LEONOS4_ROOT
 kernel	compatibility	drivers/bootstrap/storage/storage_mount.c	旧 leonos-installer-root 引导 module tag 双接受
 kernel	compatibility	fs/procfs.c	冻结 LeonOSRole/LeonOSFlags 与 /proc/leonos-drivers 接口值
 kernel	compatibility	fs/sysfs.c	冻结 /sys/devices/platform/leonos-block 运行时设备路径
-kernel	compatibility	include/leonos/boot_handoff.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 kernel	compatibility	include/leonos/driver.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 kernel	compatibility	include/leonos/elf_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 kernel	compatibility	include/leonos/fb.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
@@ -338,7 +336,7 @@ main	compatibility	tools/build/efi-stage.sh	新旧 ESP 成套内核/display.conf
 main	external-url	tools/build/home-page.sh	Source 链接继续真实旧主仓 GitHub slug
 main	compatibility	tools/build/images.sh	PROFILE 字节值冻结；LEONOS_EXT2_TIME 为新变量之后回退的旧输入。
 main	compatibility	tools/build/installer-stage.sh	从同一 runtime 对象提供 usr/lib/leonos/libleonos.so.2，供已发布 ELF 依赖；规范 libreliefos 同时生成。
-main	compatibility	tools/build/iso.sh	canonical installer marker 之外同步旧 marker，兼容旧 loader/GRUB 搜索。
+main	compatibility	tools/build/iso.sh	canonical installer marker 之外同步旧 marker，兼容旧 GRUB/介质搜索。
 main	compatibility	tools/build/musl-sdk.sh	新旧 runtime/archive 作为不同输入装入同一 SDK，旧头转发
 main	compatibility	tools/build/musl-sysroot.sh	现有 sysroot .leonos-unpacked/.leonos-musl.json 持久缓存标记；mk/third-party.mk 显式依赖。
 main	compatibility	tools/build/pam-stage.sh	已发布 PAM 模块文件名与现有源文件路径，不修改 PAM 配置入口
@@ -557,7 +555,7 @@ main	compatibility	tools/test_upstream_tools_images.py	检查 legacy ESP 内核�
 main	history	tools/tests/oobe_auth_boot_test.c	已退役 authd/OOBE 架构测试夹具，引用已删除 authd 源；旧 marker 与保留的历史实现对应，未宣称当前回归通过
 main	compatibility	userland/apps/installer/main.c	验证旧安装 namespace、冻结账户事务文件、旧 SONAME 与 legacy ESP 升级/回滚；私有复制临时名已 canonical
 main	compatibility	userland/storage/leonos-check-update	保留旧命令源文件名与 leonos-* 包升级识别；当前帮助/临时文件名已 canonical
-main	compatibility	userland/storage/leonos-grub-installer	旧命令源文件名及 legacy ESP/loader 回滚发布路径；帮助已 canonical
+main	compatibility	userland/storage/leonos-grub-installer	旧命令源文件名及 legacy ESP 回滚保留、旧布局残留清理路径；帮助已 canonical
 main	compatibility	userland/storage/leonos-kernel-update	旧命令源文件名、legacy ESP 与共享旧更新锁防止并发旧客户端；当前帮助/临时名已 canonical
 main	compatibility	userland/storage/leonos-rpr-apkcheck	旧命令源文件名为既有构建输入与兼容入口；当前帮助/私有 key 临时名已 canonical
 main	compatibility	userland/storage/leonos-rpr-ping	旧命令源文件名与外部服务冻结 leonos-rpr-ok 响应；当前帮助/临时名已 canonical

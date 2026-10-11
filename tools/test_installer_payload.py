@@ -43,8 +43,8 @@ class InstallerPayloadTests(unittest.TestCase):
             "root/usr/lib/reliefos/kerneldebug.sys", "root/lib/ld-musl-x86_64.so.1",
             "root/lib/libc.so", "root/lib/libmimalloc.so.3",
             "root/usr/lib/reliefos/libreliefos.so.2", "root/usr/lib/leonos/libleonos.so.2",
-            "esp/reliefos/kernel.sys", "esp/reliefos/loader.elf", "esp/leonos/kernel.sys",
-            "esp/loader.elf", "esp/grub/grub.cfg", "esp/EFI/BOOT/BOOTX64.EFI",
+            "esp/reliefos/kernel.sys", "esp/leonos/kernel.sys",
+            "esp/grub/grub.cfg", "esp/EFI/BOOT/BOOTX64.EFI",
         ):
             target = self.root / "install" / name
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -61,7 +61,7 @@ class InstallerPayloadTests(unittest.TestCase):
                      f"usr/lib/{namespace}/apps", "boot/EFI"):
             (root / name).mkdir(parents=True, exist_ok=True)
         library = "libreliefos.so.2" if namespace == "reliefos" else "libleonos.so.2"
-        for name in (f"usr/lib/{namespace}/{library}", "boot/loader.elf", f"boot/{namespace}/kernel.sys"):
+        for name in (f"usr/lib/{namespace}/{library}", f"boot/{namespace}/kernel.sys"):
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(b"old installed payload")

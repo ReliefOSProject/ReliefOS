@@ -222,10 +222,10 @@ int main(void)
     RUN("boot payload copy", NULL, "COPY_OK", "/bin/sh", "-c",
         "set -e; s=/tmp/storage-copy-source; d='/tmp/storage copy target'; "
         "mkdir -p \"$s/EFI/BOOT\" \"$s/reliefos\" \"$s/leonos\" \"$s/grub/fonts\" \"$d\"; "
-        "for f in EFI/BOOT/BOOTX64.EFI loader.elf reliefos/loader.elf reliefos/kernel.sys leonos/kernel.sys grub/grub.cfg grub/fonts/test.pf2; "
+        "for f in EFI/BOOT/BOOTX64.EFI reliefos/kernel.sys leonos/kernel.sys grub/grub.cfg grub/fonts/test.pf2; "
         "do printf '%s' \"$f\" > \"$s/$f\"; done; "
         "/usr/sbin/leonos-grub-installer --source \"$s\" \"$d\"; "
-        "for f in EFI/BOOT/BOOTX64.EFI loader.elf reliefos/loader.elf reliefos/kernel.sys leonos/kernel.sys grub/grub.cfg grub/fonts/test.pf2; "
+        "for f in EFI/BOOT/BOOTX64.EFI reliefos/kernel.sys leonos/kernel.sys grub/grub.cfg grub/fonts/test.pf2; "
         "do test \"$(cat \"$d/$f\")\" = \"$f\"; done; echo COPY_OK");
     RUN("boot missing payload rejected", NULL, "REJECT_OK", "/bin/sh", "-c",
         "if /usr/sbin/leonos-grub-installer --source /tmp/missing-boot-payload '/tmp/storage copy target'; "

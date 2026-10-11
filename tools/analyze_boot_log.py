@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Analyze ReliefOS loader, kernel, and dynamic-loader boot logs.
+"""Analyze ReliefOS kernel and dynamic-loader boot logs.
 
 Examples:
     python tools/analyze_boot_log.py serial.log
@@ -67,22 +67,6 @@ class Rule:
 
 
 DIRECT_RULES = (
-    Rule(
-        "LOADER-INTEGRITY", "致命", "引导加载器",
-        r"^\[loader\] Boot stopped by integrity policy\.",
-        "引导加载器因完整性策略停止启动",
-        "loader 检测到 kernel 的 SHA-256 与其内置值不一致，且用户拒绝继续。",
-        "重新构建 loader 与 kernel，或检查 ESP/ISO 中是否混入了不同构建的组件。",
-        "kernel/reliefnt/boot/loader/main.c:1028",
-    ),
-    Rule(
-        "LOADER-FILE", "致命", "引导加载器",
-        r"^\[loader\].*(?:kernel\.sys load failed|module load failed|no readable EFI FAT volume|unable to open EFI filesystem)",
-        "引导加载器无法读取核心启动组件",
-        "loader 无法从 EFI 文件系统或 GRUB 模块获得 kernel.sys。",
-        "检查 ESP 中的 boot/、reliefos/kernel.sys（旧盘为 leonos/kernel.sys），以及 ext2 根分区和 EFI/FAT32 挂载状态。",
-        "kernel/reliefnt/boot/loader/main.c:1114",
-    ),
     Rule(
         "STORAGE-ROOT", "错误", "存储",
         r"^\[(?:reliefnt|ntclks)\] no block-backed root filesystem available for userland$",

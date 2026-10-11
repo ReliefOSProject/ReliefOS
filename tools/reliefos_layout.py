@@ -22,7 +22,7 @@ do not collide with third-party Linux software:
     /var/lib/reliefos             persistent mutable state
     /var/cache/reliefos           cache data
     /run/reliefos                 volatile per-boot IPC and session state
-    /usr/lib/reliefos             private libraries and loader payload
+    /usr/lib/reliefos             private libraries and interpreter payload
     /usr/lib/reliefos/apps        application packages (manifest + executable)
     /usr/lib/reliefos/tests       diagnostic guest probes
     /usr/share/reliefos           desktop resources that are not icon-theme data
@@ -182,10 +182,9 @@ P_BOOT_KERNELDEBUG_MARKER = "/boot/reliefos/state/kerneldebug.next"
 P_BOOT_DISPLAY_CONF = "/boot/reliefos/config/display.conf"
 P_KERNELDEBUG_MODULE = P_RELIEFOS_LIB + "/kerneldebug.sys"
 
-# ESP-internal (EFI FAT) paths.  GRUB and loader.elf use these before any
-# root filesystem exists.  The loader is at the ESP root so GRUB's
-# ``search --file /loader.elf`` convention is preserved.
-ESP_LOADER = "/loader.elf"
+# ESP-internal (EFI FAT) paths.  GRUB and the kernel read these before any
+# root filesystem exists.  kernel.sys carries the Multiboot2 header GRUB
+# searches for (``search --file /reliefos/kernel.sys``).
 ESP_KERNEL = "/reliefos/kernel.sys"
 ESP_KERNEL_LEGACY = "/leonos/kernel.sys"
 ESP_KERNELDEBUG_MARKER = "/reliefos/state/kerneldebug.next"

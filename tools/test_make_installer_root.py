@@ -21,9 +21,9 @@ class InstallerLayoutTests(unittest.TestCase):
                 "usr/lib/reliefos/apps/dynlinkerror/dynlinkerror.elf",
                 "usr/lib/reliefos/libreliefos.so.2",
                 "usr/lib/leonos/libleonos.so.2",
-                "EFI/BOOT/BOOTX64.EFI", "grub/grub.cfg", "loader.elf",
-                "reliefos/kernel.sys", "reliefos/loader.elf",
-                "leonos/kernel.sys", "leonos/loader.elf",
+                "EFI/BOOT/BOOTX64.EFI", "grub/grub.cfg",
+                "reliefos/kernel.sys",
+                "leonos/kernel.sys",
             ):
                 path = source / name
                 path.parent.mkdir(parents=True, exist_ok=True)
@@ -51,11 +51,10 @@ class InstallerLayoutTests(unittest.TestCase):
                 self.assertFalse((root / "usr/lib/reliefos/apps" / stale).exists(), stale)
             stage_installed_payloads(source, work / "stage")
             for namespace in ("reliefos", "leonos"):
-                for name in ("kernel.sys", "loader.elf"):
-                    self.assertEqual(
-                        (work / "stage/install/esp" / namespace / name).read_bytes(),
-                        (source / namespace / name).read_bytes(),
-                    )
+                self.assertEqual(
+                    (work / "stage/install/esp" / namespace / "kernel.sys").read_bytes(),
+                    (source / namespace / "kernel.sys").read_bytes(),
+                )
                 self.assertFalse((work / "stage/install/root" / namespace).exists())
 
 

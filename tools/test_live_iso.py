@@ -20,8 +20,6 @@ class LiveRootTests(unittest.TestCase):
             for name, content in {
                 "EFI/BOOT/BOOTX64.EFI": b"boot",
                 "grub/grub.cfg": b"set root=(hd0,gpt1)",
-                "loader.elf": b"loader",
-                "reliefos/loader.elf": b"loader",
                 "reliefos/kernel.sys": b"kernel",
                 "usr/lib/reliefos/apps/desktop/desktop.elf": b"desktop",
                 "usr/lib/reliefos/apps/terminal/terminal.elf": b"terminal",
@@ -88,7 +86,7 @@ class LiveRootTests(unittest.TestCase):
         self.assertIn("mode=live", config)
         self.assertNotIn("startup=", config)
         self.assertIn("module2 /install/root.fat reliefos-installer-root", config)
-        self.assertIn("module2 /reliefos/kernel.sys reliefos-kernel", config)
+        self.assertIn("multiboot2 /reliefos/kernel.sys", config)
 
 
 if __name__ == "__main__":

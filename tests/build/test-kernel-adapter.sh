@@ -209,19 +209,18 @@ fi
 pass 'the baseline kernel build succeeds'
 expected_manifest="$work/expected-products"
 actual_manifest="$work/actual-products"
-printf '%s\n' kernel.debug kernel.sys kerneldebug.sys loader.elf \
+printf '%s\n' kernel.debug kernel.sys kerneldebug.sys \
     | LC_ALL=C sort > "$expected_manifest"
 awk '/^artifacts:$/ { artifacts=1; next } artifacts { print $2 }' \
     "$O/kernel-install/manifest.txt" | LC_ALL=C sort > "$actual_manifest"
 if cmp -s "$expected_manifest" "$actual_manifest"; then
-    pass 'kernel manifest contains the four required product names'
+    pass 'kernel manifest contains the three required product names'
 else
-    fail 'kernel manifest contains the four required product names' \
+    fail 'kernel manifest contains the three required product names' \
         "want: $(tr '\n' ' ' < "$expected_manifest")" \
         "have: $(tr '\n' ' ' < "$actual_manifest")"
 fi
 find "$O/generated" -type f -printf '%p %T@\n' | LC_ALL=C sort >"$work/published-before"
-loader_hash_before=$(sha256sum "$O/generated/boot/loader.elf" | cut -d' ' -f1)
 kerneldebug_hash_before=$(sha256sum "$O/generated/system/kerneldebug.sys" | cut -d' ' -f1)
 
 advance_clock
@@ -238,23 +237,22 @@ else
     fail 'the sub-make relinks and refreshes the affected products' \
         "$(grep -E '^  (CC|LD|IMAGE) ' "$work/dirty.log" | head -3 | tr '\n' ' ')"
 fi
-if grep -qE 'loader\.elf|kerneldebug\.sys' "$work/dirty.log"; then
-    fail 'a kernel source touch leaves the loader and debug module alone' \
-        "$(grep -E 'loader\.elf|kerneldebug\.sys' "$work/dirty.log" | head -2 | tr '\n' ' ')"
+if grep -qE 'kerneldebug\.sys' "$work/dirty.log"; then
+    fail 'a kernel source touch leaves the debug module alone' \
+        "$(grep -E 'kerneldebug\.sys' "$work/dirty.log" | head -2 | tr '\n' ' ')"
 else
-    pass 'a kernel source touch leaves the loader and debug module alone'
+    pass 'a kernel source touch leaves the debug module alone'
 fi
-if [ "$loader_hash_before" = "$(sha256sum "$O/generated/boot/loader.elf" | cut -d' ' -f1)" ] &&
-        [ "$kerneldebug_hash_before" = "$(sha256sum "$O/generated/system/kerneldebug.sys" | cut -d' ' -f1)" ]; then
+if [ "$kerneldebug_hash_before" = "$(sha256sum "$O/generated/system/kerneldebug.sys" | cut -d' ' -f1)" ]; then
     pass 'untouched products keep their bytes'
 else
-    fail 'untouched products keep their bytes' 'loader.elf or kerneldebug.sys moved'
+    fail 'untouched products keep their bytes' 'kerneldebug.sys moved'
 fi
 # The publish path runs on every delegation; the published set must track what
 # the kernel checkout installed byte for byte.
 synced=yes
 for pair in system/kernel.sys:kernel.sys system/kernel.debug:kernel.debug \
-            system/kerneldebug.sys:kerneldebug.sys boot/loader.elf:loader.elf; do
+            system/kerneldebug.sys:kerneldebug.sys; do
     rel=${pair%%:*}
     name=${pair#*:}
     cmp -s "$O/generated/$rel" "$O/kernel-install/$name" || synced=no
@@ -323,7 +321,6 @@ else
         "$(tail -c 300 "$work/fail.log")"
 fi
 if [ ! -e "$fail_out/generated/system/kernel.sys" ] &&
-        [ ! -e "$fail_out/generated/boot/loader.elf" ] &&
         [ ! -e "$fail_out/generated/system/kerneldebug.sys" ]; then
     pass 'the failed build publishes no half-products'
 else
@@ -365,7 +362,7 @@ fi
 
 # Failure after products exist: the published set must stay the old complete
 # set, not gain a half-published mix.
-loader_checksum=$(sha256sum "$fail_out/generated/boot/loader.elf" | cut -d' ' -f1)
+debug_checksum=$(sha256sum "$fail_out/generated/system/kerneldebug.sys" | cut -d' ' -f1)
 printf '\nthis is a deliberate syntax error in the fixture\n' >>"$broken"
 rm -f "$fail_out/generated/system/kernel.sys"
 if build "$work/fail2.log" "$fail_out" RELIEFNT_DIR="$fixture"; then
@@ -378,11 +375,11 @@ if [ ! -e "$fail_out/generated/system/kernel.sys" ]; then
 else
     fail 'a failed build does not restore a deleted product' 'kernel.sys reappeared'
 fi
-if [ "$(sha256sum "$fail_out/generated/boot/loader.elf" | cut -d' ' -f1)" = \
-      "$loader_checksum" ]; then
+if [ "$(sha256sum "$fail_out/generated/system/kerneldebug.sys" | cut -d' ' -f1)" = \
+      "$debug_checksum" ]; then
     pass 'surviving products keep their bytes across a failed build'
 else
-    fail 'surviving products keep their bytes across a failed build' 'loader.elf moved'
+    fail 'surviving products keep their bytes across a failed build' 'kerneldebug.sys moved'
 fi
 
 printf '\n%s: %d checks, %d failures\n' 'test-kernel-adapter' "$checks" "$failures"

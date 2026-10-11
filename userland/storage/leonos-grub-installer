@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install the new boot pair atomically while leaving the old pair available.
+# Install the new boot payload atomically while leaving the rollback payload.
 set -eu
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 export PATH
@@ -15,11 +15,11 @@ fi
 }
 esp=$1
 
-# Validate both generations before touching the target. The canonical loader
-# and kernel form one pair; the root loader and /leonos kernel are the rollback
-# pair used by an existing GRUB menu.
-for file in EFI/BOOT/BOOTX64.EFI loader.elf reliefos/loader.elf \
-            reliefos/kernel.sys leonos/kernel.sys grub/grub.cfg; do
+# Validate the payload before touching the target. kernel.sys carries its own
+# Multiboot2 header and is the single boot image; the /leonos copy is the
+# rollback payload used by the legacy GRUB menu entry.
+for file in EFI/BOOT/BOOTX64.EFI reliefos/kernel.sys leonos/kernel.sys \
+            grub/grub.cfg; do
     [ -f "$source/$file" ] || { printf 'Missing boot payload: %s\n' "$file" >&2; exit 1; }
 done
 [ -d "$source/grub" ] || { printf 'Missing GRUB payload: %s\n' "$source/grub" >&2; exit 1; }
@@ -55,10 +55,8 @@ publish_if_missing() {
 
 mkdir -p -- "$esp/reliefos" "$esp/leonos" "$esp/grub" "$esp/EFI/BOOT"
 publish_file "$source/reliefos/kernel.sys" "$esp/reliefos/kernel.sys"
-publish_file "$source/reliefos/loader.elf" "$esp/reliefos/loader.elf"
-# Do not replace either file in an existing rollback layout.
+# Do not replace the rollback payload in an existing layout.
 publish_if_missing "$source/leonos/kernel.sys" "$esp/leonos/kernel.sys"
-publish_if_missing "$source/loader.elf" "$esp/loader.elf"
 publish_file "$source/EFI/BOOT/BOOTX64.EFI" "$esp/EFI/BOOT/BOOTX64.EFI"
 
 for entry in "$source/grub/"*; do
@@ -73,6 +71,10 @@ for entry in "$source/grub/"*; do
     fi
 done
 
-# The new default entry is exposed only after both new payloads are present.
+# The new default entry is exposed only after all payloads are present.
 publish_file "$source/grub/grub.cfg" "$esp/grub/grub.cfg"
-printf 'ReliefOS boot payload installed to %s; legacy rollback files retained.\n' "$esp"
+
+# The menu no longer references the retired second-stage loader; remove any
+# stale copies only now that the published config cannot name them.
+rm -f -- "$esp/loader.elf" "$esp/reliefos/loader.elf" "$esp/leonos/loader.elf"
+printf 'ReliefOS boot payload installed to %s; rollback payload retained.\n' "$esp"

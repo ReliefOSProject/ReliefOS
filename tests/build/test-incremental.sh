@@ -75,7 +75,7 @@ count_label() { printf '%s\n' "$1" | grep -cE "^  $2 " || true; }
 # path + full mtime with nanoseconds, for everything this suite watches:
 # kernel sub-build objects, userland objects, the published products and the
 # exported headers. $(O)/kernel-install is deliberately excluded: the sub-make's
-# `install` recopies its four products there on every ask.
+# `install` recopies its three products there on every ask.
 snapshot() {
     {
         find "$O/obj" "$reliefnt_o/obj" -name '*.o' -printf '%p %T@\n' 2>/dev/null
@@ -83,7 +83,6 @@ snapshot() {
         for product in "$O/generated/system/kernel.sys" \
                        "$O/generated/system/kernel.debug" \
                        "$O/generated/system/kerneldebug.sys" \
-                       "$O/generated/boot/loader.elf" \
                        "$O/include/generated/autoconf.h" \
                        "$O/include/generated/build_info.h"; do
             [ -e "$product" ] && printf '%s %s\n' "$product" "$(stat -c %y "$product")"
@@ -141,26 +140,25 @@ printf '       clean build actions: CC=%s AS=%s LD=%s IMAGE=%s\n' \
     "$(printf '%s\n' "$first" | grep -cE '^  LD ' || true)" \
     "$(printf '%s\n' "$first" | grep -cE '^  IMAGE ' || true)"
 
-# The parent must not compile any kernel, driver or boot-loader source itself:
+# The parent must not compile any kernel or driver source itself:
 # its object tree holds userland and host objects only.
 parent_kernel_objects=$(find "$O/obj/kernel" -name '*.o' 2>/dev/null | grep -c '' || true)
 if [ "$parent_kernel_objects" = 0 ]; then
-    pass 'the parent compiles no kernel, driver or loader sources'
+    pass 'the parent compiles no kernel or driver sources'
 else
-    fail 'the parent compiles no kernel, driver or loader sources' \
+    fail 'the parent compiles no kernel or driver sources' \
         "$parent_kernel_objects objects under $O/obj/kernel"
 fi
 
 # Every product the rest of the build consumes is published to its legacy path.
 missing=''
-for product in system/kernel.sys system/kernel.debug system/kerneldebug.sys \
-               boot/loader.elf; do
+for product in system/kernel.sys system/kernel.debug system/kerneldebug.sys; do
     [ -s "$O/generated/$product" ] || missing="$missing $product"
 done
 if [ -z "$missing" ]; then
-    pass 'all four kernel products are published to their legacy paths'
+    pass 'all three kernel products are published to their legacy paths'
 else
-    fail 'all four kernel products are published to their legacy paths' "missing:$missing"
+    fail 'all three kernel products are published to their legacy paths' "missing:$missing"
 fi
 
 # Nothing may be linked in that the deletion-detecting manifest does not list:
@@ -259,13 +257,13 @@ expect_count "$third" CC 1 'changing one C file recompiles exactly one object'
 expect_count "$third" LD 1 'changing one C file relinks once'
 expect_count "$third" IMAGE 2 'changing one C file refreshes exactly the two kernel images'
 expect_contains "$third" "$target_source" 'the recompiled file is the one that changed'
-# Only the affected products take part: the loader depends on the kernel only
-# through the integrity chain, and a content-preserving touch does not move it.
-if printf '%s\n' "$third" | grep -qE 'loader\.elf|kerneldebug\.sys'; then
-    fail 'changing one C file leaves loader.elf and kerneldebug.sys alone' \
-        "$(printf '%s\n' "$third" | grep -E 'loader\.elf|kerneldebug\.sys' | head -2 | tr '\n' ' ')"
+# Only the affected products take part: the debug module is built separately
+# and a content-preserving touch does not move it.
+if printf '%s\n' "$third" | grep -qE 'kerneldebug\.sys'; then
+    fail 'changing one C file leaves kerneldebug.sys alone' \
+        "$(printf '%s\n' "$third" | grep -E 'kerneldebug\.sys' | head -2 | tr '\n' ' ')"
 else
-    pass 'changing one C file leaves loader.elf and kerneldebug.sys alone'
+    pass 'changing one C file leaves kerneldebug.sys alone'
 fi
 userland_after=$(userland_snapshot)
 expect_same "$userland_before" "$userland_after" \
@@ -291,7 +289,7 @@ fi
 printf '\n=== A04: a kernel header several objects share ===\n'
 # The depfiles are the oracle: every object that recorded the header must be
 # rebuilt and no object that did not record it may be. The oracle covers the
-# whole freestanding side of the sub-build (kernel, loader and drivers: they
+# whole freestanding side of the sub-build (kernel and drivers: they
 # share the ReliefNT headers); generated headers under the sub-build output tree
 # are excluded so the candidate is a real source header.
 depfiles=$(find "$reliefnt_o/obj" -name '*.o.d' | tr '\n' ' ')

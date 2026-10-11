@@ -23,7 +23,6 @@ REGION_PATTERNS: dict[str, tuple[str, ...]] = {
         "kernel/reliefnt/arch/**/*.c", "kernel/reliefnt/arch/**/*.S",
         "kernel/reliefnt/mm/**/*.c", "kernel/reliefnt/fs/**/*.c", "kernel/reliefnt/net/**/*.c",
     ),
-    "loader": ("kernel/reliefnt/boot/loader/**/*.c", "kernel/reliefnt/boot/loader/**/*.S"),
     "libc": (
         "userland/runtime/src/**/*.c", "userland/runtime/src/**/*.S",
         "userland/runtime/src/**/*.cpp",
@@ -55,10 +54,6 @@ def include_flags(root: Path, region: str) -> list[str]:
                  root / "kernel/reliefnt/include/uapi", root / "kernel/reliefnt/include",
                  root / "include", root / "build/include/generated",
                  root / "kernel/reliefnt/drivers/bootstrap"]
-    elif region == "loader":
-        paths = [root / "build/include", root / "kernel/reliefnt/include/uapi",
-                 root / "kernel/reliefnt/include", root / "include",
-                 root / "build/include/generated"]
     elif region in {"libc", "userland"}:
         paths = common + [
             root / "userland/runtime/include",
@@ -105,8 +100,6 @@ def compiler_flags(root: Path, region: str, source: Path) -> list[str]:
                   *include_flags(root, region)]
         if generated_autoconf.is_file():
             flags += ["-include", relative_path(root, generated_autoconf)]
-    elif region == "loader":
-        flags += ["-fno-pic", "-fno-pie", *include_flags(root, region)]
     elif region in {"libc", "userland"}:
         flags += ["-fPIC", *(["-fPIE"] if region == "userland" else []),
                   "-ffunction-sections", "-fdata-sections",
@@ -131,8 +124,6 @@ def output_path(root: Path, source: Path) -> Path:
 def source_region(root: Path, source: Path, selected: str) -> str:
     # A source can match multiple broad patterns (notably userland/runtime).
     # Keep the most specific region first so its flags and headers win.
-    if source.is_relative_to(root / "kernel/reliefnt/boot/loader"):
-        return "loader"
     if source.is_relative_to(root / "userland/runtime") or source.is_relative_to(root / "third_party/mbedtls"):
         return "libc"
     if source.is_relative_to(root / "kernel"):

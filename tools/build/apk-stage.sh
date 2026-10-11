@@ -80,7 +80,7 @@ cp -a "$raw"/. "$tree"/
 
 # Media-only payloads are copied back after the transaction and never claimed
 # by an installed package. Runtime state is always created by apk itself.
-for name in EFI grub reliefos leonos loader.elf install; do rm -rf "$tree/$name"; done
+for name in EFI grub reliefos leonos install; do rm -rf "$tree/$name"; done
 for name in lib/apk/db var/cache/apk usr/share/reliefos/apk/repository; do
     [ ! -L "$tree/$name" ] || { echo "invalid package-state symlink: $name" >&2; exit 1; }
     rm -rf "$tree/$name"
@@ -341,7 +341,7 @@ while IFS= read -r request; do set -- "$@" "$request"; done <"$scratch/upstream-
 run_apk "$@"
 mkdir -p "$managed/usr/share/reliefos/apk"
 cp -a "$repository" "$managed/usr/share/reliefos/apk/repository"
-for name in EFI grub reliefos leonos loader.elf install; do [ ! -e "$raw/$name" ] || cp -a "$raw/$name" "$managed/$name"; done
+for name in EFI grub reliefos leonos install; do [ ! -e "$raw/$name" ] || cp -a "$raw/$name" "$managed/$name"; done
 
 mkdir -p "$work/repository.new"
 rm -rf "$work/repository.new"

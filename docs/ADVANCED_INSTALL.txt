@@ -141,8 +141,8 @@ cat /mnt/root/etc/fstab
 
 leonos-grub-installer /mnt/esp
 
-This command copies EFI/BOOT/BOOTX64.EFI, loader.elf, reliefos/kernel.sys,
-and the grub directory from /install/esp. It is not
+This command copies EFI/BOOT/BOOTX64.EFI, reliefos/kernel.sys,
+leonos/kernel.sys, and the grub directory from /install/esp. It is not
 GNU grub-install. It does not format or mount the ESP and does not create a
 firmware NVRAM boot entry.
 

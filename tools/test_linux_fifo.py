@@ -93,7 +93,7 @@ def main():
         grub = tree / "grub/grub.cfg"
         text = grub.read_text()
         text = text.replace("set timeout=5", "set timeout=0", 1)
-        text = text.replace("multiboot2 /loader.elf root=/", "multiboot2 /loader.elf init=/usr/bin/fifo-abi syscall-trace=/usr/bin/fifo-abi root=/", 1)
+        text = text.replace("multiboot2 /reliefos/kernel.sys root=/", "multiboot2 /reliefos/kernel.sys init=/usr/bin/fifo-abi syscall-trace=/usr/bin/fifo-abi root=/", 1)
         grub.write_text(text)
         with (work / "image.log").open("w") as log:
             run(sys.executable, "tools/make_image.py", "--esp-tree", tree,

@@ -138,19 +138,6 @@ config BUILD_VERBOSE_LOG
 
 endmenu
 
-menu "Boot"
-
-config LOADER_VERIFY_SHA256
-    bool "Verify the kernel SHA-256 hash in loader"
-    default n
-    help
-      When enabled, the EFI/Multiboot loader hashes kernel.sys before
-      executing it and stops on a mismatch unless the user explicitly
-      confirms a bypass. Leave disabled to skip this
-      optional integrity check and its boot-time cost.
-
-endmenu
-
 endmenu
 
 menu "QEMU Run"

@@ -65,7 +65,6 @@ def guest(args):
              '--grub-efi-dir',iso_tools.grub_efi_dir(),
              '--stage',str((WORK/'iso').relative_to(ROOT)),
              '--boot-image',str((WORK/'efiboot.img').relative_to(ROOT)),
-             '--loader',str((release_dir/'generated/boot/loader.elf').relative_to(ROOT)),
              '--kernel',str((release_dir/'generated/system/kernel.sys').relative_to(ROOT)),
              '--installer-root',str(image.relative_to(ROOT)),
              '--grub-font',str((release_dir/'generated/grub/leonos-unicode.pf2').relative_to(ROOT)),

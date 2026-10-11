@@ -93,8 +93,7 @@ else
         "see $work/build.log" "$(tail -n 5 "$work/build.log")"
 fi
 missing=
-for product in system/kernel.sys system/kernel.debug system/kerneldebug.sys \
-        boot/loader.elf; do
+for product in system/kernel.sys system/kernel.debug system/kerneldebug.sys; do
     [ -f "$work/out/generated/$product" ] || missing="$missing $product"
 done
 if [ -z "$missing" ]; then
@@ -104,7 +103,7 @@ else
         "missing:$missing"
 fi
 # The rolled-back pin may still install legacy loadable driver modules into the
-# sub-make install directory; the current adapter publishes only the four kernel
+# sub-make install directory; the current adapter publishes only the three kernel
 # products and leaves those unpublished.
 if find "$work/out/kernel-install" -name '*.drv' 2>/dev/null | grep -q .; then
     printf 'note - rolled-back pin installs legacy .drv modules; they stay unpublished\n'

@@ -152,21 +152,19 @@ def stage_installed_payloads(esp_tree: Path, destination: Path) -> None:
     """Split normal staging into ext2 root and the minimal FAT32 boot payload.
 
     The installed root keeps real /bin, /sbin and /lib directories; there is
-    deliberately no /lib64.  The ESP gets only GRUB, the loader and the
-    /reliefos boot files and the /leonos rollback payload.
+    deliberately no /lib64.  The ESP gets only GRUB, the /reliefos boot
+    files and the /leonos rollback payload.
     """
     root = destination / "install/root"
     esp = destination / "install/esp"
     copy_tree(esp_tree, root)
     shutil.rmtree(root / "EFI", ignore_errors=True)
     shutil.rmtree(root / "grub", ignore_errors=True)
-    remove_file(root / "loader.elf")
     shutil.rmtree(root / "reliefos", ignore_errors=True)
     shutil.rmtree(root / "leonos", ignore_errors=True)
 
     copy_file(esp_tree / "EFI/BOOT/BOOTX64.EFI", esp / "EFI/BOOT/BOOTX64.EFI")
     copy_tree(esp_tree / "grub", esp / "grub")
-    copy_file(esp_tree / "loader.elf", esp / "loader.elf")
     copy_tree(esp_tree / "reliefos", esp / "reliefos")
     copy_tree(esp_tree / "leonos", esp / "leonos")
 

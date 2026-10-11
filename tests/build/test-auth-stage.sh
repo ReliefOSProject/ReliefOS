@@ -69,7 +69,7 @@ else
 fi
 
 # A staged library has to be the one the runtime will link against: a SONAME the
-# loader can resolve, and exported crypt() entry points.
+# dynamic loader can resolve, and exported crypt() entry points.
 soname=$(readelf -d "$stage/lib/libcrypt.so.2" 2>/dev/null |
         sed -n 's/.*SONAME.*\[\(.*\)\].*/\1/p')
 if [ "$soname" = libcrypt.so.2 ]; then

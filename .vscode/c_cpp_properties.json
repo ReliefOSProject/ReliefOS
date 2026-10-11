@@ -15,17 +15,6 @@
             "browse": {"path": ["${workspaceFolder}/kernel/reliefnt/include", "${workspaceFolder}/kernel/reliefnt/include/uapi", "${workspaceFolder}/kernel/reliefnt/kernel/reliefnt/include", "${workspaceFolder}/include", "${workspaceFolder}/build/include"], "limitSymbolsToIncludedHeaders": true}
         },
         {
-            "name": "ReliefOS Loader (WSL)",
-            "compilerPath": "/usr/bin/clang",
-            "intelliSenseMode": "linux-clang-x64",
-            "cStandard": "gnu11",
-            "compileCommands": "${workspaceFolder}/build/vscode/compile_commands.json",
-            "includePath": ["${workspaceFolder}/kernel/reliefnt/include/uapi", "${workspaceFolder}/kernel/reliefnt/include", "${workspaceFolder}/include", "${workspaceFolder}/build/include", "${workspaceFolder}/build/include/generated", "${workspaceFolder}/kernel/reliefnt/boot/loader"],
-            "defines": ["RELIEFOS_LOADER=1"],
-            "compilerArgs": ["-target", "x86_64-unknown-none", "-ffreestanding", "-fno-stack-protector", "-fno-pic", "-fno-pie", "-mno-red-zone", "-mgeneral-regs-only", "-Wall", "-Wextra"],
-            "browse": {"path": ["${workspaceFolder}/kernel/reliefnt/include/uapi", "${workspaceFolder}/kernel/reliefnt/include", "${workspaceFolder}/include", "${workspaceFolder}/build/include", "${workspaceFolder}/kernel/reliefnt/boot/loader"], "limitSymbolsToIncludedHeaders": true}
-        },
-        {
             "name": "ReliefOS libc (WSL)",
             "compilerPath": "/usr/bin/clang",
             "intelliSenseMode": "linux-clang-x64",

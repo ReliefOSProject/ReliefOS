@@ -28,7 +28,7 @@ for f in index.html download/index.html download/reliefos-installer.iso download
          rpr/manifest.json rpr/health.txt \
          rpr/css/reliefos.css \
          rpr/apk/packages.adb rpr/apk/repository.json rpr/apk/reliefos-rpr.rsa.pub rpr/apk/leonos-rpr.rsa.pub rpr/apk/SHA256SUMS \
-         rpr/kernel/kernel.sys rpr/kernel/loader.elf \
+         rpr/kernel/kernel.sys \
          rpr/kernel/release.txt rpr/kernel/release.json rpr/kernel/SHA256SUMS; do
     [ -e "$site/$f" ] || report "missing $f"
 done

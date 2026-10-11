@@ -195,9 +195,8 @@ terminal_input console serial
 terminal_output gfxterm serial
 
 menuentry "ReliefOS ioctl CLOEXEC regression" {
-    multiboot2 /loader.elf root=/ log=serial mode=live syscall-trace=/opt/python/ autospawn=ioctlcloexec autospawn=python315
-    module2 /leonos/kernel.sys leonos-kernel
-    module2 /install/root.fat leonos-installer-root
+    multiboot2 /reliefos/kernel.sys root=/ log=serial mode=live syscall-trace=/opt/python/ autospawn=ioctlcloexec autospawn=python315
+    module2 /install/root.fat reliefos-installer-root
     boot
 }
 """
@@ -257,7 +256,6 @@ def build_iso(root: Path, output: Path, config: Path, work: Path) -> Path:
                 return name
         raise AssertionError(f"missing build artifact (tried {names}); build kernel and userland targets separately")
 
-    loader = artifact("build/boot/loader.elf", "out/x86_64/release/generated/boot/loader.elf")
     kernel = artifact("build/system/kernel.sys", "out/x86_64/release/generated/system/kernel.sys")
     font = artifact("build/generated/grub/leonos-unicode.pf2", "out/x86_64/release/generated/grub/leonos-unicode.pf2")
     config.write_text(GRUB_TEMPLATE, encoding="ascii")
@@ -267,7 +265,7 @@ def build_iso(root: Path, output: Path, config: Path, work: Path) -> Path:
         "--grub-efi-dir", grub_efi_dir(),
         "--stage", str((work / "iso").relative_to(ROOT)),
         "--boot-image", str((work / "efiboot.img").relative_to(ROOT)),
-        "--loader", loader, "--kernel", kernel,
+        "--kernel", kernel,
         "--installer-root", str(root.relative_to(ROOT)),
         "--grub-font", font,
         "--work-dir", str(work.relative_to(ROOT)),

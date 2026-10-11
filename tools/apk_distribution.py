@@ -28,7 +28,7 @@ LICENSE_URLS = (
     "https://gitlab.alpinelinux.org/alpine/apk-tools/-/raw/v3.0.8/LICENSE",
 )
 REPOSITORY = "usr/share/reliefos/apk/repository"
-EXTERNAL = {"EFI", "grub", "reliefos", "leonos", "loader.elf", "install"}
+EXTERNAL = {"EFI", "grub", "reliefos", "leonos", "install"}
 _USER_NAMESPACE_AVAILABLE = None
 
 

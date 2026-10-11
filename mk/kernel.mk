@@ -1,9 +1,9 @@
 # Kernel products: adapter over the standalone reliefnt kernel checkout.
 #
 # Phase 3 of the kernel/userland separation: this repository no longer compiles
-# any kernel, driver or boot-loader source. The standalone checkout named by
+# any kernel, driver or boot source. The standalone checkout named by
 # RELIEFNT_DIR owns those sources and builds kernel.sys, kernel.debug,
-# kerneldebug.sys and loader.elf (the device drivers are linked into kernel.sys);
+# kerneldebug.sys (the device drivers are linked into kernel.sys);
 # this fragment drives that build and publishes the results to the legacy
 # locations the rest of the parent build (rootfs, images, rpr) consumes. The
 # parent consumes only the sub-build's `install` output and its exported headers
@@ -59,16 +59,15 @@ RELIEFNT_SUBBUILD_DEST := $(abspath $(RELIEFNT_DEST))
 # mk/rpr.mk and mk/boot.mk).
 RELIEFOS_KERNEL_SYS := $(O_GENERATED)/system/kernel.sys
 RELIEFOS_KERNEL_DEBUG := $(O_GENERATED)/system/kernel.debug
-RELIEFNT_LOADER_ELF := $(O_GENERATED)/boot/loader.elf
 RELIEFNT_KERNELDEBUG_SYS := $(O_GENERATED)/system/kerneldebug.sys
 
 # "legacy path below generated/:installed file name" per product; the sub-make's
-# install writes the four products flat under $(RELIEFNT_DEST).
+# install writes the three products flat under $(RELIEFNT_DEST).
 RELIEFNT_PUBLISH_PAIRS := system/kernel.sys:kernel.sys system/kernel.debug:kernel.debug \
-	system/kerneldebug.sys:kerneldebug.sys boot/loader.elf:loader.elf
+	system/kerneldebug.sys:kerneldebug.sys
 
 RELIEFNT_PUBLISHED := $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_DEBUG) \
-	$(RELIEFNT_KERNELDEBUG_SYS) $(RELIEFNT_LOADER_ELF)
+	$(RELIEFNT_KERNELDEBUG_SYS)
 
 # An explicit command-line tool override is part of the caller's intent and is
 # passed to the sub-make as well (the checkout accepts the same CC/CXX/AR/
@@ -101,7 +100,7 @@ RELIEFNT_VERSION_PASSTHRU := $(strip $(foreach suffix,EXTRAVERSION LOCALVERSION,
 RELIEFNT_HEADER_EXPORT_LIST_FOR_KERNEL := $(if $(strip $(HEADER_EXPORT_LIST)),$(HEADER_EXPORT_LIST),$(RELIEFOS_SRC)/configs/header-export.list)
 RELIEFNT_HEADER_EXPORT_ENTRIES_FOR_KERNEL := $(shell sed -e 's/\#.*//' -e '/^[[:space:]]*$$/d' $(RELIEFNT_HEADER_EXPORT_LIST_FOR_KERNEL))
 RELIEFNT_HEADER_EXPORTS_COMPLETE := $(shell for entry in $(RELIEFNT_HEADER_EXPORT_ENTRIES_FOR_KERNEL); do test -f '$(RELIEFNT_DIR)/'$$entry || exit 1; done; printf yes)
-RELIEFNT_KERNEL_ONLY_GOALS := kernel all loader kerneldebug
+RELIEFNT_KERNEL_ONLY_GOALS := kernel all kerneldebug
 RELIEFNT_NON_KERNEL_GOALS := $(filter-out $(RELIEFNT_KERNEL_ONLY_GOALS),$(MAKECMDGOALS))
 RELIEFNT_KERNEL_HEADER_ORDER_ONLY := | $(O)/kernel-export/manifest.txt
 ifeq ($(strip $(RELIEFNT_NON_KERNEL_GOALS)),)

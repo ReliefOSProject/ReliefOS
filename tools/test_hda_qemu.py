@@ -68,7 +68,7 @@ def stage_probe(image: Path, out: Path, probe: Path, capture: bool, card: int,
                 'printf "[u6-standard] DONE failures=%s\\n" "${failures:-0}"; }\n')
             standard_script.write_text('#!/bin/sh\nexec /bin/sh /usr/lib/reliefos/tests/u6-standard-probe.sh "$@"\n')
         # debugfs edits the copied partition only; normal filesystem ownership,
-        # kernel, loader, init and OpenRC binaries remain the input image's bytes.
+        # kernel, init and OpenRC binaries remain the input image's bytes.
         batch=out/'debugfs.commands'
         ops=['mkdir /usr/lib/reliefos/tests',
              f'write "{probe}" /usr/lib/reliefos/tests/audio-guest',

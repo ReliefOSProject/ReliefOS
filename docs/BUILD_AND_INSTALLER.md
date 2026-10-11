@@ -108,7 +108,6 @@ Important generated files include:
 - `<O>/include/generated/autoconf.h`
 - `<O>/include/generated/autoconf-installer.h`
 - `<O>/include/generated/build_info.h`
-- `<O>/include/generated/loader_integrity.h`
 
 The default output directory is `out/x86_64/release`; source-tree version headers
 are not build inputs.
@@ -188,11 +187,11 @@ it is not a QEMU login or sudo execution test.
 
 The installer has two related payload groups:
 
-- Top-level ISO boot payload: loader, kernel, and installer root.
+- Top-level ISO boot payload: kernel and installer root.
 - Installed-system root payload: a copy of `build/esp` without `EFI/`,
-  `grub/`, `loader.elf`, or `reliefos/`, stored under `install/root` inside
+  `grub/`, `reliefos/`, or `leonos/`, stored under `install/root` inside
   `build/install/root.fat`.
-- Installed-system FAT32 ESP payload: the UEFI/GRUB and early loader files
+- Installed-system FAT32 ESP payload: the UEFI/GRUB and early boot files
   stored under `install/esp` inside `build/install/root.fat`.
 
 `tools/make_installer_root.py` creates `build/install/root.fat`, copies the
@@ -204,7 +203,6 @@ policy-sensitive binaries built with `autoconf-installer.h`.
 `tools/make_installer_iso.py` creates `build/images/reliefos-installer.iso` and
 stages:
 
-- `loader.elf`
 - `reliefos/kernel.sys`
 - `install/root.fat`
 

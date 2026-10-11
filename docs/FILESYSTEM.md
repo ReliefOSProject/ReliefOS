@@ -12,10 +12,10 @@ installer rejects that combination instead of materializing directory copies.
 
 | GPT partition | Type | Contents | Runtime mount |
 | --- | --- | --- | --- |
-| 1 | EFI System Partition / FAT32 | `EFI/`, `loader.elf`, `grub/`, `reliefos/kernel.sys` | `/boot` normally, `/target/boot` while Installer is running |
+| 1 | EFI System Partition / FAT32 | `EFI/`, `grub/`, `reliefos/kernel.sys`, `leonos/kernel.sys` (rollback copy) | `/boot` normally, `/target/boot` while Installer is running |
 | 2 | Linux filesystem / ext4 | normal rootfs: `bin/`, `sbin/`, `lib/`, `usr/`, `etc/`, `opt/`, `var/`, `home/`, `tmp/`, `run/` | `/` in a normal session, `/target` while Installer is running |
 
-UEFI GRUB and the early loader read partition 1. Once the kernel is running,
+UEFI GRUB reads partition 1. Once the kernel is running,
 the storage layer selects partition 2 as `/`. FAT32 and exFAT data-volume
 backends remain available; the current userspace boot contract requires ext4
 and the new root skeleton. Old images require a fresh installation.

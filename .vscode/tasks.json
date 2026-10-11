@@ -213,14 +213,6 @@
             "presentation": {"reveal": "always", "panel": "shared", "clear": false}
         },
         {
-            "label": "ReliefOS: Generate compile database (loader)",
-            "type": "process",
-            "command": "wsl.exe",
-            "args": ["--cd", "${config:leonos.wslProjectRoot}", "--", "bash", "-lc", "python3 tools/vscode/generate_compile_commands.py --region loader"],
-            "problemMatcher": [],
-            "presentation": {"reveal": "always", "panel": "shared", "clear": false}
-        },
-        {
             "label": "ReliefOS: clang-tidy kernel",
             "type": "process",
             "command": "wsl.exe",
@@ -244,15 +236,6 @@
             "command": "wsl.exe",
             "args": ["--cd", "${config:leonos.wslProjectRoot}", "--", "bash", "-lc", "python3 tools/vscode/run_clang_tidy.py --region userland"],
             "dependsOn": "ReliefOS: Generate compile database (userland)",
-            "problemMatcher": [],
-            "presentation": {"reveal": "always", "panel": "shared", "clear": false}
-        },
-        {
-            "label": "ReliefOS: clang-tidy loader",
-            "type": "process",
-            "command": "wsl.exe",
-            "args": ["--cd", "${config:leonos.wslProjectRoot}", "--", "bash", "-lc", "python3 tools/vscode/run_clang_tidy.py --region loader"],
-            "dependsOn": "ReliefOS: Generate compile database (loader)",
             "problemMatcher": [],
             "presentation": {"reveal": "always", "panel": "shared", "clear": false}
         },

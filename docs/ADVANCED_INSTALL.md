@@ -238,8 +238,8 @@ leonos-grub-installer /mnt/esp
 验证并复制：
 
 - `EFI/BOOT/BOOTX64.EFI`；
-- `loader.elf`；
-- `reliefos/kernel.sys`（并保留旧布局回滚入口）；
+- `reliefos/kernel.sys`；
+- `leonos/kernel.sys`（旧布局回滚入口，已存在则保留）；
 - 完整的 `grub/` 配置、字体和主题。
 
 工具不会格式化或挂载 ESP，也不会写入固件 NVRAM。它安装标准 UEFI fallback
