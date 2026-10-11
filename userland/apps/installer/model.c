@@ -74,8 +74,6 @@ enum installer_page installer_model_next(enum installer_page page,
     case INSTALLER_PAGE_LANGUAGE:
         return INSTALLER_PAGE_THANKS;
     case INSTALLER_PAGE_THANKS:
-        return INSTALLER_PAGE_THEME;
-    case INSTALLER_PAGE_THEME:
         return INSTALLER_PAGE_WELCOME;
     case INSTALLER_PAGE_WELCOME:
         return INSTALLER_PAGE_MODE;
@@ -101,10 +99,8 @@ enum installer_page installer_model_prev(enum installer_page page,
     switch (page) {
     case INSTALLER_PAGE_THANKS:
         return INSTALLER_PAGE_LANGUAGE;
-    case INSTALLER_PAGE_THEME:
-        return INSTALLER_PAGE_THANKS;
     case INSTALLER_PAGE_WELCOME:
-        return INSTALLER_PAGE_THEME;
+        return INSTALLER_PAGE_THANKS;
     case INSTALLER_PAGE_MODE:
         return INSTALLER_PAGE_WELCOME;
     case INSTALLER_PAGE_DISK:

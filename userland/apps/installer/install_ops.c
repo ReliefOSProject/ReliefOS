@@ -31,8 +31,6 @@ unsigned long reliefos_uptime_ms(void);
 
 uint8_t page = INSTALLER_PAGE_LANGUAGE;
 uint8_t install_mode = INSTALLER_MODE_FRESH;
-uint8_t installer_theme = INSTALLER_THEME_METRO;
-uint8_t installer_theme_explicit;
 struct reliefos_block_disk_info disks[RELIEFOS_BLOCK_MAX_DISKS];
 uint32_t disk_count;
 int32_t selected_disk = -1;
@@ -1311,98 +1309,12 @@ static int write_target_locale(void)
         ? 0 : -errno;
 }
 
-static int display_config_line_is_theme(const char *line, uint32_t len)
-{
-    return len >= 6 && line[0] == 't' && line[1] == 'h' && line[2] == 'e' &&
-           line[3] == 'm' && line[4] == 'e' && line[5] == '=';
-}
-
-static int write_target_theme(void)
-{
-    char input[384];
-    char output[512];
-    const char *theme = installer_theme == INSTALLER_THEME_WIN95 ? "win95" : "metro";
-    struct reliefos_stat stat_info;
-    uint32_t input_len = 0;
-    uint32_t output_len = 0;
-    uint32_t offset = 0;
-    int ret = reliefos_stat_legacy(TARGET_ETC_RELIEFOS "/display.conf", &stat_info);
-    if (ret == 0) {
-        int fd;
-        long got;
-        if (stat_info.type != RELIEFOS_FS_TYPE_FILE || stat_info.size >= sizeof(input)) {
-            return -27;
-        }
-        fd = open(TARGET_ETC_RELIEFOS "/display.conf", RELIEFOS_O_RDONLY, 0);
-        if (fd < 0) {
-            return fd;
-        }
-        got = read(fd, input, (uint32_t)stat_info.size);
-        close(fd);
-        if (got < 0) {
-            return (int)got;
-        }
-        input_len = (uint32_t)got;
-    } else if (ret != -2) {
-        return ret;
-    }
-    while (offset < input_len) {
-        uint32_t line_start = offset;
-        uint32_t line_end;
-        while (offset < input_len && input[offset] != '\n') {
-            ++offset;
-        }
-        line_end = offset;
-        if (line_end > line_start && input[line_end - 1] == '\r') {
-            --line_end;
-        }
-        if (offset < input_len) {
-            ++offset;
-        }
-        if (display_config_line_is_theme(input + line_start, line_end - line_start)) {
-            continue;
-        }
-        for (uint32_t index = line_start; index < line_end; ++index) {
-            if (append_char(output, &output_len, sizeof(output), input[index]) < 0) {
-                return -27;
-            }
-        }
-        if (append_char(output, &output_len, sizeof(output), '\n') < 0) {
-            return -27;
-        }
-    }
-    if (append_text(output, &output_len, sizeof(output), "theme=") < 0 ||
-        append_text(output, &output_len, sizeof(output), theme) < 0 ||
-        append_char(output, &output_len, sizeof(output), '\n') < 0) {
-        return -27;
-    }
-    {
-        int fd = open(TARGET_ETC_RELIEFOS "/display.conf",
-                      RELIEFOS_O_WRONLY | RELIEFOS_O_CREAT | RELIEFOS_O_TRUNC, 0666);
-        long wrote;
-        if (fd < 0) {
-            return fd;
-        }
-        wrote = write(fd, output, output_len);
-        close(fd);
-        if (wrote < 0) {
-            return (int)wrote;
-        }
-        return wrote == (long)output_len ? 0 : -5;
-    }
-}
-
+/* The target keeps the image's display.conf theme= line (stamped from the
+ * build configuration); setup does not select or rewrite it. */
 static int write_target_preferences(void)
 {
-    int ret;
     if (install_mode == INSTALL_MODE_FRESH) {
-        ret = write_target_locale();
-        if (ret < 0) {
-            return ret;
-        }
-    }
-    if (install_mode == INSTALL_MODE_FRESH || installer_theme_explicit) {
-        return write_target_theme();
+        return write_target_locale();
     }
     return 0;
 }

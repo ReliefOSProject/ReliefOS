@@ -50,7 +50,6 @@ static Widget account_fields[5];
 static Widget account_hint;
 static Widget progress_text_label;
 static Widget progress_bar_label;
-static Widget theme_note;
 static unsigned long sidebar_bg;
 static unsigned long sidebar_bg_active;
 static unsigned long sidebar_fg;
@@ -183,7 +182,6 @@ static const char *page_label(enum installer_page target)
     switch (target) {
     case INSTALLER_PAGE_LANGUAGE: return T("Language");
     case INSTALLER_PAGE_THANKS: return T("Thanks");
-    case INSTALLER_PAGE_THEME: return T("Style");
     case INSTALLER_PAGE_WELCOME: return T("Welcome");
     case INSTALLER_PAGE_MODE: return T("Mode");
     case INSTALLER_PAGE_DISK: return T("Disk");
@@ -418,47 +416,6 @@ static void build_thanks_page(void)
                   XmNrightAttachment, XmATTACH_FORM, XmNrightOffset, 24,
                   XmNbottomAttachment, XmATTACH_FORM, XmNbottomOffset, 24, NULL);
     XtManageChild(text);
-}
-
-static void theme_selected(Widget widget, XtPointer unused, XtPointer call)
-{
-    (void)unused;
-    (void)call;
-    if (!XmToggleButtonGetState(widget)) {
-        return;
-    }
-    if (!strcmp(XtName(widget), "metro")) {
-        installer_theme = INSTALLER_THEME_METRO;
-    } else {
-        installer_theme = INSTALLER_THEME_WIN95;
-    }
-    installer_theme_explicit = 1;
-    set_label(theme_note, installer_theme == INSTALLER_THEME_METRO
-                             ? T("Metro uses the modern flat system appearance.")
-                             : T("Win95 keeps the classic beveled system appearance."));
-}
-
-static void build_theme_page(void)
-{
-    place_label(content, T("Choose UI Style"), 16, 24);
-    place_label(content, T("Preview a style now and apply it to the installed system."),
-                48, 24);
-    Widget radio = XtVaCreateManagedWidget("style", xmRowColumnWidgetClass, content,
-        XmNtopAttachment, XmATTACH_FORM, XmNtopOffset, 96,
-        XmNleftAttachment, XmATTACH_FORM, XmNleftOffset, 24,
-        XmNradioBehavior, True, XmNpacking, XmPACK_COLUMN, XmNnumColumns, 1, NULL);
-    Widget metro = XtVaCreateManagedWidget("metro", xmToggleButtonWidgetClass, radio, NULL);
-    Widget win95 = XtVaCreateManagedWidget("win95", xmToggleButtonWidgetClass, radio, NULL);
-    set_label(metro, "Metro");
-    set_label(win95, "Win95");
-    XtVaSetValues(metro, XmNset, installer_theme != INSTALLER_THEME_WIN95 ? True : False, NULL);
-    XtVaSetValues(win95, XmNset, installer_theme == INSTALLER_THEME_WIN95 ? True : False, NULL);
-    XtAddCallback(metro, XmNvalueChangedCallback, theme_selected, NULL);
-    XtAddCallback(win95, XmNvalueChangedCallback, theme_selected, NULL);
-    theme_note = place_label(content, installer_theme == INSTALLER_THEME_METRO
-                             ? T("Metro uses the modern flat system appearance.")
-                             : T("Win95 keeps the classic beveled system appearance."),
-                             176, 24);
 }
 
 static void build_welcome_page(void)
@@ -1099,7 +1056,6 @@ static void clear_content(void)
     account_hint = NULL;
     progress_text_label = NULL;
     progress_bar_label = NULL;
-    theme_note = NULL;
     for (int i = 0; i < 5; ++i) {
         account_fields[i] = NULL;
     }
@@ -1111,7 +1067,6 @@ static void show_page(void)
     switch ((enum installer_page)page) {
     case INSTALLER_PAGE_LANGUAGE: build_language_page(); break;
     case INSTALLER_PAGE_THANKS: build_thanks_page(); break;
-    case INSTALLER_PAGE_THEME: build_theme_page(); break;
     case INSTALLER_PAGE_WELCOME: build_welcome_page(); break;
     case INSTALLER_PAGE_MODE: build_mode_page(); break;
     case INSTALLER_PAGE_DISK: build_disk_page(); break;

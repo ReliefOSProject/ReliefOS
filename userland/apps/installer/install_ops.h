@@ -17,10 +17,6 @@
 #define INSTALL_MODE_FRESH INSTALLER_MODE_FRESH
 #define INSTALL_MODE_UPDATE INSTALLER_MODE_UPDATE
 
-/* Values written to the installed system's display.conf theme= line. */
-#define INSTALLER_THEME_WIN95 0u
-#define INSTALLER_THEME_METRO 1u
-
 #define COPY_BUF_SIZE (32U * 1024U)
 #define COPY_ESP_WRITE_SLICE 4096U
 #define COPY_PRESENT_INTERVAL_MS 50U
@@ -56,8 +52,6 @@
 /* Wizard state shared with the frontends. */
 extern uint8_t page;
 extern uint8_t install_mode;
-extern uint8_t installer_theme;
-extern uint8_t installer_theme_explicit;
 extern struct reliefos_block_disk_info disks[RELIEFOS_BLOCK_MAX_DISKS];
 extern uint32_t disk_count;
 extern int32_t selected_disk;
