@@ -209,7 +209,7 @@ expect_same "$before" "$after" 'no-op build leaves every object and product mtim
 
 printf '\n=== A02b: deleted headers in existing dependency files ===\n'
 legacy_object="$reliefnt_o/obj/kernel/kernel/reliefnt/kernel.c.o"
-legacy_header="$reliefnt/kernel/reliefnt/include/ntclks/boot_splash.h"
+legacy_header="$reliefnt/kernel/reliefnt/include/reliefnt/boot_splash.h"
 # Reproduce a dependency file from before the splash removal and before -MP.
 # No empty header target is present in these old compiler-generated files.
 printf '\n%s: %s\n' "$legacy_object" "$legacy_header" >>"$legacy_object.d"

@@ -35,7 +35,7 @@
 | --- | --- | --- |
 | 内核子仓路径 | `kernel/ntclks/` | `kernel/reliefnt/` |
 | 内核私有源/头 | `kernel/ntclks/kernel/ntclks/`、`include/ntclks/` | `kernel/reliefnt/kernel/reliefnt/`、`include/reliefnt/` |
-| 公开 UAPI 头 | `include/uapi/leonos/*.h` | `include/uapi/reliefos/*.h`（旧路径转发头兼容） |
+| 公开 UAPI 头 | `include/uapi/leonos/*.h` | `include/uapi/reliefos/*.h`（旧路径转发头已移除，旧拼写不再编译） |
 | 主仓公共头 | `include/leonos/` | `include/reliefos/`（旧目录转发头兼容） |
 | 运行库头 | `userland/runtime/include/leonos/` | `userland/runtime/include/reliefos/` |
 | 共享库 | `libleonos.so.2` | `libreliefos.so.2`（同一对象集链接两个 SONAME） |
@@ -48,10 +48,10 @@
 | 产物名 | `leonos4.vmdk`、`leonos4-live.iso`、`leonos4-installer.iso` | `reliefos.vmdk`、`reliefos-live.iso`、`reliefos-installer.iso` |
 | APK 包组 | `leonos-*` | `reliefos-*`（显式 replaces/升级路径） |
 | Kconfig 组件符号 | `CONFIG_LEON_COMPONENT_*` | `CONFIG_RELIEFOS_COMPONENT_*`（显式迁移命令导入旧配置） |
-| 构建/环境变量 | `LEONOS_*` | `RELIEFOS_*`（旧名为输入别名，新名优先） |
+| 构建/环境变量 | `LEONOS_*` | `RELIEFOS_*`（主仓旧名为输入别名，新名优先；内核检出不再接受旧名输入） |
 | OpenRC 服务 | `leonos-*` 服务与 runlevel 链接 | `reliefos-*`（旧名脚本转发入口，服务只启动一次） |
 | 布局契约 | `include/leonos/layout.h` | `include/reliefos/layout.h`（旧头转发） |
-| 标记/所有权 | 旧 `LEONOS_BUILD_OWNER` 等 marker | 新/旧 marker 均识别，拒绝未知目录 |
+| 标记/所有权 | 旧 `LEONOS_BUILD_OWNER` 等 marker | 只识别新 marker 文本并拒绝未知目录；主仓 `LEONOS_BUILD_OWNER` 输入别名保留 |
 
 `kernel.sys`、`kernel.debug`、`kerneldebug.sys`、
 `EFI/BOOT/BOOTX64.EFI`、syscall 编号、UAPI 结构布局与 `LEONACL.SYS`

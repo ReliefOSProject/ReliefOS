@@ -105,7 +105,7 @@ printf '== header boundary ==\n'
 
 # Baseline: config + export + runtime.
 build "$work/0.log" defconfig headers_install runtime
-[ -f "$export_include/leonos/fs_abi.h" ] && [ -f "$export_include/reliefos/fs_abi.h" ] \
+[ -f "$export_include/reliefos/fs_abi.h" ] \
     && [ -f "$export_include/linux/types.h" ] \
     && pass "export tree installed under $export_include" \
     || fail "export tree missing" "$(find "$O/kernel-export" -type f | head)"

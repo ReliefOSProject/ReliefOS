@@ -1,111 +1,17 @@
 # ReliefOS/ReliefNT task 11 reviewed old-name allowlist.
 # scope<TAB>category<TAB>path<TAB>reason; exact tracked path, no blanket migration exemptions.
 # Rules: docs/branding-compatibility.md section 3.
-kernel	history	.github/workflows/build.yml	注释记录已知可用 LeonOS-4 ubuntu-24.04 依赖集出处
-kernel	external-url	Kconfig	仅真实既有 Pages/RPR URL；新目标未提供，不修改。
-kernel	compatibility	Makefile	LEONOS_TEST_PYTHON 是旧输入回退，RELIEFOS 优先
-kernel	external-url	README.md	父仓与子仓真实旧 GitHub 地址，未提供新地址
-kernel	external-url	configs/default.conf	真实旧 RPR 默认 URL，未获新地址
-kernel	compatibility	configs/header-export.list	同时导出旧 UAPI 转发头与新 canonical 头
 kernel	compatibility	drivers/bootstrap/storage/storage_block.c	识别已有磁盘 GPT 名 LEONOS4_ROOT
 kernel	compatibility	drivers/bootstrap/storage/storage_mount.c	旧 leonos-installer-root 引导 module tag 双接受
 kernel	compatibility	fs/procfs.c	冻结 LeonOSRole/LeonOSFlags 与 /proc/leonos-drivers 接口值
 kernel	compatibility	fs/sysfs.c	冻结 /sys/devices/platform/leonos-block 运行时设备路径
-kernel	compatibility	include/leonos/driver.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/leonos/elf_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/leonos/fb.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/leonos/lat15_vga16_psf.inc	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/leonos/layout.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/leonos/psf_font.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/leonos/text.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/leonos/utf8_stream.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 kernel	compatibility	include/reliefos/elf_abi.h	published ELF note and runtime SONAME values
 kernel	compatibility	include/reliefos/layout.h	frozen task 6 guest layout values
 kernel	compatibility	include/uapi/README.md	文档说明旧 libleonos.so.2 独立兼容 SONAME，禁止将旧库伪装为新库符号链接
-kernel	compatibility	include/uapi/leonos/audio_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/auth_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/auth_user.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/device_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/driver_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/fs_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/gpu_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/inputm_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/kernel_debug_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/net_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/net_control.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/pty_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/rootfs.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/signal_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/startup_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/syscall_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	include/uapi/leonos/system_abi.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 kernel	compatibility	include/uapi/reliefos/rootfs.h	frozen task 6 rootfs paths
-kernel	compatibility	kernel/reliefnt/driver_manager.c	新 driver module 符号查找失败回退 leonos_driver_module
-kernel	compatibility	kernel/reliefnt/include/ntclks/apic.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/arch.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/bugcheck.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/console.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/driver_manager.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/e1000.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/eevdf.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/efi_fs.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/elf.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/framebuffer.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/futex.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/gpu.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/heap.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/input.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/inventory.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/kernel.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/kernel_debug.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/loadavg.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/lock.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/mm.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/mouse.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/multiboot2.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/net.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/net_packet.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/net_udp.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/object.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/ostui.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/page_cache.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/paging.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/panic.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/pci.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/permissions.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/platform.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/port.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/power.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/pty.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/random.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/sched.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/signal.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/smp.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/storage.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/svga.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/syscall.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/syscall_internal.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/text_stream.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/text_utf16.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/time.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/time_discipline.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/tmpfs.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/trap.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/types.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/usb.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/usercopy.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/userland.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/uts.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/version.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-kernel	compatibility	kernel/reliefnt/include/ntclks/wait.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 kernel	compatibility	kernel/reliefnt/kernel.c	识别旧 installer-root GRUB module tag
 kernel	compatibility	kernel/reliefnt/kernel_debug.c	旧 kerneldebug ELF note section 与函数名/hash 双接受
 kernel	compatibility	kernel/reliefnt/syscall.c	冻结设备 ioctl 对外 identity：PS/2 名称与 leonos-fb
-kernel	compatibility	mk/kernel.mk	为旧 depfile 中已删除的 ntclks/boot_splash.h 提供空规则，避免历史输出增量构建失败。
-kernel	compatibility	scripts/build-lock.sh	LEONOS_BUILD_OWNER 旧输入兼容，优先新变量
-kernel	compatibility	scripts/clean.sh	旧输出所有权标记双识别，未知标记拒绝删除
-kernel	compatibility	tests/uapi/uapi_compat.c	checks old UAPI forwarding headers
-kernel	compatibility	tools/test_header_export.py	同时禁止 ntclks/ 与 reliefnt/ 私有头，保持导出边界
 main	compatibility	.github/workflows/build-installer.yml	上传既有 leonos.conf 配置文件名
 main	external-url	.github/workflows/build-pages.yml	GitHub Secret 旧名回退；优先新 RELIEFOS Secret，不改外部配置
 main	external-url	.github/workflows/sourcehut-sync.yml	real old remote addresses, switch only after new targets verified
@@ -116,7 +22,6 @@ main	compatibility	.vscode/settings.json	既有用户 VS Code leonos.* 设置键
 main	compatibility	.vscode/tasks.json	既有用户 VS Code leonos.* 设置键及真实 WSL 工作目录；不改用户磁盘路径。tasks 的旧 build.py 调用另属既有工具配置问题
 main	compatibility	AGENT.md	旧 leonos/ 公共转发头、双接受 ntclks 日志前缀；另保留未切换的真实 NTCLKS 子仓地址
 main	history	BY_AUTHOR.md	historical material
-main	external-url	Kconfig	真实既有 RPR 地址或 GitHub 签名 Secret；外部服务未提供新目标
 main	compatibility	Makefile	LEONOS_CACHE / LEONOS_BUILD_OWNER 仅作为旧输入回退，新变量优先
 main	attribution	NOTICE	PL Editor LeonOS fork 是具体第三方分叉归属名称
 main	compatibility	README.md	明确解释旧 leonos 转发头及尚未切换的 NTCLKS 外部 URL
@@ -126,12 +31,9 @@ main	compatibility	boot/grub/installer_embedded.cfg	新 marker 不存在才回�
 main	compatibility	boot/grub/live.cfg	新 marker 不存在才回退旧 marker，并加载既有 PF2 字体文件名
 main	compatibility	boot/grub/theme/theme.txt	LeonOS Pixel Regular 16 是实际 PF2 字体内部 family identity，非菜单显示文案
 main	compatibility	configs/apk-ownership.json	旧目录/工具/PAM/TERM/fastfetch alias 真实归属与已安装包迁移说明
-main	external-url	configs/default.conf	保留真实旧 Pages/RPR 默认 URL，未获新远端
 main	compatibility	configs/dependencies.lock.json	fastfetch 精确锁定归档内部目录名，不可改目录导致锁定产物读取失败
-main	compatibility	configs/header-export.list	导出旧 UAPI 转发头，旧源码与新头布局共用单一定义
 main	attribution	configs/locale/zh_CN.po	Last-Translator: LeonOS 是原翻译署名，Project-Id-Version 已改 ReliefOS
 main	compatibility	configs/nls/po/leonos.pot	gettext 历史 domain 文件名与旧安装 boot/leonos 迁移提示 msgid
-main	external-url	configs/profiles/default.conf	保留真实旧 Pages/RPR 默认 URL，未获新远端
 main	compatibility	docs/ABI.md	公开旧符号/宏/头与 SONAME 兼容说明，旧用户数据库识别、已退役 service 状态名、kerneldebug 旧 note 与回滚标记；当前路径已规范化
 main	compatibility	docs/ABI_MIGRATION.md	旧 ABI 迁移登记与禁止新增旧 ioctl 的规则；input-method.sock 字节值冻结，新 UAPI 源路径已更新
 main	history	docs/ABI_PRIVATE_INVENTORY.md	既有 ABI 私有符号清点快照，保留清点时的路径和宏名，未重新生成历史清单
@@ -143,7 +45,6 @@ main	compatibility	docs/BOOT_AND_INTEGRITY.md	仅旧 /leonos 内核与 display.c
 main	compatibility	docs/BROWSER.md	仅保存书签的旧 about:leonos URI 双接受说明
 main	compatibility	docs/BUILDSYSTEM.md	仅旧 ntclks 与新 reliefnt 启动日志前缀双接受说明
 main	history	docs/BUILD_AND_INSTALLER.md	混合指南的剩余旧展示名/ISO 名与原 SHA 属构建3534/3535历史证据；另有真实旧 ABI、旧助手入口与已存在 WSL 示例目录，当前路径/输出已新名
-main	compatibility	docs/DRIVERS.md	仅旧 ELF leonos_driver_module 符号回退说明
 main	history	docs/EEVDF_SCHEDULER.md	当前标题与实现描述已 ReliefOS；仅历史验证的旧 ISO 名及 Uinxed 旧来宾实测记载保留
 main	compatibility	docs/FILESYSTEM.md	旧 GPT/ext2/exFAT 根卷标签是磁盘识别契约，不改已有磁盘身份
 main	history	docs/KERNEL_USERSPACE_BOUNDARIES.md	当前 owner 表已指向新子仓；旧名仅在明确标为历史的中间层移除迁移表/删除清单与原格式兼容说明
@@ -159,7 +60,6 @@ main	compatibility	docs/OPENRC_MIGRATION_STATUS.md	仅冻结 /proc/leonos-driver
 main	history	docs/POWER_SHUTDOWN_FIX_VERIFICATION.md	已有 VMware/QEMU 实测证据、用户虚拟机名及旧生成 ISO 路径
 main	compatibility	docs/ROOTFS_LAYOUT_AND_MIGRATION.md	旧 Python转发入口、/boot/leonos回滚、冻结IPC socket路径、旧ELF库搜索与note值；另有明确历史镜像验证记录
 main	external-url	docs/RPR.md	真实旧 Pages/RPR/GitHub slug 及旧 CI Secret 外部配置名称，未获新目标不能切换
-main	external-url	docs/SOURCEHUT_SYNC.md	现有 SourceHut 仓库slug和部署密钥名称示例，不猜测替换为未提供的新远端
 main	history	docs/SUDOERS_PAM_STATUS.md	记录旧独立认证验证的暂停状态、精确ISO SHA、日志与旧来宾结果，不改写为本次验证
 main	history	docs/SUDOERS_PAM_UPSTREAM.md	剩余 LeonOS 展示词均限定旧 guest03/固定Linux独立验证；pam_leonos_password 另是实际发布模块文件名
 main	compatibility	docs/SUDO_AND_ELEVATION.md	仅说明旧 leonos-gui PAM service 文件供旧调用者；现行 GUI login 已 reliefos-gui
@@ -201,13 +101,11 @@ main	history	docs/superpowers/ntclks-separation/09-m1-authority-design-review.md
 main	history	docs/superpowers/ntclks-separation/10-ntclks-layout-moves.md	historical material
 main	history	docs/superpowers/ntclks-separation/README.md	historical material
 main	history	docs/superpowers/plans/2026-09-24-ntclks-separation-agent-prompt.md	historical material
-main	history	docs/superpowers/plans/2026-09-27-ext4-driver.md	historical material
 main	history	docs/superpowers/plans/2026-09-28-reliefos-ext4.md	historical ext4 implementation plan; superseded and excluded from current driver work
 main	history	docs/superpowers/plans/2026-09-27-reliefos-reliefnt-rename.md	migration plan quotes old names
 main	history	docs/superpowers/progress/2026-10-04-u6-lifecycle-audit.json	audit evidence records historical artifact paths
 main	history	docs/superpowers/progress/2026-10-04-vmware-hda-wavplay-handoff.md	historical handoff quotes the user VM name
 main	history	docs/superpowers/specs/2026-09-24-ntclks-separation-design.md	historical material
-main	history	docs/superpowers/specs/2026-09-27-ext4-driver-design.md	historical material
 main	history	docs/superpowers/specs/2026-09-27-reliefos-reliefnt-rename-baseline.md	pre-migration scan evidence
 main	history	docs/superpowers/specs/2026-09-27-reliefos-reliefnt-rename-design.md	design spec quotes old names
 main	history	docs/superpowers/specs/2026-09-27-reliefos-reliefnt-rename-inventory.tsv	inventory records old names
@@ -288,7 +186,7 @@ main	compatibility	tests/build/test-brand-identity.sh	audit tool itself
 main	compatibility	tests/build/test-busybox-profile.sh	读取现行 BusyBox profile 的历史文件名 leonos.config，验证官方 applet 清单
 main	compatibility	tests/build/test-config-migrate.sh	legacy configuration backup compatibility
 main	compatibility	tests/build/test-deps.sh	针对 test-deps 的旧配置/旧变量/头库/路径/目标输入与新 canonical 共存回归；旧临时前缀可独立规范化
-main	compatibility	tests/build/test-header-boundary.sh	旧 NTCLKS_DIR 输入回退，并验证新旧公共头同时导出
+main	compatibility	tests/build/test-header-boundary.sh	旧 NTCLKS_DIR 输入回退
 main	compatibility	tests/build/test-image-adapters.sh	针对 test-image-adapters 的旧配置/旧变量/头库/路径/目标输入与新 canonical 共存回归；旧临时前缀可独立规范化
 main	compatibility	tests/build/test-incremental.sh	旧 NTCLKS_* 输入及旧 boot_splash.h depfile 增量迁移回归
 main	compatibility	tests/build/test-installer-stage.sh	针对 test-installer-stage 的旧配置/旧变量/头库/路径/目标输入与新 canonical 共存回归；旧临时前缀可独立规范化
@@ -314,7 +212,6 @@ main	compatibility	tests/fixtures/brand-abi/old-sdk/include/leonos/tar.h	old pub
 main	compatibility	tests/fixtures/brand-abi/old-shared-symbols.tsv	preserved old dynamic symbol table
 main	compatibility	tests/fixtures/brand-abi/old-soname.txt	preserved old SONAME
 main	compatibility	tests/fixtures/brand-abi/old_api.c	compiles a legacy SDK consumer
-main	compatibility	tests/host/test_motd.c	旧 ntclks/loadavg.h 转发头在 host 侧编译消费；余下是实际主仓 GitHub URL 的 MOTD 换行输入。
 main	compatibility	tests/integration/brand-abi.sh	compiles and checks both SDK ABIs
 main	compatibility	tests/integration/pam-product.sh	PAM 模块历史符号导出检查
 main	compatibility	tests/integration/test-apk-upgrade.sh	真实旧包数据库、world、签名和配置升级的回归输入
@@ -333,9 +230,7 @@ main	compatibility	tools/apk_distribution.py	旧签名密钥位置/输入兼容�
 main	compatibility	tools/build/apk-stage.sh	保留旧 license 元数据目录、签名公钥、protected_paths 文件与 updater 别名，并排除旧 ESP
 main	compatibility	tools/build/auth-upstream.sh	现有构建输出的 .leonos-auth-inputs/.leonos-auth.json 缓存格式，与 mk/third-party.mk 及恢复测试配对。
 main	compatibility	tools/build/efi-stage.sh	新旧 ESP 成套内核/display.conf 同步；PF2 文件名冻结
-main	external-url	tools/build/home-page.sh	Source 链接继续真实旧主仓 GitHub slug
 main	compatibility	tools/build/images.sh	PROFILE 字节值冻结；LEONOS_EXT2_TIME 为新变量之后回退的旧输入。
-main	compatibility	tools/build/installer-stage.sh	从同一 runtime 对象提供 usr/lib/leonos/libleonos.so.2，供已发布 ELF 依赖；规范 libreliefos 同时生成。
 main	compatibility	tools/build/iso.sh	canonical installer marker 之外同步旧 marker，兼容旧 GRUB/介质搜索。
 main	compatibility	tools/build/musl-sdk.sh	新旧 runtime/archive 作为不同输入装入同一 SDK，旧头转发
 main	compatibility	tools/build/musl-sysroot.sh	现有 sysroot .leonos-unpacked/.leonos-musl.json 持久缓存标记；mk/third-party.mk 显式依赖。
@@ -400,7 +295,7 @@ main	compatibility	tools/test_security_regressions.py	禁止新旧 ioctl 私有�
 main	compatibility	tools/test_service_marker.py	冻结 LeonOSFlags 进程状态字段/旧服务组身份；历史内核分离设计引用
 main	compatibility	tools/test_storage_payload.py	保留旧 GRUB 安装器命令入口，验证旧 /leonos 回滚载荷
 main	compatibility	tools/test_tcp_download_qemu.py	仅校验生成 ISO 中保留的 legacy /leonos/kernel.sys 副本哈希。
-main	compatibility	tools/test_uapi.py	验证旧 syscall 转发头仍存在以兼容旧源码
+main	compatibility	tools/test_uapi.py	校验保留的 userland/runtime/include/leonos/syscall.h 转发头（SDK 面）不含数字 syscall 宏
 main	compatibility	tools/test_uinxed_guest.py	计算实际打包的旧 ESP 回滚内核载荷哈希
 main	compatibility	tools/test_upstream_tools_runtime.py	旧环境变量输入兼容，禁止引入旧 libleonos SONAME 的依赖负向断言
 main	compatibility	tools/tests/abi_layout_golden.json	旧 UAPI sizeof/offsetof/常量布局 golden，值级对比基线不得随意改写
@@ -442,7 +337,6 @@ main	compatibility	userland/apps/hello/main.c	仅已发布 gettext domain leonos
 main	compatibility	userland/apps/helloworld/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/httpget/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/imageview/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/login/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/minesweeper/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/mp3play/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/netctl/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
@@ -461,7 +355,6 @@ main	compatibility	userland/apps/taskmgr/main.c	仅已发布 gettext domain leon
 main	compatibility	userland/apps/terminal/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/auth/account_store.c	账户提交 prepared/committed/cleanup 持久事务标记，旧安装中断后恢复需识别原值
 main	compatibility	userland/auth/standard_accounts.c	此文件全部旧名命中为已发布 ELF 导出符号 alias 与其说明，从同一实现提供新旧入口
-main	compatibility	userland/busybox/README.md	仅已发布 leonos-grub-installer 命令入口；现行文档说明独立脚本。
 main	compatibility	userland/busybox/block_storage.c	保留旧 BusyBox 端口 CONFIG_LEONOS_* 开关/旧 grub applet 入口及旧 ESP 回滚路径；当前诊断显示 ReliefOS
 main	compatibility	userland/busybox/leonos.config	保留既有 BusyBox profile 输入文件名；生产 upstream-busybox.sh 明确过滤 CONFIG_LEONOS_* 与 CONFIG_EXTRA_LDLIBS。
 main	compatibility	userland/busybox/leonos_shim.c	保留端口源文件名与已发布 leonos-grub-installer 命令分发入口
@@ -560,3 +453,6 @@ main	compatibility	userland/storage/leonos-kernel-update	旧命令源文件名�
 main	compatibility	userland/storage/leonos-rpr-apkcheck	旧命令源文件名为既有构建输入与兼容入口；当前帮助/私有 key 临时名已 canonical
 main	compatibility	userland/storage/leonos-rpr-ping	旧命令源文件名与外部服务冻结 leonos-rpr-ok 响应；当前帮助/临时名已 canonical
 main	history	docs/superpowers/task11-verification.md	任务 11 实际执行记录：旧快照 SHA、兼容 ABI/旧安装验证与未通过的外部旧 URL 证据，非现行品牌残留
+main	compatibility	tests/build/test-fetch-check.sh	旧 LEONOS_* 环境/命令行输入别名，与各 tests/build 契约同款回退；fetch-check 及内核 fetch-check 代理目标回归
+main	compatibility	userland/apps/installer/install_ops.h	旧 ESP 启动载荷路径 TARGET_ESP_KERNEL_LEGACY，旧载荷保留回滚契约
+main	compatibility	userland/apps/installer/install_ops.c	安装器升级时清理旧 ESP 遗留载荷文件与 /etc/leonos 等旧目录、libleonos.so.2 兼容库路径清单

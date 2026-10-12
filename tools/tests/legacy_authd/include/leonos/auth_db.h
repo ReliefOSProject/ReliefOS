@@ -3,8 +3,13 @@
 #endif
 #ifndef LEONOS_UAPI_AUTH_DB_H
 #define LEONOS_UAPI_AUTH_DB_H
-#include <leonos/auth_user.h>
+#include <reliefos/auth_user.h>
 #include <leonos/layout.h>
+
+/* Historical regression fixture only: the pre-rename type spellings alias
+ * the canonical UAPI structs so the fixture and its tests share one type. */
+#define leonos_user_info reliefos_user_info
+#define leonos_auth_record reliefos_auth_record
 
 #define LEONOS_AUTH_DB_PATH LEONOS_PATH_USERS_DB
 #define LEONOS_AUTH_DB_MAGIC 0x41555332U
