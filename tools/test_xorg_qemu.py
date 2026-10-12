@@ -24,7 +24,8 @@ def source_check():
         "docs/XORG.md": ["IceWM", "make fetch", "Dillo", "QEMU"],
         "docs/APK_PREPARATION.md": ["feature=xorg", "xdm", "v3.24"],
         "system/xorg/xdm-Xservers": ["/usr/lib/reliefos/xorg-tty-wrapper", "vt1", "-keeptty"],
-        "system/xorg/xdm-session": ["/usr/bin/icewm", "/usr/bin/xterm"],
+        "system/xorg/xdm-session": ["/usr/bin/icewm", "/usr/bin/xterm",
+                                    "xdg-user-dirs-update"],
         "system/xorg/icewm/menu": ["fileman", "calc", "dillo", "nedit"],
         "system/xorg/icewm/theme": ["Theme="],
     }
@@ -52,6 +53,13 @@ def source_check():
             errors.append("alpine-twm must stay out of the fetch lock")
         if "coreutils" not in ids:
             errors.append("configs/dependencies.lock.json: missing coreutils package lock for dd")
+        # gdk-pixbuf 2.44 keeps only the legacy XPM module; every other image
+        # format is decoded by the glycin loaders, so GTK icon and theme
+        # pixbufs need both loaders in the fetch lock.  xdg-user-dirs supplies
+        # the user directories that GTK file libraries expect at session start.
+        for gid in ("alpine-glycin-image-rs", "alpine-glycin-svg", "alpine-xdg-user-dirs"):
+            if gid not in ids:
+                errors.append(f"configs/dependencies.lock.json: missing {gid}")
     session_path = ROOT / "system/xorg/xdm-session"
     if session_path.is_file() and "/var/log/" in session_path.read_text():
         errors.append("xdm-session must not write root-only logs")

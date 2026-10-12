@@ -88,6 +88,13 @@ if test -x /usr/bin/xwallpaper; then
     /usr/bin/xwallpaper --focus /etc/reliefos/wallpaper.png 2>/dev/null || :
 fi
 
+# Create the freedesktop.org XDG user directories before any session client
+# starts.  This is the same hook Xsession/xinitrc startup runs on other
+# distributions; GTK file libraries expect e.g. $HOME/Templates to exist.
+if test -x /usr/bin/xdg-user-dirs-update; then
+    /usr/bin/xdg-user-dirs-update || :
+fi
+
 # ICEWM_PRIVCFG is the first directory IceWM searches for its configuration, so
 # the session always gets the shipped theme, menu, toolbar and key bindings
 # instead of a user or upstream default.

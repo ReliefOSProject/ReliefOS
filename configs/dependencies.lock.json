@@ -340,6 +340,32 @@
       "license_in_source": ".PKGINFO"
     },
     {
+      "id": "alpine-adwaita-icon-theme",
+      "kind": "apk",
+      "version": "50.0-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/adwaita-icon-theme-50.0-r1.apk",
+      "sha256": "cdda5d059fdf6adae4d7e8fdc863ddf082eeb3a665a1ace3dc3740fe6f607f1e",
+      "directory": "adwaita-icon-theme-50.0-r1",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Alpine v3.24 community x86_64 APKINDEX license = LGPL-3.0-or-later OR CC-BY-SA-3.0; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-adwaita-xfce-icon-theme",
+      "kind": "apk",
+      "version": "0.0.4-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/adwaita-xfce-icon-theme-0.0.4-r0.apk",
+      "sha256": "6a89fa51571d7bcea4722459df201d68197d29130ba0145252c23b1e70d84d28",
+      "directory": "adwaita-xfce-icon-theme-0.0.4-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Alpine v3.24 community x86_64 APKINDEX license = GPL-2.0-only; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
       "id": "alpine-at-spi2-core-libs",
       "kind": "apk",
       "version": "2.60.5-r0",
@@ -649,6 +675,32 @@
       "license_in_source": ".PKGINFO"
     },
     {
+      "id": "alpine-glycin-image-rs",
+      "kind": "apk",
+      "version": "2.1.5-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/glycin-image-rs-2.1.5-r0.apk",
+      "sha256": "9c9d639e1484e244316acfd8b9815ec90773f695b90f99451e914c66ddaf4726",
+      "directory": "glycin-image-rs-2.1.5-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Alpine v3.24 community x86_64 APKINDEX license = MPL-2.0 OR LGPL-2.0-or-later; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-glycin-svg",
+      "kind": "apk",
+      "version": "2.1.5-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/glycin-svg-2.1.5-r0.apk",
+      "sha256": "59cf8cb8816249019f9498ef3acf20073f5443d2e89d4d3baf7878c0a454137a",
+      "directory": "glycin-svg-2.1.5-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Alpine v3.24 community x86_64 APKINDEX license = MPL-2.0 OR LGPL-2.0-or-later; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
       "id": "alpine-gmp",
       "kind": "apk",
       "version": "6.3.0-r4",
@@ -724,6 +776,19 @@
       "target": "apk-root",
       "feature": "xorg",
       "note": "Alpine v3.24 main x86_64 APKINDEX license = MIT; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-hicolor-icon-theme",
+      "kind": "apk",
+      "version": "0.18-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/hicolor-icon-theme-0.18-r0.apk",
+      "sha256": "e05ffcf07a87bd283390cf5d91967d1ffeca84140ac70f4da2734a8c45a58d46",
+      "directory": "hicolor-icon-theme-0.18-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Alpine v3.24 main x86_64 APKINDEX license = GPL-2.0-or-later; embedded APK signature is verified by apk-tools",
       "license_in_source": ".PKGINFO"
     },
     {
@@ -2054,6 +2119,19 @@
       "target": "apk-root",
       "feature": "xorg",
       "note": "Alpine v3.24 community x86_64 APKINDEX license = MIT; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-xdg-user-dirs",
+      "kind": "apk",
+      "version": "0.20-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/xdg-user-dirs-0.20-r0.apk",
+      "sha256": "88dc8038fbf8b8d02d25ce75e77d152cda6d74a85e1d596f8a57c988ab72613e",
+      "directory": "xdg-user-dirs-0.20-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Alpine v3.24 community x86_64 APKINDEX license = MIT AND GPL-2.0-only; embedded APK signature is verified by apk-tools",
       "license_in_source": ".PKGINFO"
     },
     {

@@ -329,7 +329,7 @@ def frame_distance(first, second):
                for y in range(90) for x in range(160)) / (160 * 90 * 255)
 
 
-def collect(probe, serial, process, tag, path=None, command=None):
+def collect(probe, serial, process, tag, path=None, command=None, timeout=20):
     """Run a guest command and read its output between serial markers."""
     if (path is None) == (command is None):
         raise ValueError("exactly one of path or command is required")
@@ -346,7 +346,7 @@ def collect(probe, serial, process, tag, path=None, command=None):
     # are stable on the guest's busybox shell.
     probe.text(f"echo '{begin}' >/dev/ttyS0; {body} >/dev/ttyS0; echo '{end}' >/dev/ttyS0")
     probe.key("ret")
-    wait_serial_after(serial, end, process, 0, timeout=20)
+    wait_serial_after(serial, end, process, 0, timeout=timeout)
     text = serial.read_text(errors="replace")
     start = text.rfind(begin)
     finish = text.find(end, start + len(begin))
