@@ -29,8 +29,10 @@ RELIEFNT_DIR ?= $(if $(strip $(NTCLKS_DIR)),$(NTCLKS_DIR),$(RELIEFOS_SRC)/kernel
 # may carry no root Makefile (history extract), and release flows must reach
 # the release guard to name both SHAs instead of tripping this parse error.
 # Goals that must keep working before any submodule exists are exempt, so a
-# fresh machine can still run `make doctor` / `make fetch` to set up.
-reliefnt_init_exempt_goals := help doctor fetch reliefnt-fetch ntclks-fetch
+# fresh machine can still run `make doctor` / `make fetch` / `make fetch-check`
+# to set up.
+reliefnt_init_exempt_goals := help doctor fetch fetch-check \
+	reliefnt-fetch ntclks-fetch reliefnt-fetch-check ntclks-fetch-check
 reliefnt_init_exempt :=
 ifeq ($(MAKECMDGOALS),)
 reliefnt_init_exempt := 1
@@ -160,6 +162,27 @@ reliefnt-fetch:
 	    exit 0; \
 	fi; \
 	exec $(MAKE) -C '$(RELIEFNT_DIR)' fetch
+
+# --- fetch-check delegation -------------------------------------------------
+# `make fetch-check` also probes the kernel checkout's locked URLs.  Probes
+# download nothing, so asking on every check is cheap.  The skip behavior
+# mirrors reliefnt-fetch: a missing checkout warns instead of failing, and
+# RELIEFNT_DIR pointing back at this repository would recurse into
+# `make -C . fetch-check`; skip instead.
+.PHONY: reliefnt-fetch-check ntclks-fetch-check
+ntclks-fetch-check: reliefnt-fetch-check
+reliefnt-fetch-check:
+	+$(Q)case "$${MAKEFLAGS%% *}" in *n*) exit 0 ;; esac; \
+	if [ '$(realpath $(RELIEFNT_DIR))' = '$(realpath $(RELIEFOS_SRC))' ]; then \
+	    echo 'reliefnt adapter: RELIEFNT_DIR is this repository; skipping the kernel fetch-check' >&2; \
+	    exit 0; \
+	fi; \
+	if [ ! -f '$(RELIEFNT_DIR)/Makefile' ] && [ ! -e '$(RELIEFNT_DIR)/.git' ]; then \
+	    echo 'reliefnt adapter: kernel checkout not found: $(RELIEFNT_DIR)/Makefile; skipping the kernel fetch-check' >&2; \
+	    echo 'Initialize it with `git submodule update --init --recursive`, or point RELIEFNT_DIR at an existing checkout' >&2; \
+	    exit 0; \
+	fi; \
+	exec $(MAKE) -C '$(RELIEFNT_DIR)' fetch-check
 
 # --- the parent-owned version header -----------------------------------------
 # build_info.h is not a kernel product: the parent generates it for its own

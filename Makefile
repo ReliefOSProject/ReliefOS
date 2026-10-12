@@ -193,7 +193,7 @@ include $(RELIEFOS_SRC)/mk/tests.mk
 # Source inventories are inputs, never implicit host executable targets.
 .SUFFIXES:
 
-.PHONY: help doctor fetch defconfig olddefconfig menuconfig tools headers_install \
+.PHONY: help doctor fetch fetch-check defconfig olddefconfig menuconfig tools headers_install \
 	kernel userland runtime sdk rootfs apk-repo image-vmdk iso installer all \
 	pages site download-page \
 	run run-iso run-installer test test-tools test-build test-long test-smoke \

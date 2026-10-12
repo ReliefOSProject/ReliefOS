@@ -27,6 +27,16 @@ fetch: reliefos-check-lock reliefnt-fetch | $(RELIEFOS_CACHE)
 	$(Q)sh $(RELIEFOS_FETCH_SCRIPT) --deps $(RELIEFOS_DEPS_TOOL) --lock $(RELIEFOS_LOCK) \
 		--cache $(RELIEFOS_CACHE)
 
+# URL liveness for everything `make fetch` would download: a 404 or a vanished
+# mirror is named here before a build ever has to refuse for missing cache
+# bytes.  The kernel checkout's locked URLs are probed the same way (see
+# reliefnt-fetch-check in mk/kernel.mk).  Probes only: nothing is downloaded.
+.PHONY: fetch-check
+fetch-check: reliefos-check-lock reliefnt-fetch-check
+	$(call RELIEFOS_LOG,FETCH-CHECK,$(RELIEFOS_LOCK))
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/fetch-check.sh --deps $(RELIEFOS_DEPS_TOOL) \
+		--lock $(RELIEFOS_LOCK)
+
 # Used by the build itself: a dependency that was never fetched stops the build
 # with the id and the command that fixes it, instead of silently going online
 # (plan section 9).
