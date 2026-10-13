@@ -28,7 +28,11 @@ following Alpine's trigger model: binutils may own these paths, and removing it
 restores only missing links. The BusyBox executable remains package-owned.
 The package advertises its actual `/bin/sh` provider so shell script
 dependencies do not pull in a conflicting second BusyBox. `/bin/bash` is
-reserved for upstream GNU Bash; the former ash alias is no longer shipped.
+provided by the pinned official Alpine GNU Bash package and is the default
+login shell. `make fetch` includes Bash, Readline, programmable completion and
+Bash documentation. The former ash alias is no longer shipped. The base package
+depends on Bash and its configuration packages so offline upgrades also install
+them. Login and interactive settings are described in `userland/busybox/README.md`.
 Upstream BusyBox `add-shell` and `remove-shell` register shell packages in
 `/etc/shells` during their original installation/removal scripts.
 This coarse package split can be refined in a future signed package migration.

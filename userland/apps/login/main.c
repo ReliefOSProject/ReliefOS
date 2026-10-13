@@ -1,6 +1,7 @@
 #include <reliefos/pam_session.h>
 #include <reliefos/stdio.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -34,7 +35,11 @@ static int installer_shell_main(void)
         return 1;
     }
     if (take_console_terminal() < 0) return 1;
-    execl("/bin/sh", "sh", "-l", (char *)0);
+    if (setenv("SHELL", "/bin/bash", 1) < 0) {
+        perror("Set installer shell");
+        return 1;
+    }
+    execl("/bin/bash", "bash", "-l", (char *)0);
     perror("Start installer shell");
     return 1;
 }

@@ -2,6 +2,58 @@
   "schema_version": 1,
   "dependencies": [
     {
+      "id": "alpine-bash",
+      "kind": "apk",
+      "version": "5.3.9-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/bash-5.3.9-r1.apk",
+      "sha256": "4ad962f26fb3c68365171233fe61e3c51bbee1cab35e8dc661198233daeab0dd",
+      "directory": "bash-5.3.9-r1",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "base",
+      "note": "Official Alpine v3.24 main package; recipe commit 1522c3193610902d8493f9790a2755c11f21f26d; GPL-3.0-or-later; default login shell with upstream startup files and APK shell-registration scripts",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-bash-completion",
+      "kind": "apk",
+      "version": "2.17.0-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/bash-completion-2.17.0-r1.apk",
+      "sha256": "9db205ae09360013128162b0f94cf121c24a8887c46330e0422fc31b8c854d6c",
+      "directory": "bash-completion-2.17.0-r1",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "base",
+      "note": "Official Alpine v3.24 main package; recipe commit 5fc8418c6904b56de1ce06118049cfa7f000281e; GPL-2.0-or-later; programmable completion loaded by the upstream Bash configuration",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-bash-doc",
+      "kind": "apk",
+      "version": "5.3.9-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/bash-doc-5.3.9-r1.apk",
+      "sha256": "519c0a4d7b13e044862bfab9a5cdb8ebf634d6d59483b3af40c09779a3771bb9",
+      "directory": "bash-doc-5.3.9-r1",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "base",
+      "note": "Official Alpine v3.24 main package; recipe commit 1522c3193610902d8493f9790a2755c11f21f26d; GPL-3.0-or-later; Bash manuals and examples",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-readline",
+      "kind": "apk",
+      "version": "8.3.3-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/readline-8.3.3-r1.apk",
+      "sha256": "766911ecb986a6c5cf0841a6b556cd1e9dbbf22b3559726de32416486cd15c81",
+      "directory": "readline-8.3.3-r1",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "base",
+      "note": "Official Alpine v3.24 main package; recipe commit a854c03acdac188901fb012f7acbee70a36e8041; GPL-3.0-or-later; Bash line editing and libreadline.so.8, using the pinned libncursesw provider",
+      "license_in_source": ".PKGINFO"
+    },
+    {
       "id": "alpine-giflib",
       "kind": "apk",
       "version": "5.2.2-r2",

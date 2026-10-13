@@ -18,7 +18,7 @@ def packages(apk):
         filename = f"{entry['name']}-{entry['version']}.apk"
         archive = cache / filename
         if not archive.is_file() or digest(archive) != entry['sha256']:
-            download_verified((manifest['repository'] + '/' + filename,), archive, entry['sha256'])
+            download_verified((entry.get('url', manifest['repository'] + '/' + filename),), archive, entry['sha256'])
         run([apk, '--keys-dir', ROOT / 'system/rootfs/etc/apk/keys', 'verify', archive])
         with tarfile.open(archive, 'r:gz', ignore_zeros=True) as packed:
             info = packed.extractfile('.PKGINFO').read().decode()

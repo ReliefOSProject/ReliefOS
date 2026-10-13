@@ -139,11 +139,13 @@ for applet in ar strings; do
     fi
 done
 # Only retire the BusyBox alias, never a real Bash executable or another link.
-if [ -L "$tree/bin/bash" ]; then
-    case $(readlink "$tree/bin/bash") in
-        busybox|./busybox|/bin/busybox|../bin/busybox) rm "$tree/bin/bash" ;;
-    esac
-fi
+for path in bin/bash sbin/bash usr/bin/bash usr/sbin/bash; do
+    if [ -L "$tree/$path" ]; then
+        case $(readlink "$tree/$path") in
+            busybox|./busybox|/bin/busybox|../bin/busybox|../../bin/busybox) rm "$tree/$path" ;;
+        esac
+    fi
+done
 
 # Preserve the exact dependency lock alongside the installed tools. The binary
 # digest records the actual verified bootstrap executable, not a second pin.
@@ -304,6 +306,7 @@ while IFS= read -r group; do
         provides="$provides /bin/sh ifupdown-any"
     fi
     case $package in
+        reliefos-base) dependencies="$dependencies bash bash-completion bash-doc" ;;
         reliefos-musl-dev) dependencies="$dependencies reliefos-musl=$version"; provides="$provides musl-dev=$version libc-dev=$version" ;;
         reliefos-apk-tools) dependencies="$dependencies reliefos-busybox" ;;
         reliefos-trust) dependencies="$dependencies ca-certificates-bundle" ;;

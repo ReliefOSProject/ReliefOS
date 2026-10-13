@@ -108,7 +108,7 @@ int reliefos_account_seed(const char *target, const char *name,
     int fd = -1, result = -1;
     if (!hash || !root_hash) goto out;
     if (asprintf(&directory, "%s/etc", target) < 0 ||
-        asprintf(&contents[0], "root:x:0:0:root:/root:/bin/sh\nnobody:x:65534:65534:nobody:/:/sbin/nologin\n%s:x:1000:1000::/home/%s:/bin/sh\n", name, name) < 0 ||
+        asprintf(&contents[0], "root:x:0:0:root:/root:/bin/bash\nnobody:x:65534:65534:nobody:/:/sbin/nologin\n%s:x:1000:1000::/home/%s:/bin/bash\n", name, name) < 0 ||
         asprintf(&contents[1], "root:%s:%ld:0:99999:7:::\nnobody:!:::::::\n%s:%s:%ld:0:99999:7:::\n", root_hash, (long)(time(NULL) / 86400), name, hash, (long)(time(NULL) / 86400)) < 0 ||
         asprintf(&contents[2], "root:x:0:\nwheel:x:10:%s\nnobody:x:65534:\n%s:x:1000:\n", name, name) < 0 ||
         asprintf(&contents[3], "root:!::\nwheel:!::%s\nnobody:!::\n%s:!::\n", name, name) < 0) goto out;

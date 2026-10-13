@@ -314,9 +314,12 @@ def build_distribution(source, output, work, apk, key):
                 link.unlink()
         # Retire the old ash-as-bash alias when repackaging an existing root.
         # GNU Bash from Alpine must own /bin/bash, including its script semantics.
-        bash = tree / "bin/bash"
-        if bash.is_symlink() and bash.resolve() == (tree / "bin/busybox").resolve():
-            bash.unlink()
+        for relative in ("bin/bash", "sbin/bash", "usr/bin/bash", "usr/sbin/bash"):
+            bash = tree / relative
+            if bash.is_symlink() and os.readlink(bash) in {
+                "busybox", "./busybox", "/bin/busybox", "../bin/busybox", "../../bin/busybox"
+            }:
+                bash.unlink()
         notices = tree / "usr/share/licenses/apk-tools"
         notices.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(apk.parent / "LICENSE", notices / "LICENSE")
@@ -418,6 +421,7 @@ def build_distribution(source, output, work, apk, key):
             raise ValueError("BusyBox is missing required init/network applets")
         provides["reliefos-busybox"].add("ifupdown-any")
         dependencies = defaultdict(set)
+        dependencies["reliefos-base"].update(("bash", "bash-completion", "bash-doc"))
         dependencies["reliefos-apk-tools"].add("reliefos-busybox")
         if "ca-certificates-bundle" in groups:
             dependencies["reliefos-trust"].add("ca-certificates-bundle")
@@ -528,6 +532,8 @@ def repackage_tree(stage, work):
 
     def fingerprint(root):
         digestor = hashlib.sha256()
+        digestor.update(Path(__file__).read_bytes())
+        digestor.update((ROOT / "configs/openrc-packages.json").read_bytes())
         for path in sorted(root.rglob("*")):
             relative = path.relative_to(root).as_posix().encode()
             digestor.update(relative + b"\0")

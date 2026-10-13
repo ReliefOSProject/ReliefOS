@@ -75,6 +75,52 @@ out:;
     return result;
 }
 
+static int prepare_shell_config(const char *target, const struct reliefos_user_info *user,
+                                const char *name)
+{
+    char path[512], buffer[4096];
+    int length = snprintf(path, sizeof(path), "%s/etc/skel/%s", target, name);
+    if (length < 0 || (size_t)length >= sizeof(path)) { errno = ENAMETOOLONG; return -1; }
+    int source = open(path, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
+    if (source < 0) return -1;
+    int home = -1, output = -1, result = -1, created = 0;
+    struct stat info;
+    if (fstat(source, &info) < 0) goto out;
+    if (!S_ISREG(info.st_mode)) { errno = EINVAL; goto out; }
+    length = snprintf(path, sizeof(path), "%s%s", target, user->home);
+    if (length < 0 || (size_t)length >= sizeof(path)) { errno = ENAMETOOLONG; goto out; }
+    home = open(path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+    if (home < 0) goto out;
+    output = openat(home, name, O_WRONLY | O_CREAT | O_EXCL | O_CLOEXEC, 0600);
+    if (output < 0) {
+        if (errno == EEXIST) result = 0;
+        goto out;
+    }
+    created = 1;
+    for (;;) {
+        ssize_t count = read(source, buffer, sizeof(buffer));
+        if (count < 0 && errno == EINTR) continue;
+        if (count < 0) goto out;
+        if (!count) break;
+        for (ssize_t offset = 0; offset < count;) {
+            ssize_t written = write(output, buffer + offset, (size_t)(count - offset));
+            if (written < 0 && errno == EINTR) continue;
+            if (written <= 0) { if (!written) errno = EIO; goto out; }
+            offset += written;
+        }
+    }
+    if (fchown(output, user->uid, user->uid) < 0 || fsync(output) < 0) goto out;
+    result = 0;
+out:;
+    int error = errno;
+    if (output >= 0 && close(output) < 0 && !result) { result = -1; error = errno; }
+    if (created && result < 0) unlinkat(home, name, 0);
+    if (home >= 0) close(home);
+    close(source);
+    errno = error;
+    return result;
+}
+
 static int prepare_home(const char *target, const struct reliefos_user_info *user)
 {
     const char *const directories[] = {"", "/desktop", "/documents", "/downloads"};
@@ -97,6 +143,9 @@ static int prepare_home(const char *target, const struct reliefos_user_info *use
         if (reliefos_launch_create_shortcut_in_dir(desktop, executable, path, sizeof(path)) < 0 ||
             chown(path, user->uid, user->uid) < 0 || chmod(path, 0600) < 0) return -1;
     }
+    const char *const shell_configs[] = {".bash_profile", ".bashrc", ".inputrc"};
+    for (unsigned index = 0; index < sizeof(shell_configs) / sizeof(shell_configs[0]); ++index)
+        if (prepare_shell_config(target, user, shell_configs[index]) < 0) return -1;
     return prepare_hyfetch_config(target, user);
 }
 

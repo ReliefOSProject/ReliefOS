@@ -105,7 +105,7 @@ start_child icewm /usr/bin/icewm || exit 1
 icewm_pid=$child_pid
 event "icewm started for uid=$uid"
 
-start_child xterm /usr/bin/xterm -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' || exit 1
+start_child xterm /usr/bin/xterm -ls -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' || exit 1
 xterm_pid=$child_pid
 event 'xterm started'
 

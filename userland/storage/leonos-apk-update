@@ -102,7 +102,7 @@ broken_packages() {
 preflight_repository=$temporary/preflight
 /bin/busybox mkdir "$preflight_repository"
 status=0
-apk --root "$target" --repositories-file "$configuration" --no-network fetch \
+apk --root "$target" --repositories-file "$configuration" --no-network fetch --recursive \
     --output "$preflight_repository" 'reliefos-*' > "$temporary/preflight.log" 2>&1 || status=$?
 /bin/busybox cat "$temporary/preflight.log"
 if [ "$status" -ne 0 ]; then
@@ -150,6 +150,7 @@ if [ "$status" -ne 0 ]; then
     fi
 fi
 restore_world=0
+/bin/busybox chroot "$target" /bin/sh /usr/lib/reliefos/migrate-shell
 # Publish the offline repository only after the package transaction succeeded.
 destination=$target/usr/share/reliefos/apk/repository
 /bin/busybox mkdir -p "$destination"

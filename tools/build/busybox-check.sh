@@ -11,7 +11,7 @@ END {exit bad}' "$links"
 for name in find xargs dd mount umount fdisk sfdisk blkid lsblk fsck runuser \
     su login passwd sulogin chpasswd adduser addgroup deluser delgroup \
     cryptpw mkpasswd chattr lsattr tune2fs mke2fs mkfs.ext2 mkdosfs mkfs.vfat nologin \
-    clear reset resize less wget xxd start-stop-daemon; do
+    clear reset resize less wget xxd start-stop-daemon bash; do
     # The applet must not even be compiled in: a suppressed link still leaves
     # `busybox NAME` callable. Alias names like mkfs.ext2 are covered through
     # their primary symbol (MKE2FS).
@@ -27,7 +27,7 @@ for name in find xargs dd mount umount fdisk sfdisk blkid lsblk fsck runuser \
 done
 for name in sh ash false ping ping6 df free top dmesg hexdump killall nc netstat \
     traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod \
-    unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch; do
+    unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch chroot setuidgid; do
     awk -F / -v name="$name" '$NF==name {found=1} END {exit !found}' "$links" || {
         echo "BusyBox applet is missing: $name" >&2
         exit 1
@@ -36,7 +36,7 @@ done
 for path in /bin/sh /bin/ash /bin/false; do
     grep -Fqx "$path" "$links" || { echo "BusyBox shell link is missing: $path" >&2; exit 1; }
 done
-if grep -Eq '^CONFIG_(HUSH|ASH_JOB_CONTROL|HUSH_JOB|SSL_CLIENT|TLS|FEATURE_WGET_HTTPS|FEATURE_SH_STANDALONE|FEATURE_SH_NOFORK|FEATURE_PREFER_APPLETS)=y$' "$config"; then
+if grep -Eq '^CONFIG_(BASH_IS_ASH|BASH_IS_HUSH|HUSH|ASH_JOB_CONTROL|HUSH_JOB|SSL_CLIENT|TLS|FEATURE_WGET_HTTPS|FEATURE_SH_STANDALONE|FEATURE_SH_NOFORK|FEATURE_PREFER_APPLETS)=y$' "$config"; then
     echo 'BusyBox enabled an incompatible shell or TLS feature' >&2
     exit 1
 fi

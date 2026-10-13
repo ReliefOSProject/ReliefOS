@@ -40,6 +40,8 @@ excluded from this profile:
 - The official Alpine packages supply `less` and `xxd`. GNU `wget` is supplied
   with the Xorg backend; the BusyBox wget/TLS implementations remain disabled.
 - OpenRC supplies `start-stop-daemon`.
+- Official Alpine GNU Bash supplies `bash`; BusyBox never owns a `bash` link
+  or applet. The resolved profile rejects both ash-as-bash and hush-as-bash.
 
 BusyBox supplies `/bin/ping` and `/bin/ping6` as command-line applets using
 ICMP sockets. Raw sockets require the kernel's applicable permissions; no
@@ -55,7 +57,26 @@ package trigger adds their links only when no existing provider is present.
 
 ## Shell and compatibility limits
 
-`/bin/sh` remains BusyBox `ash`, using the upstream MMU
+The default login and interactive shell is GNU Bash from the official Alpine
+v3.24 APK repository. `make fetch` downloads the pinned `bash`, `readline`,
+`bash-completion` and `bash-doc` archives; APK staging verifies their upstream
+signatures and installs their real package records and dependencies.
+Root, installer-created accounts, `useradd` and desktop terminals use Bash.
+
+Alpine owns `/etc/bash/bashrc`, `/etc/profile.d/00-bashrc.sh`, `/etc/inputrc`
+and the completion scripts. ReliefOS adds `/etc/bash/reliefos.sh` for the
+interactive prompt and history settings. User configuration lives in
+`~/.bash_profile`, `~/.bashrc` and `~/.inputrc`; the skeleton and installer
+populate these files for new accounts. The login profile also reads an existing
+`~/.profile`. Existing user files remain intact during upgrades.
+
+The one-time `migrate-shell` step changes the previous `/bin/sh` or `/bin/ash`
+login defaults to Bash, updates `useradd` defaults and fills missing user
+configuration. It runs after offline package updates and during runtime
+initialization, preserves custom shells and configuration, and records completion
+in `/var/lib/reliefos/bash-default-v1`.
+
+`/bin/sh` remains BusyBox `ash` for system scripts, using the upstream MMU
 `fork`/`pipe`/`dup2`/`execvp`/`waitpid` path. Hush and Bash aliases are disabled.
 Shell command lookup follows `PATH`; standalone applet execution and applet
 preference are disabled so external tools retain their command ownership.
