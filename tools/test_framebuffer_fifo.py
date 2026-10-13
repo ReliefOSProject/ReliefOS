@@ -10,7 +10,7 @@ with tempfile.TemporaryDirectory(prefix="reliefos-framebuffer-fifo-") as directo
     subprocess.run([
         "cc", "-std=c11", "-Wall", "-Wextra", "-Werror",
         "-Ikernel/reliefnt/kernel/reliefnt/include",
-        "-Ikernel/reliefnt/drivers/bootstrap",
+        "-Ikernel/reliefnt/drivers/video/framebuffer",
         "tools/tests/framebuffer_fifo_test.c", "-o", str(binary),
     ], cwd=ROOT, check=True)
     subprocess.run([str(binary)], check=True)
