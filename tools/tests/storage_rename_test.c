@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_internal.h"
 
 static FILE *disk;
 static struct task *writer;
@@ -93,7 +93,7 @@ int storage_ext4_device_flush(const struct storage_volume *v) { (void)v; return 
 #include "../../kernel/reliefnt/fs/storage_ext4_journal.c"
 #include "../../kernel/reliefnt/fs/storage_ext4_dir.c"
 #include "../../kernel/reliefnt/fs/storage_ext4_mount.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_inode.c"
+#include "../../kernel/reliefnt/fs/storage_inode.c"
 #include "../../kernel/reliefnt/fs/storage_ext4_vfs.c"
 #include "../../kernel/reliefnt/fs/storage_ext2.c"
 

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_internal.h"
 static unsigned commands, last_command, transport_calls;
 static int transport_result;
 static unsigned char port_status = 0x40;
@@ -20,7 +20,7 @@ void kernel_execution_lock_irqsave(uint64_t *flags) { *flags = 0; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { (void)flags; }
 void kernel_spin_lock(struct kernel_spinlock *lock) { (void)lock; }
 void kernel_spin_unlock(struct kernel_spinlock *lock) { (void)lock; }
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_sync.c"
+#include "../../kernel/reliefnt/block/storage_sync.c"
 int storage_ext4_journal_commit(struct storage_volume *v, bool wait)
 { (void)wait; assert(!v->ext4.journal); return 0; }
 int storage_ext4_journal_checkpoint(struct storage_volume *v)

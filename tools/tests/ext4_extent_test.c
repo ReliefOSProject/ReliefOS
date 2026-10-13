@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_internal.h"
 
 static uint8_t *disk;
 static uint64_t disk_len, reads, writes;

@@ -44,7 +44,7 @@
  *     -DRELIEFOS_STORAGE_STANDALONE_TU \
  *     -Ikernel/reliefnt/include -Iinclude \
  *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/kernel/reliefnt/include \
- *     -include kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h \
+ *     -include kernel/reliefnt/block/storage_internal.h \
  *     tools/tests/ext4_alloc_test.c \
  *     kernel/reliefnt/fs/storage_ext4_format.c \
  *     kernel/reliefnt/fs/storage_ext4_checksum.c \
@@ -76,7 +76,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_internal.h"
 
 /* ---- kernel fakes and fake disk layer --------------------------------- */
 static uint8_t *disk_bytes;

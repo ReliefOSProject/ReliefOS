@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_internal.h"
 
 static FILE *disk;
 static unsigned locked;
@@ -72,8 +72,8 @@ uint32_t ext4_get_le32(const uint8_t *p)
 { return p[0]|((uint32_t)p[1]<<8)|((uint32_t)p[2]<<16)|((uint32_t)p[3]<<24); }
 const struct storage_ext4_operations storage_ext4_ops={0};
 
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_permissions.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_statfs.c"
+#include "../../kernel/reliefnt/fs/storage_permissions.c"
+#include "../../kernel/reliefnt/fs/storage_statfs.c"
 
 int main(int argc, char **argv)
 {

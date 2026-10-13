@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_internal.h"
 
 /* ext4_super_block offsets (linux/fs/ext4/ext4.h:1369). */
 #define SB_INODES_COUNT 0x00

@@ -42,7 +42,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_internal.h"
 
 /* ---- kernel fakes ---------------------------------------------------- */
 static uint8_t *disk_bytes;
@@ -187,8 +187,8 @@ static void storage_scan_nvme_controller(uint8_t bus, uint8_t slot, uint8_t func
 #include "../../kernel/reliefnt/fs/storage_ext4_xattr.c"
 #include "../../kernel/reliefnt/fs/storage_ext4_journal.c"
 #include "../../kernel/reliefnt/fs/storage_ext4_mount.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_mount.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_sync.c"
+#include "../../kernel/reliefnt/fs/storage_mount.c"
+#include "../../kernel/reliefnt/block/storage_sync.c"
 
 /* ---- fixture helpers -------------------------------------------------- */
 static void load_disk(const char *image, uint64_t part_offset_sectors,

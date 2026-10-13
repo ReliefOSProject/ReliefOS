@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_internal.h"
 
 #define EXT4_BLOCK_CACHE_ENTRIES 2u
 #include "../../kernel/reliefnt/fs/storage_ext4_cache.c"

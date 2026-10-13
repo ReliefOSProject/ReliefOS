@@ -5,7 +5,7 @@
 #include "audio_fake_card.h"
 #include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
 #include "../../kernel/reliefnt/kernel/reliefnt/audio/device.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_audio.c"
+#include "../../kernel/reliefnt/kernel/reliefnt/audio/storage_audio.c"
 
 static int sparse_caps(void *opaque, uint32_t device, enum audio_direction direction,
                        struct audio_caps *caps)

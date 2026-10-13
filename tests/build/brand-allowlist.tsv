@@ -1,8 +1,8 @@
 # ReliefOS/ReliefNT task 11 reviewed old-name allowlist.
 # scope<TAB>category<TAB>path<TAB>reason; exact tracked path, no blanket migration exemptions.
 # Rules: docs/branding-compatibility.md section 3.
-kernel	compatibility	drivers/bootstrap/storage/storage_block.c	识别已有磁盘 GPT 名 LEONOS4_ROOT
-kernel	compatibility	drivers/bootstrap/storage/storage_mount.c	旧 leonos-installer-root 引导 module tag 双接受
+kernel	compatibility	block/storage_block.c	识别已有磁盘 GPT 名 LEONOS4_ROOT
+kernel	compatibility	fs/storage_mount.c	旧 leonos-installer-root 引导 module tag 双接受
 kernel	compatibility	fs/procfs.c	冻结 LeonOSRole/LeonOSFlags 与 /proc/leonos-drivers 接口值
 kernel	compatibility	fs/sysfs.c	冻结 /sys/devices/platform/leonos-block 运行时设备路径
 kernel	compatibility	include/reliefos/elf_abi.h	published ELF note and runtime SONAME values

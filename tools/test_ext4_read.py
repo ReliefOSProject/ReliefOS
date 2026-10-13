@@ -8,7 +8,7 @@ import subprocess
 import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-STORAGE = ROOT / "kernel/reliefnt/drivers/bootstrap/storage"
+STORAGE = ROOT / "kernel/reliefnt/block"
 FS = ROOT / "kernel/reliefnt/fs"
 
 

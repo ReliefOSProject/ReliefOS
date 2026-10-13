@@ -24,7 +24,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix="reliefos-jbd2-") as directory:
         work = Path(directory)
         binary = work / "journal-test"
-        storage = ROOT / "kernel/reliefnt/drivers/bootstrap/storage"
+        storage = ROOT / "kernel/reliefnt/block"
         fs = ROOT / "kernel/reliefnt/fs"
         run(["cc", "-std=c11", "-O1", "-g", "-D_GNU_SOURCE",
              "-fsanitize=address,undefined", "-fno-sanitize-recover=all",

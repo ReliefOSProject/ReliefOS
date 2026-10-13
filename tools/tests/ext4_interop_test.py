@@ -19,7 +19,7 @@ from pathlib import Path
 from ext4_fixture import create_image, e2fsck_read_only, run_checked
 
 ROOT = Path(__file__).resolve().parents[2]
-STORAGE = ROOT / "kernel/reliefnt/drivers/bootstrap/storage"
+STORAGE = ROOT / "kernel/reliefnt/block"
 FS = ROOT / "kernel/reliefnt/fs"
 LOG_DIR = ROOT / "build/logs/ext4-interop"
 EXT4_SOURCES = [
