@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/drivers/bootstrap/console.c"
+#include "../../kernel/reliefnt/drivers/console/console.c"
 
 void *kernel_malloc(size_t size) { return malloc(size); }
 void kernel_free(void *ptr) { free(ptr); }

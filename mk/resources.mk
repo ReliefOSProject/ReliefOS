@@ -1,6 +1,6 @@
 # The CJK font generation (cjk_font.h, its unifont dependency closure and the
 # framebuffer.c.o prerequisite) belongs to the kernel checkout since phase 3:
-# the only consumer was drivers/bootstrap/framebuffer.c, which is built there.
+# the only consumer was drivers/video/framebuffer/framebuffer.c, which is built there.
 RELIEFOS_FONT_TOOL := $(RELIEFOS_HOST_BIN)/reliefos-font
 RELIEFOS_GRUB_FONT_TOOL := $(RELIEFOS_HOST_BIN)/reliefos-grub-font
 $(RELIEFOS_FONT_TOOL): $(O_HOST)/obj/tools/host/assets/reliefos-font.c.o $(RELIEFOS_HOST_COMMON_OBJS)

@@ -6,7 +6,7 @@ import unittest
 from test_gpu import GpuAbiTests
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCES = [ROOT / "kernel/reliefnt/drivers/bootstrap/svga" / name for name in
+SOURCES = [ROOT / "kernel/reliefnt/drivers/video/svga" / name for name in
            ("fifo.c", "device.c", "gmr.c", "gb.c", "svga3d.c", "triangle.c", "render.c")]
 
 
@@ -20,7 +20,7 @@ class SvgaTests(unittest.TestCase):
                 "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
                 "-fsanitize=address,undefined", "-fno-omit-frame-pointer",
                 "-DSVGA_HOST_TEST", "-Ikernel/reliefnt/kernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                "-Ikernel/reliefnt/drivers/bootstrap/svga", "tools/tests/svga_test.c",
+                "-Ikernel/reliefnt/drivers/video/svga", "tools/tests/svga_test.c",
                 *(str(path) for path in SOURCES), "-o", str(executable),
             ], cwd=ROOT, check=True)
             subprocess.run([str(executable)], cwd=ROOT, check=True, timeout=30)

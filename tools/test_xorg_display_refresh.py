@@ -4,9 +4,9 @@ from pathlib import Path
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-FRAMEBUFFER = ROOT / "kernel/reliefnt/drivers/bootstrap/framebuffer.c"
+FRAMEBUFFER = ROOT / "kernel/reliefnt/drivers/video/framebuffer/framebuffer.c"
 FRAMEBUFFER_H = ROOT / "kernel/reliefnt/kernel/reliefnt/include/reliefnt/framebuffer.h"
-CONSOLE = ROOT / "kernel/reliefnt/drivers/bootstrap/console.c"
+CONSOLE = ROOT / "kernel/reliefnt/drivers/console/console.c"
 CONSOLE_H = ROOT / "kernel/reliefnt/kernel/reliefnt/include/reliefnt/console.h"
 TIME = ROOT / "kernel/reliefnt/kernel/reliefnt/time.c"
 
