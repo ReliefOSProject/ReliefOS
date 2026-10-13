@@ -4,12 +4,13 @@
 #include <string.h>
 #include <mntent.h>
 #include "../../kernel/reliefnt/block/storage_internal.h"
-static void exfat_cache_invalidate(void) {}
+void exfat_cache_invalidate(void) {}
 #include "../../kernel/reliefnt/block/storage_state.c"
+#include "../../kernel/reliefnt/block/storage_state_data.c"
 static unsigned locked;
 void kernel_execution_lock_irqsave(uint64_t *flags) { assert(!locked); locked = 1; *flags = 17; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { assert(locked && flags == 17); locked = 0; }
-static void storage_format_u32(char *out, uint32_t cap, const char *prefix, uint32_t n, int part)
+void storage_format_u32(char *out, uint32_t cap, const char *prefix, uint32_t n, int part)
 {
     if (part < 0) snprintf(out, cap, "%s%u", prefix, n);
     else snprintf(out, cap, "%s%up%u", prefix, n, part + 1);

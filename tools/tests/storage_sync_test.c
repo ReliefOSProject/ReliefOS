@@ -2,19 +2,20 @@
 #include <stdio.h>
 #include <string.h>
 #include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_state_data.c"
 static unsigned commands, last_command, transport_calls;
 static int transport_result;
 static unsigned char port_status = 0x40;
-static void storage_memzero(void *buffer, size_t length) { memset(buffer, 0, length); }
+void storage_memzero(void *buffer, size_t length) { memset(buffer, 0, length); }
 uint8_t x86_64_inb(uint16_t port) { (void)port; return port_status; }
 void x86_64_outb(uint8_t value, uint16_t port)
 { if ((port & 7) == 7) { ++commands; last_command = value; } }
 #include "../../kernel/reliefnt/drivers/storage/ide/storage_ide.c"
-static void storage_volume_ide_device(const struct storage_volume *volume, struct ide_device_info *device)
+void storage_volume_ide_device(const struct storage_volume *volume, struct ide_device_info *device)
 { assert(volume->ready); *device = (struct ide_device_info){.present = 1, .command_base = 0x1f0, .control_base = 0x3f6}; }
-static int ahci_flush_cache(struct ahci_hba_port *port)
+int ahci_flush_cache(struct ahci_hba_port *port)
 { assert(port && !storage_io_async_context); ++transport_calls; return transport_result; }
-static int nvme_flush_cache(struct nvme_controller *controller, uint32_t nsid)
+int nvme_flush_cache(struct nvme_controller *controller, uint32_t nsid)
 { assert(controller && nsid == 1 && !storage_io_async_context); ++transport_calls; return transport_result; }
 void kernel_execution_lock_irqsave(uint64_t *flags) { *flags = 0; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { (void)flags; }

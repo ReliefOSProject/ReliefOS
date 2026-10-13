@@ -43,6 +43,7 @@
 #include <string.h>
 
 #include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_state_data.c"
 
 /* ---- kernel fakes ---------------------------------------------------- */
 static uint8_t *disk_bytes;
@@ -83,13 +84,13 @@ void x86_64_outb(uint8_t value, uint16_t port) { (void)value; (void)port; abort(
 void x86_64_outw(uint16_t value, uint16_t port) { (void)value; (void)port; abort(); }
 int time_wall_clock(struct reliefos_time_info *info)
 { *info = (struct reliefos_time_info){.unix_seconds = 1800000000}; return 0; }
-static void storage_memzero(void *out, size_t n) { memset(out, 0, n); }
-static void storage_memcpy(void *out, const void *in, size_t n) { memcpy(out, in, n); }
-static void storage_copy_text(char *out, uint32_t cap, const char *text)
+void storage_memzero(void *out, size_t n) { memset(out, 0, n); }
+void storage_memcpy(void *out, const void *in, size_t n) { memcpy(out, in, n); }
+void storage_copy_text(char *out, uint32_t cap, const char *text)
 { snprintf(out, cap, "%s", text); }
-static uint32_t storage_strlen(const char *text) { return (uint32_t)strlen(text); }
-static int storage_text_eq(const char *a, const char *b) { return !strcmp(a, b); }
-static void storage_cache_invalidate(void) {}
+size_t storage_strlen(const char *text) { return strlen(text); }
+int storage_text_eq(const char *a, const char *b) { return !strcmp(a, b); }
+void storage_cache_invalidate(void) {}
 void storage_disk_block_cache_reset(void) {}
 const char *storage_root_filesystem_name(void) { return "ext2"; }
 uint32_t pci_config_read32(uint8_t bus, uint8_t slot, uint8_t function, uint8_t offset)
@@ -103,7 +104,7 @@ void *paging_kernel_direct_map(uint64_t phys) { (void)phys; return NULL; }
 /* RAM-disk device layer.  Bounds mirror the production STORAGE_VOLUME_RAM
  * branch of storage_read_device; counters and the lock-depth check are the
  * test's observability points. */
-static int storage_read_device(const struct storage_volume *volume, uint64_t lba,
+int storage_read_device(const struct storage_volume *volume, uint64_t lba,
                                uint32_t sector_count, void *buffer)
 {
     uint64_t offset = lba * SECTOR_SIZE;
@@ -118,7 +119,7 @@ static int storage_read_device(const struct storage_volume *volume, uint64_t lba
     return 0;
 }
 
-static int storage_write_device(const struct storage_volume *volume, uint64_t lba,
+int storage_write_device(const struct storage_volume *volume, uint64_t lba,
                                 uint32_t sector_count, const void *buffer)
 {
     uint64_t offset = lba * SECTOR_SIZE;
@@ -136,16 +137,16 @@ static int storage_write_device(const struct storage_volume *volume, uint64_t lb
 
 #include "../../kernel/reliefnt/drivers/storage/ide/storage_ide.c"
 
-static void storage_volume_ide_device(const struct storage_volume *volume,
+void storage_volume_ide_device(const struct storage_volume *volume,
                                       struct ide_device_info *device)
 {
     (void)volume;
     *device = (struct ide_device_info){.present = 1, .command_base = 0x1f0,
                                        .control_base = 0x3f6};
 }
-static int nvme_flush_cache(struct nvme_controller *controller, uint32_t nsid)
+int nvme_flush_cache(struct nvme_controller *controller, uint32_t nsid)
 { (void)controller; (void)nsid; abort(); }
-static int ahci_flush_cache(struct ahci_hba_port *port)
+int ahci_flush_cache(struct ahci_hba_port *port)
 {
     assert(port && transport_lock_depth == 1);
     ++test_transport_flushes;
@@ -156,25 +157,25 @@ static int ahci_flush_cache(struct ahci_hba_port *port)
 /* Route-level fakes for storage_mount.c: ext2_mount() is the fallback under
  * test, so it records whether the legacy backend was ever reached. */
 static unsigned ext2_mount_calls;
-static int ext2_mount(void)
+int ext2_mount(void)
 {
     ++ext2_mount_calls;
     g_storage.filesystem = STORAGE_FILESYSTEM_EXT2;
     return 0;
 }
-static int exfat_mount(void) { return -2; }
-static int fat32_mount(void) { return -2; }
-static int iso9660_mount(void) { return -2; }
-static int gpt_find_esp(void) { return -2; }
-static void storage_volume_from_install_disk(struct storage_volume *volume,
+int exfat_mount(void) { return -2; }
+int fat32_mount(void) { return -2; }
+int iso9660_mount(void) { return -2; }
+int gpt_find_esp(void) { return -2; }
+void storage_volume_from_install_disk(struct storage_volume *volume,
                                              const struct install_disk_state *disk)
 { (void)volume; (void)disk; }
-static const char *storage_transport_name(uint8_t transport)
+const char *storage_transport_name(uint8_t transport)
 { (void)transport; return "ahci"; }
-static void ahci_pending_clear(void) {}
-static int ahci_setup_port(struct ahci_hba_port *port) { (void)port; return -1; }
-static void nvme_reset_all_controllers(void) {}
-static void storage_scan_nvme_controller(uint8_t bus, uint8_t slot, uint8_t function,
+void ahci_pending_clear(void) {}
+int ahci_setup_port(struct ahci_hba_port *port) { (void)port; return -1; }
+void nvme_reset_all_controllers(void) {}
+void storage_scan_nvme_controller(uint8_t bus, uint8_t slot, uint8_t function,
                                          uint8_t *root_ready)
 { (void)bus; (void)slot; (void)function; (void)root_ready; }
 

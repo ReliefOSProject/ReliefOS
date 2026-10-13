@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_state_data.c"
 
 static FILE *disk;
 static unsigned locked;
@@ -13,17 +14,17 @@ static long inode_offset;
 void kernel_execution_lock_irqsave(uint64_t *flags) { assert(!locked); locked = 1; *flags = 17; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { assert(locked && flags == 17); locked = 0; }
 int time_wall_clock(struct reliefos_time_info *value) { value->unix_seconds = 1800000000; return 0; }
-static void storage_memcpy(void *dst, const void *src, size_t count) { memcpy(dst, src, count); }
-static int storage_select_node_volume(const struct storage_node *node, struct storage_volume **previous)
+void storage_memcpy(void *dst, const void *src, size_t count) { memcpy(dst, src, count); }
+int storage_select_node_volume(const struct storage_node *node, struct storage_volume **previous)
 { assert(locked && node->volume_id == 0); *previous = g_active_volume; return 0; }
-static void storage_restore_volume(struct storage_volume *previous) { assert(previous == g_active_volume && locked); }
-static int storage_read_sectors(uint64_t lba, uint32_t count, void *out)
+void storage_restore_volume(struct storage_volume *previous) { assert(previous == g_active_volume && locked); }
+int storage_read_sectors(uint64_t lba, uint32_t count, void *out)
 {
     if (read_error) return read_error;
     assert(!fseek(disk, lba * 512, SEEK_SET));
     return fread(out, 512, count, disk) == count ? 0 : -5;
 }
-static int ext2_read_inode(uint32_t number, struct ext2_inode *out)
+int ext2_read_inode(uint32_t number, struct ext2_inode *out)
 {
     assert(number == test_inode);
     if (read_error) return read_error;
@@ -36,15 +37,15 @@ static int ext2_write_inode(uint32_t number, const struct ext2_inode *in)
     assert(!fseek(disk, inode_offset, SEEK_SET));
     return fwrite(in, sizeof(*in), 1, disk) == 1 && !fflush(disk) ? 0 : -5;
 }
-static int ext2_group_desc(uint32_t number, struct ext2_group_desc *out)
+int ext2_group_desc(uint32_t number, struct ext2_group_desc *out)
 {
     if (read_error) return read_error;
     assert(!fseek(disk, 2048 + number * sizeof(*out), SEEK_SET));
     return fread(out, sizeof(*out), 1, disk) == 1 ? 0 : -5;
 }
-static int fat32_read_fat_entry(uint32_t cluster, uint32_t *out)
+int fat32_read_fat_entry(uint32_t cluster, uint32_t *out)
 { *out = cluster == 2 || cluster == 4 ? 0 : 0xfffffff; return read_error; }
-static int exfat_bitmap_get_cached(uint32_t cluster, uint8_t *out)
+int exfat_bitmap_get_cached(uint32_t cluster, uint8_t *out)
 { *out = cluster != 3 && cluster != 5; return read_error; }
 
 /* Unit-test boundaries follow the unified backend; full-facade ext4_vfs_test

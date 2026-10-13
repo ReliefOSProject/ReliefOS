@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_state_data.c"
 
 static FILE *disk;
 static struct task *writer;
@@ -20,15 +21,14 @@ uint64_t mm_alloc_pages(uint32_t pages)
 static uint64_t test_start_lba = 1;
 static uint64_t test_read_commands, test_write_commands, test_read_bytes, test_write_bytes;
 static unsigned test_fail_write_at, test_partial_write;
-static void ext2_cache_invalidate_range(uint64_t lba, uint32_t sectors);
-static int storage_read_sectors(uint64_t lba, uint32_t count, void *out)
+int storage_read_sectors(uint64_t lba, uint32_t count, void *out)
 {
     ++test_read_commands;
     test_read_bytes += (uint64_t)count * 512;
     assert(lba >= test_start_lba && !fseek(disk, (lba - test_start_lba) * 512, SEEK_SET));
     return fread(out, 512, count, disk) == count ? 0 : -5;
 }
-static int storage_write_sectors(uint64_t lba, uint32_t count, const void *in)
+int storage_write_sectors(uint64_t lba, uint32_t count, const void *in)
 {
     ++test_write_commands;
     test_write_bytes += (uint64_t)count * 512;
@@ -44,20 +44,20 @@ static int storage_write_sectors(uint64_t lba, uint32_t count, const void *in)
     }
     return fwrite(in, 512, count, disk) == count && !fflush(disk) ? 0 : -5;
 }
-static void storage_memzero(void *out, size_t n) { memset(out, 0, n); }
-static void storage_memcpy(void *out, const void *in, size_t n) { memcpy(out, in, n); }
-static uint32_t storage_strlen(const char *text) { return strlen(text); }
-static int storage_text_eq_ci(const char *a, const char *b) { return !strcasecmp(a, b); }
-static int storage_text_eq(const char *a, const char *b) { return !strcmp(a, b); }
-static void storage_copy_text(char *out, uint32_t cap, const char *text) { snprintf(out, cap, "%s", text); }
-static void storage_cache_invalidate(void) { storage_read_cache.valid = 0; }
-static void storage_begin_mutation(void) {}
-static int storage_dir_index_lookup(uint32_t directory, const char *name, struct storage_node *node)
+void storage_memzero(void *out, size_t n) { memset(out, 0, n); }
+void storage_memcpy(void *out, const void *in, size_t n) { memcpy(out, in, n); }
+size_t storage_strlen(const char *text) { return strlen(text); }
+int storage_text_eq_ci(const char *a, const char *b) { return !strcasecmp(a, b); }
+int storage_text_eq(const char *a, const char *b) { return !strcmp(a, b); }
+void storage_copy_text(char *out, uint32_t cap, const char *text) { snprintf(out, cap, "%s", text); }
+void storage_cache_invalidate(void) { storage_read_cache.valid = 0; }
+void storage_begin_mutation(void) {}
+int storage_dir_index_lookup(uint32_t directory, const char *name, struct storage_node *node)
 { (void)directory; (void)name; (void)node; return 0; }
-static void storage_dir_index_store(uint32_t directory, const char *name, const struct storage_node *node)
+void storage_dir_index_store(uint32_t directory, const char *name, const struct storage_node *node)
 { (void)directory; (void)name; (void)node; }
-static uint32_t min_u32(uint32_t a, uint32_t b) { return a < b ? a : b; }
-static int storage_parent_path(const char *path, char *parent, uint32_t parent_cap, char *name, uint32_t name_cap)
+uint32_t min_u32(uint32_t a, uint32_t b) { return a < b ? a : b; }
+int storage_parent_path(const char *path, char *parent, uint32_t parent_cap, char *name, uint32_t name_cap)
 {
     const char *slash = strrchr(path, '/');
     if (!slash || !slash[1]) return -22;
@@ -73,14 +73,14 @@ void kernel_execution_lock_irqsave(uint64_t *flags) { *flags = 0; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { (void)flags; }
 void page_cache_invalidate_node(const struct storage_node *node)
 { assert(node && (node->flags & STORAGE_NODE_FLAG_EXT2)); }
-static int storage_select_node_volume(const struct storage_node *node, struct storage_volume **previous)
+int storage_select_node_volume(const struct storage_node *node, struct storage_volume **previous)
 { *previous = g_active_volume; return node->volume_id == g_storage.volume_id ? 0 : -2; }
-static void storage_restore_volume(struct storage_volume *previous) { g_active_volume = previous; }
+void storage_restore_volume(struct storage_volume *previous) { g_active_volume = previous; }
 
 #include "../../kernel/reliefnt/fs/storage_ext2_cache.c"
-static int storage_read_device(const struct storage_volume *v,uint64_t lba,uint32_t n,void *out)
+int storage_read_device(const struct storage_volume *v,uint64_t lba,uint32_t n,void *out)
 { (void)v; return storage_read_sectors(lba,n,out); }
-static int storage_write_device(const struct storage_volume *v,uint64_t lba,uint32_t n,const void *in)
+int storage_write_device(const struct storage_volume *v,uint64_t lba,uint32_t n,const void *in)
 { storage_ext4_cache_invalidate_write(v,lba,n); return storage_write_sectors(lba,n,in); }
 int storage_ext4_device_flush(const struct storage_volume *v) { (void)v; return fflush(disk)?-5:0; }
 #include "../../kernel/reliefnt/fs/storage_ext4_format.c"

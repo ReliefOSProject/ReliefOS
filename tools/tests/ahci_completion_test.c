@@ -3,11 +3,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_state_data.c"
 
 static int task_file_errors;
 static int timeouts;
-static bool storage_async_can_yield(void) { return storage_io_async_context; }
-static void storage_memzero(void *out, size_t n) { memset(out, 0, n); }
+bool storage_async_can_yield(void) { return storage_io_async_context; }
+void storage_memzero(void *out, size_t n) { memset(out, 0, n); }
 uint64_t time_ticks(void) { return 1; }
 uint32_t sched_current_pid(void) { return 7; }
 void storage_release_task_io(uint32_t pid) { (void)pid; }

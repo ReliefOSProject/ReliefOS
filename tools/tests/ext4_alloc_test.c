@@ -77,6 +77,15 @@
 #include <unistd.h>
 
 #include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_state_data.c"
+
+/* The two cache-internal helpers are test seams: the textual
+ * storage_ext4_mount.c below must call the fakes in this file, while the
+ * linked storage_ext4_cache.c keeps the real ones for the other fragment
+ * translation units.  A TU-local static shadow is not legal against the
+ * external prototypes in storage_internal.h, so rename this TU's copies. */
+#define ext4_cache_block_range fixture_ext4_cache_block_range
+#define ext4_cache_note_checksum_ok fixture_ext4_cache_note_checksum_ok
 
 /* ---- kernel fakes and fake disk layer --------------------------------- */
 static uint8_t *disk_bytes;
@@ -142,14 +151,14 @@ int storage_write_device(const struct storage_volume *volume, uint64_t lba,
 
 /* storage_ext4_mount.c reaches into cache.c's internals; cache.c keeps both
  * static, so this TU provides its own copies for the included mount path. */
-static void ext4_cache_note_checksum_ok(struct storage_volume *volume,
+void ext4_cache_note_checksum_ok(struct storage_volume *volume,
                                         uint64_t block)
 {
     (void)volume;
     (void)block;
 }
 
-static int ext4_cache_block_range(const struct storage_volume *volume,
+int ext4_cache_block_range(const struct storage_volume *volume,
                                   uint64_t block, uint64_t *out_lba,
                                   uint32_t *out_sectors)
 {

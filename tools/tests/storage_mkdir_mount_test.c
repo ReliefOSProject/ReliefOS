@@ -3,7 +3,47 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/drivers/bootstrap/storage.c"
+/* The storage modules are independent translation units; this fixture keeps
+ * them in one TU so a plain host build can exercise them together.  The list
+ * mirrors the former drivers/bootstrap/storage.c aggregation, in its order. */
+#include "../../kernel/reliefnt/block/storage_internal.h"
+#include <reliefnt/tmpfs.h>
+#include "../../kernel/reliefnt/block/storage_state.c"
+#include "../../kernel/reliefnt/block/storage_state_data.c"
+#include "../../kernel/reliefnt/block/storage_devlinks.c"
+#include "../../kernel/reliefnt/fs/storage_ext2_cache.c"
+#include "../../kernel/reliefnt/drivers/storage/ide/storage_ide.c"
+#include "../../kernel/reliefnt/drivers/storage/ahci/storage_ahci.c"
+#include "../../kernel/reliefnt/drivers/storage/nvme/storage_nvme.c"
+#include "../../kernel/reliefnt/block/storage_block.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_format.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_checksum.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_cache.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_alloc.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_extent.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_ops.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_xattr.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_journal.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_dir.c"
+#include "../../kernel/reliefnt/block/storage_sync.c"
+#include "../../kernel/reliefnt/fs/storage_iso.c"
+#include "../../kernel/reliefnt/fs/storage_fat32.c"
+#include "../../kernel/reliefnt/fs/storage_inode.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_vfs.c"
+#include "../../kernel/reliefnt/fs/storage_ext2.c"
+#include "../../kernel/reliefnt/fs/storage_exfat.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_mount.c"
+#include "../../kernel/reliefnt/fs/storage_mount.c"
+#include "../../kernel/reliefnt/kernel/reliefnt/audio/storage_audio.c"
+#include "../../kernel/reliefnt/fs/storage_vfs.c"
+#include "../../kernel/reliefnt/fs/storage_mounts.c"
+#include "../../kernel/reliefnt/fs/storage_tmpfs.c"
+#include "../../kernel/reliefnt/fs/storage_permissions.c"
+#include "../../kernel/reliefnt/fs/storage_sidecar.c"
+#include "../../kernel/reliefnt/fs/storage_statfs.c"
+#include "../../kernel/reliefnt/block/storage_installer.c"
+#include "../../kernel/reliefnt/block/storage_disk.c"
+#include "../../kernel/reliefnt/block/storage_identity.c"
 
 static int test_fail_cache_alloc;
 void *kernel_malloc(size_t size) { return malloc(size); }

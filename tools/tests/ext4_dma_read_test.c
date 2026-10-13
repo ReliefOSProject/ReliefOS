@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/storage_state_data.c"
 
 #define EXT4_BLOCK_CACHE_ENTRIES 2u
 #include "../../kernel/reliefnt/fs/storage_ext4_cache.c"
