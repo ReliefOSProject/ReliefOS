@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 import tempfile
 import subprocess
-from test_ext4_read import ROOT, STORAGE, run
+from test_ext4_read import ROOT, STORAGE, FS, run
 
 def main():
     p=argparse.ArgumentParser(description=__doc__); p.add_argument("--count",type=int,default=10000)
@@ -16,7 +16,7 @@ def main():
              "-DRELIEFOS_STORAGE_STANDALONE_TU","-Ikernel/reliefnt/include","-Iinclude",
              "-Ikernel/reliefnt/include/uapi","-Ikernel/reliefnt/kernel/reliefnt/include",
              "-include",str(STORAGE/"storage_internal.h"),"tools/tests/ext4_dir_test.c",
-             *[str(STORAGE/f"storage_ext4_{n}.c") for n in
+             *[str(FS/f"storage_ext4_{n}.c") for n in
                ("format","checksum","cache","alloc","extent","ops","xattr","journal","dir")],"-lext2fs","-o",str(binary)])
         stage=work/"stage"; (stage/"linux").mkdir(parents=True)
         for i in range(1000): (stage/"linux"/f"linux-file-{i:05d}").touch()

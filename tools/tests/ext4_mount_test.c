@@ -1,6 +1,6 @@
 /* Host-side tests for the ext4 mount path, feature policy and bounded caches.
  *
- * Covers kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_mount.c and
+ * Covers kernel/reliefnt/fs/storage_ext4_mount.c and
  * storage_ext4_cache.c against real mke2fs images that
  * tools/tests/ext4_mount_test.py patches per case:
  *
@@ -134,7 +134,7 @@ static int storage_write_device(const struct storage_volume *volume, uint64_t lb
     return 0;
 }
 
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ide.c"
+#include "../../kernel/reliefnt/drivers/storage/ide/storage_ide.c"
 
 static void storage_volume_ide_device(const struct storage_volume *volume,
                                       struct ide_device_info *device)
@@ -178,15 +178,15 @@ static void storage_scan_nvme_controller(uint8_t bus, uint8_t slot, uint8_t func
                                          uint8_t *root_ready)
 { (void)bus; (void)slot; (void)function; (void)root_ready; }
 
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_format.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_checksum.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_cache.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_alloc.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_extent.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_ops.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_xattr.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_journal.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_mount.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_format.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_checksum.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_cache.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_alloc.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_extent.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_ops.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_xattr.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_journal.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_mount.c"
 #include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_mount.c"
 #include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_sync.c"
 

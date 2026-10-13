@@ -9,6 +9,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 STORAGE = ROOT / "kernel/reliefnt/drivers/bootstrap/storage"
+FS = ROOT / "kernel/reliefnt/fs"
 
 
 def run(args, **kwargs):
@@ -22,7 +23,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix="reliefos-ext4-read-") as directory:
         work = Path(directory)
         binary = work / "read-test"
-        sources = [STORAGE / f"storage_ext4_{name}.c" for name in
+        sources = [FS / f"storage_ext4_{name}.c" for name in
                    ("format", "checksum", "cache", "alloc", "extent", "ops", "xattr", "journal")]
         run(["cc", "-std=c11", "-O1", "-g", "-D_GNU_SOURCE",
              "-fsanitize=address,undefined", "-fno-sanitize-recover=all",

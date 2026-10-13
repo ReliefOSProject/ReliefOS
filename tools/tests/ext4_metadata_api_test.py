@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from test_ext4_read import ROOT, STORAGE, run
+from test_ext4_read import ROOT, STORAGE, FS, run
 
 def main():
     with tempfile.TemporaryDirectory(prefix="reliefos-ext4-xattr-") as d:
@@ -16,7 +16,7 @@ def main():
              "-DRELIEFOS_STORAGE_STANDALONE_TU","-Ikernel/reliefnt/include","-Iinclude",
              "-Ikernel/reliefnt/include/uapi","-Ikernel/reliefnt/kernel/reliefnt/include",
              "-include",str(STORAGE/"storage_internal.h"),"tools/tests/ext4_xattr_test.c",
-             *[str(STORAGE/f"storage_ext4_{n}.c") for n in
+             *[str(FS/f"storage_ext4_{n}.c") for n in
                ("format","checksum","cache","alloc","extent","ops","journal","dir","xattr")],"-o",str(binary)])
         for bs in (1024,4096):
             for kind,features in (("ext2","none,filetype,ext_attr"),

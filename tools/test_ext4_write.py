@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 import re
 import tempfile
-from test_ext4_read import ROOT, STORAGE, run
+from test_ext4_read import ROOT, STORAGE, FS, run
 
 def build(work):
     binary = work / "write-test"
@@ -13,7 +13,7 @@ def build(work):
          "-DRELIEFOS_STORAGE_STANDALONE_TU", "-Ikernel/reliefnt/include", "-Iinclude",
          "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
          "-include", str(STORAGE / "storage_internal.h"), "tools/tests/ext4_write_test.c",
-         *[str(STORAGE / f"storage_ext4_{n}.c") for n in
+         *[str(FS / f"storage_ext4_{n}.c") for n in
            ("format", "checksum", "cache", "alloc", "extent", "ops", "xattr", "journal")], "-o", str(binary)])
     return binary
 

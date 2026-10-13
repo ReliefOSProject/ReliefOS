@@ -9,7 +9,7 @@ static void storage_memzero(void *buffer, size_t length) { memset(buffer, 0, len
 uint8_t x86_64_inb(uint16_t port) { (void)port; return port_status; }
 void x86_64_outb(uint8_t value, uint16_t port)
 { if ((port & 7) == 7) { ++commands; last_command = value; } }
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ide.c"
+#include "../../kernel/reliefnt/drivers/storage/ide/storage_ide.c"
 static void storage_volume_ide_device(const struct storage_volume *volume, struct ide_device_info *device)
 { assert(volume->ready); *device = (struct ide_device_info){.present = 1, .command_base = 0x1f0, .control_base = 0x3f6}; }
 static int ahci_flush_cache(struct ahci_hba_port *port)

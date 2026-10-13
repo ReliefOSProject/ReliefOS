@@ -23,7 +23,7 @@ void console_printf(const char *format, ...)
     va_end(ap);
 }
 
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ahci.c"
+#include "../../kernel/reliefnt/drivers/storage/ahci/storage_ahci.c"
 
 int main(void)
 {

@@ -5,7 +5,7 @@
 #include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
 
 #define EXT4_BLOCK_CACHE_ENTRIES 2u
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_cache.c"
+#include "../../kernel/reliefnt/fs/storage_ext4_cache.c"
 
 static uint8_t disk[64 * 4096];
 static uint8_t output[8 * 4096];

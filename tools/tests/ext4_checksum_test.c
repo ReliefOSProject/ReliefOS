@@ -2,7 +2,7 @@
  *
  * Covers the CRC32C/CRC16 primitives, the superblock / group-descriptor /
  * inode checksum algorithms in
- * kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_checksum.c.
+ * kernel/reliefnt/fs/storage_ext4_checksum.c.
  *
  * Independent oracles (the implementation under test is table-driven and
  * shares no code with these):
@@ -33,7 +33,7 @@
  *     -Ikernel/reliefnt/include -Iinclude \
  *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/kernel/reliefnt/include \
  *     tools/tests/ext4_checksum_test.c \
- *     kernel/reliefnt/drivers/bootstrap/storage/storage_ext4_checksum.c \
+ *     kernel/reliefnt/fs/storage_ext4_checksum.c \
  *     -o /tmp/reliefos-ext4-checksum-test
  *   ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
  *     /tmp/reliefos-ext4-checksum-test

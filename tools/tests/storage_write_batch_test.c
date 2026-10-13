@@ -3,10 +3,10 @@
 #include <string.h>
 #include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_internal.h"
 #include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_state.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ext2_cache.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ide.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_ahci.c"
-#include "../../kernel/reliefnt/drivers/bootstrap/storage/storage_nvme.c"
+#include "../../kernel/reliefnt/fs/storage_ext2_cache.c"
+#include "../../kernel/reliefnt/drivers/storage/ide/storage_ide.c"
+#include "../../kernel/reliefnt/drivers/storage/ahci/storage_ahci.c"
+#include "../../kernel/reliefnt/drivers/storage/nvme/storage_nvme.c"
 
 static uint8_t media[32768];
 static unsigned commands, reject_batch, fail_sector;

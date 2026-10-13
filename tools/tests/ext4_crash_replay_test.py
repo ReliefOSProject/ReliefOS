@@ -25,6 +25,7 @@ def main():
         work = Path(directory)
         binary = work / "journal-test"
         storage = ROOT / "kernel/reliefnt/drivers/bootstrap/storage"
+        fs = ROOT / "kernel/reliefnt/fs"
         run(["cc", "-std=c11", "-O1", "-g", "-D_GNU_SOURCE",
              "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
              "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
@@ -32,7 +33,7 @@ def main():
              "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
              "-include", str(storage / "storage_internal.h"),
              "tools/tests/ext4_journal_test.c",
-             *[str(storage / f"storage_ext4_{name}.c") for name in
+             *[str(fs / f"storage_ext4_{name}.c") for name in
                ("format", "checksum", "cache", "alloc", "extent", "ops", "xattr", "journal")],
              "-o", str(binary)])
         vfs = work / "vfs-read"

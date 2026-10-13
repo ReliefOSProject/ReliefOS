@@ -20,9 +20,10 @@ from ext4_fixture import create_image, e2fsck_read_only, run_checked
 
 ROOT = Path(__file__).resolve().parents[2]
 STORAGE = ROOT / "kernel/reliefnt/drivers/bootstrap/storage"
+FS = ROOT / "kernel/reliefnt/fs"
 LOG_DIR = ROOT / "build/logs/ext4-interop"
 EXT4_SOURCES = [
-    STORAGE / f"storage_ext4_{name}.c"
+    FS / f"storage_ext4_{name}.c"
     for name in ("format", "checksum", "cache", "alloc", "extent", "ops", "xattr", "journal")
 ]
 
