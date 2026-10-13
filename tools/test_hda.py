@@ -21,8 +21,8 @@ with tempfile.TemporaryDirectory(prefix='hda-', dir=qa) as work:
         try:
             sources = [f'tools/tests/{SUITES[suite]}']
             if suite == 'codec':
-                sources.append('kernel/reliefnt/drivers/hda/codec.c')
-                sources.append('kernel/reliefnt/drivers/hda/controls.c')
+                sources.append('kernel/reliefnt/drivers/sound/hda/codec.c')
+                sources.append('kernel/reliefnt/drivers/sound/hda/controls.c')
             arguments = []
             extra_flags = ['-Iuserland/runtime/include', '-Iinclude',
                            '-Wall', '-Wextra', '-Werror'] if suite == 'wavplay' else []

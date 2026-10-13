@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
-#include "../../kernel/reliefnt/drivers/hda/hda.h"
+#include "../../kernel/reliefnt/drivers/sound/hda/hda.h"
 static uint8_t registers[2][0x4000];
 static uint8_t hda_test_mmio_read8(void *p,uint32_t n){return ((uint8_t*)p)[n];}
 static uint16_t hda_test_mmio_read16(void *p,uint32_t n){uint16_t v;memcpy(&v,(char*)p+n,2);return v;}
@@ -33,10 +33,10 @@ static void hda_test_before_sleep(const struct hda_controller *c){(void)c;}
 #include "../../kernel/reliefnt/kernel/reliefnt/audio/pcm.c"
 #include "../../kernel/reliefnt/kernel/reliefnt/driver_manager_phase.c"
 #define memset module_memset
-#include "../../kernel/reliefnt/drivers/hda/hda.c"
+#include "../../kernel/reliefnt/drivers/sound/hda/hda.c"
 #undef memset
-#include "../../kernel/reliefnt/drivers/hda/stream.c"
-#include "../../kernel/reliefnt/drivers/hda/controls.c"
+#include "../../kernel/reliefnt/drivers/sound/hda/stream.c"
+#include "../../kernel/reliefnt/drivers/sound/hda/controls.c"
 
 /* The module fixture links the PCM core without the ALSA timer module. */
 void audio_timer_period_elapsed(uint32_t card, uint32_t device,

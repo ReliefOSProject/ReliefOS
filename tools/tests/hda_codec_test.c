@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/drivers/hda/hda.h"
+#include "../../kernel/reliefnt/drivers/sound/hda/hda.h"
 
 #define PAGE_BYTES 4096u
 #define FAKE_MAX_CODECS 2u

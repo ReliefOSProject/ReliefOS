@@ -35,7 +35,7 @@ static void write_byte(uint16_t port,uint8_t value)
 static void write_long(uint16_t port,uint32_t value) { memcpy(regs+port,&value,sizeof value); }
 static void log_text(const char *text) { (void)text; }
 #ifndef AC97_QUEUE_SOURCE
-#define AC97_QUEUE_SOURCE "../../kernel/reliefnt/drivers/ac97/ac97.c"
+#define AC97_QUEUE_SOURCE "../../kernel/reliefnt/drivers/sound/ac97/ac97.c"
 #endif
 #include AC97_QUEUE_SOURCE
 static void fetch_descriptor(void)

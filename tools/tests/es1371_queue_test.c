@@ -9,7 +9,7 @@ static uint32_t read_long(uint16_t port) { return regs[port / 4U]; }
 static void write_long(uint16_t port, uint32_t value) { regs[port / 4U] = value; }
 static void log_text(const char *text) { (void)text; }
 #ifndef ES1371_QUEUE_SOURCE
-#define ES1371_QUEUE_SOURCE "../../kernel/reliefnt/drivers/es1371/es1371.c"
+#define ES1371_QUEUE_SOURCE "../../kernel/reliefnt/drivers/sound/es1371/es1371.c"
 #endif
 #include ES1371_QUEUE_SOURCE
 static void cursor(uint32_t offset) { regs[ES_REG_DAC1_SIZE / 4U] = offset << 14; }

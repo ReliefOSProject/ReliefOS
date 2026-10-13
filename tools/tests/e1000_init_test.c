@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
-#include "../../kernel/reliefnt/drivers/e1000/e1000.c"
+#include "../../kernel/reliefnt/drivers/net/e1000/e1000.c"
 
 static unsigned allocations, allocation_limit = 1024;
 static int registration_error;

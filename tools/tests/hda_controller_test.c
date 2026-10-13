@@ -7,7 +7,7 @@
 #include <string.h>
 #include <reliefos/driver.h>
 
-#include "../../kernel/reliefnt/drivers/hda/hda.h"
+#include "../../kernel/reliefnt/drivers/sound/hda/hda.h"
 
 struct hda_fake_device;
 static uint8_t hda_test_mmio_read8(void *base, uint32_t offset);
@@ -21,8 +21,8 @@ static uint64_t hda_test_irq_save(void);
 static void hda_test_irq_restore(uint64_t flags);
 static void hda_test_before_sleep(const struct hda_controller *c);
 
-#include "../../kernel/reliefnt/drivers/hda/controller.c"
-#include "../../kernel/reliefnt/drivers/hda/controls.c"
+#include "../../kernel/reliefnt/drivers/sound/hda/controller.c"
+#include "../../kernel/reliefnt/drivers/sound/hda/controls.c"
 
 #define FAKE_REGS_BYTES 0x4000u
 #define FAKE_PAGE_BYTES 4096u

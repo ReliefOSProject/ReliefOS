@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include "../../kernel/reliefnt/drivers/mouse/mouse.c"
+#include "../../kernel/reliefnt/drivers/input/mouse/mouse.c"
 
 static uint8_t aux_next;
 static uint8_t ack_pending;

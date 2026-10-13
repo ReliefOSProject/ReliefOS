@@ -62,8 +62,8 @@ struct hda_controller;
 void hda_test_before_sleep(const struct hda_controller *c) { (void)c; }
 
 #include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/drivers/hda/controller.c"
-#include "../../kernel/reliefnt/drivers/hda/stream.c"
+#include "../../kernel/reliefnt/drivers/sound/hda/controller.c"
+#include "../../kernel/reliefnt/drivers/sound/hda/stream.c"
 
 /* The stream fixture links the PCM core without the ALSA timer module. */
 void audio_timer_period_elapsed(uint32_t card, uint32_t device,

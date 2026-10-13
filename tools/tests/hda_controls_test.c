@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/drivers/hda/hda.h"
+#include "../../kernel/reliefnt/drivers/sound/hda/hda.h"
 
 static struct {
     uint16_t amp[2];
@@ -106,7 +106,7 @@ int hda_verb_submit(struct hda_controller *c,uint8_t cad,uint8_t nid,
                    uint16_t verb,uint16_t payload,bool short_verb,uint64_t *ticket)
 { (void)c;(void)cad;(void)nid;(void)verb;(void)payload;(void)short_verb;*ticket=1;return 0; }
 
-#include "../../kernel/reliefnt/drivers/hda/controls.c"
+#include "../../kernel/reliefnt/drivers/sound/hda/controls.c"
 
 static void test_amp_units(void)
 {
