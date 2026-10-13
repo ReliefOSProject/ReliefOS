@@ -48,17 +48,19 @@ def _user_namespace_available():
     return _USER_NAMESPACE_AVAILABLE
 
 
-def _run_apk(apk, arguments, *, usermode=False):
+def _run_apk(apk, arguments, *, install=False):
     """Run apk with root-like metadata support on restricted CI runners."""
     if _user_namespace_available():
         run(["unshare", "-Ur", apk, *arguments])
         return
+    if install:
+        # Install transactions execute package triggers chrooted inside the
+        # target root; fakeroot cannot chroot, so user namespaces are required.
+        raise RuntimeError(
+            "apk install requires unshare user namespaces: package triggers must run chrooted inside the target root")
     if shutil.which("fakeroot") is None:
         raise RuntimeError("apk packaging requires unshare user namespaces or fakeroot")
-    command = ["fakeroot", apk]
-    if usermode:
-        command += ["--usermode", "--force-no-chroot"]
-    run(command + list(arguments))
+    run(["fakeroot", apk, *arguments])
 
 
 def digest(path):
@@ -491,7 +493,7 @@ def build_distribution(source, output, work, apk, key):
         shutil.copyfile(public, managed / "etc/apk/keys" / legacy_public_name)
         _run_apk(apk, ["--root", managed, "--arch", "x86_64", "--initdb",
                        "--repositories-file", "/dev/null", "--repository", repository / "packages.adb",
-                       "add", *sorted(groups), *[entry["name"] + "=" + entry["version"] for entry in upstream_manifest["packages"]]], usermode=True)
+                       "add", *sorted(groups), *[entry["name"] + "=" + entry["version"] for entry in upstream_manifest["packages"]]], install=True)
         apply_root_symlinks(managed)
         shutil.copytree(repository, managed / REPOSITORY)
         for name in EXTERNAL - {"install"}:

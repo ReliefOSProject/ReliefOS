@@ -25,6 +25,13 @@ done
 [ -x "$own" ] || { echo "ownership tool is missing: $own" >&2; exit 1; }
 [ -d "$upstream/packages" ] || { echo "verified upstream package directory is missing: $upstream/packages" >&2; exit 1; }
 
+# Package triggers must execute chrooted inside the target root: they invoke
+# target-root tools by bare name or absolute path and write caches to
+# compiled-in absolute paths. fakeroot cannot chroot, so without user
+# namespaces the transaction would run trigger scripts against the host.
+unshare -Ur true >/dev/null 2>&1 ||
+    { echo 'APK staging requires user namespaces (unshare -Ur): package triggers must run chrooted inside the target root' >&2; exit 1; }
+
 # The desktop backend marker is a plain single-line value; never source it.
 # Unknown, empty, multi-line or missing markers abort before any staging work.
 backend_file=$raw/etc/reliefos/desktop-backend
@@ -267,14 +274,7 @@ run_apk()
     if [ "$1" = mkpkg ]; then apk_log=$work/logs/$package.log
     else apk_log=$work/logs/install.log
     fi
-    if unshare -Ur true >/dev/null 2>&1; then set -- unshare -Ur "$apk" "$@"
-    elif command -v fakeroot >/dev/null 2>&1; then
-        if [ "$1" = mkpkg ]; then set -- fakeroot "$apk" "$@"
-        else set -- fakeroot "$apk" --usermode --force-no-chroot "$@"
-        fi
-    else echo 'APK packaging requires user namespaces or fakeroot' >&2; exit 1
-    fi
-    sh "$src/tools/build/run-logged.sh" --tag APK "$apk_log" "$@"
+    sh "$src/tools/build/run-logged.sh" --tag APK "$apk_log" unshare -Ur "$apk" "$@"
 }
 
 : >"$scratch/local-packages"

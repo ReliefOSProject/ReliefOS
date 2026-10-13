@@ -46,6 +46,21 @@ jobs:
             libtool-bin gawk gperf gettext libncurses-dev ncurses-bin exfatprogs openssl perl
           msgfmt --version
 
+      # APK staging executes package triggers chrooted inside the target root
+      # via `unshare -Ur`. Ubuntu 24.04 restricts unprivileged user namespaces
+      # by default (AppArmor), so lift the restriction and assert the capability
+      # here instead of failing deep inside the build.
+      - name: Enable unprivileged user namespaces
+        run: |
+          set -euo pipefail
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          if [ -e /proc/sys/kernel/unprivileged_userns_clone ]; then
+            sudo sysctl -w kernel.unprivileged_userns_clone=1
+          fi
+          unshare -Ur true
+
       - name: Verify third-party sources
         run: |
           set -euo pipefail
