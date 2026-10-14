@@ -35,6 +35,7 @@
  * The EXT4_*_CACHE_ENTRIES macros may be overridden with -D to exercise
  * eviction at small scale (the "cache-small" case; see ext4_mount_test.py).
  */
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <stdint.h>
@@ -54,7 +55,7 @@ static uint64_t test_step, test_cache_write_step, test_transport_flush_step;
 static unsigned test_fail_cache_alloc;
 static unsigned transport_lock_depth;
 static unsigned test_transport_flushes;
-static char console_log[16384];
+static char console_log_buffer[16384];
 
 void *kernel_malloc(size_t size) { return malloc(size); }
 void kernel_free(void *p) { free(p); }
@@ -62,13 +63,27 @@ uint64_t mm_alloc_page(void) { return (uintptr_t)aligned_alloc(4096, 4096); }
 void mm_free_page(uint64_t p) { free((void *)(uintptr_t)p); }
 uint64_t mm_alloc_pages(uint32_t pages)
 { return test_fail_cache_alloc ? 0 : (uint64_t)(uintptr_t)calloc(pages, 4096); }
+static void fixture_console_vprintf(const char *format, va_list arguments)
+{
+    size_t used = strlen(console_log_buffer);
+    vsnprintf(console_log_buffer + used, sizeof(console_log_buffer) - used, format, arguments);
+}
+
 void console_printf(const char *format, ...)
 {
-    va_list ap;
-    size_t used = strlen(console_log);
-    va_start(ap, format);
-    vsnprintf(console_log + used, sizeof(console_log) - used, format, ap);
-    va_end(ap);
+    va_list arguments;
+    va_start(arguments, format);
+    fixture_console_vprintf(format, arguments);
+    va_end(arguments);
+}
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level;
+    va_list arguments;
+    va_start(arguments, format);
+    fixture_console_vprintf(format, arguments);
+    va_end(arguments);
 }
 void kernel_execution_lock_irqsave(uint64_t *flags) { *flags = 0; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { (void)flags; }
@@ -255,9 +270,9 @@ static void expect_reject(const char *image, const char *needle)
     struct storage_volume *volume;
     load_disk(image, 0, 0);
     volume = &g_volumes[0];
-    console_log[0] = 0;
+    console_log_buffer[0] = 0;
     assert(storage_ext4_mount(volume) == -RELIEFOS_EOPNOTSUPP);
-    assert(strstr(console_log, needle) != NULL);
+    assert(strstr(console_log_buffer, needle) != NULL);
     assert_volume_untouched(volume);
     printf("PASS ext4 reject: %s", needle); /* needle ends at the line break */
 }
@@ -377,12 +392,12 @@ static void case_route_policy_reject(const char *image)
     struct storage_volume *volume;
     load_disk(image, 0, 0);
     volume = &g_volumes[0];
-    console_log[0] = 0;
+    console_log_buffer[0] = 0;
     assert(storage_mount_ext_family(volume) == -RELIEFOS_EOPNOTSUPP);
     assert(ext2_mount_calls == 0);
     assert(!volume->ready);
     assert_volume_untouched(volume);
-    assert(strstr(console_log, "ro_compat=0x200\n") != NULL);
+    assert(strstr(console_log_buffer, "ro_compat=0x200\n") != NULL);
     puts("PASS ext4 root route: policy rejection never reaches ext2_mount");
 }
 

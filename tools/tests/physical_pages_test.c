@@ -1,4 +1,5 @@
 #define _GNU_SOURCE
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -7,6 +8,11 @@
 #include "../../kernel/reliefnt/mm/mm.c"
 
 void console_printf(const char *format, ...) { (void)format; }
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level; (void)format;
+}
 const struct framebuffer *framebuffer_get(void) { static struct framebuffer fb; return &fb; }
 void kernel_spin_init(struct kernel_spinlock *lock) { lock->state = 0; }
 void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)

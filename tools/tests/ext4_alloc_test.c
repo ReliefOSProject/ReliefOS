@@ -64,6 +64,7 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -91,7 +92,7 @@
 static uint8_t *disk_bytes;
 static uint64_t disk_size;
 static uint64_t test_read_commands, test_write_commands;
-static char console_log[16384];
+static char console_log_buffer[16384];
 
 void *kernel_malloc(size_t size) { return malloc(size); }
 int storage_ext4_device_flush(const struct storage_volume *v) { (void)v; return 0; }
@@ -102,13 +103,27 @@ uint64_t mm_alloc_page(void) { return (uintptr_t)aligned_alloc(4096, 4096); }
 void mm_free_page(uint64_t p) { free((void *)(uintptr_t)p); }
 uint64_t mm_alloc_pages(uint32_t pages)
 { return (uint64_t)(uintptr_t)calloc(pages, 4096); }
+static void fixture_console_vprintf(const char *format, va_list arguments)
+{
+    size_t used = strlen(console_log_buffer);
+    vsnprintf(console_log_buffer + used, sizeof(console_log_buffer) - used, format, arguments);
+}
+
 void console_printf(const char *format, ...)
 {
-    va_list ap;
-    size_t used = strlen(console_log);
-    va_start(ap, format);
-    vsnprintf(console_log + used, sizeof(console_log) - used, format, ap);
-    va_end(ap);
+    va_list arguments;
+    va_start(arguments, format);
+    fixture_console_vprintf(format, arguments);
+    va_end(arguments);
+}
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level;
+    va_list arguments;
+    va_start(arguments, format);
+    fixture_console_vprintf(format, arguments);
+    va_end(arguments);
 }
 void kernel_execution_lock_irqsave(uint64_t *flags) { *flags = 0; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { (void)flags; }
@@ -970,12 +985,12 @@ static void case_bitmap_csum_corrupt(void)
     volume = mount_now();
     /* A single flipped bitmap byte must fail the checksum verify with
      * -EIO and mark the volume errored. */
-    console_log[0] = 0;
+    console_log_buffer[0] = 0;
     patch_flip_byte(bbm_block(1), 3);
     assert(storage_ext4_alloc_blocks(volume, 64 + 20, 1, &first, &allocated) ==
            -RELIEFOS_EIO);
     assert(volume->ext4.fs_error == 1);
-    assert(strstr(console_log, "bitmap checksum") != NULL);
+    assert(strstr(console_log_buffer, "bitmap checksum") != NULL);
 
     load_spec(&s);
     volume = mount_now();
@@ -1155,10 +1170,10 @@ static void case_flex_log_clamp(void)
     load_spec(&s);
     disk_bytes[1024 + T_SB_FLEX_LOG] = 9;
     image_resync();
-    console_log[0] = 0;
+    console_log_buffer[0] = 0;
     volume = mount_now();
     assert(volume->ext4.flex_log_groups == EXT4_MAX_FLEX_LOG);
-    assert(strstr(console_log, "s_log_groups_per_flex") != NULL);
+    assert(strstr(console_log_buffer, "s_log_groups_per_flex") != NULL);
     puts("PASS ext4 alloc: s_log_groups_per_flex clamped to EXT4_MAX_FLEX_LOG");
 }
 

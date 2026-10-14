@@ -1,3 +1,4 @@
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -67,6 +68,11 @@ int storage_parent_path(const char *path, char *parent, uint32_t parent_cap, cha
     return 0;
 }
 void console_printf(const char *format, ...) { (void)format; }
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level; (void)format;
+}
 void *kernel_malloc(size_t size) { return malloc(size); }
 void kernel_free(void *memory) { free(memory); }
 void kernel_execution_lock_irqsave(uint64_t *flags) { *flags = 0; }

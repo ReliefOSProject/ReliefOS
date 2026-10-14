@@ -29,6 +29,10 @@ void framebuffer_codepoint(uint32_t x, uint32_t y, uint32_t c, uint32_t fg, uint
 void serial_write(const char *text) { (void)text; }
 void vga_putc(char c) { (void)c; }
 uint64_t time_uptime_us(void) { return 0; }
+uint64_t kernel_irq_save(void) { return 0; }
+void kernel_irq_restore(uint64_t flags) { (void)flags; }
+uint32_t smp_current_cpu(void) { return 0; }
+void smp_membarrier_poll(void) {}
 
 int main(void)
 {

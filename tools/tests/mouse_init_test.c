@@ -3,6 +3,12 @@
 
 #include "../../kernel/reliefnt/drivers/input/mouse/mouse.c"
 
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level;
+    (void)format;
+}
+
 static uint8_t aux_next;
 static uint8_t ack_pending;
 static uint8_t mouse_bytes[16];

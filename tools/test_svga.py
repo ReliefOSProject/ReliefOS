@@ -29,7 +29,7 @@ class SvgaTests(unittest.TestCase):
         # The host ABI hides compiler float helpers that -mgeneral-regs-only
         # emits for the kernel. Check the real target before full OS linking.
         kernel_imports = {
-            "console_printf", "framebuffer_get", "kernel_spin_lock_irqsave",
+            "console_printf", "console_log", "framebuffer_get", "kernel_spin_lock_irqsave",
             "kernel_spin_unlock_irqrestore", "mm_alloc_pages", "mm_free_pages",
             "paging_kernel_direct_map", "paging_mmio_uncached", "x86_64_inl",
             "x86_64_outl", "memcpy", "memset", "memmove",

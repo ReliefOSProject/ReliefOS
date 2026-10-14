@@ -35,7 +35,7 @@ class DisplayRefreshTests(unittest.TestCase):
         self.assertNotIn("!fb_console_enabled", tick)
 
         activate = console.split("void console_vt_activate", 1)[1].split(
-            "void console_printf", 1)[0]
+            "static void console_log_putc", 1)[0]
         self.assertIn("if (!framebuffer_get()->available) return;", activate)
         self.assertIn("if (graphical)", activate)
         self.assertIn("if (!fb_console_enabled) return;", activate)

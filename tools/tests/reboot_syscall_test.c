@@ -1,3 +1,4 @@
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <setjmp.h>
 #include <stdio.h>
@@ -10,6 +11,11 @@ static int action;
 
 struct task *sched_current_task(void) { return current; }
 void console_printf(const char *format, ...) { (void)format; }
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level; (void)format;
+}
 void power_reboot(void) { action = 1; longjmp(transition, 1); }
 void power_shutdown(void) { action = 2; longjmp(transition, 1); }
 

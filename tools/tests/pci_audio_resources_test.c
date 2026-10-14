@@ -10,6 +10,12 @@
 #include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
 #include "../../kernel/reliefnt/kernel/reliefnt/driver_resources.c"
 
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level;
+    (void)format;
+}
+
 /* Resource/manager fixtures link the registry without the ALSA timer module. */
 void audio_timer_period_elapsed(uint32_t card, uint32_t device,
                                 enum audio_direction direction,

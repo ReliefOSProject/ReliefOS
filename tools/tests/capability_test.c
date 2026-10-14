@@ -1,3 +1,4 @@
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall_process.c"
@@ -21,6 +22,11 @@ void mm_free_pages(uint64_t p, uint32_t n) { (void)p; (void)n; assert(0); }
 void power_reboot(void) { assert(0); __builtin_unreachable(); }
 void power_shutdown(void) { assert(0); __builtin_unreachable(); }
 void console_printf(const char *format, ...) { (void)format; }
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level; (void)format;
+}
 
 int main(void)
 {

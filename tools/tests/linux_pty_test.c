@@ -1,3 +1,4 @@
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -51,6 +52,11 @@ int sched_process_group_has_pty(uint32_t group, uint32_t id)
 { (void)group; (void)id; return 1; }
 const struct framebuffer *framebuffer_get(void) { return NULL; }
 void console_printf(const char *format, ...) { (void)format; }
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level; (void)format;
+}
 void console_write_len(const char *text, size_t count) { (void)text; (void)count; }
 
 int main(void)

@@ -1,3 +1,4 @@
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +30,11 @@ void net_udp_input(uint32_t source, uint32_t destination, uint16_t source_port,
 { (void)ifindex; (void)source; (void)destination; (void)source_port; (void)destination_port; (void)data; (void)length; }
 void net_packet_input(const void *frame, uint32_t length) { (void)frame; (void)length; }
 void console_printf(const char *format, ...) { (void)format; }
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level; (void)format;
+}
 
 static void test_small_reads(struct net_socket *s)
 {

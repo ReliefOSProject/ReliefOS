@@ -1,5 +1,6 @@
 /* Execute the real inventory parsers and namespace against hardware fixtures. */
 #define TEST_REAL_INVENTORY
+#include <reliefnt/console.h>
 #include "../../kernel/reliefnt/arch/x86_64/cpuinfo.c"
 #include "../../kernel/reliefnt/arch/x86_64/platform.c"
 #include "../../kernel/reliefnt/fs/sysfs.c"
@@ -47,6 +48,13 @@ bool smp_cpu_online(uint32_t cpu)
 void console_printf(const char *format, ...)
 {
     (void)format;
+}
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level;
+    (void)format;
+
 }
 static struct framebuffer fixture_fb = {
     .available = true, .width = 1280, .height = 720, .pitch = 5120, .bpp = 32};

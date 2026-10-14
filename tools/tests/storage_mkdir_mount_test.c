@@ -1,3 +1,4 @@
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,6 +56,11 @@ void sched_truncate_file_mappings(const struct storage_node *node, uint64_t size
 uint64_t mm_alloc_pages(uint32_t pages)
 { return test_fail_cache_alloc ? 0 : (uint64_t)(uintptr_t)calloc(pages, 4096); }
 void console_printf(const char *format, ...) { (void)format; }
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level; (void)format;
+}
 void kernel_execution_lock_irqsave(uint64_t *flags) { *flags = 0; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { (void)flags; }
 uint32_t sched_current_pid(void) { return 1; }

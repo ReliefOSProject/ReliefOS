@@ -1,3 +1,4 @@
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -41,6 +42,11 @@ static int fake_ahci_write(struct ahci_hba_port *port, uint64_t lba,
 
 void console_printf(const char *format, ...)
 { if (strstr(format, "device read failed")) ++read_failures; }
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level; if (strstr(format, "device read failed")) ++read_failures;
+}
 void kernel_spin_lock(struct kernel_spinlock *lock) { (void)lock; }
 void kernel_spin_unlock(struct kernel_spinlock *lock) { (void)lock; }
 uint32_t smp_cpu_count(void) { return 1; }

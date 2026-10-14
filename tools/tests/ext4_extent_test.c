@@ -2,6 +2,7 @@
  * stale cached reads and per-block I/O regressions using the actual backend.
  * Disk fixture offsets below are taken independently from Linux's disk format;
  * real mke2fs/debugfs images provide the external oracle. */
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +22,11 @@ int time_wall_clock(struct reliefos_time_info *info)
 { memset(info,0,sizeof(*info)); info->unix_seconds=1790640000; return 0; }
 uint64_t mm_alloc_pages(uint32_t n) { return (uintptr_t)calloc(n, 4096); }
 void console_printf(const char *fmt, ...) { (void)fmt; }
+
+void console_log(enum console_log_level level, const char *fmt, ...)
+{
+    (void)level; (void)fmt;
+}
 void storage_memzero(void *p, size_t n) { memset(p, 0, n); }
 void storage_memcpy(void *d, const void *s, size_t n) { memcpy(d, s, n); }
 int storage_read_device(const struct storage_volume *v, uint64_t lba,

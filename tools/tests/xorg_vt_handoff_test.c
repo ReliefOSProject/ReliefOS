@@ -10,6 +10,7 @@
  * K_RAW / K_MEDIUMRAW / K_XLATE / K_OFF contract instead of always producing
  * cooked canonical characters.
  */
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -35,6 +36,11 @@ void console_vt_activate(uint32_t number, bool graphical)
 void console_vt_write(uint32_t number, const char *text, size_t count)
 { (void)number; (void)text; (void)count; }
 void console_printf(const char *format, ...) { (void)format; }
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level; (void)format;
+}
 void console_write_len(const char *text, size_t count) { (void)text; (void)count; }
 const struct framebuffer *framebuffer_get(void) { return NULL; }
 

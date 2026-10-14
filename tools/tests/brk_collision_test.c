@@ -67,6 +67,11 @@ int task_shm_map(const struct task_file *file, uint64_t offset, uint64_t length,
 { (void)file; (void)offset; (void)length; (void)phys; return -1; }
 const struct framebuffer *framebuffer_get(void) { return NULL; }
 void console_printf(const char *fmt, ...) { (void)fmt; }
+
+void console_log(enum console_log_level level, const char *fmt, ...)
+{
+    (void)level; (void)fmt;
+}
 void *kernel_malloc(size_t size) { return __builtin_malloc(size); }
 void kernel_free(void *ptr) { __builtin_free(ptr); }
 

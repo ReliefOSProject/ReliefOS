@@ -1,6 +1,7 @@
 /* Host-only behavioral fixture. Compile with clang (userland.c uses its
  * constant-array folding extension), ASan/UBSan and --gc-sections. Source
  * overrides allow the same executable contracts to run against pre-fix code. */
+#include <reliefnt/console.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -26,7 +27,7 @@ static unsigned console_calls_with_irqs_disabled;
 static void (*after_scheduler_unlock)(void);
 static unsigned console_calls;
 static unsigned console_calls_while_locked;
-static char console_log[4096];
+static char console_log_buffer[4096];
 static size_t console_log_len;
 
 uint32_t smp_current_cpu(void) { return 0; }
@@ -59,23 +60,37 @@ void kernel_spin_unlock_irqrestore(struct kernel_spinlock *lock, uint64_t flags)
     }
 }
 
-void console_printf(const char *format, ...)
+static void fixture_console_vprintf(const char *format, va_list arguments)
 {
-    va_list args;
-    va_start(args, format);
     ++console_calls;
     if (scheduler_lock_depth) ++console_calls_while_locked;
     if (!interrupts_enabled) ++console_calls_with_irqs_disabled;
-    if (console_log_len < sizeof(console_log)) {
-        int written = vsnprintf(console_log + console_log_len,
-                                sizeof(console_log) - console_log_len,
-                                format, args);
+    if (console_log_len < sizeof(console_log_buffer)) {
+        int written = vsnprintf(console_log_buffer + console_log_len,
+                                sizeof(console_log_buffer) - console_log_len,
+                                format, arguments);
         if (written > 0) {
-            size_t available = sizeof(console_log) - console_log_len - 1;
+            size_t available = sizeof(console_log_buffer) - console_log_len - 1;
             console_log_len += (size_t)written < available ? (size_t)written : available;
         }
     }
-    va_end(args);
+}
+
+void console_printf(const char *format, ...)
+{
+    va_list arguments;
+    va_start(arguments, format);
+    fixture_console_vprintf(format, arguments);
+    va_end(arguments);
+}
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level;
+    va_list arguments;
+    va_start(arguments, format);
+    fixture_console_vprintf(format, arguments);
+    va_end(arguments);
 }
 
 int kernel_signal_fatal_pending(const struct task *task) { (void)task; return 0; }
@@ -135,7 +150,7 @@ static void reset_console_log(void)
     console_calls_while_locked = 0;
     console_calls_with_irqs_disabled = 0;
     console_log_len = 0;
-    console_log[0] = 0;
+    console_log_buffer[0] = 0;
 }
 
 static struct task *fixture_task(uint32_t pid, const char *name)
@@ -189,7 +204,7 @@ static void check_one_exit_log(uint32_t pid, uint64_t code, const char *name)
     snprintf(expected, sizeof(expected),
              "scheduler task exited pid=%u name=%s code=%llu",
              pid, name, (unsigned long long)code);
-    check(strstr(console_log, expected) != NULL, "exit snapshot pid/name/code");
+    check(strstr(console_log_buffer, expected) != NULL, "exit snapshot pid/name/code");
 }
 
 static struct task *snapshot_task;
@@ -281,7 +296,7 @@ int main(void)
     char expected[160];
     snprintf(expected, sizeof(expected),
              "[reliefnt] scheduler task exited pid=43 name=%s code=27\n", truncated);
-    check(strcmp(console_log, expected) == 0, "bounded NUL-terminated exit name");
+    check(strcmp(console_log_buffer, expected) == 0, "bounded NUL-terminated exit name");
 
     struct task *waiter = fixture_task(50, "fixture-waiter");
     struct task *child = fixture_task(51, "fixture-child");
@@ -310,7 +325,7 @@ int main(void)
     assert(status == (7 << 8));
     assert(info.fields.child.pid == (int32_t)child_pid && info.fields.child.status == 7);
     check_log("wait reaped", 1);
-    check(strstr(console_log, "scheduler wait reaped pid=51 by pid=50") != NULL,
+    check(strstr(console_log_buffer, "scheduler wait reaped pid=51 by pid=50") != NULL,
           "reap log retains consumed pid");
     assert(file_releases == releases_before_wait + 1);
 
