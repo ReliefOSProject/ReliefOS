@@ -36,7 +36,7 @@ excluded from this profile:
 - e2fsprogs, dosfstools and exfatprogs supply their matching filesystem
   formatters/checkers; e2fsprogs also owns `chattr`, `lsattr` and `tune2fs`.
 - PAM, sudo and shadow own login, authentication and account management.
-- ncurses supplies `clear` and `reset`; xterm supplies `resize`.
+- ncurses supplies `clear` and `reset`.
 - The official Alpine packages supply `less` and `xxd`. GNU `wget` is supplied
   with the Xorg backend; the BusyBox wget/TLS implementations remain disabled.
 - OpenRC supplies `start-stop-daemon`.

@@ -3,7 +3,7 @@
 
 Boots the Xorg image (XORG_IMAGE, default out/x86_64/release/images/reliefos.raw),
 signs in at the xlogin greeter, and starts the shipped GTK executables from the
-session xterm.  Each program must still be alive once its startup window had
+session st.  Each program must still be alive once its startup window had
 time to map, and its stderr must not carry GLib/GTK warnings or errors such as
 the missing-pixbuf-loader message.  glycin's plain "Glycin running without
 sandbox" notice is evidence, not a failure: the guest kernel has no
@@ -15,7 +15,7 @@ import os
 import sys
 import time
 
-from test_xorg_vm_qemu import boot, collect, greeter_login, wait_session, xterm_marker
+from test_xorg_vm_qemu import boot, collect, greeter_login, wait_session, st_marker
 from test_installer_window_qemu import wait_log
 from test_installer_accounts_qemu import Probe
 from run_gcc_probe_qemu import qmp_quit
@@ -34,7 +34,7 @@ APPS = {
 }
 
 # Click point that hands IceWM's pointer-bound keyboard focus back to the
-# session xterm: well inside the +0+0 terminal, clear of the centered GTK
+# session st: well inside the +0+0 terminal, clear of the centered GTK
 # dialogs that map around the middle of the screen.
 FOCUS_X, FOCUS_Y = 120, 120
 
@@ -74,7 +74,7 @@ def main() -> int:
 
         greeter_login(probe, process)
         wait_session(probe, process, "tty1-session")
-        xterm_marker(probe, serial, process, "GTK-XTERM-READY")
+        st_marker(probe, serial, process, "GTK-ST-READY")
         print("gtk-qemu: session ready", flush=True)
 
         evidence = []

@@ -34,11 +34,11 @@ class GreeterStageTests(unittest.TestCase):
         self.assertEqual(classify_greeter_text("X Window System\nLogin: E\n"), "login")
 
     def test_missing_banner_cannot_count_as_greeter(self):
-        self.assertEqual(classify_greeter_text("ReliefOS xterm\n$"), "session")
+        self.assertEqual(classify_greeter_text("ReliefOS st\n$"), "session")
 
 
 class EvidenceTests(unittest.TestCase):
-    def test_session_xterm_is_not_an_xlogin_panel(self):
+    def test_session_st_is_not_an_xlogin_panel(self):
         frame = Image.new("RGB", (1280, 800), "black")
         ImageDraw.Draw(frame).rectangle((0, 20, 605, 440), fill="white")
         self.assertIsNone(_bright_panel_bbox(frame))
@@ -67,24 +67,24 @@ class EvidenceTests(unittest.TestCase):
         log = "\n".join([
             "PAM authentication accepted",
             "icewm started for uid=1000",
-            "xterm started",
+            "st started",
             "xdm session ended",
             "tty1 restored to text login",
         ])
         self.assertEqual(lifecycle_events(log), [
             "PAM authentication accepted",
             "icewm started for uid",
-            "xterm started",
+            "st started",
             "xdm session ended",
             "tty1 restored to text login",
         ])
         require_event_order(log)
 
     def test_lifecycle_order_rejects_missing_or_root_icewm(self):
-        root_log = "PAM authentication accepted\nicewm started for uid=0\nxterm started\n"
+        root_log = "PAM authentication accepted\nicewm started for uid=0\nst started\n"
         with self.assertRaises(AssertionError):
             require_event_order(root_log)
-        missing = "PAM authentication accepted\nxterm started\n"
+        missing = "PAM authentication accepted\nst started\n"
         with self.assertRaises(AssertionError):
             require_event_order(missing)
 

@@ -9,7 +9,7 @@ runs `/usr/lib/reliefos/reliefos-xdm` in the foreground. XDM starts
 `/usr/bin/Xorg :0 -config /etc/X11/xorg.conf vt1 -keeptty`; the fixed config
 uses `/dev/fb0`, `/dev/input/event0` and `/dev/input/event1`. After PAM accepts
 credentials, `/usr/lib/reliefos/xdm-session` runs as the authenticated user,
-starts `xterm`, and keeps `icewm` in the foreground. Exiting IceWM returns
+starts `st`, and keeps `icewm` in the foreground. Exiting IceWM returns
 control to XDM; exiting XDM lets tty1's console session fall back to text
 login. tty2 through tty6 remain text consoles.
 
@@ -85,7 +85,7 @@ exists. An existing `$XDG_CONFIG_HOME/icewm` directory or a user-provided
 logins, and one user's choice does not change other users' themes.
 
 The taskbar runs along the bottom edge of a single workspace and shows the
-window list and the clock. `xdm-session` starts xterm in the same colours as
+window list and the clock. `xdm-session` starts st in the same colours as
 before (`#f7f8fb` background, `#22242e` text, `#3b62a6` cursor), and the
 `Terminal` menu and toolbar entries run `terminal.sh`, which starts that same
 terminal.
@@ -101,7 +101,7 @@ control back to XDM.
 
 | Keys | Action |
 | --- | --- |
-| Super+Return | new themed xterm |
+| Super+Return | new themed st |
 | Super+Space | root menu |
 | Super+Q | close window |
 | Super+M | minimize window |
@@ -146,7 +146,7 @@ python3 tools/test_xorg_qemu.py --image out/xorg-test/images/reliefos.vmdk \
 ```
 
 The log must show `desktop-backend=xorg`, XDM on vt1, accepted PAM
-authentication, a non-root IceWM session, xterm, session exit and tty1 text
+authentication, a non-root IceWM session, st, session exit and tty1 text
 recovery in that order. This contract does not certify physical GPUs or
 hardware-specific fbdev modes; those require a platform run with captured
 evidence.

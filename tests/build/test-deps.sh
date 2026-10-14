@@ -154,10 +154,12 @@ D='0000000000000000000000000000000000000000000000000000000000000000'
 
 expect_output_is 'xorg entry reports feature' xorg \
     "$deps" --lock "$lock" --id alpine-xdm --print feature
-expect_output_is 'xterm entry reports pinned version' 410-r0 \
-    "$deps" --lock "$lock" --id alpine-xterm --print version
-expect_output_is 'xterm entry reports feature' xorg \
-    "$deps" --lock "$lock" --id alpine-xterm --print feature
+expect_output_is 'st entry reports pinned version' 0.9.3-r0 \
+    "$deps" --lock "$lock" --id alpine-st --print version
+expect_output_is 'st entry reports feature' xorg \
+    "$deps" --lock "$lock" --id alpine-st --print feature
+expect_output_is 'st font dependency is pinned' 2.1.5-r2 \
+    "$deps" --lock "$lock" --id alpine-font-liberation --print version
 expect_output_is 'unmarked entry defaults to base' base \
     "$deps" --lock "$lock" --id alpine-openrc --print feature
 expect_failure 'invalid feature is rejected' \

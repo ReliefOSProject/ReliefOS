@@ -8,7 +8,7 @@ Ctrl+Alt+F1～F6 切换显示与键盘目标。每个文本 VT 保留最多 64 K
 
 ## termios 输出处理
 
-slave 侧写入的输出在进入 master 输出队列或 VT 文本路径前执行 Linux n_tty 同款 OPOST 后处理：`ONLCR` 把 `\n` 展开为 `\r\n`（xterm 等终端据此换行并回到行首），`OCRNL` 把 `\r` 映射为 `\n`，`ONOCR` 丢弃第 0 列的 `\r`，`ONLRET` 使换行后的游标列归零，`OLCUC` 把小写字母转为大写，`TAB3`（`XTABS`）把制表符展开到下一个 8 列制表位。`OPOST` 关闭时字节原样通过，且不更新输出列（与 Linux 一致）。`ONOCR`/`ONLRET`/`TAB3` 依赖内核为每个会话维护的输出列状态。
+slave 侧写入的输出在进入 master 输出队列或 VT 文本路径前执行 Linux n_tty 同款 OPOST 后处理：`ONLCR` 把 `\n` 展开为 `\r\n`（终端据此换行并回到行首），`OCRNL` 把 `\r` 映射为 `\n`，`ONOCR` 丢弃第 0 列的 `\r`，`ONLRET` 使换行后的游标列归零，`OLCUC` 把小写字母转为大写，`TAB3`（`XTABS`）把制表符展开到下一个 8 列制表位。`OPOST` 关闭时字节原样通过，且不更新输出列（与 Linux 一致）。`ONOCR`/`ONLRET`/`TAB3` 依赖内核为每个会话维护的输出列状态。
 
 ## VT ioctl
 

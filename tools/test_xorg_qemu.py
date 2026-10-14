@@ -12,7 +12,7 @@ EVENTS = [
     re.compile(r"xdm started on vt1\b"),
     re.compile(r"PAM authentication accepted\b"),
     re.compile(r"icewm started for uid=(?!0\b)\d+\b"),
-    re.compile(r"xterm started\b"),
+    re.compile(r"st started\b"),
     re.compile(r"xdm session ended\b"),
     re.compile(r"tty1 restored to text login\b"),
 ]
@@ -24,7 +24,7 @@ def source_check():
         "docs/XORG.md": ["IceWM", "make fetch", "Dillo", "QEMU"],
         "docs/APK_PREPARATION.md": ["feature=xorg", "xdm", "v3.24"],
         "system/xorg/xdm-Xservers": ["/usr/lib/reliefos/xorg-tty-wrapper", "vt1", "-keeptty"],
-        "system/xorg/xdm-session": ["/usr/bin/icewm", "/usr/bin/xterm",
+        "system/xorg/xdm-session": ["/usr/bin/icewm", "/usr/bin/st",
                                     "xdg-user-dirs-update"],
         "system/xorg/icewm/menu": ["fileman", "calc", "dillo", "nedit"],
         "system/xorg/icewm/theme": ["Theme="],

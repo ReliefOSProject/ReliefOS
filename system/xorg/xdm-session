@@ -71,12 +71,12 @@ start_child() {
 event 'PAM authentication accepted'
 
 icewm_pid=
-xterm_pid=
+st_pid=
 cleanup() {
-    for pid in $xterm_pid $icewm_pid; do
+    for pid in $st_pid $icewm_pid; do
         kill "$pid" 2>/dev/null || :
     done
-    for pid in $xterm_pid $icewm_pid; do
+    for pid in $st_pid $icewm_pid; do
         wait "$pid" 2>/dev/null || :
     done
 }
@@ -99,18 +99,20 @@ start_child icewm /usr/bin/icewm || exit 1
 icewm_pid=$child_pid
 event "icewm started for uid=$uid"
 
-start_child xterm /usr/bin/xterm -ls -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' || exit 1
-xterm_pid=$child_pid
-event 'xterm started'
+# st fixes its palette at build time, so restore the session colours through the
+# OSC colour escapes it understands, then hand it a login shell.
+start_child st /usr/bin/st -T ReliefOS -g 100x32+0+0 -e /bin/sh -c 'printf "\033]10;#22242e\007\033]11;#f7f8fb\007\033]12;#3b62a6\007\033[2J\033[H"; exec "${SHELL:-/bin/sh}" -l' || exit 1
+st_pid=$child_pid
+event 'st started'
 
-# The window manager owns the session lifetime; xterm is torn down with it.
+# The window manager owns the session lifetime; st is torn down with it.
 wait "$icewm_pid"
 status=$?
 icewm_pid=
-if test -n "$xterm_pid"; then
-    kill "$xterm_pid" 2>/dev/null || :
+if test -n "$st_pid"; then
+    kill "$st_pid" 2>/dev/null || :
 fi
-wait "$xterm_pid" 2>/dev/null || :
-xterm_pid=
+wait "$st_pid" 2>/dev/null || :
+st_pid=
 event 'xdm session ended'
 exit "$status"

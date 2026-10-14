@@ -134,7 +134,7 @@ def _bright_panel_bbox(frame):
         if len(columns) < width * 0.40:
             continue
         # xlogin's panel is centered with a margin on every side.  A running
-        # xterm is also a bright rectangle, but it touches the display edge
+        # st is also a bright rectangle, but it touches the display edge
         # and must not keep the session probe in the greeter state.
         if (columns[0] < width * 0.10 or columns[-1] >= width * 0.90 or
                 band[0] < height * 0.10 or band[-1] >= height * 0.90):
@@ -170,7 +170,7 @@ def lifecycle_events(log):
     patterns = (
         ("PAM authentication accepted", re.compile(r"PAM authentication accepted\b")),
         ("icewm started for uid", re.compile(r"icewm started for uid=(?!0\b)[1-9][0-9]*\b")),
-        ("xterm started", re.compile(r"xterm started\b")),
+        ("st started", re.compile(r"st started\b")),
         ("xdm session ended", re.compile(r"xdm session ended\b")),
         ("tty1 restored to text login", re.compile(r"tty1 restored to text login\b")),
     )
@@ -186,7 +186,7 @@ def require_event_order(log):
     """Require the authenticated XDM lifecycle to be recorded in order."""
     expected = [
         "PAM authentication accepted", "icewm started for uid",
-        "xterm started", "xdm session ended", "tty1 restored to text login",
+        "st started", "xdm session ended", "tty1 restored to text login",
     ]
     actual = lifecycle_events(log)
     if actual != expected:
@@ -263,12 +263,12 @@ def wait_greeter_stage(probe, process, expected, name, timeout=45):
     raise AssertionError(f"XDM greeter did not reach {expected!r}; observed {observed!r}")
 
 
-def _session_xterm_visible(frame):
-    """Return True once the session xterm has mapped its window.
+def _session_st_visible(frame):
+    """Return True once the session st has mapped its window.
 
     The pale wallpaper alone already passes any brightness floor on the bare
-    root window the moment xdm kills the greeter, long before icewm/xterm have
-    mapped.  The xterm started by xdm-session fills its window with #f7f8fb
+    root window the moment xdm kills the greeter, long before icewm/st have
+    mapped.  The st started by xdm-session fills its window with #f7f8fb
     and the wallpaper palette contains no pixel of that exact color, so only
     a mapped terminal can put it on screen -- the readiness signal needed
     before typing the marker command.
@@ -278,24 +278,24 @@ def _session_xterm_visible(frame):
 
 
 def wait_session(probe, process, name, timeout=45):
-    """Require a mapped session window before sending an xterm probe."""
+    """Require a mapped session window before sending an st probe."""
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         assert process.poll() is None, "QEMU exited while waiting for the session"
         frame = probe.frame(name)
         if (_bright_panel_bbox(frame) is None and
-                _session_xterm_visible(frame)):
+                _session_st_visible(frame)):
             return
         time.sleep(.5)
-    raise AssertionError(f"IceWM/xterm session never became visible on {name}")
+    raise AssertionError(f"IceWM/st session never became visible on {name}")
 
 
-def xterm_marker(probe, serial, process, marker, command=None):
-    """Prove that input reached the xterm shell by observing its serial marker."""
+def st_marker(probe, serial, process, marker, command=None):
+    """Prove that input reached the st shell by observing its serial marker."""
     command = command or f"echo {marker} >/dev/ttyS0"
     offset = len(serial.read_text(errors="replace")) if serial.exists() else 0
     # IceWM keeps the keyboard focus with the pointer, and the greeter login
-    # clicks leave the pointer outside the session xterm that xdm-session
+    # clicks leave the pointer outside the session st that xdm-session
     # places at +0+0.  Click the terminal first, the same way greeter_login
     # focuses the login field before typing.
     probe.click(300, 200)
@@ -408,7 +408,7 @@ def main() -> int:
         try:
             greeter_login(probe, process)
             wait_session(probe, process, "tty1-session-live")
-            xterm_marker(probe, serial, process, "XORG-XTERM-READY")
+            st_marker(probe, serial, process, "XORG-ST-READY")
             session_ready = True
         except AssertionError as error:
             fail(f"tty1 session did not replace the greeter: {error}")
@@ -453,10 +453,10 @@ def main() -> int:
 
             # Type a sentinel on the active text VT without submitting it.
             # After the return, neither OCR nor the measurable framebuffer
-            # distance may show that text in the xterm surface.
+            # distance may show that text in the st surface.
             switch_vt(probe, serial, process, 1)
             wait_session(probe, process, "tty1-before-isolation")
-            xterm_marker(probe, serial, process, "XORG-RESTORED")
+            st_marker(probe, serial, process, "XORG-RESTORED")
             baseline = probe.frame("tty1-isolation-baseline")
             switch_vt(probe, serial, process, 2)
             sentinel = "TTY2-ONLY-INPUT-9F3A"
@@ -477,7 +477,7 @@ def main() -> int:
                        "echo TTY2-AFTER-ISOLATION >/dev/ttyS0", "TTY2-AFTER-ISOLATION")
 
             # Capture the real process table, then terminate IceWM through the
-            # xterm shell.  This exercises XDM's session-ended and tty1 getty
+            # st shell.  This exercises XDM's session-ended and tty1 getty
             # handoff paths instead of leaving the session alive at teardown.
             processes = collect(probe, serial, process, "SESSION-PROCS", command="ps")
             icewm = re.search(r"(?im)^\s*(\d+)\s+.*\bicewm(?:\s|$)", processes)
@@ -489,7 +489,7 @@ def main() -> int:
                 icewm_pid = icewm.group(1)
                 switch_vt(probe, serial, process, 1)
                 wait_session(probe, process, "tty1-before-exit")
-                xterm_marker(probe, serial, process, "XORG-EXIT-REQUEST",
+                st_marker(probe, serial, process, "XORG-EXIT-REQUEST",
                              f"echo XORG-EXIT-REQUEST >/dev/ttyS0; kill {icewm_pid}")
                 # XDM may immediately present a fresh greeter after the user
                 # session ends.  First collect that end event, then terminate
