@@ -37,8 +37,7 @@ stage 'starting live installer session on vt1'
 printf '%s\n' 'desktop-backend=xorg'
 
 DISPLAY=:0
-ICEWM_PRIVCFG=/etc/reliefos/icewm
-export DISPLAY ICEWM_PRIVCFG
+export DISPLAY
 
 xorg_pid=
 icewm_pid=
@@ -79,7 +78,7 @@ if test ! -S /tmp/.X11-unix/X0; then
 fi
 stage 'X server ready on vt1'
 
-# Retro pixel-art root background matching the IceWM Light theme.  This is a
+# Retro pixel-art root background.  This is a
 # best-effort one-shot: on failure the installer window keeps the default root.
 if test -x /usr/bin/xwallpaper && test -r /etc/reliefos/wallpaper.png; then
     /usr/bin/xwallpaper --focus /etc/reliefos/wallpaper.png 2>/dev/null || :

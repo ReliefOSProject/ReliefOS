@@ -62,14 +62,27 @@ staged into the guest.
 ## IceWM theme, taskbar, menu and keys
 
 The session ships supplemental IceWM files from `system/xorg/icewm`, staged to
-`/etc/reliefos/icewm`. `xdm-session` exports `ICEWM_PRIVCFG=/etc/reliefos/icewm`
-before starting the window manager. The packaged IceWM defaults provide the
-menu and dynamic Programs submenu; the ReliefOS directory supplies any local
-scripts and theme overrides that are present, without restoring removed config
-files. The `theme` file selects `themes/light/default.theme`, the
-"Light" theme, which keeps the previous palette on IceWM's `nice` look:
-`#dce4f5` title bars with `#1a1b26` text, `#8aa0d6` active borders, white menus
-with a `#3b62a6` selection, and an `#eceef4` taskbar and borders.
+`/etc/reliefos/icewm` and exposed through `/etc/icewm`, IceWM's standard system
+configuration path. Desktop and installer sessions leave `ICEWM_PRIVCFG`
+unassigned, so personal configuration takes precedence over system defaults.
+The packaged IceWM defaults provide the menu and dynamic Programs submenu;
+the ReliefOS directory supplies any local scripts and theme overrides that
+are present, without restoring removed config files. The system `theme` file
+selects `win95/default.theme` for users who have not chosen a personal theme.
+
+Both desktop and installer images include every theme and all associated
+pixmaps from the pinned IceWM APK under `/usr/share/icewm/themes`. The bundled
+themes are `CrystalBlue`, `Helix`, `Infadel2`, `NanoBlue`, `default`, `icedesert`,
+`metal2`, `motif` and `win95`, including Infadel2's `Ergonomic` and `Overloaded`
+variants. APK staging checks the entire upstream theme payload before
+publishing an image; no theme selection needs an additional download.
+
+Use IceWM's own **Settings -> Themes** submenu to switch themes. IceWM saves
+the selection in the user's configuration directory, normally
+`$HOME/.icewm/theme`, or `$HOME/.config/icewm/theme` when that directory already
+exists. An existing `$XDG_CONFIG_HOME/icewm` directory or a user-provided
+`ICEWM_PRIVCFG` is also supported. The selection is restored on subsequent
+logins, and one user's choice does not change other users' themes.
 
 The taskbar runs along the bottom edge of a single workspace and shows the
 window list and the clock. `xdm-session` starts xterm in the same colours as

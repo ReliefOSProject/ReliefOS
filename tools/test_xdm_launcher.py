@@ -119,7 +119,7 @@ class XdmLauncherTests(unittest.TestCase):
                               xterm: str = "exec sleep 4\n") -> None:
         write_stub(self.sandbox / "usr/bin/id", f'if test "$1" = -u; then echo {uid}; else echo tester; fi\n')
         # The stub records its configuration environment so the session can be
-        # held to pointing IceWM at the shipped configuration directory.  No
+        # held to leaving IceWM's personal configuration path unassigned.  No
         # twm stub exists: a session that still execs /usr/bin/twm fails.
         write_stub(self.sandbox / "usr/bin/icewm",
                    'printf \'%s\\n\' "$ICEWM_PRIVCFG" > /run/icewm.privcfg\n' + wm)
@@ -188,9 +188,10 @@ class XdmLauncherTests(unittest.TestCase):
         self.assertNotIn("icewm failed to start", "\n".join(lines))
         self.assertLess(lines.index("icewm started for uid=1000"),
                         lines.index("xterm started"))
-        # The session must point IceWM at the shipped configuration instead of
-        # letting it fall back to a user or upstream default.
-        self.assertEqual(self.wm_config().strip(), "/etc/reliefos/icewm")
+        # The session must let IceWM use personal configuration before the
+        # standard system defaults rather than force a root-owned directory.
+        self.assertEqual(self.wm_config().strip(),
+                         os.environ.get("ICEWM_PRIVCFG", ""))
 
     def test_immediate_child_death_is_not_recorded_as_started(self):
         self.install_session_stubs(wm="exit 3\n")

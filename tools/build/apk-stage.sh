@@ -342,6 +342,29 @@ set -- --root "$managed" --arch x86_64 --initdb --repositories-file /dev/null \
 while IFS= read -r group; do set -- "$@" "$(package_name "$group")"; done <"$scratch/groups"
 while IFS= read -r request; do set -- "$@" "$request"; done <"$scratch/upstream-requests"
 run_apk "$@"
+if [ "$backend" = xorg ]; then
+    icewm_url=$("$deps" --lock "$lock" --id alpine-icewm --print url)
+    tar --ignore-zeros -tzf "$repository/${icewm_url##*/}" >"$scratch/icewm-members" 2>/dev/null
+    icewm_themes=0
+    while IFS= read -r path; do
+        case $path in
+            usr/share/icewm/themes/*)
+                [ -e "$managed/$path" ] || [ -L "$managed/$path" ] || {
+                    echo "bundled IceWM theme resource is missing: $path" >&2
+                    exit 1
+                }
+                case $path in
+                    */default.theme) icewm_themes=$((icewm_themes + 1)) ;;
+                esac
+                ;;
+        esac
+    done <"$scratch/icewm-members"
+    [ "$icewm_themes" -gt 0 ] || {
+        echo 'the pinned IceWM package contains no bundled themes' >&2
+        exit 1
+    }
+    reliefos_log APK "included $icewm_themes bundled IceWM themes"
+fi
 mkdir -p "$managed/usr/share/reliefos/apk"
 cp -a "$repository" "$managed/usr/share/reliefos/apk/repository"
 for name in EFI grub reliefos leonos install; do [ ! -e "$raw/$name" ] || cp -a "$raw/$name" "$managed/$name"; done

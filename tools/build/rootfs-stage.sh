@@ -65,8 +65,9 @@ file "$src/system/xorg/xdm-Xresources" etc/reliefos/xdm-Xresources 0644 product-
 file "$src/system/xorg/xdm-session" etc/reliefos/xdm-session 0755 reliefos-apps override
 file "$src/system/xorg/xdm-session" usr/lib/reliefos/xdm-session 0755 reliefos-apps override
 file "$src/system/xorg/xdm-setup" usr/lib/reliefos/xdm-setup 0755 reliefos-apps override
-# IceWM reads its whole configuration from this directory (ICEWM_PRIVCFG).
+# IceWM reads these system defaults through its standard /etc/icewm path.
 tree "$src/system/xorg/icewm" etc/reliefos/icewm product-policy override
+link etc/icewm reliefos/icewm reliefos-apps
 file "$src/system/xorg/wallpaper.png" etc/reliefos/wallpaper.png 0644 product-policy override
 file "$src/system/xorg/pam-xdm" etc/pam.d/xdm 0644 product-policy override
 legacy=$src/system/rootfs/var/lib/leonos/users.db

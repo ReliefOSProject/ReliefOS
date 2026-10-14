@@ -82,7 +82,7 @@ cleanup() {
 }
 trap cleanup EXIT HUP INT TERM
 
-# Retro pixel-art root background matching the IceWM Light theme.  This is a
+# Retro pixel-art root background.  This is a
 # best-effort one-shot: on failure the X server keeps its default background.
 if test -x /usr/bin/xwallpaper; then
     /usr/bin/xwallpaper --focus /etc/reliefos/wallpaper.png 2>/dev/null || :
@@ -94,12 +94,6 @@ fi
 if test -x /usr/bin/xdg-user-dirs-update; then
     /usr/bin/xdg-user-dirs-update || :
 fi
-
-# ICEWM_PRIVCFG is the first directory IceWM searches for its configuration, so
-# the session always gets the shipped theme, menu, toolbar and key bindings
-# instead of a user or upstream default.
-ICEWM_PRIVCFG=/etc/reliefos/icewm
-export ICEWM_PRIVCFG
 
 start_child icewm /usr/bin/icewm || exit 1
 icewm_pid=$child_pid

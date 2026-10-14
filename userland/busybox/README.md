@@ -65,7 +65,8 @@ Root, installer-created accounts, `useradd` and desktop terminals use Bash.
 
 Alpine owns `/etc/bash/bashrc`, `/etc/profile.d/00-bashrc.sh`, `/etc/inputrc`
 and the completion scripts. ReliefOS adds `/etc/bash/reliefos.sh` for the
-interactive prompt and history settings. User configuration lives in
+interactive prompt and history settings, and to run `fastfetch` when an
+interactive terminal opens and the command is available. User configuration lives in
 `~/.bash_profile`, `~/.bashrc` and `~/.inputrc`; the skeleton and installer
 populate these files for new accounts. The login profile also reads an existing
 `~/.profile`. Existing user files remain intact during upgrades.
