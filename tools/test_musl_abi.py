@@ -15,9 +15,30 @@ def run(args):
     subprocess.run([str(arg) for arg in args], check=True, timeout=60)
 
 
+def default_prefix() -> Path:
+    """Locate the musl sysroot the ABI probes compile and run against.
+
+    The pinned musl the userland links against is built into the output tree as
+    ``out/<arch>/<profile>/sysroot/musl``.  A hand-built sysroot under
+    ``build/musl/sysroot`` still wins when present; otherwise fall back to the
+    most recently built complete one so a bare run finds real headers instead of
+    erroring on a stale default path.
+    """
+    explicit = ROOT / "build/musl/sysroot"
+    if (explicit / "include/fcntl.h").is_file():
+        return explicit
+    complete = [
+        p for p in (ROOT / "out").glob("*/sysroot/musl")
+        if (p / "include/fcntl.h").is_file() and (p / "lib/libc.so").is_file()
+    ]
+    if complete:
+        return max(complete, key=lambda p: p.stat().st_mtime)
+    return explicit
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--prefix", type=Path, default=ROOT / "build/musl/sysroot")
+    parser.add_argument("--prefix", type=Path, default=default_prefix())
     args = parser.parse_args()
     prefix = args.prefix.resolve()
     resource = subprocess.check_output(["clang", "-print-resource-dir"], text=True).strip()

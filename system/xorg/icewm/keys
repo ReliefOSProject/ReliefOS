@@ -1,0 +1,3 @@
+# ReliefOS hotkeys that launch programs.  Window-manager actions are bound in
+# preferences (KeySys*/KeyWin*), so only program launchers appear here.
+key "Super+Return" sh /etc/reliefos/icewm/terminal.sh

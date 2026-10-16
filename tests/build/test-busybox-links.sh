@@ -49,7 +49,7 @@ sh "$src/tools/build/busybox-links.sh" "$work/empty-plan" "$work/empty-links" > 
 # callable when the applet is compiled in.
 for name in sh ash false ping ping6 df free top dmesg hexdump killall nc netstat \
     traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod \
-    unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch; do
+    unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch chroot setuidgid; do
     printf '/bin/%s\n' "$name"
 done > "$work/check-links"
 : > "$work/check-config"
