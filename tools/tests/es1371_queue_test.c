@@ -8,6 +8,8 @@ static uint32_t regs[64];
 static uint32_t read_long(uint16_t port) { return regs[port / 4U]; }
 static void write_long(uint16_t port, uint32_t value) { regs[port / 4U] = value; }
 static void log_text(const char *text) { (void)text; }
+static void log_record(enum console_log_level level, const char *format, ...)
+{ (void)level; (void)format; }
 #ifndef ES1371_QUEUE_SOURCE
 #define ES1371_QUEUE_SOURCE "../../kernel/reliefnt/drivers/sound/es1371/es1371.c"
 #endif
@@ -18,7 +20,7 @@ static int all_zero(const uint8_t *p, unsigned n)
 int main(void)
 {
     struct reliefos_driver_kernel_api api = {.inl=read_long, .outl=write_long,
-        .console_write=log_text};
+        .console_write=log_text,.console_log=log_record};
     uint8_t ring[ES1371_DMA_BYTES] = {0}, pcm[2048];
     memset(pcm, 0x5a, sizeof pcm);
     kernel_api = &api;es1371.dma_buffer=ring;es1371.dma_configured=1;

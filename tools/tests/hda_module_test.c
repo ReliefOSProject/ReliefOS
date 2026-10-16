@@ -227,10 +227,13 @@ static int register_card(const struct audio_card_identity *id,const struct audio
                           void *p,uint32_t *token)
 { int ret=audio_register_card_owned(id,ops,p,1,token);if(!ret){identities[card_count]=*id;registered[card_count++]=*token;}return ret; }
 static void console(const char *text){(void)text;}
+static void console_record(enum console_log_level level,const char *format,...)
+{(void)level;(void)format;}
 static void report(int error){if(!teardown_error)teardown_error=error;}
 static struct reliefos_driver_kernel_api api={.abi_version=RELIEFOS_DRIVER_ABI_VERSION,
     .struct_size=sizeof(struct reliefos_driver_kernel_api),.alloc_pages=alloc_pages,.free_pages=free_pages,
     .alloc_dma=alloc_dma,.free_dma=free_pages,.pci_enumerate=enumerate,.console_write=console,
+    .console_log=console_record,
     .audio_register_card=register_card,.audio_unregister_card=audio_unregister_card,
     .audio_period_elapsed=core_audio_period_elapsed,.audio_control_changed=audio_control_changed,
     .audio_set_service=audio_card_set_service,.report_teardown_failure=report,

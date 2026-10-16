@@ -72,6 +72,22 @@ The normal boot entries and `bootlog=1` alone still continue automatically.
 IRQ/timer input remains active while paused; queued input, mouse events, and
 key releases are ignored. Press Enter in the virtual machine to resume boot.
 
+Kernel log levels and formatting are shared by every built-in driver. Level
+labels use muted ANSI colors by default. Append `logcolor=0` to the
+`multiboot2 /reliefos/kernel.sys ...` line to disable those escapes from the
+first boot message; `logcolor=1` enables them explicitly. Repeated valid values
+use the last one. This setting does not disable userspace or debugger colors.
+Framebuffer replay interprets the same ANSI labels as serial output; the VGA
+text fallback strips the escape sequences.
+
+The first text-console handoff happens after the final `boot complete` log.
+tty1 adopts the existing framebuffer text and cursor without clearing or
+replaying over the screen, so PID 1 and OpenRC output continues immediately
+below the kernel messages. The retained boot log becomes part of tty1's text
+history and is replayed when returning from another VT or graphical mode.
+Reactivating the already-visible text VT does not clear it. Actual VT changes,
+graphical ownership changes and explicit userspace clear sequences still work.
+
 ## Installer compatibility
 
 The installer writes target disks through AHCI, legacy IDE/PATA PIO, or NVMe.

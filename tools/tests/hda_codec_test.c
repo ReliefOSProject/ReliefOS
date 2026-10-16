@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -188,6 +189,7 @@ static struct fake_codec *fake_codec_by_cad(uint8_t cad);
 static uint64_t fake_api_alloc_pages(uint32_t page_count);
 static void fake_api_free_pages(uint64_t phys, uint32_t page_count);
 static void fake_api_console(const char *text);
+static void fake_api_console_log(enum console_log_level level, const char *format, ...);
 static uint64_t fake_api_ticks(void);
 static void fake_api_sleep_ms(uint64_t milliseconds);
 static uint32_t fake_param(struct fake_codec *codec, struct fake_hda_node *node,
@@ -442,6 +444,7 @@ static void fake_reset(void)
     fake_api.alloc_pages = fake_api_alloc_pages;
     fake_api.free_pages = fake_api_free_pages;
     fake_api.console_write = fake_api_console;
+    fake_api.console_log = fake_api_console_log;
     fake_api.ticks = fake_api_ticks;
     fake_api.sleep_ms = fake_api_sleep_ms;
     fake_build_primary();
@@ -740,6 +743,17 @@ static void fake_api_console(const char *text)
     memcpy(fake_console_text + fake_console_length, text, length);
     fake_console_length += (uint32_t)length;
     fake_console_text[fake_console_length] = '\0';
+}
+
+static void fake_api_console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level;
+    char text[512];
+    va_list arguments;
+    va_start(arguments, format);
+    vsnprintf(text, sizeof(text), format, arguments);
+    va_end(arguments);
+    fake_api_console(text);
 }
 
 static uint32_t fake_param(struct fake_codec *codec, struct fake_hda_node *node,

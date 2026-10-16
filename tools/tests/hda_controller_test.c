@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <reliefos/driver.h>
@@ -142,6 +143,7 @@ static void fake_free_irq(uint32_t handle);
 static uint64_t fake_ticks(void);
 static void fake_sleep_ms(uint64_t ms);
 static void fake_console(const char *text);
+static void fake_console_log(enum console_log_level level, const char *format, ...);
 static void fake_push_response(uint8_t cad, uint32_t response, int unsolicited);
 static uint16_t fake_raw16(const struct hda_fake_device *dev, uint32_t offset);
 
@@ -255,6 +257,7 @@ static struct reliefos_driver_kernel_api fake_api(void) {
         .abi_version = RELIEFOS_DRIVER_ABI_VERSION,
         .struct_size = sizeof(struct reliefos_driver_kernel_api),
         .console_write = fake_console,
+        .console_log = fake_console_log,
         .pci_read16 = fake_pci_read16,
         .pci_write16 = fake_pci_write16,
         .pci_read32 = fake_pci_read32,
@@ -720,6 +723,17 @@ static void fake_console(const char *text) {
         ++i;
     }
     fake.last_log[i] = '\0';
+}
+
+static void fake_console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level;
+    char text[512];
+    va_list arguments;
+    va_start(arguments, format);
+    vsnprintf(text, sizeof(text), format, arguments);
+    va_end(arguments);
+    fake_console(text);
 }
 
 static void verb_layout_is_correct(void) {
@@ -1248,7 +1262,7 @@ static void ring_handshake_failure_is_bounded_and_reclaimed(void) {
     fake_device_init(0x40, 0x40);
     fake.fail_corb_start = 1u;
     api = fake_api();
-    api.console_write = NULL;
+    api.console_log = NULL;
     assert(hda_controller_init(&c, &api, &fake_pci) == -EOPNOTSUPP);
     fake_assert_resources_reclaimed();
 }

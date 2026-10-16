@@ -23,6 +23,16 @@ callbacks. Drivers receive `struct reliefos_driver_kernel_api`; they do not
 call arbitrary kernel subsystems directly. The API table binds a mouse input
 provider, serial console provider, e1000 link provider, or audio card.
 
+Kernel and driver diagnostics share the severity enum in
+`<reliefos/kernel_log.h>`. Built-in drivers check
+`api->struct_size >= RELIEFOS_DRIVER_LOG_API_SIZE` and call
+`api->console_log(level, format, ...)`; the kernel alone formats timestamps,
+level labels and muted ANSI colors. The callback is appended to ABI v1, so
+older prefix offsets remain unchanged. The old `console_write` logging callback
+is retained only for compatibility, not used by current built-in diagnostics.
+The boot parameter `logcolor=0` disables kernel-log color escapes, including
+early boot and replay, without changing userspace terminal output.
+
 ## Startup
 
 During boot the driver manager initializes every built-in driver in a fixed

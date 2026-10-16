@@ -35,6 +35,8 @@ static void write16(uint8_t b, uint8_t s, uint8_t f, uint8_t offset, uint16_t va
 static void pause_ms(uint64_t ms)
 { (void)ms; *(uint32_t *)(registers + E1000_REG_CTRL) &= ~(1u << 26); }
 static void log_text(const char *text) { (void)text; }
+static void log_record(enum console_log_level level, const char *format, ...)
+{ (void)level; (void)format; }
 static int register_ops(const struct reliefos_driver_e1000_ops *ops)
 { assert(ops->is_ready()); return registration_error; }
 
@@ -49,6 +51,7 @@ int main(void)
     const struct reliefos_driver_kernel_api api = {
         .abi_version = RELIEFOS_DRIVER_ABI_VERSION, .struct_size = sizeof(api),
         .alloc_pages = allocate, .free_pages = release, .console_write = log_text,
+        .console_log = log_record,
         .pci_find = find, .pci_read16 = read16, .pci_write16 = write16,
         .pci_read32 = read32, .sleep_ms = pause_ms, .register_e1000 = register_ops,
     };

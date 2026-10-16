@@ -8,6 +8,7 @@ void *kernel_malloc(size_t size) { return malloc(size); }
 void kernel_free(void *ptr) { free(ptr); }
 
 static uint32_t pixels[80 * 48];
+static uint32_t full_clear_count;
 static const struct framebuffer display = {
     .pixels = pixels, .width = 80, .height = 48, .pitch = 80 * 4,
     .bpp = 32, .bytes_per_pixel = 4, .available = true,
@@ -15,6 +16,7 @@ static const struct framebuffer display = {
 const struct framebuffer *framebuffer_get(void) { return &display; }
 void framebuffer_rect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t c)
 {
+    if (!x && !y && w == display.width && h == display.height) ++full_clear_count;
     for (uint32_t row = y; row < y + h && row < 48; ++row)
         for (uint32_t col = x; col < x + w && col < 80; ++col)
             pixels[row * 80 + col] = c;
@@ -36,7 +38,31 @@ void smp_membarrier_poll(void) {}
 
 int main(void)
 {
-    fb_console_enabled = true;
+    console_log_configure("logcolor=0");
+    console_enable_framebuffer();
+    console_info("boot ready\n");
+    uint32_t boot_col = fb_col;
+    uint32_t boot_row = fb_row;
+    uint32_t boot_clear_count = full_clear_count;
+    size_t boot_history_length = log_len - console_log_replay_start();
+    console_vt_activate(1, false);
+    assert(full_clear_count == boot_clear_count);
+    assert(fb_col == boot_col && fb_row == boot_row);
+    assert(vt_text[0].length == boot_history_length);
+    assert(strstr(vt_text[0].bytes, "[INFO] boot ready\n") != NULL);
+    console_vt_write(1, "init\n", 5);
+    assert(full_clear_count == boot_clear_count);
+    assert(vt_text[0].length == boot_history_length + 5u);
+    assert(memcmp(vt_text[0].bytes + boot_history_length, "init\n", 5) == 0);
+    uint32_t init_col = fb_col;
+    uint32_t init_row = fb_row;
+    console_vt_activate(1, false);
+    assert(full_clear_count == boot_clear_count);
+    assert(fb_col == init_col && fb_row == init_row);
+    console_vt_activate(2, false);
+    console_vt_activate(1, false);
+    assert(vt_text[0].length == boot_history_length + 5u);
+    assert(strstr(vt_text[0].bytes, "[INFO] boot ready\ninit\n") != NULL);
     console_vt_activate(2, false);
     assert(fb_console_tty_cursor_visible && fb_console_tty_cursor_x == 0);
     console_vt_write(2, "a", 1);
@@ -49,5 +75,5 @@ int main(void)
     assert(memcmp(before, pixels, sizeof(pixels)) == 0);
     console_vt_write(3, "another terminal", 16);
     assert(memcmp(before, pixels, sizeof(pixels)) == 0);
-    puts("VT text cursor, kernel-log isolation and background output passed");
+    puts("VT boot continuity, text cursor, kernel-log isolation and background output passed");
 }

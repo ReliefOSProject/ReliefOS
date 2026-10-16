@@ -34,6 +34,8 @@ static void write_byte(uint16_t port,uint8_t value)
 }
 static void write_long(uint16_t port,uint32_t value) { memcpy(regs+port,&value,sizeof value); }
 static void log_text(const char *text) { (void)text; }
+static void log_record(enum console_log_level level, const char *format, ...)
+{ (void)level; (void)format; }
 #ifndef AC97_QUEUE_SOURCE
 #define AC97_QUEUE_SOURCE "../../kernel/reliefnt/drivers/sound/ac97/ac97.c"
 #endif
@@ -48,7 +50,7 @@ static void terminal_lvi(void)
 int main(void)
 {
     struct reliefos_driver_kernel_api api={.inb=read_byte,.outb=write_byte,
-        .outl=write_long,.console_write=log_text};
+        .outl=write_long,.console_write=log_text,.console_log=log_record};
     struct ac97_buffer_desc bdl[32];uint8_t buffers[65536];uint8_t samples[2048];
     memset(samples,0x5a,sizeof samples);
     kernel_api=&api;ac97.bdl=bdl;ac97.buffers=buffers;ac97.buffers_phys=0x200000;
