@@ -13,6 +13,25 @@ CRYPTO = [f"third_party/mbedtls/library/{name}.c" for name in
 
 
 class InstallerSetupTests(unittest.TestCase):
+    def test_console_home_does_not_create_desktop_shortcuts(self):
+        with tempfile.TemporaryDirectory(prefix="reliefos-console-home-") as temporary:
+            root = Path(temporary)
+            executable = root / "console-home"
+            subprocess.run([
+                "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
+                "-idirafter", "userland/runtime/include",
+                "tools/tests/installer_console_home_test.c", "-o", str(executable),
+            ], cwd=ROOT, check=True)
+            (root / "home").mkdir()
+            (root / "etc/skel").mkdir(parents=True)
+            for name in (".bash_profile", ".bashrc", ".inputrc"):
+                (root / "etc/skel" / name).write_text("# shell defaults\n")
+            subprocess.run([str(executable), root], check=True, timeout=10)
+            self.assertEqual(list((root / "home/test/desktop").iterdir()), [])
+            self.assertEqual((root / "home/test/.bashrc").read_text(), "# shell defaults\n")
+
     def test_hyfetch_defaults(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-hyfetch-home-") as temporary:
             work = Path(temporary)

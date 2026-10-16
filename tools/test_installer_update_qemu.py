@@ -90,7 +90,7 @@ def main():
                 probe.command("stop")
                 probe.command("pmemsave", {"val": int(match[1], 16), "size": int(match[2]),
                                           "filename": str(memory)})
-                subprocess.run(["debugfs", "-R", f"dump /var/log/desktop.log {output / 'installer.log'}",
+                subprocess.run(["debugfs", "-R", f"dump /var/log/installer-session.log {output / 'installer.log'}",
                                 str(memory)], check=True)
         log = (output / "installer.log").read_text()
         assert "APK update wait_status=0" in log and "update completed successfully" in log

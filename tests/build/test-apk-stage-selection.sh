@@ -202,6 +202,32 @@ for id in alpine-openrc alpine-xorg-fonts alpine-xorg-server alpine-xterm alpine
 done
 expect_grep "$s/deps.log" "$w/lock.json"
 
+# --- console backend: xorg archives are omitted and their raw files cannot
+# fall through into local signed packages. A same-named base archive remains.
+set_marker "console
+"
+stage console
+s=$w/console
+expect_present "$s/repository/openrc-0.1.apk"
+expect_present "$s/repository/xorg-fonts-0.1.apk"
+expect_absent "$s/repository/icewm-0.1.apk"
+expect_absent "$s/repository/xorg-server-0.1.apk"
+expect_absent "$s/repository/xterm-0.1.apk"
+expect_present "$s/managed/usr/share/fonts/xorg-fonts.fixture"
+expect_present "$s/managed/etc/openrc-extra.conf"
+expect_present "$s/managed/usr/bin/keep-me.txt"
+expect_absent "$s/managed/usr/lib/xorg/modules/raw-overlay-probe"
+expect_absent "$s/managed/usr/bin/xorg-server"
+expect_absent "$s/managed/usr/bin/xterm"
+expect_absent "$s/managed/usr/share/icewm/themes/default/default.theme"
+expect_no_grep "$s/own.log" 'usr/lib/xorg/modules/raw-overlay-probe'
+expect_no_grep "$s/own.log" 'usr/bin/xorg-server'
+expect_no_grep "$s/own.log" 'usr/bin/xterm'
+expect_no_grep "$s/apk.log" 'icewm'
+expect_no_grep "$s/apk.log" 'xorg-server'
+expect_no_grep "$s/apk.log" 'xterm'
+expect_grep "$s/apk.log" 'add reliefos-base openrc=0.1 xorg-fonts=0.1'
+
 # --- xorg backend: base and xorg archives are all installed ---
 set_marker "xorg
 "

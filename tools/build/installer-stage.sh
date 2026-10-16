@@ -22,6 +22,9 @@ package_root() {
         "$src/configs/apk-ownership.json" "$APK_OWN_TOOL" "$APK_KEY" "$APK_VERSION"
 }
 package_root "$work/installed-raw" "$work/installed" "$out/packages/apk-installed"
+cp -a "$work/installed-raw" "$work/console-raw"
+sh "$src/tools/build/installer-console-profile.sh" "$work/console-raw"
+package_root "$work/console-raw" "$work/console-installed" "$out/packages/apk-console"
 cp -a "$raw" "$work/runtime-raw"
 mkdir -p "$work/runtime-raw/usr/lib/reliefos/apps/installer"
 cp "$out/userland/installer.elf" "$work/runtime-raw/usr/lib/reliefos/apps/installer/installer.elf"
@@ -58,6 +61,7 @@ package_root "$work/runtime-raw" "$work/runtime" "$out/packages/apk-installer-ru
 mkdir -p "$work/runtime/install"
 reliefos_log STAGE 'installer payload and ESP'
 mv "$work/installed" "$work/runtime/install/root"
+mv "$work/console-installed" "$work/runtime/install/root-console"
 cp -a "$esp" "$work/runtime/install/esp"
 "${INSTALLER_DEDUP_TOOL:-$out/host/bin/reliefos-dedup}" "$work/runtime"
 find "$work/runtime" -exec touch -h -d "@$epoch" {} +

@@ -7,6 +7,13 @@ Select "Install ReliefOS (TTY mode)" from the Installer ISO boot menu. The
 entry starts a root Ash shell. Run "installer" to launch the interactive TTY
 installer, or continue with this guide for a manual installation.
 
+For a fresh installation, the confirmation page offers "Install Xorg desktop
+environment", enabled by default. Clear it to install a text-login system
+without Xorg, IceWM, or the X11 applications. The TTY installer asks the same
+question; press Enter for the desktop or answer n for text login. This choice
+affects the installed disk; the installation media retains its graphical UI.
+In-place updates retain the target's desktop or text-login profile.
+
 The TTY environment provides standard Linux command-line tools: fdisk, mount,
 lsblk, and blkid from util-linux; mkfs.ext4 and fsck.ext4 from e2fsprogs;
 mkfs.fat and fsck.fat from dosfstools; mkfs.exfat and fsck.exfat from
@@ -31,6 +38,7 @@ development.
 ------------------------------------------------
 
 ls /install/root
+ls /install/root-console
 ls /install/esp
 lsblk
 blkid

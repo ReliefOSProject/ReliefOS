@@ -718,6 +718,10 @@ msgstr ""
 msgid "Confirm Update"
 msgstr ""
 
+#: userland/apps/installer/main.c
+msgid "Install Xorg desktop environment"
+msgstr ""
+
 #: userland/apps/installer/main.c:628
 msgid "Confirm password"
 msgstr ""

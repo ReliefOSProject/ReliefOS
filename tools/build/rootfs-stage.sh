@@ -52,8 +52,8 @@ for spec in auth pam; do
 done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
-# Runtime marker: the only supported value is xorg.  The installer media keeps
-# it and selects its live session from the installer-runtime marker instead.
+# Image roots default to Xorg. Installer staging also derives a console target
+# profile; the live media keeps Xorg and selects its own installer session.
 printf '%s\n' xorg > "$work/data/desktop-backend"
 file "$work/data/desktop-backend" etc/reliefos/desktop-backend 0644 product-policy override
 file "$src/system/xorg/xorg.conf" etc/X11/xorg.conf 0644 product-policy override

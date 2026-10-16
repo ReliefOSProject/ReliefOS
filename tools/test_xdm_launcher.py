@@ -23,7 +23,7 @@ XORG = ROOT / "system/xorg"
 CONSOLE_SESSION = ROOT / "system/rootfs/usr/lib/reliefos/console-session"
 
 COMMANDS = ["sh", "bash", "cp", "wc", "tr", "rm", "touch", "mkdir", "chmod",
-            "cat", "head", "sleep", "stat", "printf"]
+            "cat", "head", "sleep", "stat", "printf", "awk", "grep"]
 
 
 def resolve(command: str) -> Path:
@@ -54,10 +54,11 @@ def build_sandbox(work: Path) -> Path:
     sandbox = work / "root"
     for name in ("usr/bin", "usr/lib/reliefos", "etc/reliefos", "etc/X11",
                  "var/log", "var/lib/xdm", "run/reliefos", "home/tester", "tmp",
-                 "dev"):
+                 "dev", "proc", "root", "sbin"):
         (sandbox / name).mkdir(parents=True, exist_ok=True)
     # The scripts redirect diagnostics to /dev/null; a plain file is enough.
     (sandbox / "dev/null").write_text("")
+    (sandbox / "proc/cmdline").write_text("")
     for command in COMMANDS:
         copy_with_libs(sandbox, resolve(command))
     # /bin/sh is what the scripts' shebangs name.
@@ -108,6 +109,7 @@ class XdmLauncherTests(unittest.TestCase):
         command = ["unshare", "--user", "--map-root-user", "--mount",
                    "chroot", str(self.sandbox), "/bin/sh", "-c", script]
         return subprocess.run(command, capture_output=True, text=True,
+                              env={**os.environ, "LC_ALL": "C"},
                               timeout=timeout)
 
     def log(self) -> str:
@@ -144,6 +146,87 @@ class XdmLauncherTests(unittest.TestCase):
         else:
             body = f"exit {status}\n"
         write_stub(self.sandbox / "usr/bin/xdm", body)
+
+    def install_console_session(self, marker: str,
+                                installer_runtime: bool = False) -> None:
+        (self.sandbox / "etc/reliefos/desktop-backend").write_text(marker)
+        runtime_marker = self.sandbox / "etc/reliefos/installer-runtime"
+        if installer_runtime:
+            runtime_marker.write_text("installer\n")
+        else:
+            runtime_marker.unlink(missing_ok=True)
+        write_stub(
+            self.sandbox / "sbin/getty",
+            'printf \'%s\\n\' "$*" >> /run/getty.log\n',
+        )
+        self.install_xdm(0, run_session=False)
+
+    def run_console_session(self, tty: str = "tty1") -> subprocess.CompletedProcess:
+        return self.run_guest(f"exec /usr/lib/reliefos/console-session {tty}")
+
+    def test_console_backend_uses_text_getty_without_graphical_startup(self):
+        self.install_console_session("console\n")
+
+        result = self.run_console_session()
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.sandbox / "run/getty.log").read_text().splitlines(),
+                         ["-n -l /usr/lib/reliefos/apps/login/login.elf 115200 tty1"])
+        self.assertNotIn("invalid desktop backend", result.stderr)
+        self.assertFalse((self.sandbox / "run/reliefos/graphical-session-started").exists())
+        self.assertFalse((self.sandbox / "var/log/xdm.log").exists())
+
+    def test_console_backend_hands_tty1_directly_to_getty_with_installer_runtime(self):
+        self.install_console_session("console\n", installer_runtime=True)
+
+        result = self.run_console_session()
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.sandbox / "run/getty.log").read_text().splitlines(),
+                         ["-n -l /usr/lib/reliefos/apps/login/login.elf 115200 tty1"])
+        self.assertNotIn("invalid desktop backend", result.stderr)
+        self.assertFalse((self.sandbox / "run/reliefos/graphical-session-started").exists())
+        self.assertFalse((self.sandbox / "var/log/xdm.log").exists())
+
+    def test_invalid_and_multiline_backend_markers_fall_back_to_text_getty(self):
+        for marker in ("wayland\n", "console\nxorg\n", ""):
+            with self.subTest(marker=marker):
+                self.install_console_session(marker)
+
+                result = self.run_console_session()
+
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("invalid desktop backend", result.stderr)
+                self.assertEqual(len((self.sandbox / "run/getty.log").read_text().splitlines()), 1)
+                self.assertFalse((self.sandbox / "run/reliefos/graphical-session-started").exists())
+                self.assertFalse((self.sandbox / "var/log/xdm.log").exists())
+                (self.sandbox / "run/getty.log").unlink()
+
+    def test_xorg_backend_keeps_the_graphical_then_text_handoff(self):
+        self.install_console_session("xorg\n")
+
+        result = self.run_console_session()
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.sandbox / "run/reliefos/graphical-session-started").exists())
+        self.assertEqual((self.sandbox / "var/log/xdm.log").read_text().splitlines()[-1],
+                         "reliefos-xdm: tty1 restored to text login")
+        self.assertEqual((self.sandbox / "run/getty.log").read_text().splitlines(),
+                         ["-n -l /usr/lib/reliefos/apps/login/login.elf 115200 tty1"])
+
+    def test_tty2_through_tty6_remain_text_gettys(self):
+        self.install_console_session("console\n")
+
+        for number in range(2, 7):
+            result = self.run_console_session(f"tty{number}")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+        self.assertEqual((self.sandbox / "run/getty.log").read_text().splitlines(), [
+            f"-n -l /usr/lib/reliefos/apps/login/login.elf 115200 tty{number}"
+            for number in range(2, 7)
+        ])
+        self.assertFalse((self.sandbox / "run/reliefos/graphical-session-started").exists())
+        self.assertFalse((self.sandbox / "var/log/xdm.log").exists())
 
     def test_success_merges_events_records_status_and_restores_getty(self):
         self.install_session_stubs()

@@ -46,6 +46,7 @@ static Widget cancel_button;
 static Widget disk_list;
 static Widget partition_list;
 static Widget confirm_field;
+static Widget xorg_toggle;
 static Widget account_fields[5];
 static Widget account_hint;
 static Widget progress_text_label;
@@ -954,6 +955,13 @@ static void confirm_activated(Widget widget, XtPointer unused, XtPointer call)
     go_primary();
 }
 
+static void xorg_install_changed(Widget widget, XtPointer unused, XtPointer call)
+{
+    (void)unused;
+    (void)call;
+    setup.skip_xorg = XmToggleButtonGetState(widget) ? 0 : 1;
+}
+
 static void build_confirm_page(void)
 {
     char line[160];
@@ -991,6 +999,17 @@ static void build_confirm_page(void)
         XmNvalue, confirm_text, NULL);
     XtAddCallback(confirm_field, XmNvalueChangedCallback, confirm_changed, NULL);
     XtAddCallback(confirm_field, XmNactivateCallback, confirm_activated, NULL);
+    if (install_mode != INSTALL_MODE_UPDATE) {
+        XmString label = XmStringCreateLocalized((char *)T("Install Xorg desktop environment"));
+        xorg_toggle = XtVaCreateManagedWidget("installXorg", xmToggleButtonWidgetClass, content,
+            XmNtopAttachment, XmATTACH_FORM, XmNtopOffset, 260,
+            XmNleftAttachment, XmATTACH_FORM, XmNleftOffset, 24,
+            XmNlabelString, label,
+            XmNset, setup.skip_xorg ? False : True,
+            NULL);
+        XmStringFree(label);
+        XtAddCallback(xorg_toggle, XmNvalueChangedCallback, xorg_install_changed, NULL);
+    }
 }
 
 static void build_progress_page(void)
@@ -1053,6 +1072,7 @@ static void clear_content(void)
     disk_list = NULL;
     partition_list = NULL;
     confirm_field = NULL;
+    xorg_toggle = NULL;
     account_hint = NULL;
     progress_text_label = NULL;
     progress_bar_label = NULL;

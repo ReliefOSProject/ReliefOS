@@ -52,6 +52,14 @@ class ConsoleBootPolicyTests(unittest.TestCase):
         self.assertNotIn(". /etc/reliefos/desktop-backend", script)
         self.assertNotIn("-novtswitch", (ROOT / "system/xorg/xdm-Xservers").read_text())
 
+    def test_installer_root_keeps_the_xorg_backend_marker(self):
+        rootfs_stage = (ROOT / "tools/build/rootfs-stage.sh").read_text()
+        installer_root = (ROOT / "tools/make_installer_root.py").read_text()
+        self.assertIn("printf '%s\\n' xorg > \"$work/data/desktop-backend\"",
+                      rootfs_stage)
+        self.assertIn("etc/reliefos/desktop-backend", rootfs_stage)
+        self.assertIn("copy_tree(esp_tree / ETC, stage / ETC)", installer_root)
+
     def test_xorg_server_is_attached_to_tty1_before_vt_initialization(self):
         servers = (ROOT / "system/xorg/xdm-Xservers").read_text()
         wrapper = (ROOT / "system/xorg/xorg-tty-wrapper").read_text()

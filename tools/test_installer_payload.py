@@ -1,6 +1,7 @@
 """Run the real installer media validator against the staged dual ABI layout."""
 from pathlib import Path
 import os
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -49,6 +50,7 @@ class InstallerPayloadTests(unittest.TestCase):
             target = self.root / "install" / name
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(b"staged payload\n")
+        self.install_profile()
 
     def validate(self):
         return subprocess.run([self.executable, self.root], cwd=ROOT, text=True,
@@ -70,6 +72,75 @@ class InstallerPayloadTests(unittest.TestCase):
     def validate_target(self):
         return subprocess.run([self.executable, self.root, "target"], cwd=ROOT,
                               capture_output=True, text=True, timeout=10)
+
+    def install_profile(self, console=False):
+        root = self.root / "install/root"
+        if console:
+            shutil.copytree(root, self.root / "install/root-console")
+            root = self.root / "install/root-console"
+        for name in ("lib/apk/db/installed", "etc/apk/world",
+                     "usr/share/reliefos/apk/repository/packages.adb"):
+            file = root / name
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_text("signed package fixture\n")
+        (root / "etc/reliefos/desktop-backend").write_text("console\n" if console else "xorg\n")
+        return root
+
+    def validate_profile(self, mode):
+        return subprocess.run([self.executable, self.root, mode], cwd=ROOT,
+                              capture_output=True, text=True, timeout=10)
+
+    def test_default_fresh_install_uses_xorg_payload(self):
+        self.install_profile()
+        result = self.validate_profile("fresh-xorg")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_console_install_requires_its_own_complete_payload(self):
+        self.install_profile()
+        self.assertEqual(self.validate_profile("fresh-console").returncode, 1)
+        root = self.install_profile(console=True)
+        result = self.validate_profile("fresh-console")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        (root / "lib/apk/db/installed").unlink()
+        self.assertEqual(self.validate_profile("fresh-console").returncode, 1)
+
+    def test_payload_marker_must_match_the_selected_profile(self):
+        root = self.install_profile(console=True)
+        marker = root / "etc/reliefos/desktop-backend"
+        for value in ("xorg\n", "console\nxorg\n", "", "console;echo bad\n"):
+            marker.write_text(value)
+            self.assertEqual(self.validate_profile("fresh-console").returncode, 1, value)
+
+    def test_console_target_updates_from_console_payload(self):
+        target = self.target_fixture("reliefos")
+        (target / "etc/reliefos/desktop-backend").write_text("console\n")
+        self.assertEqual(self.validate_profile("update").returncode, 1)
+        self.install_profile(console=True)
+        result = self.validate_profile("update")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_invalid_update_marker_does_not_select_xorg(self):
+        target = self.target_fixture("reliefos")
+        marker = target / "etc/reliefos/desktop-backend"
+        for value in ("", "console\nxorg\n", "nonsense\n"):
+            marker.write_text(value)
+            self.assertEqual(self.validate_profile("update").returncode, 1, value)
+
+    def test_legacy_target_without_marker_keeps_xorg_update(self):
+        self.target_fixture("leonos")
+        result = self.validate_profile("update")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_update_profile_and_signed_repository_are_checked(self):
+        target = self.target_fixture("reliefos")
+        (target / "etc/reliefos/desktop-backend").write_text("console\n")
+        root = self.install_profile(console=True)
+        marker = root / "etc/reliefos/desktop-backend"
+        marker.write_text("xorg\n")
+        self.assertEqual(self.validate_profile("update").returncode, 1)
+        marker.write_text("console\n")
+        (root / "usr/share/reliefos/apk/repository/packages.adb").unlink()
+        self.assertEqual(self.validate_profile("update").returncode, 1)
 
     def test_existing_canonical_install_is_accepted(self):
         self.target_fixture("reliefos")

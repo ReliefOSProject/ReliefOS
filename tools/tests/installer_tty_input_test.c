@@ -53,6 +53,7 @@ static void feed(const char *text)
 int main(void)
 {
     char output[RELIEFOS_AUTH_PASSWORD_LEN], overlong[140];
+    struct installer_setup setup = {0};
     feed("U!lower\n");
     interrupt_read = 1;
     assert(tty_secret(NULL, output, sizeof(output)) == 1);
@@ -66,6 +67,26 @@ int main(void)
     feed("r\n");
     restore_error = 1;
     assert(tty_secret(NULL, output, sizeof(output)) == 0 && errno == EIO);
-    puts("installer input: EINTR, complete-line rejection, and terminal restoration PASS");
+    restore_error = 0;
+
+    feed("\n");
+    setup.skip_xorg = 1;
+    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 0);
+    feed("YeS\n");
+    setup.skip_xorg = 1;
+    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 0);
+    feed("nO\n");
+    setup.skip_xorg = 0;
+    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 1);
+    feed("maybe\nno\n");
+    setup.skip_xorg = 0;
+    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 1);
+    feed("0123456789abcdefghijklmnop\nyes\n");
+    setup.skip_xorg = 1;
+    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 0);
+    feed("");
+    setup.skip_xorg = 0;
+    assert(tty_install_xorg(&setup) == 0 && setup.skip_xorg == 0);
+    puts("installer input: line handling, Xorg choice, and terminal restoration PASS");
     return 0;
 }

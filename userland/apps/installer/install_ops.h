@@ -21,6 +21,7 @@
 #define COPY_ESP_WRITE_SLICE 4096U
 #define COPY_PRESENT_INTERVAL_MS 50U
 #define INSTALL_ROOT_PAYLOAD "/install/root"
+#define INSTALL_CONSOLE_ROOT_PAYLOAD "/install/root-console"
 #define INSTALL_ESP_PAYLOAD "/install/esp"
 #define INSTALL_ROOT_MOUNT "/target"
 #define INSTALL_ESP_MOUNT "/target/boot"

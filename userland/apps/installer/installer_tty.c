@@ -92,6 +92,32 @@ static int tty_line_is(const char *line, const char *expected)
     return line[i] == 0 && expected[i] == 0;
 }
 
+static int tty_install_xorg(struct installer_setup *setup)
+{
+    char input[16];
+    if (!setup) return 0;
+    for (;;) {
+        errno = 0;
+        if (!tty_read_line("Install Xorg desktop environment? [Y/n]: ",
+                           input, sizeof(input))) {
+            if (errno == EOVERFLOW) {
+                puts("Please answer yes or no.");
+                continue;
+            }
+            return 0;
+        }
+        if (!input[0] || tty_line_is(input, "y") || tty_line_is(input, "yes")) {
+            setup->skip_xorg = 0;
+            return 1;
+        }
+        if (tty_line_is(input, "n") || tty_line_is(input, "no")) {
+            setup->skip_xorg = 1;
+            return 1;
+        }
+        puts("Please answer yes or no.");
+    }
+}
+
 static void tty_print_disks(const struct installer_tty_context *context)
 {
     char line[160];
@@ -277,6 +303,10 @@ int installer_tty_main(const struct installer_tty_context *context)
         }
         if (!tty_setup(context->setup)) {
             puts("Account setup cancelled or input exceeds the transport buffer.");
+            return 1;
+        }
+        if (!tty_install_xorg(context->setup)) {
+            puts("Desktop selection cancelled.");
             return 1;
         }
         if (!tty_read_line("Type INSTALL to confirm the partition layout and installation: ",

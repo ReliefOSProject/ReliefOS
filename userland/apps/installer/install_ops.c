@@ -60,6 +60,11 @@ static uint32_t tty_last_progress = 0xffffffffu;
 static char tty_last_status[128];
 static uint8_t copy_buf[COPY_BUF_SIZE];
 
+static const char *fresh_root_payload(void)
+{
+    return setup.skip_xorg ? INSTALL_CONSOLE_ROOT_PAYLOAD : INSTALL_ROOT_PAYLOAD;
+}
+
 int text_eq(const char *a, const char *b)
 {
     if (!a || !b) {
@@ -1105,7 +1110,8 @@ out:
 }
 static int copy_payload_ordered(void)
 {
-    int ret = copy_dir_recursive(INSTALL_ROOT_PAYLOAD, INSTALL_ROOT_MOUNT);
+    const char *root = fresh_root_payload();
+    int ret = copy_dir_recursive(root, INSTALL_ROOT_MOUNT);
     if (!ret) ret = installer_write_fstab();
     if (!ret && installer_setup_write(&setup, INSTALL_ROOT_MOUNT) < 0) {
         ret = -errno;
@@ -1113,7 +1119,7 @@ static int copy_payload_ordered(void)
     }
     if (ret < 0) {
         printf("[installer.elf] root payload copy failed src=%s dst=%s ret=%d\n",
-               INSTALL_ROOT_PAYLOAD, INSTALL_ROOT_MOUNT, ret);
+               root, INSTALL_ROOT_MOUNT, ret);
         return ret;
     }
     ret = copy_dir_recursive(INSTALL_ESP_PAYLOAD, INSTALL_ESP_MOUNT);
@@ -1224,53 +1230,111 @@ static int check_update_target_required(void)
     return 0;
 }
 
-static int check_update_payload_required(void)
+/* Return the exact installed profile; the marker is data, never shell code. */
+static int desktop_profile(const char *root)
 {
-    static const char *const required_dirs[] = {
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_ETC_RELIEFOS,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_VAR_LIB_RELIEFOS,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_USR_LIB,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_LIB,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_APPS,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_DOC,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_FONTS,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_RESOURCES,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_LICENSES,
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_ETC_SSL_CERTS,
-        INSTALL_ESP_PAYLOAD "/grub",
-        INSTALL_ESP_PAYLOAD "/reliefos",
-        INSTALL_ESP_PAYLOAD "/leonos",
-        INSTALL_ESP_PAYLOAD "/EFI",
-    };
-    static const char *const required_files[] = {
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_RELIEFOS_LIB "/kerneldebug.sys",
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_LIB "/ld-musl-x86_64.so.1",
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_LIB "/libc.so",
-        INSTALL_ROOT_PAYLOAD RELIEFOS_LAYOUT_LIB "/libmimalloc.so.3",
-        INSTALL_ROOT_PAYLOAD RELIEFOS_PATH_LIBRELIEFOS,
-        INSTALL_ROOT_PAYLOAD "/usr/lib/leonos/libleonos.so.2",
-        INSTALL_ESP_PAYLOAD "/reliefos/kernel.sys",
-        INSTALL_ESP_PAYLOAD "/leonos/kernel.sys",
-        INSTALL_ESP_PAYLOAD "/grub/grub.cfg",
-        INSTALL_ESP_PAYLOAD "/EFI/BOOT/BOOTX64.EFI",
-    };
-    for (uint32_t i = 0; i < sizeof(required_dirs) / sizeof(required_dirs[0]); ++i) {
-        int ret = path_has_type(required_dirs[i], RELIEFOS_FS_TYPE_DIR);
+    char path[RELIEFOS_FS_PATH_LEN], text[16];
+    if (path_join(path, sizeof(path), root, "/etc/reliefos/desktop-backend") < 0)
+        return -ENAMETOOLONG;
+    FILE *stream = fopen(path, "r");
+    if (!stream) return -errno;
+    size_t length = fread(text, 1, sizeof(text) - 1, stream);
+    int error = ferror(stream);
+    fclose(stream);
+    if (error) return -EIO;
+    text[length] = 0;
+    if ((length == 5 && !memcmp(text, "xorg\n", 5)) ||
+        (length == 4 && !memcmp(text, "xorg", 4))) return 0;
+    if ((length == 8 && !memcmp(text, "console\n", 8)) ||
+        (length == 7 && !memcmp(text, "console", 7))) return 1;
+    return -EINVAL;
+}
+
+static const char *update_root_payload(void)
+{
+    /* A missing legacy marker keeps the old desktop update path. Damaged or
+     * unreadable markers must not convert a console target back to Xorg. */
+    int profile = desktop_profile(INSTALL_ROOT_MOUNT);
+    if (profile < 0 && profile != -ENOENT) return NULL;
+    return profile == 1
+        ? INSTALL_CONSOLE_ROOT_PAYLOAD : INSTALL_ROOT_PAYLOAD;
+}
+
+static int check_payload_paths(const char *root, const char *const *paths,
+                               uint32_t count, int type)
+{
+    for (uint32_t i = 0; i < count; ++i) {
+        char path[RELIEFOS_FS_PATH_LEN];
+        int ret = path_join(path, sizeof(path), root, paths[i]);
+        if (ret >= 0) ret = path_has_type(path, type);
         if (ret < 0) {
-            set_status(T("Installation media is incomplete"),
-                       required_dirs[i]);
-            return ret;
-        }
-    }
-    for (uint32_t i = 0; i < sizeof(required_files) / sizeof(required_files[0]); ++i) {
-        int ret = path_has_type(required_files[i], RELIEFOS_FS_TYPE_FILE);
-        if (ret < 0) {
-            set_status(T("Installation media is incomplete"),
-                       required_files[i]);
+            set_status(T("Installation media is incomplete"), ret == -ENAMETOOLONG ? root : path);
             return ret;
         }
     }
     return 0;
+}
+
+static int check_payload_required(const char *root)
+{
+    static const char *const root_dirs[] = {
+        RELIEFOS_LAYOUT_ETC_RELIEFOS, RELIEFOS_LAYOUT_VAR_LIB_RELIEFOS,
+        RELIEFOS_LAYOUT_USR_LIB, RELIEFOS_LAYOUT_RELIEFOS_LIB,
+        RELIEFOS_LAYOUT_RELIEFOS_APPS, RELIEFOS_LAYOUT_RELIEFOS_DOC,
+        RELIEFOS_LAYOUT_RELIEFOS_FONTS, RELIEFOS_LAYOUT_RELIEFOS_RESOURCES,
+        RELIEFOS_LAYOUT_LICENSES, RELIEFOS_LAYOUT_ETC_SSL_CERTS,
+    };
+    static const char *const root_files[] = {
+        RELIEFOS_LAYOUT_RELIEFOS_LIB "/kerneldebug.sys",
+        RELIEFOS_LAYOUT_LIB "/ld-musl-x86_64.so.1",
+        RELIEFOS_LAYOUT_LIB "/libc.so", RELIEFOS_LAYOUT_LIB "/libmimalloc.so.3",
+        RELIEFOS_PATH_LIBRELIEFOS, "/usr/lib/leonos/libleonos.so.2",
+    };
+    static const char *const boot_dirs[] = {"/grub", "/reliefos", "/leonos", "/EFI"};
+    static const char *const boot_files[] = {
+        "/reliefos/kernel.sys", "/leonos/kernel.sys", "/grub/grub.cfg", "/EFI/BOOT/BOOTX64.EFI",
+    };
+    int ret = check_payload_paths(root, root_dirs,
+        sizeof(root_dirs) / sizeof(root_dirs[0]), RELIEFOS_FS_TYPE_DIR);
+    if (!ret) ret = check_payload_paths(root, root_files,
+        sizeof(root_files) / sizeof(root_files[0]), RELIEFOS_FS_TYPE_FILE);
+    if (!ret) ret = check_payload_paths(INSTALL_ESP_PAYLOAD, boot_dirs,
+        sizeof(boot_dirs) / sizeof(boot_dirs[0]), RELIEFOS_FS_TYPE_DIR);
+    if (!ret) ret = check_payload_paths(INSTALL_ESP_PAYLOAD, boot_files,
+        sizeof(boot_files) / sizeof(boot_files[0]), RELIEFOS_FS_TYPE_FILE);
+    return ret;
+}
+
+static int check_profile_payload_required(const char *root, int skip_xorg)
+{
+    static const char *const package_files[] = {
+        "/lib/apk/db/installed", "/etc/apk/world",
+        "/usr/share/reliefos/apk/repository/packages.adb",
+    };
+    int ret = check_payload_required(root);
+    if (!ret) ret = check_payload_paths(root, package_files,
+        sizeof(package_files) / sizeof(package_files[0]), RELIEFOS_FS_TYPE_FILE);
+    if (!ret && desktop_profile(root) != (skip_xorg ? 1 : 0)) {
+        set_status(T("Installation media is incomplete"), root);
+        ret = -EINVAL;
+    }
+    return ret;
+}
+
+static int check_update_payload_required(void)
+{
+    const char *root = update_root_payload();
+    if (!root) {
+        set_status(T("Existing system check failed"),
+                   INSTALL_ROOT_MOUNT "/etc/reliefos/desktop-backend");
+        return -EINVAL;
+    }
+    return check_profile_payload_required(root, !strcmp(root, INSTALL_CONSOLE_ROOT_PAYLOAD));
+}
+
+static int check_install_payload_required(void)
+{
+    return check_profile_payload_required(fresh_root_payload(), setup.skip_xorg);
 }
 static int app_package_is_system(const char *package_dir)
 {
@@ -1529,8 +1593,13 @@ static int overlay_dir_recursive(const char *src, const char *dst)
 static int sync_system_payload(void)
 {
     pid_t child;
+    char repository[RELIEFOS_FS_PATH_LEN];
+    const char *root = update_root_payload();
+    if (!root) return -EINVAL;
+    if (path_join(repository, sizeof(repository), root,
+                  "/usr/share/reliefos/apk/repository") < 0) return -ENAMETOOLONG;
     char *const argv[] = {"sh", "/usr/lib/reliefos/reliefos-apk-update", INSTALL_ROOT_MOUNT,
-                         INSTALL_ROOT_PAYLOAD "/usr/share/reliefos/apk/repository", NULL};
+                         repository, NULL};
     char *const envp[] = {"PATH=/usr/sbin:/usr/bin:/sbin:/bin", "LC_ALL=C", "HOME=/root", NULL};
     int ret = posix_spawn(&child, "/bin/sh", NULL, NULL, argv, envp);
     if (ret) return -ret;
@@ -1610,6 +1679,14 @@ void perform_install(void)
     copy_total_bytes = 0;
     copy_done_bytes = 0;
 
+    /* Validate the chosen root before mounting/formatting the destination. A
+     * missing optional payload must never erase a disk or silently install Xorg. */
+    ret = check_install_payload_required();
+    if (ret < 0) {
+        finish_install(ret, T("Payload check failed"));
+        return;
+    }
+
     show_progress(2, "Preparing target disk", "");
     show_progress(22, "Mounting target filesystems", "Root: /target (ext4 for new installs; ext4 or exFAT for updates), ESP: /target/boot (FAT32)");
     ret = installer_mount_targets(disks[selected_disk].path, 1);
@@ -1619,7 +1696,7 @@ void perform_install(void)
     }
 
     show_progress(30, "Scanning installation payload", "Root and boot partitions");
-    ret = count_files_recursive(INSTALL_ROOT_PAYLOAD, &copy_total);
+    ret = count_files_recursive(fresh_root_payload(), &copy_total);
     if (ret >= 0) {
         ret = count_files_recursive(INSTALL_ESP_PAYLOAD, &copy_total);
     }

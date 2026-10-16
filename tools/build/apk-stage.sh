@@ -45,7 +45,7 @@ while IFS= read -r marker_line || [ -n "$marker_line" ]; do
 done <"$backend_file"
 [ "$backend_lines" = 1 ] || { echo "desktop backend marker must be exactly one line: $backend_file" >&2; exit 1; }
 case $backend in
-    reliefos|xorg) ;;
+    reliefos|console|xorg) ;;
     *) echo "invalid desktop backend marker: $backend_file" >&2; exit 1 ;;
 esac
 
@@ -64,6 +64,7 @@ mkdir -p "$tree" "$repository" "$managed"
 # scan, the APK transaction and the index all consume this list. Selection is
 # driven by the dependency lock, never by archive or package names.
 : >"$scratch/kept-archives"
+: >"$scratch/console-excluded-archives"
 for archive in "$upstream"/packages/*.apk; do
     [ -f "$archive" ] || continue
     tar --ignore-zeros -xOf "$archive" .PKGINFO >"$scratch/upstream-pkginfo" 2>/dev/null ||
@@ -76,7 +77,16 @@ for archive in "$upstream"/packages/*.apk; do
     fi
     case $feature in
         base) ;;
-        xorg) [ "$backend" = xorg ] || continue ;;
+        xorg)
+            if [ "$backend" = xorg ]; then
+                :
+            elif [ "$backend" = console ]; then
+                printf '%s\n' "$archive" >>"$scratch/console-excluded-archives"
+                continue
+            else
+                continue
+            fi
+            ;;
         *) echo "invalid dependency feature for APK package: $upstream_name (lock: $lock): $feature" >&2; exit 1 ;;
     esac
     printf '%s\n' "$archive" >>"$scratch/kept-archives"
@@ -84,6 +94,46 @@ done
 reliefos_log APK "selected $(wc -l <"$scratch/kept-archives") upstream archives for the $backend desktop backend"
 
 cp -a "$raw"/. "$tree"/
+
+# Console roots are made from an Xorg raw image so the live installer can
+# continue to use its graphical stack. Remove the payload files belonging to
+# excluded Xorg archives before ownership scanning, while retaining any
+# archive path that is also supplied by a selected base archive. Otherwise
+# omitted upstream files could be silently reclassified into local signed
+# packages and the generated APK database would still contain Xorg.
+if [ "$backend" = console ]; then
+    archive_tab=$(printf '\t')
+    : >"$scratch/kept-members"
+    : >"$scratch/excluded-members"
+    for list in kept-archives console-excluded-archives; do
+        if [ "$list" = kept-archives ]; then members=$scratch/kept-members
+        else members=$scratch/excluded-members
+        fi
+        while IFS= read -r archive; do
+            tar --ignore-zeros -tzf "$archive" >"$scratch/archive-members" 2>/dev/null || {
+                echo "invalid APK archive members: $archive" >&2
+                exit 1
+            }
+            while IFS= read -r path; do
+                case $path in ''|.*|*/) continue;; esac
+                case $path in
+                    /*|..|../*|*/../*|*/..|*"$archive_tab"*)
+                        echo "unsafe upstream APK path: $path" >&2
+                        exit 1
+                        ;;
+                esac
+                printf '%s\n' "$path" >>"$members"
+            done <"$scratch/archive-members"
+        done <"$scratch/$list"
+    done
+    LC_ALL=C sort -u "$scratch/kept-members" -o "$scratch/kept-members"
+    LC_ALL=C sort -u "$scratch/excluded-members" -o "$scratch/excluded-members"
+    LC_ALL=C comm -23 "$scratch/excluded-members" "$scratch/kept-members" >"$scratch/console-only-xorg-members"
+    while IFS= read -r path; do
+        [ -n "$path" ] || continue
+        rm -f "$tree/$path"
+    done <"$scratch/console-only-xorg-members"
+fi
 
 # Media-only payloads are copied back after the transaction and never claimed
 # by an installed package. Runtime state is always created by apk itself.

@@ -22,13 +22,13 @@ if test "$1" = tty1; then
     desktop_backend=
     if test -f /etc/reliefos/desktop-backend; then
         # The marker is data, not shell syntax.  Require exactly one line and
-        # reject missing, empty, unknown, or multi-line values; xorg is the
-        # only supported backend and there is no native-desktop fallback.
+        # reject missing, empty, unknown, or multi-line values.  xorg selects
+        # the graphical session; console leaves tty1 for the text getty below.
         desktop_backend=$(awk '
             NR == 1 { value = $0 }
             NR > 1 { invalid = 1 }
             END {
-                if (NR != 1 || invalid || value != "xorg") exit 1
+                if (NR != 1 || invalid || (value != "xorg" && value != "console")) exit 1
                 print value
             }
         ' /etc/reliefos/desktop-backend 2>/dev/null) || {
@@ -37,6 +37,9 @@ if test "$1" = tty1; then
         }
     else
         printf '%s\n' 'console-session: missing desktop backend marker; using text login' >&2
+        start_getty "$1"
+    fi
+    if test "$desktop_backend" = console; then
         start_getty "$1"
     fi
     if test "$desktop_backend" = xorg &&

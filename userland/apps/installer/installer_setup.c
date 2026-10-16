@@ -121,7 +121,8 @@ out:;
     return result;
 }
 
-static int prepare_home(const char *target, const struct reliefos_user_info *user)
+static int prepare_home(const char *target, const struct reliefos_user_info *user,
+                        int skip_xorg)
 {
     const char *const directories[] = {"", "/desktop", "/documents", "/downloads"};
     char path[512];
@@ -137,7 +138,7 @@ static int prepare_home(const char *target, const struct reliefos_user_info *use
     const char *const applications[] = {"fileman", "terminal", "settings", "run", "taskmgr"};
     char desktop[512], executable[256];
     snprintf(desktop, sizeof(desktop), "%s%s/desktop", target, user->home);
-    for (unsigned i = 0; i < sizeof(applications) / sizeof(applications[0]); ++i) {
+    for (unsigned i = 0; !skip_xorg && i < sizeof(applications) / sizeof(applications[0]); ++i) {
         snprintf(executable, sizeof(executable), RELIEFOS_LAYOUT_RELIEFOS_APPS "/%s/%s.elf",
                  applications[i], applications[i]);
         if (reliefos_launch_create_shortcut_in_dir(desktop, executable, path, sizeof(path)) < 0 ||
@@ -163,7 +164,7 @@ int installer_setup_write(const struct installer_setup *setup, const char *targe
     snprintf(records[1].home, sizeof(records[1].home), "/home/%s", setup->username);
     if (reliefos_account_legacy_check(target) < 0) goto out;
     for (unsigned i = 0; i < 2; ++i)
-        if (prepare_home(target, &records[i]) < 0) goto out;
+        if (prepare_home(target, &records[i], setup->skip_xorg) < 0) goto out;
     if (reliefos_account_seed(target, setup->username, setup->password,
                             setup->root_password) < 0) goto out;
     snprintf(path, sizeof(path), "%s/etc/reliefos/installed", target);

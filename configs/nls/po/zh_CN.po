@@ -726,6 +726,10 @@ msgstr "确认注销"
 msgid "Confirm Update"
 msgstr "确认更新"
 
+#: userland/apps/installer/main.c
+msgid "Install Xorg desktop environment"
+msgstr "安装 Xorg 桌面环境"
+
 #: userland/apps/installer/main.c:628
 msgid "Confirm password"
 msgstr "确认普通用户密码"

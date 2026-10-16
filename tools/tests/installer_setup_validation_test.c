@@ -6,6 +6,7 @@
 int main(void)
 {
     struct installer_setup setup = {0};
+    assert(setup.skip_xorg == 0);
     strcpy(setup.username, "alice");
     strcpy(setup.password, "user!");
     strcpy(setup.password_confirm, "user!");
