@@ -1,23 +1,25 @@
 #!/bin/sh
 set -eu
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
-work=$(mktemp -d)
+mkdir -p "$src/out/tmp"
+work=$(TMPDIR="$src/out/tmp" mktemp -d)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 mkdir -p "$work/vendor/bin" "$work/vendor/sbin" "$work/vendor/usr/bin" "$work/inactive/usr/bin"
 printf 'GNU dd\n' > "$work/vendor/bin/dd"
+printf 'GNU coreutils yes\n' > "$work/vendor/usr/bin/yes"
 printf 'util-linux mount\n' > "$work/vendor/bin/mount"
 printf 'ncurses clear\n' > "$work/vendor/usr/bin/clear"
 ln -s missing-target "$work/vendor/usr/bin/reset"
 printf 'shadow passwd\n' > "$work/vendor/usr/bin/passwd"
 printf 'not selected\n' > "$work/inactive/usr/bin/tree"
 printf 't\t%s\t/\t0755\tvendor\tunique\n' "$work/vendor" > "$work/plan"
-printf '%s\n' /bin/ash /bin/sh /bin/false /bin/ping /bin/ping6 /sbin/mount /usr/bin/dd /usr/bin/clear /bin/reset /bin/passwd /usr/bin/tree /usr/bin/hexdump > "$work/links"
+printf '%s\n' /bin/ash /bin/sh /bin/false /bin/ping /bin/ping6 /sbin/mount /usr/bin/dd /usr/bin/yes /usr/bin/clear /bin/reset /bin/passwd /usr/bin/tree /usr/bin/hexdump > "$work/links"
 
 # Exercise the link composer itself; the plan is the authority, including trees.
 if sh "$src/tools/build/busybox-links.sh" "$work/plan" "$work/links" > "$work/generated"; then :; else
     echo 'BusyBox link composer rejected valid fixture' >&2; exit 1
 fi
-for name in mount dd clear reset passwd; do
+for name in mount dd yes clear reset passwd; do
     if awk -F '\t' -v name="$name" '$5=="busybox" {n=split($3,a,"/"); if(a[n]==name) found=1} END {exit !found}' "$work/generated"; then
         echo "BusyBox shadows another command provider: $name" >&2; exit 1
     fi

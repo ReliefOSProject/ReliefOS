@@ -73,7 +73,7 @@ def test_kernel_dispatch_contract() -> None:
     syscall_c = read("kernel/reliefnt/kernel/reliefnt/syscall.c")
     sched_h = read("kernel/reliefnt/kernel/reliefnt/include/reliefnt/sched.h")
     # The generic requests must be resolved before any category/device routing.
-    dispatch = syscall_c.index("static int64_t syscall_dispatch_regs(uint64_t number")
+    dispatch = syscall_c.rindex("static int64_t syscall_dispatch_regs(")
     generic = syscall_c.index("syscall_ioctl_descriptor_flags(sched_current_task(), a0")
     owned = syscall_c.index("if (syscall_fs_owns(number))", dispatch)
     assert dispatch < generic < owned, "FIOCLEX/FIONCLEX must precede device dispatch"
@@ -130,6 +130,7 @@ def test_kernel_descriptor_table(directory: Path) -> None:
         "kernel/reliefnt/kernel/reliefnt/audio/alsa_control.c",
         "kernel/reliefnt/kernel/reliefnt/audio/mixer.c",
         "kernel/reliefnt/kernel/reliefnt/audio/oss.c",
+        "kernel/reliefnt/kernel/reliefnt/audio/timer.c",
     ]
     run([
         "clang", "-std=c11", "-g", "-O1", "-ffunction-sections", "-fdata-sections",

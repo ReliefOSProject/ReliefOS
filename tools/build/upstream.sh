@@ -26,6 +26,9 @@ source=$work/source/$directory
 if [ "$pkg" = alsa-lib ]; then
     patch -d "$source" -p1 < "$src/patches/alsa-lib/0001-reliefos-dmix-server.patch"
 fi
+if [ "$pkg" = coreutils ]; then
+    patch -d "$source" -p1 < "$src/patches/coreutils/0001-yes-batch-buffer.patch"
+fi
 resource=$("$cc" -print-resource-dir)
 CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -isystem $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib"
 case $pkg in libbsd|shadow) CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -idirafter $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib" ;; esac
@@ -88,9 +91,9 @@ fi
 case $pkg in
 libbsd) sed 's@GROUP(/lib/@GROUP(@' "$tmp/lib/libbsd.so" > "$tmp/lib/libbsd.so.new"; mv "$tmp/lib/libbsd.so.new" "$tmp/lib/libbsd.so"; rm "$tmp/lib/libbsd.la" ;;
 libmd) rm "$tmp/lib/libmd.la" ;;
-# Ship GNU dd only: BusyBox has no dd applet here and its dd lacks
-# status=progress, while the rest of coreutils must not shadow BusyBox applets.
-coreutils) find "$tmp" \( -type f -o -type l \) ! -path "$tmp/usr/bin/dd" -delete; find "$tmp" -mindepth 1 -type d -empty -delete ;;
+# Ship GNU dd and yes: dd provides status=progress, and yes has the larger
+# full_write fallback buffer. Other coreutils commands remain BusyBox-owned.
+coreutils) find "$tmp" \( -type f -o -type l \) ! -path "$tmp/usr/bin/dd" ! -path "$tmp/usr/bin/yes" -delete; find "$tmp" -mindepth 1 -type d -empty -delete ;;
 esac
 license=$(get license_in_source)
 mkdir -p "$tmp/usr/share/licenses/$pkg"

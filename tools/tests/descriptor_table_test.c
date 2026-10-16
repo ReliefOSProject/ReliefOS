@@ -34,6 +34,11 @@ static int fail_allocation;
 static unsigned pty_references;
 void *kernel_malloc(size_t size) { return fail_allocation ? NULL : malloc(size); }
 void kernel_free(void *memory) { free(memory); }
+/* Descriptor scheduling fixtures model a single active CPU, the BSP. */
+uint32_t smp_cpu_count(void) { return 1; }
+bool smp_cpu_online(uint32_t cpu) { return cpu == 0; }
+void console_log(enum console_log_level level, const char *format, ...)
+{ (void)level; (void)format; }
 /* OSS tests bind a registered PCM. Legacy discovery reports no hardware;
  * entering a legacy backend after that result is a failure. */
 void driver_manager_audio_get_state(struct reliefos_audio_state *state)

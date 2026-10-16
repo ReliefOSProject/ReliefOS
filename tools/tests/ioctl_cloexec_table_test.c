@@ -33,6 +33,9 @@ void task_socket_collect(void) {}
 void input_evdev_release(uint32_t kind, uint64_t token)
 { (void)kind; (void)token; }
 uint32_t smp_current_cpu(void) { return 0; }
+/* The descriptor fixture models only the BSP, matching its current-CPU stub. */
+uint32_t smp_cpu_count(void) { return 1; }
+bool smp_cpu_online(uint32_t cpu) { return cpu == 0; }
 /* Hardware clock edge; PCM and descriptor cleanup stay production code. */
 int time_clock_get(int32_t clock, struct linux_timespec *value)
 { (void)clock; *value = (struct linux_timespec){0}; return 0; }

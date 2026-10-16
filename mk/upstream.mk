@@ -10,7 +10,7 @@ upstream_shadow_outputs := bin/login usr/sbin/useradd usr/sbin/usermod usr/sbin/
 upstream_e2fsprogs_outputs := usr/sbin/mkfs.ext4 usr/sbin/fsck.ext4 usr/sbin/mkfs.ext2 usr/sbin/fsck.ext2
 upstream_dosfstools_outputs := usr/sbin/mkfs.fat usr/sbin/fsck.fat
 upstream_exfatprogs_outputs := usr/sbin/mkfs.exfat usr/sbin/fsck.exfat
-upstream_coreutils_outputs := usr/bin/dd
+upstream_coreutils_outputs := usr/bin/dd usr/bin/yes
 upstream_ncurses_outputs := usr/lib/libncursesw.a usr/lib/libtinfow.a usr/include/curses.h
 upstream_alsa-lib_outputs := usr/lib/libasound.so.2 usr/lib/libasound.a usr/include/alsa/asoundlib.h usr/share/alsa/alsa.conf
 upstream_alsa-utils_outputs := usr/bin/aplay usr/bin/arecord usr/bin/amixer usr/sbin/alsactl usr/bin/speaker-test
@@ -23,6 +23,7 @@ upstream_e2fsprogs_deps := util-linux
 upstream_exfatprogs_deps := util-linux
 upstream_alsa-utils_deps := alsa-lib
 upstream_alsa-lib_patches := $(wildcard $(RELIEFOS_SRC)/patches/alsa-lib/*.patch)
+upstream_coreutils_patches := $(wildcard $(RELIEFOS_SRC)/patches/coreutils/*.patch)
 # Install manifests register every published file, so deleting a non-primary
 # header, library link or manual page also invalidates the package group.
 
