@@ -91,6 +91,20 @@ test-audio:
 
 test: test-tools test-build
 
+# The vDSO tests execute its real ELF and the kernel mapping/timekeeper code.
+# Give the standalone ELF build and host fixtures their own output trees so
+# they can run alongside an ordinary kernel build without sharing its lock.
+.PHONY: test-vdso
+RELIEFOS_VDSO_TEST_PYTHON = $(or $(RELIEFOS_TEST_PYTHON),python3)
+test-vdso:
+	$(Q)mkdir -p $(O)/tmp/vdso-tests
+	$(Q)TMPDIR='$(abspath $(O))/tmp/vdso-tests' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFNT_DIR)/tools/test_vdso.py --output '$(abspath $(O))/vdso-tests'
+	$(Q)TMPDIR='$(abspath $(O))/tmp/vdso-tests' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_vdso_time.py
+	$(Q)TMPDIR='$(abspath $(O))/tmp/vdso-tests' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_vdso_mapping.py
+
 $(O_HOST)/obj/tests/host/%.c.o: $(RELIEFOS_SRC)/tests/host/%.c $(O_META)/host-cc.sig
 	$(Q)mkdir -p $(dir $@)
 	$(call RELIEFOS_LOG,HOSTCC,$<)

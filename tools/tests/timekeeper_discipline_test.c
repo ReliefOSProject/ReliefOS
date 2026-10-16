@@ -9,6 +9,12 @@ void kernel_spin_unlock_irqrestore(struct kernel_spinlock *lock, uint64_t flags)
 { (void)lock; (void)flags; assert(held-- == 1); }
 void usb_poll(void) { assert(!held); }
 void sched_on_tick(void) { assert(!held); }
+void audio_service_tick(void) { assert(!held); }
+void console_display_tick(void) { assert(!held); }
+/* This existing test covers the PIT discipline; the dedicated vDSO fixture
+ * exercises trusted TSC interpolation with a controlled counter. */
+uint32_t smp_cpu_count(void) { return 2; }
+bool smp_cpu_online(uint32_t cpu) { return cpu < 2; }
 void console_printf(const char *format, ...) { (void)format; }
 
 void console_log(enum console_log_level level, const char *format, ...)

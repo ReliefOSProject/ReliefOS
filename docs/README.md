@@ -12,6 +12,7 @@ when changing the kernel, loader, installer, or user ABI.
 - [musl migration](MUSL_MIGRATION_2026-09-08.md): runtime, SDK and binary compatibility.
 - [Unix permissions](POSIX_PERMISSIONS_2026-09-08.md): implemented contracts and verification.
 - [Timer validation](LINUX_ABI_TIMER_2026-09-09.md): timer and Vim evidence and remaining gaps.
+- [x86-64 vDSO](VDSO.md): Linux clock ABI, fast-path conditions, mapping and validation.
 - [Syscalls](SYSCALLS.md): syscall entry convention, syscall table,
   `mmap`/`munmap`, process calls, and ioctl groups.
 - [Filesystem](FILESYSTEM.md): Unix-style root paths, ext4 default root plus legacy ext2, exFAT/FAT32/ISO 9660 support,

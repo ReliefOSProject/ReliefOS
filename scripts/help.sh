@@ -46,6 +46,7 @@ ReliefOS build system (GNU Make + C host tools)
 
   make test-tools      C host tool tests, plain and under ASan/UBSan
   make test-build      shell contract tests for the build surface
+  make test-vdso       vDSO ELF, timekeeper and mapping/auxv regression tests
   make test            test-tools plus test-build
   make test-long       repeated -j1/-j8 comparisons and interrupt recovery
   make test-smoke      QEMU boot tests (long; explicit)
