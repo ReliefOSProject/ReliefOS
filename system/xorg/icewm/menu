@@ -6,6 +6,7 @@ prog "System information" help osver
 prog "Text editor" file nedit
 prog "Web browser" app dillo
 prog "xeyes" app xeyes
+includeprog icewm-menu-fdo --sep-before -d1400 -D1650 -S --limit-max-len=42
 separator
 prog "About" about xterm -title About -geometry 62x12 -e sh /etc/reliefos/icewm/about.sh
 separator
