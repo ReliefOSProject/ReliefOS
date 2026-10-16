@@ -10,6 +10,8 @@ static struct task members[3];
 static struct task *table[] = {&members[0], &members[1], &members[2]};
 static unsigned direct_calls;
 uint32_t smp_current_cpu(void) { return 0; }
+uint32_t smp_cpu_count(void) { return 1; }
+bool smp_cpu_online(uint32_t cpu) { return cpu == 0; }
 uint64_t time_ticks(void) { return scheduler_ticks; }
 int time_clock_get(int32_t clock, struct linux_timespec *out)
 {

@@ -26,6 +26,8 @@ void kernel_wait_queue_init(struct kernel_wait_queue *q) { memset(q, 0, sizeof(*
 void kernel_wait_queue_remove(struct kernel_wait_queue *q, struct task *t) { (void)q; (void)t; }
 void kernel_wait_queue_block_current(struct kernel_wait_queue *q) { (void)q; }
 uint32_t kernel_wait_queue_wake_all(struct kernel_wait_queue *q) { (void)q; return 1; }
+/* This fixture covers VT handoff, not poll waiter wakeups. */
+void kernel_poll_readiness_notify(void) {}
 uint8_t input_caps_lock_active(void) { return 0; }
 
 static uint32_t shown_vt;

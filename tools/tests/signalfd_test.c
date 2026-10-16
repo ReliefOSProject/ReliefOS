@@ -9,6 +9,7 @@
 static struct task readers[2], *current;
 static struct task_file descriptor;
 static unsigned allocations, reconfigured, sleeps;
+static unsigned runnable_notifications;
 static uint64_t fault_at;
 void power_reboot(void) { abort(); }
 void power_shutdown(void) { abort(); }
@@ -41,6 +42,7 @@ struct task_file *task_file_for_fd(struct task *task, int fd)
 int task_allocate_fd(struct task *task, int minimum, struct task_file **out)
 { (void)task; assert(!minimum); if (descriptor.used) return -LINUX_EMFILE; descriptor.used = 1; *out = &descriptor; return 3; }
 void sched_signalfd_reconfigure(struct task *task) { assert(task == current); ++reconfigured; }
+void sched_notify_runnable(void) { ++runnable_notifications; }
 void sched_signal_wait_current(uint64_t deadline)
 { assert(!deadline); ++sleeps; current->state = TASK_BLOCKED; }
 
@@ -117,7 +119,9 @@ int main(void)
     assert(task_signalfd_read(current, &descriptor, (uintptr_t)output, 128) == KERNEL_SYSCALL_BLOCKED);
     assert(sleeps == 1 && current->signalfd_waiting && current->signalfd_wait_mask == mask);
     struct linux_siginfo sent = {.signo = 35, .code = LINUX_SI_QUEUE, .fields.realtime.value = 7};
+    unsigned wake_before = runnable_notifications;
     assert(kernel_signal_queue_task_info(current, 35, &sent) == 0 && current->state == TASK_READY);
+    assert(runnable_notifications == wake_before + 1);
     assert(task_signalfd_read(current, &descriptor, (uintptr_t)output, 128) == 128);
     assert(!current->signalfd_waiting && !current->signalfd_wait_mask && output[0].value_ptr == 7);
     assert(task_signalfd_readv(current, &descriptor, (uintptr_t)vectors, 3, 0) == KERNEL_SYSCALL_BLOCKED);
@@ -126,6 +130,30 @@ int main(void)
     enqueue(current, false, 35, 8);
     assert(task_signalfd_readv(current, &descriptor, (uintptr_t)vectors, 3, 0) == 128);
     assert(output[0].value_ptr == 8 && !current->signalfd_vectors && !allocations);
+
+    /* Caught handlers and sigwait sleepers also need a runnable notification. */
+    const uint64_t wake_bit = 1ULL << (12 - 1);
+    current->signalfd_waiting = false;
+    current->state = TASK_BLOCKED;
+    current->blocked_signals &= ~wake_bit;
+    current->sigwait_mask = 0;
+    current->signal_actions[12].handler = 0x410000;
+    wake_before = runnable_notifications;
+    sent = (struct linux_siginfo){.signo = 12, .code = LINUX_SI_QUEUE};
+    assert(kernel_signal_queue_task_info(current, 12, &sent) == 0);
+    assert(current->state == TASK_READY && runnable_notifications == wake_before + 1);
+    kernel_signal_flush(current, false, wake_bit);
+
+    current->state = TASK_BLOCKED;
+    current->blocked_signals |= wake_bit;
+    current->sigwait_mask = wake_bit;
+    current->signal_actions[12].handler = 0;
+    wake_before = runnable_notifications;
+    assert(kernel_signal_queue_task_info(current, 12, &sent) == 0);
+    assert(current->state == TASK_READY && runnable_notifications == wake_before + 1);
+    kernel_signal_flush(current, false, wake_bit);
+    current->sigwait_mask = 0;
+
     sent = (struct linux_siginfo){.signo = 7, .code = 4, .fields.fault = {0x1122334455667788ULL, 9}};
     output[0] = signalfd_info(&sent);
     assert(output[0].address == sent.fields.fault.address && output[0].address_lsb == 9);

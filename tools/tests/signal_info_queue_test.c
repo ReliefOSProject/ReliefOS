@@ -23,6 +23,7 @@ struct task *sched_current_task(void) { return current; }
 struct task *sched_find(uint32_t pid)
 { for (unsigned i = 0; i < 3; ++i) if (people[i].pid == pid) return &people[i]; return NULL; }
 void sched_alarm_rearm(struct task *task) { (void)task; }
+void sched_notify_runnable(void) { }
 uint64_t time_ticks(void) { return ticks; }
 bool user_range_ok(uint64_t p, uint64_t n)
 { return p >= 4096 && n <= UINT64_MAX - p && (!inaccessible || p + n <= inaccessible); }

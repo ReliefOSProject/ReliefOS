@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "device.h"
+#include "../../kernel/reliefnt/drivers/video/framebuffer/framebuffer.c"
 
 #define FIFO_BYTES 65536u
 static uint32_t fifo[FIFO_BYTES / 4], regs[64];
@@ -31,6 +32,52 @@ static struct allocation allocations[512];
 static uint64_t next_phys = 0x10000000;
 static uint32_t live_pages, fail_after = UINT32_MAX, allocation_calls;
 static uint32_t host_gmr_pages[SVGA_GMRS], host_gmr_ppn[SVGA_GMRS][SVGA_MAX_GUEST_PAGES];
+static uint32_t selected_port_reg, port_busy_reads, port_sync_writes;
+
+void x86_64_outl(uint32_t value, uint16_t port)
+{
+    if (port == vmware_svga.io_port) {
+        selected_port_reg = value;
+    } else if (port == (uint16_t)(vmware_svga.io_port + 1u)) {
+        if (selected_port_reg == SVGA_REG_TRACES) regs[SVGA_REG_TRACES] = value;
+        if (selected_port_reg == SVGA_REG_SYNC) ++port_sync_writes;
+    }
+}
+
+uint32_t x86_64_inl(uint16_t port)
+{
+    if (port == (uint16_t)(vmware_svga.io_port + 1u) &&
+        selected_port_reg == SVGA_REG_BUSY) {
+        ++port_busy_reads;
+        return 1;
+    }
+    return 0;
+}
+
+void x86_64_outw(uint16_t value, uint16_t port)
+{
+    (void)value;
+    (void)port;
+}
+
+uint16_t x86_64_inw(uint16_t port)
+{
+    (void)port;
+    return 0;
+}
+
+void svga_platform_bind(uint16_t port, volatile uint32_t *ring, uint32_t bytes)
+{
+    (void)port;
+    (void)ring;
+    (void)bytes;
+}
+
+void console_log(enum console_log_level level, const char *format, ...)
+{
+    (void)level;
+    (void)format;
+}
 
 static void *physical_pointer(uint64_t phys)
 {
@@ -451,6 +498,7 @@ static uint32_t read_reg(uint32_t reg)
 static void write_reg(uint32_t reg, uint32_t value)
 {
     regs[reg] = value;
+    if (reg == SVGA_REG_CONFIG_DONE && !value) regs[SVGA_REG_TRACES] = 0;
     if (reg == SVGA_REG_CONFIG_DONE && value) {
         if (fifo[SVGA_FIFO_MIN] > SVGA_FIFO_GUEST_3D_HWVERSION * 4) {
             configured_guest = fifo[SVGA_FIFO_GUEST_3D_HWVERSION];
@@ -604,6 +652,115 @@ static void test_fifo_wakeup(void)
     assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
     assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
     assert(sync_writes == wakes + 2 && visible_updates == updates + 2);
+}
+
+static void prepare_graphical_framebuffer(void);
+
+static void test_trace_capability_survives_fifo_reconfiguration(void)
+{
+    setup(SVGA_CAP_TRACES | SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+          SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE, SVGA3D_HWVERSION_WS8_B1);
+    assert(regs[SVGA_REG_TRACES] == 1);
+
+    write_reg(SVGA_REG_CONFIG_DONE, 0);
+    svga.fifo_ready = false;
+    assert(svga_configure_locked(true) == 0);
+    assert(regs[SVGA_REG_TRACES] == 1);
+
+    setup(SVGA_CAP_TRACES, 0, 0);
+    assert(svga3d_init() == SVGA_ENOTSUP);
+    assert(regs[SVGA_REG_TRACES] == 1);
+
+    setup(0, 0, 0);
+    assert(regs[SVGA_REG_TRACES] == 0);
+
+    setup(SVGA_CAP_TRACES, 0, 0);
+    prepare_graphical_framebuffer();
+    fb.capabilities = FRAMEBUFFER_CAP_MODE_SET;
+    fb.max_width = 800;
+    fb.max_height = 600;
+    fb.max_bytes = 800 * 600 * 4;
+    fb.bpp = 32;
+    regs[SVGA_REG_TRACES] = 0;
+    assert(framebuffer_set_mode(800, 600) == 0);
+    assert(regs[SVGA_REG_TRACES] == 1);
+    setup(0, 0, 0);
+    prepare_graphical_framebuffer();
+    fb.capabilities = FRAMEBUFFER_CAP_MODE_SET;
+    fb.max_width = 800;
+    fb.max_height = 600;
+    fb.max_bytes = 800 * 600 * 4;
+    fb.bpp = 32;
+    assert(framebuffer_set_mode(800, 600) == 0);
+    assert(regs[SVGA_REG_TRACES] == 0);
+}
+
+static uint32_t legacy_display_fifo[256];
+
+static void prepare_graphical_framebuffer(void)
+{
+    memset(&fb, 0, sizeof(fb));
+    memset(&vmware_svga, 0, sizeof(vmware_svga));
+    fb.available = true;
+    fb.backend = FRAMEBUFFER_BACKEND_VMWARE_SVGA;
+    fb.width = 800;
+    fb.height = 600;
+    vmware_svga.present = true;
+    vmware_svga.fifo_present = true;
+    vmware_svga.io_port = 0x456;
+    vmware_svga.fifo = legacy_display_fifo;
+    vmware_svga.fifo_min = VMWARE_SVGA_FIFO_MIN_BYTES;
+    vmware_svga.fifo_max = sizeof(legacy_display_fifo);
+    memset(legacy_display_fifo, 0, sizeof(legacy_display_fifo));
+    selected_port_reg = 0;
+    port_busy_reads = 0;
+    port_sync_writes = 0;
+}
+
+static void test_display_tick_defers_lock_and_fifo_backpressure(void)
+{
+    setup(SVGA_CAP_TRACES | SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+          SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE, SVGA3D_HWVERSION_WS8_B1);
+    prepare_graphical_framebuffer();
+    assert(svga.traces_enabled && regs[SVGA_REG_TRACES] == 1);
+    uint32_t before_next = fifo[SVGA_FIFO_NEXT_CMD];
+    framebuffer_display_tick();
+    assert(fifo[SVGA_FIFO_NEXT_CMD] == before_next);
+
+    setup(SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+          SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE, SVGA3D_HWVERSION_WS8_B1);
+    prepare_graphical_framebuffer();
+    stalled = true;
+    fifo[SVGA_FIFO_NEXT_CMD] = svga.min + 4;
+    fifo[SVGA_FIFO_STOP] = svga.min + 8;
+    uint32_t before_busy = busy_reads;
+    before_next = fifo[SVGA_FIFO_NEXT_CMD];
+    framebuffer_display_tick();
+    assert(busy_reads - before_busy <= 1);
+    assert(fifo[SVGA_FIFO_NEXT_CMD] == before_next);
+
+    stalled = false;
+    fifo[SVGA_FIFO_NEXT_CMD] = fifo[SVGA_FIFO_STOP] = svga.min;
+    before_next = fifo[SVGA_FIFO_NEXT_CMD];
+    uint64_t held = svga_lock();
+    framebuffer_display_tick();
+    svga_unlock(held);
+    assert(fifo[SVGA_FIFO_NEXT_CMD] == before_next);
+    framebuffer_display_tick();
+    assert(fifo[SVGA_FIFO_NEXT_CMD] != before_next);
+
+    setup(SVGA_CAP_EXTENDED_FIFO, 0, 0);
+    prepare_graphical_framebuffer();
+    svga.fifo_ready = false;
+    vmware_svga.fifo[VMWARE_SVGA_FIFO_NEXT_CMD] = vmware_svga.fifo_min;
+    vmware_svga.fifo[VMWARE_SVGA_FIFO_STOP] = vmware_svga.fifo_min + 4;
+    framebuffer_display_tick();
+    assert(port_busy_reads == 1);
+    vmware_svga.fifo[VMWARE_SVGA_FIFO_STOP] =
+        vmware_svga.fifo[VMWARE_SVGA_FIFO_NEXT_CMD];
+    framebuffer_display_tick();
+    assert(vmware_svga.fifo[VMWARE_SVGA_FIFO_NEXT_CMD] !=
+           vmware_svga.fifo_min);
 }
 
 static void test_fence_last_poll(void)
@@ -1142,6 +1299,8 @@ static void test_gb_display_compatibility(void)
 }
 int main(void)
 {
+    test_display_tick_defers_lock_and_fifo_backpressure();
+    test_trace_capability_survives_fifo_reconfiguration();
     test_gb_display_compatibility();
     test_fence_last_poll(); test_fifo_wakeup(); test_fifo(); test_fallback();
     test_resources(); test_gpu(); test_gb_recovery();

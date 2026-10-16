@@ -63,6 +63,33 @@ int main(void)
     struct task *b = sched_select_next_user();
     assert(b == tasks[2] && b != a);
     assert(a->running_cpu == 0 && b->running_cpu == 1);
+    /* The BSP's scheduler round must not consume the AP's local preemption
+     * request, even when the BSP tick runs first. */
+    fake_cpu = 0;
+    sched_on_tick();
+    assert(sched_current_cpu_needs_resched());
+    finish(a, 0);
+    a = sched_select_next_user();
+    assert(a && a->running_cpu == 0);
+    assert(!sched_current_cpu_needs_resched());
+    sched_yield_current();
+    assert(sched_current_cpu_needs_resched());
+    fake_cpu = 1;
+    assert(!sched_current_cpu_needs_resched());
+    fake_cpu = 0;
+    finish(a, 0);
+    a = sched_select_next_user();
+    assert(a && a->running_cpu == 0);
+    assert(!sched_current_cpu_needs_resched());
+    fake_cpu = 1;
+    sched_on_cpu_tick();
+    assert(sched_current_cpu_needs_resched());
+    fake_cpu = 0;
+    assert(!sched_current_cpu_needs_resched());
+    fake_cpu = 1;
+    finish(b, 0);
+    assert(sched_select_next_user() == b);
+    assert(!sched_current_cpu_needs_resched());
     finish(b, 100);
     /* A captured frame remains reserved until its owner retires CR3. */
     tasks[2]->affinity_mask = 3;
@@ -74,6 +101,9 @@ int main(void)
     fake_cpu = 0;
     sched_mark_ready(b->pid);
     assert(b->state == TASK_READY && b->running_cpu == 1);
+    assert(sched_current_cpu_needs_resched());
+    fake_cpu = 1;
+    assert(sched_current_cpu_needs_resched());
     tasks[2]->state = TASK_BLOCKED;
     fake_cpu = 1;
     assert(!sched_select_next_user());
@@ -116,5 +146,5 @@ int main(void)
     for (unsigned i = 0; i < task_count; ++i) { fair_forget(tasks[i]); free(tasks[i]); }
     free(tasks);
     assert(!fair_queues[0].head && !fair_queues[1].head);
-    puts("PASS scheduler EEVDF integration: nice shares, affinity migration, CPU ownership, block/steal, exit");
+    puts("PASS scheduler EEVDF integration: per-CPU preemption, wake propagation, nice shares, affinity migration, block/steal, exit");
 }

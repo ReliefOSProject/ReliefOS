@@ -18,6 +18,12 @@ int task_udp_send(struct task_file *f, const void *b, uint32_t n, uint32_t flags
 { (void)f; (void)b; (void)n; (void)flags; (void)a; (void)l; abort(); }
 short net_socket_poll_fd(int32_t h, uint32_t p, short e)
 { (void)h; (void)p; (void)e; abort(); }
+int task_packet_recv(struct task_file *file, void *data, uint32_t length,
+                     uint32_t flags, uint64_t address, uint64_t address_length)
+{ (void)file; (void)data; (void)length; (void)flags; (void)address; (void)address_length; abort(); }
+int task_packet_send(struct task_file *file, const void *data, uint32_t length,
+                     uint32_t flags, uint64_t address, uint32_t address_length)
+{ (void)file; (void)data; (void)length; (void)flags; (void)address; (void)address_length; abort(); }
 int net_socket_error(int32_t h, bool c) { (void)h; (void)c; abort(); }
 int net_socket_recv(struct reliefos_net_socket_io *r, uint32_t p) { (void)r; (void)p; abort(); }
 int net_socket_send(struct reliefos_net_socket_io *r, uint32_t p) { (void)r; (void)p; abort(); }
@@ -74,6 +80,8 @@ uint32_t kernel_wait_queue_wake_all(struct kernel_wait_queue *queue)
 { if (current.waiting_queue == queue) { current.waiting_queue = NULL; current.state = TASK_READY; return 1; } return 0; }
 void kernel_wait_queue_remove(struct kernel_wait_queue *queue, struct task *task)
 { if (task->waiting_queue == queue) task->waiting_queue = NULL; }
+/* This fixture exercises socket batching, not global poll waiters. */
+void kernel_poll_readiness_notify(void) { }
 int fs_permissions_resolve_flags(const struct task *task, const char *base, const char *path,
     char *out, uint32_t capacity, bool real_ids, uint32_t flags)
 { (void)task; (void)base; (void)path; (void)out; (void)capacity; (void)real_ids; (void)flags; assert(0); return -1; }

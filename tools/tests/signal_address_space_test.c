@@ -54,6 +54,7 @@ void sched_exit_group(uint32_t pid, uint64_t code)
 { assert(pid == 1 && code == 139); target.state = TASK_EXITED; ++exits; }
 void sched_signal_job_control(uint32_t pid, int sig) { (void)pid; (void)sig; assert(0); }
 void sched_alarm_rearm(struct task *task) { (void)task; assert(0); }
+void sched_notify_runnable(void) { }
 void sched_signal_discard(struct task *task, int sig)
 { task->pending_signals &= ~(1ULL << (sig - 1)); *sched_task_process_pending(task) &= ~(1ULL << (sig - 1)); }
 

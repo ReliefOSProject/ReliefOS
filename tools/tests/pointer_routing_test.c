@@ -45,6 +45,8 @@ void kernel_spin_unlock_irqrestore(struct kernel_spinlock *lock, uint64_t flags)
     (void)lock;
     (void)flags;
 }
+/* This fixture covers event routing, not poll waiter wakeups. */
+void kernel_poll_readiness_notify(void) {}
 
 static long test_read(long number, long fd, long buffer, long length)
 {

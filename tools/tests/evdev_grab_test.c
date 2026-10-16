@@ -38,6 +38,27 @@ void task_pipe_release(struct task_file *f) { (void)f; }
 void task_socket_release(struct task_file *f) { (void)f; }
 void task_inet_release(struct task_file *f) { (void)f; }
 void task_shm_release(struct task_file *f) { (void)f; }
+/* The real generic device dispatcher also links audio branches. No evdev
+ * scenario may enter them: fail loudly instead of linking the audio stack. */
+#define UNUSED_AUDIO_CLOSE(name) \
+    int name(struct task_file *file) \
+    { (void)file; abort(); }
+UNUSED_AUDIO_CLOSE(audio_device_close)
+UNUSED_AUDIO_CLOSE(audio_control_close)
+UNUSED_AUDIO_CLOSE(audio_mixer_close)
+UNUSED_AUDIO_CLOSE(audio_timer_close)
+UNUSED_AUDIO_CLOSE(audio_oss_close)
+#undef UNUSED_AUDIO_CLOSE
+#define UNUSED_AUDIO_READ(name) \
+    int name(struct task *task, struct task_file *file, void *buffer, uint32_t count) \
+    { (void)task; (void)file; (void)buffer; (void)count; abort(); }
+UNUSED_AUDIO_READ(audio_device_read)
+UNUSED_AUDIO_READ(audio_oss_read)
+UNUSED_AUDIO_READ(audio_timer_read)
+UNUSED_AUDIO_READ(audio_control_read_task)
+#undef UNUSED_AUDIO_READ
+int audio_control_read_file(struct audio_control_file *file, void *buffer, uint32_t count)
+{ (void)file; (void)buffer; (void)count; abort(); }
 void task_socket_collect(void) {}
 uint32_t kernel_wait_queue_wake_all(struct kernel_wait_queue *q) { (void)q; return 0; }
 uint64_t time_uptime_us(void) { return 0; }
@@ -46,6 +67,8 @@ void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)
 { (void)lock; *flags = 0; }
 void kernel_spin_unlock_irqrestore(struct kernel_spinlock *lock, uint64_t flags)
 { (void)lock; (void)flags; }
+/* This fixture covers grab/ioctl semantics, not poll waiter wakeups. */
+void kernel_poll_readiness_notify(void) {}
 
 /* Count console handler invocations, which the real input layer must exclude. */
 static unsigned console_key_events;

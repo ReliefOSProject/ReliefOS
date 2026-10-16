@@ -12,6 +12,7 @@ void kernel_wait_queue_init(struct kernel_wait_queue *q) { memset(q, 0, sizeof(*
 void kernel_wait_queue_remove(struct kernel_wait_queue *q, struct task *t) { (void)q; (void)t; }
 void kernel_wait_queue_block_current(struct kernel_wait_queue *q) { (void)q; ++blocked; }
 uint32_t kernel_wait_queue_wake_all(struct kernel_wait_queue *q) { (void)q; ++awakened; return 1; }
+void kernel_poll_readiness_notify(void) { }
 static unsigned descriptor_refs = 1;
 static uint8_t keyboard_caps;
 uint8_t input_caps_lock_active(void) { return keyboard_caps; }

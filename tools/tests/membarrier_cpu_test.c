@@ -34,6 +34,9 @@ static void *remote_cpu(void *argument)
 
 int main(void)
 {
+    /* Host TSC_AUX identifies a Linux CPU, not this fixture's logical CPU.
+     * Use the mocked LAPIC identity for these simulated worker threads. */
+    smp_rdtscp_supported = 0;
     cpu_count = 4;
     for (uint32_t i = 0; i < 4; ++i) {
         cpus[i].apic_id = i;

@@ -16,10 +16,18 @@ class SvgaTests(unittest.TestCase):
                         "SVGA3D implementation is missing")
         with tempfile.TemporaryDirectory(prefix="reliefos-svga-") as directory:
             executable = Path(directory) / "svga-test"
+            # Scanout/FIFO tests include framebuffer.c but do not render text.
+            # Supply a minimal font fixture without requiring a kernel build.
+            generated = Path(directory) / "generated"
+            generated.mkdir()
+            (generated / "cjk_font.h").write_text(
+                "static const struct { uint32_t cp; uint8_t width; uint8_t bits[32]; } "
+                "cjk_glyphs[] = {{0xfffdU, 1, {0}}};\n")
             subprocess.run([
                 "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
                 "-fsanitize=address,undefined", "-fno-omit-frame-pointer",
-                "-DSVGA_HOST_TEST", "-Ikernel/reliefnt/kernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-DSVGA_HOST_TEST", f"-I{directory}", "-Ikernel/reliefnt/kernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
                 "-Ikernel/reliefnt/drivers/video/svga", "tools/tests/svga_test.c",
                 *(str(path) for path in SOURCES), "-o", str(executable),
             ], cwd=ROOT, check=True)
@@ -30,7 +38,8 @@ class SvgaTests(unittest.TestCase):
         # emits for the kernel. Check the real target before full OS linking.
         kernel_imports = {
             "console_printf", "console_log", "framebuffer_get", "kernel_spin_lock_irqsave",
-            "kernel_spin_unlock_irqrestore", "mm_alloc_pages", "mm_free_pages",
+            "kernel_spin_unlock_irqrestore", "kernel_irq_save", "kernel_irq_restore",
+            "mm_alloc_pages", "mm_free_pages",
             "paging_kernel_direct_map", "paging_mmio_uncached", "x86_64_inl",
             "x86_64_outl", "memcpy", "memset", "memmove",
         }

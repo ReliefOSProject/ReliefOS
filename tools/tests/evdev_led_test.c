@@ -16,6 +16,8 @@ void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)
 { (void)lock; *flags = 0; }
 void kernel_spin_unlock_irqrestore(struct kernel_spinlock *lock, uint64_t flags)
 { (void)lock; (void)flags; }
+/* This fixture covers LED/ioctl state, not poll waiter wakeups. */
+void kernel_poll_readiness_notify(void) {}
 
 int main(void)
 {
