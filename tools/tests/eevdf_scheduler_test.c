@@ -4,8 +4,17 @@
 #include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
 #include "sysv_shm_fixture_stubs.h"
 
+_Static_assert(sizeof(struct task) == 104176, "task size changed with EEVDF tree integration");
+_Static_assert(__builtin_offsetof(struct task, fair) == 0, "task fair offset changed");
+_Static_assert(sizeof(((struct task *)0)->fair) == 64, "task fair size changed");
+_Static_assert(__builtin_offsetof(struct task, priority) == 5856, "task priority offset changed");
+_Static_assert(__builtin_offsetof(struct task, frame) == 101368, "task frame offset changed");
+_Static_assert(__builtin_offsetof(struct task, running_cpu) == 104160,
+               "task running_cpu offset changed");
+
 static uint32_t fake_cpu;
 static uint64_t fake_time;
+static bool fail_kernel_allocation;
 uint32_t smp_current_cpu(void) { return fake_cpu; }
 uint32_t smp_cpu_count(void) { return 2; }
 static bool offline_ap;
@@ -23,6 +32,9 @@ void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)
 void kernel_spin_unlock_irqrestore(struct kernel_spinlock *lock, uint64_t flags)
 { (void)lock; (void)flags; }
 int kernel_signal_fatal_pending(const struct task *task) { (void)task; return 0; }
+void *kernel_malloc(size_t size)
+{ return fail_kernel_allocation ? NULL : malloc(size); }
+void kernel_free(void *memory) { free(memory); }
 
 static void finish(struct task *task, uint64_t elapsed)
 {
@@ -34,10 +46,13 @@ static void finish(struct task *task, uint64_t elapsed)
 int main(void)
 {
     task_count = 3;
-    tasks = calloc(task_count, sizeof(*tasks));
+    task_capacity = 4;
+    tasks = calloc(task_capacity, sizeof(*tasks));
     for (unsigned i = 0; i < task_count; ++i) {
-        tasks[i] = calloc(1, sizeof(**tasks));
-        assert(tasks[i]);
+        struct sched_task_object *object = calloc(1, sizeof(*object));
+        assert(object);
+        tasks[i] = &object->task;
+        task_zero(tasks[i]);
         tasks[i]->pid = i + 1;
         tasks[i]->kind = TASK_KIND_USER;
         tasks[i]->state = TASK_READY;
@@ -51,6 +66,18 @@ int main(void)
             .ss = RELIEFNT_USER_DS, .rflags = 1ULL << 9};
         tasks[i]->affinity_mask = 1;
     }
+    fail_kernel_allocation = true;
+    assert(!alloc_task_slot() && task_count == 3);
+    fail_kernel_allocation = false;
+    struct sched_task_object *clone_object = calloc(1, sizeof(*clone_object));
+    assert(clone_object);
+    struct task *clone_task = &clone_object->task;
+    *clone_task = *tasks[0];
+    task_fair_reset(clone_task);
+    assert(clone_task->fair.node == &clone_object->fair_node);
+    assert(clone_task->fair.node != tasks[0]->fair.node);
+    assert(!clone_task->fair.initialized && !clone_task->fair.queued);
+    free(clone_object);
     tasks[1]->priority = 5;
     tasks[2]->affinity_mask = 2;
     offline_ap = true;
@@ -143,8 +170,15 @@ int main(void)
     finish(a, 1000);
     a->state = TASK_EXITED;
     assert(!sched_select_next_user());
+    a->running_cpu = SCHED_CPU_NONE;
+    a->flags = TASK_FLAG_RESOURCES_RELEASED;
+    a->parent_pid = 0;
+    struct eevdf_node *recycled_node = &((struct sched_task_object *)a)->fair_node;
+    assert(alloc_task_slot() == a);
+    assert(a->fair.node == recycled_node && !a->fair.initialized && !a->fair.queued);
     for (unsigned i = 0; i < task_count; ++i) { fair_forget(tasks[i]); free(tasks[i]); }
     free(tasks);
-    assert(!fair_queues[0].head && !fair_queues[1].head);
+    assert(!fair_queues[0].root && !fair_queues[0].nr_active &&
+           !fair_queues[1].root && !fair_queues[1].nr_active);
     puts("PASS scheduler EEVDF integration: per-CPU preemption, wake propagation, nice shares, affinity migration, block/steal, exit");
 }

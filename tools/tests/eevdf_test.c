@@ -2,10 +2,27 @@
 #include <stdio.h>
 #include <reliefnt/eevdf.h>
 
+#ifdef RELIEFNT_EEVDF_RBTREE
+static struct eevdf_node node_a, node_b;
+#endif
+
+static void reset_pair(struct eevdf_queue *q, struct eevdf_entity *a,
+                       struct eevdf_entity *b)
+{
+    *q = (struct eevdf_queue){0};
+    *a = (struct eevdf_entity){0};
+    *b = (struct eevdf_entity){0};
+#ifdef RELIEFNT_EEVDF_RBTREE
+    eevdf_bind(a, &node_a);
+    eevdf_bind(b, &node_b);
+#endif
+}
+
 int main(void)
 {
     struct eevdf_queue q = {0};
     struct eevdf_entity a = {0}, b = {0};
+    reset_pair(&q, &a, &b);
     eevdf_enqueue(&q, &a, 0);
     eevdf_enqueue(&q, &b, 0);
     for (unsigned i = 0; i < 10000; ++i) {
@@ -17,7 +34,7 @@ int main(void)
     assert(b.runtime > 4900000 && b.runtime < 5100000);
     puts("PASS EEVDF equal-weight service");
 
-    q = (struct eevdf_queue){0}; a = (struct eevdf_entity){0}; b = a;
+    reset_pair(&q, &a, &b);
     eevdf_enqueue(&q, &a, 0);
     eevdf_enqueue(&q, &b, 5);
     for (unsigned i = 0; i < 200000; ++i) eevdf_account(eevdf_pick(&q), 100);
@@ -26,10 +43,14 @@ int main(void)
     assert(eevdf_weight(-20) == 88761 && eevdf_weight(19) == 15);
     puts("PASS EEVDF nice 0:5 proportional service, neither task starves");
 
-    q = (struct eevdf_queue){0}; a = (struct eevdf_entity){0}; b = a;
+    reset_pair(&q, &a, &b);
     eevdf_enqueue(&q, &a, 0); eevdf_enqueue(&q, &b, 0);
     a.vruntime = 0; a.deadline = 20000;
     b.vruntime = 1000; b.deadline = 100;
+#ifdef RELIEFNT_EEVDF_RBTREE
+    eevdf_refresh(&a);
+    eevdf_refresh(&b);
+#endif
     assert(eevdf_pick(&q) == &a); /* earliest deadline alone is insufficient */
     eevdf_account(&a, 2000);
     assert(eevdf_pick(&q) == &b);
@@ -42,6 +63,9 @@ int main(void)
     eevdf_enqueue(&q, &a, 0);
     assert(a.vruntime == b.vruntime);
     a.deadline = b.deadline - 1;
+#ifdef RELIEFNT_EEVDF_RBTREE
+    eevdf_refresh(&a);
+#endif
     assert(eevdf_pick(&q) == &a);
     eevdf_yield(&a);
     assert(eevdf_pick(&q) == &b);
@@ -49,7 +73,7 @@ int main(void)
     assert(!q.head && !eevdf_pick(&q));
     puts("PASS EEVDF eligibility, delayed sleep debt, wakeup and yield");
 
-    q = (struct eevdf_queue){0}; a = (struct eevdf_entity){0}; b = a;
+    reset_pair(&q, &a, &b);
     eevdf_enqueue(&q, &a, 0); eevdf_enqueue(&q, &b, 0);
     eevdf_account(&b, 2000);
     eevdf_sleep(&q, &a);
