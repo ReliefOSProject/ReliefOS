@@ -1,12 +1,12 @@
 # ReliefOS 应用图标
 
-图标沿用 ReliefOS 的经典彩色像素风格，仅用于 ReliefOS 自写的图形应用。现有 34 套资源各自可区分，包含 12 个已迁移的 X11 程序和保留的旧版图形程序资源。控制台命令、后台服务、第三方应用不提供自定义图标。
+图标沿用 ReliefOS 的经典彩色像素风格，仅用于 ReliefOS 自写的图形应用。现有 35 套资源各自可区分，包含 13 个 X11 程序和保留的旧版图形程序资源。控制台命令、后台服务、第三方应用不提供自定义图标。
 
 `configs/app-icons.list` 是生成和安装共同使用的明确清单。sudo、fastfetch、nano、PL Editor、DOOM 游戏本体、PortableGL gears 及 StardustUI 上游示例均不在其中；ReliefOS 自写的 DOOM 启动器保留图标。旧版自写图形终端属于图形应用，和 shell 等命令行程序分别处理。
 
 ## 标准路径
 
-公开桌面图标使用透明 RGBA PNG，尺寸为 16、32、48、64、128、256 像素；共 204 个 PNG，约 66 KiB。安装路径为：
+公开桌面图标使用透明 RGBA PNG，尺寸为 16、32、48、64、128、256 像素；共 210 个 PNG。安装路径为：
 
 ```text
 /usr/share/icons/hicolor/16x16/apps/reliefos-fileman.png
@@ -21,7 +21,7 @@
 
 ## 窗口图标
 
-计算器、系统信息、Fileman、Taskmgr、扫雷、Leonmmcoset、Xiaobai、画图、图像查看器、DOOM 启动器、安装器和 ReliefExcel 使用共用 FLTK 图标接入。DOOM 游戏本体不设置自定义图标。
+计算器、系统信息、Fileman、Taskmgr、扫雷、Leonmmcoset、Xiaobai、画图、图像查看器、DOOM 启动器、安装器、ReliefExcel 和 ReliefWord 使用共用 FLTK 图标接入。DOOM 游戏本体不设置自定义图标。
 
 每个程序初始化自己的 `reliefos-程序名` 窗口身份，并通过 FLTK 的 `default_icons` 设置 16、32、48、64 像素的窗口图标。FLTK 将它们发布为标准 `_NET_WM_ICON` 属性，供标题栏、任务栏和窗口切换器使用。
 

@@ -44,5 +44,6 @@ const char *fileman_x11_default_app(const char *path)
         return "/usr/bin/dillo";
     if (extension && (!strcasecmp(extension, ".rexl") || !strcasecmp(extension, ".csv")))
         return "/usr/bin/reliefexcel";
+    if (extension && !strcasecmp(extension, ".rword")) return "/usr/bin/reliefword";
     return "/usr/bin/nedit";
 }

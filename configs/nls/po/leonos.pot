@@ -6211,3 +6211,416 @@ msgstr ""
 #: userland/apps/reliefexcel/document.cpp
 msgid "Could not lock recovery file"
 msgstr ""
+
+
+#: userland/apps/reliefword/window.cpp:253
+msgid "%s\nCharacters: %zu\nNon-space characters: %zu\nWords / CJK characters: %zu\nParagraphs: %zu\nPages: %u"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:255
+msgid "A native ReliefOS word processor.\nCtrl+S: save  ·  Ctrl+F: find  ·  Ctrl+Enter: page break\nUse the original .rword format to keep all formatting."
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:37
+msgid "About ReliefWord"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:164
+msgid "An unsaved ReliefWord recovery copy is available. Recover it into a new document?"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Body text"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Bold (Ctrl+B)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:33
+msgid "Bottom margin (mm)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:73
+msgid "Bullets"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:124
+msgid "Choose a different export file"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:84
+msgid "Clear format"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:171
+msgid "Could not create a new document"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:130
+msgid "Could not export the document"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:101
+msgid "Could not open the document"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:130
+msgid "Document exported; original remains open"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:86
+msgid "Document saved"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:83
+msgid "Document was not saved"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:101
+msgid "Editing"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:211
+msgid "Enter a font size from 6 to 96 points"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:54
+msgid "Enter finite page values within the displayed ranges"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:87
+msgid "Enter finite paragraph values within the displayed ranges"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:118
+msgid "Enter search text"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:37
+msgid "Example document"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:36
+msgid "Export HTML..."
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:36
+msgid "Export TXT..."
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:127
+msgid "Exporting document..."
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:123
+msgid "Exporting over the imported source could discard content ReliefWord did not preserve"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:53
+msgid "File path is too long"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:99
+msgid "Find..."
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:76
+msgid "First line indent (mm)"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:114
+msgid "Fit width"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:79
+msgid "Font family"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:80
+msgid "Font size in points (6–96); press Enter to apply"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:37
+msgid "Footer ({page} inserts the page number)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:36
+msgid "Header"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Heading 1"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Heading 2"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:30
+msgid "Height (mm)"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:89
+msgid "Highlight"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:35
+msgid "Import HTML..."
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:35
+msgid "Import TXT..."
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:113
+msgid "Imported — save as .rword to keep formatting"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:98
+msgid "Indent"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:106
+msgid "Indentation, spacing and line height"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:104
+msgid "Insert a page break (Ctrl+Enter)"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:105
+msgid "Insert date"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Italic (Ctrl+I)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:72
+msgid "Justify"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:29
+msgid "Landscape"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:74
+msgid "Left indent (mm)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:32
+msgid "Left margin (mm)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:76
+msgid "Line spacing (%)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:122
+msgid "Match selected"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:153
+msgid "Modified"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:78
+msgid "Monospace"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:73
+msgid "Numbering"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:43
+msgid "Open document"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:96
+msgid "Opening document..."
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:29
+msgid "Orientation"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:98
+msgid "Outdent"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:105
+msgid "Page"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:144
+msgid "Page %u / %u   ·   %zu characters   ·   %zu words   ·   %d%%"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:104
+msgid "Page break"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:38
+msgid "Page layout"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:25
+msgid "Page setup"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:103
+msgid "Page setup..."
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:26
+msgid "Paper size"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:103
+msgid "Paper, orientation, margins, headers and footers"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:71
+msgid "Paragraph"
+msgstr ""
+
+#: userland/apps/reliefword/view.cpp:293
+msgid "Paragraph..."
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:75
+msgid "Paste (Ctrl+V)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:29
+msgid "Portrait"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:172
+msgid "Recovered — save this document to a new file"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:264
+msgid "ReliefOS project report\nA document made with ReliefWord\n\nOverview\nWrite, edit and arrange Chinese and English text on real pages. The ribbon keeps everyday commands within reach.\n\nThis week's work\nDraft the proposal and collect feedback.\nReview the document together.\nSave the final document in the original format.\n\nNext steps\nUse headings, lists and paragraph spacing to make the report easy to read. You can open TXT or HTML and save an editable .rword copy.\n\nPrepared with ReliefWord — simple tools for everyday writing."
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:70
+msgid "Replace the existing file?\n%s"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:99
+msgid "Replace..."
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:100
+msgid "Replace:"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:138
+msgid "Replaced %u matches"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:74
+msgid "Right indent (mm)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:32
+msgid "Right margin (mm)"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:116
+msgid "Ruler"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:78
+msgid "Sans serif"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:78
+msgid "Save a copy..."
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:37
+msgid "Save changes before continuing?"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:43
+msgid "Save document"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:72
+msgid "Saving document..."
+msgstr ""
+
+#: userland/apps/reliefword/view.cpp:293
+msgid "Select all"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:253
+msgid "Selection"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:78
+msgid "Serif"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:38
+msgid "Show page numbers"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:78
+msgid "Space after (pt)"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:78
+msgid "Space before (pt)"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Strikethrough"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:98
+msgid "Styles"
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:119
+msgid "TXT keeps text only. Character formatting, paragraph layout and page settings are not saved. Your original document remains open."
+msgstr ""
+
+#: userland/apps/reliefword/files.cpp:78
+msgid "The file changed outside ReliefWord. Save a copy or explicitly replace it."
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Title"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:33
+msgid "Top margin (mm)"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Underline (Ctrl+U)"
+msgstr ""
+
+#: userland/apps/reliefword/main.cpp:10
+msgid "Usage: reliefword [document.rword | text.txt | page.html]"
+msgstr ""
+
+#: userland/apps/reliefword/dialogs.cpp:30
+msgid "Width (mm)"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:100
+msgid "Word count"
+msgstr ""
+
+#: userland/apps/reliefword/window.cpp:115
+msgid "Zoom"
+msgstr ""
+
+#: configs/nls/messages.c
+msgid "Some HTML links, tables, or embedded objects were flattened or skipped"
+msgstr ""

@@ -6691,3 +6691,419 @@ msgstr "恢复文件正在使用中"
 #: userland/apps/reliefexcel/document.cpp
 msgid "Could not lock recovery file"
 msgstr "无法锁定恢复文件"
+
+#. ReliefWord
+#, c-format
+msgid "%s\nCharacters: %zu\nNon-space characters: %zu\nWords / CJK characters: %zu\nParagraphs: %zu\nPages: %u"
+msgstr "%s\n字符数：%zu\n不含空格：%zu\n词语/汉字：%zu\n段落：%zu\n页数：%u"
+
+#. ReliefWord
+msgid "A native ReliefOS word processor.\nCtrl+S: save  ·  Ctrl+F: find  ·  Ctrl+Enter: page break\nUse the original .rword format to keep all formatting."
+msgstr "ReliefOS 内置文字处理器。\nCtrl+S：保存  ·  Ctrl+F：查找  ·  Ctrl+Enter：分页\n保存为 .rword 原生格式可保留全部排版。"
+
+#. ReliefWord
+msgid "About ReliefWord"
+msgstr "关于 ReliefWord"
+
+#. ReliefWord
+msgid "An unsaved ReliefWord recovery copy is available. Recover it into a new document?"
+msgstr "发现 ReliefWord 未保存的恢复副本。要恢复为新文档吗？"
+
+#. ReliefWord
+msgid "Body text"
+msgstr "正文"
+
+#. ReliefWord
+msgid "Bold (Ctrl+B)"
+msgstr "加粗（Ctrl+B）"
+
+#. ReliefWord
+msgid "Bottom margin (mm)"
+msgstr "下页边距（毫米）"
+
+#. ReliefWord
+msgid "Bullets"
+msgstr "项目符号"
+
+#. ReliefWord
+msgid "Clear format"
+msgstr "清除格式"
+
+#. ReliefWord
+msgid "Could not export the document"
+msgstr "无法导出文档"
+
+#. ReliefWord
+msgid "Could not open the document"
+msgstr "无法打开文档"
+
+#. ReliefWord
+msgid "Document exported; original remains open"
+msgstr "文档已导出，原文档继续保留"
+
+#. ReliefWord
+msgid "Document saved"
+msgstr "文档已保存"
+
+#. ReliefWord
+msgid "Document was not saved"
+msgstr "文档未保存"
+
+#. ReliefWord
+msgid "Editing"
+msgstr "编辑"
+
+#. ReliefWord
+msgid "Enter a font size from 6 to 96 points"
+msgstr "请输入 6 到 96 磅之间的字号"
+
+#. ReliefWord
+msgid "Enter search text"
+msgstr "请输入查找内容"
+
+#. ReliefWord
+msgid "Example document"
+msgstr "示例文档"
+
+#. ReliefWord
+msgid "Export HTML..."
+msgstr "导出 HTML..."
+
+#. ReliefWord
+msgid "Export TXT..."
+msgstr "导出 TXT..."
+
+#. ReliefWord
+msgid "Exporting document..."
+msgstr "正在导出文档..."
+
+#. ReliefWord
+msgid "First line indent (mm)"
+msgstr "首行缩进（毫米）"
+
+#. ReliefWord
+msgid "Fit width"
+msgstr "适应宽度"
+
+#. ReliefWord
+msgid "Font family"
+msgstr "字体"
+
+#. ReliefWord
+msgid "Font size in points (6–96); press Enter to apply"
+msgstr "字号（6–96 磅），按回车应用"
+
+#. ReliefWord
+msgid "Footer ({page} inserts the page number)"
+msgstr "页脚（{page} 表示页码）"
+
+#. ReliefWord
+msgid "Header"
+msgstr "页眉"
+
+#. ReliefWord
+msgid "Heading 1"
+msgstr "标题 1"
+
+#. ReliefWord
+msgid "Heading 2"
+msgstr "标题 2"
+
+#. ReliefWord
+msgid "Height (mm)"
+msgstr "高度（毫米）"
+
+#. ReliefWord
+msgid "Highlight"
+msgstr "高亮"
+
+#. ReliefWord
+msgid "Import HTML..."
+msgstr "导入 HTML..."
+
+#. ReliefWord
+msgid "Import TXT..."
+msgstr "导入 TXT..."
+
+#. ReliefWord
+msgid "Imported — save as .rword to keep formatting"
+msgstr "已导入，请保存为 .rword 以保留排版"
+
+#. ReliefWord
+msgid "Indent"
+msgstr "增加缩进"
+
+#. ReliefWord
+msgid "Indentation, spacing and line height"
+msgstr "缩进、段前段后和行距"
+
+#. ReliefWord
+msgid "Insert a page break (Ctrl+Enter)"
+msgstr "插入分页符（Ctrl+Enter）"
+
+#. ReliefWord
+msgid "Insert date"
+msgstr "插入日期"
+
+#. ReliefWord
+msgid "Italic (Ctrl+I)"
+msgstr "斜体（Ctrl+I）"
+
+#. ReliefWord
+msgid "Justify"
+msgstr "两端对齐"
+
+#. ReliefWord
+msgid "Landscape"
+msgstr "横向"
+
+#. ReliefWord
+msgid "Left indent (mm)"
+msgstr "左缩进（毫米）"
+
+#. ReliefWord
+msgid "Left margin (mm)"
+msgstr "左页边距（毫米）"
+
+#. ReliefWord
+msgid "Line spacing (%)"
+msgstr "行距（百分比）"
+
+#. ReliefWord
+msgid "Match selected"
+msgstr "已选中匹配文字"
+
+#. ReliefWord
+msgid "Monospace"
+msgstr "等宽"
+
+#. ReliefWord
+msgid "Numbering"
+msgstr "编号"
+
+#. ReliefWord
+msgid "Open document"
+msgstr "打开文档"
+
+#. ReliefWord
+msgid "Opening document..."
+msgstr "正在打开文档..."
+
+#. ReliefWord
+msgid "Orientation"
+msgstr "方向"
+
+#. ReliefWord
+msgid "Outdent"
+msgstr "减少缩进"
+
+#. ReliefWord
+msgid "Page"
+msgstr "页面"
+
+#. ReliefWord
+#, c-format
+msgid "Page %u / %u   ·   %zu characters   ·   %zu words   ·   %d%%"
+msgstr "第 %u / %u 页   ·   %zu 字符   ·   %zu 词/汉字   ·   %d%%"
+
+#. ReliefWord
+msgid "Page break"
+msgstr "分页符"
+
+#. ReliefWord
+msgid "Page layout"
+msgstr "页面布局"
+
+#. ReliefWord
+msgid "Page setup"
+msgstr "页面设置"
+
+#. ReliefWord
+msgid "Page setup..."
+msgstr "页面设置..."
+
+#. ReliefWord
+msgid "Paper size"
+msgstr "纸张大小"
+
+#. ReliefWord
+msgid "Paper, orientation, margins, headers and footers"
+msgstr "纸张、方向、页边距及页眉页脚"
+
+#. ReliefWord
+msgid "Paragraph"
+msgstr "段落"
+
+#. ReliefWord
+msgid "Paragraph..."
+msgstr "段落..."
+
+#. ReliefWord
+msgid "Paste (Ctrl+V)"
+msgstr "粘贴（Ctrl+V）"
+
+#. ReliefWord
+msgid "Portrait"
+msgstr "纵向"
+
+#. ReliefWord
+msgid "Recovered — save this document to a new file"
+msgstr "已恢复，请将文档另存为新文件"
+
+#. ReliefWord
+msgid "ReliefOS project report\nA document made with ReliefWord\n\nOverview\nWrite, edit and arrange Chinese and English text on real pages. The ribbon keeps everyday commands within reach.\n\nThis week's work\nDraft the proposal and collect feedback.\nReview the document together.\nSave the final document in the original format.\n\nNext steps\nUse headings, lists and paragraph spacing to make the report easy to read. You can open TXT or HTML and save an editable .rword copy.\n\nPrepared with ReliefWord — simple tools for everyday writing."
+msgstr "ReliefOS 项目报告\n使用 ReliefWord 编写的工作文档\n\n工作概览\n在真实的纸张页面中编写、编辑和排版中文与英文。常用工具集中在顶部功能区，便于随时操作。\n\n本周工作\n整理项目方案并收集反馈。\n共同审阅文档，完善重点内容。\n使用原生格式保存最终版本。\n\n下一步计划\n使用标题、列表和段落间距，让报告更清晰易读。还可以导入 TXT 或 HTML，另存为可继续编辑的 .rword 文档。\n\n由 ReliefWord 编写——用于日常写作的简单工具。"
+
+#. ReliefWord
+msgid "Replace:"
+msgstr "替换为："
+
+#. ReliefWord
+#, c-format
+msgid "Replaced %u matches"
+msgstr "已替换 %u 处匹配内容"
+
+#. ReliefWord
+msgid "Right indent (mm)"
+msgstr "右缩进（毫米）"
+
+#. ReliefWord
+msgid "Right margin (mm)"
+msgstr "右页边距（毫米）"
+
+#. ReliefWord
+msgid "Ruler"
+msgstr "标尺"
+
+#. ReliefWord
+msgid "Sans serif"
+msgstr "无衬线"
+
+#. ReliefWord
+msgid "Save document"
+msgstr "保存文档"
+
+#. ReliefWord
+msgid "Saving document..."
+msgstr "正在保存文档..."
+
+#. ReliefWord
+msgid "Serif"
+msgstr "宋体"
+
+#. ReliefWord
+msgid "Show page numbers"
+msgstr "显示页码"
+
+#. ReliefWord
+msgid "Space after (pt)"
+msgstr "段后间距（磅）"
+
+#. ReliefWord
+msgid "Space before (pt)"
+msgstr "段前间距（磅）"
+
+#. ReliefWord
+msgid "Strikethrough"
+msgstr "删除线"
+
+#. ReliefWord
+msgid "Styles"
+msgstr "样式"
+
+#. ReliefWord
+msgid "TXT keeps text only. Character formatting, paragraph layout and page settings are not saved. Your original document remains open."
+msgstr "TXT 仅保留文字，不保存字符格式、段落排版或页面设置。原文档会继续保留。"
+
+#. ReliefWord
+msgid "The file changed outside ReliefWord. Save a copy or explicitly replace it."
+msgstr "文件已被其他程序修改。可以另存副本，或明确选择替换。"
+
+#. ReliefWord
+msgid "Title"
+msgstr "标题"
+
+#. ReliefWord
+msgid "Top margin (mm)"
+msgstr "上页边距（毫米）"
+
+#. ReliefWord
+msgid "Underline (Ctrl+U)"
+msgstr "下划线（Ctrl+U）"
+
+#. ReliefWord
+msgid "Usage: reliefword [document.rword | text.txt | page.html]"
+msgstr "用法：reliefword [文档.rword | 文本.txt | 网页.html]"
+
+#. ReliefWord
+msgid "Width (mm)"
+msgstr "宽度（毫米）"
+
+#. ReliefWord
+msgid "Word count"
+msgstr "字数统计"
+
+#. ReliefWord
+msgid "File path is too long"
+msgstr "文件路径过长"
+
+#. ReliefWord
+msgid "Find..."
+msgstr "查找..."
+
+#. ReliefWord
+msgid "Modified"
+msgstr "已修改"
+
+#. ReliefWord
+#, c-format
+msgid "Replace the existing file?\n%s"
+msgstr "是否替换现有文件？\n%s"
+
+#. ReliefWord
+msgid "Replace..."
+msgstr "替换..."
+
+#. ReliefWord
+msgid "Save a copy..."
+msgstr "另存副本..."
+
+#. ReliefWord
+msgid "Save changes before continuing?"
+msgstr "继续之前保存修改吗？"
+
+#. ReliefWord
+msgid "Select all"
+msgstr "全选"
+
+#. ReliefWord
+msgid "Selection"
+msgstr "选中内容"
+
+#. ReliefWord
+msgid "Zoom"
+msgstr "缩放"
+
+#. ReliefWord HTML subset import warning
+msgid "Some HTML links, tables, or embedded objects were flattened or skipped"
+msgstr "部分 HTML 链接、表格或嵌入对象已转为文字或跳过。请保留源文件，并将导入结果另存为新的文档。"
+
+#. ReliefWord
+msgid "Choose a different export file"
+msgstr "请选择另一个导出文件"
+
+#. ReliefWord
+msgid "Could not create a new document"
+msgstr "无法新建文档"
+
+#. ReliefWord
+msgid "Enter finite page values within the displayed ranges"
+msgstr "请输入显示范围内的有效页面数值"
+
+#. ReliefWord
+msgid "Enter finite paragraph values within the displayed ranges"
+msgstr "请输入显示范围内的有效段落数值"
+
+#. ReliefWord
+msgid "Exporting over the imported source could discard content ReliefWord did not preserve"
+msgstr "导出到原导入文件会丢失 ReliefWord 无法保留的内容，请使用其他文件名。"

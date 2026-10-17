@@ -411,6 +411,11 @@ def icon_extra(c, name):
         fill(c, 3, 5, 10, 8, WHITE); rect(c, 3, 5, 10, 8, MID)
         for x in (3, 10): fill(c, x, 2, 3, 4, LIGHT); put(c, x+1, 3, rgba(229,109,158))
         put(c, 5, 8, BLUE); put(c, 10, 8, BLUE); put(c, 7, 11, DARK); put(c, 8, 11, DARK)
+    elif name == "reliefword":
+        draw_document(c, BLUE)
+        fill(c, 4, 4, 8, 2, BLUE)
+        line(c, 5, 7, 6, 11, BLUE); line(c, 6, 11, 8, 8, BLUE)
+        line(c, 8, 8, 10, 11, BLUE); line(c, 10, 11, 11, 7, BLUE)
     elif name == "reliefexcel":
         fill(c, 2, 1, 12, 14, WHITE); rect(c, 2, 1, 12, 14, GREEN)
         fill(c, 3, 2, 10, 3, GREEN)
