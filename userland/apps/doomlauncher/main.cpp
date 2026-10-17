@@ -82,7 +82,7 @@ static void poll(void *)
 
 int main()
 {
-    reliefos_fltk::init();
+    reliefos_fltk::init("doomlauncher");
     Fl_Double_Window window(660, 320, T("DOOM Launcher"));
     Fl_Box *label = new Fl_Box(18, 12, 620, 26, T("IWAD path")); label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
     iwad = new Fl_Input(18, 42, 620, 34); iwad->textsize(15);

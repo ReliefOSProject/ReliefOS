@@ -122,6 +122,12 @@ def stage_runtime_payload(esp_tree: Path, stage: Path,
               stage / RELIEFOS_APPS / "installer" / "installer.elf")
     copy_file(ROOT / "userland/apps/installer/installer.desktop",
               stage / "usr/share/applications/reliefos-installer.desktop")
+    copy_file(ROOT / "resources/build-art/app-icons/installer.bmp",
+              stage / "usr/lib/reliefos/apps/installer/installer.bmp")
+    for size in (16, 32, 48, 64, 128, 256):
+        icon = Path(f"hicolor/{size}x{size}/apps/reliefos-installer.png")
+        copy_file(ROOT / "resources/build-art/app-icons" / icon,
+                  stage / "usr/share/icons" / icon)
     session = stage / "usr/lib/reliefos/installer-session"
     copy_file(ROOT / "system/xorg/installer-session", session)
     session.chmod(0o755)

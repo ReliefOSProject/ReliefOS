@@ -1102,7 +1102,7 @@ static int run_graphical(void)
     COLOR_TEXT = fl_rgb_color(34, 36, 46);
     COLOR_SIDEBAR = fl_rgb_color(59, 98, 166);
     COLOR_ACTIVE = fl_rgb_color(255, 255, 255);
-    reliefos_fltk::init();
+    reliefos_fltk::init("installer");
     main_window = new Fl_Window(WINDOW_W, WINDOW_H, T("Install ReliefOS"));
     main_window->color(COLOR_BG);
     main_window->callback(window_close);

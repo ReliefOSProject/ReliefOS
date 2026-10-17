@@ -63,6 +63,14 @@ for locale in $(cat configs/nls/LINGUAS); do
     printf '%s\n' fixture > "$work/out/generated/nls/$locale/LC_MESSAGES/${legacy_brand}.mo"
 done
 printf 'busybox\ttool\t1\t1\t0\t0\t0\tBusyBox\tTools\t\t0\n' > "$work/metadata"
+for app in fileman installer leonmmcoset soundctl sudo fastfetch; do
+    entry=0
+    case $app in fileman|fastfetch) entry=1 ;; esac
+    printf '%s\tsystem-app\t1\t1\t%s\t0\t0\t%s\tSystem applications\t\t0\n' "$app" "$entry" "$app" >> "$work/metadata"
+    printf 'app fixture\n' > "$work/out/userland/$app.elf"
+done
+printf 'audio fixture\n' > "$work/out/system/lib/libreliefos-audio.so.1"
+printf 'calc\tprogram-app\t0\t0\t1\t0\t0\tCalculator\tOffice applications\t\t0\n' >> "$work/metadata"
 printf 'ncurses\tlibrary\t1\t1\t0\t1\t0\tncurses\tLibraries\t\t0\n' >> "$work/metadata"
 mkdir -p "$work/out/upstream/ncurses/root/usr/bin" \
     "$work/out/upstream/ncurses/root/usr/share/terminfo" \
@@ -98,6 +106,24 @@ sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
     "$work/rootfs.config" "$work/metadata" "$work/stage" "$work/layout" \
     "$work/root" "$work/manifest.json" 1700000000
 xorg_root=$work/root
+
+# Only self-authored graphical apps receive artwork, including hidden entries.
+for app in fileman installer leonmmcoset; do
+    for size in 16 32 48 64 128 256; do
+        icon=usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png
+        cmp "$repo_root/resources/build-art/app-icons/hicolor/${size}x${size}/apps/reliefos-$app.png" "$xorg_root/$icon"
+    done
+done
+for app in soundctl sudo fastfetch; do
+    test ! -e "$xorg_root/usr/lib/reliefos/apps/$app/$app.bmp"
+    for size in 16 32 48 64 128 256; do
+        test ! -e "$xorg_root/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png"
+    done
+done
+grep -qx 'icon=' "$xorg_root/usr/lib/reliefos/apps/fastfetch/manifest.ini"
+test ! -e "$xorg_root/usr/share/icons/hicolor/48x48/apps/reliefos-calc.png"
+test -f "$xorg_root/usr/lib/reliefos/apps/installer/installer.bmp"
+test -f "$xorg_root/usr/lib/reliefos/apps/leonmmcoset/leonmmcoset.bmp"
 
 grep -qx xorg "$xorg_root/etc/reliefos/desktop-backend"
 test ! -e "$xorg_root/etc/runlevels/default/reliefos-windowd"

@@ -1258,7 +1258,7 @@ extern "C" void present_fileman(uint32_t window_id, struct reliefos_ui_surface *
 
 int main(int argc, char **argv)
 {
-    reliefos_fltk::init();
+    reliefos_fltk::init("fileman");
     refresh_home_path();
     fileman_settings_load();
     fileman_tree_reset();

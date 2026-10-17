@@ -7,7 +7,7 @@ $(OSCHINPT_INDEX): $(RELIEFOS_SRC)/third_party/rime-pinyin-simp/pinyin_simp.dict
 	$(Q)$(RELIEFOS_OSCHINPT_INDEX) $< $@
 RPR_APPS := $(O)/rpr-apps/repository
 RPR_APP_PACKAGES := $(RPR_APPS)/.complete $(RPR_APPS)/packages.list
-RPR_INPUTS := $(wildcard $(RELIEFOS_SRC)/third_party/rime-pinyin-simp/* $(RELIEFOS_SRC)/tools/oschinpt-apk-* $(RELIEFOS_SRC)/userland/apps/oschinpt/settings.ini) $(RELIEFOS_SRC)/third_party/doomgeneric/freedoom1.wad $(RELIEFOS_SRC)/third_party/doomgeneric/LICENSE $(RELIEFOS_SRC)/third_party/doomgeneric/FREEDOOM-COPYING.txt $(RELIEFOS_SRC)/resources/build-art/app-icons/helloworld.bmp $(RELIEFOS_SRC)/resources/build-art/app-icons/doom.bmp
+RPR_INPUTS := $(wildcard $(RELIEFOS_SRC)/third_party/rime-pinyin-simp/* $(RELIEFOS_SRC)/tools/oschinpt-apk-* $(RELIEFOS_SRC)/userland/apps/oschinpt/settings.ini) $(RELIEFOS_SRC)/third_party/doomgeneric/freedoom1.wad $(RELIEFOS_SRC)/third_party/doomgeneric/LICENSE $(RELIEFOS_SRC)/third_party/doomgeneric/FREEDOOM-COPYING.txt $(RELIEFOS_SRC)/resources/build-art/app-icons/helloworld.bmp
 $(RPR_APP_PACKAGES) &: $(addprefix $(USERLAND_DIR)/,helloworld.elf doom.elf doomlauncher.elf oschinpt.elf) $(OSCHINPT_INDEX) $(BUILD_INFO_HEADER) $(RPR_INPUTS) $(APK_MANIFEST) $(RELIEFOS_SRC)/tools/build/rpr-apps.sh
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/rpr-apps.sh $(RELIEFOS_SRC) $(O) $(BUILD_INFO_HEADER) $(OSCHINPT_INDEX) $(UPSTREAM_APK) '$(APK_SIGNING_KEY)' $(RPR_APPS) $(SOURCE_DATE_EPOCH)
 RPR_PAGES := $(O)/rpr-pages

@@ -147,7 +147,7 @@ public:
 
 int main(int argc, char **argv)
 {
-    reliefos_fltk::init();
+    reliefos_fltk::init("paint");
     Fl_Double_Window root(940, 700, T("Paint")); window = &root; root.callback(close);
     const char *labels[] = {T("New"), T("Open"), T("Save"), T("Save as")};
     for (int i = 0; i < 4; ++i) {

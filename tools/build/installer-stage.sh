@@ -33,6 +33,13 @@ ln -s ../lib/reliefos/apps/installer/installer.elf "$work/runtime-raw/usr/bin/in
 mkdir -p "$work/runtime-raw/usr/share/applications"
 cp "$src/userland/apps/installer/installer.desktop" \
    "$work/runtime-raw/usr/share/applications/reliefos-installer.desktop"
+cp "$src/resources/build-art/app-icons/installer.bmp" \
+   "$work/runtime-raw/usr/lib/reliefos/apps/installer/installer.bmp"
+for size in 16 32 48 64 128 256; do
+    icons=usr/share/icons/hicolor/${size}x${size}/apps
+    mkdir -p "$work/runtime-raw/$icons"
+    cp "$src/resources/build-art/app-icons/hicolor/${size}x${size}/apps/reliefos-installer.png" "$work/runtime-raw/$icons/"
+done
 mkdir -p "$work/runtime-raw/usr/lib/reliefos"
 cp "$src/system/xorg/installer-session" "$work/runtime-raw/usr/lib/reliefos/installer-session"
 chmod 755 "$work/runtime-raw/usr/lib/reliefos/installer-session"

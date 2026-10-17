@@ -10,6 +10,7 @@
 #include <libintl.h>
 #include <locale.h>
 #include <reliefos/layout.h>
+#include "fltk_icons.h"
 
 #ifndef T
 #define T(text) gettext(text)
@@ -17,7 +18,7 @@
 
 namespace reliefos_fltk {
 
-inline void init()
+inline void init(const char *app = nullptr)
 {
     setlocale(LC_ALL, "");
     bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
@@ -59,6 +60,7 @@ inline void init()
     Fl_File_Chooser::show_label = T("Show:");
     Fl_File_Chooser::hidden_label = T("Show hidden files");
     Fl::scheme("gtk+");
+    app_icons(app);
 }
 
 inline void style(Fl_Widget *widget)

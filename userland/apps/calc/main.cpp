@@ -70,7 +70,7 @@ static void press(Fl_Widget *, void *token) { input(static_cast<const char *>(to
 
 int main()
 {
-    reliefos_fltk::init();
+    reliefos_fltk::init("calc");
     Calculator window;
     expression = new Expression(14, 14, 312, 38);
     expression->textsize(20);

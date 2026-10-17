@@ -56,7 +56,7 @@ for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imag
     done
     if ! grep -q 'fltk_support.h\|fltk_png_app.h' "$src/userland/apps/$app/main.cpp" ||
        { ! grep -q 'reliefos_fltk::init' "$src/userland/apps/$app/main.cpp" &&
-         ! grep -q 'init();' "$src/userland/apps/fltk_png_app.h"; }; then
+         ! grep -q 'init(app);' "$src/userland/apps/fltk_png_app.h"; }; then
         printf 'FAIL - %s does not initialize the shared FLTK locale/font support\n' "$app" >&2
         exit 1
     fi
@@ -70,7 +70,7 @@ for old_file in motif.c motif_dialogs.c motif.h; do
 done
 grep -q '^Categories=Office;Spreadsheet;$' "$src/userland/apps/reliefexcel/reliefexcel.desktop"
 grep -q '^Exec=/usr/bin/reliefexcel %f$' "$src/userland/apps/reliefexcel/reliefexcel.desktop"
-grep -q '^Icon=/usr/lib/reliefos/apps/reliefexcel/reliefexcel.bmp$' "$src/userland/apps/reliefexcel/reliefexcel.desktop"
+grep -q '^Icon=reliefos-reliefexcel$' "$src/userland/apps/reliefexcel/reliefexcel.desktop"
 [ -s "$src/resources/build-art/app-icons/reliefexcel.bmp" ]
 for app in taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher installer; do
     grep -q "userland/apps/$app/model.c" "$work/sources"

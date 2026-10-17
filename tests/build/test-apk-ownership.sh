@@ -32,6 +32,11 @@ ln -s tool "$tmp/root/usr/bin/tool-link"
 printf app >"$tmp/root/usr/lib/reliefos/apps/demo/demo.elf"
 printf legacy-library >"$tmp/root/usr/lib/leonos/libleonos.so.2"
 printf library >"$tmp/root/usr/lib/reliefos/libreliefos.so.2"
+for size in 16 32 48 64 128 256; do
+    mkdir -p "$tmp/root/usr/share/icons/hicolor/${size}x${size}/apps"
+    printf png > "$tmp/root/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-demo.png"
+done
+printf png > "$tmp/root/usr/share/icons/hicolor/48x48/apps/folder.png"
 cat >"$tmp/policy.json" <<'EOF'
 {"version":1,"current_distributor":"reliefos-build","apk_registration":"not-installed","groups":{
  "reliefos-tools":{"destination":"reliefos","components":[],"paths":["usr/bin/tool"]},
@@ -59,6 +64,8 @@ _, rules = apk_ownership.load_policy(root / "policy.json", root / "components.to
 rows = {row[3]: row for row in (line.split("\t") for line in (root / "list").read_text().splitlines())}
 failures = []
 for path, owner in (("usr/lib/reliefos/apps/demo/demo.elf", "reliefos-demo"),
+                    *((f"usr/share/icons/hicolor/{size}x{size}/apps/reliefos-demo.png", "reliefos-demo") for size in (16,32,48,64,128,256)),
+                    ("usr/share/icons/hicolor/48x48/apps/folder.png", "reliefos-base"),
                     ("usr/lib/reliefos/libreliefos.so.2", "reliefos-apps"),
                     ("usr/lib/leonos/libleonos.so.2", "reliefos-apps")):
     for implementation, actual in (("C", rows[path][0]),

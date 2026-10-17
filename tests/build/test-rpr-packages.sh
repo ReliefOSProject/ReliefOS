@@ -17,7 +17,6 @@ printf 'wad\n' > "$tmp/src/third_party/doomgeneric/freedoom1.wad"
 printf 'license\n' > "$tmp/src/third_party/doomgeneric/LICENSE"
 printf 'copying\n' > "$tmp/src/third_party/doomgeneric/FREEDOOM-COPYING.txt"
 printf 'icon\n' > "$tmp/src/resources/build-art/app-icons/helloworld.bmp"
-printf 'icon\n' > "$tmp/src/resources/build-art/app-icons/doom.bmp"
 printf 'index\n' > "$tmp/index"
 for app in helloworld doom doomlauncher oschinpt; do
     printf '%s\n' "$app" > "$tmp/out/userland/$app.elf"
@@ -35,9 +34,11 @@ cat > "$tmp/fake-bin/apk" <<'EOF'
 set -eu
 output=
 metadata=
+files=
 while [ "$#" -gt 0 ]; do
     case $1 in
         --output) output=$2; shift 2 ;;
+        --files) files=$2; shift 2 ;;
         --info) metadata="$metadata\n$2"; shift 2 ;;
         *) shift ;;
     esac
@@ -45,6 +46,10 @@ done
 [ -n "$output" ]
 : > "$output"
 printf '%b\n' "$metadata" > "$output.metadata"
+if [ -n "$files" ]; then
+    cp "$files"/usr/lib/reliefos/apps/*/manifest.ini "$output.app-manifest"
+    find "$files" -name '*.bmp' > "$output.icons"
+fi
 EOF
 chmod 755 "$tmp/fake-bin/apk"
 
@@ -60,6 +65,9 @@ for app in helloworld doom oschinpt; do
     grep -F 'depends:reliefos-apps reliefos-musl' "$package.metadata"
     grep -Fx "replaces:leonos-$app" "$package.metadata"
 done
+grep -qx 'icon=' "$tmp/repository/reliefos-doom-4.7.1-r123.apk.app-manifest"
+test ! -s "$tmp/repository/reliefos-doom-4.7.1-r123.apk.icons"
+grep -qx 'icon=helloworld.bmp' "$tmp/repository/reliefos-helloworld-4.7.1-r123.apk.app-manifest"
 printf '%s\n' \
     reliefos-helloworld-4.7.1-r123.apk \
     reliefos-doom-4.7.1-r123.apk \

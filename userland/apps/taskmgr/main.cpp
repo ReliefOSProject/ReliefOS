@@ -1170,7 +1170,7 @@ int main(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    reliefos_fltk::init();
+    reliefos_fltk::init("taskmgr");
     taskmgr_perf_history_init(&history);
     build_ui();
     shell->show(argc, argv);

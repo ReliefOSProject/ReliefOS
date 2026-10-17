@@ -76,6 +76,9 @@ for app in \
     remove_path "usr/lib/reliefos/apps/$app"
     remove_path "usr/bin/$app"
     remove_path "usr/share/applications/reliefos-$app.desktop"
+    for size in 16 32 48 64 128 256; do
+        remove_path "usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png"
+    done
 done
 
 printf '%s\n' console >"$marker"

@@ -51,7 +51,7 @@ public:
 template<class Fit> int png_main(int argc, char **argv, const char *app,
     void (*fit)(Fit *, uint32_t, uint32_t, uint32_t, uint32_t, uint32_t))
 {
-    init();
+    init(app);
     Fl_Double_Window window(760, 760, app);
     PngCanvas<Fit> *canvas = new PngCanvas<Fit>(app, argc ? argv[0] : nullptr, fit);
     window.end(); window.resizable(canvas); window.size_range(120, 120);

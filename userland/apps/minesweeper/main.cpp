@@ -95,7 +95,7 @@ public:
 
 int main()
 {
-    reliefos_fltk::init();
+    reliefos_fltk::init("minesweeper");
     if (!load_sprite(RELIEFOS_PATH_MINESWEEPER_MINE_BMP, &mine_sprite) ||
         !load_sprite(RELIEFOS_PATH_MINESWEEPER_FLAG_BMP, &flag_sprite)) {
         fprintf(stderr, "[minesweeper.elf] required BMP assets unavailable\n"); return 1;

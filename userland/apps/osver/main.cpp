@@ -82,7 +82,7 @@ public:
 
 int main()
 {
-    reliefos_fltk::init();
+    reliefos_fltk::init("osver");
     struct reliefos_system_info info{};
     const char *status = T("System version information");
     if (reliefos_system_info(&info) < 0) {

@@ -19,7 +19,7 @@ void start(void *context) {
 }
 int main(int argc, char **argv)
 {
-    reliefos_fltk::init();
+    reliefos_fltk::init("reliefexcel");
     // Native formulas and CSV use a dot independently of the UI language.
     setlocale(LC_NUMERIC,"C");
     rx::ExcelWindow window;

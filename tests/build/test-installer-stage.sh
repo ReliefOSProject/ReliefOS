@@ -17,6 +17,7 @@ mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/src/userland/apps/installer" "$w
 printf 'guide\n' > "$w/src/docs/ADVANCED_INSTALL.txt"
 printf '[Desktop Entry]\n' > "$w/src/userland/apps/installer/installer.desktop"
 cp "$src/system/xorg/installer-session" "$w/src/system/xorg/installer-session"
+ln -s "$src/resources" "$w/src/resources"
 printf 'canonical runtime\n' > "$w/raw/usr/lib/reliefos/libreliefos.so.2"
 printf 'compat runtime\n' > "$w/raw/usr/lib/leonos/libleonos.so.2"
 printf 'settings\n' > "$w/raw/usr/lib/reliefos/apps/settings/settings.elf"
@@ -85,6 +86,12 @@ fi
 [ -f "$w/stage/usr/share/applications/reliefos-installer.desktop" ]
 cmp "$w/src/userland/apps/installer/installer.desktop" \
     "$w/stage/usr/share/applications/reliefos-installer.desktop"
+cmp "$src/resources/build-art/app-icons/installer.bmp" "$w/stage/usr/lib/reliefos/apps/installer/installer.bmp"
+for size in 16 32 48 64 128 256; do
+    icon=usr/share/icons/hicolor/${size}x${size}/apps/reliefos-installer.png
+    cmp "$src/resources/build-art/app-icons/hicolor/${size}x${size}/apps/reliefos-installer.png" "$w/stage/$icon"
+    [ ! -e "$w/stage/install/root-console/$icon" ]
+done
 # The runtime root keeps the plain X11 policy of the raw root: the marker is
 # never rewritten and the X session files are never stripped.
 [ "$(cat "$w/stage/etc/reliefos/desktop-backend")" = xorg ]

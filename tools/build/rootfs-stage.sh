@@ -106,16 +106,31 @@ file "$out/userland/dynlinkerror.elf" usr/lib/reliefos/apps/dynlinkerror/dynlink
 # awk reads TSV without collapsing empty label/extension fields. No data is
 # interpreted as a command; only validated component IDs are used in paths.
 awk -F '\t' -v dir="$work/manifests" -v src="$src" '
+BEGIN {
+  catalog=src "/configs/app-icons.list";
+  while ((getline app < catalog)>0) if(app!~/^#/ && app!="") artwork[app]=1;
+  close(catalog);
+}
 $4==1 && ($2 ~ /-app$/ || $1 ~ /^(busybox|sl)$/) {
   terminal=0; ini=src "/userland/apps/" $1 "/" $1 ".app.ini";
   while ((getline line < ini)>0) {split(line,a,"="); if(a[1]=="terminal" && a[2]~/^(1|true|yes)$/) terminal=1} close(ini);
   ini=src "/userland/" $1 "/" $1 ".app.ini";
   while ((getline line < ini)>0) {split(line,a,"="); if(a[1]=="terminal" && a[2]~/^(1|true|yes)$/) terminal=1} close(ini);
   f=dir "/" $1 ".ini";
-  printf "[app]\nid=%s\nname=%s\nversion=system\ncategory=%s\nexec=%s.elf\nicon=%s\nentry=%d\nterminal=%d\nsystem=%d\nhidden=0\nopen_with=%d\nextensions=%s\ncommands=%s\n", $1,$8,$9,$1,($5?$1 ".bmp":""),$5,terminal,($2=="system-app"),$11,$10,$1 > f; close(f);
+  printf "[app]\nid=%s\nname=%s\nversion=system\ncategory=%s\nexec=%s.elf\nicon=%s\nentry=%d\nterminal=%d\nsystem=%d\nhidden=0\nopen_with=%d\nextensions=%s\ncommands=%s\n", $1,$8,$9,$1,($5 && artwork[$1]?$1 ".bmp":""),$5,terminal,($2=="system-app"),$11,$10,$1 > f; close(f);
 }' "$metadata"
 awk -F '\t' '$4==1 && $2 ~ /-app$/ {print $1, $5}' "$metadata" > "$work/apps"
 while read -r app entry; do
+    # Artwork is limited to self-authored graphical applications. The
+    # upstream hicolor-icon-theme package supplies index.theme unchanged.
+    if grep -qx "$app" "$src/configs/app-icons.list"; then
+        for size in 16 32 48 64 128 256; do
+            icon=${size}x${size}/apps/reliefos-$app.png
+            file "$src/resources/build-art/app-icons/hicolor/$icon" "usr/share/icons/hicolor/$icon" 0644 "$app"
+        done
+        # Hidden graphical entries (installer/easter eggs) need window icons.
+        file "$src/resources/build-art/app-icons/$app.bmp" "usr/lib/reliefos/apps/$app/$app.bmp" 0644 "$app"
+    fi
     case $app in sudo|su) continue ;; esac
     # Role gid marks are gone with the windowd stack: the kernel keeps its
     # dormant gid grants but no staged binary is marked any more.
@@ -123,7 +138,6 @@ while read -r app entry; do
     file "$out/userland/$app.elf" "usr/lib/reliefos/apps/$app/$app.elf" 0755 "$app" unique "$gid"
     file "$work/manifests/$app.ini" "usr/lib/reliefos/apps/$app/manifest.ini" 0644 "$app"
     if [ "$entry" = 1 ]; then
-        file "$src/resources/build-art/app-icons/$app.bmp" "usr/lib/reliefos/apps/$app/$app.bmp" 0644 "$app"
         for ini in "$src/userland/apps/$app/$app.app.ini" "$src/userland/$app/$app.app.ini"; do
             if [ -f "$ini" ]; then file "$ini" "usr/lib/reliefos/apps/$app/$app.app.ini" 0644 "$app"; break; fi
         done

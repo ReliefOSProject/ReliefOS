@@ -33,8 +33,7 @@ for app in helloworld doom oschinpt; do
         cp "$out/userland/doomlauncher.elf" "$root/"
         cp "$src/third_party/doomgeneric/freedoom1.wad" "$src/third_party/doomgeneric/FREEDOOM-COPYING.txt" "$root/"
         cp "$src/third_party/doomgeneric/LICENSE" "$root/DOOMGENERIC-LICENSE"
-        cp "$src/resources/build-art/app-icons/doom.bmp" "$root/"
-        manifest doom DOOM Games doomlauncher.elf doom.bmp 1 doom,doomlauncher
+        manifest doom DOOM Games doomlauncher.elf '' 1 doom,doomlauncher
         ln -s ../lib/reliefos/apps/doom/doomlauncher.elf "$payload/usr/bin/doom"
         ln -s ../lib/reliefos/apps/doom/doomlauncher.elf "$payload/usr/bin/doomlauncher"
         ;;

@@ -129,7 +129,7 @@ public:
 
 int main(int argc, char **argv)
 {
-    reliefos_fltk::init();
+    reliefos_fltk::init("imageview");
     Viewer window;
     Fl_Button *open = new Fl_Button(12, 12, 100, 34, T("Open")); open->callback(open_image); open->shortcut(FL_CTRL+'o');
     previous_button = new Fl_Button(120, 12, 120, 34, T("Previous")); previous_button->callback(navigate, reinterpret_cast<void *>(-1));
