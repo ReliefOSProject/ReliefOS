@@ -1,4 +1,5 @@
 #include "fileman.h"
+#include "search.h"
 
 extern "C" {
 #include <reliefos/launch_result.h>
@@ -36,9 +37,9 @@ extern "C" {
 
 namespace {
 
-enum { ACTION_ABOUT = 1000 };
+enum { ACTION_ABOUT = 1000, ACTION_SEARCH };
 
-Fl_Double_Window *main_window;
+Fl_Window *main_window;
 Fl_Menu_Bar *menu_bar;
 Fl_Input *address;
 Fl_Hold_Browser *folders;
@@ -47,6 +48,21 @@ Fl_Output *status_output;
 Fl_Output *operation_output;
 Fl_Progress *progress;
 Fl_Menu_Button *context_menu;
+Fl_Box *address_label;
+Fl_Box *folders_heading;
+Fl_Box *name_heading;
+Fl_Box *type_heading;
+Fl_Output *item_summary;
+char selected_path_tip[RELIEFOS_FS_PATH_LEN];
+Fl_Button *up_button;
+Fl_Button *root_button;
+Fl_Button *search_button;
+Fl_Button *refresh_button;
+Fl_Box *action_separators[2];
+int file_columns[2];
+struct ToolbarAction { Fl_Button *button; uint32_t action; };
+ToolbarAction toolbar_actions[8];
+unsigned toolbar_action_count;
 struct reliefos_ui_tree_item tree_items[FILEMAN_TREE_MAX_NODES];
 uint32_t tree_count;
 int updating;
@@ -55,6 +71,8 @@ void refresh_ui();
 void perform_action(uint32_t action);
 void show_context_menu();
 void menu_action(Fl_Widget *, void *data);
+void show_search();
+void layout_main();
 
 int action_enabled(uint32_t action)
 {
@@ -487,11 +505,246 @@ void open_with_path_ui(const char *path, uint8_t set_default_only)
     else set_status(T("Application launched"));
 }
 
-void add_menu_action(const char *group, const char *label, uint32_t action, int divider = 0)
+struct SearchState {
+    FileSearch search;
+    Fl_Window *window;
+    Fl_Input *root;
+    Fl_Input *query;
+    Fl_Check_Button *recursive;
+    Fl_Check_Button *ignore_case;
+    Fl_Check_Button *hidden;
+    Fl_Button *start;
+    Fl_Button *stop;
+    Fl_Button *open;
+    Fl_Button *locate;
+    Fl_Hold_Browser *results;
+    Fl_Output *selected;
+    Fl_Output *status;
+    unsigned rendered;
+    int action;
+    char chosen[RELIEFOS_FS_PATH_LEN];
+};
+
+void search_tick(void *data);
+
+void search_selection(Fl_Widget *, void *data)
+{
+    SearchState *state = static_cast<SearchState *>(data);
+    int row = state->results->value();
+    const FileSearchResult *result = row > 0 ? state->search.result((unsigned)row - 1) : NULL;
+    state->selected->value(result ? result->path : "");
+    if (result) {
+        state->open->activate();
+        state->locate->activate();
+    } else {
+        state->open->deactivate();
+        state->locate->deactivate();
+    }
+}
+
+void search_status(SearchState *state)
+{
+    const char *phase = state->search.running() ? T("Searching") :
+        state->search.canceled() ? T("Search stopped") :
+        state->search.limited() ? T("Search stopped at limit") :
+        state->search.skipped() ? T("Search complete (partial)") :
+        state->search.result_count() ? T("Search complete") : T("No matches found");
+    char message[320];
+    snprintf(message, sizeof(message), T("%s — %lu checked, %u matches, %lu skipped"),
+             phase, state->search.scanned(), state->search.result_count(), state->search.skipped());
+    state->status->value(message);
+    Fl_Widget *controls[] = {state->root, state->query, state->recursive,
+                             state->ignore_case, state->hidden, state->start};
+    for (unsigned i = 0; i < sizeof(controls) / sizeof(controls[0]); ++i) {
+        if (state->search.running()) controls[i]->deactivate();
+        else controls[i]->activate();
+    }
+    if (state->search.running()) state->stop->activate();
+    else state->stop->deactivate();
+}
+
+void search_stop(Fl_Widget *, void *data)
+{
+    SearchState *state = static_cast<SearchState *>(data);
+    Fl::remove_timeout(search_tick, state);
+    state->search.cancel();
+    search_status(state);
+}
+
+void search_close(Fl_Widget *, void *data)
+{
+    SearchState *state = static_cast<SearchState *>(data);
+    Fl::remove_timeout(search_tick, state);
+    state->search.cancel();
+    state->window->hide();
+}
+
+void search_choose(SearchState *state, int action)
+{
+    int row = state->results->value();
+    const FileSearchResult *result = row > 0 ? state->search.result((unsigned)row - 1) : NULL;
+    if (!result || !reliefos_fltk::copy_input(state->chosen, sizeof(state->chosen), result->path)) return;
+    state->action = action;
+    search_close(NULL, state);
+}
+
+void search_open(Fl_Widget *, void *data) { search_choose(static_cast<SearchState *>(data), 1); }
+void search_locate(Fl_Widget *, void *data) { search_choose(static_cast<SearchState *>(data), 2); }
+
+class SearchBrowser : public Fl_Hold_Browser {
+    SearchState *state_;
+public:
+    SearchBrowser(int x, int y, int w, int h, SearchState *state)
+        : Fl_Hold_Browser(x, y, w, h), state_(state) {}
+    int handle(int event) override
+    {
+        if (event == FL_KEYDOWN && (Fl::event_key() == FL_Enter || Fl::event_key() == FL_KP_Enter)) {
+            search_choose(state_, 1);
+            return 1;
+        }
+        int handled = Fl_Hold_Browser::handle(event);
+        if (event == FL_RELEASE && Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks())
+            search_choose(state_, 1);
+        return handled;
+    }
+};
+
+void search_tick(void *data)
+{
+    SearchState *state = static_cast<SearchState *>(data);
+    state->search.step(32);
+    while (state->rendered < state->search.result_count()) {
+        const FileSearchResult *result = state->search.result(state->rendered++);
+        /* Escape control bytes only for display. The selected/opened path
+         * remains byte-for-byte intact, including UTF-8 and literal '@'. */
+        char line[RELIEFOS_FS_PATH_LEN * 4 + 1];
+        unsigned at = 0;
+        for (const unsigned char *p = (const unsigned char *)result->path; *p; ++p) {
+            if (*p < 32 || *p == 127) {
+                snprintf(line + at, sizeof(line) - at, "\\x%02x", (unsigned)*p);
+                at += 4;
+            } else line[at++] = (char)*p;
+        }
+        line[at] = 0;
+        state->results->add(line);
+    }
+    search_status(state);
+    if (state->search.running()) Fl::repeat_timeout(.01, search_tick, state);
+}
+
+void search_start(Fl_Widget *, void *data)
+{
+    SearchState *state = static_cast<SearchState *>(data);
+    if (!state->query->value()[0]) {
+        fl_alert("%s", T("Enter part of a file or folder name."));
+        state->query->take_focus();
+        return;
+    }
+    FileSearchOptions options;
+    options.recursive = state->recursive->value() != 0;
+    options.show_hidden = state->hidden->value() != 0;
+    options.ignore_ascii_case = state->ignore_case->value() != 0;
+    Fl::remove_timeout(search_tick, state);
+    int error = state->search.start(state->root->value(), state->query->value(), options);
+    state->results->clear();
+    state->rendered = 0;
+    search_selection(NULL, state);
+    search_status(state);
+    if (error < 0) {
+        char message[320];
+        snprintf(message, sizeof(message), "%s: %s", T("Could not start search"), strerror(-error));
+        state->status->value(message);
+        return;
+    }
+    Fl::add_timeout(.01, search_tick, state);
+}
+
+void show_search()
+{
+    SearchState state{};
+    state.window = new Fl_Double_Window(main_window->x() + 40, main_window->y() + 45,
+                                         900, 560, T("Search Files"));
+    state.window->set_modal();
+    state.window->callback(search_close, &state);
+    Fl_Box *root_label = new Fl_Box(16, 14, 98, 30, T("Search in:"));
+    root_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+    state.root = new Fl_Input(114, 14, 770, 30);
+    state.root->value(current_path);
+    Fl_Box *query_label = new Fl_Box(16, 54, 98, 30, T("File name:"));
+    query_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+    state.query = new Fl_Input(114, 54, 646, 30);
+    state.query->when(FL_WHEN_ENTER_KEY_ALWAYS);
+    state.query->callback(search_start, &state);
+    state.start = new Fl_Button(772, 54, 112, 30, T("Search"));
+    state.start->callback(search_start, &state);
+    state.recursive = new Fl_Check_Button(16, 94, 205, 28, T("Include subfolders"));
+    state.recursive->value(1);
+    state.ignore_case = new Fl_Check_Button(230, 94, 280, 28, T("Ignore English letter case"));
+    state.ignore_case->value(1);
+    state.hidden = new Fl_Check_Button(525, 94, 230, 28, T("Show hidden files"));
+    state.hidden->value(fileman_show_hidden != 0);
+    Fl_Box *hint = new Fl_Box(16, 125, 868, 24, T("Matches part of a file or folder name."));
+    hint->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+    state.results = new SearchBrowser(16, 154, 868, 300, &state);
+    state.results->format_char(0);
+    state.results->when(FL_WHEN_CHANGED);
+    state.results->callback(search_selection, &state);
+    state.selected = new Fl_Output(16, 462, 868, 28);
+    state.status = new Fl_Output(16, 496, 868, 26);
+    state.status->value(T("Enter part of a file or folder name."));
+    state.open = new Fl_Button(16, 526, 110, 30, T("Open"));
+    state.open->deactivate();
+    state.open->callback(search_open, &state);
+    state.locate = new Fl_Button(138, 526, 240, 30, T("Open Containing Folder"));
+    state.locate->deactivate();
+    state.locate->callback(search_locate, &state);
+    state.stop = new Fl_Button(628, 526, 112, 30, T("Stop"));
+    state.stop->deactivate();
+    state.stop->callback(search_stop, &state);
+    Fl_Button *close = new Fl_Button(752, 526, 132, 30, T("Close"));
+    close->callback(search_close, &state);
+    state.window->end();
+    reliefos_fltk::style(state.window);
+    state.window->show();
+    state.query->take_focus();
+    while (state.window->shown()) Fl::wait();
+    Fl::remove_timeout(search_tick, &state);
+    state.search.cancel();
+    delete state.window;
+    files->take_focus();
+    int located_row = 0;
+    if (state.action == 1) {
+        int result = fileman_launch_path(state.chosen);
+        if (result < 0) set_status_error(T("Could not open the search result"), result);
+    } else if (state.action == 2) {
+        char *base = strrchr(state.chosen, '/');
+        if (base) {
+            char name[RELIEFOS_FS_PATH_LEN];
+            reliefos_fltk::copy_input(name, sizeof(name), base + 1);
+            if (base == state.chosen) base[1] = 0; else *base = 0;
+            if (navigate_to_path(state.chosen) == 0) {
+                for (uint32_t i = 0; i < entry_count; ++i) {
+                    if (!strcmp(entries[i].name, name)) {
+                        file_list.selected = (int)i;
+                        located_row = (int)i + 1;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    refresh_ui();
+    if (located_row) {
+        files->middleline(located_row);
+    }
+}
+
+void add_menu_action(const char *group, const char *label, uint32_t action, int divider = 0,
+                     int shortcut = 0)
 {
     char path[128];
     snprintf(path, sizeof(path), "%s/%s", group, label);
-    menu_bar->add(path, 0, menu_action, (void *)(uintptr_t)action,
+    menu_bar->add(path, shortcut, menu_action, (void *)(uintptr_t)action,
                   divider ? FL_MENU_DIVIDER : 0);
 }
 
@@ -501,6 +754,8 @@ void action_menu_callback(Fl_Widget *, void *data)
     if (action == ACTION_ABOUT) {
         (void)confirm_dialog(T("File Manager"),
             T("Browse files, manage folders and launch X11 applications."), 1);
+    } else if (action == ACTION_SEARCH) {
+        show_search();
     } else if (action == FILEMAN_ACTION_ROOT) {
         navigate_root();
     } else {
@@ -518,8 +773,34 @@ void perform_action(uint32_t action)
 void update_status()
 {
     if (!status_output) return;
-    status_output->value(status_text);
+    const char *directory_prefix = T("Items ");
+    size_t prefix_length = strlen(directory_prefix);
+    bool directory_status = !strncmp(status_text, directory_prefix, prefix_length) &&
+                            status_text[prefix_length] >= '0' &&
+                            status_text[prefix_length] <= '9';
+    status_output->value(directory_status ? T("Ready") : status_text);
+    for (unsigned i = 0; i < toolbar_action_count; ++i) {
+        if (action_enabled(toolbar_actions[i].action)) toolbar_actions[i].button->activate();
+        else toolbar_actions[i].button->deactivate();
+    }
+    selected_path_tip[0] = 0;
+    if (selected_entry_valid() &&
+        fileman_join_path(selected_path_tip, sizeof(selected_path_tip), current_path,
+                          entries[file_list.selected].name) < 0)
+        selected_path_tip[0] = 0;
+    status_output->tooltip(selected_path_tip[0] ? selected_path_tip : NULL);
+    if (item_summary) {
+        unsigned selected = fileman_selected_count();
+        if (!selected && selected_entry_valid()) selected = 1;
+        char summary[160];
+        snprintf(summary, sizeof(summary), T("%u items, %u selected"), entry_count, selected);
+        item_summary->value(summary);
+    }
     if (fileman_operation_active) {
+        status_output->hide();
+        item_summary->hide();
+        operation_output->show();
+        progress->show();
         operation_output->value(fileman_operation_text);
         if (progress->value() != (double)fileman_operation_percent)
             progress->value((double)fileman_operation_percent);
@@ -528,6 +809,10 @@ void update_status()
         operation_output->value("");
         if (progress->value() != 0) progress->value(0);
         progress->deactivate();
+        operation_output->hide();
+        progress->hide();
+        status_output->show();
+        item_summary->show();
     }
     if (main_window) {
         char title[RELIEFOS_FS_PATH_LEN + 64];
@@ -567,8 +852,23 @@ void refresh_files()
     files->clear();
     files->format_char(0);
     for (uint32_t i = 0; i < entry_count; ++i) {
-        char line[RELIEFOS_FS_NAME_LEN + 32];
-        snprintf(line, sizeof(line), "%s  %s", entry_type_name(&entries[i]), entries[i].name);
+        // Columns and labels are display-only: keep the original filename
+        // bytes in entries for every open, rename and batch operation.
+        char display_name[RELIEFOS_FS_NAME_LEN * 4 + 1];
+        unsigned at = 0;
+        for (const unsigned char *p = (const unsigned char *)entries[i].name; *p; ++p) {
+            if (*p < 32 || *p == 127) {
+                snprintf(display_name + at, sizeof(display_name) - at, "\\x%02x", (unsigned)*p);
+                at += 4;
+            } else display_name[at++] = (char)*p;
+        }
+        display_name[at] = 0;
+        const char *kind = entries[i].type == RELIEFOS_FS_TYPE_DIR ? T("Folder") :
+            fileman_entry_is_device(i) ? T("Device") :
+            ends_with(entries[i].name, ".elf") ? T("Application") :
+            ends_with(entries[i].name, ".lnk") ? T("Shortcut") : T("File");
+        char line[sizeof(display_name) + 128];
+        snprintf(line, sizeof(line), "%s\t%s", display_name, kind);
         files->add(line);
         if (fileman_entry_marked(i)) files->select((int)i + 1, 1);
     }
@@ -628,7 +928,8 @@ void tree_callback(Fl_Widget *, void *)
     const char *selected_path = tree_path_for_id(tree_items[row - 1].id);
     char path[RELIEFOS_FS_PATH_LEN];
     if (!reliefos_fltk::copy_input(path, sizeof(path), selected_path)) return;
-    if (Fl::event_clicks()) fileman_tree_toggle(tree_items[row - 1].id);
+    if (Fl::event() == FL_RELEASE && Fl::event_button() == FL_LEFT_MOUSE &&
+        Fl::event_clicks()) fileman_tree_toggle(tree_items[row - 1].id);
     if (navigate_to_path(path) < 0) set_status(T("Could not open the requested path"));
     refresh_ui();
 }
@@ -654,6 +955,30 @@ void files_key(int key, int state)
     else if (key == FL_Enter || key == FL_KP_Enter) perform_action(FILEMAN_ACTION_OPEN);
 }
 
+bool main_shortcut(int event)
+{
+    if (event != FL_KEYDOWN && event != FL_SHORTCUT) return false;
+    int key = Fl::event_key(), modifiers = Fl::event_state();
+    if ((modifiers & FL_CTRL) && (key == 'f' || key == 'F')) show_search();
+    else if ((modifiers & FL_CTRL) && (key == 'l' || key == 'L')) address_focus();
+    else if (key == FL_F + 5) perform_action(FILEMAN_ACTION_REFRESH);
+    else if ((modifiers & FL_ALT) && key == FL_Up) perform_action(FILEMAN_ACTION_UP);
+    else return false;
+    return true;
+}
+
+template <typename Base>
+class SearchShortcutWidget : public Base {
+public:
+    SearchShortcutWidget(int x, int y, int w, int h, const char *label = 0)
+        : Base(x, y, w, h, label) {}
+    int handle(int event) override
+    {
+        if (main_shortcut(event)) return 1;
+        return Base::handle(event);
+    }
+};
+
 class FileBrowser : public Fl_Multi_Browser {
 public:
     FileBrowser(int x, int y, int w, int h, const char *label = 0)
@@ -669,6 +994,12 @@ public:
                 ((Fl::event_state() & FL_ALT) && key == FL_Up)) return 1;
         }
         int result = Fl_Multi_Browser::handle(event);
+        if (event == FL_RELEASE && Fl::event_button() == FL_LEFT_MOUSE && Fl::event_clicks() &&
+            !(Fl::event_state() & (FL_CTRL | FL_SHIFT))) {
+            sync_selection();
+            perform_action(FILEMAN_ACTION_OPEN);
+            return 1;
+        }
         if (event == FL_PUSH && Fl::event_button() == FL_RIGHT_MOUSE) {
             sync_selection();
             if (context_menu) {
@@ -710,6 +1041,8 @@ void menu_action(Fl_Widget *, void *data)
     if (action == ACTION_ABOUT) {
         (void)confirm_dialog(T("File Manager"),
             T("Browse files, manage folders and launch X11 applications."), 1);
+    } else if (action == ACTION_SEARCH) {
+        show_search();
     } else if (action == FILEMAN_ACTION_ROOT) {
         navigate_root();
     } else if (action == FILEMAN_ACTION_SETTINGS) {
@@ -729,12 +1062,53 @@ void reap_children(void *)
     Fl::repeat_timeout(1.0, reap_children);
 }
 
+class FilemanWindow : public Fl_Window {
+public:
+    FilemanWindow(int w, int h, const char *label) : Fl_Window(w, h, label) {}
+    void resize(int x, int y, int w, int h) override
+    {
+        Fl_Window::resize(x, y, w, h);
+        if (files) layout_main();
+    }
+    int handle(int event) override
+    {
+        if (main_shortcut(event)) return 1;
+        return Fl_Window::handle(event);
+    }
+};
+
+void layout_main()
+{
+    if (!main_window || !item_summary) return;
+    int w = main_window->w(), h = main_window->h();
+    menu_bar->resize(0, 0, w, 28);
+    address->resize(204, 36, w - 416, 30);
+    search_button->resize(w - 204, 36, 92, 30);
+    refresh_button->resize(w - 104, 36, 92, 30);
+    int list_width = w - 224;
+    int list_height = h - 182;
+    folders->resize(12, 136, 190, list_height);
+    files->resize(212, 136, list_width, list_height);
+    // Reserve a native column for the type, while giving filenames all
+    // remaining width. Column storage must outlive the FLTK browser.
+    file_columns[0] = list_width - 120;
+    file_columns[1] = 0;
+    name_heading->resize(212, 112, file_columns[0], 24);
+    type_heading->resize(212 + file_columns[0], 112, 120, 24);
+    operation_output->resize(12, h - 34, w / 2 - 20, 24);
+    progress->resize(w / 2, h - 34, w / 2 - 12, 24);
+    status_output->resize(12, h - 34, w - 284, 24);
+    item_summary->resize(w - 264, h - 34, 252, 24);
+    files->redraw();
+    main_window->redraw();
+}
+
 void build_ui(int argc, char **argv)
 {
     (void)argc;
-    main_window = new Fl_Double_Window(980, 650, T("File Manager"));
-    main_window->size_range(760, 460);
-    menu_bar = new Fl_Menu_Bar(0, 0, 980, 30);
+    main_window = new FilemanWindow(960, 600, T("File Manager"));
+    main_window->size_range(800, 480);
+    menu_bar = new Fl_Menu_Bar(0, 0, 960, 28);
     add_menu_action(T("File"), T("Open"), FILEMAN_ACTION_OPEN);
     add_menu_action(T("File"), T("Open With..."), FILEMAN_ACTION_OPEN_WITH);
     add_menu_action(T("File"), T("Default Program..."), FILEMAN_ACTION_DEFAULT_PROGRAM);
@@ -746,6 +1120,7 @@ void build_ui(int argc, char **argv)
     add_menu_action(T("Edit"), T("Copy"), FILEMAN_ACTION_COPY);
     add_menu_action(T("Edit"), T("Cut"), FILEMAN_ACTION_CUT);
     add_menu_action(T("Edit"), T("Paste"), FILEMAN_ACTION_PASTE);
+    add_menu_action(T("Edit"), T("Search Files..."), ACTION_SEARCH, 0, FL_CTRL + 'f');
     add_menu_action(T("Edit"), T("Mark for Batch"), FILEMAN_ACTION_TOGGLE_MARK, 1);
     add_menu_action(T("Edit"), T("Mark All"), FILEMAN_ACTION_SELECT_ALL);
     add_menu_action(T("Edit"), T("Clear Marks"), FILEMAN_ACTION_CLEAR_SELECTION);
@@ -758,55 +1133,86 @@ void build_ui(int argc, char **argv)
     add_menu_action(T("Archive"), T("Compress to .tar"), FILEMAN_ACTION_COMPRESS_TAR);
     add_menu_action(T("Archive"), T("Extract tar"), FILEMAN_ACTION_EXTRACT_TAR);
 
-    int toolbar_y = 32;
-    int x = 8;
-    struct ButtonSpec { const char *label; uint32_t action; int width; };
-    static const ButtonSpec buttons[] = {
-        {"Up", FILEMAN_ACTION_UP, 62}, {"Open", FILEMAN_ACTION_OPEN, 76},
-        {"Refresh", FILEMAN_ACTION_REFRESH, 88}, {"New Folder", FILEMAN_ACTION_NEW_FOLDER, 104},
-        {"Copy", FILEMAN_ACTION_COPY, 76}, {"Cut", FILEMAN_ACTION_CUT, 68},
-        {"Paste", FILEMAN_ACTION_PASTE, 76}, {"Rename", FILEMAN_ACTION_RENAME, 88},
-        {"Delete", FILEMAN_ACTION_DELETE, 82},
-    };
-    for (unsigned i = 0; i < sizeof(buttons) / sizeof(buttons[0]); ++i) {
-        Fl_Button *button = new Fl_Button(x, toolbar_y, buttons[i].width, 30, T(buttons[i].label));
-        button->callback(button_action, (void *)(uintptr_t)buttons[i].action);
-        x += buttons[i].width + 4;
-    }
-    Fl_Box *address_label = new Fl_Box(8, 69, 62, 30, T("Address"));
+    up_button = new Fl_Button(12, 36, 60, 30, T("Up"));
+    up_button->callback(button_action, (void *)(uintptr_t)FILEMAN_ACTION_UP);
+    up_button->tooltip(T("Up one folder (Alt+Up)"));
+    root_button = new Fl_Button(80, 36, 64, 30, T("Root"));
+    root_button->callback(button_action, (void *)(uintptr_t)FILEMAN_ACTION_ROOT);
+    address_label = new Fl_Box(156, 36, 48, 30, T("Address"));
     address_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    address = new Fl_Input(70, 69, 900, 30);
+    address = new SearchShortcutWidget<Fl_Input>(204, 36, 544, 30);
     address->when(FL_WHEN_ENTER_KEY);
     address->callback(address_callback_wrapper);
+    address->tooltip(T("Enter a folder path, then press Enter (Ctrl+L)"));
+    search_button = new Fl_Button(756, 36, 92, 30, T("Search"));
+    search_button->callback(button_action, (void *)(uintptr_t)ACTION_SEARCH);
+    search_button->tooltip(T("Search this folder and subfolders (Ctrl+F)"));
+    refresh_button = new Fl_Button(856, 36, 92, 30, T("Refresh"));
+    refresh_button->callback(button_action, (void *)(uintptr_t)FILEMAN_ACTION_REFRESH);
+    refresh_button->tooltip(T("Refresh (F5)"));
 
-    Fl_Box *tree_heading = new Fl_Box(8, 106, 236, 24, T("Folders (double-click to expand)"));
-    tree_heading->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    Fl_Box *files_heading = new Fl_Box(254, 106, 716, 24,
-        T("Type / Name (Ctrl or Shift for multiple selection)"));
-    files_heading->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    int content_bottom = 586;
-    folders = new Fl_Hold_Browser(8, 130, 236, content_bottom - 130);
+    struct ButtonSpec { const char *label; uint32_t action; int x, width; const char *tip; };
+    const ButtonSpec buttons[] = {
+        {"New Folder", FILEMAN_ACTION_NEW_FOLDER, 12, 108, T("Create a folder in the current location")},
+        {"Open", FILEMAN_ACTION_OPEN, 128, 70, T("Open the selected item (Enter)")},
+        {"Details", FILEMAN_ACTION_DETAILS, 206, 88, T("View properties and permissions")},
+        {"Copy", FILEMAN_ACTION_COPY, 314, 66, T("Copy selected items (Ctrl+C)")},
+        {"Cut", FILEMAN_ACTION_CUT, 388, 60, T("Move selected items using Cut and Paste (Ctrl+X)")},
+        {"Paste", FILEMAN_ACTION_PASTE, 456, 66, T("Paste into the current folder (Ctrl+V)")},
+        {"Rename", FILEMAN_ACTION_RENAME, 542, 82, T("Rename the selected item (F2)")},
+        {"Delete", FILEMAN_ACTION_DELETE, 632, 82, T("Delete selected items after confirmation")},
+    };
+    toolbar_action_count = 0;
+    for (unsigned i = 0; i < sizeof(buttons) / sizeof(buttons[0]); ++i) {
+        Fl_Button *button = new Fl_Button(buttons[i].x, 74, buttons[i].width, 28,
+                                          T(buttons[i].label));
+        button->callback(button_action, (void *)(uintptr_t)buttons[i].action);
+        button->tooltip(buttons[i].tip);
+        toolbar_actions[toolbar_action_count++] = {button, buttons[i].action};
+    }
+    action_separators[0] = new Fl_Box(FL_ENGRAVED_BOX, 302, 78, 2, 20, NULL);
+    action_separators[1] = new Fl_Box(FL_ENGRAVED_BOX, 530, 78, 2, 20, NULL);
+
+    folders_heading = new Fl_Box(FL_THIN_UP_BOX, 12, 112, 190, 24, T("Folders"));
+    name_heading = new Fl_Box(FL_THIN_UP_BOX, 212, 112, 616, 24, T("Name"));
+    type_heading = new Fl_Box(FL_THIN_UP_BOX, 828, 112, 120, 24, T("Type"));
+    Fl_Box *column_headings[] = {folders_heading, name_heading, type_heading};
+    for (unsigned i = 0; i < 3; ++i) {
+        column_headings[i]->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+        column_headings[i]->labelfont(FL_HELVETICA_BOLD);
+    }
+    folders = new SearchShortcutWidget<Fl_Hold_Browser>(12, 136, 190, 418);
     folders->format_char(0);
-    folders->when(FL_WHEN_CHANGED);
+    folders->textsize(15);
+    folders->when(FL_WHEN_CHANGED | FL_WHEN_ENTER_KEY);
     folders->callback(tree_callback);
-    files = new FileBrowser(254, 130, 716, content_bottom - 130);
+    folders->tooltip(T("Double-click a folder to expand or collapse its tree"));
+    files = new SearchShortcutWidget<FileBrowser>(212, 136, 736, 418);
     files->format_char(0);
+    files->column_char('\t');
+    files->column_widths(file_columns);
+    files->textsize(15);
     files->when(FL_WHEN_CHANGED);
     files->callback(files_callback);
+    files->tooltip(T("Double-click to open. Ctrl/Shift selects multiple items."));
 
     context_menu = new Fl_Menu_Button(0, 0, 0, 0);
     context_menu->type(Fl_Menu_Button::POPUP3);
 
-    operation_output = new Fl_Output(8, 592, 430, 24);
-    progress = new Fl_Progress(446, 592, 524, 24);
+    operation_output = new SearchShortcutWidget<Fl_Output>(12, 566, 460, 24);
+    progress = new Fl_Progress(480, 566, 468, 24);
     progress->minimum(0.0);
     progress->maximum(100.0);
     progress->deactivate();
-    status_output = new Fl_Output(8, 620, 962, 22);
+    operation_output->hide();
+    progress->hide();
+    status_output = new SearchShortcutWidget<Fl_Output>(12, 566, 676, 24);
     status_output->value(T("Ready"));
-    main_window->resizable(files);
+    item_summary = new SearchShortcutWidget<Fl_Output>(696, 566, 252, 24);
+    main_window->resizable(NULL);
     main_window->end();
     reliefos_fltk::style(main_window);
+    layout_main();
     if (argc > 1 && argv[1]) address->value(argv[1]);
 }
 

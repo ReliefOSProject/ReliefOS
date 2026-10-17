@@ -21,6 +21,7 @@ extern "C" {
 #include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Return_Button.H>
+#include <FL/Fl_Scroll.H>
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Widget.H>
 #include <FL/Fl_Window.H>
@@ -54,22 +55,32 @@ enum {
     TASKMGR_ACTION_SERVICE_MANAGER = 10,
 };
 
-Fl_Double_Window *shell;
+class TaskWindow;
+
+TaskWindow *shell;
 Fl_Menu_Bar *menu_bar;
 Fl_Tabs *tab_stack;
 Fl_Group *page_processes;
 Fl_Group *page_performance;
 Fl_Group *page_startup;
 Fl_Browser *process_list;
+Fl_Box *process_headers[7];
 Fl_Browser *startup_list_widget;
 Fl_Choice *startup_choice;
+Fl_Box *startup_user_label;
 Fl_Output *startup_username;
 Fl_Output *status_output;
+Fl_Button *button_refresh;
 Fl_Button *button_end_task;
+Fl_Button *button_details;
 Fl_Button *button_startup_toggle;
 Fl_Button *button_startup_remove;
+Fl_Button *button_startup_service_manager;
 Fl_Menu_Button *process_popup;
 Fl_Widget *performance_widget;
+class PerformanceView;
+PerformanceView *performance_view;
+Fl_Scroll *performance_scroll;
 
 struct reliefos_task_info tasks[RELIEFOS_TASK_MAX];
 struct reliefos_task_info previous_tasks[RELIEFOS_TASK_MAX];
@@ -100,6 +111,7 @@ int startup_available;
 int selected_startup = -1;
 int active_tab = TASKMGR_TAB_PROCESSES;
 int updating;
+int process_column_widths[8];
 
 static const uint32_t core_palette[] = {
     0x00B81C1C, 0x001CB89E, 0x00000080, 0x007AB800,
@@ -118,10 +130,31 @@ void refresh_all();
 void update_controls();
 void select_page(int tab);
 void perform_action(uint32_t action);
+void layout_ui(int width, int height);
+void update_performance_layout();
+
+class TaskWindow : public Fl_Double_Window {
+public:
+    TaskWindow(int width, int height, const char *label)
+        : Fl_Double_Window(width, height, label) {}
+    void resize(int x, int y, int width, int height) override;
+};
 
 void set_status(const char *text)
 {
     if (status_output) status_output->value(text ? text : "");
+}
+
+void sanitize_column_text(char *destination, size_t capacity, const char *source,
+                          size_t source_limit = (size_t)-1)
+{
+    if (!destination || !capacity) return;
+    size_t used = 0;
+    for (size_t i = 0; source && source[i] && i < source_limit && used + 1 < capacity; ++i) {
+        unsigned char byte = (unsigned char)source[i];
+        destination[used++] = byte < 0x20U || byte == 0x7fU ? ' ' : (char)byte;
+    }
+    destination[used] = 0;
 }
 
 int task_index_by_pid(uint32_t pid)
@@ -189,8 +222,14 @@ void update_controls()
          (uint32_t)selected_startup < startup_entry_count)
             ? &startup_entries[selected_startup] : NULL;
     if (button_end_task) {
-        if (selected_task_killable()) button_end_task->activate();
+        if (active_tab == TASKMGR_TAB_PROCESSES && selected_task_killable())
+            button_end_task->activate();
         else button_end_task->deactivate();
+    }
+    if (button_details) {
+        if (active_tab == TASKMGR_TAB_PROCESSES && selected_task())
+            button_details->activate();
+        else button_details->deactivate();
     }
     if (button_startup_toggle) {
         button_startup_toggle->copy_label(entry && entry->enabled ? T("Disable") : T("Enable"));
@@ -245,16 +284,21 @@ void refresh_tasks()
         process_list->format_char(0);
         for (uint32_t i = 0; i < tree_count; ++i) {
             uint32_t index = tree_rows[i].index;
-            char pid[16], cpu[16], mem[24];
+            char name[RELIEFOS_TASK_NAME_LEN + 1], user[RELIEFOS_TASK_NAME_LEN + 1];
+            char pid[16], cpu[16], mem[24], state[32], privileges[32];
             taskmgr_format_dec(pid, sizeof(pid), tasks[index].pid);
             taskmgr_format_percent(cpu, sizeof(cpu), task_cpu_percent[index]);
             taskmgr_format_memory(mem, sizeof(mem), tasks[index].memory_kib);
+            sanitize_column_text(name, sizeof(name), tasks[index].name,
+                                 sizeof(tasks[index].name));
+            sanitize_column_text(user, sizeof(user), task_user_name(&tasks[index]));
+            sanitize_column_text(state, sizeof(state), taskmgr_state_name(tasks[index].state));
+            sanitize_column_text(privileges, sizeof(privileges),
+                                 task_privilege_name(&tasks[index]));
             unsigned indent = tree_rows[i].depth * 2U;
             if (indent > 120U) indent = 120U;
-            snprintf(lines[i], sizeof(lines[i]), "%*s%s  PID %s  CPU %s  MEM %s  %s  %s  %s",
-                     (int)indent, "", tasks[index].name, pid, cpu, mem,
-                     taskmgr_state_name(tasks[index].state), task_user_name(&tasks[index]),
-                     task_privilege_name(&tasks[index]));
+            snprintf(lines[i], sizeof(lines[i]), "%*s%s\t%s\t%s\t%s\t%s\t%s\t%s",
+                     (int)indent, "", name, pid, cpu, mem, state, user, privileges);
             rows[i] = lines[i];
             process_list->add(rows[i]);
             if (selected_pid && tasks[index].pid == selected_pid)
@@ -394,6 +438,7 @@ void refresh_performance()
     if (reliefos_perf_info(&next) < 0) {
         perf_valid = 0;
         set_status(T("Performance data unavailable"));
+        update_performance_layout();
         return;
     }
     cpu_percent = taskmgr_busy_percent(last_busy_ticks, last_idle_ticks,
@@ -422,6 +467,7 @@ void refresh_performance()
     last_idle_ticks = next.idle_ticks;
     cpu_snapshot_valid = 1;
     perf_valid = 1;
+    update_performance_layout();
 }
 
 Fl_Color core_color(uint32_t core)
@@ -461,7 +507,7 @@ void draw_history_line(const PerfPlotRect *plot, const uint8_t *series, Fl_Color
 void draw_graph_frame(int x, int y, int w, int h, const char *title,
                       const char *current, int available, PerfPlotRect *plot)
 {
-    fl_color(available ? FL_DARK3 : FL_INACTIVE_COLOR);
+    fl_color(available ? FL_FOREGROUND_COLOR : FL_INACTIVE_COLOR);
     fl_draw(title, x + 8, y + 18);
     if (current) fl_draw(current, x + w - 64, y + 18);
     plot->x = x + 8;
@@ -606,6 +652,49 @@ public:
     }
 };
 
+void update_performance_layout()
+{
+    if (!performance_scroll || !performance_view) return;
+    int view_width = performance_scroll->w() - 18;
+    if (view_width < 1) view_width = 1;
+    int viewport_height = performance_scroll->h();
+    if (viewport_height < 1) viewport_height = 1;
+
+    uint32_t cpu_count = perf_info.cpu_count > RELIEFOS_PERF_MAX_CPUS
+                             ? RELIEFOS_PERF_MAX_CPUS : perf_info.cpu_count;
+    int content_width = view_width - 24;
+    int core_columns = cpu_count > 16U ? 3 : (cpu_count > 8U ? 2 : 1);
+    if (content_width < 200) core_columns = 1;
+    int core_rows = (int)((cpu_count + (uint32_t)core_columns - 1U) /
+                          (uint32_t)core_columns);
+
+    int graph_height = viewport_height > 440 ? 126 : 100;
+    int required_height = graph_height + 168 + core_rows * 27;
+    int content_height = viewport_height > required_height
+                             ? viewport_height : required_height;
+    if (content_height > 440) graph_height = 126;
+    else graph_height = 100;
+    required_height = graph_height + 168 + core_rows * 27;
+    content_height = viewport_height > required_height
+                         ? viewport_height : required_height;
+    if (!perf_valid) content_height = viewport_height;
+
+    if (performance_view->w() != view_width || performance_view->h() != content_height) {
+        int old_x = performance_scroll->xposition();
+        int old_y = performance_scroll->yposition();
+        // Fl_Scroll moves its child to encode the current offset. Keep that
+        // position when changing content size; moving it to the viewport
+        // origin would desynchronize the child and the scrollbar value.
+        performance_view->resize(performance_view->x(), performance_view->y(),
+                                 view_width, content_height);
+        int max_y = content_height - viewport_height;
+        if (old_y > max_y) old_y = max_y;
+        if (old_y < 0) old_y = 0;
+        performance_scroll->scroll_to(old_x, old_y);
+        performance_scroll->redraw();
+    }
+}
+
 int confirm_dialog(const char *title, const char *message)
 {
     fl_message_title(title);
@@ -623,10 +712,13 @@ void kill_selected_task()
         set_status(T("Cannot end protected or non-user task"));
         return;
     }
+    const uint32_t pid = task->pid;
     char prompt[RELIEFOS_TASK_NAME_LEN + 96];
-    snprintf(prompt, sizeof(prompt), T("End task %s (PID %u)?"), task->name, task->pid);
+    snprintf(prompt, sizeof(prompt), T("End task %s (PID %u)?"), task->name, pid);
     if (!confirm_dialog(T("End Task"), prompt)) return;
-    if (reliefos_task_kill(task->pid) < 0) {
+    // The modal dialog runs the sampling timer; its next snapshot can
+    // replace tasks[]. Act on the PID named in the confirmation.
+    if (reliefos_task_kill(pid) < 0) {
         set_status(T("End Task failed"));
         return;
     }
@@ -698,8 +790,10 @@ void remove_selected_startup_entry()
         set_status(T("No startup app selected"));
         return;
     }
+    const uint32_t uid = startup_selected_uid;
+    const uint32_t entry_id = entry->id;
     if (!confirm_dialog(T("Remove Startup App"), T("Remove the selected startup app?"))) return;
-    if (reliefos_startup_remove(startup_selected_uid, entry->id) < 0) {
+    if (reliefos_startup_remove(uid, entry_id) < 0) {
         set_status(T("Could not remove startup app"));
         return;
     }
@@ -765,7 +859,10 @@ class TaskBrowser : public Fl_Browser {
     int startup_;
 public:
     TaskBrowser(int x, int y, int w, int h, int startup, const char *label = NULL)
-        : Fl_Browser(x, y, w, h, label), startup_(startup) {}
+        : Fl_Browser(x, y, w, h, label), startup_(startup)
+    {
+        type(FL_HOLD_BROWSER);
+    }
     int handle(int event) override
     {
         if (event == FL_KEYDOWN) {
@@ -874,11 +971,89 @@ void add_menu_action(const char *group, const char *label, uint32_t action, int 
                   divider ? FL_MENU_DIVIDER : 0);
 }
 
+void layout_ui(int width, int height)
+{
+    if (!shell || !menu_bar || !tab_stack) return;
+    if (width < 1 || height < 1) return;
+
+    menu_bar->resize(0, 0, width, 28);
+    const int status_y = height - 32;
+    if (status_output) status_output->resize(8, status_y, width - 16, 24);
+
+    const int tabs_height = height - 74;
+    tab_stack->resize(12, 34, width - 24, tabs_height);
+
+    const int page_x = 12;
+    const int page_y = 56;
+    const int page_width = width - 24;
+    const int page_height = tabs_height - 22;
+    if (page_processes) page_processes->resize(page_x, page_y, page_width, page_height);
+    if (page_performance) page_performance->resize(page_x, page_y, page_width, page_height);
+    if (page_startup) page_startup->resize(page_x, page_y, page_width, page_height);
+
+    if (button_refresh) button_refresh->resize(20, 66, 88, 30);
+    if (button_details) button_details->resize(112, 66, 96, 30);
+    if (button_end_task) button_end_task->resize(212, 66, 104, 30);
+    if (process_list) {
+        const int list_x = 20;
+        const int list_y = 132;
+        const int list_width = width - 40;
+        const int list_height = height - 180;
+        process_list->resize(list_x, list_y, list_width, list_height);
+
+        int available = list_width - 20;
+        if (available < 1) available = 1;
+        process_column_widths[0] = available - (80 + 64 + 96 + 84 + 110 + 90);
+        if (process_column_widths[0] < 150) process_column_widths[0] = 150;
+        process_column_widths[1] = 80;
+        process_column_widths[2] = 64;
+        process_column_widths[3] = 96;
+        process_column_widths[4] = 84;
+        process_column_widths[5] = 110;
+        process_column_widths[6] = 90;
+        process_column_widths[7] = 0;
+        process_list->column_widths(process_column_widths);
+        int column_x = list_x + 5;
+        for (int i = 0; i < 7; ++i) {
+            if (process_headers[i])
+                process_headers[i]->resize(column_x, 108,
+                                           process_column_widths[i], 22);
+            column_x += process_column_widths[i];
+        }
+    }
+
+    if (performance_scroll) {
+        performance_scroll->resize(20, 66, width - 40, height - 114);
+        update_performance_layout();
+    }
+
+    const int manager_x = width - 214;
+    if (startup_user_label) startup_user_label->resize(20, 66, 48, 28);
+    if (startup_choice) startup_choice->resize(72, 66, 134, 28);
+    if (startup_username)
+        startup_username->resize(216, 66, manager_x - 226, 28);
+    if (button_startup_service_manager)
+        button_startup_service_manager->resize(manager_x, 66, 202, 28);
+    if (button_startup_toggle) button_startup_toggle->resize(20, 106, 96, 30);
+    if (button_startup_remove) button_startup_remove->resize(124, 106, 96, 30);
+    if (startup_list_widget)
+        startup_list_widget->resize(20, 148, width - 40, height - 196);
+
+    if (process_list) process_list->redraw();
+    shell->redraw();
+}
+
+void TaskWindow::resize(int x, int y, int width, int height)
+{
+    Fl_Double_Window::resize(x, y, width, height);
+    layout_ui(width, height);
+}
+
 void build_ui()
 {
-    shell = new Fl_Double_Window(1000, 740, T("Task Manager"));
-    shell->size_range(760, 520);
-    menu_bar = new Fl_Menu_Bar(0, 0, 1000, 30);
+    shell = new TaskWindow(1000, 660, T("Task Manager"));
+    shell->size_range(800, 520);
+    menu_bar = new Fl_Menu_Bar(0, 0, 1000, 28);
     add_menu_action(T("File"), T("Refresh"), TASKMGR_ACTION_REFRESH);
     add_menu_action(T("File"), T("End Task"), TASKMGR_ACTION_END);
     add_menu_action(T("File"), T("Details"), TASKMGR_ACTION_DETAILS, 1);
@@ -886,68 +1061,87 @@ void build_ui()
     add_menu_action(T("File"), T("About"), TASKMGR_ACTION_ABOUT);
     add_menu_action(T("Options"), T("Processes"), TASKMGR_ACTION_PROCESSES);
     add_menu_action(T("Options"), T("Performance"), TASKMGR_ACTION_PERFORMANCE);
-    add_menu_action(T("Options"), T("Service Manager"), TASKMGR_ACTION_STARTUP);
-    add_menu_action(T("Options"), T("Open Service Manager"), TASKMGR_ACTION_SERVICE_MANAGER, 1);
-    add_menu_action(T("Options"), T("About"), TASKMGR_ACTION_ABOUT);
+    add_menu_action(T("Options"), T("Startup applications"), TASKMGR_ACTION_STARTUP);
 
-    Fl_Button *refresh = new Fl_Button(8, 34, 88, 30, T("Refresh"));
-    refresh->callback(action_callback, (void *)(uintptr_t)TASKMGR_ACTION_REFRESH);
-    button_end_task = new Fl_Button(102, 34, 104, 30, T("End Task"));
-    button_end_task->callback(action_callback, (void *)(uintptr_t)TASKMGR_ACTION_END);
-    Fl_Button *details = new Fl_Button(212, 34, 88, 30, T("Details"));
-    details->callback(action_callback, (void *)(uintptr_t)TASKMGR_ACTION_DETAILS);
-    Fl_Button *open_manager = new Fl_Button(306, 34, 202, 30, T("Open Service Manager"));
-    open_manager->callback(action_callback,
-                           (void *)(uintptr_t)TASKMGR_ACTION_SERVICE_MANAGER);
-
-    status_output = new Fl_Output(8, 704, 984, 26);
+    status_output = new Fl_Output(8, 628, 984, 24);
     status_output->value(T("Ready"));
-    tab_stack = new Fl_Tabs(8, 72, 984, 624);
+    tab_stack = new Fl_Tabs(12, 34, 976, 586);
     tab_stack->callback(tabs_changed);
 
-    page_processes = new Fl_Group(8, 94, 984, 602, T("Processes"));
+    page_processes = new Fl_Group(12, 56, 976, 564, T("Processes"));
+    page_processes->tooltip(T("Inspect running tasks and open details or end a task."));
     page_processes->begin();
-    Fl_Box *columns = new Fl_Box(16, 100, 960, 26,
-        T("Process tree: name, PID, CPU, memory, state, user and privileges"));
-    columns->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    process_list = new TaskBrowser(16, 128, 960, 550, 0);
+    button_refresh = new Fl_Button(20, 66, 88, 30, T("Refresh"));
+    button_refresh->callback(action_callback, (void *)(uintptr_t)TASKMGR_ACTION_REFRESH);
+    button_refresh->tooltip(T("Refresh task and performance data now."));
+    button_details = new Fl_Button(112, 66, 96, 30, T("Details"));
+    button_details->callback(action_callback, (void *)(uintptr_t)TASKMGR_ACTION_DETAILS);
+    button_details->tooltip(T("Show details for the selected task."));
+    button_end_task = new Fl_Button(212, 66, 104, 30, T("End Task"));
+    button_end_task->callback(action_callback, (void *)(uintptr_t)TASKMGR_ACTION_END);
+    button_end_task->tooltip(T("End the selected task after confirmation."));
+
+    const char *process_column_labels[7] = {
+        T("Process"), T("PID"), T("CPU"), T("Memory"), T("State"), T("User"), T("Privileges")
+    };
+    for (int i = 0; i < 7; ++i) {
+        process_headers[i] = new Fl_Box(25, 108, 100, 22, process_column_labels[i]);
+        process_headers[i]->align((i == 0 ? FL_ALIGN_LEFT : FL_ALIGN_CENTER) |
+                                  FL_ALIGN_INSIDE);
+    }
+    process_list = new TaskBrowser(20, 132, 960, 480, 0);
     process_list->format_char(0);
+    process_list->column_char('\t');
     process_list->when(FL_WHEN_CHANGED);
     process_list->callback(process_selected);
+    process_list->tooltip(T("Select a row; press Enter for details or Delete to end the task."));
     page_processes->resizable(process_list);
     process_list->take_focus();
     page_processes->end();
 
-    page_performance = new Fl_Group(8, 94, 984, 602, T("Performance"));
+    page_performance = new Fl_Group(12, 56, 976, 564, T("Performance"));
+    page_performance->tooltip(T("View live CPU, memory, and estimated GPU usage."));
     page_performance->begin();
-    PerformanceView *perf = new PerformanceView(16, 100, 960, 576);
+    performance_scroll = new Fl_Scroll(20, 66, 960, 546);
+    performance_scroll->type(Fl_Scroll::VERTICAL);
+    performance_scroll->box(FL_NO_BOX);
+    performance_scroll->tooltip(T("Scroll to see per-core CPU usage and memory totals."));
+    performance_scroll->begin();
+    PerformanceView *perf = new PerformanceView(20, 66, 942, 546);
+    perf->tooltip(T("Live CPU, memory, and estimated GPU history with per-core usage."));
+    performance_view = perf;
     performance_widget = perf;
-    page_performance->resizable(perf);
+    performance_scroll->end();
+    page_performance->resizable(performance_scroll);
     page_performance->end();
 
-    page_startup = new Fl_Group(8, 94, 984, 602, T("Service Manager"));
+    page_startup = new Fl_Group(12, 56, 976, 564, T("Startup applications"));
+    page_startup->tooltip(T("Manage startup entries for the selected user."));
     page_startup->begin();
-    Fl_Box *user_label = new Fl_Box(16, 102, 64, 28, T("User"));
-    user_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    startup_choice = new Fl_Choice(82, 102, 140, 28);
+    startup_user_label = new Fl_Box(20, 66, 48, 28, T("User"));
+    startup_user_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+    startup_choice = new Fl_Choice(72, 66, 134, 28);
     startup_choice->callback(startup_user_selected);
-    startup_username = new Fl_Output(232, 102, 260, 28);
-    Fl_Button *launch_manager = new Fl_Button(714, 102, 262, 30,
-        T("Open Service Manager"));
-    launch_manager->callback(action_callback,
-                             (void *)(uintptr_t)TASKMGR_ACTION_SERVICE_MANAGER);
-    button_startup_toggle = new Fl_Button(16, 140, 96, 30, T("Enable"));
+    startup_choice->tooltip(T("Choose which user's startup entries to manage."));
+    startup_username = new Fl_Output(216, 66, 560, 28);
+    button_startup_service_manager = new Fl_Button(786, 66, 202, 28,
+                                                    T("Open Service Manager"));
+    button_startup_service_manager->callback(
+        action_callback, (void *)(uintptr_t)TASKMGR_ACTION_SERVICE_MANAGER);
+    button_startup_service_manager->tooltip(T("Open the Service Manager."));
+    button_startup_toggle = new Fl_Button(20, 106, 96, 30, T("Enable"));
     button_startup_toggle->callback(action_callback,
                                     (void *)(uintptr_t)TASKMGR_ACTION_ENABLE);
-    button_startup_remove = new Fl_Button(120, 140, 96, 30, T("Remove"));
+    button_startup_toggle->tooltip(T("Enable or disable the selected startup entry."));
+    button_startup_remove = new Fl_Button(124, 106, 96, 30, T("Remove"));
     button_startup_remove->callback(action_callback,
                                     (void *)(uintptr_t)TASKMGR_ACTION_REMOVE);
-    Fl_Box *startup_heading = new Fl_Box(228, 140, 748, 30, T("Startup applications"));
-    startup_heading->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    startup_list_widget = new TaskBrowser(16, 176, 960, 500, 1);
+    button_startup_remove->tooltip(T("Remove the selected startup entry after confirmation."));
+    startup_list_widget = new TaskBrowser(20, 148, 960, 464, 1);
     startup_list_widget->format_char(0);
     startup_list_widget->when(FL_WHEN_CHANGED);
     startup_list_widget->callback(startup_selected);
+    startup_list_widget->tooltip(T("Select a startup entry before using Enable, Disable, or Remove."));
     page_startup->resizable(startup_list_widget);
     page_startup->end();
 
@@ -960,9 +1154,14 @@ void build_ui()
                        (void *)(uintptr_t)TASKMGR_ACTION_DETAILS);
     process_popup->add(T("Refresh"), 0, NULL,
                        (void *)(uintptr_t)TASKMGR_ACTION_REFRESH);
-    shell->resizable(tab_stack);
+    // Geometry is assigned by layout_ui; do not also scale children around
+    // the old status-bar rectangle through Fl_Group's automatic layout.
+    shell->resizable(NULL);
     shell->end();
     reliefos_fltk::style(shell);
+    for (int i = 0; i < 7; ++i)
+        if (process_headers[i]) process_headers[i]->labelsize(13);
+    layout_ui(shell->w(), shell->h());
 }
 
 } // namespace

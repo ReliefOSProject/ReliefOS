@@ -4430,9 +4430,6 @@ msgstr "时钟节拍"
 msgid "user"
 msgstr "用户"
 
-#~ msgid "CPU"
-#~ msgstr "CPU"
-
 #~ msgid "Choose UI Style"
 #~ msgstr "选择界面样式"
 
@@ -4906,4 +4903,247 @@ msgstr "用户"
 
 #~ msgid "Language changed"
 #~ msgstr "语言已更改"
+
+
+#: userland/apps/fileman/main.cpp
+msgid "Search Files..."
+msgstr "搜索文件…"
+
+#: userland/apps/fileman/main.cpp
+msgid "Search Files"
+msgstr "搜索文件"
+
+#: userland/apps/fileman/main.cpp
+msgid "Search"
+msgstr "搜索"
+
+#: userland/apps/fileman/main.cpp
+msgid "Searching"
+msgstr "正在搜索"
+
+#: userland/apps/fileman/main.cpp
+msgid "Search stopped"
+msgstr "搜索已停止"
+
+#: userland/apps/fileman/main.cpp
+msgid "Search stopped at limit"
+msgstr "已达上限，搜索已停止"
+
+#: userland/apps/fileman/main.cpp
+msgid "Search complete"
+msgstr "搜索完成"
+
+#: userland/apps/fileman/main.cpp
+msgid "No matches found"
+msgstr "未找到匹配项"
+
+#: userland/apps/fileman/main.cpp
+#, c-format
+msgid "%s — %lu checked, %u matches, %lu skipped"
+msgstr "%s — 已检查 %lu 项，匹配 %u 项，跳过 %lu 项"
+
+#: userland/apps/fileman/main.cpp
+msgid "Enter part of a file or folder name."
+msgstr "请输入文件或文件夹名称的一部分。"
+
+#: userland/apps/fileman/main.cpp
+msgid "Could not start search"
+msgstr "无法开始搜索"
+
+#: userland/apps/fileman/main.cpp
+msgid "Search in:"
+msgstr "搜索目录："
+
+#: userland/apps/fileman/main.cpp
+msgid "Include subfolders"
+msgstr "包含子文件夹"
+
+#: userland/apps/fileman/main.cpp
+msgid "Ignore English letter case"
+msgstr "忽略英文字母大小写"
+
+#: userland/apps/fileman/main.cpp
+msgid "Matches part of a file or folder name."
+msgstr "按文件或文件夹名称的一部分匹配。"
+
+#: userland/apps/fileman/main.cpp
+msgid "Open Containing Folder"
+msgstr "打开所在文件夹"
+
+#: userland/apps/fileman/main.cpp
+msgid "Could not open the search result"
+msgstr "无法打开搜索结果"
+
+#: userland/apps/fileman/main.cpp
+msgid "Search complete (partial)"
+msgstr "搜索完成（部分）"
+
+#: userland/apps/fileman/main.cpp:798
+#, c-format
+msgid "%u items, %u selected"
+msgstr "%u 项，已选择 %u 项"
+
+#: userland/apps/fileman/main.cpp:1140
+msgid "Browse, search and manage files"
+msgstr "浏览、搜索和管理文件"
+
+#: userland/apps/taskmgr/main.cpp:1158
+msgid "CPU"
+msgstr "CPU"
+
+#: userland/apps/taskmgr/main.cpp:1221
+msgid "Choose a user, then select a startup app to enable, disable, or remove."
+msgstr "选择用户，再选择启动项进行启用、禁用或移除。"
+
+#: userland/apps/taskmgr/main.cpp:1203
+msgid "Choose which user's startup entries to manage."
+msgstr "选择要管理启动项的用户。"
+
+#: userland/apps/fileman/main.cpp:1166
+msgid "Copy selected items (Ctrl+C)"
+msgstr "复制所选项目（Ctrl+C）"
+
+#: userland/apps/fileman/main.cpp:1163
+msgid "Create a folder in the current location"
+msgstr "在当前位置新建文件夹"
+
+#: userland/apps/fileman/main.cpp:1217
+msgid "Ctrl+L: address   Ctrl+F: search   F2: rename   Delete: delete"
+msgstr "Ctrl+L：地址　Ctrl+F：搜索　F2：重命名　Delete：删除"
+
+#: userland/apps/fileman/main.cpp:1170
+msgid "Delete selected items after confirmation"
+msgstr "确认后删除所选项目"
+
+#: userland/apps/fileman/main.cpp:1199
+msgid "Double-click a folder to expand or collapse its tree"
+msgstr "双击文件夹展开或折叠目录树"
+
+#: userland/apps/fileman/main.cpp:1183 userland/apps/fileman/main.cpp:1207
+msgid "Double-click to open. Ctrl/Shift selects multiple items."
+msgstr "双击打开，按 Ctrl 或 Shift 可多选。"
+
+#: userland/apps/taskmgr/main.cpp:1213
+msgid "Enable or disable the selected startup entry."
+msgstr "启用或禁用所选启动项。"
+
+#: userland/apps/taskmgr/main.cpp:1126
+msgid "End the selected task after confirmation."
+msgstr "确认后结束所选任务。"
+
+#: userland/apps/fileman/main.cpp:1153
+msgid "Enter a folder path, then press Enter (Ctrl+L)"
+msgstr "输入文件夹路径后按 Enter（Ctrl+L）"
+
+#: userland/apps/fileman/main.cpp:866
+msgid "Folder"
+msgstr "文件夹"
+
+#: userland/apps/fileman/main.cpp:1186
+msgid "Folders"
+msgstr "文件夹"
+
+#: userland/apps/taskmgr/main.cpp:1151
+msgid "Inspect running tasks and open details or end a task."
+msgstr "查看运行中的进程、详细信息或结束任务。"
+
+#: userland/apps/taskmgr/main.cpp:1189
+msgid "Live CPU, memory, and estimated GPU history with per-core usage."
+msgstr "实时 CPU、内存与 GPU 估算历史，以及各核心使用情况。"
+
+#: userland/apps/taskmgr/main.cpp:1197
+msgid "Manage startup entries for the selected user."
+msgstr "管理所选用户的启动项。"
+
+#: userland/apps/taskmgr/main.cpp:1158
+msgid "Memory"
+msgstr "内存"
+
+#: userland/apps/fileman/main.cpp:1167
+msgid "Move selected items using Cut and Paste (Ctrl+X)"
+msgstr "通过剪切和粘贴移动所选项目（Ctrl+X）"
+
+#: userland/apps/taskmgr/main.cpp:1133 userland/apps/taskmgr/main.cpp:1209
+msgid "Open the Service Manager."
+msgstr "打开服务管理器。"
+
+#: userland/apps/fileman/main.cpp:1164
+msgid "Open the selected item (Enter)"
+msgstr "打开所选项目（Enter）"
+
+#: userland/apps/taskmgr/main.cpp:1158
+msgid "PID"
+msgstr "PID"
+
+#: userland/apps/fileman/main.cpp:1168
+msgid "Paste into the current folder (Ctrl+V)"
+msgstr "粘贴到当前文件夹（Ctrl+V）"
+
+#: userland/apps/taskmgr/main.cpp:1158
+msgid "Privileges"
+msgstr "权限"
+
+#: userland/apps/taskmgr/main.cpp:1158
+msgid "Process"
+msgstr "进程"
+
+#: userland/apps/fileman/main.cpp:1159
+msgid "Refresh (F5)"
+msgstr "刷新（F5）"
+
+#: userland/apps/taskmgr/main.cpp:1123
+msgid "Refresh task and performance data now."
+msgstr "立即刷新进程和性能数据。"
+
+#: userland/apps/taskmgr/main.cpp:1217
+msgid "Remove the selected startup entry after confirmation."
+msgstr "确认后移除所选启动项。"
+
+#: userland/apps/fileman/main.cpp:1169
+msgid "Rename the selected item (F2)"
+msgstr "重命名所选项目（F2）"
+
+#: userland/apps/taskmgr/main.cpp:1180 userland/apps/taskmgr/main.cpp:1186
+msgid "Scroll to see per-core CPU usage and memory totals."
+msgstr "向下滚动可查看各核心使用率和内存统计。"
+
+#: userland/apps/fileman/main.cpp:1156
+msgid "Search this folder and subfolders (Ctrl+F)"
+msgstr "搜索当前文件夹及子文件夹（Ctrl+F）"
+
+#: userland/apps/taskmgr/main.cpp:1154
+msgid "Select a process to view details or end it. Press Enter for details; Delete asks before ending."
+msgstr "选择进程后可查看详情或结束任务。Enter 查看详情，Delete 确认后结束。"
+
+#: userland/apps/taskmgr/main.cpp:1171
+msgid "Select a row; press Enter for details or Delete to end the task."
+msgstr "选择一行，按 Enter 查看详情，按 Delete 结束任务。"
+
+#: userland/apps/taskmgr/main.cpp:1228
+msgid "Select a startup entry before using Enable, Disable, or Remove."
+msgstr "先选择启动项，再使用启用、禁用或移除。"
+
+#: userland/apps/fileman/main.cpp:869
+msgid "Shortcut"
+msgstr "快捷方式"
+
+#: userland/apps/taskmgr/main.cpp:1129
+msgid "Show details for the selected task."
+msgstr "查看所选任务的详细信息。"
+
+#: userland/apps/fileman/main.cpp:1215
+msgid "The full path of the selected item"
+msgstr "所选项目的完整路径"
+
+#: userland/apps/fileman/main.cpp:1145
+msgid "Up one folder (Alt+Up)"
+msgstr "返回上一级文件夹（Alt+Up）"
+
+#: userland/apps/taskmgr/main.cpp:1177
+msgid "View live CPU, memory, and estimated GPU usage."
+msgstr "查看实时 CPU、内存与 GPU 估算使用情况。"
+
+#: userland/apps/fileman/main.cpp:1165
+msgid "View properties and permissions"
+msgstr "查看属性和权限"
 

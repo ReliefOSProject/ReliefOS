@@ -25,11 +25,12 @@ import tempfile
 import time
 import traceback
 
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageOps
 
 import test_vdso_qemu as vdso
 import test_xorg_vm_qemu as xorg
 from run_gcc_probe_qemu import qmp_quit
+from fltk_taskmgr_gui import exercise_taskmgr
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "out/xorg-vmware-debug"
@@ -57,7 +58,7 @@ CHINESE_EXPECTATIONS = {
     "calc": "计算器",
     "osver": "关于",
     "fileman": "新建文件夹",
-    "taskmgr": "进程树",
+    "taskmgr": "刷新",
     "minesweeper": "新游戏",
     "paint": "图片已打开",
     "imageview": "图片",
@@ -67,8 +68,8 @@ CHINESE_EXPECTATIONS = {
 CLIENT_OCR_ANCHORS = {
     "calc": (14, 348, 312, 28),
     "osver": (20, 46, 750, 28),
-    "fileman": (246, 32, 104, 30),
-    "taskmgr": (16, 100, 960, 26),
+    "fileman": (12, 74, 108, 28),
+    "taskmgr": (20, 66, 80, 30),
     "minesweeper": (168, 12, 154, 32),
     "paint": (12, 660, 916, 28),
     "doomlauncher": (18, 164, 290, 30),
@@ -196,13 +197,26 @@ def generated_guest_helpers(output: Path) -> dict[str, Path]:
         f"  paint) set -- '{FIXTURE_DIR}/扫雷矿石.bmp' ;;\n"
         "esac\n"
         "if [ \"$app\" = installer ]; then set -- --graphical; fi\n"
+        "if [ \"$app\" = taskmgr ]; then\n"
+        "  (\n"
+        "    /bin/sleep 600 &\n"
+        "    worker=$!\n"
+        "    echo \"FLTK_TASKMGR_WORKER pid=$worker\" > /dev/ttyS0\n"
+        "    wait \"$worker\"\n"
+        "    worker_status=$?\n"
+        "    echo \"FLTK_TASKMGR_WORKER_EXIT pid=$worker status=$worker_status\" > /dev/ttyS0\n"
+        "  ) &\n"
+        "fi\n"
         f"if [ \"$app\" = doom ]; then\n"
         f"  /bin/sh -c 'app=$1; shift; echo \"[fltk-runner] START app=$app pid=$$\" > /dev/ttyS0; exec timeout {DOOM_SECONDS} \"$@\"' fltk-child \"$app\" \"$exe\" \"$@\" >/dev/ttyS0 2>&1 &\n"
         "else\n"
         "  /bin/sh -c 'app=$1; shift; echo \"[fltk-runner] START app=$app pid=$$\" > /dev/ttyS0; exec \"$@\"' fltk-child \"$app\" \"$exe\" \"$@\" >/dev/ttyS0 2>&1 &\n"
         "fi\n"
         "pid=$!\n"
-        f'if [ "$app" != doom ]; then {PROBE_GUEST} --window-info "$pid" >/dev/ttyS0 2>&1; fi\n'
+        'case "$app" in\n'
+        f'  fileman|taskmgr) {PROBE_GUEST} --watch-window "$pid" >/dev/ttyS0 2>&1 & ;;\n'
+        f'  doom) ;; *) {PROBE_GUEST} --window-info "$pid" >/dev/ttyS0 2>&1 ;;\n'
+        'esac\n'
         "wait \"$pid\"\n"
         "status=$?\n"
         "echo \"[fltk-runner] EXIT app=$app pid=$pid status=$status\" > /dev/ttyS0\n"
@@ -273,12 +287,31 @@ def materialize_fixtures(output: Path) -> list[tuple[Path, str, int]]:
     flag_source = ROOT / "resources/build-art/minesweeper/minesweeper-flag.bmp"
     flag_file = fixture_dir / "扫雷旗帜.bmp"
     shutil.copyfile(flag_source, flag_file)
+    search_dir = fixture_dir / ".search-fixture" / "子目录"
+    search_dir.mkdir(parents=True)
+    # Keep the locate target inside the ordinary browser's legacy 64-row
+    # window while the independent BulkNeedle search still exercises 80 hits.
+    search_target = search_dir / "000-深层DeepSearchNeedle.txt"
+    search_target.write_text("用于递归搜索与中文路径验收。\n", encoding="utf-8")
+    search_files = [
+        (search_target,
+         FIXTURE_DIR + "/.search-fixture/子目录/000-深层DeepSearchNeedle.txt",
+         0o100664),
+    ]
+    for index in range(80):
+        bulk_file = search_dir / f"BulkNeedle{index:03d}.txt"
+        bulk_file.write_text("用于超过 64 条结果的搜索验收。\n", encoding="utf-8")
+        search_files.append((
+            bulk_file,
+            FIXTURE_DIR + f"/.search-fixture/子目录/BulkNeedle{index:03d}.txt",
+            0o100664,
+        ))
     return [
         (text_file, FIXTURE_DIR + "/中文样本.txt", 0o100664),
         (png_file, FIXTURE_DIR + "/图片标志.png", 0o100664),
         (mine_file, FIXTURE_DIR + "/扫雷矿石.bmp", 0o100664),
         (flag_file, FIXTURE_DIR + "/扫雷旗帜.bmp", 0o100664),
-    ]
+    ] + search_files
 
 
 def payload_files(output: Path, probe: Path) -> list[tuple[Path, str, int]]:
@@ -446,14 +479,15 @@ def prepare_disk(image: Path, kernel: Path, output: Path,
     }
 
 
-def tesseract_ocr(frame, output: Path, tag: str, psm: int = 11) -> str:
+def tesseract_ocr(frame, output: Path, tag: str, psm: int = 11,
+                  language: str = "chi_sim+eng", scale: int = 2) -> str:
     scratch = ROOT / "out/tmp"
     scratch.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(prefix=f"fltk-{tag}-", suffix=".png",
                                      dir=scratch) as temporary:
-        frame.resize((frame.width * 2, frame.height * 2)).save(temporary.name)
+        frame.resize((frame.width * scale, frame.height * scale)).save(temporary.name)
         text = subprocess.check_output(
-            ["tesseract", temporary.name, "stdout", "-l", "chi_sim+eng",
+            ["tesseract", temporary.name, "stdout", "-l", language,
              "--psm", str(psm)], cwd=ROOT, text=True, stderr=subprocess.DEVNULL)
     (output / f"{tag}.ocr.txt").write_text(text, encoding="utf-8")
     return text
@@ -661,6 +695,529 @@ def click_client(probe, geometry: tuple[int, int, int, int], x: int, y: int) -> 
     probe.click(geometry[0] + x, geometry[1] + y)
 
 
+def fileman_address_crop(frame, geometry: tuple[int, int, int, int]):
+    window_x, window_y, window_width, _ = geometry
+    return client_crop(frame, window_x + 204, window_y + 36,
+                       window_width - 416, 30)
+
+
+def wait_client_geometry(serial: Path, process, pid: int, offset: int,
+                         width: int | None = None, height: int | None = None):
+    pattern = re.compile(r"FLTK_APP_GEOMETRY pid=" + str(pid) +
+                         r" x=(-?\d+) y=(-?\d+) w=(\d+) h=(\d+)")
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline:
+        matches = list(pattern.finditer(serial.read_text(errors="replace")[offset:]))
+        for match in reversed(matches):
+            geometry = tuple(map(int, match.groups()))
+            # Absolute USB tablet coordinates are quantized to screen
+            # pixels, so native border drags can differ by a pixel or two.
+            if ((width is None or abs(geometry[2] - width) <= 2) and
+                    (height is None or abs(geometry[3] - height) <= 2)):
+                return geometry
+        if process.poll() is not None:
+            raise RuntimeError("QEMU exited during window resize")
+        time.sleep(0.1)
+    raise AssertionError(f"window {pid} did not report client geometry {width}x{height}")
+
+
+def double_click(probe, x: int, y: int) -> None:
+    probe.move(x, y)
+    for _ in range(2):
+        probe.button(True)
+        time.sleep(0.06)
+        probe.button(False)
+        time.sleep(0.08)
+    time.sleep(0.35)
+
+
+def exercise_window_resizing(app: str, probe, geometry, serial: Path,
+                             process, output: Path, pid: int):
+    original = geometry
+    default = (960, 600) if app == "fileman" else (1000, 660)
+    minimum = (800, 480) if app == "fileman" else (800, 520)
+    if (abs(original[2] - default[0]) > 2 or
+            abs(original[3] - default[1]) > 2):
+        raise AssertionError(
+            f"{app}: unexpected default client geometry {original[2:]} (expected {default})")
+    evidence = {"default": list(default), "minimum": list(minimum), "captures": []}
+
+    def capture(tag, actual):
+        frame = probe.frame(tag)
+        client = client_crop(frame, *actual)
+        path = output / f"{tag}.client.png"
+        client.save(path)
+        if client.size != actual[2:]:
+            raise AssertionError(f"{app}: resized window is clipped by the display")
+        if app == "fileman":
+            label = client_crop(client, 12, 74, 108, 28)
+            search = client_crop(client, actual[2] - 204, 36, 92, 30)
+            text = tesseract_ocr(label, output, tag + "-new-folder", psm=7)
+            search_text = tesseract_ocr(search, output, tag + "-search", psm=7)
+            if (not normalized_contains(text, "新建文件夹") or
+                    not normalized_contains(search_text, "搜索")):
+                raise AssertionError(f"{app}: controls were lost after resize: {text!r}, {search_text!r}")
+        else:
+            headers = client_crop(client, 20, 108, actual[2] - 40, 24)
+            text = tesseract_ocr(headers, output, tag + "-columns", psm=7)
+            if not normalized_contains(text, "PID") or cjk_count(text) < 4:
+                raise AssertionError(f"{app}: process columns were lost after resize: {text!r}")
+        evidence["captures"].append({"geometry": list(actual), "screenshot": str(path)})
+
+    def drag_resize(current, width, height):
+        offset = len(serial.read_text(errors="replace"))
+        probe.move(current[0] + current[2] + 2, current[1] + current[3] + 2)
+        probe.button(True)
+        time.sleep(0.15)
+        probe.move(current[0] + width + 2, current[1] + height + 2)
+        time.sleep(0.25)
+        probe.button(False)
+        actual = wait_client_geometry(serial, process, pid, offset, width, height)
+        time.sleep(0.3)
+        return actual
+
+    geometry = drag_resize(geometry, *minimum)
+    if geometry[2] < minimum[0] or geometry[3] < minimum[1]:
+        raise AssertionError(f"{app}: window resized below its declared minimum: {geometry}")
+    capture(f"app-{app}-minimum", geometry)
+    geometry = drag_resize(geometry, original[2], original[3])
+    capture(f"app-{app}-restored", geometry)
+    offset = len(serial.read_text(errors="replace"))
+    double_click(probe, geometry[0] + 200, geometry[1] - 12)
+    maximized = wait_client_geometry(serial, process, pid, offset)
+    if maximized[2] <= original[2] or maximized[3] < original[3]:
+        raise AssertionError(f"{app}: title-bar double-click did not maximize: {maximized}")
+    capture(f"app-{app}-maximized", maximized)
+    offset = len(serial.read_text(errors="replace"))
+    double_click(probe, maximized[0] + 200, maximized[1] - 12)
+    geometry = wait_client_geometry(serial, process, pid, offset, original[2], original[3])
+    time.sleep(0.25)
+    evidence["restored_geometry"] = list(geometry)
+    evidence["passed"] = True
+    return geometry, evidence
+
+
+def fileman_search_phase(text: str) -> str | None:
+    compact = re.sub(r"[\s\W_]+", "", text, flags=re.UNICODE).lower()
+    if "limit" in compact or "上限" in compact:
+        return "limited"
+    if "searching" in compact or "正在搜索" in compact or "搜索中" in compact:
+        return "searching"
+    if "searchstopped" in compact or "停止" in compact:
+        return "stopped"
+    if "partial" in compact or "部分" in compact:
+        return "partial"
+    if "searchcomplete" in compact or "搜索完成" in compact:
+        return "complete"
+    if "nomatchesfound" in compact or "没有匹配" in compact or "未找到" in compact:
+        return "empty"
+    return None
+
+
+def fileman_search_counts(status_text: str) -> dict[str, int] | None:
+    numbers = re.findall(r"\d+", status_text)
+    if len(numbers) < 3:
+        return None
+    return {"checked": int(numbers[-3]), "matches": int(numbers[-2]),
+            "skipped": int(numbers[-1])}
+
+
+def capture_fileman_search(probe, output: Path, dialog_origin: tuple[int, int],
+                            tag: str) -> tuple[object, dict[str, object]]:
+    frame = probe.frame(tag)
+    dialog_x, dialog_y = dialog_origin
+    dialog = client_crop(frame, dialog_x, dialog_y, 900, 560)
+    dialog_path = output / f"{tag}.dialog.png"
+    dialog.save(dialog_path)
+
+    header = client_crop(frame, dialog_x + 16, dialog_y + 14, 868, 126)
+    header_path = output / f"{tag}.header.png"
+    header.save(header_path)
+    # OCR one label without surrounding input-box borders. Sparse-page OCR
+    # can return an empty header even when all Chinese labels are visible.
+    label = client_crop(frame, dialog_x + 16, dialog_y + 54, 98, 30)
+    label_path = output / f"{tag}.header-label.png"
+    label.save(label_path)
+    header_text = tesseract_ocr(label, output, f"{tag}-header", psm=7)
+
+    results = client_crop(frame, dialog_x + 16, dialog_y + 154, 868, 300)
+    results_path = output / f"{tag}.results.png"
+    results.save(results_path)
+    results_text = tesseract_ocr(results, output, f"{tag}-results", psm=6)
+
+    selected = client_crop(frame, dialog_x + 16, dialog_y + 462, 868, 28)
+    selected_path = output / f"{tag}.selected.png"
+    selected.save(selected_path)
+    selected_text = tesseract_ocr(selected, output, f"{tag}-selected", psm=7)
+
+    status = client_crop(frame, dialog_x + 16, dialog_y + 496, 868, 26)
+    status_path = output / f"{tag}.status.png"
+    status.save(status_path)
+    status_text = tesseract_ocr(status, output, f"{tag}-status", psm=7)
+
+    evidence = {
+        "dialog_screenshot": str(dialog_path),
+        "header_screenshot": str(header_path),
+        "header_label_screenshot": str(label_path),
+        "header_ocr_region": [16, 54, 98, 30],
+        "header_ocr_file": str(output / f"{tag}-header.ocr.txt"),
+        "header_cjk_count": cjk_count(header_text),
+        "results_screenshot": str(results_path),
+        "results_ocr_file": str(output / f"{tag}-results.ocr.txt"),
+        "results_ocr": results_text.strip(),
+        "selected_screenshot": str(selected_path),
+        "selected_ocr_file": str(output / f"{tag}-selected.ocr.txt"),
+        "selected_ocr": selected_text.strip(),
+        "status_screenshot": str(status_path),
+        "status_ocr_file": str(output / f"{tag}-status.ocr.txt"),
+        "status_ocr": status_text.strip(),
+        "status_phase": fileman_search_phase(status_text),
+        "status_counts": fileman_search_counts(status_text),
+    }
+    return frame, evidence
+
+
+def exercise_fileman_search(probe, geometry: tuple[int, int, int, int],
+                            output: Path, failures: list[str]) -> dict[str, object]:
+    dialog_origin = (geometry[0] + 40, geometry[1] + 45)
+    dialog_open = False
+    recursive_enabled = True
+    evidence: dict[str, object] = {"performed": True, "passed": False, "checks": {}}
+    checks = evidence["checks"]
+
+    def open_dialog_from_main(entry: str) -> None:
+        nonlocal dialog_open
+        if entry == "ctrl-f":
+            probe.click(geometry[0] + 20, geometry[1] + geometry[3] - 22)
+            probe.key("ctrl-f")
+        elif entry == "address-ctrl-f":
+            probe.key("ctrl-l")
+            probe.key("ctrl-f")
+        elif entry == "toolbar":
+            click_client(probe, geometry, geometry[2] - 158, 51)
+        else:
+            raise ValueError(f"unknown Fileman search entry point: {entry}")
+        time.sleep(0.3)
+        dialog_open = True
+
+    def enter_query(query: str, *, recursive: bool | None = None,
+                    click_search: bool = False) -> None:
+        nonlocal recursive_enabled
+        if recursive is not None:
+            if recursive != recursive_enabled:
+                probe.click(dialog_origin[0] + 30, dialog_origin[1] + 108)
+                recursive_enabled = recursive
+        probe.click(dialog_origin[0] + 350, dialog_origin[1] + 69)
+        probe.key("ctrl-a")
+        probe.text(query)
+        if click_search:
+            probe.click(dialog_origin[0] + 828, dialog_origin[1] + 69)
+        else:
+            probe.key("ret")
+
+    def capture(tag: str, *, settled: bool = True) -> dict[str, object]:
+        deadline = time.monotonic() + 10.0
+        while True:
+            _, captured = capture_fileman_search(probe, output, dialog_origin, tag)
+            if not settled or captured["status_phase"] not in (None, "searching"):
+                break
+            if time.monotonic() >= deadline:
+                raise AssertionError(f"search did not settle: {captured['status_ocr']!r}")
+            time.sleep(0.15)
+        if settled and captured["status_phase"] not in ("complete", "empty"):
+            raise AssertionError(f"fixture search did not complete: {captured['status_ocr']!r}")
+        checks[tag] = captured
+        return captured
+
+    try:
+        # The hidden test tree stays out of the existing fixed-row rename/copy
+        # scenario. The search dialog inherits Show Hidden=false in this test
+        # image, so turn its independent checkbox on explicitly.
+        # The rename/copy exercise leaves Fileman in FIXTURE_DIR/roundtrip.
+        # Ctrl+L selects the address. Move to its end and erase the ASCII
+        # /roundtrip suffix without sending a non-ASCII path through QMP text.
+        probe.key("ctrl-l")
+        probe.key("end")
+        for _ in range(len("/roundtrip")):
+            probe.key("backspace")
+        probe.key("ret")
+        time.sleep(0.4)
+        root_frame = probe.frame("app-fileman-search-root-fixture-dir")
+        root_address = fileman_address_crop(root_frame, geometry)
+        root_address_path = output / "app-fileman-search-root-address.png"
+        root_address.save(root_address_path)
+        root_address_text = tesseract_ocr(
+            root_address, output, "app-fileman-search-root-address", psm=7)
+        # Mixed Latin/CJK paths are not reliably transcribed by Tesseract
+        # (the real '/home/test/桌面验收目录' was read as '/homey/test/亩面...').
+        # Retain this as visual evidence. Finding the unique deep fixture below
+        # verifies the navigation; byte-exact paths are covered by host tests.
+        checks["initial_root"] = {
+            "address_screenshot": str(root_address_path),
+            "address_ocr_file": str(output / "app-fileman-search-root-address.ocr.txt"),
+            "address_ocr": root_address_text.strip(),
+            "address_ocr_is_evidence_only": True,
+        }
+
+        open_dialog_from_main("ctrl-f")
+        frame = probe.frame("app-fileman-search-open-ctrl-f")
+        dialog = client_crop(frame, *dialog_origin, 900, 560)
+        dialog.save(output / "app-fileman-search-open-ctrl-f.dialog.png")
+        probe.click(dialog_origin[0] + 535, dialog_origin[1] + 108)
+
+        enter_query("deepsearchneedle")
+        time.sleep(0.25)
+        recursive = capture("app-fileman-search-recursive-hit")
+        counts = recursive["status_counts"]
+        result_text = str(recursive["results_ocr"])
+        if int(recursive["header_cjk_count"]) < 3:
+            raise AssertionError("search dialog filename label was not recognized in Chinese")
+        if not isinstance(counts, dict) or counts["matches"] != 1:
+            raise AssertionError(
+                f"recursive search should report one unique fixture match; status={recursive['status_ocr']!r}")
+        if (cjk_count(result_text) < 2 or
+                not normalized_contains(result_text, "子目录") or
+                not normalized_contains(result_text, "deepsearchneedle")):
+            raise AssertionError(
+                f"recursive result row did not show its full Chinese path: {result_text!r}")
+        checks["recursive_hit"] = {"matches": counts["matches"],
+                                   "chinese_path_recognized": True}
+
+        enter_query("deepsearchneedle", recursive=False)
+        time.sleep(0.25)
+        nonrecursive = capture("app-fileman-search-nonrecursive-empty")
+        counts = nonrecursive["status_counts"]
+        if not isinstance(counts, dict) or counts["matches"] != 0:
+            raise AssertionError(
+                f"non-recursive search should not descend into the fixture; status={nonrecursive['status_ocr']!r}")
+        if (normalized_contains(str(nonrecursive["results_ocr"]), "deepsearchneedle") or
+                normalized_contains(str(nonrecursive["selected_ocr"]), "deepsearchneedle")):
+            raise AssertionError("non-recursive zero-result search retained a stale result")
+        checks["nonrecursive_zero"] = {"matches": 0, "stale_result_cleared": True}
+
+        enter_query("bulkneedle", recursive=True, click_search=True)
+        time.sleep(0.35)
+        bulk = capture("app-fileman-search-over-64")
+        counts = bulk["status_counts"]
+        if not isinstance(counts, dict) or counts["matches"] != 80:
+            raise AssertionError(
+                f"search should retain more than 64 results; status={bulk['status_ocr']!r}")
+        checks["over_64"] = {"matches": counts["matches"], "minimum": 65}
+
+        enter_query("deepsearchneedle", recursive=True)
+        time.sleep(0.25)
+        deep = capture("app-fileman-search-locate-target")
+        counts = deep["status_counts"]
+        result_text = str(deep["results_ocr"])
+        if not isinstance(counts, dict) or counts["matches"] != 1:
+            raise AssertionError(
+                f"search target should be the only matching result; status={deep['status_ocr']!r}")
+        if (cjk_count(result_text) < 2 or
+                not normalized_contains(result_text, "deepsearchneedle")):
+            raise AssertionError(f"search target row was not visible: {result_text!r}")
+
+        probe.click(dialog_origin[0] + 240, dialog_origin[1] + 164)
+        time.sleep(0.15)
+        selected_frame = probe.frame("app-fileman-search-selected-target")
+        selected_crop = client_crop(
+            selected_frame, dialog_origin[0] + 16, dialog_origin[1] + 462, 868, 28)
+        selected_crop.save(output / "app-fileman-search-selected-target.png")
+        selected_text = tesseract_ocr(
+            selected_crop, output, "app-fileman-search-selected-target", psm=7)
+        if (cjk_count(selected_text) < 2 or
+                not normalized_contains(selected_text, "deepsearchneedle")):
+            raise AssertionError(f"selected-path output omitted the UTF-8 search result: {selected_text!r}")
+        checks["selected_path"] = {
+            "screenshot": str(output / "app-fileman-search-selected-target.png"),
+            "ocr_file": str(output / "app-fileman-search-selected-target.ocr.txt"),
+            "ocr": selected_text.strip(),
+        }
+
+        probe.click(dialog_origin[0] + 258, dialog_origin[1] + 541)
+        dialog_open = False
+        # The WM title changes before FLTK has necessarily repainted the
+        # exposed parent after closing a modal. Wait for the address control.
+        address_deadline = time.monotonic() + 5.0
+        while True:
+            time.sleep(0.2)
+            located = probe.frame("app-fileman-search-open-containing-folder")
+            address_crop = fileman_address_crop(located, geometry)
+            address_text = tesseract_ocr(
+                address_crop, output, "app-fileman-search-containing-folder-address", psm=7)
+            if (normalized_contains(address_text, ".search-fixture") and
+                    normalized_contains(address_text, "子目录")):
+                break
+            if time.monotonic() >= address_deadline:
+                break
+        main_client = client_crop(located, *geometry)
+        main_path = output / "app-fileman-search-open-containing-folder.client.png"
+        main_client.save(main_path)
+        main_ocr = tesseract_ocr(
+            main_client, output, "app-fileman-search-open-containing-folder", psm=11)
+        address_crop.save(output / "app-fileman-search-containing-folder-address.png")
+        expected_directory = FIXTURE_DIR + "/.search-fixture/子目录"
+        if (not normalized_contains(address_text, ".search-fixture") or
+                not normalized_contains(address_text, "子目录")):
+            raise AssertionError(
+                f"Open Containing Folder navigated to the wrong address: {address_text!r}")
+        # Sparse-page OCR omits white text on the selected blue row. Check
+        # that row directly, retaining both its raw pixels and grayscale OCR.
+        # Exclude the native focus border and the next row's glyphs. Keep
+        # the raw crop, normalizing blue/white only for OCR below.
+        selected_row = client_crop(main_client, 216, 139, 400, 14)
+        selected_row_path = output / "app-fileman-search-located-selected-row.png"
+        selected_row.save(selected_row_path)
+        selection_pixels = client_crop(main_client, 600, 144, 150, 8)
+        colors = selection_pixels.convert("RGB").getcolors(
+            maxcolors=selection_pixels.width * selection_pixels.height)
+        blue_pixels = sum(count for count, (red, green, blue) in colors
+                          if red < 40 and green < 40 and blue > 80)
+        selection_fraction = blue_pixels / (selection_pixels.width * selection_pixels.height)
+        row_text = selected_row.getchannel("R").point(
+            lambda value: 0 if value > 80 else 255)
+        row_ocr = tesseract_ocr(
+            ImageOps.expand(row_text, 10, 255), output,
+            "app-fileman-search-located-selected-row", psm=7, language="eng", scale=3)
+        if (selection_fraction < 0.9 or
+                not normalized_contains(row_ocr, "deepsearchneedle")):
+            raise AssertionError(
+                f"Open Containing Folder did not select the matching row: "
+                f"blue_fraction={selection_fraction:.3f}, row={row_ocr!r}")
+        checks["open_containing_folder"] = {
+            "client_screenshot": str(main_path),
+            "client_ocr_file": str(output / "app-fileman-search-open-containing-folder.ocr.txt"),
+            "address_screenshot": str(output / "app-fileman-search-containing-folder-address.png"),
+            "address_ocr_file": str(output / "app-fileman-search-containing-folder-address.ocr.txt"),
+            "address_ocr": address_text.strip(),
+            "expected_directory": expected_directory,
+            "full_address_ocr_is_evidence_only": True,
+            "selected_basename_recognized": True,
+            "selected_row_screenshot": str(selected_row_path),
+            "selected_row_ocr": row_ocr.strip(),
+            "selected_row_blue_fraction": selection_fraction,
+        }
+
+        open_dialog_from_main("toolbar")
+        enter_query("bulkneedle")
+        time.sleep(0.35)
+        previous_results = capture("app-fileman-search-before-cancel")
+        counts = previous_results["status_counts"]
+        if not isinstance(counts, dict) or counts["matches"] != 80:
+            raise AssertionError(
+                f"pre-cancel query did not populate the result browser: status={previous_results['status_ocr']!r}")
+
+        probe.click(dialog_origin[0] + 300, dialog_origin[1] + 29)
+        probe.key("ctrl-a")
+        probe.text("/usr")
+        probe.click(dialog_origin[0] + 350, dialog_origin[1] + 69)
+        probe.key("ctrl-a")
+        probe.text("cancelsearchfixture")
+        probe.key("ret")
+        # /usr contains enough entries to keep
+        # the timer-driven scan active while the Stop click is delivered.
+        probe.click(dialog_origin[0] + 684, dialog_origin[1] + 541)
+        time.sleep(0.2)
+        stopped = capture("app-fileman-search-canceled", settled=False)
+        counts = stopped["status_counts"]
+        if stopped["status_phase"] != "stopped":
+            raise AssertionError(
+                f"Stop did not report a canceled search (a completed scan is not a pass): "
+                f"status={stopped['status_ocr']!r}")
+        if not isinstance(counts, dict) or counts["checked"] <= 0:
+            raise AssertionError(
+                f"canceled search did not record any scan progress: status={stopped['status_ocr']!r}")
+        if (normalized_contains(str(stopped["results_ocr"]), "bulkneedle") or
+                normalized_contains(str(stopped["selected_ocr"]), "bulkneedle")):
+            raise AssertionError("starting a new query retained results from the previous search")
+        checks["cancel"] = {"status_phase": stopped["status_phase"],
+                            "checked_before_stop": counts["checked"],
+                            "old_results_cleared": True}
+
+        probe.click(dialog_origin[0] + 300, dialog_origin[1] + 29)
+        probe.key("ctrl-a")
+        probe.text("/tmp")
+        probe.click(dialog_origin[0] + 350, dialog_origin[1] + 69)
+        probe.key("ctrl-a")
+        probe.text("freshquery")
+        probe.click(dialog_origin[0] + 828, dialog_origin[1] + 69)
+        time.sleep(0.35)
+        fresh = capture("app-fileman-search-after-cancel")
+        counts = fresh["status_counts"]
+        if (fresh["status_phase"] not in ("complete", "empty") or
+                not isinstance(counts, dict) or counts["matches"] != 0):
+            raise AssertionError(
+                f"a fresh query did not complete after cancellation: status={fresh['status_ocr']!r}")
+        if normalized_contains(str(fresh["results_ocr"]), "bulkneedle"):
+            raise AssertionError("fresh query displayed stale pre-cancel results")
+        checks["after_cancel_query"] = {"matches": 0, "old_results_cleared": True,
+                                        "search_button_responsive": True}
+
+        probe.click(dialog_origin[0] + 818, dialog_origin[1] + 541)
+        dialog_open = False
+        time.sleep(0.25)
+        probe.key("ctrl-f")
+        time.sleep(0.25)
+        dialog_open = True
+        responsive_frame, responsive = capture_fileman_search(
+            probe, output, dialog_origin, "app-fileman-search-controls-responsive")
+        if int(responsive["header_cjk_count"]) < 3:
+            raise AssertionError("Ctrl+F did not reopen the search dialog after Close")
+        responsive_path = responsive["dialog_screenshot"]
+        probe.key("esc")
+        time.sleep(0.25)
+        closed_frame = probe.frame("app-fileman-search-escape-closed")
+        if frame_distance(responsive_frame, closed_frame) < 0.01:
+            raise AssertionError("Escape did not close the responsive search dialog")
+        dialog_open = False
+        checks["controls_responsive"] = {"reopened_via_ctrl_f": True,
+                                         "screenshot": str(responsive_path)}
+
+        # Open a directory result with Enter, exercising the stored full path
+        # instead of only the separate Open Containing Folder action.
+        open_dialog_from_main("address-ctrl-f")
+        probe.click(dialog_origin[0] + 300, dialog_origin[1] + 29)
+        probe.key("ctrl-a")
+        probe.text("/home/test")
+        probe.click(dialog_origin[0] + 535, dialog_origin[1] + 108)
+        enter_query("search-fixture")
+        time.sleep(0.35)
+        directory_result = capture("app-fileman-search-open-directory-result")
+        counts = directory_result["status_counts"]
+        if (directory_result["status_phase"] != "complete" or
+                not isinstance(counts, dict) or counts["matches"] != 1):
+            raise AssertionError(
+                f"directory query did not finish with one match: {directory_result['status_ocr']!r}")
+        probe.click(dialog_origin[0] + 240, dialog_origin[1] + 164)
+        probe.key("ret")
+        dialog_open = False
+        time.sleep(0.35)
+        opened_directory = probe.frame("app-fileman-search-directory-opened-with-enter")
+        opened_address = fileman_address_crop(opened_directory, geometry)
+        opened_address.save(output / "app-fileman-search-directory-opened-address.png")
+        opened_address_text = tesseract_ocr(
+            opened_address, output, "app-fileman-search-directory-opened-address", psm=7)
+        if (not normalized_contains(opened_address_text, ".search-fixture") or
+                normalized_contains(opened_address_text, "子目录")):
+            raise AssertionError(
+                f"Enter did not open the directory result: {opened_address_text!r}")
+        checks["open_directory_with_enter"] = {
+            "expected_path": FIXTURE_DIR + "/.search-fixture",
+            "address_ocr": opened_address_text.strip(),
+            "address_screenshot": str(output / "app-fileman-search-directory-opened-address.png"),
+        }
+        evidence["passed"] = True
+    except Exception as error:
+        failures.append(f"fileman: search GUI regression failed: {error}")
+        evidence["error"] = str(error)
+        if dialog_open:
+            try:
+                probe.key("esc")
+                time.sleep(0.2)
+            except Exception:
+                pass
+    return evidence
+
+
 def run_guest_verifier(probe, serial: Path, process, helper: str,
                        marker: str) -> str:
     offset = len(serial.read_text(errors="replace"))
@@ -676,14 +1233,76 @@ def run_guest_verifier(probe, serial: Path, process, helper: str,
 def exercise_fileman(probe, geometry: tuple[int, int, int, int],
                      serial: Path, process, output: Path, failures: list[str],
                      fileman_pid: int) -> dict[str, object]:
-    click_client(probe, geometry, 298, 47)
+    # Save the UTF-8 address through the native clipboard; QMP key typing is
+    # ASCII-only and must not be used to reconstruct the Chinese fixture path.
+    probe.key("ctrl-l")
+    probe.key("ctrl-c")
+    # A selected Hold Browser row must still receive its double-click action.
+    # Check real child text below the root, not only a changed selection color.
+    def tree_children(tag):
+        probe.move(geometry[0] + geometry[2] - 24,
+                   geometry[1] + geometry[3] - 12)
+        time.sleep(0.2)
+        frame = probe.frame(tag)
+        crop = client_crop(frame, geometry[0] + 20, geometry[1] + 154, 190, 90)
+        crop.save(output / f"{tag}.children.png")
+        tesseract_ocr(crop, output, tag, psm=6)
+        # The interior below the root is plain white when collapsed. Checking
+        # glyph pixels also avoids OCR dropping the first line at a crop edge.
+        ink = sum(value < 100 for value in crop.convert("L").tobytes())
+        return ink / (crop.width * crop.height)
+
+    def double_click_root():
+        probe.move(geometry[0] + 55, geometry[1] + 146)
+        for _ in range(2):
+            probe.button(True)
+            time.sleep(0.06)
+            probe.button(False)
+            time.sleep(0.08)
+
+    tree_before = tree_children("app-fileman-tree-before")
+    if tree_before < 0.003:
+        raise AssertionError("folder tree did not initially show root children")
+    double_click_root()
+    tree_collapsed = tree_children("app-fileman-tree-collapsed")
+    if tree_collapsed > 0.0005:
+        raise AssertionError("double-click did not collapse the selected root folder")
+    time.sleep(0.4)
+    double_click_root()
+    tree_expanded = tree_children("app-fileman-tree-expanded")
+    if tree_expanded < 0.003:
+        raise AssertionError("double-click did not restore root folder children")
+    probe.key("ctrl-l")
+    probe.key("ctrl-v")
+    probe.key("ret")
+    time.sleep(0.3)
+
+    click_client(probe, geometry, 66, 88)
     probe.key("ctrl-a")
     probe.text("roundtrip")
     probe.key("ret")
     time.sleep(0.4)
 
+    # Double-click the new directory, then navigate back. This checks the
+    # visible open hint against real navigation rather than only labels.
+    probe.move(geometry[0] + 500, geometry[1] + 148)
+    for _ in range(2):
+        probe.button(True)
+        time.sleep(0.06)
+        probe.button(False)
+        time.sleep(0.08)
+    time.sleep(0.4)
+    opened_folder = probe.frame("app-fileman-double-click-directory")
+    opened_address = fileman_address_crop(opened_folder, geometry)
+    opened_text = tesseract_ocr(opened_address, output,
+                              "app-fileman-double-click-directory-address", psm=7)
+    if not normalized_contains(opened_text, "roundtrip"):
+        raise AssertionError(f"double-click did not open the new folder: {opened_text!r}")
+    probe.key("alt-up")
+    time.sleep(0.3)
+
     # Directories sort before files, so the Chinese fixture is the second row.
-    click_client(probe, geometry, 600, 159)
+    click_client(probe, geometry, 500, 164)
     probe.key("f2")
     probe.key("end")
     for _ in range(4):
@@ -692,16 +1311,18 @@ def exercise_fileman(probe, geometry: tuple[int, int, int, int],
     probe.key("ret")
     time.sleep(0.3)
 
-    click_client(probe, geometry, 600, 159)
+    click_client(probe, geometry, 500, 164)
     probe.key("ctrl-c")
     probe.key("ctrl-l")
     probe.key("end")
     probe.text("/roundtrip")
     probe.key("ret")
     time.sleep(0.3)
-    click_client(probe, geometry, 600, 141)
+    click_client(probe, geometry, 500, 148)
     probe.key("ctrl-v")
     time.sleep(0.8)
+
+    search_result = exercise_fileman_search(probe, geometry, output, failures)
 
     # Navigate to the exact allowlisted installer ELF through fileman.  Its
     # address callback is directory-only, so select the ELF in its parent.
@@ -715,7 +1336,7 @@ def exercise_fileman(probe, geometry: tuple[int, int, int, int],
     before_child = probe.frame("app-fileman-before-child-installer")
     open_offset = len(serial.read_text(errors="replace"))
     # installer.bmp sorts before installer.elf in the staged directory.
-    click_client(probe, geometry, 600, 159)
+    click_client(probe, geometry, 500, 164)
     probe.key("ret")
 
     child_pid = None
@@ -794,7 +1415,7 @@ def exercise_fileman(probe, geometry: tuple[int, int, int, int],
         fileman_client.save(output / "app-fileman-after-installer-parent.client.png")
         before_client = client_crop(before_child, *geometry)
         parent_client_distance = frame_distance(before_client, fileman_client)
-        address = client_crop(fileman_client, 70, 69, 900, 30)
+        address = client_crop(fileman_client, 204, 36, geometry[2] - 416, 30)
         address.save(output / "app-fileman-after-installer-address.png")
         address_text = tesseract_ocr(
             address, output, "app-fileman-after-installer-address", psm=7)
@@ -838,9 +1459,15 @@ def exercise_fileman(probe, geometry: tuple[int, int, int, int],
             time.sleep(0.4)
 
     return {"performed": True,
-            "actions": ["new ASCII folder", "rename UTF-8 filename",
+            "actions": ["double-click folder tree collapse and expand", "new ASCII folder", "double-click directory and Alt+Up", "rename UTF-8 filename",
                         "copy", "navigate by address", "paste",
+                        "recursive Chinese filename search", "non-recursive zero-result search",
+                        "more than 64 search results", "Open Containing Folder",
+                        "stop and restart a search",
                         "open allowlisted installer ELF in GUI", "close child; retain fileman"],
+            "search": search_result,
+            "folder_tree_double_click": True,
+            "folder_tree_ink_fractions": [tree_before, tree_collapsed, tree_expanded],
             "installer_child": child_result,
             "verification_helper": FILEMAN_VERIFY_GUEST}
 
@@ -1040,6 +1667,12 @@ def run_one_app(app: str, probe, serial: Path, process, baseline,
             raise AssertionError(f"{app}: missing mapped client geometry")
         window_x, window_y, window_w, window_h = map(int, geometry.groups())
 
+    if app in ("fileman", "taskmgr"):
+        # Newly added tooltips are useful UI, but a pointer left on a toolbar
+        # button can obscure its label during the startup screenshot/OCR.
+        probe.move(window_x + window_w - 24, window_y + window_h - 12)
+        time.sleep(0.2)
+
     expected = CHINESE_EXPECTATIONS.get(app)
     anchor_box = CLIENT_OCR_ANCHORS.get(app)
     anchor_tag = f"app-{app}-client-anchor" if anchor_box else None
@@ -1119,6 +1752,12 @@ def run_one_app(app: str, probe, serial: Path, process, baseline,
             f"{client_png_mean_max_error:.3f}, source={gallery_source_path})")
 
     interaction: dict[str, object] = {"performed": False}
+    resize_evidence = None
+    if app in ("fileman", "taskmgr"):
+        resized, resize_evidence = exercise_window_resizing(
+            app, probe, (window_x, window_y, window_w, window_h),
+            serial, process, output, pid)
+        window_x, window_y, window_w, window_h = resized
     close_sent = False
     if app == "calc":
         for key in ("3", "shift-equal", "4", "ret"):
@@ -1138,6 +1777,10 @@ def run_one_app(app: str, probe, serial: Path, process, baseline,
         interaction = exercise_fileman(
             probe, (window_x, window_y, window_w, window_h),
             serial, process, output, failures, pid)
+    elif app == "taskmgr":
+        interaction = exercise_taskmgr(
+            probe, (window_x, window_y, window_w, window_h),
+            serial, process, output, failures, pid, sys.modules[__name__])
     elif app == "paint":
         interaction = exercise_paint(
             probe, output, failures, (window_x, window_y, window_w, window_h))
@@ -1145,12 +1788,15 @@ def run_one_app(app: str, probe, serial: Path, process, baseline,
     elif app == "installer":
         interaction = exercise_installer_readonly(probe)
 
+    if resize_evidence is not None:
+        interaction["resizing"] = resize_evidence
+
     close_mode = "timeout_sigterm" if app == "doom" else "window_manager_alt_f4"
     if app != "doom" and not close_sent:
         if app == "fileman":
             # The child installer may have taken focus before it closed. Focus
             # fileman's read-only status strip explicitly before sending Alt+F4.
-            probe.click(window_x + 20, window_y + 630)
+            probe.click(window_x + 20, window_y + window_h - 22)
         probe.key("alt-f4")
     if close_sent:
         close_mode = "interaction_alt_f4"
@@ -1243,6 +1889,8 @@ def parse_args() -> argparse.Namespace:
                         help="pinned x86_64-musl sysroot used to build the GUI probe")
     parser.add_argument("--probe-elf", type=Path,
                         help="use a prebuilt target probe instead of compiling it here")
+    parser.add_argument("--skip-input-probe", action="store_true",
+                        help="skip the unchanged shared UTF-8 widget probe for focused app checks")
     parser.add_argument("--apps", nargs="+", choices=APP_NAMES, default=list(APP_NAMES),
                         help="apps to launch; payload injection still includes all 12 current ELFs")
     parser.add_argument("--cxx", default="clang++", help="configured target C++ compiler")
@@ -1347,29 +1995,32 @@ def main() -> int:
         except (AssertionError, RuntimeError) as error:
             failures.append(f"SimSun fc-match verification failed: {error}")
 
-        try:
-            probe_result = probe_chinese_input(probe_qmp, serial, process,
-                                                output, failures)
-            probe_exit_offset = len(serial.read_text(errors="replace"))
-            probe_qmp.key("alt-f4")
-            probe_pid = probe_result["pid"]
-            exit_marker = f"[fltk-runner] EXIT app=fltk-ui-probe pid={probe_pid} status="
-            final_probe_log = wait_marker(serial, exit_marker, process,
-                                          probe_exit_offset, 20)
-            exit_line = next((line for line in final_probe_log[probe_exit_offset:].splitlines()
-                              if exit_marker in line), "")
-            status_match = re.search(r"\bstatus=(\d+)", exit_line)
-            probe_status = int(status_match.group(1)) if status_match else None
-            probe_result["exit_status"] = probe_status
-            if probe_status != 0:
-                failures.append(f"FLTK input probe exited with status {probe_status!r}")
-        except (AssertionError, RuntimeError) as error:
-            failures.append(f"FLTK UTF-8 input/browser probe failed: {error}")
+        if args.skip_input_probe:
+            probe_result = {"performed": False, "skipped": True,
+                            "reason": "--skip-input-probe; focused app regression"}
+        else:
             try:
+                probe_result = probe_chinese_input(probe_qmp, serial, process,
+                                                    output, failures)
+                probe_exit_offset = len(serial.read_text(errors="replace"))
                 probe_qmp.key("alt-f4")
-            except Exception:
-                pass
-
+                probe_pid = probe_result["pid"]
+                exit_marker = f"[fltk-runner] EXIT app=fltk-ui-probe pid={probe_pid} status="
+                final_probe_log = wait_marker(serial, exit_marker, process,
+                                              probe_exit_offset, 20)
+                exit_line = next((line for line in final_probe_log[probe_exit_offset:].splitlines()
+                                  if exit_marker in line), "")
+                status_match = re.search(r"\bstatus=(\d+)", exit_line)
+                probe_status = int(status_match.group(1)) if status_match else None
+                probe_result["exit_status"] = probe_status
+                if probe_status != 0:
+                    failures.append(f"FLTK input probe exited with status {probe_status!r}")
+            except (AssertionError, RuntimeError) as error:
+                failures.append(f"FLTK UTF-8 input/browser probe failed: {error}")
+                try:
+                    probe_qmp.key("alt-f4")
+                except Exception:
+                    pass
         for app in args.apps:
             try:
                 app_result = run_one_app(

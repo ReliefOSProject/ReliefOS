@@ -19,7 +19,7 @@ static int input_pass_reported;
 static int secret_pass_reported;
 static int browser_pass_reported;
 
-static int window_info(unsigned long pid)
+static int window_info(unsigned long pid, bool watch = false)
 {
     fl_open_display();
     Window root = DefaultRootWindow(fl_display);
@@ -56,8 +56,24 @@ static int window_info(unsigned long pid)
                                            0, 0, &x, &y, &child)) {
                     printf("FLTK_APP_GEOMETRY pid=%lu x=%d y=%d w=%u h=%u\n",
                            pid, x, y, width, height);
+                    Window target = windows[index];
                     XFree(data);
-                    return 0;
+                    fflush(stdout);
+                    if (!watch) return 0;
+                    XSelectInput(fl_display, target, StructureNotifyMask);
+                    XFlush(fl_display);
+                    for (;;) {
+                        XEvent event;
+                        XNextEvent(fl_display, &event);
+                        if (event.type == DestroyNotify) return 0;
+                        if (event.type != ConfigureNotify) continue;
+                        if (XTranslateCoordinates(fl_display, target, root,
+                                                   0, 0, &x, &y, &child)) {
+                            printf("FLTK_APP_GEOMETRY pid=%lu x=%d y=%d w=%d h=%d\n",
+                                   pid, x, y, event.xconfigure.width, event.xconfigure.height);
+                            fflush(stdout);
+                        }
+                    }
                 }
             }
             XFree(data);
@@ -125,6 +141,8 @@ int main(int argc, char **argv)
 {
     if (argc == 3 && strcmp(argv[1], "--window-info") == 0)
         return window_info(strtoul(argv[2], nullptr, 10));
+    if (argc == 3 && strcmp(argv[1], "--watch-window") == 0)
+        return window_info(strtoul(argv[2], nullptr, 10), true);
     reliefos_fltk::init();
     if (!copy_input_checks()) {
         puts("FLTK_PROBE_FAIL copy_input_capacity");

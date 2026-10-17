@@ -127,3 +127,61 @@ acceptance-8 使用当时的 runner 版本。验收之后只对测试 harness �
 提交前重新运行 XDM/控制台/画面识别单元检查，46 项通过；安装器与任务管理器主机检查 42 项通过，复制读取聚合的 ASan/UBSan 检查通过。C 行为模型、C++ 构建图、devroot、桌面/安装器 staging、APK ownership 与许可证检查亦通过。
 
 更早的完整 VT/XDM QEMU suite 在登录、切换与退出后，于日志收集的 `xdm.log changed prefix during the run` 断言失败；串口中混入内核日志，尚未完成该完整 suite 的通过验证。本轮定向截图通过不替代该测试，也不替代前述完整新装、升级或硬件验证。VMware 验证未完成。
+
+## Fileman 文件名搜索（2026-10-17）
+
+Fileman 新增地址栏右侧“搜索”按钮、编辑菜单入口与 `Ctrl+F`。默认在当前目录和子目录按名称子串搜索文件/文件夹；可修改起点、关闭递归、显示隐藏项或切换英文字母大小写匹配。中文 UTF-8 名称保持原字节。搜索结果使用独立的完整路径，不复用主列表的 64 项容量。
+
+搜索由 FLTK 每 10ms 分批推进，每批最多处理 32 次目录读取；停止和关闭窗口会回收全部扫描目录句柄，停止保留已找到的结果，重新搜索会清空旧结果。递归不跟随子目录符号链接。默认结果上限 1000、扫描上限 100 万项；达到全局限制会明确停止，权限、路径长度和深度限制导致的局部遗漏则显示“搜索完成（部分）”与跳过计数。路径不作截断，超长根路径/查询报错。
+
+结果支持打开和打开所在文件夹；后者在主列表包含该项时选中并滚动到它。主列表仍保留原有的 64 项呈现上限及隐藏项设置，定位不保证能高亮被这些设置排除的条目，搜索列表本身仍可直接打开完整路径。
+
+编译：`TMPDIR="$PWD/out/tmp" make -j4 O=out/xorg-vmware-debug PROFILE=release app-fileman nls` 通过，日志为 `out/tmp/fileman-search-final-build.log`。这是目录名含 debug 的显式 release 构建；本轮没有修改内核。
+
+主机检查：`test-fileman-search.sh`、原有 `test-fileman-boundary.sh` / `test-fileman-operations.sh`、`test-nls-build.sh` / `test-nls-extract.sh` 均通过。搜索使用真实目录和 ASan/UBSan，覆盖中文与 ASCII 大小写、同名完整路径、隐藏项、80 项目录、符号链接环、取消/重启、FD 回收、长度与资源上限。本机以 uid 1000 验证了无权限子目录跳过而兄弟目录继续；root 运行该用例时会明确输出 SKIP。
+
+GUI 回归还发现并修复了两个键盘集成问题：关闭对话框后恢复文件列表焦点，使 Ctrl+L 等原有操作继续可用；主窗口的 Ctrl+F 会被文件列表和输入控件提前吞掉，因此在主窗口的地址栏、目录/文件列表和只读输出控件处理按键之前统一响应搜索快捷键。搜索窗口内的输入控件仍使用各自原有行为。
+
+早期 `build/fltk-migration/fileman-search-1/` 至 `fileman-search-5/` 保留失败与诊断记录，其中混合中英文路径、稀疏标签和蓝底白字选中行存在 OCR 漏读；人工查看原始截图确认实际路径与选中行。路径 OCR 作为辅助证据，名称/完整路径的精确行为由真实文件系统主机测试验证；定位另外验证选中行颜色和文件名，Ctrl+F 重开另外验证真实中文标签，避免仅凭画面变化误判。第 5 轮还暴露了上述 Ctrl+F 吞键问题；第 6 轮候选测试主动中止，未计为通过。
+
+最终目标系统验收为 `build/fltk-migration/fileman-search-7/run.json`，runner exit 0、`failures: []`、Fileman exit 0；日志为 `out/tmp/fileman-search-qemu-7.log`。使用 QEMU/KVM、2 vCPU、4 GiB 内存和 VMware SVGA 模拟设备，内核显式使用已验证的 release ELF `build/kernel-throughput-5g/final/kernel.sys`，未重新构建或修改内核。可用以下命令重跑（output 必须为新目录）：
+
+```sh
+TMPDIR="$PWD/out/tmp" python3 -u tools/test_fltk_apps_qemu.py --apps fileman \
+  --kernel build/kernel-throughput-5g/final/kernel.sys \
+  --probe-elf build/fltk-migration/acceptance-9/fltk_ui_probe.elf \
+  --output build/fltk-migration/fileman-search-new
+```
+
+客机验证了递归 1 条匹配、禁用递归 0 条、80 条结果、中文完整路径显示、定位父目录并选中目标（选中行蓝色检测区域占比 1.0）；扫描 1090 项后实际停止，再查询 `/tmp` 完成且为 0 条，没有沿用旧结果。关闭后文件列表焦点下 Ctrl+F 成功重开；地址栏焦点下 Ctrl+F 成功打开，随后按 Enter 打开目录搜索结果。原有中文重命名、复制粘贴、导航以及独立 installer 子窗口启动/关闭均通过，文件系统 helper 输出 `FLTK_FILEMAN_VERIFY PASS`。取消保留已有结果由主机模型覆盖；这轮客机停止用例使用无匹配查询，不将其表述为 GUI 保留结果的端到端验收。
+
+人工查看本轮搜索与重开窗口截图，确认中文标签和名称实际可见。最终 Fileman ELF SHA-256 为 `5d449795d46424d44949da2dd5ba7af8c8f582fb9c37bd9e6d787aea47927a6e`，生成的 zh_CN catalog 为 `f95efec44ea6a36144776b42dd97421e9e28c17f1b88af9edcefedde7b31ee9e`；注入值、客机文件系统 readback 与当前构建一致。源 baseline 镜像及 QEMU snapshot 的私有基础镜像运行前后哈希不变，核对记录为 `out/tmp/fileman-search-final-evidence.json`。这轮仅验证 Fileman 及所需子窗口，其他应用仍以前面的独立记录为准。
+
+正式 RAW/VMDK/ISO 尚未重新打包。VMware 验证未完成；私有 QEMU 验收不能替代真实 VMware、物理设备或完整中文输入法验证。
+
+
+## Fileman / Taskmgr 原生界面整理（2026-10-17）
+
+两款程序继续使用原有 FLTK `gtk+` scheme、SimSun 中文字体及原生控件，共享主题未修改。界面采用紧凑的工具布局，没有窗口内程序大标题或常驻说明段落。帮助放在控件 tooltip，标签页各自展示本页的数据和操作。
+
+Fileman 默认 960×600、最小 800×480。菜单下是导航/地址/搜索行和分组文件操作栏，其余主要区域留给文件夹树与名称/类型列表；底部仅一行操作状态与条目计数，耗时操作在同一行显示真实进度。所选完整路径可在状态栏 tooltip 及原有详情窗口查看，搜索结果仍保留独立的完整路径输出。按钮状态反映当前选择与剪贴板，双击打开与 Ctrl/Shift 多选保留；Ctrl+L、Ctrl+F、F5、Alt+Up 在主窗口控件上统一处理，文本输入中的复制/剪切/粘贴由原控件处理。原有打开方式、默认关联、快捷方式、属性与权限、重命名、删除、复制/剪切/粘贴、批量选择、归档、设置、隐藏项与递归搜索均保留，后端 C 文件未改动。
+
+Taskmgr 默认 1000×660、最小 800×520。全局仅保留菜单、标签页和状态栏；进程页使用对齐的七列表格与刷新/详情/结束任务操作，性能页独立展示图表、每核占用和内存/运行时间/任务统计，启动项页包含用户选择、启用/禁用/移除及一个服务管理器入口。全局资源卡、重复页标题、说明行和重复菜单项已移除。保留进程树次序、按 PID 跟踪选择、菜单/右键操作、Enter/Delete/F5、确认框及 500ms 采样。性能滚动区按 ABI 最大 64 核心计算内容高度，并保持、钳制缩放后的滚动位置；这不等于已在 64 vCPU 硬件实测。结束任务及移除启动项在确认前保存 PID 或 UID/条目 ID，避免定时刷新改变操作对象。
+
+本阶段的目标构建与 NLS 构建通过；紧凑布局最终共同构建为 `TMPDIR="$PWD/out/tmp" make -j4 O=out/xorg-vmware-debug PROFILE=release app-fileman app-taskmgr nls`，日志 `out/tmp/desktop-ui-compact-final-build.log`（exit 0）。主机测试 `test-fileman-search.sh`（ASan/UBSan）、`test-fileman-boundary.sh`、`test-fileman-operations.sh`、`test-motif-apps.sh`、`test-nls-build.sh`、`test-nls-extract.sh` 均通过，日志位于 `out/tmp/desktop-ui-*-test.log` / `desktop-ui-nls-build.log`。Taskmgr 模型检查覆盖格式、利用率、历史环和树次序，不将其表述为启动项修改的 GUI 端到端测试。
+
+交互验证发现并修正了 Taskmgr 的实际缩放与选择问题：布局使用 resize 传入的新尺寸，关闭与手动布局冲突的自动缩放，进程与启动项浏览器显式使用 `FL_HOLD_BROWSER`。Fileman 文件夹树启用 FLTK 原生双击回调条件，且仅在左键释放的双击事件切换展开状态，解决重复双击已选行不能展开/收起的问题；依据为 [Fl_Browser_ 原生实现](https://github.com/fltk/fltk/blob/branch-1.3/src/Fl_Browser_.cxx)。
+
+测试记录真实 ConfigureNotify 几何，允许 USB tablet 拖动最多 2 像素量化误差，并另行断言最小尺寸不低于应用声明值。OCR 避开边框、tooltip 和 native focus 虚线；原始截图不经这些 OCR 预处理。中文路径通过原生剪贴板保存/恢复，不能用只支持 ASCII 的 QMP 键入模拟中文。Taskmgr 测试限定独立临时 sleep applet 的串口 PID，在 PID 列及详情/确认框核对名称与完整数字，排除父 PID 和较长数字；只有确认后收到同一 PID 非零退出状态并看到列表更新，才判定结束任务成功。GPU 当前值单独裁区域，允许有效百分比或原生 N/A。
+
+Taskmgr 最终客机结果为 `build/fltk-migration/desktop-ui-compact-taskmgr-4/run.json`，runner exit 0、Taskmgr exit 0、`failures: []`。使用 QEMU/KVM、2 vCPU、4 GiB 和 VMware SVGA 模拟设备；验证了七列与对应 CPU/内存值、精确 PID 的详情、结束确认与定时列表刷新：独立 sleep applet 的 PID 为 310，客机快照名称为 busybox，确认后记录 `FLTK_TASKMGR_WORKER_EXIT pid=310 status=143`，随后从列表消失。性能页的 CPU/内存百分比、两个核心读数、总/已用/可用内存、uptime 和 GPU N/A 均按独立区域识别，跨 500ms 采样周期后仍有效；启动项页验证 test 用户、控件、列表区域与单一服务管理器入口。本轮没有启用、禁用或移除现有启动项，不能作为这些修改操作的 GUI 端到端验收。
+
+Fileman 紧凑布局回归曾发现关闭搜索窗口、定位父目录后仍显示旧画面的实际问题。诊断记录确认模型、地址控件和列表内容已更新；单独或组合请求全窗重绘与 flush 均未解决。仅将顶层窗口从 `Fl_Double_Window` 换为原生 `Fl_Window` 的对照中，地址、64 条目录内容与目标选中行均正确显示，其他控件、布局和搜索模态窗保持相同。最终采用该顶层组件，移除了无效的强制 flush；此证据不用于断言具体 X server 或内核根因。`desktop-ui-compact-fileman-9` 的失败只剩选中行 OCR 裁剪带入下一行，原始截图显示目标已正确选中；测试现只裁实际首行，原图保留，蓝底白字转换仅用于 OCR。
+
+Fileman 最终客机结果为 `build/fltk-migration/desktop-ui-compact-fileman-10/run.json`，runner exit 0、Fileman exit 0、`failures: []`，日志为 `out/tmp/desktop-ui-compact-fileman-qemu-10.log`。验证了文件夹树双击收起/展开、新建目录、双击打开与 Alt+Up、中文重命名、复制粘贴、独立 installer 子窗口打开/关闭，以及搜索递归 1 条、非递归 0 条、80 条结果、定位父目录并选中目标（选中区域蓝色占比 1.0）。扫描 1121 项后实际停止，再查 `/tmp` 完成且为 0 条；Ctrl+F 重开与 Enter 打开目录结果均通过，文件系统 helper 输出 `FLTK_FILEMAN_VERIFY PASS`。真实缩放记录为最小 800×481、恢复 960×599、最大化 1280×754，均符合声明最小值与最多 2 像素拖动量化容差。
+
+最终 Fileman ELF SHA-256 为 `b4ec0c2cbad8d5daedcee1edea5513ff6ef4ee196202c3d4dc0fa27258005188`，Taskmgr 为 `2838d6ddf670ec8bc6935fb7f24b3abe32b37054129d5548269db9d3900aebca`，zh_CN catalog 为 `99e62c17017ffc3ad67d91b63552293a162651d504213b8640f05ea2d0b3ec4c`。各应用最终通过轮次的注入文件、客机 readback 与当前相应构建一致；全部注入文件 readback 与当时记录值一致。核对记录为 `out/tmp/desktop-ui-final-evidence.json`。内核仍使用 release `build/kernel-throughput-5g/final/kernel.sys`，SHA-256 为 `f6a8193fdae96a097820e4eecd052d43d5cf0ed036be581d5433c4976afe73b7`；本轮未修改内核。源 baseline 与 QEMU snapshot 使用的私有基础磁盘运行前后哈希不变。
+
+两轮紧凑布局定向测试使用 `--skip-input-probe`，跳过项在 manifest 中明确记录；共享字体检查仍执行。共享 UTF-8 输入、密码框粘贴、浏览器选择和 `copy_input` 容量边界已在 `desktop-ui-fileman-3` 完整输入探针通过，共享 `fltk_support.h` 此后未修改，不将其表述为完整中文输入法验收。
+
+交付截图取自实际 QEMU 客户区：Fileman 使用 `desktop-ui-compact-fileman-10/app-fileman-restored.client.png`，Taskmgr 使用 `desktop-ui-compact-taskmgr-4/app-taskmgr-processes.client.png` 和 `app-taskmgr-performance-after-timer.client.png`；仅裁剪客户区，没有修改显示内容。正式 RAW/VMDK/ISO 未重新打包。启动项修改、真实 VMware 与物理设备仍不属于上述 GUI 通过范围。VMware 验证未完成。
