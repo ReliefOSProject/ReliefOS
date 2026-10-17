@@ -9,7 +9,7 @@ python3 - "$src/configs/apk-ownership.json" <<'PY'
 import json, sys
 policy = json.load(open(sys.argv[1], encoding="utf-8"))
 groups = policy["groups"]
-required = {"reliefos-nls", "reliefos-apps", "reliefos-fastfetch",
+required = {"reliefos-nls", "reliefos-apps", "reliefos-fastfetch", "reliefos-xdm-config",
             "reliefos-mimalloc", "reliefos-musl-dev", "reliefos-apk-tools", "reliefos-base"}
 missing = sorted(required - groups.keys())
 legacy = sorted(name for name in groups if name.startswith("leonos-"))
@@ -95,4 +95,22 @@ printf '\177ELFfixture' > "$tmp/root/usr/bin/non-executable-data"
 test "$(wc -l < "$tmp/elf")" = 1
 grep -q 'non-executable-data' "$tmp/elf"
 grep -q '"apk_registration":"installed-by-upstream-apk"' "$tmp/installed.json"
+# XDM policy overlaps exactly five upstream paths. All other XDM files retain
+# upstream ownership when the package stage strips the verified archive list.
+for path in etc/X11/xdm/xdm-config etc/X11/xdm/Xservers etc/X11/xdm/Xresources \
+    usr/lib/X11/xdm/Xsession usr/lib/X11/xdm/Xsetup_0 usr/lib/X11/xdm/chooser; do
+    mkdir -p "$tmp/root/${path%/*}"
+    printf 'XDM fixture\n' > "$tmp/root/$path"
+done
+"$tmp/reliefos-apk-own" --policy "$src/configs/apk-ownership.json" --root "$tmp/root" --output "$tmp/xdm-list"
+PYTHONDONTWRITEBYTECODE=1 python3 - "$src" "$tmp" <<'PY'
+import sys
+from pathlib import Path
+root = Path(sys.argv[2])
+rows = {row[3]: row[0] for row in (line.split("\t") for line in (root / "xdm-list").read_text().splitlines())}
+expected = {"etc/X11/xdm/xdm-config", "etc/X11/xdm/Xservers", "etc/X11/xdm/Xresources",
+            "usr/lib/X11/xdm/Xsession", "usr/lib/X11/xdm/Xsetup_0"}
+assert {path for path, owner in rows.items() if owner == "reliefos-xdm-config"} == expected
+assert rows["usr/lib/X11/xdm/chooser"] != "reliefos-xdm-config"
+PY
 printf 'apk ownership: component groups, legacy libraries, installed identity, policy conflicts, symlinks and ELF inventory passed\n'

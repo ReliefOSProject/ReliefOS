@@ -24,7 +24,7 @@ if test -f "$xorg_log" && test ! -f "$xorg_log.first"; then
     cp -p "$xorg_log" "$xorg_log.first" 2>/dev/null || :
 fi
 
-for path in /etc/X11/xorg.conf /usr/lib/reliefos/xorg-tty-wrapper /usr/bin/icewm \
+for path in /etc/X11/xorg.conf /usr/lib/reliefos/xorg-tty-wrapper /usr/bin/icewm-session \
     /usr/lib/reliefos/apps/installer/installer.elf; do
     if test ! -r "$path"; then
         stage "missing $path"
@@ -78,13 +78,9 @@ if test ! -S /tmp/.X11-unix/X0; then
 fi
 stage 'X server ready on vt1'
 
-# Retro pixel-art root background.  This is a
-# best-effort one-shot: on failure the installer window keeps the default root.
-if test -x /usr/bin/xwallpaper && test -r /etc/reliefos/wallpaper.png; then
-    /usr/bin/xwallpaper --focus /etc/reliefos/wallpaper.png 2>/dev/null || :
-fi
-
-/usr/bin/icewm &
+# Use the same theme-managed background and native session lifetime as the
+# installed desktop; no media-specific wallpaper is imposed on the theme.
+/usr/bin/icewm-session &
 icewm_pid=$!
 sleep 1
 if ! kill -0 "$icewm_pid" 2>/dev/null; then

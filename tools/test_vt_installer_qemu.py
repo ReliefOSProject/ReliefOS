@@ -44,7 +44,7 @@ def main():
             wait_text(probe, process, 'installer-shell', 'built-in shell', timeout=100)
         else:
             wait_text(probe, process, 'installer-language', 'English', timeout=100)
-            probe.click(320, 164 if probe.height > 640 else 144)
+            probe.click(*probe.language_option_point())
             wait_text(probe, process, 'installer-english', 'Select Language')
         for number in range(2, 7):
             probe.key(f'ctrl-alt-f{number}')

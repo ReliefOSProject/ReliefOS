@@ -7,7 +7,7 @@ work=${TMPDIR:-/tmp}/reliefos-desktop-backend.$$
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 mkdir -p "$work"
 
-# The Motif X11 frontend is the only desktop frontend; the backend choice is
+# The FLTK X11 frontend is the only desktop frontend; the backend choice is
 # gone from the configuration.
 if grep -q 'DESKTOP_BACKEND' Kconfig configs/default.conf; then
     echo 'desktop backend choice is still configurable' >&2
@@ -118,12 +118,20 @@ if ! printf '%s\n' "$mouse0" | grep -q 'Option "IgnoreAbsoluteAxes" "false"'; th
     echo 'FAIL - xorg.conf mouse absolute position contract' >&2
     exit 1
 fi
-test -f "$xorg_root/etc/reliefos/xdm.conf"
-test -f "$xorg_root/etc/reliefos/xdm-Xservers"
-test -f "$xorg_root/etc/reliefos/xdm-session"
+test -f "$xorg_root/etc/X11/xdm/xdm-config"
+test -f "$xorg_root/etc/X11/xdm/Xservers"
+test -f "$xorg_root/etc/X11/xdm/Xresources"
+test -x "$xorg_root/usr/lib/X11/xdm/Xsession"
+test -x "$xorg_root/usr/lib/X11/xdm/Xsetup_0"
+test ! -e "$xorg_root/etc/reliefos/wallpaper.png"
 test -x "$xorg_root/usr/lib/reliefos/reliefos-xdm"
 test -x "$xorg_root/usr/lib/reliefos/xorg-tty-wrapper"
-test -x "$xorg_root/usr/lib/reliefos/xdm-session"
+for path in etc/reliefos/xdm.conf etc/reliefos/xdm-Xservers \
+    etc/reliefos/xdm-Xresources etc/reliefos/xdm-session \
+    etc/reliefos/xdm-setup usr/lib/reliefos/xdm-session \
+    usr/lib/reliefos/xdm-setup; do
+    test ! -e "$xorg_root/$path"
+done
 test -f "$xorg_root/etc/pam.d/xdm"
 # IceWM is the only window manager: its configuration is staged and no old
 # window manager file may survive in the product root.

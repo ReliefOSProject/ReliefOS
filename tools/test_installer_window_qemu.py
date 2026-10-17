@@ -22,6 +22,7 @@ class Probe(InstallerProbe):
         self.stream = self.socket.makefile("rwb", buffering=0)
         self.stream.readline()
         self.command("qmp_capabilities")
+        self._reset_installer_geometry()
         self.width, self.height = self.screenshot("boot").size
 
     def key(self, key):
@@ -55,14 +56,40 @@ def wait_log(serial, needle, process, timeout=90):
     raise AssertionError(f"Missing serial output: {needle}")
 
 
+def wait_for_installer_language(probe, process, timeout=90):
+    deadline = time.monotonic() + timeout
+    last_page = None
+    while time.monotonic() < deadline:
+        if process.poll() is not None:
+            raise RuntimeError("QEMU exited before the installer language page appeared")
+        frame = probe.frame("installer-startup")
+        last_page = probe.visible_page(frame)
+        if last_page == 0:
+            return frame
+        time.sleep(0.5)
+    raise AssertionError(
+        f"Installer language page did not appear within {timeout}s; last visible page={last_page}")
+
+
+def vga_arguments(profile):
+    if profile == "vmware":
+        return ["-vga", "vmware"]
+    if profile == "std":
+        return ["-device", "VGA,xres=1280,yres=720"]
+    raise ValueError(f"Unsupported VGA profile: {profile}")
+
+
 def installer(probe):
     frame = probe.frame("installer-language")
     assert probe.visible_page(frame) == 0, "Installer sidebar is cropped or scaled"
-    # The actual sidebar is at most 220 pixels wide. It must not be stretched
-    # across the content, and the footer's Next button must be visible.
-    assert frame.getpixel((300, 400)) != frame.getpixel((20, 400)), "Sidebar covers content"
+    # The FLTK sidebar must not be stretched across the content, and its
+    # primary footer button must be visible at the detected window position.
+    sidebar_sample = (probe.sidebar_left + 4, probe.sidebar_top + 400)
+    content_sample = (probe.content_left + 4, probe.sidebar_top + 400)
+    assert frame.getpixel(sidebar_sample) != frame.getpixel(content_sample), \
+        "Sidebar covers content"
     for expected in (1, 2, 3):
-        probe.click(probe.width - 165, probe.height - 33)
+        probe.click(*probe.footer_point())
         time.sleep(0.8)
         frame = probe.frame(f"installer-page-{expected}")
         assert probe.visible_page(frame) == expected, "Footer click did not change page"
@@ -145,6 +172,8 @@ def main():
     parser.add_argument("case", choices=("tty", "installer", "desktop", "installed"))
     parser.add_argument("--output", type=Path, default=ROOT / "build/ui-regressions")
     parser.add_argument("--iso", type=Path)
+    parser.add_argument("--vga", choices=("std", "vmware"), default="std",
+                        help="QEMU display device (std preserves the legacy 1280x720 VGA device)")
     parser.add_argument("--install", action="store_true", help="Install onto this test's disposable scratch disk")
     parser.add_argument("--disk", type=Path, help="Previously installed test disk to boot without the ISO")
     args = parser.parse_args()
@@ -164,7 +193,7 @@ def main():
     command = ["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-machine", "q35",
                "-m", "4096", "-smp", "2", "-bios", "/usr/share/edk2/x64/OVMF.4m.fd",
                "-display", "none", "-serial", f"file:{serial}",
-               "-device", "VGA,xres=1280,yres=720", "-device", "qemu-xhci", "-device", "usb-tablet",
+               *vga_arguments(args.vga), "-device", "qemu-xhci", "-device", "usb-tablet",
                "-netdev", "user,id=net0", "-device", "e1000,netdev=net0",
                "-qmp", f"unix:{qmp},server=on,wait=off",
                "-no-reboot", "-no-shutdown"]
@@ -206,15 +235,14 @@ def main():
                     wait_log(serial, "Installation finished.", process, 10)
                 else:
                     wait_log(serial, "Installation not confirmed", process, 10)
+            elif args.case == "installer":
+                wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
+                wait_for_installer_language(probe, process, timeout=90)
+                installer(probe)
             else:
-                wait_log(
-                    serial,
-                    "path=/usr/lib/reliefos/apps/installer/installer.elf"
-                    if args.case == "installer" else "[oobe.elf] starting first-run",
-                    process,
-                )
+                wait_log(serial, "[oobe.elf] starting first-run", process)
                 time.sleep(8)
-                (installer if args.case == "installer" else desktop)(probe)
+                desktop(probe)
             assert "KERNEL PANIC" not in serial.read_text(errors="replace")
             print(f"PASS {args.case}: {out}", flush=True)
         finally:

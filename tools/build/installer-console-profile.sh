@@ -49,6 +49,8 @@ remove_path() {
 
 for path in \
     etc/X11/xorg.conf \
+    etc/X11/xdm \
+    usr/lib/X11/xdm \
     etc/reliefos/xdm.conf \
     etc/reliefos/xdm-Xservers \
     etc/reliefos/xdm-Xresources \
@@ -65,8 +67,9 @@ for path in \
     remove_path "$path"
 done
 
-# These applications directly use X11/Motif/OpenGL and must not pull Xorg
-# libraries back into reliefos-apps through the package's ELF dependencies.
+# These Xorg-only applications include FLTK frontends and OpenGL tools; they
+# must not pull Xorg libraries back into reliefos-apps through their package
+# ELF dependencies.
 for app in \
     calc doom doomlauncher fileman imageview installer leonmmcoset minesweeper osver \
     paint taskmgr xiaobai glxgears portablegl; do

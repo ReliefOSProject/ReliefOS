@@ -23,7 +23,9 @@ allowlist="$root/tests/build/brand-allowlist.tsv"
 strict=${BRAND_STRICT:-0}
 fails=0
 
-work=$(mktemp -d)
+tmp_root=${TMPDIR:-$root/out/tmp}
+mkdir -p "$tmp_root"
+work=$(mktemp -d "$tmp_root/reliefos-brand-identity.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 
 ok() { printf 'ok - %s\n' "$1"; }
@@ -78,17 +80,17 @@ system/docs/zh_CN/leonos.hlp
 configs/components.toml
 configs/nls/po/leonos.pot
 configs/nls/po/zh_CN.po
-userland/apps/installer/main.c
+userland/apps/installer/main.cpp
 userland/apps/installer/installer_tty.c
 userland/apps/login/main.c
 userland/apps/desktop/desktop.h
 userland/apps/desktop/start_menu.c
 userland/apps/desktop/render.c
 userland/apps/desktop/screen.c
-userland/apps/osver/main.c
+userland/apps/osver/main.cpp
 userland/apps/settings/main.c
 userland/apps/run/main.c
-userland/apps/fileman/main.c
+userland/apps/fileman/main.cpp
 userland/apps/browser/main.c
 userland/apps/browser/input.c
 userland/apps/browser/navigation.c
@@ -99,8 +101,15 @@ userland/apps/hello/main.c
 userland/apps/cjktest/main.c
 userland/apps/oschinpt/main.c
 userland/apps/uidemo/main.c
-userland/apps/paint/main.c
-userland/apps/minesweeper/main.c
+userland/apps/minesweeper/main.cpp
+userland/apps/calc/main.cpp
+userland/apps/taskmgr/main.cpp
+userland/apps/leonmmcoset/main.cpp
+userland/apps/xiaobai/main.cpp
+userland/apps/paint/main.cpp
+userland/apps/imageview/main.cpp
+userland/apps/doomlauncher/main.cpp
+userland/apps/doom/main.cpp
 userland/apps/oshlp/main.c
 userland/apps/notepad/main.c
 userland/apps/terminal/main.c
@@ -168,7 +177,7 @@ userland/apps/shell/main.c
     if grep -qx 'kernel_name=ReliefNT' "$root/kernel/reliefnt/configs/build-version" &&
        grep -q 'LINUX_UTS_SYSNAME "ReliefNT"' \
            "$root/kernel/reliefnt/kernel/reliefnt/include/reliefnt/uts.h" &&
-       grep -q 'info.kernel_name' "$root/userland/apps/osver/main.c"; then
+       grep -q 'info.kernel_name' "$root/userland/apps/osver/main.cpp"; then
         ok 'system information surfaces the ReliefNT kernel name'
     else
         fail 'kernel identity used by Fastfetch and the version page must be ReliefNT'

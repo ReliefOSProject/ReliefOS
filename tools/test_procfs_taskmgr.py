@@ -39,17 +39,29 @@ class ProcfsTaskmgrTests(unittest.TestCase):
         self.assertIn('ps_read_file("/proc/stat"', libc)
 
     def test_taskmgr_presents_initial_snapshot(self):
-        source = (ROOT / "userland/apps/taskmgr/main.c").read_text()
-        init = source.index("int main(void)")
-        loop = source.index("for (;;) {", init)
-        self.assertLess(source.index("refresh_all();", init), loop)
-        self.assertLess(source.index("present_taskmgr(", init), loop)
+        source = (ROOT / "userland/apps/taskmgr/main.cpp").read_text()
+        init = source.index("int main(int argc, char **argv)")
+        main = source[init:]
+        steps = (
+            "reliefos_fltk::init();",
+            "taskmgr_perf_history_init(&history);",
+            "build_ui();",
+            "shell->show(argc, argv);",
+            "refresh_performance();",
+            "refresh_tasks();",
+            "refresh_startup();",
+            "update_controls();",
+            "Fl::add_timeout(0.5, timer_callback);",
+            "return Fl::run();",
+        )
+        positions = [main.index(step) for step in steps]
+        self.assertEqual(positions, sorted(positions))
 
     def test_taskmgr_service_manager_entry_uses_openrc_manager(self):
-        source = (ROOT / "userland/apps/taskmgr/main.c").read_text()
+        source = (ROOT / "userland/apps/taskmgr/main.cpp").read_text()
         self.assertIn('T("Service Manager")', source)
         self.assertIn('reliefos_launch_builtin_path("servicemgr")', source)
-        self.assertIn('reliefos_launch_argv(argv)', source)
+        self.assertIn('reliefos_launch_argv(args)', source)
         self.assertNotIn('T("Startup Apps")', source)
 
     def test_musl_forkpty_propagates_child_setup_failure(self):

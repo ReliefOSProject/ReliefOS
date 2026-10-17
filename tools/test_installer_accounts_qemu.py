@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Install onto an exclusive scratch disk, then verify actual login credentials."""
 import argparse
+from collections import Counter
 from contextlib import contextmanager
 from pathlib import Path
 import subprocess
@@ -15,9 +16,6 @@ from run_gcc_probe_qemu import qmp_quit
 ROOT = Path(__file__).resolve().parents[1]
 USER_PASSWORD = "U!" + "u" * 30
 ROOT_PASSWORD = "r"
-SIDEBAR_WIDTH = 180
-SIDEBAR_BLUE = (0x3B, 0x62, 0xA6)
-SIDEBAR_ACTIVE = (0xEC, 0xEE, 0xF4)
 XORG_EXCLUDED_APPS = (
     "calc", "doom", "doomlauncher", "fileman", "imageview", "installer",
     "leonmmcoset", "minesweeper", "osver", "paint", "taskmgr", "xiaobai",
@@ -38,128 +36,20 @@ def xorg_apk_packages():
 
 
 class Probe(WindowProbe):
-    def __init__(self, path, output):
-        self.sidebar_left = None
-        self.sidebar_top = None
-        self.sidebar_bottom = None
-        self.sidebar_right = None
-        self.content_left = None
-        self.motif_geometry_enabled = False
-        super().__init__(path, output)
-
-    def enable_motif_geometry(self):
-        self.motif_geometry_enabled = True
-
-    def clear_motif_geometry(self):
-        self.sidebar_left = None
-        self.sidebar_top = None
-        self.sidebar_bottom = None
-        self.sidebar_right = None
-        self.content_left = None
-
-    def _detect_sidebar(self, frame):
-        if self.sidebar_left is not None:
-            return
-        pixels = frame.load()
-        column_counts = [0] * frame.width
-        for y in range(frame.height):
-            for x in range(frame.width):
-                if pixels[x, y] == SIDEBAR_BLUE:
-                    column_counts[x] += 1
-
-        threshold = frame.height // 2
-        columns = [x for x, count in enumerate(column_counts) if count > threshold]
-        runs = []
-        for x in columns:
-            if not runs or x != runs[-1][-1] + 1:
-                runs.append([x])
-            else:
-                runs[-1].append(x)
-        candidates = [run for run in runs if len(run) >= SIDEBAR_WIDTH - 24]
-        if not candidates:
-            return
-        run = min(candidates, key=lambda item: (abs(len(item) - SIDEBAR_WIDTH),
-                                                -sum(column_counts[x] for x in item)))
-        left, right = run[0], run[-1] + 1
-        x = max(run, key=lambda item: column_counts[item])
-        blue_rows = [y for y in range(frame.height) if pixels[x, y] == SIDEBAR_BLUE]
-        if not blue_rows or blue_rows[-1] - blue_rows[0] + 1 <= threshold:
-            return
-        self.sidebar_left = left
-        self.sidebar_top = blue_rows[0]
-        self.sidebar_bottom = blue_rows[-1] + 1
-        self.content_left = left + SIDEBAR_WIDTH
-        self.sidebar_right = right
-
-    def frame(self, name):
-        frame = super().frame(name)
-        if self.motif_geometry_enabled:
-            self._detect_sidebar(frame)
-        return frame
-
-    def visible_page(self, frame):
-        if not self.motif_geometry_enabled:
-            return None
-        self._detect_sidebar(frame)
-        if self.sidebar_left is None:
-            return None
-        x = self.sidebar_left + SIDEBAR_WIDTH - 20
-        for page in range(10):
-            y = self.sidebar_top + 96 + page * 28 + 9
-            if y < self.sidebar_bottom and frame.getpixel((x, y)) == SIDEBAR_ACTIVE:
-                return page
+    def enable_installer_geometry(self):
+        """Compatibility no-op: the shared FLTK detector is always active."""
         return None
 
-    def footer_point(self, previous=False):
-        if self.sidebar_left is None or self.sidebar_bottom is None:
-            raise AssertionError("Installer Motif sidebar geometry was not detected")
-        # Label changes can resize both the buttons and their footer. Detect
-        # the closed 3D borders in the current frame, rather than font metrics.
-        deadline = time.monotonic() + 15
-        while time.monotonic() < deadline:
-            frame = self.frame("footer")
-            left, top = self.content_left, max(0, self.sidebar_bottom - 100)
-            region = frame.crop((left, top, min(frame.width, left + 520), self.sidebar_bottom))
-            pixels = region.load()
-            remaining = {(x, y) for y in range(region.height) for x in range(region.width)
-                         if pixels[x, y] != SIDEBAR_ACTIVE}
-            boxes = []
-            while remaining:
-                seed = remaining.pop()
-                pending = [seed]
-                xmin = xmax = seed[0]
-                ymin = ymax = seed[1]
-                while pending:
-                    x, y = pending.pop()
-                    xmin, xmax = min(xmin, x), max(xmax, x)
-                    ymin, ymax = min(ymin, y), max(ymax, y)
-                    for point in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
-                        if point in remaining:
-                            remaining.remove(point)
-                            pending.append(point)
-                if xmax - xmin >= 28 and 16 <= ymax - ymin <= 40:
-                    boxes.append((xmin, ymin, xmax, ymax))
-            boxes.sort()
-            if len(boxes) >= 2:
-                x1, y1, x2, y2 = boxes[0 if previous else 1]
-                return left + (x1 + x2) // 2, top + (y1 + y2) // 2
-            time.sleep(.2)
-        raise AssertionError(f"Installer footer buttons are not visible: {boxes}")
+    def enable_motif_geometry(self):
+        """Compatibility alias for callers written against the Motif probe."""
+        self.enable_installer_geometry()
 
-    def account_field_point(self, index):
-        if self.sidebar_left is None or self.sidebar_top is None:
-            raise AssertionError("Installer Motif sidebar geometry was not detected")
-        return self.sidebar_left + 304, self.sidebar_top + 112 + index * 58 + 16
+    def clear_installer_geometry(self):
+        self._reset_installer_geometry()
 
-    def confirm_field_point(self):
-        if self.sidebar_left is None or self.sidebar_top is None:
-            raise AssertionError("Installer Motif sidebar geometry was not detected")
-        return self.sidebar_left + 304, self.sidebar_top + 228
-
-    def xorg_indicator_point(self):
-        if self.sidebar_left is None or self.sidebar_top is None:
-            raise AssertionError("Installer Motif sidebar geometry was not detected")
-        return self.sidebar_left + 216, self.sidebar_top + 275
+    def clear_motif_geometry(self):
+        """Compatibility alias for callers written against the Motif probe."""
+        self.clear_installer_geometry()
 
     def click(self, x, y):
         super().click(x, y)
@@ -220,7 +110,9 @@ def boot(output, disk, iso=None, *, smp=2):
 
 def next_page(probe, expected_page=None):
     if expected_page is None:
-        enable_geometry = getattr(probe, "enable_motif_geometry", None)
+        enable_geometry = getattr(probe, "enable_installer_geometry", None)
+        if enable_geometry is None:
+            enable_geometry = getattr(probe, "enable_motif_geometry", None)
         if enable_geometry is not None:
             enable_geometry()
     before = probe.visible_page(probe.frame("before-next"))
@@ -245,7 +137,9 @@ def next_page(probe, expected_page=None):
 
 def previous_page(probe, expected_page=None):
     if expected_page is None:
-        enable_geometry = getattr(probe, "enable_motif_geometry", None)
+        enable_geometry = getattr(probe, "enable_installer_geometry", None)
+        if enable_geometry is None:
+            enable_geometry = getattr(probe, "enable_motif_geometry", None)
         if enable_geometry is not None:
             enable_geometry()
     before = probe.visible_page(probe.frame("before-previous"))
@@ -268,16 +162,21 @@ def previous_page(probe, expected_page=None):
     raise AssertionError(f"Previous left the installer on page {before}; expected {expected_page}")
 
 
-def wait_motif_sidebar(probe, process, frame_name, timeout=60):
+def wait_installer_sidebar(probe, process, frame_name, timeout=60):
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         frame = probe.frame(frame_name)
         if probe.visible_page(frame) is not None:
             return frame
         if process.poll() is not None:
-            raise RuntimeError("QEMU exited before the installer Motif window appeared")
+            raise RuntimeError("QEMU exited before the installer FLTK window appeared")
         time.sleep(.5)
-    raise AssertionError("Installer Motif sidebar did not appear within 60 seconds")
+    raise AssertionError("Installer FLTK sidebar did not appear within 60 seconds")
+
+
+def wait_motif_sidebar(probe, process, frame_name, timeout=60):
+    """Compatibility alias for the former Motif-specific helper name."""
+    return wait_installer_sidebar(probe, process, frame_name, timeout)
 
 
 def installer_log(probe, serial):
@@ -355,8 +254,8 @@ def wait_install(probe, serial, process, *, tty=False):
             time.sleep(5)
             continue
         frame = probe.frame("progress")
-        # Use the shared page detector so this is independent of the exact
-        # highlight color used by the Motif theme.
+        # Use the shared page detector so this is independent of the current
+        # installer theme's page highlight.
         if probe.visible_page(frame) == 9:
             guest_log = installer_log(probe, serial)
             assert "[installer.elf] installation completed successfully" in guest_log, guest_log
@@ -385,30 +284,34 @@ def xorg_checkbox_crop(probe, name):
 
 
 def xorg_checkbox_checked(indicator):
-    # This Motif theme uses a filled square for XmSET. Its interior is darker
-    # than the unchecked background, without drawing a black check mark.
-    center = indicator.crop((7, 7, 12, 12))
-    return sum(1 for red, green, blue in (
-                   center.getpixel((x, y)) for y in range(center.height) for x in range(center.width))
-               if max(red, green, blue) < 224) >= 20
+    # FLTK's gtk+ scheme draws a contrasting check mark inside the square.
+    # Ignore the bevel and detect pixels that differ from the uniform interior,
+    # independent of whether the selected scheme chooses a light or dark mark.
+    center = indicator.crop((5, 5, 14, 14))
+    colors = [center.getpixel((x, y)) for y in range(center.height)
+              for x in range(center.width)]
+    background, _ = Counter(colors).most_common(1)[0]
+    return sum(1 for color in colors
+               if max(abs(channel - background[index])
+                      for index, channel in enumerate(color)) > 40) >= 3
 
 
 def install_gui(probe, serial, process, *, skip_xorg=False):
-    probe.enable_motif_geometry()
+    probe.enable_installer_geometry()
     wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
-    frame = wait_motif_sidebar(probe, process, "language")
+    frame = wait_installer_sidebar(probe, process, "language")
     assert probe.visible_page(frame) == 0, "Installer did not start at the language page"
-    if probe.height <= 700 or probe.sidebar_bottom >= probe.height - 1:
+    if probe.sidebar_bottom - probe.sidebar_top < 680:
         probe.key("alt-f10")
         time.sleep(.8)
-        probe.clear_motif_geometry()
-        frame = wait_motif_sidebar(probe, process, "language-maximized")
+        probe.clear_installer_geometry()
+        frame = wait_installer_sidebar(probe, process, "language-maximized")
         assert probe.visible_page(frame) == 0, "Installer left the language page while maximizing"
-    if probe.sidebar_bottom >= probe.height - 1:
-        raise AssertionError("Installer Motif footer remains clipped after maximizing")
+    if probe.sidebar_bottom - probe.sidebar_top < 680:
+        raise AssertionError("Installer FLTK footer remains clipped after maximizing")
     next_x, next_y = probe.footer_point()
     if not (0 <= next_x < probe.width and 0 <= next_y < probe.height):
-        raise AssertionError("Installer Motif Next button is outside the visible screen")
+        raise AssertionError("Installer FLTK Next button is outside the visible screen")
     for expected_page in range(1, 7):
         next_page(probe, expected_page)
     for index, text in enumerate(("alice", USER_PASSWORD, USER_PASSWORD, ROOT_PASSWORD, ROOT_PASSWORD)):

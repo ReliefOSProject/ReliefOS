@@ -52,8 +52,12 @@ def copy_with_libs(target: Path, source: Path, dest_name: str | None = None) -> 
 
 def build_sandbox(work: Path) -> Path:
     sandbox = work / "root"
-    for name in ("usr/bin", "usr/lib/reliefos", "etc/reliefos", "etc/X11",
-                 "var/log", "var/lib/xdm", "run/reliefos", "home/tester", "tmp",
+    # Only XDM's standard config and script paths are installed.  The full
+    # lifecycle tests therefore exercise login and logout with every former
+    # ReliefOS-specific XDM path absent.
+    for name in ("usr/bin", "usr/lib/reliefos", "usr/lib/X11/xdm",
+                 "etc/reliefos", "etc/X11/xdm", "var/log", "var/lib/xdm",
+                 "run/reliefos", "home/tester", "tmp",
                  "dev", "proc", "root", "sbin"):
         (sandbox / name).mkdir(parents=True, exist_ok=True)
     # The scripts redirect diagnostics to /dev/null; a plain file is enough.
@@ -77,17 +81,18 @@ def build_sandbox(work: Path) -> Path:
                     shutil.copy2(token, library, follow_symlinks=True)
     shutil.copy2(XORG / "reliefos-xdm", sandbox / "usr/lib/reliefos/reliefos-xdm")
     shutil.copy2(XORG / "xorg-tty-wrapper", sandbox / "usr/lib/reliefos/xorg-tty-wrapper")
-    shutil.copy2(XORG / "xdm-session", sandbox / "usr/lib/reliefos/xdm-session")
     (sandbox / "usr/lib/reliefos/reliefos-xdm").chmod(0o755)
     (sandbox / "usr/lib/reliefos/xorg-tty-wrapper").chmod(0o755)
-    (sandbox / "usr/lib/reliefos/xdm-session").chmod(0o755)
+    write_stub(sandbox / "usr/bin/Xorg", "exit 0\n")
+    shutil.copy2(XORG / "xdm-session", sandbox / "usr/lib/X11/xdm/Xsession")
+    shutil.copy2(XORG / "xdm-setup", sandbox / "usr/lib/X11/xdm/Xsetup_0")
+    (sandbox / "usr/lib/X11/xdm/Xsession").chmod(0o755)
+    (sandbox / "usr/lib/X11/xdm/Xsetup_0").chmod(0o755)
     shutil.copy2(CONSOLE_SESSION, sandbox / "usr/lib/reliefos/console-session")
     (sandbox / "usr/lib/reliefos/console-session").chmod(0o755)
-    (sandbox / "etc/reliefos/xdm.conf").write_text("DisplayManager._0: :0\n")
-    (sandbox / "etc/reliefos/xdm-Xservers").write_text(
-        (XORG / "xdm-Xservers").read_text())
-    (sandbox / "etc/reliefos/xdm-Xresources").write_text(
-        (XORG / "xdm-Xresources").read_text())
+    shutil.copy2(XORG / "xdm.conf", sandbox / "etc/X11/xdm/xdm-config")
+    shutil.copy2(XORG / "xdm-Xservers", sandbox / "etc/X11/xdm/Xservers")
+    shutil.copy2(XORG / "xdm-Xresources", sandbox / "etc/X11/xdm/Xresources")
     (sandbox / "etc/X11/xorg.conf").write_text("Section \"Device\"\nEndSection\n")
     (sandbox / "etc/reliefos/icewm").mkdir(parents=True, exist_ok=True)
     (sandbox / "etc/reliefos/icewm/preferences").write_text("Theme=\"light/light.theme\"\n")
@@ -122,12 +127,21 @@ class XdmLauncherTests(unittest.TestCase):
                               wm: str = "exec sleep 2\n",
                               st: str = "exec sleep 4\n") -> None:
         write_stub(self.sandbox / "usr/bin/id", f'if test "$1" = -u; then echo {uid}; else echo tester; fi\n')
-        # The stub records its configuration environment so the session can be
-        # held to leaving IceWM's personal configuration path unassigned.  No
-        # twm stub exists: a session that still execs /usr/bin/twm fails.
+        # Model IceWM's native session supervisor: Xsession must start
+        # icewm-session, which then execs the window manager process.
+        write_stub(self.sandbox / "usr/bin/icewm-session",
+                   'printf \'%s\\n\' started >> /run/icewm-session.log\n'
+                   'exec /usr/bin/icewm\n')
+        # The WM stub records its configuration environment so the session can
+        # be held to leaving IceWM's personal configuration path unassigned.
         write_stub(self.sandbox / "usr/bin/icewm",
                    'printf \'%s\\n\' "$ICEWM_PRIVCFG" > /run/icewm.privcfg\n' + wm)
         write_stub(self.sandbox / "usr/bin/st", st)
+
+    def install_wallpaper_probe(self) -> None:
+        (self.sandbox / "etc/reliefos/wallpaper.png").write_bytes(b"fixture")
+        write_stub(self.sandbox / "usr/bin/xwallpaper",
+                   'printf \'%s\\n\' "$*" >> /run/xwallpaper.calls\n')
 
     def wm_config(self) -> str:
         return (self.sandbox / "run/icewm.privcfg").read_text()
@@ -138,13 +152,14 @@ class XdmLauncherTests(unittest.TestCase):
         # is what the launcher must report.
         if run_session:
             body = (
+                'printf \'%s\\n\' "$@" > /run/xdm.argv\n'
                 "export HOME=/home/tester DISPLAY=:0\n"
-                "/usr/lib/reliefos/xdm-session\n"
+                "/usr/lib/X11/xdm/Xsession\n"
                 "session_status=$?\n"
                 f"if test {status} -ne 0; then exit {status}; fi\n"
                 "exit $session_status\n")
         else:
-            body = f"exit {status}\n"
+            body = 'printf \'%s\\n\' "$@" > /run/xdm.argv\n' + f"exit {status}\n"
         write_stub(self.sandbox / "usr/bin/xdm", body)
 
     def install_console_session(self, marker: str,
@@ -236,6 +251,8 @@ class XdmLauncherTests(unittest.TestCase):
         log = self.log()
         self.assertIn("desktop-backend=xorg", log)
         self.assertIn("xdm started on vt1", log)
+        self.assertEqual((self.sandbox / "run/xdm.argv").read_text().splitlines(),
+                         ["-nodaemon"])
         self.assertIn("xdm exit status=0", log)
         self.assertIn("tty1 restored to text login", log)
         self.assertFalse((self.sandbox / "run/reliefos/xdm/events").exists(),
@@ -243,8 +260,42 @@ class XdmLauncherTests(unittest.TestCase):
         # The real server return code is what console-session observes.
         self.assertIn("PAM authentication accepted", log)
         self.assertIn("icewm started for uid=1000", log)
+        self.assertEqual((self.sandbox / "run/icewm-session.log").read_text().splitlines(),
+                         ["started"])
         self.assertIn("st started", log)
         self.assertIn("xdm session ended", log)
+
+    def test_xsession_does_not_force_the_wallpaper(self):
+        self.install_session_stubs()
+        self.install_wallpaper_probe()
+        self.install_xdm(0)
+
+        result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse((self.sandbox / "run/xwallpaper.calls").exists())
+
+    def test_xsetup_is_a_noop_for_wallpaper(self):
+        self.install_wallpaper_probe()
+
+        result = self.run_guest("exec /usr/lib/X11/xdm/Xsetup_0")
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse((self.sandbox / "run/xwallpaper.calls").exists())
+
+    def test_missing_standard_xdm_config_is_reported_before_start(self):
+        self.install_session_stubs()
+        self.install_xdm(0)
+        (self.sandbox / "etc/X11/xdm/xdm-config").unlink()
+
+        result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        log = self.log()
+        self.assertIn("missing /etc/X11/xdm/xdm-config", log)
+        self.assertIn("tty1 restored to text login", log)
+        self.assertFalse((self.sandbox / "run/xdm.argv").exists(),
+                         "XDM must not start with an incomplete standard configuration")
 
     def test_failure_still_merges_events_and_reports_the_return_code(self):
         self.install_session_stubs()
@@ -335,8 +386,9 @@ class XdmLauncherTests(unittest.TestCase):
         state_dir = self.sandbox / "run/reliefos/xdm"
         self.assertFalse((state_dir / "events").exists())
         # No script may promise append-only semantics it cannot enforce.
-        for script in ("reliefos-xdm", "xdm-session"):
-            text = (self.sandbox / "usr/lib/reliefos" / script).read_text()
+        for script in ("usr/lib/reliefos/reliefos-xdm",
+                       "usr/lib/X11/xdm/Xsession"):
+            text = (self.sandbox / script).read_text()
             self.assertNotIn("append-only", text.lower())
             self.assertNotIn("0622", text)
             self.assertNotIn("password", text.lower())

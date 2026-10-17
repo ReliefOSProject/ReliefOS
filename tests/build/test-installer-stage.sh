@@ -10,25 +10,28 @@ mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/src/userland/apps/installer" "$w
     "$w/out/userland" "$w/out/userland-installer" \
     "$w/raw/usr/lib/reliefos/apps/settings" "$w/raw/usr/lib/leonos" "$w/raw/usr/bin" \
     "$w/raw/etc/reliefos/icewm" "$w/raw/etc/runlevels/default" \
-    "$w/raw/etc/X11" "$w/raw/etc/pam.d" "$w/raw/usr/share/applications" \
+    "$w/raw/etc/X11/xdm" "$w/raw/etc/pam.d" "$w/raw/usr/share/applications" \
+    "$w/raw/usr/lib/X11/xdm" \
     "$w/raw/usr/lib/reliefos/apps" \
     "$w/esp/EFI/BOOT" "$w/esp/reliefos" "$w/esp/leonos" "$w/esp/grub"
 printf 'guide\n' > "$w/src/docs/ADVANCED_INSTALL.txt"
 printf '[Desktop Entry]\n' > "$w/src/userland/apps/installer/installer.desktop"
-printf '#!/bin/sh\n' > "$w/src/system/xorg/installer-session"
+cp "$src/system/xorg/installer-session" "$w/src/system/xorg/installer-session"
 printf 'canonical runtime\n' > "$w/raw/usr/lib/reliefos/libreliefos.so.2"
 printf 'compat runtime\n' > "$w/raw/usr/lib/leonos/libleonos.so.2"
 printf 'settings\n' > "$w/raw/usr/lib/reliefos/apps/settings/settings.elf"
 printf 'xorg\n' > "$w/raw/etc/reliefos/desktop-backend"
 printf 'xorg server config\n' > "$w/raw/etc/X11/xorg.conf"
-printf 'xdm conf\n' > "$w/raw/etc/reliefos/xdm.conf"
-printf 'xdm servers\n' > "$w/raw/etc/reliefos/xdm-Xservers"
-printf 'xdm resources\n' > "$w/raw/etc/reliefos/xdm-Xresources"
+printf 'xdm conf\n' > "$w/raw/etc/X11/xdm/xdm-config"
+printf 'xdm servers\n' > "$w/raw/etc/X11/xdm/Xservers"
+printf 'xdm resources\n' > "$w/raw/etc/X11/xdm/Xresources"
+printf '#!/bin/sh\nexit 0\n' > "$w/raw/usr/lib/X11/xdm/Xsession"
+printf '#!/bin/sh\nexit 0\n' > "$w/raw/usr/lib/X11/xdm/Xsetup_0"
+chmod 755 "$w/raw/usr/lib/X11/xdm/Xsession" "$w/raw/usr/lib/X11/xdm/Xsetup_0"
 printf 'toolbar\n' > "$w/raw/etc/reliefos/icewm/toolbar"
 printf 'icewm pam\n' > "$w/raw/etc/pam.d/xdm"
 printf 'wallpaper\n' > "$w/raw/etc/reliefos/wallpaper.png"
-for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper \
-    usr/lib/reliefos/xdm-session usr/lib/reliefos/xdm-setup; do
+for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper; do
     mkdir -p "$w/raw/${path%/*}"
     printf 'Xorg helper\n' > "$w/raw/$path"
 done
@@ -74,6 +77,11 @@ cmp "$w/out/userland/installer.elf" "$w/stage/$program"
 [ "$(cat "$w/stage/etc/reliefos/installer-runtime")" = installer ]
 [ -x "$w/stage/usr/lib/reliefos/installer-session" ]
 cmp "$w/src/system/xorg/installer-session" "$w/stage/usr/lib/reliefos/installer-session"
+grep -q '/usr/bin/icewm-session' "$w/stage/usr/lib/reliefos/installer-session"
+if grep -q 'xwallpaper' "$w/stage/usr/lib/reliefos/installer-session"; then
+    echo 'live installer session must leave its background to the IceWM theme' >&2
+    exit 1
+fi
 [ -f "$w/stage/usr/share/applications/reliefos-installer.desktop" ]
 cmp "$w/src/userland/apps/installer/installer.desktop" \
     "$w/stage/usr/share/applications/reliefos-installer.desktop"
@@ -82,20 +90,36 @@ cmp "$w/src/userland/apps/installer/installer.desktop" \
 [ "$(cat "$w/stage/etc/reliefos/desktop-backend")" = xorg ]
 [ "$(cat "$w/stage/install/root/etc/reliefos/desktop-backend")" = xorg ]
 [ "$(cat "$w/stage/install/root-console/etc/reliefos/desktop-backend")" = console ]
-[ -f "$w/stage/etc/reliefos/xdm.conf" ]
+for path in etc/X11/xdm/xdm-config etc/X11/xdm/Xservers \
+    etc/X11/xdm/Xresources usr/lib/X11/xdm/Xsession \
+    usr/lib/X11/xdm/Xsetup_0; do
+    [ -f "$w/stage/$path" ]
+    [ -f "$w/stage/install/root/$path" ]
+    [ ! -e "$w/stage/install/root-console/$path" ]
+done
+# No package root installs the former ReliefOS-specific XDM config or script
+# paths after the move to XDM's standard directories.
+for root in "$w/stage" "$w/stage/install/root" "$w/stage/install/root-console"; do
+    for path in etc/reliefos/xdm.conf etc/reliefos/xdm-Xservers \
+        etc/reliefos/xdm-Xresources etc/reliefos/xdm-session \
+        etc/reliefos/xdm-setup usr/lib/reliefos/xdm-session \
+        usr/lib/reliefos/xdm-setup; do
+        [ ! -e "$root/$path" ]
+    done
+done
 [ -f "$w/stage/etc/reliefos/icewm/toolbar" ]
-[ -f "$w/stage/install/root/etc/reliefos/xdm.conf" ]
 [ -f "$w/stage/install/root/usr/lib/reliefos/apps/calc/calc.elf" ]
 [ ! -e "$w/stage/install/root-console/etc/X11/xorg.conf" ]
-[ ! -e "$w/stage/install/root-console/etc/reliefos/xdm.conf" ]
-[ ! -e "$w/stage/install/root-console/etc/reliefos/xdm-Xservers" ]
-[ ! -e "$w/stage/install/root-console/etc/reliefos/xdm-Xresources" ]
+[ ! -e "$w/stage/install/root-console/etc/X11/xdm/xdm-config" ]
+[ ! -e "$w/stage/install/root-console/etc/X11/xdm/Xservers" ]
+[ ! -e "$w/stage/install/root-console/etc/X11/xdm/Xresources" ]
+[ ! -e "$w/stage/install/root-console/usr/lib/X11/xdm/Xsession" ]
+[ ! -e "$w/stage/install/root-console/usr/lib/X11/xdm/Xsetup_0" ]
 [ ! -e "$w/stage/install/root-console/etc/reliefos/icewm" ]
 [ ! -e "$w/stage/install/root-console/etc/icewm" ]
 [ ! -e "$w/stage/install/root-console/etc/pam.d/xdm" ]
 [ ! -e "$w/stage/install/root-console/etc/reliefos/wallpaper.png" ]
-for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper \
-    usr/lib/reliefos/xdm-session usr/lib/reliefos/xdm-setup; do
+for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper; do
     [ ! -e "$w/stage/install/root-console/$path" ]
 done
 for app in calc doom doomlauncher fileman imageview leonmmcoset minesweeper osver \

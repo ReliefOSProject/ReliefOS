@@ -12,7 +12,8 @@ RELIEFOS_NLS_LANGS := $(strip $(shell cat $(RELIEFOS_SRC)/configs/nls/LINGUAS))
 NLS_DIR := $(O_GENERATED)/nls
 NLS_MO := $(addsuffix /LC_MESSAGES/leonos.mo,$(addprefix $(NLS_DIR)/,$(RELIEFOS_NLS_LANGS)))
 NLS_MUSL_MO := $(addsuffix .UTF-8,$(addprefix $(O_GENERATED)/musl-locales/,$(RELIEFOS_NLS_LANGS)))
-RELIEFOS_NLS_SOURCES := $(sort $(wildcard $(RELIEFOS_SRC)/userland/apps/*/*.c \
+RELIEFOS_NLS_SOURCES := $(sort $(wildcard $(RELIEFOS_SRC)/userland/apps/*/*.c $(RELIEFOS_SRC)/userland/apps/*/*.cpp \
+    $(RELIEFOS_SRC)/userland/apps/fltk_*.h \
     $(RELIEFOS_SRC)/userland/apps/*/*.h $(RELIEFOS_SRC)/userland/runtime/src/*.c $(RELIEFOS_SRC)/configs/nls/messages.c))
 RELIEFOS_NLS_REL_SOURCES := $(patsubst $(RELIEFOS_SRC)/%,%,$(RELIEFOS_NLS_SOURCES))
 RELIEFOS_SIG_nls := msgfmt=$(shell msgfmt --version 2>/dev/null | head -n1)|flags=-c --check --endianness=little|langs=$(RELIEFOS_NLS_LANGS)|sources=$(RELIEFOS_NLS_REL_SOURCES)

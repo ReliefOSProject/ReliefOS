@@ -59,16 +59,16 @@ file "$work/data/desktop-backend" etc/reliefos/desktop-backend 0644 product-poli
 file "$src/system/xorg/xorg.conf" etc/X11/xorg.conf 0644 product-policy override
 file "$src/system/xorg/reliefos-xdm" usr/lib/reliefos/reliefos-xdm 0755 reliefos-apps override
 file "$src/system/xorg/xorg-tty-wrapper" usr/lib/reliefos/xorg-tty-wrapper 0755 reliefos-apps override
-file "$src/system/xorg/xdm.conf" etc/reliefos/xdm.conf 0644 product-policy override
-file "$src/system/xorg/xdm-Xservers" etc/reliefos/xdm-Xservers 0644 product-policy override
-file "$src/system/xorg/xdm-Xresources" etc/reliefos/xdm-Xresources 0644 product-policy override
-file "$src/system/xorg/xdm-session" etc/reliefos/xdm-session 0755 reliefos-apps override
-file "$src/system/xorg/xdm-session" usr/lib/reliefos/xdm-session 0755 reliefos-apps override
-file "$src/system/xorg/xdm-setup" usr/lib/reliefos/xdm-setup 0755 reliefos-apps override
+# XDM reads its compiled-in config and native script locations. The APK stage
+# assigns these overlapping upstream files to reliefos-xdm-config.
+file "$src/system/xorg/xdm.conf" etc/X11/xdm/xdm-config 0644 product-policy override
+file "$src/system/xorg/xdm-Xservers" etc/X11/xdm/Xservers 0644 product-policy override
+file "$src/system/xorg/xdm-Xresources" etc/X11/xdm/Xresources 0644 product-policy override
+file "$src/system/xorg/xdm-session" usr/lib/X11/xdm/Xsession 0755 product-policy override
+file "$src/system/xorg/xdm-setup" usr/lib/X11/xdm/Xsetup_0 0755 product-policy override
 # IceWM reads these system defaults through its standard /etc/icewm path.
 tree "$src/system/xorg/icewm" etc/reliefos/icewm product-policy override
 link etc/icewm reliefos/icewm reliefos-apps
-file "$src/system/xorg/wallpaper.png" etc/reliefos/wallpaper.png 0644 product-policy override
 file "$src/system/xorg/pam-xdm" etc/pam.d/xdm 0644 product-policy override
 legacy=$src/system/rootfs/var/lib/leonos/users.db
 if [ -e "$legacy" ] || [ -L "$legacy" ]; then

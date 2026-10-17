@@ -298,6 +298,7 @@ main	compatibility	tools/test_tcp_download_qemu.py	仅校验生成 ISO 中保留
 main	compatibility	tools/test_uapi.py	校验保留的 userland/runtime/include/leonos/syscall.h 转发头（SDK 面）不含数字 syscall 宏
 main	compatibility	tools/test_uinxed_guest.py	计算实际打包的旧 ESP 回滚内核载荷哈希
 main	compatibility	tools/test_upstream_tools_runtime.py	旧环境变量输入兼容，禁止引入旧 libleonos SONAME 的依赖负向断言
+main	compatibility	tools/test_vdso_qemu.py	QEMU 镜像回归同时验证 canonical 与旧 /leonos/kernel.sys ESP 内核副本哈希
 main	compatibility	tools/tests/abi_layout_golden.json	旧 UAPI sizeof/offsetof/常量布局 golden，值级对比基线不得随意改写
 main	compatibility	tools/tests/installer_accounts_test.c	LEONOS_TEST_PASSWORD_HASH 是既有宿主测试驱动与 C fixture 共享输入键
 main	history	tools/tests/legacy_authd/accounts.c	文件声明 Historical regression fixture only；已退役 authd 实现仅保留历史回归，不入产品
@@ -320,38 +321,31 @@ main	compatibility	tools/tests/storage_upstream_guest.c	使用旧 leonos-grub-in
 main	compatibility	tools/vscode/README.md	仅实际项目目录 LeonOS-4 与现有 VS Code leonos.wslProjectRoot 设置键；不把设置键当 UI 品牌。
 main	compatibility	userland/apps/apiapp/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/browser/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/calc/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	history	userland/apps/desktop/autospawn.c	注释引用既有 ntclks separation M5 历史架构阶段
 main	compatibility	userland/apps/desktop/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/device-agent/main.c	/proc/leonos-drivers 是冻结运行时接口值
 main	compatibility	userland/apps/devmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/diskmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/doomlauncher/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/downloadmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/drvmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/dynlinkerror/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/fastfetch/README.md	明确旧 LeonOS Logo 仅是锁定上游内置 alias
-main	compatibility	userland/apps/fileman/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
+main	compatibility	userland/apps/fltk_support.h	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/guitest/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/hello/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/helloworld/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/httpget/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/imageview/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/minesweeper/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/mp3play/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/netctl/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/notepad/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/oschinpt/main.c	旧 leonos 输入词条仍解析到 ReliefOS 候选，不是旧品牌展示
 main	compatibility	userland/apps/oshlp/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/osver/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/paint/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/run/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/servicemgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/settings/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/sudod/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/sudod/paths.h	LEONOS_FILEOP_* 是已发布 wire 值的历史名称，数值冻结
 main	compatibility	userland/apps/sysconfdialog/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/taskmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/terminal/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/auth/account_store.c	账户提交 prepared/committed/cleanup 持久事务标记，旧安装中断后恢复需识别原值
 main	compatibility	userland/auth/standard_accounts.c	此文件全部旧名命中为已发布 ELF 导出符号 alias 与其说明，从同一实现提供新旧入口
@@ -446,7 +440,7 @@ main	compatibility	tools/test_linux_ioctl_cloexec.py	旧 GRUB module tag、marke
 main	compatibility	tools/test_storage_upstream_runtime.py	LEONOS_UPSTREAM_TREE 接受旧测试输入环境；不存在的私有设备名已 canonical
 main	compatibility	tools/test_upstream_tools_images.py	检查 legacy ESP 内核字节与旧 grub 安装命令兼容入口；输出镜像名已 canonical
 main	history	tools/tests/oobe_auth_boot_test.c	已退役 authd/OOBE 架构测试夹具，引用已删除 authd 源；旧 marker 与保留的历史实现对应，未宣称当前回归通过
-main	compatibility	userland/apps/installer/main.c	验证旧安装 namespace、冻结账户事务文件、旧 SONAME 与 legacy ESP 升级/回滚；私有复制临时名已 canonical
+main	compatibility	userland/apps/installer/main.cpp	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/storage/leonos-check-update	保留旧命令源文件名与 leonos-* 包升级识别；当前帮助/临时文件名已 canonical
 main	compatibility	userland/storage/leonos-grub-installer	旧命令源文件名及 legacy ESP 回滚保留、旧布局残留清理路径；帮助已 canonical
 main	compatibility	userland/storage/leonos-kernel-update	旧命令源文件名、legacy ESP 与共享旧更新锁防止并发旧客户端；当前帮助/临时名已 canonical
@@ -456,3 +450,4 @@ main	history	docs/superpowers/task11-verification.md	任务 11 实际执行记�
 main	compatibility	tests/build/test-fetch-check.sh	旧 LEONOS_* 环境/命令行输入别名，与各 tests/build 契约同款回退；fetch-check 及内核 fetch-check 代理目标回归
 main	compatibility	userland/apps/installer/install_ops.h	旧 ESP 启动载荷路径 TARGET_ESP_KERNEL_LEGACY，旧载荷保留回滚契约
 main	compatibility	userland/apps/installer/install_ops.c	安装器升级时清理旧 ESP 遗留载荷文件与 /etc/leonos 等旧目录、libleonos.so.2 兼容库路径清单
+main	compatibility	tools/test_fltk_apps_qemu.py	验收镜像保留已发布 gettext catalog 文件名与旧独立兼容 SONAME/目录，不作为 UI 展示品牌

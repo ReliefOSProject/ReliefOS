@@ -8,14 +8,23 @@ The Xorg backend is intentionally small. tty1's existing `console-session`
 runs `/usr/lib/reliefos/reliefos-xdm` in the foreground. XDM starts
 `/usr/bin/Xorg :0 -config /etc/X11/xorg.conf vt1 -keeptty`; the fixed config
 uses `/dev/fb0`, `/dev/input/event0` and `/dev/input/event1`. After PAM accepts
-credentials, `/usr/lib/reliefos/xdm-session` runs as the authenticated user,
-starts `st`, and keeps `icewm` in the foreground. Exiting IceWM returns
+credentials, `/usr/lib/X11/xdm/Xsession` runs as the authenticated user,
+starts `st` and the native `icewm-session` supervisor for IceWM and its
+theme-managed background. Exiting IceWM returns
 control to XDM; exiting XDM lets tty1's console session fall back to text
 login. tty2 through tty6 remain text consoles.
 
-The XDM resource override keeps the packaged greeter appearance while changing
-the heading to `Login into <hostname>`; XDM expands `CLIENTHOST` to the local
-display host name.
+XDM uses its compiled-in default `/etc/X11/xdm/xdm-config`, with no `-config`
+argument from the launcher. Server commands and greeter resources live in
+`/etc/X11/xdm/Xservers` and `/etc/X11/xdm/Xresources`; session and setup hooks
+use `/usr/lib/X11/xdm/Xsession` and `/usr/lib/X11/xdm/Xsetup_0`.
+The signed `reliefos-xdm-config` package owns these five policy files and
+declares its dependency on and file replacement of the official `xdm` package.
+It also depends on the local server, drivers and session programs used by the
+profile. The upstream archive remains unchanged. Edit these standard paths to customize
+XDM. The greeter uses the packaged gray background, blue greeting and X logo,
+with the heading `Login into ReliefOS`. Its complete resource definitions live
+in `Xresources`, without an include of that file into itself.
 
 `make fetch` downloads the official Alpine community `dillo` 3.3.0-r2 browser,
 with its locked runtime dependencies from
@@ -25,9 +34,16 @@ NetSurf packages were
 removed after failing to run in the VMware SVGA QEMU session; PCManFM was
 dropped from the fetch list after it kept exiting silently without a window.
 
-## Motif applications
+## C++ / FLTK applications
 
-The Xorg backend builds `calc`, `osver` and `fileman` as Motif X11 clients. Calculator
+The Xorg backend builds the ReliefOS application frontends with C++17 and
+FLTK 1.3.11: `calc`, `osver`, `fileman`, `taskmgr`, `minesweeper`,
+`leonmmcoset`, `xiaobai`, `paint`, `imageview`, `doomlauncher`, `installer`
+and the ReliefOS `doom` platform frontend. Independent C models, file
+operations, installation transactions, the TTY installer and the Doom engine
+remain shared backend code, called through C linkage.
+
+Calculator
 supports signed 64-bit integer expressions, parentheses, normal arithmetic
 precedence, keyboard input and on-screen buttons. Division by zero, overflow
 and malformed expressions display an error. System information shows the
@@ -53,11 +69,35 @@ Ctrl+L focuses the address bar, F5 refreshes,
 Alt+Up goes to the parent, F2 renames, Ctrl+C/X/V copies/cuts/pastes, and both
 Delete and Shift+Delete request direct deletion after confirmation.
 
-The build extracts X11, Xt and Motif development headers and linker libraries
+Task Manager retains its process tree, process details and termination
+confirmation, CPU/core/memory/GPU history and startup application management.
+Paint supports BMP and PNG open/save, tools, brush sizes and colors, and
+confirmation before discarding unsaved work. Image Viewer keeps sibling
+navigation and fit/1x/2x zoom. The installer keeps its complete fresh/update
+wizard, partition tools and confirmations, accounts and optional Xorg choice;
+without `--graphical`, a terminal still uses the C TTY frontend without
+opening an X display. Doom keeps its keyboard input, audio pacing, fullscreen
+and headless test mode.
+
+`userland/apps/fltk_support.h` initializes locale and the existing application
+gettext domain using UTF-8. The shipped SimSun CJK font is selected for
+widget labels, input text and dialogs through FLTK's Xft backend. Native
+FLTK file chooser labels share the application translation catalog. Path
+inputs reject excessive byte lengths instead of silently truncating a
+multibyte filename. File/task browser lists disable FLTK format-character
+interpretation for external names. Translation extraction includes C++
+sources and the common UI headers.
+
+The build extracts X11 and FLTK development headers and target linker libraries
 from checksum-pinned, signature-verified Alpine APKs into
 `out/<profile>/upstream/x11-development`. These inputs use the same versions as
-the guest runtime libraries. Development headers are build-only and are not
-staged into the guest.
+the guest runtime libraries. Target `libstdc++` and `libgcc_s` are linked
+explicitly; host glibc C++ libraries are not used. The frontends use the
+FLTK/C APIs without STL, exceptions or RTTI. Development headers are
+build-only and are not staged into the guest. The package dependency scanner
+uses the actual ELF SONAME dependencies to select the runtime libraries for
+the Xorg desktop and live graphical installer. Third-party NEdit still needs
+its Motif runtime; it is not one of these migrated ReliefOS frontends.
 
 ## IceWM theme, taskbar, menu and keys
 
@@ -111,10 +151,15 @@ control back to XDM.
 | Super+Up / Down / Left / Right | tile window to top / bottom / left / right half |
 | Alt+Tab / Alt+Shift+Tab | window switcher next / previous |
 
-The root background is a retro pixel-art wallpaper
-(`system/xorg/wallpaper.png`, 1280x800) that `xdm-session` applies with
-`xwallpaper --focus` before IceWM starts; when xwallpaper is missing or fails
-the X server keeps its default background.
+XDM background setup belongs to `/usr/lib/X11/xdm/Xsetup_0`; the shipped hook
+leaves the X server's background unchanged. Greeter colors, fonts and the logo
+belong to `/etc/X11/xdm/Xresources`. No product wallpaper is imposed on either
+the greeter or the desktop.
+
+Both installed and installer desktops start `/usr/bin/icewm-session`, whose
+native `icewmbg` process reads the selected theme's background settings and
+follows theme changes. If a theme does not define a background, IceWM's own
+defaults apply. The former `/etc/reliefos/wallpaper.png` is no longer staged.
 
 Packages come from the pinned Alpine v3.24 x86_64/musl main and community
 indexes. The lock file marks only the Xorg closure entries with `feature=xorg`;

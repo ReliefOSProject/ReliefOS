@@ -64,18 +64,17 @@ def main():
         wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
         time.sleep(4)
         probe.frame("initial-language")
-        language_y = 64 if probe.height > 640 else 44
-        probe.click(320, language_y + 100)
+        probe.click(*probe.language_option_point())
         wait_page(probe, process, "Select Language")
         probe.frame("language")
-        for _ in range(4):
+        # FLTK removed the Motif-only Style step before the Mode page.
+        for _ in range(3):
             next_page(probe)
-        y = 64 if probe.height > 640 else 44
-        probe.click(350, y + 192)
+        probe.click(*probe.mode_option_point(update=True))
         next_page(probe)
         next_page(probe)
         wait_page(probe, process, "Confirm Update")
-        probe.click(350, y + 212)
+        probe.click(*probe.confirm_field_point())
         probe.text("UPDATE")
         probe.frame("confirmation")
         next_page(probe)

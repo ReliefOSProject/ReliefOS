@@ -48,6 +48,31 @@ class EvidenceTests(unittest.TestCase):
         ImageDraw.Draw(frame).rectangle((271, 157, 1010, 489), fill="white")
         self.assertEqual(_bright_panel_bbox(frame), (271, 157, 1011, 490))
 
+    def test_centered_neutral_gray_xlogin_panel_is_detected(self):
+        frame = Image.new("RGB", (1280, 800), "black")
+        ImageDraw.Draw(frame).rectangle((271, 157, 1010, 489), fill=(190, 198, 205))
+        self.assertEqual(_bright_panel_bbox(frame), (271, 157, 1011, 490))
+
+    def test_gray_panel_survives_input_box_and_password_label_gap(self):
+        frame = Image.new("RGB", (1280, 800), "black")
+        draw = ImageDraw.Draw(frame)
+        draw.rectangle((323, 242, 837, 435), fill=(190, 198, 205))
+        # Model the dark input outline and a 9-row text glyph at the panel's
+        # near-threshold width.  The label makes every row in its height miss
+        # the detector's 40%-of-screen bright-row threshold.
+        draw.rectangle((456, 310, 780, 335), outline=(20, 20, 20), width=1)
+        label = (20, 20, 20)
+        draw.rectangle((456, 340, 459, 348), fill=label)
+        draw.rectangle((456, 340, 466, 343), fill=label)
+        draw.rectangle((456, 344, 466, 347), fill=label)
+        draw.rectangle((463, 340, 466, 345), fill=label)
+        self.assertEqual(_bright_panel_bbox(frame), (323, 242, 838, 436))
+
+    def test_neutral_gray_terminal_touching_display_edge_is_not_xlogin(self):
+        frame = Image.new("RGB", (1280, 800), "black")
+        ImageDraw.Draw(frame).rectangle((0, 20, 605, 440), fill=(190, 198, 205))
+        self.assertIsNone(_bright_panel_bbox(frame))
+
     def test_vt_evidence_requires_process_handshake(self):
         trace = "\n".join([
             "VT mode vt=1 mode=1 relsig=10 acqsig=12",

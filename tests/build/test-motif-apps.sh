@@ -1,7 +1,9 @@
 #!/bin/sh
 set -eu
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
-work=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-motif-apps.XXXXXX")
+tmp_root=${TMPDIR:-$src/out/tmp}
+mkdir -p "$tmp_root"
+work=$(mktemp -d "$tmp_root/reliefos-fltk-apps.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 if [ ! -f "$src/userland/apps/calc/engine.c" ] || [ ! -f "$src/userland/apps/osver/debug_click.h" ]; then
     printf 'FAIL - calculator and system information have no toolkit-independent behavior boundary\n' >&2
@@ -36,56 +38,57 @@ include $(ROOT)/mk/userland.mk
 .PHONY: sources
 sources:
 	@printf '%s\n' '$(call userland_sources,calc)' '$(call userland_sources,osver)' '$(call userland_sources,fileman)' '$(call userland_sources,taskmgr)' '$(call userland_sources,minesweeper)' '$(call userland_sources,leonmmcoset)' '$(call userland_sources,xiaobai)' '$(call userland_sources,paint)' '$(call userland_sources,imageview)' '$(call userland_sources,doom)' '$(call userland_sources,doomlauncher)' '$(call userland_sources,installer)'
-	@printf '%s\n' '$(USERLAND_LIBS_fileman)' '$(USERLAND_LIBS_taskmgr)' '$(USERLAND_LIBS_minesweeper)' '$(USERLAND_LIBS_leonmmcoset)' '$(USERLAND_LIBS_xiaobai)' '$(USERLAND_LIBS_paint)' '$(USERLAND_LIBS_imageview)' '$(USERLAND_LIBS_doomlauncher)' '$(USERLAND_LIBS_doom)' '$(USERLAND_LIBS_installer)'
+	@printf '%s\n' '$(USERLAND_LIBS_calc)' '$(USERLAND_LIBS_osver)' '$(USERLAND_LIBS_fileman)' '$(USERLAND_LIBS_taskmgr)' '$(USERLAND_LIBS_minesweeper)' '$(USERLAND_LIBS_leonmmcoset)' '$(USERLAND_LIBS_xiaobai)' '$(USERLAND_LIBS_paint)' '$(USERLAND_LIBS_imageview)' '$(USERLAND_LIBS_doomlauncher)' '$(USERLAND_LIBS_doom)' '$(USERLAND_LIBS_installer)'
+	@printf '%s\n' '$(USERLAND_CXX_FLAGS)' '$(USERLAND_CXX_EXTRA_calc)'
 MAKE
 make -s -f "$work/sources.mk" ROOT="$src" WORK="$work" sources >"$work/sources"
 for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher doom installer; do
-    grep -q "userland/apps/$app/main.c" "$work/sources"
+    grep -q "userland/apps/$app/main.cpp" "$work/sources"
+    if grep -Eq "userland/apps/$app/main\\.c([[:space:]]|$)" "$work/sources"; then
+        printf 'FAIL - %s still selects a C frontend instead of the FLTK C++ frontend\n' "$app" >&2
+        exit 1
+    fi
     for removed in native.c input.c view.c; do
         if grep -q "userland/apps/$app/$removed" "$work/sources"; then
             printf 'FAIL - %s still selects native frontend source %s\n' "$app" "$removed" >&2
             exit 1
         fi
     done
+    if ! grep -q 'fltk_support.h\|fltk_png_app.h' "$src/userland/apps/$app/main.cpp" ||
+       { ! grep -q 'reliefos_fltk::init' "$src/userland/apps/$app/main.cpp" &&
+         ! grep -q 'init();' "$src/userland/apps/fltk_png_app.h"; }; then
+        printf 'FAIL - %s does not initialize the shared FLTK locale/font support\n' "$app" >&2
+        exit 1
+    fi
 done
-grep -q 'userland/apps/fileman/motif.c' "$work/sources"
-grep -q 'userland/apps/fileman/motif_dialogs.c' "$work/sources"
+for old_file in motif.c motif_dialogs.c motif.h; do
+    if [ -e "$src/userland/apps/fileman/$old_file" ]; then
+        printf 'FAIL - fileman still carries the obsolete Motif frontend file %s\n' "$old_file" >&2
+        exit 1
+    fi
+done
 for app in taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher installer; do
     grep -q "userland/apps/$app/model.c" "$work/sources"
     if grep -q 'reliefos_gui_create_app_window\|reliefos_ui_' \
-        "$src/userland/apps/$app/main.c" "$src/userland/apps/$app/model.c"; then
-        printf 'FAIL - %s still uses the windowd frontend API\n' "$app" >&2
+        "$src/userland/apps/$app/model.c"; then
+        printf 'FAIL - %s business model still uses the windowd frontend API\n' "$app" >&2
         exit 1
     fi
 done
-# DOOM keeps its keyboard-only X11 window and headless test mode, but never the
-# windowd protocol frontend.
-if grep -q 'reliefos_gui_create_app_window\|reliefos_ui_' "$src/userland/apps/doom/main.c"; then
-    printf 'FAIL - doom still uses the windowd frontend API\n' >&2
+grep -q 'Fl::set_font.*SimSun' "$src/userland/apps/fltk_support.h"
+grep -q 'gettext(text)' "$src/userland/apps/fltk_support.h"
+grep -q 'libfltk.so' "$work/sources"
+grep -q 'libstdc++.so.6' "$work/sources"
+grep -q 'libgcc_s.so.1' "$work/sources"
+grep -q -- '-std=c++17' "$work/sources"
+grep -q -- '-nostdinc++' "$work/sources"
+grep -q -- '-fno-exceptions' "$work/sources"
+grep -q -- '-fno-rtti' "$work/sources"
+grep -Fq -- "-I$src/userland/apps -isystem $work/out/upstream/x11-development/usr/include" "$work/sources"
+if grep -q 'libXm.so\|libXt.so' "$work/sources"; then
+    printf 'FAIL - FLTK apps still link Motif or Xt\n' >&2
     exit 1
 fi
-# XmNfontList string resources can only describe core X fonts; pinning one
-# disables Motif's Xft renditions and its per-codepoint fallback, so translated
-# CJK labels cannot render. Widgets must inherit the default Xft render table.
-for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher doom installer; do
-    if grep -q '\*fontList:' "$src/userland/apps/$app"/*.c; then
-        printf 'FAIL - %s pins a core font with *fontList: and cannot render CJK\n' "$app" >&2
-        exit 1
-    fi
-done
-# Apps that show translated text must route the shell font lists to the
-# CJK-capable Xft rendition; the vendor shell resolves them to core "fixed"
-# otherwise and translated labels render as empty boxes.
-for app in calc osver fileman taskmgr minesweeper paint imageview doomlauncher installer; do
-    for resource in XmNlabelFontList XmNbuttonFontList XmNtextFontList; do
-        if ! grep -q "$resource" "$src/userland/apps/$app/main.c"; then
-            printf 'FAIL - %s does not route %s to a CJK-capable Xft font\n' \
-                "$app" "$resource" >&2
-            exit 1
-        fi
-    done
-done
-grep -q 'libXm.so' "$work/sources"
 for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doom doomlauncher installer; do
     desktop="$src/userland/apps/$app/$app.desktop"
     if [ ! -f "$desktop" ]; then
@@ -98,4 +101,4 @@ for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imag
         exit 1
     fi
 done
-printf 'ok - applications build only the Motif X11 frontend\n'
+printf 'ok - applications build the FLTK frontend and retain C behavior models\n'

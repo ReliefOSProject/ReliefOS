@@ -1,6 +1,10 @@
 #ifndef RELIEFOS_FILEMAN_H
 #define RELIEFOS_FILEMAN_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <reliefos/auth.h>
 #include <reliefos/fs.h>
 #include <reliefos/gui.h>
@@ -49,7 +53,9 @@ int fileman_launch_path(const char *path);
 #define FILEMAN_FOLDER_SIZE_MAX_ITEMS 2048
 #define FILEMAN_SETTINGS_DIALOG_W 340
 #define FILEMAN_SETTINGS_DIALOG_H 166
+#ifndef T
 #define T(s) gettext(s)
+#endif
 
 enum {
     FILEMAN_MENU_NONE = 0,
@@ -255,5 +261,9 @@ void handle_click(int32_t x, int32_t y);
 void handle_key(uint8_t keycode, uint8_t pressed);
 int handle_wheel(int32_t x, int32_t y, int32_t wheel);
 void present_fileman(uint32_t window_id, struct reliefos_ui_surface *ui);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

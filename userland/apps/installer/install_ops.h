@@ -1,8 +1,14 @@
-/* Installer install/update operations shared by the Motif and TTY frontends. */
+/* Installer install/update operations shared by the FLTK and TTY frontends. */
 #ifndef RELIEFOS_INSTALLER_OPS_H
 #define RELIEFOS_INSTALLER_OPS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <reliefos/blockdev.h>
+#ifdef __cplusplus
+}
+#endif
 #include <reliefos/layout.h>
 #include <stdint.h>
 
@@ -51,6 +57,9 @@
 #define TARGET_ESP_KERNEL_LEGACY TARGET_BOOT "/leonos/kernel.sys"
 
 /* Wizard state shared with the frontends. */
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern uint8_t page;
 extern uint8_t install_mode;
 extern struct reliefos_block_disk_info disks[RELIEFOS_BLOCK_MAX_DISKS];
@@ -108,5 +117,9 @@ int installer_partition_format(uint32_t filesystem, const char *label);
 void prepare_update_target(void);
 void perform_install(void);
 void perform_update(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

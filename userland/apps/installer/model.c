@@ -1,4 +1,4 @@
-/* Installer wizard model: page flow shared by the Motif and TTY frontends. */
+/* Installer wizard model: page flow shared by the FLTK and TTY frontends. */
 #include "model.h"
 
 #include <stddef.h>

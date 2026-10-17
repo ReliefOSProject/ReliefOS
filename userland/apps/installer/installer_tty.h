@@ -1,7 +1,13 @@
 #ifndef RELIEFOS_INSTALLER_TTY_H
 #define RELIEFOS_INSTALLER_TTY_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <reliefos/blockdev.h>
+#ifdef __cplusplus
+}
+#endif
 #include <stdint.h>
 #include "installer_setup.h"
 
@@ -44,6 +50,12 @@ struct installer_tty_context {
     void (*perform_update)(void);
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int installer_tty_main(const struct installer_tty_context *context);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

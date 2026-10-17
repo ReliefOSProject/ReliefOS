@@ -1,9 +1,9 @@
 # ReliefOS IceWM preferences (2026-10).
 #
-# xdm-session starts icewm with ICEWM_PRIVCFG=/etc/reliefos/icewm, so this
-# directory is the single configuration source: the selected theme lives in the
-# "theme" file, the application/menu/toolbar/key definitions in menu, toolbar
-# and keys.  Only values that differ from the IceWM defaults are listed.
+# icewm-session uses IceWM's normal personal configuration search, followed by
+# the system defaults at /etc/icewm. The selected theme lives in "theme";
+# application/menu/toolbar/key definitions live in menu, toolbar and keys.
+# Only values that differ from the IceWM defaults are listed.
 
 Look="nice"
 

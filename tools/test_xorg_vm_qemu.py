@@ -57,7 +57,12 @@ def login(probe, process, name, user, password, prompt_needle):
     wait_text(probe, process, f"{name}-password", "Password:")
     probe.text(password)
     probe.key("ret")
-    wait_text(probe, process, f"{name}-shell", "built-in shell")
+    # Login now selects Bash where available. Check the account prompt and
+    # execute a fresh command rather than require BusyBox's startup banner.
+    wait_text(probe, process, f"{name}-shell", f"{user}@")
+    marker = f"XORG-LOGIN-{time.monotonic_ns():x}"
+    serial_run(probe, probe.output / "serial.log", process,
+               f"echo {marker} >/dev/ttyS0", marker)
 
 
 GREETER_NEEDLE = "unsecure"   # xlogin's banner; gone once a session runs
@@ -76,12 +81,13 @@ def classify_greeter_text(text):
 
 
 def _bright_panel_bbox(frame):
-    """Find xlogin's large white panel, ignoring bright terminal glyphs."""
+    """Find xlogin's neutral white/gray panel, ignoring terminal glyphs."""
     width, height = frame.size
     pixels = frame.load()
 
     def bright(pixel):
-        return min(pixel[:3]) >= 220
+        colors = pixel[:3]
+        return min(colors) >= 180 and max(colors) - min(colors) <= 20
 
     # A bright wallpaper band (the pale sky) is bright too, but it runs edge
     # to edge.  Only rows whose widest bright run keeps a margin on both
@@ -110,7 +116,10 @@ def _bright_panel_bbox(frame):
     # Text and the separator split individual rows.  Group rows into bands
     # tolerating short gaps, then aggregate each band so a single row cannot
     # select only half of the white surface.  The panel is the largest band.
-    gap = max(4, height // 100)
+    # A short text label can hide several full rows when the centered panel
+    # is only just wide enough to pass the screen-relative row threshold.
+    # On 1280x800 captures, allow the ten-row jump around xlogin's label.
+    gap = max(10, height // 100)
     bands = [[row_hits[0]]]
     for y in row_hits[1:]:
         if y - bands[-1][-1] <= gap:
@@ -236,10 +245,8 @@ def greeter_login(probe, process):
     probe.text("test")
     probe.key("ret")            # accept the name; xlogin swaps in the password
     wait_greeter_stage(probe, process, "password", "tty1-greeter-password")
-    # xlogin keeps the password field at the same y coordinate as the login
-    # field; clicking below the field leaves the keyboard focus on the root
-    # window and submits an empty password, returning to the greeter.
-    probe.click(700, 310)
+    # Return advances xlogin to its password entry. Keep that keyboard focus;
+    # field positions differ between the white and packaged gray resources.
     probe.text("test")
     probe.key("ret")            # submit
 
@@ -496,20 +503,29 @@ def main() -> int:
                 # the display manager itself to exercise tty1's text fallback.
                 switch_vt(probe, serial, process, 2)
                 session_log = collect(probe, serial, process,
-                                      "XDM-AFTER-SESSION", path="/var/log/xdm.log")
+                                      "XDM-AFTER-SESSION", path="/home/test/.xsession-errors")
                 if "xdm session ended" not in session_log:
-                    fail("XDM log has no session-ended event after IceWM termination")
-                xdm_ps = collect(probe, serial, process, "XDM-PROCS", command="ps")
-                xdm_pid_match = re.search(r"(?im)^\s*(\d+)\s+.*\bxdm\b", xdm_ps)
-                if xdm_pid_match:
+                    fail("user session log has no session-ended event after IceWM termination")
+                # The root launcher merges its session-event sink only after
+                # XDM exits. Check that final log below, and stop the actual
+                # manager identified by its configured pid file: a process-name
+                # search can accidentally select the reliefos-xdm wrapper.
+                xdm_pid_output = collect(probe, serial, process, "XDM-PID", path="/run/xdm.pid")
+                # Kernel diagnostics share the serial stream, so only a
+                # standalone decimal line can be the pid file's contents.
+                xdm_pids = re.findall(r"(?m)^([1-9][0-9]*)\s*$", xdm_pid_output)
+                if len(xdm_pids) == 1:
+                    xdm_pid = xdm_pids[0]
                     serial_run(probe, serial, process,
-                               f"echo TTY2-XDM-STOP >/dev/ttyS0; kill {xdm_pid_match.group(1)}",
+                               f"echo TTY2-XDM-STOP >/dev/ttyS0; kill {xdm_pid}",
                                "TTY2-XDM-STOP")
                 else:
-                    fail(f"XDM process missing after session end: {xdm_ps!r}")
+                    fail(f"XDM pid file invalid after session end: {xdm_pid_output!r}")
                 try:
-                    switch_vt(probe, serial, process, 1)
-                    wait_text(probe, process, "tty1-restored-login", "login:", timeout=60)
+                    # Xorg has exited, so tty1 is now a text VT. Do not require
+                    # the graphics=1 handshake used for a live Xorg switch.
+                    probe.key("ctrl-alt-f1")
+                    wait_text(probe, process, "tty1-restored-login", "reliefos login:", timeout=60)
                 except AssertionError as error:
                     fail(f"tty1 did not restore a text login after XDM exit: {error}")
 

@@ -11,6 +11,12 @@ int main(void)
     assert(fileman_name_valid("New Folder"));
     assert(fileman_name_valid(".hidden"));
     assert(fileman_name_valid("a;$'b"));
+    assert(fileman_name_valid("中文文件.txt"));
+    char chinese_path[128];
+    assert(fileman_join_path(chinese_path, sizeof(chinese_path), "/home/test/中文目录", "中文文件.txt") == 0);
+    assert(!strcmp(chinese_path, "/home/test/中文目录/中文文件.txt"));
+    assert(fileman_join_path(chinese_path, 12, "/home/test", "中文文件.txt") < 0);
+    assert(!chinese_path[0]);
     char path[32];
     assert(fileman_join_path(path, sizeof(path), "/", "hello") == 0);
     assert(!strcmp(path, "/hello"));

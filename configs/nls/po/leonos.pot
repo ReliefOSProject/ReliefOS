@@ -138,7 +138,7 @@ msgstr ""
 msgid "ARP timeout"
 msgstr ""
 
-#: userland/apps/notepad/main.c:688
+#: userland/apps/fileman/main.cpp:764
 msgid "About"
 msgstr ""
 
@@ -146,23 +146,23 @@ msgstr ""
 msgid "About Browser"
 msgstr ""
 
-#: userland/apps/osver/main.c:199
+#: userland/apps/osver/main.cpp:75
 msgid "About ReliefOS"
 msgstr ""
 
-#: userland/apps/osver/main.c:236
+#: userland/apps/osver/main.cpp:105
 msgid "About this operating system"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:847
+#: userland/apps/installer/install_ops.c:1118
 msgid "Account setup failed"
 msgstr ""
 
-#: userland/apps/installer/main.c:177
+#: userland/apps/installer/main.cpp:216
 msgid "Accounts"
 msgstr ""
 
-#: userland/apps/installer/main.c:382
+#: userland/apps/installer/main.cpp:473
 msgid "Acknowledgements for public resources and open-source projects."
 msgstr ""
 
@@ -198,6 +198,10 @@ msgstr ""
 msgid "Add Current Page"
 msgstr ""
 
+#: userland/apps/fltk_support.h:43
+msgid "Add to Favorites"
+msgstr ""
+
 #: userland/apps/browser/view.c:1003
 msgid "Address"
 msgstr ""
@@ -210,7 +214,7 @@ msgstr ""
 msgid "Address selected"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:154
+#: userland/apps/taskmgr/main.cpp:157
 msgid "Admin"
 msgstr ""
 
@@ -226,12 +230,16 @@ msgstr ""
 msgid "Administrator rights required"
 msgstr ""
 
-#: userland/apps/installer/main.c:637
+#: userland/apps/installer/main.cpp:902
 msgid "Administrator: root"
 msgstr ""
 
 #: userland/apps/settings/main.c:1466
 msgid "Administrators can create and manage local accounts."
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "All Files (*)"
 msgstr ""
 
 #: userland/apps/desktop/start_menu.c:857
@@ -262,11 +270,11 @@ msgstr ""
 msgid "Allow this app to start a process when you sign in?"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1419
+#: userland/apps/installer/install_ops.c:1657
 msgid "Alpine packages and local configuration are preserved."
 msgstr ""
 
-#: userland/apps/installer/main.c:708
+#: userland/apps/installer/main.cpp:955
 msgid "Alpine packages and local configuration are retained. Boot files are updated after the package transaction succeeds."
 msgstr ""
 
@@ -274,7 +282,7 @@ msgstr ""
 msgid "Always use this app"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:147
+#: userland/apps/doomlauncher/main.cpp:58
 msgid "An IWAD path is required"
 msgstr ""
 
@@ -294,7 +302,7 @@ msgstr ""
 msgid "Application download started"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:218
+#: userland/apps/fileman/main.cpp:483
 msgid "Application launched"
 msgstr ""
 
@@ -318,11 +326,15 @@ msgstr ""
 msgid "Apply again"
 msgstr ""
 
+#: userland/apps/fileman/main.cpp:765
+msgid "Archive"
+msgstr ""
+
 #: userland/apps/fileman/actions.c:372
 msgid "Archive Conflict"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:97
+#: userland/apps/doomlauncher/main.cpp:36
 msgid "Arguments are empty"
 msgstr ""
 
@@ -334,7 +346,7 @@ msgstr ""
 msgid "At sign-in"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:450
+#: userland/apps/installer/install_ops.c:720
 msgid "Attach a disk and click Refresh."
 msgstr ""
 
@@ -366,11 +378,19 @@ msgstr ""
 msgid "Authorizing installation..."
 msgstr ""
 
+#: userland/apps/installer/main.cpp:808
+msgid "Automatic layout creates a 128 MiB FAT32 ESP and an ext4 root."
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:223
+msgid "Automatic mode replaces its partition table; manual mode can preserve other partitions."
+msgstr ""
+
 #: userland/apps/drvmgr/main.c:185
 msgid "Available"
 msgstr ""
 
-#: userland/apps/installer/main.c:538
+#: userland/apps/installer/main.cpp:572
 msgid "Available disks"
 msgstr ""
 
@@ -414,7 +434,7 @@ msgstr ""
 msgid "Bookmarks"
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:199
+#: userland/apps/minesweeper/main.cpp:34
 msgid "Boom"
 msgstr ""
 
@@ -430,7 +450,7 @@ msgstr ""
 msgid "Boot disk"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1563
+#: userland/apps/installer/install_ops.c:1809
 msgid "Boot update failed"
 msgstr ""
 
@@ -446,19 +466,19 @@ msgstr ""
 msgid "Browse"
 msgstr ""
 
-#: userland/apps/fileman/motif.c:124
+#: userland/apps/fileman/main.cpp:511
 msgid "Browse files, manage folders and launch X11 applications."
 msgstr ""
 
-#: userland/apps/paint/main.c:678
+#: userland/apps/paint/main.cpp:171
 msgid "Brush"
 msgstr ""
 
-#: userland/apps/osver/main.c:287
+#: userland/apps/osver/main.cpp:115
 msgid "Build and runtime components"
 msgstr ""
 
-#: userland/apps/osver/main.c:263
+#: userland/apps/osver/main.cpp:107
 msgid "Build time"
 msgstr ""
 
@@ -490,19 +510,15 @@ msgstr ""
 msgid "Buttons, inputs, lists, menus, panels, windows"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1059
-msgid "CPU"
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:618
+#: userland/apps/taskmgr/main.cpp:513
 msgid "CPU Usage"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:801
+#: userland/apps/taskmgr/main.cpp:662
 msgid "CPU time:"
 msgstr ""
 
-#: userland/apps/calc/main.c:99
+#: userland/apps/calc/main.cpp:26
 msgid "Calculator"
 msgstr ""
 
@@ -518,7 +534,7 @@ msgstr ""
 msgid "Cannot create extraction folder"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:713
+#: userland/apps/taskmgr/main.cpp:620
 msgid "Cannot end protected or non-user task"
 msgstr ""
 
@@ -554,11 +570,11 @@ msgstr ""
 msgid "Checked"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1550
+#: userland/apps/installer/install_ops.c:1796
 msgid "Checking dependencies and preserving local configuration"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1401
+#: userland/apps/installer/install_ops.c:1639
 msgid "Checking existing ReliefOS"
 msgstr ""
 
@@ -570,12 +586,8 @@ msgstr ""
 msgid "Chinese punctuation"
 msgstr ""
 
-#: userland/apps/installer/main.c:466
+#: userland/apps/installer/main.cpp:510
 msgid "Choose Setup Mode"
-msgstr ""
-
-#: userland/apps/installer/main.c:420
-msgid "Choose UI Style"
 msgstr ""
 
 #: userland/runtime/src/ui.c:1759
@@ -590,7 +602,7 @@ msgstr ""
 msgid "Choose a text file or PNG image"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:202
+#: userland/apps/fileman/main.cpp:464
 msgid "Choose an installed X11 executable using its absolute path"
 msgstr ""
 
@@ -602,16 +614,20 @@ msgstr ""
 msgid "Choose the default app used by File Manager and desktop shortcuts."
 msgstr ""
 
-#: userland/apps/installer/main.c:530
+#: userland/apps/installer/main.cpp:568
 msgid "Choose the disk that already contains ReliefOS."
 msgstr ""
 
-#: userland/apps/installer/main.c:531
+#: userland/apps/installer/main.cpp:569
 msgid "Choose the disk that will receive ReliefOS."
 msgstr ""
 
-#: userland/apps/installer/main.c:358
+#: userland/apps/installer/main.cpp:452
 msgid "Choose the language for Setup and the installed system."
+msgstr ""
+
+#: userland/apps/installer/main.cpp:527
+msgid "Choose the target disk, configure its partitions, then replace boot, system and EFI files."
 msgstr ""
 
 #: userland/apps/settings/main.c:1877
@@ -638,7 +654,7 @@ msgstr ""
 msgid "Clear Address"
 msgstr ""
 
-#: userland/apps/fileman/model.c:536
+#: userland/apps/fileman/main.cpp:758
 msgid "Clear Marks"
 msgstr ""
 
@@ -670,7 +686,7 @@ msgstr ""
 msgid "Cloudflare DNS"
 msgstr ""
 
-#: userland/apps/fileman/model.c:485
+#: userland/apps/fileman/main.cpp:765
 msgid "Compress to .tar"
 msgstr ""
 
@@ -694,11 +710,15 @@ msgstr ""
 msgid "Config:"
 msgstr ""
 
-#: userland/apps/installer/main.c:178
+#: userland/apps/installer/main.cpp:806
+msgid "Configure partitions"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:217
 msgid "Confirm"
 msgstr ""
 
-#: userland/apps/installer/main.c:691
+#: userland/apps/installer/main.cpp:943
 msgid "Confirm Installation"
 msgstr ""
 
@@ -714,20 +734,8 @@ msgstr ""
 msgid "Confirm Sign Out"
 msgstr ""
 
-#: userland/apps/installer/main.c:691
+#: userland/apps/installer/main.cpp:943
 msgid "Confirm Update"
-msgstr ""
-
-#: userland/apps/installer/main.c
-msgid "Install Xorg desktop environment"
-msgstr ""
-
-#: userland/apps/installer/main.c:628
-msgid "Confirm password"
-msgstr ""
-
-#: userland/apps/installer/main.c:630
-msgid "Confirm root password"
 msgstr ""
 
 #: userland/apps/diskmgr/main.c:708
@@ -746,7 +754,11 @@ msgstr ""
 msgid "Connection query failed"
 msgstr ""
 
-#: userland/apps/fileman/model.c:459
+#: userland/apps/installer/main.cpp:720
+msgid "Continue"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:753
 msgid "Copy"
 msgstr ""
 
@@ -754,11 +766,11 @@ msgstr ""
 msgid "Copy complete"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1466
+#: userland/apps/installer/install_ops.c:1712
 msgid "Copy failed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:783
+#: userland/apps/installer/install_ops.c:1053
 msgid "Copy path is too long"
 msgstr ""
 
@@ -766,15 +778,15 @@ msgstr ""
 msgid "Copying files..."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:502
+#: userland/apps/installer/install_ops.c:772
 msgid "Copying system files"
 msgstr ""
 
-#: userland/apps/osver/main.c:263
+#: userland/apps/osver/main.cpp:107
 msgid "Copyright"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1553
+#: userland/apps/installer/install_ops.c:1799
 msgid "Core update failed"
 msgstr ""
 
@@ -786,7 +798,7 @@ msgstr ""
 msgid "Could not arm the next debug boot."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:832
+#: userland/apps/taskmgr/main.cpp:681
 msgid "Could not change startup app"
 msgstr ""
 
@@ -794,7 +806,7 @@ msgstr ""
 msgid "Could not choose target file."
 msgstr ""
 
-#: userland/apps/paint/main.c:457
+#: userland/apps/paint/main.cpp:42
 msgid "Could not create canvas"
 msgstr ""
 
@@ -802,8 +814,12 @@ msgstr ""
 msgid "Could not create user"
 msgstr ""
 
-#: userland/apps/imageview/main.c:243
+#: userland/apps/notepad/main.c:443
 msgid "Could not decode PNG (maximum 1024x1024)."
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
 msgstr ""
 
 #: userland/apps/notepad/main.c:415
@@ -814,6 +830,10 @@ msgstr ""
 msgid "Could not install:"
 msgstr ""
 
+#: userland/apps/taskmgr/main.cpp:717
+msgid "Could not open Service Manager"
+msgstr ""
+
 #: userland/apps/oshlp/main.c:1207
 msgid "Could not open help"
 msgstr ""
@@ -822,23 +842,23 @@ msgstr ""
 msgid "Could not open help file."
 msgstr ""
 
-#: userland/apps/paint/main.c:190
+#: userland/apps/imageview/main.cpp:82
 msgid "Could not open image"
 msgstr ""
 
-#: userland/apps/osver/main.c:124
+#: userland/apps/fileman/main.cpp:625
+msgid "Could not open the requested path"
+msgstr ""
+
+#: userland/apps/osver/main.cpp:29
 msgid "Could not persist kernel debug mode."
 msgstr ""
 
-#: userland/apps/imageview/main.c:253
-msgid "Could not read image."
-msgstr ""
-
-#: userland/apps/osver/main.c:212
+#: userland/apps/osver/main.cpp:91
 msgid "Could not read system version information"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:854
+#: userland/apps/taskmgr/main.cpp:700
 msgid "Could not remove startup app"
 msgstr ""
 
@@ -854,7 +874,7 @@ msgstr ""
 msgid "Could not save file."
 msgstr ""
 
-#: userland/apps/paint/main.c:263
+#: userland/apps/paint/main.cpp:97
 msgid "Could not save image"
 msgstr ""
 
@@ -866,7 +886,7 @@ msgstr ""
 msgid "Could not save input method order"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1476
+#: userland/apps/installer/install_ops.c:1722
 msgid "Could not save installed preferences"
 msgstr ""
 
@@ -878,7 +898,7 @@ msgstr ""
 msgid "Could not save services."
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:210
+#: userland/apps/fileman/main.cpp:472
 msgid "Could not save the file association"
 msgstr ""
 
@@ -910,6 +930,10 @@ msgstr ""
 msgid "Create Shortcut"
 msgstr ""
 
+#: userland/apps/fltk_support.h:52
+msgid "Create a new directory"
+msgstr ""
+
 #: userland/apps/apiapp/main.c:756
 msgid "Create desktop shortcut"
 msgstr ""
@@ -924,6 +948,10 @@ msgstr ""
 
 #: userland/apps/settings/main.c:1765
 msgid "Create user"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:839
+msgid "Create: size in MiB, filesystem, name. Resize only changes the trailing edge."
 msgstr ""
 
 #: userland/apps/guitest/main.c:66
@@ -942,7 +970,11 @@ msgstr ""
 msgid "Custom DNS"
 msgstr ""
 
-#: userland/apps/fileman/model.c:461
+#: userland/apps/fltk_support.h:45
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:754
 msgid "Cut"
 msgstr ""
 
@@ -1022,15 +1054,15 @@ msgstr ""
 msgid "DNS:"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:294
+#: userland/apps/doomlauncher/main.cpp:86
 msgid "DOOM Launcher"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:200
+#: userland/apps/doomlauncher/main.cpp:74
 msgid "DOOM exited with code "
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:207
+#: userland/apps/doomlauncher/main.cpp:77
 msgid "DOOM is no longer running"
 msgstr ""
 
@@ -1038,15 +1070,19 @@ msgstr ""
 msgid "Data"
 msgstr ""
 
+#: userland/apps/installer/main.cpp:833
+msgid "Data type"
+msgstr ""
+
 #: userland/apps/settings/main.c:1320
 msgid "Default"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:198
+#: userland/apps/fileman/main.cpp:457
 msgid "Default Program"
 msgstr ""
 
-#: userland/apps/fileman/model.c:504
+#: userland/apps/fileman/main.cpp:747
 msgid "Default Program..."
 msgstr ""
 
@@ -1054,7 +1090,7 @@ msgstr ""
 msgid "Default app"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:213
+#: userland/apps/fileman/main.cpp:476
 msgid "Default application saved"
 msgstr ""
 
@@ -1182,7 +1218,7 @@ msgstr ""
 msgid "Disable"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:329
+#: userland/apps/doomlauncher/main.cpp:93
 msgid "Disable sound"
 msgstr ""
 
@@ -1190,15 +1226,15 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: userland/apps/paint/main.c:453
+#: userland/apps/paint/main.cpp:51
 msgid "Discard"
 msgstr ""
 
-#: userland/apps/paint/main.c:451
+#: userland/apps/paint/main.cpp:50
 msgid "Discard changes?"
 msgstr ""
 
-#: userland/apps/installer/main.c:176
+#: userland/apps/installer/main.cpp:214
 msgid "Disk"
 msgstr ""
 
@@ -1242,7 +1278,7 @@ msgstr ""
 msgid "Do not ask again if I deny this request"
 msgstr ""
 
-#: userland/apps/installer/main.c:728
+#: userland/apps/installer/main.cpp:982
 msgid "Do not turn off this machine."
 msgstr ""
 
@@ -1346,7 +1382,7 @@ msgstr ""
 msgid "Editing form input"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:153
+#: userland/apps/taskmgr/main.cpp:156
 msgid "Elevated"
 msgstr ""
 
@@ -1374,8 +1410,16 @@ msgstr ""
 msgid "End"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:717
+#: userland/apps/taskmgr/main.cpp:625
+msgid "End Task"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:627
 msgid "End Task failed"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:624
+msgid "End task %s (PID %u)?"
 msgstr ""
 
 #: userland/runtime/src/ui.c:1012
@@ -1394,23 +1438,43 @@ msgstr ""
 msgid "Enter a valid size in MiB"
 msgstr ""
 
-#: userland/apps/paint/main.c:679
+#: userland/apps/installer/main.cpp:695
+msgid "Enter a value:"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:691
+msgid "Enter filesystem and label (for example: ext4 RELIEFOS_DATA):"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:685
+msgid "Enter size_MiB filesystem name (ext4/ext2/fat32/exfat):"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:689
+msgid "Enter the GPT partition name:"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:687
+msgid "Enter the new partition size in MiB:"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:171
 msgid "Eraser"
 msgstr ""
 
-#: userland/apps/calc/main.c:24
+#: userland/apps/calc/main.cpp:20
 msgid "Error"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:949
+#: userland/apps/installer/install_ops.c:1220
 msgid "Existing ReliefOS boot partition was not detected"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:939
+#: userland/apps/installer/install_ops.c:1210
 msgid "Existing ReliefOS was not detected"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1410
+#: userland/apps/installer/install_ops.c:1328
 msgid "Existing system check failed"
 msgstr ""
 
@@ -1422,7 +1486,7 @@ msgstr ""
 msgid "Extension:"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:319
+#: userland/apps/doomlauncher/main.cpp:89
 msgid "Extra DOOM arguments"
 msgstr ""
 
@@ -1462,12 +1526,16 @@ msgstr ""
 msgid "File Manager"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:103
+#: userland/apps/fileman/main.cpp:318
 msgid "File Manager Settings"
 msgstr ""
 
 #: userland/apps/fileman/model.c:207
 msgid "File Manager settings saved"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "File Systems"
 msgstr ""
 
 #: userland/apps/settings/main.c:1620
@@ -1486,7 +1554,7 @@ msgstr ""
 msgid "File loaded, truncated"
 msgstr ""
 
-#: userland/runtime/src/ui.c:1121
+#: userland/apps/fltk_support.h:48
 msgid "File name:"
 msgstr ""
 
@@ -1522,6 +1590,14 @@ msgstr ""
 msgid "Fill"
 msgstr ""
 
+#: userland/apps/installer/main.cpp:842
+msgid "Final confirmation formats a FAT32 ESP and ext4 root on the selected disk."
+msgstr ""
+
+#: userland/apps/installer/main.cpp:843
+msgid "Final confirmation formats only the selected ESP and root; other partitions are preserved."
+msgstr ""
+
 #: userland/apps/apiapp/main.c:665
 msgid "Finalizing download..."
 msgstr ""
@@ -1542,11 +1618,11 @@ msgstr ""
 msgid "Find:"
 msgstr ""
 
-#: userland/apps/installer/main.c:180
+#: userland/apps/installer/main.cpp:219
 msgid "Finish"
 msgstr ""
 
-#: userland/apps/settings/main.c:297
+#: userland/apps/imageview/main.cpp:137
 msgid "Fit"
 msgstr ""
 
@@ -1570,7 +1646,7 @@ msgstr ""
 msgid "Folder name:"
 msgstr ""
 
-#: userland/apps/fileman/motif.c:314
+#: userland/apps/fileman/main.cpp:789
 msgid "Folders (double-click to expand)"
 msgstr ""
 
@@ -1590,8 +1666,8 @@ msgstr ""
 msgid "Format partition"
 msgstr ""
 
-#: userland/apps/installer/main.c:481
-msgid "Format the selected disk and copy a clean ReliefOS system."
+#: userland/apps/installer/main.cpp:721
+msgid "Formatting destroys all files on the selected partition."
 msgstr ""
 
 #: userland/apps/browser/view.c:964
@@ -1602,15 +1678,15 @@ msgstr ""
 msgid "Framebuffer "
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:679
+#: userland/apps/taskmgr/main.cpp:574
 msgid "Free memory:"
 msgstr ""
 
-#: userland/apps/installer/main.c:475
+#: userland/apps/installer/main.cpp:514
 msgid "Fresh Install"
 msgstr ""
 
-#: userland/apps/installer/main.c:467
+#: userland/apps/installer/main.cpp:511
 msgid "Fresh install erases the disk. Update keeps existing users and extra programs."
 msgstr ""
 
@@ -1618,7 +1694,7 @@ msgstr ""
 msgid "Full-width space"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:333
+#: userland/apps/doomlauncher/main.cpp:94
 msgid "Fullscreen"
 msgstr ""
 
@@ -1626,11 +1702,15 @@ msgstr ""
 msgid "GET"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:631
+#: userland/apps/fileman/main.cpp:404
+msgid "GID"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:527
 msgid "GPU (est.)"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:631
+#: userland/apps/taskmgr/main.cpp:527
 msgid "GPU (estimated)"
 msgstr ""
 
@@ -1754,23 +1834,23 @@ msgstr ""
 msgid "IPv4:"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:308
+#: userland/apps/doomlauncher/main.cpp:87
 msgid "IWAD path"
 msgstr ""
 
-#: userland/apps/imageview/main.c:535
+#: userland/apps/imageview/main.cpp:119
 msgid "Image Viewer"
 msgstr ""
 
-#: userland/apps/imageview/main.c:271
+#: userland/apps/imageview/main.cpp:86
 msgid "Image loaded"
 msgstr ""
 
-#: userland/apps/paint/main.c:200
+#: userland/apps/paint/main.cpp:73
 msgid "Image opened"
 msgstr ""
 
-#: userland/apps/paint/main.c:268
+#: userland/apps/paint/main.cpp:99
 msgid "Image saved"
 msgstr ""
 
@@ -1780,6 +1860,14 @@ msgstr ""
 
 #: userland/apps/settings/main.c:1623
 msgid "Input Method"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:49
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:255
+msgid "Input is too long; the value was not changed."
 msgstr ""
 
 #: userland/apps/settings/main.c:1361
@@ -1834,7 +1922,15 @@ msgstr ""
 msgid "Install Options"
 msgstr ""
 
-#: userland/apps/installer/main.c:444
+#: userland/apps/installer/main.cpp:1106
+msgid "Install ReliefOS"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:972
+msgid "Install Xorg desktop environment"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:491
 msgid "Install a new system or update an existing ReliefOS disk."
 msgstr ""
 
@@ -1854,19 +1950,19 @@ msgstr ""
 msgid "Installation Failed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1160
+#: userland/apps/installer/install_ops.c:1393
 msgid "Installation completed successfully"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:172
+#: userland/apps/installer/install_ops.c:183
 msgid "Installation failed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1005
+#: userland/apps/installer/install_ops.c:1271
 msgid "Installation media is incomplete"
 msgstr ""
 
-#: userland/apps/installer/main.c:694
+#: userland/apps/installer/main.cpp:945
 msgid "Installed ReliefOS packages will be upgraded."
 msgstr ""
 
@@ -1878,7 +1974,7 @@ msgstr ""
 msgid "Installing Application"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:202
+#: userland/apps/installer/install_ops.c:213
 msgid "Installing ReliefOS"
 msgstr ""
 
@@ -1886,7 +1982,7 @@ msgstr ""
 msgid "Installing..."
 msgstr ""
 
-#: userland/apps/calc/main.c:117
+#: userland/apps/calc/main.cpp:66
 msgid "Integer calculator"
 msgstr ""
 
@@ -1918,15 +2014,15 @@ msgstr ""
 msgid "Invalid help file"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1430
+#: userland/apps/installer/install_ops.c:1668
 msgid "Invalid installation settings"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:284
+#: userland/apps/fileman/main.cpp:435
 msgid "Invalid mode, UID or GID"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1531
+#: userland/apps/installer/install_ops.c:1777
 msgid "Invalid root layout"
 msgstr ""
 
@@ -1962,7 +2058,7 @@ msgstr ""
 msgid "Kawaii Pink"
 msgstr ""
 
-#: userland/apps/paint/main.c:453
+#: userland/apps/paint/main.cpp:51
 msgid "Keep"
 msgstr ""
 
@@ -1970,19 +2066,19 @@ msgstr ""
 msgid "Keep these display settings? Reverting in "
 msgstr ""
 
-#: userland/apps/osver/main.c:263
+#: userland/apps/osver/main.cpp:107
 msgid "Kernel"
 msgstr ""
 
-#: userland/apps/osver/main.c:125
+#: userland/apps/osver/main.cpp:27
 msgid "Kernel debug mode"
 msgstr ""
 
-#: userland/apps/osver/main.c:119
+#: userland/apps/osver/main.cpp:26
 msgid "Kernel debug mode enabled"
 msgstr ""
 
-#: userland/apps/osver/main.c:123
+#: userland/apps/osver/main.cpp:28
 msgid "Kernel debug mode enabled. Reboot to enter it."
 msgstr ""
 
@@ -1994,11 +2090,11 @@ msgstr ""
 msgid "Kernel device list"
 msgstr ""
 
-#: userland/apps/osver/main.c:263
+#: userland/apps/osver/main.cpp:107
 msgid "Kernel version"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:798
+#: userland/apps/taskmgr/main.cpp:659
 msgid "Kind:"
 msgstr ""
 
@@ -2006,11 +2102,11 @@ msgstr ""
 msgid "Label:"
 msgstr ""
 
-#: userland/apps/installer/main.c:171
+#: userland/apps/installer/main.cpp:210
 msgid "Language"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:337
+#: userland/apps/doomlauncher/main.cpp:95
 msgid "Launch"
 msgstr ""
 
@@ -2022,7 +2118,7 @@ msgstr ""
 msgid "Launch failed "
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:171
+#: userland/apps/doomlauncher/main.cpp:61
 msgid "Launch failed: "
 msgstr ""
 
@@ -2034,7 +2130,7 @@ msgstr ""
 msgid "Lease:"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1397
+#: userland/apps/installer/install_ops.c:1635
 msgid "Legacy accounts require recovery before updating"
 msgstr ""
 
@@ -2058,8 +2154,8 @@ msgstr ""
 msgid "List"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:867
-msgid "Live task snapshot from the scheduler."
+#: userland/apps/taskmgr/main.cpp:724
+msgid "Live task and performance snapshot from the system."
 msgstr ""
 
 #: userland/apps/drvmgr/main.c:81
@@ -2086,7 +2182,7 @@ msgstr ""
 msgid "Login startup approval requested"
 msgstr ""
 
-#: userland/apps/osver/main.c:257
+#: userland/apps/osver/main.cpp:58
 msgid "Logo unavailable"
 msgstr ""
 
@@ -2096,10 +2192,6 @@ msgstr ""
 
 #: userland/apps/netctl/main.c:626
 msgid "MAC:"
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:1059
-msgid "MEM"
 msgstr ""
 
 #: userland/apps/mp3play/main.c:347
@@ -2114,6 +2206,10 @@ msgstr ""
 msgid "Manage Bookmarks..."
 msgstr ""
 
+#: userland/apps/fltk_support.h:50
+msgid "Manage Favorites"
+msgstr ""
+
 #: userland/apps/diskmgr/main.c:1070
 msgid "Manage GPT partitions"
 msgstr ""
@@ -2122,11 +2218,15 @@ msgstr ""
 msgid "Manual"
 msgstr ""
 
-#: userland/apps/fileman/model.c:534
+#: userland/apps/installer/main.cpp:809
+msgid "Manual layout: select partitions, then assign ESP and root roles."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:757
 msgid "Mark All"
 msgstr ""
 
-#: userland/apps/fileman/model.c:467
+#: userland/apps/fileman/main.cpp:756
 msgid "Mark for Batch"
 msgstr ""
 
@@ -2142,11 +2242,11 @@ msgstr ""
 msgid "Mask:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:622
+#: userland/apps/taskmgr/main.cpp:520
 msgid "Memory Usage"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:802
+#: userland/apps/taskmgr/main.cpp:663
 msgid "Memory:"
 msgstr ""
 
@@ -2162,15 +2262,11 @@ msgstr ""
 msgid "Metro color changed"
 msgstr ""
 
-#: userland/apps/installer/main.c:414
-msgid "Metro uses the modern flat system appearance."
-msgstr ""
-
-#: userland/apps/minesweeper/main.c:196
+#: userland/apps/minesweeper/main.cpp:32
 msgid "Mines: "
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:306
+#: userland/apps/minesweeper/main.cpp:102
 msgid "Minesweeper"
 msgstr ""
 
@@ -2178,12 +2274,16 @@ msgstr ""
 msgid "Minimized windows"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:101
+#: userland/apps/doomlauncher/main.cpp:38
 msgid "Missing closing quote"
 msgstr ""
 
-#: userland/apps/installer/main.c:175
+#: userland/apps/installer/main.cpp:213
 msgid "Mode"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:393
+msgid "Mode (octal)"
 msgstr ""
 
 #: userland/apps/diskmgr/main.c:809
@@ -2194,7 +2294,7 @@ msgstr ""
 msgid "Mount exFAT, FAT32, ext4, or legacy ext2 data partitions at stable /mnt paths."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1392
+#: userland/apps/installer/install_ops.c:1630
 msgid "Mount failed"
 msgstr ""
 
@@ -2214,7 +2314,7 @@ msgstr ""
 msgid "Mounted target"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1388
+#: userland/apps/installer/install_ops.c:1626
 msgid "Mounting target filesystems"
 msgstr ""
 
@@ -2290,24 +2390,24 @@ msgstr ""
 msgid "New"
 msgstr ""
 
-#: userland/apps/fileman/actions.c:80
-msgid "New Folder"
+#: userland/apps/fltk_support.h:51
+msgid "New Directory?"
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:325
-msgid "New Game"
+#: userland/apps/fileman/actions.c:80
+msgid "New Folder"
 msgstr ""
 
 #: userland/apps/settings/main.c:1484
 msgid "New User"
 msgstr ""
 
-#: userland/apps/paint/main.c:459
-msgid "New canvas"
-msgstr ""
-
 #: userland/apps/fileman/actions.c:81
 msgid "New folder canceled"
+msgstr ""
+
+#: userland/apps/minesweeper/main.cpp:103
+msgid "New game"
 msgstr ""
 
 #: userland/apps/fileman/actions.c:194
@@ -2322,7 +2422,7 @@ msgstr ""
 msgid "New partition"
 msgstr ""
 
-#: userland/apps/installer/main.c:192
+#: userland/apps/installer/main.cpp:233
 msgid "Next"
 msgstr ""
 
@@ -2330,7 +2430,7 @@ msgstr ""
 msgid "Next >"
 msgstr ""
 
-#: userland/apps/imageview/main.c:561
+#: userland/apps/imageview/main.cpp:136
 msgid "Next Image"
 msgstr ""
 
@@ -2346,7 +2446,7 @@ msgstr ""
 msgid "No A record"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1415
+#: userland/apps/installer/install_ops.c:1653
 msgid "No APK database: reinstall from this media"
 msgstr ""
 
@@ -2370,7 +2470,7 @@ msgstr ""
 msgid "No disk selected."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:450
+#: userland/apps/installer/install_ops.c:720
 msgid "No disks were found"
 msgstr ""
 
@@ -2382,16 +2482,8 @@ msgstr ""
 msgid "No e1000 adapter"
 msgstr ""
 
-#: userland/apps/imageview/main.c:162
-msgid "No file"
-msgstr ""
-
 #: userland/apps/desktop/desktop_items.c:559
 msgid "No file association for this item."
-msgstr ""
-
-#: userland/apps/imageview/main.c:146
-msgid "No image loaded."
 msgstr ""
 
 #: userland/apps/desktop/desktop_items.c:551
@@ -2410,15 +2502,15 @@ msgstr ""
 msgid "No saved bookmarks"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:827
+#: userland/apps/taskmgr/main.cpp:676
 msgid "No startup app selected"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:709
+#: userland/apps/taskmgr/main.cpp:616
 msgid "No task selected"
 msgstr ""
 
-#: userland/apps/installer/main.c:758
+#: userland/apps/installer/main.cpp:1021
 msgid "No writes will continue after this error."
 msgstr ""
 
@@ -2482,6 +2574,10 @@ msgstr ""
 msgid "Only pages with an address can be bookmarked"
 msgstr ""
 
+#: userland/apps/installer/main.cpp:958
+msgid "Only the selected ESP and root partitions will be formatted; other partitions are preserved."
+msgstr ""
+
 #: userland/apps/browser/bookmarks.c:306
 msgid "Open"
 msgstr ""
@@ -2502,15 +2598,19 @@ msgstr ""
 msgid "Open ReliefOS program or file path"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:198
+#: userland/apps/taskmgr/main.cpp:887
+msgid "Open Service Manager"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:457
 msgid "Open With"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:200
+#: userland/apps/fileman/main.cpp:460
 msgid "Open With canceled"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:217
+#: userland/apps/fileman/main.cpp:482
 msgid "Open With failed"
 msgstr ""
 
@@ -2518,7 +2618,7 @@ msgstr ""
 msgid "Open With is for files"
 msgstr ""
 
-#: userland/apps/fileman/model.c:457
+#: userland/apps/fileman/main.cpp:746
 msgid "Open With..."
 msgstr ""
 
@@ -2538,7 +2638,7 @@ msgstr ""
 msgid "Open files from File Manager or Run."
 msgstr ""
 
-#: userland/apps/imageview/main.c:425
+#: userland/apps/imageview/main.cpp:92
 msgid "Open image"
 msgstr ""
 
@@ -2560,6 +2660,10 @@ msgstr ""
 
 #: userland/apps/desktop/desktop_items.c:583
 msgid "Operation failed"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:889
+msgid "Options"
 msgstr ""
 
 #: userland/apps/devmgr/main.c:99
@@ -2586,15 +2690,7 @@ msgstr ""
 msgid "PNG preview is unavailable."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1060
-msgid "PRIV"
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:1059
-msgid "PROCESS"
-msgstr ""
-
-#: userland/apps/paint/main.c:635
+#: userland/apps/paint/main.cpp:32
 msgid "Paint"
 msgstr ""
 
@@ -2602,7 +2698,7 @@ msgstr ""
 msgid "Panel"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:796
+#: userland/apps/taskmgr/main.cpp:657
 msgid "Parent PID:"
 msgstr ""
 
@@ -2634,12 +2730,24 @@ msgstr ""
 msgid "Partition formatted"
 msgstr ""
 
+#: userland/apps/installer/main.cpp:613
+msgid "Partition layout updated"
+msgstr ""
+
 #: userland/apps/diskmgr/main.c:615
 msgid "Partition mount failed"
 msgstr ""
 
+#: userland/apps/installer/main.cpp:611
+msgid "Partition operation failed"
+msgstr ""
+
 #: userland/apps/diskmgr/main.c:393
 msgid "Partition refresh failed"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:790
+msgid "Partition role updated."
 msgstr ""
 
 #: userland/apps/diskmgr/main.c:828
@@ -2670,16 +2778,20 @@ msgstr ""
 msgid "Password:"
 msgstr ""
 
-#: userland/apps/installer/main.c:664
+#: userland/apps/installer/main.cpp:917
 msgid "Passwords: 1-32 characters, no spaces; confirmations must match"
 msgstr ""
 
-#: userland/apps/fileman/model.c:463
+#: userland/apps/fileman/main.cpp:755
 msgid "Paste"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:247
+#: userland/apps/fileman/main.cpp:385
 msgid "Path"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:621
+msgid "Path is too long"
 msgstr ""
 
 #: userland/apps/fileman/actions.c:367
@@ -2690,31 +2802,31 @@ msgstr ""
 msgid "Path:"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1405
+#: userland/apps/installer/install_ops.c:1643
 msgid "Payload check failed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:545
+#: userland/apps/installer/install_ops.c:815
 msgid "Payload path is too long"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1458
+#: userland/apps/installer/install_ops.c:1704
 msgid "Payload scan failed"
 msgstr ""
 
-#: userland/apps/paint/main.c:677
+#: userland/apps/paint/main.cpp:171
 msgid "Pencil"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:639
+#: userland/apps/taskmgr/main.cpp:536
 msgid "Per-core usage"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1180
+#: userland/apps/taskmgr/main.cpp:890
 msgid "Performance"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:409
+#: userland/apps/taskmgr/main.cpp:393
 msgid "Performance data unavailable"
 msgstr ""
 
@@ -2722,7 +2834,7 @@ msgstr ""
 msgid "Permanently delete the selected items and all folder contents? This cannot be undone."
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:267
+#: userland/apps/fileman/main.cpp:410
 msgid "Permission changes use the current user's access rights."
 msgstr ""
 
@@ -2734,7 +2846,7 @@ msgstr ""
 msgid "Permission denied; administrator access requires a terminal in X11"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:290
+#: userland/apps/fileman/main.cpp:446
 msgid "Permissions saved"
 msgstr ""
 
@@ -2754,8 +2866,12 @@ msgstr ""
 msgid "Place shortcut on Desktop? No creates it here."
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:201
+#: userland/apps/minesweeper/main.cpp:35
 msgid "Playing"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Please choose an existing file!"
 msgstr ""
 
 #: userland/apps/apiapp/main.c:393
@@ -2782,6 +2898,10 @@ msgstr ""
 msgid "Power request failed"
 msgstr ""
 
+#: userland/apps/installer/main.cpp:525
+msgid "Prepare a clean ReliefOS system with automatic or manual disk partitioning."
+msgstr ""
+
 #: userland/apps/apiapp/main.c:631
 msgid "Preparing download..."
 msgstr ""
@@ -2790,7 +2910,7 @@ msgstr ""
 msgid "Present"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1161
+#: userland/apps/installer/install_ops.c:1394
 msgid "Press Restart to boot from the installed disk."
 msgstr ""
 
@@ -2798,23 +2918,27 @@ msgstr ""
 msgid "Pressed"
 msgstr ""
 
-#: userland/apps/installer/main.c:421
-msgid "Preview a style now and apply it to the installed system."
+#: userland/apps/fltk_support.h:53
+msgid "Preview"
 msgstr ""
 
-#: userland/apps/imageview/main.c:560
+#: userland/apps/imageview/main.cpp:135
 msgid "Previous"
 msgstr ""
 
-#: userland/apps/installer/main.c:986
+#: userland/apps/installer/main.cpp:1145
 msgid "Previous Step"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:800
+#: userland/apps/taskmgr/main.cpp:661
 msgid "Privileges:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:1179
+#: userland/apps/taskmgr/main.cpp:913
+msgid "Process tree: name, PID, CPU, memory, state, user and privileges"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:889
 msgid "Processes"
 msgstr ""
 
@@ -2834,11 +2958,11 @@ msgstr ""
 msgid "Progress    ready"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:248
+#: userland/apps/fileman/main.cpp:390
 msgid "Properties"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:235
+#: userland/apps/fileman/main.cpp:370
 msgid "Properties failed"
 msgstr ""
 
@@ -2882,7 +3006,7 @@ msgstr ""
 msgid "Ready"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:686
+#: userland/apps/taskmgr/main.cpp:585
 msgid "Ready "
 msgstr ""
 
@@ -2922,7 +3046,7 @@ msgstr ""
 msgid "ReliefOS Help"
 msgstr ""
 
-#: userland/apps/installer/main.c:443
+#: userland/apps/installer/main.cpp:490
 msgid "ReliefOS Setup"
 msgstr ""
 
@@ -2938,11 +3062,11 @@ msgstr ""
 msgid "ReliefOS text viewer"
 msgstr ""
 
-#: userland/apps/installer/main.c:746
+#: userland/apps/installer/main.cpp:1008
 msgid "ReliefOS was installed to the selected disk."
 msgstr ""
 
-#: userland/apps/installer/main.c:745
+#: userland/apps/installer/main.cpp:1007
 msgid "ReliefOS was updated on the selected disk."
 msgstr ""
 
@@ -2950,19 +3074,23 @@ msgstr ""
 msgid "Remaining"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:206
+#: userland/apps/fileman/main.cpp:468
 msgid "Remember this application for files with the same extension?"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:850
+#: userland/apps/taskmgr/main.cpp:944
+msgid "Remove"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:698
 msgid "Remove Startup App"
 msgstr ""
 
-#: userland/apps/installer/main.c:748
+#: userland/apps/installer/main.cpp:1010
 msgid "Remove the installation media, then restart."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:850
+#: userland/apps/taskmgr/main.cpp:698
 msgid "Remove the selected startup app?"
 msgstr ""
 
@@ -2998,8 +3126,8 @@ msgstr ""
 msgid "Reopen applications to apply the language"
 msgstr ""
 
-#: userland/apps/installer/main.c:482
-msgid "Replace boot, system, EFI and bundled docs. Then choose changed or missing system apps."
+#: userland/apps/paint/main.cpp:106
+msgid "Replace existing file?"
 msgstr ""
 
 #: userland/apps/sysconfdialog/main.c:71
@@ -3018,7 +3146,7 @@ msgstr ""
 msgid "Required system shell. Cannot be disabled here."
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:343
+#: userland/apps/doomlauncher/main.cpp:96
 msgid "Reset"
 msgstr ""
 
@@ -3102,6 +3230,10 @@ msgstr ""
 msgid "Revert"
 msgstr ""
 
+#: userland/apps/installer/main.cpp:770
+msgid "Review the selected ESP and root before continuing."
+msgstr ""
+
 #: userland/apps/desktop/render.c:238
 msgid "Ring-3 desktop shadow blit"
 msgstr ""
@@ -3110,19 +3242,19 @@ msgstr ""
 msgid "Role"
 msgstr ""
 
-#: userland/runtime/src/ui.c:1119
+#: userland/apps/fileman/main.cpp:761
 msgid "Root"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1536
+#: userland/apps/installer/install_ops.c:1782
 msgid "Root and boot payloads"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1389
+#: userland/apps/installer/install_ops.c:1627
 msgid "Root: /target; ESP: /target/boot"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1463
+#: userland/apps/installer/install_ops.c:1709
 msgid "Root: /target; boot partition: /target/boot"
 msgstr ""
 
@@ -3130,31 +3262,27 @@ msgstr ""
 msgid "Run"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:685
-msgid "Run "
-msgstr ""
-
 #: userland/apps/servicemgr/main.c:202
 msgid "Running"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:584
+msgid "Running "
 msgstr ""
 
 #: userland/apps/servicemgr/main.c:222
 msgid "Runtime state is visible. Administrator rights are required to control services."
 msgstr ""
 
-#: userland/apps/installer/main.c:449
+#: userland/apps/installer/main.cpp:497
 msgid "SATA/AHCI and IDE/PATA target disks are supported."
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:1059
-msgid "STATE"
 msgstr ""
 
 #: userland/apps/desktop/render.c:44
 msgid "Sample text"
 msgstr ""
 
-#: userland/apps/notepad/main.c:678
+#: userland/apps/fileman/main.cpp:322
 msgid "Save"
 msgstr ""
 
@@ -3162,7 +3290,7 @@ msgstr ""
 msgid "Save As"
 msgstr ""
 
-#: userland/apps/paint/main.c:662
+#: userland/apps/paint/main.cpp:152
 msgid "Save as"
 msgstr ""
 
@@ -3182,15 +3310,15 @@ msgstr ""
 msgid "Save changes before opening another file?"
 msgstr ""
 
-#: userland/apps/paint/main.c:470
+#: userland/apps/paint/main.cpp:113
 msgid "Save changes?"
 msgstr ""
 
-#: userland/apps/paint/main.c:422
+#: userland/apps/paint/main.cpp:104
 msgid "Save image"
 msgstr ""
 
-#: userland/apps/paint/main.c:471
+#: userland/apps/paint/main.cpp:114
 msgid "Save the current drawing before closing?"
 msgstr ""
 
@@ -3210,7 +3338,7 @@ msgstr ""
 msgid "Scale changed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1535
+#: userland/apps/installer/install_ops.c:1781
 msgid "Scanning update payload"
 msgstr ""
 
@@ -3230,15 +3358,15 @@ msgstr ""
 msgid "Select Address"
 msgstr ""
 
-#: userland/apps/installer/main.c:527
+#: userland/apps/installer/main.cpp:566
 msgid "Select Disk to Update"
 msgstr ""
 
-#: userland/apps/installer/main.c:527
+#: userland/apps/installer/main.cpp:566
 msgid "Select Installation Disk"
 msgstr ""
 
-#: userland/apps/installer/main.c:357
+#: userland/apps/installer/main.cpp:451
 msgid "Select Language"
 msgstr ""
 
@@ -3270,11 +3398,11 @@ msgstr ""
 msgid "Select an unprotected non-boot disk partition"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:208
+#: userland/apps/installer/install_ops.c:219
 msgid "Select the disk to update"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:211
+#: userland/apps/installer/install_ops.c:222
 msgid "Select the target disk"
 msgstr ""
 
@@ -3322,6 +3450,14 @@ msgstr ""
 msgid "Service Manager"
 msgstr ""
 
+#: userland/apps/taskmgr/main.cpp:713
+msgid "Service Manager is unavailable"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:718
+msgid "Service Manager launched"
+msgstr ""
+
 #: userland/apps/servicemgr/main.c:314
 msgid "Service setting changed"
 msgstr ""
@@ -3342,8 +3478,16 @@ msgstr ""
 msgid "Set Default"
 msgstr ""
 
+#: userland/apps/installer/main.cpp:827
+msgid "Set ESP"
+msgstr ""
+
 #: userland/apps/guitest/main.c:143
 msgid "Set alternate title"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:830
+msgid "Set root"
 msgstr ""
 
 #: userland/apps/guitest/main.c:144
@@ -3354,19 +3498,23 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:120
+#: userland/apps/doomlauncher/main.cpp:30
 msgid "Settings reset"
 msgstr ""
 
-#: userland/apps/installer/main.c:961
+#: userland/apps/fileman/main.cpp:763
+msgid "Settings..."
+msgstr ""
+
+#: userland/apps/installer/main.cpp:260
 msgid "Setup"
 msgstr ""
 
-#: userland/apps/installer/main.c:446
+#: userland/apps/installer/main.cpp:493
 msgid "Setup can copy the full normal system payload"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:209
+#: userland/apps/installer/install_ops.c:220
 msgid "Setup will check for an existing ReliefOS system."
 msgstr ""
 
@@ -3386,8 +3534,12 @@ msgstr ""
 msgid "Show desktop taskbar"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:107
+#: userland/apps/fileman/main.cpp:320
 msgid "Show files and folders starting with a dot"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "Show hidden files"
 msgstr ""
 
 #: userland/apps/settings/main.c:164
@@ -3400,6 +3552,10 @@ msgstr ""
 
 #: userland/apps/guitest/main.c:150
 msgid "Show window in taskbar"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Show:"
 msgstr ""
 
 #: userland/apps/desktop/start_menu.c:1015
@@ -3442,8 +3598,8 @@ msgstr ""
 msgid "Skipped at boot"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:687
-msgid "Sleep "
+#: userland/apps/taskmgr/main.cpp:586
+msgid "Sleeping "
 msgstr ""
 
 #: userland/apps/browser/util.c:190
@@ -3466,16 +3622,8 @@ msgstr ""
 msgid "Sound"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:155
+#: userland/apps/taskmgr/main.cpp:158
 msgid "Standard"
-msgstr ""
-
-#: userland/apps/installer/main.c:626
-msgid "Standard user name"
-msgstr ""
-
-#: userland/apps/installer/main.c:627
-msgid "Standard user password"
 msgstr ""
 
 #: userland/apps/servicemgr/main.c:267
@@ -3490,7 +3638,7 @@ msgstr ""
 msgid "Starting"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:176
+#: userland/apps/doomlauncher/main.cpp:65
 msgid "Starting DOOM: the game window shows loading progress"
 msgstr ""
 
@@ -3506,16 +3654,20 @@ msgstr ""
 msgid "Startup Application"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:835
+#: userland/apps/taskmgr/main.cpp:684
 msgid "Startup app disabled"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:835
+#: userland/apps/taskmgr/main.cpp:684
 msgid "Startup app enabled"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:857
+#: userland/apps/taskmgr/main.cpp:704
 msgid "Startup app removed"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:947
+msgid "Startup applications"
 msgstr ""
 
 #: userland/apps/settings/main.c:2028
@@ -3550,10 +3702,6 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:69
-msgid "Status "
-msgstr ""
-
 #: userland/apps/devmgr/main.c:251
 msgid "Status:"
 msgstr ""
@@ -3572,10 +3720,6 @@ msgstr ""
 
 #: userland/apps/settings/main.c:303
 msgid "Stretch"
-msgstr ""
-
-#: userland/apps/installer/main.c:173
-msgid "Style"
 msgstr ""
 
 #: userland/apps/browser/navigation.c:507
@@ -3618,7 +3762,7 @@ msgstr ""
 msgid "System settings"
 msgstr ""
 
-#: userland/apps/osver/main.c:207
+#: userland/apps/osver/main.cpp:87
 msgid "System version information"
 msgstr ""
 
@@ -3662,7 +3806,7 @@ msgstr ""
 msgid "Tar extraction failed; check the archive and destination permissions"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1480
+#: userland/apps/installer/install_ops.c:1726
 msgid "Target disk is ready."
 msgstr ""
 
@@ -3678,11 +3822,11 @@ msgstr ""
 msgid "Target path:"
 msgstr ""
 
-#: userland/apps/installer/main.c:704
+#: userland/apps/installer/main.cpp:952
 msgid "Target:"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1402
+#: userland/apps/installer/install_ops.c:1640
 msgid "Target: /target"
 msgstr ""
 
@@ -3690,7 +3834,7 @@ msgstr ""
 msgid "Task Button"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:808
+#: userland/apps/taskmgr/main.cpp:666
 msgid "Task Details"
 msgstr ""
 
@@ -3698,7 +3842,7 @@ msgstr ""
 msgid "Task Manager"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:720
+#: userland/apps/taskmgr/main.cpp:630
 msgid "Task ended"
 msgstr ""
 
@@ -3706,7 +3850,7 @@ msgstr ""
 msgid "Taskbar network icon"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:684
+#: userland/apps/taskmgr/main.cpp:583
 msgid "Tasks "
 msgstr ""
 
@@ -3714,7 +3858,7 @@ msgstr ""
 msgid "Teal"
 msgstr ""
 
-#: userland/apps/terminal/main.c:1615
+#: userland/apps/terminal/main.c:1631
 msgid "Terminal"
 msgstr ""
 
@@ -3750,11 +3894,11 @@ msgstr ""
 msgid "TextField   selected"
 msgstr ""
 
-#: userland/apps/installer/main.c:381
+#: userland/apps/installer/main.cpp:472
 msgid "Thank You"
 msgstr ""
 
-#: userland/apps/installer/main.c:172
+#: userland/apps/installer/main.cpp:211
 msgid "Thanks"
 msgstr ""
 
@@ -3778,7 +3922,7 @@ msgstr ""
 msgid "The archive exists. Replace it?"
 msgstr ""
 
-#: userland/apps/paint/main.c:452
+#: userland/apps/paint/main.cpp:51
 msgid "The current drawing has not been saved."
 msgstr ""
 
@@ -3790,6 +3934,10 @@ msgstr ""
 msgid "The destination exists. Replace it? Choose No to save with another name."
 msgstr ""
 
+#: userland/apps/installer/main.cpp:610
+msgid "The disk may have been changed"
+msgstr ""
+
 #: userland/apps/fileman/actions.c:322
 msgid "The extraction folder exists. Existing files may be replaced. Continue?"
 msgstr ""
@@ -3798,16 +3946,12 @@ msgstr ""
 msgid "The form action could not be parsed as HTTP."
 msgstr ""
 
-#: userland/apps/installer/main.c:373
+#: userland/apps/installer/main.cpp:466
 msgid "The installed system will use the same language."
 msgstr ""
 
-#: userland/apps/installer/main.c:709
+#: userland/apps/installer/main.cpp:957
 msgid "The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root."
-msgstr ""
-
-#: userland/apps/installer/install_ops.c:212
-msgid "The selected disk will be erased."
 msgstr ""
 
 #: userland/apps/settings/main.c:1290
@@ -3834,7 +3978,7 @@ msgstr ""
 msgid "This input method has no configurable options."
 msgstr ""
 
-#: userland/apps/installer/main.c:695
+#: userland/apps/installer/main.cpp:946
 msgid "This operation is destructive."
 msgstr ""
 
@@ -3862,7 +4006,7 @@ msgstr ""
 msgid "Toggle borderless"
 msgstr ""
 
-#: userland/apps/doomlauncher/main.c:99
+#: userland/apps/doomlauncher/main.cpp:37
 msgid "Too many arguments"
 msgstr ""
 
@@ -3878,7 +4022,7 @@ msgstr ""
 msgid "Top of page"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:673
+#: userland/apps/taskmgr/main.cpp:566
 msgid "Total memory:"
 msgstr ""
 
@@ -3886,24 +4030,40 @@ msgstr ""
 msgid "Transmit failed"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:246
+#: userland/apps/fileman/main.cpp:384
 msgid "Type"
 msgstr ""
 
-#: userland/apps/fileman/motif.c:320
+#: userland/apps/fileman/main.cpp:792
 msgid "Type / Name (Ctrl or Shift for multiple selection)"
 msgstr ""
 
-#: userland/apps/installer/main.c:713
+#: userland/apps/installer/main.cpp:681
+msgid "Type AUTO to erase the disk and create an ESP and root partition:"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:693
+msgid "Type DELETE to remove the selected partition:"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:683
+msgid "Type INITIALIZE to replace the partition table:"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:962
 msgid "Type INSTALL to enable the Install button."
 msgstr ""
 
-#: userland/apps/installer/main.c:712
+#: userland/apps/installer/main.cpp:961
 msgid "Type UPDATE to enable the Update button."
 msgstr ""
 
 #: userland/apps/diskmgr/main.c:525
 msgid "Type the confirmation word and click Apply twice"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:399
+msgid "UID"
 msgstr ""
 
 #: userland/apps/httpget/main.c:245
@@ -3912,10 +4072,6 @@ msgstr ""
 
 #: userland/apps/browser/bookmarks.c:352
 msgid "URL:"
-msgstr ""
-
-#: userland/apps/taskmgr/main.c:1059
-msgid "USER"
 msgstr ""
 
 #: userland/apps/netctl/main.c:509
@@ -3966,15 +4122,11 @@ msgstr ""
 msgid "Unsupported Address"
 msgstr ""
 
-#: userland/apps/imageview/main.c:259
-msgid "Unsupported BMP. Use uncompressed 24/32-bit BMP."
-msgstr ""
-
-#: userland/apps/imageview/main.c:237
+#: userland/apps/imageview/main.cpp:67
 msgid "Unsupported image format. Use BMP, DIB, or PNG."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:915
+#: userland/apps/installer/install_ops.c:1186
 msgid "Unsupported root layout; use a fresh ext4 installation"
 msgstr ""
 
@@ -3990,7 +4142,7 @@ msgstr ""
 msgid "Untitled Page"
 msgstr ""
 
-#: userland/runtime/src/ui.c:1116
+#: userland/apps/fileman/main.cpp:760
 msgid "Up"
 msgstr ""
 
@@ -3998,23 +4150,23 @@ msgstr ""
 msgid "Up arrow"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:196
+#: userland/apps/installer/install_ops.c:207
 msgid "Update"
 msgstr ""
 
-#: userland/apps/installer/main.c:742
+#: userland/apps/installer/main.cpp:1005
 msgid "Update Complete"
 msgstr ""
 
-#: userland/apps/installer/main.c:476
+#: userland/apps/installer/main.cpp:516
 msgid "Update Existing System"
 msgstr ""
 
-#: userland/apps/installer/main.c:756
+#: userland/apps/installer/main.cpp:1020
 msgid "Update Failed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1159
+#: userland/apps/installer/install_ops.c:1392
 msgid "Update completed successfully"
 msgstr ""
 
@@ -4026,7 +4178,7 @@ msgstr ""
 msgid "Update dictionary"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1418
+#: userland/apps/installer/install_ops.c:1656
 msgid "Update installed ReliefOS packages"
 msgstr ""
 
@@ -4034,7 +4186,7 @@ msgstr ""
 msgid "Updating OpenRC..."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:201
+#: userland/apps/installer/install_ops.c:212
 msgid "Updating ReliefOS"
 msgstr ""
 
@@ -4042,16 +4194,12 @@ msgstr ""
 msgid "Updating runlevel..."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1549
+#: userland/apps/installer/install_ops.c:1795
 msgid "Upgrading signed ReliefOS packages"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:682
+#: userland/apps/taskmgr/main.cpp:578
 msgid "Uptime:"
-msgstr ""
-
-#: userland/apps/imageview/main.c:614
-msgid "Use Open to choose a BMP or PNG image."
 msgstr ""
 
 #: userland/apps/settings/main.c:1394
@@ -4062,7 +4210,7 @@ msgstr ""
 msgid "Use http://, https://, about:, or a ReliefOS file path such as /file.html."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:676
+#: userland/apps/taskmgr/main.cpp:570
 msgid "Used memory:"
 msgstr ""
 
@@ -4082,7 +4230,7 @@ msgstr ""
 msgid "User state updated"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:799
+#: userland/apps/taskmgr/main.cpp:660
 msgid "User:"
 msgstr ""
 
@@ -4126,7 +4274,7 @@ msgstr ""
 msgid "Waiting for applications to close..."
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:803
+#: userland/apps/taskmgr/main.cpp:664
 msgid "Wake tick:"
 msgstr ""
 
@@ -4154,7 +4302,7 @@ msgstr ""
 msgid "Web downloads are saved to the current user's Downloads folder."
 msgstr ""
 
-#: userland/apps/installer/main.c:174
+#: userland/apps/installer/main.cpp:212
 msgid "Welcome"
 msgstr ""
 
@@ -4164,10 +4312,6 @@ msgstr ""
 
 #: userland/apps/settings/main.c:1742
 msgid "Win95 color changed"
-msgstr ""
-
-#: userland/apps/installer/main.c:415
-msgid "Win95 keeps the classic beveled system appearance."
 msgstr ""
 
 #: userland/apps/desktop/start_menu.c:877
@@ -4182,7 +4326,7 @@ msgstr ""
 msgid "Window server v2"
 msgstr ""
 
-#: userland/apps/fileman/motif_dialogs.c:199
+#: userland/apps/fileman/main.cpp:458
 msgid "X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"
 msgstr ""
 
@@ -4194,7 +4338,7 @@ msgstr ""
 msgid "You can change your password."
 msgstr ""
 
-#: userland/apps/minesweeper/main.c:199
+#: userland/apps/minesweeper/main.cpp:34
 msgid "You won"
 msgstr ""
 
@@ -4202,7 +4346,7 @@ msgstr ""
 msgid "boot  system  programs"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1524
+#: userland/apps/installer/install_ops.c:1770
 msgid "exFAT root cannot carry the current symlink layout; use a fresh ext4 install"
 msgstr ""
 
@@ -4230,7 +4374,7 @@ msgstr ""
 msgid "open failed "
 msgstr ""
 
-#: userland/apps/installer/main.c:447
+#: userland/apps/installer/main.cpp:495
 msgid "or replace the boot/reliefos and system files on an existing installation."
 msgstr ""
 
@@ -4240,10 +4384,6 @@ msgstr ""
 
 #: userland/apps/desktop/draw.c:694
 msgid "ready"
-msgstr ""
-
-#: userland/apps/installer/main.c:629
-msgid "root password"
 msgstr ""
 
 #: userland/apps/desktop/draw.c:696
@@ -4274,7 +4414,7 @@ msgstr ""
 msgid "stat failed "
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:788
+#: userland/apps/taskmgr/main.cpp:650
 msgid "ticks"
 msgstr ""
 

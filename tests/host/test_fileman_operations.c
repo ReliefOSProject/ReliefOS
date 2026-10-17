@@ -33,6 +33,8 @@ int main(int argc, char **argv)
     assert(mkdir("source/empty", 0700) == 0);
     put("source/nested/inside.txt", "directory contents");
     put("source/-odd 'quote';$.txt", "literal filename");
+    assert(mkdir("source/中文目录", 0700) == 0);
+    put("source/中文目录/中文文件.txt", "中文内容");
     assert(chmod("source/nested/inside.txt", 0640) == 0);
     char archive[512];
     assert(getcwd(archive, sizeof(archive)));
@@ -45,15 +47,17 @@ int main(int argc, char **argv)
     umask(previous_umask);
     content("extracted/nested/inside.txt", "directory contents");
     content("extracted/-odd 'quote';$.txt", "literal filename");
+    content("extracted/中文目录/中文文件.txt", "中文内容");
     struct stat st;
     assert(stat("extracted/empty", &st) == 0 && S_ISDIR(st.st_mode));
     assert(stat("extracted/nested/inside.txt", &st) == 0 && (st.st_mode & 0777) == 0640);
-    const char *batch[] = {"nested", "-odd 'quote';$.txt", "empty"};
-    assert(fileman_tar_create(archive, "source", batch, 3) == 0);
+    const char *batch[] = {"nested", "-odd 'quote';$.txt", "empty", "中文目录"};
+    assert(fileman_tar_create(archive, "source", batch, 4) == 0);
     assert(mkdir("batch", 0700) == 0);
     assert(fileman_tar_extract(archive, "batch") == 0);
     content("batch/nested/inside.txt", "directory contents");
     content("batch/-odd 'quote';$.txt", "literal filename");
+    content("batch/中文目录/中文文件.txt", "中文内容");
     assert(stat("batch/empty", &st) == 0 && S_ISDIR(st.st_mode));
     assert(fileman_tar_extract("/no-such-fileman-archive", "batch") != 0);
     const char *missing[] = {"missing.txt"};

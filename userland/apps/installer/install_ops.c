@@ -1,4 +1,4 @@
-/* Installer disk/partition and payload operations shared by the Motif and TTY
+/* Installer disk/partition and payload operations shared by the FLTK and TTY
  * frontends.  The wizard state lives here; the frontends repaint through
  * refresh_ui() and drive the page machine via the model in model.h. */
 #include <reliefos/fs.h>

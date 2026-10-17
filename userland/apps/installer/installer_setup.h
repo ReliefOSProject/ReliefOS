@@ -12,6 +12,12 @@ struct installer_setup {
     uint8_t skip_xorg;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int installer_setup_valid(const struct installer_setup *setup);
 int installer_setup_write(const struct installer_setup *setup, const char *target);
+#ifdef __cplusplus
+}
+#endif
 #endif

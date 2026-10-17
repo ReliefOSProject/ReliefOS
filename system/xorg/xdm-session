@@ -90,12 +90,6 @@ cleanup() {
 }
 trap cleanup EXIT HUP INT TERM
 
-# The retro pixel-art backdrop is painted once by the root greeter setup
-# (xdm-setup) before the login box maps, and the root window background it
-# sets persists across the greeter -> session handoff.  Re-decoding and
-# re-uploading the image here would block the window manager and terminal on
-# cosmetic work the display has already done, so the session leaves it alone.
-
 # Create the freedesktop.org XDG user directories before any session client
 # starts.  This is the same hook Xsession/xinitrc startup runs on other
 # distributions; GTK file libraries expect e.g. $HOME/Templates to exist.
@@ -103,7 +97,9 @@ if test -x /usr/bin/xdg-user-dirs-update; then
     /usr/bin/xdg-user-dirs-update || :
 fi
 
-start_child icewm /usr/bin/icewm || exit 1
+# IceWM's native session supervisor starts icewmbg, which reads background
+# preferences from the selected theme and follows subsequent theme changes.
+start_child icewm /usr/bin/icewm-session || exit 1
 icewm_pid=$child_pid
 event "icewm started for uid=$uid"
 

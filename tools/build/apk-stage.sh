@@ -164,7 +164,8 @@ fi
 
 # Files from pinned official archives retain their upstream signatures and
 # package ownership. The verified APK archive member list is the authority for
-# their file paths; metadata members are not root payload.
+# their file paths; metadata members are not root payload. Only the five XDM
+# policy files are retained for the signed reliefos-xdm-config replacement.
 while IFS= read -r archive; do
     cp "$archive" "$repository/"
     tar --ignore-zeros -xOf "$archive" .PKGINFO >"$scratch/upstream-pkginfo" 2>/dev/null
@@ -177,6 +178,17 @@ while IFS= read -r archive; do
     while IFS= read -r path; do
         case $path in ''|.*|*/) continue;; esac
         case $path in /*|*../*|../*|*"	"*) echo "unsafe upstream APK path: $path" >&2; exit 1;; esac
+        case $backend:$upstream_name:$path in
+            xorg:xdm:etc/X11/xdm/xdm-config|xorg:xdm:etc/X11/xdm/Xservers|\
+            xorg:xdm:etc/X11/xdm/Xresources|xorg:xdm:usr/lib/X11/xdm/Xsession|\
+            xorg:xdm:usr/lib/X11/xdm/Xsetup_0)
+                [ -f "$tree/$path" ] && [ ! -L "$tree/$path" ] || {
+                    echo "missing regular XDM policy file: $path" >&2
+                    exit 1
+                }
+                continue
+                ;;
+        esac
         rm -f "$tree/$path"
     done <"$scratch/upstream-members"
 done <"$scratch/kept-archives"
@@ -361,9 +373,16 @@ while IFS= read -r group; do
         reliefos-apk-tools) dependencies="$dependencies reliefos-busybox" ;;
         reliefos-trust) dependencies="$dependencies ca-certificates-bundle" ;;
         reliefos-fastfetch) dependencies="$dependencies !fastfetch" ;;
+        reliefos-xdm-config)
+            # The local server command uses the ReliefOS tty wrapper and Xorg
+            # configuration; its session requires IceWM and st. Native xdm can
+            # otherwise be installed without any local server or its drivers.
+            dependencies="$dependencies xdm reliefos-apps reliefos-base xorg-server xf86-input-evdev xf86-video-fbdev icewm st"
+            ;;
     esac
     replaces=
     case $package in reliefos-*) replaces="leonos-${package#reliefos-}";; esac
+    [ "$package" != reliefos-xdm-config ] || replaces="$replaces xdm"
     set -- mkpkg --files "$payload" --output "$repository/$package-$version.apk" \
         --info "name:$package" --info "version:$version" --info arch:x86_64 \
         --info "origin:$package" --info "description:ReliefOS build payload $package" \

@@ -146,7 +146,7 @@ msgstr "API 安装程序"
 msgid "ARP timeout"
 msgstr "ARP 超时"
 
-#: userland/apps/notepad/main.c:688
+#: userland/apps/fileman/main.cpp:764
 msgid "About"
 msgstr "关于"
 
@@ -154,23 +154,23 @@ msgstr "关于"
 msgid "About Browser"
 msgstr "关于浏览器"
 
-#: userland/apps/osver/main.c:199
+#: userland/apps/osver/main.cpp:75
 msgid "About ReliefOS"
 msgstr "关于 ReliefOS"
 
-#: userland/apps/osver/main.c:236
+#: userland/apps/osver/main.cpp:105
 msgid "About this operating system"
 msgstr "关于此操作系统"
 
-#: userland/apps/installer/install_ops.c:847
+#: userland/apps/installer/install_ops.c:1118
 msgid "Account setup failed"
 msgstr "账户创建失败"
 
-#: userland/apps/installer/main.c:177
+#: userland/apps/installer/main.cpp:216
 msgid "Accounts"
 msgstr "账户"
 
-#: userland/apps/installer/main.c:382
+#: userland/apps/installer/main.cpp:473
 msgid "Acknowledgements for public resources and open-source projects."
 msgstr "公共资源与开源项目致谢。"
 
@@ -206,6 +206,10 @@ msgstr "添加书签"
 msgid "Add Current Page"
 msgstr "添加当前页面"
 
+#: userland/apps/fltk_support.h:43
+msgid "Add to Favorites"
+msgstr "添加到收藏夹"
+
 #: userland/apps/browser/view.c:1003
 msgid "Address"
 msgstr "地址"
@@ -218,7 +222,7 @@ msgstr "地址已清空"
 msgid "Address selected"
 msgstr "已选中地址"
 
-#: userland/apps/taskmgr/main.c:154
+#: userland/apps/taskmgr/main.cpp:157
 msgid "Admin"
 msgstr "管理员"
 
@@ -234,13 +238,17 @@ msgstr "需要管理员授权"
 msgid "Administrator rights required"
 msgstr "需要管理员权限"
 
-#: userland/apps/installer/main.c:637
+#: userland/apps/installer/main.cpp:902
 msgid "Administrator: root"
 msgstr "管理员：root"
 
 #: userland/apps/settings/main.c:1466
 msgid "Administrators can create and manage local accounts."
 msgstr "管理员可以创建和管理本地账户。"
+
+#: userland/apps/fltk_support.h:44
+msgid "All Files (*)"
+msgstr "所有文件 (*)"
 
 #: userland/apps/desktop/start_menu.c:857
 msgid "All applications"
@@ -270,11 +278,11 @@ msgstr "允许开机启动应用？"
 msgid "Allow this app to start a process when you sign in?"
 msgstr "允许此应用在你登录时自动启动一个进程？"
 
-#: userland/apps/installer/install_ops.c:1419
+#: userland/apps/installer/install_ops.c:1657
 msgid "Alpine packages and local configuration are preserved."
 msgstr "保留 Alpine 软件包及本地配置。"
 
-#: userland/apps/installer/main.c:708
+#: userland/apps/installer/main.cpp:955
 msgid "Alpine packages and local configuration are retained. Boot files are updated after the package transaction succeeds."
 msgstr "保留 Alpine 软件包和本地配置，软件包事务成功后再更新启动文件。"
 
@@ -282,7 +290,7 @@ msgstr "保留 Alpine 软件包和本地配置，软件包事务成功后再更�
 msgid "Always use this app"
 msgstr "始终使用此应用"
 
-#: userland/apps/doomlauncher/main.c:147
+#: userland/apps/doomlauncher/main.cpp:58
 msgid "An IWAD path is required"
 msgstr "需要指定 IWAD 路径"
 
@@ -302,9 +310,9 @@ msgstr "应用安装程序"
 msgid "Application download started"
 msgstr "应用下载已开始"
 
-#: userland/apps/fileman/motif_dialogs.c:218
+#: userland/apps/fileman/main.cpp:483
 msgid "Application launched"
-msgstr ""
+msgstr "程序已启动"
 
 #: userland/apps/desktop/input.c:380
 msgid "Application window"
@@ -326,11 +334,15 @@ msgstr "应用"
 msgid "Apply again"
 msgstr "再次应用"
 
+#: userland/apps/fileman/main.cpp:765
+msgid "Archive"
+msgstr "归档"
+
 #: userland/apps/fileman/actions.c:372
 msgid "Archive Conflict"
-msgstr ""
+msgstr "归档文件冲突"
 
-#: userland/apps/doomlauncher/main.c:97
+#: userland/apps/doomlauncher/main.cpp:36
 msgid "Arguments are empty"
 msgstr "启动参数为空"
 
@@ -342,7 +354,7 @@ msgstr "箭头"
 msgid "At sign-in"
 msgstr "登录时启动"
 
-#: userland/apps/installer/install_ops.c:450
+#: userland/apps/installer/install_ops.c:720
 msgid "Attach a disk and click Refresh."
 msgstr "连接硬盘后点击刷新。"
 
@@ -374,11 +386,19 @@ msgstr "正在授权更新 DHCP..."
 msgid "Authorizing installation..."
 msgstr "正在授权安装..."
 
+#: userland/apps/installer/main.cpp:808
+msgid "Automatic layout creates a 128 MiB FAT32 ESP and an ext4 root."
+msgstr "自动布局将创建 128 MiB 的 FAT32 EFI 系统分区和 ext4 根分区。"
+
+#: userland/apps/installer/install_ops.c:223
+msgid "Automatic mode replaces its partition table; manual mode can preserve other partitions."
+msgstr "自动模式会替换分区表；手动模式可以保留其他分区。"
+
 #: userland/apps/drvmgr/main.c:185
 msgid "Available"
 msgstr "可用"
 
-#: userland/apps/installer/main.c:538
+#: userland/apps/installer/main.cpp:572
 msgid "Available disks"
 msgstr "可用硬盘"
 
@@ -422,7 +442,7 @@ msgstr "书签已保存"
 msgid "Bookmarks"
 msgstr "书签"
 
-#: userland/apps/minesweeper/main.c:199
+#: userland/apps/minesweeper/main.cpp:34
 msgid "Boom"
 msgstr "爆炸"
 
@@ -438,7 +458,7 @@ msgstr "启动和服务运行时自动请求地址。"
 msgid "Boot disk"
 msgstr "启动磁盘"
 
-#: userland/apps/installer/install_ops.c:1563
+#: userland/apps/installer/install_ops.c:1809
 msgid "Boot update failed"
 msgstr "启动更新失败"
 
@@ -454,19 +474,19 @@ msgstr "页面底部"
 msgid "Browse"
 msgstr "浏览"
 
-#: userland/apps/fileman/motif.c:124
+#: userland/apps/fileman/main.cpp:511
 msgid "Browse files, manage folders and launch X11 applications."
-msgstr ""
+msgstr "浏览文件、管理文件夹并启动 X11 应用程序。"
 
-#: userland/apps/paint/main.c:678
+#: userland/apps/paint/main.cpp:171
 msgid "Brush"
 msgstr "画笔"
 
-#: userland/apps/osver/main.c:287
+#: userland/apps/osver/main.cpp:115
 msgid "Build and runtime components"
 msgstr "构建和运行时组件"
 
-#: userland/apps/osver/main.c:263
+#: userland/apps/osver/main.cpp:107
 msgid "Build time"
 msgstr "构建时间"
 
@@ -498,19 +518,15 @@ msgstr "按钮"
 msgid "Buttons, inputs, lists, menus, panels, windows"
 msgstr "按钮、输入框、列表、菜单、面板、窗口"
 
-#: userland/apps/taskmgr/main.c:1059
-msgid "CPU"
-msgstr "CPU"
-
-#: userland/apps/taskmgr/main.c:618
+#: userland/apps/taskmgr/main.cpp:513
 msgid "CPU Usage"
 msgstr "CPU 占用"
 
-#: userland/apps/taskmgr/main.c:801
+#: userland/apps/taskmgr/main.cpp:662
 msgid "CPU time:"
 msgstr "CPU 时间:"
 
-#: userland/apps/calc/main.c:99
+#: userland/apps/calc/main.cpp:26
 msgid "Calculator"
 msgstr "计算器"
 
@@ -524,9 +540,9 @@ msgstr "候选框"
 
 #: userland/apps/fileman/actions.c:318
 msgid "Cannot create extraction folder"
-msgstr ""
+msgstr "无法创建解压文件夹"
 
-#: userland/apps/taskmgr/main.c:713
+#: userland/apps/taskmgr/main.cpp:620
 msgid "Cannot end protected or non-user task"
 msgstr "无法结束受保护或非用户任务"
 
@@ -562,11 +578,11 @@ msgstr "复选框已取消"
 msgid "Checked"
 msgstr "已选中"
 
-#: userland/apps/installer/install_ops.c:1550
+#: userland/apps/installer/install_ops.c:1796
 msgid "Checking dependencies and preserving local configuration"
 msgstr "检查依赖关系并保留本地配置"
 
-#: userland/apps/installer/install_ops.c:1401
+#: userland/apps/installer/install_ops.c:1639
 msgid "Checking existing ReliefOS"
 msgstr "正在检测现有 ReliefOS"
 
@@ -578,13 +594,9 @@ msgstr "复选框和输入框"
 msgid "Chinese punctuation"
 msgstr "中文标点"
 
-#: userland/apps/installer/main.c:466
+#: userland/apps/installer/main.cpp:510
 msgid "Choose Setup Mode"
 msgstr "选择安装模式"
-
-#: userland/apps/installer/main.c:420
-msgid "Choose UI Style"
-msgstr "选择界面样式"
 
 #: userland/runtime/src/ui.c:1759
 msgid "Choose a default program for this file type:"
@@ -598,9 +610,9 @@ msgstr "选择用于打开此文件的程序:"
 msgid "Choose a text file or PNG image"
 msgstr "请选择文本文件或 PNG 图片"
 
-#: userland/apps/fileman/motif_dialogs.c:202
+#: userland/apps/fileman/main.cpp:464
 msgid "Choose an installed X11 executable using its absolute path"
-msgstr ""
+msgstr "请输入已安装 X11 程序的可执行文件绝对路径"
 
 #: userland/apps/notepad/main.c:676
 msgid "Choose file"
@@ -610,17 +622,21 @@ msgstr "选择文件"
 msgid "Choose the default app used by File Manager and desktop shortcuts."
 msgstr "选择文件资源管理器和桌面快捷方式打开文件时使用的默认应用。"
 
-#: userland/apps/installer/main.c:530
+#: userland/apps/installer/main.cpp:568
 msgid "Choose the disk that already contains ReliefOS."
 msgstr "选择已经包含 ReliefOS 的硬盘。"
 
-#: userland/apps/installer/main.c:531
+#: userland/apps/installer/main.cpp:569
 msgid "Choose the disk that will receive ReliefOS."
 msgstr "选择用于安装 ReliefOS 的硬盘。"
 
-#: userland/apps/installer/main.c:358
+#: userland/apps/installer/main.cpp:452
 msgid "Choose the language for Setup and the installed system."
 msgstr "选择安装程序和安装后系统使用的语言。"
+
+#: userland/apps/installer/main.cpp:527
+msgid "Choose the target disk, configure its partitions, then replace boot, system and EFI files."
+msgstr "选择目标磁盘并配置分区，然后替换引导、系统和 EFI 文件。"
 
 #: userland/apps/settings/main.c:1877
 msgid "Choose wallpaper"
@@ -646,7 +662,7 @@ msgstr "清空"
 msgid "Clear Address"
 msgstr "清空地址"
 
-#: userland/apps/fileman/model.c:536
+#: userland/apps/fileman/main.cpp:758
 msgid "Clear Marks"
 msgstr "清除标记"
 
@@ -678,7 +694,7 @@ msgstr "Cloudflare"
 msgid "Cloudflare DNS"
 msgstr "Cloudflare DNS"
 
-#: userland/apps/fileman/model.c:485
+#: userland/apps/fileman/main.cpp:765
 msgid "Compress to .tar"
 msgstr "压缩为tar"
 
@@ -688,7 +704,7 @@ msgstr "正在压缩为tar..."
 
 #: userland/apps/fileman/actions.c:373
 msgid "Compression canceled"
-msgstr ""
+msgstr "已取消压缩"
 
 #: userland/apps/settings/main.c:1599
 msgid "Computer"
@@ -702,11 +718,15 @@ msgstr "读取配置失败"
 msgid "Config:"
 msgstr "配置:"
 
-#: userland/apps/installer/main.c:178
+#: userland/apps/installer/main.cpp:806
+msgid "Configure partitions"
+msgstr "配置分区"
+
+#: userland/apps/installer/main.cpp:217
 msgid "Confirm"
 msgstr "确认"
 
-#: userland/apps/installer/main.c:691
+#: userland/apps/installer/main.cpp:943
 msgid "Confirm Installation"
 msgstr "确认安装"
 
@@ -722,21 +742,9 @@ msgstr "确认关机"
 msgid "Confirm Sign Out"
 msgstr "确认注销"
 
-#: userland/apps/installer/main.c:691
+#: userland/apps/installer/main.cpp:943
 msgid "Confirm Update"
 msgstr "确认更新"
-
-#: userland/apps/installer/main.c
-msgid "Install Xorg desktop environment"
-msgstr "安装 Xorg 桌面环境"
-
-#: userland/apps/installer/main.c:628
-msgid "Confirm password"
-msgstr "确认普通用户密码"
-
-#: userland/apps/installer/main.c:630
-msgid "Confirm root password"
-msgstr "确认 root 密码"
 
 #: userland/apps/diskmgr/main.c:708
 msgid "Confirm:"
@@ -754,7 +762,11 @@ msgstr "正在连接..."
 msgid "Connection query failed"
 msgstr "读取连接失败"
 
-#: userland/apps/fileman/model.c:459
+#: userland/apps/installer/main.cpp:720
+msgid "Continue"
+msgstr "继续"
+
+#: userland/apps/fileman/main.cpp:753
 msgid "Copy"
 msgstr "复制"
 
@@ -762,11 +774,11 @@ msgstr "复制"
 msgid "Copy complete"
 msgstr "复制完成"
 
-#: userland/apps/installer/install_ops.c:1466
+#: userland/apps/installer/install_ops.c:1712
 msgid "Copy failed"
 msgstr "复制失败"
 
-#: userland/apps/installer/install_ops.c:783
+#: userland/apps/installer/install_ops.c:1053
 msgid "Copy path is too long"
 msgstr "复制路径过长"
 
@@ -774,15 +786,15 @@ msgstr "复制路径过长"
 msgid "Copying files..."
 msgstr "正在复制文件..."
 
-#: userland/apps/installer/install_ops.c:502
+#: userland/apps/installer/install_ops.c:772
 msgid "Copying system files"
 msgstr "正在复制系统文件"
 
-#: userland/apps/osver/main.c:263
+#: userland/apps/osver/main.cpp:107
 msgid "Copyright"
 msgstr "版权"
 
-#: userland/apps/installer/install_ops.c:1553
+#: userland/apps/installer/install_ops.c:1799
 msgid "Core update failed"
 msgstr "核心系统更新失败"
 
@@ -794,7 +806,7 @@ msgstr "无法应用个性化设置"
 msgid "Could not arm the next debug boot."
 msgstr "无法设置下一次调试启动。"
 
-#: userland/apps/taskmgr/main.c:832
+#: userland/apps/taskmgr/main.cpp:681
 msgid "Could not change startup app"
 msgstr "无法更改启动应用"
 
@@ -802,7 +814,7 @@ msgstr "无法更改启动应用"
 msgid "Could not choose target file."
 msgstr "无法选择目标文件。"
 
-#: userland/apps/paint/main.c:457
+#: userland/apps/paint/main.cpp:42
 msgid "Could not create canvas"
 msgstr "无法创建画布"
 
@@ -810,9 +822,13 @@ msgstr "无法创建画布"
 msgid "Could not create user"
 msgstr "无法创建用户"
 
-#: userland/apps/imageview/main.c:243
+#: userland/apps/notepad/main.c:443
 msgid "Could not decode PNG (maximum 1024x1024)."
 msgstr "无法解码 PNG（最大 1024x1024）。"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "无法解码图像"
 
 #: userland/apps/notepad/main.c:415
 msgid "Could not decode text file"
@@ -822,6 +838,10 @@ msgstr "无法解码文本文件"
 msgid "Could not install:"
 msgstr "无法安装："
 
+#: userland/apps/taskmgr/main.cpp:717
+msgid "Could not open Service Manager"
+msgstr "无法打开服务管理器"
+
 #: userland/apps/oshlp/main.c:1207
 msgid "Could not open help"
 msgstr "无法打开帮助"
@@ -830,23 +850,23 @@ msgstr "无法打开帮助"
 msgid "Could not open help file."
 msgstr "无法打开帮助文件。"
 
-#: userland/apps/paint/main.c:190
+#: userland/apps/imageview/main.cpp:82
 msgid "Could not open image"
 msgstr "无法打开图片"
 
-#: userland/apps/osver/main.c:124
+#: userland/apps/fileman/main.cpp:625
+msgid "Could not open the requested path"
+msgstr "无法打开指定路径"
+
+#: userland/apps/osver/main.cpp:29
 msgid "Could not persist kernel debug mode."
 msgstr "无法保存内核调试模式状态。"
 
-#: userland/apps/imageview/main.c:253
-msgid "Could not read image."
-msgstr "无法读取图片。"
-
-#: userland/apps/osver/main.c:212
+#: userland/apps/osver/main.cpp:91
 msgid "Could not read system version information"
 msgstr "无法读取系统版本信息"
 
-#: userland/apps/taskmgr/main.c:854
+#: userland/apps/taskmgr/main.cpp:700
 msgid "Could not remove startup app"
 msgstr "无法删除启动应用"
 
@@ -862,7 +882,7 @@ msgstr "无法保存文件资源管理器设置 "
 msgid "Could not save file."
 msgstr "无法保存文件。"
 
-#: userland/apps/paint/main.c:263
+#: userland/apps/paint/main.cpp:97
 msgid "Could not save image"
 msgstr "无法保存图片"
 
@@ -874,7 +894,7 @@ msgstr "无法保存输入法设置"
 msgid "Could not save input method order"
 msgstr "无法保存输入法顺序"
 
-#: userland/apps/installer/install_ops.c:1476
+#: userland/apps/installer/install_ops.c:1722
 msgid "Could not save installed preferences"
 msgstr "无法保存安装后偏好设置"
 
@@ -886,9 +906,9 @@ msgstr "无法保存语言设置"
 msgid "Could not save services."
 msgstr "无法保存服务设置。"
 
-#: userland/apps/fileman/motif_dialogs.c:210
+#: userland/apps/fileman/main.cpp:472
 msgid "Could not save the file association"
-msgstr ""
+msgstr "无法保存文件关联"
 
 #: userland/apps/browser/navigation.c:784
 msgid "Could not start API Installer"
@@ -918,6 +938,10 @@ msgstr "无法启动输入法设置"
 msgid "Create Shortcut"
 msgstr "创建快捷方式"
 
+#: userland/apps/fltk_support.h:52
+msgid "Create a new directory"
+msgstr "创建新目录"
+
 #: userland/apps/apiapp/main.c:756
 msgid "Create desktop shortcut"
 msgstr "创建桌面快捷方式"
@@ -933,6 +957,10 @@ msgstr "创建快捷方式失败"
 #: userland/apps/settings/main.c:1765
 msgid "Create user"
 msgstr "创建用户"
+
+#: userland/apps/installer/main.cpp:839
+msgid "Create: size in MiB, filesystem, name. Resize only changes the trailing edge."
+msgstr "创建：依次输入大小（MiB）、文件系统和名称。调整大小只移动分区末端。"
 
 #: userland/apps/guitest/main.c:66
 msgid "Crosshair"
@@ -950,7 +978,11 @@ msgstr "自定义"
 msgid "Custom DNS"
 msgstr "自定义 DNS"
 
-#: userland/apps/fileman/model.c:461
+#: userland/apps/fltk_support.h:45
+msgid "Custom Filter"
+msgstr "自定义筛选器"
+
+#: userland/apps/fileman/main.cpp:754
 msgid "Cut"
 msgstr "剪切"
 
@@ -1030,15 +1062,15 @@ msgstr "DNS 超时"
 msgid "DNS:"
 msgstr "DNS:"
 
-#: userland/apps/doomlauncher/main.c:294
+#: userland/apps/doomlauncher/main.cpp:86
 msgid "DOOM Launcher"
 msgstr "DOOM 启动器"
 
-#: userland/apps/doomlauncher/main.c:200
+#: userland/apps/doomlauncher/main.cpp:74
 msgid "DOOM exited with code "
 msgstr "DOOM 已退出，代码 "
 
-#: userland/apps/doomlauncher/main.c:207
+#: userland/apps/doomlauncher/main.cpp:77
 msgid "DOOM is no longer running"
 msgstr "DOOM 已不再运行"
 
@@ -1046,15 +1078,19 @@ msgstr "DOOM 已不再运行"
 msgid "Data"
 msgstr "数据"
 
+#: userland/apps/installer/main.cpp:833
+msgid "Data type"
+msgstr "数据分区类型"
+
 #: userland/apps/settings/main.c:1320
 msgid "Default"
 msgstr "默认"
 
-#: userland/apps/fileman/motif_dialogs.c:198
+#: userland/apps/fileman/main.cpp:457
 msgid "Default Program"
 msgstr "默认程序"
 
-#: userland/apps/fileman/model.c:504
+#: userland/apps/fileman/main.cpp:747
 msgid "Default Program..."
 msgstr "默认程序..."
 
@@ -1062,9 +1098,9 @@ msgstr "默认程序..."
 msgid "Default app"
 msgstr "默认应用"
 
-#: userland/apps/fileman/motif_dialogs.c:213
+#: userland/apps/fileman/main.cpp:476
 msgid "Default application saved"
-msgstr ""
+msgstr "已保存默认程序"
 
 #: userland/apps/settings/main.c:2090
 msgid "Default input method saved"
@@ -1190,7 +1226,7 @@ msgstr "脏区重绘减少闪烁"
 msgid "Disable"
 msgstr "禁用"
 
-#: userland/apps/doomlauncher/main.c:329
+#: userland/apps/doomlauncher/main.cpp:93
 msgid "Disable sound"
 msgstr "禁用声音"
 
@@ -1198,15 +1234,15 @@ msgstr "禁用声音"
 msgid "Disabled"
 msgstr "已禁用"
 
-#: userland/apps/paint/main.c:453
+#: userland/apps/paint/main.cpp:51
 msgid "Discard"
 msgstr "放弃"
 
-#: userland/apps/paint/main.c:451
+#: userland/apps/paint/main.cpp:50
 msgid "Discard changes?"
 msgstr "放弃更改？"
 
-#: userland/apps/installer/main.c:176
+#: userland/apps/installer/main.cpp:214
 msgid "Disk"
 msgstr "硬盘"
 
@@ -1250,7 +1286,7 @@ msgstr "显示设置已保存"
 msgid "Do not ask again if I deny this request"
 msgstr "拒绝后不再询问"
 
-#: userland/apps/installer/main.c:728
+#: userland/apps/installer/main.cpp:982
 msgid "Do not turn off this machine."
 msgstr "请勿关闭此计算机。"
 
@@ -1354,7 +1390,7 @@ msgstr "编辑书签"
 msgid "Editing form input"
 msgstr "正在编辑表单输入"
 
-#: userland/apps/taskmgr/main.c:153
+#: userland/apps/taskmgr/main.cpp:156
 msgid "Elevated"
 msgstr "已提升"
 
@@ -1382,9 +1418,17 @@ msgstr "编码"
 msgid "End"
 msgstr "末尾"
 
-#: userland/apps/taskmgr/main.c:717
+#: userland/apps/taskmgr/main.cpp:625
+msgid "End Task"
+msgstr "结束任务"
+
+#: userland/apps/taskmgr/main.cpp:627
 msgid "End Task failed"
 msgstr "结束任务失败"
+
+#: userland/apps/taskmgr/main.cpp:624
+msgid "End task %s (PID %u)?"
+msgstr "结束任务 %s（PID %u）？"
 
 #: userland/runtime/src/ui.c:1012
 msgid "Enter a file name in "
@@ -1402,23 +1446,43 @@ msgstr "请输入有效的自定义 IPv4 DNS 地址。"
 msgid "Enter a valid size in MiB"
 msgstr "请输入有效的 MiB 大小"
 
-#: userland/apps/paint/main.c:679
+#: userland/apps/installer/main.cpp:695
+msgid "Enter a value:"
+msgstr "请输入："
+
+#: userland/apps/installer/main.cpp:691
+msgid "Enter filesystem and label (for example: ext4 RELIEFOS_DATA):"
+msgstr "输入文件系统和卷标（例如：ext4 RELIEFOS_DATA）："
+
+#: userland/apps/installer/main.cpp:685
+msgid "Enter size_MiB filesystem name (ext4/ext2/fat32/exfat):"
+msgstr "输入大小（MiB）、文件系统和名称（ext4/ext2/fat32/exfat）："
+
+#: userland/apps/installer/main.cpp:689
+msgid "Enter the GPT partition name:"
+msgstr "输入 GPT 分区名称："
+
+#: userland/apps/installer/main.cpp:687
+msgid "Enter the new partition size in MiB:"
+msgstr "输入新的分区大小（MiB）："
+
+#: userland/apps/paint/main.cpp:171
 msgid "Eraser"
 msgstr "橡皮"
 
-#: userland/apps/calc/main.c:24
+#: userland/apps/calc/main.cpp:20
 msgid "Error"
 msgstr "错误"
 
-#: userland/apps/installer/install_ops.c:949
+#: userland/apps/installer/install_ops.c:1220
 msgid "Existing ReliefOS boot partition was not detected"
 msgstr "未检测到现有 ReliefOS 启动分区"
 
-#: userland/apps/installer/install_ops.c:939
+#: userland/apps/installer/install_ops.c:1210
 msgid "Existing ReliefOS was not detected"
 msgstr "未检测到现有 ReliefOS"
 
-#: userland/apps/installer/install_ops.c:1410
+#: userland/apps/installer/install_ops.c:1328
 msgid "Existing system check failed"
 msgstr "现有系统检测失败"
 
@@ -1430,7 +1494,7 @@ msgstr "扩展名"
 msgid "Extension:"
 msgstr "扩展名:"
 
-#: userland/apps/doomlauncher/main.c:319
+#: userland/apps/doomlauncher/main.cpp:89
 msgid "Extra DOOM arguments"
 msgstr "附加 DOOM 参数"
 
@@ -1444,7 +1508,7 @@ msgstr "正在解压tar..."
 
 #: userland/apps/fileman/actions.c:323
 msgid "Extraction canceled"
-msgstr ""
+msgstr "已取消解压"
 
 #: userland/apps/drvmgr/main.c:85
 msgid "Failed"
@@ -1470,13 +1534,17 @@ msgstr "文件错误"
 msgid "File Manager"
 msgstr "文件资源管理器"
 
-#: userland/apps/fileman/motif_dialogs.c:103
+#: userland/apps/fileman/main.cpp:318
 msgid "File Manager Settings"
 msgstr "文件资源管理器设置"
 
 #: userland/apps/fileman/model.c:207
 msgid "File Manager settings saved"
 msgstr "文件资源管理器设置已保存"
+
+#: userland/apps/fltk_support.h:49
+msgid "File Systems"
+msgstr "文件系统"
 
 #: userland/apps/settings/main.c:1620
 msgid "File Types"
@@ -1494,7 +1562,7 @@ msgstr "文件已打开"
 msgid "File loaded, truncated"
 msgstr "文件已打开，内容被截断"
 
-#: userland/runtime/src/ui.c:1121
+#: userland/apps/fltk_support.h:48
 msgid "File name:"
 msgstr "文件名："
 
@@ -1530,6 +1598,14 @@ msgstr "文件："
 msgid "Fill"
 msgstr "填充"
 
+#: userland/apps/installer/main.cpp:842
+msgid "Final confirmation formats a FAT32 ESP and ext4 root on the selected disk."
+msgstr "最终确认后，会在所选磁盘上格式化 FAT32 EFI 系统分区和 ext4 根分区。"
+
+#: userland/apps/installer/main.cpp:843
+msgid "Final confirmation formats only the selected ESP and root; other partitions are preserved."
+msgstr "最终确认后，仅格式化选中的 EFI 系统分区和根分区，保留其他分区。"
+
 #: userland/apps/apiapp/main.c:665
 msgid "Finalizing download..."
 msgstr "正在完成下载..."
@@ -1550,11 +1626,11 @@ msgstr "在页面中查找..."
 msgid "Find:"
 msgstr "查找:"
 
-#: userland/apps/installer/main.c:180
+#: userland/apps/installer/main.cpp:219
 msgid "Finish"
 msgstr "完成"
 
-#: userland/apps/settings/main.c:297
+#: userland/apps/imageview/main.cpp:137
 msgid "Fit"
 msgstr "适应"
 
@@ -1578,9 +1654,9 @@ msgstr "文件夹名称为空"
 msgid "Folder name:"
 msgstr "文件夹名称:"
 
-#: userland/apps/fileman/motif.c:314
+#: userland/apps/fileman/main.cpp:789
 msgid "Folders (double-click to expand)"
-msgstr ""
+msgstr "文件夹（双击展开）"
 
 #: userland/apps/desktop/screen.c:826
 msgid "Force"
@@ -1598,9 +1674,9 @@ msgstr "表单已重置"
 msgid "Format partition"
 msgstr "格式化分区"
 
-#: userland/apps/installer/main.c:481
-msgid "Format the selected disk and copy a clean ReliefOS system."
-msgstr "格式化所选硬盘并复制干净的 ReliefOS 系统。"
+#: userland/apps/installer/main.cpp:721
+msgid "Formatting destroys all files on the selected partition."
+msgstr "格式化会删除所选分区中的全部文件。"
 
 #: userland/apps/browser/view.c:964
 msgid "Forward"
@@ -1610,15 +1686,15 @@ msgstr "前进"
 msgid "Framebuffer "
 msgstr "帧缓冲 "
 
-#: userland/apps/taskmgr/main.c:679
+#: userland/apps/taskmgr/main.cpp:574
 msgid "Free memory:"
 msgstr "可用内存:"
 
-#: userland/apps/installer/main.c:475
+#: userland/apps/installer/main.cpp:514
 msgid "Fresh Install"
 msgstr "全新安装"
 
-#: userland/apps/installer/main.c:467
+#: userland/apps/installer/main.cpp:511
 msgid "Fresh install erases the disk. Update keeps existing users and extra programs."
 msgstr "全新安装会清空硬盘；更新会保留用户和额外程序。"
 
@@ -1626,7 +1702,7 @@ msgstr "全新安装会清空硬盘；更新会保留用户和额外程序。"
 msgid "Full-width space"
 msgstr "全角空格"
 
-#: userland/apps/doomlauncher/main.c:333
+#: userland/apps/doomlauncher/main.cpp:94
 msgid "Fullscreen"
 msgstr "全屏"
 
@@ -1634,11 +1710,15 @@ msgstr "全屏"
 msgid "GET"
 msgstr "GET"
 
-#: userland/apps/taskmgr/main.c:631
+#: userland/apps/fileman/main.cpp:404
+msgid "GID"
+msgstr "组 ID"
+
+#: userland/apps/taskmgr/main.cpp:527
 msgid "GPU (est.)"
 msgstr "GPU (估算)"
 
-#: userland/apps/taskmgr/main.c:631
+#: userland/apps/taskmgr/main.cpp:527
 msgid "GPU (estimated)"
 msgstr "GPU (估算)"
 
@@ -1762,23 +1842,23 @@ msgstr "主机:"
 msgid "IPv4:"
 msgstr "IPv4:"
 
-#: userland/apps/doomlauncher/main.c:308
+#: userland/apps/doomlauncher/main.cpp:87
 msgid "IWAD path"
 msgstr "IWAD 路径"
 
-#: userland/apps/imageview/main.c:535
+#: userland/apps/imageview/main.cpp:119
 msgid "Image Viewer"
 msgstr "图片查看器"
 
-#: userland/apps/imageview/main.c:271
+#: userland/apps/imageview/main.cpp:86
 msgid "Image loaded"
 msgstr "图片已打开"
 
-#: userland/apps/paint/main.c:200
+#: userland/apps/paint/main.cpp:73
 msgid "Image opened"
 msgstr "图片已打开"
 
-#: userland/apps/paint/main.c:268
+#: userland/apps/paint/main.cpp:99
 msgid "Image saved"
 msgstr "图片已保存"
 
@@ -1789,6 +1869,14 @@ msgstr "输入"
 #: userland/apps/settings/main.c:1623
 msgid "Input Method"
 msgstr "输入法"
+
+#: userland/apps/doomlauncher/main.cpp:49
+msgid "Input is too long"
+msgstr "输入内容过长"
+
+#: userland/apps/fileman/main.cpp:255
+msgid "Input is too long; the value was not changed."
+msgstr "输入内容过长，原值未更改。"
 
 #: userland/apps/settings/main.c:1361
 msgid "Input method"
@@ -1842,7 +1930,15 @@ msgstr "安装"
 msgid "Install Options"
 msgstr "安装选项"
 
-#: userland/apps/installer/main.c:444
+#: userland/apps/installer/main.cpp:1106
+msgid "Install ReliefOS"
+msgstr "安装 ReliefOS"
+
+#: userland/apps/installer/main.cpp:972
+msgid "Install Xorg desktop environment"
+msgstr "安装 Xorg 桌面环境"
+
+#: userland/apps/installer/main.cpp:491
 msgid "Install a new system or update an existing ReliefOS disk."
 msgstr "全新安装系统，或更新现有 ReliefOS 硬盘。"
 
@@ -1862,19 +1958,19 @@ msgstr "安装完成"
 msgid "Installation Failed"
 msgstr "安装失败"
 
-#: userland/apps/installer/install_ops.c:1160
+#: userland/apps/installer/install_ops.c:1393
 msgid "Installation completed successfully"
 msgstr "安装成功完成"
 
-#: userland/apps/installer/install_ops.c:172
+#: userland/apps/installer/install_ops.c:183
 msgid "Installation failed"
 msgstr "安装失败"
 
-#: userland/apps/installer/install_ops.c:1005
+#: userland/apps/installer/install_ops.c:1271
 msgid "Installation media is incomplete"
 msgstr "安装介质不完整"
 
-#: userland/apps/installer/main.c:694
+#: userland/apps/installer/main.cpp:945
 msgid "Installed ReliefOS packages will be upgraded."
 msgstr "将升级已安装的 ReliefOS 软件包。"
 
@@ -1886,7 +1982,7 @@ msgstr "通过 API 包安装"
 msgid "Installing Application"
 msgstr "正在安装应用"
 
-#: userland/apps/installer/install_ops.c:202
+#: userland/apps/installer/install_ops.c:213
 msgid "Installing ReliefOS"
 msgstr "正在安装 ReliefOS"
 
@@ -1894,7 +1990,7 @@ msgstr "正在安装 ReliefOS"
 msgid "Installing..."
 msgstr "正在安装..."
 
-#: userland/apps/calc/main.c:117
+#: userland/apps/calc/main.cpp:66
 msgid "Integer calculator"
 msgstr "整数计算器"
 
@@ -1912,29 +2008,29 @@ msgstr "激活无效"
 
 #: userland/apps/fileman/actions.c:311
 msgid "Invalid extraction folder name"
-msgstr ""
+msgstr "解压文件夹名称无效"
 
 #: userland/apps/fileman/actions.c:199
 msgid "Invalid file name or path too long"
-msgstr ""
+msgstr "文件名无效或路径过长"
 
 #: userland/apps/fileman/actions.c:89
 msgid "Invalid folder name or path too long"
-msgstr ""
+msgstr "文件夹名称无效或路径过长"
 
 #: userland/apps/oshlp/main.c:1213
 msgid "Invalid help file"
 msgstr "无效的帮助文件"
 
-#: userland/apps/installer/install_ops.c:1430
+#: userland/apps/installer/install_ops.c:1668
 msgid "Invalid installation settings"
 msgstr "安装设置无效"
 
-#: userland/apps/fileman/motif_dialogs.c:284
+#: userland/apps/fileman/main.cpp:435
 msgid "Invalid mode, UID or GID"
-msgstr ""
+msgstr "权限、用户 ID 或组 ID 无效"
 
-#: userland/apps/installer/install_ops.c:1531
+#: userland/apps/installer/install_ops.c:1777
 msgid "Invalid root layout"
 msgstr "根目录布局无效"
 
@@ -1964,13 +2060,13 @@ msgstr "项目已剪切。打开一个文件夹后粘贴。"
 
 #: userland/apps/fileman/operations.c:394
 msgid "Items deleted"
-msgstr ""
+msgstr "已删除所选项目"
 
 #: userland/apps/settings/main.c:287
 msgid "Kawaii Pink"
 msgstr "卡哇伊粉"
 
-#: userland/apps/paint/main.c:453
+#: userland/apps/paint/main.cpp:51
 msgid "Keep"
 msgstr "保留"
 
@@ -1978,21 +2074,21 @@ msgstr "保留"
 msgid "Keep these display settings? Reverting in "
 msgstr "保留这些显示设置？将在 "
 
-#: userland/apps/osver/main.c:263
+#: userland/apps/osver/main.cpp:107
 msgid "Kernel"
 msgstr "内核"
 
-#: userland/apps/osver/main.c:125
+#: userland/apps/osver/main.cpp:27
 msgid "Kernel debug mode"
 msgstr "内核调试模式"
 
-#: userland/apps/osver/main.c:119
+#: userland/apps/osver/main.cpp:26
 msgid "Kernel debug mode enabled"
 msgstr "内核调试模式已启用"
 
-#: userland/apps/osver/main.c:123
+#: userland/apps/osver/main.cpp:28
 msgid "Kernel debug mode enabled. Reboot to enter it."
-msgstr ""
+msgstr "已启用内核调试模式，重启后进入。"
 
 #: userland/apps/desktop/start_menu.c:1406
 msgid "Kernel debugger"
@@ -2002,11 +2098,11 @@ msgstr "内核调试工具"
 msgid "Kernel device list"
 msgstr "内核设备列表"
 
-#: userland/apps/osver/main.c:263
+#: userland/apps/osver/main.cpp:107
 msgid "Kernel version"
 msgstr "内核版本"
 
-#: userland/apps/taskmgr/main.c:798
+#: userland/apps/taskmgr/main.cpp:659
 msgid "Kind:"
 msgstr "类型:"
 
@@ -2014,11 +2110,11 @@ msgstr "类型:"
 msgid "Label:"
 msgstr "卷标:"
 
-#: userland/apps/installer/main.c:171
+#: userland/apps/installer/main.cpp:210
 msgid "Language"
 msgstr "语言"
 
-#: userland/apps/doomlauncher/main.c:337
+#: userland/apps/doomlauncher/main.cpp:95
 msgid "Launch"
 msgstr "启动"
 
@@ -2030,7 +2126,7 @@ msgstr "启动命令存在未闭合引号。"
 msgid "Launch failed "
 msgstr "启动失败 "
 
-#: userland/apps/doomlauncher/main.c:171
+#: userland/apps/doomlauncher/main.cpp:61
 msgid "Launch failed: "
 msgstr "启动失败: "
 
@@ -2042,7 +2138,7 @@ msgstr "学习已选候选词"
 msgid "Lease:"
 msgstr "租约:"
 
-#: userland/apps/installer/install_ops.c:1397
+#: userland/apps/installer/install_ops.c:1635
 msgid "Legacy accounts require recovery before updating"
 msgstr "旧账户需完成受控迁移后再更新"
 
@@ -2066,9 +2162,9 @@ msgstr "行数 "
 msgid "List"
 msgstr "列表"
 
-#: userland/apps/taskmgr/main.c:867
-msgid "Live task snapshot from the scheduler."
-msgstr "来自调度器的实时任务快照。"
+#: userland/apps/taskmgr/main.cpp:724
+msgid "Live task and performance snapshot from the system."
+msgstr "实时显示系统任务与性能信息。"
 
 #: userland/apps/drvmgr/main.c:81
 msgid "Loaded"
@@ -2094,7 +2190,7 @@ msgstr "地址: "
 msgid "Login startup approval requested"
 msgstr "已请求登录启动权限"
 
-#: userland/apps/osver/main.c:257
+#: userland/apps/osver/main.cpp:58
 msgid "Logo unavailable"
 msgstr "Logo 不可用"
 
@@ -2105,10 +2201,6 @@ msgstr "查找范围："
 #: userland/apps/netctl/main.c:626
 msgid "MAC:"
 msgstr "MAC:"
-
-#: userland/apps/taskmgr/main.c:1059
-msgid "MEM"
-msgstr "内存"
 
 #: userland/apps/mp3play/main.c:347
 msgid "MP3 audio (*.mp3)"
@@ -2122,6 +2214,10 @@ msgstr "机器码"
 msgid "Manage Bookmarks..."
 msgstr "管理书签..."
 
+#: userland/apps/fltk_support.h:50
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
 #: userland/apps/diskmgr/main.c:1070
 msgid "Manage GPT partitions"
 msgstr "管理 GPT 分区"
@@ -2130,11 +2226,15 @@ msgstr "管理 GPT 分区"
 msgid "Manual"
 msgstr "手动启动"
 
-#: userland/apps/fileman/model.c:534
+#: userland/apps/installer/main.cpp:809
+msgid "Manual layout: select partitions, then assign ESP and root roles."
+msgstr "手动布局：选择分区，然后指定 EFI 系统分区和根分区。"
+
+#: userland/apps/fileman/main.cpp:757
 msgid "Mark All"
 msgstr "标记全部"
 
-#: userland/apps/fileman/model.c:467
+#: userland/apps/fileman/main.cpp:756
 msgid "Mark for Batch"
 msgstr "标记为批量操作"
 
@@ -2150,11 +2250,11 @@ msgstr "已清除标记"
 msgid "Mask:"
 msgstr "掩码:"
 
-#: userland/apps/taskmgr/main.c:622
+#: userland/apps/taskmgr/main.cpp:520
 msgid "Memory Usage"
 msgstr "内存占用"
 
-#: userland/apps/taskmgr/main.c:802
+#: userland/apps/taskmgr/main.cpp:663
 msgid "Memory:"
 msgstr "内存:"
 
@@ -2170,15 +2270,11 @@ msgstr "Metro 颜色"
 msgid "Metro color changed"
 msgstr "Metro 颜色已更改"
 
-#: userland/apps/installer/main.c:414
-msgid "Metro uses the modern flat system appearance."
-msgstr "Metro 使用现代扁平化系统外观。"
-
-#: userland/apps/minesweeper/main.c:196
+#: userland/apps/minesweeper/main.cpp:32
 msgid "Mines: "
 msgstr "地雷: "
 
-#: userland/apps/minesweeper/main.c:306
+#: userland/apps/minesweeper/main.cpp:102
 msgid "Minesweeper"
 msgstr "扫雷"
 
@@ -2186,13 +2282,17 @@ msgstr "扫雷"
 msgid "Minimized windows"
 msgstr "最小化窗口"
 
-#: userland/apps/doomlauncher/main.c:101
+#: userland/apps/doomlauncher/main.cpp:38
 msgid "Missing closing quote"
 msgstr "缺少闭合引号"
 
-#: userland/apps/installer/main.c:175
+#: userland/apps/installer/main.cpp:213
 msgid "Mode"
 msgstr "模式"
+
+#: userland/apps/fileman/main.cpp:393
+msgid "Mode (octal)"
+msgstr "权限（八进制）"
 
 #: userland/apps/diskmgr/main.c:809
 msgid "Mount"
@@ -2202,7 +2302,7 @@ msgstr "挂载"
 msgid "Mount exFAT, FAT32, ext4, or legacy ext2 data partitions at stable /mnt paths."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1392
+#: userland/apps/installer/install_ops.c:1630
 msgid "Mount failed"
 msgstr "挂载失败"
 
@@ -2222,7 +2322,7 @@ msgstr "已挂载为 "
 msgid "Mounted target"
 msgstr "已挂载目标"
 
-#: userland/apps/installer/install_ops.c:1388
+#: userland/apps/installer/install_ops.c:1626
 msgid "Mounting target filesystems"
 msgstr "正在挂载目标文件系统"
 
@@ -2298,25 +2398,25 @@ msgstr "网络失败"
 msgid "New"
 msgstr "新建"
 
+#: userland/apps/fltk_support.h:51
+msgid "New Directory?"
+msgstr "新建目录？"
+
 #: userland/apps/fileman/actions.c:80
 msgid "New Folder"
 msgstr "新建文件夹"
-
-#: userland/apps/minesweeper/main.c:325
-msgid "New Game"
-msgstr "新游戏"
 
 #: userland/apps/settings/main.c:1484
 msgid "New User"
 msgstr "新建用户"
 
-#: userland/apps/paint/main.c:459
-msgid "New canvas"
-msgstr "新建画布"
-
 #: userland/apps/fileman/actions.c:81
 msgid "New folder canceled"
 msgstr "已取消新建文件夹"
+
+#: userland/apps/minesweeper/main.cpp:103
+msgid "New game"
+msgstr "新游戏"
 
 #: userland/apps/fileman/actions.c:194
 msgid "New name is empty"
@@ -2330,7 +2430,7 @@ msgstr "新名称:"
 msgid "New partition"
 msgstr "新建分区"
 
-#: userland/apps/installer/main.c:192
+#: userland/apps/installer/main.cpp:233
 msgid "Next"
 msgstr "下一步"
 
@@ -2338,7 +2438,7 @@ msgstr "下一步"
 msgid "Next >"
 msgstr "下一步 >"
 
-#: userland/apps/imageview/main.c:561
+#: userland/apps/imageview/main.cpp:136
 msgid "Next Image"
 msgstr "下一张"
 
@@ -2354,7 +2454,7 @@ msgstr "否"
 msgid "No A record"
 msgstr "没有 A 记录"
 
-#: userland/apps/installer/install_ops.c:1415
+#: userland/apps/installer/install_ops.c:1653
 msgid "No APK database: reinstall from this media"
 msgstr "缺少 APK 数据库，请使用此介质重新安装"
 
@@ -2378,7 +2478,7 @@ msgstr "未选择设备"
 msgid "No disk selected."
 msgstr "未选择磁盘。"
 
-#: userland/apps/installer/install_ops.c:450
+#: userland/apps/installer/install_ops.c:720
 msgid "No disks were found"
 msgstr "未找到硬盘"
 
@@ -2390,17 +2490,9 @@ msgstr "没有文档"
 msgid "No e1000 adapter"
 msgstr "没有 e1000 网卡"
 
-#: userland/apps/imageview/main.c:162
-msgid "No file"
-msgstr "没有文件"
-
 #: userland/apps/desktop/desktop_items.c:559
 msgid "No file association for this item."
 msgstr "此项目没有默认打开方式。"
-
-#: userland/apps/imageview/main.c:146
-msgid "No image loaded."
-msgstr "未加载图片。"
 
 #: userland/apps/desktop/desktop_items.c:551
 msgid "No item selected."
@@ -2418,15 +2510,15 @@ msgstr "没有页面"
 msgid "No saved bookmarks"
 msgstr "没有保存的书签"
 
-#: userland/apps/taskmgr/main.c:827
+#: userland/apps/taskmgr/main.cpp:676
 msgid "No startup app selected"
 msgstr "未选择启动应用"
 
-#: userland/apps/taskmgr/main.c:709
+#: userland/apps/taskmgr/main.cpp:616
 msgid "No task selected"
 msgstr "未选择任务"
 
-#: userland/apps/installer/main.c:758
+#: userland/apps/installer/main.cpp:1021
 msgid "No writes will continue after this error."
 msgstr "出现此错误后不会继续写入。"
 
@@ -2490,6 +2582,10 @@ msgstr "目前只支持 http:// 和 https:// 下载。"
 msgid "Only pages with an address can be bookmarked"
 msgstr "只有带地址的页面可以加入书签"
 
+#: userland/apps/installer/main.cpp:958
+msgid "Only the selected ESP and root partitions will be formatted; other partitions are preserved."
+msgstr "仅格式化选中的 EFI 系统分区和根分区，保留其他分区。"
+
 #: userland/apps/browser/bookmarks.c:306
 msgid "Open"
 msgstr "打开"
@@ -2510,23 +2606,27 @@ msgstr "打开 MP3"
 msgid "Open ReliefOS program or file path"
 msgstr "打开 ReliefOS 程序或文件路径"
 
-#: userland/apps/fileman/motif_dialogs.c:198
+#: userland/apps/taskmgr/main.cpp:887
+msgid "Open Service Manager"
+msgstr "打开服务管理器"
+
+#: userland/apps/fileman/main.cpp:457
 msgid "Open With"
 msgstr "打开方式"
 
-#: userland/apps/fileman/motif_dialogs.c:200
+#: userland/apps/fileman/main.cpp:460
 msgid "Open With canceled"
 msgstr "已取消打开方式"
 
-#: userland/apps/fileman/motif_dialogs.c:217
+#: userland/apps/fileman/main.cpp:482
 msgid "Open With failed"
-msgstr ""
+msgstr "使用指定程序打开失败"
 
 #: userland/apps/fileman/model.c:616
 msgid "Open With is for files"
 msgstr "打开方式仅用于文件"
 
-#: userland/apps/fileman/model.c:457
+#: userland/apps/fileman/main.cpp:746
 msgid "Open With..."
 msgstr "打开方式..."
 
@@ -2546,7 +2646,7 @@ msgstr "打开文件路径"
 msgid "Open files from File Manager or Run."
 msgstr "从文件管理器或运行打开文件。"
 
-#: userland/apps/imageview/main.c:425
+#: userland/apps/imageview/main.cpp:92
 msgid "Open image"
 msgstr "打开图片"
 
@@ -2569,6 +2669,10 @@ msgstr "操作已取消"
 #: userland/apps/desktop/desktop_items.c:583
 msgid "Operation failed"
 msgstr "操作失败"
+
+#: userland/apps/taskmgr/main.cpp:889
+msgid "Options"
+msgstr "选项"
 
 #: userland/apps/devmgr/main.c:99
 msgid "Other"
@@ -2594,15 +2698,7 @@ msgstr "PNG 预览不能保存为文本"
 msgid "PNG preview is unavailable."
 msgstr "PNG 预览不可用。"
 
-#: userland/apps/taskmgr/main.c:1060
-msgid "PRIV"
-msgstr "权限"
-
-#: userland/apps/taskmgr/main.c:1059
-msgid "PROCESS"
-msgstr "进程"
-
-#: userland/apps/paint/main.c:635
+#: userland/apps/paint/main.cpp:32
 msgid "Paint"
 msgstr "画图"
 
@@ -2610,7 +2706,7 @@ msgstr "画图"
 msgid "Panel"
 msgstr "面板"
 
-#: userland/apps/taskmgr/main.c:796
+#: userland/apps/taskmgr/main.cpp:657
 msgid "Parent PID:"
 msgstr "父 PID:"
 
@@ -2642,13 +2738,25 @@ msgstr "分区格式化失败"
 msgid "Partition formatted"
 msgstr "分区格式化完成"
 
+#: userland/apps/installer/main.cpp:613
+msgid "Partition layout updated"
+msgstr "已更新分区布局"
+
 #: userland/apps/diskmgr/main.c:615
 msgid "Partition mount failed"
 msgstr "分区挂载失败"
 
+#: userland/apps/installer/main.cpp:611
+msgid "Partition operation failed"
+msgstr "分区操作失败"
+
 #: userland/apps/diskmgr/main.c:393
 msgid "Partition refresh failed"
 msgstr "分区刷新失败"
+
+#: userland/apps/installer/main.cpp:790
+msgid "Partition role updated."
+msgstr "已更新分区用途。"
 
 #: userland/apps/diskmgr/main.c:828
 msgid "Partition safety"
@@ -2678,17 +2786,21 @@ msgstr "密码（只保存在本次浏览器会话中）:"
 msgid "Password:"
 msgstr "密码："
 
-#: userland/apps/installer/main.c:664
+#: userland/apps/installer/main.cpp:917
 msgid "Passwords: 1-32 characters, no spaces; confirmations must match"
 msgstr "密码为 1 至 32 个字符，不含空格，两次输入需一致；请检查用户名"
 
-#: userland/apps/fileman/model.c:463
+#: userland/apps/fileman/main.cpp:755
 msgid "Paste"
 msgstr "粘贴"
 
-#: userland/apps/fileman/motif_dialogs.c:247
+#: userland/apps/fileman/main.cpp:385
 msgid "Path"
-msgstr ""
+msgstr "路径"
+
+#: userland/apps/fileman/main.cpp:621
+msgid "Path is too long"
+msgstr "路径过长"
 
 #: userland/apps/fileman/actions.c:367
 msgid "Path too long"
@@ -2698,41 +2810,41 @@ msgstr "路径过长"
 msgid "Path:"
 msgstr "路径:"
 
-#: userland/apps/installer/install_ops.c:1405
+#: userland/apps/installer/install_ops.c:1643
 msgid "Payload check failed"
 msgstr "负载检测失败"
 
-#: userland/apps/installer/install_ops.c:545
+#: userland/apps/installer/install_ops.c:815
 msgid "Payload path is too long"
 msgstr "负载路径过长"
 
-#: userland/apps/installer/install_ops.c:1458
+#: userland/apps/installer/install_ops.c:1704
 msgid "Payload scan failed"
 msgstr "扫描安装负载失败"
 
-#: userland/apps/paint/main.c:677
+#: userland/apps/paint/main.cpp:171
 msgid "Pencil"
 msgstr "铅笔"
 
-#: userland/apps/taskmgr/main.c:639
+#: userland/apps/taskmgr/main.cpp:536
 msgid "Per-core usage"
 msgstr "每核占用"
 
-#: userland/apps/taskmgr/main.c:1180
+#: userland/apps/taskmgr/main.cpp:890
 msgid "Performance"
 msgstr "性能"
 
-#: userland/apps/taskmgr/main.c:409
+#: userland/apps/taskmgr/main.cpp:393
 msgid "Performance data unavailable"
 msgstr "性能数据不可用"
 
 #: userland/apps/fileman/operations.c:369
 msgid "Permanently delete the selected items and all folder contents? This cannot be undone."
-msgstr ""
+msgstr "永久删除所选项目及文件夹中的全部内容？此操作无法撤销。"
 
-#: userland/apps/fileman/motif_dialogs.c:267
+#: userland/apps/fileman/main.cpp:410
 msgid "Permission changes use the current user's access rights."
-msgstr ""
+msgstr "修改权限时使用当前用户的访问权限。"
 
 #: userland/apps/desktop/desktop_items.c:547
 msgid "Permission denied"
@@ -2740,9 +2852,9 @@ msgstr "权限被拒绝"
 
 #: userland/apps/fileman/elevation.c:14
 msgid "Permission denied; administrator access requires a terminal in X11"
-msgstr ""
+msgstr "权限不足；在 X11 环境中需要通过终端获取管理员权限"
 
-#: userland/apps/fileman/motif_dialogs.c:290
+#: userland/apps/fileman/main.cpp:446
 msgid "Permissions saved"
 msgstr "权限已保存"
 
@@ -2762,9 +2874,13 @@ msgstr "个性化"
 msgid "Place shortcut on Desktop? No creates it here."
 msgstr "是否放到桌面？选择“否”则放在当前目录。"
 
-#: userland/apps/minesweeper/main.c:201
+#: userland/apps/minesweeper/main.cpp:35
 msgid "Playing"
 msgstr "游戏中"
+
+#: userland/apps/fltk_support.h:46
+msgid "Please choose an existing file!"
+msgstr "请选择已存在的文件！"
 
 #: userland/apps/apiapp/main.c:393
 msgid "Please keep this window open until installation completes."
@@ -2790,6 +2906,10 @@ msgstr "电源"
 msgid "Power request failed"
 msgstr "电源请求失败"
 
+#: userland/apps/installer/main.cpp:525
+msgid "Prepare a clean ReliefOS system with automatic or manual disk partitioning."
+msgstr "通过自动或手动分区安装全新的 ReliefOS 系统。"
+
 #: userland/apps/apiapp/main.c:631
 msgid "Preparing download..."
 msgstr "正在准备下载..."
@@ -2798,7 +2918,7 @@ msgstr "正在准备下载..."
 msgid "Present"
 msgstr "存在"
 
-#: userland/apps/installer/install_ops.c:1161
+#: userland/apps/installer/install_ops.c:1394
 msgid "Press Restart to boot from the installed disk."
 msgstr "点击重启从已安装硬盘启动。"
 
@@ -2806,23 +2926,27 @@ msgstr "点击重启从已安装硬盘启动。"
 msgid "Pressed"
 msgstr "已按下"
 
-#: userland/apps/installer/main.c:421
-msgid "Preview a style now and apply it to the installed system."
-msgstr "可立即预览样式，安装后系统也会使用此样式。"
+#: userland/apps/fltk_support.h:53
+msgid "Preview"
+msgstr "预览"
 
-#: userland/apps/imageview/main.c:560
+#: userland/apps/imageview/main.cpp:135
 msgid "Previous"
 msgstr "上一张"
 
-#: userland/apps/installer/main.c:986
+#: userland/apps/installer/main.cpp:1145
 msgid "Previous Step"
 msgstr "上一步"
 
-#: userland/apps/taskmgr/main.c:800
+#: userland/apps/taskmgr/main.cpp:661
 msgid "Privileges:"
 msgstr "权限:"
 
-#: userland/apps/taskmgr/main.c:1179
+#: userland/apps/taskmgr/main.cpp:913
+msgid "Process tree: name, PID, CPU, memory, state, user and privileges"
+msgstr "进程树：名称、PID、CPU、内存、状态、用户和权限"
+
+#: userland/apps/taskmgr/main.cpp:889
 msgid "Processes"
 msgstr "进程"
 
@@ -2842,13 +2966,13 @@ msgstr "进度"
 msgid "Progress    ready"
 msgstr "进度        就绪"
 
-#: userland/apps/fileman/motif_dialogs.c:248
+#: userland/apps/fileman/main.cpp:390
 msgid "Properties"
 msgstr "属性"
 
-#: userland/apps/fileman/motif_dialogs.c:235
+#: userland/apps/fileman/main.cpp:370
 msgid "Properties failed"
-msgstr ""
+msgstr "属性操作失败"
 
 #: userland/apps/diskmgr/main.c:244
 msgid "Protected"
@@ -2890,7 +3014,7 @@ msgstr "只读：驱动已内建到内核"
 msgid "Ready"
 msgstr "就绪"
 
-#: userland/apps/taskmgr/main.c:686
+#: userland/apps/taskmgr/main.cpp:585
 msgid "Ready "
 msgstr "就绪 "
 
@@ -2930,7 +3054,7 @@ msgstr "ReliefOS GUI API 测试器"
 msgid "ReliefOS Help"
 msgstr "ReliefOS 帮助"
 
-#: userland/apps/installer/main.c:443
+#: userland/apps/installer/main.cpp:490
 msgid "ReliefOS Setup"
 msgstr "ReliefOS 安装程序"
 
@@ -2946,11 +3070,11 @@ msgstr "ReliefOS 设备协议"
 msgid "ReliefOS text viewer"
 msgstr "ReliefOS 文本查看器"
 
-#: userland/apps/installer/main.c:746
+#: userland/apps/installer/main.cpp:1008
 msgid "ReliefOS was installed to the selected disk."
 msgstr "ReliefOS 已安装到所选硬盘。"
 
-#: userland/apps/installer/main.c:745
+#: userland/apps/installer/main.cpp:1007
 msgid "ReliefOS was updated on the selected disk."
 msgstr "所选硬盘上的 ReliefOS 已更新。"
 
@@ -2958,19 +3082,23 @@ msgstr "所选硬盘上的 ReliefOS 已更新。"
 msgid "Remaining"
 msgstr "剩余"
 
-#: userland/apps/fileman/motif_dialogs.c:206
+#: userland/apps/fileman/main.cpp:468
 msgid "Remember this application for files with the same extension?"
-msgstr ""
+msgstr "将此程序设为相同扩展名文件的默认打开程序？"
 
-#: userland/apps/taskmgr/main.c:850
+#: userland/apps/taskmgr/main.cpp:944
+msgid "Remove"
+msgstr "删除"
+
+#: userland/apps/taskmgr/main.cpp:698
 msgid "Remove Startup App"
 msgstr "删除启动应用"
 
-#: userland/apps/installer/main.c:748
+#: userland/apps/installer/main.cpp:1010
 msgid "Remove the installation media, then restart."
 msgstr "移除安装介质，然后重启。"
 
-#: userland/apps/taskmgr/main.c:850
+#: userland/apps/taskmgr/main.cpp:698
 msgid "Remove the selected startup app?"
 msgstr "删除选中的启动应用？"
 
@@ -2980,7 +3108,7 @@ msgstr "重命名"
 
 #: userland/apps/fileman/actions.c:204
 msgid "Rename Conflict"
-msgstr ""
+msgstr "重命名冲突"
 
 #: userland/apps/fileman/actions.c:190
 msgid "Rename canceled"
@@ -3006,9 +3134,9 @@ msgstr "更新 DHCP"
 msgid "Reopen applications to apply the language"
 msgstr "重新打开应用后生效"
 
-#: userland/apps/installer/main.c:482
-msgid "Replace boot, system, EFI and bundled docs. Then choose changed or missing system apps."
-msgstr "替换 boot、system、EFI 和内置文档，然后选择变化或缺失的系统程序。"
+#: userland/apps/paint/main.cpp:106
+msgid "Replace existing file?"
+msgstr "替换已存在的文件？"
 
 #: userland/apps/sysconfdialog/main.c:71
 msgid "Requesting application"
@@ -3026,7 +3154,7 @@ msgstr "缺少必需的动态链接库："
 msgid "Required system shell. Cannot be disabled here."
 msgstr "必需的系统外壳，不能在这里禁用。"
 
-#: userland/apps/doomlauncher/main.c:343
+#: userland/apps/doomlauncher/main.cpp:96
 msgid "Reset"
 msgstr "重置"
 
@@ -3110,6 +3238,10 @@ msgstr "返回"
 msgid "Revert"
 msgstr "还原"
 
+#: userland/apps/installer/main.cpp:770
+msgid "Review the selected ESP and root before continuing."
+msgstr "继续之前，请核对选中的 EFI 系统分区和根分区。"
+
 #: userland/apps/desktop/render.c:238
 msgid "Ring-3 desktop shadow blit"
 msgstr "Ring-3 桌面阴影缓冲绘制"
@@ -3118,19 +3250,19 @@ msgstr "Ring-3 桌面阴影缓冲绘制"
 msgid "Role"
 msgstr "权限"
 
-#: userland/runtime/src/ui.c:1119
+#: userland/apps/fileman/main.cpp:761
 msgid "Root"
 msgstr "根目录"
 
-#: userland/apps/installer/install_ops.c:1536
+#: userland/apps/installer/install_ops.c:1782
 msgid "Root and boot payloads"
 msgstr "根分区和启动分区负载"
 
-#: userland/apps/installer/install_ops.c:1389
+#: userland/apps/installer/install_ops.c:1627
 msgid "Root: /target; ESP: /target/boot"
 msgstr "根分区：/target；ESP：/target/boot"
 
-#: userland/apps/installer/install_ops.c:1463
+#: userland/apps/installer/install_ops.c:1709
 msgid "Root: /target; boot partition: /target/boot"
 msgstr "根分区：/target；启动分区：/target/boot"
 
@@ -3138,31 +3270,27 @@ msgstr "根分区：/target；启动分区：/target/boot"
 msgid "Run"
 msgstr "运行"
 
-#: userland/apps/taskmgr/main.c:685
-msgid "Run "
-msgstr "运行 "
-
 #: userland/apps/servicemgr/main.c:202
 msgid "Running"
 msgstr "运行中"
+
+#: userland/apps/taskmgr/main.cpp:584
+msgid "Running "
+msgstr "运行 "
 
 #: userland/apps/servicemgr/main.c:222
 msgid "Runtime state is visible. Administrator rights are required to control services."
 msgstr "可以查看运行状态，控制服务需要管理员权限。"
 
-#: userland/apps/installer/main.c:449
+#: userland/apps/installer/main.cpp:497
 msgid "SATA/AHCI and IDE/PATA target disks are supported."
 msgstr "支持 SATA/AHCI 和 IDE/PATA 目标硬盘。"
-
-#: userland/apps/taskmgr/main.c:1059
-msgid "STATE"
-msgstr "状态"
 
 #: userland/apps/desktop/render.c:44
 msgid "Sample text"
 msgstr "示例文本"
 
-#: userland/apps/notepad/main.c:678
+#: userland/apps/fileman/main.cpp:322
 msgid "Save"
 msgstr "保存"
 
@@ -3170,7 +3298,7 @@ msgstr "保存"
 msgid "Save As"
 msgstr "另存为"
 
-#: userland/apps/paint/main.c:662
+#: userland/apps/paint/main.cpp:152
 msgid "Save as"
 msgstr "另存为"
 
@@ -3190,15 +3318,15 @@ msgstr "新建文件前保存更改？"
 msgid "Save changes before opening another file?"
 msgstr "打开其他文件前保存更改？"
 
-#: userland/apps/paint/main.c:470
+#: userland/apps/paint/main.cpp:113
 msgid "Save changes?"
 msgstr "保存更改？"
 
-#: userland/apps/paint/main.c:422
+#: userland/apps/paint/main.cpp:104
 msgid "Save image"
 msgstr "保存图片"
 
-#: userland/apps/paint/main.c:471
+#: userland/apps/paint/main.cpp:114
 msgid "Save the current drawing before closing?"
 msgstr "关闭前保存当前绘画？"
 
@@ -3218,7 +3346,7 @@ msgstr "缩放"
 msgid "Scale changed"
 msgstr "缩放已更改"
 
-#: userland/apps/installer/install_ops.c:1535
+#: userland/apps/installer/install_ops.c:1781
 msgid "Scanning update payload"
 msgstr "正在扫描更新负载"
 
@@ -3238,15 +3366,15 @@ msgstr "搜索结果"
 msgid "Select Address"
 msgstr "选中地址"
 
-#: userland/apps/installer/main.c:527
+#: userland/apps/installer/main.cpp:566
 msgid "Select Disk to Update"
 msgstr "选择要更新的硬盘"
 
-#: userland/apps/installer/main.c:527
+#: userland/apps/installer/main.cpp:566
 msgid "Select Installation Disk"
 msgstr "选择安装硬盘"
 
-#: userland/apps/installer/main.c:357
+#: userland/apps/installer/main.cpp:451
 msgid "Select Language"
 msgstr "选择语言"
 
@@ -3278,11 +3406,11 @@ msgstr ""
 msgid "Select an unprotected non-boot disk partition"
 msgstr "请选择未受保护的非启动磁盘分区"
 
-#: userland/apps/installer/install_ops.c:208
+#: userland/apps/installer/install_ops.c:219
 msgid "Select the disk to update"
 msgstr "请选择要更新的硬盘"
 
-#: userland/apps/installer/install_ops.c:211
+#: userland/apps/installer/install_ops.c:222
 msgid "Select the target disk"
 msgstr "请选择目标硬盘"
 
@@ -3330,6 +3458,14 @@ msgstr "服务"
 msgid "Service Manager"
 msgstr "服务管理器"
 
+#: userland/apps/taskmgr/main.cpp:713
+msgid "Service Manager is unavailable"
+msgstr "服务管理器不可用"
+
+#: userland/apps/taskmgr/main.cpp:718
+msgid "Service Manager launched"
+msgstr "服务管理器已启动"
+
 #: userland/apps/servicemgr/main.c:314
 msgid "Service setting changed"
 msgstr "服务设置已更改"
@@ -3350,9 +3486,17 @@ msgstr "会话"
 msgid "Set Default"
 msgstr "设为默认"
 
+#: userland/apps/installer/main.cpp:827
+msgid "Set ESP"
+msgstr "设为 EFI 系统分区"
+
 #: userland/apps/guitest/main.c:143
 msgid "Set alternate title"
 msgstr "设置备用标题"
+
+#: userland/apps/installer/main.cpp:830
+msgid "Set root"
+msgstr "设为根分区"
 
 #: userland/apps/guitest/main.c:144
 msgid "Set test title"
@@ -3362,19 +3506,23 @@ msgstr "设置测试标题"
 msgid "Settings"
 msgstr "设置"
 
-#: userland/apps/doomlauncher/main.c:120
+#: userland/apps/doomlauncher/main.cpp:30
 msgid "Settings reset"
 msgstr "设置已重置"
 
-#: userland/apps/installer/main.c:961
+#: userland/apps/fileman/main.cpp:763
+msgid "Settings..."
+msgstr "设置..."
+
+#: userland/apps/installer/main.cpp:260
 msgid "Setup"
 msgstr "安装"
 
-#: userland/apps/installer/main.c:446
+#: userland/apps/installer/main.cpp:493
 msgid "Setup can copy the full normal system payload"
 msgstr "安装程序可以复制完整的普通系统文件"
 
-#: userland/apps/installer/install_ops.c:209
+#: userland/apps/installer/install_ops.c:220
 msgid "Setup will check for an existing ReliefOS system."
 msgstr "安装程序会检测现有 ReliefOS 系统。"
 
@@ -3394,9 +3542,13 @@ msgstr "检测到快捷方式循环。"
 msgid "Show desktop taskbar"
 msgstr "显示桌面任务栏"
 
-#: userland/apps/fileman/motif_dialogs.c:107
+#: userland/apps/fileman/main.cpp:320
 msgid "Show files and folders starting with a dot"
 msgstr "显示名称以点开头的文件和文件夹"
+
+#: userland/apps/fltk_support.h:56
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
 
 #: userland/apps/settings/main.c:164
 msgid "Show network state in the desktop taskbar."
@@ -3409,6 +3561,10 @@ msgstr "在任务栏显示硬件时钟。"
 #: userland/apps/guitest/main.c:150
 msgid "Show window in taskbar"
 msgstr "在任务栏显示窗口"
+
+#: userland/apps/fltk_support.h:55
+msgid "Show:"
+msgstr "显示："
 
 #: userland/apps/desktop/start_menu.c:1015
 msgid "Shut down"
@@ -3450,9 +3606,9 @@ msgstr "大小 MiB:"
 msgid "Skipped at boot"
 msgstr "启动时跳过"
 
-#: userland/apps/taskmgr/main.c:687
-msgid "Sleep "
-msgstr "睡眠 "
+#: userland/apps/taskmgr/main.cpp:586
+msgid "Sleeping "
+msgstr "休眠 "
 
 #: userland/apps/browser/util.c:190
 msgid "Socket closed"
@@ -3474,17 +3630,9 @@ msgstr "所选编码无法表示部分字符。将其保存为 '?' 吗？"
 msgid "Sound"
 msgstr ""
 
-#: userland/apps/taskmgr/main.c:155
+#: userland/apps/taskmgr/main.cpp:158
 msgid "Standard"
 msgstr "标准"
-
-#: userland/apps/installer/main.c:626
-msgid "Standard user name"
-msgstr "普通用户名"
-
-#: userland/apps/installer/main.c:627
-msgid "Standard user password"
-msgstr "普通用户密码"
 
 #: userland/apps/servicemgr/main.c:267
 msgid "Start"
@@ -3498,7 +3646,7 @@ msgstr "开始"
 msgid "Starting"
 msgstr "启动中"
 
-#: userland/apps/doomlauncher/main.c:176
+#: userland/apps/doomlauncher/main.cpp:65
 msgid "Starting DOOM: the game window shows loading progress"
 msgstr "正在启动 DOOM: 游戏窗口将显示加载进度"
 
@@ -3514,17 +3662,21 @@ msgstr "启动方式"
 msgid "Startup Application"
 msgstr "启动应用"
 
-#: userland/apps/taskmgr/main.c:835
+#: userland/apps/taskmgr/main.cpp:684
 msgid "Startup app disabled"
 msgstr "启动应用已禁用"
 
-#: userland/apps/taskmgr/main.c:835
+#: userland/apps/taskmgr/main.cpp:684
 msgid "Startup app enabled"
 msgstr "启动应用已启用"
 
-#: userland/apps/taskmgr/main.c:857
+#: userland/apps/taskmgr/main.cpp:704
 msgid "Startup app removed"
 msgstr "启动应用已删除"
+
+#: userland/apps/taskmgr/main.cpp:947
+msgid "Startup applications"
+msgstr "启动应用程序"
 
 #: userland/apps/settings/main.c:2028
 msgid "Startup behavior saved"
@@ -3558,10 +3710,6 @@ msgstr "静态回退"
 msgid "Status"
 msgstr "状态"
 
-#: userland/apps/doomlauncher/main.c:69
-msgid "Status "
-msgstr "状态 "
-
 #: userland/apps/devmgr/main.c:251
 msgid "Status:"
 msgstr "状态:"
@@ -3581,10 +3729,6 @@ msgstr "存储"
 #: userland/apps/settings/main.c:303
 msgid "Stretch"
 msgstr "拉伸"
-
-#: userland/apps/installer/main.c:173
-msgid "Style"
-msgstr "样式"
 
 #: userland/apps/browser/navigation.c:507
 msgid "Submitting form..."
@@ -3626,7 +3770,7 @@ msgstr "系统根目录视图"
 msgid "System settings"
 msgstr "系统设置"
 
-#: userland/apps/osver/main.c:207
+#: userland/apps/osver/main.cpp:87
 msgid "System version information"
 msgstr "系统版本信息"
 
@@ -3660,7 +3804,7 @@ msgstr "Tar创建成功"
 
 #: userland/apps/fileman/actions.c:393
 msgid "Tar creation failed"
-msgstr ""
+msgstr "创建 tar 归档失败"
 
 #: userland/apps/fileman/actions.c:337
 msgid "Tar extracted successfully"
@@ -3668,9 +3812,9 @@ msgstr "Tar解压成功"
 
 #: userland/apps/fileman/actions.c:336
 msgid "Tar extraction failed; check the archive and destination permissions"
-msgstr ""
+msgstr "解压 tar 失败，请检查归档和目标目录权限"
 
-#: userland/apps/installer/install_ops.c:1480
+#: userland/apps/installer/install_ops.c:1726
 msgid "Target disk is ready."
 msgstr "目标硬盘已准备就绪。"
 
@@ -3686,11 +3830,11 @@ msgstr "目标路径为空。"
 msgid "Target path:"
 msgstr "目标路径:"
 
-#: userland/apps/installer/main.c:704
+#: userland/apps/installer/main.cpp:952
 msgid "Target:"
 msgstr "目标:"
 
-#: userland/apps/installer/install_ops.c:1402
+#: userland/apps/installer/install_ops.c:1640
 msgid "Target: /target"
 msgstr "目标: /target"
 
@@ -3698,7 +3842,7 @@ msgstr "目标: /target"
 msgid "Task Button"
 msgstr "任务按钮"
 
-#: userland/apps/taskmgr/main.c:808
+#: userland/apps/taskmgr/main.cpp:666
 msgid "Task Details"
 msgstr "任务详细信息"
 
@@ -3706,7 +3850,7 @@ msgstr "任务详细信息"
 msgid "Task Manager"
 msgstr "任务管理器"
 
-#: userland/apps/taskmgr/main.c:720
+#: userland/apps/taskmgr/main.cpp:630
 msgid "Task ended"
 msgstr "任务已结束"
 
@@ -3714,7 +3858,7 @@ msgstr "任务已结束"
 msgid "Taskbar network icon"
 msgstr "任务栏网络图标"
 
-#: userland/apps/taskmgr/main.c:684
+#: userland/apps/taskmgr/main.cpp:583
 msgid "Tasks "
 msgstr "任务 "
 
@@ -3722,7 +3866,7 @@ msgstr "任务 "
 msgid "Teal"
 msgstr "青色"
 
-#: userland/apps/terminal/main.c:1615
+#: userland/apps/terminal/main.c:1631
 msgid "Terminal"
 msgstr "终端"
 
@@ -3758,11 +3902,11 @@ msgstr "未找到文本"
 msgid "TextField   selected"
 msgstr "输入框      已选中"
 
-#: userland/apps/installer/main.c:381
+#: userland/apps/installer/main.cpp:472
 msgid "Thank You"
 msgstr "感谢"
 
-#: userland/apps/installer/main.c:172
+#: userland/apps/installer/main.cpp:211
 msgid "Thanks"
 msgstr "感谢"
 
@@ -3784,39 +3928,39 @@ msgstr "无法启动该应用程序。"
 
 #: userland/apps/fileman/actions.c:372
 msgid "The archive exists. Replace it?"
-msgstr ""
+msgstr "归档文件已存在，是否替换？"
 
-#: userland/apps/paint/main.c:452
+#: userland/apps/paint/main.cpp:51
 msgid "The current drawing has not been saved."
 msgstr "当前绘画尚未保存。"
 
 #: userland/apps/fileman/actions.c:204
 msgid "The destination exists. Replace it?"
-msgstr ""
+msgstr "目标已存在，是否替换？"
 
 #: userland/apps/fileman/operations.c:99
 msgid "The destination exists. Replace it? Choose No to save with another name."
 msgstr "目标已存在。要替换它吗？选择“否”将使用其他名称保存。"
 
+#: userland/apps/installer/main.cpp:610
+msgid "The disk may have been changed"
+msgstr "磁盘内容可能已更改"
+
 #: userland/apps/fileman/actions.c:322
 msgid "The extraction folder exists. Existing files may be replaced. Continue?"
-msgstr ""
+msgstr "解压文件夹已存在，现有文件可能被替换，是否继续？"
 
 #: userland/apps/browser/navigation.c:498
 msgid "The form action could not be parsed as HTTP."
 msgstr "无法把表单提交地址解析为 HTTP。"
 
-#: userland/apps/installer/main.c:373
+#: userland/apps/installer/main.cpp:466
 msgid "The installed system will use the same language."
 msgstr "安装后的操作系统将使用相同语言。"
 
-#: userland/apps/installer/main.c:709
+#: userland/apps/installer/main.cpp:957
 msgid "The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root."
-msgstr ""
-
-#: userland/apps/installer/install_ops.c:212
-msgid "The selected disk will be erased."
-msgstr "所选硬盘将被清空。"
+msgstr "所选磁盘将被清空，并创建、格式化 FAT32 EFI 系统分区和 ext4 系统根分区。"
 
 #: userland/apps/settings/main.c:1290
 msgid "Theme style"
@@ -3842,7 +3986,7 @@ msgstr "此帮助文件没有页面。"
 msgid "This input method has no configurable options."
 msgstr "此输入法没有可配置选项。"
 
-#: userland/apps/installer/main.c:695
+#: userland/apps/installer/main.cpp:946
 msgid "This operation is destructive."
 msgstr "此操作会清空目标硬盘。"
 
@@ -3870,7 +4014,7 @@ msgstr "标题:"
 msgid "Toggle borderless"
 msgstr "切换无边框"
 
-#: userland/apps/doomlauncher/main.c:99
+#: userland/apps/doomlauncher/main.cpp:37
 msgid "Too many arguments"
 msgstr "启动参数过多"
 
@@ -3886,7 +4030,7 @@ msgstr "顶部"
 msgid "Top of page"
 msgstr "页面顶部"
 
-#: userland/apps/taskmgr/main.c:673
+#: userland/apps/taskmgr/main.cpp:566
 msgid "Total memory:"
 msgstr "总内存:"
 
@@ -3894,25 +4038,41 @@ msgstr "总内存:"
 msgid "Transmit failed"
 msgstr "发送失败"
 
-#: userland/apps/fileman/motif_dialogs.c:246
+#: userland/apps/fileman/main.cpp:384
 msgid "Type"
 msgstr "类型"
 
-#: userland/apps/fileman/motif.c:320
+#: userland/apps/fileman/main.cpp:792
 msgid "Type / Name (Ctrl or Shift for multiple selection)"
-msgstr ""
+msgstr "类型 / 名称（按住 Ctrl 或 Shift 多选）"
 
-#: userland/apps/installer/main.c:713
+#: userland/apps/installer/main.cpp:681
+msgid "Type AUTO to erase the disk and create an ESP and root partition:"
+msgstr "输入 AUTO 以清空磁盘并创建 EFI 系统分区和根分区："
+
+#: userland/apps/installer/main.cpp:693
+msgid "Type DELETE to remove the selected partition:"
+msgstr "输入 DELETE 以删除所选分区："
+
+#: userland/apps/installer/main.cpp:683
+msgid "Type INITIALIZE to replace the partition table:"
+msgstr "输入 INITIALIZE 以替换分区表："
+
+#: userland/apps/installer/main.cpp:962
 msgid "Type INSTALL to enable the Install button."
 msgstr "输入 INSTALL 以启用安装按钮。"
 
-#: userland/apps/installer/main.c:712
+#: userland/apps/installer/main.cpp:961
 msgid "Type UPDATE to enable the Update button."
 msgstr "输入 UPDATE 以启用更新按钮。"
 
 #: userland/apps/diskmgr/main.c:525
 msgid "Type the confirmation word and click Apply twice"
 msgstr "输入确认词后点击两次应用"
+
+#: userland/apps/fileman/main.cpp:399
+msgid "UID"
+msgstr "用户 ID"
 
 #: userland/apps/httpget/main.c:245
 msgid "URL is too large"
@@ -3921,10 +4081,6 @@ msgstr "URL 过大"
 #: userland/apps/browser/bookmarks.c:352
 msgid "URL:"
 msgstr "地址:"
-
-#: userland/apps/taskmgr/main.c:1059
-msgid "USER"
-msgstr "用户"
 
 #: userland/apps/netctl/main.c:509
 msgid "Unable to read the current DNS policy."
@@ -3974,17 +4130,13 @@ msgstr "卸载需要管理员授权，且不能有进程正在使用该挂载点
 msgid "Unsupported Address"
 msgstr "不支持的地址"
 
-#: userland/apps/imageview/main.c:259
-msgid "Unsupported BMP. Use uncompressed 24/32-bit BMP."
-msgstr "不支持的 BMP，请使用未压缩 24/32 位 BMP。"
-
-#: userland/apps/imageview/main.c:237
+#: userland/apps/imageview/main.cpp:67
 msgid "Unsupported image format. Use BMP, DIB, or PNG."
 msgstr "不支持的图片格式，请使用 BMP、DIB 或 PNG。"
 
-#: userland/apps/installer/install_ops.c:915
+#: userland/apps/installer/install_ops.c:1186
 msgid "Unsupported root layout; use a fresh ext4 installation"
-msgstr ""
+msgstr "不支持此根分区布局，请使用 ext4 全新安装"
 
 #: userland/apps/notepad/main.c:408
 msgid "Unsupported text encoding"
@@ -3998,7 +4150,7 @@ msgstr "未命名"
 msgid "Untitled Page"
 msgstr "无标题"
 
-#: userland/runtime/src/ui.c:1116
+#: userland/apps/fileman/main.cpp:760
 msgid "Up"
 msgstr "上级"
 
@@ -4006,23 +4158,23 @@ msgstr "上级"
 msgid "Up arrow"
 msgstr "向上箭头"
 
-#: userland/apps/installer/install_ops.c:196
+#: userland/apps/installer/install_ops.c:207
 msgid "Update"
 msgstr "更新"
 
-#: userland/apps/installer/main.c:742
+#: userland/apps/installer/main.cpp:1005
 msgid "Update Complete"
 msgstr "更新完成"
 
-#: userland/apps/installer/main.c:476
+#: userland/apps/installer/main.cpp:516
 msgid "Update Existing System"
 msgstr "更新现有系统"
 
-#: userland/apps/installer/main.c:756
+#: userland/apps/installer/main.cpp:1020
 msgid "Update Failed"
 msgstr "更新失败"
 
-#: userland/apps/installer/install_ops.c:1159
+#: userland/apps/installer/install_ops.c:1392
 msgid "Update completed successfully"
 msgstr "更新成功完成"
 
@@ -4034,7 +4186,7 @@ msgstr "更新默认程序"
 msgid "Update dictionary"
 msgstr "更新词库"
 
-#: userland/apps/installer/install_ops.c:1418
+#: userland/apps/installer/install_ops.c:1656
 msgid "Update installed ReliefOS packages"
 msgstr "更新已安装的 ReliefOS 软件包"
 
@@ -4042,7 +4194,7 @@ msgstr "更新已安装的 ReliefOS 软件包"
 msgid "Updating OpenRC..."
 msgstr "正在更新 OpenRC…"
 
-#: userland/apps/installer/install_ops.c:201
+#: userland/apps/installer/install_ops.c:212
 msgid "Updating ReliefOS"
 msgstr "正在更新 ReliefOS"
 
@@ -4050,17 +4202,13 @@ msgstr "正在更新 ReliefOS"
 msgid "Updating runlevel..."
 msgstr "正在更新运行级别…"
 
-#: userland/apps/installer/install_ops.c:1549
+#: userland/apps/installer/install_ops.c:1795
 msgid "Upgrading signed ReliefOS packages"
 msgstr "正在升级已签名的 ReliefOS 软件包"
 
-#: userland/apps/taskmgr/main.c:682
+#: userland/apps/taskmgr/main.cpp:578
 msgid "Uptime:"
 msgstr "运行时间:"
-
-#: userland/apps/imageview/main.c:614
-msgid "Use Open to choose a BMP or PNG image."
-msgstr "用“打开”选择 BMP 或 PNG 图像。"
 
 #: userland/apps/settings/main.c:1394
 msgid "Use as default"
@@ -4070,7 +4218,7 @@ msgstr "设为默认"
 msgid "Use http://, https://, about:, or a ReliefOS file path such as /file.html."
 msgstr "请使用 http://、https://、about:，或类似 /file.html 的 ReliefOS 文件路径。"
 
-#: userland/apps/taskmgr/main.c:676
+#: userland/apps/taskmgr/main.cpp:570
 msgid "Used memory:"
 msgstr "已用内存:"
 
@@ -4090,7 +4238,7 @@ msgstr "用户状态更改被拒绝"
 msgid "User state updated"
 msgstr "用户状态已更新"
 
-#: userland/apps/taskmgr/main.c:799
+#: userland/apps/taskmgr/main.cpp:660
 msgid "User:"
 msgstr "用户:"
 
@@ -4134,7 +4282,7 @@ msgstr "等待"
 msgid "Waiting for applications to close..."
 msgstr "正在等待应用程序关闭..."
 
-#: userland/apps/taskmgr/main.c:803
+#: userland/apps/taskmgr/main.cpp:664
 msgid "Wake tick:"
 msgstr "唤醒 tick:"
 
@@ -4162,7 +4310,7 @@ msgstr "网页下载"
 msgid "Web downloads are saved to the current user's Downloads folder."
 msgstr "网页下载会保存到当前用户的 Downloads 文件夹。"
 
-#: userland/apps/installer/main.c:174
+#: userland/apps/installer/main.cpp:212
 msgid "Welcome"
 msgstr "欢迎"
 
@@ -4173,10 +4321,6 @@ msgstr "Win95 颜色"
 #: userland/apps/settings/main.c:1742
 msgid "Win95 color changed"
 msgstr "Win95 颜色已更改"
-
-#: userland/apps/installer/main.c:415
-msgid "Win95 keeps the classic beveled system appearance."
-msgstr "Win95 保留经典立体系统外观。"
 
 #: userland/apps/desktop/start_menu.c:877
 msgid "Window"
@@ -4190,9 +4334,9 @@ msgstr "窗口和任务栏"
 msgid "Window server v2"
 msgstr "窗口服务 v2"
 
-#: userland/apps/fileman/motif_dialogs.c:199
+#: userland/apps/fileman/main.cpp:458
 msgid "X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"
-msgstr ""
+msgstr "X11 程序路径（NEdit：/usr/bin/nedit，Dillo：/usr/bin/dillo）："
 
 #: userland/apps/desktop/screen.c:838
 msgid "Yes"
@@ -4202,7 +4346,7 @@ msgstr "是"
 msgid "You can change your password."
 msgstr "你可以修改自己的密码。"
 
-#: userland/apps/minesweeper/main.c:199
+#: userland/apps/minesweeper/main.cpp:34
 msgid "You won"
 msgstr "胜利"
 
@@ -4210,9 +4354,9 @@ msgstr "胜利"
 msgid "boot  system  programs"
 msgstr "boot  system  programs"
 
-#: userland/apps/installer/install_ops.c:1524
+#: userland/apps/installer/install_ops.c:1770
 msgid "exFAT root cannot carry the current symlink layout; use a fresh ext4 install"
-msgstr ""
+msgstr "exFAT 根分区无法保存当前符号链接布局，请使用 ext4 全新安装"
 
 #: userland/apps/desktop/draw.c:700
 msgid "exit"
@@ -4220,7 +4364,7 @@ msgstr "退出"
 
 #: userland/apps/fileman/operations.c:392
 msgid "failed"
-msgstr ""
+msgstr "失败"
 
 #: userland/apps/helloworld/main.c:26
 msgid "helloworld"
@@ -4228,7 +4372,7 @@ msgstr "helloworld"
 
 #: userland/apps/fileman/operations.c:392
 msgid "item(s) deleted"
-msgstr ""
+msgstr "个项目已删除"
 
 #: userland/apps/desktop/draw.c:708
 msgid "kern"
@@ -4238,7 +4382,7 @@ msgstr "内核"
 msgid "open failed "
 msgstr "打开失败 "
 
-#: userland/apps/installer/main.c:447
+#: userland/apps/installer/main.cpp:495
 msgid "or replace the boot/reliefos and system files on an existing installation."
 msgstr "也可以替换现有安装中的启动和系统文件。"
 
@@ -4249,10 +4393,6 @@ msgstr "读取失败 "
 #: userland/apps/desktop/draw.c:694
 msgid "ready"
 msgstr "就绪"
-
-#: userland/apps/installer/main.c:629
-msgid "root password"
-msgstr "root 密码"
 
 #: userland/apps/desktop/draw.c:696
 msgid "run"
@@ -4282,13 +4422,103 @@ msgstr "睡眠"
 msgid "stat failed "
 msgstr "状态读取失败 "
 
-#: userland/apps/taskmgr/main.c:788
+#: userland/apps/taskmgr/main.cpp:650
 msgid "ticks"
-msgstr ""
+msgstr "时钟节拍"
 
 #: userland/apps/desktop/draw.c:708
 msgid "user"
 msgstr "用户"
+
+#~ msgid "CPU"
+#~ msgstr "CPU"
+
+#~ msgid "Choose UI Style"
+#~ msgstr "选择界面样式"
+
+#~ msgid "Confirm password"
+#~ msgstr "确认普通用户密码"
+
+#~ msgid "Confirm root password"
+#~ msgstr "确认 root 密码"
+
+#~ msgid "Could not read image."
+#~ msgstr "无法读取图片。"
+
+#~ msgid "Format the selected disk and copy a clean ReliefOS system."
+#~ msgstr "格式化所选硬盘并复制干净的 ReliefOS 系统。"
+
+#~ msgid "Live task snapshot from the scheduler."
+#~ msgstr "来自调度器的实时任务快照。"
+
+#~ msgid "MEM"
+#~ msgstr "内存"
+
+#~ msgid "Metro uses the modern flat system appearance."
+#~ msgstr "Metro 使用现代扁平化系统外观。"
+
+#~ msgid "New Game"
+#~ msgstr "新游戏"
+
+#~ msgid "New canvas"
+#~ msgstr "新建画布"
+
+#~ msgid "No file"
+#~ msgstr "没有文件"
+
+#~ msgid "No image loaded."
+#~ msgstr "未加载图片。"
+
+#~ msgid "PRIV"
+#~ msgstr "权限"
+
+#~ msgid "PROCESS"
+#~ msgstr "进程"
+
+#~ msgid "Preview a style now and apply it to the installed system."
+#~ msgstr "可立即预览样式，安装后系统也会使用此样式。"
+
+#~ msgid "Replace boot, system, EFI and bundled docs. Then choose changed or missing system apps."
+#~ msgstr "替换 boot、system、EFI 和内置文档，然后选择变化或缺失的系统程序。"
+
+#~ msgid "Run "
+#~ msgstr "运行 "
+
+#~ msgid "STATE"
+#~ msgstr "状态"
+
+#~ msgid "Sleep "
+#~ msgstr "睡眠 "
+
+#~ msgid "Standard user name"
+#~ msgstr "普通用户名"
+
+#~ msgid "Standard user password"
+#~ msgstr "普通用户密码"
+
+#~ msgid "Status "
+#~ msgstr "状态 "
+
+#~ msgid "Style"
+#~ msgstr "样式"
+
+#~ msgid "The selected disk will be erased."
+#~ msgstr "所选硬盘将被清空。"
+
+#~ msgid "USER"
+#~ msgstr "用户"
+
+#~ msgid "Unsupported BMP. Use uncompressed 24/32-bit BMP."
+#~ msgstr "不支持的 BMP，请使用未压缩 24/32 位 BMP。"
+
+#~ msgid "Use Open to choose a BMP or PNG image."
+#~ msgstr "用“打开”选择 BMP 或 PNG 图像。"
+
+#~ msgid "Win95 keeps the classic beveled system appearance."
+#~ msgstr "Win95 保留经典立体系统外观。"
+
+#~ msgid "root password"
+#~ msgstr "root 密码"
 
 #~ msgid " program package update(s) found."
 #~ msgstr " 个程序包更新。"
@@ -4353,9 +4583,6 @@ msgstr "用户"
 #~ msgid "Could not load permissions"
 #~ msgstr "无法加载权限"
 
-#~ msgid "Could not open Service Manager"
-#~ msgstr "无法打开服务管理器"
-
 #~ msgid "Could not replace original item"
 #~ msgstr "无法替换原始项目"
 
@@ -4400,9 +4627,6 @@ msgstr "用户"
 
 #~ msgid "Enable boot"
 #~ msgstr "开机启用"
-
-#~ msgid "End Task"
-#~ msgstr "结束任务"
 
 #~ msgid "Force stop"
 #~ msgstr "强制卸载"
@@ -4503,9 +4727,6 @@ msgstr "用户"
 #~ msgid "Operation denied or canceled"
 #~ msgstr "操作被拒绝或已取消"
 
-#~ msgid "Options"
-#~ msgstr "选项"
-
 #~ msgid "Original location is unavailable"
 #~ msgstr "原始位置不可用"
 
@@ -4557,9 +4778,6 @@ msgstr "用户"
 #~ msgid "Reload"
 #~ msgstr "重新读取"
 
-#~ msgid "Remove"
-#~ msgstr "删除"
-
 #~ msgid "Restore"
 #~ msgstr "还原"
 
@@ -4595,9 +4813,6 @@ msgstr "用户"
 
 #~ msgid "Session IPC"
 #~ msgstr "会话 IPC"
-
-#~ msgid "Settings..."
-#~ msgstr "设置..."
 
 #~ msgid "Shows runnable, sleeping, and exited tasks."
 #~ msgstr "显示可运行、睡眠和已退出任务。"

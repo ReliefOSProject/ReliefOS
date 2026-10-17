@@ -4,6 +4,7 @@ from pathlib import Path
 import unittest
 import subprocess
 import tempfile
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 ROOTFS = ROOT / "system/rootfs"
@@ -46,11 +47,58 @@ class ConsoleBootPolicyTests(unittest.TestCase):
     def test_xorg_session_is_selected_by_raw_marker(self):
         script = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
         self.assertIn("/etc/reliefos/desktop-backend", script)
-        self.assertIn("reliefos-xdm", (ROOT / "system/xorg/reliefos-xdm").read_text())
-        self.assertIn("xdm -nodaemon -config", (ROOT / "system/xorg/reliefos-xdm").read_text())
+        launcher = (ROOT / "system/xorg/reliefos-xdm").read_text()
+        self.assertIn("reliefos-xdm", launcher)
+        self.assertIn("/usr/bin/xdm -nodaemon", launcher)
+        self.assertNotIn("/usr/bin/xdm -nodaemon -config", launcher)
         self.assertNotIn("source ", script)
         self.assertNotIn(". /etc/reliefos/desktop-backend", script)
         self.assertNotIn("-novtswitch", (ROOT / "system/xorg/xdm-Xservers").read_text())
+
+    def test_xdm_source_config_selects_the_standard_x11_paths(self):
+        config = (ROOT / "system/xorg/xdm.conf").read_text()
+        for path in (
+            "/etc/X11/xdm/Xservers",
+            "/etc/X11/xdm/Xresources",
+            "/usr/lib/X11/xdm/Xsession",
+            "/usr/lib/X11/xdm/Xsetup_0",
+        ):
+            self.assertIn(path, config)
+        for legacy_path in (
+            "/etc/reliefos/xdm-Xservers",
+            "/etc/reliefos/xdm-Xresources",
+            "/usr/lib/reliefos/xdm-session",
+            "/usr/lib/reliefos/xdm-setup",
+        ):
+            self.assertNotIn(legacy_path, config)
+
+    def test_xdm_greeter_keeps_reliefos_identity_and_gray_blue_branding(self):
+        resources = (ROOT / "system/xorg/xdm-Xresources").read_text()
+        self.assertIn("xlogin*greeting: Login into ReliefOS", resources)
+        self.assertIn("/usr/lib/X11/xdm/pixmaps/xorg.xpm", resources)
+        self.assertIn("/usr/lib/X11/xdm/pixmaps/xorg-bw.xpm", resources)
+
+        def resource_color(name):
+            match = re.search(
+                rf"(?im)^\s*xlogin\*{re.escape(name)}:\s*(#[0-9a-f]{{6}}|[a-z][a-z0-9]*)\s*$",
+                resources,
+            )
+            self.assertIsNotNone(match, f"missing XDM color resource {name}")
+            value = match.group(1).lower()
+            if value.startswith("#"):
+                return tuple(int(value[index:index + 2], 16) for index in (1, 3, 5))
+            named = {"grey": (190, 190, 190), "gray": (190, 190, 190),
+                     "blue3": (0, 0, 205), "blue": (0, 0, 255)}
+            self.assertIn(value, named, f"unrecognized X11 color {value}")
+            return named[value]
+
+        background = resource_color("background")
+        self.assertGreaterEqual(min(background), 160)
+        self.assertLessEqual(max(background) - min(background), 20)
+
+        red, green, blue = resource_color("greetColor")
+        self.assertGreater(blue, red * 1.5, "greeter text should be blue")
+        self.assertGreater(blue, green * 1.15, "greeter text should be blue")
 
     def test_installer_root_keeps_the_xorg_backend_marker(self):
         rootfs_stage = (ROOT / "tools/build/rootfs-stage.sh").read_text()
@@ -72,7 +120,8 @@ class ConsoleBootPolicyTests(unittest.TestCase):
         session = (ROOT / "system/xorg/installer-session").read_text()
         self.assertIn("installer.elf --graphical", session)
         self.assertIn("/usr/lib/reliefos/xorg-tty-wrapper", session)
-        self.assertIn("/usr/bin/icewm", session)
+        self.assertIn("/usr/bin/icewm-session", session)
+        self.assertNotIn("xwallpaper", session)
         self.assertIn("desktop-backend=xorg", session)
         self.assertNotIn("reliefos-xdm", session)
         self.assertNotIn("PAM", session)
@@ -87,6 +136,8 @@ class ConsoleBootPolicyTests(unittest.TestCase):
     def test_xorg_evidence_events_are_safe_and_orderable(self):
         launcher = (ROOT / "system/xorg/reliefos-xdm").read_text()
         session = (ROOT / "system/xorg/xdm-session").read_text()
+        self.assertIn("/usr/bin/icewm-session", session)
+        self.assertNotIn("xwallpaper", session)
         console = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
         for event in ("desktop-backend=xorg", "xdm started on vt1"):
             self.assertIn(event, launcher)

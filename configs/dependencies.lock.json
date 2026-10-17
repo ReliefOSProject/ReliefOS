@@ -314,42 +314,16 @@
       "license_in_source": ".PKGINFO"
     },
     {
-      "id": "x11-dev-libsm",
+      "id": "x11-dev-fltk",
       "kind": "apk",
-      "version": "1.2.6-r0",
-      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/libsm-dev-1.2.6-r0.apk",
-      "sha256": "ebf4370407b600c638e578c3bd29d8d2a71aca6164046a0eebe9cdb25f4a1824",
-      "directory": "libsm-dev-1.2.6-r0",
+      "version": "1.3.11-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/fltk-dev-1.3.11-r1.apk",
+      "sha256": "ad0d535e2675acdb64b939c0f42a7a8151099cf9d235cfd684f63d8e7e2c8497",
+      "directory": "fltk-dev-1.3.11-r1",
       "script": "tools/build/x11-development.sh",
       "target": "x11-development",
       "feature": "xorg",
-      "note": "Build-only Xt session management headers; matching alpine-libsm runtime. Official APK signature verified before extraction.",
-      "license_in_source": ".PKGINFO"
-    },
-    {
-      "id": "x11-dev-libice",
-      "kind": "apk",
-      "version": "1.1.2-r0",
-      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/libice-dev-1.1.2-r0.apk",
-      "sha256": "a24db377cc2aeb5e34f339fcf13ac8ec65d3b38f8027c879336cba20dd2d043c",
-      "directory": "libice-dev-1.1.2-r0",
-      "script": "tools/build/x11-development.sh",
-      "target": "x11-development",
-      "feature": "xorg",
-      "note": "Build-only Xt interclient exchange headers; matching alpine-libice runtime. Official APK signature verified before extraction.",
-      "license_in_source": ".PKGINFO"
-    },
-    {
-      "id": "x11-dev-motif",
-      "kind": "apk",
-      "version": "2.5.2-r0",
-      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/motif-dev-2.5.2-r0.apk",
-      "sha256": "1d1cc944e4d3320c02d6ff412295e5ce4edcaf78958826321b8c63d1905db6da",
-      "directory": "motif-dev-2.5.2-r0",
-      "script": "tools/build/x11-development.sh",
-      "target": "x11-development",
-      "feature": "xorg",
-      "note": "Build-only headers; matching alpine-motif runtime. Official APK signature verified before extraction.",
+      "note": "Build-only FLTK 1.3.11 C++ headers and linker symlink; Alpine v3.24 community x86_64 APK signature verified before extraction (LGPL-2.0-only WITH FLTK-exception).",
       "license_in_source": ".PKGINFO"
     },
     {
@@ -363,19 +337,6 @@
       "target": "x11-development",
       "feature": "xorg",
       "note": "Build-only headers; matching alpine-libx11 runtime. Official APK signature verified before extraction.",
-      "license_in_source": ".PKGINFO"
-    },
-    {
-      "id": "x11-dev-libxt",
-      "kind": "apk",
-      "version": "1.3.1-r0",
-      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/libxt-dev-1.3.1-r0.apk",
-      "sha256": "70efb21ec9a58ace81e5a345007662bc72fa42002f9b09938495362cc2c0b5a8",
-      "directory": "libxt-dev-1.3.1-r0",
-      "script": "tools/build/x11-development.sh",
-      "target": "x11-development",
-      "feature": "xorg",
-      "note": "Build-only headers; matching alpine-libxt runtime. Official APK signature verified before extraction.",
       "license_in_source": ".PKGINFO"
     },
     {

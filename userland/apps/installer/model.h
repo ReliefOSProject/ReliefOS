@@ -31,6 +31,10 @@ enum installer_action {
     INSTALLER_ACTION_CLOSE,
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Forward transition; the disk page branches by setup mode (update goes
  * straight to the confirm page, fresh installs collect accounts first). */
 enum installer_page installer_model_next(enum installer_page page,
@@ -68,5 +72,8 @@ void installer_model_format_disk_line(char *buf, uint32_t cap, uint32_t id,
 int installer_model_secret_characters(const char *text, uint32_t length);
 int installer_model_edit_secret(char *secret, uint32_t cap, uint32_t start,
                                 uint32_t end, const char *text, uint32_t length);
+#ifdef __cplusplus
+}
+#endif
 
 #endif
