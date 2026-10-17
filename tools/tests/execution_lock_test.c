@@ -9,6 +9,9 @@
 static _Thread_local uint32_t cpu;
 static _Thread_local uint64_t irq_flags = 1u << 9;
 static atomic_int entered, release_worker, polling, active_readers, active_writers;
+static atomic_int suspended_writer_entered, suspended_writer_release;
+static atomic_int suspended_owner_count;
+static uint32_t suspended_payload;
 
 uint32_t smp_current_cpu(void) { return cpu; }
 void smp_membarrier_poll(void) { atomic_store(&polling, 1); }
@@ -48,6 +51,36 @@ static void *writer(void *unused)
     atomic_store(&entered, 1);
     wait_for(&release_worker);
     kernel_execution_unlock_irqrestore(flags);
+    return NULL;
+}
+
+static void *suspended_writer(void *unused)
+{
+    (void)unused;
+    cpu = 2;
+    uint64_t flags;
+    kernel_execution_lock_irqsave(&flags);
+    assert(!irq_flags);
+    assert(atomic_fetch_add_explicit(&suspended_owner_count, 1,
+                                     memory_order_relaxed) == 0);
+    atomic_store(&suspended_writer_entered, 1);
+    wait_for(&suspended_writer_release);
+    suspended_payload = 0x51a7c0deu;
+    assert(atomic_fetch_sub_explicit(&suspended_owner_count, 1,
+                                     memory_order_relaxed) == 1);
+    kernel_execution_unlock_irqrestore(flags);
+    assert(irq_flags == (1u << 9));
+    return NULL;
+}
+
+static void *release_suspended_writer(void *unused)
+{
+    (void)unused;
+    cpu = 3;
+    /* Main reaches this poll only after resume has queued behind the writer. */
+    wait_for(&polling);
+    assert(atomic_load_explicit(&suspended_owner_count, memory_order_relaxed) == 1);
+    atomic_store(&suspended_writer_release, 1);
     return NULL;
 }
 
@@ -105,6 +138,38 @@ int main(void)
     assert(irq_flags == (1u << 9));
     atomic_store(&release_worker, 1);
     assert(pthread_join(thread, NULL) == 0);
+
+    /* Suspend releases the ticket to a writer; resume queues behind it and
+     * observes the writer's protected data before restoring the transaction. */
+    atomic_store(&polling, 0);
+    atomic_store(&suspended_writer_entered, 0);
+    atomic_store(&suspended_writer_release, 0);
+    atomic_store(&suspended_owner_count, 0);
+    suspended_payload = 0;
+    assert(irq_flags == (1u << 9));
+    kernel_execution_lock_irqsave(&flags);
+    assert(!irq_flags);
+    assert(atomic_fetch_add_explicit(&suspended_owner_count, 1,
+                                     memory_order_relaxed) == 0);
+    struct kernel_execution_suspend_token token = {0};
+    assert(atomic_fetch_sub_explicit(&suspended_owner_count, 1,
+                                     memory_order_relaxed) == 1);
+    assert(kernel_execution_suspend_irqrestore(&token) == 0);
+    assert(token.active && irq_flags == (1u << 9));
+
+    pthread_t suspended_thread, release_thread;
+    assert(pthread_create(&suspended_thread, NULL, suspended_writer, NULL) == 0);
+    wait_for(&suspended_writer_entered);
+    assert(atomic_load_explicit(&suspended_owner_count, memory_order_relaxed) == 1);
+    assert(pthread_create(&release_thread, NULL, release_suspended_writer, NULL) == 0);
+    assert(kernel_execution_resume_irqsave(&token) == 0);
+    assert(!token.active && !irq_flags);
+    assert(atomic_load_explicit(&suspended_owner_count, memory_order_relaxed) == 0);
+    assert(suspended_payload == 0x51a7c0deu);
+    kernel_execution_unlock_irqrestore(flags);
+    assert(irq_flags == (1u << 9));
+    assert(pthread_join(suspended_thread, NULL) == 0);
+    assert(pthread_join(release_thread, NULL) == 0);
 
     pthread_t workers[4];
     for (uintptr_t i = 0; i < 4; ++i)

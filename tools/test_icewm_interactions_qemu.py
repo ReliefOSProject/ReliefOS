@@ -130,12 +130,13 @@ def main():
                               motion_interval=args.motion_interval)
         metadata["checks"].append(result)
         normal = bounds
-        probe.key("alt-f10")
+        # Match KeyWinMaximize/KeyWinMinimize in the shipped preferences.
+        probe.key("meta_l-z")
         bounds, _ = wait_bounds(probe, process, "maximized", lambda b: b is not None and
                                b[2] - b[0] > normal[2] - normal[0] + 100)
-        probe.key("alt-f10")
+        probe.key("meta_l-z")
         wait_bounds(probe, process, "restored", lambda b: b == normal)
-        probe.key("alt-f9")
+        probe.key("meta_l-m")
         wait_bounds(probe, process, "minimized", lambda b: b is None)
         probe.key("alt-tab")
         wait_bounds(probe, process, "unminimized", lambda b: b == normal)

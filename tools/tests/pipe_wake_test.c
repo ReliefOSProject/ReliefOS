@@ -37,6 +37,7 @@ static uint8_t source_data[TASK_PIPE_CAP];
 static uint8_t writer_a_data[8192];
 static uint8_t writer_b_data[8192];
 static uint8_t read_data[TASK_PIPE_CAP];
+static uint32_t spin_lock_acquisition_count;
 static uint32_t signal_count;
 static uint32_t signal_pid;
 static int signal_number;
@@ -50,6 +51,7 @@ void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)
 {
     (void)lock;
     *flags = 0;
+    ++spin_lock_acquisition_count;
 }
 
 void kernel_spin_unlock_irqrestore(struct kernel_spinlock *lock, uint64_t flags)
@@ -646,9 +648,180 @@ static int test_pipe_close_wake_all_preserves_stopped_waiter(void)
     return 0;
 }
 
+static void check_fast_path(int condition, const char *message, uint32_t *failures)
+{
+    if (!condition) {
+        fprintf(stderr, "FAIL: %s\n", message);
+        ++*failures;
+    }
+}
+
+static int test_wait_queue_fast_paths_reduce_lock_acquisitions(void)
+{
+    struct kernel_wait_queue queue;
+    uint32_t failures = 0;
+    uint32_t woke;
+
+    reset_tasks();
+    kernel_wait_queue_init(&queue);
+    spin_lock_acquisition_count = 0;
+    kernel_wait_queue_remove(&queue, &test_tasks[1]);
+    check_fast_path(spin_lock_acquisition_count == 0,
+                    "removing from an empty wait queue must not acquire its lock", &failures);
+
+    spin_lock_acquisition_count = 0;
+    woke = kernel_wait_queue_wake_one(&queue);
+    check_fast_path(woke == 0 && spin_lock_acquisition_count == 0,
+                    "waking one task on an empty queue must not acquire its lock", &failures);
+
+    spin_lock_acquisition_count = 0;
+    woke = kernel_wait_queue_wake_all(&queue);
+    check_fast_path(woke == 0 && spin_lock_acquisition_count == 0,
+                    "waking all tasks on an empty queue must not acquire its lock", &failures);
+
+    spin_lock_acquisition_count = 0;
+    woke = kernel_wait_queue_wake_satisfied(&queue, 0);
+    check_fast_path(woke == 0 && spin_lock_acquisition_count == 0,
+                    "threshold wake on an empty queue must not acquire its lock", &failures);
+
+    current_task = &test_tasks[1];
+    kernel_wait_queue_block_current_minimum(&queue, 4096u);
+    spin_lock_acquisition_count = 0;
+    woke = kernel_wait_queue_wake_satisfied(&queue, 512u);
+    check_fast_path(woke == 0 && spin_lock_acquisition_count == 0 &&
+                        test_tasks[1].state == TASK_BLOCKED,
+                    "wake below every waiter threshold must skip the lock and leave waiters blocked",
+                    &failures);
+
+    /* Updating one registered waiter's requirement upward must publish the
+     * new minimum; lowering it must publish the newly eligible requirement. */
+    current_task = &test_tasks[1];
+    kernel_wait_queue_block_current_minimum(&queue, 8192u);
+    spin_lock_acquisition_count = 0;
+    woke = kernel_wait_queue_wake_satisfied(&queue, 4096u);
+    check_fast_path(woke == 0 && spin_lock_acquisition_count == 0 &&
+                        test_tasks[1].state == TASK_BLOCKED,
+                    "raising a waiter's threshold must refresh the fast snapshot", &failures);
+
+    current_task = &test_tasks[1];
+    kernel_wait_queue_block_current_minimum(&queue, 4096u);
+    spin_lock_acquisition_count = 0;
+    woke = kernel_wait_queue_wake_satisfied(&queue, 4096u);
+    check_fast_path(woke == 1 && test_tasks[1].state == TASK_READY,
+                    "lowering a waiter's threshold must allow the eligible wake", &failures);
+
+    /* The first eligible waiter is removed; the remaining higher threshold
+     * must become the fast minimum before wake_satisfied retries. */
+    kernel_wait_queue_init(&queue);
+    reset_tasks();
+    current_task = &test_tasks[1];
+    kernel_wait_queue_block_current_minimum(&queue, 512u);
+    current_task = &test_tasks[2];
+    kernel_wait_queue_block_current_minimum(&queue, 4096u);
+    spin_lock_acquisition_count = 0;
+    woke = kernel_wait_queue_wake_satisfied(&queue, 512u);
+    check_fast_path(woke == 1 && test_tasks[1].state == TASK_READY &&
+                        test_tasks[2].state == TASK_BLOCKED &&
+                        spin_lock_acquisition_count == 1,
+                    "wake must publish the remaining threshold so a retry avoids another lock",
+                    &failures);
+
+    /* Removing the waiter that supplied the minimum must publish the new
+     * minimum from the remaining queue entries. */
+    kernel_wait_queue_init(&queue);
+    reset_tasks();
+    current_task = &test_tasks[1];
+    kernel_wait_queue_block_current_minimum(&queue, 512u);
+    current_task = &test_tasks[2];
+    kernel_wait_queue_block_current_minimum(&queue, 4096u);
+    kernel_wait_queue_remove(&queue, &test_tasks[1]);
+    spin_lock_acquisition_count = 0;
+    woke = kernel_wait_queue_wake_satisfied(&queue, 512u);
+    check_fast_path(woke == 0 && test_tasks[2].state == TASK_BLOCKED &&
+                        spin_lock_acquisition_count == 0,
+                    "remove must publish the remaining threshold for a lock-free early return",
+                    &failures);
+
+    kernel_wait_queue_wake_all(&queue);
+    current_task = &test_tasks[1];
+    kernel_wait_queue_block_current_minimum(&queue, UINT32_MAX);
+    spin_lock_acquisition_count = 0;
+    woke = kernel_wait_queue_wake_satisfied(&queue, UINT32_MAX - 1u);
+    check_fast_path(woke == 0 && test_tasks[1].state == TASK_BLOCKED &&
+                        spin_lock_acquisition_count == 0,
+                    "maximum resource requirement must reject a smaller available amount",
+                    &failures);
+    woke = kernel_wait_queue_wake_satisfied(&queue, UINT32_MAX);
+    check_fast_path(woke == 1 && test_tasks[1].state == TASK_READY &&
+                        test_tasks[1].waiting_queue == NULL,
+                    "maximum available amount must wake a maximum-threshold waiter",
+                    &failures);
+
+    return failures ? 1 : 0;
+}
+
+static int test_poll_wait_queue_fast_snapshot_keeps_generation_locking(void)
+{
+    uint32_t failures = 0;
+    uint64_t generation;
+
+    reset_tasks();
+    generation = kernel_poll_readiness_generation();
+    spin_lock_acquisition_count = 0;
+    kernel_poll_readiness_notify();
+    check_fast_path(kernel_poll_readiness_generation() == generation + 1u &&
+                        spin_lock_acquisition_count == 1,
+                    "poll notify must publish and take its queue lock even when empty", &failures);
+
+    /* A readiness change between the caller's sample and registration must
+     * be detected under poll_waiters.lock rather than lost to an empty fast path. */
+    generation = kernel_poll_readiness_generation();
+    kernel_poll_readiness_notify();
+    current_task = &test_tasks[4];
+    spin_lock_acquisition_count = 0;
+    int wait_result = kernel_poll_wait_current(generation, 0);
+    uint32_t registration_locks = spin_lock_acquisition_count;
+    check_fast_path(wait_result == 0 && registration_locks == 1 &&
+                        current_task->state == TASK_RUNNING &&
+                        !kernel_poll_wait_registered(current_task),
+                    "poll registration must lock and reject a stale readiness generation",
+                    &failures);
+
+    if (block_global_poll_waiter(4u)) return 1;
+    spin_lock_acquisition_count = 0;
+    kernel_poll_wait_remove(&test_tasks[4]);
+    check_fast_path(spin_lock_acquisition_count == 1 &&
+                        !kernel_poll_wait_registered(&test_tasks[4]),
+                    "removing a registered poll waiter must unlink it under the queue lock",
+                    &failures);
+    spin_lock_acquisition_count = 0;
+    kernel_poll_wait_remove(&test_tasks[4]);
+    check_fast_path(spin_lock_acquisition_count == 0,
+                    "removing from an empty poll queue must skip its lock", &failures);
+
+    if (block_global_poll_waiter(4u)) return 1;
+    generation = kernel_poll_readiness_generation();
+    spin_lock_acquisition_count = 0;
+    kernel_poll_readiness_notify();
+    check_fast_path(kernel_poll_readiness_generation() == generation + 1u &&
+                        test_tasks[4].state == TASK_READY &&
+                        !kernel_poll_wait_registered(&test_tasks[4]),
+                    "poll notify must still wake a registered waiter", &failures);
+    spin_lock_acquisition_count = 0;
+    kernel_poll_wait_remove(&test_tasks[4]);
+    check_fast_path(spin_lock_acquisition_count == 0,
+                    "poll wake must publish the empty snapshot before later removal", &failures);
+
+    return failures ? 1 : 0;
+}
+
 int main(void)
 {
+    int fast_path_failures = 0;
     reset_pipe();
+    fast_path_failures |= test_wait_queue_fast_paths_reduce_lock_acquisitions();
+    fast_path_failures |= test_poll_wait_queue_fast_snapshot_keeps_generation_locking();
+    if (fast_path_failures) return EXIT_FAILURE;
     if (test_8192_writer_threshold_and_data()) return EXIT_FAILURE;
     if (test_multiple_writer_thresholds_and_hol()) return EXIT_FAILURE;
     if (test_multiple_satisfied_writers_retry_without_lost_wakeup()) return EXIT_FAILURE;

@@ -273,3 +273,151 @@ Generated kernels are available locally at
 `out/xorg-vmware-debug/generated/system/kernel.sys` (debug) and
 `out/yesdd-release/generated/system/kernel.sys` (release). Production disk
 images and installer media were not repackaged by this experiment.
+
+## Further kernel optimization (2026-10-17)
+
+This experiment starts from parent `4b41b6ab232b9ad4d4d5e3bf0ae6b61f68f957f9`
+and ReliefNT `a24aa43271a3a9b0cabf9ae84c937f3cb4e80143`. It keeps the prepared
+GNU yes disk, yes/dd binaries, default 512-byte dd blocks and controller from
+the preceding experiment. All throughput comparisons in this section use
+`PROFILE=release` (`-O3`), KVM, q35, `host,+invtsc` and 4096 MiB RAM.
+Compilation and host tests are stopped before each timed guest run.
+
+### Wait queues and output validation
+
+Wait queues now publish an atomic count/minimum-threshold hint under their
+existing lock. Empty removal/wake operations and threshold wakeups that cannot
+satisfy any waiter can return without taking the lock. Adding or updating a
+waiter first publishes a conservative nonempty, zero-threshold hint; actual
+task entries and thresholds remain authoritative under the queue lock.
+Wakeups still retain the registration while the scheduler uses the task.
+Close/EOF/EPIPE wakeups and stopped-task behavior are preserved.
+The hint does not by itself prevent a producer from reading an old empty
+state before registration begins. Syscall callers retain execution-transaction
+serialization; concurrent audio IRQ paths retain their epoch check after
+registration/sleep and explicitly wake/retry when it changes.
+
+The global poll notifier still increments its generation and takes the queue
+lock unconditionally. Registration holds that lock through the BLOCKED state
+transition. An empty hint is deliberately not used to bypass this handshake.
+This follows the ordering concerns described in the Linux
+[wait-queue documentation](https://docs.kernel.org/next/driver-api/basics.html);
+the hint is not a replacement for condition-to-sleep synchronization.
+
+`user_range_writable()` checks an already mapped single output page once.
+The production PTE query requires PRESENT, USER and WRITABLE, which implies
+readability on x86. Bounds and overflow checks precede the shortcut. Lazy,
+COW and cross-page ranges use the original full readable-range validation
+before changing COW mappings. No bytes, faults or permission checks are
+discarded to improve a benchmark result.
+
+| Guest vCPUs | Baseline MB/s | First candidate MB/s | Repeat MB/s | Change (repeat) |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 729.584 | 759.218 | 759.497 | +4.10% |
+| 2 | 555.725 | 577.544 | 577.822 | +3.98% |
+
+Each entry is the median of three approximately ten-second rounds, computed
+from dd's final byte count and elapsed time. These are observations from one
+boot per entry, not confidence intervals. The repeat uses the same retained
+candidate binary in a fresh boot of each CPU configuration. A subsequent existing
+image kernel control gave 728.814/550.584 MB/s. Despite its local path containing
+`debug`, that control has the same optimized instruction sizes as the release
+baseline; it is not an `-O0` comparison. The explicit debug build uses `-O0 -g`
+and is recorded separately as a compilation check.
+
+Evidence: `build/yes-dd-optimization/next5g-{baseline,candidate,final,debug-baseline}/results.json`.
+The last directory name is historical and denotes the optimized existing-image
+control above. Both ESP paths were read back and matched the selected kernel;
+the source disk and snapshot base disks remained unchanged.
+The repeat comparison is `build/yes-dd-optimization/next5g-final-comparison/comparison.md`.
+
+The 5 GB/s target was not reached. The default command still performs roughly
+three million read/write calls per second at the observed one-vCPU throughput.
+Its small-block fixed costs remain significant, and kernel pipe operations
+still share the execution transaction. The lower two-vCPU throughput is
+consistent with serialization and cross-CPU handoff costs; these data do not
+measure a memory-bandwidth limit or establish a per-function cost breakdown.
+
+- Baseline kernel SHA-256:
+  `74bbb165f9249f8822d56451063306bea51fbdc8dea16ecc48ec6955f9f032df`.
+- Wait/usercopy candidate SHA-256:
+  `f6a8193fdae96a097820e4eecd052d43d5cf0ed036be581d5433c4976afe73b7`.
+
+### Rejected execution-lock trial
+
+A separate trial replaced the execution lock owner's serving-counter increment
+with a relaxed load and release store, retaining all SC ticket allocation and
+reader admission operations. Linux's
+[generic ticket spinlock](https://github.com/torvalds/linux/blob/master/include/asm-generic/ticket_spinlock.h)
+also uses release-store owner handoff; its implementation is a reference for
+that operation, not a proof of this kernel's separate reader-admission protocol.
+
+The trial passed the concurrency and driver-phase tests, but measured only
+751.842/577.736 MB/s on one/two vCPUs, compared with 759.218/577.544 MB/s for
+the wait/usercopy candidate. This does not establish an additional speedup.
+The lock change was therefore removed, restoring its original SC increment;
+the useful suspend/resume concurrency regression remains. Trial evidence is
+`build/yes-dd-optimization/next5g-candidate2/results.json`, kernel SHA-256
+`dc6cf0fea477037fbbfae545b5263e101e92b85e302ada661650185d33e0474b`.
+
+SYSRET was reviewed but not implemented here. The existing entry/frame and
+exception-stack handling need a separate design before replacing IRET. In
+particular, the final return frame must be checked for canonical addresses,
+selectors, RCX/R11 consistency and flag restrictions. Linux documents the
+required conservative fallback in its
+[x86 return code](https://github.com/torvalds/linux/blob/v6.12/arch/x86/entry/common.c)
+and [entry assembly](https://github.com/torvalds/linux/blob/v6.12/arch/x86/entry/entry_64.S).
+
+### Validation of this experiment
+
+- Release and explicit debug kernel compilation passed for the wait/usercopy
+  candidate and final retained source. The final release hash is identical to
+  the first wait/usercopy candidate. The explicit debug kernel SHA-256 is
+  `5d6f77b7fa351982af7b1b15c4a5791545c71efef5e0805c4bd9e6e882e0a2e7`.
+- ASan/UBSan host checks passed: pipe wake/PIPE_BUF behavior, usercopy/COW,
+  poll wakeups, AF_UNIX IPC, descriptor pin/SCM_RIGHTS lifetime, scheduler
+  resume/accounting and kernel memory/guard pages.
+- The new pthread wait-queue fixture passed. It uses real acquire/release
+  locks and deterministic contention to exercise poll notifications on both
+  sides of the BLOCKED transition, stale generations, stopped tasks,
+  threshold boundaries and concurrent wake/removal. Fast-path operation
+  counts are also checked by the pipe fixture, including `UINT32_MAX`.
+- Execution-lock host tests passed with ASan/UBSan, including readers,
+  recursive writers, exclusion/progress and IRQ restoration. The new
+  suspend/writer/resume test passed with both the old and new lock: resume
+  waits behind an active writer and observes its protected payload. All seven
+  existing driver execution-phase checks also passed.
+- Final release-kernel IceWM/QEMU regression passed title/Alt drag, resize,
+  maximize/restore, minimize/restore, mouse release and terminal input.
+  Both ESP readbacks matched the final kernel; source and snapshot base disks
+  were unchanged. Evidence:
+  `build/yes-dd-optimization/next5g-icewm-final-retry/results.json`.
+  The first attempt passed dragging and resizing but failed at maximize
+  because the test still sent Alt+F10/F9. The shipped preferences use
+  Super+Z/M; only the test's shortcut input was synchronized before rerunning.
+  The initial failure is preserved in `next5g-icewm-final/results.json`.
+- The final release kernel completed all 36 decomposition measurements
+  (including three repetitions per case) on each of one and two vCPUs.
+  Device tests account for successful short I/O; pipe tests verify 64 MiB of
+  payload per repetition, including the two-process wakeup path. Both ESP
+  readbacks matched the selected kernel and source/snapshot base disks stayed
+  unchanged. Evidence: `build/yes-dd-500/evidence/next5g-final/results.json`.
+  These are separate diagnostic cases, not replacements for the exact GNU
+  yes/dd command in the throughput table.
+- The full kernel `make ... test` was attempted and failed at the existing
+  audio/driver UAPI ABI golden drift. Header export (81 self-contained C/C++
+  headers) and test-tools passed. The golden file was not regenerated.
+
+Logs: `out/tmp/kernel-5g-*-tests.log`, `kernel-5g-kernel-suite.log`,
+`kernel-5g-final-build.log` and `kernel-5g-final-debug-build.log`.
+
+Final standalone kernels are copied to `build/kernel-throughput-5g/final/`.
+The `out/xorg-vmware-debug/generated/system/kernel.sys` output is explicitly
+an `-O0` debug build from this experiment; the directory name alone does not
+select the profile (the parent Makefile defaults to release). Existing formal
+RAW/VMDK/ISO media were not repackaged by this experiment. Runtime checks inject
+the release kernel into private image copies instead.
+
+VMware 验证未完成。The IceWM test uses QEMU's VMware SVGA emulation, not the
+VMware hypervisor. It checks completed interactions, not desktop frame rate,
+parallel-build responsiveness or real-hardware performance.

@@ -7,6 +7,8 @@
 static struct task current;
 static uint64_t flags[3];
 static unsigned cow_copies;
+static unsigned readable_page_checks;
+static unsigned writable_page_checks;
 static int lazy_result;
 static bool lazy_maps;
 static bool cow_leaves_readonly;
@@ -15,6 +17,7 @@ static unsigned index_for(uint64_t address) { return (address - RELIEFNT_USER_BA
 bool address_space_user_page_readable(const struct address_space *as, uint64_t address)
 {
     (void)as;
+    ++readable_page_checks;
     unsigned index = index_for(address);
     uint64_t required = RELIEFNT_PAGE_PRESENT | RELIEFNT_PAGE_USER;
     return index < 3 && (flags[index] & required) == required;
@@ -22,8 +25,20 @@ bool address_space_user_page_readable(const struct address_space *as, uint64_t a
 bool address_space_user_page_writable(const struct address_space *as, uint64_t address)
 {
     (void)as;
+    ++writable_page_checks;
     unsigned index = index_for(address);
-    return index < 3 && (flags[index] & RELIEFNT_PAGE_WRITABLE);
+    uint64_t required = RELIEFNT_PAGE_PRESENT | RELIEFNT_PAGE_USER |
+                        RELIEFNT_PAGE_WRITABLE;
+    return index < 3 && (flags[index] & required) == required;
+}
+static unsigned page_table_checks(void)
+{
+    return readable_page_checks + writable_page_checks;
+}
+static void reset_page_table_checks(void)
+{
+    readable_page_checks = 0;
+    writable_page_checks = 0;
 }
 bool address_space_handle_cow_fault(struct address_space *as, uint64_t address)
 {
@@ -51,10 +66,31 @@ int main(void)
     flags[1] = RELIEFNT_PAGE_PRESENT | RELIEFNT_PAGE_USER | RELIEFNT_PAGE_COW;
     flags[2] = RELIEFNT_PAGE_PRESENT | RELIEFNT_PAGE_USER;
     assert(user_range_writable(RELIEFNT_USER_BASE + 1, 0));
+    assert(user_range_writable(UINT64_MAX, 0));
     assert(!user_range_writable(0, 4));
+    assert(!user_range_writable(RELIEFNT_USER_TOP, 1));
     assert(!user_range_writable(UINT64_MAX - 2, 16));
+
+    /* A legal, already-writable single-page range needs one permission query:
+     * a writable user PTE is present and implicitly readable on x86. */
+    reset_page_table_checks();
+    assert(user_range_writable(RELIEFNT_USER_BASE + 64, 512));
+    assert(page_table_checks() <= 1);
+    assert(readable_page_checks == 0);
+    assert(writable_page_checks == 1);
+
     assert(user_range_writable(RELIEFNT_USER_BASE, 4096));
     assert(cow_copies == 0);
+
+    /* A write bit without present/user permissions cannot take the fast path. */
+    flags[0] = RELIEFNT_PAGE_WRITABLE;
+    lazy_result = 0;
+    lazy_maps = false;
+    reset_page_table_checks();
+    assert(!user_range_writable(RELIEFNT_USER_BASE + 64, 512));
+    assert(readable_page_checks >= 1);
+    flags[0] = RELIEFNT_PAGE_PRESENT | RELIEFNT_PAGE_USER | RELIEFNT_PAGE_WRITABLE;
+
     assert(user_range_writable(RELIEFNT_USER_BASE + 4090, 12));
     assert(cow_copies == 1);
     assert(!user_range_writable(RELIEFNT_USER_BASE + 8190, 12));
