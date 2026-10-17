@@ -36,7 +36,7 @@ for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper; do
     printf 'Xorg helper\n' > "$w/raw/$path"
 done
 ln -s reliefos/icewm "$w/raw/etc/icewm"
-for app in calc doom doomlauncher fileman imageview leonmmcoset minesweeper osver \
+for app in calc doom doomlauncher fileman imageview leonmmcoset minesweeper osver reliefexcel \
     paint taskmgr xiaobai glxgears portablegl; do
     mkdir -p "$w/raw/usr/lib/reliefos/apps/$app"
     printf '%s executable\n' "$app" > "$w/raw/usr/lib/reliefos/apps/$app/$app.elf"
@@ -122,7 +122,7 @@ done
 for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper; do
     [ ! -e "$w/stage/install/root-console/$path" ]
 done
-for app in calc doom doomlauncher fileman imageview leonmmcoset minesweeper osver \
+for app in calc doom doomlauncher fileman imageview leonmmcoset minesweeper osver reliefexcel \
     paint taskmgr xiaobai glxgears portablegl; do
     [ ! -e "$w/stage/install/root-console/usr/lib/reliefos/apps/$app" ]
     [ ! -e "$w/stage/install/root-console/usr/bin/$app" ]

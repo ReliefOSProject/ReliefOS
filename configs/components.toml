@@ -374,6 +374,21 @@ sdk = false
 api = false
 
 [[components]]
+id = "reliefexcel"
+symbol = "APP_RELIEFEXCEL"
+label = "ReliefExcel"
+category = "Office applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+open_with = true
+extensions = [".rexl", ".csv"]
+
+[[components]]
 id = "minesweeper"
 symbol = "APP_MINESWEEPER"
 label = "Minesweeper"

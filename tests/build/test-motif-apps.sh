@@ -37,12 +37,12 @@ O := $(WORK)/out
 include $(ROOT)/mk/userland.mk
 .PHONY: sources
 sources:
-	@printf '%s\n' '$(call userland_sources,calc)' '$(call userland_sources,osver)' '$(call userland_sources,fileman)' '$(call userland_sources,taskmgr)' '$(call userland_sources,minesweeper)' '$(call userland_sources,leonmmcoset)' '$(call userland_sources,xiaobai)' '$(call userland_sources,paint)' '$(call userland_sources,imageview)' '$(call userland_sources,doom)' '$(call userland_sources,doomlauncher)' '$(call userland_sources,installer)'
-	@printf '%s\n' '$(USERLAND_LIBS_calc)' '$(USERLAND_LIBS_osver)' '$(USERLAND_LIBS_fileman)' '$(USERLAND_LIBS_taskmgr)' '$(USERLAND_LIBS_minesweeper)' '$(USERLAND_LIBS_leonmmcoset)' '$(USERLAND_LIBS_xiaobai)' '$(USERLAND_LIBS_paint)' '$(USERLAND_LIBS_imageview)' '$(USERLAND_LIBS_doomlauncher)' '$(USERLAND_LIBS_doom)' '$(USERLAND_LIBS_installer)'
+	@printf '%s\n' '$(call userland_sources,calc)' '$(call userland_sources,osver)' '$(call userland_sources,fileman)' '$(call userland_sources,taskmgr)' '$(call userland_sources,minesweeper)' '$(call userland_sources,leonmmcoset)' '$(call userland_sources,xiaobai)' '$(call userland_sources,paint)' '$(call userland_sources,imageview)' '$(call userland_sources,doom)' '$(call userland_sources,doomlauncher)' '$(call userland_sources,installer)' '$(call userland_sources,reliefexcel)'
+	@printf '%s\n' '$(USERLAND_LIBS_calc)' '$(USERLAND_LIBS_osver)' '$(USERLAND_LIBS_fileman)' '$(USERLAND_LIBS_taskmgr)' '$(USERLAND_LIBS_minesweeper)' '$(USERLAND_LIBS_leonmmcoset)' '$(USERLAND_LIBS_xiaobai)' '$(USERLAND_LIBS_paint)' '$(USERLAND_LIBS_imageview)' '$(USERLAND_LIBS_doomlauncher)' '$(USERLAND_LIBS_doom)' '$(USERLAND_LIBS_installer)' '$(USERLAND_LIBS_reliefexcel)'
 	@printf '%s\n' '$(USERLAND_CXX_FLAGS)' '$(USERLAND_CXX_EXTRA_calc)'
 MAKE
 make -s -f "$work/sources.mk" ROOT="$src" WORK="$work" sources >"$work/sources"
-for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher doom installer; do
+for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher doom installer reliefexcel; do
     grep -q "userland/apps/$app/main.cpp" "$work/sources"
     if grep -Eq "userland/apps/$app/main\\.c([[:space:]]|$)" "$work/sources"; then
         printf 'FAIL - %s still selects a C frontend instead of the FLTK C++ frontend\n' "$app" >&2
@@ -61,12 +61,17 @@ for app in calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imag
         exit 1
     fi
 done
+grep -q 'userland/apps/reliefexcel/main.cpp' "$work/sources"
 for old_file in motif.c motif_dialogs.c motif.h; do
     if [ -e "$src/userland/apps/fileman/$old_file" ]; then
         printf 'FAIL - fileman still carries the obsolete Motif frontend file %s\n' "$old_file" >&2
         exit 1
     fi
 done
+grep -q '^Categories=Office;Spreadsheet;$' "$src/userland/apps/reliefexcel/reliefexcel.desktop"
+grep -q '^Exec=/usr/bin/reliefexcel %f$' "$src/userland/apps/reliefexcel/reliefexcel.desktop"
+grep -q '^Icon=/usr/lib/reliefos/apps/reliefexcel/reliefexcel.bmp$' "$src/userland/apps/reliefexcel/reliefexcel.desktop"
+[ -s "$src/resources/build-art/app-icons/reliefexcel.bmp" ]
 for app in taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher installer; do
     grep -q "userland/apps/$app/model.c" "$work/sources"
     if grep -q 'reliefos_gui_create_app_window\|reliefos_ui_' \

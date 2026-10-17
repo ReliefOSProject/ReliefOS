@@ -26,6 +26,8 @@ int main(void)
     assert(path[0] == 0);
     assert(fileman_join_path(path, sizeof(path), "/tmp", "../escape") < 0);
     assert(!strcmp(fileman_x11_default_app("/tmp/Hello.HTML"), "/usr/bin/dillo"));
+    assert(!strcmp(fileman_x11_default_app("/tmp/budget.rexl"), "/usr/bin/reliefexcel"));
+    assert(!strcmp(fileman_x11_default_app("/tmp/export.CSV"), "/usr/bin/reliefexcel"));
     assert(!strcmp(fileman_x11_default_app("/tmp/test.txt"), "/usr/bin/nedit"));
     assert(!strcmp(fileman_x11_default_app("/tmp/.hidden"), "/usr/bin/nedit"));
     assert(!fileman_x11_default_app("/tmp/program.elf"));

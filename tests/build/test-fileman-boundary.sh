@@ -7,6 +7,8 @@ if [ ! -f "$src/userland/apps/fileman/boundary.c" ]; then
     printf 'FAIL - file manager has no checked path and X11 handler boundary\n' >&2
     exit 1
 fi
+grep -Fq 'RELIEFOS_LAYOUT_RELIEFOS_APPS "/reliefexcel/reliefexcel.elf"' \
+    "$src/userland/apps/fileman/main.cpp"
 ${HOSTCC:-cc} -std=c11 -Wall -Wextra -Werror -fsanitize=undefined -fno-sanitize-recover=all \
     -I"$src/userland/apps/fileman" "$src/tests/host/test_fileman_boundary.c" \
     "$src/userland/apps/fileman/boundary.c" -o "$work/test"

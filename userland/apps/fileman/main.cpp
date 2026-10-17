@@ -121,6 +121,7 @@ int x11_app_allowed(const char *program)
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/minesweeper/minesweeper.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/osver/osver.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/paint/paint.elf",
+        RELIEFOS_LAYOUT_RELIEFOS_APPS "/reliefexcel/reliefexcel.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/taskmgr/taskmgr.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/xiaobai/xiaobai.elf",
     };

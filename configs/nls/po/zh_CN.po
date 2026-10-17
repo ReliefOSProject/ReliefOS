@@ -4628,8 +4628,6 @@ msgstr "用户"
 #~ msgid "Force stop"
 #~ msgstr "强制卸载"
 
-#~ msgid "General"
-#~ msgstr "常规"
 
 #~ msgid "Group"
 #~ msgstr "所属组"
@@ -5147,3 +5145,1549 @@ msgstr "查看实时 CPU、内存与 GPU 估算使用情况。"
 msgid "View properties and permissions"
 msgstr "查看属性和权限"
 
+#: userland/apps/reliefexcel
+msgid "&File"
+msgstr "文件(&F)"
+
+
+#: userland/apps/reliefexcel
+msgid "ABS(number) returns its absolute value."
+msgstr "ABS(数值)：返回绝对值。"
+
+
+#: userland/apps/reliefexcel
+msgid "Adds numeric cells in a range."
+msgstr "计算选区中数值的总和。"
+
+
+#: userland/apps/reliefexcel
+msgid "Alignment"
+msgstr "对齐方式"
+
+
+#: userland/apps/reliefexcel
+msgid "Amount"
+msgstr "金额"
+
+
+#: userland/apps/reliefexcel
+msgid "An unfinished workbook was found. Recover it?"
+msgstr "发现未完成的工作簿，是否恢复？"
+
+
+#: userland/apps/reliefexcel
+msgid "AutoSum"
+msgstr "自动求和"
+
+
+#: userland/apps/reliefexcel
+msgid "Average expense"
+msgstr "平均支出"
+
+
+#: userland/apps/reliefexcel
+msgid "Average:"
+msgstr "平均值："
+
+
+#: userland/apps/reliefexcel
+msgid "Balance"
+msgstr "余额"
+
+
+#: userland/apps/reliefexcel/document.cpp:861
+msgid "Bare carriage return outside quoted field"
+msgstr "带引号字段外出现了单独的回车符"
+
+
+#: userland/apps/reliefexcel
+msgid "Bold"
+msgstr "加粗"
+
+
+#: userland/apps/reliefexcel
+msgid "Borders"
+msgstr "边框"
+
+
+#: userland/apps/reliefexcel
+msgid "Budget status"
+msgstr "预算状态"
+
+
+#: userland/apps/reliefexcel
+msgid "Budget template"
+msgstr "记账模板"
+
+
+#: userland/apps/reliefexcel
+msgid "COUNTIF(range, criteria)"
+msgstr "COUNTIF(区域, 条件)：统计符合条件的单元格。"
+
+
+#: userland/apps/reliefexcel
+msgid "CSV exported"
+msgstr "CSV 已导出"
+
+
+#: userland/apps/reliefexcel
+msgid "CSV exports only this sheet's values. Formulas, styles and other sheets remain in the native workbook."
+msgstr "CSV 仅导出当前工作表的数值和文本；公式、样式和其他工作表请保存到原生工作簿。"
+
+
+#: userland/apps/reliefexcel
+msgid "CSV imported; save as a native workbook to keep formulas and formatting"
+msgstr "CSV 已导入；请保存为原生工作簿以保留公式和格式"
+
+
+#: userland/apps/reliefexcel/document.cpp:892
+msgid "Calculated value exceeds CSV text limits"
+msgstr "计算结果超出 CSV 文本长度限制"
+
+
+#: userland/apps/reliefexcel
+msgid "Calculation"
+msgstr "计算"
+
+
+#: userland/apps/reliefexcel
+msgid "Calculation canceled; results will update when accessed"
+msgstr "已取消重算；查看单元格时会更新结果"
+
+
+#: userland/apps/reliefexcel
+msgid "Category"
+msgstr "分类"
+
+
+#: userland/apps/reliefexcel
+msgid "Cell address, for example A1 or C25"
+msgstr "输入单元格地址，例如 A1 或 C25"
+
+
+#: userland/apps/reliefexcel/document.cpp:158
+msgid "Cell coordinate is outside worksheet bounds"
+msgstr "单元格坐标超出工作表范围"
+
+
+#: userland/apps/reliefexcel
+msgid "Cells"
+msgstr "单元格"
+
+
+#: userland/apps/reliefexcel
+msgid "Cells copied"
+msgstr "单元格已复制"
+
+
+#: userland/apps/reliefexcel
+msgid "Clear contents"
+msgstr "清除内容"
+
+
+#: userland/apps/reliefexcel
+msgid "Clear filters"
+msgstr "清除筛选"
+
+
+#: userland/apps/reliefexcel
+msgid "Clipboard"
+msgstr "剪贴板"
+
+
+#: userland/apps/reliefexcel
+msgid "Column:"
+msgstr "列："
+
+
+#: userland/apps/reliefexcel
+msgid "Columns"
+msgstr "列"
+
+
+#: userland/apps/reliefexcel
+msgid "Columns:"
+msgstr "列数："
+
+
+#: userland/apps/reliefexcel
+msgid "Comma|Semicolon|Tab"
+msgstr "逗号|分号|制表符"
+
+
+#: userland/apps/reliefexcel
+msgid "Condition:"
+msgstr "条件："
+
+
+#: userland/apps/reliefexcel
+msgid "Contains|Equals|Greater than|Less than|Not empty"
+msgstr "包含|等于|大于|小于|非空"
+
+
+#: userland/apps/reliefexcel/document.cpp:877
+msgid "Could not calculate imported worksheet"
+msgstr "无法计算导入的工作表"
+
+
+#: userland/apps/reliefexcel/document.cpp:1123
+msgid "Could not calculate workbook or operation cancelled"
+msgstr "无法计算工作簿，或操作已取消"
+
+
+#: userland/apps/reliefexcel/document.cpp:1033
+msgid "Could not close temporary save file"
+msgstr "无法关闭临时保存文件"
+
+
+#: userland/apps/reliefexcel/document.cpp:947 userland/apps/reliefexcel/document.cpp:964
+msgid "Could not create recovery directory"
+msgstr "无法创建恢复目录"
+
+
+#: userland/apps/reliefexcel/document.cpp:1005
+msgid "Could not create temporary save file"
+msgstr "无法创建临时保存文件"
+
+
+#: userland/apps/reliefexcel/document.cpp:628
+msgid "Could not create temporary save path"
+msgstr "无法创建临时保存路径"
+
+
+#: userland/apps/reliefexcel/document.cpp:1146
+msgid "Could not inspect delimited file"
+msgstr "无法检查分隔文件"
+
+
+#: userland/apps/reliefexcel/document.cpp:1055
+msgid "Could not inspect file"
+msgstr "无法检查文件"
+
+
+#: userland/apps/reliefexcel/document.cpp:965
+msgid "Could not inspect recovery directory"
+msgstr "无法检查恢复目录"
+
+
+#: userland/apps/reliefexcel/document.cpp:601
+msgid "Could not inspect save target"
+msgstr "无法检查保存目标"
+
+
+#: userland/apps/reliefexcel/document.cpp:1092
+msgid "Could not inspect workbook"
+msgstr "无法检查工作簿"
+
+
+#: userland/apps/reliefexcel/document.cpp:1142
+msgid "Could not open delimited file"
+msgstr "无法打开分隔文件"
+
+
+#: userland/apps/reliefexcel/document.cpp:647
+msgid "Could not open save directory"
+msgstr "无法打开保存目录"
+
+
+#: userland/apps/reliefexcel/document.cpp:1088
+msgid "Could not open workbook"
+msgstr "无法打开工作簿"
+
+
+#: userland/apps/reliefexcel/document.cpp:1012
+msgid "Could not preserve workbook permissions"
+msgstr "无法保留工作簿权限"
+
+
+#: userland/apps/reliefexcel/document.cpp:1163
+msgid "Could not read delimited file"
+msgstr "无法读取分隔文件"
+
+
+#: userland/apps/reliefexcel/document.cpp:362
+msgid "Could not read workbook"
+msgstr "无法读取工作簿"
+
+
+#: userland/apps/reliefexcel/document.cpp:1038
+msgid "Could not replace saved file"
+msgstr "无法替换已保存的文件"
+
+
+#: userland/apps/reliefexcel
+msgid "Could not save the recovery copy"
+msgstr "无法保存恢复副本"
+
+
+#: userland/apps/reliefexcel/document.cpp:970
+msgid "Could not secure recovery directory"
+msgstr "无法保护恢复目录"
+
+
+#: userland/apps/reliefexcel/document.cpp:651
+msgid "Could not sync save directory"
+msgstr "无法同步保存目录"
+
+
+#: userland/apps/reliefexcel/document.cpp:1032
+msgid "Could not sync temporary save file"
+msgstr "无法同步临时保存文件"
+
+
+#: userland/apps/reliefexcel/document.cpp:230
+msgid "Could not write workbook"
+msgstr "无法写入工作簿"
+
+
+#: userland/apps/reliefexcel
+msgid "Count:"
+msgstr "计数："
+
+
+#: userland/apps/reliefexcel
+msgid "Counts nonempty cells."
+msgstr "统计非空单元格的数量。"
+
+
+#: userland/apps/reliefexcel
+msgid "Counts numeric cells."
+msgstr "统计包含数值的单元格数量。"
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+C"
+msgstr "Ctrl+C"
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+D"
+msgstr "Ctrl+D"
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+F"
+msgstr "Ctrl+F"
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+H"
+msgstr "Ctrl+H"
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+R"
+msgstr "Ctrl+R"
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+V"
+msgstr "Ctrl+V"
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+X"
+msgstr "Ctrl+X"
+
+
+#: userland/apps/reliefexcel
+msgid "Currency"
+msgstr "货币"
+
+
+#: userland/apps/reliefexcel
+msgid "Data exchange"
+msgstr "数据交换"
+
+
+#: userland/apps/reliefexcel
+msgid "Date"
+msgstr "日期"
+
+
+#: userland/apps/reliefexcel
+msgid "Delete column"
+msgstr "删除列"
+
+
+#: userland/apps/reliefexcel
+msgid "Delete row"
+msgstr "删除行"
+
+
+#: userland/apps/reliefexcel
+msgid "Delete sheet"
+msgstr "删除工作表"
+
+
+#: userland/apps/reliefexcel
+msgid "Delete this worksheet? You can undo this operation."
+msgstr "删除当前工作表？此操作可以撤销。"
+
+
+#: userland/apps/reliefexcel/document.cpp:812 userland/apps/reliefexcel/document.cpp:817 userland/apps/reliefexcel/document.cpp:834
+msgid "Delimited field exceeds resource limits"
+msgstr "分隔字段超出资源限制"
+
+
+#: userland/apps/reliefexcel/document.cpp:814 userland/apps/reliefexcel/document.cpp:819 userland/apps/reliefexcel/document.cpp:836
+msgid "Delimited field exceeds the text limit"
+msgstr "分隔字段超出文本长度限制"
+
+
+#: userland/apps/reliefexcel/document.cpp:1150
+msgid "Delimited file has an invalid size or type"
+msgstr "分隔文件大小或类型无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:1162
+msgid "Delimited file is truncated"
+msgstr "分隔文件已截断"
+
+
+#: userland/apps/reliefexcel/document.cpp:1139
+msgid "Delimited file path is empty"
+msgstr "分隔文件路径为空"
+
+
+#: userland/apps/reliefexcel/document.cpp:775
+msgid "Delimited input exceeds the resource limit"
+msgstr "分隔输入超出资源限制"
+
+
+#: userland/apps/reliefexcel/document.cpp:844 userland/apps/reliefexcel/document.cpp:854 userland/apps/reliefexcel/document.cpp:875
+msgid "Delimited input exceeds worksheet dimensions"
+msgstr "分隔输入超出工作表尺寸"
+
+
+#: userland/apps/reliefexcel/document.cpp:910 userland/apps/reliefexcel/document.cpp:914 userland/apps/reliefexcel/document.cpp:916
+msgid "Delimited output exceeds resource limits"
+msgstr "分隔输出超出资源限制"
+
+
+#: userland/apps/reliefexcel/document.cpp:987
+msgid "Delimited output exceeds the resource limit"
+msgstr "分隔输出超出资源限制"
+
+
+#: userland/apps/reliefexcel/document.cpp:754
+msgid "Delimited text contains invalid UTF-8 or a NUL byte"
+msgstr "分隔文本包含无效 UTF-8 或 NUL 字节"
+
+
+#: userland/apps/reliefexcel
+msgid "Description"
+msgstr "说明"
+
+
+#: userland/apps/reliefexcel
+msgid "Dinner"
+msgstr "晚餐"
+
+
+#: userland/apps/reliefexcel
+msgid "Discard changes"
+msgstr "放弃更改"
+
+
+#: userland/apps/reliefexcel/document.cpp:160 userland/apps/reliefexcel/document.cpp:532
+msgid "Duplicate or unordered cell coordinate"
+msgstr "单元格坐标重复或顺序错误"
+
+
+#: userland/apps/reliefexcel/document.cpp:190
+msgid "Duplicate worksheet identifier"
+msgstr "工作表标识符重复"
+
+
+#: userland/apps/reliefexcel/document.cpp:192
+msgid "Duplicate worksheet name"
+msgstr "工作表名称重复"
+
+
+#: userland/apps/reliefexcel
+msgid "Edit cell content or formula; Enter applies the change"
+msgstr "编辑单元格内容或公式，按 Enter 应用"
+
+
+#: userland/apps/reliefexcel
+msgid "Electricity"
+msgstr "电费"
+
+
+#: userland/apps/reliefexcel
+msgid "Enter a zoom value from 25 to 400"
+msgstr "请输入 25 到 400 之间的缩放比例"
+
+
+#: userland/apps/reliefexcel
+msgid "Enter an address between A1 and IV10000"
+msgstr "请输入 A1 到 IV10000 范围内的地址"
+
+
+#: userland/apps/reliefexcel
+msgid "Enter text to find"
+msgstr "请输入查找内容"
+
+
+#: userland/apps/reliefexcel
+msgid "Examples: =SUM(B2:B20)    =IF(C2>0,C2,0)"
+msgstr "示例：=SUM(B2:B20)    =IF(C2>0,C2,0)"
+
+
+#: userland/apps/reliefexcel
+msgid "Exit"
+msgstr "退出"
+
+
+#: userland/apps/reliefexcel
+msgid "Expense"
+msgstr "支出"
+
+
+#: userland/apps/reliefexcel
+msgid "Export"
+msgstr "导出"
+
+
+#: userland/apps/reliefexcel
+msgid "Export CSV"
+msgstr "导出 CSV"
+
+
+#: userland/apps/reliefexcel
+msgid "Export CSV..."
+msgstr "导出 CSV…"
+
+
+#: userland/apps/reliefexcel/document.cpp:901
+msgid "Export range exceeds resource limits"
+msgstr "导出范围超出资源限制"
+
+
+#: userland/apps/reliefexcel/document.cpp:1051
+msgid "File path is empty"
+msgstr "文件路径为空"
+
+
+#: userland/apps/reliefexcel/document.cpp:1057
+msgid "File stamp requires a regular file"
+msgstr "文件状态检查要求目标是普通文件"
+
+
+#: userland/apps/reliefexcel
+msgid "Fill color"
+msgstr "填充色"
+
+
+#: userland/apps/reliefexcel
+msgid "Fill down"
+msgstr "向下填充"
+
+
+#: userland/apps/reliefexcel
+msgid "Fill right"
+msgstr "向右填充"
+
+
+#: userland/apps/reliefexcel
+msgid "Filter"
+msgstr "筛选"
+
+
+#: userland/apps/reliefexcel
+msgid "Filtering hides rows and preserves their contents."
+msgstr "筛选只隐藏行，不会删除其中的数据。"
+
+
+#: userland/apps/reliefexcel
+msgid "Find"
+msgstr "查找"
+
+
+#: userland/apps/reliefexcel
+msgid "Find and replace"
+msgstr "查找与替换"
+
+
+#: userland/apps/reliefexcel
+msgid "Find next"
+msgstr "查找下一个"
+
+
+#: userland/apps/reliefexcel
+msgid "First row is a header"
+msgstr "首行为表头"
+
+
+#: userland/apps/reliefexcel
+msgid "Font"
+msgstr "字体"
+
+
+#: userland/apps/reliefexcel
+msgid "Font size"
+msgstr "字号"
+
+
+#: userland/apps/reliefexcel
+msgid "Food"
+msgstr "餐饮"
+
+
+#: userland/apps/reliefexcel
+msgid "Food expenses"
+msgstr "餐饮支出"
+
+
+#: userland/apps/reliefexcel
+msgid "Food purchases"
+msgstr "餐饮笔数"
+
+
+#: userland/apps/reliefexcel
+msgid "Formulas"
+msgstr "公式"
+
+
+#: userland/apps/reliefexcel
+msgid "Freeze both"
+msgstr "冻结首行首列"
+
+
+#: userland/apps/reliefexcel
+msgid "Freeze first column"
+msgstr "冻结首列"
+
+
+#: userland/apps/reliefexcel
+msgid "Freeze first row"
+msgstr "冻结首行"
+
+
+#: userland/apps/reliefexcel
+msgid "Freeze panes"
+msgstr "冻结窗格"
+
+
+#: userland/apps/reliefexcel
+msgid "Function:"
+msgstr "函数："
+
+
+#: userland/apps/reliefexcel
+msgid "Functions"
+msgstr "函数"
+
+
+#: userland/apps/reliefexcel
+msgid "General"
+msgstr "常规"
+
+
+#: userland/apps/reliefexcel
+msgid "Gridlines"
+msgstr "网格线"
+
+
+#: userland/apps/reliefexcel
+msgid "Groceries"
+msgstr "买菜"
+
+
+#: userland/apps/reliefexcel
+msgid "Home tab"
+msgstr "开始"
+
+
+#: userland/apps/reliefexcel
+msgid "IF(condition, value_if_true, value_if_false)"
+msgstr "IF(条件, 成立时的值, 不成立时的值)"
+
+
+#: userland/apps/reliefexcel
+msgid "Import"
+msgstr "导入"
+
+
+#: userland/apps/reliefexcel
+msgid "Import CSV"
+msgstr "导入 CSV"
+
+
+#: userland/apps/reliefexcel
+msgid "Import CSV..."
+msgstr "导入 CSV…"
+
+
+#: userland/apps/reliefexcel/document.cpp:756
+msgid "Import exceeds the cell limit"
+msgstr "导入内容超出单元格数量限制"
+
+
+#: userland/apps/reliefexcel
+msgid "Income"
+msgstr "收入"
+
+
+#: userland/apps/reliefexcel/document.cpp:1031
+msgid "Incomplete temporary save file"
+msgstr "临时保存文件不完整"
+
+
+#: userland/apps/reliefexcel
+msgid "Insert"
+msgstr "插入"
+
+
+#: userland/apps/reliefexcel
+msgid "Insert column"
+msgstr "插入列"
+
+
+#: userland/apps/reliefexcel
+msgid "Insert function"
+msgstr "插入函数"
+
+
+#: userland/apps/reliefexcel
+msgid "Insert row"
+msgstr "插入行"
+
+
+#: userland/apps/reliefexcel/document.cpp:206
+msgid "Invalid active worksheet or identifier sequence"
+msgstr "当前工作表或标识符序列无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:527
+msgid "Invalid cell coordinate or style"
+msgstr "单元格坐标或样式无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:168
+msgid "Invalid cell style"
+msgstr "单元格样式无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:163
+msgid "Invalid cell text"
+msgstr "单元格文本无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:456
+msgid "Invalid column dimensions"
+msgstr "列尺寸无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:107
+msgid "Invalid column width"
+msgstr "列宽无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:899
+msgid "Invalid delimited range"
+msgstr "分隔数据范围无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:773 userland/apps/reliefexcel/document.cpp:1140
+msgid "Invalid field delimiter"
+msgstr "字段分隔符无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:466
+msgid "Invalid filter metadata"
+msgstr "筛选器元数据无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:111
+msgid "Invalid filter range"
+msgstr "筛选范围无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:133 userland/apps/reliefexcel/document.cpp:500
+msgid "Invalid merged range"
+msgstr "合并单元格范围无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:490
+msgid "Invalid merged range count"
+msgstr "合并范围数量无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:461
+msgid "Invalid row dimensions"
+msgstr "行尺寸无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:110
+msgid "Invalid row height"
+msgstr "行高无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:1116
+msgid "Invalid workbook header or length"
+msgstr "工作簿标头或长度无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:179 userland/apps/reliefexcel/document.cpp:568
+msgid "Invalid workbook metadata"
+msgstr "工作簿元数据无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:118
+msgid "Invalid worksheet filter"
+msgstr "工作表筛选器无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:445
+msgid "Invalid worksheet flags"
+msgstr "工作表标志无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:96
+msgid "Invalid worksheet name or identifier"
+msgstr "工作表名称或标识符无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:101
+msgid "Invalid worksheet view settings"
+msgstr "工作表视图设置无效"
+
+
+#: userland/apps/reliefexcel
+msgid "Italic"
+msgstr "斜体"
+
+
+#: userland/apps/reliefexcel
+msgid "Item"
+msgstr "项目"
+
+
+#: userland/apps/reliefexcel
+msgid "Later"
+msgstr "稍后"
+
+
+#: userland/apps/reliefexcel
+msgid "Ledger"
+msgstr "记账明细"
+
+
+#: userland/apps/reliefexcel
+msgid "Left"
+msgstr "左对齐"
+
+
+#: userland/apps/reliefexcel
+msgid "Lunch"
+msgstr "午餐"
+
+
+#: userland/apps/reliefexcel
+msgid "Match case"
+msgstr "区分大小写"
+
+
+#: userland/apps/reliefexcel
+msgid "Merge"
+msgstr "合并单元格"
+
+
+#: userland/apps/reliefexcel
+msgid "Monthly rent"
+msgstr "月租"
+
+
+#: userland/apps/reliefexcel
+msgid "Monthly salary"
+msgstr "每月工资"
+
+
+#: userland/apps/reliefexcel
+msgid "Move sheet left"
+msgstr "工作表左移"
+
+
+#: userland/apps/reliefexcel
+msgid "Move sheet right"
+msgstr "工作表右移"
+
+
+#: userland/apps/reliefexcel
+msgid "New sheet"
+msgstr "新建工作表"
+
+
+#: userland/apps/reliefexcel
+msgid "No borders"
+msgstr "无边框"
+
+
+#: userland/apps/reliefexcel
+msgid "No matching cell found"
+msgstr "未找到匹配的单元格"
+
+
+#: userland/apps/reliefexcel/document.cpp:1219
+msgid "No per-user state directory is available"
+msgstr "没有可用的用户状态目录"
+
+
+#: userland/apps/reliefexcel
+msgid "Not enough memory"
+msgstr "内存不足"
+
+
+#: userland/apps/reliefexcel/document.cpp:922
+msgid "Not enough memory to build delimited output"
+msgstr "内存不足，无法生成分隔数据"
+
+
+#: userland/apps/reliefexcel/document.cpp:931
+msgid "Not enough memory to create recovery directory"
+msgstr "内存不足，无法创建恢复目录"
+
+
+#: userland/apps/reliefexcel/document.cpp:777
+msgid "Not enough memory to import worksheet"
+msgstr "内存不足，无法导入工作表"
+
+
+#: userland/apps/reliefexcel/document.cpp:758 userland/apps/reliefexcel/document.cpp:762
+msgid "Not enough memory to import worksheet cell"
+msgstr "内存不足，无法导入工作表单元格"
+
+
+#: userland/apps/reliefexcel/document.cpp:1223 userland/apps/reliefexcel/document.cpp:1234
+msgid "Not enough memory to locate recovery directory"
+msgstr "内存不足，无法定位恢复目录"
+
+
+#: userland/apps/reliefexcel/document.cpp:541
+msgid "Not enough memory to read cell input"
+msgstr "内存不足，无法读取单元格内容"
+
+
+#: userland/apps/reliefexcel/document.cpp:555
+msgid "Not enough memory to read cell style"
+msgstr "内存不足，无法读取单元格样式"
+
+
+#: userland/apps/reliefexcel/document.cpp:509
+msgid "Not enough memory to read cells"
+msgstr "内存不足，无法读取单元格"
+
+
+#: userland/apps/reliefexcel/document.cpp:1154
+msgid "Not enough memory to read delimited file"
+msgstr "内存不足，无法读取分隔文件"
+
+
+#: userland/apps/reliefexcel/document.cpp:470 userland/apps/reliefexcel/document.cpp:485
+msgid "Not enough memory to read filters"
+msgstr "内存不足，无法读取筛选器"
+
+
+#: userland/apps/reliefexcel/document.cpp:494
+msgid "Not enough memory to read merged ranges"
+msgstr "内存不足，无法读取合并单元格范围"
+
+
+#: userland/apps/reliefexcel/document.cpp:413
+msgid "Not enough memory to read workbook"
+msgstr "内存不足，无法读取工作簿"
+
+
+#: userland/apps/reliefexcel/document.cpp:424
+msgid "Not enough memory to read workbook text"
+msgstr "内存不足，无法读取工作簿文本"
+
+
+#: userland/apps/reliefexcel/document.cpp:572 userland/apps/reliefexcel/document.cpp:580
+msgid "Not enough memory to read worksheets"
+msgstr "内存不足，无法读取工作表"
+
+
+#: userland/apps/reliefexcel/document.cpp:1239
+msgid "Not enough memory to return recovery path"
+msgstr "内存不足，无法返回恢复路径"
+
+
+#: userland/apps/reliefexcel/document.cpp:618
+msgid "Not enough memory to save workbook"
+msgstr "内存不足，无法保存工作簿"
+
+
+#: userland/apps/reliefexcel/document.cpp:635
+msgid "Not enough memory to sync save directory"
+msgstr "内存不足，无法同步保存目录"
+
+
+#: userland/apps/reliefexcel/document.cpp:127
+msgid "Not enough memory to validate merged ranges"
+msgstr "内存不足，无法验证合并单元格范围"
+
+
+#: userland/apps/reliefexcel
+msgid "Number"
+msgstr "数字"
+
+
+#: userland/apps/reliefexcel
+msgid "Number format"
+msgstr "数字格式"
+
+
+#: userland/apps/reliefexcel
+msgid "Office supplies"
+msgstr "办公用品"
+
+
+#: userland/apps/reliefexcel
+msgid "Only the upper-left cell's content is kept when merging. Continue?"
+msgstr "合并后只保留左上角单元格的内容，是否继续？"
+
+
+#: userland/apps/reliefexcel
+msgid "Open workbook"
+msgstr "打开工作簿"
+
+
+#: userland/apps/reliefexcel
+msgid "Open..."
+msgstr "打开…"
+
+
+#: userland/apps/reliefexcel/document.cpp:148
+msgid "Overlapping merged ranges"
+msgstr "合并单元格范围相互重叠"
+
+
+#: userland/apps/reliefexcel
+msgid "Overspent"
+msgstr "已超支"
+
+
+#: userland/apps/reliefexcel
+msgid "Paste values"
+msgstr "粘贴数值"
+
+
+#: userland/apps/reliefexcel
+msgid "Percent"
+msgstr "百分比"
+
+
+#: userland/apps/reliefexcel
+msgid "Preview of the first rows. Text and leading zeros are preserved; formulas are not executed."
+msgstr "预览前几行；保留文本与前导零，不执行 CSV 中的公式。"
+
+
+#: userland/apps/reliefexcel
+msgid "ROUND(number, decimal_places)"
+msgstr "ROUND(数值, 小数位数)：四舍五入。"
+
+
+#: userland/apps/reliefexcel
+msgid "Recalculate"
+msgstr "重新计算"
+
+
+#: userland/apps/reliefexcel
+msgid "Recover"
+msgstr "恢复"
+
+
+#: userland/apps/reliefexcel
+msgid "Recovery copy saved"
+msgstr "恢复副本已保存"
+
+
+#: userland/apps/reliefexcel/document.cpp:969
+msgid "Recovery directory belongs to another user"
+msgstr "恢复目录属于其他用户"
+
+
+#: userland/apps/reliefexcel/document.cpp:952
+msgid "Recovery path contains a non-directory component"
+msgstr "恢复路径中的某个组件不是目录"
+
+
+#: userland/apps/reliefexcel/document.cpp:968
+msgid "Recovery path is not a directory"
+msgstr "恢复路径不是目录"
+
+
+#: userland/apps/reliefexcel
+msgid "Redo"
+msgstr "重做"
+
+
+#: userland/apps/reliefexcel
+msgid "Remaining balance"
+msgstr "剩余余额"
+
+
+#: userland/apps/reliefexcel
+msgid "Rename sheet"
+msgstr "重命名工作表"
+
+
+#: userland/apps/reliefexcel
+msgid "Rent"
+msgstr "房租"
+
+
+#: userland/apps/reliefexcel
+msgid "Replace"
+msgstr "替换"
+
+
+#: userland/apps/reliefexcel
+msgid "Replace all"
+msgstr "全部替换"
+
+
+#: userland/apps/reliefexcel
+msgid "Replace current"
+msgstr "替换当前单元格"
+
+
+#: userland/apps/reliefexcel
+msgid "Replace with:"
+msgstr "替换为："
+
+
+#: userland/apps/reliefexcel
+msgid "Replacements:"
+msgstr "替换次数："
+
+
+#: userland/apps/reliefexcel
+msgid "Returns the largest number."
+msgstr "返回选区中的最大数值。"
+
+
+#: userland/apps/reliefexcel
+msgid "Returns the mean of numeric cells."
+msgstr "返回选区中数值的平均值。"
+
+
+#: userland/apps/reliefexcel
+msgid "Returns the smallest number."
+msgstr "返回选区中的最小数值。"
+
+
+#: userland/apps/reliefexcel
+msgid "Right"
+msgstr "右对齐"
+
+
+#: userland/apps/reliefexcel
+msgid "Rows"
+msgstr "行"
+
+
+#: userland/apps/reliefexcel
+msgid "Rows and their formatting move together within the selected range."
+msgstr "选区中的整行数据与格式将一起排序。"
+
+
+#: userland/apps/reliefexcel
+msgid "Rows:"
+msgstr "行数："
+
+
+#: userland/apps/reliefexcel
+msgid "SUMIF(range, criteria, sum_range)"
+msgstr "SUMIF(条件区域, 条件, 求和区域)"
+
+
+#: userland/apps/reliefexcel
+msgid "Salary"
+msgstr "工资"
+
+
+#: userland/apps/reliefexcel
+msgid "Save as..."
+msgstr "另存为…"
+
+
+#: userland/apps/reliefexcel
+msgid "Save canceled; original file preserved"
+msgstr "已取消保存，原文件保持不变"
+
+
+#: userland/apps/reliefexcel
+msgid "Save changes to this workbook?"
+msgstr "是否保存对工作簿的更改？"
+
+
+#: userland/apps/reliefexcel/document.cpp:977
+msgid "Save path is empty"
+msgstr "保存路径为空"
+
+
+#: userland/apps/reliefexcel/document.cpp:616 userland/apps/reliefexcel/document.cpp:633
+msgid "Save path is too long"
+msgstr "保存路径过长"
+
+
+#: userland/apps/reliefexcel/document.cpp:597
+msgid "Save target must be a regular file"
+msgstr "保存目标必须是普通文件"
+
+
+#: userland/apps/reliefexcel
+msgid "Save workbook"
+msgstr "保存工作簿"
+
+
+#: userland/apps/reliefexcel
+msgid "Select a destination and paste to move the cells"
+msgstr "请选择目标单元格并粘贴，以移动这些单元格"
+
+
+#: userland/apps/reliefexcel
+msgid "Select at least two columns to fill right"
+msgstr "请至少选择两列，再向右填充"
+
+
+#: userland/apps/reliefexcel
+msgid "Select at least two rows to fill down"
+msgstr "请至少选择两行，再向下填充"
+
+
+#: userland/apps/reliefexcel
+msgid "Select numbers or a cell below the numbers to sum"
+msgstr "请选择数值区域，或选择数值下方的单元格"
+
+
+#: userland/apps/reliefexcel
+msgid "Separator:"
+msgstr "分隔符："
+
+
+#: userland/apps/reliefexcel
+msgid "Sheet1"
+msgstr "工作表1"
+
+
+#: userland/apps/reliefexcel
+msgid "Shopping"
+msgstr "购物"
+
+
+#: userland/apps/reliefexcel
+msgid "Show formulas"
+msgstr "显示公式"
+
+
+#: userland/apps/reliefexcel
+msgid "Sort"
+msgstr "排序"
+
+
+#: userland/apps/reliefexcel
+msgid "Sort ascending"
+msgstr "升序排序"
+
+
+#: userland/apps/reliefexcel
+msgid "Sort descending"
+msgstr "降序排序"
+
+
+#: userland/apps/reliefexcel/document.cpp:929
+msgid "State directory must be an absolute path"
+msgstr "状态目录必须使用绝对路径"
+
+
+#: userland/apps/reliefexcel/document.cpp:1221 userland/apps/reliefexcel/document.cpp:1229
+msgid "State directory path is too long"
+msgstr "状态目录路径过长"
+
+
+#: userland/apps/reliefexcel/document.cpp:408
+msgid "String exceeds workbook resource limits"
+msgstr "字符串超出工作簿资源限制"
+
+
+#: userland/apps/reliefexcel
+msgid "Sum:"
+msgstr "求和："
+
+
+#: userland/apps/reliefexcel
+msgid "Summary"
+msgstr "汇总"
+
+
+#: userland/apps/reliefexcel
+msgid "Text color"
+msgstr "文字色"
+
+
+#: userland/apps/reliefexcel
+msgid "The destination contains data. Replace it?"
+msgstr "目标单元格已有内容，是否替换？"
+
+
+#: userland/apps/reliefexcel
+msgid "The file changed outside ReliefExcel. Choose how to save."
+msgstr "文件已被其他程序修改，请选择保存方式。"
+
+
+#: userland/apps/reliefexcel
+msgid "There is no room below this range"
+msgstr "此选区下方没有可用的单元格"
+
+
+#: userland/apps/reliefexcel/document.cpp:123
+msgid "Too many merged ranges"
+msgstr "合并范围过多"
+
+
+#: userland/apps/reliefexcel/document.cpp:113
+msgid "Too many worksheet filters"
+msgstr "工作表筛选器过多"
+
+
+#: userland/apps/reliefexcel
+msgid "Total expenses"
+msgstr "支出合计"
+
+
+#: userland/apps/reliefexcel
+msgid "Total income"
+msgstr "收入合计"
+
+
+#: userland/apps/reliefexcel
+msgid "Transit pass"
+msgstr "交通卡"
+
+
+#: userland/apps/reliefexcel
+msgid "Transport"
+msgstr "交通"
+
+
+#: userland/apps/reliefexcel
+msgid "Undo"
+msgstr "撤销"
+
+
+#: userland/apps/reliefexcel/document.cpp:829
+msgid "Unexpected data after quoted field"
+msgstr "带引号字段后存在意外数据"
+
+
+#: userland/apps/reliefexcel/document.cpp:833
+msgid "Unexpected quote in unquoted field"
+msgstr "未加引号字段中出现意外引号"
+
+
+#: userland/apps/reliefexcel
+msgid "Unfreeze"
+msgstr "取消冻结"
+
+
+#: userland/apps/reliefexcel
+msgid "Unmerge"
+msgstr "取消合并"
+
+
+#: userland/apps/reliefexcel/document.cpp:827
+msgid "Unterminated quoted field"
+msgstr "带引号字段未结束"
+
+
+#: userland/apps/reliefexcel
+msgid "Usage: reliefexcel [workbook.rexl | data.csv]"
+msgstr "用法：reliefexcel [工作簿.rexl | 数据.csv]"
+
+
+#: userland/apps/reliefexcel
+msgid "Utilities"
+msgstr "水电"
+
+
+#: userland/apps/reliefexcel
+msgid "Value:"
+msgstr "值："
+
+
+#: userland/apps/reliefexcel
+msgid "Within budget"
+msgstr "预算充足"
+
+
+#: userland/apps/reliefexcel/document.cpp:421
+msgid "Workbook contains invalid UTF-8 text"
+msgstr "工作簿包含无效 UTF-8 文本"
+
+
+#: userland/apps/reliefexcel/document.cpp:153 userland/apps/reliefexcel/document.cpp:505
+msgid "Workbook exceeds the cell limit"
+msgstr "工作簿超出单元格数量限制"
+
+
+#: userland/apps/reliefexcel/document.cpp:197 userland/apps/reliefexcel/document.cpp:200 userland/apps/reliefexcel/document.cpp:203
+msgid "Workbook exceeds the file size limit"
+msgstr "工作簿超出文件大小限制"
+
+
+#: userland/apps/reliefexcel/document.cpp:1096
+msgid "Workbook file has an invalid size or type"
+msgstr "工作簿文件大小或类型无效"
+
+
+#: userland/apps/reliefexcel/document.cpp:585
+msgid "Workbook has trailing or malformed data"
+msgstr "工作簿包含尾随数据或格式错误的数据"
+
+
+#: userland/apps/reliefexcel/document.cpp:347 userland/apps/reliefexcel/document.cpp:361
+msgid "Workbook is truncated"
+msgstr "工作簿已截断"
+
+
+#: userland/apps/reliefexcel
+msgid "Workbook opened"
+msgstr "工作簿已打开"
+
+
+#: userland/apps/reliefexcel/document.cpp:1086
+msgid "Workbook path is empty"
+msgstr "工作簿路径为空"
+
+
+#: userland/apps/reliefexcel
+msgid "Workbook saved"
+msgstr "工作簿已保存"
+
+
+#: userland/apps/reliefexcel/document.cpp:120 userland/apps/reliefexcel/document.cpp:170 userland/apps/reliefexcel/document.cpp:207 userland/apps/reliefexcel/document.cpp:481 userland/apps/reliefexcel/document.cpp:537
+msgid "Workbook text exceeds the resource limit"
+msgstr "工作簿文本超出资源限制"
+
+
+#: userland/apps/reliefexcel
+msgid "Working..."
+msgstr "正在处理…"
+
+
+#: userland/apps/reliefexcel/document.cpp:104
+msgid "Worksheet dimensions exceed resource limits"
+msgstr "工作表尺寸超出资源限制"
+
+
+#: userland/apps/reliefexcel/document.cpp:983
+msgid "Worksheet is unavailable"
+msgstr "工作表不可用"
+
+
+#: userland/apps/reliefexcel
+msgid "Worksheet name:"
+msgstr "工作表名称："
+
+
+#: userland/apps/reliefexcel/document.cpp:902 userland/apps/reliefexcel/document.cpp:1185
+msgid "Worksheet no longer exists"
+msgstr "工作表已不存在"
+
+
+#: userland/apps/reliefexcel
+msgid "Worksheets"
+msgstr "工作表"
+
+
+#: userland/apps/reliefexcel
+msgid "Wrap text"
+msgstr "自动换行"
+
+
+#: userland/apps/reliefexcel
+msgid "Zoom percentage (25–400):"
+msgstr "缩放比例（25–400）："
+
+
+#: userland/apps/reliefexcel
+msgid "Zoom..."
+msgstr "缩放…"
+
+#: userland/apps/reliefexcel/window.cpp
+#, c-format
+msgid "Sheet%u"
+msgstr "工作表%u"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Not enough memory to reserve recovery file"
+msgstr "内存不足，无法预留恢复文件"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not create recovery reservation"
+msgstr "无法创建恢复文件占位"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not secure recovery reservation"
+msgstr "无法设置恢复文件占位的安全权限"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not close recovery reservation"
+msgstr "无法关闭恢复文件占位"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not clean recovery reservation"
+msgstr "无法清理恢复文件占位"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not reserve recovery file"
+msgstr "无法预留恢复文件"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not reserve a unique recovery file"
+msgstr "无法预留独立的恢复文件"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery path is empty"
+msgstr "恢复文件路径为空"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery lock path is too long"
+msgstr "恢复文件锁路径过长"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Not enough memory to build recovery lock path"
+msgstr "内存不足，无法构建恢复文件锁路径"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not open recovery lock"
+msgstr "无法打开恢复文件锁"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery lock is not a regular file"
+msgstr "恢复文件锁不是普通文件"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery lock belongs to another user"
+msgstr "恢复文件锁属于其他用户"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery lock must have mode 0600"
+msgstr "恢复文件锁的权限必须为 0600"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not secure recovery lock"
+msgstr "无法设置恢复文件锁的安全权限"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery file is already in use"
+msgstr "恢复文件正在使用中"
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not lock recovery file"
+msgstr "无法锁定恢复文件"

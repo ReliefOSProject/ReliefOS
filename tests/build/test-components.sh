@@ -6,9 +6,11 @@ trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 cc=${HOSTCC:-cc}
 "$cc" -std=c11 -Wall -Wextra -Wpedantic -Werror -Wformat=2 -Wshadow -Wstrict-prototypes -Wmissing-prototypes -I"$root" "$root/tools/host/manifest/reliefos-components.c" "$root/tools/host/common/buffer.c" "$root/tools/host/common/io.c" -o "$tmp/parser"
 printf '# CONFIG_RELIEFOS_COMPONENT_APP_HELLO_BUILD is not set\nCONFIG_RELIEFOS_COMPONENT_APP_INSTALLER_BUILD=n\nCONFIG_RELIEFOS_COMPONENT_APP_DESKTOP_BUILD=n\nCONFIG_RELIEFOS_COMPONENT_APP_WINDOWD_BUILD=n\nCONFIG_RELIEFOS_COMPONENT_APP_IMD_BUILD=n\nCONFIG_RELIEFOS_COMPONENT_APP_SESSIOND_BUILD=n\n' > "$tmp/config"
-"$tmp/parser" --input "$root/configs/components.toml" --config "$tmp/config" --output "$tmp/out"
+"$tmp/parser" --input "$root/configs/components.toml" --config "$tmp/config" --output "$tmp/out" --metadata "$tmp/metadata"
 grep '^RELIEFOS_COMPONENTS_DISABLED :=.* hello ' "$tmp/out"
 grep '^RELIEFOS_COMPONENT_APPS :=.* installer ' "$tmp/out"
+grep '^RELIEFOS_COMPONENT_APPS :=.* reliefexcel ' "$tmp/out"
+awk -F '\t' '$1=="reliefexcel" && $2=="program-app" && $3==1 && $4==1 && $5==1 && $8=="ReliefExcel" && $9=="Office applications" && $10==".rexl,.csv" && $11==1 { found=1 } END { exit !found }' "$tmp/metadata"
 for id in desktop windowd imd sessiond; do
     grep "^RELIEFOS_COMPONENTS_DISABLED :=.* $id " "$tmp/out"
 done

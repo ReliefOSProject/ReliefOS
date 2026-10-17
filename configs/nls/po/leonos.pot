@@ -4665,3 +4665,1549 @@ msgstr ""
 msgid "View properties and permissions"
 msgstr ""
 
+#: userland/apps/reliefexcel
+msgid "&File"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "ABS(number) returns its absolute value."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Adds numeric cells in a range."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Alignment"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Amount"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "An unfinished workbook was found. Recover it?"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "AutoSum"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Average expense"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Average:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Balance"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:861
+msgid "Bare carriage return outside quoted field"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Bold"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Borders"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Budget status"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Budget template"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "COUNTIF(range, criteria)"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "CSV exported"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "CSV exports only this sheet's values. Formulas, styles and other sheets remain in the native workbook."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "CSV imported; save as a native workbook to keep formulas and formatting"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:892
+msgid "Calculated value exceeds CSV text limits"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Calculation"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Calculation canceled; results will update when accessed"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Category"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Cell address, for example A1 or C25"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:158
+msgid "Cell coordinate is outside worksheet bounds"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Cells"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Cells copied"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Clear contents"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Clear filters"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Clipboard"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Column:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Columns"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Columns:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Comma|Semicolon|Tab"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Condition:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Contains|Equals|Greater than|Less than|Not empty"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:877
+msgid "Could not calculate imported worksheet"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1123
+msgid "Could not calculate workbook or operation cancelled"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1033
+msgid "Could not close temporary save file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:947 userland/apps/reliefexcel/document.cpp:964
+msgid "Could not create recovery directory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1005
+msgid "Could not create temporary save file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:628
+msgid "Could not create temporary save path"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1146
+msgid "Could not inspect delimited file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1055
+msgid "Could not inspect file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:965
+msgid "Could not inspect recovery directory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:601
+msgid "Could not inspect save target"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1092
+msgid "Could not inspect workbook"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1142
+msgid "Could not open delimited file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:647
+msgid "Could not open save directory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1088
+msgid "Could not open workbook"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1012
+msgid "Could not preserve workbook permissions"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1163
+msgid "Could not read delimited file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:362
+msgid "Could not read workbook"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1038
+msgid "Could not replace saved file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Could not save the recovery copy"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:970
+msgid "Could not secure recovery directory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:651
+msgid "Could not sync save directory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1032
+msgid "Could not sync temporary save file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:230
+msgid "Could not write workbook"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Count:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Counts nonempty cells."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Counts numeric cells."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+C"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+D"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+F"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+H"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+R"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+V"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Ctrl+X"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Currency"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Data exchange"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Date"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Delete column"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Delete row"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Delete sheet"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Delete this worksheet? You can undo this operation."
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:812 userland/apps/reliefexcel/document.cpp:817 userland/apps/reliefexcel/document.cpp:834
+msgid "Delimited field exceeds resource limits"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:814 userland/apps/reliefexcel/document.cpp:819 userland/apps/reliefexcel/document.cpp:836
+msgid "Delimited field exceeds the text limit"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1150
+msgid "Delimited file has an invalid size or type"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1162
+msgid "Delimited file is truncated"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1139
+msgid "Delimited file path is empty"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:775
+msgid "Delimited input exceeds the resource limit"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:844 userland/apps/reliefexcel/document.cpp:854 userland/apps/reliefexcel/document.cpp:875
+msgid "Delimited input exceeds worksheet dimensions"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:910 userland/apps/reliefexcel/document.cpp:914 userland/apps/reliefexcel/document.cpp:916
+msgid "Delimited output exceeds resource limits"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:987
+msgid "Delimited output exceeds the resource limit"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:754
+msgid "Delimited text contains invalid UTF-8 or a NUL byte"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Description"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Dinner"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Discard changes"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:160 userland/apps/reliefexcel/document.cpp:532
+msgid "Duplicate or unordered cell coordinate"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:190
+msgid "Duplicate worksheet identifier"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:192
+msgid "Duplicate worksheet name"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Edit cell content or formula; Enter applies the change"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Electricity"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Enter a zoom value from 25 to 400"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Enter an address between A1 and IV10000"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Enter text to find"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Examples: =SUM(B2:B20)    =IF(C2>0,C2,0)"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Exit"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Expense"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Export"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Export CSV"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Export CSV..."
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:901
+msgid "Export range exceeds resource limits"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1051
+msgid "File path is empty"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1057
+msgid "File stamp requires a regular file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Fill color"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Fill down"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Fill right"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Filter"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Filtering hides rows and preserves their contents."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Find"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Find and replace"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Find next"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "First row is a header"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Font"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Font size"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Food"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Food expenses"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Food purchases"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Formulas"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Freeze both"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Freeze first column"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Freeze first row"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Freeze panes"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Function:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Functions"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "General"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Gridlines"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Groceries"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Home tab"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "IF(condition, value_if_true, value_if_false)"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Import"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Import CSV"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Import CSV..."
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:756
+msgid "Import exceeds the cell limit"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Income"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1031
+msgid "Incomplete temporary save file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Insert"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Insert column"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Insert function"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Insert row"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:206
+msgid "Invalid active worksheet or identifier sequence"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:527
+msgid "Invalid cell coordinate or style"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:168
+msgid "Invalid cell style"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:163
+msgid "Invalid cell text"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:456
+msgid "Invalid column dimensions"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:107
+msgid "Invalid column width"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:899
+msgid "Invalid delimited range"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:773 userland/apps/reliefexcel/document.cpp:1140
+msgid "Invalid field delimiter"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:466
+msgid "Invalid filter metadata"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:111
+msgid "Invalid filter range"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:133 userland/apps/reliefexcel/document.cpp:500
+msgid "Invalid merged range"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:490
+msgid "Invalid merged range count"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:461
+msgid "Invalid row dimensions"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:110
+msgid "Invalid row height"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1116
+msgid "Invalid workbook header or length"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:179 userland/apps/reliefexcel/document.cpp:568
+msgid "Invalid workbook metadata"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:118
+msgid "Invalid worksheet filter"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:445
+msgid "Invalid worksheet flags"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:96
+msgid "Invalid worksheet name or identifier"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:101
+msgid "Invalid worksheet view settings"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Italic"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Item"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Later"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Ledger"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Left"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Lunch"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Match case"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Merge"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Monthly rent"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Monthly salary"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Move sheet left"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Move sheet right"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "New sheet"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "No borders"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "No matching cell found"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1219
+msgid "No per-user state directory is available"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Not enough memory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:922
+msgid "Not enough memory to build delimited output"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:931
+msgid "Not enough memory to create recovery directory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:777
+msgid "Not enough memory to import worksheet"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:758 userland/apps/reliefexcel/document.cpp:762
+msgid "Not enough memory to import worksheet cell"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1223 userland/apps/reliefexcel/document.cpp:1234
+msgid "Not enough memory to locate recovery directory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:541
+msgid "Not enough memory to read cell input"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:555
+msgid "Not enough memory to read cell style"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:509
+msgid "Not enough memory to read cells"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1154
+msgid "Not enough memory to read delimited file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:470 userland/apps/reliefexcel/document.cpp:485
+msgid "Not enough memory to read filters"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:494
+msgid "Not enough memory to read merged ranges"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:413
+msgid "Not enough memory to read workbook"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:424
+msgid "Not enough memory to read workbook text"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:572 userland/apps/reliefexcel/document.cpp:580
+msgid "Not enough memory to read worksheets"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1239
+msgid "Not enough memory to return recovery path"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:618
+msgid "Not enough memory to save workbook"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:635
+msgid "Not enough memory to sync save directory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:127
+msgid "Not enough memory to validate merged ranges"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Number"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Number format"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Office supplies"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Only the upper-left cell's content is kept when merging. Continue?"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Open workbook"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Open..."
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:148
+msgid "Overlapping merged ranges"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Overspent"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Paste values"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Percent"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Preview of the first rows. Text and leading zeros are preserved; formulas are not executed."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "ROUND(number, decimal_places)"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Recalculate"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Recover"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Recovery copy saved"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:969
+msgid "Recovery directory belongs to another user"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:952
+msgid "Recovery path contains a non-directory component"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:968
+msgid "Recovery path is not a directory"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Redo"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Remaining balance"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Rename sheet"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Rent"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Replace"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Replace all"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Replace current"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Replace with:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Replacements:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Returns the largest number."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Returns the mean of numeric cells."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Returns the smallest number."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Right"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Rows"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Rows and their formatting move together within the selected range."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Rows:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "SUMIF(range, criteria, sum_range)"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Salary"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Save as..."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Save canceled; original file preserved"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Save changes to this workbook?"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:977
+msgid "Save path is empty"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:616 userland/apps/reliefexcel/document.cpp:633
+msgid "Save path is too long"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:597
+msgid "Save target must be a regular file"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Save workbook"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Select a destination and paste to move the cells"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Select at least two columns to fill right"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Select at least two rows to fill down"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Select numbers or a cell below the numbers to sum"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Separator:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Sheet1"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Shopping"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Show formulas"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Sort"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Sort ascending"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Sort descending"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:929
+msgid "State directory must be an absolute path"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1221 userland/apps/reliefexcel/document.cpp:1229
+msgid "State directory path is too long"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:408
+msgid "String exceeds workbook resource limits"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Sum:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Summary"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Text color"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "The destination contains data. Replace it?"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "The file changed outside ReliefExcel. Choose how to save."
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "There is no room below this range"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:123
+msgid "Too many merged ranges"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:113
+msgid "Too many worksheet filters"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Total expenses"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Total income"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Transit pass"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Transport"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Undo"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:829
+msgid "Unexpected data after quoted field"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:833
+msgid "Unexpected quote in unquoted field"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Unfreeze"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Unmerge"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:827
+msgid "Unterminated quoted field"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Usage: reliefexcel [workbook.rexl | data.csv]"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Utilities"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Value:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Within budget"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:421
+msgid "Workbook contains invalid UTF-8 text"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:153 userland/apps/reliefexcel/document.cpp:505
+msgid "Workbook exceeds the cell limit"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:197 userland/apps/reliefexcel/document.cpp:200 userland/apps/reliefexcel/document.cpp:203
+msgid "Workbook exceeds the file size limit"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1096
+msgid "Workbook file has an invalid size or type"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:585
+msgid "Workbook has trailing or malformed data"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:347 userland/apps/reliefexcel/document.cpp:361
+msgid "Workbook is truncated"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Workbook opened"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:1086
+msgid "Workbook path is empty"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Workbook saved"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:120 userland/apps/reliefexcel/document.cpp:170 userland/apps/reliefexcel/document.cpp:207 userland/apps/reliefexcel/document.cpp:481 userland/apps/reliefexcel/document.cpp:537
+msgid "Workbook text exceeds the resource limit"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Working..."
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:104
+msgid "Worksheet dimensions exceed resource limits"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:983
+msgid "Worksheet is unavailable"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Worksheet name:"
+msgstr ""
+
+
+#: userland/apps/reliefexcel/document.cpp:902 userland/apps/reliefexcel/document.cpp:1185
+msgid "Worksheet no longer exists"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Worksheets"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Wrap text"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Zoom percentage (25–400):"
+msgstr ""
+
+
+#: userland/apps/reliefexcel
+msgid "Zoom..."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp
+#, c-format
+msgid "Sheet%u"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Not enough memory to reserve recovery file"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not create recovery reservation"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not secure recovery reservation"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not close recovery reservation"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not clean recovery reservation"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not reserve recovery file"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not reserve a unique recovery file"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery path is empty"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery lock path is too long"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Not enough memory to build recovery lock path"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not open recovery lock"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery lock is not a regular file"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery lock belongs to another user"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery lock must have mode 0600"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not secure recovery lock"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Recovery file is already in use"
+msgstr ""
+
+#: userland/apps/reliefexcel/document.cpp
+msgid "Could not lock recovery file"
+msgstr ""
