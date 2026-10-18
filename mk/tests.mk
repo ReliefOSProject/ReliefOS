@@ -179,3 +179,13 @@ $(O_HOST)/obj/tests-sanitised/host/userland/locale_conf.c.o: $(RELIEFOS_SRC)/use
 $(O_HOST)/tests-sanitised/test_locale_conf: $(O_HOST)/obj/tests-sanitised/host/test_locale_conf.c.o $(O_HOST)/obj/tests-sanitised/host/userland/locale_conf.c.o
 	$(Q)mkdir -p $(@D)
 	$(Q)$(HOSTCC) $(RELIEFOS_SANITISE) -g -O1 $^ -o $@
+
+.PHONY: test-reliefapk
+test-reliefapk:
+	$(Q)TMPDIR='$(abspath $(O))/tmp' sh $(RELIEFOS_SRC)/tests/build/test-reliefapk-model.sh
+	$(Q)TMPDIR='$(abspath $(O))/tmp' sh $(RELIEFOS_SRC)/tests/build/test-reliefapk-process.sh
+	$(Q)TMPDIR='$(abspath $(O))/tmp' sh $(RELIEFOS_SRC)/tests/build/test-reliefapk-repositories.sh
+
+.PHONY: test-reliefapk-apk
+test-reliefapk-apk: $(UPSTREAM_APK)
+	$(Q)TMPDIR='$(abspath $(O))/tmp' python3 $(RELIEFOS_SRC)/tools/tests/test_reliefapk_apk.py --apk $(abspath $(UPSTREAM_APK))

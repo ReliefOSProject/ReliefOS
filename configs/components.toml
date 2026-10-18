@@ -387,6 +387,22 @@ sdk = false
 api = false
 
 [[components]]
+id = "reliefapk"
+symbol = "APP_RELIEFAPK"
+label = "ReliefAPK"
+category = "System applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+open_with = true
+extensions = [".apk"]
+depends = ["sudo", "su"]
+
+[[components]]
 id = "reliefexcel"
 symbol = "APP_RELIEFEXCEL"
 label = "ReliefExcel"
