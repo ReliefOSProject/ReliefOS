@@ -15,7 +15,7 @@ missing = sorted(required - groups.keys())
 legacy = sorted(name for name in groups if name.startswith("leonos-"))
 if missing or legacy or policy.get("current_distributor") != "reliefos-build":
     raise SystemExit(f"APK ownership identity is not migrated: missing={missing}, legacy={legacy}, distributor={policy.get('current_distributor')}")
-for app in ("reliefexcel", "reliefword"):
+for app in ("reliefexcel", "reliefword", "reliefppt"):
     if app not in groups["reliefos-apps"]["components"]:
         raise SystemExit(f"{app} is missing from reliefos-apps ownership")
 PY

@@ -13,7 +13,7 @@ from test_installer_window_qemu import wait_log
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'out/xorg-vmware-debug'
-APPS = (*(app for app in fltk.APP_NAMES if app != 'doom'), 'reliefexcel', 'reliefword')
+APPS = (*(app for app in fltk.APP_NAMES if app != 'doom'), 'reliefexcel', 'reliefword', 'reliefppt')
 
 
 def prepare(image, kernel, output):

@@ -404,6 +404,21 @@ open_with = true
 extensions = [".rword", ".txt", ".html", ".htm"]
 
 [[components]]
+id = "reliefppt"
+symbol = "APP_RELIEFPPT"
+label = "ReliefPPT"
+category = "Office applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+open_with = true
+extensions = [".rppt"]
+
+[[components]]
 id = "minesweeper"
 symbol = "APP_MINESWEEPER"
 label = "Minesweeper"

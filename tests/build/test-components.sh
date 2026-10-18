@@ -11,8 +11,10 @@ grep '^RELIEFOS_COMPONENTS_DISABLED :=.* hello ' "$tmp/out"
 grep '^RELIEFOS_COMPONENT_APPS :=.* installer ' "$tmp/out"
 grep '^RELIEFOS_COMPONENT_APPS :=.* reliefexcel ' "$tmp/out"
 grep '^RELIEFOS_COMPONENT_APPS :=.* reliefword ' "$tmp/out"
+grep '^RELIEFOS_COMPONENT_APPS :=.* reliefppt ' "$tmp/out"
 awk -F '\t' '$1=="reliefexcel" && $2=="program-app" && $3==1 && $4==1 && $5==1 && $8=="ReliefExcel" && $9=="Office applications" && $10==".rexl,.csv" && $11==1 { found=1 } END { exit !found }' "$tmp/metadata"
 awk -F '\t' '$1=="reliefword" && $2=="program-app" && $3==1 && $4==1 && $5==1 && $8=="ReliefWord" && $9=="Office applications" && $10==".rword,.txt,.html,.htm" && $11==1 { found=1 } END { exit !found }' "$tmp/metadata"
+awk -F '\t' '$1=="reliefppt" && $2=="program-app" && $3==1 && $4==1 && $5==1 && $8=="ReliefPPT" && $9=="Office applications" && $10==".rppt" && $11==1 { found=1 } END { exit !found }' "$tmp/metadata"
 for id in desktop windowd imd sessiond; do
     grep "^RELIEFOS_COMPONENTS_DISABLED :=.* $id " "$tmp/out"
 done

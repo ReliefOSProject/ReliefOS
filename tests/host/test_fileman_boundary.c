@@ -29,6 +29,7 @@ int main(void)
     assert(!strcmp(fileman_x11_default_app("/tmp/budget.rexl"), "/usr/bin/reliefexcel"));
     assert(!strcmp(fileman_x11_default_app("/tmp/export.CSV"), "/usr/bin/reliefexcel"));
     assert(!strcmp(fileman_x11_default_app("/tmp/report.RWORD"), "/usr/bin/reliefword"));
+    assert(!strcmp(fileman_x11_default_app("/tmp/show.RPPT"), "/usr/bin/reliefppt"));
     assert(!strcmp(fileman_x11_default_app("/tmp/test.txt"), "/usr/bin/nedit"));
     assert(!strcmp(fileman_x11_default_app("/tmp/.hidden"), "/usr/bin/nedit"));
     assert(!fileman_x11_default_app("/tmp/program.elf"));

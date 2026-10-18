@@ -71,7 +71,7 @@ done
 # must not pull Xorg libraries back into reliefos-apps through their package
 # ELF dependencies.
 for app in \
-    calc doom doomlauncher fileman imageview installer leonmmcoset minesweeper osver reliefexcel reliefword \
+    calc doom doomlauncher fileman imageview installer leonmmcoset minesweeper osver reliefexcel reliefword reliefppt \
     paint taskmgr xiaobai glxgears portablegl; do
     remove_path "usr/lib/reliefos/apps/$app"
     remove_path "usr/bin/$app"

@@ -63,7 +63,7 @@ for locale in $(cat configs/nls/LINGUAS); do
     printf '%s\n' fixture > "$work/out/generated/nls/$locale/LC_MESSAGES/${legacy_brand}.mo"
 done
 printf 'busybox\ttool\t1\t1\t0\t0\t0\tBusyBox\tTools\t\t0\n' > "$work/metadata"
-for app in fileman installer leonmmcoset reliefword soundctl sudo fastfetch; do
+for app in fileman installer leonmmcoset reliefword reliefppt soundctl sudo fastfetch; do
     entry=0
     case $app in fileman|fastfetch) entry=1 ;; esac
     printf '%s\tsystem-app\t1\t1\t%s\t0\t0\t%s\tSystem applications\t\t0\n' "$app" "$entry" "$app" >> "$work/metadata"
@@ -108,7 +108,7 @@ sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
 xorg_root=$work/root
 
 # Only self-authored graphical apps receive artwork, including hidden entries.
-for app in fileman installer leonmmcoset reliefword; do
+for app in fileman installer leonmmcoset reliefword reliefppt; do
     for size in 16 32 48 64 128 256; do
         icon=usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png
         cmp "$repo_root/resources/build-art/app-icons/hicolor/${size}x${size}/apps/reliefos-$app.png" "$xorg_root/$icon"

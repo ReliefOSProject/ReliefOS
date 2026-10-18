@@ -7107,3 +7107,519 @@ msgstr "请输入显示范围内的有效段落数值"
 #. ReliefWord
 msgid "Exporting over the imported source could discard content ReliefWord did not preserve"
 msgstr "导出到原导入文件会丢失 ReliefWord 无法保留的内容，请使用其他文件名。"
+
+#: userland/apps/reliefppt/window.cpp:640
+msgid "A native ReliefOS presentation editor.\nDouble-click text to edit. Drag handles to resize.\nF5: present · Ctrl+S: save · Esc: finish editing\nUse .rppt to keep editable slides and embedded pictures."
+msgstr "ReliefOS 内置演示文稿编辑器。\n双击文字编辑，拖动控制点调整大小。\nF5：放映 · Ctrl+S：保存 · Esc：结束编辑\n保存为 .rppt 可保留可编辑的幻灯片和内嵌图片。"
+
+#: userland/apps/reliefppt/window.cpp:53
+msgid "About ReliefPPT"
+msgstr "关于 ReliefPPT"
+
+#: userland/apps/reliefppt/window.cpp:192
+msgid "Align bottom"
+msgstr "底端对齐"
+
+#: userland/apps/reliefppt/window.cpp:187
+msgid "Align left"
+msgstr "左对齐"
+
+#: userland/apps/reliefppt/window.cpp:189
+msgid "Align right"
+msgstr "右对齐"
+
+#: userland/apps/reliefppt/window.cpp:193
+msgid "Align selected objects"
+msgstr "对齐选中对象"
+
+#: userland/apps/reliefppt/window.cpp:190
+msgid "Align top"
+msgstr "顶端对齐"
+
+#: userland/apps/reliefppt/files.cpp:355
+msgid "An unsaved ReliefPPT recovery copy is available. Recover it into a new presentation?"
+msgstr "发现未保存的 ReliefPPT 恢复副本。是否恢复为新的演示文稿？"
+
+#: userland/apps/reliefppt/window.cpp:240
+msgid "Arrow keys: change slide\nB: black screen   Esc: return"
+msgstr "方向键：切换幻灯片\nB：黑屏   Esc：返回编辑"
+
+#: userland/apps/reliefppt/window.cpp:206
+msgid "Background..."
+msgstr "背景..."
+
+#: userland/apps/reliefppt/window.cpp:129
+msgid "Blank slide"
+msgstr "空白幻灯片"
+
+#: userland/apps/reliefppt/window.cpp:207
+msgid "Blue theme"
+msgstr "蓝色"
+
+#: userland/apps/reliefppt/window.cpp:188
+msgid "Center X"
+msgstr "水平居中"
+
+#: userland/apps/reliefppt/window.cpp:191
+msgid "Center Y"
+msgstr "垂直居中"
+
+#: userland/apps/reliefppt/window.cpp:139
+msgid "Chinese / serif"
+msgstr "宋体 / 衬线"
+
+#: userland/apps/reliefppt/files.cpp:242
+msgid "Choose an export file different from the editable presentation"
+msgstr "请选择与可编辑演示文稿不同的导出文件"
+
+#: configs/nls/messages.c:16
+msgid "Could not capture the edited text"
+msgstr "无法保存正在编辑的文字"
+
+#: configs/nls/messages.c:28
+msgid "Could not decode the PNG image"
+msgstr "无法解码 PNG 图片"
+
+#: configs/nls/messages.c:22
+msgid "Could not encode the slide image"
+msgstr "无法编码幻灯片图片"
+
+#: configs/nls/messages.c:29
+msgid "Could not open the image"
+msgstr "无法打开图片"
+
+#: userland/apps/reliefppt/files.cpp:214
+msgid "Could not open the presentation"
+msgstr "无法打开演示文稿"
+
+#: configs/nls/messages.c:30
+msgid "Could not read the image"
+msgstr "无法读取图片"
+
+#: configs/nls/messages.c:26
+msgid "Could not read the image file"
+msgstr "无法读取图片文件"
+
+#: configs/nls/messages.c:21
+msgid "Could not render the slide image"
+msgstr "无法渲染幻灯片图片"
+
+#: userland/apps/reliefppt/window.cpp:210
+msgid "Current slide colors"
+msgstr "当前幻灯片配色"
+
+#: userland/apps/reliefppt/window.cpp:136
+msgid "Delete slide"
+msgstr "删除幻灯片"
+
+#: userland/apps/reliefppt/window.cpp:55
+msgid "Design"
+msgstr "设计"
+
+#: userland/apps/reliefppt/dialogs.cpp:48
+msgid "Draw outline"
+msgstr "显示边框"
+
+#: userland/apps/reliefppt/window.cpp:175
+msgid "Duplicate"
+msgstr "创建副本"
+
+#: userland/apps/reliefppt/window.cpp:135
+msgid "Duplicate slide"
+msgstr "复制幻灯片"
+
+#: userland/apps/reliefppt/window.cpp:236
+msgid "Editor view"
+msgstr "编辑视图"
+
+#: userland/apps/reliefppt/window.cpp:183
+msgid "Ellipse"
+msgstr "椭圆"
+
+#: userland/apps/reliefppt/slideshow.cpp:20
+msgid "End of presentation\nPress Esc to return, or Left to go back"
+msgstr "放映结束\n按 Esc 返回编辑，按左方向键回到上一张"
+
+#: userland/apps/reliefppt/window.cpp:494
+msgid "Enter a font size from 6 to 144 points"
+msgstr "请输入 6 至 144 磅的字号"
+
+#: userland/apps/reliefppt/dialogs.cpp:111
+msgid "Enter finite values that keep the object inside the slide"
+msgstr "请输入有效数值，确保对象位于幻灯片内"
+
+#: userland/apps/reliefppt/window.cpp:52
+msgid "Example presentation"
+msgstr "示例演示文稿"
+
+#: userland/apps/reliefppt/window.cpp:237
+msgid "Export PNG..."
+msgstr "导出 PNG..."
+
+#: configs/nls/messages.c:23
+msgid "Export cancelled"
+msgstr "已取消导出"
+
+#: userland/apps/reliefppt/files.cpp:285
+msgid "Export complete; the editable presentation remains open"
+msgstr "导出完成，可以继续编辑演示文稿"
+
+#: userland/apps/reliefppt/window.cpp:50
+msgid "Export current slide as PNG..."
+msgstr "导出当前幻灯片为 PNG..."
+
+#: userland/apps/reliefppt/window.cpp:51
+msgid "Export presentation as HTML..."
+msgstr "导出演示文稿为 HTML..."
+
+#: userland/apps/reliefppt/files.cpp:286
+msgid "Export was not completed"
+msgstr "导出未完成"
+
+#: userland/apps/reliefppt/files.cpp:255
+msgid "Exporting presentation"
+msgstr "导出演示文稿"
+
+#: userland/apps/reliefppt/files.cpp:250
+msgid "Exporting presentation..."
+msgstr "正在导出演示文稿..."
+
+#: userland/apps/reliefppt/dialogs.cpp:47
+msgid "Fill object"
+msgstr "填充对象"
+
+#: userland/apps/reliefppt/window.cpp:233
+msgid "Fit slide"
+msgstr "适应窗口"
+
+#: userland/apps/reliefppt/window.cpp:143
+msgid "Font for the selected text boxes"
+msgstr "选中文本框的字体"
+
+#: userland/apps/reliefppt/window.cpp:153
+msgid "Font size: 6–144 points; press Enter"
+msgstr "字号：6–144 磅，按 Enter 应用"
+
+#: userland/apps/reliefppt/window.cpp:222
+msgid "From beginning"
+msgstr "从头开始"
+
+#: userland/apps/reliefppt/window.cpp:223
+msgid "From current slide"
+msgstr "从当前幻灯片"
+
+#: userland/apps/reliefppt/window.cpp:208
+msgid "Green theme"
+msgstr "绿色"
+
+#: userland/apps/reliefppt/window.cpp:216
+msgid "Guides"
+msgstr "辅助线"
+
+#: configs/nls/messages.c:24
+msgid "HTML export is too large"
+msgstr "HTML 导出内容过大"
+
+#: userland/apps/reliefppt/dialogs.cpp:42
+msgid "Height"
+msgstr "高度"
+
+#: configs/nls/messages.c:27
+msgid "Image dimensions exceed the supported limit"
+msgstr "图片尺寸超过支持的上限"
+
+#: userland/apps/reliefppt/window.cpp:186
+msgid "Insert objects"
+msgstr "插入对象"
+
+#: userland/apps/reliefppt/files.cpp:91
+msgid "Insert picture"
+msgstr "插入图片"
+
+#: userland/apps/reliefppt/canvas.cpp:129
+msgid "Insert text, pictures or shapes to start your slide"
+msgstr "插入文字、图片或图形，开始制作幻灯片"
+
+#: configs/nls/messages.c:18
+msgid "Invalid image reference"
+msgstr "图片引用无效"
+
+#: userland/apps/reliefppt/dialogs.cpp:54
+msgid "Keep aspect ratio"
+msgstr "保持宽高比"
+
+#: userland/apps/reliefppt/window.cpp:134
+msgid "Layout for the next new slide"
+msgstr "下一张新建幻灯片的版式"
+
+#: userland/apps/reliefppt/window.cpp:209
+msgid "Light theme"
+msgstr "浅色"
+
+#: userland/apps/reliefppt/window.cpp:184
+msgid "Line"
+msgstr "直线"
+
+#: userland/apps/reliefppt/dialogs.cpp:147
+msgid "Line color"
+msgstr "线条颜色"
+
+#: userland/apps/reliefppt/dialogs.cpp:51
+msgid "Line width (0–20)"
+msgstr "线宽（0–20）"
+
+#: userland/apps/reliefppt/window.cpp:197
+msgid "Lower"
+msgstr "下移一层"
+
+#: userland/apps/reliefppt/window.cpp:218
+msgid "Move slide down"
+msgstr "下移幻灯片"
+
+#: userland/apps/reliefppt/window.cpp:217
+msgid "Move slide up"
+msgstr "上移幻灯片"
+
+#: userland/apps/reliefppt/window.cpp:127
+msgid "New slide"
+msgstr "新建幻灯片"
+
+#: configs/nls/messages.c:20
+msgid "Not enough memory to draw text"
+msgstr "内存不足，无法绘制文字"
+
+#: configs/nls/messages.c:19
+msgid "Not enough memory to draw the image"
+msgstr "内存不足，无法绘制图片"
+
+#: configs/nls/messages.c:25
+msgid "Not enough memory to export HTML"
+msgstr "内存不足，无法导出 HTML"
+
+#: userland/apps/reliefppt/window.cpp:82
+msgid "Notes"
+msgstr "备注"
+
+#: userland/apps/reliefppt/window.cpp:200
+msgid "Object"
+msgstr "对象"
+
+#: userland/apps/reliefppt/window.cpp:177
+msgid "Objects"
+msgstr "对象"
+
+#: userland/apps/reliefppt/window.cpp:408
+msgid "Objects copied"
+msgstr "已复制对象"
+
+#: userland/apps/reliefppt/files.cpp:92
+msgid "Open presentation"
+msgstr "打开演示文稿"
+
+#: userland/apps/reliefppt/files.cpp:201
+msgid "Opening presentation..."
+msgstr "正在打开演示文稿..."
+
+#: userland/apps/reliefppt/window.cpp:198
+msgid "Order"
+msgstr "图层顺序"
+
+#: userland/apps/reliefppt/window.cpp:172
+msgid "Picture..."
+msgstr "图片..."
+
+#: userland/apps/reliefppt/dialogs.cpp:40
+msgid "Position and size"
+msgstr "位置与大小"
+
+#: userland/apps/reliefppt/window.cpp:199
+msgid "Position and size..."
+msgstr "位置与大小..."
+
+#: userland/apps/reliefppt/dialogs.cpp:87
+msgid "Positions and sizes are measured in slide units.\nThe object must remain inside the slide."
+msgstr "位置和大小以幻灯片单位计量。\n对象必须完全位于幻灯片内。"
+
+#: userland/apps/reliefppt/files.cpp:225
+msgid "Presentation opened"
+msgstr "已打开演示文稿"
+
+#: userland/apps/reliefppt/files.cpp:183
+msgid "Presentation saved"
+msgstr "已保存演示文稿"
+
+#: userland/apps/reliefppt/files.cpp:171
+msgid "Presentation was not saved"
+msgstr "演示文稿未保存"
+
+#: userland/apps/reliefppt/window.cpp:169
+msgid "Properties..."
+msgstr "属性..."
+
+#: userland/apps/reliefppt/window.cpp:195
+msgid "Raise"
+msgstr "上移一层"
+
+#: userland/apps/reliefppt/files.cpp:380
+msgid "Recovered — save this presentation to a new file"
+msgstr "已恢复，请将演示文稿保存为新文件"
+
+#: userland/apps/reliefppt/window.cpp:182
+msgid "Rectangle"
+msgstr "矩形"
+
+#: userland/apps/reliefppt/files.cpp:62
+msgid "Save changes to this presentation?"
+msgstr "是否保存对演示文稿的修改？"
+
+#: userland/apps/reliefppt/files.cpp:90
+msgid "Save presentation or export"
+msgstr "保存演示文稿或导出"
+
+#: userland/apps/reliefppt/files.cpp:148
+msgid "Saving presentation..."
+msgstr "正在保存演示文稿..."
+
+#: userland/apps/reliefppt/window.cpp:546
+msgid "Select a text box first"
+msgstr "请先选择文本框"
+
+#: userland/apps/reliefppt/dialogs.cpp:136
+msgid "Select an object first"
+msgstr "请先选择对象"
+
+#: userland/apps/reliefppt/dialogs.cpp:33
+msgid "Select one object to edit its position and size"
+msgstr "请选择一个对象，再编辑位置和大小"
+
+#: userland/apps/reliefppt/window.cpp:239
+msgid "Share"
+msgstr "分享"
+
+#: userland/apps/reliefppt/window.cpp:211
+msgid "Show grid"
+msgstr "显示网格"
+
+#: userland/apps/reliefppt/window.cpp:348
+msgid "Slide %zu / %zu  ·  %zu selected  ·  %d%%"
+msgstr "幻灯片 %zu / %zu  ·  已选 %zu 项  ·  %d%%"
+
+#: userland/apps/reliefppt/dialogs.cpp:144
+msgid "Slide background"
+msgstr "幻灯片背景"
+
+#: userland/apps/reliefppt/window.cpp:219
+msgid "Slide order"
+msgstr "幻灯片顺序"
+
+#: userland/apps/reliefppt/window.cpp:55
+msgid "Slide show"
+msgstr "放映"
+
+#: userland/apps/reliefppt/window.cpp:205
+msgid "Slide size"
+msgstr "幻灯片大小"
+
+#: userland/apps/reliefppt/window.cpp:137
+msgid "Slides"
+msgstr "幻灯片"
+
+#: userland/apps/reliefppt/window.cpp:215
+msgid "Snap movement to 10 units; hold Alt to bypass"
+msgstr "移动时吸附至 10 单位网格；按住 Alt 暂时取消"
+
+#: userland/apps/reliefppt/window.cpp:213
+msgid "Snap to grid"
+msgstr "吸附网格"
+
+#: userland/apps/reliefppt/window.cpp:234
+msgid "Speaker notes"
+msgstr "演讲备注"
+
+#: userland/apps/reliefppt/window.cpp:204
+msgid "Standard 4:3"
+msgstr "标准 4:3"
+
+#: userland/apps/reliefppt/window.cpp:224
+msgid "Start from current slide (Shift+F5)"
+msgstr "从当前幻灯片放映（Shift+F5）"
+
+#: userland/apps/reliefppt/window.cpp:222
+msgid "Start slide show (F5)"
+msgstr "开始放映（F5）"
+
+#: userland/apps/reliefppt/window.cpp:170
+msgid "Text / object"
+msgstr "文字与对象"
+
+#: userland/apps/reliefppt/window.cpp:171
+msgid "Text box"
+msgstr "文本框"
+
+#: userland/apps/reliefppt/dialogs.cpp:86
+msgid "Text exceeds this box. Increase its height or reduce the font size."
+msgstr "文字超出文本框，请增大高度或减小字号。"
+
+#: configs/nls/messages.c:32
+msgid "The BMP image is truncated"
+msgstr "BMP 图片数据不完整"
+
+#: userland/apps/reliefppt/files.cpp:159
+msgid "The file changed outside ReliefPPT. Save a copy or explicitly replace it."
+msgstr "文件已被其他程序修改。可以另存副本，或明确选择替换。"
+
+#: configs/nls/messages.c:17
+msgid "The file changed while it was being opened"
+msgstr "文件在打开期间发生变化"
+
+#: userland/apps/reliefppt/window.cpp:131
+msgid "Title and content"
+msgstr "标题和内容"
+
+#: userland/apps/reliefppt/window.cpp:130
+msgid "Title slide"
+msgstr "标题幻灯片"
+
+#: userland/apps/reliefppt/window.cpp:196
+msgid "To back"
+msgstr "置于底层"
+
+#: userland/apps/reliefppt/window.cpp:194
+msgid "To front"
+msgstr "置于顶层"
+
+#: userland/apps/reliefppt/window.cpp:132
+msgid "Two columns"
+msgstr "两栏内容"
+
+#: userland/apps/reliefppt/window.cpp:464
+msgid "Type your text here"
+msgstr "在此输入文字"
+
+#: userland/apps/reliefppt/window.cpp:283
+msgid "Untitled presentation"
+msgstr "未命名演示文稿"
+
+#: userland/apps/reliefppt/main.cpp:16
+msgid "Usage: reliefppt [presentation.rppt]"
+msgstr "用法：reliefppt [演示文稿.rppt]"
+
+#: configs/nls/messages.c:31
+msgid "Use PNG or an uncompressed 24/32-bit BMP image"
+msgstr "请选择 PNG 或未压缩的 24/32 位 BMP 图片"
+
+#: userland/apps/reliefppt/window.cpp:203
+msgid "Widescreen 16:9"
+msgstr "宽屏 16:9"
+
+#: userland/apps/reliefppt/dialogs.cpp:42
+msgid "Width"
+msgstr "宽度"
+
+#: userland/apps/reliefppt/dialogs.cpp:41
+msgid "X position"
+msgstr "水平位置"
+
+#: userland/apps/reliefppt/dialogs.cpp:41
+msgid "Y position"
+msgstr "垂直位置"
