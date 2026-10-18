@@ -239,6 +239,19 @@ sdk = false
 api = false
 
 [[components]]
+id = "driverinfo"
+symbol = "APP_DRIVERINFO"
+label = "Driver information"
+category = "System applications"
+kind = "system-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+
+[[components]]
 id = "sysconfdialog"
 symbol = "APP_SYSCONFDIALOG"
 label = "System configuration dialog"
