@@ -1,4 +1,6 @@
 #include <assert.h>
+#include <stddef.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -70,7 +72,8 @@ struct host_query { uint32_t mobid, offset; bool active, pending; };
 static struct host_query host_queries[SVGA_CONTEXTS];
 struct host_surface { uint32_t width, height, format, mobid; uint8_t *data; bool gb; };
 static struct host_surface host_surfaces[SVGA_SURFACES];
-static bool stalled, invalid_caps_record;
+static bool stalled, invalid_caps_record, host_busy_supported;
+static bool expect_guest_fifo_busy;
 struct allocation { uint64_t phys; void *ptr; uint32_t pages; };
 static struct allocation allocations[512];
 static uint64_t next_phys = 0x10000000;
@@ -79,24 +82,85 @@ static uint32_t host_gmr_pages[SVGA_GMRS], host_gmr_ppn[SVGA_GMRS][SVGA_MAX_GUES
 static uint32_t selected_port_reg, port_busy_reads, port_sync_writes;
 static uint32_t batch_storage[SVGA_BATCH_MAX_BYTES / sizeof(uint32_t)];
 static uint32_t heap_alloc_calls, heap_fail_after = UINT32_MAX, heap_live_allocations;
+static uint64_t heap_live_bytes, heap_live_pages;
+static bool assert_heap_unlocked;
 static uint64_t assert_unlocked_free_phys;
 static uint32_t unlocked_free_checks;
+static bool assert_console_log_unlocked;
+static uint32_t console_log_count;
+static char console_log_text[256];
+
+union svga_test_heap_header {
+    max_align_t alignment;
+    struct { size_t requested_bytes; } allocation;
+};
+
+static uint64_t heap_pages_for_size(size_t size)
+{
+    return size / 4096u + (size % 4096u != 0u);
+}
+
+static size_t heap_allocation_size(const void *pointer)
+{
+    if (!pointer) return 0;
+    const union svga_test_heap_header *header = (const union svga_test_heap_header *)
+        ((const uint8_t *)pointer - sizeof(union svga_test_heap_header));
+    return header->allocation.requested_bytes;
+}
+
+static uint64_t eager_batch_sidecar_bytes(uint32_t capacity)
+{
+    return (uint64_t)capacity *
+        (sizeof(struct svga_batch_query_op) +
+         sizeof(struct svga_batch_shader_op) +
+         sizeof(struct svga_batch_binding_op));
+}
+
+static uint64_t eager_batch_sidecar_pages(uint32_t capacity)
+{
+    return heap_pages_for_size((size_t)capacity * sizeof(struct svga_batch_query_op)) +
+        heap_pages_for_size((size_t)capacity * sizeof(struct svga_batch_shader_op)) +
+        heap_pages_for_size((size_t)capacity * sizeof(struct svga_batch_binding_op));
+}
 
 void *kernel_malloc(size_t size)
 {
+    if (assert_heap_unlocked) {
+        uint64_t flags;
+        assert(svga_try_lock_irqsave(&flags));
+        svga_unlock(flags);
+    }
     uint32_t call = heap_alloc_calls++;
     if (call == heap_fail_after) return NULL;
-    void *pointer = malloc(size);
-    if (pointer) ++heap_live_allocations;
-    return pointer;
+    if (size > SIZE_MAX - sizeof(union svga_test_heap_header)) return NULL;
+    union svga_test_heap_header *header = malloc(
+        sizeof(union svga_test_heap_header) + size);
+    if (!header) return NULL;
+    header->allocation.requested_bytes = size;
+    ++heap_live_allocations;
+    heap_live_bytes += size;
+    heap_live_pages += heap_pages_for_size(size);
+    return (uint8_t *)header + sizeof(*header);
 }
 
 void kernel_free(void *pointer)
 {
     if (!pointer) return;
+    if (assert_heap_unlocked) {
+        uint64_t flags;
+        assert(svga_try_lock_irqsave(&flags));
+        svga_unlock(flags);
+    }
     assert(heap_live_allocations > 0);
+    union svga_test_heap_header *header = (union svga_test_heap_header *)
+        ((uint8_t *)pointer - sizeof(union svga_test_heap_header));
+    size_t size = header->allocation.requested_bytes;
+    assert(heap_live_bytes >= size &&
+           heap_live_pages >= heap_pages_for_size(size));
     --heap_live_allocations;
-    free(pointer);
+    heap_live_bytes -= size;
+    heap_live_pages -= heap_pages_for_size(size);
+    free(header);
 }
 
 void x86_64_outl(uint32_t value, uint16_t port)
@@ -140,8 +204,17 @@ void svga_platform_bind(uint16_t port, volatile uint32_t *ring, uint32_t bytes)
 
 void console_log(enum console_log_level level, const char *format, ...)
 {
+    if (assert_console_log_unlocked) {
+        uint64_t flags;
+        assert(svga_try_lock_irqsave(&flags));
+        svga_unlock(flags);
+    }
     (void)level;
-    (void)format;
+    va_list args;
+    va_start(args, format);
+    vsnprintf(console_log_text, sizeof(console_log_text), format, args);
+    va_end(args);
+    ++console_log_count;
 }
 
 static void *physical_pointer(uint64_t phys)
@@ -682,7 +755,7 @@ static void consume(void)
         stop = min + (stop - min + words * 4) % (max - min);
         fifo[SVGA_FIFO_STOP] = stop;
     }
-    if (fifo[SVGA_FIFO_MIN] > SVGA_FIFO_BUSY * 4u)
+    if (host_busy_supported)
         fifo[SVGA_FIFO_BUSY] = 0;
 }
 static uint32_t read_reg(uint32_t reg)
@@ -726,6 +799,11 @@ static void write_reg(uint32_t reg, uint32_t value)
     regs[reg] = value;
     if (reg == SVGA_REG_CONFIG_DONE && !value) regs[SVGA_REG_TRACES] = 0;
     if (reg == SVGA_REG_CONFIG_DONE && value) {
+        host_busy_supported =
+            (regs[SVGA_REG_CAPABILITIES] & SVGA_CAP_EXTENDED_FIFO) &&
+            regs[SVGA_REG_MEM_REGS] > SVGA_FIFO_BUSY &&
+            fifo[SVGA_FIFO_MIN] > SVGA_FIFO_BUSY * 4u &&
+            fifo[SVGA_FIFO_MIN] <= sizeof(fifo);
         if (fifo[SVGA_FIFO_MIN] > SVGA_FIFO_GUEST_3D_HWVERSION * 4) {
             configured_guest = fifo[SVGA_FIFO_GUEST_3D_HWVERSION];
             fifo[SVGA_FIFO_CAPABILITIES] = fifo_caps;
@@ -758,7 +836,14 @@ static void write_reg(uint32_t reg, uint32_t value)
     }
     if (reg == SVGA_REG_SYNC) {
         ++sync_writes;
-        if (fifo[SVGA_FIFO_MIN] > SVGA_FIFO_BUSY * 4u) fifo[SVGA_FIFO_BUSY] = 1;
+        if (host_busy_supported) {
+            if (expect_guest_fifo_busy) {
+                /* The guest must publish BUSY before ringing the doorbell. */
+                assert(fifo[SVGA_FIFO_BUSY] == 1);
+                expect_guest_fifo_busy = false;
+            }
+            fifo[SVGA_FIFO_BUSY] = 1;
+        }
         if (!host_delay_reads) consume();
     }
     if (reg == SVGA_REG_GMR_ID) selected_gmr = value;
@@ -780,6 +865,7 @@ static void setup(uint32_t caps, uint32_t fc, uint32_t version)
     assert(live_pages == 0);
     assert(!retired_count);
     assert(!heap_live_allocations);
+    assert(!heap_live_bytes && !heap_live_pages);
     memset(&svga, 0, sizeof(svga)); memset(fifo, 0, sizeof(fifo)); memset(regs, 0, sizeof(regs));
     memset(host_gmr_pages, 0, sizeof(host_gmr_pages));
     memset(host_shaders, 0, sizeof(host_shaders));
@@ -802,6 +888,7 @@ static void setup(uint32_t caps, uint32_t fc, uint32_t version)
     host_devcap_3d = 1;
     devcap_queries = 0;
     host_delay_reads = 0;
+    expect_guest_fifo_busy = false;
     const struct svga_ops ops = {read_reg, write_reg, allocate, deallocate, physical_pointer, read_clock};
     svga_bind(&ops, fifo, sizeof(fifo));
     svga.memory_ready = true;
@@ -891,6 +978,8 @@ static void test_nonblocking_batch(void)
 
     svga.fifo[SVGA_FIFO_STOP] = next;
     stalled = false;
+    /* The preceding backpressure path already notified the host. */
+    consume();
     uint32_t before_commands = command_count;
     assert(!svga_batch_submit(&batch, &fence) && fence);
     assert(batch.submitted && svga.fifo[SVGA_FIFO_STOP] == svga.fifo[SVGA_FIFO_NEXT_CMD]);
@@ -932,11 +1021,14 @@ static void test_fifo_wakeup(void)
     assert(svga_configure_locked(true) == 0 && !fifo[SVGA_FIFO_BUSY]);
     uint32_t wakes = sync_writes, updates = visible_updates;
     stalled = true;
+    expect_guest_fifo_busy = true;
     assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
+    assert(!expect_guest_fifo_busy);
+    assert(sync_writes == wakes + 1);
     assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
+    assert(sync_writes == wakes + 2);
     svga_handle fence;
     assert(svga_fence_insert(&fence) == 0);
-    /* Conservative submission explicitly notifies the host for every packet. */
     assert(sync_writes == wakes + 3);
     assert(fifo[SVGA_FIFO_BUSY] == 1);
     stalled = false;
@@ -958,6 +1050,53 @@ static void test_fifo_wakeup(void)
     assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
     assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
     assert(sync_writes == wakes + 2 && visible_updates == updates + 2);
+}
+
+static void test_fifo_busy_requires_reported_register(void)
+{
+    uint32_t update[] = {0, 0, 10, 10};
+    struct svga_span span = {update, sizeof(update)};
+    setup(SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+          SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE, SVGA3D_HWVERSION_WS8_B1);
+
+    /* MEM_REGS is a count: BUSY is absent when the raw count equals its index,
+     * even though configure clamps the allocated header up to NUM_REGS. */
+    regs[SVGA_REG_MEM_REGS] = SVGA_FIFO_BUSY;
+    const uint32_t busy_sentinel = 0xdecafbad;
+    fifo[SVGA_FIFO_BUSY] = busy_sentinel;
+    uint32_t wakes = sync_writes;
+    assert(svga_configure_locked(true) == 0);
+    assert(!host_busy_supported && fifo[SVGA_FIFO_BUSY] == busy_sentinel);
+
+    stalled = true;
+    assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
+    assert(sync_writes == wakes + 1);
+    assert(fifo[SVGA_FIFO_BUSY] == busy_sentinel);
+    stalled = false;
+    consume();
+}
+
+static void test_fifo_busy_state_resets_on_reconfigure(void)
+{
+    uint32_t update[] = {0, 0, 10, 10};
+    struct svga_span span = {update, sizeof(update)};
+    setup(SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+          SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE, SVGA3D_HWVERSION_WS8_B1);
+
+    stalled = true;
+    assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
+    assert(fifo[SVGA_FIFO_BUSY] == 1);
+    uint32_t wakes = sync_writes;
+
+    /* The four-register reconfiguration reuses the old word as FIFO data. */
+    const uint32_t busy_sentinel = 0xdecafbad;
+    fifo[SVGA_FIFO_BUSY] = busy_sentinel;
+    assert(svga_configure_locked(false) == 0);
+    assert(!host_busy_supported && fifo[SVGA_FIFO_BUSY] == busy_sentinel);
+    assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
+    assert(sync_writes == wakes + 1 && fifo[SVGA_FIFO_BUSY] == busy_sentinel);
+    stalled = false;
+    consume();
 }
 
 static void prepare_graphical_framebuffer(void);
@@ -1129,6 +1268,60 @@ static void test_fallback(void)
     assert(info.probe.fifo_caps == SVGA_FIFO_CAP_RESERVE);
     assert(info.probe.host_legacy == SVGA3D_HWVERSION_WS8_B1);
     assert(!svga_update(0, 0, 10, 10));
+}
+static void test_cache_policy_failure_restores_legacy_fifo(void)
+{
+    setup(SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+          SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE,
+          SVGA3D_HWVERSION_WS8_B1);
+    uint64_t flags = svga_lock();
+    int ret = svga_restore_legacy_after_cache_error_locked(SVGA_ENOTSUP);
+    svga_unlock(flags);
+    assert(ret == SVGA_ENOTSUP && svga.fifo_ready && !svga.available);
+    assert(regs[SVGA_REG_CONFIG_DONE] == 1u);
+
+    setup(SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+          SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE,
+          SVGA3D_HWVERSION_WS8_B1);
+    svga.fifo = NULL;
+    flags = svga_lock();
+    ret = svga_restore_legacy_after_cache_error_locked(SVGA_ENOTSUP);
+    svga_unlock(flags);
+    assert(ret == SVGA_EIO);
+}
+static void test_cache_policy_reports_with_svga_lock_released(void)
+{
+    assert_console_log_unlocked = true;
+    uint32_t previous_count = console_log_count;
+    struct svga_cache_report report = {
+        .policy = "default-PTE WB+NX requested for validated BAR2",
+    };
+    svga_report_cache_result_unlocked(&report);
+    assert(console_log_count == previous_count + 1);
+    assert(strstr(console_log_text, "default-PTE WB+NX requested for validated BAR2"));
+
+    report = (struct svga_cache_report){
+        .policy = "UC+NX fallback",
+        .reason = "below-user-top",
+    };
+    svga_report_cache_result_unlocked(&report);
+    assert(strstr(console_log_text, "UC+NX fallback"));
+    assert(strstr(console_log_text, "below-user-top"));
+
+    report = (struct svga_cache_report){
+        .reason = "reservation-mismatch",
+        .status = SVGA_ENOTSUP,
+        .legacy_restored = true,
+    };
+    svga_report_cache_result_unlocked(&report);
+    assert(strstr(console_log_text, "legacy 2D restored"));
+
+    report.legacy_restored = false;
+    svga_report_cache_result_unlocked(&report);
+    assert(strstr(console_log_text, "legacy 2D restore failed"));
+    assert(console_log_count == previous_count + 4);
+    assert_console_log_unlocked = false;
+    puts("SVGA cache-policy reports present outside device lock");
 }
 static void test_effective_surface_limit_snapshot(void)
 {
@@ -1466,6 +1659,52 @@ static void test_gpu(void)
         assert(!svga3d_shutdown());
     }
 }
+
+static void test_gpu_diagnostic_skips_unadvertised_fifo_busy(void)
+{
+    setup(SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+          SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE,
+          SVGA3D_HWVERSION_WS8_B1);
+    regs[SVGA_REG_MEM_REGS] = SVGA_FIFO_BUSY;
+    assert(svga_configure_locked(true) == 0 && !svga.fifo_busy_present);
+    const uint32_t busy_sentinel = 0xdecafbad;
+    fifo[SVGA_FIFO_BUSY] = busy_sentinel;
+
+    struct reliefos_gpu_context request = gpu_request();
+    assert(!svga_gpu_create(17, &request));
+    struct reliefos_gpu_vertex vertices[6] = {
+        {-1, -1, 0.5f, 0xffff0000}, {1, -1, 0.5f, 0xff00ff00},
+        {0, 1, 0.5f, 0xff0000ff}, {-1, -1, 0.5f, 0xffff0000},
+        {1, -1, 0.5f, 0xff00ff00}, {0, 1, 0.5f, 0xff0000ff},
+    };
+    struct reliefos_gpu_draw draws[2] = {
+        {.first = 0, .count = 3, .transform = {1,0,0,0, 0,1,0,0,
+            0,0,1,0, 0.25f,0,0,1}},
+        {.first = 3, .count = 3, .transform = {1,0,0,0, 0,1,0,0,
+            0,0,1,0, 0.5f,0,0,1}},
+    };
+    uint32_t pixels[129] = {0};
+    struct reliefos_gpu_frame frame = {
+        .size = sizeof(frame), .version = RELIEFOS_GPU_ABI_VERSION,
+        .handle = request.handle, .vertices = UINT64_MAX, .draws = UINT64_MAX,
+        .pixels = UINT64_MAX, .vertex_count = 6, .draw_count = 2,
+        .pixel_capacity = 128, .fill_mode = RELIEFOS_GPU_FILL_SOLID,
+    };
+    stalled = true;
+    assert(svga_gpu_render(17, &frame, vertices, draws, pixels) == SVGA_ETIMEDOUT);
+    struct reliefos_gpu_diagnostics diagnostic;
+    svga_gpu_get_diagnostics(17, &diagnostic);
+    assert(diagnostic.status == SVGA_ETIMEDOUT &&
+           diagnostic.fifo_busy == UINT32_MAX &&
+           fifo[SVGA_FIFO_BUSY] == busy_sentinel);
+
+    stalled = false;
+    consume();
+    svga_gpu_release_owner(17);
+    assert(live_pages == 0 && !svga.surface_bytes);
+    assert(!svga3d_shutdown());
+}
+
 static void test_gb_recovery(void)
 {
     host_render_targets_cap = UINT32_MAX;
@@ -2285,6 +2524,257 @@ static void test_batch_submit_failure_snapshot_query_check(void)
     assert(!svga3d_shutdown());
 }
 
+static void assert_batch_operation_arrays_unused(const struct svga_batch *batch,
+                                                 uint64_t old_bytes,
+                                                 uint64_t old_pages)
+{
+    assert(batch->metadata && !batch->metadata->query_ops &&
+           !batch->metadata->shader_ops && !batch->metadata->binding_ops);
+    assert(heap_live_bytes - old_bytes == sizeof(*batch->metadata));
+    assert(heap_live_pages - old_pages ==
+           heap_pages_for_size(sizeof(*batch->metadata)));
+    uint64_t eager_bytes = sizeof(*batch->metadata) +
+        eager_batch_sidecar_bytes(batch->metadata->operation_capacity);
+    uint64_t eager_pages = heap_pages_for_size(sizeof(*batch->metadata)) +
+        eager_batch_sidecar_pages(batch->metadata->operation_capacity);
+    assert(heap_live_bytes - old_bytes < eager_bytes);
+    assert(heap_live_pages - old_pages < eager_pages);
+}
+
+static void test_batch_operation_sidecar_demand_cost(void)
+{
+    setup(SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+          SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE,
+          SVGA3D_HWVERSION_WS8_B1);
+    struct svga_batch batch;
+    assert_heap_unlocked = true;
+    uint64_t bytes_before = heap_live_bytes, pages_before = heap_live_pages;
+    assert(!svga_batch_init_sized(&batch, svga.generation, batch_storage,
+                                  64u, 8u));
+    assert_batch_operation_arrays_unused(&batch, bytes_before, pages_before);
+    uint64_t small_actual_bytes = heap_live_bytes - bytes_before;
+    uint64_t small_actual_pages = heap_live_pages - pages_before;
+    uint64_t small_eager_bytes = sizeof(*batch.metadata) +
+        eager_batch_sidecar_bytes(batch.metadata->operation_capacity);
+    uint64_t small_eager_pages = heap_pages_for_size(sizeof(*batch.metadata)) +
+        eager_batch_sidecar_pages(batch.metadata->operation_capacity);
+    printf("SVGA batch sidecars: small-source allocated %llu bytes/%llu pages; "
+           "eager would request %llu bytes/%llu pages\n",
+           (unsigned long long)small_actual_bytes,
+           (unsigned long long)small_actual_pages,
+           (unsigned long long)small_eager_bytes,
+           (unsigned long long)small_eager_pages);
+    assert(!svga_batch_abort(&batch));
+
+    bytes_before = heap_live_bytes;
+    pages_before = heap_live_pages;
+    assert(!svga_batch_init_sized(&batch, svga.generation, batch_storage,
+                                  64u, 64u));
+    struct {
+        SVGA3dCmdPresent command;
+        SVGA3dCopyRect rect;
+    } present = {
+        .command = {.sid = 1u},
+        .rect = {.x = 2u, .y = 3u, .w = 4u, .h = 5u,
+                 .srcx = 2u, .srcy = 3u},
+    };
+    assert(!svga_batch_append(&batch, SVGA_3D_CMD_PRESENT, true,
+                              &present, sizeof(present)));
+    assert_batch_operation_arrays_unused(&batch, bytes_before, pages_before);
+    assert(!svga_batch_abort(&batch));
+
+    bytes_before = heap_live_bytes;
+    pages_before = heap_live_pages;
+    assert(!svga_batch_init_sized(&batch, svga.generation, wide_batch_storage,
+            SVGA_BATCH_MAX_OUTPUT_BYTES, SVGA_BATCH_MAX_INPUT_BYTES));
+    uint64_t actual_bytes = heap_live_bytes - bytes_before;
+    uint64_t actual_pages = heap_live_pages - pages_before;
+    uint32_t update[4] = {0, 0, 1, 1};
+    assert(!svga_batch_append(&batch, SVGA_CMD_UPDATE, false,
+                              update, sizeof(update)));
+    assert_batch_operation_arrays_unused(&batch, bytes_before, pages_before);
+    uint64_t eager_bytes = sizeof(*batch.metadata) +
+        eager_batch_sidecar_bytes(batch.metadata->operation_capacity);
+    uint64_t eager_pages = heap_pages_for_size(sizeof(*batch.metadata)) +
+        eager_batch_sidecar_pages(batch.metadata->operation_capacity);
+    printf("SVGA batch sidecars: max-source allocated %llu bytes/%llu pages; "
+           "eager would request %llu bytes/%llu pages\n",
+           (unsigned long long)actual_bytes,
+           (unsigned long long)actual_pages,
+           (unsigned long long)eager_bytes,
+           (unsigned long long)eager_pages);
+    assert(!svga_batch_abort(&batch));
+    assert_heap_unlocked = false;
+    assert(!svga3d_shutdown());
+}
+
+static void test_batch_operation_sidecar_growth_and_failure(void)
+{
+    setup(0x1dffc3e2u, 0x77fu, 0);
+    svga_handle context = 0;
+    assert(!svga3d_context_create(&context));
+    struct svga_batch batch;
+    assert_heap_unlocked = true;
+
+    assert(!svga_batch_init_sized(&batch, svga.generation, batch_storage,
+                                  SVGA_BATCH_MAX_OUTPUT_BYTES, 128u));
+    uint64_t start_bytes = heap_live_bytes, start_pages = heap_live_pages;
+    heap_fail_after = heap_alloc_calls;
+    assert(svga_batch_bind_shader(&batch, context, SVGA3D_SHADERTYPE_VS,
+                                  SVGA3D_INVALID_ID) == SVGA_ENOMEM);
+    heap_fail_after = UINT32_MAX;
+    uint32_t cid = svga_resource_id(context);
+    assert(!batch.shader_op_count && !batch.operation_count && !batch.bytes &&
+           !batch.context_count && !batch.metadata->shader_ops &&
+           !svga.contexts[cid].batch_state_owner &&
+           heap_live_bytes == start_bytes && heap_live_pages == start_pages);
+
+    for (uint32_t i = 0; i < 4; ++i)
+        assert(!svga_batch_bind_shader(&batch, context,
+                SVGA3D_SHADERTYPE_VS, SVGA3D_INVALID_ID));
+    assert(batch.shader_op_count == 4u && batch.operation_count == 4u);
+    assert(heap_allocation_size(batch.metadata->shader_ops) ==
+           4u * sizeof(struct svga_batch_shader_op));
+    assert(!batch.metadata->query_ops && !batch.metadata->binding_ops);
+    struct svga_batch_shader_op *old_shader_ops = batch.metadata->shader_ops;
+    assert(!svga_batch_bind_shader(&batch, context,
+            SVGA3D_SHADERTYPE_VS, SVGA3D_INVALID_ID));
+    assert(batch.shader_op_count == 5u && batch.operation_count == 5u &&
+           batch.metadata->shader_ops != old_shader_ops);
+    assert(heap_allocation_size(batch.metadata->shader_ops) ==
+           8u * sizeof(struct svga_batch_shader_op));
+    for (uint32_t i = 5; i < 8; ++i)
+        assert(!svga_batch_bind_shader(&batch, context,
+                SVGA3D_SHADERTYPE_VS, SVGA3D_INVALID_ID));
+    old_shader_ops = batch.metadata->shader_ops;
+    uint32_t old_shader_count = batch.shader_op_count;
+    uint32_t old_operation_count = batch.operation_count;
+    uint32_t old_context_count = batch.context_count;
+    uint32_t old_bytes = batch.bytes;
+    uint64_t old_transaction = batch.metadata->transaction_id;
+    uint64_t old_owner = svga.contexts[cid].batch_state_owner;
+    uint64_t old_live_bytes = heap_live_bytes, old_live_pages = heap_live_pages;
+    heap_fail_after = heap_alloc_calls;
+    assert(svga_batch_bind_shader(&batch, context, SVGA3D_SHADERTYPE_VS,
+                                  SVGA3D_INVALID_ID) == SVGA_ENOMEM);
+    heap_fail_after = UINT32_MAX;
+    assert(batch.metadata->shader_ops == old_shader_ops &&
+           heap_allocation_size(batch.metadata->shader_ops) ==
+               8u * sizeof(struct svga_batch_shader_op) &&
+           batch.shader_op_count == old_shader_count &&
+           batch.operation_count == old_operation_count &&
+           batch.context_count == old_context_count && batch.bytes == old_bytes &&
+           batch.metadata->transaction_id == old_transaction &&
+           svga.contexts[cid].batch_state_owner == old_owner &&
+           heap_live_bytes == old_live_bytes && heap_live_pages == old_live_pages);
+    assert(!svga_batch_abort(&batch));
+
+    assert(!svga_batch_init_sized(&batch, svga.generation, batch_storage,
+                                  SVGA_BATCH_MAX_OUTPUT_BYTES, 128u));
+    assert(!svga_batch_stage_texture(&batch, context, 0, 0));
+    assert(batch.binding_op_count == 1u && !batch.metadata->query_ops &&
+           !batch.metadata->shader_ops);
+    assert(heap_allocation_size(batch.metadata->binding_ops) ==
+           4u * sizeof(struct svga_batch_binding_op));
+    assert(!svga_batch_abort(&batch));
+
+    assert(!svga_batch_init_sized(&batch, svga.generation, batch_storage,
+                                  SVGA_BATCH_MAX_OUTPUT_BYTES, 128u));
+    assert(!svga_batch_query_begin(&batch, context, 0));
+    assert(batch.query_op_count == 1u && !batch.metadata->shader_ops &&
+           !batch.metadata->binding_ops);
+    assert(heap_allocation_size(batch.metadata->query_ops) ==
+           4u * sizeof(struct svga_batch_query_op));
+    assert(!svga_batch_abort(&batch));
+    assert_heap_unlocked = false;
+    assert(!svga3d_context_destroy(context));
+    assert(!svga3d_shutdown());
+}
+
+static void test_batch_operation_capacity_guards(void)
+{
+    setup(0x1dffc3e2u, 0x77fu, 0);
+    svga_handle context = 0;
+    assert(!svga3d_context_create(&context));
+    struct svga_batch batch;
+    assert_heap_unlocked = true;
+
+    assert(!svga_batch_init_sized(&batch, svga.generation, batch_storage,
+                                  SVGA_BATCH_MAX_OUTPUT_BYTES, 128u));
+    assert(!svga_batch_query_begin(&batch, context, 0));
+    struct svga_batch_query_op query_storage[4];
+    struct svga_batch_query_op *query_ops = batch.metadata->query_ops;
+    assert(heap_allocation_size(query_ops) == sizeof(query_storage));
+    memcpy(query_storage, query_ops, sizeof(query_storage));
+    batch.metadata->query_ops = NULL;
+    uint64_t flags = svga_lock();
+    assert(svga_query_validate_batch_locked(&batch) == SVGA_EINVAL);
+    svga_unlock(flags);
+    batch.metadata->query_ops = query_ops;
+    batch.query_op_count = 5u;
+    batch.operation_count = 5u;
+    batch.metadata->query_ops = query_storage;
+    flags = svga_lock();
+    assert(svga_query_validate_batch_locked(&batch) == SVGA_EINVAL);
+    svga_unlock(flags);
+    batch.metadata->query_ops = query_ops;
+    batch.query_op_count = 1u;
+    batch.operation_count = 1u;
+    assert(!svga_batch_abort(&batch));
+
+    assert(!svga_batch_init_sized(&batch, svga.generation, batch_storage,
+                                  SVGA_BATCH_MAX_OUTPUT_BYTES, 128u));
+    assert(!svga_batch_stage_texture(&batch, context, 0, 0));
+    struct svga_batch_binding_op binding_storage[4];
+    struct svga_batch_binding_op *binding_ops = batch.metadata->binding_ops;
+    assert(heap_allocation_size(binding_ops) == sizeof(binding_storage));
+    memcpy(binding_storage, binding_ops, sizeof(binding_storage));
+    batch.metadata->binding_ops = NULL;
+    flags = svga_lock();
+    assert(svga_batch_state_validate_locked(&batch) == SVGA_EINVAL);
+    svga_unlock(flags);
+    batch.metadata->binding_ops = binding_ops;
+    batch.binding_op_count = 5u;
+    batch.operation_count = 5u;
+    batch.metadata->binding_ops = binding_storage;
+    flags = svga_lock();
+    assert(svga_batch_state_validate_locked(&batch) == SVGA_EINVAL);
+    svga_unlock(flags);
+    batch.metadata->binding_ops = binding_ops;
+    batch.binding_op_count = 1u;
+    batch.operation_count = 1u;
+    assert(!svga_batch_abort(&batch));
+
+    assert(!svga_batch_init_sized(&batch, svga.generation, batch_storage,
+                                  SVGA_BATCH_MAX_OUTPUT_BYTES, 128u));
+    assert(!svga_batch_bind_shader(&batch, context, SVGA3D_SHADERTYPE_VS,
+                                   SVGA3D_INVALID_ID));
+    struct svga_batch_shader_op shader_storage[4];
+    struct svga_batch_shader_op *shader_ops = batch.metadata->shader_ops;
+    assert(heap_allocation_size(shader_ops) == sizeof(shader_storage));
+    memcpy(shader_storage, shader_ops, sizeof(shader_storage));
+    uint32_t shader_count = batch.shader_op_count;
+    uint32_t operation_count = batch.operation_count;
+    batch.metadata->shader_ops = NULL;
+    svga_handle fence = 0;
+    assert(svga_batch_submit(&batch, &fence) == SVGA_EINVAL && !fence);
+    batch.metadata->shader_ops = shader_ops;
+    batch.shader_op_count = 5u;
+    batch.operation_count = 5u;
+    batch.metadata->shader_ops = NULL;
+    assert(svga_batch_submit(&batch, &fence) == SVGA_EINVAL && !fence);
+    batch.metadata->shader_ops = shader_storage;
+    assert(svga_batch_submit(&batch, &fence) == SVGA_EINVAL && !fence);
+    batch.metadata->shader_ops = shader_ops;
+    batch.shader_op_count = shader_count;
+    batch.operation_count = operation_count;
+    assert(!svga_batch_abort(&batch));
+
+    assert_heap_unlocked = false;
+    assert(!svga3d_context_destroy(context));
+    assert(!svga3d_shutdown());
+}
+
 static void test_global_batch_metadata_budget(void)
 {
     setup(SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
@@ -2330,7 +2820,7 @@ static void test_global_batch_metadata_budget(void)
         assert(!svga_batch_abort(&batches[i]));
 
     unsigned heap_before = heap_live_allocations;
-    heap_fail_after = heap_alloc_calls + 1u;
+    heap_fail_after = heap_alloc_calls;
     assert(svga_batch_init_sized(&batches[0], svga.generation,
             batch_storage, 8u, 8u) == SVGA_ENOMEM);
     heap_fail_after = UINT32_MAX;
@@ -2611,15 +3101,11 @@ static void test_sized_batch_and_fence_progress(void)
             SVGA_BATCH_MAX_OUTPUT_BYTES, SVGA_BATCH_MAX_INPUT_BYTES) == SVGA_ENOMEM);
     heap_fail_after = UINT32_MAX;
     assert(heap_live_allocations == heap_before);
-    heap_fail_after = heap_alloc_calls + 1u;
-    assert(svga_batch_init_sized(&batch, svga.generation, wide_batch_storage,
-            SVGA_BATCH_MAX_OUTPUT_BYTES, SVGA_BATCH_MAX_INPUT_BYTES) == SVGA_ENOMEM);
-    heap_fail_after = UINT32_MAX;
-    assert(heap_live_allocations == heap_before);
-    heap_fail_after = heap_alloc_calls + 2u;
-    assert(svga_batch_init_sized(&batch, svga.generation, wide_batch_storage,
-            SVGA_BATCH_MAX_OUTPUT_BYTES, SVGA_BATCH_MAX_INPUT_BYTES) == SVGA_ENOMEM);
-    heap_fail_after = UINT32_MAX;
+    assert(!svga_batch_init_sized(&batch, svga.generation, wide_batch_storage,
+            SVGA_BATCH_MAX_OUTPUT_BYTES, SVGA_BATCH_MAX_INPUT_BYTES));
+    assert(!batch.metadata->query_ops && !batch.metadata->shader_ops &&
+           !batch.metadata->binding_ops);
+    assert(!svga_batch_abort(&batch));
     assert(heap_live_allocations == heap_before);
     assert(svga_batch_init_sized(&batch, svga.generation, wide_batch_storage,
             SVGA_BATCH_MAX_OUTPUT_BYTES + 4u, SVGA_BATCH_MAX_INPUT_BYTES) == SVGA_EINVAL);
@@ -3007,6 +3493,24 @@ static void test_many_query_operations_in_one_batch(void)
         assert(!svga_batch_query_end(&batch, context, 0, result, offset));
         assert(!svga_batch_query_wait(&batch, context, 0, result, offset));
     }
+    assert(batch.operation_count == 384u && batch.query_op_count == 384u);
+    assert(!svga_batch_bind_shader(&batch, context, SVGA3D_SHADERTYPE_VS,
+                                   SVGA3D_INVALID_ID));
+    for (uint32_t i = batch.operation_count;
+         i < SVGA_BATCH_MAX_QUERY_OPS; ++i)
+        assert(!svga_batch_stage_texture(&batch, context, 0, 0));
+    assert(batch.operation_count == SVGA_BATCH_MAX_QUERY_OPS &&
+           batch.query_op_count == 384u && batch.shader_op_count == 1u &&
+           batch.binding_op_count == SVGA_BATCH_MAX_QUERY_OPS - 385u);
+    assert(heap_allocation_size(batch.metadata->query_ops) ==
+           512u * sizeof(struct svga_batch_query_op));
+    assert(heap_allocation_size(batch.metadata->shader_ops) ==
+           4u * sizeof(struct svga_batch_shader_op));
+    assert(heap_allocation_size(batch.metadata->binding_ops) ==
+           SVGA_BATCH_MAX_QUERY_OPS * sizeof(struct svga_batch_binding_op));
+    /* Binding staging historically reports EINVAL when the shared source
+     * operation ceiling is exhausted; keep that API result unchanged. */
+    assert(svga_batch_stage_texture(&batch, context, 0, 0) == SVGA_EINVAL);
     svga_handle fence = 0;
     assert(!svga_batch_submit(&batch, &fence));
     bool signaled = false;
@@ -3302,6 +3806,9 @@ static void test_nonblocking_legacy_resource_lifecycle(void)
 
 int main(void)
 {
+    test_batch_operation_sidecar_demand_cost();
+    test_batch_operation_sidecar_growth_and_failure();
+    test_batch_operation_capacity_guards();
     test_batch_submit_failure_snapshot_shape_retry_and_fifo();
     test_batch_submit_failure_snapshot_binding_owner();
     test_batch_submit_failure_snapshot_shader_key();
@@ -3312,11 +3819,16 @@ int main(void)
     test_display_tick_defers_lock_and_fifo_backpressure();
     test_trace_capability_survives_fifo_reconfiguration();
     test_gb_display_compatibility();
-    test_fence_last_poll(); test_fifo_wakeup(); test_fifo(); test_nonblocking_batch();
+    test_fence_last_poll(); test_fifo_busy_requires_reported_register();
+    test_fifo_busy_state_resets_on_reconfigure(); test_fifo_wakeup();
+    test_fifo(); test_nonblocking_batch();
     test_mode_lease_preserves_live_backend(); test_fallback();
+    test_cache_policy_failure_restores_legacy_fifo();
+    test_cache_policy_reports_with_svga_lock_released();
     test_effective_surface_limit_snapshot();
     test_resources(); test_surface_size_rejects_mip_sum_overflow();
-    test_gpu(); test_gb_recovery();
+    test_gpu(); test_gpu_diagnostic_skips_unadvertised_fifo_busy();
+    test_gb_recovery();
     test_vgpu9_shader_backend();
     test_many_shader_binds_in_one_batch();
     test_batch_reference_rollback();

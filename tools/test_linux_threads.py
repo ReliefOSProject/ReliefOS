@@ -7,7 +7,7 @@ import tempfile
 root = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix="reliefos-threads-") as tmp:
     for test in ("futex_queue", "process_signal_queue", "signal_info_queue", "signalfd",
-                 "signal_address_space", "user_gp_dispatch", "resource_limits", "membarrier_cpu"):
+                 "signal_address_space", "signal_wake", "user_gp_dispatch", "resource_limits", "membarrier_cpu"):
         output = str(Path(tmp) / test)
         subprocess.run([
             "cc", "-std=c11", "-pthread", "-g", "-O1", "-fsanitize=address,undefined",

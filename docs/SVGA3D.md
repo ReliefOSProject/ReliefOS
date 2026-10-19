@@ -11,9 +11,9 @@ those pages and the FIFO until a later initialization/shutdown retry can finish
 retirement. FIFO waits remain bounded.
 
 The public ring-0 API is declared in `kernel/reliefnt/kernel/reliefnt/include/reliefnt/svga.h`.
-The implementation lives in `kernel/reliefnt/drivers/bootstrap/svga/` and uses the vendored
-Linux VMware protocol headers in `kernel/reliefnt/drivers/bootstrap/svga/protocol/`, with
-the required GB wire extensions in `kernel/reliefnt/drivers/bootstrap/svga/gb_protocol.h`.
+The implementation lives in `kernel/reliefnt/drivers/video/svga/` and uses the vendored
+Linux VMware protocol headers in `kernel/reliefnt/drivers/video/svga/protocol/`, with
+the required GB wire extensions in `kernel/reliefnt/drivers/video/svga/gb_protocol.h`.
 
 ## Xorg, Mesa and the DRM device
 
@@ -120,9 +120,130 @@ The `e9cf25df756dfcb78eccae03d1e890a608019686d022086e88ead91c9b30743f`
 kernel SHA and runtime results above remain historical evidence for that exact
 image. The subsequent upstream merge incorporates console PTY semantics and
 5.1.0 version/release updates while preserving the SVGA source. The combined
-source has not been rebuilt into a new canonical image or rerun under native
-VMware; **VMware 验证未完成**. The e9cf identity does not identify or validate
-the merged source.
+source had not been rebuilt into a new canonical image or rerun under native
+VMware when this historical note was written; **VMware 验证未完成**. The e9cf
+identity does not identify or validate the merged source. The scoped
+performance follow-up below records a later build and runtime check for that
+repair only.
+
+## Scoped SVGA performance follow-up (2026-10-20)
+
+The follow-up repairs several measured costs without changing the DRM/UAPI or
+Linux signal ABI. Queued KMS damage now unions all clips received while a job
+is pending, including disjoint, overlapping and containing rectangles. SVGA
+batches retain the original worst-case operation quota, but allocate the
+query, shader and binding side arrays only when each operation type is used;
+their capacities grow geometrically and remain bounded by that same quota.
+Validation checks the allocated capacities before reading records, and a
+failed growth leaves existing storage and counts intact.
+
+For VMware SVGA `15ad:0405`, FIFO cache preparation on the validated BAR2
+path runs only after a successful FIFO drain and shutdown. Eligible
+identity-mapped FIFO pages use the default-PTE write-back policy with supervisor access and NX;
+validation, cache-policy conflicts or pin failures retain the uncached policy.
+VRAM remains uncached. Unsupported devices and low BAR mappings keep the prior
+uncached behavior. FIFO contents continue to be published with an explicit
+SYNC on every flush; the optional FIFO_BUSY register does not suppress that
+notification.
+
+For `DRM_VMW_FENCE_WAIT`, initial attempts may use the existing bounded fast
+poll regardless of `lazy`; resumed `lazy=0` attempts also poll within a
+500-microsecond window and an 8192-sample cap. This polling section releases
+execution ownership and runs with interrupts enabled. If still pending, a
+lazy wait sleeps one tick; a non-lazy wait returns through ordinary
+current-CPU rescheduling and the existing continuation path. A coarse or
+unavailable clock or refused suspension follows the existing fallback. The
+deadline, timeout, error, fence-reference, signal and success-only `UNREF`
+semantics remain in force. The 500-microsecond window limits when another
+sample may start; an in-flight status read, rescheduling, or ownership
+reacquisition can extend wall-clock latency. This unlocked polling applies to
+the Linux DRM `FENCE_WAIT` ioctl only.
+
+Signal delivery now wakes an interruptible blocked task after a handler frame
+has been installed successfully. This covers the observed Xorg
+`SA_RESTART`/untimed `FUTEX_WAIT_PRIVATE` case, where delivery cancels the wait
+but previously left the task parked. Existing signal-frame, restart-context,
+mask and syscall ABI behavior is preserved.
+
+The scoped canonical kernel is
+`b85588b2a5a5526acb36c42c4f4e7da7d1767298f0c302311fadc578a7ff5ab1`.
+All 25 source identities matched before and after the build; both ESP kernel
+readbacks matched, the pinned root filesystem and six QA payloads remained
+unchanged, and the complete RAW/VMDK comparison passed. Only the kernel was
+rebuilt and the private QA disk refreshed; the complete default product disk
+and installer ISO were not rebuilt. The two unloaded selected runs used the
+same pinned image, 2 vCPUs,
+2048 MiB and controller (`4c329979389a626e301ed390c8fa425d88122b1cc80bd660ead155c800713295`).
+Neither run had a background CPU-load process. This controller hash identifies
+J1/J2 only; the CPU-load run used a separate run-case controller.
+Both selected runs completed 18 measurement rows with zero reported errors,
+SVGA glamor and GLX SVGA, and successful pixel readback. Each
+`interactive-readback` row is 60 operations:
+
+| Native run | Three elapsed samples (ms) | Median (ms) | UI evidence |
+| --- | ---: | ---: | --- |
+| J1 (`candidate-j-on-auto1`) | 43.661, 42.728, 46.796 | 43.661 | Chinese 12-folder list, drag, VT2 login and VT1 restore reviewed. |
+| J2 (`candidate-j-on-auto2`) | 44.220, 42.308, 44.635 | 44.220 | Pixels reviewed; partial File Manager capture, not a full UI pass. |
+
+These are repeat measurements of the interactive readback workload, not a
+claim that every operation improved. Earlier baseline readback medians were
+about 607.3 ms and 794.441 ms in separate runs; the table reports only the two
+selected J runs. The J CPU snapshots are raw scheduler counters over the full
+benchmark phase. AP tick calibration is insufficient for a reliable CPU
+utilization or fence-only overhead estimate, so no CPU percentage is claimed.
+The detailed results are in
+`out/svga-performance-20261019/candidate-j-on-auto1/result.json` and
+`out/svga-performance-20261019/candidate-j-on-auto2/result.json`.
+
+The focused DRM, scheduler-resume and signal-wake fixtures passed with
+ASan/UBSan. The two signal-ABI tail fixtures passed in optimized `-O2` builds
+without sanitizers. `tools/test_linux_threads.py` passed its futex and signal
+fixtures, then stopped at the unchanged `membarrier_cpu_test.c` compile error
+(`smp_rdtscp_supported` undeclared). The EEVDF suite remains incomplete because
+existing task-layout static assertions fail; its separate red-black index
+fixture passed. These out-of-scope failures were left unchanged. The earlier
+repository-wide audio-suite failure is documented above and was not rerun.
+
+The separate CPU-load run (`candidate-j-load-auto1`) also completed with 18
+rows, zero reported errors and passing pixel readback. Two CPU-load processes
+remained active through the benchmark and the reviewed File Manager, drag and
+VT checks. Its interactive-readback samples were 123.244, 132.551 and 113.557
+ms (median 123.244 ms); this loaded run is not directly comparable to the
+unloaded J1/J2 samples. It used the separate run-case controller
+(`081eede083756cdf3c89eaeff219d9ea8220be45b4a8f8d17090476fe9cb39fd`). See
+`out/svga-performance-20261019/candidate-j-load-auto1/result.json`. The
+`mks.enable3d=FALSE` software-fallback run (`candidate-j-software-auto1`) also
+completed in 180.656 seconds with 18 rows, zero errors and passing pixel
+readback. It used the same J kernel/image and the J1/J2 controller, produced
+`llvmpipe (LLVM 22.1.3, 128 bits)` with `glamor_svga=false`, and passed the
+reviewed checkerboard, Chinese File Manager, window drag and VT recovery.
+Its full results are in
+`out/svga-performance-20261019/candidate-j-software-auto1/result.json`.
+
+These same-kernel, unloaded J1/J2 and software runs report the following
+median elapsed time per workload batch (milliseconds; each workload has its
+own operation count):
+
+| Workload | J1 SVGA | J2 SVGA | Software llvmpipe |
+| --- | ---: | ---: | ---: |
+| Fill 128×64 | 1726.785 | 1779.983 | 637.425 |
+| Copy 640×400 | 11.525 | 8.367 | 24.172 |
+| Alpha 128×64 | 155.831 | 156.336 | 284.608 |
+| Text | 1157.545 | 1361.602 | 500.539 |
+| Upload 640×400 | 1880.249 | 1769.537 | 1489.497 |
+| Interactive readback | 43.661 | 44.220 | 23.355 |
+
+In these samples SVGA is faster for copy and alpha; software is faster for
+fill, text, upload and readback. Small synchronous draws and readbacks still
+pay fixed virtual submission and host synchronization costs. The readback
+improvement over the earlier baseline does not translate into a whole-desktop
+speedup claim.
+
+Installer, full release and full lifecycle gates were not rerun for this
+follow-up. **VMware 验证未完成**: the selected native runs establish the
+SVGA/glamor path, the software fallback, readback results and described UI
+checks only; they do not establish physical host GPU utilization or full
+Linux/POSIX certification. Physical-machine hardware was not validated.
 
 ## glxgears and Task Manager
 
@@ -159,11 +280,15 @@ N/A. CPU/memory ABI is unchanged.
 High guest CPU usage does not by itself indicate software rasterization. The
 current hardware path still computes vertex lighting on the CPU, copies each
 returned frame through the GPU ioctl and GUI window service, and uses the CPU
-desktop compositor. Fence waits are bounded and poll while holding the device
-lock, but normal frame-to-frame waits now target the previous slot and are
-usually already complete. A short submission-to-Fence interval can therefore
-coexist with high guest CPU usage. These counters cannot establish which
-physical rendering backend VMware selected on the host.
+desktop compositor. Linux DRM `FENCE_WAIT` calls from Xorg/Mesa are bounded;
+their non-lazy polling section releases execution ownership as described in
+the scoped follow-up above. This is separate from the device-lock-held
+`svga_wait_locked()` path used by the legacy GPU-render ioctl, described below.
+Normal frame-to-frame waits target the previous slot and may already be
+complete. A short submission-to-Fence interval can coexist with high guest CPU
+usage.
+These counters cannot establish which physical rendering backend VMware
+selected on the host.
 
 The GPU ioctl snapshots vertex/draw inputs and validates every writable output
 page, including COW resolution. Under the kernel execution lock, the driver
@@ -189,11 +314,17 @@ progress. The bounded BUSY wait survives only where progress must be proven:
 explicit fence waits, mode transitions and shutdown. A glxgears
 frame is deferred as one batch: its vertex upload, state, draw and readback
 packets are written before a single SYNC at the frame Fence. This avoids one
-SYNC port write per packet while preserving the earlier explicit-notification
-fallback for every non-batched path. Fence waits first poll the FIFO Fence
-register at MMIO speed with paced PAUSE delays; only a slow frame falls back to
-the bounded SVGA_REG_BUSY loop. The slow fallback preserves the previous
-synchronous progress guarantee and the final allowed BUSY-read boundary check.
+SYNC port write per packet; every batched or non-batched FIFO flush still
+issues its explicit SYNC.
+
+The legacy render ioctl calls `svga_wait_locked()` while holding the SVGA
+device lock; it polls `SVGA_FIFO_FENCE` with paced PAUSE delays, then falls
+back for slow waits to the bounded `SVGA_REG_BUSY` loop. The public
+`svga_fence_wait()` wrapper also holds that device lock. These low-level SVGA
+waits are separate from Linux `DRM_VMW_FENCE_WAIT`; only the latter uses the
+unlocked 500-microsecond polling window described above. The bounded BUSY
+wait also remains where FIFO progress must be proven during mode transitions
+and shutdown, including its final allowed BUSY-read boundary check.
 
 For VMware acceptance, run glxgears alongside Task Manager, exercise rotation,
 polygon modes, window resizing, overlapping windows, close and force termination.

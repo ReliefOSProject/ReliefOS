@@ -99,6 +99,11 @@ static unsigned wait_queue_add_calls;
 static unsigned block_current_calls;
 static unsigned sleep_current_calls;
 static uint64_t sleep_current_deadline;
+static unsigned reschedule_current_calls;
+static struct task *reschedule_expected_task;
+static uint32_t reschedule_expected_handle;
+static int32_t reschedule_expected_lazy;
+static uint64_t reschedule_expected_deadline;
 static uint64_t mm_pages_allocated;
 static uint64_t mm_pages_freed;
 static bool mm_allocation_fails;
@@ -159,11 +164,41 @@ static int drm_test_batch_submit_failure;
 static bool drm_test_batch_abort_rewrites_failure;
 static uint32_t drm_test_present_sid;
 static struct svga_present_rect drm_test_present_rect;
-static uint32_t drm_test_present_packets;
+static struct svga_batch *drm_test_pending_present_batch;
+static uint32_t drm_test_pending_present_rect_word;
+static struct svga_present_rect drm_test_published_present_rect;
 static uint32_t drm_test_present_submitted;
 static uint64_t drm_test_ticks = 100;
 static uint32_t drm_test_fence_status_calls;
 static uint32_t drm_test_fence_status_sequences[256];
+static int drm_test_fence_status_script[128];
+static bool drm_test_fence_signaled_script[128];
+static uint32_t drm_test_fence_status_script_count;
+static uint32_t drm_test_fence_status_script_index;
+static uint32_t drm_test_unlocked_fence_status_calls;
+static struct drm_file *drm_test_replace_fence_file;
+static uint32_t drm_test_replace_fence_handle;
+static struct task *drm_test_replace_continuation_task;
+static struct drm_vmwgfx_task_continuation *
+    drm_test_replacement_continuation;
+static struct task *drm_test_exit_task_during_unlocked_poll;
+static bool drm_test_execution_owned = true;
+static bool drm_test_interrupts_enabled;
+static int drm_test_suspend_status;
+static int drm_test_resume_status;
+static uint32_t drm_test_suspend_calls;
+static uint32_t drm_test_resume_calls;
+static uint32_t drm_test_clock_getres_calls;
+static int drm_test_clock_getres_status;
+static int64_t drm_test_clock_resolution_ns = 1000;
+static uint64_t drm_test_uptime_value;
+static uint64_t drm_test_uptime_step;
+static uint64_t drm_test_uptime_calls;
+static uint64_t drm_test_uptime_advance_after_calls;
+static uint64_t drm_test_uptime_advance_to;
+static uint64_t drm_test_uptime_script[8];
+static uint32_t drm_test_uptime_script_count;
+static uint32_t drm_test_uptime_script_index;
 static uint32_t drm_test_quiesced_generation, drm_test_quiesced_seq;
 static svga_handle drm_test_last_retained_gmr;
 static svga_handle drm_test_borrowed_detach_fence_handle;
@@ -222,6 +257,51 @@ int svga_fence_status(svga_handle fence, bool *signaled)
         drm_test_fence_status_sequences[drm_test_fence_status_calls] =
             (uint32_t)fence;
     ++drm_test_fence_status_calls;
+    if (!drm_test_execution_owned) {
+        assert(drm_test_interrupts_enabled);
+        ++drm_test_unlocked_fence_status_calls;
+        if (drm_test_replace_continuation_task) {
+            struct task *task = drm_test_replace_continuation_task;
+            struct drm_vmwgfx_task_continuation *replacement =
+                drm_test_replacement_continuation;
+            assert(replacement);
+            drm_test_replace_continuation_task = NULL;
+            drm_test_replacement_continuation = NULL;
+            drm_vmwgfx_cancel_task_continuation(task);
+            assert(!task->drm_vmwgfx_continuation);
+            task->drm_vmwgfx_continuation = replacement;
+        }
+        if (drm_test_exit_task_during_unlocked_poll) {
+            struct task *task = drm_test_exit_task_during_unlocked_poll;
+            drm_test_exit_task_during_unlocked_poll = NULL;
+            task->state = TASK_EXITED;
+        }
+        if (drm_test_replace_fence_file) {
+            assert(drm_test_replace_fence_handle);
+            struct drm_file *file = drm_test_replace_fence_file;
+            uint32_t handle = drm_test_replace_fence_handle;
+            assert(drm_vmwgfx_fence_remove(file, handle));
+            file->next_fence_handle = handle;
+            struct drm_vmwgfx_fence *replacement =
+                drm_vmwgfx_fence_reserve(file, true, NULL);
+            assert(replacement && replacement->handle == handle);
+            svga_handle token = 0;
+            assert(svga_fence_try_insert(&token) == 0);
+            replacement->token = token;
+            drm_vmwgfx_fence_publish(file, replacement);
+            drm_vmwgfx_fence_put(replacement);
+            drm_test_replace_fence_file = NULL;
+            drm_test_replace_fence_handle = 0;
+        }
+    } else {
+        assert(!drm_test_interrupts_enabled);
+    }
+    if (drm_test_fence_status_script_index <
+        drm_test_fence_status_script_count) {
+        uint32_t index = drm_test_fence_status_script_index++;
+        *signaled = drm_test_fence_signaled_script[index];
+        return drm_test_fence_status_script[index];
+    }
     *signaled = drm_test_fence_passed >= (uint32_t)fence;
     return 0;
 }
@@ -267,6 +347,8 @@ int svga_batch_append(struct svga_batch *batch, uint32_t command, bool three_d,
 {
     if (!batch || !batch->metadata || (bytes && !payload) || (bytes & 3u))
         return SVGA_EINVAL;
+    uint32_t packet_bytes = 8u + bytes;
+    if (packet_bytes > batch->capacity - batch->bytes) return SVGA_ENOMEM;
     if (command == SVGA_3D_CMD_PRESENT) {
         assert(three_d && bytes == sizeof(SVGA3dCmdPresent) +
                                 sizeof(struct svga_present_rect));
@@ -275,10 +357,9 @@ int svga_batch_append(struct svga_batch *batch, uint32_t command, bool three_d,
             (const struct svga_present_rect *)(present + 1);
         drm_test_present_sid = present->sid;
         drm_test_present_rect = *rect;
-        ++drm_test_present_packets;
+        drm_test_pending_present_batch = batch;
+        drm_test_pending_present_rect_word = batch->bytes / sizeof(uint32_t) + 3u;
     }
-    uint32_t packet_bytes = 8u + bytes;
-    if (packet_bytes > batch->capacity - batch->bytes) return SVGA_ENOMEM;
     batch->bytes += packet_bytes;
     ++drm_test_batch_append_calls;
     return 0;
@@ -303,7 +384,13 @@ int svga_batch_submit(struct svga_batch *batch, svga_handle *fence)
         };
         return drm_test_batch_submit_failure;
     }
-    if (drm_test_present_packets) ++drm_test_present_submitted;
+    if (drm_test_pending_present_batch == batch) {
+        __builtin_memcpy(&drm_test_published_present_rect,
+            batch->words + drm_test_pending_present_rect_word,
+            sizeof(drm_test_published_present_rect));
+        drm_test_pending_present_batch = NULL;
+        ++drm_test_present_submitted;
+    }
     batch->submitted = true;
     kernel_free(batch->metadata);
     batch->metadata = NULL;
@@ -316,6 +403,8 @@ int svga_batch_abort(struct svga_batch *batch)
 {
     if (!batch || !batch->metadata || batch->submitted) return SVGA_EINVAL;
     ++drm_test_batch_abort_calls;
+    if (drm_test_pending_present_batch == batch)
+        drm_test_pending_present_batch = NULL;
     if (drm_test_batch_abort_rewrites_failure)
         batch->submit_failure = (struct svga_batch_submit_failure){
             .reason = SVGA_BATCH_SUBMIT_REASON_NONE,
@@ -673,9 +762,107 @@ void sched_sleep_current_until(uint64_t wake_tick)
     sleep_current_deadline = wake_tick;
 }
 
+void sched_request_reschedule_current(void)
+{
+    ++reschedule_current_calls;
+    if (reschedule_expected_task) {
+        const struct drm_vmwgfx_task_continuation *continuation =
+            reschedule_expected_task->drm_vmwgfx_continuation;
+        assert(continuation &&
+               continuation->kind == DRM_VMW_CONT_FENCE_WAIT &&
+               continuation->snapshot.wait.handle ==
+                   reschedule_expected_handle &&
+               continuation->snapshot.wait.lazy ==
+                   reschedule_expected_lazy &&
+               continuation->deadline == reschedule_expected_deadline);
+    }
+}
+
 uint64_t time_ticks(void)
 {
     return drm_test_ticks;
+}
+
+int time_clock_getres(int32_t clock, struct linux_timespec *resolution)
+{
+    ++drm_test_clock_getres_calls;
+    assert(clock == LINUX_CLOCK_MONOTONIC);
+    if (drm_test_clock_getres_status) return drm_test_clock_getres_status;
+    if (resolution) {
+        resolution->tv_sec = 0;
+        resolution->tv_nsec = drm_test_clock_resolution_ns;
+    }
+    return 0;
+}
+
+uint64_t time_uptime_us(void)
+{
+    ++drm_test_uptime_calls;
+    if (drm_test_uptime_script_index < drm_test_uptime_script_count)
+        return drm_test_uptime_script[drm_test_uptime_script_index++];
+    if (drm_test_uptime_advance_after_calls &&
+        drm_test_uptime_calls >= drm_test_uptime_advance_after_calls) {
+        uint64_t previous = drm_test_uptime_value;
+        drm_test_uptime_value = drm_test_uptime_advance_to;
+        drm_test_uptime_advance_after_calls = 0;
+        return previous;
+    }
+    uint64_t result = drm_test_uptime_value;
+    drm_test_uptime_value += drm_test_uptime_step;
+    return result;
+}
+
+int kernel_execution_suspend_irqrestore(
+    struct kernel_execution_suspend_token *token)
+{
+    ++drm_test_suspend_calls;
+    assert(token && !token->active);
+    assert(drm_test_execution_owned && !drm_test_interrupts_enabled);
+    if (drm_test_suspend_status) return drm_test_suspend_status;
+    token->active = 1;
+    drm_test_execution_owned = false;
+    drm_test_interrupts_enabled = true;
+    return 0;
+}
+
+int kernel_execution_resume_irqsave(
+    struct kernel_execution_suspend_token *token)
+{
+    ++drm_test_resume_calls;
+    assert(token && token->active);
+    assert(!drm_test_execution_owned && drm_test_interrupts_enabled);
+    if (drm_test_resume_status) return drm_test_resume_status;
+    token->active = 0;
+    drm_test_execution_owned = true;
+    drm_test_interrupts_enabled = false;
+    return 0;
+}
+
+static void drm_test_fence_status_script_reset(void)
+{
+    drm_test_fence_status_script_count = 0;
+    drm_test_fence_status_script_index = 0;
+}
+
+static void drm_test_fence_status_script_push(int status, bool signaled)
+{
+    assert(drm_test_fence_status_script_count <
+           sizeof(drm_test_fence_status_script) /
+               sizeof(drm_test_fence_status_script[0]));
+    uint32_t index = drm_test_fence_status_script_count++;
+    drm_test_fence_status_script[index] = status;
+    drm_test_fence_signaled_script[index] = signaled;
+}
+
+static void drm_test_uptime_reset(uint64_t value, uint64_t step)
+{
+    drm_test_uptime_value = value;
+    drm_test_uptime_step = step;
+    drm_test_uptime_calls = 0;
+    drm_test_uptime_advance_after_calls = 0;
+    drm_test_uptime_advance_to = 0;
+    drm_test_uptime_script_count = 0;
+    drm_test_uptime_script_index = 0;
 }
 
 uint64_t mm_alloc_pages(uint32_t page_count)
@@ -869,6 +1056,19 @@ static int ioctl_call(struct task *task, struct task_file *file,
 {
     return (int)drm_file_ioctl(task, file, command,
                                (uint64_t)(uintptr_t)argument);
+}
+
+static struct drm_vmw_fence_rep drm_test_submit_wait_fence(
+    struct task *task, struct task_file *file)
+{
+    struct drm_vmw_fence_rep reply = {0};
+    struct drm_vmw_execbuf_arg exec = {
+        .fence_rep = (uint64_t)(uintptr_t)&reply,
+        .version = 1,
+    };
+    assert(ioctl_call(task, file, DRM_IOCTL_VMW_EXECBUF, &exec) == 0);
+    assert(reply.handle && reply.seqno == drm_test_fence_issued);
+    return reply;
 }
 
 static uint32_t test_append_packet(uint32_t *stream, uint32_t capacity_dwords,
@@ -1626,6 +1826,69 @@ static void test_kms_resources_properties_and_scanout(void)
     assert(allocations == 0);
 }
 
+static void drm_test_assert_present_job_rect(
+    const struct drm_kms_present_job *job,
+    uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2)
+{
+    assert(job);
+    assert(job->x1 == x1 && job->y1 == y1 &&
+           job->x2 == x2 && job->y2 == y2);
+    struct SVGA3dCopyRect rect;
+    __builtin_memcpy(&rect, &job->output[3], sizeof(rect));
+    assert(rect.x == x1 && rect.y == y1 &&
+           rect.w == x2 - x1 && rect.h == y2 - y1 &&
+           rect.srcx == x1 && rect.srcy == y1);
+}
+
+static void drm_test_kms_pending_damage_union(
+    struct task *task, struct task_file *file, uint32_t fb_id,
+    struct drm_clip_rect first, struct drm_clip_rect second,
+    uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2)
+{
+    struct drm_mode_fb_dirty_cmd dirty = {
+        .fb_id = fb_id, .num_clips = 1,
+        .clips_ptr = (uint64_t)(uintptr_t)&first,
+    };
+    const uint32_t submitted_before = drm_test_present_submitted;
+    const uint32_t submits_before = drm_test_batch_submit_calls;
+    drm_test_batch_busy_submits = 2;
+
+    assert(ioctl_call(task, file, DRM_IOCTL_MODE_DIRTYFB, &dirty) == 0);
+    struct drm_kms_present_job *job = drm_kms_pending_job;
+    assert(job && !job->submitted && job->batch_open);
+    assert(drm_test_batch_busy_submits == 1u);
+    drm_test_assert_present_job_rect(job, first.x1, first.y1,
+                                    first.x2, first.y2);
+
+    dirty.clips_ptr = (uint64_t)(uintptr_t)&second;
+    assert(ioctl_call(task, file, DRM_IOCTL_MODE_DIRTYFB, &dirty) == 0);
+    assert(drm_kms_pending_job == job);
+    assert(!job->submitted && job->batch_open);
+    assert(drm_test_batch_busy_submits == 0u);
+    assert(drm_test_batch_submit_calls == submits_before + 2u);
+    assert(drm_test_present_submitted == submitted_before);
+    drm_test_assert_present_job_rect(job, x1, y1, x2, y2);
+
+    drm_vmwgfx_process_retirements(1);
+    assert(drm_kms_pending_job == NULL);
+    assert(job->submitted && !job->batch_open);
+    assert(drm_test_batch_submit_calls == submits_before + 3u);
+    assert(drm_test_present_submitted == submitted_before + 1u);
+    assert(drm_test_published_present_rect.x == x1 &&
+           drm_test_published_present_rect.y == y1 &&
+           drm_test_published_present_rect.w == x2 - x1 &&
+           drm_test_published_present_rect.h == y2 - y1 &&
+           drm_test_published_present_rect.srcx == x1 &&
+           drm_test_published_present_rect.srcy == y1);
+
+    drm_test_fence_passed = drm_test_fence_issued;
+    drm_vmwgfx_process_retirements(16);
+    assert(drm_kms_present_jobs == NULL &&
+           drm_kms_present_job_count == 0u &&
+           drm_kms_pending_job == NULL &&
+           !drm_kms_pending_damage.valid);
+}
+
 static void test_kms_surface_present_pressure(void)
 {
     const uint32_t drm_format_argb8888 = 0x34325241u;
@@ -1698,6 +1961,22 @@ static void test_kms_surface_present_pressure(void)
            drm_test_present_rect.h == DRM_TEST_HEIGHT &&
            !drm_test_present_rect.srcx && !drm_test_present_rect.srcy);
     assert(scanout_present_calls == 0);
+
+    drm_test_kms_pending_damage_union(&owner_task, &owner, fb.fb_id,
+        (struct drm_clip_rect){5, 6, 7, 8},
+        (struct drm_clip_rect){20, 21, 24, 25},
+        5, 6, 24, 25);
+    drm_test_kms_pending_damage_union(&owner_task, &owner, fb.fb_id,
+        (struct drm_clip_rect){30, 20, 40, 30},
+        (struct drm_clip_rect){35, 25, 45, 35},
+        30, 20, 45, 35);
+    drm_test_kms_pending_damage_union(&owner_task, &owner, fb.fb_id,
+        (struct drm_clip_rect){20, 10, 40, 30},
+        (struct drm_clip_rect){25, 15, 30, 20},
+        20, 10, 40, 30);
+    /* Keep the original full-frame PRESENT in the baseline used by the
+     * pressure checks below; the three union cases above each publish once. */
+    submitted_before = drm_test_present_submitted - 1u;
 
     struct drm_clip_rect clip = {5, 6, 7, 8};
     struct drm_mode_fb_dirty_cmd dirty = {
@@ -4256,6 +4535,7 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
     struct drm_vmw_fence_wait_arg wait = {
         .handle = wait_reply.handle,
         .timeout_us = 5000000,
+        .lazy = 1,
         .flags = 0x7fffffff,
         .pad64 = 0x7fffffff,
     };
@@ -4268,6 +4548,470 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
     assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
                       &wait) == 0);
     assert(wait.handle == wait_reply.handle);
+
+    /* Non-lazy waits request a normal scheduler decision on both the initial
+     * block and each pending continuation retry. The retained snapshot and
+     * success-only UNREF behavior remain unchanged. */
+    const int64_t saved_clock_resolution = drm_test_clock_resolution_ns;
+    drm_test_clock_resolution_ns = 10000000;
+    struct drm_vmw_fence_rep nonlazy_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = nonlazy_reply.seqno - 1u;
+    struct drm_vmw_fence_wait_arg nonlazy_wait = {
+        .handle = nonlazy_reply.handle,
+        .timeout_us = 5000000,
+        .lazy = 0,
+        .wait_options = DRM_VMW_WAIT_OPTION_UNREF,
+    };
+    uint32_t nonlazy_sleeps_before = sleep_current_calls;
+    uint32_t nonlazy_reschedules_before = reschedule_current_calls;
+    reschedule_expected_task = &client_task;
+    reschedule_expected_handle = nonlazy_reply.handle;
+    reschedule_expected_lazy = 0;
+    reschedule_expected_deadline = drm_test_ticks + 500u;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &nonlazy_wait) == KERNEL_SYSCALL_BLOCKED);
+    struct drm_vmwgfx_task_continuation *nonlazy_continuation =
+        client_task.drm_vmwgfx_continuation;
+    assert(nonlazy_continuation &&
+           nonlazy_continuation->kind == DRM_VMW_CONT_FENCE_WAIT &&
+           nonlazy_continuation->snapshot.wait.lazy == 0 &&
+           nonlazy_continuation->snapshot.wait.handle == nonlazy_reply.handle &&
+           nonlazy_continuation->deadline == nonlazy_wait.kernel_cookie);
+    assert(reschedule_current_calls == nonlazy_reschedules_before + 1u &&
+           sleep_current_calls == nonlazy_sleeps_before);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &nonlazy_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(client_task.drm_vmwgfx_continuation == nonlazy_continuation &&
+           nonlazy_continuation->snapshot.wait.lazy == 0 &&
+           nonlazy_continuation->deadline == nonlazy_wait.kernel_cookie);
+    assert(reschedule_current_calls == nonlazy_reschedules_before + 2u &&
+           sleep_current_calls == nonlazy_sleeps_before);
+    drm_test_fence_passed = nonlazy_reply.seqno;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &nonlazy_wait) == 0);
+    assert(!client_task.drm_vmwgfx_continuation &&
+           reschedule_current_calls == nonlazy_reschedules_before + 2u &&
+           sleep_current_calls == nonlazy_sleeps_before);
+    reschedule_expected_task = NULL;
+    struct drm_vmw_fence_signaled_arg nonlazy_removed = {
+        .handle = nonlazy_reply.handle,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_SIGNALED,
+                      &nonlazy_removed) == -LINUX_EINVAL);
+
+    /* Lazy waits retain the one-tick sleep on both initial and resumed
+     * pending attempts, without also requesting an immediate reschedule. */
+    struct drm_vmw_fence_rep lazy_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = lazy_reply.seqno - 1u;
+    struct drm_vmw_fence_wait_arg lazy_wait = {
+        .handle = lazy_reply.handle,
+        .timeout_us = 5000000,
+        .lazy = 1,
+        .wait_options = DRM_VMW_WAIT_OPTION_UNREF,
+    };
+    uint32_t lazy_sleeps_before = sleep_current_calls;
+    uint32_t lazy_reschedules_before = reschedule_current_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &lazy_wait) == KERNEL_SYSCALL_BLOCKED);
+    struct drm_vmwgfx_task_continuation *lazy_continuation =
+        client_task.drm_vmwgfx_continuation;
+    assert(lazy_continuation &&
+           lazy_continuation->snapshot.wait.lazy == 1);
+    assert(sleep_current_calls == lazy_sleeps_before + 1u &&
+           sleep_current_deadline == drm_test_ticks + 1u &&
+           reschedule_current_calls == lazy_reschedules_before);
+    uint32_t lazy_suspends_before_retry = drm_test_suspend_calls;
+    uint32_t lazy_unlocked_polls_before_retry =
+        drm_test_unlocked_fence_status_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &lazy_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(client_task.drm_vmwgfx_continuation == lazy_continuation &&
+           sleep_current_calls == lazy_sleeps_before + 2u &&
+           sleep_current_deadline == drm_test_ticks + 1u &&
+           reschedule_current_calls == lazy_reschedules_before &&
+           drm_test_suspend_calls == lazy_suspends_before_retry &&
+           drm_test_unlocked_fence_status_calls ==
+               lazy_unlocked_polls_before_retry);
+    drm_test_fence_passed = lazy_reply.seqno;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &lazy_wait) == 0);
+    assert(!client_task.drm_vmwgfx_continuation &&
+           sleep_current_calls == lazy_sleeps_before + 2u &&
+           reschedule_current_calls == lazy_reschedules_before);
+    struct drm_vmw_fence_signaled_arg lazy_removed = {
+        .handle = lazy_reply.handle,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_SIGNALED,
+                      &lazy_removed) == -LINUX_EINVAL);
+
+    /* A resumed non-lazy retry can complete in the bounded unlocked poll,
+     * while retaining its original timeout cookie and success-only UNREF. */
+    struct drm_vmw_fence_rep resumed_poll_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = resumed_poll_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_clock_resolution_ns = 10000000;
+    struct drm_vmw_fence_wait_arg resumed_poll_wait = {
+        .handle = resumed_poll_reply.handle,
+        .timeout_us = 5000000,
+        .wait_options = DRM_VMW_WAIT_OPTION_UNREF,
+    };
+    reschedule_expected_handle = resumed_poll_reply.handle;
+    reschedule_expected_lazy = 0;
+    reschedule_expected_deadline = drm_test_ticks + 500u;
+    reschedule_expected_task = &client_task;
+    uint32_t resumed_poll_reschedules_before = reschedule_current_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_poll_wait) == KERNEL_SYSCALL_BLOCKED);
+    struct drm_vmwgfx_task_continuation *resumed_poll_continuation =
+        client_task.drm_vmwgfx_continuation;
+    struct drm_vmwgfx_fence *resumed_poll_fence =
+        resumed_poll_continuation
+            ? resumed_poll_continuation->fence_object : NULL;
+    uint64_t resumed_poll_deadline = resumed_poll_continuation
+        ? resumed_poll_continuation->deadline : 0;
+    assert(resumed_poll_continuation &&
+           resumed_poll_continuation->kind == DRM_VMW_CONT_FENCE_WAIT &&
+           resumed_poll_continuation->snapshot.wait.handle ==
+               resumed_poll_reply.handle &&
+           resumed_poll_continuation->deadline ==
+               resumed_poll_wait.kernel_cookie &&
+           reschedule_current_calls == resumed_poll_reschedules_before + 1u);
+
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(0, true);
+    drm_test_clock_resolution_ns = 1000;
+    drm_test_uptime_reset(9000, 0);
+    drm_test_uptime_script[0] = 9000;
+    drm_test_uptime_script[1] = 9000;
+    drm_test_uptime_script[2] = 9010;
+    drm_test_uptime_script_count = 3;
+    resumed_poll_wait.handle = UINT32_MAX;
+    uint32_t resumed_poll_status_before = drm_test_fence_status_calls;
+    uint32_t resumed_poll_unlocked_before =
+        drm_test_unlocked_fence_status_calls;
+    uint32_t resumed_poll_suspend_before = drm_test_suspend_calls;
+    uint32_t resumed_poll_resume_before = drm_test_resume_calls;
+    uint32_t resumed_poll_sleep_before = sleep_current_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_poll_wait) == 0);
+    assert(resumed_poll_wait.handle == resumed_poll_reply.handle &&
+           resumed_poll_wait.cookie_valid &&
+           resumed_poll_wait.kernel_cookie ==
+               resumed_poll_deadline);
+    assert(drm_test_fence_status_calls == resumed_poll_status_before + 2u &&
+           drm_test_unlocked_fence_status_calls ==
+               resumed_poll_unlocked_before + 1u &&
+           drm_test_suspend_calls == resumed_poll_suspend_before + 1u &&
+           drm_test_resume_calls == resumed_poll_resume_before + 1u &&
+           sleep_current_calls == resumed_poll_sleep_before &&
+           reschedule_current_calls == resumed_poll_reschedules_before + 1u &&
+           !client_task.drm_vmwgfx_continuation &&
+           resumed_poll_fence && resumed_poll_fence->references == 1u &&
+           !resumed_poll_fence->user_linked &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    struct drm_vmw_fence_signaled_arg resumed_poll_removed = {
+        .handle = resumed_poll_reply.handle,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_SIGNALED,
+                      &resumed_poll_removed) == -LINUX_EINVAL);
+    reschedule_expected_task = NULL;
+
+    /* A hard error found by a resumed poll releases the retained continuation
+     * without applying the wait's success-only UNREF option. */
+    struct drm_vmw_fence_rep resumed_error_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = resumed_error_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_clock_resolution_ns = 10000000;
+    struct drm_vmw_fence_wait_arg resumed_error_wait = {
+        .handle = resumed_error_reply.handle,
+        .timeout_us = 5000000,
+        .wait_options = DRM_VMW_WAIT_OPTION_UNREF,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_error_wait) == KERNEL_SYSCALL_BLOCKED);
+    struct drm_vmwgfx_fence *resumed_error_fence =
+        ((struct drm_vmwgfx_task_continuation *)
+            client_task.drm_vmwgfx_continuation)->fence_object;
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(SVGA_EIO, false);
+    drm_test_clock_resolution_ns = 1000;
+    drm_test_uptime_reset(10000, 0);
+    drm_test_uptime_script[0] = 10000;
+    drm_test_uptime_script[1] = 10000;
+    drm_test_uptime_script[2] = 10010;
+    drm_test_uptime_script_count = 3;
+    uint32_t resumed_error_unlocked_before =
+        drm_test_unlocked_fence_status_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_error_wait) == -LINUX_EIO);
+    assert(drm_test_unlocked_fence_status_calls ==
+               resumed_error_unlocked_before + 1u &&
+           !client_task.drm_vmwgfx_continuation &&
+           resumed_error_fence->references == 2u &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    struct drm_vmw_fence_signaled_arg resumed_error_signaled = {
+        .handle = resumed_error_reply.handle,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_SIGNALED,
+                      &resumed_error_signaled) == 0 &&
+           !resumed_error_signaled.signaled);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){
+            .handle = resumed_error_reply.handle}) == 0);
+    assert(resumed_error_fence->references == 1u);
+
+    /* Coarse clock and suspend refusal retain the existing locked-sample
+     * fallback and never leave ownership or IRQ state changed. */
+    struct drm_vmw_fence_rep resumed_fallback_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = resumed_fallback_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_clock_resolution_ns = 10000000;
+    struct drm_vmw_fence_wait_arg resumed_fallback_wait = {
+        .handle = resumed_fallback_reply.handle,
+        .timeout_us = 5000000,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_fallback_wait) == KERNEL_SYSCALL_BLOCKED);
+    struct drm_vmwgfx_fence *resumed_fallback_fence =
+        ((struct drm_vmwgfx_task_continuation *)
+            client_task.drm_vmwgfx_continuation)->fence_object;
+    drm_test_clock_resolution_ns = 1000;
+    drm_test_clock_getres_status = -1;
+    uint32_t resumed_fallback_status_before = drm_test_fence_status_calls;
+    uint32_t resumed_fallback_unlocked_before =
+        drm_test_unlocked_fence_status_calls;
+    uint32_t resumed_fallback_suspend_before = drm_test_suspend_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_fallback_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(drm_test_fence_status_calls ==
+               resumed_fallback_status_before + 1u &&
+           drm_test_unlocked_fence_status_calls ==
+               resumed_fallback_unlocked_before &&
+           drm_test_suspend_calls == resumed_fallback_suspend_before &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    drm_test_clock_getres_status = 0;
+    drm_test_suspend_status = -35;
+    resumed_fallback_status_before = drm_test_fence_status_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_fallback_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(drm_test_fence_status_calls ==
+               resumed_fallback_status_before + 1u &&
+           drm_test_unlocked_fence_status_calls ==
+               resumed_fallback_unlocked_before &&
+           drm_test_suspend_calls == resumed_fallback_suspend_before + 1u &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    drm_test_suspend_status = 0;
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    drm_vmwgfx_execbuf_process_retirements(1);
+    assert(resumed_fallback_fence->references == 2u);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){
+            .handle = resumed_fallback_reply.handle}) == 0);
+    assert(resumed_fallback_fence->references == 1u);
+
+    /* With a stopped fine clock the resumed batch is bounded by its hard
+     * sample cap and returns through the original non-lazy reschedule path. */
+    struct drm_vmw_fence_rep resumed_cap_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = resumed_cap_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_clock_resolution_ns = 10000000;
+    struct drm_vmw_fence_wait_arg resumed_cap_wait = {
+        .handle = resumed_cap_reply.handle,
+        .timeout_us = 5000000,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_cap_wait) == KERNEL_SYSCALL_BLOCKED);
+    struct drm_vmwgfx_task_continuation *resumed_cap_continuation =
+        client_task.drm_vmwgfx_continuation;
+    struct drm_vmwgfx_fence *resumed_cap_fence =
+        resumed_cap_continuation->fence_object;
+    uint64_t resumed_cap_deadline = resumed_cap_wait.kernel_cookie;
+    drm_test_clock_resolution_ns = 1000;
+    drm_test_uptime_reset(11000, 0);
+    uint32_t resumed_cap_unlocked_before =
+        drm_test_unlocked_fence_status_calls;
+    uint32_t resumed_cap_reschedules_before = reschedule_current_calls;
+    reschedule_expected_task = &client_task;
+    reschedule_expected_handle = resumed_cap_reply.handle;
+    reschedule_expected_lazy = 0;
+    reschedule_expected_deadline = resumed_cap_deadline;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_cap_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(client_task.drm_vmwgfx_continuation ==
+               resumed_cap_continuation &&
+           resumed_cap_continuation->deadline == resumed_cap_deadline &&
+           drm_test_unlocked_fence_status_calls ==
+               resumed_cap_unlocked_before + 8192u &&
+           reschedule_current_calls == resumed_cap_reschedules_before + 1u &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    reschedule_expected_task = NULL;
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    drm_vmwgfx_execbuf_process_retirements(1);
+    assert(resumed_cap_fence->references == 2u);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = resumed_cap_reply.handle}) == 0);
+    assert(resumed_cap_fence->references == 1u);
+
+    /* UNREF after a resumed poll is still tied to the retained object when
+     * its numeric handle is closed and reused during the unlocked sample. */
+    struct drm_vmw_fence_rep resumed_reuse_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = resumed_reuse_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_clock_resolution_ns = 10000000;
+    struct drm_vmw_fence_wait_arg resumed_reuse_wait = {
+        .handle = resumed_reuse_reply.handle,
+        .timeout_us = 5000000,
+        .wait_options = DRM_VMW_WAIT_OPTION_UNREF,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_reuse_wait) == KERNEL_SYSCALL_BLOCKED);
+    struct drm_vmwgfx_fence *resumed_reuse_fence =
+        ((struct drm_vmwgfx_task_continuation *)
+            client_task.drm_vmwgfx_continuation)->fence_object;
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(0, true);
+    drm_test_clock_resolution_ns = 1000;
+    drm_test_uptime_reset(12000, 0);
+    drm_test_uptime_script[0] = 12000;
+    drm_test_uptime_script[1] = 12000;
+    drm_test_uptime_script[2] = 12010;
+    drm_test_uptime_script_count = 3;
+    drm_test_replace_fence_file = client.drm_file;
+    drm_test_replace_fence_handle = resumed_reuse_reply.handle;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_reuse_wait) == 0);
+    assert(!drm_test_replace_fence_file && !drm_test_replace_fence_handle &&
+           !client_task.drm_vmwgfx_continuation &&
+           resumed_reuse_fence->references == 1u &&
+           !resumed_reuse_fence->user_linked);
+    struct drm_vmw_fence_signaled_arg resumed_reuse_signaled = {
+        .handle = resumed_reuse_reply.handle,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_SIGNALED,
+                      &resumed_reuse_signaled) == 0 &&
+           !resumed_reuse_signaled.signaled);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){
+            .handle = resumed_reuse_reply.handle}) == 0);
+
+    /* If cancellation replaces the continuation while the status sample is
+     * unlocked, the resumed poll must not release or rewrite that new object. */
+    struct drm_vmw_fence_rep resumed_replace_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = resumed_replace_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_clock_resolution_ns = 10000000;
+    struct drm_vmw_fence_wait_arg resumed_replace_wait = {
+        .handle = resumed_replace_reply.handle,
+        .timeout_us = 5000000,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_replace_wait) == KERNEL_SYSCALL_BLOCKED);
+    struct drm_vmwgfx_fence *resumed_replace_fence =
+        ((struct drm_vmwgfx_task_continuation *)
+            client_task.drm_vmwgfx_continuation)->fence_object;
+    struct drm_vmwgfx_task_continuation *replacement_continuation =
+        kernel_malloc(sizeof(*replacement_continuation));
+    assert(replacement_continuation);
+    *replacement_continuation = (struct drm_vmwgfx_task_continuation){
+        .kind = DRM_VMW_CONT_SYNCCPU,
+    };
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(0, true);
+    drm_test_clock_resolution_ns = 1000;
+    drm_test_uptime_reset(13000, 0);
+    drm_test_uptime_script[0] = 13000;
+    drm_test_uptime_script[1] = 13000;
+    drm_test_uptime_script[2] = 13010;
+    drm_test_uptime_script_count = 3;
+    drm_test_replacement_continuation = replacement_continuation;
+    drm_test_replace_continuation_task = &client_task;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_replace_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(!drm_test_replacement_continuation &&
+           !drm_test_replace_continuation_task &&
+           client_task.drm_vmwgfx_continuation ==
+               replacement_continuation &&
+           replacement_continuation->kind == DRM_VMW_CONT_SYNCCPU &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    drm_vmwgfx_execbuf_process_retirements(8);
+    assert(resumed_replace_fence->references == 2u);
+    struct drm_vmw_fence_signaled_arg resumed_replace_signaled = {
+        .handle = resumed_replace_reply.handle,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_SIGNALED,
+                      &resumed_replace_signaled) == 0 &&
+           !resumed_replace_signaled.signaled);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){
+            .handle = resumed_replace_reply.handle}) == 0);
+    assert(resumed_replace_fence->references == 1u);
+
+    /* A remote exit can change task state during suspension without freeing
+     * the running task's resources; the resumed path leaves cleanup to the
+     * normal scheduler boundary and releases only its local fence pin. */
+    struct drm_vmw_fence_rep resumed_exit_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = resumed_exit_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_clock_resolution_ns = 10000000;
+    struct drm_vmw_fence_wait_arg resumed_exit_wait = {
+        .handle = resumed_exit_reply.handle,
+        .timeout_us = 5000000,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_exit_wait) == KERNEL_SYSCALL_BLOCKED);
+    struct drm_vmwgfx_task_continuation *resumed_exit_continuation =
+        client_task.drm_vmwgfx_continuation;
+    struct drm_vmwgfx_fence *resumed_exit_fence =
+        resumed_exit_continuation->fence_object;
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(0, true);
+    drm_test_clock_resolution_ns = 1000;
+    drm_test_uptime_reset(14000, 0);
+    drm_test_uptime_script[0] = 14000;
+    drm_test_uptime_script[1] = 14000;
+    drm_test_uptime_script[2] = 14010;
+    drm_test_uptime_script_count = 3;
+    enum task_state resumed_exit_prior_state = client_task.state;
+    drm_test_exit_task_during_unlocked_poll = &client_task;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &resumed_exit_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(!drm_test_exit_task_during_unlocked_poll &&
+           client_task.state == TASK_EXITED &&
+           client_task.drm_vmwgfx_continuation ==
+               resumed_exit_continuation &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    client_task.state = resumed_exit_prior_state;
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    drm_vmwgfx_execbuf_process_retirements(1);
+    assert(resumed_exit_fence->references == 2u);
+    struct drm_vmw_fence_signaled_arg resumed_exit_signaled = {
+        .handle = resumed_exit_reply.handle,
+    };
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_SIGNALED,
+                      &resumed_exit_signaled) == 0 &&
+           !resumed_exit_signaled.signaled);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){
+            .handle = resumed_exit_reply.handle}) == 0);
+    assert(resumed_exit_fence->references == 1u);
+
+    drm_test_fence_status_script_reset();
+    drm_test_clock_resolution_ns = saved_clock_resolution;
 
     /* A zero timeout is an immediate completion check. The timeout cookie
      * returned on EBUSY is reused by an explicit successful UNREF wait. */
@@ -4282,14 +5026,17 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
         .handle = immediate_reply.handle,
         .timeout_us = 0,
     };
+    uint32_t suspend_calls_before_zero = drm_test_suspend_calls;
     assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
                       &immediate_wait) == -LINUX_EBUSY);
+    assert(drm_test_suspend_calls == suspend_calls_before_zero);
     assert(immediate_wait.cookie_valid &&
            immediate_wait.kernel_cookie == drm_test_ticks);
     drm_test_fence_passed = immediate_reply.seqno;
     immediate_wait.wait_options = DRM_VMW_WAIT_OPTION_UNREF;
     assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
                       &immediate_wait) == 0);
+    assert(drm_test_suspend_calls == suspend_calls_before_zero);
     struct drm_vmw_fence_signaled_arg removed_signaled = {
         .handle = immediate_reply.handle,
     };
@@ -4308,6 +5055,7 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
     struct drm_vmw_fence_wait_arg restart_wait = {
         .handle = restart_reply.handle,
         .timeout_us = 5000000,
+        .lazy = 1,
     };
     assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
                       &restart_wait) == KERNEL_SYSCALL_BLOCKED);
@@ -4323,6 +5071,312 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
     drm_test_fence_passed = restart_reply.seqno;
     assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
                       &restart_wait) == 0);
+
+    /* A conclusive in-flight status result wins even if the measured window
+     * crosses 500 us. Reusing its numeric handle during the unlocked phase
+     * must leave lookup_get's reference alive and protect the replacement
+     * from the old wait's success-only UNREF. */
+    struct drm_vmw_fence_rep fast_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = fast_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(0, true);
+    drm_test_clock_getres_status = 0;
+    drm_test_clock_resolution_ns = 1000;
+    drm_test_suspend_status = 0;
+    drm_test_resume_status = 0;
+    drm_test_uptime_reset(1000, 0);
+    drm_test_uptime_script[0] = 1000;
+    drm_test_uptime_script[1] = 1000;
+    drm_test_uptime_script[2] = 1501;
+    drm_test_uptime_script_count = 3;
+    drm_test_replace_fence_file = client.drm_file;
+    drm_test_replace_fence_handle = fast_reply.handle;
+    struct drm_vmw_fence_wait_arg fast_wait = {
+        .handle = fast_reply.handle,
+        .timeout_us = 5000000,
+        .wait_options = DRM_VMW_WAIT_OPTION_UNREF,
+    };
+    uint32_t fast_sleeps_before = sleep_current_calls;
+    uint32_t fast_suspends_before = drm_test_suspend_calls;
+    uint32_t fast_resumes_before = drm_test_resume_calls;
+    uint32_t fast_polls_before = drm_test_unlocked_fence_status_calls;
+    uint32_t fast_clock_getres_before = drm_test_clock_getres_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &fast_wait) == 0);
+    assert(sleep_current_calls == fast_sleeps_before);
+    assert(drm_test_suspend_calls == fast_suspends_before + 1u &&
+           drm_test_resume_calls == fast_resumes_before + 1u);
+    assert(drm_test_clock_getres_calls == fast_clock_getres_before + 1u);
+    assert(drm_test_unlocked_fence_status_calls == fast_polls_before + 1u);
+    assert(drm_test_execution_owned && !drm_test_interrupts_enabled &&
+           !client_task.drm_vmwgfx_continuation);
+    assert(!drm_test_replace_fence_file);
+    signaled.handle = fast_reply.handle;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_SIGNALED,
+                      &signaled) == 0 && !signaled.signaled);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = fast_reply.handle}) == 0);
+
+    /* A fence completing after a few 100-us samples but within the 500-us
+     * window completes without entering the one-tick fallback. */
+    struct drm_vmw_fence_rep midwindow_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = midwindow_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(0, true);
+    drm_test_uptime_reset(2500, 0);
+    drm_test_uptime_script[0] = 2500;
+    drm_test_uptime_script[1] = 2500;
+    drm_test_uptime_script[2] = 2600;
+    drm_test_uptime_script[3] = 2700;
+    drm_test_uptime_script[4] = 2800;
+    drm_test_uptime_script[5] = 2800;
+    drm_test_uptime_script[6] = 2850;
+    drm_test_uptime_script_count = 7;
+    struct drm_vmw_fence_wait_arg midwindow_wait = {
+        .handle = midwindow_reply.handle,
+        .timeout_us = 5000000,
+    };
+    fast_sleeps_before = sleep_current_calls;
+    fast_polls_before = drm_test_unlocked_fence_status_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &midwindow_wait) == 0);
+    assert(sleep_current_calls == fast_sleeps_before &&
+           drm_test_unlocked_fence_status_calls == fast_polls_before + 3u);
+    assert(drm_test_execution_owned && !drm_test_interrupts_enabled);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = midwindow_reply.handle}) == 0);
+
+    /* SVGA lock contention is an inconclusive poll, so a subsequent pass in
+     * the same bounded phase completes without the one-tick sleep. */
+    struct drm_vmw_fence_rep contention_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = contention_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(SVGA_EBUSY, false);
+    drm_test_fence_status_script_push(0, true);
+    drm_test_uptime_reset(2000, 0);
+    struct drm_vmw_fence_wait_arg contention_wait = {
+        .handle = contention_reply.handle,
+        .timeout_us = 5000000,
+    };
+    fast_sleeps_before = sleep_current_calls;
+    fast_polls_before = drm_test_unlocked_fence_status_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &contention_wait) == 0);
+    assert(sleep_current_calls == fast_sleeps_before &&
+           drm_test_unlocked_fence_status_calls == fast_polls_before + 2u);
+    assert(drm_test_execution_owned && !drm_test_interrupts_enabled);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = contention_reply.handle}) == 0);
+
+    /* A pending sample at the window boundary stops further polling while
+     * retaining the original blocking continuation behavior. */
+    struct drm_vmw_fence_rep budget_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = budget_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(0, false);
+    drm_test_uptime_reset(4000, 0);
+    drm_test_uptime_script[0] = 4000;
+    drm_test_uptime_script[1] = 4000;
+    drm_test_uptime_script[2] = 4501;
+    drm_test_uptime_script_count = 3;
+    struct drm_vmw_fence_wait_arg budget_wait = {
+        .handle = budget_reply.handle,
+        .timeout_us = 5000000,
+        .lazy = 1,
+    };
+    fast_polls_before = drm_test_unlocked_fence_status_calls;
+    fast_sleeps_before = sleep_current_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &budget_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(drm_test_unlocked_fence_status_calls == fast_polls_before + 1u &&
+           sleep_current_calls == fast_sleeps_before + 1u &&
+           client_task.drm_vmwgfx_continuation);
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = budget_reply.handle}) == 0);
+
+    /* Hard errors after an unlocked poll resume ownership and preserve the
+     * user fence even when UNREF was requested. */
+    struct drm_vmw_fence_rep error_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = error_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_fence_status_script_push(0, false);
+    drm_test_fence_status_script_push(SVGA_EIO, false);
+    drm_test_uptime_reset(3000, 0);
+    struct drm_vmw_fence_wait_arg error_wait = {
+        .handle = error_reply.handle,
+        .timeout_us = 5000000,
+        .wait_options = DRM_VMW_WAIT_OPTION_UNREF,
+    };
+    fast_sleeps_before = sleep_current_calls;
+    fast_resumes_before = drm_test_resume_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &error_wait) == -LINUX_EIO);
+    assert(sleep_current_calls == fast_sleeps_before &&
+           drm_test_resume_calls == fast_resumes_before + 1u);
+    assert(drm_test_execution_owned && !drm_test_interrupts_enabled &&
+           !client_task.drm_vmwgfx_continuation);
+    signaled.handle = error_reply.handle;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_SIGNALED,
+                      &signaled) == 0 && !signaled.signaled);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = error_reply.handle}) == 0);
+
+    /* A backward fine-clock sample is bounded and falls back through the
+     * retained continuation after reacquiring ownership. */
+    struct drm_vmw_fence_rep clock_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = clock_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_uptime_reset(0, 0);
+    drm_test_uptime_script[0] = 5000;
+    drm_test_uptime_script[1] = 4999;
+    drm_test_uptime_script_count = 2;
+    struct drm_vmw_fence_wait_arg clock_wait = {
+        .handle = clock_reply.handle,
+        .timeout_us = 5000000,
+        .lazy = 1,
+    };
+    fast_polls_before = drm_test_unlocked_fence_status_calls;
+    fast_sleeps_before = sleep_current_calls;
+    fast_resumes_before = drm_test_resume_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &clock_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(drm_test_unlocked_fence_status_calls <= fast_polls_before + 1u);
+    assert(drm_test_resume_calls == fast_resumes_before + 1u &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    assert(sleep_current_calls == fast_sleeps_before + 1u &&
+           client_task.drm_vmwgfx_continuation);
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = clock_reply.handle}) == 0);
+
+    /* A progressing clock reaches the 500-us window well before the sample
+     * ceiling, even when status never passes. */
+    struct drm_vmw_fence_rep capped_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = capped_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_uptime_reset(6000, 1);
+    struct drm_vmw_fence_wait_arg capped_wait = {
+        .handle = capped_reply.handle,
+        .timeout_us = 5000000,
+        .lazy = 1,
+    };
+    fast_polls_before = drm_test_unlocked_fence_status_calls;
+    fast_sleeps_before = sleep_current_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &capped_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(drm_test_unlocked_fence_status_calls > fast_polls_before + 64u &&
+           drm_test_unlocked_fence_status_calls < fast_polls_before + 8192u &&
+           drm_test_uptime_value >= 6500u);
+    assert(sleep_current_calls == fast_sleeps_before + 1u &&
+           client_task.drm_vmwgfx_continuation &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = capped_reply.handle}) == 0);
+
+    /* A stopped clock cannot keep the unlocked poll running past the hard
+     * sample ceiling; fallback still retains the original continuation. */
+    struct drm_vmw_fence_rep stopped_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = stopped_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_uptime_reset(7000, 0);
+    struct drm_vmw_fence_wait_arg stopped_wait = {
+        .handle = stopped_reply.handle,
+        .timeout_us = 5000000,
+        .lazy = 1,
+    };
+    fast_polls_before = drm_test_unlocked_fence_status_calls;
+    fast_sleeps_before = sleep_current_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &stopped_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(drm_test_unlocked_fence_status_calls == fast_polls_before + 8192u &&
+           sleep_current_calls == fast_sleeps_before + 1u &&
+           client_task.drm_vmwgfx_continuation &&
+           drm_test_execution_owned && !drm_test_interrupts_enabled);
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = stopped_reply.handle}) == 0);
+
+    /* Coarse clocks and failed suspension skip polling and use the existing
+     * continuation/sleep semantics with ownership and IRQ state untouched. */
+    struct drm_vmw_fence_rep coarse_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = coarse_reply.seqno - 1u;
+    drm_test_fence_status_script_reset();
+    drm_test_clock_resolution_ns = 10000000;
+    struct drm_vmw_fence_wait_arg coarse_wait = {
+        .handle = coarse_reply.handle,
+        .timeout_us = 5000000,
+        .lazy = 1,
+    };
+    fast_suspends_before = drm_test_suspend_calls;
+    fast_polls_before = drm_test_unlocked_fence_status_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &coarse_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(drm_test_suspend_calls == fast_suspends_before &&
+           drm_test_unlocked_fence_status_calls == fast_polls_before);
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = coarse_reply.handle}) == 0);
+
+    struct drm_vmw_fence_rep suspend_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = suspend_reply.seqno - 1u;
+    drm_test_clock_resolution_ns = 1000;
+    drm_test_suspend_status = -35;
+    struct drm_vmw_fence_wait_arg suspend_wait = {
+        .handle = suspend_reply.handle,
+        .timeout_us = 5000000,
+        .lazy = 1,
+    };
+    fast_suspends_before = drm_test_suspend_calls;
+    fast_resumes_before = drm_test_resume_calls;
+    fast_polls_before = drm_test_unlocked_fence_status_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &suspend_wait) == KERNEL_SYSCALL_BLOCKED);
+    assert(drm_test_suspend_calls == fast_suspends_before + 1u &&
+           drm_test_resume_calls == fast_resumes_before &&
+           drm_test_unlocked_fence_status_calls == fast_polls_before);
+    assert(drm_test_execution_owned && !drm_test_interrupts_enabled);
+    drm_vmwgfx_cancel_task_continuation(&client_task);
+    drm_test_suspend_status = 0;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = suspend_reply.handle}) == 0);
+
+    /* Expired cookies do not suspend or enter the polling section. */
+    struct drm_vmw_fence_rep expired_reply =
+        drm_test_submit_wait_fence(&client_task, &client);
+    drm_test_fence_passed = expired_reply.seqno - 1u;
+    struct drm_vmw_fence_wait_arg expired_wait = {
+        .handle = expired_reply.handle,
+        .cookie_valid = 1,
+        .kernel_cookie = drm_test_ticks - 1u,
+    };
+    fast_suspends_before = drm_test_suspend_calls;
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_WAIT,
+                      &expired_wait) == -LINUX_EBUSY);
+    assert(drm_test_suspend_calls == fast_suspends_before);
+    assert(ioctl_call(&client_task, &client, DRM_IOCTL_VMW_FENCE_UNREF,
+        &(struct drm_vmw_fence_arg){.handle = expired_reply.handle}) == 0);
+
+    drm_test_fence_status_script_reset();
+    drm_test_uptime_reset(0, 0);
+    drm_test_clock_resolution_ns = 1000;
 
     /* The reply-copy fault continuation never resubmits and returns EFAULT
      * only after its fence has passed, even though the bad reply page is now

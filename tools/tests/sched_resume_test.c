@@ -12,11 +12,12 @@
 extern bool sched_try_resume_current_user_frame(const struct trap_frame *frame);
 
 static uint32_t fake_cpu;
+static uint32_t fake_cpu_count = 1;
 static uint64_t fake_time;
 
 uint32_t smp_current_cpu(void) { return fake_cpu; }
-uint32_t smp_cpu_count(void) { return 1; }
-bool smp_cpu_online(uint32_t cpu) { return cpu == 0; }
+uint32_t smp_cpu_count(void) { return fake_cpu_count; }
+bool smp_cpu_online(uint32_t cpu) { return cpu < fake_cpu_count; }
 uint64_t paging_kernel_cr3(void) { return 0x1000; }
 void paging_load_cr3(uint64_t cr3) { assert(cr3 == 0x1000); }
 uint64_t time_uptime_us(void) { return fake_time; }
@@ -45,6 +46,7 @@ static struct task *start_fixture(void)
 {
     discard_fixture();
     fake_cpu = 0;
+    fake_cpu_count = 1;
     fake_time = 1000;
     sched_init();
 
@@ -214,11 +216,68 @@ static void test_blocked_pending_signals_preserve_fast_resume(void)
     assert(task->process_pending_signals == blocked_signal);
 }
 
+static void test_current_reschedule_request_is_local_and_fair(void)
+{
+    struct task *current = start_fixture();
+    uint64_t initial_runtime = current->fair.runtime;
+    uint64_t initial_deadline = current->fair.deadline;
+
+    struct task *competitor = alloc_task_slot();
+    assert(competitor);
+    competitor->pid = 42;
+    competitor->kind = TASK_KIND_USER;
+    competitor->state = TASK_READY;
+    competitor->running_cpu = SCHED_CPU_NONE;
+    competitor->entry = RELIEFNT_USER_BASE + 0x2000;
+    competitor->stack_top = RELIEFNT_USER_TOP - 8192;
+    competitor->stack_low = competitor->stack_top - 4096;
+    competitor->affinity_mask = 1;
+    sched_task_as(competitor)->cr3 = 0x3000;
+    competitor->frame = (struct trap_frame){
+        .rip = competitor->entry,
+        .rsp = competitor->stack_low + 128,
+        .cs = RELIEFNT_USER_CS,
+        .ss = RELIEFNT_USER_DS,
+        .rflags = 1ULL << 9,
+    };
+
+    fake_cpu_count = 2;
+    __atomic_store_n(&sched_resched_pending[0], 0, __ATOMIC_RELEASE);
+    __atomic_store_n(&sched_resched_pending[1], 0, __ATOMIC_RELEASE);
+    fake_time += 2u * EEVDF_SLICE_US;
+    struct trap_frame frame = next_syscall_frame(current, 1);
+
+    sched_request_reschedule_current();
+    sched_request_reschedule_current();
+    assert(sched_current_cpu_needs_resched());
+    assert(!__atomic_load_n(&sched_resched_pending[1], __ATOMIC_ACQUIRE));
+    assert(current->state == TASK_RUNNING && current->running_cpu == fake_cpu);
+    assert(current_task[fake_cpu] == current && fair_running[fake_cpu] == current);
+    assert(current->fair.runtime == initial_runtime &&
+           current->fair.deadline == initial_deadline);
+    assert(!sched_try_resume_current_user_frame(&frame));
+    assert(current->state == TASK_RUNNING && current->running_cpu == fake_cpu);
+    assert(current->fair.runtime == initial_runtime &&
+           current->fair.deadline == initial_deadline);
+
+    assert(sched_capture_current_user_frame(&frame));
+    assert(current->state == TASK_READY && current->fair.runtime ==
+           initial_runtime + 2u * EEVDF_SLICE_US);
+    assert(current->fair.deadline != initial_deadline);
+    assert(sched_select_next_user() == competitor);
+    assert(sched_current_pid() == competitor->pid);
+    assert(competitor->state == TASK_RUNNING && competitor->running_cpu == fake_cpu);
+    assert(current->state == TASK_READY && current->running_cpu == SCHED_CPU_NONE);
+    assert(!sched_current_cpu_needs_resched());
+    assert(!__atomic_load_n(&sched_resched_pending[1], __ATOMIC_ACQUIRE));
+}
+
 int main(void)
 {
     test_repeated_fast_returns_keep_fair_accounting();
     test_reschedule_signal_state_and_frame_guards();
     test_blocked_pending_signals_preserve_fast_resume();
+    test_current_reschedule_request_is_local_and_fair();
     discard_fixture();
     puts("PASS scheduler fast resume preserves RUNNING ownership and EEVDF runtime; deliverable signals fall back while blocked task/process signals remain pending");
     return 0;

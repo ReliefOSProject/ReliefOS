@@ -149,6 +149,10 @@ static void mmio_large_page_pat_is_converted_and_restored(void) {
     mm_fixture_init(0x30000000,8,0,0); nx_enabled=true;
     kernel_pd[3][224]=base|0x83|(1ULL<<12)|nx;
 
+    uint64_t *pat_page=mmio_leaf(base+4096); assert(pat_page);
+    uint64_t pat_original=*pat_page;
+    assert(!paging_mmio_writeback_nx(base+4096,4096));
+    assert(*pat_page==pat_original);
     assert(paging_acquire_mmio(base+4096,4096));
     assert(!(kernel_pd[3][224]&0x80));
     uint64_t *pt=(void *)(uintptr_t)(kernel_pd[3][224]&RELIEFNT_PHYS_ADDR_MASK);
@@ -161,6 +165,173 @@ static void mmio_large_page_pat_is_converted_and_restored(void) {
     assert(pt[1]==(base+4096|nx|0x83|pat));
     assert(pt[2]==(base+8192|nx|0x83|pat));
     puts("mmio_large_page_pat_conversion_uc_and_restore PASS");
+}
+static void mmio_writeback_policy_is_default_only_and_exclusive(void) {
+    const uint64_t base=0xe0000000ULL;
+    const uint64_t wb=base+2*4096;
+    mm_fixture_init(0x30000000,32,0,0); nx_enabled=true;
+    kernel_pd[3][256]=base|0x83;
+    uint64_t *first=mmio_leaf(base+4096), *wb_page=mmio_leaf(wb);
+    uint64_t *after=mmio_leaf(wb+4096), *uc_page=mmio_leaf(base+6*4096);
+    assert(first && wb_page && after && uc_page);
+    const uint64_t original_first=*first, original_wb=*wb_page,
+                   original_after=*after, original_uc=*uc_page;
+    unsigned before_shootdowns=shootdowns;
+
+    nx_enabled=false;
+    assert(!paging_mmio_writeback_nx(wb,4096));
+    assert(*wb_page==original_wb);
+    nx_enabled=true;
+    for (uint64_t cache=RELIEFNT_PAGE_PWT; cache<=RELIEFNT_PAGE_PAT; cache<<=1) {
+        if (cache != RELIEFNT_PAGE_PWT && cache != RELIEFNT_PAGE_PCD &&
+            cache != RELIEFNT_PAGE_PAT) continue;
+        *wb_page=wb|3|cache;
+        uint64_t nondefault=*wb_page;
+        assert(!paging_mmio_writeback_nx(wb,4096));
+        assert(*wb_page==nondefault);
+    }
+    *wb_page=original_wb;
+
+    assert(paging_mmio_writeback_nx(wb,4096));
+    assert(*wb_page==(wb|3|RELIEFNT_PAGE_NOEXEC));
+    assert(paging_mmio_writeback_nx(wb,4096));
+    assert(*wb_page==(wb|3|RELIEFNT_PAGE_NOEXEC));
+    assert(shootdowns>before_shootdowns);
+
+    /* UC may touch either exact page neighbor, but no page-edge or partial
+     * range that rounds into the permanent WB extent. */
+    assert(paging_mmio_uncached(base+4096,4096));
+    assert(paging_mmio_uncached(wb+4096,4096));
+    assert(!paging_mmio_uncached(wb+1,1));
+    assert(!paging_mmio_uncached(wb,4096));
+    assert(!paging_acquire_mmio(wb,4096));
+    assert(!paging_mmio_uncached(wb-4096,8192));
+    assert(*first==(base+4096|RELIEFNT_PAGE_PWT|RELIEFNT_PAGE_PCD|
+                    RELIEFNT_PAGE_NOEXEC|3));
+    assert(*after==(wb+4096|RELIEFNT_PAGE_PWT|RELIEFNT_PAGE_PCD|
+                    RELIEFNT_PAGE_NOEXEC|3));
+    assert(*wb_page==(wb|3|RELIEFNT_PAGE_NOEXEC));
+
+    assert(paging_mmio_uncached(base+6*4096,4096));
+    assert(!paging_mmio_writeback_nx(base+6*4096,4096));
+    assert(*uc_page==(base+6*4096|3|RELIEFNT_PAGE_PWT|
+                      RELIEFNT_PAGE_PCD|RELIEFNT_PAGE_NOEXEC));
+    uint64_t lease_page_phys=base+7*4096;
+    assert(paging_acquire_mmio(lease_page_phys,4096));
+    uint64_t *lease_page=mmio_leaf(lease_page_phys); assert(lease_page);
+    uint64_t leased_uc=*lease_page;
+    assert(!paging_mmio_writeback_nx(lease_page_phys,4096));
+    assert(*lease_page==leased_uc);
+    paging_release_mmio(lease_page_phys,4096);
+    assert(*lease_page==(lease_page_phys|3));
+    assert(*wb_page==(wb|3|RELIEFNT_PAGE_NOEXEC));
+    puts("mmio_writeback_default_cache_nx_and_bidirectional_policy_conflicts PASS");
+    (void)original_first; (void)original_after; (void)original_uc;
+}
+static void mmio_writeback_registry_exhaustion_is_atomic(void) {
+    const uint64_t base=0xd8000000ULL;
+    mm_fixture_init(0x30000000,8,0,0); nx_enabled=true;
+    kernel_pd[3][192]=base|0x83;
+    for (unsigned i=0;i<257;i++) {
+        uint64_t phys=base+(uint64_t)i*4096;
+        uint64_t *pte=mmio_leaf(phys); assert(pte);
+        *pte=phys|3|((i&1)?RELIEFNT_PAGE_DEVICE:0);
+    }
+    assert(!paging_mmio_writeback_nx(base,257ULL*4096));
+    for (unsigned i=0;i<257;i++) {
+        uint64_t phys=base+(uint64_t)i*4096;
+        assert(*mmio_leaf(phys)==(phys|3|((i&1)?RELIEFNT_PAGE_DEVICE:0)));
+    }
+    puts("mmio_writeback_registry_exhaustion_no_partial_flags_or_ownership PASS");
+}
+static void mmio_writeback_rejects_holes_aliases_and_user_leaves(void) {
+    const uint64_t base=0xd9000000ULL;
+    mm_fixture_init(0x30000000,8,0,0); nx_enabled=true;
+    kernel_pd[3][200]=base|0x83;
+    uint64_t *first=mmio_leaf(base), *second=mmio_leaf(base+4096);
+    assert(first && second);
+    uint64_t original_first=*first, original_second=*second;
+    *second=0;
+    assert(!paging_mmio_writeback_nx(base,8192));
+    assert(*first==original_first && *second==0);
+    *second=(base+0x3000)|3;
+    uint64_t alias=*second;
+    assert(!paging_mmio_writeback_nx(base,8192));
+    assert(*first==original_first && *second==alias);
+    *second=(base+4096)|3|RELIEFNT_PAGE_USER;
+    uint64_t user=*second;
+    assert(!paging_mmio_writeback_nx(base,8192));
+    assert(*first==original_first && *second==user);
+    *second=original_second;
+    puts("mmio_writeback_rejects_hole_alias_and_user_leaf_without_partial_change PASS");
+}
+static void mmio_writeback_second_large_page_split_oom_is_atomic(void) {
+    const uint64_t first_large=0xe0000000ULL;
+    const uint64_t second_large=first_large+0x200000ULL;
+    const uint64_t first_page=second_large-4096;
+    const uint32_t first_index=(uint32_t)((first_page>>21)&511u);
+    const uint32_t second_index=first_index+1;
+    mm_fixture_init(0x30000000,1,0,0); nx_enabled=true;
+    kernel_pd[3][first_index]=first_large|0x83;
+    kernel_pd[3][second_index]=second_large|0x83;
+
+    /* One free page splits the first 2 MiB mapping; the second split then
+     * fails. The documented preparatory split may remain, but WB attributes
+     * and registry ownership must stay wholly unpublished. */
+    assert(!paging_mmio_writeback_nx(first_page,8192));
+    assert(!(kernel_pd[3][first_index]&0x80));
+    uint64_t *first_pt=(uint64_t *)(uintptr_t)
+        (kernel_pd[3][first_index]&RELIEFNT_PHYS_ADDR_MASK);
+    assert(first_pt[511]==(first_page|3));
+    assert(kernel_pd[3][second_index]==(second_large|0x83));
+
+    /* A conflicting UC claim on the first half would reveal a partial WB
+     * registry entry even if the PTE itself had not been changed. */
+    assert(paging_mmio_uncached(first_page,4096));
+    assert(first_pt[511]==(first_page|3|RELIEFNT_PAGE_PWT|
+                           RELIEFNT_PAGE_PCD|RELIEFNT_PAGE_NOEXEC));
+    puts("mmio_writeback_second_2MiB_split_oom_no_partial_policy_or_claim PASS");
+}
+static void pci_vmware_svga_bar2_identity_size_and_restore(void) {
+    struct pci_device d={.bus=0,.slot=0,.function=0,
+                         .vendor_id=0x15ad,.device_id=0x0405};
+    uint32_t saved_id=cfg[0],saved_command=cfg[1],saved_bar0=cfg[0x10/4],
+             saved_bar1=cfg[0x14/4],saved_bar2=cfg[0x18/4],
+             saved_bar3=cfg[0x1c/4],saved_mask2=bar_masks[0x18/4],
+             saved_mask3=bar_masks[0x1c/4],saved_mask0=bar_masks[0x10/4],
+             saved_mask1=bar_masks[0x14/4];
+    cfg[0]=0x040515ad; cfg[1]=0x00000007;
+    cfg[0x10/4]=0xc0000000; cfg[0x14/4]=0;
+    cfg[0x18/4]=0xf0000000; cfg[0x1c/4]=0;
+    bar_masks[0x10/4]=0; bar_masks[0x14/4]=0;
+    bar_masks[0x18/4]=0xffff0000; bar_masks[0x1c/4]=0;
+    assert(pci_device_bar_contains(&d,2,0xf0000000,0x10000));
+    assert(pci_device_bar_contains(&d,2,0xf0001000,0xf000));
+    assert(!pci_device_bar_contains(&d,2,0xf000f000,0x2000));
+    assert(cfg[1]==0x00000007 && cfg[0x18/4]==0xf0000000 && cfg[0x1c/4]==0);
+    struct pci_device wrong=d; wrong.device_id=0x0406;
+    assert(!pci_device_bar_contains(&wrong,2,0xf0000000,4096));
+    cfg[0x14/4]=0x00000004; /* BAR2 is the high dword, not an independent BAR. */
+    assert(!pci_device_bar_contains(&d,2,0xf0000000,4096));
+    cfg[0x14/4]=0;
+    assert(!pci_device_bar_contains(&d,6,0xf0000000,4096));
+    cfg[0x18/4]=0xf0000001;
+    assert(!pci_device_bar_contains(&d,2,0xf0000000,4096));
+    cfg[0x18/4]=0xf0000002;
+    assert(!pci_device_bar_contains(&d,2,0xf0000000,4096));
+
+    cfg[0x18/4]=0x00000004; cfg[0x1c/4]=1;
+    bar_masks[0x18/4]=0xffff0004; bar_masks[0x1c/4]=0xffffffff;
+    assert(pci_device_bar_contains(&d,2,0x100000000ULL,0x10000));
+    assert(!pci_device_bar_contains(&d,2,0x10000f000ULL,0x2000));
+    assert(cfg[0x18/4]==0x00000004 && cfg[0x1c/4]==1 && cfg[1]==0x00000007);
+
+    cfg[0]=saved_id; cfg[1]=saved_command; cfg[0x10/4]=saved_bar0;
+    cfg[0x14/4]=saved_bar1; cfg[0x18/4]=saved_bar2;
+    cfg[0x1c/4]=saved_bar3; bar_masks[0x18/4]=saved_mask2;
+    bar_masks[0x1c/4]=saved_mask3; bar_masks[0x10/4]=saved_mask0;
+    bar_masks[0x14/4]=saved_mask1;
+    puts("pci_exact_device_BAR2_identity_size_32_64_and_restore PASS");
 }
 static void mmio_exact_lease_capacity_rejects_atomically(void) {
     const uint64_t base=0xd4000000ULL;
@@ -231,6 +402,7 @@ static void mmio_validation_and_page_table_oom_roll_back(void) {
     assert(!paging_acquire_mmio(base+1,4096));
 
     kernel_pd[3][209]=(base+0x200000)|0x83;
+    assert(!paging_mmio_writeback_nx(base,0x400000));
     assert(!paging_acquire_mmio(base,0x400000));
     assert(!(kernel_pd[3][208]&0x80));
     uint64_t *first_pt=(uint64_t *)(uintptr_t)(kernel_pd[3][208]&RELIEFNT_PHYS_ADDR_MASK);
@@ -340,6 +512,10 @@ int main(void) {
     mmio_pages_are_precise_and_owned();
     mmio_large_aperture_is_precise_and_owned();
     mmio_large_page_pat_is_converted_and_restored();
+    mmio_writeback_policy_is_default_only_and_exclusive();
+    mmio_writeback_registry_exhaustion_is_atomic();
+    mmio_writeback_rejects_holes_aliases_and_user_leaves();
+    mmio_writeback_second_large_page_split_oom_is_atomic();
     mmio_exact_lease_capacity_rejects_atomically();
     mmio_interval_capacity_failure_rolls_back();
     mmio_validation_and_page_table_oom_roll_back();
@@ -351,6 +527,7 @@ int main(void) {
     assert(!pci_map_mmio(0xc0001000,4096));
     pci_unmap_mmio(mmio,8192); for(unsigned i=0;i<PCI_MMIO_MAX;i++)assert(!pci_mappings[i].refs);
     puts("pci_bar_range_and_mapping_ledger PASS");
+    pci_vmware_svga_bar2_identity_size_and_restore();
     puts("module_v1_prefix_is_unchanged PASS");
     dma_mask_is_enforced(); puts("dma_mask_is_enforced PASS");
     struct reliefos_driver_pci_device d={0}; uint32_t h; unsigned count=0;

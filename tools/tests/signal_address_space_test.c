@@ -62,6 +62,14 @@ void sched_exit_group(uint32_t pid, uint64_t code)
 void sched_signal_job_control(uint32_t pid, int sig) { (void)pid; (void)sig; assert(0); }
 void sched_alarm_rearm(struct task *task) { (void)task; assert(0); }
 void sched_notify_runnable(void) { }
+void sched_wake_interruptible(struct task *task)
+{
+    if (task && task->state == TASK_BLOCKED && !task->vfork_child) {
+        task->wake_tick = 0;
+        task->wait_window_id = 0;
+        task->state = TASK_READY;
+    }
+}
 bool drm_vmwgfx_task_uninterruptible(const struct task *task)
 { (void)task; return false; }
 bool drm_vmwgfx_task_signal_busy(const struct task *task)
