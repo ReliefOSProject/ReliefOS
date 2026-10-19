@@ -239,6 +239,9 @@ or AF_UNIX service protocols. What the kernel still accepts, keyed by the
   (`TCGETS`/`TCSETS`, `TIOCGWINSZ`, `TIOCSCTTY`, `TIOCGPGRP`, `TIOCSPGRP`,
   `TIOCGSID`, `TIOCNOTTY`, `TIOCSPTLCK`, `TIOCGPTLCK`); PTY users call
   `posix_openpt/openpty/forkpty`.
+- `/dev/console`: the bound virtual terminal's termios, window-size and VT
+  ioctls. Opening the console does not automatically make it a controlling
+  terminal. `/dev/kmsg` rejects terminal ioctls with `ENOTTY`.
 - AF_INET socket fds: `LEONOS_NET_CONTROL_IOCTL` with a versioned
   `struct leonos_net_control` for read-only network status queries; see
   Networking below.

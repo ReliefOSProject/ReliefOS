@@ -81,6 +81,14 @@ int pty_vt_graphical_active(void) { return 0; }
 
 uint32_t pty_vt_id(uint32_t number) { return number >= 1 && number <= 6 ? number : 0u; }
 uint32_t pty_vt_number(uint32_t pty_id) { return pty_vt_id(pty_id); }
+/* Device-read dispatch must keep evdev descriptors out of console I/O. */
+int pty_is_active(uint32_t id) { (void)id; abort(); }
+int64_t pty_check_change(uint32_t id, uint32_t pid, int signal)
+{ (void)id; (void)pid; (void)signal; abort(); }
+uint32_t pty_input_available(uint32_t id) { (void)id; abort(); }
+int pty_is_hungup(uint32_t id) { (void)id; abort(); }
+void pty_transfer_put(uint32_t id, uint32_t endpoint)
+{ (void)id; (void)endpoint; abort(); }
 
 static struct task_file *keyboard_file(struct task_file *file)
 {

@@ -171,6 +171,9 @@ int main(void)
     assert(pty_transfer_get(id, TASK_PTY_ENDPOINT_SLAVE) == -9);
     pty_init();
     assert(pty_vt_init() == 0);
+    /* kernel_start activates tty1 after boot diagnostics, not in pty_vt_init. */
+    assert(pty_vt_active() == 1 && shown_vt == 0);
+    console_vt_activate(1, false);
     assert(pty_vt_active() == 1 && shown_vt == 1 && shown_graphical == 0);
     for (uint32_t number = 1; number <= 6; ++number) {
         char path[16];
