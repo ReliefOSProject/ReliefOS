@@ -4,6 +4,12 @@
 set -eu
 [ "$#" = 1 ] || { echo 'usage: installer-console-profile.sh ROOT' >&2; exit 2; }
 root=$1
+src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd -P)
+fltk_apps=$src/configs/fltk-apps.list
+[ -f "$fltk_apps" ] && [ ! -L "$fltk_apps" ] || {
+    echo "console profile requires the FLTK application list: $fltk_apps" >&2
+    exit 1
+}
 [ -d "$root" ] && [ ! -L "$root" ] || {
     echo "console profile root is missing or not a directory: $root" >&2
     exit 1
@@ -67,18 +73,29 @@ for path in \
     remove_path "$path"
 done
 
-# These Xorg-only applications include FLTK frontends and OpenGL tools; they
-# must not pull Xorg libraries back into reliefos-apps through their package
-# ELF dependencies.
-for app in \
-    calc doom doomlauncher fileman imageview installer leonmmcoset minesweeper osver reliefexcel reliefword reliefppt \
-    paint taskmgr xiaobai glxgears portablegl; do
+remove_app() {
+    app=$1
     remove_path "usr/lib/reliefos/apps/$app"
     remove_path "usr/bin/$app"
     remove_path "usr/share/applications/reliefos-$app.desktop"
     for size in 16 32 48 64 128 256; do
         remove_path "usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png"
     done
+}
+
+# Use the build's FLTK application list so new graphical frontends cannot
+# retain Xorg ELF dependencies in the console-only reliefos-apps package.
+while IFS= read -r app || [ -n "$app" ]; do
+    case $app in
+        ''|*[!a-z0-9_-]*)
+            echo "invalid FLTK application name in $fltk_apps: $app" >&2
+            exit 1
+            ;;
+    esac
+    remove_app "$app"
+done <"$fltk_apps"
+for app in glxgears portablegl; do
+    remove_app "$app"
 done
 
 printf '%s\n' console >"$marker"

@@ -6,7 +6,7 @@ w=$(mktemp -d)
 trap 'rm -rf "$w"' EXIT HUP INT TERM
 ${HOSTCC:-cc} -std=c11 -O2 -Wall -Wextra -Werror "$src/tools/host/manifest/reliefos-dedup.c" -o "$w/dedup"
 export INSTALLER_DEDUP_TOOL="$w/dedup"
-mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/src/userland/apps/installer" "$w/src/system/xorg" \
+mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/src/configs" "$w/src/userland/apps/installer" "$w/src/system/xorg" \
     "$w/out/userland" "$w/out/userland-installer" \
     "$w/raw/usr/lib/reliefos/apps/settings" "$w/raw/usr/lib/leonos" "$w/raw/usr/bin" \
     "$w/raw/etc/reliefos/icewm" "$w/raw/etc/runlevels/default" \
@@ -15,6 +15,8 @@ mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/src/userland/apps/installer" "$w
     "$w/raw/usr/lib/reliefos/apps" \
     "$w/esp/EFI/BOOT" "$w/esp/reliefos" "$w/esp/leonos" "$w/esp/grub"
 printf 'guide\n' > "$w/src/docs/ADVANCED_INSTALL.txt"
+cp "$src/configs/fltk-apps.list" "$w/src/configs/fltk-apps.list"
+printf 'future-fltk\n' >> "$w/src/configs/fltk-apps.list"
 printf '[Desktop Entry]\n' > "$w/src/userland/apps/installer/installer.desktop"
 cp "$src/system/xorg/installer-session" "$w/src/system/xorg/installer-session"
 ln -s "$src/resources" "$w/src/resources"
@@ -37,13 +39,18 @@ for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper; do
     printf 'Xorg helper\n' > "$w/raw/$path"
 done
 ln -s reliefos/icewm "$w/raw/etc/icewm"
-for app in calc doom doomlauncher fileman imageview leonmmcoset minesweeper osver reliefexcel reliefword reliefppt \
-    paint taskmgr xiaobai glxgears portablegl; do
+for app in $(cat "$w/src/configs/fltk-apps.list") glxgears portablegl; do
+    [ "$app" != installer ] || continue
     mkdir -p "$w/raw/usr/lib/reliefos/apps/$app"
     printf '%s executable\n' "$app" > "$w/raw/usr/lib/reliefos/apps/$app/$app.elf"
     printf '%s manifest\n' "$app" > "$w/raw/usr/lib/reliefos/apps/$app/manifest.ini"
     ln -s "../lib/reliefos/apps/$app/$app.elf" "$w/raw/usr/bin/$app"
     printf '[Desktop Entry]\n' > "$w/raw/usr/share/applications/reliefos-$app.desktop"
+    for size in 16 32 48 64 128 256; do
+        icons=usr/share/icons/hicolor/${size}x${size}/apps
+        mkdir -p "$w/raw/$icons"
+        printf '%s icon\n' "$app" > "$w/raw/$icons/reliefos-$app.png"
+    done
 done
 printf 'portablegl library\n' > "$w/raw/usr/lib/libportablegl.so.1"
 printf 'license\n' > "$w/raw/etc/license.conf"
@@ -129,11 +136,21 @@ done
 for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper; do
     [ ! -e "$w/stage/install/root-console/$path" ]
 done
-for app in calc doom doomlauncher fileman imageview leonmmcoset minesweeper osver reliefexcel reliefword reliefppt \
-    paint taskmgr xiaobai glxgears portablegl; do
+for app in $(cat "$w/src/configs/fltk-apps.list") glxgears portablegl; do
     [ ! -e "$w/stage/install/root-console/usr/lib/reliefos/apps/$app" ]
     [ ! -e "$w/stage/install/root-console/usr/bin/$app" ]
     [ ! -e "$w/stage/install/root-console/usr/share/applications/reliefos-$app.desktop" ]
+    [ "$app" != installer ] || continue
+    for profile in "$w/stage" "$w/stage/install/root"; do
+        cmp "$w/raw/usr/lib/reliefos/apps/$app/$app.elf" "$profile/usr/lib/reliefos/apps/$app/$app.elf"
+        [ -L "$profile/usr/bin/$app" ]
+        [ -f "$profile/usr/share/applications/reliefos-$app.desktop" ]
+        for size in 16 32 48 64 128 256; do
+            icon=usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png
+            cmp "$w/raw/$icon" "$profile/$icon"
+            [ ! -e "$w/stage/install/root-console/$icon" ]
+        done
+    done
 done
 [ ! -e "$w/stage/install/root-console/usr/lib/libportablegl.so.1" ]
 [ -d "$w/stage/install/root-console/usr/lib/reliefos/apps/settings" ]

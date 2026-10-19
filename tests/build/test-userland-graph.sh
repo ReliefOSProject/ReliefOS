@@ -9,6 +9,7 @@ trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 mkdir -p "$tmp/src/configs" "$tmp/src/userland/apps/one" "$tmp/src/userland/apps/two" "$tmp/out/config" "$tmp/out/host/bin" "$tmp/out/host/obj/tools/host/manifest" "$tmp/out/meta" "$tmp/musl/lib"
 mkdir -p "$tmp/src/mk/components"
 cp "$root/mk/components/graphics.mk" "$tmp/src/mk/components/graphics.mk"
+cp "$root/configs/fltk-apps.list" "$tmp/src/configs/fltk-apps.list"
 cat >"$tmp/src/configs/components.toml" <<'DATA'
 version = 1
 [[components]]

@@ -28,7 +28,7 @@ X11_DEVELOPMENT_PRODUCTS := $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/FL/
 $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK)
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(X11_DEVELOPMENT_ROOT))
 	$(Q)touch $(X11_DEVELOPMENT_PRODUCTS)
-USERLAND_FLTK_APPS := calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher doom installer reliefexcel reliefword reliefppt reliefapk
+USERLAND_FLTK_APPS := $(strip $(file <$(RELIEFOS_SRC)/configs/fltk-apps.list))
 USERLAND_FLTK_LIBS := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libfltk.so libstdc++.so.6 libgcc_s.so.1)
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_CXX_EXTRA_$(app) := -I$(RELIEFOS_SRC)/userland/apps -isystem $(X11_DEVELOPMENT_ROOT)/usr/include))
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_LIBS_$(app) += $(USERLAND_FLTK_LIBS)))

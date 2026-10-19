@@ -12,6 +12,9 @@ depend on `$(RELIEFOS_COMPONENT_TOOL)` and `$(RELIEFOS_GEARS_TOOL)`.
   Required components remain enabled; dependency closure follows the old resolver.
 - Apps: `O/userland/NAME.elf`, aliases `app-NAME` for enabled project applications.
 - Installer: `O/userland-installer/gptinit.elf`; aggregate `installer-userland`.
+- `configs/fltk-apps.list` is shared by FLTK linking and installer console-profile
+  pruning. Add each FLTK frontend there once; its executable, command alias,
+  desktop entry and icons stay in Xorg roots but are removed from console roots.
 - Static loader-error GUI: `O/userland/dynlinkerror.elf` (no dynamic section).
 - Graphics exports: `PORTABLEGL_SO`, `PORTABLEGL_ARCHIVE`, `GLXGEARS_SOURCE`,
   `STARDUSTUI_ARCHIVE`. Stardust examples are owned by this fragment too.
