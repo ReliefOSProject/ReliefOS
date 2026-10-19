@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefMail
+Name[zh_CN]=ReliefMail 邮件客户端
+GenericName=Mail Client
+GenericName[zh_CN]=邮件客户端
+Comment=Read, write and manage email
+Comment[zh_CN]=收发、撰写和管理邮件
+Exec=/usr/bin/reliefmail
+TryExec=/usr/bin/reliefmail
+Icon=mail-read-symbolic
+Terminal=false
+Categories=Network;Email;
+StartupWMClass=reliefos-reliefmail
