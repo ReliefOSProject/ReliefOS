@@ -15,6 +15,104 @@ The implementation lives in `kernel/reliefnt/drivers/bootstrap/svga/` and uses t
 Linux VMware protocol headers in `kernel/reliefnt/drivers/bootstrap/svga/protocol/`, with
 the required GB wire extensions in `kernel/reliefnt/drivers/bootstrap/svga/gb_protocol.h`.
 
+## Xorg, Mesa and the DRM device
+
+The desktop configuration uses unmodified Alpine Xorg 21.1.25 with its
+`modesetting` driver and glamor, plus the signed Mesa Gallium DRI subpackage
+26.1.6-r0. The `vmwgfx_dri.so` entry point is the upstream Gallium SVGA driver.
+The profile leaves the Xorg Device driver and KMS path to standard
+auto-configuration, requests `SWcursor`, and sets `PageFlip` false. That option
+prevents modesetting page flips; it does not disable DRI3, glamor or Present,
+whose copy path remains available. Xorg 21.1.25 registers DRI3 and Present as
+non-disableable extensions, so `-extension DRI3` is not a supported way to
+turn off DRI3.
+
+Mesa's VGPU9 path provides the GL 2.1 / GLSL 1.20 compatibility level that
+meets glamor's source-level desktop GL minimum. This source compatibility does
+not establish that a particular guest boot obtained a VMware context or that
+all desktop rendering and interaction are stable. The independent
+`glxgears` SVGA3D ioctl renderer described above is application-specific and
+does not prove that Xorg's GLX/DRI or glamor path works.
+
+The primary KMS node `/dev/dri/card0` and render node `/dev/dri/renderD128`
+are exposed with mode `0660`, group `video` (GID 44). Mesa and Xorg use the
+same vmwgfx DRM device for the screen pixmap, glamor and KMS scanout. DRI3
+clients must use that same device and the authenticated primary-node route.
+The vmwgfx PRIME path exchanges opaque shareable surface references for this
+same-device use; it is not a promise of cross-device DMA-BUF attachment,
+mapping or import. A PRIME capability bit alone does not prove a surface can
+be exported and imported.
+
+The fixed profile does not claim atomic modesetting, page-flip presentation,
+hardware vblank, hardware cursor support, cross-device DMA-BUF import, physical
+host GPU utilization, or installer-ISO acceptance.
+
+## Product validation status (2026-10-19)
+
+All required final runtime gates passed for the bounded VGPU9 profile. The
+source-frozen canonical image uses kernel
+`e9cf25df756dfcb78eccae03d1e890a608019686d022086e88ead91c9b30743f`. Native
+VMware GPU/PRIME/KMS checks completed with status 0, including Mesa pixel and
+feature checks, same-device PRIME, and visible scanout; the red triangle and
+blue pixels were root-viewed and all four owned-resource baselines were
+restored. The default-user accelerated session used unmodified Xorg and the
+upstream `vmwgfx` glamor path, reported GL 2.1, and passed the original DRI3
+surface checks in both directions. The session covered visible gears and
+Chinese File Manager, window move/resize/cover, VT2 isolation and return,
+renderer kill and recovery, normal closes/logout, and restored tty1 text
+login. The upstream DRI query remains `accelerated=no` and `video_memory=1
+MiB`; these query values do not identify the renderer that produced a frame or
+measure physical-host GPU use. See
+`out/svga-final-console-gpu-vmware/runtime-result.json` and
+`out/svga-final-console-session-vmware/runtime-result.json`.
+
+The unchanged repository lifecycle oracle passed on both QEMU Standard VGA
+(531.68 seconds) and VMware VGA 2D (618.91 seconds) with status 0 on the same
+canonical source image. Fresh tty1 numeric-prompt checks were separate OUT-only
+strict observations, not part of the unchanged oracle: Standard VGA displayed
+`37192972` and VMware VGA 2D displayed `83680142`; each token was erased without
+pressing Enter. Their control records and root-reviewed captures are in
+`out/svq-std-e9cf-n/` and `out/svq-vmw-e9cf-n/`. The VMware VGA 2D log retains
+the SMP APIC 1 startup timeout followed by `online=2/2`, also present in the
+earlier controls; its cause remains uninvestigated and is not claimed fixed or
+warning-free.
+
+The native VMware session with `mks.enable3d=FALSE` also passed the bounded
+software-fallback gate. 3D was unavailable (`-95`), the render node was absent,
+and the default user obtained `llvmpipe (LLVM 22.1.3)`; Xorg declined glamor for
+that software renderer and initialized DRISWRAST. Chinese File Manager,
+window move/resize, VT2 numeric-marker clear and return, normal client/session
+exit, a fresh greeter, and tty1 numeric prompt entry/erase without Enter were
+observed. This is a working software-rendered fallback, not accelerated
+glamor. The runner completed with status 0 in 623.17 seconds, including a
+recovered host-space pause before guest kernel execution. The same attempt
+paused with VMware `noSpaceBasic/noSpaceCritical` and zero kernel serial bytes;
+root moved only a stopped, read-only private GPU RAW between owned filesystems,
+verified the copy before replacing its former path with a symlink, and resumed
+the same VM without changing guest configuration or discarding artifacts. See
+`out/svga-final-console-fallback-vmware/` and
+`out/svga-storage-relief-20261019/migration-proof.json`. This run was not an
+uninterrupted cold boot. Independently prepared private RAW image hashes differ;
+the canonical kernel, four injected payloads and 14 product-file readbacks
+were verified separately, so the full private images are not claimed byte-
+identical. Existing Xorg/font and XDM reset warnings remain in the runtime
+logs.
+
+Build and runtime results are separate. The frozen source set contains 2,737
+identities; the canonical kernel and product image builds completed, both ESP
+kernel readbacks match, 14 product-file readbacks match staging, and the RAW
+and VMDK content comparison passed. The full `make test` target remains failed
+(exit 2) because `out/audio-hda/system/lib/libreliefos-audio.so.1` is missing;
+the repository-wide suite is not green. Targeted source fixtures and package
+checks do not replace that result.
+
+These results cover the final pinned VGPU9 profile only. They do not establish
+physical host GPU utilization, full Linux/POSIX certification, installer-ISO
+acceptance, atomic modesetting, page-flip presentation, hardware vblank,
+hardware cursor support, or cross-device DMA-BUF import. The inherited
+`preadv2` flag/error-order concern and unknown upstream recursive-exit caller
+remain deferred; console replay's allocation fallback preserves text and
+cursor semantics but can retain the earlier device-memory replay latency.
 ## glxgears and Task Manager
 
 Start glxgears from its existing desktop entry, or from a GUI terminal:

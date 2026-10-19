@@ -98,6 +98,31 @@ int main(void)
     assert(fs_permissions_chmod(&other, "/dev/snd/pcmC0D0c", &recording, 0666) == -EPERM);
     assert(!check_node(&root, "/dev/snd/pcmC0D0c", &recording, FS_ACCESS_READ, false));
     puts("PASS recording node uses actual owner/group DAC and refuses unrelated users");
+
+    struct storage_node render_node = {
+        .type = RELIEFOS_FS_TYPE_DEVICE,
+        .flags = STORAGE_NODE_FLAG_DEV_NODE,
+        .first_cluster = STORAGE_DEV_KIND_DRM_RENDERD128,
+    };
+    struct reliefos_permissions render_permissions;
+    assert(fs_permissions_get("/dev/dri/renderD128", &render_node,
+                              &render_permissions) == 0);
+    assert(render_permissions.mode == 0660 && render_permissions.uid == 0 &&
+           render_permissions.gid == 44);
+    struct task video_client = {
+        .uid = 1000, .euid = 1000, .fsuid = 1000,
+        .gid = 44, .egid = 44, .fsgid = 44,
+    };
+    struct task unrelated_client = {
+        .uid = 1001, .euid = 1001, .fsuid = 1001,
+        .gid = 300, .egid = 300, .fsgid = 300,
+    };
+    assert(check_node(&video_client, "/dev/dri/renderD128", &render_node,
+                      FS_ACCESS_READ | FS_ACCESS_WRITE, false) == 0);
+    assert(check_node(&unrelated_client, "/dev/dri/renderD128", &render_node,
+                      FS_ACCESS_READ, false) == -RELIEFOS_EACCES);
+    puts("PASS render node defaults to char-device DAC owner root group 44 mode 0660");
+
     entries[2].value.mode = 0755;
     fixture_mount_flags = MS_NOEXEC;
     assert(fs_permissions_check(&root, "/data/file", FS_ACCESS_EXEC, false) == -RELIEFOS_EACCES);

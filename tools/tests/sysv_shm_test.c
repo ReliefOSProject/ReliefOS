@@ -51,6 +51,12 @@ static uint64_t shm_test_page(void)
 
 void storage_inode_retain(struct storage_inode_ref *inode) { assert(!inode); }
 int storage_inode_put(struct storage_inode_ref *inode) { assert(!inode); return 0; }
+/* This SHM fixture covers ordinary shared pages and never maps a DRM BO. */
+void drm_bo_get(struct drm_bo *bo) { assert(!bo); }
+void drm_bo_put(struct drm_bo *bo) { assert(!bo); }
+struct task_file *task_file_get(struct task_file *description)
+{ assert(!description); return NULL; }
+void task_file_put(struct task_file *description) { assert(!description); }
 /* Fork must fail before any descriptor/SEM_UNDO ownership is cloned in the
  * focused rollback case. Entering those unrelated backends is a fixture error. */
 void arch_fpu_save(void *state) { (void)state; }

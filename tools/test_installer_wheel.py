@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Verify real installer account creation in a disposable root namespace."""
 from pathlib import Path
+import os
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
-    work = ROOT / "build/auth-upstream"
+    work = Path(os.environ.get("RELIEFOS_TEST_OUT", ROOT / "build/auth-upstream")).resolve()
     work.mkdir(parents=True, exist_ok=True)
     binary = work / "installer-wheel-test"
     subprocess.run([

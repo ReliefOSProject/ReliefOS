@@ -4,6 +4,9 @@
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
 #include "../../kernel/reliefnt/kernel/reliefnt/input.c"
 
+void drm_file_close(struct task_file *file)
+{ if (file) file->drm_file = NULL; }
+
 static bool output_writable = true;
 bool user_range_ok(uint64_t address, uint64_t length)
 { return address != 0 || length == 0; }

@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 XORG = ROOT / "system/xorg"
 CONSOLE_SESSION = ROOT / "system/rootfs/usr/lib/reliefos/console-session"
 
-COMMANDS = ["sh", "bash", "cp", "wc", "tr", "rm", "touch", "mkdir", "chmod",
+COMMANDS = ["sh", "bash", "env", "cp", "wc", "tr", "rm", "touch", "mkdir", "chmod",
             "cat", "head", "sleep", "stat", "printf", "awk", "grep"]
 
 
@@ -55,13 +55,14 @@ def build_sandbox(work: Path) -> Path:
     # Only XDM's standard config and script paths are installed.  The full
     # lifecycle tests therefore exercise login and logout with every former
     # ReliefOS-specific XDM path absent.
-    for name in ("usr/bin", "usr/lib/reliefos", "usr/lib/X11/xdm",
+    for name in ("usr/bin", "usr/sbin", "usr/lib/reliefos", "usr/lib/X11/xdm",
                  "etc/reliefos", "etc/X11/xdm", "var/log", "var/lib/xdm",
                  "run/reliefos", "home/tester", "tmp",
                  "dev", "proc", "root", "sbin"):
         (sandbox / name).mkdir(parents=True, exist_ok=True)
     # The scripts redirect diagnostics to /dev/null; a plain file is enough.
     (sandbox / "dev/null").write_text("")
+    (sandbox / "dev/tty1").write_text("")
     (sandbox / "proc/cmdline").write_text("")
     for command in COMMANDS:
         copy_with_libs(sandbox, resolve(command))
@@ -117,6 +118,21 @@ class XdmLauncherTests(unittest.TestCase):
                               env={**os.environ, "LC_ALL": "C"},
                               timeout=timeout)
 
+    def run_guest_with_fbdev(self, script: str, drm: bool = False) -> subprocess.CompletedProcess:
+        framebuffer = self.sandbox / "dev/fb0"
+        framebuffer.touch()
+        mounts = 'mount --bind /dev/zero "$1/dev/fb0"'
+        if drm:
+            drm_node = self.sandbox / "dev/dri/card0"
+            drm_node.parent.mkdir(parents=True, exist_ok=True)
+            drm_node.touch()
+            mounts += ' && mount --bind /dev/zero "$1/dev/dri/card0"'
+        command = ["unshare", "--user", "--map-root-user", "--mount", "sh", "-c",
+                   mounts + ' && chroot "$1" /bin/sh -c "$2"',
+                   "sh", str(self.sandbox), script]
+        return subprocess.run(command, capture_output=True, text=True,
+                              env={**os.environ, "LC_ALL": "C"}, timeout=30)
+
     def log(self) -> str:
         return (self.sandbox / "var/log/xdm.log").read_text()
 
@@ -147,14 +163,33 @@ class XdmLauncherTests(unittest.TestCase):
         return (self.sandbox / "run/icewm.privcfg").read_text()
 
     def install_xdm(self, status: int, run_session: bool = True) -> None:
-        # Real xdm runs the session script and then terminates with its own
-        # status: a non-zero server status wins, otherwise the session's status
-        # is what the launcher must report.
+        # XDM's user environment contains its fixed session values plus names
+        # from the installed DisplayManager.exportList.  This fixture models
+        # only that exact, whitespace-separated resource subset; it is not a
+        # general X resource parser.  env -i filters the launcher environment
+        # while preserving inherited descriptors such as the event sink on 3.
         if run_session:
             body = (
                 'printf \'%s\\n\' "$@" > /run/xdm.argv\n'
-                "export HOME=/home/tester DISPLAY=:0\n"
-                "/usr/lib/X11/xdm/Xsession\n"
+                'export HOME=/home/tester DISPLAY=:0 LOGNAME=tester USER=tester SHELL=/bin/sh\n'
+                'export PATH=/usr/bin:/bin\n'
+                'export_list=$(/usr/bin/awk \'\n'
+                '  /^[[:space:]]*DisplayManager[.]exportList[[:space:]]*:/ {\n'
+                '    sub(/^[^:]*:[[:space:]]*/, "")\n'
+                '    print\n'
+                '    exit\n'
+                '  }\' /etc/X11/xdm/xdm-config)\n'
+                'set -- HOME=/home/tester DISPLAY=:0 LOGNAME=tester USER=tester '
+                'SHELL=/bin/sh PATH=/usr/bin:/bin\n'
+                'if test "${TZ+x}" = x; then set -- "$@" "TZ=$TZ"; fi\n'
+                'for exported_name in $export_list; do\n'
+                '  case "$exported_name" in\n'
+                '    RELIEFOS_XORG_EVENT_FD)\n'
+                '      set -- "$@" "RELIEFOS_XORG_EVENT_FD=$RELIEFOS_XORG_EVENT_FD"\n'
+                '      ;;\n'
+                '  esac\n'
+                'done\n'
+                '/usr/bin/env -i "$@" /usr/lib/X11/xdm/Xsession\n'
                 "session_status=$?\n"
                 f"if test {status} -ne 0; then exit {status}; fi\n"
                 "exit $session_status\n")
@@ -317,6 +352,8 @@ class XdmLauncherTests(unittest.TestCase):
                   "icewm started for uid=1000",
                   "st started",
                   "xdm session ended"]
+        self.assertTrue(all(item in lines for item in wanted),
+                        f"missing lifecycle events {[item for item in wanted if item not in lines]}: {lines}")
         positions = [lines.index(item) for item in wanted]
         self.assertEqual(positions, sorted(positions),
                          f"event order is {lines}")
@@ -328,6 +365,34 @@ class XdmLauncherTests(unittest.TestCase):
         # standard system defaults rather than force a root-owned directory.
         self.assertEqual(self.wm_config().strip(),
                          os.environ.get("ICEWM_PRIVCFG", ""))
+
+    def test_session_still_runs_when_event_fd_is_not_in_xdm_export_list(self):
+        self.install_session_stubs()
+        self.install_xdm(0)
+        config = self.sandbox / "etc/X11/xdm/xdm-config"
+        config.write_text("\n".join(
+            line for line in config.read_text().splitlines()
+            if not line.lstrip().startswith("DisplayManager.exportList:")
+        ) + "\n")
+
+        result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        user_log = (self.sandbox / "home/tester/.xsession-errors").read_text()
+        wanted = ["PAM authentication accepted",
+                  "icewm started for uid=1000",
+                  "st started",
+                  "xdm session ended"]
+        for event in wanted[1:]:
+            self.assertIn(event, user_log)
+        root_log = self.events()
+        for event in wanted:
+            self.assertNotIn(event, root_log)
+        self.assertIn("reliefos-xdm: xdm exit status=0", root_log)
+        self.assertIn("reliefos-xdm: tty1 restored to text login", root_log)
+        self.assertEqual(stat.S_IMODE((self.sandbox / "var/log/xdm.log").stat().st_mode),
+                         0o600)
+        self.assertFalse((self.sandbox / "run/reliefos/xdm/events").exists())
 
     def test_immediate_child_death_is_not_recorded_as_started(self):
         self.install_session_stubs(wm="exit 3\n")
@@ -438,6 +503,46 @@ class XdmLauncherTests(unittest.TestCase):
         self.assertIn("/usr/lib/reliefos/xorg-tty-wrapper", servers)
         self.assertIn("exec <\"$tty\" >\"$tty\" 2>&1", wrapper)
         self.assertIn("exec /usr/bin/Xorg \"$@\"", wrapper)
+
+    def test_fbdev_wrapper_preflights_only_without_drm_and_preserves_xorg_arguments(self):
+        write_stub(self.sandbox / "usr/sbin/fbset",
+                   'printf "<%s>\\n" "$@" >> /tmp/fbset.argv\nexit 1\n')
+        write_stub(self.sandbox / "usr/bin/Xorg",
+                   'printf "<%s>\\n" "$@" >> /tmp/xorg.argv\n'
+                   'printf "Xorg stdout reached tty1\\n"\n'
+                   'printf "Xorg stderr reached tty1\\n" >&2\n'
+                   'exit 0\n')
+        result = self.run_guest_with_fbdev(
+            'exec /usr/lib/reliefos/xorg-tty-wrapper :0 -config /etc/X11/xorg.conf '
+            '-nolisten tcp vt1 -keeptty "argument with spaces"')
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((self.sandbox / "tmp/fbset.argv").is_file(),
+                        "fbdev fallback did not run the framebuffer preflight")
+        self.assertEqual((self.sandbox / "tmp/fbset.argv").read_text().splitlines(),
+                         ["<-fb>", "</dev/fb0>", "<-depth>", "<32>"])
+        self.assertEqual((self.sandbox / "tmp/xorg.argv").read_text().splitlines(),
+                         ["<:0>", "<-config>", "</etc/X11/xorg.conf>",
+                          "<-nolisten>", "<tcp>", "<vt1>", "<-keeptty>",
+                          "<argument with spaces>"])
+        tty_output = (self.sandbox / "dev/tty1").read_text()
+        self.assertIn("Xorg stdout reached tty1", tty_output)
+        self.assertIn("Xorg stderr reached tty1", tty_output)
+
+    def test_drm_device_skips_fbdev_preflight_and_keeps_xorg_arguments(self):
+        write_stub(self.sandbox / "usr/sbin/fbset",
+                   'printf "called\\n" >> /tmp/fbset.argv\n')
+        write_stub(self.sandbox / "usr/bin/Xorg",
+                   'printf "<%s>\\n" "$@" >> /tmp/xorg.argv\nexit 0\n')
+        result = self.run_guest_with_fbdev(
+            'exec /usr/lib/reliefos/xorg-tty-wrapper :0 -config /etc/X11/custom.conf '
+            '-nolisten tcp vt1 -keeptty', drm=True)
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse((self.sandbox / "tmp/fbset.argv").exists())
+        self.assertEqual((self.sandbox / "tmp/xorg.argv").read_text().splitlines(),
+                         ["<:0>", "<-config>", "</etc/X11/custom.conf>",
+                          "<-nolisten>", "<tcp>", "<vt1>", "<-keeptty>"])
 
 
 if __name__ == "__main__":

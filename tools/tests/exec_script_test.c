@@ -4,6 +4,9 @@
 #include <string.h>
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
 
+void drm_file_close(struct task_file *file)
+{ if (file) file->drm_file = NULL; }
+
 static bool fail_allocation;
 bool user_range_ok(uint64_t address, uint64_t size) { return address != 0 || size == 0; }
 size_t user_strlen(const char *s, size_t max) { size_t n = 0; while (n < max && s[n]) ++n; return n; }

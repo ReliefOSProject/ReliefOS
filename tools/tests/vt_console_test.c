@@ -21,6 +21,19 @@ void framebuffer_rect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t c
         for (uint32_t col = x; col < x + w && col < 80; ++col)
             pixels[row * 80 + col] = c;
 }
+void framebuffer_rect_to(const struct framebuffer *target, uint32_t x, uint32_t y,
+                         uint32_t w, uint32_t h, uint32_t c)
+{
+    if (!target || !target->available || !target->pixels ||
+        x >= target->width || y >= target->height) return;
+    if (!x && !y && w == target->width && h == target->height) ++full_clear_count;
+    if (w > target->width - x) w = target->width - x;
+    if (h > target->height - y) h = target->height - y;
+    for (uint32_t row = y; row < y + h; ++row)
+        for (uint32_t col = x; col < x + w; ++col)
+            ((uint32_t *)(void *)((uint8_t *)target->pixels +
+                (size_t)row * target->pitch))[col] = c;
+}
 void framebuffer_clear(uint32_t c) { framebuffer_rect(0, 0, 80, 48, c); }
 void framebuffer_present(void) {}
 void framebuffer_present_region(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
@@ -28,6 +41,9 @@ void framebuffer_present_region(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 uint32_t framebuffer_codepoint_width(uint32_t c) { (void)c; return 1; }
 void framebuffer_codepoint(uint32_t x, uint32_t y, uint32_t c, uint32_t fg, uint32_t bg)
 { (void)c; (void)bg; framebuffer_rect(x, y, 8, 16, fg); }
+void framebuffer_codepoint_to(const struct framebuffer *target, uint32_t x, uint32_t y,
+                              uint32_t c, uint32_t fg, uint32_t bg)
+{ (void)c; (void)bg; framebuffer_rect_to(target, x, y, 8, 16, fg); }
 void serial_write(const char *text) { (void)text; }
 void vga_putc(char c) { (void)c; }
 uint64_t time_uptime_us(void) { return 0; }

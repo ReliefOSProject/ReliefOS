@@ -1,6 +1,7 @@
 root:x:0:
 uucp:x:14:
 wheel:x:10:
+video:x:44:
 nobody:x:65534:
 leonos-window-server:x:60001:
 leonos-service:x:60002:

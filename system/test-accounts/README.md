@@ -4,7 +4,9 @@ Only `image-vmdk` and the ordinary `image-iso` consume these fixtures, through
 `tools/image_test_accounts.py`. They are not part of `system/rootfs`, shared
 staging, the installer runtime or its installed-system payload.
 
-- `test` / `test`: UID/GID 1000, supplementary wheel group 10.
+- `test` / `test`: UID/GID 1000, supplementary `wheel` (GID 10) and `video`
+  (GID 44) groups. `video` grants the test desktop DAC access to DRM devices;
+  `wheel` alone controls the normal password-authenticated sudo policy.
 - `root` / `root`: UID/GID 0.
 - `nobody`: locked.
 

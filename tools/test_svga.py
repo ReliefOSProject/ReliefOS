@@ -7,7 +7,8 @@ from test_gpu import GpuAbiTests
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = [ROOT / "kernel/reliefnt/drivers/video/svga" / name for name in
-           ("fifo.c", "device.c", "gmr.c", "gb.c", "svga3d.c", "triangle.c", "render.c")]
+           ("fifo.c", "batch_state.c", "device.c", "gmr.c", "gb.c", "svga3d.c", "shader.c",
+            "borrowed.c", "query.c", "triangle.c", "render.c")]
 
 
 class SvgaTests(unittest.TestCase):
@@ -41,7 +42,8 @@ class SvgaTests(unittest.TestCase):
             "kernel_spin_unlock_irqrestore", "kernel_irq_save", "kernel_irq_restore",
             "mm_alloc_pages", "mm_free_pages",
             "paging_kernel_direct_map", "paging_mmio_uncached", "x86_64_inl",
-            "x86_64_outl", "memcpy", "memset", "memmove",
+            "x86_64_outl", "memcpy", "memset", "memmove", "kernel_malloc",
+            "kernel_free",
         }
         with tempfile.TemporaryDirectory(prefix="reliefos-svga-kernel-") as directory:
             for optimization in ("-O0", "-O2"):

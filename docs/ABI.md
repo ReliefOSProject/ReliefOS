@@ -97,6 +97,16 @@ pthread contention/cancellation and Unix descriptor passing. This does not
 certify complete signal, PTY, wait, clone, socket or SMP behavior; consult
 [the implementation ledger](LINUX_ABI_PROGRESS_2026-09-08.md).
 
+On native x86-64, a user-mode general-protection fault (`#GP`) is delivered as
+forced `SIGSEGV`. A newly queued private record uses `SI_KERNEL` with
+`si_addr == 0`; if that thread already has a private standard `SIGSEGV`
+pending, Linux-compatible coalescing retains the first record's siginfo. An
+`SA_SIGINFO` handler receives the saved fault context, and its restorer's
+`rt_sigreturn` resumes the edited context, so the handler may change RIP to
+recover. The default action terminates the faulting process, while a CPL0
+`#GP` remains a fatal kernel exception. This describes the vector-13 path and
+does not certify the complete signal ABI.
+
 `stat`, `fstat` and `lstat` use Linux x86-64 layouts, including the 144-byte raw
 stat record. Compact ReliefOS metadata is available through explicitly named
 `leonos_stat_legacy` and `leonos_fstat_legacy` extension functions only.
@@ -510,6 +520,26 @@ ReliefOS-specific device name. Xorg may claim that terminal with standard
 `VT_AUTO` and `KD_TEXT` before exit. `VT_OPENQRY` reports an available VT in the
 tty1–tty6 range; keyboard mode changes use the public Linux `KDGKBMODE` and
 `KDSKBMODE` requests.
+
+### DRM device access for the Xorg desktop
+
+The vmwgfx DRM interface exposes `/dev/dri/card0` as the primary KMS node and
+`/dev/dri/renderD128` as its render node (major 226, minors 0 and 128). Both
+nodes use mode `0660` and GID 44, the standard `video` group. The base rootfs
+defines `video`; installer-created users and later users from the standard
+account flow receive supplementary membership. Login group initialization
+must retain that supplementary membership. This is ordinary DAC device access;
+it does not grant wheel or sudo membership by itself.
+
+The pinned Xorg 21.1.25 modesetting/glamor path uses DRI3 and Present. Its
+extensions cannot be runtime-disabled by Xorg configuration. The ReliefOS
+profile turns off page flips with `Option "PageFlip" "false"`, which selects
+the Present copy path; it does not disable DRI3. The supported PRIME use is an
+opaque vmwgfx surface shared between clients on the same DRM device. The
+implemented contract does not include cross-device DMA-BUF attachment or
+mapping, atomic modesetting, page-flip presentation, vblank, or a hardware
+cursor. See [XORG.md](XORG.md) and [SVGA3D.md](SVGA3D.md) for configuration,
+Mesa limits and runtime-validation status.
 
 The userspace IPC library retains at most one partially transmitted frame per
 nonblocking connection. A successful send means the frame is accepted; event

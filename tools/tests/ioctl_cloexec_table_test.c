@@ -15,6 +15,9 @@
 
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
 
+void drm_file_close(struct task_file *file)
+{ if (file) file->drm_file = NULL; }
+
 static int fail_allocation;
 void *kernel_malloc(size_t size) { return fail_allocation ? NULL : malloc(size); }
 void kernel_free(void *memory) { free(memory); }

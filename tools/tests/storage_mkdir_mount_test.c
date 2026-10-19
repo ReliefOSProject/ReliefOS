@@ -47,6 +47,8 @@
 #include "../../kernel/reliefnt/block/storage_identity.c"
 
 static int test_fail_cache_alloc;
+static bool test_drm_registered;
+static bool test_drm_render_ready;
 void *kernel_malloc(size_t size) { return malloc(size); }
 void kernel_free(void *p) { free(p); }
 uint64_t mm_alloc_page(void) { return (uintptr_t)aligned_alloc(4096, 4096); }
@@ -61,6 +63,19 @@ void console_log(enum console_log_level level, const char *format, ...)
 {
     (void)level; (void)format;
 }
+bool drm_device_is_registered(void) { return test_drm_registered; }
+bool drm_device_render_node_ready(void) { return test_drm_render_ready; }
+int audio_card_snapshot(uint32_t index, uint32_t *out_id,
+                        struct audio_card_identity *identity)
+{ (void)index; (void)out_id; (void)identity; return -2; }
+int audio_device_parse_name(const char *name, uint32_t *card,
+                            uint32_t *device,
+                            enum audio_direction *direction)
+{ (void)name; (void)card; (void)device; (void)direction; return -22; }
+int audio_card_pcm_caps(uint32_t card, uint32_t device,
+                        enum audio_direction direction,
+                        struct audio_caps *caps)
+{ (void)card; (void)device; (void)direction; (void)caps; return -19; }
 void kernel_execution_lock_irqsave(uint64_t *flags) { *flags = 0; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { (void)flags; }
 uint32_t sched_current_pid(void) { return 1; }
@@ -107,6 +122,36 @@ int main(int argc, char **argv)
 {
     assert(argc == 2);
     load_volume(argv[1], 0, "/");
+    struct storage_node dri;
+    test_drm_registered = true;
+    assert(storage_lookup_path("/dev/dri", &dri) == 0 &&
+           dri.type == RELIEFOS_FS_TYPE_DIR &&
+           dri.first_cluster == STORAGE_DEV_KIND_DRI_DIR);
+    struct storage_node render;
+    assert(storage_lookup_path("/dev/dri/renderD128", &render) == -2);
+    uint64_t dri_cursor = 0;
+    struct reliefos_dir_entry dri_entry;
+    assert(storage_readdir_node(&dri, &dri_cursor, &dri_entry) == 1 &&
+           !strcmp(dri_entry.name, "card0") &&
+           dri_entry.type == RELIEFOS_FS_TYPE_DEVICE);
+    assert(storage_readdir_node(&dri, &dri_cursor, &dri_entry) == 0);
+    test_drm_render_ready = true;
+    assert(storage_lookup_path("/dev/dri/renderD128", &render) == 0 &&
+           render.type == RELIEFOS_FS_TYPE_DEVICE &&
+           render.first_cluster == STORAGE_DEV_KIND_DRM_RENDERD128 &&
+           (render.flags & STORAGE_NODE_FLAG_DEV_NODE));
+    dri_cursor = 0;
+    assert(storage_readdir_node(&dri, &dri_cursor, &dri_entry) == 1 &&
+           !strcmp(dri_entry.name, "card0"));
+    assert(storage_readdir_node(&dri, &dri_cursor, &dri_entry) == 1 &&
+           !strcmp(dri_entry.name, "renderD128") &&
+           dri_entry.type == RELIEFOS_FS_TYPE_DEVICE);
+    assert(storage_readdir_node(&dri, &dri_cursor, &dri_entry) == 0);
+    test_drm_registered = false;
+    assert(storage_lookup_path("/dev/dri", &dri) == -2);
+    test_drm_registered = true;
+    test_drm_render_ready = false;
+
     assert(storage_mkdir("/target") == 0);
     assert(storage_mkdir("/target") == -17);
     load_volume(argv[1], 1, "/target");

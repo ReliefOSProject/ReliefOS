@@ -38,6 +38,23 @@ def source_check():
         for needle in needles:
             if needle not in text:
                 errors.append(f"{relative}: missing {needle}")
+    xorg_conf = ROOT / "system/xorg/xorg.conf"
+    if xorg_conf.is_file():
+        config = xorg_conf.read_text()
+        device = re.search(r'(?ims)^Section\s+"Device"\s*\n(.*?)^EndSection\s*$', config)
+        if not device:
+            errors.append("system/xorg/xorg.conf: missing a Device section for stock Xorg auto-configuration")
+        else:
+            device_text = device.group(1)
+            if re.search(r"(?im)^\s*Driver\s+", device_text):
+                errors.append("system/xorg/xorg.conf: Device must leave driver selection to Xorg auto-configuration")
+            if re.search(r'(?im)^\s*Option\s+"(?:kmsdev|fbdev)"', device_text):
+                errors.append("system/xorg/xorg.conf: Device must not force a device path")
+            for option in ('Option "SWcursor" "true"', 'Option "PageFlip" "false"'):
+                if option not in device_text:
+                    errors.append(f"system/xorg/xorg.conf: Device missing fixed-profile option {option}")
+        if 'Option "IgnoreAbsoluteAxes" "false"' not in config:
+            errors.append("system/xorg/xorg.conf: preserve absolute pointer resynchronization")
     lock_path = ROOT / "configs/dependencies.lock.json"
     try:
         lock = json.loads(lock_path.read_text())
@@ -60,6 +77,20 @@ def source_check():
         for gid in ("alpine-glycin-image-rs", "alpine-glycin-svg", "alpine-xdg-user-dirs"):
             if gid not in ids:
                 errors.append(f"configs/dependencies.lock.json: missing {gid}")
+        gallium = next((item for item in lock["dependencies"]
+                        if item.get("id") == "alpine-mesa-dri-gallium"), None)
+        expected_gallium = {
+            "version": "26.1.6-r0",
+            "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/mesa-dri-gallium-26.1.6-r0.apk",
+            "sha256": "91a8c6d8186a0f855e545cd7d7fedeb6265e90b0d74fda2538652665941d1de5",
+            "feature": "xorg",
+        }
+        if gallium is None:
+            errors.append("configs/dependencies.lock.json: missing alpine-mesa-dri-gallium")
+        else:
+            for field, value in expected_gallium.items():
+                if gallium.get(field) != value:
+                    errors.append(f"configs/dependencies.lock.json: alpine-mesa-dri-gallium {field} must be {value}")
     session_path = ROOT / "system/xorg/xdm-session"
     if session_path.is_file() and "/var/log/" in session_path.read_text():
         errors.append("xdm-session must not write root-only logs")

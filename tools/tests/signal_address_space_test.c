@@ -22,6 +22,8 @@ static uint64_t lazy_page;
 static unsigned demand_faults;
 static unsigned drained_io;
 static uint64_t clock_ticks = 100;
+static unsigned fpu_restore_calls;
+static uint8_t restored_fpu_state[512];
 void power_reboot(void) { abort(); }
 void power_shutdown(void) { abort(); }
 void storage_drain_task_io(uint32_t pid) { assert(pid==target.pid); ++drained_io; }
@@ -34,6 +36,11 @@ void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)
 void kernel_spin_unlock_irqrestore(struct kernel_spinlock *lock, uint64_t flags)
 { (void)flags; assert(lock->state); lock->state = 0; }
 uint64_t time_ticks(void) { return 100; }
+void arch_fpu_restore(const void *state)
+{
+    memcpy(restored_fpu_state, state, sizeof(restored_fpu_state));
+    ++fpu_restore_calls;
+}
 void kernel_wait_queue_remove(struct kernel_wait_queue *queue, struct task *task)
 { (void)queue; (void)task; assert(0); }
 void futex_cancel_wait(struct task *task) { (void)task; assert(0); }
@@ -55,6 +62,10 @@ void sched_exit_group(uint32_t pid, uint64_t code)
 void sched_signal_job_control(uint32_t pid, int sig) { (void)pid; (void)sig; assert(0); }
 void sched_alarm_rearm(struct task *task) { (void)task; assert(0); }
 void sched_notify_runnable(void) { }
+bool drm_vmwgfx_task_uninterruptible(const struct task *task)
+{ (void)task; return false; }
+bool drm_vmwgfx_task_signal_busy(const struct task *task)
+{ (void)task; return false; }
 void sched_signal_discard(struct task *task, int sig)
 { task->pending_signals &= ~(1ULL << (sig - 1)); *sched_task_process_pending(task) &= ~(1ULL << (sig - 1)); }
 
@@ -73,6 +84,9 @@ int syscall_handle_task_page_fault(struct task *task, uint64_t address, uint64_t
 
 bool user_range_writable(uint64_t ptr, uint64_t len)
 { return ptr >= STACK_ADDRESS && ptr + len <= STACK_ADDRESS + sizeof(target_pages); }
+bool user_range_ok(uint64_t ptr, uint64_t len)
+{ return ptr >= STACK_ADDRESS && ptr <= STACK_ADDRESS + sizeof(target_pages) &&
+         len <= STACK_ADDRESS + sizeof(target_pages) - ptr; }
 uint64_t address_space_user_page_phys(const struct address_space *as, uint64_t vaddr)
 {
     assert(as == &target.as);
@@ -328,7 +342,74 @@ int main(void)
     memcpy(&saved, target_pages + frame.rsp - STACK_ADDRESS, sizeof(saved));
     assert(saved.info.code == LINUX_SEGV_MAPERR && saved.info.fields.fault.address == 0x1234);
     assert(saved.uc.context.cr2 == 0x1234 && saved.uc.context.vector == 14 && saved.uc.context.error == 6);
+
+    /* A user #GP must carry SI_KERNEL with a zero address, preserve the full
+     * register frame, and round-trip a handler's edited RIP plus FPU image. */
+    target.signal_stack_base = 0;
+    target.signal_stack_size = 0;
+    target.signal_stack_flags = 0;
+    target.blocked_signals = 0;
+    target.ignored_signals = 0;
+    memset(target.fpu_state, 0x3c, sizeof(target.fpu_state));
+    uint32_t mxcsr = 0x1f80;
+    memcpy(target.fpu_state + 24, &mxcsr, sizeof(mxcsr));
+    frame = (struct trap_frame){
+        .r15 = 0x1515151515151515ULL, .r14 = 0x1414141414141414ULL,
+        .r13 = 0x1313131313131313ULL, .r12 = 0x1212121212121212ULL,
+        .r11 = 0x1111111111111111ULL, .r10 = 0x1010101010101010ULL,
+        .r9 = 0x0909090909090909ULL, .r8 = 0x0808080808080808ULL,
+        .rbp = 0x0b0b0b0b0b0b0b0bULL, .rdi = 0x0d0d0d0d0d0d0d0dULL,
+        .rsi = 0x0606060606060606ULL, .rdx = 0x0202020202020202ULL,
+        .rcx = 0x0c0c0c0c0c0c0c0cULL, .rbx = 0x0b0b0b0b0b0b0b0bULL,
+        .rax = 0x0a0a0a0a0a0a0a0aULL, .rip = 0x430000,
+        .cs = 0x23, .rflags = 0x3202,
+        .rsp = STACK_ADDRESS + 4096 + 800, .ss = 0x1b,
+        .vector = 13, .error = 0,
+    };
+    const struct trap_frame fault_frame = frame;
+    const uint64_t interrupted_rsp = frame.rsp;
+    kernel_signal_force_fault(&target, LINUX_SIGSEGV, LINUX_SI_KERNEL, 0);
+    assert(kernel_signal_deliver_pending(&target, &frame) == 1);
+    memcpy(&saved, target_pages + frame.rsp - STACK_ADDRESS, sizeof(saved));
+    assert(saved.info.signo == LINUX_SIGSEGV && saved.info.code == LINUX_SI_KERNEL);
+    assert(saved.info.fields.fault.address == 0 && saved.uc.context.cr2 == 0);
+    assert(saved.uc.context.vector == 13 && saved.uc.context.error == 0);
+    assert(saved.uc.context.rip == 0x430000 && saved.uc.context.rsp == interrupted_rsp);
+    assert(saved.uc.context.r15 == fault_frame.r15 && saved.uc.context.r14 == fault_frame.r14);
+    assert(saved.uc.context.r13 == fault_frame.r13 && saved.uc.context.r12 == fault_frame.r12);
+    assert(saved.uc.context.r11 == fault_frame.r11 && saved.uc.context.r10 == fault_frame.r10);
+    assert(saved.uc.context.r9 == fault_frame.r9 && saved.uc.context.r8 == fault_frame.r8);
+    assert(saved.uc.context.rbp == fault_frame.rbp && saved.uc.context.rdi == fault_frame.rdi);
+    assert(saved.uc.context.rsi == fault_frame.rsi && saved.uc.context.rdx == fault_frame.rdx);
+    assert(saved.uc.context.rcx == fault_frame.rcx && saved.uc.context.rbx == fault_frame.rbx);
+    assert(saved.uc.context.rax == fault_frame.rax && saved.uc.context.rflags == fault_frame.rflags);
+    uint8_t *saved_fpstate = target_pages + (saved.uc.context.fpstate - STACK_ADDRESS);
+    assert(saved_fpstate[160] == 0x3c);
+    uint8_t previous_stack_backup[sizeof(target_pages)];
+    memcpy(previous_stack_backup, previous_stack, sizeof(previous_stack_backup));
+    memcpy(previous_stack, target_pages, sizeof(target_pages));
+    struct linux_rt_sigframe *user_frame = (struct linux_rt_sigframe *)(uintptr_t)frame.rsp;
+    user_frame->uc.context.rip = 0x440100;
+    user_frame->uc.context.r12 = 0xfeed123456789abcULL;
+    user_frame->uc.context.rax = 0x1234abcd5678ef90ULL;
+    user_frame->uc.context.rflags = 0x3202;
+    uint8_t *user_fpstate = (uint8_t *)(uintptr_t)user_frame->uc.context.fpstate;
+    for (unsigned i = 0; i < 16; ++i) user_fpstate[160 + i] = (uint8_t)(0x80 + i);
+    memcpy(user_fpstate + 24, &mxcsr, sizeof(mxcsr));
+    frame.rsp += 8; /* The signal trampoline's ret popped the restorer. */
+    assert(kernel_signal_rt_sigreturn(&target, &frame) == 0);
+    assert(frame.rip == 0x440100 && frame.rsp == interrupted_rsp);
+    assert(frame.r12 == 0xfeed123456789abcULL && frame.rax == 0x1234abcd5678ef90ULL);
+    assert(frame.vector == 13 && frame.error == 0 && frame.cs == 0x23 && frame.ss == 0x1b);
+    assert((frame.rflags & 0x202) == 0x202 && !(frame.rflags & 0x3000));
+    assert(fpu_restore_calls == 1 && restored_fpu_state[160] == 0x80 &&
+           restored_fpu_state[175] == 0x8f);
+    memcpy(&mxcsr, restored_fpu_state + 24, sizeof(mxcsr));
+    assert(mxcsr == 0x1f80);
+    memcpy(previous_stack, previous_stack_backup, sizeof(previous_stack_backup));
+
     /* A synchronous blocked fault must become fatal, not run a blocked handler. */
+    target.blocked_signals |= 1ULL << (LINUX_SIGSEGV - 1);
     kernel_signal_force_fault(&target, 11, LINUX_SEGV_ACCERR, 0x2345);
     assert(!target.signal_actions[11].handler && !(target.blocked_signals & (1ULL << 10)));
     assert(kernel_signal_deliver_pending(&target, &frame) == 0);

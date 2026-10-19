@@ -6,13 +6,31 @@ the installer media rewrites the marker to run its native setup desktop.
 
 The Xorg backend is intentionally small. tty1's existing `console-session`
 runs `/usr/lib/reliefos/reliefos-xdm` in the foreground. XDM starts
-`/usr/bin/Xorg :0 -config /etc/X11/xorg.conf vt1 -keeptty`; the fixed config
-uses `/dev/fb0`, `/dev/input/event0` and `/dev/input/event1`. After PAM accepts
+`/usr/bin/Xorg :0 -config /etc/X11/xorg.conf vt1 -keeptty`. The shipped
+`/etc/X11/xorg.conf` leaves the `Device` driver and device path unspecified so
+stock Xorg auto-configuration can select `modesetting` for a supported DRM
+device or `fbdev` when none is available. The fixed profile requests a software
+cursor and disables KMS page flips; it retains the evdev keyboard and mouse on
+`/dev/input/event0` and `/dev/input/event1`, including absolute-pointer
+resynchronization. The server keeps its normal depth-24 screen configuration.
+On a no-DRM fbdev boot, `/usr/lib/reliefos/xorg-tty-wrapper` runs the existing
+BusyBox `fbset -fb /dev/fb0 -depth 32` immediately before Xorg when `/dev/fb0`
+is a character device. This prepares the 32bpp framebuffer expected by the
+24-bit true-color X screen; a failed `fbset` does not prevent Xorg from
+starting. The wrapper passes the configured Xorg arguments unchanged and
+skips the preflight when `/dev/dri/card0` is present. After PAM accepts
 credentials, `/usr/lib/X11/xdm/Xsession` runs as the authenticated user,
 starts `st` and the native `icewm-session` supervisor for IceWM and its
 theme-managed background. Exiting IceWM returns
 control to XDM; exiting XDM lets tty1's console session fall back to text
 login. tty2 through tty6 remain text consoles.
+
+Text-VT restoration replays the retained ANSI/UTF-8 history into a same-layout
+RAM framebuffer, then copies every visible row and publishes the frame once.
+The copy includes the strip below the text grid and excludes row padding. If
+the temporary surface cannot be allocated or validated, direct replay preserves
+the text and cursor semantics but can retain the earlier device-memory replay
+latency.
 
 XDM uses its compiled-in default `/etc/X11/xdm/xdm-config`, with no `-config`
 argument from the launcher. Server commands and greeter resources live in
@@ -24,7 +42,12 @@ It also depends on the local server, drivers and session programs used by the
 profile. The upstream archive remains unchanged. Edit these standard paths to customize
 XDM. The greeter uses the packaged gray background, blue greeting and X logo,
 with the heading `Login into ReliefOS`. Its complete resource definitions live
-in `Xresources`, without an include of that file into itself.
+in `Xresources`, without an include of that file into itself. The standard
+`xdm-config` also lists `RELIEFOS_XORG_EVENT_FD` in
+`DisplayManager.exportList` so the launcher's session-event descriptor reaches
+Xsession. On the final e9cf guest, the actual root-owned XDM log recorded all
+four expected lifecycle events in order with status 0. The host XDM fixture
+is a model and does not replace this guest evidence.
 
 `make fetch` downloads the official Alpine community `dillo` 3.3.0-r2 browser,
 with its locked runtime dependencies from
@@ -172,6 +195,34 @@ missing dependency ID when an archive is absent. Native staging selects only
 `feature=base` entries, while Xorg staging selects both features and preserves
 the APK database, signatures and ownership manifests.
 
+The installed Alpine graphics stack uses the signed, hash-locked
+`mesa-dri-gallium` 26.1.6-r0 APK with the existing Mesa 26.1.6, libdrm 2.4.134,
+and Xorg 21.1.25 packages. Its `vmwgfx_dri.so` entry point supplies the
+upstream VMware Gallium driver; the package is part of the `xorg` feature, so
+console-only staging does not install it. No Mesa replacement library or
+renderer-string override is used. See [SVGA3D.md](SVGA3D.md) for the supported
+VGPU9/DRI3 boundaries and accepted final native and QEMU runtime evidence.
+
+With this pinned, unmodified Mesa 26.1.6, the DRI renderer queries report
+`accelerated=0` and `video_memory=1 MiB`. Upstream `svga_init_screen_caps()`
+calls `u_init_pipe_screen_caps(..., 0)`, so Mesa sets `caps.accelerated` to zero
+and returns that value from the DRI query; this bit alone does not identify
+llvmpipe or the path that produced a frame. Mesa's video-memory query uses
+`max_mob_memory_mib` and falls back to 1 MiB when it is zero; ReliefNT currently
+returns zero for `DRM_VMW_PARAM_MAX_MOB_MEMORY` on this VGPU9 host-backed path.
+Separately, the ReliefOS SVGA3D application path submits device commands, reads
+back rendered pixels and presents frames for scanout (see [SVGA3D.md](SVGA3D.md));
+that app-path evidence does not certify Xorg glamor or physical host-GPU use.
+ReliefNT returns `EINVAL` for `DRM_VMW_PARAM_HW_CAPS` and `HW_CAPS2`; its
+`GET_3D_CAP` table describes the supported VGPU9 interface without claiming
+unimplemented GB/DX userspace interfaces.
+
+The DRM primary and render nodes use Linux DAC permissions `0660` and group
+`video` (GID 44). The base rootfs defines this group, the installer adds normal
+users to it, and later standard user creation does the same. This grants device
+access without making the user an administrator. See [ABI.md](ABI.md) for the
+node names and permission contract.
+
 The XDM PAM service includes the existing `common-auth`, `common-account` and
 `common-session` policy. The user session writes `$HOME/.xsession-errors` (or a
 user cache fallback); it never writes root-only logs or records passwords and
@@ -181,9 +232,14 @@ Xorg policy.
 
 Xorg consumes public Linux/POSIX interfaces only. ReliefNT exposes `/dev/tty0`
 as the active VT and implements `VT_OPENQRY`, `VT_GETMODE/VT_SETMODE`,
-`VT_RELDISP`, `KDGKBMODE`, `KDSKBMODE`, and the existing VT/KD calls. The
-Xorg ABI probe is `python3 tools/test_xorg_abi.py --source-only`; kernel
-compilation and subrepository ABI tests are separate checks.
+`VT_RELDISP`, `KDGKBMODE`, `KDSKBMODE`, and the existing VT/KD calls. User-mode
+#GP faults now follow the process-local SIGSEGV path; kernel-mode #GP remains
+fatal. This containment does not identify or repair the upstream recursive-exit
+caller observed in the earlier logout failure. An inherited `preadv2`
+flag/error-order concern remains deferred, so these results do not certify
+complete Linux/POSIX conformance. The Xorg ABI probe is
+`python3 tools/test_xorg_abi.py --source-only`; kernel compilation and
+subrepository ABI tests are separate checks.
 
 For QEMU acceptance, capture serial/QMP evidence and run:
 
@@ -194,6 +250,13 @@ python3 tools/test_xorg_qemu.py --image out/xorg-test/images/reliefos.vmdk \
 
 The log must show `desktop-backend=xorg`, XDM on vt1, accepted PAM
 authentication, a non-root IceWM session, st, session exit and tty1 text
-recovery in that order. This contract does not certify physical GPUs or
-hardware-specific fbdev modes; those require a platform run with captured
-evidence.
+recovery in that order. The unchanged repository lifecycle oracle passed on
+both QEMU Standard VGA and VMware VGA 2D for the final source image. The fresh
+tty1 numeric-prompt observations (`37192972` and `83680142`) were separate
+OUT-only strict checks; they did not alter the repository oracle. The VMware
+VGA 2D log retains the APIC 1 startup timeout followed by `online=2/2`; its
+cause remains deferred. Native VMware with `mks.enable3d=FALSE` passed ordinary
+session and text-restoration checks using llvmpipe/DRISWRAST software rendering;
+Xorg did not use glamor for that fallback. See [SVGA3D.md](SVGA3D.md) for
+accepted accelerated and software-fallback results and their exact scope. This
+contract does not certify physical GPUs or hardware-specific fbdev modes.

@@ -8,8 +8,13 @@
 #include "procfs_directories_test.c"
 #undef main
 #include <stdarg.h>
+#include <stdlib.h>
+#include <linux/errno.h>
 
 static unsigned fixture_cpus=1;
+static bool fixture_drm_present;
+static bool fixture_render_present;
+static bool fixture_kms_enabled;
 int storage_install_list_disks(struct reliefos_install_disk *disks, uint32_t capacity, uint32_t *count)
 {
     *count = 1;
@@ -79,12 +84,33 @@ uint32_t pci_config_read32(uint8_t b, uint8_t s, uint8_t f, uint8_t o)
     assert(!b && s == 2 && !f);
     return o == 0x2c ? 0x11001af4 : 0;
 }
+int drm_device_pci_identity(struct pci_device *out)
+{
+    if (!fixture_drm_present) return -LINUX_ENODEV;
+    *out = (struct pci_device){.bus = 0, .slot = 2, .function = 0,
+                               .vendor_id = 0x1234, .device_id = 0x1111,
+                               .class_code = 3};
+    return 0;
+}
+bool drm_device_render_node_ready(void)
+{
+    return fixture_drm_present && fixture_render_present;
+}
+bool drm_device_kms_scanout_active(void)
+{
+    return fixture_kms_enabled;
+}
 static void read_value(const char *path, char *out, size_t capacity)
 {
     uint32_t total = 0, got;
     do {
-        assert(proc_read(path, total, out + total, capacity - total > 7 ? 7 : capacity - total, &got) ==
-               0);
+        int ret = proc_read(path, total, out + total,
+                            capacity - total > 7 ? 7 : capacity - total, &got);
+        if (ret != 0) {
+            fprintf(stderr, "proc_read failed path=%s offset=%u ret=%d\n",
+                    path, total, ret);
+            abort();
+        }
         total += got;
     } while (got && total + 1 < capacity);
     out[total] = 0;
@@ -176,12 +202,83 @@ int main(void)
     assert(!strcmp(value, "0\n"));
     read_value("/sys/devices/pci0000:00/0000:00:02.0/modalias", value, sizeof(value));
     assert(!strcmp(value, "pci:v00001234d00001111sv00001af4sd00001100bc03sc00i00\n"));
-    read_value("/sys/devices/virtual/drm/card0/card0-Unknown-1/modes", value, sizeof(value));
-    assert(!strcmp(value, "1280x720\n"));
+    read_value("/sys/devices/pci0000:00/0000:00:02.0/uevent", value, sizeof(value));
+    assert(strstr(value, "PCI_SUBSYS_ID=1AF4:1100\n"));
+    assert(proc_lookup("/sys/class/drm/card0", &node) == -2);
+    read_value("/sys/devices/virtual/graphics/fb0/virtual_size", value, sizeof(value));
+    assert(!strcmp(value, "1280,720\n"));
     fixture_fb.width = 1920;
     fixture_fb.height = 1080;
-    read_value("/sys/devices/virtual/drm/card0/card0-Unknown-1/modes", value, sizeof(value));
+    read_value("/sys/devices/virtual/graphics/fb0/virtual_size", value, sizeof(value));
+    assert(!strcmp(value, "1920,1080\n"));
+    /* A real DRM card is associated with its enumerated PCI function. The
+     * PCI subsystem link is required by pinned libdrm's drmGetDevice2(). */
+    fixture_drm_present = true;
+    fixture_render_present = false;
+    assert(proc_lookup("/sys/class/drm/card0", &node) == 0);
+    assert(proc_lookup("/sys/class/drm/renderD128", &node) == -2);
+    int subsystem_length = proc_readlink(
+        "/sys/devices/pci0000:00/0000:00:02.0/subsystem", value, sizeof(value));
+    assert(subsystem_length == (int)strlen("../../../bus/pci"));
+    value[subsystem_length] = 0;
+    assert(!strcmp(value, "../../../bus/pci"));
+    assert(proc_lookup("/sys/bus/pci", &node) == 0 &&
+           node.type == RELIEFOS_FS_TYPE_DIR);
+    assert(proc_lookup("/sys/class/drm/card0-Virtual-1", &node) == 0 &&
+           node.type == RELIEFOS_FS_TYPE_SYMLINK);
+    assert(proc_lookup("/sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-Unknown-1",
+                       &node) == -2);
+    read_value("/sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-Virtual-1/status",
+               value, sizeof(value));
+    assert(!strcmp(value, "connected\n"));
+    read_value("/sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-Virtual-1/modes",
+               value, sizeof(value));
     assert(!strcmp(value, "1920x1080\n"));
+    read_value("/sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-Virtual-1/enabled",
+               value, sizeof(value));
+    assert(!strcmp(value, "disabled\n"));
+    fixture_kms_enabled = true;
+    read_value("/sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-Virtual-1/enabled",
+               value, sizeof(value));
+    assert(!strcmp(value, "enabled\n"));
+    fixture_kms_enabled = false;
+    fixture_fb.width = 1920;
+    fixture_fb.height = 1080;
+    read_value("/sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-Virtual-1/modes",
+               value, sizeof(value));
+    assert(!strcmp(value, "1920x1080\n"));
+
+    /* Render inventory exists only with the real 3D readiness predicate and
+     * shares card0's PCI function without impersonating the primary node. */
+    fixture_render_present = true;
+    assert(proc_lookup("/sys/devices/pci0000:00/0000:00:02.0/drm/renderD128",
+                       &node) == 0 && node.type == RELIEFOS_FS_TYPE_DIR);
+    read_value("/sys/devices/pci0000:00/0000:00:02.0/drm/renderD128/dev",
+               value, sizeof(value));
+    assert(!strcmp(value, "226:128\n"));
+    read_value("/sys/devices/pci0000:00/0000:00:02.0/drm/renderD128/uevent",
+               value, sizeof(value));
+    assert(!strcmp(value,
+                   "MAJOR=226\nMINOR=128\nDEVNAME=dri/renderD128\n"
+                   "DEVTYPE=drm_minor\n"));
+    const char *render_target =
+        "../../devices/pci0000:00/0000:00:02.0/drm/renderD128";
+    assert(proc_readlink("/sys/class/drm/renderD128", value,
+                         sizeof(value)) == (int)strlen(render_target));
+    value[strlen(render_target)] = 0;
+    assert(!strcmp(value, render_target));
+    assert(proc_readlink("/sys/dev/char/226:128", value,
+                         sizeof(value)) == (int)strlen(render_target));
+    value[strlen(render_target)] = 0;
+    assert(!strcmp(value, render_target));
+    assert(proc_readlink(
+               "/sys/devices/pci0000:00/0000:00:02.0/drm/renderD128/device",
+               value, sizeof(value)) == (int)strlen("../.."));
+    value[strlen("../..")]=0;
+    assert(!strcmp(value, "../.."));
+    fixture_render_present = false;
+    assert(proc_lookup("/sys/class/drm/renderD128", &node) == -2);
+    fixture_drm_present = false;
     assert(proc_readlink("/sys/class/dmi/id", value, 3) == 3 && !memcmp(value, "../", 3));
     walk("/sys", 0);
     fixture_cpus=4;

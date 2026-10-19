@@ -4,7 +4,105 @@
 #include <sound/asound.h>
 #include <linux/soundcard.h>
 #include <linux/poll.h>
+#include <reliefnt/sched.h>
+
+static struct task *descriptor_dispatch_task;
+static unsigned descriptor_dispatch_sleep_count;
+static struct task *descriptor_dispatch_current(void)
+{ return descriptor_dispatch_task; }
+static uint32_t descriptor_dispatch_pid(void)
+{ return descriptor_dispatch_task ? descriptor_dispatch_task->pid : 0; }
+static void descriptor_dispatch_sleep(uint64_t deadline)
+{ (void)deadline; ++descriptor_dispatch_sleep_count; }
+static int64_t descriptor_dispatch_regs(struct task *task, uint64_t number,
+                                        uint64_t a0, uint64_t a1, uint64_t a2,
+                                        uint64_t a3, uint64_t a4, uint64_t a5);
+static int64_t descriptor_dispatch_clone(const struct trap_frame *frame,
+                                         uint64_t flags, uint64_t stack,
+                                         uint64_t parent_tid, uint64_t child_tid,
+                                         uint64_t tls);
+static int64_t descriptor_dispatch_fork(const struct trap_frame *frame);
+static int64_t descriptor_dispatch_vfork(const struct trap_frame *frame);
+
+#define sched_current_task descriptor_dispatch_current
+#define sched_current_pid descriptor_dispatch_pid
+#define sched_sleep_current_until descriptor_dispatch_sleep
+#define sched_clone_current descriptor_dispatch_clone
+#define sched_fork_current descriptor_dispatch_fork
+#define sched_vfork_current descriptor_dispatch_vfork
+#define RELIEFOS_SYSCALL_FRAME_DISPATCH descriptor_dispatch_regs
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
+#undef RELIEFOS_SYSCALL_FRAME_DISPATCH
+#undef sched_vfork_current
+#undef sched_fork_current
+#undef sched_clone_current
+#undef sched_current_task
+#undef sched_current_pid
+#undef sched_sleep_current_until
+
+/* This descriptor fixture never registers a DRM node. */
+void drm_file_close(struct task_file *file)
+{ if (file) file->drm_file = NULL; }
+void drm_vmwgfx_cancel_task_continuation(struct task *task) { (void)task; }
+uint32_t drm_vmwgfx_process_retirements(uint32_t budget)
+{ (void)budget; return 0; }
+
+static unsigned descriptor_drm_read_count;
+int drm_file_read(struct task *task, struct task_file *file,
+                  void *buffer, uint32_t length)
+{
+    assert(task == descriptor_dispatch_task && file && file->drm_file);
+    assert(buffer && length == 1);
+    ++descriptor_drm_read_count;
+    return (file->flags & RELIEFOS_O_NONBLOCK) ? -RELIEFOS_EAGAIN
+                                                : KERNEL_SYSCALL_BLOCKED;
+}
+int64_t drm_file_ioctl(struct task *task, struct task_file *file,
+                       uint32_t command, uint64_t argument)
+{ (void)task; (void)file; (void)command; (void)argument; abort(); }
+uint32_t drm_file_poll(struct task_file *file, uint32_t events)
+{ (void)file; (void)events; abort(); }
+
+
+int64_t syscall_clone3(const struct trap_frame *frame, uint64_t arguments,
+                       uint64_t size)
+{ (void)frame; (void)arguments; (void)size; abort(); }
+int64_t kernel_signal_rt_sigreturn(struct task *task, struct trap_frame *frame)
+{ (void)task; (void)frame; abort(); }
+void net_close_owner_sockets(uint32_t owner_pid) { (void)owner_pid; }
+
+static int64_t descriptor_dispatch_regs(struct task *task, uint64_t number,
+                                        uint64_t a0, uint64_t a1, uint64_t a2,
+                                        uint64_t a3, uint64_t a4, uint64_t a5)
+{
+    (void)a3; (void)a4; (void)a5;
+    assert((number == LINUX_SYS_READ || number == LINUX_SYS_READV) &&
+           task == descriptor_dispatch_task);
+    struct task_file *file = task_file_for_io(task, (int)a0);
+    assert(file && file->drm_file);
+    if (number == LINUX_SYS_READV) {
+        assert(a2 == 1);
+        const struct iovec *vector = (const struct iovec *)(uintptr_t)a1;
+        return drm_file_read(task, file, vector[0].iov_base,
+                             (uint32_t)vector[0].iov_len);
+    }
+    return drm_file_read(task, file, (void *)(uintptr_t)a1, (uint32_t)a2);
+}
+static int64_t descriptor_dispatch_clone(const struct trap_frame *frame,
+                                         uint64_t flags, uint64_t stack,
+                                         uint64_t parent_tid, uint64_t child_tid,
+                                         uint64_t tls)
+{ (void)frame; (void)flags; (void)stack; (void)parent_tid; (void)child_tid; (void)tls; abort(); }
+static int64_t descriptor_dispatch_fork(const struct trap_frame *frame)
+{ (void)frame; abort(); }
+static int64_t descriptor_dispatch_vfork(const struct trap_frame *frame)
+{ (void)frame; abort(); }
+
+void driver_manager_process_audio_faults(void) { }
+void input_process_pending(void) { }
+void storage_set_io_async_context(bool enabled) { (void)enabled; }
+void storage_release_task_io(uint32_t pid) { (void)pid; }
+
 #define AUDIO_FIXTURE_REAL_WAIT
 #define AUDIO_FIXTURE_NO_PTHREAD
 #include "audio_fixture.h"
@@ -352,6 +450,102 @@ static void test_audio_write_batch(void)
     puts("PASS actual OSS syscall batching: whole Doom block, bounded large request, exact samples, short/EAGAIN");
 }
 
+static void test_nonblocking_drm_read_dispatch(void)
+{
+    struct task *task = calloc(1, sizeof(*task));
+    assert(task);
+    task->pid = task->tgid = 1400;
+    sched_task_limits(task)->nofile.rlim_cur = 64;
+    struct task_file *file;
+    int fd = task_allocate_fd(task, 3, &file);
+    assert(fd == 3);
+    file->flags = TASK_FILE_FLAG_DEV_NODE | RELIEFOS_O_RDONLY |
+                  RELIEFOS_O_NONBLOCK;
+    file->node = (struct storage_node){.type = RELIEFOS_FS_TYPE_DEVICE,
+        .flags = STORAGE_NODE_FLAG_DEV_NODE,
+        .first_cluster = STORAGE_DEV_KIND_DRM_CARD0};
+    file->drm_file = (struct drm_file *)(uintptr_t)1;
+    descriptor_dispatch_task = task;
+    descriptor_dispatch_sleep_count = 0;
+    descriptor_drm_read_count = 0;
+    assert(syscall_eagain_is_nonblocking_device(task, LINUX_SYS_READ, fd));
+    assert(syscall_eagain_is_nonblocking_device(task, LINUX_SYS_READV, fd));
+    assert(syscall_eagain_is_nonblocking_device(task, LINUX_SYS_PREAD64, fd));
+    assert(syscall_eagain_is_nonblocking_device(task, LINUX_SYS_PREADV, fd));
+    assert(syscall_eagain_is_nonblocking_device(task, LINUX_SYS_PREADV2, fd));
+    assert(!syscall_eagain_is_nonblocking_device(task, LINUX_SYS_PWRITE64, fd));
+    assert(!syscall_eagain_is_nonblocking_device(task, LINUX_SYS_PWRITEV, fd));
+    file->flags &= ~RELIEFOS_O_NONBLOCK;
+    assert(!syscall_eagain_is_nonblocking_device(task, LINUX_SYS_PREAD64, fd));
+    assert(!syscall_eagain_is_nonblocking_device(task, LINUX_SYS_PREADV, fd));
+    file->flags |= RELIEFOS_O_NONBLOCK;
+    file->drm_file = NULL;
+    assert(!syscall_eagain_is_nonblocking_device(task, LINUX_SYS_PREAD64, fd));
+    file->drm_file = (struct drm_file *)(uintptr_t)1;
+    char byte;
+    struct trap_frame frame = {.rax = LINUX_SYS_READ, .rdi = (uint64_t)fd,
+        .rsi = (uintptr_t)&byte, .rdx = 1, .rip = 0x4002, .rsp = 0x8000};
+
+    syscall_dispatch_frame(&frame);
+
+    assert(descriptor_drm_read_count == 1);
+    assert((int64_t)frame.rax == -RELIEFOS_EAGAIN);
+    assert(frame.rip == 0x4002);
+    assert(descriptor_dispatch_sleep_count == 0);
+    assert(task->syscall_file == NULL);
+
+    struct iovec vector = {.iov_base = &byte, .iov_len = 1};
+    frame = (struct trap_frame){.rax = LINUX_SYS_READV, .rdi = (uint64_t)fd,
+        .rsi = (uintptr_t)&vector, .rdx = 1, .rip = 0x5002, .rsp = 0x8000};
+    syscall_dispatch_frame(&frame);
+    assert(descriptor_drm_read_count == 2);
+    assert((int64_t)frame.rax == -RELIEFOS_EAGAIN);
+    assert(frame.rip == 0x5002);
+    assert(descriptor_dispatch_sleep_count == 0);
+    assert(task->syscall_file == NULL);
+
+    assert(syscall_drm_read(task, file, (uintptr_t)&byte, 1) == -RELIEFOS_EAGAIN);
+    assert(descriptor_drm_read_count == 3);
+    assert(syscall_drm_pread(task, file, (uintptr_t)&byte, 1, 4096) ==
+           -RELIEFOS_EAGAIN);
+    assert(descriptor_drm_read_count == 4);
+    assert(file->offset == 0);
+    assert(syscall_drm_pread(task, file, (uintptr_t)&byte, 1, UINT64_MAX) ==
+           -RELIEFOS_EINVAL);
+    assert(descriptor_drm_read_count == 4);
+    assert(syscall_drm_readv(task, file, &vector, 1, false, 0, 0) ==
+           -RELIEFOS_EAGAIN);
+    assert(descriptor_drm_read_count == 5);
+    assert(syscall_drm_readv(task, file, &vector, 1, true, 4096, 0) ==
+           -RELIEFOS_EAGAIN);
+    assert(descriptor_drm_read_count == 6);
+    assert(file->offset == 0);
+    assert(syscall_drm_readv(task, file, &vector, 1, false, UINT64_MAX, 0) ==
+           -RELIEFOS_EAGAIN);
+    assert(descriptor_drm_read_count == 7);
+    assert(syscall_drm_readv(task, file, &vector, 1, true, 4096, 1) ==
+           -RELIEFOS_EAGAIN);
+    assert(descriptor_drm_read_count == 8);
+    assert(syscall_drm_readv(task, file, &vector, 1, true, 4096, 2) ==
+           -RELIEFOS_EOPNOTSUPP);
+    assert(syscall_drm_readv(task, file, &vector, 0, true, UINT64_MAX, 0) ==
+           -RELIEFOS_EINVAL);
+    assert(syscall_drm_readv(task, file, &vector, 0, false, UINT64_MAX, 1) == 0);
+    assert(file->offset == 0);
+    assert(descriptor_drm_read_count == 8);
+
+    file->offset = 37;
+    for (uint64_t whence = 0; whence <= 4; ++whence)
+        assert(syscall_drm_llseek(file, whence) == 37);
+    assert(syscall_drm_llseek(file, 5) == -RELIEFOS_EINVAL);
+    assert(syscall_drm_llseek(file, UINT32_MAX) == -RELIEFOS_EINVAL);
+    assert(file->offset == 37);
+    task_discard_file_fd(task, fd);
+    descriptor_dispatch_task = NULL;
+    free(task);
+    puts("PASS production syscall frame returns nonblocking DRM read/readv EAGAIN without retry sleep; positional DRM EAGAIN classification is scoped by syscall number");
+}
+
 /* mode 0 imports then dup/closes; modes 1/2 truncate by control capacity/fd
  * limit; mode 3 exits with queued rights. Each checks the actual last release. */
 static void test_audio_scm_rights(int control, unsigned mode)
@@ -590,6 +784,7 @@ static void test_console_descriptions(void)
 
 int main(void)
 {
+    test_nonblocking_drm_read_dispatch();
     test_audio_write_batch();
     kernel_objects_init();
     struct audio_test_card stat_cards[2];

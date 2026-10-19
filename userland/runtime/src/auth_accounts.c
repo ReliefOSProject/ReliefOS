@@ -129,7 +129,7 @@ int reliefos_auth_create_user(const char *name, const char *password,
     if (!user || role != RELIEFOS_AUTH_ROLE_USER ||
         !reliefos_account_name_valid(name, RELIEFOS_AUTH_USERNAME_LEN) ||
         !reliefos_auth_password_valid(password, RELIEFOS_AUTH_PASSWORD_LEN)) { errno = EINVAL; return -1; }
-    char *args[] = {"/usr/sbin/useradd", "-m", "-U", "-s", "/bin/bash",
+    char *args[] = {"/usr/sbin/useradd", "-m", "-U", "-s", "/bin/bash", "-G", "video",
                     "-e", "1970-01-02", "--", (char *)name, NULL};
     if (account_command(args, NULL) < 0) return -1;
     char *record = NULL;

@@ -103,6 +103,149 @@ static void mmio_pages_are_precise_and_owned(void) {
     assert(shootdowns>=4); assert(!paging_acquire_mmio(0xc0002001,4096));
     assert(!paging_acquire_mmio(UINT64_MAX-4095,8192)); puts("mmio_exact_uc_nx_refcounts PASS");
 }
+static void mmio_large_aperture_is_precise_and_owned(void) {
+    const uint64_t base=0xc0000000ULL, bytes=128ULL*1024*1024;
+    const uint64_t fifo=0xf0000000ULL;
+    mm_fixture_init(0x30000000,128,0,0); nx_enabled=true;
+    for(unsigned i=0;i<64;i++)kernel_pd[3][i]=(base+(uint64_t)i*0x200000)|0x83;
+    kernel_pd[2][511]=0xbfe00000ULL|0x83;
+    kernel_pd[3][384]=fifo|0x83;
+    uint64_t variant_phys=base+0x123000, neighbor_phys=base-4096;
+    uint64_t *variant=mmio_leaf(variant_phys), *neighbor=mmio_leaf(neighbor_phys);
+    assert(variant && neighbor);
+    *variant=variant_phys|0x800000000000000bULL;
+    *neighbor=neighbor_phys|0x8000000000000001ULL;
+
+    assert(paging_acquire_mmio(base,bytes));
+    uint64_t *first=mmio_leaf(base), *last=mmio_leaf(base+bytes-4096);
+    assert(first && last);
+    assert(*first==(base|0x800000000000001bULL));
+    assert(*last==((base+bytes-4096)|0x800000000000001bULL));
+    assert(*variant==(variant_phys|0x800000000000001bULL));
+    assert(*neighbor==(neighbor_phys|0x8000000000000001ULL));
+
+    assert(paging_acquire_mmio(fifo,4096));
+    uint64_t *fifo_pte=mmio_leaf(fifo); assert(fifo_pte);
+    assert(*fifo_pte==(fifo|0x800000000000001bULL));
+    paging_release_mmio(fifo,4096);
+    assert(*fifo_pte==(fifo|3));
+
+    assert(paging_acquire_mmio(base+0x2000,0x6000));
+    paging_release_mmio(base,bytes);
+    assert(first[2]==((base+0x2000)|0x800000000000001bULL));
+    assert(first[8]==((base+0x8000)|3));
+    assert(*variant==(variant_phys|0x800000000000000bULL));
+    assert(*neighbor==(neighbor_phys|0x8000000000000001ULL));
+    paging_release_mmio(base+0x2000,0x6000);
+    assert(first[2]==((base+0x2000)|3));
+    assert(first[8]==((base+0x8000)|3));
+    assert(*last==((base+bytes-4096)|3));
+    puts("mmio_128MiB_aperture_fifo_overlap_and_neighbors PASS");
+}
+static void mmio_large_page_pat_is_converted_and_restored(void) {
+    const uint64_t base=0xdc000000ULL;
+    const uint64_t pat=RELIEFNT_PAGE_PAT;
+    const uint64_t nx=0x8000000000000000ULL;
+    mm_fixture_init(0x30000000,8,0,0); nx_enabled=true;
+    kernel_pd[3][224]=base|0x83|(1ULL<<12)|nx;
+
+    assert(paging_acquire_mmio(base+4096,4096));
+    assert(!(kernel_pd[3][224]&0x80));
+    uint64_t *pt=(void *)(uintptr_t)(kernel_pd[3][224]&RELIEFNT_PHYS_ADDR_MASK);
+    assert(pt[0]==(base|nx|0x83|pat));
+    assert(pt[1]==(base+4096|nx|0x1b));
+    assert(pt[2]==(base+8192|nx|0x83|pat));
+
+    paging_release_mmio(base+4096,4096);
+    assert(pt[0]==(base|nx|0x83|pat));
+    assert(pt[1]==(base+4096|nx|0x83|pat));
+    assert(pt[2]==(base+8192|nx|0x83|pat));
+    puts("mmio_large_page_pat_conversion_uc_and_restore PASS");
+}
+static void mmio_exact_lease_capacity_rejects_atomically(void) {
+    const uint64_t base=0xd4000000ULL;
+    const uint64_t original=0x3ULL;
+    const uint64_t uc=0x800000000000001bULL;
+    mm_fixture_init(0x30000000,8,0,0); nx_enabled=true;
+    kernel_pd[3][160]=base|0x83;
+
+    for(unsigned i=0;i<128;i++)
+        assert(paging_acquire_mmio(base+(uint64_t)i*4096,4096));
+    uint64_t *pt=(void *)(uintptr_t)(kernel_pd[3][160]&RELIEFNT_PHYS_ADDR_MASK);
+    for(unsigned i=0;i<128;i++)assert(pt[i]==(base+(uint64_t)i*4096|uc));
+
+    assert(!paging_acquire_mmio(base+128ULL*4096,4096));
+    assert(pt[128]==(base+128ULL*4096|original));
+    for(unsigned i=0;i<128;i++)assert(pt[i]==(base+(uint64_t)i*4096|uc));
+
+    for(unsigned i=0;i<128;i++)
+        paging_release_mmio(base+(uint64_t)i*4096,4096);
+    for(unsigned i=0;i<129;i++)assert(pt[i]==(base+(uint64_t)i*4096|original));
+    puts("mmio_exact_lease_capacity_rejection_and_releases PASS");
+}
+static void mmio_interval_capacity_failure_rolls_back(void) {
+    const uint64_t base=0xd0000000ULL;
+    mm_fixture_init(0x30000000,8,0,0); nx_enabled=true;
+    kernel_pd[3][128]=base|0x83;
+    for(unsigned i=0;i<257;i++) {
+        uint64_t phys=base+(uint64_t)i*4096;
+        uint64_t *pte=mmio_leaf(phys); assert(pte);
+        *pte=phys|((i&1)?0xbULL:3ULL);
+    }
+    assert(!paging_acquire_mmio(base,257ULL*4096));
+    for(unsigned i=0;i<257;i++) {
+        uint64_t phys=base+(uint64_t)i*4096;
+        uint64_t *pte=mmio_leaf(phys); assert(pte);
+        assert(*pte==(phys|((i&1)?0xbULL:3ULL)));
+    }
+    assert(paging_acquire_mmio(base,4096));
+    paging_release_mmio(base,4096);
+    assert(*(uint64_t *)(uintptr_t)mmio_leaf(base)==(base|3));
+    puts("mmio_interval_capacity_failure_is_atomic PASS");
+}
+static void mmio_permanent_claims_are_idempotent(void) {
+    const uint64_t base=0xc8000000ULL, phys=base+4096;
+    mm_fixture_init(0x30000000,4,0,0); nx_enabled=true;
+    kernel_pd[3][64]=base|0x83;
+    uint64_t *pte=mmio_leaf(phys); assert(pte);
+    *pte=phys|0x800000000000000bULL;
+    assert(paging_mmio_uncached(phys,1));
+    for(unsigned i=0;i<100;i++)assert(paging_mmio_uncached(phys,1));
+    assert(*pte==(phys|0x800000000000001bULL));
+    assert(paging_acquire_mmio(phys,4096));
+    paging_release_mmio(phys,4096);
+    assert(*pte==(phys|0x800000000000001bULL));
+    puts("mmio_permanent_claims_are_idempotent_and_persistent PASS");
+}
+static void mmio_validation_and_page_table_oom_roll_back(void) {
+    const uint64_t base=0xda000000ULL;
+    mm_fixture_init(0x30000000,1,0,0);
+    nx_enabled=false;
+    kernel_pd[3][208]=base|0x83;
+    assert(!paging_acquire_mmio(base,4096));
+    assert(!paging_mmio_uncached(base,4096));
+    nx_enabled=true;
+    assert(!paging_acquire_mmio(RELIEFNT_KERNEL_DIRECT_MAP_SIZE-4096,8192));
+    assert(!paging_acquire_mmio(UINT64_MAX-4095,8192));
+    assert(!paging_mmio_uncached(UINT64_MAX-7,16));
+    assert(!paging_acquire_mmio(base+1,4096));
+
+    kernel_pd[3][209]=(base+0x200000)|0x83;
+    assert(!paging_acquire_mmio(base,0x400000));
+    assert(!(kernel_pd[3][208]&0x80));
+    uint64_t *first_pt=(uint64_t *)(uintptr_t)(kernel_pd[3][208]&RELIEFNT_PHYS_ADDR_MASK);
+    assert(first_pt[0]==(base|3));
+    assert(first_pt[511]==((base+0x1ff000)|3));
+    assert(kernel_pd[3][209]==((base+0x200000)|0x83));
+    assert(paging_acquire_mmio(base,4096));
+    paging_release_mmio(base,4096);
+    assert(first_pt[0]==(base|3));
+    mm_fixture_init(0x30000000,8,0,0);
+    kernel_pd[3][0]=0xc0000000ULL|0x83;
+    kernel_pd[3][208]=base|0x83;
+    kernel_pd[3][209]=(base+0x200000)|0x83;
+    puts("mmio_nx_bounds_alignment_overflow_and_page_table_oom PASS");
+}
 static void module_resource_failure_rolls_back(void) {
     mm_fixture_init(0x50000000,300,0,0);
     for(unsigned i=0;i<DRIVER_RESOURCE_MAX;i++)assert(driver_alloc_dma_owned(9,1,0xffffffff));
@@ -195,6 +338,12 @@ int main(void) {
     assert(!pci_enumerate(1,&enum_device) && enum_device.function==1);
     assert(pci_enumerate(2,&enum_device)==-19); puts("pci_enumerates_multifunction PASS");
     mmio_pages_are_precise_and_owned();
+    mmio_large_aperture_is_precise_and_owned();
+    mmio_large_page_pat_is_converted_and_restored();
+    mmio_exact_lease_capacity_rejects_atomically();
+    mmio_interval_capacity_failure_rolls_back();
+    mmio_validation_and_page_table_oom_roll_back();
+    kernel_pd[3][0]=0xc0000000ULL|0x83;
     cfg[0x10/4]=0xc0000004;cfg[0x14/4]=0;bar_masks[0x10/4]=0xffffc004;
     void *mmio=pci_map_mmio(0xc0000000,8192); assert(mmio);
     assert(cfg[0x10/4]==0xc0000004 && cfg[0x14/4]==0);
@@ -213,5 +362,6 @@ int main(void) {
     pci_irq_dispatch(cfg[0x4c/4]&0xff); assert(count==1); pci_free_irq(h);
     assert(!(cfg[0x40/4]&(1u<<16))); pci_irq_dispatch(cfg[0x4c/4]&0xff); assert(count==1);
     puts("msi_64_address_and_disable PASS");msi_disable_synchronizes_inflight();module_resource_failure_rolls_back();
-    automatic_mmio_cleanup_releases_provider();retired_msi_cannot_reach_new_owner();return 0;
+    automatic_mmio_cleanup_releases_provider();retired_msi_cannot_reach_new_owner();
+    mmio_permanent_claims_are_idempotent();return 0;
 }

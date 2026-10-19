@@ -16,6 +16,11 @@
 #include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
 #include "../../kernel/reliefnt/kernel/reliefnt/input.c"
 
+/* The syscall close dispatcher also owns DRM OFDs; these input-only fixtures
+ * never construct one, so keep that unrelated close hook inert. */
+void drm_file_close(struct task_file *file)
+{ if (file) file->drm_file = NULL; }
+
 static bool output_writable = true;
 bool user_range_ok(uint64_t address, uint64_t length)
 { return address != 0 || length == 0; }

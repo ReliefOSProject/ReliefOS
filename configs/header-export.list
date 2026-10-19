@@ -76,8 +76,12 @@ include/uapi/asm/ipcbuf.h
 include/uapi/asm/posix_types.h
 include/uapi/asm/posix_types_64.h
 include/uapi/asm/bitsperlong.h
+include/uapi/asm/ioctl.h
 include/uapi/asm-generic/shmbuf.h
 include/uapi/asm-generic/ipcbuf.h
 include/uapi/asm-generic/posix_types.h
 include/uapi/asm-generic/bitsperlong.h
 include/uapi/asm-generic/hugetlb_encode.h
+include/uapi/drm/drm.h
+include/uapi/drm/drm_mode.h
+include/uapi/drm/vmwgfx_drm.h

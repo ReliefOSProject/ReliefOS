@@ -1698,6 +1698,19 @@
       "license_in_source": ".PKGINFO"
     },
     {
+      "id": "alpine-mesa-dri-gallium",
+      "kind": "apk",
+      "version": "26.1.6-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/mesa-dri-gallium-26.1.6-r0.apk",
+      "sha256": "91a8c6d8186a0f855e545cd7d7fedeb6265e90b0d74fda2538652665941d1de5",
+      "directory": "mesa-dri-gallium-26.1.6-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Alpine v3.24 main x86_64 APKINDEX license = MIT AND SGI-B-2.0 AND BSL-1.0; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
       "id": "alpine-mesa-egl",
       "kind": "apk",
       "version": "26.1.6-r0",

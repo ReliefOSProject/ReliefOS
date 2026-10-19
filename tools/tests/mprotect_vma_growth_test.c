@@ -15,6 +15,10 @@ static struct task *test_current_task(void) { return current; }
 #undef sched_current_task
 
 static unsigned pages, allocations;
+static unsigned user_tlb_flush_calls;
+static uint64_t user_tlb_flush_probe_page;
+static struct drm_bo *drm_test_bo = (struct drm_bo *)(uintptr_t)0x1000;
+static struct task_file *drm_test_file = (struct task_file *)(uintptr_t)0x2000;
 static int fail_after = -1;
 void *kernel_malloc(size_t size)
 {
@@ -38,9 +42,30 @@ void mm_free_page(uint64_t page) { assert(pages); --pages; free((void *)(uintptr
 int page_cache_owns(uint64_t page) { (void)page; return 0; }
 void page_cache_release(uint64_t page) { (void)page; abort(); }
 void x86_64_invlpg(uint64_t page) { (void)page; }
-void smp_flush_user_tlb(void) {}
+void smp_flush_user_tlb(void)
+{
+    ++user_tlb_flush_calls;
+    if (user_tlb_flush_probe_page)
+        assert(!address_space_user_page_writable(
+            sched_task_as(current), user_tlb_flush_probe_page));
+}
 void storage_inode_retain(struct storage_inode_ref *inode) { assert(!inode); }
 int storage_inode_put(struct storage_inode_ref *inode) { assert(!inode); return 0; }
+void drm_bo_get(struct drm_bo *bo) { assert(!bo || bo == drm_test_bo); }
+void drm_bo_put(struct drm_bo *bo) { assert(!bo || bo == drm_test_bo); }
+struct task_file *task_file_get(struct task_file *description)
+{ assert(!description || description == drm_test_file); return description; }
+void task_file_put(struct task_file *description)
+{ assert(!description || description == drm_test_file); }
+void sysv_shm_vma_release(struct task *task, struct task_vma *vma)
+{ (void)task; (void)vma; }
+void sysv_shm_vma_split(struct task_vma *vma) { (void)vma; }
+int audio_pcm_mmap_retain(struct audio_pcm *pcm,
+                          enum audio_pcm_mmap_region region)
+{ (void)pcm; (void)region; return 0; }
+void audio_pcm_mmap_release(struct audio_pcm *pcm,
+                            enum audio_pcm_mmap_region region)
+{ (void)pcm; (void)region; }
 
 static const uint64_t base = RELIEFNT_USER_BASE + 0x100000;
 
@@ -160,6 +185,40 @@ static void test_adjacent_vmas(void)
     teardown();
 }
 
+static void test_drm_mprotect_flushes_remote_translations(void)
+{
+    setup(1);
+    uint32_t last = sched_task_vma_capacity(current) - 1;
+    struct task_vma *vma = sched_task_vma_at(current, last);
+    assert(vma && vma->used);
+    uint64_t physical = mm_alloc_page();
+    vma->start = base;
+    vma->end = base + 4096;
+    vma->flags = TASK_VMA_FLAG_DEVICE | TASK_VMA_FLAG_SHARED |
+                 TASK_VMA_FLAG_MMAP;
+    vma->prot = LINUX_PROT_READ | LINUX_PROT_WRITE;
+    vma->max_prot = LINUX_PROT_READ | LINUX_PROT_WRITE;
+    vma->drm_bo = drm_test_bo;
+    vma->drm_mapping_file = drm_test_file;
+    vma->device_physical = physical;
+    assert(address_space_map_user_page(sched_task_as(current), base, physical,
+           RELIEFNT_PAGE_DEVICE | RELIEFNT_PAGE_SHARED |
+           RELIEFNT_PAGE_WRITABLE | RELIEFNT_PAGE_NOEXEC));
+    assert(address_space_user_page_writable(sched_task_as(current), base));
+
+    user_tlb_flush_calls = 0;
+    user_tlb_flush_probe_page = base;
+    assert(syscall_mm_mprotect(base, 4096, LINUX_PROT_READ) == 0);
+    assert(user_tlb_flush_calls == 1);
+    assert(!address_space_user_page_writable(sched_task_as(current), base));
+    assert(sched_task_vma_at(current, last)->prot == LINUX_PROT_READ);
+
+    assert(syscall_mm_munmap(base, 4096) == 0);
+    user_tlb_flush_probe_page = 0;
+    mm_free_page(physical);
+    teardown();
+}
+
 int main(void)
 {
     for (unsigned extra = 1; extra <= 17; ++extra) {
@@ -171,6 +230,7 @@ int main(void)
     test_allocation_failure(16); /* allocation fails on the first needed slot */
     test_append_with_spare_capacity();
     test_adjacent_vmas();
+    test_drm_mprotect_flushes_remote_translations();
     puts("PASS mprotect: VMA growth, guard pages, lazy writes, page rounding, revoke/restore and errno");
     assert(allocations);
     return 0;
