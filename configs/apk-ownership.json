@@ -21,6 +21,12 @@
       "paths": ["usr/lib/leonos", "usr/lib/reliefos", "usr/share/reliefos", "usr/share/fonts/reliefos", "etc/reliefos", "etc/icewm", "usr/sbin/leonos-rpr-apkcheck", "usr/sbin/leonos-rpr-ping", "usr/sbin/leonos-kernel-update", "usr/sbin/leonos-check-update", "usr/sbin/reliefos-rpr-apkcheck", "usr/sbin/reliefos-rpr-ping", "usr/sbin/reliefos-kernel-update", "usr/sbin/reliefos-check-update", "usr/lib/libportablegl.so.1"],
       "reason": "Native desktop, service, graphics and application interfaces. Embedded dependencies remain part of their actual consumers."
     },
+    "reliefos-reliefmath": {
+      "destination": "reliefos",
+      "components": ["reliefmath"],
+      "paths": ["usr/bin/reliefmath", "usr/share/applications/reliefos-reliefmath.desktop", "usr/share/mime/packages/reliefmath.xml", "usr/share/reliefmath", "usr/share/licenses/reliefmath"],
+      "reason": "ReliefMath GUI and isolated worker, their private math font and license texts, desktop launcher, MIME declaration and component icon are installed and removed together."
+    },
     "reliefos-fastfetch": {
       "destination": "reliefos",
       "components": ["fastfetch"],

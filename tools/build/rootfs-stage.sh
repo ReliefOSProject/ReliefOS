@@ -52,6 +52,9 @@ for spec in auth pam; do
 done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
+# The source lives in the product rootfs tree, but ReliefMath owns its package
+# and must only contribute it when the application component is selected.
+record x - /usr/share/mime/packages/reliefmath.xml 0000 product-policy override
 # Image roots default to Xorg. Installer staging also derives a console target
 # profile; the live media keeps Xorg and selects its own installer session.
 printf '%s\n' xorg > "$work/data/desktop-backend"
@@ -149,6 +152,13 @@ while read -r app entry; do
     done
     link "usr/bin/$app" "../lib/reliefos/apps/$app/$app.elf" "$app"
 done < "$work/apps"
+if enabled reliefmath; then
+    # The GUI component owns its worker, private math font, license notices and
+    # MIME declaration as one component-selected rootfs product.
+    file "$out/userland/reliefmath-render.elf" usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf 0755 reliefmath
+    file "$src/system/rootfs/usr/share/mime/packages/reliefmath.xml" usr/share/mime/packages/reliefmath.xml 0644 reliefmath override
+    sh "$src/tools/build/reliefmath-resources-stage.sh" "$src" "$plan"
+fi
 # Doom's image payload is deliberately opt-in with the app image switch.  Keep
 # the WAD beside the executable so the guest launcher can use its configured
 # default path, and carry the Freedoom notice into the same rootfs manifest.

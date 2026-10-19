@@ -94,6 +94,18 @@ msgstr ""
 msgid " source limit reached"
 msgstr ""
 
+#: configs/nls/messages.c:42
+msgid "%d pt"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:198
+msgid "%zu completed · %zu failed · %zu cancelled · %zu total"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:138
+msgid "%zu formulas · %zu characters · %d%%"
+msgstr ""
+
 #: userland/runtime/src/ui.c:1767
 msgid "(none)"
 msgstr ""
@@ -120,6 +132,50 @@ msgstr ""
 
 #: userland/apps/apiapp/main.c:766
 msgid "< Back"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1123
+msgid "A document can contain up to 256 formulas; a formula name is limited to 256 UTF-8 bytes."
+msgstr ""
+
+#: configs/nls/messages.c:219
+msgid "A file task is already running"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:57
+msgid "A file task is running; wait or cancel it"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1126
+msgid "A preview or export is limited to 16,384 pixels per dimension and 16,777,216 raster pixels."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:151
+msgid "A previous session left recoverable formula documents."
+msgstr ""
+
+#: configs/nls/messages.c:220
+msgid "A required formula glyph is unavailable"
+msgstr ""
+
+#: configs/nls/messages.c:221
+msgid "A required function glyph is unavailable"
+msgstr ""
+
+#: configs/nls/messages.c:222
+msgid "A required large operator is unavailable"
+msgstr ""
+
+#: configs/nls/messages.c:223
+msgid "A required text glyph is unavailable"
+msgstr ""
+
+#: configs/nls/messages.c:224
+msgid "A script cannot be a spacing command"
+msgstr ""
+
+#: configs/nls/messages.c:225
+msgid "A script marker has no base atom"
 msgstr ""
 
 #: userland/apps/drvmgr/main.c:153
@@ -152,6 +208,18 @@ msgstr ""
 
 #: userland/apps/osver/main.cpp:105
 msgid "About this operating system"
+msgstr ""
+
+#: configs/nls/messages.c:50
+msgid "Absolute value"
+msgstr ""
+
+#: configs/nls/messages.c:226
+msgid "Accent glyph has no outline"
+msgstr ""
+
+#: configs/nls/messages.c:51
+msgid "Accents"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1118
@@ -198,8 +266,20 @@ msgstr ""
 msgid "Add Current Page"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:316
+msgid "Add current"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:101
+msgid "Add favorite..."
+msgstr ""
+
 #: userland/apps/fltk_support.h:43
 msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:291
+msgid "Added current formula."
 msgstr ""
 
 #: userland/apps/browser/view.c:1003
@@ -238,6 +318,18 @@ msgstr ""
 msgid "Administrators can create and manage local accounts."
 msgstr ""
 
+#: configs/nls/messages.c:52
+msgid "Aligned equations"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:105
+msgid "Aligned..."
+msgstr ""
+
+#: configs/nls/messages.c:227
+msgid "Alignment marker outside an alignment environment"
+msgstr ""
+
 #: userland/apps/fltk_support.h:44
 msgid "All Files (*)"
 msgstr ""
@@ -250,12 +342,24 @@ msgstr ""
 msgid "All apps"
 msgstr ""
 
+#: configs/nls/messages.c:53
+msgid "All categories"
+msgstr ""
+
 #: userland/runtime/src/ui.c:715
 msgid "All files (*.*)"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:164
+msgid "All formulas"
+msgstr ""
+
 #: userland/apps/fileman/model.c:83
 msgid "All items marked"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:101
+msgid "All symbols..."
 msgstr ""
 
 #: userland/apps/sysconfdialog/main.c:88
@@ -268,6 +372,10 @@ msgstr ""
 
 #: userland/apps/sysconfdialog/main.c:69
 msgid "Allow this app to start a process when you sign in?"
+msgstr ""
+
+#: configs/nls/messages.c:54
+msgid "Alpha"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1657
@@ -286,8 +394,24 @@ msgstr ""
 msgid "An IWAD path is required"
 msgstr ""
 
+#: configs/nls/messages.c:228
+msgid "An export is already running"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:77
+msgid "An export is running. Cancel it before switching documents?"
+msgstr ""
+
+#: configs/nls/messages.c:55
+msgid "Angle brackets"
+msgstr ""
+
 #: userland/apps/guitest/main.c:86
 msgid "App starting"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:111
+msgid "Appearance"
 msgstr ""
 
 #: userland/apps/desktop/input.c:244
@@ -326,6 +450,10 @@ msgstr ""
 msgid "Apply again"
 msgstr ""
 
+#: configs/nls/messages.c:56
+msgid "Approximately equal"
+msgstr ""
+
 #: userland/apps/fileman/main.cpp:765
 msgid "Archive"
 msgstr ""
@@ -340,6 +468,26 @@ msgstr ""
 
 #: userland/apps/guitest/main.c:58
 msgid "Arrow"
+msgstr ""
+
+#: configs/nls/messages.c:57
+msgid "Arrows"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:99
+msgid "Arrows and sets"
+msgstr ""
+
+#: configs/nls/messages.c:229
+msgid "ArtifactChunk has no matching bounded artifact"
+msgstr ""
+
+#: configs/nls/messages.c:230
+msgid "ArtifactChunk type is invalid"
+msgstr ""
+
+#: configs/nls/messages.c:231
+msgid "ArtifactEnd arrived before the declared bytes"
 msgstr ""
 
 #: userland/apps/settings/main.c:1145
@@ -378,12 +526,28 @@ msgstr ""
 msgid "Authorizing installation..."
 msgstr ""
 
+#: configs/nls/messages.c:58
+msgid "Automatic absolute value"
+msgstr ""
+
+#: configs/nls/messages.c:59
+msgid "Automatic curly brackets"
+msgstr ""
+
 #: userland/apps/installer/main.cpp:808
 msgid "Automatic layout creates a 128 MiB FAT32 ESP and an ext4 root."
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:223
 msgid "Automatic mode replaces its partition table; manual mode can preserve other partitions."
+msgstr ""
+
+#: configs/nls/messages.c:60
+msgid "Automatic parentheses"
+msgstr ""
+
+#: configs/nls/messages.c:61
+msgid "Automatic square brackets"
 msgstr ""
 
 #: userland/apps/drvmgr/main.c:185
@@ -402,6 +566,10 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:119
+msgid "Background tasks"
+msgstr ""
+
 #: userland/apps/browser/util.c:160
 msgid "Bad argument"
 msgstr ""
@@ -410,8 +578,28 @@ msgstr ""
 msgid "Bad socket"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:103
+msgid "Basic structures"
+msgstr ""
+
+#: configs/nls/messages.c:232
+msgid "Begin metadata exceeds render limits"
+msgstr ""
+
 #: userland/apps/notepad/main.c:683
 msgid "Beginning"
+msgstr ""
+
+#: configs/nls/messages.c:62
+msgid "Beta"
+msgstr ""
+
+#: configs/nls/messages.c:63
+msgid "Big operators"
+msgstr ""
+
+#: configs/nls/messages.c:64
+msgid "Binary operators"
 msgstr ""
 
 #: userland/apps/settings/main.c:1879
@@ -424,6 +612,10 @@ msgstr ""
 
 #: userland/apps/settings/main.c:289
 msgid "Blue"
+msgstr ""
+
+#: configs/nls/messages.c:65
+msgid "Bold math font"
 msgstr ""
 
 #: userland/apps/browser/bookmarks.c:208
@@ -462,12 +654,28 @@ msgstr ""
 msgid "Bottom of page"
 msgstr ""
 
+#: configs/nls/messages.c:233
+msgid "Bracket source is null"
+msgstr ""
+
+#: configs/nls/messages.c:66
+msgid "Bracketed matrix"
+msgstr ""
+
+#: configs/nls/messages.c:67
+msgid "Brackets"
+msgstr ""
+
 #: userland/apps/settings/main.c:1318
 msgid "Browse"
 msgstr ""
 
 #: userland/apps/fileman/main.cpp:511
 msgid "Browse files, manage folders and launch X11 applications."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:167
+msgid "Browse..."
 msgstr ""
 
 #: userland/apps/paint/main.cpp:171
@@ -484,6 +692,10 @@ msgstr ""
 
 #: userland/apps/drvmgr/main.c:217
 msgid "Built-in kernel drivers"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1130
+msgid "Built-in tools, commands, and examples"
 msgstr ""
 
 #: userland/apps/servicemgr/main.c:47
@@ -526,20 +738,232 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:77
+msgid "Cancel export"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:95
+msgid "Cancel task"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:37
+msgid "Cancelled"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:207
+msgid "Cancelling task..."
+msgstr ""
+
 #: userland/apps/settings/main.c:1417
 msgid "Candidates"
+msgstr ""
+
+#: configs/nls/messages.c:234
+msgid "Cannot allocate LaTeX output"
+msgstr ""
+
+#: configs/nls/messages.c:235
+msgid "Cannot allocate accent glyph"
+msgstr ""
+
+#: configs/nls/messages.c:236
+msgid "Cannot allocate bounded frame payload"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:240
+msgid "Cannot allocate clipboard image"
+msgstr ""
+
+#: configs/nls/messages.c:237
+msgid "Cannot allocate declared render artifact"
+msgstr ""
+
+#: configs/nls/messages.c:238
+msgid "Cannot allocate delimiter glyph"
+msgstr ""
+
+#: configs/nls/messages.c:239
+msgid "Cannot allocate formula layout"
+msgstr ""
+
+#: configs/nls/messages.c:240
+msgid "Cannot allocate formula output"
+msgstr ""
+
+#: configs/nls/messages.c:241
+msgid "Cannot allocate glyph layout"
+msgstr ""
+
+#: configs/nls/messages.c:242
+msgid "Cannot allocate matrix cells"
+msgstr ""
+
+#: configs/nls/messages.c:243
+msgid "Cannot allocate matrix row data"
+msgstr ""
+
+#: configs/nls/messages.c:244
+msgid "Cannot allocate radical glyph"
+msgstr ""
+
+#: configs/nls/messages.c:245
+msgid "Cannot allocate rectangular matrix"
+msgstr ""
+
+#: configs/nls/messages.c:246
+msgid "Cannot allocate renderer client"
+msgstr ""
+
+#: configs/nls/messages.c:247
+msgid "Cannot allocate rule"
+msgstr ""
+
+#: configs/nls/messages.c:248
+msgid "Cannot allocate vector output"
+msgstr ""
+
+#: configs/nls/messages.c:249
+msgid "Cannot append formula box"
+msgstr ""
+
+#: configs/nls/messages.c:250
+msgid "Cannot change worker path during a render"
+msgstr ""
+
+#: configs/nls/messages.c:251
+msgid "Cannot change worker path while its child is being reaped"
+msgstr ""
+
+#: configs/nls/messages.c:252
+msgid "Cannot copy source chunk"
+msgstr ""
+
+#: configs/nls/messages.c:253
+msgid "Cannot create export filename"
 msgstr ""
 
 #: userland/apps/fileman/actions.c:318
 msgid "Cannot create extraction folder"
 msgstr ""
 
+#: configs/nls/messages.c:254
+msgid "Cannot create formula outline"
+msgstr ""
+
+#: configs/nls/messages.c:255
+msgid "Cannot create renderer pipes"
+msgstr ""
+
+#: configs/nls/messages.c:256
+msgid "Cannot encode Begin metadata"
+msgstr ""
+
+#: configs/nls/messages.c:257
+msgid "Cannot encode Done metadata"
+msgstr ""
+
+#: configs/nls/messages.c:258
+msgid "Cannot encode Failure metadata"
+msgstr ""
+
+#: configs/nls/messages.c:259
+msgid "Cannot encode artifact descriptor"
+msgstr ""
+
+#: configs/nls/messages.c:260
+msgid "Cannot encode frame"
+msgstr ""
+
 #: userland/apps/taskmgr/main.cpp:620
 msgid "Cannot end protected or non-user task"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:300
+msgid "Cannot find a writable user configuration path."
+msgstr ""
+
+#: configs/nls/messages.c:261
+msgid "Cannot initialize FreeType"
+msgstr ""
+
+#: configs/nls/messages.c:262
+msgid "Cannot load glyph outline"
+msgstr ""
+
+#: configs/nls/messages.c:263
+msgid "Cannot load required formula fonts"
+msgstr ""
+
+#: configs/nls/messages.c:264
+msgid "Cannot make renderer pipes nonblocking"
+msgstr ""
+
 #: userland/apps/desktop/desktop_items.c:653
 msgid "Cannot open Desktop folder"
+msgstr ""
+
+#: configs/nls/messages.c:265
+msgid "Cannot poll renderer pipes"
+msgstr ""
+
+#: configs/nls/messages.c:266
+msgid "Cannot prepare export snapshots"
+msgstr ""
+
+#: configs/nls/messages.c:267
+msgid "Cannot prepare recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:268
+msgid "Cannot prepare save snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:269
+msgid "Cannot produce formula image"
+msgstr ""
+
+#: configs/nls/messages.c:270
+msgid "Cannot queue decoded frame"
+msgstr ""
+
+#: configs/nls/messages.c:271
+msgid "Cannot queue render request"
+msgstr ""
+
+#: configs/nls/messages.c:272
+msgid "Cannot read render protocol input"
+msgstr ""
+
+#: configs/nls/messages.c:273
+msgid "Cannot reserve bounded formula source"
+msgstr ""
+
+#: configs/nls/messages.c:274
+msgid "Cannot start renderer worker"
+msgstr ""
+
+#: configs/nls/messages.c:275
+msgid "Cannot store Failure message"
+msgstr ""
+
+#: configs/nls/messages.c:276
+msgid "Cannot store file path"
+msgstr ""
+
+#: configs/nls/messages.c:277
+msgid "Cannot store formula source"
+msgstr ""
+
+#: configs/nls/messages.c:278
+msgid "Cannot store output path"
+msgstr ""
+
+#: configs/nls/messages.c:279
+msgid "Cannot store vector path"
+msgstr ""
+
+#: configs/nls/messages.c:280
+msgid "Cannot write artifact response"
 msgstr ""
 
 #: userland/apps/diskmgr/main.c:727
@@ -550,8 +974,68 @@ msgstr ""
 msgid "Capacity:"
 msgstr ""
 
+#: configs/nls/messages.c:68
+msgid "Capital delta"
+msgstr ""
+
+#: configs/nls/messages.c:69
+msgid "Capital gamma"
+msgstr ""
+
+#: configs/nls/messages.c:70
+msgid "Capital lambda"
+msgstr ""
+
+#: configs/nls/messages.c:71
+msgid "Capital omega"
+msgstr ""
+
+#: configs/nls/messages.c:72
+msgid "Capital phi"
+msgstr ""
+
+#: configs/nls/messages.c:73
+msgid "Capital pi"
+msgstr ""
+
+#: configs/nls/messages.c:74
+msgid "Capital psi"
+msgstr ""
+
+#: configs/nls/messages.c:75
+msgid "Capital sigma"
+msgstr ""
+
+#: configs/nls/messages.c:76
+msgid "Capital theta"
+msgstr ""
+
+#: configs/nls/messages.c:77
+msgid "Capital upsilon"
+msgstr ""
+
+#: configs/nls/messages.c:78
+msgid "Capital xi"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:689
+msgid "Cases"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:105
+msgid "Cases..."
+msgstr ""
+
+#: configs/nls/messages.c:79
+msgid "Ceiling brackets"
+msgstr ""
+
 #: userland/apps/settings/main.c:299
 msgid "Center"
+msgstr ""
+
+#: configs/nls/messages.c:80
+msgid "Centered dot"
 msgstr ""
 
 #: userland/apps/settings/main.c:1493
@@ -582,6 +1066,14 @@ msgstr ""
 msgid "Checks and Fields"
 msgstr ""
 
+#: configs/nls/messages.c:81
+msgid "Chi"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:97
+msgid "Chinese formula"
+msgstr ""
+
 #: configs/nls/messages.c:4
 msgid "Chinese punctuation"
 msgstr ""
@@ -602,8 +1094,16 @@ msgstr ""
 msgid "Choose a text file or PNG image"
 msgstr ""
 
+#: configs/nls/messages.c:281
+msgid "Choose an export directory and filename pattern"
+msgstr ""
+
 #: userland/apps/fileman/main.cpp:464
 msgid "Choose an installed X11 executable using its absolute path"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:127
+msgid "Choose an item to see its command and example."
 msgstr ""
 
 #: userland/apps/notepad/main.c:676
@@ -658,6 +1158,10 @@ msgstr ""
 msgid "Clear Marks"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:84
+msgid "Clearing recovery snapshot..."
+msgstr ""
+
 #: userland/apps/diskmgr/main.c:540
 msgid "Click Apply again to continue"
 msgstr ""
@@ -674,6 +1178,14 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:421
+msgid "Close anyway"
+msgstr ""
+
+#: configs/nls/messages.c:82
+msgid "Closed integral"
+msgstr ""
+
 #: userland/apps/desktop/screen.c:803
 msgid "Closing applications"
 msgstr ""
@@ -684,6 +1196,26 @@ msgstr ""
 
 #: userland/apps/netctl/main.c:173
 msgid "Cloudflare DNS"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:136
+msgid "Command"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:615
+msgid "Command details"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1049
+msgid "Command prefix"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:92
+msgid "Complete"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1047
+msgid "Complete command"
 msgstr ""
 
 #: userland/apps/fileman/main.cpp:765
@@ -762,12 +1294,20 @@ msgstr ""
 msgid "Copy"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:118
+msgid "Copy LaTeX"
+msgstr ""
+
 #: userland/apps/fileman/operations.c:348
 msgid "Copy complete"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1712
 msgid "Copy failed"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:94
+msgid "Copy image"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1053
@@ -788,6 +1328,10 @@ msgstr ""
 
 #: userland/apps/installer/install_ops.c:1799
 msgid "Core update failed"
+msgstr ""
+
+#: configs/nls/messages.c:83
+msgid "Cosine"
 msgstr ""
 
 #: userland/apps/settings/main.c:1179
@@ -854,6 +1398,10 @@ msgstr ""
 msgid "Could not persist kernel debug mode."
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:913
+msgid "Could not prepare the source edit."
+msgstr ""
+
 #: userland/apps/osver/main.cpp:91
 msgid "Could not read system version information"
 msgstr ""
@@ -910,6 +1458,10 @@ msgstr ""
 msgid "Could not start Download Manager"
 msgstr ""
 
+#: configs/nls/messages.c:282
+msgid "Could not start background file task"
+msgstr ""
+
 #: userland/apps/settings/main.c:2192
 msgid "Could not start dictionary update"
 msgstr ""
@@ -958,6 +1510,66 @@ msgstr ""
 msgid "Crosshair"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:1111
+msgid "Ctrl+A  Select all"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1112
+msgid "Ctrl+C  Copy"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1115
+msgid "Ctrl+F  Find"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1116
+msgid "Ctrl+H  Find and replace"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1105
+msgid "Ctrl+N  New document"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1106
+msgid "Ctrl+O  Open document"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1107
+msgid "Ctrl+S  Save document"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1108
+msgid "Ctrl+Shift+S  Save as"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1117
+msgid "Ctrl+Space  Complete the backslash command at the caret"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1114
+msgid "Ctrl+V  Paste"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1113
+msgid "Ctrl+X  Cut"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1110
+msgid "Ctrl+Y or Ctrl+Shift+Z  Redo"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1109
+msgid "Ctrl+Z  Undo"
+msgstr ""
+
+#: configs/nls/messages.c:84
+msgid "Curly brackets"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:164
+msgid "Current formula"
+msgstr ""
+
 #: userland/apps/guitest/main.c:127
 msgid "Cursor style: "
 msgstr ""
@@ -972,6 +1584,10 @@ msgstr ""
 
 #: userland/apps/fltk_support.h:45
 msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:760
+msgid "Custom source will be inserted as typed; generated Tab stops are cleared."
 msgstr ""
 
 #: userland/apps/fileman/main.cpp:754
@@ -1066,6 +1682,10 @@ msgstr ""
 msgid "DOOM is no longer running"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:171
+msgid "DPI:"
+msgstr ""
+
 #: userland/apps/diskmgr/main.c:247
 msgid "Data"
 msgstr ""
@@ -1130,8 +1750,24 @@ msgstr ""
 msgid "Delete partition"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:227
+msgid "Delete the current formula?"
+msgstr ""
+
 #: userland/apps/fileman/operations.c:373
 msgid "Deleting items..."
+msgstr ""
+
+#: configs/nls/messages.c:283
+msgid "Delimiter geometry overflow"
+msgstr ""
+
+#: configs/nls/messages.c:85
+msgid "Delimiters"
+msgstr ""
+
+#: configs/nls/messages.c:86
+msgid "Delta"
 msgstr ""
 
 #: userland/apps/sysconfdialog/main.c:86
@@ -1210,6 +1846,10 @@ msgstr ""
 msgid "Dictionary update started"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:166
+msgid "Directory:"
+msgstr ""
+
 #: userland/apps/desktop/render.c:239
 msgid "Dirty redraw reduces flicker"
 msgstr ""
@@ -1232,6 +1872,10 @@ msgstr ""
 
 #: userland/apps/paint/main.cpp:50
 msgid "Discard changes?"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:154
+msgid "Discard snapshot"
 msgstr ""
 
 #: userland/apps/installer/main.cpp:214
@@ -1262,6 +1906,10 @@ msgstr ""
 msgid "Display"
 msgstr ""
 
+#: configs/nls/messages.c:87
+msgid "Display fraction"
+msgstr ""
+
 #: userland/apps/settings/main.c:1322
 msgid "Display mode"
 msgstr ""
@@ -1272,6 +1920,14 @@ msgstr ""
 
 #: userland/apps/settings/main.c:1861
 msgid "Display settings saved"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:109
+msgid "Display style"
+msgstr ""
+
+#: configs/nls/messages.c:88
+msgid "Division"
 msgstr ""
 
 #: userland/apps/sysconfdialog/main.c:83
@@ -1286,6 +1942,10 @@ msgstr ""
 msgid "Document"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:124
+msgid "Document opened"
+msgstr ""
+
 #: userland/apps/browser/view.c:889
 msgid "Document: "
 msgstr ""
@@ -1296,6 +1956,22 @@ msgstr ""
 
 #: userland/apps/netctl/main.c:650
 msgid "Domain:"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:37
+msgid "Done"
+msgstr ""
+
+#: configs/nls/messages.c:284
+msgid "Done arrived before all requested artifacts"
+msgstr ""
+
+#: configs/nls/messages.c:89
+msgid "Double integral"
+msgstr ""
+
+#: configs/nls/messages.c:90
+msgid "Double quad space"
 msgstr ""
 
 #: userland/apps/downloadmgr/main.c:366
@@ -1366,8 +2042,28 @@ msgstr ""
 msgid "Drivers are built into the kernel image. This view is read-only."
 msgstr ""
 
+#: configs/nls/messages.c:285
+msgid "Duplicate script on one math atom"
+msgstr ""
+
 #: userland/apps/dynlinkerror/main.c:60
 msgid "Dynamic Link Error"
+msgstr ""
+
+#: configs/nls/messages.c:286
+msgid "EOF before request End frame"
+msgstr ""
+
+#: configs/nls/messages.c:287
+msgid "EOF before the declared artifact completed"
+msgstr ""
+
+#: configs/nls/messages.c:288
+msgid "EOF in a partial frame"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1124
+msgid "Each formula source is limited to 64 KiB and nesting is limited to 128 levels."
 msgstr ""
 
 #: userland/apps/browser/bookmarks.c:310
@@ -1378,8 +2074,24 @@ msgstr ""
 msgid "Edit Bookmark"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:587
+msgid "Editable LaTeX source; generated placeholders support Tab."
+msgstr ""
+
 #: userland/apps/browser/forms.c:1040
 msgid "Editing form input"
+msgstr ""
+
+#: configs/nls/messages.c:289
+msgid "Editor source is null"
+msgstr ""
+
+#: configs/nls/messages.c:290
+msgid "Editor undo snapshot is too large"
+msgstr ""
+
+#: configs/nls/messages.c:91
+msgid "Element of"
 msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:156
@@ -1392,6 +2104,10 @@ msgstr ""
 
 #: userland/apps/settings/main.c:1609
 msgid "Email hash"
+msgstr ""
+
+#: configs/nls/messages.c:92
+msgid "Empty set"
 msgstr ""
 
 #: userland/apps/settings/main.c:1362
@@ -1450,6 +2166,10 @@ msgstr ""
 msgid "Enter size_MiB filesystem name (ext4/ext2/fat32/exfat):"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:813
+msgid "Enter text to find."
+msgstr ""
+
 #: userland/apps/installer/main.cpp:689
 msgid "Enter the GPT partition name:"
 msgstr ""
@@ -1458,12 +2178,48 @@ msgstr ""
 msgid "Enter the new partition size in MiB:"
 msgstr ""
 
+#: configs/nls/messages.c:291
+msgid "Environment has an invalid number of columns"
+msgstr ""
+
+#: configs/nls/messages.c:93
+msgid "Epsilon"
+msgstr ""
+
+#: configs/nls/messages.c:94
+msgid "Equals"
+msgstr ""
+
+#: configs/nls/messages.c:95
+msgid "Equivalent"
+msgstr ""
+
 #: userland/apps/paint/main.cpp:171
 msgid "Eraser"
 msgstr ""
 
 #: userland/apps/calc/main.cpp:20
 msgid "Error"
+msgstr ""
+
+#: configs/nls/messages.c:96
+msgid "Eta"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:97
+msgid "Euler identity"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:137
+msgid "Example"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:102
+msgid "Example document · save it as a new file"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:95
+msgid "Example formulas"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1220
@@ -1476,6 +2232,122 @@ msgstr ""
 
 #: userland/apps/installer/install_ops.c:1328
 msgid "Existing system check failed"
+msgstr ""
+
+#: configs/nls/messages.c:292
+msgid "Expected SourceChunk or complete End frame"
+msgstr ""
+
+#: configs/nls/messages.c:293
+msgid "Expected a braced argument"
+msgstr ""
+
+#: configs/nls/messages.c:294
+msgid "Expected a braced text argument"
+msgstr ""
+
+#: configs/nls/messages.c:295
+msgid "Expected a control sequence"
+msgstr ""
+
+#: configs/nls/messages.c:296
+msgid "Expected a matching right delimiter"
+msgstr ""
+
+#: configs/nls/messages.c:297
+msgid "Expected a math atom"
+msgstr ""
+
+#: configs/nls/messages.c:298
+msgid "Expected an alignment marker or matching end"
+msgstr ""
+
+#: configs/nls/messages.c:299
+msgid "Expected an environment name after begin"
+msgstr ""
+
+#: configs/nls/messages.c:97
+msgid "Exponential"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:29
+msgid "Export LaTeX..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:94
+msgid "Export PNG"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:94
+msgid "Export SVG"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:28
+msgid "Export SVG..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:30
+msgid "Export all formulas..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:94
+msgid "Export all..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:167
+msgid "Export directory"
+msgstr ""
+
+#: configs/nls/messages.c:300
+msgid "Export filename is too long"
+msgstr ""
+
+#: configs/nls/messages.c:301
+msgid "Export filenames cannot contain parent path components"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:163
+msgid "Export formulas"
+msgstr ""
+
+#: configs/nls/messages.c:302
+msgid "Export path is too long"
+msgstr ""
+
+#: configs/nls/messages.c:303
+msgid "Export request identifiers exhausted"
+msgstr ""
+
+#: configs/nls/messages.c:304
+msgid "Export result does not match its source snapshot"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:183
+msgid "Export results"
+msgstr ""
+
+#: configs/nls/messages.c:305
+msgid "Export scale or DPI is outside the supported range"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:29
+msgid "Export selected formulas..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:113
+msgid "Export settings..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:189
+msgid "Export started in background"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:28
+msgid "Export transparent PNG..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:173
+msgid "Exports use a source snapshot. Editing can continue.\nEach result is reported separately; cancelling keeps completed files."
 msgstr ""
 
 #: userland/apps/settings/main.c:1500
@@ -1502,12 +2374,52 @@ msgstr ""
 msgid "Extraction canceled"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:1119
+msgid "F1  Open this help"
+msgstr ""
+
 #: userland/apps/drvmgr/main.c:85
 msgid "Failed"
 msgstr ""
 
+#: configs/nls/messages.c:306
+msgid "Failure details exceed protocol limits"
+msgstr ""
+
+#: configs/nls/messages.c:307
+msgid "Failure interrupted an artifact stream"
+msgstr ""
+
+#: configs/nls/messages.c:308
+msgid "Failure message is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages.c:309
+msgid "Failure range or message length is invalid"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:349
+msgid "Favorite deleted."
+msgstr ""
+
 #: userland/apps/browser/input.c:153
 msgid "Favorites"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:420
+msgid "Favorites could not be saved. Close without saving?"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:390
+msgid "Favorites loaded."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:405
+msgid "Favorites saved."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:93
+msgid "Favorites..."
 msgstr ""
 
 #: userland/apps/browser/input.c:150
@@ -1546,6 +2458,10 @@ msgstr ""
 msgid "File association saved"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:31
+msgid "File changed externally"
+msgstr ""
+
 #: userland/apps/browser/navigation.c:734
 msgid "File loaded"
 msgstr ""
@@ -1570,12 +2486,20 @@ msgstr ""
 msgid "File system:"
 msgstr ""
 
+#: configs/nls/messages.c:310
+msgid "File task cancelled"
+msgstr ""
+
 #: userland/runtime/src/ui.c:1017
 msgid "File type must match "
 msgstr ""
 
 #: userland/runtime/src/ui.c:1762
 msgid "File:"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:168
+msgid "Filename pattern:"
 msgstr ""
 
 #: userland/runtime/src/ui.c:1128
@@ -1590,12 +2514,20 @@ msgstr ""
 msgid "Fill"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:46
+msgid "Filter formulas by name or source"
+msgstr ""
+
 #: userland/apps/installer/main.cpp:842
 msgid "Final confirmation formats a FAT32 ESP and ext4 root on the selected disk."
 msgstr ""
 
 #: userland/apps/installer/main.cpp:843
 msgid "Final confirmation formats only the selected ESP and root; other partitions are preserved."
+msgstr ""
+
+#: configs/nls/messages.c:98
+msgid "Final sigma"
 msgstr ""
 
 #: userland/apps/apiapp/main.c:665
@@ -1626,8 +2558,16 @@ msgstr ""
 msgid "Fit"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:115
+msgid "Fit preview"
+msgstr ""
+
 #: userland/apps/devmgr/main.c:208
 msgid "Flags"
+msgstr ""
+
+#: configs/nls/messages.c:99
+msgid "Floor brackets"
 msgstr ""
 
 #: userland/apps/fileman/actions.c:118
@@ -1650,6 +2590,14 @@ msgstr ""
 msgid "Folders (double-click to expand)"
 msgstr ""
 
+#: configs/nls/messages.c:311
+msgid "Font book already initialized"
+msgstr ""
+
+#: configs/nls/messages.c:100
+msgid "For all"
+msgstr ""
+
 #: userland/apps/desktop/screen.c:826
 msgid "Force"
 msgstr ""
@@ -1666,12 +2614,120 @@ msgstr ""
 msgid "Format partition"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:165
+msgid "Format:"
+msgstr ""
+
 #: userland/apps/installer/main.cpp:721
 msgid "Formatting destroys all files on the selected partition."
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:224
+msgid "Formula %zu"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:100
+msgid "Formula 1"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:111
+msgid "Formula color"
+msgstr ""
+
+#: configs/nls/messages.c:312
+msgid "Formula effective size must be finite and positive"
+msgstr ""
+
+#: configs/nls/messages.c:313
+msgid "Formula exceeds image dimensions or pixel limit"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:304
+msgid "Formula favorites"
+msgstr ""
+
+#: configs/nls/messages.c:314
+msgid "Formula fonts must have scalable outlines"
+msgstr ""
+
+#: configs/nls/messages.c:315
+msgid "Formula geometry overflow"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:226
+msgid "Formula name:"
+msgstr ""
+
+#: configs/nls/messages.c:316
+msgid "Formula nesting exceeds 128 levels"
+msgstr ""
+
+#: configs/nls/messages.c:317
+msgid "Formula point size must be between 1 and 512"
+msgstr ""
+
+#: configs/nls/messages.c:318
+msgid "Formula render settings exceed supported limits"
+msgstr ""
+
+#: configs/nls/messages.c:319
+msgid "Formula resource path is too long"
+msgstr ""
+
+#: configs/nls/messages.c:320
+msgid "Formula source exceeds 64 KiB"
+msgstr ""
+
+#: configs/nls/messages.c:321
+msgid "Formula source is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages.c:322
+msgid "Formula source is null"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:109
+msgid "Formula style"
+msgstr ""
+
+#: configs/nls/messages.c:323
+msgid "Formula width overflow"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:164
+msgid "Formulas:"
+msgstr ""
+
 #: userland/apps/browser/view.c:964
 msgid "Forward"
+msgstr ""
+
+#: configs/nls/messages.c:101
+msgid "Fraction"
+msgstr ""
+
+#: configs/nls/messages.c:324
+msgid "Fraction geometry overflow"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:498
+msgid "Fraction style"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:103
+msgid "Fraction..."
+msgstr ""
+
+#: configs/nls/messages.c:102
+msgid "Fractions"
+msgstr ""
+
+#: configs/nls/messages.c:325
+msgid "Frame decoder is in a failed state"
+msgstr ""
+
+#: configs/nls/messages.c:326
+msgid "Frame payload exceeds 65536 bytes"
 msgstr ""
 
 #: userland/apps/settings/main.c:1229
@@ -1698,6 +2754,10 @@ msgstr ""
 msgid "Fullscreen"
 msgstr ""
 
+#: configs/nls/messages.c:327
+msgid "Function width overflow"
+msgstr ""
+
 #: userland/apps/httpget/main.c:302
 msgid "GET"
 msgstr ""
@@ -1722,8 +2782,32 @@ msgstr ""
 msgid "GUI API title update passed"
 msgstr ""
 
+#: configs/nls/messages.c:104
+msgid "Gamma"
+msgstr ""
+
 #: userland/apps/netctl/main.c:630
 msgid "Gateway:"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:97
+msgid "Gaussian integral"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:716
+msgid "Generated editable LaTeX source"
+msgstr ""
+
+#: configs/nls/messages.c:328
+msgid "Generated snippet is empty"
+msgstr ""
+
+#: configs/nls/messages.c:329
+msgid "Glyph has no vector outline"
+msgstr ""
+
+#: configs/nls/messages.c:330
+msgid "Glyph metrics exceed layout limits"
 msgstr ""
 
 #: userland/apps/browser/view.c:1007
@@ -1732,6 +2816,18 @@ msgstr ""
 
 #: userland/apps/settings/main.c:285
 msgid "Graphite"
+msgstr ""
+
+#: configs/nls/messages.c:106
+msgid "Greater than"
+msgstr ""
+
+#: configs/nls/messages.c:105
+msgid "Greater than or equal"
+msgstr ""
+
+#: configs/nls/messages.c:107
+msgid "Greek letters"
 msgstr ""
 
 #: userland/apps/settings/main.c:279
@@ -1776,6 +2872,14 @@ msgstr ""
 
 #: userland/apps/devmgr/main.c:219
 msgid "Hardware detected by the kernel"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:106
+msgid "Hat"
+msgstr ""
+
+#: configs/nls/messages.c:108
+msgid "Hat accent"
 msgstr ""
 
 #: userland/apps/hello/main.c:22
@@ -1830,6 +2934,10 @@ msgstr ""
 msgid "Host:"
 msgstr ""
 
+#: configs/nls/messages.c:331
+msgid "I/O error"
+msgstr ""
+
 #: userland/apps/netctl/main.c:628
 msgid "IPv4:"
 msgstr ""
@@ -1852,6 +2960,22 @@ msgstr ""
 
 #: userland/apps/paint/main.cpp:99
 msgid "Image saved"
+msgstr ""
+
+#: configs/nls/messages.c:332
+msgid "Incomplete control sequence"
+msgstr ""
+
+#: configs/nls/messages.c:109
+msgid "Indexed root"
+msgstr ""
+
+#: configs/nls/messages.c:110
+msgid "Infinity"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:109
+msgid "Inline style"
 msgstr ""
 
 #: userland/apps/devmgr/main.c:87
@@ -1908,6 +3032,14 @@ msgstr ""
 
 #: userland/apps/settings/main.c:2049
 msgid "Input shortcut changed"
+msgstr ""
+
+#: configs/nls/messages.c:333
+msgid "Inserted source is too large"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:997
+msgid "Insertion"
 msgstr ""
 
 #: userland/apps/desktop/render.c:54
@@ -1986,16 +3118,88 @@ msgstr ""
 msgid "Integer calculator"
 msgstr ""
 
+#: configs/nls/messages.c:111
+msgid "Integral"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:503
+msgid "Integral type"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:104
+msgid "Integral..."
+msgstr ""
+
 #: userland/apps/netctl/main.c:616
 msgid "Intel e1000 Network"
+msgstr ""
+
+#: configs/nls/messages.c:112
+msgid "Intersection"
+msgstr ""
+
+#: configs/nls/messages.c:334
+msgid "Invalid ArtifactBegin metadata"
+msgstr ""
+
+#: configs/nls/messages.c:335
+msgid "Invalid Begin display flag"
+msgstr ""
+
+#: configs/nls/messages.c:336
+msgid "Invalid Begin frame or metadata length"
+msgstr ""
+
+#: configs/nls/messages.c:337
+msgid "Invalid Done metadata"
+msgstr ""
+
+#: configs/nls/messages.c:338
+msgid "Invalid Failure metadata"
+msgstr ""
+
+#: configs/nls/messages.c:339
+msgid "Invalid PNG output declaration"
+msgstr ""
+
+#: configs/nls/messages.c:340
+msgid "Invalid RGBA extent or stride"
+msgstr ""
+
+#: configs/nls/messages.c:341
+msgid "Invalid SVG header"
+msgstr ""
+
+#: configs/nls/messages.c:342
+msgid "Invalid SVG output declaration"
 msgstr ""
 
 #: userland/apps/browser/navigation.c:497
 msgid "Invalid URL"
 msgstr ""
 
+#: configs/nls/messages.c:343
+msgid "Invalid UTF-8 in formula"
+msgstr ""
+
+#: configs/nls/messages.c:344
+msgid "Invalid UTF-8 in text"
+msgstr ""
+
+#: configs/nls/messages.c:345
+msgid "Invalid accent geometry"
+msgstr ""
+
 #: userland/apps/settings/main.c:475
 msgid "Invalid activation"
+msgstr ""
+
+#: configs/nls/messages.c:346
+msgid "Invalid box placement"
+msgstr ""
+
+#: configs/nls/messages.c:347
+msgid "Invalid delimiter geometry"
 msgstr ""
 
 #: userland/apps/fileman/actions.c:311
@@ -2010,24 +3214,92 @@ msgstr ""
 msgid "Invalid folder name or path too long"
 msgstr ""
 
+#: configs/nls/messages.c:348
+msgid "Invalid formula scale"
+msgstr ""
+
+#: configs/nls/messages.c:349
+msgid "Invalid fraction geometry"
+msgstr ""
+
+#: configs/nls/messages.c:350
+msgid "Invalid frame kind or flags"
+msgstr ""
+
+#: configs/nls/messages.c:351
+msgid "Invalid frame magic"
+msgstr ""
+
+#: configs/nls/messages.c:352
+msgid "Invalid glyph outline"
+msgstr ""
+
+#: configs/nls/messages.c:353
+msgid "Invalid glyph size"
+msgstr ""
+
 #: userland/apps/oshlp/main.c:1213
 msgid "Invalid help file"
+msgstr ""
+
+#: configs/nls/messages.c:354
+msgid "Invalid horizontal spacing"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1668
 msgid "Invalid installation settings"
 msgstr ""
 
+#: configs/nls/messages.c:355
+msgid "Invalid layout coordinates"
+msgstr ""
+
+#: configs/nls/messages.c:356
+msgid "Invalid matrix cell geometry"
+msgstr ""
+
 #: userland/apps/fileman/main.cpp:435
 msgid "Invalid mode, UID or GID"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:234
+msgid "Invalid padding value"
+msgstr ""
+
+#: configs/nls/messages.c:357
+msgid "Invalid path coordinate"
+msgstr ""
+
+#: configs/nls/messages.c:358
+msgid "Invalid radical geometry"
+msgstr ""
+
+#: configs/nls/messages.c:359
+msgid "Invalid render snapshot metadata"
+msgstr ""
+
+#: configs/nls/messages.c:360
+msgid "Invalid renderer baseline"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1777
 msgid "Invalid root layout"
 msgstr ""
 
+#: configs/nls/messages.c:361
+msgid "Invalid script geometry"
+msgstr ""
+
 #: userland/apps/desktop/desktop_items.c:561
 msgid "Invalid shortcut."
+msgstr ""
+
+#: configs/nls/messages.c:113
+msgid "Iota"
+msgstr ""
+
+#: configs/nls/messages.c:114
+msgid "Italic math font"
 msgstr ""
 
 #: userland/apps/fileman/model.c:75
@@ -2054,6 +3326,10 @@ msgstr ""
 msgid "Items deleted"
 msgstr ""
 
+#: configs/nls/messages.c:115
+msgid "Kappa"
+msgstr ""
+
 #: userland/apps/settings/main.c:287
 msgid "Kawaii Pink"
 msgstr ""
@@ -2062,8 +3338,20 @@ msgstr ""
 msgid "Keep"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:154
+msgid "Keep for later"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:421
+msgid "Keep open"
+msgstr ""
+
 #: userland/apps/settings/main.c:1253
 msgid "Keep these display settings? Reverting in "
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:77
+msgid "Keep working"
 msgstr ""
 
 #: userland/apps/osver/main.cpp:107
@@ -2094,16 +3382,32 @@ msgstr ""
 msgid "Kernel version"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:1104
+msgid "Keyboard shortcuts"
+msgstr ""
+
 #: userland/apps/taskmgr/main.cpp:659
 msgid "Kind:"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:165
+msgid "LaTeX source"
 msgstr ""
 
 #: userland/apps/diskmgr/main.c:704
 msgid "Label:"
 msgstr ""
 
+#: configs/nls/messages.c:116
+msgid "Lambda"
+msgstr ""
+
 #: userland/apps/installer/main.cpp:210
 msgid "Language"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:104
+msgid "Large operators"
 msgstr ""
 
 #: userland/apps/doomlauncher/main.cpp:95
@@ -2126,12 +3430,52 @@ msgstr ""
 msgid "Learn selected candidates"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:117
+msgid "Learning"
+msgstr ""
+
 #: userland/apps/netctl/main.c:632
 msgid "Lease:"
 msgstr ""
 
+#: configs/nls/messages.c:117
+msgid "Left and right arrow"
+msgstr ""
+
+#: configs/nls/messages.c:118
+msgid "Left arrow"
+msgstr ""
+
+#: configs/nls/messages.c:119
+msgid "Left double arrow"
+msgstr ""
+
 #: userland/apps/installer/install_ops.c:1635
 msgid "Legacy accounts require recovery before updating"
+msgstr ""
+
+#: configs/nls/messages.c:121
+msgid "Less than"
+msgstr ""
+
+#: configs/nls/messages.c:120
+msgid "Less than or equal"
+msgstr ""
+
+#: configs/nls/messages.c:362
+msgid "Lexer input is too large"
+msgstr ""
+
+#: configs/nls/messages.c:363
+msgid "Lexer source is null"
+msgstr ""
+
+#: configs/nls/messages.c:364
+msgid "Lexer token output capacity is too small"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:93
+msgid "Library"
 msgstr ""
 
 #: userland/apps/browser/view.c:970
@@ -2144,6 +3488,10 @@ msgstr ""
 
 #: userland/apps/settings/main.c:1583
 msgid "License validation is disabled for this build."
+msgstr ""
+
+#: configs/nls/messages.c:122
+msgid "Limit"
 msgstr ""
 
 #: userland/apps/notepad/main.c:254
@@ -2174,8 +3522,24 @@ msgstr ""
 msgid "Loading documents..."
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:314
+msgid "Loading favorites..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:64
+msgid "Locate error"
+msgstr ""
+
 #: userland/apps/browser/view.c:882
 msgid "Location: "
+msgstr ""
+
+#: configs/nls/messages.c:123
+msgid "Logarithm"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:100
+msgid "Logic"
 msgstr ""
 
 #: userland/apps/settings/main.c:2002
@@ -2202,6 +3566,10 @@ msgstr ""
 msgid "Machine ID"
 msgstr ""
 
+#: configs/nls/messages.c:365
+msgid "Malformed environment name"
+msgstr ""
+
 #: userland/apps/browser/bookmarks.c:221
 msgid "Manage Bookmarks..."
 msgstr ""
@@ -2214,12 +3582,24 @@ msgstr ""
 msgid "Manage GPT partitions"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:619
+msgid "Manage favorites"
+msgstr ""
+
 #: userland/apps/settings/main.c:1150
 msgid "Manual"
 msgstr ""
 
 #: userland/apps/installer/main.cpp:809
 msgid "Manual layout: select partitions, then assign ESP and root roles."
+msgstr ""
+
+#: configs/nls/messages.c:125
+msgid "Maps to"
+msgstr ""
+
+#: configs/nls/messages.c:124
+msgid "Maps to the right"
 msgstr ""
 
 #: userland/apps/fileman/main.cpp:757
@@ -2240,6 +3620,78 @@ msgstr ""
 
 #: userland/apps/netctl/main.c:629
 msgid "Mask:"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:836
+msgid "Match selected."
+msgstr ""
+
+#: configs/nls/messages.c:366
+msgid "Matching bracket was not found"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1053
+msgid "Matching commands"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:110
+msgid "Math fonts"
+msgstr ""
+
+#: configs/nls/messages.c:126
+msgid "Matrices"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1125
+msgid "Matrices must be rectangular and no larger than 16 rows by 16 columns."
+msgstr ""
+
+#: configs/nls/messages.c:127
+msgid "Matrix"
+msgstr ""
+
+#: configs/nls/messages.c:367
+msgid "Matrix cell count overflow"
+msgstr ""
+
+#: configs/nls/messages.c:368
+msgid "Matrix column count exceeds 16"
+msgstr ""
+
+#: configs/nls/messages.c:369
+msgid "Matrix dimensions are limited to 16 by 16"
+msgstr ""
+
+#: configs/nls/messages.c:370
+msgid "Matrix dimensions exceed 16 by 16"
+msgstr ""
+
+#: configs/nls/messages.c:371
+msgid "Matrix dimensions must be between 1 and 16"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:512
+msgid "Matrix form"
+msgstr ""
+
+#: configs/nls/messages.c:372
+msgid "Matrix geometry overflow"
+msgstr ""
+
+#: configs/nls/messages.c:373
+msgid "Matrix row count exceeds 16"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:105
+msgid "Matrix..."
+msgstr ""
+
+#: configs/nls/messages.c:128
+msgid "Maximum"
+msgstr ""
+
+#: configs/nls/messages.c:129
+msgid "Medium space"
 msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:520
@@ -2274,8 +3726,44 @@ msgstr ""
 msgid "Minimized windows"
 msgstr ""
 
+#: configs/nls/messages.c:130
+msgid "Minimum"
+msgstr ""
+
+#: configs/nls/messages.c:132
+msgid "Minus"
+msgstr ""
+
+#: configs/nls/messages.c:131
+msgid "Minus or plus"
+msgstr ""
+
+#: configs/nls/messages.c:374
+msgid "Mismatched scalable delimiters"
+msgstr ""
+
+#: configs/nls/messages.c:375
+msgid "Missing a matching right delimiter"
+msgstr ""
+
 #: userland/apps/doomlauncher/main.cpp:38
 msgid "Missing closing quote"
+msgstr ""
+
+#: configs/nls/messages.c:376
+msgid "Missing delimiter"
+msgstr ""
+
+#: configs/nls/messages.c:377
+msgid "Missing left delimiter"
+msgstr ""
+
+#: configs/nls/messages.c:378
+msgid "Missing right delimiter"
+msgstr ""
+
+#: configs/nls/messages.c:379
+msgid "Missing script argument"
 msgstr ""
 
 #: userland/apps/installer/main.cpp:213
@@ -2326,7 +3814,7 @@ msgstr ""
 msgid "Move complete"
 msgstr ""
 
-#: userland/apps/settings/main.c:1407
+#: userland/apps/reliefmath/window.cpp:91
 msgid "Move down"
 msgstr ""
 
@@ -2334,12 +3822,32 @@ msgstr ""
 msgid "Move mouse to 320, 240"
 msgstr ""
 
-#: userland/apps/settings/main.c:1403
+#: userland/apps/reliefmath/window.cpp:91
 msgid "Move up"
 msgstr ""
 
 #: userland/apps/fileman/operations.c:274
 msgid "Moving files..."
+msgstr ""
+
+#: configs/nls/messages.c:133
+msgid "Mu"
+msgstr ""
+
+#: configs/nls/messages.c:134
+msgid "Much greater than"
+msgstr ""
+
+#: configs/nls/messages.c:135
+msgid "Much less than"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:105
+msgid "Multiline structures"
+msgstr ""
+
+#: configs/nls/messages.c:136
+msgid "Multiplication"
 msgstr ""
 
 #: userland/apps/settings/main.c:1561
@@ -2360,6 +3868,18 @@ msgstr ""
 
 #: userland/apps/diskmgr/main.c:664
 msgid "Name:"
+msgstr ""
+
+#: configs/nls/messages.c:137
+msgid "Natural logarithm"
+msgstr ""
+
+#: configs/nls/messages.c:138
+msgid "Negative thin space"
+msgstr ""
+
+#: configs/nls/messages.c:380
+msgid "Nested ArtifactBegin frame"
 msgstr ""
 
 #: userland/apps/devmgr/main.c:95
@@ -2462,6 +3982,10 @@ msgstr ""
 msgid "No TCP client sockets."
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:1040
+msgid "No catalog command matches this prefix."
+msgstr ""
+
 #: userland/apps/devmgr/main.c:259
 msgid "No device selected"
 msgstr ""
@@ -2482,12 +4006,28 @@ msgstr ""
 msgid "No e1000 adapter"
 msgstr ""
 
+#: configs/nls/messages.c:381
+msgid "No editor change to undo"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:393
+msgid "No favorites saved yet."
+msgstr ""
+
 #: userland/apps/desktop/desktop_items.c:559
 msgid "No file association for this item."
 msgstr ""
 
+#: configs/nls/messages.c:382
+msgid "No formulas selected for export"
+msgstr ""
+
 #: userland/apps/desktop/desktop_items.c:551
 msgid "No item selected."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:830
+msgid "No matching text was found."
 msgstr ""
 
 #: userland/apps/desktop/start_menu.c:866
@@ -2518,6 +4058,14 @@ msgstr ""
 msgid "None"
 msgstr ""
 
+#: configs/nls/messages.c:139
+msgid "Norm"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:499
+msgid "Normal fraction"
+msgstr ""
+
 #: userland/apps/desktop/render.c:59
 msgid "Normal item"
 msgstr ""
@@ -2528,6 +4076,22 @@ msgstr ""
 
 #: userland/apps/guitest/main.c:70
 msgid "Not allowed"
+msgstr ""
+
+#: configs/nls/messages.c:140
+msgid "Not an element of"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:155
+msgid "Not enough memory to list items."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1035
+msgid "Not enough memory to show command completions."
+msgstr ""
+
+#: configs/nls/messages.c:141
+msgid "Not equal"
 msgstr ""
 
 #: userland/apps/settings/main.c:1584
@@ -2546,6 +4110,14 @@ msgstr ""
 msgid "Nothing found"
 msgstr ""
 
+#: configs/nls/messages.c:142
+msgid "Nu"
+msgstr ""
+
+#: configs/nls/messages.c:383
+msgid "Null frame input"
+msgstr ""
+
 #: userland/apps/browser/input.c:292
 msgid "OK"
 msgstr ""
@@ -2554,8 +4126,36 @@ msgstr ""
 msgid "Offline"
 msgstr ""
 
+#: configs/nls/messages.c:384
+msgid "Offset does not identify a bracket"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:182
+msgid "Old preview · error"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:175
+msgid "Old preview · rendering..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:168
+msgid "Old preview · waiting for render"
+msgstr ""
+
+#: configs/nls/messages.c:143
+msgid "Omega"
+msgstr ""
+
+#: configs/nls/messages.c:144
+msgid "Omicron"
+msgstr ""
+
 #: userland/apps/settings/main.c:1148
 msgid "On demand"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:932
+msgid "One match replaced."
 msgstr ""
 
 #: userland/apps/settings/main.c:490
@@ -2564,6 +4164,10 @@ msgstr ""
 
 #: userland/apps/desktop/inputm.c:381
 msgid "Only English input is available"
+msgstr ""
+
+#: configs/nls/messages.c:385
+msgid "Only escaped characters are allowed in text"
 msgstr ""
 
 #: userland/apps/downloadmgr/main.c:301
@@ -2626,6 +4230,10 @@ msgstr ""
 msgid "Open dir failed "
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:185
+msgid "Open directory"
+msgstr ""
+
 #: userland/apps/browser/navigation.c:702
 msgid "Open failed"
 msgstr ""
@@ -2636,6 +4244,10 @@ msgstr ""
 
 #: userland/apps/notepad/main.c:788
 msgid "Open files from File Manager or Run."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:70
+msgid "Open formula document"
 msgstr ""
 
 #: userland/apps/imageview/main.cpp:92
@@ -2650,6 +4262,14 @@ msgstr ""
 msgid "Opened "
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:93
+msgid "Opening document in background..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:204
+msgid "Opening document · wait or cancel the file task"
+msgstr ""
+
 #: userland/apps/browser/navigation.c:608
 msgid "Opening page..."
 msgstr ""
@@ -2662,6 +4282,10 @@ msgstr ""
 msgid "Operation failed"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:98
+msgid "Operators and relations"
+msgstr ""
+
 #: userland/apps/taskmgr/main.cpp:889
 msgid "Options"
 msgstr ""
@@ -2670,12 +4294,32 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:113
+msgid "Output"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:106
+msgid "Overline"
+msgstr ""
+
+#: configs/nls/messages.c:145
+msgid "Overline accent"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:33
+msgid "Overwrite"
+msgstr ""
+
 #: userland/runtime/src/ui.c:1031
 msgid "Overwrite canceled for "
 msgstr ""
 
 #: userland/apps/desktop/render.c:256
 msgid "PID PPID STATE KIND CR3        WAKE NAME"
+msgstr ""
+
+#: configs/nls/messages.c:386
+msgid "PNG exceeds protocol byte limit"
 msgstr ""
 
 #: userland/apps/notepad/main.c:245
@@ -2690,6 +4334,14 @@ msgstr ""
 msgid "PNG preview is unavailable."
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:234
+msgid "Padding in points (0–4096):"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:111
+msgid "Padding..."
+msgstr ""
+
 #: userland/apps/paint/main.cpp:32
 msgid "Paint"
 msgstr ""
@@ -2698,8 +4350,28 @@ msgstr ""
 msgid "Panel"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:116
+msgid "Panels"
+msgstr ""
+
+#: configs/nls/messages.c:146
+msgid "Parallel"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1139
+msgid "Parameters"
+msgstr ""
+
 #: userland/apps/taskmgr/main.cpp:657
 msgid "Parent PID:"
+msgstr ""
+
+#: configs/nls/messages.c:147
+msgid "Parentheses"
+msgstr ""
+
+#: configs/nls/messages.c:148
+msgid "Parenthesized matrix"
 msgstr ""
 
 #: userland/apps/oshlp/main.c:1215
@@ -2850,6 +4522,10 @@ msgstr ""
 msgid "Permissions saved"
 msgstr ""
 
+#: configs/nls/messages.c:149
+msgid "Perpendicular"
+msgstr ""
+
 #: userland/apps/settings/main.c:1287
 msgid "Personalization is saved for the current user. Metro and Win95 keep separate colors."
 msgstr ""
@@ -2862,8 +4538,36 @@ msgstr ""
 msgid "Personalize"
 msgstr ""
 
+#: configs/nls/messages.c:150
+msgid "Phi"
+msgstr ""
+
+#: configs/nls/messages.c:151
+msgid "Pi"
+msgstr ""
+
+#: configs/nls/messages.c:152
+msgid "Piecewise cases"
+msgstr ""
+
 #: userland/apps/fileman/actions.c:136
 msgid "Place shortcut on Desktop? No creates it here."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1027
+msgid "Place the caret inside a backslash command to complete it."
+msgstr ""
+
+#: configs/nls/messages.c:387
+msgid "Placeholder byte range overflow"
+msgstr ""
+
+#: configs/nls/messages.c:388
+msgid "Placeholder shift underflow"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:513
+msgid "Plain matrix"
 msgstr ""
 
 #: userland/apps/minesweeper/main.cpp:35
@@ -2876,6 +4580,14 @@ msgstr ""
 
 #: userland/apps/apiapp/main.c:393
 msgid "Please keep this window open until installation completes."
+msgstr ""
+
+#: configs/nls/messages.c:154
+msgid "Plus"
+msgstr ""
+
+#: configs/nls/messages.c:153
+msgid "Plus or minus"
 msgstr ""
 
 #: userland/apps/diskmgr/main.c:726
@@ -2922,6 +4634,10 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:181
+msgid "Preview · up to date"
+msgstr ""
+
 #: userland/apps/imageview/main.cpp:135
 msgid "Previous"
 msgstr ""
@@ -2940,6 +4656,10 @@ msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:889
 msgid "Processes"
+msgstr ""
+
+#: configs/nls/messages.c:155
+msgid "Product"
 msgstr ""
 
 #: userland/apps/desktop/desktop_items.c:557
@@ -2966,6 +4686,10 @@ msgstr ""
 msgid "Properties failed"
 msgstr ""
 
+#: configs/nls/messages.c:156
+msgid "Proportional to"
+msgstr ""
+
 #: userland/apps/diskmgr/main.c:244
 msgid "Protected"
 msgstr ""
@@ -2978,16 +4702,48 @@ msgstr ""
 msgid "Provider settings started"
 msgstr ""
 
+#: configs/nls/messages.c:157
+msgid "Psi"
+msgstr ""
+
 #: userland/apps/settings/main.c:281
 msgid "Purple"
+msgstr ""
+
+#: configs/nls/messages.c:158
+msgid "Quad space"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:97
+msgid "Quadratic formula"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:37
+msgid "Queued"
 msgstr ""
 
 #: userland/apps/desktop/start_menu.c:843
 msgid "Quick access"
 msgstr ""
 
+#: configs/nls/messages.c:389
+msgid "RGBA output exceeds its buffer limit"
+msgstr ""
+
 #: userland/apps/settings/main.c:165
 msgid "RTC taskbar clock"
+msgstr ""
+
+#: configs/nls/messages.c:390
+msgid "Radical geometry overflow"
+msgstr ""
+
+#: configs/nls/messages.c:391
+msgid "Radical glyph has no measurable extent"
+msgstr ""
+
+#: configs/nls/messages.c:392
+msgid "Radical width overflow"
 msgstr ""
 
 #: userland/apps/browser/forms.c:1531
@@ -3018,6 +4774,22 @@ msgstr ""
 msgid "Ready to install:"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:154
+msgid "Recover as new"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:150
+msgid "Recover formula document"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:119
+msgid "Recovered into a new document · choose Save as"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:117
+msgid "Recovery snapshot saved"
+msgstr ""
+
 #: userland/apps/settings/main.c:283
 msgid "Red"
 msgstr ""
@@ -3032,6 +4804,26 @@ msgstr ""
 
 #: userland/apps/servicemgr/main.c:161
 msgid "Refreshing OpenRC..."
+msgstr ""
+
+#: configs/nls/messages.c:159
+msgid "Relations"
+msgstr ""
+
+#: configs/nls/messages.c:41
+msgid "ReliefMath Favorites"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1101
+msgid "ReliefMath edits UTF-8 math source and renders a supported LaTeX-like subset."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1100
+msgid "ReliefMath help"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1127
+msgid "ReliefMath is not a full TeX engine; arbitrary macros, packages, file input, and unknown environments are unsupported."
 msgstr ""
 
 #: userland/apps/browser/input.c:290
@@ -3068,6 +4860,10 @@ msgstr ""
 
 #: userland/apps/installer/main.cpp:1007
 msgid "ReliefOS was updated on the selected disk."
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:457
+msgid "Reload"
 msgstr ""
 
 #: userland/apps/desktop/screen.c:832
@@ -3114,8 +4910,72 @@ msgstr ""
 msgid "Renamed (elevated)"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:182
+msgid "Render error"
+msgstr ""
+
+#: configs/nls/messages.c:393
+msgid "Render request cancelled"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:242
+msgid "Rendered image copied"
+msgstr ""
+
 #: userland/apps/browser/view.c:914
 msgid "Rendered: "
+msgstr ""
+
+#: configs/nls/messages.c:394
+msgid "Renderer declared an unrequested or duplicate artifact"
+msgstr ""
+
+#: configs/nls/messages.c:395
+msgid "Renderer emitted data after request completion"
+msgstr ""
+
+#: configs/nls/messages.c:396
+msgid "Renderer request exceeded 10 seconds"
+msgstr ""
+
+#: configs/nls/messages.c:397
+msgid "Renderer response identity or sequence mismatch"
+msgstr ""
+
+#: configs/nls/messages.c:398
+msgid "Renderer worker died from signal %d; submit again to retry"
+msgstr ""
+
+#: configs/nls/messages.c:399
+msgid "Renderer worker disappeared; submit again to retry"
+msgstr ""
+
+#: configs/nls/messages.c:400
+msgid "Renderer worker exited with status %d; submit again to retry"
+msgstr ""
+
+#: configs/nls/messages.c:401
+msgid "Renderer worker path has not been configured"
+msgstr ""
+
+#: configs/nls/messages.c:402
+msgid "Renderer worker path is empty"
+msgstr ""
+
+#: configs/nls/messages.c:403
+msgid "Renderer worker path is too long"
+msgstr ""
+
+#: configs/nls/messages.c:404
+msgid "Renderer worker rejected the request"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:37
+msgid "Rendering"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:175
+msgid "Rendering..."
 msgstr ""
 
 #: userland/apps/netctl/main.c:649
@@ -3130,8 +4990,36 @@ msgstr ""
 msgid "Replace existing file?"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:172
+msgid "Replace existing output files"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:871
+msgid "Replace with"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:964
+msgid "Replaced %zu matches."
+msgstr ""
+
+#: configs/nls/messages.c:405
+msgid "Replaced text is too large"
+msgstr ""
+
+#: configs/nls/messages.c:406
+msgid "Replacement text is null"
+msgstr ""
+
+#: configs/nls/messages.c:407
+msgid "Request frame identity does not match Begin"
+msgstr ""
+
 #: userland/apps/sysconfdialog/main.c:71
 msgid "Requesting application"
+msgstr ""
+
+#: configs/nls/messages.c:408
+msgid "Required glyph is missing from formula fonts"
 msgstr ""
 
 #: userland/apps/dynlinkerror/main.c:61
@@ -3144,6 +5032,10 @@ msgstr ""
 
 #: userland/apps/settings/main.c:162
 msgid "Required system shell. Cannot be disabled here."
+msgstr ""
+
+#: configs/nls/messages.c:409
+msgid "Reserved TeX character must be escaped"
 msgstr ""
 
 #: userland/apps/doomlauncher/main.cpp:96
@@ -3214,6 +5106,10 @@ msgstr ""
 msgid "Restore the library from the system image, then try again."
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:319
+msgid "Retry save"
+msgstr ""
+
 #: userland/apps/browser/navigation.c:528
 msgid "Retrying form submission..."
 msgstr ""
@@ -3234,12 +5130,36 @@ msgstr ""
 msgid "Review the selected ESP and root before continuing."
 msgstr ""
 
+#: configs/nls/messages.c:160
+msgid "Rho"
+msgstr ""
+
+#: configs/nls/messages.c:161
+msgid "Right arrow"
+msgstr ""
+
+#: configs/nls/messages.c:410
+msgid "Right delimiter has no matching left delimiter"
+msgstr ""
+
+#: configs/nls/messages.c:162
+msgid "Right double arrow"
+msgstr ""
+
 #: userland/apps/desktop/render.c:238
 msgid "Ring-3 desktop shadow blit"
 msgstr ""
 
 #: userland/apps/settings/main.c:1460
 msgid "Role"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:110
+msgid "Roman"
+msgstr ""
+
+#: configs/nls/messages.c:163
+msgid "Roman math font"
 msgstr ""
 
 #: userland/apps/fileman/main.cpp:761
@@ -3250,12 +5170,24 @@ msgstr ""
 msgid "Root and boot payloads"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:103
+msgid "Root..."
+msgstr ""
+
 #: userland/apps/installer/install_ops.c:1627
 msgid "Root: /target; ESP: /target/boot"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1709
 msgid "Root: /target; boot partition: /target/boot"
+msgstr ""
+
+#: configs/nls/messages.c:164
+msgid "Roots"
+msgstr ""
+
+#: configs/nls/messages.c:411
+msgid "Row break outside a matrix or alignment"
 msgstr ""
 
 #: userland/apps/run/main.c:107
@@ -3278,6 +5210,10 @@ msgstr ""
 msgid "SATA/AHCI and IDE/PATA target disks are supported."
 msgstr ""
 
+#: configs/nls/messages.c:412
+msgid "SVG exceeds protocol byte limit"
+msgstr ""
+
 #: userland/apps/desktop/render.c:44
 msgid "Sample text"
 msgstr ""
@@ -3292,6 +5228,10 @@ msgstr ""
 
 #: userland/apps/paint/main.cpp:152
 msgid "Save as"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:137
+msgid "Save cancelled · original file kept"
 msgstr ""
 
 #: userland/apps/notepad/main.c:757
@@ -3314,6 +5254,10 @@ msgstr ""
 msgid "Save changes?"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:61
+msgid "Save formula document"
+msgstr ""
+
 #: userland/apps/paint/main.cpp:104
 msgid "Save image"
 msgstr ""
@@ -3330,6 +5274,22 @@ msgstr ""
 msgid "Saved browser pages"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:307
+msgid "Saved in the .rmath format."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:37
+msgid "Saving"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:67
+msgid "Saving document in background..."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:260
+msgid "Saving favorites..."
+msgstr ""
+
 #: userland/apps/settings/main.c:1241
 msgid "Scale"
 msgstr ""
@@ -3338,12 +5298,28 @@ msgstr ""
 msgid "Scale changed"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:170
+msgid "Scale:"
+msgstr ""
+
 #: userland/apps/installer/install_ops.c:1781
 msgid "Scanning update payload"
 msgstr ""
 
+#: configs/nls/messages.c:165
+msgid "Scripts"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:103
+msgid "Scripts..."
+msgstr ""
+
 #: userland/apps/browser/view.c:928
 msgid "Scroll: line "
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:606
+msgid "Search Chinese names, English names, categories, or commands."
 msgstr ""
 
 #: userland/apps/desktop/start_menu.c:814
@@ -3352,6 +5328,22 @@ msgstr ""
 
 #: userland/apps/desktop/start_menu.c:885
 msgid "Search results"
+msgstr ""
+
+#: configs/nls/messages.c:413
+msgid "Search start is not a UTF-8 boundary"
+msgstr ""
+
+#: configs/nls/messages.c:414
+msgid "Search text is empty"
+msgstr ""
+
+#: configs/nls/messages.c:415
+msgid "Search text is null"
+msgstr ""
+
+#: configs/nls/messages.c:416
+msgid "Search text was not found"
 msgstr ""
 
 #: userland/apps/browser/input.c:199
@@ -3368,6 +5360,10 @@ msgstr ""
 
 #: userland/apps/installer/main.cpp:451
 msgid "Select Language"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:989
+msgid "Select a command to see its insertion form and example."
 msgstr ""
 
 #: userland/apps/fileman/actions.c:130
@@ -3398,6 +5394,10 @@ msgstr ""
 msgid "Select an unprotected non-boot disk partition"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:179
+msgid "Select at least one formula"
+msgstr ""
+
 #: userland/apps/installer/install_ops.c:219
 msgid "Select the disk to update"
 msgstr ""
@@ -3408,6 +5408,10 @@ msgstr ""
 
 #: userland/apps/diskmgr/main.c:660
 msgid "Selected disk"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:164
+msgid "Selected formulas"
 msgstr ""
 
 #: userland/apps/desktop/render.c:60
@@ -3494,6 +5498,10 @@ msgstr ""
 msgid "Set test title"
 msgstr ""
 
+#: configs/nls/messages.c:166
+msgid "Sets"
+msgstr ""
+
 #: userland/apps/desktop/desktop_run.c:33
 msgid "Settings"
 msgstr ""
@@ -3538,12 +5546,20 @@ msgstr ""
 msgid "Show files and folders starting with a dot"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:116
+msgid "Show formula list"
+msgstr ""
+
 #: userland/apps/fltk_support.h:56
 msgid "Show hidden files"
 msgstr ""
 
 #: userland/apps/settings/main.c:164
 msgid "Show network state in the desktop taskbar."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1034
+msgid "Show preview"
 msgstr ""
 
 #: userland/apps/settings/main.c:165
@@ -3570,6 +5586,10 @@ msgstr ""
 msgid "Shutdown failed"
 msgstr ""
 
+#: configs/nls/messages.c:167
+msgid "Sigma"
+msgstr ""
+
 #: userland/apps/settings/main.c:2057
 msgid "Sign in to change input methods"
 msgstr ""
@@ -3586,6 +5606,18 @@ msgstr ""
 msgid "Sign out of ReliefOS now?"
 msgstr ""
 
+#: configs/nls/messages.c:168
+msgid "Similar"
+msgstr ""
+
+#: configs/nls/messages.c:169
+msgid "Sine"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:504
+msgid "Single integral"
+msgstr ""
+
 #: userland/apps/diskmgr/main.c:734
 msgid "Size"
 msgstr ""
@@ -3600,6 +5632,26 @@ msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:586
 msgid "Sleeping "
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:129
+msgid "Snapshot saved · newer edits remain unsaved"
+msgstr ""
+
+#: configs/nls/messages.c:417
+msgid "Snippet exceeds the source byte limit"
+msgstr ""
+
+#: configs/nls/messages.c:418
+msgid "Snippet placeholder must not be empty"
+msgstr ""
+
+#: configs/nls/messages.c:419
+msgid "Snippet placeholders are invalid"
+msgstr ""
+
+#: configs/nls/messages.c:420
+msgid "Snippet source is empty"
 msgstr ""
 
 #: userland/apps/browser/util.c:190
@@ -3622,8 +5674,44 @@ msgstr ""
 msgid "Sound"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:1122
+msgid "Source and rendering limits"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:310
+msgid "Source preview"
+msgstr ""
+
+#: configs/nls/messages.c:421
+msgid "Source text is null"
+msgstr ""
+
+#: configs/nls/messages.c:422
+msgid "SourceChunk exceeds declared source length"
+msgstr ""
+
+#: configs/nls/messages.c:170
+msgid "Spacing"
+msgstr ""
+
+#: configs/nls/messages.c:423
+msgid "Spacing overflow"
+msgstr ""
+
+#: configs/nls/messages.c:171
+msgid "Square brackets"
+msgstr ""
+
+#: configs/nls/messages.c:172
+msgid "Square root"
+msgstr ""
+
 #: userland/apps/taskmgr/main.cpp:158
 msgid "Standard"
+msgstr ""
+
+#: configs/nls/messages.c:173
+msgid "Star product"
 msgstr ""
 
 #: userland/apps/servicemgr/main.c:267
@@ -3722,8 +5810,28 @@ msgstr ""
 msgid "Stretch"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:682
+msgid "Structure wizard"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:32
+msgid "Structures"
+msgstr ""
+
 #: userland/apps/browser/navigation.c:507
 msgid "Submitting form..."
+msgstr ""
+
+#: configs/nls/messages.c:174
+msgid "Subscript"
+msgstr ""
+
+#: configs/nls/messages.c:176
+msgid "Subset"
+msgstr ""
+
+#: configs/nls/messages.c:175
+msgid "Subset or equal"
 msgstr ""
 
 #: userland/apps/browser/util.c:154
@@ -3734,12 +5842,28 @@ msgstr ""
 msgid "Successfully installed:"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:104
+msgid "Sum..."
+msgstr ""
+
+#: configs/nls/messages.c:177
+msgid "Summation"
+msgstr ""
+
+#: configs/nls/messages.c:178
+msgid "Superscript"
+msgstr ""
+
 #: userland/apps/desktop/switcher.c:70
 msgid "Switch To"
 msgstr ""
 
 #: userland/apps/settings/main.c:1411
 msgid "Switch shortcut"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:101
+msgid "Symbol library"
 msgstr ""
 
 #: userland/apps/settings/main.c:166
@@ -3788,6 +5912,14 @@ msgstr ""
 
 #: userland/apps/browser/util.c:194
 msgid "TLS verification failed"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1118
+msgid "Tab and Shift+Tab  Move between generated placeholders"
+msgstr ""
+
+#: configs/nls/messages.c:179
+msgid "Tangent"
 msgstr ""
 
 #: userland/apps/fileman/actions.c:394
@@ -3854,8 +5986,20 @@ msgstr ""
 msgid "Tasks "
 msgstr ""
 
+#: configs/nls/messages.c:180
+msgid "Tau"
+msgstr ""
+
 #: userland/apps/settings/main.c:277
 msgid "Teal"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:601
+msgid "Templates"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:93
+msgid "Templates..."
 msgstr ""
 
 #: userland/apps/terminal/main.c:1631
@@ -3870,8 +6014,16 @@ msgstr ""
 msgid "Text and PNG (*.txt; *.png)"
 msgstr ""
 
+#: configs/nls/messages.c:181
+msgid "Text and fonts"
+msgstr ""
+
 #: userland/apps/settings/main.c:142
 msgid "Text documents"
+msgstr ""
+
+#: configs/nls/messages.c:424
+msgid "Text exceeds the source byte limit"
 msgstr ""
 
 #: userland/apps/notepad/main.c:558
@@ -3882,12 +6034,36 @@ msgstr ""
 msgid "Text found"
 msgstr ""
 
+#: configs/nls/messages.c:182
+msgid "Text in math"
+msgstr ""
+
+#: configs/nls/messages.c:425
+msgid "Text is not valid UTF-8"
+msgstr ""
+
 #: userland/apps/notepad/main.c:482
 msgid "Text is too large for selected encoding"
 msgstr ""
 
 #: userland/apps/browser/bookmarks.c:451
 msgid "Text not found"
+msgstr ""
+
+#: configs/nls/messages.c:426
+msgid "Text range is outside the source"
+msgstr ""
+
+#: configs/nls/messages.c:427
+msgid "Text range must start and end at UTF-8 boundaries"
+msgstr ""
+
+#: configs/nls/messages.c:428
+msgid "Text width overflow"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:103
+msgid "Text..."
 msgstr ""
 
 #: userland/apps/desktop/render.c:67
@@ -3942,6 +6118,14 @@ msgstr ""
 msgid "The extraction folder exists. Existing files may be replaced. Continue?"
 msgstr ""
 
+#: userland/apps/reliefmath/files.cpp:32
+msgid "The file differs from the version you opened.\nReload it, save to another path, or explicitly replace it."
+msgstr ""
+
+#: configs/nls/messages.c:429
+msgid "The filename pattern creates duplicate output paths; include {index}"
+msgstr ""
+
 #: userland/apps/browser/navigation.c:498
 msgid "The form action could not be parsed as HTTP."
 msgstr ""
@@ -3954,6 +6138,10 @@ msgstr ""
 msgid "The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root."
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:776
+msgid "The source is invalid UTF-8 or exceeds the source limit."
+msgstr ""
+
 #: userland/apps/settings/main.c:1290
 msgid "Theme style"
 msgstr ""
@@ -3962,12 +6150,32 @@ msgstr ""
 msgid "Theme style changed"
 msgstr ""
 
+#: configs/nls/messages.c:183
+msgid "There exists"
+msgstr ""
+
+#: configs/nls/messages.c:184
+msgid "Theta"
+msgstr ""
+
+#: configs/nls/messages.c:185
+msgid "Thick space"
+msgstr ""
+
+#: configs/nls/messages.c:186
+msgid "Thin space"
+msgstr ""
+
 #: userland/apps/oshlp/main.c:998
 msgid "This document has no body."
 msgstr ""
 
 #: userland/runtime/src/ui.c:1028
 msgid "This file already exists. Replace it?"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:274
+msgid "This formula is already a favorite."
 msgstr ""
 
 #: userland/apps/oshlp/main.c:974
@@ -4010,8 +6218,16 @@ msgstr ""
 msgid "Too many arguments"
 msgstr ""
 
+#: configs/nls/messages.c:430
+msgid "Too many complete frames buffered"
+msgstr ""
+
 #: userland/apps/desktop/desktop_items.c:553
 msgid "Too many launch arguments."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:175
+msgid "Tools"
 msgstr ""
 
 #: userland/apps/browser/input.c:231
@@ -4026,8 +6242,20 @@ msgstr ""
 msgid "Total memory:"
 msgstr ""
 
+#: configs/nls/messages.c:431
+msgid "Trailing partial frame after render completion"
+msgstr ""
+
 #: userland/apps/browser/util.c:162
 msgid "Transmit failed"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:165
+msgid "Transparent PNG"
+msgstr ""
+
+#: configs/nls/messages.c:187
+msgid "Triple integral"
 msgstr ""
 
 #: userland/apps/fileman/main.cpp:384
@@ -4062,6 +6290,10 @@ msgstr ""
 msgid "Type the confirmation word and click Apply twice"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:32
+msgid "Typesetting"
+msgstr ""
+
 #: userland/apps/fileman/main.cpp:399
 msgid "UID"
 msgstr ""
@@ -4074,8 +6306,88 @@ msgstr ""
 msgid "URL:"
 msgstr ""
 
+#: configs/nls/messages.c:432
+msgid "Unable to allocate bracket matcher state"
+msgstr ""
+
+#: configs/nls/messages.c:433
+msgid "Unable to allocate inserted source"
+msgstr ""
+
+#: configs/nls/messages.c:434
+msgid "Unable to allocate lexer state"
+msgstr ""
+
+#: configs/nls/messages.c:435
+msgid "Unable to allocate placeholder range"
+msgstr ""
+
+#: configs/nls/messages.c:436
+msgid "Unable to allocate replaced text"
+msgstr ""
+
+#: configs/nls/messages.c:437
+msgid "Unable to allocate snippet placeholders"
+msgstr ""
+
+#: configs/nls/messages.c:438
+msgid "Unable to allocate undo snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:439
+msgid "Unable to assemble inserted source"
+msgstr ""
+
+#: configs/nls/messages.c:440
+msgid "Unable to assemble replaced text"
+msgstr ""
+
+#: configs/nls/messages.c:441
+msgid "Unable to build snippet source"
+msgstr ""
+
+#: configs/nls/messages.c:442
+msgid "Unable to copy editor undo snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:443
+msgid "Unable to preserve placeholder range"
+msgstr ""
+
 #: userland/apps/netctl/main.c:509
 msgid "Unable to read the current DNS policy."
+msgstr ""
+
+#: configs/nls/messages.c:444
+msgid "Unable to restore editor placeholders"
+msgstr ""
+
+#: configs/nls/messages.c:445
+msgid "Unable to restore editor source"
+msgstr ""
+
+#: configs/nls/messages.c:446
+msgid "Unable to shift existing placeholders"
+msgstr ""
+
+#: configs/nls/messages.c:447
+msgid "Unable to store editor source"
+msgstr ""
+
+#: configs/nls/messages.c:448
+msgid "Unable to store generated snippet"
+msgstr ""
+
+#: configs/nls/messages.c:449
+msgid "Unable to store inserted source"
+msgstr ""
+
+#: configs/nls/messages.c:450
+msgid "Unable to store replaced text"
+msgstr ""
+
+#: configs/nls/messages.c:451
+msgid "Unable to update active placeholder"
 msgstr ""
 
 #: userland/apps/netctl/main.c:625
@@ -4086,8 +6398,64 @@ msgstr ""
 msgid "Unchecked"
 msgstr ""
 
+#: configs/nls/messages.c:453
+msgid "Unclosed group"
+msgstr ""
+
+#: configs/nls/messages.c:452
+msgid "Unclosed group or layout construct"
+msgstr ""
+
+#: configs/nls/messages.c:454
+msgid "Unclosed math environment"
+msgstr ""
+
+#: configs/nls/messages.c:455
+msgid "Unclosed root index"
+msgstr ""
+
+#: configs/nls/messages.c:456
+msgid "Unclosed text argument"
+msgstr ""
+
+#: configs/nls/messages.c:457
+msgid "Unexpected closing brace"
+msgstr ""
+
+#: configs/nls/messages.c:458
+msgid "Unexpected environment terminator"
+msgstr ""
+
+#: configs/nls/messages.c:459
+msgid "Unexpected frame from renderer worker"
+msgstr ""
+
+#: configs/nls/messages.c:460
+msgid "Unexpected input after formula"
+msgstr ""
+
+#: configs/nls/messages.c:188
+msgid "Union"
+msgstr ""
+
 #: userland/apps/diskmgr/main.c:216
 msgid "Unknown"
+msgstr ""
+
+#: configs/nls/messages.c:461
+msgid "Unknown artifact type"
+msgstr ""
+
+#: configs/nls/messages.c:462
+msgid "Unknown frame kind or flags"
+msgstr ""
+
+#: configs/nls/messages.c:463
+msgid "Unknown function tool"
+msgstr ""
+
+#: configs/nls/messages.c:464
+msgid "Unknown mathematical tool"
 msgstr ""
 
 #: userland/apps/browser/util.c:196
@@ -4122,16 +6490,40 @@ msgstr ""
 msgid "Unsupported Address"
 msgstr ""
 
+#: configs/nls/messages.c:465
+msgid "Unsupported ReliefMath protocol version"
+msgstr ""
+
+#: configs/nls/messages.c:466
+msgid "Unsupported control symbol"
+msgstr ""
+
 #: userland/apps/imageview/main.cpp:67
 msgid "Unsupported image format. Use BMP, DIB, or PNG."
+msgstr ""
+
+#: configs/nls/messages.c:467
+msgid "Unsupported math command"
+msgstr ""
+
+#: configs/nls/messages.c:468
+msgid "Unsupported math environment"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1186
 msgid "Unsupported root layout; use a fresh ext4 installation"
 msgstr ""
 
+#: configs/nls/messages.c:469
+msgid "Unsupported scalable delimiter"
+msgstr ""
+
 #: userland/apps/notepad/main.c:408
 msgid "Unsupported text encoding"
+msgstr ""
+
+#: configs/nls/messages.c:470
+msgid "Unsupported text escape"
 msgstr ""
 
 #: userland/apps/notepad/main.c:192
@@ -4198,8 +6590,16 @@ msgstr ""
 msgid "Upgrading signed ReliefOS packages"
 msgstr ""
 
+#: configs/nls/messages.c:189
+msgid "Upsilon"
+msgstr ""
+
 #: userland/apps/taskmgr/main.cpp:578
 msgid "Uptime:"
+msgstr ""
+
+#: configs/nls/messages.c:43
+msgid "Usage: reliefmath [document.rmath]\nOffline mathematical formula editor with SVG, transparent PNG and LaTeX export."
 msgstr ""
 
 #: userland/apps/settings/main.c:1394
@@ -4208,6 +6608,14 @@ msgstr ""
 
 #: userland/apps/browser/navigation.c:812
 msgid "Use http://, https://, about:, or a ReliefOS file path such as /file.html."
+msgstr ""
+
+#: configs/nls/messages.c:471
+msgid "Use {index} and {name} without path separators"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:169
+msgid "Use {index} and {name}; the extension is added automatically."
 msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:570
@@ -4246,6 +6654,38 @@ msgstr ""
 msgid "Users"
 msgstr ""
 
+#: userland/apps/reliefmath/dialogs.cpp:694
+msgid "Variant"
+msgstr ""
+
+#: configs/nls/messages.c:190
+msgid "Variant epsilon"
+msgstr ""
+
+#: configs/nls/messages.c:191
+msgid "Variant phi"
+msgstr ""
+
+#: configs/nls/messages.c:192
+msgid "Variant pi"
+msgstr ""
+
+#: configs/nls/messages.c:193
+msgid "Variant rho"
+msgstr ""
+
+#: configs/nls/messages.c:194
+msgid "Variant theta"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:106
+msgid "Vector"
+msgstr ""
+
+#: configs/nls/messages.c:195
+msgid "Vector accent"
+msgstr ""
+
 #: userland/apps/apiapp/main.c:724
 msgid "Version:"
 msgstr ""
@@ -4270,8 +6710,16 @@ msgstr ""
 msgid "Wait"
 msgstr ""
 
+#: userland/apps/reliefmath/window.cpp:239
+msgid "Wait for a successful current preview before copying an image"
+msgstr ""
+
 #: userland/apps/desktop/screen.c:804
 msgid "Waiting for applications to close..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:168
+msgid "Waiting for render..."
 msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:664
@@ -4330,6 +6778,14 @@ msgstr ""
 msgid "X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"
 msgstr ""
 
+#: configs/nls/messages.c:472
+msgid "XDG state path exceeds the path limit"
+msgstr ""
+
+#: configs/nls/messages.c:196
+msgid "Xi"
+msgstr ""
+
 #: userland/apps/desktop/screen.c:838
 msgid "Yes"
 msgstr ""
@@ -4342,8 +6798,432 @@ msgstr ""
 msgid "You won"
 msgstr ""
 
+#: configs/nls/messages.c:197
+msgid "Zeta"
+msgstr ""
+
+#: configs/nls/messages.c:473
+msgid "active recovery snapshot changed outside ReliefMath"
+msgstr ""
+
+#: configs/nls/messages.c:198
+msgid "argument: math source"
+msgstr ""
+
+#: configs/nls/messages.c:474
+msgid "atomic file data is null or exceeds the bounded storage limit"
+msgstr ""
+
+#: configs/nls/messages.c:199
+msgid "base and exponent: math source"
+msgstr ""
+
+#: configs/nls/messages.c:200
+msgid "base and subscript: math source"
+msgstr ""
+
+#: configs/nls/messages.c:201
+msgid "base: math source"
+msgstr ""
+
 #: userland/apps/desktop/render.c:243
 msgid "boot  system  programs"
+msgstr ""
+
+#: configs/nls/messages.c:202
+msgid "bounds and integrand: math source"
+msgstr ""
+
+#: configs/nls/messages.c:475
+msgid "cannot mark an active transaction saved"
+msgstr ""
+
+#: configs/nls/messages.c:476
+msgid "cannot redo an active transaction"
+msgstr ""
+
+#: configs/nls/messages.c:477
+msgid "cannot undo an active transaction"
+msgstr ""
+
+#: configs/nls/messages.c:478
+msgid "caret is not on a UTF-8 boundary"
+msgstr ""
+
+#: configs/nls/messages.c:203
+msgid "content: math source"
+msgstr ""
+
+#: configs/nls/messages.c:479
+msgid "could not allocate replacement result"
+msgstr ""
+
+#: configs/nls/messages.c:481
+msgid "could not close document"
+msgstr ""
+
+#: configs/nls/messages.c:480
+msgid "could not close document directory"
+msgstr ""
+
+#: configs/nls/messages.c:483
+msgid "could not close recovery directory"
+msgstr ""
+
+#: configs/nls/messages.c:482
+msgid "could not close recovery directory scan"
+msgstr ""
+
+#: configs/nls/messages.c:484
+msgid "could not close recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:485
+msgid "could not close temporary document"
+msgstr ""
+
+#: configs/nls/messages.c:486
+msgid "could not create a recovery directory"
+msgstr ""
+
+#: configs/nls/messages.c:487
+msgid "could not create recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages.c:488
+msgid "could not create temporary document"
+msgstr ""
+
+#: configs/nls/messages.c:489
+msgid "could not discard recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:490
+msgid "could not inspect document"
+msgstr ""
+
+#: configs/nls/messages.c:491
+msgid "could not inspect opened document"
+msgstr ""
+
+#: configs/nls/messages.c:492
+msgid "could not inspect opened recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:493
+msgid "could not inspect own recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:494
+msgid "could not inspect recovery directory"
+msgstr ""
+
+#: configs/nls/messages.c:495
+msgid "could not inspect recovery entry"
+msgstr ""
+
+#: configs/nls/messages.c:496
+msgid "could not inspect recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages.c:497
+msgid "could not inspect recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:498
+msgid "could not inspect save target"
+msgstr ""
+
+#: configs/nls/messages.c:499
+msgid "could not inspect synced document"
+msgstr ""
+
+#: configs/nls/messages.c:500
+msgid "could not inspect temporary document"
+msgstr ""
+
+#: configs/nls/messages.c:501
+msgid "could not lock recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:502
+msgid "could not open a recovery directory"
+msgstr ""
+
+#: configs/nls/messages.c:504
+msgid "could not open document"
+msgstr ""
+
+#: configs/nls/messages.c:503
+msgid "could not open document parent directory"
+msgstr ""
+
+#: configs/nls/messages.c:505
+msgid "could not open recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages.c:506
+msgid "could not open recovery path root"
+msgstr ""
+
+#: configs/nls/messages.c:507
+msgid "could not open recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:508
+msgid "could not read document"
+msgstr ""
+
+#: configs/nls/messages.c:509
+msgid "could not read recovery directory"
+msgstr ""
+
+#: configs/nls/messages.c:510
+msgid "could not read recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:511
+msgid "could not recheck document"
+msgstr ""
+
+#: configs/nls/messages.c:512
+msgid "could not recheck recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages.c:513
+msgid "could not remove own recovery lock"
+msgstr ""
+
+#: configs/nls/messages.c:514
+msgid "could not replace document"
+msgstr ""
+
+#: configs/nls/messages.c:515
+msgid "could not reserve a unique recovery instance ID"
+msgstr ""
+
+#: configs/nls/messages.c:516
+msgid "could not reserve a unique temporary document"
+msgstr ""
+
+#: configs/nls/messages.c:517
+msgid "could not retain recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages.c:518
+msgid "could not scan recovery directory"
+msgstr ""
+
+#: configs/nls/messages.c:519
+msgid "could not secure recovery directory"
+msgstr ""
+
+#: configs/nls/messages.c:520
+msgid "could not secure recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages.c:521
+msgid "could not secure recovery lock descriptor"
+msgstr ""
+
+#: configs/nls/messages.c:522
+msgid "could not store replacement result"
+msgstr ""
+
+#: configs/nls/messages.c:523
+msgid "could not store the completion prefix"
+msgstr ""
+
+#: configs/nls/messages.c:524
+msgid "could not sync recovery directory parent"
+msgstr ""
+
+#: configs/nls/messages.c:525
+msgid "could not sync recovery directory permissions"
+msgstr ""
+
+#: configs/nls/messages.c:526
+msgid "could not sync temporary document"
+msgstr ""
+
+#: configs/nls/messages.c:527
+msgid "could not verify document length"
+msgstr ""
+
+#: configs/nls/messages.c:528
+msgid "could not write temporary document"
+msgstr ""
+
+#: configs/nls/messages.c:529
+msgid "current recovery ID is invalid"
+msgstr ""
+
+#: configs/nls/messages.c:530
+msgid "document I/O was cancelled"
+msgstr ""
+
+#: configs/nls/messages.c:531
+msgid "document changed outside ReliefMath; original was preserved"
+msgstr ""
+
+#: configs/nls/messages.c:532
+msgid "document changed while it was being opened"
+msgstr ""
+
+#: configs/nls/messages.c:533
+msgid "document changed while it was being read"
+msgstr ""
+
+#: configs/nls/messages.c:534
+msgid "document contains trailing bytes"
+msgstr ""
+
+#: configs/nls/messages.c:535
+msgid "document differs from current history state"
+msgstr ""
+
+#: configs/nls/messages.c:536
+msgid "document does not exist"
+msgstr ""
+
+#: configs/nls/messages.c:537
+msgid "document encoding allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:538
+msgid "document exceeds the .rmath v1 length range"
+msgstr ""
+
+#: configs/nls/messages.c:539
+msgid "document exceeds the 16 MiB limit"
+msgstr ""
+
+#: configs/nls/messages.c:540
+msgid "document fields exceed the .rmath v1 range"
+msgstr ""
+
+#: configs/nls/messages.c:541
+msgid "document formula allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:542
+msgid "document formula count exceeds the limit"
+msgstr ""
+
+#: configs/nls/messages.c:543
+msgid "document formula record is truncated"
+msgstr ""
+
+#: configs/nls/messages.c:544
+msgid "document grew while it was being read"
+msgstr ""
+
+#: configs/nls/messages.c:545
+msgid "document header is truncated"
+msgstr ""
+
+#: configs/nls/messages.c:546
+msgid "document input is null"
+msgstr ""
+
+#: configs/nls/messages.c:547
+msgid "document length does not match its header"
+msgstr ""
+
+#: configs/nls/messages.c:548
+msgid "document magic is invalid"
+msgstr ""
+
+#: configs/nls/messages.c:549
+msgid "document must be a regular non-symbolic-link file"
+msgstr ""
+
+#: configs/nls/messages.c:550
+msgid "document parent directory is invalid"
+msgstr ""
+
+#: configs/nls/messages.c:551
+msgid "document parent path allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:552
+msgid "document path allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:553
+msgid "document path changed while it was being read"
+msgstr ""
+
+#: configs/nls/messages.c:554
+msgid "document path contains a symbolic link or non-directory"
+msgstr ""
+
+#: configs/nls/messages.c:555
+msgid "document path exceeds the path limit"
+msgstr ""
+
+#: configs/nls/messages.c:556
+msgid "document path has an unsafe file name"
+msgstr ""
+
+#: configs/nls/messages.c:557
+msgid "document path is empty"
+msgstr ""
+
+#: configs/nls/messages.c:558
+msgid "document path may not traverse a parent directory"
+msgstr ""
+
+#: configs/nls/messages.c:559
+msgid "document read allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:560
+msgid "document revision exhausted"
+msgstr ""
+
+#: configs/nls/messages.c:561
+msgid "document snapshot allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:562
+msgid "document text allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:563
+msgid "document title exceeds the limit"
+msgstr ""
+
+#: configs/nls/messages.c:564
+msgid "document title is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages.c:565
+msgid "document title is truncated"
+msgstr ""
+
+#: configs/nls/messages.c:566
+msgid "document was replaced, but directory persistence is unconfirmed"
+msgstr ""
+
+#: configs/nls/messages.c:567
+msgid "document was replaced, but directory persistence is unconfirmed: %s"
+msgstr ""
+
+#: configs/nls/messages.c:568
+msgid "document was replaced, but its installed stamp could not be confirmed"
+msgstr ""
+
+#: configs/nls/messages.c:569
+msgid "document was truncated while it was being read"
+msgstr ""
+
+#: configs/nls/messages.c:570
+msgid "duplicate ID in formula ordering"
+msgstr ""
+
+#: configs/nls/messages.c:571
+msgid "duplicate formula ID"
 msgstr ""
 
 #: userland/apps/installer/install_ops.c:1770
@@ -4354,12 +7234,144 @@ msgstr ""
 msgid "exit"
 msgstr ""
 
+#: configs/nls/messages.c:572
+msgid "expected --render-worker"
+msgstr ""
+
 #: userland/apps/fileman/operations.c:392
 msgid "failed"
 msgstr ""
 
+#: configs/nls/messages.c:573
+msgid "file exceeds the bounded storage limit"
+msgstr ""
+
+#: configs/nls/messages.c:574
+msgid "filesystem root cannot be a recovery directory"
+msgstr ""
+
+#: configs/nls/messages.c:575
+msgid "find and replace text must be provided"
+msgstr ""
+
+#: configs/nls/messages.c:576
+msgid "find and replace text must be valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages.c:577
+msgid "formula ID and generation must be nonzero"
+msgstr ""
+
+#: configs/nls/messages.c:579
+msgid "formula ID not found"
+msgstr ""
+
+#: configs/nls/messages.c:578
+msgid "formula ID not found in ordering"
+msgstr ""
+
+#: configs/nls/messages.c:580
+msgid "formula ID space exhausted"
+msgstr ""
+
+#: configs/nls/messages.c:581
+msgid "formula array allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:582
+msgid "formula display flag is invalid"
+msgstr ""
+
+#: configs/nls/messages.c:583
+msgid "formula generation exhausted"
+msgstr ""
+
+#: configs/nls/messages.c:584
+msgid "formula index out of range"
+msgstr ""
+
+#: configs/nls/messages.c:585
+msgid "formula limit reached"
+msgstr ""
+
+#: configs/nls/messages.c:586
+msgid "formula name allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:587
+msgid "formula name is empty"
+msgstr ""
+
+#: configs/nls/messages.c:588
+msgid "formula name is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages.c:589
+msgid "formula ordering allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:590
+msgid "formula ordering must contain every ID"
+msgstr ""
+
+#: configs/nls/messages.c:591
+msgid "formula reserved bytes must be zero"
+msgstr ""
+
+#: configs/nls/messages.c:592
+msgid "formula source allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:593
+msgid "formula source is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages.c:594
+msgid "formula text exceeds the field limit"
+msgstr ""
+
+#: configs/nls/messages.c:595
+msgid "formula text is truncated"
+msgstr ""
+
 #: userland/apps/helloworld/main.c:26
 msgid "helloworld"
+msgstr ""
+
+#: configs/nls/messages.c:596
+msgid "history baseline allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:597
+msgid "history state allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:598
+msgid "history transaction already active"
+msgstr ""
+
+#: configs/nls/messages.c:599
+msgid "home state path exceeds the path limit"
+msgstr ""
+
+#: configs/nls/messages.c:204
+msgid "index and radicand: math source"
+msgstr ""
+
+#: configs/nls/messages.c:600
+msgid "invalid document title"
+msgstr ""
+
+#: configs/nls/messages.c:601
+msgid "invalid formula name"
+msgstr ""
+
+#: configs/nls/messages.c:602
+msgid "invalid formula source"
+msgstr ""
+
+#: configs/nls/messages.c:603
+msgid "invalid formula style"
 msgstr ""
 
 #: userland/apps/fileman/operations.c:392
@@ -4370,12 +7382,64 @@ msgstr ""
 msgid "kern"
 msgstr ""
 
+#: configs/nls/messages.c:205
+msgid "lower bound, upper bound, and term: math source"
+msgstr ""
+
+#: configs/nls/messages.c:604
+msgid "next formula ID is not monotonic"
+msgstr ""
+
+#: configs/nls/messages.c:605
+msgid "no absolute XDG_STATE_HOME or HOME is available"
+msgstr ""
+
+#: configs/nls/messages.c:606
+msgid "no active history transaction"
+msgstr ""
+
+#: configs/nls/messages.c:206
+msgid "none"
+msgstr ""
+
+#: configs/nls/messages.c:607
+msgid "nothing to redo"
+msgstr ""
+
+#: configs/nls/messages.c:608
+msgid "nothing to undo"
+msgstr ""
+
+#: configs/nls/messages.c:207
+msgid "numerator and denominator: display-style math"
+msgstr ""
+
+#: configs/nls/messages.c:208
+msgid "numerator and denominator: math source"
+msgstr ""
+
 #: userland/apps/notepad/main.c:373
 msgid "open failed "
 msgstr ""
 
 #: userland/apps/installer/main.cpp:495
 msgid "or replace the boot/reliefos and system files on an existing installation."
+msgstr ""
+
+#: configs/nls/messages.c:609
+msgid "own recovery lock was removed but directory persistence is unconfirmed"
+msgstr ""
+
+#: configs/nls/messages.c:209
+msgid "path and integrand: math source"
+msgstr ""
+
+#: configs/nls/messages.c:610
+msgid "place the caret in a backslash command"
+msgstr ""
+
+#: configs/nls/messages.c:210
+msgid "radicand: math source"
 msgstr ""
 
 #: userland/apps/notepad/main.c:388
@@ -4386,6 +7450,158 @@ msgstr ""
 msgid "ready"
 msgstr ""
 
+#: configs/nls/messages.c:611
+msgid "recovery I/O was cancelled"
+msgstr ""
+
+#: configs/nls/messages.c:612
+msgid "recovery ID is invalid"
+msgstr ""
+
+#: configs/nls/messages.c:613
+msgid "recovery directory contains too many snapshots"
+msgstr ""
+
+#: configs/nls/messages.c:614
+msgid "recovery directory must be an absolute bounded path"
+msgstr ""
+
+#: configs/nls/messages.c:615
+msgid "recovery directory must belong to the current user"
+msgstr ""
+
+#: configs/nls/messages.c:616
+msgid "recovery directory path allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:617
+msgid "recovery entry is not a private regular file"
+msgstr ""
+
+#: configs/nls/messages.c:618
+msgid "recovery list allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:619
+msgid "recovery lock is not a private regular file"
+msgstr ""
+
+#: configs/nls/messages.c:620
+msgid "recovery lock name is too long"
+msgstr ""
+
+#: configs/nls/messages.c:621
+msgid "recovery path allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:622
+msgid "recovery path contains a symbolic link or non-directory"
+msgstr ""
+
+#: configs/nls/messages.c:623
+msgid "recovery path exceeds the path limit"
+msgstr ""
+
+#: configs/nls/messages.c:624
+msgid "recovery path hint allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:625
+msgid "recovery path hint exceeds the limit"
+msgstr ""
+
+#: configs/nls/messages.c:626
+msgid "recovery path hint is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages.c:627
+msgid "recovery path may not traverse a parent directory"
+msgstr ""
+
+#: configs/nls/messages.c:628
+msgid "recovery snapshot allocation failed"
+msgstr ""
+
+#: configs/nls/messages.c:629
+msgid "recovery snapshot belongs to a live instance"
+msgstr ""
+
+#: configs/nls/messages.c:630
+msgid "recovery snapshot changed since it was listed"
+msgstr ""
+
+#: configs/nls/messages.c:631
+msgid "recovery snapshot changed while opening"
+msgstr ""
+
+#: configs/nls/messages.c:632
+msgid "recovery snapshot changed while reading"
+msgstr ""
+
+#: configs/nls/messages.c:633
+msgid "recovery snapshot does not exist"
+msgstr ""
+
+#: configs/nls/messages.c:634
+msgid "recovery snapshot exceeds the bounded storage limit"
+msgstr ""
+
+#: configs/nls/messages.c:635
+msgid "recovery snapshot has an invalid length"
+msgstr ""
+
+#: configs/nls/messages.c:636
+msgid "recovery snapshot is not a private regular file"
+msgstr ""
+
+#: configs/nls/messages.c:637
+msgid "recovery snapshot length is outside its limit"
+msgstr ""
+
+#: configs/nls/messages.c:638
+msgid "recovery snapshot lengths are inconsistent"
+msgstr ""
+
+#: configs/nls/messages.c:639
+msgid "recovery snapshot magic is invalid"
+msgstr ""
+
+#: configs/nls/messages.c:640
+msgid "recovery snapshot was removed but directory persistence is unconfirmed"
+msgstr ""
+
+#: configs/nls/messages.c:641
+msgid "recovery snapshot was removed but its lock could not be cleaned up"
+msgstr ""
+
+#: configs/nls/messages.c:642
+msgid "recovery snapshot was truncated while reading"
+msgstr ""
+
+#: configs/nls/messages.c:643
+msgid "recovery store is already open"
+msgstr ""
+
+#: configs/nls/messages.c:644
+msgid "recovery store is not open"
+msgstr ""
+
+#: configs/nls/messages.c:645
+msgid "recovery store or ID is invalid"
+msgstr ""
+
+#: configs/nls/messages.c:44
+msgid "reliefmath: unsupported argument\n"
+msgstr ""
+
+#: configs/nls/messages.c:646
+msgid "replacement result exceeds the source limit"
+msgstr ""
+
+#: configs/nls/messages.c:211
+msgid "rows and columns: 1..16"
+msgstr ""
+
 #: userland/apps/desktop/draw.c:696
 msgid "run"
 msgstr ""
@@ -4394,8 +7610,16 @@ msgstr ""
 msgid "s"
 msgstr ""
 
+#: configs/nls/messages.c:647
+msgid "save failed and its temporary file could not be removed"
+msgstr ""
+
 #: userland/apps/notepad/main.c:493
 msgid "save open failed "
+msgstr ""
+
+#: configs/nls/messages.c:648
+msgid "save target must be a regular non-symbolic-link file"
 msgstr ""
 
 #: userland/apps/notepad/main.c:501
@@ -4406,22 +7630,65 @@ msgstr ""
 msgid "save write incomplete"
 msgstr ""
 
+#: configs/nls/messages.c:649
+msgid "search text cannot be empty"
+msgstr ""
+
 #: userland/apps/desktop/draw.c:698
 msgid "sleep"
+msgstr ""
+
+#: configs/nls/messages.c:650
+msgid "source is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages.c:651
+msgid "source text is missing"
 msgstr ""
 
 #: userland/apps/notepad/main.c:364
 msgid "stat failed "
 msgstr ""
 
+#: configs/nls/messages.c:652
+msgid "temporary document is not a private regular file"
+msgstr ""
+
+#: configs/nls/messages.c:653
+msgid "temporary document write made no progress"
+msgstr ""
+
+#: configs/nls/messages.c:654
+msgid "temporary file name is too long"
+msgstr ""
+
+#: configs/nls/messages.c:212
+msgid "text content; selected UTF-8 text is preserved"
+msgstr ""
+
+#: configs/nls/messages.c:655
+msgid "the backslash is escaped"
+msgstr ""
+
 #: userland/apps/taskmgr/main.cpp:650
 msgid "ticks"
+msgstr ""
+
+#: configs/nls/messages.c:656
+msgid "too many formulas"
+msgstr ""
+
+#: configs/nls/messages.c:657
+msgid "unsupported .rmath document version"
+msgstr ""
+
+#: configs/nls/messages.c:658
+msgid "unsupported recovery snapshot version"
 msgstr ""
 
 #: userland/apps/desktop/draw.c:708
 msgid "user"
 msgstr ""
-
 
 #: userland/apps/fileman/main.cpp
 msgid "Search Files..."
@@ -4669,1471 +7936,1177 @@ msgstr ""
 msgid "&File"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "ABS(number) returns its absolute value."
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Adds numeric cells in a range."
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Alignment"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Amount"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "An unfinished workbook was found. Recover it?"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "AutoSum"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Average expense"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Average:"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Balance"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:861
 msgid "Bare carriage return outside quoted field"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Bold"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Borders"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Budget status"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Budget template"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "COUNTIF(range, criteria)"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "CSV exported"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "CSV exports only this sheet's values. Formulas, styles and other sheets remain in the native workbook."
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "CSV imported; save as a native workbook to keep formulas and formatting"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:892
 msgid "Calculated value exceeds CSV text limits"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Calculation"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Calculation canceled; results will update when accessed"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Category"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Cell address, for example A1 or C25"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:158
 msgid "Cell coordinate is outside worksheet bounds"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Cells"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Cells copied"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Clear contents"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Clear filters"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Clipboard"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Column:"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Columns"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Columns:"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Comma|Semicolon|Tab"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Condition:"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Contains|Equals|Greater than|Less than|Not empty"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:877
 msgid "Could not calculate imported worksheet"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1123
 msgid "Could not calculate workbook or operation cancelled"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1033
 msgid "Could not close temporary save file"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:947 userland/apps/reliefexcel/document.cpp:964
 msgid "Could not create recovery directory"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1005
 msgid "Could not create temporary save file"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:628
 msgid "Could not create temporary save path"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1146
 msgid "Could not inspect delimited file"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1055
 msgid "Could not inspect file"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:965
 msgid "Could not inspect recovery directory"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:601
 msgid "Could not inspect save target"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1092
 msgid "Could not inspect workbook"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1142
 msgid "Could not open delimited file"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:647
 msgid "Could not open save directory"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1088
 msgid "Could not open workbook"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1012
 msgid "Could not preserve workbook permissions"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1163
 msgid "Could not read delimited file"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:362
 msgid "Could not read workbook"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1038
 msgid "Could not replace saved file"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Could not save the recovery copy"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:970
 msgid "Could not secure recovery directory"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:651
 msgid "Could not sync save directory"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1032
 msgid "Could not sync temporary save file"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:230
 msgid "Could not write workbook"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Count:"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Counts nonempty cells."
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Counts numeric cells."
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Ctrl+C"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Ctrl+D"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Ctrl+F"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Ctrl+H"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Ctrl+R"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Ctrl+V"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Ctrl+X"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Currency"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Data exchange"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Date"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Delete column"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Delete row"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Delete sheet"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Delete this worksheet? You can undo this operation."
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:812 userland/apps/reliefexcel/document.cpp:817 userland/apps/reliefexcel/document.cpp:834
 msgid "Delimited field exceeds resource limits"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:814 userland/apps/reliefexcel/document.cpp:819 userland/apps/reliefexcel/document.cpp:836
 msgid "Delimited field exceeds the text limit"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1150
 msgid "Delimited file has an invalid size or type"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1162
 msgid "Delimited file is truncated"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1139
 msgid "Delimited file path is empty"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:775
 msgid "Delimited input exceeds the resource limit"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:844 userland/apps/reliefexcel/document.cpp:854 userland/apps/reliefexcel/document.cpp:875
 msgid "Delimited input exceeds worksheet dimensions"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:910 userland/apps/reliefexcel/document.cpp:914 userland/apps/reliefexcel/document.cpp:916
 msgid "Delimited output exceeds resource limits"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:987
 msgid "Delimited output exceeds the resource limit"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:754
 msgid "Delimited text contains invalid UTF-8 or a NUL byte"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Description"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Dinner"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Discard changes"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:160 userland/apps/reliefexcel/document.cpp:532
 msgid "Duplicate or unordered cell coordinate"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:190
 msgid "Duplicate worksheet identifier"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:192
 msgid "Duplicate worksheet name"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Edit cell content or formula; Enter applies the change"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Electricity"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Enter a zoom value from 25 to 400"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Enter an address between A1 and IV10000"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Enter text to find"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Examples: =SUM(B2:B20)    =IF(C2>0,C2,0)"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Exit"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Expense"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Export"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Export CSV"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Export CSV..."
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:901
 msgid "Export range exceeds resource limits"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1051
 msgid "File path is empty"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1057
 msgid "File stamp requires a regular file"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Fill color"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Fill down"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Fill right"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Filter"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Filtering hides rows and preserves their contents."
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Find"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Find and replace"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Find next"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "First row is a header"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Font"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Font size"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Food"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Food expenses"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Food purchases"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Formulas"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Freeze both"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Freeze first column"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Freeze first row"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Freeze panes"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Function:"
 msgstr ""
 
-
-#: userland/apps/reliefexcel
+#: configs/nls/messages.c:103
 msgid "Functions"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "General"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Gridlines"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Groceries"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Home tab"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "IF(condition, value_if_true, value_if_false)"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Import"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Import CSV"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Import CSV..."
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:756
 msgid "Import exceeds the cell limit"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Income"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1031
 msgid "Incomplete temporary save file"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Insert"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Insert column"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Insert function"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Insert row"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:206
 msgid "Invalid active worksheet or identifier sequence"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:527
 msgid "Invalid cell coordinate or style"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:168
 msgid "Invalid cell style"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:163
 msgid "Invalid cell text"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:456
 msgid "Invalid column dimensions"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:107
 msgid "Invalid column width"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:899
 msgid "Invalid delimited range"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:773 userland/apps/reliefexcel/document.cpp:1140
 msgid "Invalid field delimiter"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:466
 msgid "Invalid filter metadata"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:111
 msgid "Invalid filter range"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:133 userland/apps/reliefexcel/document.cpp:500
 msgid "Invalid merged range"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:490
 msgid "Invalid merged range count"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:461
 msgid "Invalid row dimensions"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:110
 msgid "Invalid row height"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1116
 msgid "Invalid workbook header or length"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:179 userland/apps/reliefexcel/document.cpp:568
 msgid "Invalid workbook metadata"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:118
 msgid "Invalid worksheet filter"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:445
 msgid "Invalid worksheet flags"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:96
 msgid "Invalid worksheet name or identifier"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:101
 msgid "Invalid worksheet view settings"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Italic"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Item"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Later"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Ledger"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Left"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Lunch"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Match case"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Merge"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Monthly rent"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Monthly salary"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Move sheet left"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Move sheet right"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "New sheet"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "No borders"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "No matching cell found"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1219
 msgid "No per-user state directory is available"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Not enough memory"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:922
 msgid "Not enough memory to build delimited output"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:931
 msgid "Not enough memory to create recovery directory"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:777
 msgid "Not enough memory to import worksheet"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:758 userland/apps/reliefexcel/document.cpp:762
 msgid "Not enough memory to import worksheet cell"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1223 userland/apps/reliefexcel/document.cpp:1234
 msgid "Not enough memory to locate recovery directory"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:541
 msgid "Not enough memory to read cell input"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:555
 msgid "Not enough memory to read cell style"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:509
 msgid "Not enough memory to read cells"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1154
 msgid "Not enough memory to read delimited file"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:470 userland/apps/reliefexcel/document.cpp:485
 msgid "Not enough memory to read filters"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:494
 msgid "Not enough memory to read merged ranges"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:413
 msgid "Not enough memory to read workbook"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:424
 msgid "Not enough memory to read workbook text"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:572 userland/apps/reliefexcel/document.cpp:580
 msgid "Not enough memory to read worksheets"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1239
 msgid "Not enough memory to return recovery path"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:618
 msgid "Not enough memory to save workbook"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:635
 msgid "Not enough memory to sync save directory"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:127
 msgid "Not enough memory to validate merged ranges"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Number"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Number format"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Office supplies"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Only the upper-left cell's content is kept when merging. Continue?"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Open workbook"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Open..."
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:148
 msgid "Overlapping merged ranges"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Overspent"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Paste values"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Percent"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Preview of the first rows. Text and leading zeros are preserved; formulas are not executed."
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "ROUND(number, decimal_places)"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Recalculate"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Recover"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Recovery copy saved"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:969
 msgid "Recovery directory belongs to another user"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:952
 msgid "Recovery path contains a non-directory component"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:968
 msgid "Recovery path is not a directory"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Redo"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Remaining balance"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Rename sheet"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Rent"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Replace"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Replace all"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Replace current"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Replace with:"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Replacements:"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Returns the largest number."
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Returns the mean of numeric cells."
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Returns the smallest number."
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Right"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Rows"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Rows and their formatting move together within the selected range."
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Rows:"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "SUMIF(range, criteria, sum_range)"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Salary"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Save as..."
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Save canceled; original file preserved"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Save changes to this workbook?"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:977
 msgid "Save path is empty"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:616 userland/apps/reliefexcel/document.cpp:633
 msgid "Save path is too long"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:597
 msgid "Save target must be a regular file"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Save workbook"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Select a destination and paste to move the cells"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Select at least two columns to fill right"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Select at least two rows to fill down"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Select numbers or a cell below the numbers to sum"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Separator:"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Sheet1"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Shopping"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Show formulas"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Sort"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Sort ascending"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Sort descending"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:929
 msgid "State directory must be an absolute path"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:1221 userland/apps/reliefexcel/document.cpp:1229
 msgid "State directory path is too long"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:408
 msgid "String exceeds workbook resource limits"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Sum:"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Summary"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Text color"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "The destination contains data. Replace it?"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "The file changed outside ReliefExcel. Choose how to save."
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "There is no room below this range"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:123
 msgid "Too many merged ranges"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:113
 msgid "Too many worksheet filters"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Total expenses"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Total income"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Transit pass"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Transport"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Undo"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:829
 msgid "Unexpected data after quoted field"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:833
 msgid "Unexpected quote in unquoted field"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Unfreeze"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Unmerge"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:827
 msgid "Unterminated quoted field"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Usage: reliefexcel [workbook.rexl | data.csv]"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Utilities"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Value:"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Within budget"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:421
 msgid "Workbook contains invalid UTF-8 text"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:153 userland/apps/reliefexcel/document.cpp:505
 msgid "Workbook exceeds the cell limit"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:197 userland/apps/reliefexcel/document.cpp:200 userland/apps/reliefexcel/document.cpp:203
 msgid "Workbook exceeds the file size limit"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1096
 msgid "Workbook file has an invalid size or type"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:585
 msgid "Workbook has trailing or malformed data"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:347 userland/apps/reliefexcel/document.cpp:361
 msgid "Workbook is truncated"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Workbook opened"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:1086
 msgid "Workbook path is empty"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Workbook saved"
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:120 userland/apps/reliefexcel/document.cpp:170 userland/apps/reliefexcel/document.cpp:207 userland/apps/reliefexcel/document.cpp:481 userland/apps/reliefexcel/document.cpp:537
 msgid "Workbook text exceeds the resource limit"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Working..."
 msgstr ""
-
 
 #: userland/apps/reliefexcel/document.cpp:104
 msgid "Worksheet dimensions exceed resource limits"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:983
 msgid "Worksheet is unavailable"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Worksheet name:"
 msgstr ""
 
-
 #: userland/apps/reliefexcel/document.cpp:902 userland/apps/reliefexcel/document.cpp:1185
 msgid "Worksheet no longer exists"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Worksheets"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Wrap text"
 msgstr ""
 
-
 #: userland/apps/reliefexcel
 msgid "Zoom percentage (25–400):"
 msgstr ""
-
 
 #: userland/apps/reliefexcel
 msgid "Zoom..."
@@ -6212,7 +9185,6 @@ msgstr ""
 msgid "Could not lock recovery file"
 msgstr ""
 
-
 #: userland/apps/reliefword/window.cpp:253
 msgid "%s\nCharacters: %zu\nNon-space characters: %zu\nWords / CJK characters: %zu\nParagraphs: %zu\nPages: %u"
 msgstr ""
@@ -6269,7 +9241,7 @@ msgstr ""
 msgid "Document exported; original remains open"
 msgstr ""
 
-#: userland/apps/reliefword/files.cpp:86
+#: userland/apps/reliefmath/files.cpp:129
 msgid "Document saved"
 msgstr ""
 
@@ -6317,11 +9289,11 @@ msgstr ""
 msgid "Exporting over the imported source could discard content ReliefWord did not preserve"
 msgstr ""
 
-#: userland/apps/reliefword/files.cpp:53
+#: userland/apps/reliefmath/files.cpp:64
 msgid "File path is too long"
 msgstr ""
 
-#: userland/apps/reliefword/window.cpp:99
+#: userland/apps/reliefmath/window.cpp:92
 msgid "Find..."
 msgstr ""
 
@@ -6421,7 +9393,7 @@ msgstr ""
 msgid "Match selected"
 msgstr ""
 
-#: userland/apps/reliefword/window.cpp:153
+#: userland/apps/reliefmath/window.cpp:156
 msgid "Modified"
 msgstr ""
 
@@ -6509,7 +9481,7 @@ msgstr ""
 msgid "Replace the existing file?\n%s"
 msgstr ""
 
-#: userland/apps/reliefword/window.cpp:99
+#: userland/apps/reliefmath/window.cpp:92
 msgid "Replace..."
 msgstr ""
 
@@ -6541,7 +9513,7 @@ msgstr ""
 msgid "Save a copy..."
 msgstr ""
 
-#: userland/apps/reliefword/files.cpp:37
+#: userland/apps/reliefmath/files.cpp:43
 msgid "Save changes before continuing?"
 msgstr ""
 
@@ -6617,7 +9589,7 @@ msgstr ""
 msgid "Word count"
 msgstr ""
 
-#: userland/apps/reliefword/window.cpp:115
+#: userland/apps/reliefmath/window.cpp:115
 msgid "Zoom"
 msgstr ""
 
@@ -6737,7 +9709,7 @@ msgstr ""
 msgid "Draw outline"
 msgstr ""
 
-#: userland/apps/reliefppt/window.cpp:175
+#: userland/apps/reliefmath/window.cpp:90
 msgid "Duplicate"
 msgstr ""
 
@@ -6937,7 +9909,7 @@ msgstr ""
 msgid "Opening presentation..."
 msgstr ""
 
-#: userland/apps/reliefppt/window.cpp:198
+#: userland/apps/reliefmath/window.cpp:91
 msgid "Order"
 msgstr ""
 
@@ -7139,4 +10111,28 @@ msgstr ""
 
 #: userland/apps/reliefppt/dialogs.cpp:41
 msgid "Y position"
+msgstr ""
+
+#: configs/nls/messages.c:37
+msgid "ReliefMath"
+msgstr ""
+
+#: configs/nls/messages.c:38
+msgid "Formula"
+msgstr ""
+
+#: configs/nls/messages.c:39
+msgid "Symbols"
+msgstr ""
+
+#: configs/nls/messages.c:40
+msgid "Structure"
+msgstr ""
+
+#: configs/nls/messages.c:213
+msgid "variable, target, and expression: math source"
+msgstr ""
+
+#: configs/nls/messages.c:659
+msgid "worker error"
 msgstr ""

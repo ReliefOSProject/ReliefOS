@@ -2783,6 +2783,32 @@
       "script": "tools/build/opl3.sh",
       "target": "upstream-nuked-opl3",
       "license_in_source": "LICENSE"
+    },
+    {
+      "id": "reliefmath-dev-cairo",
+      "kind": "apk",
+      "version": "1.18.4-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/cairo-dev-1.18.4-r1.apk",
+      "sha256": "5ed67544a0b919ce4991586485135c4a7afaae8e2eeb9266866df96d823d1f33",
+      "directory": "cairo-dev-1.18.4-r1",
+      "script": "tools/build/reliefmath-development.sh",
+      "target": "reliefmath-development",
+      "feature": "xorg",
+      "note": "Build-only C API headers and linker symlink for ReliefMath worker; matches the locked Alpine runtime; verified APK signature.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "reliefmath-dev-freetype",
+      "kind": "apk",
+      "version": "2.14.3-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/freetype-dev-2.14.3-r0.apk",
+      "sha256": "423641ce2ebc18338c520ddabd64cd007d3f8a1e83b846d755e86f0a14addf3c",
+      "directory": "freetype-dev-2.14.3-r0",
+      "script": "tools/build/reliefmath-development.sh",
+      "target": "reliefmath-development",
+      "feature": "xorg",
+      "note": "Build-only C API headers and linker symlink for ReliefMath worker; matches the locked Alpine runtime; verified APK signature.",
+      "license_in_source": ".PKGINFO"
     }
   ]
 }

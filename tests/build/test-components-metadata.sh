@@ -8,5 +8,6 @@ printf 'CONFIG_RELIEFOS_COMPONENT_APP_HELLO_BUILD=y\n# CONFIG_RELIEFOS_COMPONENT
 awk -F '\t' '$1=="hello" {if($3!=1 || $4!=0 || $5!=0) exit 1;found=1} END{if(!found)exit 1}' "$w/tsv"
 awk -F '\t' '$1=="installer" {if($3!=1)exit 1;found=1} END{if(!found)exit 1}' "$w/tsv"
 awk -F '\t' '$1=="desktop" {if($3!=0 || $4!=0)exit 1;found=1} END{if(!found)exit 1}' "$w/tsv"
+awk -F '\t' '$1=="reliefmath" {if($3!=1 || $4!=1 || $5!=1 || $8!="ReliefMath" || $9!="Office applications" || $10!=".rmath" || $11!=1)exit 1;found=1} END{if(!found)exit 1}' "$w/tsv"
 grep -q '"schema_version":1' "$w/json"
 printf 'component metadata: independent image selection and required policy passed\n'

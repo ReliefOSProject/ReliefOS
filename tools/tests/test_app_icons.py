@@ -43,6 +43,14 @@ def decode_png(path):
 
 
 class AppIcons(unittest.TestCase):
+    def test_reliefmath_has_distinct_math_artwork(self):
+        self.assertIn('reliefmath', APPS)
+        pixels = icons.draw_icon('reliefmath')
+        rgba = bytes(channel for row in pixels for pixel in row for channel in pixel)
+        self.assertIn(0, rgba[3::4])
+        self.assertIn(255, rgba[3::4])
+        self.assertNotEqual(pixels, icons.draw_icon('reliefword'))
+
     def test_only_reliefos_graphical_applications_ship_artwork(self):
         directory = ROOT / 'resources/build-art/app-icons'
         self.assertEqual({p.stem for p in directory.glob('*.bmp')}, set(APPS))

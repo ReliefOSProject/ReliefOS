@@ -124,6 +124,7 @@ int x11_app_allowed(const char *program)
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/reliefexcel/reliefexcel.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/reliefword/reliefword.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/reliefppt/reliefppt.elf",
+        RELIEFOS_LAYOUT_RELIEFOS_APPS "/reliefmath/reliefmath.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/taskmgr/taskmgr.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/xiaobai/xiaobai.elf",
     };
@@ -193,10 +194,12 @@ int launch_path(const char *path, unsigned depth)
         if (!x11_app_allowed(path)) return -ENOTSUP;
         return spawn_app(path, NULL);
     }
+    const char *user_association = NULL;
     char extension[16], association[RELIEFOS_FS_PATH_LEN];
     if (reliefos_launch_get_extension_for_path(path, extension, sizeof(extension)) &&
         reliefos_launch_get_extension_association(extension, association, sizeof(association)) > 0 &&
-        association[0] && x11_app_allowed(association)) program = association;
+        association[0] && x11_app_allowed(association)) user_association = association;
+    program = fileman_x11_app_for_path(path, user_association);
     return spawn_app(program, path);
 }
 

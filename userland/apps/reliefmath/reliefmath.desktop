@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefMath
+Name[zh_CN]=ReliefMath
+GenericName=Math Editor
+GenericName[zh_CN]=数学公式编辑器
+Exec=/usr/bin/reliefmath %f
+TryExec=/usr/bin/reliefmath
+Icon=reliefos-reliefmath
+Terminal=false
+Categories=Office;Math;
+MimeType=application/x-reliefmath;
+StartupWMClass=reliefos-reliefmath

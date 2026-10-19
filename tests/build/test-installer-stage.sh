@@ -12,7 +12,9 @@ mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/src/configs" "$w/src/userland/ap
     "$w/raw/etc/reliefos/icewm" "$w/raw/etc/runlevels/default" \
     "$w/raw/etc/X11/xdm" "$w/raw/etc/pam.d" "$w/raw/usr/share/applications" \
     "$w/raw/usr/lib/X11/xdm" \
-    "$w/raw/usr/lib/reliefos/apps" \
+    "$w/raw/usr/lib/reliefos/apps" "$w/raw/usr/share/reliefmath" \
+    "$w/raw/usr/share/licenses/reliefmath" "$w/raw/usr/share/mime/packages" \
+    "$w/raw/usr/share/fonts/reliefos" "$w/raw/usr/share/reliefos" \
     "$w/esp/EFI/BOOT" "$w/esp/reliefos" "$w/esp/leonos" "$w/esp/grub"
 printf 'guide\n' > "$w/src/docs/ADVANCED_INSTALL.txt"
 cp "$src/configs/fltk-apps.list" "$w/src/configs/fltk-apps.list"
@@ -51,6 +53,18 @@ for app in $(cat "$w/src/configs/fltk-apps.list") glxgears portablegl; do
         mkdir -p "$w/raw/$icons"
         printf '%s icon\n' "$app" > "$w/raw/$icons/reliefos-$app.png"
     done
+done
+printf 'math font\n' > "$w/raw/usr/share/reliefmath/STIXTwoMath-Regular.otf"
+printf 'font license\n' > "$w/raw/usr/share/licenses/reliefmath/STIX-OFL.txt"
+printf 'license summary\n' > "$w/raw/usr/share/licenses/reliefmath/README.md"
+printf '<mime-info/>\n' > "$w/raw/usr/share/mime/packages/reliefmath.xml"
+printf 'shared CJK font\n' > "$w/raw/usr/share/fonts/reliefos/simsun.ttc"
+printf 'unrelated app data\n' > "$w/raw/usr/share/reliefos/other-app-data"
+printf 'worker executable\n' > "$w/raw/usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf"
+printf 'window icon\n' > "$w/raw/usr/lib/reliefos/apps/reliefmath/reliefmath.bmp"
+for size in 16 32 48 64 128 256; do
+    mkdir -p "$w/raw/usr/share/icons/hicolor/${size}x${size}/apps"
+    printf 'math icon\n' > "$w/raw/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-reliefmath.png"
 done
 printf 'portablegl library\n' > "$w/raw/usr/lib/libportablegl.so.1"
 printf 'license\n' > "$w/raw/etc/license.conf"
@@ -152,6 +166,27 @@ for app in $(cat "$w/src/configs/fltk-apps.list") glxgears portablegl; do
         done
     done
 done
+for path in \
+    usr/lib/reliefos/apps/reliefmath \
+    usr/bin/reliefmath \
+    usr/share/applications/reliefos-reliefmath.desktop \
+    usr/share/reliefmath \
+    usr/share/licenses/reliefmath \
+    usr/share/mime/packages/reliefmath.xml; do
+    [ ! -e "$w/stage/install/root-console/$path" ] || {
+        echo "ReliefMath asset entered console root: $path" >&2
+        exit 1
+    }
+done
+for size in 16 32 48 64 128 256; do
+    [ ! -e "$w/stage/install/root-console/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-reliefmath.png" ]
+done
+[ -f "$w/stage/install/root/usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf" ]
+[ -f "$w/stage/install/root/usr/share/reliefmath/STIXTwoMath-Regular.otf" ]
+[ -f "$w/stage/install/root/usr/share/licenses/reliefmath/STIX-OFL.txt" ]
+[ -f "$w/stage/install/root/usr/share/mime/packages/reliefmath.xml" ]
+[ -f "$w/stage/install/root-console/usr/share/fonts/reliefos/simsun.ttc" ]
+[ -f "$w/stage/install/root-console/usr/share/reliefos/other-app-data" ]
 [ ! -e "$w/stage/install/root-console/usr/lib/libportablegl.so.1" ]
 [ -d "$w/stage/install/root-console/usr/lib/reliefos/apps/settings" ]
 [ -f "$w/stage/install/root-console/usr/lib/reliefos/libreliefos.so.2" ]

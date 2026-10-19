@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+const char *fileman_x11_app_for_path(const char *path, const char *user_association);
+
 int main(void)
 {
     const char *invalid[] = {"", ".", "..", "a/b", "line\nname", "tab\tname", "bad\rname"};
@@ -30,6 +32,11 @@ int main(void)
     assert(!strcmp(fileman_x11_default_app("/tmp/export.CSV"), "/usr/bin/reliefexcel"));
     assert(!strcmp(fileman_x11_default_app("/tmp/report.RWORD"), "/usr/bin/reliefword"));
     assert(!strcmp(fileman_x11_default_app("/tmp/show.RPPT"), "/usr/bin/reliefppt"));
+    assert(!strcmp(fileman_x11_default_app("/tmp/equation.rmath"), "/usr/bin/reliefmath"));
+    assert(!strcmp(fileman_x11_default_app("/tmp/EQUATION.RMATH"), "/usr/bin/reliefmath"));
+    assert(!strcmp(fileman_x11_app_for_path("/tmp/equation.rmath", "/usr/bin/custom-math"),
+                   "/usr/bin/custom-math"));
+    assert(!strcmp(fileman_x11_app_for_path("/tmp/equation.rmath", ""), "/usr/bin/reliefmath"));
     assert(!strcmp(fileman_x11_default_app("/tmp/test.txt"), "/usr/bin/nedit"));
     assert(!strcmp(fileman_x11_default_app("/tmp/.hidden"), "/usr/bin/nedit"));
     assert(!fileman_x11_default_app("/tmp/program.elf"));

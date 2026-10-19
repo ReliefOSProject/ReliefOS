@@ -69,6 +69,9 @@ for app in fileman installer leonmmcoset reliefword reliefppt soundctl sudo fast
     printf '%s\tsystem-app\t1\t1\t%s\t0\t0\t%s\tSystem applications\t\t0\n' "$app" "$entry" "$app" >> "$work/metadata"
     printf 'app fixture\n' > "$work/out/userland/$app.elf"
 done
+printf 'reliefmath\tprogram-app\t1\t1\t1\t0\t0\tReliefMath\tOffice applications\t.rmath\t1\n' >> "$work/metadata"
+printf 'math GUI fixture\n' > "$work/out/userland/reliefmath.elf"
+printf 'math worker fixture\n' > "$work/out/userland/reliefmath-render.elf"
 printf 'audio fixture\n' > "$work/out/system/lib/libreliefos-audio.so.1"
 printf 'calc\tprogram-app\t0\t0\t1\t0\t0\tCalculator\tOffice applications\t\t0\n' >> "$work/metadata"
 printf 'ncurses\tlibrary\t1\t1\t0\t1\t0\tncurses\tLibraries\t\t0\n' >> "$work/metadata"
@@ -108,7 +111,7 @@ sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
 xorg_root=$work/root
 
 # Only self-authored graphical apps receive artwork, including hidden entries.
-for app in fileman installer leonmmcoset reliefword reliefppt; do
+for app in fileman installer leonmmcoset reliefword reliefppt reliefmath; do
     for size in 16 32 48 64 128 256; do
         icon=usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png
         cmp "$repo_root/resources/build-art/app-icons/hicolor/${size}x${size}/apps/reliefos-$app.png" "$xorg_root/$icon"
@@ -124,6 +127,37 @@ grep -qx 'icon=' "$xorg_root/usr/lib/reliefos/apps/fastfetch/manifest.ini"
 test ! -e "$xorg_root/usr/share/icons/hicolor/48x48/apps/reliefos-calc.png"
 test -f "$xorg_root/usr/lib/reliefos/apps/installer/installer.bmp"
 test -f "$xorg_root/usr/lib/reliefos/apps/leonmmcoset/leonmmcoset.bmp"
+cmp "$work/out/userland/reliefmath.elf" "$xorg_root/usr/lib/reliefos/apps/reliefmath/reliefmath.elf"
+cmp "$work/out/userland/reliefmath-render.elf" "$xorg_root/usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf"
+test "$(readlink "$xorg_root/usr/bin/reliefmath")" = ../lib/reliefos/apps/reliefmath/reliefmath.elf
+grep -qx 'open_with=1' "$xorg_root/usr/lib/reliefos/apps/reliefmath/manifest.ini"
+grep -qx 'extensions=.rmath' "$xorg_root/usr/lib/reliefos/apps/reliefmath/manifest.ini"
+grep -qx 'category=Office applications' "$xorg_root/usr/lib/reliefos/apps/reliefmath/manifest.ini"
+test "$(stat -c %a "$xorg_root/usr/share/reliefmath/STIXTwoMath-Regular.otf")" = 444
+test "$(stat -c %a "$xorg_root/usr/share/licenses/reliefmath/STIX-OFL.txt")" = 444
+test -f "$xorg_root/usr/share/licenses/reliefmath/README.md"
+test -f "$xorg_root/usr/share/mime/packages/reliefmath.xml"
+
+# Removing the selected app from component metadata excludes every private
+# product while leaving the shared system CJK font in the composed root.
+awk -F '\t' '$1!="reliefmath"' "$work/metadata" > "$work/metadata-no-reliefmath"
+ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux ncurses fixture-provider' \
+sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
+    "$work/rootfs.config" "$work/metadata-no-reliefmath" "$work/stage" "$work/layout" \
+    "$work/root-no-reliefmath" "$work/no-reliefmath-manifest.json" 1700000000
+for path in \
+    usr/lib/reliefos/apps/reliefmath \
+    usr/bin/reliefmath \
+    usr/share/applications/reliefos-reliefmath.desktop \
+    usr/share/reliefmath \
+    usr/share/licenses/reliefmath \
+    usr/share/mime/packages/reliefmath.xml; do
+    test ! -e "$work/root-no-reliefmath/$path"
+done
+for size in 16 32 48 64 128 256; do
+    test ! -e "$work/root-no-reliefmath/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-reliefmath.png"
+done
+test -f "$work/root-no-reliefmath/usr/share/fonts/reliefos/simsun.ttc"
 
 grep -qx xorg "$xorg_root/etc/reliefos/desktop-backend"
 test ! -e "$xorg_root/etc/runlevels/default/reliefos-windowd"

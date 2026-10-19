@@ -87,6 +87,7 @@ app-$(1): $(3)
 -include $$(addsuffix .d,$$(USERLAND_OBJECTS_$(1)))
 endef
 include $(RELIEFOS_SRC)/mk/components/graphics.mk
+include $(RELIEFOS_SRC)/mk/components/reliefmath.mk
 $(foreach app,$(USERLAND_APPS),$(eval $(call RELIEFOS_APP,$(app),$(app),$(USERLAND_DIR)/$(app).elf,$(AUTOCONF_H),$(RUNTIME_SO))))
 $(eval $(call RELIEFOS_APP,gptinit,gptinit,$(O)/userland-installer/gptinit.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
 

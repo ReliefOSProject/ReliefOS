@@ -422,6 +422,13 @@ def icon_extra(c, name):
         fill(c, 3, 6, 4, 1, MID); fill(c, 3, 8, 5, 1, MID)
         fill(c, 10, 5, 3, 5, ORANGE); fill(c, 9, 7, 1, 3, ORANGE)
         line(c, 8, 11, 8, 14, DARK); line(c, 5, 15, 8, 12, DARK); line(c, 11, 15, 8, 12, DARK)
+    elif name == "reliefmath":
+        draw_document(c, PURPLE)
+        fill(c, 6, 5, 3, 1, BLUE)
+        line(c, 5, 10, 6, 12, PURPLE)
+        line(c, 6, 12, 8, 7, PURPLE)
+        line(c, 8, 7, 12, 7, PURPLE)
+        fill(c, 10, 4, 2, 1, ORANGE)
     elif name == "reliefword":
         draw_document(c, BLUE)
         fill(c, 4, 4, 8, 2, BLUE)

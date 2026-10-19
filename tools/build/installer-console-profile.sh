@@ -69,7 +69,10 @@ for path in \
     usr/lib/reliefos/xorg-tty-wrapper \
     usr/lib/reliefos/xdm-session \
     usr/lib/reliefos/xdm-setup \
-    usr/lib/libportablegl.so.1; do
+    usr/lib/libportablegl.so.1 \
+    usr/share/reliefmath \
+    usr/share/licenses/reliefmath \
+    usr/share/mime/packages/reliefmath.xml; do
     remove_path "$path"
 done
 

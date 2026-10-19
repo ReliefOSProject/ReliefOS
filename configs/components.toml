@@ -433,6 +433,21 @@ open_with = true
 extensions = [".rword", ".txt", ".html", ".htm"]
 
 [[components]]
+id = "reliefmath"
+symbol = "APP_RELIEFMATH"
+label = "ReliefMath"
+category = "Office applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+open_with = true
+extensions = [".rmath"]
+
+[[components]]
 id = "reliefppt"
 symbol = "APP_RELIEFPPT"
 label = "ReliefPPT"

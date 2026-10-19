@@ -46,5 +46,12 @@ const char *fileman_x11_default_app(const char *path)
         return "/usr/bin/reliefexcel";
     if (extension && !strcasecmp(extension, ".rword")) return "/usr/bin/reliefword";
     if (extension && !strcasecmp(extension, ".rppt")) return "/usr/bin/reliefppt";
+    if (extension && !strcasecmp(extension, ".rmath")) return "/usr/bin/reliefmath";
     return "/usr/bin/nedit";
+}
+
+const char *fileman_x11_app_for_path(const char *path, const char *user_association)
+{
+    if (user_association && *user_association) return user_association;
+    return fileman_x11_default_app(path);
 }

@@ -830,6 +830,86 @@ config RELIEFOS_COMPONENT_APP_MP3PLAY_SDK
 
 endmenu
 
+menu "Office applications"
+
+config RELIEFOS_COMPONENT_APP_RELIEFEXCEL_BUILD
+    bool "Build ReliefExcel"
+    default y
+
+config RELIEFOS_COMPONENT_APP_RELIEFEXCEL_IMAGE
+    bool "Include ReliefExcel in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFEXCEL_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFEXCEL_ENTRY
+    bool "Generate a desktop entry for ReliefExcel"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFEXCEL_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFEXCEL_SDK
+    bool "Include ReliefExcel in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFEXCEL_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFWORD_BUILD
+    bool "Build ReliefWord"
+    default y
+
+config RELIEFOS_COMPONENT_APP_RELIEFWORD_IMAGE
+    bool "Include ReliefWord in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFWORD_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFWORD_ENTRY
+    bool "Generate a desktop entry for ReliefWord"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFWORD_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFWORD_SDK
+    bool "Include ReliefWord in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFWORD_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFMATH_BUILD
+    bool "Build ReliefMath"
+    default y
+
+config RELIEFOS_COMPONENT_APP_RELIEFMATH_IMAGE
+    bool "Include ReliefMath in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFMATH_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFMATH_ENTRY
+    bool "Generate a desktop entry for ReliefMath"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFMATH_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFMATH_SDK
+    bool "Include ReliefMath in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFMATH_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFPPT_BUILD
+    bool "Build ReliefPPT"
+    default y
+
+config RELIEFOS_COMPONENT_APP_RELIEFPPT_IMAGE
+    bool "Include ReliefPPT in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFPPT_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFPPT_ENTRY
+    bool "Generate a desktop entry for ReliefPPT"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFPPT_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFPPT_SDK
+    bool "Include ReliefPPT in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFPPT_BUILD
+
+endmenu
+
 menu "System applications"
 
 config RELIEFOS_COMPONENT_APP_SOUNDCTL_BUILD
@@ -927,6 +1007,25 @@ config RELIEFOS_COMPONENT_APP_DRVMGR_SDK
     default n
     depends on RELIEFOS_COMPONENT_APP_DRVMGR_BUILD
 
+config RELIEFOS_COMPONENT_APP_DRIVERINFO_BUILD
+    bool "Build Driver information"
+    default y
+
+config RELIEFOS_COMPONENT_APP_DRIVERINFO_IMAGE
+    bool "Include Driver information in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_DRIVERINFO_BUILD
+
+config RELIEFOS_COMPONENT_APP_DRIVERINFO_ENTRY
+    bool "Generate a desktop entry for Driver information"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_DRIVERINFO_BUILD
+
+config RELIEFOS_COMPONENT_APP_DRIVERINFO_SDK
+    bool "Include Driver information in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_DRIVERINFO_BUILD
+
 config RELIEFOS_COMPONENT_APP_SYSCONFDIALOG_BUILD
     bool "Build System configuration dialog"
     default y
@@ -983,6 +1082,27 @@ config RELIEFOS_COMPONENT_APP_SU_SDK
     bool "Include su in the developer SDK"
     default n
     depends on RELIEFOS_COMPONENT_APP_SU_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFAPK_BUILD
+    bool "Build ReliefAPK"
+    default y
+    select RELIEFOS_COMPONENT_APP_SUDO_BUILD
+    select RELIEFOS_COMPONENT_APP_SU_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFAPK_IMAGE
+    bool "Include ReliefAPK in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFAPK_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFAPK_ENTRY
+    bool "Generate a desktop entry for ReliefAPK"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFAPK_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFAPK_SDK
+    bool "Include ReliefAPK in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFAPK_BUILD
 
 endmenu
 

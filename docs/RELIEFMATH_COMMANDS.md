@@ -1,0 +1,39 @@
+# ReliefMath 首版命令兼容表
+
+本表定义工具目录和编辑核心识别的首版数学命令。表中“支持”表示目录提供可编辑插入项，或编辑核心明确识别该语法；当前 host renderer 已对 `tests/fixtures/reliefmath/formulas.tsv` 中的 131 个目录样例完成真实渲染。首版不是完整 TeX/LaTeX 实现。
+
+| 命令或工具 | 参数 | 数学环境 | 支持 | 限制 | 示例 |
+| --- | --- | --- | --- | --- | --- |
+| `\alpha`、`\beta`、`\gamma`、`\delta`、`\epsilon`、`\varepsilon`、`\zeta`、`\eta`、`\theta`、`\vartheta`、`\iota`、`\kappa`、`\lambda`、`\mu`、`\nu`、`\xi`、Unicode `ο`、`\pi`、`\varpi`、`\rho`、`\varrho`、`\sigma`、`\varsigma`、`\tau`、`\upsilon`、`\phi`、`\varphi`、`\chi`、`\psi`、`\omega`、`\Gamma`、`\Delta`、`\Theta`、`\Lambda`、`\Xi`、`\Pi`、`\Sigma`、`\Upsilon`、`\Phi`、`\Psi`、`\Omega` | 无；可与普通数学表达式组合 | 行内、显示 | 是 | Omicron 使用 Unicode 字符，因为 TeX 没有标准 `\omicron` 命令 | `\alpha + \Gamma` |
+| `+`、`-`、`=`、`\pm`、`\mp`、`\times`、`\cdot`、`\div`、`\star` | 无 | 行内、显示 | 是 | 运算符本身不创建占位符 | `a \times b` |
+| `<`、`>`、`\le`、`\ge`、`\ne`、`\approx`、`\equiv`、`\sim`、`\propto`、`\ll`、`\gg`、`\perp`、`\parallel` | 无 | 行内、显示 | 是 | 仅列出的关系符命令 | `x \le y` |
+| `\to`、`\leftarrow`、`\rightarrow`、`\leftrightarrow`、`\Rightarrow`、`\Leftarrow`、`\mapsto` | 无 | 行内、显示 | 是 | 仅列出的箭头命令 | `x \mapsto f(x)` |
+| `\in`、`\notin`、`\subset`、`\subseteq`、`\cup`、`\cap`、`\emptyset`、`\forall`、`\exists`、`\infty` | 无 | 行内、显示 | 是 | 仅列出的集合与逻辑符号 | `x \in A` |
+| `\left( ... \right)`、`\left[ ... \right]`、`\left\{ ... \right\}`、`\left\langle...\right\rangle`、`\left\lfloor...\right\rfloor`、`\left\lceil...\right\rceil`、绝对值和范数模板 | 一个可编辑数学内容占位符 | 行内、显示 | 是 | 使用成对定界符；不接受未配对的 `\left`/`\right` | `\left( x+1 \right)` |
+| `\,`、`\:`、`\;`、`\quad`、`\qquad`、`\!` | 无 | 行内、显示 | 是 | 仅列出的间距命令 | `a\,b` |
+| `\frac`、`\displaystyle\frac` | 分子、分母 | 行内、显示 | 是 | 显示分数由 `\displaystyle` 加 `\frac` 表示；目录占位符初始为 `a`、`b` | `\frac{a}{b}` |
+| `\sqrt`、`\sqrt[n]` | 根指数（可选）、被开方项 | 行内、显示 | 是 | `ToolArgs.numbered_root` 为真时普通根式也插入指数占位符 | `\sqrt[3]{x}` |
+| `^`、`_` | 底项、上标或下标 | 行内、显示 | 是 | 每个可编辑内容单独占位；需要多个字符时用花括号 | `x_{i}^{2}` |
+| `\sum`、`\prod`、`\int`、`\iint`、`\iiint`、`\oint`、`\lim` | 界限、变量或表达式 | 行内、显示 | 是 | 目录模板提供可编辑界限和主体占位符 | `\sum_{i=1}^{n} i` |
+| `\sin`、`\cos`、`\tan`、`\log`、`\ln`、`\exp`、`\min`、`\max` | 函数参数 | 行内、显示 | 是 | 不支持任意用户定义函数名 | `\sin{x}` |
+| `matrix`、`pmatrix`、`bmatrix` 环境 | 行、列 | 行内、显示 | 是 | 每个单元格有独立占位符；每个方向最多 16 格；缺省为 2×2 | `\begin{pmatrix}a & b \\ c & d\end{pmatrix}` |
+| `cases` 环境 | 分段行与单元格 | 行内、显示 | 是 | 使用 `&` 分隔列、`\\` 分隔行；每个方向最多 16 格 | `\begin{cases}a & b \\ c & d\end{cases}` |
+| `aligned` 环境 | 对齐行和表达式 | 行内、显示 | 是 | `&` 为对齐点、`\\` 为换行；每个方向最多 16 格 | `\begin{aligned}a &= b \\ c &= d\end{aligned}` |
+| `\vec`、`\hat`、`\overline` | 被修饰项 | 行内、显示 | 是 | 每个模板有一个可编辑占位符 | `\vec{x}` |
+| `\text`、`\mathrm`、`\mathbf`、`\mathit` | 文本或数学内容 | 行内、显示 | 是 | 选区作为 UTF-8 字节原样包裹；首版不在文本内容中执行宏或外部资源 | `\text{中文}` |
+| `%` 注释、分组花括号、目录中的未知命令错误标记 | 无 | 编辑器词法分析 | 是 | 注释延续到行末；不支持的命令以错误 token 呈现 | `\frac{a}{b} % note` |
+
+目录共有 131 个稳定键。每项都包含英文 `msgid`、分类、命令、插入模板、参数说明和帮助示例。`catalog_search()` 对这些字段进行 ASCII 不区分大小写的子串搜索；`complete_command()` 按反斜杠命令前缀补全。完整静态语料见 `tests/fixtures/reliefmath/formulas.tsv`，每个目录键恰好出现一次。
+
+`build_snippet()` 产生 LaTeX 源码和 UTF-8 字节半开区间占位符。无参数符号允许零 stops；带参数结构必须提供非空 stops，且每个区间都包含完整的非空 UTF-8 占位文本。Tab 与 Shift-Tab 顺序选择占位符，到达末端或没有占位符时把按键交还给普通焦点导航。编辑核心的单次文本替换（包括一次 IME commit）作为一个撤销单元；占位范围随插入移动，删除与编辑相交的占位符会使其失效。撤销栈保留最近 64 个编辑快照。
+
+源码、查找文本、替换文本以及编辑结果最多为 65536 个 UTF-8 字节；超限返回 `Code::Limit`。C 字符串入口只检查上限内的字节和一个终止位置，替换与拼接在分配结果缓冲前检查最终长度。snippet 每次追加先检查上限，临时源码缓冲容量最多为 65537 字节（含终止符）。失败编辑保留正文、占位符与撤销历史。
+
+静态工具目录与编辑核心不依赖 FLTK。GUI 收藏采用独立 `.rmath` 文档，通过后台 IoJob 保存、加载和删除；保存失败可重试，并保留当前公式文档。
+
+| 拒绝项 | 支持 | 原因或行为 | 示例 |
+| --- | --- | --- | --- |
+| 宏定义与重定义：`\newcommand`、`\renewcommand`、`\def`、`\gdef`、`\xdef` | 否 | 用户输入宏会改变后续语义，首版不展开、不执行宏 | `\newcommand{\foo}{x}` |
+| 宏包加载：`\usepackage` | 否 | 不加载用户包或修改渲染环境 | `\usepackage{amsmath}` |
+| 外部资源：`\input`、`\include`、`\includegraphics` | 否 | 不读取文件、图片或其他外部数据 | `\input{file.tex}` |
+| 未列出的命令和环境（例如 `array`、`equation`、`gather`、`tikzpicture`） | 否 | 未知命令或环境必须显式报错，不静默忽略 | `\begin{tikzpicture}...` |
