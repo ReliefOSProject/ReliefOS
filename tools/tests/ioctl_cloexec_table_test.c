@@ -43,6 +43,11 @@ bool smp_cpu_online(uint32_t cpu) { return cpu == 0; }
 int time_clock_get(int32_t clock, struct linux_timespec *value)
 { (void)clock; *value = (struct linux_timespec){0}; return 0; }
 void pty_reap_hungup(uint32_t id) { (void)id; }
+/* These descriptor-table cases never open a system-console terminal. */
+uint32_t pty_vt_active(void) { abort(); }
+uint32_t pty_vt_id(uint32_t number) { (void)number; abort(); }
+int pty_transfer_get(uint32_t id, uint32_t endpoint)
+{ (void)id; (void)endpoint; abort(); }
 void pty_transfer_put(uint32_t id, uint32_t endpoint) { (void)id; (void)endpoint; }
 void kernel_spin_init(struct kernel_spinlock *lock) { lock->state = 0; }
 void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)

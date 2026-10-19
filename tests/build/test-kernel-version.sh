@@ -13,11 +13,11 @@ render() {
         --source-id abc123 --epoch 1700000000 --output "$work/build.h" "$@"
 }
 render
-grep -qx '#define RELIEFOS_KERNEL_VERSION "5.0.0"' "$work/build.h"
+grep -qx '#define RELIEFOS_KERNEL_VERSION "5.1.0"' "$work/build.h"
 render --extra-version -perf --local-version -test
-grep -qx '#define RELIEFOS_KERNEL_VERSION "5.0.0-perf-test"' "$work/build.h"
+grep -qx '#define RELIEFOS_KERNEL_VERSION "5.1.0-perf-test"' "$work/build.h"
 grep -qx '#define RELIEFOS_KERNEL_VERSION_MAJOR 5' "$work/build.h"
-grep -qx '#define RELIEFOS_KERNEL_VERSION_MINOR 0' "$work/build.h"
+grep -qx '#define RELIEFOS_KERNEL_VERSION_MINOR 1' "$work/build.h"
 grep -qx '#define RELIEFOS_KERNEL_VERSION_PATCH 0' "$work/build.h"
 before=$(stat -c %y "$work/build.h")
 render --extra-version -perf --local-version -test
@@ -31,7 +31,7 @@ for suffix in 'bad/flag' 'bad"flag' 'abcdefghijklmnopqrstuvwxyz0123456789'; do
     cmp "$work/expected.h" "$work/build.h"
 done
 render --extra-version '' --local-version ''
-grep -qx '#define RELIEFOS_KERNEL_VERSION "5.0.0"' "$work/build.h"
+grep -qx '#define RELIEFOS_KERNEL_VERSION "5.1.0"' "$work/build.h"
 make -s -n -C "$src" O="$work/out" EXTRAVERSION=-perf LOCALVERSION=-test kernel >"$work/plan"
 grep -Fq "EXTRAVERSION='-perf' LOCALVERSION='-test'" "$work/plan"
 if make -s -n -C "$src" O="$work/out" EXTRAVERSION='bad/flag' kernel >"$work/rejected.log" 2>&1; then

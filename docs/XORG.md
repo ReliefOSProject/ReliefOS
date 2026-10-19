@@ -49,6 +49,16 @@ Xsession. On the final e9cf guest, the actual root-owned XDM log recorded all
 four expected lifecycle events in order with status 0. The host XDM fixture
 is a model and does not replace this guest evidence.
 
+## Post-acceptance upstream sync (2026-10-19)
+
+The `e9cf25df756dfcb78eccae03d1e890a608019686d022086e88ead91c9b30743f`
+kernel SHA and runtime results above remain historical evidence for that exact
+image. The subsequent upstream merge incorporates console PTY semantics and
+5.1.0 version/release updates while preserving the SVGA source. The combined
+source has not been rebuilt into a new canonical image or rerun under native
+VMware; **VMware 验证未完成**. The e9cf identity does not identify or validate
+the merged source.
+
 `make fetch` downloads the official Alpine community `dillo` 3.3.0-r2 browser,
 with its locked runtime dependencies from
 the official Alpine v3.24 main and community repositories. Dillo uses FLTK's

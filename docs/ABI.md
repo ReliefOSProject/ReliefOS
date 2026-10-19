@@ -142,6 +142,19 @@ streams. `/dev/input`, `/dev/disk`, `/dev/pts`, and `/dev/shm` are
 directories and are enumerated through normal directory syscalls. Device
 nodes are synthetic and are not stored in the filesystem image.
 
+`/dev/console` is a terminal device (Linux major 5, minor 1), bound to the
+active virtual console when opened. It supports terminal reads and writes,
+termios, window-size queries, polling, and the existing VT ioctls. An open
+console descriptor keeps its terminal after VT switches and does not
+automatically acquire a controlling terminal. Implicit boot descriptors
+0, 1, and 2 share one read/write console description; explicit redirections
+and closed descriptors are preserved. System-console writes are mirrored
+to the diagnostic serial sink without creating kernel log entries.
+`/dev/kmsg` (major 1, minor 11) remains a separate diagnostic interface;
+terminal ioctls on it return `ENOTTY` and its writes do not enter VT history.
+This is the current virtual-console backend; Linux `console=` selection of
+serial terminal backends is not implemented by this change.
+
 Framebuffer, audio, input, disk, and PTY libc helpers open their
 corresponding `/dev` node and issue the device ABI (Linux fbdev, evdev,
 block, and OSS ioctls, plus the ReliefOS `LEONOS_FBIOBLIT` and

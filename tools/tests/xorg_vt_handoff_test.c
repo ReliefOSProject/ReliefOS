@@ -39,6 +39,9 @@ void console_vt_write(uint32_t number, const char *text, size_t count)
 { (void)number; (void)text; (void)count; }
 void console_printf(const char *format, ...) { (void)format; }
 
+/* This handoff fixture has no DRM KMS owner to release on a VT switch. */
+void drm_device_kms_vt_release(void) {}
+
 void console_log(enum console_log_level level, const char *format, ...)
 {
     (void)level; (void)format;

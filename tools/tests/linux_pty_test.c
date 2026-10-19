@@ -54,6 +54,9 @@ int sched_process_group_has_pty(uint32_t group, uint32_t id)
 const struct framebuffer *framebuffer_get(void) { return NULL; }
 void console_printf(const char *format, ...) { (void)format; }
 
+/* This PTY fixture has no DRM KMS owner to release on a VT switch. */
+void drm_device_kms_vt_release(void) {}
+
 void console_log(enum console_log_level level, const char *format, ...)
 {
     (void)level; (void)format;
@@ -171,6 +174,9 @@ int main(void)
     assert(pty_transfer_get(id, TASK_PTY_ENDPOINT_SLAVE) == -9);
     pty_init();
     assert(pty_vt_init() == 0);
+    /* kernel_start activates tty1 after boot diagnostics, not in pty_vt_init. */
+    assert(pty_vt_active() == 1 && shown_vt == 0);
+    console_vt_activate(1, false);
     assert(pty_vt_active() == 1 && shown_vt == 1 && shown_graphical == 0);
     for (uint32_t number = 1; number <= 6; ++number) {
         char path[16];

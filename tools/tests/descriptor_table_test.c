@@ -40,9 +40,10 @@ static int64_t descriptor_dispatch_vfork(const struct trap_frame *frame);
 #undef sched_current_pid
 #undef sched_sleep_current_until
 
-/* This descriptor fixture never registers a DRM node. */
+/* This descriptor fixture never registers a DRM node or PRIME surface. */
 void drm_file_close(struct task_file *file)
 { if (file) file->drm_file = NULL; }
+void drm_prime_file_close(struct task_file *file) { (void)file; }
 void drm_vmwgfx_cancel_task_continuation(struct task *task) { (void)task; }
 uint32_t drm_vmwgfx_process_retirements(uint32_t budget)
 { (void)budget; return 0; }
@@ -130,6 +131,7 @@ static int descriptor_socket_signal(uint32_t pid, int signal)
 
 static int fail_allocation;
 static unsigned pty_references;
+static unsigned console_references;
 void *kernel_malloc(size_t size) { return fail_allocation ? NULL : malloc(size); }
 void kernel_free(void *memory) { free(memory); }
 /* Descriptor scheduling fixtures model a single active CPU, the BSP. */
@@ -193,12 +195,24 @@ uint64_t time_ticks(void) { return 100; }
 void input_evdev_release(uint32_t kind, uint64_t token)
 { (void)kind; (void)token; }
 void pty_reap_hungup(uint32_t id) { (void)id; }
+static uint32_t descriptor_active_vt = 1;
+uint32_t pty_vt_active(void) { return descriptor_active_vt; }
+uint32_t pty_vt_id(uint32_t number) { return number >= 1 && number <= 6 ? number : 0; }
 int pty_is_active(uint32_t id) { return id == 7; }
 int pty_slave_open_allowed(uint32_t id) { return id == 7; }
 int pty_transfer_get(uint32_t id, uint32_t endpoint)
-{ assert(id == 7 && endpoint == TASK_PTY_ENDPOINT_SLAVE); ++pty_references; return 0; }
+{
+    assert(endpoint == TASK_PTY_ENDPOINT_SLAVE);
+    if (id >= 1 && id <= 6) ++console_references;
+    else { assert(id == 7); ++pty_references; }
+    return 0;
+}
 void pty_transfer_put(uint32_t id, uint32_t endpoint)
-{ assert(id == 7 && endpoint == TASK_PTY_ENDPOINT_SLAVE && pty_references); --pty_references; }
+{
+    assert(endpoint == TASK_PTY_ENDPOINT_SLAVE);
+    if (id >= 1 && id <= 6) { assert(console_references); --console_references; }
+    else { assert(id == 7 && pty_references); --pty_references; }
+}
 bool user_range_ok(uint64_t address, uint64_t length)
 { return address >= 4096 && length <= UINT64_MAX - address; }
 bool user_range_writable(uint64_t address, uint64_t length)
@@ -761,9 +775,22 @@ static void test_console_descriptions(void)
     assert(parent && child);
     parent->limits.nofile.rlim_cur = child->limits.nofile.rlim_cur = 64;
     assert(task_pty_materialize_stdio(parent) == 0);
+    assert(console_references == 1);
     assert(task_file_for_fd(parent, 0) && task_file_for_fd(parent, 1) && task_file_for_fd(parent, 2));
-    assert(task_device_is(task_file_for_fd(parent, 0), STORAGE_DEV_KIND_NULL));
-    assert(task_device_is(task_file_for_fd(parent, 1), STORAGE_DEV_KIND_KMSG));
+    assert(task_device_is(task_file_for_fd(parent, 0), STORAGE_DEV_KIND_CONSOLE));
+    assert(task_file_for_fd(parent, 0) == task_file_for_fd(parent, 1));
+    assert(task_file_for_fd(parent, 1) == task_file_for_fd(parent, 2));
+    assert((task_file_for_fd(parent, 1)->flags & RELIEFOS_O_ACCMODE) == RELIEFOS_O_RDWR);
+    assert(task_file_for_fd(parent, 1)->aux == 1);
+    assert(!strcmp(task_file_for_fd(parent, 1)->path, "/dev/console"));
+    assert(!parent->controlling_pty_id && !parent->pty_id);
+    descriptor_active_vt = 2;
+    assert(task_pty_materialize_stdio(parent) == 0);
+    assert(task_file_for_fd(parent, 1)->aux == 1);
+    assert(task_console_materialize_stdio(child) == 0);
+    assert(task_file_for_fd(child, 0)->aux == 2);
+    clear_task_files(child);
+    descriptor_active_vt = 1;
     assert(task_fd_set_descriptor_flags(parent, 2, RELIEFOS_FD_CLOEXEC) == 0);
     child->fd_table = parent->fd_table;
     assert(syscall_clone_task_files(parent, child) == 0);
@@ -772,14 +799,32 @@ static void test_console_descriptions(void)
     assert(copy == 3);
     task_file_for_fd(child, copy)->flags |= RELIEFOS_O_NONBLOCK;
     assert(task_file_for_fd(parent, 1)->flags & RELIEFOS_O_NONBLOCK);
+    assert(task_file_for_fd(parent, 0)->flags & RELIEFOS_O_NONBLOCK);
+    assert(task_file_for_fd(parent, 2)->flags & RELIEFOS_O_NONBLOCK);
     assert(task_fd_descriptor_flags(child, 2) == RELIEFOS_FD_CLOEXEC);
     task_discard_file_fd(child, 1);
     assert(task_pty_materialize_stdio(child) == 0 && !task_file_for_fd(child, 1));
     assert(task_file_for_fd(parent, 1));
     clear_task_files(child);
     clear_task_files(parent);
+    assert(console_references == 0);
+    fail_allocation = 1;
+    assert(task_console_materialize_stdio(parent) == -RELIEFOS_ENOMEM);
+    assert(!task_file_for_fd(parent, 0) && !task_file_for_fd(parent, 2));
+    fail_allocation = 0;
+    parent->closed_stdio_mask = 1u;
+    parent->stdio_files[1] = (struct task_file){.used = 1,
+        .flags = TASK_FILE_FLAG_DEV_NODE | RELIEFOS_O_WRONLY,
+        .node = {.type = RELIEFOS_FS_TYPE_DEVICE, .flags = STORAGE_NODE_FLAG_DEV_NODE,
+                 .first_cluster = STORAGE_DEV_KIND_NULL}};
+    assert(task_console_materialize_stdio(parent) == 0);
+    assert(!task_file_for_fd(parent, 0));
+    assert(task_device_is(task_file_for_fd(parent, 1), STORAGE_DEV_KIND_NULL));
+    assert(task_device_is(task_file_for_fd(parent, 2), STORAGE_DEV_KIND_CONSOLE));
+    clear_task_files(parent);
     free(child);
     free(parent);
+    puts("PASS boot console descriptors share one terminal, preserve redirection and survive VT switches");
 }
 
 int main(void)

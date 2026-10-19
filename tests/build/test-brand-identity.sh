@@ -54,10 +54,11 @@ check_appearance() {
     else
         fail 'os-release PRETTY_NAME must be exactly PRETTY_NAME="ReliefOS"'
     fi
-    if grep -qx 'VERSION_ID=4' "$root/system/rootfs/etc/os-release"; then
-        ok 'os-release VERSION_ID keeps numeric semantics'
+    release_version=$(sed -n 's/^release_version=//p' "$root/configs/build-version")
+    if grep -Fxq "VERSION_ID=$release_version" "$root/system/rootfs/etc/os-release"; then
+        ok 'os-release VERSION_ID matches the release version'
     else
-        fail 'os-release VERSION_ID must stay VERSION_ID=4'
+        fail 'os-release VERSION_ID must match configs/build-version'
     fi
     if grep -q 'menuentry "ReliefOS"' "$root/boot/grub/grub.cfg"; then
         ok 'GRUB menu entry uses ReliefOS'

@@ -1,6 +1,7 @@
 # ReliefOS/ReliefNT task 11 reviewed old-name allowlist.
 # scope<TAB>category<TAB>path<TAB>reason; exact tracked path, no blanket migration exemptions.
 # Rules: docs/branding-compatibility.md section 3.
+kernel	history	docs/releases/5.1.0.md	5.1.0 发布迁移说明记录已删除的旧品牌头文件路径、变量和输出标记，不是现行显示品牌
 kernel	compatibility	block/storage_block.c	识别已有磁盘 GPT 名 LEONOS4_ROOT
 kernel	compatibility	fs/storage_mount.c	旧 leonos-installer-root 引导 module tag 双接受
 kernel	compatibility	fs/procfs.c	冻结 LeonOSRole/LeonOSFlags 与 /proc/leonos-drivers 接口值

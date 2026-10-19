@@ -113,6 +113,17 @@ hardware cursor support, or cross-device DMA-BUF import. The inherited
 `preadv2` flag/error-order concern and unknown upstream recursive-exit caller
 remain deferred; console replay's allocation fallback preserves text and
 cursor semantics but can retain the earlier device-memory replay latency.
+
+## Post-acceptance upstream sync (2026-10-19)
+
+The `e9cf25df756dfcb78eccae03d1e890a608019686d022086e88ead91c9b30743f`
+kernel SHA and runtime results above remain historical evidence for that exact
+image. The subsequent upstream merge incorporates console PTY semantics and
+5.1.0 version/release updates while preserving the SVGA source. The combined
+source has not been rebuilt into a new canonical image or rerun under native
+VMware; **VMware 验证未完成**. The e9cf identity does not identify or validate
+the merged source.
+
 ## glxgears and Task Manager
 
 Start glxgears from its existing desktop entry, or from a GUI terminal:

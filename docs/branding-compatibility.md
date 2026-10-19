@@ -16,7 +16,7 @@
 | 系统机器 ID | `reliefos` | `leonos` 只用于识别旧安装/配置 |
 | 内核显示名 | `ReliefNT` | `NTCLKS` / `ntclks` 只留历史、旧路径/API 兼容 |
 | 内部前缀 | `RELIEFOS_`、`reliefos_`；内核私有为 `RELIEFNT_`、`reliefnt_` | 旧公开 ABI 符号保留兼容，旧私有前缀逐步退出 |
-| 版本字段 | `configs/build-version` 与 `VERSION_ID=4` 保留现有数值语义 | 不把 `4` 拼进正式显示名 |
+| 版本字段 | `/etc/os-release` 的 `VERSION_ID` 与主仓 `configs/build-version` 的发布版本一致 | 旧固定值 `4` 已由当前发布版本取代；不把版本数字拼进正式显示名 |
 
 词汇映射的展示规则：
 
