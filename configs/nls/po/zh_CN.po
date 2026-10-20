@@ -15059,3 +15059,135 @@ msgstr "ReliefTodo\nReliefOS 原生离线任务管理器\n\n任务支持标题�
 #: configs/nls/messages.c:663
 msgid "ReliefDiagram"
 msgstr "ReliefDiagram"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "ReliefPlayer"
+msgstr "ReliefPlayer"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Open audio..."
+msgstr "打开音频…"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Open audio"
+msgstr "打开音频"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio files (*.{mp3,MP3,wav,WAV})"
+msgstr "音频文件 (*.{mp3,MP3,wav,WAV})"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "No audio file selected"
+msgstr "尚未打开音频"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Open an MP3 or WAV file to begin"
+msgstr "打开 MP3 或 WAV 文件开始播放"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Reading audio information..."
+msgstr "正在读取音频信息…"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Paused"
+msgstr "已暂停"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Playback complete"
+msgstr "播放完毕"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Play"
+msgstr "播放"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Pause"
+msgstr "暂停"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Back 10 s"
+msgstr "后退 10 秒"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Forward 10 s"
+msgstr "前进 10 秒"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Play or pause (Space)"
+msgstr "播放或暂停（空格）"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Drag to seek; Left/Right: 10 seconds"
+msgstr "拖动定位；左右方向键跳转 10 秒"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Volume"
+msgstr "音量"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Mute"
+msgstr "静音"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Stereo"
+msgstr "立体声"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "bit"
+msgstr "位"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Stopping audio..."
+msgstr "正在停止音频…"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "The file path is too long"
+msgstr "文件路径过长"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Could not read the audio file"
+msgstr "无法读取音频文件"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Invalid or truncated audio file"
+msgstr "音频文件无效或不完整"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Unsupported audio format"
+msgstr "不支持的音频格式"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio file exceeds the supported limit"
+msgstr "音频文件超过支持的大小限制"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio device is unavailable"
+msgstr "音频设备不可用"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio device is busy"
+msgstr "音频设备正被占用"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio playback failed"
+msgstr "音频播放失败"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio process stopped unexpectedly"
+msgstr "音频进程意外结束"
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "ReliefPlayer\nSimple MP3 and WAV audio player\n\nCtrl+O: open audio\nSpace: play or pause\nLeft / Right: seek 10 seconds\nHome: return to the beginning\n\nVolume changes affect this player only.\nSupports PCM WAV 8/16/24/32-bit and float32, mono or stereo.\nLocal files only; no network streams or media library."
+msgstr "ReliefPlayer\n简易 MP3 和 WAV 音频播放器\n\nCtrl+O：打开音频\n空格：播放或暂停\n左右方向键：跳转 10 秒\nHome：回到开头\n\n音量只影响本程序。\n支持单/双声道 PCM WAV 8/16/24/32 位和 float32。\n只播放本地文件，不含网络流或媒体库。"
+
+#: userland/apps/reliefplayer/window.cpp
+msgid "Playing audio"
+msgstr "正在播放"
+
+#: userland/apps/reliefplayer/window.cpp
+msgid "Mono audio"
+msgstr "单声道"
+
+#: userland/apps/reliefplayer/window.cpp
+msgid "Stereo audio"
+msgstr "立体声"

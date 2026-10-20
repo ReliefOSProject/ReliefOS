@@ -710,6 +710,21 @@ open_with = true
 extensions = [".bmp", ".dib", ".png"]
 
 [[components]]
+id = "reliefplayer"
+symbol = "APP_RELIEFPLAYER"
+label = "ReliefPlayer"
+category = "Network and multimedia"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+open_with = true
+extensions = [".mp3", ".wav"]
+
+[[components]]
 id = "wavplay"
 symbol = "APP_WAVPLAY"
 label = "WAV player"

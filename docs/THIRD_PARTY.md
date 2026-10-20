@@ -307,6 +307,7 @@ calls are implemented by the ANSI adapter in `userland/sl`.
 ## minimp3
 
 - Path: `third_party/minimp3/minimp3.h`
+- Consumers: legacy `mp3play` and the FLTK `ReliefPlayer` local audio player.
 - Upstream: `https://github.com/lieff/minimp3`
 - Pinned commit: `ea99364f61c14656440e8d77e9c233ccf3124633`
 - License: CC0-1.0; upstream declares the source public domain dedication and

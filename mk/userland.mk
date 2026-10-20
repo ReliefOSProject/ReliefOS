@@ -47,6 +47,7 @@ USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFO
 USERLAND_LIBS_doom += $(AUDIO_OPL_ROOT)/usr/lib/libopl3.so.1 $(RUNTIME_BUILTINS)
 USERLAND_DEPS_doom += $(upstream_nuked-opl3_products)
 USERLAND_EXTRA_mp3play := -I$(RELIEFOS_SRC)/third_party/minimp3
+USERLAND_EXTRA_reliefplayer := -I$(RELIEFOS_SRC)/third_party/minimp3
 USERLAND_EXTRA_glxgears = -I$(RELIEFOS_SRC)/third_party/portablegl -I$(RELIEFOS_SRC)/userland/apps/glxgears -I$(dir $(GLXGEARS_SOURCE))
 PORTABLEGL_SO ?= $(O)/userland/libportablegl.so.1
 GLXGEARS_SOURCE ?= $(O_GENERATED)/glxgears/gears-upstream.c

@@ -681,3 +681,17 @@ static const char *const relieftodo_static_labels[] = {
     N_("Recently updated"),
     N_("Task title"),
 };
+
+/* ReliefPlayer labels returned by the decoder error table. */
+static const char *const reliefplayer_static_labels[] = {
+    N_("ReliefPlayer"),
+    N_("Could not read the audio file"),
+    N_("Invalid or truncated audio file"),
+    N_("Unsupported audio format"),
+    N_("Audio file exceeds the supported limit"),
+    N_("Not enough memory"),
+    N_("Audio device is unavailable"),
+    N_("Audio device is busy"),
+    N_("Audio playback failed"),
+    N_("Audio process stopped unexpectedly"),
+};

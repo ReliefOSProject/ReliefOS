@@ -790,6 +790,25 @@ config RELIEFOS_COMPONENT_APP_BROWSER_SDK
     default n
     depends on RELIEFOS_COMPONENT_APP_BROWSER_BUILD
 
+config RELIEFOS_COMPONENT_APP_RELIEFPLAYER_BUILD
+    bool "Build ReliefPlayer"
+    default y
+
+config RELIEFOS_COMPONENT_APP_RELIEFPLAYER_IMAGE
+    bool "Include ReliefPlayer in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFPLAYER_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFPLAYER_ENTRY
+    bool "Generate a desktop entry for ReliefPlayer"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFPLAYER_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFPLAYER_SDK
+    bool "Include ReliefPlayer in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFPLAYER_BUILD
+
 config RELIEFOS_COMPONENT_APP_WAVPLAY_BUILD
     bool "Build WAV player"
     default y

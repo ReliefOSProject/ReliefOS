@@ -19,3 +19,7 @@ awk -F '\t' '$1=="reliefdiagram" {if($3!=1 || $4!=0 || $5!=0)exit 1;found=1} END
 printf '# CONFIG_RELIEFOS_COMPONENT_APP_RELIEFDIAGRAM_BUILD is not set\n' > "$w/diagram-config"
 "$w/components" --input "$src/configs/components.toml" --config "$w/diagram-config" --output "$w/diagram-mk" --metadata "$w/diagram-tsv"
 awk -F '\t' '$1=="reliefdiagram" {if($3!=0 || $4!=0 || $5!=0)exit 1;found=1} END{if(!found)exit 1}' "$w/diagram-tsv"
+awk -F '\t' '$1=="reliefplayer" {if($3!=1 || $4!=1 || $5!=1 || $8!="ReliefPlayer" || $9!="Network and multimedia" || $10!=".mp3,.wav" || $11!=1)exit 1;found=1} END{if(!found)exit 1}' "$w/tsv"
+printf '# CONFIG_RELIEFOS_COMPONENT_APP_RELIEFPLAYER_IMAGE is not set\n' > "$w/player-config"
+"$w/components" --input "$src/configs/components.toml" --config "$w/player-config" --output "$w/player-mk" --metadata "$w/player-tsv"
+awk -F '\t' '$1=="reliefplayer" {if($3!=1 || $4!=0 || $5!=0)exit 1;found=1} END{if(!found)exit 1}' "$w/player-tsv"

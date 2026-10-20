@@ -50,6 +50,8 @@ const char *fileman_x11_default_app(const char *path)
     if (extension && !strcasecmp(extension, ".rmathpp")) return "/usr/bin/reliefmathpp";
     if (extension && !strcasecmp(extension, ".rtodo")) return "/usr/bin/relieftodo";
     if (extension && !strcasecmp(extension, ".rdiagram")) return "/usr/bin/reliefdiagram";
+    if (extension && (!strcasecmp(extension, ".mp3") || !strcasecmp(extension, ".wav")))
+        return "/usr/bin/reliefplayer";
     return "/usr/bin/nedit";
 }
 

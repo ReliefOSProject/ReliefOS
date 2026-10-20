@@ -10653,3 +10653,139 @@ msgstr ""
 #: configs/nls/messages.c:663
 msgid "ReliefDiagram"
 msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "ReliefPlayer"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Open audio..."
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Open audio"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio files (*.{mp3,MP3,wav,WAV})"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "No audio file selected"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Open an MP3 or WAV file to begin"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Reading audio information..."
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Paused"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Playback complete"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Play"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Pause"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Back 10 s"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Forward 10 s"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Play or pause (Space)"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Drag to seek; Left/Right: 10 seconds"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Volume"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Mute"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Mono"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Stereo"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "bit"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Stopping audio..."
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "The file path is too long"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Could not read the audio file"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Invalid or truncated audio file"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Unsupported audio format"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio file exceeds the supported limit"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio device is unavailable"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio device is busy"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio playback failed"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "Audio process stopped unexpectedly"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp userland/apps/reliefplayer/decoder.cpp
+msgid "ReliefPlayer\nSimple MP3 and WAV audio player\n\nCtrl+O: open audio\nSpace: play or pause\nLeft / Right: seek 10 seconds\nHome: return to the beginning\n\nVolume changes affect this player only.\nSupports PCM WAV 8/16/24/32-bit and float32, mono or stereo.\nLocal files only; no network streams or media library."
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp
+msgid "Playing audio"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp
+msgid "Mono audio"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp
+msgid "Stereo audio"
+msgstr ""

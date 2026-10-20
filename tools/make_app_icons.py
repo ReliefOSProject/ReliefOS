@@ -428,6 +428,12 @@ def icon_extra(c, name):
             rect(c, 4, y, 3, 3, GREEN)
             fill(c, 9, y+1, 3, 1, MID)
         line(c, 4, 5, 5, 6, GREEN); line(c, 5, 6, 7, 3, GREEN)
+    elif name == "reliefplayer":
+        fill(c, 1, 1, 14, 14, WHITE); rect(c, 1, 1, 14, 14, BLUE)
+        for x, height in ((3, 3), (5, 6), (7, 4)):
+            fill(c, x, 12-height, 1, height, BLUE)
+        for x in range(5):
+            fill(c, 9+x, 4+x//2, 1, 7-x, GREEN)
     elif name == "reliefdiagram":
         line(c, 5, 8, 11, 3, BLUE); line(c, 5, 8, 11, 8, BLUE); line(c, 5, 8, 11, 13, BLUE)
         fill(c, 1, 6, 5, 5, BLUE); rect(c, 1, 6, 5, 5, DARK)
