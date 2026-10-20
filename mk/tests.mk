@@ -133,6 +133,12 @@ test-user-return:
 	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
 	    $(RELIEFOS_SRC)/tools/test_sched_resume.py
 
+.PHONY: test-syscall-io
+test-syscall-io:
+	$(Q)mkdir -p $(O)/tmp
+	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_syscall_io.py
+
 $(O_HOST)/obj/tests/host/%.c.o: $(RELIEFOS_SRC)/tests/host/%.c $(O_META)/host-cc.sig
 	$(Q)mkdir -p $(dir $@)
 	$(call RELIEFOS_LOG,HOSTCC,$<)
