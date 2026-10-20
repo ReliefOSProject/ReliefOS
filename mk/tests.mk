@@ -105,6 +105,34 @@ test-vdso:
 	$(Q)TMPDIR='$(abspath $(O))/tmp/vdso-tests' $(RELIEFOS_VDSO_TEST_PYTHON) \
 	    $(RELIEFOS_SRC)/tools/test_vdso_mapping.py
 
+# Host-only coverage for AP calibration and CPU-time units. Guest SMP boots
+# remain an explicit validation step rather than an implicit test prerequisite.
+.PHONY: test-smp-time
+test-smp-time:
+	$(Q)mkdir -p $(O)/tmp
+	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_acpi_pm_timer.py
+	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_apic_timer.py
+	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_cpu_accounting.py
+
+.PHONY: test-page-cache-growth
+test-page-cache-growth:
+	$(Q)mkdir -p $(O)/tmp
+	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_page_cache_growth.py
+
+.PHONY: test-user-return
+test-user-return:
+	$(Q)mkdir -p $(O)/tmp
+	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_user_return_gate.py
+	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_execution_lock.py
+	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
+	    $(RELIEFOS_SRC)/tools/test_sched_resume.py
+
 $(O_HOST)/obj/tests/host/%.c.o: $(RELIEFOS_SRC)/tests/host/%.c $(O_META)/host-cc.sig
 	$(Q)mkdir -p $(dir $@)
 	$(call RELIEFOS_LOG,HOSTCC,$<)

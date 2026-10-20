@@ -3804,6 +3804,27 @@ static void test_nonblocking_legacy_resource_lifecycle(void)
     assert(!svga3d_shutdown() && !live_pages);
 }
 
+/* An idle reaper must not contend with an unrelated GPU batch. Live shaders
+ * alone do not imply retirement work; only a submitted destroy does. */
+static void test_idle_shader_retirement(void)
+{
+    setup(0x1dffc3e2u, 0x77fu, 0);
+    const uint32_t code[] = {0xfffe0200u, 0x0000ffffu};
+    svga_handle context = 0;
+    assert(!svga3d_context_create(&context));
+    assert(!svga3d_shader_define(context, 1, SVGA3D_SHADERTYPE_VS,
+                                 code, sizeof(code)));
+    uint64_t flags;
+    assert(svga_try_lock_irqsave(&flags));
+    uint32_t reaped = 99;
+    int result = svga_backend_reap_retired(1, &reaped);
+    svga_unlock(flags);
+    assert(result == 0 && reaped == 0 &&
+           "idle shader reaper contended with unrelated GPU work");
+    assert(!svga3d_context_destroy(context));
+    assert(!svga3d_shutdown() && !live_pages);
+}
+
 int main(void)
 {
     test_batch_operation_sidecar_demand_cost();
@@ -3847,6 +3868,7 @@ int main(void)
     test_nonblocking_typed_resource_lifecycle();
     test_nonblocking_legacy_resource_lifecycle();
     assert(draw_count >= 2);
+    test_idle_shader_retirement();
     printf("SVGA tests passed: %u commands, %u presents; no live DMA pages\n", command_count, present_count);
     return 0;
 }

@@ -101,6 +101,8 @@ static int64_t descriptor_dispatch_vfork(const struct trap_frame *frame)
 
 void driver_manager_process_audio_faults(void) { }
 void input_process_pending(void) { }
+/* No task in this descriptor fixture owns a live CPU return reservation. */
+void arch_set_user_fs(uint64_t base) { (void)base; abort(); }
 void storage_set_io_async_context(bool enabled) { (void)enabled; }
 void storage_release_task_io(uint32_t pid) { (void)pid; }
 

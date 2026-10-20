@@ -14,6 +14,12 @@ static bool io_async;
 static int read_error;
 static bool short_read;
 static unsigned reads;
+static bool fail_metadata;
+
+void console_log(enum console_log_level level, const char *format, ...)
+{ (void)level; (void)format; }
+void *kernel_malloc(size_t size) { return fail_metadata ? NULL : calloc(1, size); }
+void kernel_free(void *memory) { free(memory); }
 
 uint64_t mm_alloc_page(void)
 {
@@ -116,20 +122,28 @@ int main(void)
     text.file_node.first_cluster = 4097;
     struct task_vma shared = text;
     shared.flags |= TASK_VMA_FLAG_SHARED;
+    assert(task_map_file_vma_page(&task, &shared, shared.start) == 0);
+    uint64_t shared_page = mapped;
+    assert(task_map_file_vma_page(&task, &text, text.start) == 0);
+    assert(mapped == shared_page && page_cache_owns(mapped));
+    assert(memcmp((void *)(uintptr_t)mapped, file_bytes, 4096) == 0);
+    page_cache_release(mapped);
+    page_cache_release(shared_page); /* Empty overflow metadata is reclaimed. */
+    fail_metadata = true;
     unsigned pinned_allocations = allocations;
     assert(task_map_file_vma_page(&task, &shared, shared.start) == -RELIEFOS_EIO);
     assert(allocations == pinned_allocations);
     assert(task_map_file_vma_page(&task, &text, text.start) == 0);
     assert(!page_cache_owns(mapped));
-    assert(memcmp((void *)(uintptr_t)mapped, file_bytes, 4096) == 0);
     mm_free_page(mapped);
+    fail_metadata = false;
     for (unsigned i = 0; i < 4096; ++i) {
         page_cache_release(pinned[i]);
         text.file_node.first_cluster = i + 1;
         page_cache_invalidate_node(&text.file_node);
     }
     assert(!allocations);
-    puts("PASS pinned cache exhaustion: executable pages remain loadable without leaks");
+    puts("PASS pinned cache growth: shared identity, allocation failure and private fallback without leaks");
     puts("PASS ELF segments sharing a file page: independent zero-fill and intact code cache");
     puts("PASS cold ELF usercopy faults: synchronous I/O, cache hits, errors and short-read cleanup");
 }

@@ -36,6 +36,15 @@ uint32_t smp_cpu_count(void) { return 1; }
 void sched_cpu_ticks(uint64_t *busy, uint64_t *idle) { *busy = 10; *idle = 20; }
 void sched_cpu_ticks_per_cpu(uint64_t *busy, uint64_t *idle, uint32_t capacity)
 { if (capacity) sched_cpu_ticks(busy, idle); }
+void sched_cpu_runtime_snapshot(uint64_t *busy, uint64_t *idle,
+    uint32_t *pids, uint32_t *ready, uint32_t capacity)
+{ (void)pids; (void)ready;
+  for (uint32_t cpu = 0; cpu < capacity; ++cpu) {
+    if (busy) busy[cpu] = 10;
+    if (idle) idle[cpu] = 20;
+  } }
+uint64_t sched_task_cpu_ticks(const struct task *task, bool process)
+{ (void)process; return task->cpu_ticks; }
 /* All release interfaces must use this record, including its suffix. */
 static const struct reliefos_system_info fixture_system = {
     .kernel_name = "ReliefNT", .kernel_version = "9.8.7-0123",

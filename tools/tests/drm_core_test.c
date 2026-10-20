@@ -91,6 +91,7 @@ _Static_assert(SVGA3D_SURFACE_BIND_RENDER_TARGET == DRM_TEST_SURFACE_BIND_RENDER
 _Static_assert(SVGA3D_SURFACE_BIND_DEPTH_STENCIL == DRM_TEST_SURFACE_BIND_DEPTH_STENCIL, "SVGA depth-stencil bind bit");
 _Static_assert(SVGA3D_SURFACE_BIND_STREAM_OUTPUT == DRM_TEST_SURFACE_BIND_STREAM_OUTPUT, "SVGA stream-output bind bit");
 
+static unsigned maintenance_lock_acquisitions;
 static unsigned allocations;
 static char drm_test_diag_log_buffer[16384];
 static unsigned drm_test_diag_log_calls;
@@ -723,6 +724,8 @@ void kernel_free(void *value)
 
 void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)
 {
+    if (lock == &drm_vmwgfx_resource_lock || lock == &drm_vmwgfx_exec_lock)
+        ++maintenance_lock_acquisitions;
     if (flags) *flags = 0;
     while (__atomic_exchange_n(&lock->state, 1u, __ATOMIC_ACQUIRE)) { }
 }
@@ -5610,8 +5613,31 @@ static void test_faildiag_real_bo_failures(void)
     drm_test_diag_log_reset();
 }
 
+/* Empty maintenance must not bounce unrelated GPU locks on every read/write.
+ * Queue a real continuation afterwards to catch a stale empty publication. */
+static void test_idle_retirement_and_reactivation(void)
+{
+    unsigned locks = maintenance_lock_acquisitions;
+    assert(!drm_vmwgfx_process_retirements(2));
+    assert(maintenance_lock_acquisitions == locks &&
+           "idle retirement acquired GPU queue locks");
+    unsigned before = allocations;
+    struct drm_vmwgfx_task_continuation *continuation =
+        kernel_malloc(sizeof(*continuation));
+    assert(continuation);
+    *continuation = (struct drm_vmwgfx_task_continuation){0};
+    drm_vmwgfx_continuation_queue_release(continuation);
+    assert(allocations == before + 1);
+    drm_vmwgfx_process_retirements(2);
+    assert(allocations == before);
+    locks = maintenance_lock_acquisitions;
+    assert(!drm_vmwgfx_process_retirements(2));
+    assert(maintenance_lock_acquisitions == locks);
+}
+
 int main(void)
 {
+    test_idle_retirement_and_reactivation();
     test_faildiag_real_bo_failures();
     test_registration_and_open_lifetime();
     test_render_open_never_takes_primary_master();
