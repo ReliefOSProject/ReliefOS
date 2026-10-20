@@ -71,7 +71,7 @@ int TaskTable::handle(int event) {
 TodoWindow::TodoWindow():Fl_Double_Window(1180,760,"ReliefTodo") {
     size_range(1000,650); callback([](Fl_Widget *,void *p){ static_cast<TodoWindow *>(p)->run(Command::Close); },this);
     begin(); top_=new Fl_Group(0,0,w(),34);
-    auto *file=new Fl_Menu_Button(8,3,70,28,T("&File"));
+    auto *file=new Fl_Menu_Button(8,3,70,28,T("File"));
     auto menu=[file](const char *label,Command c,int key=0) { file->add(label,key,clicked,reinterpret_cast<void *>(intptr_t(c))); };
     menu(T("New task list"),Command::New,FL_CTRL+'n'); menu(T("Open..."),Command::Open,FL_CTRL+'o');
     menu(T("Save"),Command::Save,FL_CTRL+'s'); menu(T("Save as..."),Command::SaveAs,FL_CTRL+FL_SHIFT+'s');

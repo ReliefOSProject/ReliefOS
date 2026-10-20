@@ -77,7 +77,7 @@ ExcelWindow::ExcelWindow() : Fl_Double_Window(1120,720,"ReliefExcel") {
     editor.progress=progress; editor.progress_context=this;
     begin();
     ribbon_tabs_=new Fl_Group(0,0,w(),34);
-    file_=new Fl_Menu_Button(7,3,64,28,T("&File")); file_->box(FL_THIN_UP_BOX);
+    file_=new Fl_Menu_Button(7,3,64,28,T("File"));
     auto addfile=[this](const char *label,Command command,int shortcut=0) { file_->add(label,shortcut,dispatch,reinterpret_cast<void *>(intptr_t(command)+1)); };
     addfile(T("New"),Command::New,FL_CTRL+'n'); addfile(T("Open..."),Command::Open,FL_CTRL+'o');
     addfile(T("Save"),Command::Save,FL_CTRL+'s'); addfile(T("Save as..."),Command::SaveAs,FL_CTRL+FL_SHIFT+'s');

@@ -8441,10 +8441,6 @@ msgid "View properties and permissions"
 msgstr "查看属性和权限"
 
 #: userland/apps/reliefexcel
-msgid "&File"
-msgstr "文件(&F)"
-
-#: userland/apps/reliefexcel
 msgid "ABS(number) returns its absolute value."
 msgstr "ABS(数值)：返回绝对值。"
 

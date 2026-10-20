@@ -40,8 +40,7 @@ PptWindow::PptWindow() : Fl_Double_Window(1180, 760, "ReliefPPT") {
     saved_revision_ = editor.deck.revision;
     begin();
     top_ = new Fl_Group(0, 0, w(), 34);
-    auto *file = new Fl_Menu_Button(7, 3, 64, 28, T("&File"));
-    file->box(FL_THIN_UP_BOX);
+    auto *file = new Fl_Menu_Button(7, 3, 64, 28, T("File"));
     auto item = [file](const char *t, Command c, int shortcut = 0) {
         file->add(t, shortcut, dispatch, reinterpret_cast<void *>(intptr_t(c) + 1));
     };

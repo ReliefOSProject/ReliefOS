@@ -22,7 +22,7 @@ MathWindow::MathWindow():Fl_Double_Window(1180,780,"ReliefMath"){
     Error e;renderer_->start(worker_path(),e);
     OfficeLayout p=OfficeLayout::compute(w(),h(),true,true);
     begin();top_=new Fl_Group(0,0,w(),34);
-    auto *file=new Fl_Menu_Button(7,3,66,28,T("&File"));
+    auto *file=new Fl_Menu_Button(7,3,66,28,T("File"));
     auto item=[file](const char *label,Command c,int key=0){file->add(label,key,clicked,reinterpret_cast<void*>(intptr_t(c)+1));};
     item(T("New"),Command::New,FL_CTRL+'n');item(T("Open..."),Command::Open,FL_CTRL+'o');
     item(T("Save"),Command::Save,FL_CTRL+'s');item(T("Save as..."),Command::SaveAs,FL_CTRL+FL_SHIFT+'s');

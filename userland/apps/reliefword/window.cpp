@@ -28,7 +28,7 @@ void group_label(int X,int Y,int W,const char *label) {
 WordWindow::WordWindow():Fl_Double_Window(1160,740,"ReliefWord") {
     size_range(860,540); callback(close_cb,this); saved_revision_=editor.doc.revision;
     begin(); top_=new Fl_Group(0,0,w(),34);
-    Fl_Menu_Button *file=new Fl_Menu_Button(7,3,64,28,T("&File")); file->box(FL_THIN_UP_BOX);
+    Fl_Menu_Button *file=new Fl_Menu_Button(7,3,64,28,T("File"));
     auto item=[file](const char *label,Command command,int shortcut=0) { file->add(label,shortcut,dispatch,reinterpret_cast<void *>(intptr_t(command)+1)); };
     item(T("New"),Command::New,FL_CTRL+'n'); item(T("Open..."),Command::Open,FL_CTRL+'o');
     item(T("Save"),Command::Save,FL_CTRL+'s'); item(T("Save as..."),Command::SaveAs,FL_CTRL+FL_SHIFT+'s');

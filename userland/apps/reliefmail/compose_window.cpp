@@ -648,7 +648,7 @@ void ComposeWindow::build_widgets() {
     const int ribbon_content_height = kComposeRibbon - Fl::scrollbar_size();
     begin();
     top_ = new Fl_Group(0, 0, w(), kComposeTop);
-    Fl_Menu_Button *file = new Fl_Menu_Button(7, 3, 64, 28, T("&File"));
+    Fl_Menu_Button *file = new Fl_Menu_Button(7, 3, 64, 28, T("File"));
     file->add(T("Save draft"), FL_CTRL + 's', action_cb,
         reinterpret_cast<void *>(static_cast<intptr_t>(Action::Save) + 1));
     file->add(T("Close"), 0, close_cb, this);

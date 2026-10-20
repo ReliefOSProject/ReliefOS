@@ -7933,10 +7933,6 @@ msgid "View properties and permissions"
 msgstr ""
 
 #: userland/apps/reliefexcel
-msgid "&File"
-msgstr ""
-
-#: userland/apps/reliefexcel
 msgid "ABS(number) returns its absolute value."
 msgstr ""
 

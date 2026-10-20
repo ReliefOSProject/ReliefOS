@@ -160,7 +160,7 @@ MailWindow::MailWindow(const char *worker_executable, UiExtensionHooks hooks)
     begin();
 
     top_ = new Fl_Group(0, 0, w(), kTopHeight);
-    Fl_Menu_Button *file = new Fl_Menu_Button(7, 3, 64, 28, T("&File"));
+    Fl_Menu_Button *file = new Fl_Menu_Button(7, 3, 64, 28, T("File"));
     file->add(T("New message"), FL_CTRL + 'n', action_cb,
         reinterpret_cast<void *>(static_cast<intptr_t>(UiCommand::Compose) + 1));
     file->add(T("Drafts..."), 0, action_cb,
