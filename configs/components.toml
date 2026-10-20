@@ -462,6 +462,21 @@ open_with = true
 extensions = [".rmath"]
 
 [[components]]
+id = "reliefmathpp"
+symbol = "APP_RELIEFMATHPP"
+label = "ReliefMath++"
+category = "Office applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+open_with = true
+extensions = [".rmathpp"]
+
+[[components]]
 id = "relieftodo"
 symbol = "APP_RELIEFTODO"
 label = "ReliefTodo"

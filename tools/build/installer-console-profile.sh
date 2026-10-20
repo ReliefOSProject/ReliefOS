@@ -73,6 +73,7 @@ for path in \
     usr/share/reliefmath \
     usr/share/licenses/reliefmath \
     usr/share/mime/packages/reliefmath.xml \
+    usr/share/mime/packages/reliefmathpp.xml \
     usr/share/mime/packages/relieftodo.xml; do
     remove_path "$path"
 done

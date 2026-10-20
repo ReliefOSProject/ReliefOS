@@ -68,7 +68,7 @@ bool export_target_allowed(const char *path,const char *document,Text &error) {
               (!source_bytes.size() || !memcmp(source_bytes.data(),target_bytes.data(),source_bytes.size()))));
     }
     close(document_dir); close(target_dir);
-    if (same) { error.set("导出目标是当前任务清单，请选择其他文件"); return false; }
+    if (same) { error.set("导出目标是当前文档，请选择其他文件"); return false; }
     return ok;
 }
 class SaveLock {
@@ -86,7 +86,7 @@ public:
             error.set("保存锁必须是当前用户拥有的普通文件，且不能有其他硬链接"); return false;
         }
         if (flock(fd_,LOCK_EX|LOCK_NB)<0) {
-            if (errno==EWOULDBLOCK || errno==EAGAIN) { error.set("另一个 ReliefTodo 正在保存此目录，请稍后重试"); return false; }
+            if (errno==EWOULDBLOCK || errno==EAGAIN) { error.set("另一个文档窗口正在保存此目录，请稍后重试"); return false; }
             return fail(error,"不能取得保存锁");
         }
         // FAT can expose an 8.3 alias for this lock file. Opening the target
@@ -160,7 +160,7 @@ bool atomic_save(const char *path,const Bytes &bytes,const FileStamp &expected,F
     if (bytes.size()>MaxFileBytes) { error.set("文件超出 16 MiB 限制"); return false; }
     int dir=-1; Text name; error.clear(); if (!parent(path,dir,name,error)) return false;
     if (!strcasecmp(name.c_str(),".relieftodo-save.lock")) {
-        error.set("此文件名由 ReliefTodo 保存锁保留，请选择其他文件名"); close(dir); return false;
+        error.set("此文件名由文档保存锁保留，请选择其他文件名"); close(dir); return false;
     }
     SaveLock lock;
     if (!lock.acquire(dir,name.c_str(),error)) { close(dir); return false; }

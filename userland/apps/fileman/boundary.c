@@ -47,6 +47,7 @@ const char *fileman_x11_default_app(const char *path)
     if (extension && !strcasecmp(extension, ".rword")) return "/usr/bin/reliefword";
     if (extension && !strcasecmp(extension, ".rppt")) return "/usr/bin/reliefppt";
     if (extension && !strcasecmp(extension, ".rmath")) return "/usr/bin/reliefmath";
+    if (extension && !strcasecmp(extension, ".rmathpp")) return "/usr/bin/reliefmathpp";
     if (extension && !strcasecmp(extension, ".rtodo")) return "/usr/bin/relieftodo";
     return "/usr/bin/nedit";
 }

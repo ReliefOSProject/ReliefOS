@@ -909,6 +909,25 @@ config RELIEFOS_COMPONENT_APP_RELIEFMATH_SDK
     default n
     depends on RELIEFOS_COMPONENT_APP_RELIEFMATH_BUILD
 
+config RELIEFOS_COMPONENT_APP_RELIEFMATHPP_BUILD
+    bool "Build ReliefMath++"
+    default y
+
+config RELIEFOS_COMPONENT_APP_RELIEFMATHPP_IMAGE
+    bool "Include ReliefMath++ in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFMATHPP_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFMATHPP_ENTRY
+    bool "Generate a desktop entry for ReliefMath++"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFMATHPP_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFMATHPP_SDK
+    bool "Include ReliefMath++ in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFMATHPP_BUILD
+
 config RELIEFOS_COMPONENT_APP_RELIEFTODO_BUILD
     bool "Build ReliefTodo"
     default y
