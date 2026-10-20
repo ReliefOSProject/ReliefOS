@@ -3,6 +3,11 @@
 set -eu
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
 kernel=$src/kernel/reliefnt
+kernel_release=$(sed -n 's/^release_version=//p' "$kernel/configs/build-version")
+kernel_major=${kernel_release%%.*}
+kernel_minor_patch=${kernel_release#*.}
+kernel_minor=${kernel_minor_patch%%.*}
+kernel_patch=${kernel_minor_patch#*.}
 work=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-kernel-version.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 ${HOSTCC:-cc} -std=c11 -O2 -Wall -Wextra -Werror -I"$kernel" \
@@ -13,12 +18,12 @@ render() {
         --source-id abc123 --epoch 1700000000 --output "$work/build.h" "$@"
 }
 render
-grep -qx '#define RELIEFOS_KERNEL_VERSION "5.1.0"' "$work/build.h"
+grep -Fqx "#define RELIEFOS_KERNEL_VERSION \"$kernel_release\"" "$work/build.h"
 render --extra-version -perf --local-version -test
-grep -qx '#define RELIEFOS_KERNEL_VERSION "5.1.0-perf-test"' "$work/build.h"
-grep -qx '#define RELIEFOS_KERNEL_VERSION_MAJOR 5' "$work/build.h"
-grep -qx '#define RELIEFOS_KERNEL_VERSION_MINOR 1' "$work/build.h"
-grep -qx '#define RELIEFOS_KERNEL_VERSION_PATCH 0' "$work/build.h"
+grep -Fqx "#define RELIEFOS_KERNEL_VERSION \"$kernel_release-perf-test\"" "$work/build.h"
+grep -Fqx "#define RELIEFOS_KERNEL_VERSION_MAJOR $kernel_major" "$work/build.h"
+grep -Fqx "#define RELIEFOS_KERNEL_VERSION_MINOR $kernel_minor" "$work/build.h"
+grep -Fqx "#define RELIEFOS_KERNEL_VERSION_PATCH $kernel_patch" "$work/build.h"
 before=$(stat -c %y "$work/build.h")
 render --extra-version -perf --local-version -test
 test "$before" = "$(stat -c %y "$work/build.h")"
@@ -31,7 +36,7 @@ for suffix in 'bad/flag' 'bad"flag' 'abcdefghijklmnopqrstuvwxyz0123456789'; do
     cmp "$work/expected.h" "$work/build.h"
 done
 render --extra-version '' --local-version ''
-grep -qx '#define RELIEFOS_KERNEL_VERSION "5.1.0"' "$work/build.h"
+grep -Fqx "#define RELIEFOS_KERNEL_VERSION \"$kernel_release\"" "$work/build.h"
 make -s -n -C "$src" O="$work/out" EXTRAVERSION=-perf LOCALVERSION=-test kernel >"$work/plan"
 grep -Fq "EXTRAVERSION='-perf' LOCALVERSION='-test'" "$work/plan"
 if make -s -n -C "$src" O="$work/out" EXTRAVERSION='bad/flag' kernel >"$work/rejected.log" 2>&1; then
