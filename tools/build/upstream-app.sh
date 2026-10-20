@@ -62,7 +62,7 @@ sqlite)
  compile -c "$port/leonos_sqlite_vfs.c" -o "$work/objects/vfs.o"
  shared sqlite.so.3 "$work"/objects/*.o
  staticlib libsqlite3.a "$work"/objects/*.o
- cp "$work/generated/sqlite3.h" "$output/sqlite3.h"
+ cp "$work/generated/sqlite3.c" "$work/generated/sqlite3.h" "$output/"
  ;;
 *) echo "unsupported upstream app: $pkg" >&2; exit 2 ;;
 esac

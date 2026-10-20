@@ -125,6 +125,7 @@ int x11_app_allowed(const char *program)
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/reliefword/reliefword.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/reliefppt/reliefppt.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/reliefmath/reliefmath.elf",
+        RELIEFOS_LAYOUT_RELIEFOS_APPS "/relieftodo/relieftodo.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/taskmgr/taskmgr.elf",
         RELIEFOS_LAYOUT_RELIEFOS_APPS "/xiaobai/xiaobai.elf",
     };

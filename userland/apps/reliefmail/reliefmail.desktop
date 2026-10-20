@@ -10,5 +10,5 @@ Exec=/usr/bin/reliefmail
 TryExec=/usr/bin/reliefmail
 Icon=mail-read-symbolic
 Terminal=false
-Categories=Network;Email;
+Categories=Office;Network;Email;
 StartupWMClass=reliefos-reliefmail

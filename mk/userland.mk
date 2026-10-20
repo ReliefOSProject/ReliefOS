@@ -33,6 +33,10 @@ USERLAND_FLTK_LIBS := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libfltk.so li
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_CXX_EXTRA_$(app) := -I$(RELIEFOS_SRC)/userland/apps -isystem $(X11_DEVELOPMENT_ROOT)/usr/include))
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_LIBS_$(app) += $(USERLAND_FLTK_LIBS)))
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_DEPS_$(app) += $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
+# ReliefMail uses SQLite's standard POSIX VFS in its private wrapper.
+USERLAND_EXTRA_reliefmail := -I$(UPSTREAM_APP_DIR)
+USERLAND_DEPS_reliefmail += $(SQLITE_HEADER) $(SQLITE_AMALGAMATION)
+USERLAND_SHARED_SOURCES_reliefmail := userland/apps/reliefword/model.cpp userland/apps/reliefword/layout.cpp
 USERLAND_DEPS_osver += $(BUILD_INFO_HEADER)
 .PHONY: x11-development
 x11-development: $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)
@@ -48,7 +52,7 @@ USERLAND_LIBS_glxgears = $(PORTABLEGL_SO)
 USERLAND_DEPS_glxgears = $(GLXGEARS_SOURCE)
 USERLAND_DOOM_EXCLUDE := doomgeneric_allegro.c doomgeneric_emscripten.c doomgeneric_linuxvt.c doomgeneric_sdl.c doomgeneric_soso.c doomgeneric_sosox.c doomgeneric_win.c doomgeneric_xlib.c i_allegromusic.c i_allegrosound.c i_sdlsound.c i_sdlmusic.c i_cdmus.c mus2mid.c
 USERLAND_DOOM_SOURCES := $(filter-out $(addprefix third_party/doomgeneric/doomgeneric/,$(USERLAND_DOOM_EXCLUDE)),$(patsubst $(RELIEFOS_SRC)/%,%,$(wildcard $(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric/*.c)))
-userland_sources = $(sort $(patsubst $(RELIEFOS_SRC)/%,%,$(wildcard $(RELIEFOS_SRC)/userland/apps/$(1)/*.c $(RELIEFOS_SRC)/userland/apps/$(1)/*.cpp $(RELIEFOS_SRC)/userland/apps/$(1)/*.S)) $(if $(filter doom,$(1)),$(USERLAND_DOOM_SOURCES)))
+userland_sources = $(sort $(patsubst $(RELIEFOS_SRC)/%,%,$(wildcard $(RELIEFOS_SRC)/userland/apps/$(1)/*.c $(RELIEFOS_SRC)/userland/apps/$(1)/*.cpp $(RELIEFOS_SRC)/userland/apps/$(1)/*.S)) $(USERLAND_SHARED_SOURCES_$(1)) $(if $(filter doom,$(1)),$(USERLAND_DOOM_SOURCES)))
 USERLAND_CRT := $(MUSL_SYSROOT)/lib/Scrt1.o $(MUSL_SYSROOT)/lib/crti.o $(MUSL_SYSROOT)/lib/crtn.o
 USERLAND_LINK_FLAGS := $(RELIEFOS_LINK_POLICY_FLAGS) --gc-sections -z max-page-size=0x1000 -pie --hash-style=both --dynamic-linker /lib/ld-musl-x86_64.so.1 -rpath /usr/lib/reliefos:/lib:/usr/lib
 

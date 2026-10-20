@@ -78,8 +78,9 @@ reliefos-upstream: upstream-apk
 UPSTREAM_APP_DIR := $(O)/userland
 SQLITE_SO := $(UPSTREAM_APP_DIR)/sqlite.so.3
 SQLITE_HEADER := $(UPSTREAM_APP_DIR)/sqlite3.h
+SQLITE_AMALGAMATION := $(UPSTREAM_APP_DIR)/sqlite3.c
 upstream_app_sl_outputs := sl.elf
-upstream_app_sqlite_outputs := sqlite.so.3 libsqlite3.a sqlite3.h
+upstream_app_sqlite_outputs := sqlite.so.3 libsqlite3.a sqlite3.h sqlite3.c
 
 define RELIEFOS_UPSTREAM_APP
 upstream_app_$(1)_inputs := $$(shell find $$(RELIEFOS_SRC)/third_party/$(if $(filter pleditor,$(1)),pl_editor,$(1)) $$(RELIEFOS_SRC)/userland/$(if $(filter pleditor,$(1)),apps/pleditor,$(1)) -type f ! -name .git 2>/dev/null | LC_ALL=C sort)

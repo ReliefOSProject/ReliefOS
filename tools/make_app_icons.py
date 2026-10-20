@@ -422,6 +422,12 @@ def icon_extra(c, name):
         fill(c, 3, 6, 4, 1, MID); fill(c, 3, 8, 5, 1, MID)
         fill(c, 10, 5, 3, 5, ORANGE); fill(c, 9, 7, 1, 3, ORANGE)
         line(c, 8, 11, 8, 14, DARK); line(c, 5, 15, 8, 12, DARK); line(c, 11, 15, 8, 12, DARK)
+    elif name == "relieftodo":
+        draw_document(c, GREEN)
+        for y in (4, 8, 12):
+            rect(c, 4, y, 3, 3, GREEN)
+            fill(c, 9, y+1, 3, 1, MID)
+        line(c, 4, 5, 5, 6, GREEN); line(c, 5, 6, 7, 3, GREEN)
     elif name == "reliefmath":
         draw_document(c, PURPLE)
         fill(c, 6, 5, 3, 1, BLUE)

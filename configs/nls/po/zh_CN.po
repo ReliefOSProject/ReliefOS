@@ -14542,3 +14542,520 @@ msgstr "符号"
 #: configs/nls/messages.c:40
 msgid "Structure"
 msgstr "结构"
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+#, c-format
+msgid "%s\n\nTotal: %zu    Active: %zu    Done: %zu\nDue today: %zu    Overdue: %zu\n\nActive priorities\nUrgent: %zu    High: %zu    Normal: %zu    Low: %zu\n\nProjects: %zu    Visible tasks: %zu"
+msgstr "%s\n\n总计：%zu    待办：%zu    已完成：%zu\n今日截止：%zu    已逾期：%zu\n\n待办优先级\n紧急：%zu    高：%zu    普通：%zu    低：%zu\n\n项目：%zu    当前显示：%zu"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+#, c-format
+msgid "%zu tasks · %zu active · %zu done · %zu selected"
+msgstr "%zu 项任务 · %zu 项待办 · %zu 项完成 · 选中 %zu 项"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "A task needs a nonempty title and valid bounded text"
+msgstr "任务标题不能为空，文字须在长度限制内"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Active tasks"
+msgstr "待办任务"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "All filters cleared"
+msgstr "已清除全部筛选"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "All projects"
+msgstr "全部项目"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "All tasks"
+msgstr "全部任务"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Checking destination..."
+msgstr "正在检查目标文件…"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Choose a different path for the exported file"
+msgstr "请选择其他路径，避免覆盖原始文档"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Clear all filters"
+msgstr "清除全部筛选"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Clear date"
+msgstr "清除日期"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Clear selection"
+msgstr "取消选择"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Completed"
+msgstr "已完成"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Completion"
+msgstr "完成状态"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Ctrl or Shift selects multiple tasks; double-click toggles completion"
+msgstr "按 Ctrl 或 Shift 多选任务；双击切换完成状态"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Delete the selected tasks? You can undo this action."
+msgstr "删除选中的任务？此操作可以撤销。"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Details of the active task"
+msgstr "当前任务详情"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Due date"
+msgstr "截止日期"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Due date (YYYY-MM-DD)"
+msgstr "截止日期（YYYY-MM-DD）"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Enter a valid date as YYYY-MM-DD, or leave it empty"
+msgstr "请输入有效的 YYYY-MM-DD 日期，或留空"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Example task list"
+msgstr "示例任务清单"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Example task list loaded"
+msgstr "已载入示例任务清单"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Export Markdown..."
+msgstr "导出 Markdown…"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "File operation failed"
+msgstr "文件操作失败"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "File saved, but not enough memory to track saved state"
+msgstr "文件已保存，但内存不足，无法记录保存状态"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Filters"
+msgstr "筛选"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "High"
+msgstr "高"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Invalid path or not enough memory"
+msgstr "路径无效或内存不足"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Invalid task list title"
+msgstr "任务清单标题无效"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Learn"
+msgstr "入门"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Low"
+msgstr "低"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Manual order"
+msgstr "手工顺序"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Mark done"
+msgstr "标为完成"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "New task"
+msgstr "新建任务"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "New task created"
+msgstr "已新建任务"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "New task list"
+msgstr "新建任务清单"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "New task list created"
+msgstr "已新建任务清单"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Next week"
+msgstr "一周后"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "No date"
+msgstr "无日期"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Normal"
+msgstr "普通"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Not enough memory for undo history"
+msgstr "内存不足，无法记录撤销历史"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Nothing to redo"
+msgstr "没有可重做的操作"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Nothing to undo"
+msgstr "没有可撤销的操作"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Open task list"
+msgstr "打开任务清单"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Opening task list..."
+msgstr "正在打开任务清单…"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Operation failed: check task limits or memory"
+msgstr "操作失败：请检查任务限制或可用内存"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Overdue"
+msgstr "已逾期"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Please wait for the file operation to finish"
+msgstr "请等待文件操作完成"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Priority"
+msgstr "优先级"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Project"
+msgstr "项目"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Project (empty removes it):"
+msgstr "项目名称（留空移除）："
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Projects"
+msgstr "项目"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Recently updated"
+msgstr "最近更新"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Redo complete"
+msgstr "已重做"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "ReliefTodo"
+msgstr "ReliefTodo"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "ReliefTodo help"
+msgstr "ReliefTodo 帮助"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Rename task list"
+msgstr "清单重命名"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Restore task"
+msgstr "恢复待办"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Revert changes"
+msgstr "还原修改"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Save cancelled"
+msgstr "已取消保存"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Save changes to this task list?"
+msgstr "保存对此任务清单的修改？"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Save task list"
+msgstr "保存任务清单"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Saving task list..."
+msgstr "正在保存任务清单…"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Schedule"
+msgstr "日期安排"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Search tasks"
+msgstr "搜索任务"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Search titles, notes, projects and tags"
+msgstr "搜索标题、备注、项目和标签"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Select a single task to change its manual order"
+msgstr "请选择一项任务调整手工顺序"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Select a task to edit details"
+msgstr "选择任务以编辑详情"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Select one or more tasks first"
+msgstr "请先选择一项或多项任务"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Selected tasks updated"
+msgstr "已更新选中的任务"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Set project..."
+msgstr "设置项目…"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Set tags..."
+msgstr "设置标签…"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Sort tasks"
+msgstr "任务排序"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Tags (comma separated)"
+msgstr "标签（以逗号分隔）"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Tags, separated by commas (empty removes them):"
+msgstr "标签，以逗号分隔（留空移除）："
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+#, c-format
+msgid "Task #%llu · Ctrl+Enter to apply"
+msgstr "任务 #%llu · Ctrl+Enter 应用修改"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task completed"
+msgstr "任务已完成"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task details"
+msgstr "任务详情"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task details have unapplied changes"
+msgstr "任务详情有尚未应用的修改"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task list"
+msgstr "任务清单"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task list exported"
+msgstr "任务清单已导出"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task list opened"
+msgstr "任务清单已打开"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task list renamed"
+msgstr "任务清单已重命名"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task list saved"
+msgstr "任务清单已保存"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task list title:"
+msgstr "任务清单标题："
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task statistics"
+msgstr "任务统计"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task title"
+msgstr "任务标题"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task tools"
+msgstr "任务工具"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Task updated"
+msgstr "任务已更新"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Tasks"
+msgstr "任务"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Tasks sorted"
+msgstr "任务已排序"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "The destination already exists. Replace it?"
+msgstr "目标文件已存在，是否替换？"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "To do"
+msgstr "待办"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Today"
+msgstr "今天"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Tomorrow"
+msgstr "明天"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Unapplied changes reverted"
+msgstr "已还原尚未应用的修改"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Undo complete"
+msgstr "已撤销"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Untitled task list"
+msgstr "未命名任务清单"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Upcoming"
+msgstr "即将到期"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Urgent"
+msgstr "紧急"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Use Ctrl+Enter to apply changes"
+msgstr "按 Ctrl+Enter 应用修改"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "Visible tasks"
+msgstr "当前任务"
+
+
+#: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
+msgid "ReliefTodo\nNative offline task manager for ReliefOS\n\nCreate tasks with titles, notes, projects, tags, priority and due dates.\nUse the left sidebar to search and filter; Ctrl or Shift selects multiple rows.\nThe right panel edits the active task; Apply changes or Ctrl+Enter commits it.\nRibbon tools apply to every selected task. Undo and redo cover task changes.\n\nCtrl+N: new list    Ctrl+O: open    Ctrl+S: save\nCtrl+F: search    Ctrl+Insert: new task    F1: help\nSpace in the table: toggle completion    Delete in the table: delete\n\nSave editable lists as .rtodo; export all tasks as CSV or Markdown.\nDates follow the system local date. No background alarms or cloud sync."
+msgstr "ReliefTodo\nReliefOS 原生离线任务管理器\n\n任务支持标题、备注、项目、标签、优先级和截止日期。\n在左侧搜索和筛选；按 Ctrl 或 Shift 选择多行。\n在右侧编辑当前任务，点击“应用修改”或按 Ctrl+Enter。\n功能区工具作用于全部选中任务；任务修改支持撤销和重做。\n\nCtrl+N：新清单    Ctrl+O：打开    Ctrl+S：保存\nCtrl+F：搜索    Ctrl+Insert：新任务    F1：帮助\n表格内空格：切换完成状态    表格内 Delete：删除\n\n使用 .rtodo 保存可继续编辑的清单；CSV 和 Markdown 导出全部任务。\n日期使用系统本地日期。本版不含后台闹钟或云同步。"

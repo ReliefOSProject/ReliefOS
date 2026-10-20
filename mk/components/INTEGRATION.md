@@ -15,6 +15,11 @@ depend on `$(RELIEFOS_COMPONENT_TOOL)` and `$(RELIEFOS_GEARS_TOOL)`.
 - `configs/fltk-apps.list` is shared by FLTK linking and installer console-profile
   pruning. Add each FLTK frontend there once; its executable, command alias,
   desktop entry and icons stay in Xorg roots but are removed from console roots.
+- ReliefMail is registered in `Office applications`. Its private POSIX SQLite
+  wrapper consumes the generated `O/userland/sqlite3.c` and `sqlite3.h` products;
+  it does not use the legacy ReliefOS SQLite VFS. Its rich editor compiles the
+  ReliefWord model and layout sources into separate ReliefMail objects, so the
+  ReliefWord application itself can be disabled independently.
 - Static loader-error GUI: `O/userland/dynlinkerror.elf` (no dynamic section).
 - Graphics exports: `PORTABLEGL_SO`, `PORTABLEGL_ARCHIVE`, `GLXGEARS_SOURCE`,
   `STARDUSTUI_ARCHIVE`. Stardust examples are owned by this fragment too.

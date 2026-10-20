@@ -72,7 +72,8 @@ for path in \
     usr/lib/libportablegl.so.1 \
     usr/share/reliefmath \
     usr/share/licenses/reliefmath \
-    usr/share/mime/packages/reliefmath.xml; do
+    usr/share/mime/packages/reliefmath.xml \
+    usr/share/mime/packages/relieftodo.xml; do
     remove_path "$path"
 done
 

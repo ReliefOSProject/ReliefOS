@@ -832,6 +832,26 @@ endmenu
 
 menu "Office applications"
 
+config RELIEFOS_COMPONENT_APP_RELIEFMAIL_BUILD
+    bool "Build ReliefMail"
+    default y
+    select RELIEFOS_COMPONENT_LIB_SQLITE_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFMAIL_IMAGE
+    bool "Include ReliefMail in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFMAIL_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFMAIL_ENTRY
+    bool "Generate a desktop entry for ReliefMail"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFMAIL_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFMAIL_SDK
+    bool "Include ReliefMail in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFMAIL_BUILD
+
 config RELIEFOS_COMPONENT_APP_RELIEFEXCEL_BUILD
     bool "Build ReliefExcel"
     default y
@@ -888,6 +908,25 @@ config RELIEFOS_COMPONENT_APP_RELIEFMATH_SDK
     bool "Include ReliefMath in the developer SDK"
     default n
     depends on RELIEFOS_COMPONENT_APP_RELIEFMATH_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFTODO_BUILD
+    bool "Build ReliefTodo"
+    default y
+
+config RELIEFOS_COMPONENT_APP_RELIEFTODO_IMAGE
+    bool "Include ReliefTodo in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFTODO_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFTODO_ENTRY
+    bool "Generate a desktop entry for ReliefTodo"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFTODO_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFTODO_SDK
+    bool "Include ReliefTodo in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFTODO_BUILD
 
 config RELIEFOS_COMPONENT_APP_RELIEFPPT_BUILD
     bool "Build ReliefPPT"

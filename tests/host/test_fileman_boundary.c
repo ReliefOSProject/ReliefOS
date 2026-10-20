@@ -34,6 +34,8 @@ int main(void)
     assert(!strcmp(fileman_x11_default_app("/tmp/show.RPPT"), "/usr/bin/reliefppt"));
     assert(!strcmp(fileman_x11_default_app("/tmp/equation.rmath"), "/usr/bin/reliefmath"));
     assert(!strcmp(fileman_x11_default_app("/tmp/EQUATION.RMATH"), "/usr/bin/reliefmath"));
+    assert(!strcmp(fileman_x11_default_app("/tmp/tasks.rtodo"), "/usr/bin/relieftodo"));
+    assert(!strcmp(fileman_x11_default_app("/tmp/TASKS.RTODO"), "/usr/bin/relieftodo"));
     assert(!strcmp(fileman_x11_app_for_path("/tmp/equation.rmath", "/usr/bin/custom-math"),
                    "/usr/bin/custom-math"));
     assert(!strcmp(fileman_x11_app_for_path("/tmp/equation.rmath", ""), "/usr/bin/reliefmath"));

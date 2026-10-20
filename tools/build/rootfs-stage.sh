@@ -55,6 +55,7 @@ tree "$src/system/rootfs" '' product-policy override
 # The source lives in the product rootfs tree, but ReliefMath owns its package
 # and must only contribute it when the application component is selected.
 record x - /usr/share/mime/packages/reliefmath.xml 0000 product-policy override
+record x - /usr/share/mime/packages/relieftodo.xml 0000 product-policy override
 # Image roots default to Xorg. Installer staging also derives a console target
 # profile; the live media keeps Xorg and selects its own installer session.
 printf '%s\n' xorg > "$work/data/desktop-backend"
@@ -158,6 +159,9 @@ if enabled reliefmath; then
     file "$out/userland/reliefmath-render.elf" usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf 0755 reliefmath
     file "$src/system/rootfs/usr/share/mime/packages/reliefmath.xml" usr/share/mime/packages/reliefmath.xml 0644 reliefmath override
     sh "$src/tools/build/reliefmath-resources-stage.sh" "$src" "$plan"
+fi
+if enabled relieftodo; then
+    file "$src/system/rootfs/usr/share/mime/packages/relieftodo.xml" usr/share/mime/packages/relieftodo.xml 0644 relieftodo override
 fi
 # Doom's image payload is deliberately opt-in with the app image switch.  Keep
 # the WAD beside the executable so the guest launcher can use its configured

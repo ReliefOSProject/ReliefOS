@@ -403,6 +403,20 @@ extensions = [".apk"]
 depends = ["sudo", "su"]
 
 [[components]]
+id = "reliefmail"
+symbol = "APP_RELIEFMAIL"
+label = "ReliefMail"
+category = "Office applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+depends = ["sqlite"]
+
+[[components]]
 id = "reliefexcel"
 symbol = "APP_RELIEFEXCEL"
 label = "ReliefExcel"
@@ -446,6 +460,21 @@ sdk = false
 api = false
 open_with = true
 extensions = [".rmath"]
+
+[[components]]
+id = "relieftodo"
+symbol = "APP_RELIEFTODO"
+label = "ReliefTodo"
+category = "Office applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+open_with = true
+extensions = [".rtodo"]
 
 [[components]]
 id = "reliefppt"
