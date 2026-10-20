@@ -21,6 +21,12 @@
       "paths": ["usr/lib/leonos", "usr/lib/reliefos", "usr/share/reliefos", "usr/share/fonts/reliefos", "etc/reliefos", "etc/icewm", "usr/sbin/leonos-rpr-apkcheck", "usr/sbin/leonos-rpr-ping", "usr/sbin/leonos-kernel-update", "usr/sbin/leonos-check-update", "usr/sbin/reliefos-rpr-apkcheck", "usr/sbin/reliefos-rpr-ping", "usr/sbin/reliefos-kernel-update", "usr/sbin/reliefos-check-update", "usr/lib/libportablegl.so.1"],
       "reason": "Native desktop, service, graphics and application interfaces. Embedded dependencies remain part of their actual consumers."
     },
+    "reliefos-reliefdiagram": {
+      "destination": "reliefos",
+      "components": ["reliefdiagram"],
+      "paths": ["usr/bin/reliefdiagram", "usr/share/applications/reliefos-reliefdiagram.desktop", "usr/share/mime/packages/reliefdiagram.xml"],
+      "reason": "ReliefDiagram editor, desktop entry, MIME declaration and component artwork are installed and removed together."
+    },
     "reliefos-reliefmathpp": {
       "destination": "reliefos",
       "components": ["reliefmathpp"],

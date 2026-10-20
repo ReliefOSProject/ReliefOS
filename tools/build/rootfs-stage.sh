@@ -57,6 +57,7 @@ tree "$src/system/rootfs" '' product-policy override
 record x - /usr/share/mime/packages/reliefmath.xml 0000 product-policy override
 record x - /usr/share/mime/packages/reliefmathpp.xml 0000 product-policy override
 record x - /usr/share/mime/packages/relieftodo.xml 0000 product-policy override
+record x - /usr/share/mime/packages/reliefdiagram.xml 0000 product-policy override
 # Image roots default to Xorg. Installer staging also derives a console target
 # profile; the live media keeps Xorg and selects its own installer session.
 printf '%s\n' xorg > "$work/data/desktop-backend"
@@ -166,6 +167,9 @@ if enabled reliefmathpp; then
 fi
 if enabled relieftodo; then
     file "$src/system/rootfs/usr/share/mime/packages/relieftodo.xml" usr/share/mime/packages/relieftodo.xml 0644 relieftodo override
+fi
+if enabled reliefdiagram; then
+    file "$src/system/rootfs/usr/share/mime/packages/reliefdiagram.xml" usr/share/mime/packages/reliefdiagram.xml 0644 reliefdiagram override
 fi
 # Doom's image payload is deliberately opt-in with the app image switch.  Keep
 # the WAD beside the executable so the guest launcher can use its configured

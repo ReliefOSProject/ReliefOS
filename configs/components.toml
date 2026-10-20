@@ -477,6 +477,21 @@ open_with = true
 extensions = [".rmathpp"]
 
 [[components]]
+id = "reliefdiagram"
+symbol = "APP_RELIEFDIAGRAM"
+label = "ReliefDiagram"
+category = "Office applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+open_with = true
+extensions = [".rdiagram"]
+
+[[components]]
 id = "relieftodo"
 symbol = "APP_RELIEFTODO"
 label = "ReliefTodo"

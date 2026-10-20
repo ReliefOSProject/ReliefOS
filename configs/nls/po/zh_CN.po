@@ -15055,3 +15055,7 @@ msgstr "当前任务"
 #: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
 msgid "ReliefTodo\nNative offline task manager for ReliefOS\n\nCreate tasks with titles, notes, projects, tags, priority and due dates.\nUse the left sidebar to search and filter; Ctrl or Shift selects multiple rows.\nThe right panel edits the active task; Apply changes or Ctrl+Enter commits it.\nRibbon tools apply to every selected task. Undo and redo cover task changes.\n\nCtrl+N: new list    Ctrl+O: open    Ctrl+S: save\nCtrl+F: search    Ctrl+Insert: new task    F1: help\nSpace in the table: toggle completion    Delete in the table: delete\n\nSave editable lists as .rtodo; export all tasks as CSV or Markdown.\nDates follow the system local date. No background alarms or cloud sync."
 msgstr "ReliefTodo\nReliefOS 原生离线任务管理器\n\n任务支持标题、备注、项目、标签、优先级和截止日期。\n在左侧搜索和筛选；按 Ctrl 或 Shift 选择多行。\n在右侧编辑当前任务，点击“应用修改”或按 Ctrl+Enter。\n功能区工具作用于全部选中任务；任务修改支持撤销和重做。\n\nCtrl+N：新清单    Ctrl+O：打开    Ctrl+S：保存\nCtrl+F：搜索    Ctrl+Insert：新任务    F1：帮助\n表格内空格：切换完成状态    表格内 Delete：删除\n\n使用 .rtodo 保存可继续编辑的清单；CSV 和 Markdown 导出全部任务。\n日期使用系统本地日期。本版不含后台闹钟或云同步。"
+
+#: configs/nls/messages.c:663
+msgid "ReliefDiagram"
+msgstr "ReliefDiagram"

@@ -659,6 +659,9 @@ static const char *const reliefmath_error_messages[] = {
     N_("worker error"),
 };
 
+/* ReliefDiagram desktop application label. */
+static const char *const reliefdiagram_static_labels[] = { N_("ReliefDiagram") };
+
 /* ReliefTodo labels used through enumeration lookup tables. */
 static const char *const relieftodo_static_labels[] = {
     N_("ReliefTodo"),

@@ -428,6 +428,11 @@ def icon_extra(c, name):
             rect(c, 4, y, 3, 3, GREEN)
             fill(c, 9, y+1, 3, 1, MID)
         line(c, 4, 5, 5, 6, GREEN); line(c, 5, 6, 7, 3, GREEN)
+    elif name == "reliefdiagram":
+        line(c, 5, 8, 11, 3, BLUE); line(c, 5, 8, 11, 8, BLUE); line(c, 5, 8, 11, 13, BLUE)
+        fill(c, 1, 6, 5, 5, BLUE); rect(c, 1, 6, 5, 5, DARK)
+        for y, shade in ((1, GREEN), (6, PURPLE), (11, ORANGE)):
+            fill(c, 10, y, 5, 4, shade); rect(c, 10, y, 5, 4, DARK)
     elif name == "reliefmathpp":
         fill(c, 1, 1, 14, 14, WHITE); rect(c, 1, 1, 14, 14, BLUE)
         line(c, 3, 12, 13, 12, MID); line(c, 4, 3, 4, 13, MID)

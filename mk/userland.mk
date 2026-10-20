@@ -34,6 +34,7 @@ $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_CXX_EXTRA_$(app) := -I$(RELI
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_LIBS_$(app) += $(USERLAND_FLTK_LIBS)))
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_DEPS_$(app) += $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
 USERLAND_SHARED_SOURCES_reliefmathpp := userland/apps/relieftodo/file_io.cpp
+USERLAND_SHARED_SOURCES_reliefdiagram := userland/apps/relieftodo/file_io.cpp
 # ReliefMail uses SQLite's standard POSIX VFS in its private wrapper.
 USERLAND_EXTRA_reliefmail := -I$(UPSTREAM_APP_DIR)
 USERLAND_DEPS_reliefmail += $(SQLITE_HEADER) $(SQLITE_AMALGAMATION)

@@ -928,6 +928,25 @@ config RELIEFOS_COMPONENT_APP_RELIEFMATHPP_SDK
     default n
     depends on RELIEFOS_COMPONENT_APP_RELIEFMATHPP_BUILD
 
+config RELIEFOS_COMPONENT_APP_RELIEFDIAGRAM_BUILD
+    bool "Build ReliefDiagram"
+    default y
+
+config RELIEFOS_COMPONENT_APP_RELIEFDIAGRAM_IMAGE
+    bool "Include ReliefDiagram in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFDIAGRAM_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFDIAGRAM_ENTRY
+    bool "Generate a desktop entry for ReliefDiagram"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFDIAGRAM_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFDIAGRAM_SDK
+    bool "Include ReliefDiagram in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFDIAGRAM_BUILD
+
 config RELIEFOS_COMPONENT_APP_RELIEFTODO_BUILD
     bool "Build ReliefTodo"
     default y

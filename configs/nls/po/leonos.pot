@@ -10649,3 +10649,7 @@ msgstr ""
 #: userland/apps/relieftodo/window.cpp userland/apps/relieftodo/actions.cpp
 msgid "ReliefTodo\nNative offline task manager for ReliefOS\n\nCreate tasks with titles, notes, projects, tags, priority and due dates.\nUse the left sidebar to search and filter; Ctrl or Shift selects multiple rows.\nThe right panel edits the active task; Apply changes or Ctrl+Enter commits it.\nRibbon tools apply to every selected task. Undo and redo cover task changes.\n\nCtrl+N: new list    Ctrl+O: open    Ctrl+S: save\nCtrl+F: search    Ctrl+Insert: new task    F1: help\nSpace in the table: toggle completion    Delete in the table: delete\n\nSave editable lists as .rtodo; export all tasks as CSV or Markdown.\nDates follow the system local date. No background alarms or cloud sync."
 msgstr ""
+
+#: configs/nls/messages.c:663
+msgid "ReliefDiagram"
+msgstr ""
