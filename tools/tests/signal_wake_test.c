@@ -9,16 +9,16 @@
 #undef RELIEFNT_KERNEL_DIRECT_MAP_BASE
 #define RELIEFNT_KERNEL_DIRECT_MAP_BASE 0
 
-#include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#include "../../kernel/reliefnt/tools/tests/modules/scheduler.h"
 #include "sysv_shm_fixture_stubs.h"
 void signal_fixture_exit_group(uint32_t tgid, uint64_t code);
 void signal_fixture_job_control(uint32_t tgid, int signal_number);
 #define sched_exit_group signal_fixture_exit_group
 #define sched_signal_job_control signal_fixture_job_control
-#include "../../kernel/reliefnt/kernel/reliefnt/signal.c"
+#include "../../kernel/reliefnt/kernel/signal/signal.c"
 #undef sched_exit_group
 #undef sched_signal_job_control
-#include "../../kernel/reliefnt/kernel/reliefnt/signal_queue.c"
+#include "../../kernel/reliefnt/kernel/signal/signal_queue.c"
 #include "../../kernel/reliefnt/kernel/exec/usercopy_task.c"
 
 #define STACK_ADDRESS 0x10000000ULL

@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <mntent.h>
-#include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/core/storage_internal.h"
 void exfat_cache_invalidate(void) {}
-#include "../../kernel/reliefnt/block/storage_state.c"
-#include "../../kernel/reliefnt/block/storage_state_data.c"
+#include "../../kernel/reliefnt/block/core/storage_state.c"
+#include "../../kernel/reliefnt/block/core/storage_state_data.c"
 static unsigned locked;
 void kernel_execution_lock_irqsave(uint64_t *flags) { assert(!locked); locked = 1; *flags = 17; }
 void kernel_execution_unlock_irqrestore(uint64_t flags) { assert(locked && flags == 17); locked = 0; }
@@ -22,7 +22,7 @@ int storage_disk_device_name(uint32_t disk, int32_t part, char *out, uint32_t ca
     else snprintf(out, cap, "/dev/sd%c%u", (char)('a' + disk), (unsigned)part + 1u);
     return 0;
 }
-#include "../../kernel/reliefnt/fs/storage_mounts.c"
+#include "../../kernel/reliefnt/fs/vfs/mounts.c"
 static int duplicate, io_error;
 int storage_disk_partition_uuid(uint32_t disk, uint32_t part, char uuid[37])
 {
@@ -31,7 +31,7 @@ int storage_disk_partition_uuid(uint32_t disk, uint32_t part, char uuid[37])
     strcpy(uuid, "12345678-1234-5678-90ab-112233445566");
     return 0;
 }
-#include "../../kernel/reliefnt/block/storage_devlinks.c"
+#include "../../kernel/reliefnt/block/device/storage_devlinks.c"
 int main(void)
 {
     g_devfs_enabled = 1;

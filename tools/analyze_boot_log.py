@@ -145,7 +145,7 @@ DIRECT_RULES = (
         "ACPI 关机路径不可用",
         "固件没有提供完成 ACPI S5 关机所需的表或寄存器，关机可能只能停止 CPU。",
         "检查虚拟机 ACPI 选项、固件类型和硬件平台；在 VMware 中验证 ACPI 电源管理已启用。",
-        "kernel/reliefnt/arch/x86_64/power.c:532",
+        "kernel/reliefnt/arch/x86_64/platform/power.c:532",
     ),
 )
 
@@ -201,7 +201,7 @@ def _bugcheck_findings(lines: list[str], radius: int) -> list[Finding]:
             tuple(item + 1 for item in indexes), _context(lines, indexes, radius),
             "内核进入不可恢复的停止状态；同一段日志通常包含陷阱向量、任务名、RIP、CR2 和栈指针。",
             "优先检查本条之前最近的 exception、page fault、ELF 或驱动错误；使用 RIP 和任务名定位对应模块。",
-            "kernel/reliefnt/kernel/reliefnt/lib/bugcheck.c:422",
+            "kernel/reliefnt/lib/bugcheck.c:422",
         ))
         index = cursor
     return findings
@@ -225,7 +225,7 @@ def _exception_findings(lines: list[str], radius: int) -> list[Finding]:
             _context(lines, (index,), radius),
             f"CPU 在 RIP={match.group('rip')} 触发向量 {vector}，错误码为 {match.group('error')}。",
             "依据 RIP、当前 pid/task 和异常模式检查近期映射、重定位、用户指针或特权级转换；页错误还需检查 CR2 与标志位。",
-            "kernel/reliefnt/arch/x86_64/idt.c:156",
+            "kernel/reliefnt/arch/x86_64/interrupt/idt.c:156",
         ))
     return findings
 
@@ -253,7 +253,7 @@ def _task_exit_findings(lines: list[str], radius: int) -> list[Finding]:
             tuple(location + 1 for location in locations), _context(lines, locations, radius),
             explanation,
             "查看该任务之前的 ELF 头部、解释器、ABI、段映射或动态库错误；init.elf 和 desktop.elf 失败会阻断系统桌面。",
-            "kernel/reliefnt/kernel/reliefnt/sched/sched.c:498",
+            "kernel/reliefnt/kernel/sched/core.c",
         ))
     return findings
 

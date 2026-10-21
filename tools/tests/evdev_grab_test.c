@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/input.c"
+#include "../../kernel/reliefnt/tools/tests/modules/syscall_dispatch.h"
+#include "../../kernel/reliefnt/drivers/tty/input/input.c"
 
 /* The syscall close dispatcher also owns DRM OFDs; these input-only fixtures
  * never construct one, so keep those unrelated close hooks inert. */

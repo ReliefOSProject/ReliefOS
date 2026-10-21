@@ -8,6 +8,8 @@ import shutil
 import subprocess
 import tempfile
 
+from kernel_test_sources import kernel_sources, module_text
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -27,9 +29,9 @@ def main():
         raise RuntimeError("a C compiler is required")
     kernel = ROOT / "kernel/reliefnt"
     bodies = [
-        ("syscall_return_body.inc", "kernel/reliefnt/syscall.c", "syscall_dispatch_frame"),
+        ("syscall_return_body.inc", "kernel/syscall/entry.c", "syscall_dispatch_frame"),
         ("user_return_body.inc", "kernel/exec/userland.c", "userland_schedule_from_frame"),
-        ("int80_return_body.inc", "arch/x86_64/idt.c", "int80_dispatch"),
+        ("int80_return_body.inc", "arch/x86_64/interrupt/idt.c", "int80_dispatch"),
     ]
     temporary = ROOT / "out/tmp"
     temporary.mkdir(parents=True, exist_ok=True)
@@ -37,7 +39,7 @@ def main():
         work = Path(directory)
         for target, source, name in bodies:
             (work / target).write_text(function(kernel / source, name))
-        source = (kernel / "kernel/reliefnt/syscall.c").read_text()
+        source = module_text("syscall_dispatch")
         start = source.index("    if (number == LINUX_SYS_PSELECT6) {")
         end = source.index("\n    }\n", start) + 6
         (work / "pselect_dispatch_body.inc").write_text(source[start:end])
@@ -49,7 +51,7 @@ def main():
                 "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
                 "-fno-omit-frame-pointer", "-ffunction-sections", "-fdata-sections",
                 "-Wl,--gc-sections", "-I" + str(work), "-Ikernel/reliefnt/include", "-Iinclude",
-                "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                 "tools/tests/" + fixture + ".c", "-o", str(executable),
             ], cwd=ROOT, env=env, check=True)
             subprocess.run([str(executable)], cwd=ROOT, env=env, check=True, timeout=30)

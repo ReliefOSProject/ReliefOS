@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/block/storage_internal.h"
-#include "../../kernel/reliefnt/block/storage_state_data.c"
+#include "../../kernel/reliefnt/block/core/storage_internal.h"
+#include "../../kernel/reliefnt/block/core/storage_state_data.c"
 
 static FILE *disk;
 static struct task *writer;
@@ -83,25 +83,25 @@ int storage_select_node_volume(const struct storage_node *node, struct storage_v
 { *previous = g_active_volume; return node->volume_id == g_storage.volume_id ? 0 : -2; }
 void storage_restore_volume(struct storage_volume *previous) { g_active_volume = previous; }
 
-#include "../../kernel/reliefnt/fs/storage_ext2_cache.c"
+#include "../../kernel/reliefnt/fs/ext2/ext2_cache.c"
 int storage_read_device(const struct storage_volume *v,uint64_t lba,uint32_t n,void *out)
 { (void)v; return storage_read_sectors(lba,n,out); }
 int storage_write_device(const struct storage_volume *v,uint64_t lba,uint32_t n,const void *in)
 { storage_ext4_cache_invalidate_write(v,lba,n); return storage_write_sectors(lba,n,in); }
 int storage_ext4_device_flush(const struct storage_volume *v) { (void)v; return fflush(disk)?-5:0; }
-#include "../../kernel/reliefnt/fs/storage_ext4_format.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_checksum.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_cache.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_alloc.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_extent.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_ops.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_xattr.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_journal.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_dir.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_mount.c"
-#include "../../kernel/reliefnt/fs/storage_inode.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_vfs.c"
-#include "../../kernel/reliefnt/fs/storage_ext2.c"
+#include "../../kernel/reliefnt/fs/ext4/format.c"
+#include "../../kernel/reliefnt/fs/ext4/checksum.c"
+#include "../../kernel/reliefnt/fs/ext4/cache.c"
+#include "../../kernel/reliefnt/fs/ext4/alloc.c"
+#include "../../kernel/reliefnt/fs/ext4/extent.c"
+#include "../../kernel/reliefnt/fs/ext4/ops.c"
+#include "../../kernel/reliefnt/fs/ext4/xattr.c"
+#include "../../kernel/reliefnt/fs/ext4/journal.c"
+#include "../../kernel/reliefnt/fs/ext4/dir.c"
+#include "../../kernel/reliefnt/fs/ext4/mount.c"
+#include "../../kernel/reliefnt/fs/vfs/inode.c"
+#include "../../kernel/reliefnt/fs/ext4/vfs.c"
+#include "../../kernel/reliefnt/fs/ext2/ext2.c"
 
 static void test_held_inode(void)
 {

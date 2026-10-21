@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/uts.c"
+#include "../../kernel/reliefnt/kernel/init/uts.c"
 static const char *config="test-host\n";
 static unsigned locked;
 static int read_error, lookup_error;

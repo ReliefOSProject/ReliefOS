@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include "audio_fixture.h"
 #include "audio_fake_card.h"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/device.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/storage_audio.c"
-#include "../../kernel/reliefnt/block/storage_state_data.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/sound/core/device.c"
+#include "../../kernel/reliefnt/sound/core/storage_audio.c"
+#include "../../kernel/reliefnt/block/core/storage_state_data.c"
 
 static int sparse_caps(void *opaque, uint32_t device, enum audio_direction direction,
                        struct audio_caps *caps)

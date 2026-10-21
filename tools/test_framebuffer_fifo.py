@@ -9,7 +9,7 @@ with tempfile.TemporaryDirectory(prefix="reliefos-framebuffer-fifo-") as directo
     binary = pathlib.Path(directory) / "framebuffer-fifo-test"
     subprocess.run([
         "cc", "-std=c11", "-Wall", "-Wextra", "-Werror",
-        "-Ikernel/reliefnt/kernel/reliefnt/include",
+        "-Ikernel/reliefnt/include",
         "-Ikernel/reliefnt/drivers/video/framebuffer",
         "tools/tests/framebuffer_fifo_test.c", "-o", str(binary),
     ], cwd=ROOT, check=True)

@@ -13,7 +13,7 @@ static bool random_hardware_word(uint64_t *value)
     return calls >= succeed_at && (!fail_from || calls < fail_from);
 }
 #define RELIEFOS_RANDOM_TEST
-#include "../../kernel/reliefnt/kernel/reliefnt/random.c"
+#include "../../kernel/reliefnt/kernel/random/random.c"
 
 int main(void)
 {

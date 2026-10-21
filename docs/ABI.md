@@ -199,7 +199,7 @@ loader accepts only PIC-free kernel sections and the `NONE`, `64`, `32`,
 undefined symbols, W+X sections, and unknown sections are rejected.
 
 The module receives the fixed `reliefos_kernel_debug_api` table declared in
-`kernel/reliefnt/kernel/reliefnt/include/reliefnt/kernel_debug.h`. It provides ostui output/input,
+`kernel/reliefnt/include/reliefnt/kernel_debug.h`. It provides ostui output/input,
 TSC timing, controlled syscall/ioctl benchmark callbacks, and explicit
 continue, reboot, and shutdown operations. A valid module owns the diagnostic
 session; the kernel's minimal menu is only a recovery path for a missing or
@@ -263,7 +263,7 @@ the private auth ioctl family was removed. The legacy
 
 Task snapshots now include `uid`, `role`, `session_id`, and `username`.
 Children inherit identity and current directory from the parent task.
-File access decisions are made in the kernel: `kernel/reliefnt/fs/permissions.c`
+File access decisions are made in the kernel: `kernel/reliefnt/fs/security/access.c`
 compares a task's filesystem UID/GID and role against the permission value the
 storage layer reports for the path. Protected service work is gated by kernel
 task flags (`TASK_FLAG_SERVICE`, `TASK_FLAG_WINDOW_SERVER`) and by
@@ -279,7 +279,7 @@ POSIX permissions reach userland through the Linux ABI only: `stat`, `chmod`,
 API implemented on top of those same calls (see `userland/runtime/src/libc.c`);
 they are not ioctls and the kernel exposes no ACL ioctl. On FAT32 and exFAT the
 kernel stores the resulting mode, owner and group in the hidden `LEONACL.SYS`
-sidecar owned by `kernel/reliefnt/drivers/bootstrap/storage/storage_sidecar.c`; on ext2 it uses
+sidecar owned by `kernel/reliefnt/fs/security/sidecar.c`; on ext2 it uses
 the native inode fields. See
 [KERNEL_USERSPACE_BOUNDARIES.md](KERNEL_USERSPACE_BOUNDARIES.md).
 
@@ -317,14 +317,14 @@ intermediate boot stage they served.
 Kernel code owns hardware probing, interrupts, page tables, physical memory,
 scheduling, user pointer validation, storage block I/O, exFAT/FAT32/ext2
 mutation, path resolution and the final DAC decision. The storage layer in
-`kernel/reliefnt/drivers/bootstrap/storage/` owns on-disk metadata, including `LEONACL.SYS`.
+`kernel/reliefnt/fs/` owns on-disk metadata, including `LEONACL.SYS`.
 The full ownership map is in
 [KERNEL_USERSPACE_BOUNDARIES.md](KERNEL_USERSPACE_BOUNDARIES.md).
 
 ## Path resolution
 
 Path normalization lives in the kernel: `fs_permissions_resolve()` and
-`fs_permissions_resolve_flags()` in `kernel/reliefnt/fs/permissions.c` combine the
+`fs_permissions_resolve_flags()` in `kernel/reliefnt/fs/security/access.c` combine the
 task's current directory with the input, walk components and symlinks, and check
 directory search permission on the way. Whether the final symlink is followed is
 decided by the syscall the caller made (for example `O_NOFOLLOW`); more than 40
@@ -359,7 +359,7 @@ Sockets use the standard Linux socket syscalls: the kernel dispatches
 `socket`, `connect`, `accept`/`accept4`, `bind`, `listen`, `send`/`recv`,
 `sendto`/`recvfrom`, `sendmsg`/`recvmsg`, `shutdown`, and option queries to
 the AF_UNIX and AF_INET backends (`syscall_socket_dispatch` in
-`kernel/reliefnt/kernel/reliefnt/syscall.c`). `include/leonos/net.h` keeps a versioned
+`kernel/reliefnt/kernel/syscall/ipc/socket.c`). `include/leonos/net.h` keeps a versioned
 compatibility surface — `leonos_net_config()`, `leonos_net_dhcp_renew()`,
 DNS, ping, TCP helpers — but its libc implementations in
 `userland/runtime/src/netsock.c` are ordinary socket-fd clients:

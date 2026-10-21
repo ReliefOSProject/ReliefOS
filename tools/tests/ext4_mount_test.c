@@ -1,6 +1,6 @@
 /* Host-side tests for the ext4 mount path, feature policy and bounded caches.
  *
- * Covers kernel/reliefnt/fs/storage_ext4_mount.c and
+ * Covers kernel/reliefnt/fs/ext4/mount.c and
  * storage_ext4_cache.c against real mke2fs images that
  * tools/tests/ext4_mount_test.py patches per case:
  *
@@ -28,7 +28,7 @@
  * #5):
  *   cc -std=c11 -O1 -g -fsanitize=address,undefined -fno-sanitize-recover=all \
  *     -Ikernel/reliefnt/include -Iinclude \
- *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/kernel/reliefnt/include \
+ *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/include \
  *     tools/tests/ext4_mount_test.c -o build/ext4-mount-test
  *   ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
  *     build/ext4-mount-test <image> <case>
@@ -43,8 +43,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/block/storage_internal.h"
-#include "../../kernel/reliefnt/block/storage_state_data.c"
+#include "../../kernel/reliefnt/block/core/storage_internal.h"
+#include "../../kernel/reliefnt/block/core/storage_state_data.c"
 
 /* ---- kernel fakes ---------------------------------------------------- */
 static uint8_t *disk_bytes;
@@ -194,17 +194,17 @@ void storage_scan_nvme_controller(uint8_t bus, uint8_t slot, uint8_t function,
                                          uint8_t *root_ready)
 { (void)bus; (void)slot; (void)function; (void)root_ready; }
 
-#include "../../kernel/reliefnt/fs/storage_ext4_format.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_checksum.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_cache.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_alloc.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_extent.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_ops.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_xattr.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_journal.c"
-#include "../../kernel/reliefnt/fs/storage_ext4_mount.c"
-#include "../../kernel/reliefnt/fs/storage_mount.c"
-#include "../../kernel/reliefnt/block/storage_sync.c"
+#include "../../kernel/reliefnt/fs/ext4/format.c"
+#include "../../kernel/reliefnt/fs/ext4/checksum.c"
+#include "../../kernel/reliefnt/fs/ext4/cache.c"
+#include "../../kernel/reliefnt/fs/ext4/alloc.c"
+#include "../../kernel/reliefnt/fs/ext4/extent.c"
+#include "../../kernel/reliefnt/fs/ext4/ops.c"
+#include "../../kernel/reliefnt/fs/ext4/xattr.c"
+#include "../../kernel/reliefnt/fs/ext4/journal.c"
+#include "../../kernel/reliefnt/fs/ext4/mount.c"
+#include "../../kernel/reliefnt/fs/vfs/mount.c"
+#include "../../kernel/reliefnt/block/core/storage_sync.c"
 
 /* ---- fixture helpers -------------------------------------------------- */
 static void load_disk(const char *image, uint64_t part_offset_sectors,

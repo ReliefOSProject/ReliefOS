@@ -25,7 +25,7 @@ class InstallerInputTests(unittest.TestCase):
             subprocess.run([
                 "clang", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                 "tools/tests/evdev_led_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
@@ -81,7 +81,7 @@ class InstallerInputTests(unittest.TestCase):
             subprocess.run([
                 "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                 "-idirafter", "userland/runtime/include",
                 "tools/tests/pointer_routing_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
@@ -129,7 +129,7 @@ class InstallerInputTests(unittest.TestCase):
                 "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "-Ikernel/reliefnt/include",
                 "tools/tests/keyboard_irq_ready_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
@@ -141,7 +141,7 @@ class InstallerInputTests(unittest.TestCase):
                 "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "-Ikernel/reliefnt/include",
                 "tools/tests/ps2_interleaved_irq_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
@@ -152,7 +152,7 @@ class InstallerInputTests(unittest.TestCase):
             subprocess.run([
                 "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                 "tools/tests/mouse_init_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)

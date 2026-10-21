@@ -9,7 +9,7 @@ from generate_linux_syscalls import header
 ROOT = Path(__file__).resolve().parents[1]
 assert (ROOT / "kernel/reliefnt/include/uapi/linux/syscall.h").read_text() == header()
 numeric_syscall = re.compile(r"^\s*#\s*define\s+(?:SYS_|__NR_|LINUX_SYS_)\w+\s+(?:0x[\da-fA-F]+|\d+)\b", re.M)
-for relative in ("kernel/reliefnt/kernel/reliefnt/include/reliefnt/syscall.h", "userland/runtime/include/reliefos/syscall.h",
+for relative in ("kernel/reliefnt/include/reliefnt/syscall.h", "userland/runtime/include/reliefos/syscall.h",
                  "userland/runtime/include/leonos/syscall.h"):
     assert not numeric_syscall.search((ROOT / relative).read_text()), relative
 headers = sorted((ROOT / "kernel/reliefnt/include/uapi").rglob("*.h"))

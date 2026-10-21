@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/kernel/reliefnt/input.c"
+#include "../../kernel/reliefnt/drivers/tty/input/input.c"
 
 void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)
 {

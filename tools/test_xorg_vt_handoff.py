@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 PTY_INCLUDES = [
     "-Ikernel/reliefnt/include", "-Iinclude",
-    "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+    "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
 ]
 
 FIXTURES = [

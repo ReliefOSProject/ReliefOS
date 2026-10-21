@@ -16,7 +16,7 @@
 #include <linux/poll.h>
 
 /* Exercise the real AF_UNIX readiness publisher and real poll implementation. */
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_socket.c"
+#include "../../kernel/reliefnt/kernel/syscall/ipc/socket.c"
 
 static struct task current;
 static struct kernel_object_table objects;

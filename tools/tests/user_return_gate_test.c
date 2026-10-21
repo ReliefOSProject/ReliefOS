@@ -24,7 +24,7 @@
 
 /* Real execution admission, including queued-writer exclusion. Privileged
  * IRQ operations and loader/scheduler boundaries are the fixture's scope. */
-#include "../../kernel/reliefnt/kernel/reliefnt/lock.c"
+#include "../../kernel/reliefnt/kernel/sync/lock.c"
 static _Thread_local uint32_t cpu;
 static _Thread_local uint64_t irq_state;
 static struct task current, replacement;

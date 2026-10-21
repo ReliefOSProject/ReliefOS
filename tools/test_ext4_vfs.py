@@ -11,9 +11,9 @@ def main():
         work=Path(d); binary=work/"test"; image=work/"image"; result=work/"result"
         run(["cc","-std=c11","-O1","-g","-fsanitize=address,undefined","-fno-sanitize-recover=all",
              "-ffunction-sections","-fdata-sections","-Wl,--gc-sections","-Ikernel/reliefnt/include",
-             "-Iinclude","-Ikernel/reliefnt/include/uapi","-Ikernel/reliefnt/kernel/reliefnt/include",
-             "tools/tests/ext4_vfs_test.c","kernel/reliefnt/fs/tmpfs.c",
-             "kernel/reliefnt/kernel/reliefnt/lib/text_utf16.c","-o",str(binary)])
+             "-Iinclude","-Ikernel/reliefnt/include/uapi","-Ikernel/reliefnt/include",
+             "tools/tests/ext4_vfs_test.c","kernel/reliefnt/fs/tmpfs/core.c",
+             "kernel/reliefnt/lib/text_utf16.c","-o",str(binary)])
         features="none,filetype,large_file,dir_index"
         if args.filesystem=="ext4": features+=",extents,64bit,metadata_csum,extra_isize,flex_bg,has_journal"
         with image.open("wb") as f:f.truncate(64*1024*1024)

@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if !__has_include("../../kernel/reliefnt/kernel/reliefnt/syscall_sysv_msg.c")
+#if !__has_include("../../kernel/reliefnt/kernel/syscall/ipc/sysv_msg.c")
 int main(void) { fputs("FAIL: SysV message queue implementation is missing\n", stderr); return 1; }
 #else
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_sysv_msg.c"
+#include "../../kernel/reliefnt/kernel/syscall/ipc/sysv_msg.c"
 
 static struct task tasks[4], *current;
 static unsigned allocations;

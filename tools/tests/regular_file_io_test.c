@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_file_io.c"
+#include "../../kernel/reliefnt/kernel/syscall/io/file_io.c"
 
 static unsigned char disk[1048576], data[1048576];
 static uint64_t disk_size = sizeof(disk), error_offset = UINT64_MAX;

@@ -22,7 +22,7 @@ FORBIDDEN_KERNEL_RE = re.compile(
     r"[A-Z0-9_]*\b"
 )
 
-KERNEL_ROOTS = ("kernel/reliefnt/kernel/reliefnt", "kernel/reliefnt/drivers/bootstrap")
+KERNEL_ROOTS = tuple("kernel/reliefnt/" + name for name in ("arch", "block", "drivers", "firmware", "fs", "kernel", "lib", "mm", "net", "sound"))
 PEERCRED_PATHS = (
     "userland/apps/windowd/main.c",
     "userland/apps/device-agent/main.c",

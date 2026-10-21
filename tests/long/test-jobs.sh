@@ -24,7 +24,12 @@ python3 - "$source_kernel" "$reliefnt" <<'PYCOPY'
 from pathlib import Path
 import shutil, sys
 source, destination = map(Path, sys.argv[1:])
-shutil.copytree(source, destination, ignore=shutil.ignore_patterns('.git', 'out', 'cache', '__pycache__'))
+def ignored(directory, names):
+    excluded = {'__pycache__'}
+    if Path(directory) == source:
+        excluded.update(('.git', 'out', 'cache'))
+    return set(names) & excluded
+shutil.copytree(source, destination, ignore=ignored)
 shutil.copytree(source / 'cache', destination / 'cache')
 PYCOPY
 failures=0
@@ -68,7 +73,7 @@ changed_between() {
 # The three invalidations are deliberately different action classes: one ordinary
 # source, one header with dozens of consumers, and the linker script, which must
 # relink without recompiling anything. They live in the kernel checkout.
-touch_targets="$reliefnt/kernel/reliefnt/futex.c $reliefnt/kernel/reliefnt/include/reliefnt/types.h
+touch_targets="$reliefnt/kernel/ipc/futex.c $reliefnt/include/reliefnt/types.h
 $reliefnt/arch/x86_64/linker.ld"
 
 printf '=== A08: -j1 and -j8 from clean output directories ===\n'
@@ -94,7 +99,7 @@ for level in $jobs; do
     # Native records identify the exact actions rather than broad action-class
     # signatures. Normalise O when comparing the same build at two job levels.
     missing_record=''
-    for record in arch/x86_64/.apic.o.cmd arch/x86_64/.boot.o.cmd generated/system/.kernel.unstripped.cmd generated/system/.kernel.sys.cmd; do
+    for record in arch/x86_64/interrupt/.apic.o.cmd arch/x86_64/boot/.boot.o.cmd generated/system/.kernel.unstripped.cmd generated/system/.kernel.sys.cmd; do
         [ -s "$tree/reliefnt/$record" ] || missing_record="$missing_record $record"
     done
     if [ -z "$missing_record" ]; then
@@ -102,7 +107,7 @@ for level in $jobs; do
     else
         fail "-j$level publishes native action records" "missing:$missing_record"
     fi
-    sed "s#$tree#<O>#g" "$tree/reliefnt/arch/x86_64/.apic.o.cmd" >"$work/command-j$level" 2>/dev/null || : >"$work/command-j$level"
+    sed "s#$tree#<O>#g" "$tree/reliefnt/arch/x86_64/interrupt/.apic.o.cmd" >"$work/command-j$level" 2>/dev/null || : >"$work/command-j$level"
 
 done
 
@@ -124,7 +129,7 @@ printf '\n=== A08: the same invalidations at both job levels, three rounds ===\n
 # is stable. The cheap pair is also two different action classes: one object, and
 # a relink with no recompilation at all.
 heavy_targets=$touch_targets
-light_targets="$reliefnt/kernel/reliefnt/futex.c $reliefnt/arch/x86_64/linker.ld"
+light_targets="$reliefnt/kernel/ipc/futex.c $reliefnt/arch/x86_64/linker.ld"
 for round in 1 2 3; do
     if [ "$round" = 1 ]; then
         round_targets=$heavy_targets

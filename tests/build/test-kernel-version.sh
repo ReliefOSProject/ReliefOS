@@ -47,6 +47,6 @@ fi
 ${HOSTCC:-cc} -std=c11 -O1 -g -fsanitize=address,undefined \
     -ffunction-sections -fdata-sections -Wl,--gc-sections \
     -I"$kernel/include" -I"$src/include" -I"$kernel/include/uapi" \
-    -I"$kernel/kernel/reliefnt/include" "$src/tools/tests/procfs_directories_test.c" -o "$work/procfs"
+    -I"$kernel/include" "$src/tools/tests/procfs_directories_test.c" -o "$work/procfs"
 "$work/procfs"
 printf 'kernel version: base release, suffixes, numeric ABI, no-op, reset, validation, adapter and procfs passed\n'

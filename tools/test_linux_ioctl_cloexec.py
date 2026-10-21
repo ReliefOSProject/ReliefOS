@@ -5,7 +5,7 @@ Host stage (always runs, no virtual machine):
   * Linux UAPI header checks and dispatch-contract checks for the kernel
     source that answers ioctl(FIOCLEX/FIONCLEX),
   * the kernel descriptor-table unit test, built from the real
-    kernel/reliefnt/kernel/reliefnt/syscall.c with ASan/UBSan,
+    kernel/reliefnt/kernel/syscall modules with ASan/UBSan,
   * the raw-syscall probe built with the ReliefOS musl SDK and executed on the
     host Linux kernel, which is the reference implementation of the ABI.
 
@@ -26,6 +26,8 @@ import sys
 import tempfile
 import time
 from pathlib import Path
+
+from kernel_test_sources import kernel_sources, module_text
 
 ROOT = Path(__file__).resolve().parents[1]
 LINUX_V612 = {
@@ -70,10 +72,10 @@ def test_linux_headers() -> None:
 
 
 def test_kernel_dispatch_contract() -> None:
-    syscall_c = read("kernel/reliefnt/kernel/reliefnt/syscall.c")
-    sched_h = read("kernel/reliefnt/kernel/reliefnt/include/reliefnt/sched.h")
+    syscall_c = module_text("syscall_dispatch")
+    sched_h = read("kernel/reliefnt/include/reliefnt/task/types.h") + read("kernel/reliefnt/include/reliefnt/sched.h")
     # The generic requests must be resolved before any category/device routing.
-    dispatch = syscall_c.rindex("static int64_t syscall_dispatch_regs(")
+    dispatch = syscall_c.rindex("int64_t syscall_dispatch_regs(")
     generic = syscall_c.index("syscall_ioctl_descriptor_flags(sched_current_task(), a0")
     owned = syscall_c.index("if (syscall_fs_owns(number))", dispatch)
     assert dispatch < generic < owned, "FIOCLEX/FIONCLEX must precede device dispatch"
@@ -119,23 +121,23 @@ def test_kernel_descriptor_table(directory: Path) -> None:
     binary = directory / "ioctl-cloexec-table"
     sources = [
         "tools/tests/ioctl_cloexec_table_test.c",
-        "kernel/reliefnt/kernel/reliefnt/sched/sched.c",
-        "kernel/reliefnt/kernel/reliefnt/wait.c",
-        "kernel/reliefnt/kernel/reliefnt/syscall_sysv_msg.c",
-        "kernel/reliefnt/kernel/reliefnt/syscall_sysv_sem.c",
-        "kernel/reliefnt/kernel/reliefnt/syscall_locks.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/core.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/pcm.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/device.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/alsa_control.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/mixer.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/oss.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/timer.c",
+        *kernel_sources("scheduler"),
+        "kernel/reliefnt/kernel/sync/wait.c",
+        "kernel/reliefnt/kernel/syscall/ipc/sysv_msg.c",
+        "kernel/reliefnt/kernel/syscall/ipc/sysv_sem.c",
+        "kernel/reliefnt/kernel/syscall/fs/locks.c",
+        "kernel/reliefnt/sound/core/core.c",
+        *kernel_sources("pcm"),
+        "kernel/reliefnt/sound/core/device.c",
+        "kernel/reliefnt/sound/core/alsa_control.c",
+        "kernel/reliefnt/sound/core/mixer.c",
+        "kernel/reliefnt/sound/core/oss.c",
+        "kernel/reliefnt/sound/core/timer.c",
     ]
     run([
         "clang", "-std=c11", "-g", "-O1", "-ffunction-sections", "-fdata-sections",
         "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
-        "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include", "-Wl,--gc-sections",
+        "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include", "-Wl,--gc-sections",
         *sources, "-o", str(binary),
     ])
     result = subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=60,

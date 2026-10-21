@@ -10,8 +10,8 @@
 static struct task *current;
 static struct task *test_current_task(void) { return current; }
 #define sched_current_task test_current_task
-#include "../../kernel/reliefnt/arch/x86_64/paging.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#include "../../kernel/reliefnt/arch/x86_64/mm/paging.c"
+#include "../../kernel/reliefnt/tools/tests/modules/user_memory.h"
 #undef sched_current_task
 
 static unsigned pages, allocations;

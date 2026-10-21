@@ -43,7 +43,7 @@ class RootfsInterfaces(unittest.TestCase):
                     executable = Path(directory) / name
                     subprocess.run(["cc", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
                                     "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                                    "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+                                    "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                                     f"tools/tests/{name}_test.c", "-o", executable], cwd=ROOT, check=True)
                     subprocess.run([executable], cwd=ROOT, check=True, timeout=20)
 

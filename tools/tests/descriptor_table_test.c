@@ -31,7 +31,7 @@ static int64_t descriptor_dispatch_vfork(const struct trap_frame *frame);
 #define sched_fork_current descriptor_dispatch_fork
 #define sched_vfork_current descriptor_dispatch_vfork
 #define RELIEFOS_SYSCALL_FRAME_DISPATCH descriptor_dispatch_regs
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
+#include "../../kernel/reliefnt/tools/tests/modules/syscall_dispatch.h"
 #undef RELIEFOS_SYSCALL_FRAME_DISPATCH
 #undef sched_vfork_current
 #undef sched_fork_current
@@ -125,7 +125,7 @@ static int descriptor_socket_signal(uint32_t pid, int signal)
 #define sched_block_current descriptor_socket_park
 #define sched_sleep_current_until descriptor_socket_sleep
 #define sched_signal_user_task descriptor_socket_signal
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_socket.c"
+#include "../../kernel/reliefnt/kernel/syscall/ipc/socket.c"
 #undef sched_current_task
 #undef sched_block_current
 #undef sched_sleep_current_until

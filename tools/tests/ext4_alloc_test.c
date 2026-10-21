@@ -1,5 +1,5 @@
 /* Host-side tests for the ext4 group descriptor, bitmap and flex-group
- * allocator (kernel/reliefnt/fs/storage_ext4_alloc.c).
+ * allocator (kernel/reliefnt/fs/ext4/alloc.c).
  *
  * Covers, against synthetic ext4 images built byte by byte here and against
  * real mke2fs images:
@@ -43,16 +43,16 @@
  *     -ffunction-sections -fdata-sections -Wl,--gc-sections \
  *     -DRELIEFOS_STORAGE_STANDALONE_TU \
  *     -Ikernel/reliefnt/include -Iinclude \
- *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/kernel/reliefnt/include \
- *     -include kernel/reliefnt/block/storage_internal.h \
+ *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/include \
+ *     -include kernel/reliefnt/block/core/storage_internal.h \
  *     tools/tests/ext4_alloc_test.c \
- *     kernel/reliefnt/fs/storage_ext4_format.c \
- *     kernel/reliefnt/fs/storage_ext4_checksum.c \
- *     kernel/reliefnt/fs/storage_ext4_cache.c \
- *     kernel/reliefnt/fs/storage_ext4_alloc.c \
- *     kernel/reliefnt/fs/storage_ext4_extent.c \
- *     kernel/reliefnt/fs/storage_ext4_ops.c \
- *     kernel/reliefnt/fs/storage_ext4_journal.c \
+ *     kernel/reliefnt/fs/ext4/format.c \
+ *     kernel/reliefnt/fs/ext4/checksum.c \
+ *     kernel/reliefnt/fs/ext4/cache.c \
+ *     kernel/reliefnt/fs/ext4/alloc.c \
+ *     kernel/reliefnt/fs/ext4/extent.c \
+ *     kernel/reliefnt/fs/ext4/ops.c \
+ *     kernel/reliefnt/fs/ext4/journal.c \
  *     -o /tmp/reliefos-ext4-alloc-test
  *   ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
  *     /tmp/reliefos-ext4-alloc-test
@@ -77,8 +77,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "../../kernel/reliefnt/block/storage_internal.h"
-#include "../../kernel/reliefnt/block/storage_state_data.c"
+#include "../../kernel/reliefnt/block/core/storage_internal.h"
+#include "../../kernel/reliefnt/block/core/storage_state_data.c"
 
 /* The two cache-internal helpers are test seams: the textual
  * storage_ext4_mount.c below must call the fakes in this file, while the
@@ -197,7 +197,7 @@ int ext4_cache_block_range(const struct storage_volume *volume,
     return 0;
 }
 
-#include "../../kernel/reliefnt/fs/storage_ext4_mount.c"
+#include "../../kernel/reliefnt/fs/ext4/mount.c"
 
 static uint8_t ext4_alloc_block_test[EXT4_MAX_BLOCK_SIZE];
 

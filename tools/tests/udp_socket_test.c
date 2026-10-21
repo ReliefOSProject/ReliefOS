@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/net/net_udp.c"
+#include "../../kernel/reliefnt/net/socket/udp.c"
 
 static struct task current;
 static struct task_file files[80];

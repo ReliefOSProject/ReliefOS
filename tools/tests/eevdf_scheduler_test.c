@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#include "../../kernel/reliefnt/tools/tests/modules/scheduler.h"
 #include "sysv_shm_fixture_stubs.h"
 
 _Static_assert(sizeof(struct task) == 104176, "task size changed with EEVDF tree integration");

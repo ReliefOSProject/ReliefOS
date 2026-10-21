@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/arch/x86_64/power.c"
+#include "../../kernel/reliefnt/arch/x86_64/platform/power.c"
 
 static uint32_t fixture_count;
 static unsigned reads;

@@ -6,12 +6,19 @@ All driver source code lives in the kernel submodule under `kernel/reliefnt/driv
 Every driver is linked into `kernel.sys` itself; there are no loadable driver
 modules and no driver files on disk.
 
-- `kernel/reliefnt/drivers/bootstrap`: console, framebuffer, VGA, EFI filesystem, storage, and
-  USB UHCI/HID implementations that are linked into `kernel.sys`.
-- `kernel/reliefnt/drivers/mouse`, `kernel/reliefnt/drivers/serial`, `kernel/reliefnt/drivers/e1000`, `kernel/reliefnt/drivers/ac97`,
-  `kernel/reliefnt/drivers/es1371`, and `kernel/reliefnt/drivers/hda`: device drivers compiled
-  into `kernel.sys` alongside the bootstrap drivers (see the explicit object list
-  in `kernel/reliefnt/Kbuild`).
+- `kernel/reliefnt/drivers/console` and `drivers/video/{framebuffer,vga,svga,drm}`:
+  console and graphics implementations.
+- `drivers/input/mouse`, `drivers/tty/{input,pty,serial}` and `drivers/usb/uhci`:
+  mouse, terminal input, PTY, serial and USB UHCI/HID support.
+- `drivers/net/e1000`, `drivers/sound/{ac97,es1371,hda}` and
+  `drivers/storage/{ahci,ide,nvme}`: network, sound and storage hardware drivers.
+- `kernel/device`, `sound/core`, `block`, `fs` and `firmware`: driver registration,
+  shared audio, block I/O, filesystems and firmware support.
+
+Paths after the first entry are relative to the kernel submodule. Each code
+directory owns its explicit local `Kbuild` list; the root `Kbuild` only visits
+subsystems and integrates final products. See [kernel modules](../kernel/reliefnt/docs/KERNEL_MODULES.md)
+for responsibilities and private interfaces.
 
 ## Module ABI
 

@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #define address_space_map_user_page real_map_user_page
-#include "../../kernel/reliefnt/arch/x86_64/paging.c"
+#include "../../kernel/reliefnt/arch/x86_64/mm/paging.c"
 #undef address_space_map_user_page
 bool address_space_map_user_page(struct address_space *, uint64_t, uint64_t, uint64_t);
 #include "../../kernel/reliefnt/kernel/exec/vdso.c"

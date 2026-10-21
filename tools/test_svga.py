@@ -28,7 +28,7 @@ class SvgaTests(unittest.TestCase):
                 "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
                 "-fsanitize=address,undefined", "-fno-omit-frame-pointer",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-DSVGA_HOST_TEST", f"-I{directory}", "-Ikernel/reliefnt/kernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
+                "-DSVGA_HOST_TEST", f"-I{directory}", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
                 "-Ikernel/reliefnt/drivers/video/svga", "tools/tests/svga_test.c",
                 *(str(path) for path in SOURCES), "-o", str(executable),
             ], cwd=ROOT, check=True)
@@ -59,7 +59,7 @@ class SvgaTests(unittest.TestCase):
                             "-std=c11", "-ffreestanding", "-fno-stack-protector",
                             "-fno-pic", "-fno-pie", "-mno-red-zone", "-mcmodel=kernel",
                             "-mgeneral-regs-only", "-Wall", "-Wextra", "-Werror",
-                            "-Ikernel/reliefnt/kernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-c", str(source),
+                            "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-c", str(source),
                             "-o", str(obj),
                         ], cwd=ROOT, check=True)
                         objects.append(str(obj))

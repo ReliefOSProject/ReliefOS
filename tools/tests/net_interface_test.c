@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/net/net.c"
+#include "../../kernel/reliefnt/tools/tests/modules/network.h"
 
 static struct task current;
 struct task *sched_current_task(void) { return &current; }

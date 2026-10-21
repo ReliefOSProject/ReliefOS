@@ -5,7 +5,7 @@
 
 /* Exercise the real page-table implementation; only physical allocation and
  * privileged CPU operations are replaced by host fixtures. */
-#include "../../kernel/reliefnt/arch/x86_64/paging.c"
+#include "../../kernel/reliefnt/arch/x86_64/mm/paging.c"
 
 static struct { uint64_t address; unsigned refs; } pages[1024];
 

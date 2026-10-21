@@ -98,7 +98,11 @@ RPR 子树。`run-iso`、`run-installer` 启动对应镜像，`QEMU_KVM=0` 可�
 
 ## 代码注释规范
 
-内核子仓 `kernel/reliefnt/kernel/reliefnt/` 的每个函数定义和公共函数
+内核按职责组织在 ReliefNT 子仓的 `kernel/`、`mm/`、`fs/`、`block/`、`net/`、
+`drivers/`、`sound/`、`lib/` 等目录中，各代码目录使用自己的 `Kbuild`。模块边界与
+私有接口见[内核模块说明](kernel/reliefnt/docs/KERNEL_MODULES.md)。
+
+内核子仓 `kernel/reliefnt/kernel/` 的每个函数定义和公共函数
 声明都必须使用 Doxygen 风格注释。C、C++ 和汇编预处理源均采用以下块注释形式，
 以便 Doxygen 读取：
 

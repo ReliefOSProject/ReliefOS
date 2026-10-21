@@ -57,7 +57,7 @@ from test_vt_qemu import wait_text
 
 ROOT = Path(__file__).resolve().parents[1]
 
-# TASK_FLAG_SERVICE | TASK_FLAG_WINDOW_SERVER (kernel/reliefnt/kernel/reliefnt/include/reliefnt/sched.h).
+# TASK_FLAG_SERVICE | TASK_FLAG_WINDOW_SERVER (kernel/reliefnt/include/reliefnt/sched.h).
 SERVICE_BITS = 0x1 | 0x8
 
 DESKTOP_DIR = "/usr/lib/reliefos/apps/desktop"
@@ -72,11 +72,11 @@ CASEVARIANT_COPY = f"{DESKTOP_DIR}/DESKTOP.ELF"  # root-owned 0755, unmarked
 
 M14_UNVERIFIED_REASON = (
     "not assertable in-guest today: kill(2)/signal delivery has no "
-    "TASK_FLAG_SERVICE gate (kernel/reliefnt/kernel/reliefnt/signal.c kernel_signal_queue_task_info, "
-    "kernel/reliefnt/kernel/reliefnt/syscall_process.c LINUX_SYS_KILL); the documented refusal "
+    "TASK_FLAG_SERVICE gate (kernel/reliefnt/kernel/signal/signal.c kernel_signal_queue_task_info, "
+    "kernel/reliefnt/kernel/syscall/process/process.c LINUX_SYS_KILL); the documented refusal "
     "'kill windowd -> -1' lives only in sched_kill_user_task "
-    "(kernel/reliefnt/kernel/reliefnt/sched/sched.c:2527), whose sole caller "
-    "auth_kill_session_tasks_for_logout (kernel/reliefnt/kernel/reliefnt/syscall.c:2724, F3) is "
+    "(kernel/reliefnt/kernel/sched/signal.c), whose sole caller "
+    "auth_kill_session_tasks_for_logout (kernel/reliefnt/kernel/syscall/process/session.c, F3) is "
     "dead code, and sched_kill_user_tasks_for_pty/_for_logout have no callers. "
     "Impersonator killability is pinned by the m1-* checks instead.")
 

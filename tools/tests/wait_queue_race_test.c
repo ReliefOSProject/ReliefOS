@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/kernel/reliefnt/wait.c"
+#include "../../kernel/reliefnt/kernel/sync/wait.c"
 
 #define CONCURRENT_TASKS 24u
 #define REMOVE_WAKE_ROUNDS 64u

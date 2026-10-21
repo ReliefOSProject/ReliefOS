@@ -16,7 +16,7 @@ static bool shm_physical_gate(void)
 #include "paging_protection_test.c"
 #undef main
 #undef RELIEFNT_TEST_PAGE_ALLOC_GATE
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#include "../../kernel/reliefnt/tools/tests/modules/user_memory.h"
 
 static int shm_fail_heap = -1, shm_fail_page = -1;
 static unsigned shm_heap_live;
@@ -44,7 +44,7 @@ static uint64_t shm_test_page(void)
 #define kernel_malloc shm_test_malloc
 #define kernel_free shm_test_free
 #define mm_alloc_page shm_test_page
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_sysv_shm.c"
+#include "../../kernel/reliefnt/kernel/syscall/ipc/sysv_shm.c"
 #undef kernel_malloc
 #undef kernel_free
 #undef mm_alloc_page

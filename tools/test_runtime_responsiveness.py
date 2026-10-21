@@ -36,9 +36,9 @@ class RuntimeResponsivenessTests(unittest.TestCase):
             subprocess.run([
                 "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
-                "tools/tests/signal_address_space_test.c", "kernel/reliefnt/kernel/reliefnt/syscall_sysv_sem.c",
-                "kernel/reliefnt/kernel/reliefnt/syscall_locks.c", "-o", executable,
+                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
+                "tools/tests/signal_address_space_test.c", "kernel/reliefnt/kernel/syscall/ipc/sysv_sem.c",
+                "kernel/reliefnt/kernel/syscall/fs/locks.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 

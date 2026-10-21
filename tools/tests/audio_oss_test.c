@@ -101,9 +101,9 @@ void kernel_wait_queue_remove(struct kernel_wait_queue *queue, struct task *task
 }
 
 #include "audio_fixture.h"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/pcm.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/oss.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pcm.h"
+#include "../../kernel/reliefnt/sound/core/oss.c"
 
 static void check_ioctl_state(struct task_file *file)
 {

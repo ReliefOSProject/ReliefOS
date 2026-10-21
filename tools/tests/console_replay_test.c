@@ -7,8 +7,8 @@
 #include <reliefnt/port.h>
 #include <reliefnt/svga.h>
 
-#include "../../kernel/reliefnt/drivers/video/framebuffer/framebuffer.c"
-#include "../../kernel/reliefnt/drivers/console/console.c"
+#include "../../kernel/reliefnt/tools/tests/modules/framebuffer.h"
+#include "../../kernel/reliefnt/tools/tests/modules/console.h"
 
 #define FB_GUARD_BYTES 32u
 #define FB_MAX_BYTES (32u * 1024u)

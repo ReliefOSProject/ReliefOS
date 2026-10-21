@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <stdatomic.h>
 #include <stdio.h>
-#include "../../kernel/reliefnt/arch/x86_64/smp.c"
+#include "../../kernel/reliefnt/arch/x86_64/cpu/smp.c"
 
 static _Thread_local uint32_t test_cpu;
 static atomic_int stop_workers;

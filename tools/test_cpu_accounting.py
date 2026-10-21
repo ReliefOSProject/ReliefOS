@@ -24,7 +24,7 @@ def main() -> None:
             "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
             "-fno-omit-frame-pointer", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include", "-Iinclude",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             "tools/tests/cpu_accounting_test.c", "-o", executable,
         ], cwd=ROOT, env=environment, check=True)
         subprocess.run([executable], cwd=ROOT, env=environment,

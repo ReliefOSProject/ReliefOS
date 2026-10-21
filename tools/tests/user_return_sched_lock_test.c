@@ -9,8 +9,8 @@
 
 /* Both locks and the scheduler are production code. Only hardware, allocation
  * and unused device boundaries are supplied by this host fixture. */
-#include "../../kernel/reliefnt/kernel/reliefnt/lock.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#include "../../kernel/reliefnt/kernel/sync/lock.c"
+#include "../../kernel/reliefnt/tools/tests/modules/scheduler.h"
 #include "sysv_shm_fixture_stubs.h"
 
 static _Thread_local uint32_t cpu;

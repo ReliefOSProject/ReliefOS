@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/drivers/console/console.c"
+#include "../../kernel/reliefnt/tools/tests/modules/console.h"
 #include "../../kernel/reliefnt/drivers/video/framebuffer/boot_logo.c"
 
 void *kernel_malloc(size_t size) { return malloc(size); }

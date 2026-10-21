@@ -1,7 +1,7 @@
 #include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_process.c"
+#include "../../kernel/reliefnt/kernel/syscall/process/process.c"
 
 static struct task caller, target;
 static uint64_t readonly;

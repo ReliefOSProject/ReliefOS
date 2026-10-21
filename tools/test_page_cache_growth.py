@@ -11,12 +11,12 @@ def main():
     compiler=shutil.which('clang') or shutil.which('cc')
     if compiler is None:raise RuntimeError('a C compiler is required')
     temporary=ROOT/'out/tmp';temporary.mkdir(parents=True,exist_ok=True)
-    source=ROOT/'kernel/reliefnt/mm/page_cache.c'
+    source=ROOT/'kernel/reliefnt/mm/cache/page_cache.c'
     print('SOURCE page_cache.c sha256='+hashlib.sha256(source.read_bytes()).hexdigest(),flush=True)
     with tempfile.TemporaryDirectory(prefix='page-cache-',dir=temporary) as directory:
         env={**os.environ,'TMPDIR':str(temporary)}
         for name,sources in (
-            ('page_cache_growth',['kernel/reliefnt/kernel/reliefnt/lock.c']),
+            ('page_cache_growth',['kernel/reliefnt/kernel/sync/lock.c']),
             ('elf_file_page',[]),
         ):
             binary=Path(directory)/name
@@ -24,8 +24,8 @@ def main():
                 '-fsanitize=address,undefined','-fno-sanitize-recover=all','-fno-omit-frame-pointer',
                 '-ffunction-sections','-fdata-sections','-Wl,--gc-sections',
                 '-Ikernel/reliefnt/include','-Iinclude','-Ikernel/reliefnt/include/uapi',
-                '-Ikernel/reliefnt/kernel/reliefnt/include',f'tools/tests/{name}_test.c',
-                'kernel/reliefnt/mm/page_cache.c',*sources,
+                '-Ikernel/reliefnt/include',f'tools/tests/{name}_test.c',
+                'kernel/reliefnt/mm/cache/page_cache.c',*sources,
                 '-o',str(binary)],cwd=ROOT,env=env,check=True)
             subprocess.run([str(binary)],cwd=ROOT,env=env,check=True,timeout=45)
 if __name__=='__main__':main()

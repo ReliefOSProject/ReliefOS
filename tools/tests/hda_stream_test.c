@@ -61,8 +61,8 @@ static void hda_test_irq_restore(uint64_t flags) { (void)flags; }
 struct hda_controller;
 void hda_test_before_sleep(const struct hda_controller *c) { (void)c; }
 
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/drivers/sound/hda/controller.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/tools/tests/modules/hda_controller.h"
 #include "../../kernel/reliefnt/drivers/sound/hda/stream.c"
 
 /* The stream fixture links the PCM core without the ALSA timer module. */

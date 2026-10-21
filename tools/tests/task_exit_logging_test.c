@@ -9,7 +9,7 @@
 #include <string.h>
 
 #ifndef TASK_EXIT_SCHED_SOURCE
-#define TASK_EXIT_SCHED_SOURCE "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#define TASK_EXIT_SCHED_SOURCE "../../kernel/reliefnt/tools/tests/modules/scheduler.h"
 #endif
 #ifndef TASK_EXIT_USERLAND_SOURCE
 #define TASK_EXIT_USERLAND_SOURCE "../../kernel/reliefnt/kernel/exec/userland.c"

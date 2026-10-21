@@ -4,6 +4,8 @@ from pathlib import Path
 import subprocess
 import tempfile
 
+from kernel_test_sources import kernel_sources, module_text
+
 ROOT = Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory(prefix="reliefos-poll-wakeup-") as tmp:
     binary = Path(tmp) / "poll-wakeup"
@@ -12,8 +14,8 @@ with tempfile.TemporaryDirectory(prefix="reliefos-poll-wakeup-") as tmp:
         "-fno-sanitize-recover=all", "-ffunction-sections", "-fdata-sections",
         "-Wl,--gc-sections", "-fno-pie", "-no-pie",
         "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-        "-Ikernel/reliefnt/kernel/reliefnt/include",
-        "tools/tests/poll_wakeup_test.c", "kernel/reliefnt/kernel/reliefnt/syscall.c",
-        "kernel/reliefnt/kernel/reliefnt/wait.c", "-o", str(binary),
+        "-Ikernel/reliefnt/include",
+        "tools/tests/poll_wakeup_test.c", *kernel_sources("syscall_dispatch"),
+        "kernel/reliefnt/kernel/sync/wait.c", "-o", str(binary),
     ], cwd=ROOT, check=True)
     subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=20)

@@ -14,15 +14,15 @@
 #include "audio_fake_card.h"
 
 #define sched_signal_wait_current device_test_real_sched_signal_wait_current
-#include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#include "../../kernel/reliefnt/tools/tests/modules/scheduler.h"
 #undef sched_signal_wait_current
 #include "sysv_shm_fixture_stubs.h"
-#include "../../kernel/reliefnt/kernel/reliefnt/wait.c"
+#include "../../kernel/reliefnt/kernel/sync/wait.c"
 
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/pcm.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/device.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/alsa_pcm.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pcm.h"
+#include "../../kernel/reliefnt/sound/core/device.c"
+#include "../../kernel/reliefnt/sound/core/alsa_pcm.c"
 #include "audio_device_fixture.h"
 
 /* Host allocator boundary; descriptor growth stays in the real scheduler. */

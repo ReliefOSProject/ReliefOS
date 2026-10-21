@@ -11,7 +11,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 TMP_ROOT = ROOT / "out/tmp"
-PRODUCTION = ROOT / "kernel/reliefnt/kernel/reliefnt/lib/string.c"
+PRODUCTION = ROOT / "kernel/reliefnt/lib/string.c"
 HARNESS = ROOT / "tools/tests/kernel_memory_test.c"
 
 
@@ -81,7 +81,7 @@ def main() -> int:
                         compiler,
                         *compile_flags,
                         f"-O{optimization}",
-                        "-Ikernel/reliefnt/kernel/reliefnt/include",
+                        "-Ikernel/reliefnt/include",
                         "-Dmemcpy=kernel_memcpy",
                         "-Dmemset=kernel_memset",
                         "-Dmemcmp=kernel_memcmp",

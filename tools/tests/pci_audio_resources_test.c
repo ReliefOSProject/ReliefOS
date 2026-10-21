@@ -1,14 +1,14 @@
 #include "audio_fixture.h"
 #include <sys/mman.h>
 #include <reliefos/driver.h>
-#include "../../kernel/reliefnt/mm/mm.c"
-#include "../../kernel/reliefnt/arch/x86_64/pci_irq.c"
-#include "../../kernel/reliefnt/arch/x86_64/pci.c"
+#include "../../kernel/reliefnt/mm/physical/mm.c"
+#include "../../kernel/reliefnt/arch/x86_64/platform/pci_irq.c"
+#include "../../kernel/reliefnt/arch/x86_64/platform/pci.c"
 #define align_down paging_align_down
-#include "../../kernel/reliefnt/arch/x86_64/paging.c"
+#include "../../kernel/reliefnt/arch/x86_64/mm/paging.c"
 #undef align_down
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/driver_resources.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/kernel/device/driver_resources.c"
 
 void console_log(enum console_log_level level, const char *format, ...)
 {

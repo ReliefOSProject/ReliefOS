@@ -8,9 +8,9 @@
 
 #include "audio_fixture.h"
 
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/alsa_control.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/mixer.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/sound/core/alsa_control.c"
+#include "../../kernel/reliefnt/sound/core/mixer.c"
 
 bool user_range_ok(uint64_t ptr, uint64_t len)
 {

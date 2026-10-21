@@ -7,10 +7,10 @@
 /* Model the kernel direct map with host pointers to the destination pages. */
 #undef RELIEFNT_KERNEL_DIRECT_MAP_BASE
 #define RELIEFNT_KERNEL_DIRECT_MAP_BASE 0
-#include "../../kernel/reliefnt/kernel/reliefnt/signal.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/signal_queue.c"
+#include "../../kernel/reliefnt/kernel/signal/signal.c"
+#include "../../kernel/reliefnt/kernel/signal/signal_queue.c"
 #include "../../kernel/reliefnt/kernel/exec/usercopy_task.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_socket_batch.c"
+#include "../../kernel/reliefnt/kernel/syscall/ipc/socket_batch.c"
 
 #define STACK_ADDRESS 0x0f400000ULL
 static unsigned char target_pages[8192] __attribute__((aligned(4096)));

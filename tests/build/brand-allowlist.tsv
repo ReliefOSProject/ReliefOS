@@ -2,17 +2,18 @@
 # scope<TAB>category<TAB>path<TAB>reason; exact tracked path, no blanket migration exemptions.
 # Rules: docs/branding-compatibility.md section 3.
 kernel	history	docs/releases/5.1.0.md	5.1.0 发布迁移说明记录已删除的旧品牌头文件路径、变量和输出标记，不是现行显示品牌
-kernel	compatibility	block/storage_block.c	识别已有磁盘 GPT 名 LEONOS4_ROOT
-kernel	compatibility	fs/storage_mount.c	旧 leonos-installer-root 引导 module tag 双接受
-kernel	compatibility	fs/procfs.c	冻结 LeonOSRole/LeonOSFlags 与 /proc/leonos-drivers 接口值
-kernel	compatibility	fs/sysfs.c	冻结 /sys/devices/platform/leonos-block 运行时设备路径
+kernel	compatibility	block/core/storage_block.c	识别已有磁盘 GPT 名 LEONOS4_ROOT
+kernel	compatibility	fs/vfs/mount.c	旧 leonos-installer-root 引导 module tag 双接受
+kernel	compatibility	fs/proc/procfs.c	冻结 LeonOSRole/LeonOSFlags 与 /proc/leonos-drivers 接口值
+kernel	compatibility	fs/sysfs/sysfs.c	冻结 /sys/devices/platform/leonos-block 运行时设备路径
 kernel	compatibility	include/reliefos/elf_abi.h	published ELF note and runtime SONAME values
 kernel	compatibility	include/reliefos/layout.h	frozen task 6 guest layout values
 kernel	compatibility	include/uapi/README.md	文档说明旧 libleonos.so.2 独立兼容 SONAME，禁止将旧库伪装为新库符号链接
 kernel	compatibility	include/uapi/reliefos/rootfs.h	frozen task 6 rootfs paths
-kernel	compatibility	kernel/reliefnt/kernel.c	识别旧 installer-root GRUB module tag
-kernel	compatibility	kernel/reliefnt/kernel_debug.c	旧 kerneldebug ELF note section 与函数名/hash 双接受
-kernel	compatibility	kernel/reliefnt/syscall.c	冻结设备 ioctl 对外 identity：PS/2 名称与 leonos-fb
+kernel	compatibility	kernel/init/kernel.c	识别旧 installer-root GRUB module tag
+kernel	compatibility	kernel/init/kernel_debug.c	旧 kerneldebug ELF note section 与函数名/hash 双接受
+kernel	compatibility	kernel/syscall/device/input_ioctl.c	冻结设备 ioctl 对外 identity：PS/2 名称与 leonos-fb
+kernel	compatibility	kernel/syscall/device/legacy_ioctl.c	冻结设备 ioctl 对外 identity：PS/2 名称与 leonos-fb
 main	compatibility	.github/workflows/build-installer.yml	上传既有 leonos.conf 配置文件名
 main	external-url	.github/workflows/build-pages.yml	GitHub Secret 旧名回退；优先新 RELIEFOS Secret，不改外部配置
 main	external-url	.github/workflows/sourcehut-sync.yml	real old remote addresses, switch only after new targets verified

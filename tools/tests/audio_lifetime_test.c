@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "audio_fixture.h"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
 
 /* The lifetime fixture links the PCM core without the ALSA timer module. */
 void audio_timer_period_elapsed(uint32_t card, uint32_t device,

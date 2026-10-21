@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_locks.c"
+#include "../../kernel/reliefnt/kernel/syscall/fs/locks.c"
 
 static struct task first, second, *current = &first;
 static struct task_file file = {.used = 1, .flags = LINUX_O_RDWR,

@@ -2,16 +2,16 @@
  *
  * Covers the endian helpers, the bounds checker, and the superblock /
  * group-descriptor / extent-header parsers in
- * kernel/reliefnt/fs/storage_ext4_format.c.
+ * kernel/reliefnt/fs/ext4/format.c.
  * Fixtures are hand-built raw byte images following the field offsets of
  * linux/fs/ext4/ext4.h (Linux v7.3-rc5 reference tree).
  *
  * Build (task 2 acceptance command):
  *   cc -std=c11 -O0 -g -fsanitize=address,undefined \
  *     -Ikernel/reliefnt/include -Iinclude \
- *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/kernel/reliefnt/include \
+ *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/include \
  *     tools/tests/ext4_format_test.c \
- *     kernel/reliefnt/fs/storage_ext4_format.c \
+ *     kernel/reliefnt/fs/ext4/format.c \
  *     -o /tmp/reliefos-ext4-format-test
  */
 #include <assert.h>
@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/core/storage_internal.h"
 
 /* ext4_super_block offsets (linux/fs/ext4/ext4.h:1369). */
 #define SB_INODES_COUNT 0x00

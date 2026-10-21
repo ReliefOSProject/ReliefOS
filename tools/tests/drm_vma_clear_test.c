@@ -1,7 +1,13 @@
 #include <assert.h>
 #include <stdio.h>
 #include <reliefnt/drm.h>
+#include <reliefnt/audio.h>
+#include <stdlib.h>
 #include <reliefnt/sched.h>
+
+/* This DRM-only fixture must never release an audio mapping. */
+void audio_pcm_mmap_release(struct audio_pcm *pcm, enum audio_pcm_mmap_region region)
+{ (void)pcm; (void)region; abort(); }
 
 static struct drm_bo *expected_bo;
 static unsigned drm_bo_put_calls;
@@ -35,7 +41,7 @@ void task_file_put(struct task_file *description)
 }
 
 #ifndef DRM_MM_SOURCE
-#define DRM_MM_SOURCE "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#define DRM_MM_SOURCE "../../kernel/reliefnt/tools/tests/modules/user_memory.h"
 #endif
 #include DRM_MM_SOURCE
 

@@ -54,7 +54,7 @@ def build_native_reader(work: Path) -> Path:
         "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
         "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
         "-DRELIEFOS_STORAGE_STANDALONE_TU", "-Ikernel/reliefnt/include", "-Iinclude",
-        "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+        "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
         "-include", str(STORAGE / "storage_internal.h"),
         "tools/tests/ext4_extent_test.c", *map(str, EXT4_SOURCES), "-o", str(binary),
     ])
@@ -68,7 +68,7 @@ def build_native_writer(work: Path) -> Path:
         "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
         "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
         "-DRELIEFOS_STORAGE_STANDALONE_TU", "-Ikernel/reliefnt/include", "-Iinclude",
-        "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+        "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
         "-include", str(STORAGE / "storage_internal.h"),
         "tools/tests/ext4_write_test.c", *map(str, EXT4_SOURCES), "-o", str(binary),
     ])

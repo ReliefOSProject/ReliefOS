@@ -4,7 +4,7 @@
 
 #define RELIEFNT_APIC_TEST 1
 #define APIC_TIMER_CALIBRATION_POLL_LIMIT 4096u
-#include "../../kernel/reliefnt/arch/x86_64/apic.c"
+#include "../../kernel/reliefnt/arch/x86_64/interrupt/apic.c"
 
 static uint64_t fixture_us, armed_us;
 static uint32_t programmed_count, programmed_lvt, programmed_divide;

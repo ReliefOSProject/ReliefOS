@@ -2,7 +2,7 @@
  * IRQ1 pending; reading an empty data port must not publish a phantom key. */
 #include <assert.h>
 #include <stdio.h>
-#include "../../kernel/reliefnt/arch/x86_64/irq.c"
+#include "../../kernel/reliefnt/arch/x86_64/interrupt/irq.c"
 
 static uint8_t controller_status, controller_byte;
 static unsigned data_reads, input_events, eois;

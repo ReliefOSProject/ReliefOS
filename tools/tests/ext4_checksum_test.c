@@ -2,7 +2,7 @@
  *
  * Covers the CRC32C/CRC16 primitives, the superblock / group-descriptor /
  * inode checksum algorithms in
- * kernel/reliefnt/fs/storage_ext4_checksum.c.
+ * kernel/reliefnt/fs/ext4/checksum.c.
  *
  * Independent oracles (the implementation under test is table-driven and
  * shares no code with these):
@@ -31,9 +31,9 @@
  * ruling for this plan, progress.md preflight #5):
  *   cc -std=c11 -O1 -g -fsanitize=address,undefined \
  *     -Ikernel/reliefnt/include -Iinclude \
- *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/kernel/reliefnt/include \
+ *     -Ikernel/reliefnt/include/uapi -Ikernel/reliefnt/include \
  *     tools/tests/ext4_checksum_test.c \
- *     kernel/reliefnt/fs/storage_ext4_checksum.c \
+ *     kernel/reliefnt/fs/ext4/checksum.c \
  *     -o /tmp/reliefos-ext4-checksum-test
  *   ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
  *     /tmp/reliefos-ext4-checksum-test
@@ -46,7 +46,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "../../kernel/reliefnt/block/storage_internal.h"
+#include "../../kernel/reliefnt/block/core/storage_internal.h"
 
 /* ext4_super_block offsets (linux/fs/ext4/ext4.h:1369). */
 #define SB_INODES_COUNT 0x00

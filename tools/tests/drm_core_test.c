@@ -30,11 +30,11 @@
 #include "../../kernel/reliefnt/drivers/video/drm/drm_ioctl.c"
 #include "../../kernel/reliefnt/drivers/video/drm/drm_kms.c"
 #include "../../kernel/reliefnt/drivers/video/drm/drm_bo.c"
-#include "../../kernel/reliefnt/drivers/video/drm/drm_vmwgfx_caps.c"
-#include "../../kernel/reliefnt/drivers/video/drm/drm_vmwgfx_resource.c"
+#include "../../kernel/reliefnt/drivers/video/drm/vmwgfx/caps.c"
+#include "../../kernel/reliefnt/drivers/video/drm/vmwgfx/resource.c"
 #include "../../kernel/reliefnt/drivers/video/drm/drm_prime.c"
-#include "../../kernel/reliefnt/drivers/video/drm/drm_vmwgfx_execbuf_parser.c"
-#include "../../kernel/reliefnt/drivers/video/drm/drm_vmwgfx_execbuf.c"
+#include "../../kernel/reliefnt/drivers/video/drm/vmwgfx/execbuf_parser.c"
+#include "../../kernel/reliefnt/tools/tests/modules/vmwgfx_execbuf.h"
 
 #define DRM_IOCTL_VMW_ALLOC_BO \
     DRM_IOWR(DRM_COMMAND_BASE + DRM_VMW_ALLOC_BO, union drm_vmw_alloc_bo_arg)

@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/signal.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/signal_queue.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/signalfd.c"
+#include "../../kernel/reliefnt/kernel/signal/signal.c"
+#include "../../kernel/reliefnt/kernel/signal/signal_queue.c"
+#include "../../kernel/reliefnt/kernel/signal/signalfd.c"
 
 static struct task readers[2], *current;
 static struct task_file descriptor;

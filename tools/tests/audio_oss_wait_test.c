@@ -24,7 +24,7 @@ static int oss_test_status(struct audio_pcm *pcm, struct audio_pcm_status *statu
 }
 #define audio_pcm_status(pcm, status) oss_test_status(pcm, status)
 #define audio_pcm_transfer(pcm, data, frames) oss_test_pcm_transfer(pcm, data, frames)
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/oss.c"
+#include "../../kernel/reliefnt/sound/core/oss.c"
 #undef audio_pcm_status
 #undef audio_pcm_transfer
 

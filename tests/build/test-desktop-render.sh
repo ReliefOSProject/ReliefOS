@@ -18,7 +18,7 @@ done
     -fsanitize=address,undefined -fno-sanitize-recover=all \
     -ffunction-sections -fdata-sections -Wl,--gc-sections \
     -DRELIEFOS_STORAGE_STANDALONE_TU -Iinclude -Ikernel/reliefnt/include/uapi \
-    -Ikernel/reliefnt/include -Ikernel/reliefnt/kernel/reliefnt/include \
+    -Ikernel/reliefnt/include -Ikernel/reliefnt/include \
     tools/tests/ext4_dma_read_test.c -o "$work/dma"
 "$work/dma"
 "$work/dma" uncached

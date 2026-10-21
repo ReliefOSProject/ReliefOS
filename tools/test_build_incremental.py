@@ -18,6 +18,27 @@ def require(value: bool, text: str) -> None:
     print(f"PASS {text}", flush=True)
 
 
+def archive_objects(source: Path, directory: Path = Path()) -> list[str]:
+    """Read explicit local obj-y ownership in native archive traversal order."""
+    entries: list[str] = []
+    text = (source / directory / "Kbuild").read_text().replace("\\\n", " ")
+    for line in text.splitlines():
+        match = re.match(r"^obj-y\s*([:+]?=)\s*(.*?)\s*(?:#.*)?$", line)
+        if match:
+            if match[1] in ("=", ":="):
+                entries = []
+            entries.extend(match[2].split())
+    result: list[str] = []
+    for entry in entries:
+        if entry.endswith("/") and "/" not in entry[:-1]:
+            result.extend(archive_objects(source, directory / entry))
+        elif entry.endswith(".o") and "/" not in entry:
+            result.append((directory / entry).as_posix())
+        else:
+            raise AssertionError(f"non-local Kbuild member: {directory}/{entry}")
+    return result
+
+
 
 def check_runtime_elf(output: Path) -> None:
     for name in ("libreliefos.so.2", "libleonos.so.2"):
@@ -34,7 +55,14 @@ def main() -> None:
         work = Path(name)
         source = work / "kernel"
         child = ROOT / "kernel/reliefnt"
-        shutil.copytree(child, source, ignore=shutil.ignore_patterns(".git", "out", "cache", "__pycache__"))
+        def ignored(directory: str, names: list[str]) -> set[str]:
+            # Only the source root's cache is an artifact; mm/cache is code.
+            excluded = {"__pycache__"}
+            if Path(directory) == child:
+                excluded.update((".git", "out", "cache"))
+            return set(names) & excluded
+
+        shutil.copytree(child, source, ignore=ignored)
         shutil.copytree(child / "cache", source / "cache")
         out = work / "output"
         kernel = out / "reliefnt"
@@ -90,17 +118,13 @@ def main() -> None:
         require(len(baseline) > 200, "production kernel and runtime first-party objects built")
         members = subprocess.check_output(["llvm-ar", "t", str(kernel / "built-in.a")], text=True).splitlines()
         members = [str(Path(path).resolve().relative_to(kernel)) for path in members]
-        expected = sorted(str(file.relative_to(source).with_suffix(".o"))
-                          for directory in ("arch", "block", "drivers", "firmware", "fs", "kernel", "mm", "net")
-                          for file in (source / directory).rglob("*.c"))
-        expected += sorted(str(file.relative_to(source).with_suffix(".o")) for file in (source / "arch").rglob("*.S"))
-        expected += ["vdso/vdso_blob.o"]
+        expected = archive_objects(source)
         require(members == expected, "archive contains exactly the intended source objects in order")
         output_before = (out / "generated/system/kernel.sys").read_bytes()
         build()
         require(baseline == objects(), "no-op leaves all native object mtimes unchanged")
 
-        file = source / "kernel/reliefnt/futex.c"
+        file = source / "kernel/ipc/futex.c"
         file.touch()
         build()
         current = objects()
@@ -112,7 +136,7 @@ def main() -> None:
                 "content-preserving source touch leaves published kernel bytes unchanged")
 
         before = current
-        (source / "kernel/reliefnt/include/reliefnt/sched.h").touch()
+        (source / "include/reliefnt/sched.h").touch()
         build()
         current = objects()
         require(len(changed(before, current)) > 1, "private kernel header rebuilds its kernel consumers")
@@ -157,7 +181,7 @@ def main() -> None:
         require(before == objects(), "tool identity invalidation settles to no-op")
 
         before = objects()
-        victim = next(obj for obj, (file, _) in before.items() if file == source / "kernel/reliefnt/futex.c")
+        victim = next(obj for obj, (file, _) in before.items() if file == source / "kernel/ipc/futex.c")
         victim.unlink()
         for path in (out / "generated/system/kernel.sys", out / "system/lib/libreliefos.so.2",
                      out / "musl/lib/libreliefos.a"):
@@ -182,6 +206,38 @@ def main() -> None:
         require(changed(before, current) == header_consumers,
                 "restored exported header rebuilds exactly its native consumers")
         require(not list(source.rglob("*.o")), "source fixture contains no generated object")
+
+        # Exercise standalone asset and clean entry points, not only parent
+        # integration. Unknown files and the user's selected config survive.
+        fresh = work / "build-info"
+        result = subprocess.run(["make", "--no-print-directory", "-C", str(source),
+                                 f"O={fresh}", "-j6", "build-info"],
+                                text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        (logs / "standalone-build-info.log").write_text(result.stdout)
+        require(result.returncode == 0 and (fresh / "include/generated/build_info.h").is_file(),
+                "standalone build-info builds its host prerequisite from a fresh output")
+        sentinel = kernel / "user.keep"
+        sentinel.write_text("unowned output entry\n")
+        config = (kernel / ".config").read_bytes()
+        result = subprocess.run(["make", "--no-print-directory", "-C", str(source),
+                                 f"O={kernel}", "clean"],
+                                text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        (logs / "standalone-clean.log").write_text(result.stdout)
+        require(result.returncode == 0 and not list(kernel.rglob("*.o")) and
+                not (kernel / "lib").exists() and not (kernel / "sound").exists(),
+                "clean removes all kernel objects including lib and sound")
+        require(sentinel.read_text() == "unowned output entry\n" and
+                (kernel / ".config").read_bytes() == config,
+                "clean preserves unknown entries and configuration")
+        build()
+        require(output_before == (out / "generated/system/kernel.sys").read_bytes(),
+                "clean release rebuild reproduces the original published kernel")
+        before = objects()
+        linked_time = (kernel / "generated/system/kernel.unstripped").stat().st_mtime_ns
+        build()
+        require(before == objects() and
+                linked_time == (kernel / "generated/system/kernel.unstripped").stat().st_mtime_ns,
+                "no-op after clean rebuild neither recompiles nor relinks")
 
 
 if __name__ == "__main__":

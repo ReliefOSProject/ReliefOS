@@ -10,9 +10,9 @@
 #include "audio_fixture.h"
 #include "audio_fake_card.h"
 
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/pcm.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/alsa_pcm.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pcm.h"
+#include "../../kernel/reliefnt/sound/core/alsa_pcm.c"
 
 int audio_alsa_refine(struct audio_pcm *pcm, struct snd_pcm_hw_params *params);
 

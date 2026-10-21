@@ -5,7 +5,7 @@
 #include <reliefnt/paging.h>
 #undef RELIEFNT_KERNEL_DIRECT_MAP_BASE
 #define RELIEFNT_KERNEL_DIRECT_MAP_BASE 0
-#include "../../kernel/reliefnt/kernel/reliefnt/futex.c"
+#include "../../kernel/reliefnt/kernel/ipc/futex.c"
 
 static struct task tasks_test[4], *current;
 static uint64_t ticks = 100;

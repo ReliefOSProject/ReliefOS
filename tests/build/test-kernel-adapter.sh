@@ -242,13 +242,13 @@ find "$O/generated" -type f -printf '%p %T@\n' | LC_ALL=C sort >"$work/published
 kerneldebug_hash_before=$(sha256sum "$O/generated/system/kerneldebug.sys" | cut -d' ' -f1)
 
 advance_clock
-touch "$reliefnt/kernel/reliefnt/futex.c"
+touch "$reliefnt/kernel/ipc/futex.c"
 if build "$work/dirty.log" "$O"; then
     pass 'a touched checkout source is rebuilt'
 else
     fail 'a touched checkout source is rebuilt' 'make failed'
 fi
-if grep -qF -- "$reliefnt/kernel/reliefnt/futex.c" "$work/dirty.log" &&
+if grep -qE '^  CC +kernel/ipc/futex\.o$' "$work/dirty.log" &&
         grep -qE '^  (LD|IMAGE) ' "$work/dirty.log"; then
     pass 'the sub-make relinks and refreshes the affected products'
 else
@@ -323,7 +323,7 @@ printf '\n=== (e) a build failure in the checkout publishes no half-products ===
 # Fixture: a scratch copy of the checkout. The real checkout is never edited.
 fixture=$work/fixture
 cp -a "$reliefnt" "$fixture" || exit 1
-broken=$fixture/kernel/reliefnt/futex.c
+broken=$fixture/kernel/ipc/futex.c
 fail_out=$work/fail-out
 
 printf '\nthis is a deliberate syntax error in the fixture\n' >>"$broken"
@@ -346,7 +346,7 @@ else
 fi
 
 # Recovery: fixing the source makes the same tree build and publish.
-cp "$reliefnt/kernel/reliefnt/futex.c" "$broken"
+cp "$reliefnt/kernel/ipc/futex.c" "$broken"
 if build "$work/recover.log" "$fail_out" RELIEFNT_DIR="$fixture" &&
         [ -s "$fail_out/generated/system/kernel.sys" ]; then
     pass 'the recovered fixture builds and publishes'
@@ -369,7 +369,7 @@ if build "$work/content.log" "$fail_out" RELIEFNT_DIR="$fixture"; then
 else
     fail 'a content change in the checkout re-publishes a new kernel.sys' 'make failed'
 fi
-cp "$reliefnt/kernel/reliefnt/futex.c" "$broken"
+cp "$reliefnt/kernel/ipc/futex.c" "$broken"
 if build "$work/restore-content.log" "$fail_out" RELIEFNT_DIR="$fixture" &&
         [ "$(sha256sum "$fail_out/generated/system/kernel.sys" | cut -d' ' -f1)" = \
           "$recovered_checksum" ]; then

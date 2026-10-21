@@ -9,6 +9,8 @@ import shutil
 import subprocess
 import tempfile
 
+from kernel_test_sources import module_text
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -22,7 +24,7 @@ def function(source, name):
 
 def io_backend(source, operation):
     name = "syscall_io_" + operation
-    if re.search(r"^static int64_t " + name + r"\(", source, re.M):
+    if re.search(r"^(?:static )?int64_t " + name + r"\(", source, re.M):
         return function(source, name)
     # Characterize the old backend without copying it into the fixture. This
     # option also permits semantic comparisons with archived pre-extraction code.
@@ -35,9 +37,9 @@ def io_backend(source, operation):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", type=Path, default=ROOT / "kernel/reliefnt/kernel/reliefnt/syscall.c")
+    parser.add_argument("--source", type=Path, default=ROOT / "kernel/reliefnt/kernel/syscall")
     args = parser.parse_args()
-    source = args.source.read_text()
+    source = module_text("syscall_dispatch") if args.source == parser.get_default("source") else args.source.read_text()
     compiler = shutil.which("clang") or shutil.which("cc")
     if not compiler:
         raise RuntimeError("a C compiler is required")
@@ -60,7 +62,7 @@ def main():
                 "-Werror", "-Wno-unused-parameter",
                 "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
                 "-fno-omit-frame-pointer", "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-I" + str(work), "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "-I" + str(work), "-Ikernel/reliefnt/include",
                 "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
                 "-Iuserland/runtime/include", "tools/tests/syscall_io_test.c", "-o", str(executable),
             ], cwd=ROOT, env={**os.environ, "TMPDIR": str(temporary)}, check=True)

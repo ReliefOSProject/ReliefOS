@@ -14,7 +14,7 @@ def main():
         run(["cc","-std=c11","-O1","-g","-D_GNU_SOURCE","-fsanitize=address,undefined",
              "-fno-sanitize-recover=all","-ffunction-sections","-fdata-sections","-Wl,--gc-sections",
              "-DRELIEFOS_STORAGE_STANDALONE_TU","-Ikernel/reliefnt/include","-Iinclude",
-             "-Ikernel/reliefnt/include/uapi","-Ikernel/reliefnt/kernel/reliefnt/include",
+             "-Ikernel/reliefnt/include/uapi","-Ikernel/reliefnt/include",
              "-include",str(STORAGE/"storage_internal.h"),"tools/tests/ext4_xattr_test.c",
              *[str(FS/f"storage_ext4_{n}.c") for n in
                ("format","checksum","cache","alloc","extent","ops","journal","dir","xattr")],"-o",str(binary)])

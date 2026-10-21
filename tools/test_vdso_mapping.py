@@ -20,7 +20,7 @@ def main():
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 "-Ikernel/reliefnt/include", "-Iinclude",
                 "-Ikernel/reliefnt/include/uapi",
-                "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "-Ikernel/reliefnt/include",
                 f"tools/tests/{name}_test.c", "-o", str(binary),
             ], cwd=ROOT, check=True)
             subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=30)

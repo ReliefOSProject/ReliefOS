@@ -3,7 +3,7 @@
 #include "procfs_directories_test.c"
 #undef main
 #include <stdlib.h>
-#include "../../kernel/reliefnt/fs/permissions.c"
+#include "../../kernel/reliefnt/fs/security/access.c"
 int storage_node_mount_flags(const struct storage_node *node, uint64_t *flags)
 { (void)node; *flags = 0; return 0; }
 void *kernel_malloc(size_t size) { return malloc(size); }

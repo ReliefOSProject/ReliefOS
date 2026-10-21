@@ -18,12 +18,12 @@
 
 #define sched_block_current audio_test_real_sched_block_current
 #define sched_signal_wait_current audio_test_real_sched_signal_wait_current
-#include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#include "../../kernel/reliefnt/tools/tests/modules/scheduler.h"
 #include "sysv_shm_fixture_stubs.h"
 #undef sched_block_current
 #undef sched_signal_wait_current
-#include "../../kernel/reliefnt/kernel/reliefnt/wait.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
+#include "../../kernel/reliefnt/kernel/sync/wait.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
 
 static uint32_t injected_card;
 static int inject_before_epoch, inject_before_sleep, inject_after_sleep;
@@ -66,7 +66,7 @@ static uint32_t control_test_epoch(void)
 }
 
 #define audio_control_event_epoch control_test_epoch
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/alsa_control.c"
+#include "../../kernel/reliefnt/sound/core/alsa_control.c"
 #undef audio_control_event_epoch
 
 bool user_range_ok(uint64_t ptr, uint64_t len)

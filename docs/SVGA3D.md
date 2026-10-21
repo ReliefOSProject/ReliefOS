@@ -10,7 +10,7 @@ If a host stalls while it still references guest memory, the driver preserves
 those pages and the FIFO until a later initialization/shutdown retry can finish
 retirement. FIFO waits remain bounded.
 
-The public ring-0 API is declared in `kernel/reliefnt/kernel/reliefnt/include/reliefnt/svga.h`.
+The public ring-0 API is declared in `kernel/reliefnt/include/reliefnt/svga.h`.
 The implementation lives in `kernel/reliefnt/drivers/video/svga/` and uses the vendored
 Linux VMware protocol headers in `kernel/reliefnt/drivers/video/svga/protocol/`, with
 the required GB wire extensions in `kernel/reliefnt/drivers/video/svga/gb_protocol.h`.

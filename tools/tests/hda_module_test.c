@@ -28,10 +28,10 @@ static void hda_test_before_sleep(const struct hda_controller *c){(void)c;}
 /* Preserve the actual core notification implementation separately from the
  * module's API forwarding symbol; the contract header is already included. */
 #define audio_period_elapsed core_audio_period_elapsed
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
 #undef audio_period_elapsed
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/pcm.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/driver_manager_phase.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pcm.h"
+#include "../../kernel/reliefnt/kernel/device/driver_manager_phase.c"
 #define memset module_memset
 #include "../../kernel/reliefnt/drivers/sound/hda/hda.c"
 #undef memset

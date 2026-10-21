@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "device.h"
-#include "../../kernel/reliefnt/drivers/video/framebuffer/framebuffer.c"
+#include "../../kernel/reliefnt/tools/tests/modules/framebuffer.h"
 
 #if defined(SVGA_BATCH_SUBMIT_FAILURE_SNAPSHOT)
 #define assert_batch_submit_failure(batch, expected_reason, expected_index, \

@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/block/storage_internal.h"
-#include "../../kernel/reliefnt/block/storage_state_data.c"
+#include "../../kernel/reliefnt/block/core/storage_internal.h"
+#include "../../kernel/reliefnt/block/core/storage_state_data.c"
 
 #define EXT4_BLOCK_CACHE_ENTRIES 2u
-#include "../../kernel/reliefnt/fs/storage_ext4_cache.c"
+#include "../../kernel/reliefnt/fs/ext4/cache.c"
 
 static uint8_t disk[64 * 4096];
 static uint8_t output[8 * 4096];

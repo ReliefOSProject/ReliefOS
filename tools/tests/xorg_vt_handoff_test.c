@@ -14,7 +14,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/pty.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pty.h"
 
 #define SIG_RELEASE 10
 #define SIG_ACQUIRE 12

@@ -9,7 +9,7 @@ INCLUDES = [
     "-Ikernel/reliefnt/include",
     "-Iinclude",
     "-Ikernel/reliefnt/include/uapi",
-    "-Ikernel/reliefnt/kernel/reliefnt/include",
+    "-Ikernel/reliefnt/include",
 ]
 
 

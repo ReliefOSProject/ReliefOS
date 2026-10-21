@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_device.c"
+#include "../../kernel/reliefnt/kernel/syscall/device/device.c"
 static struct task current;
 static int calls;
 struct task *sched_current_task(void) { return &current; }

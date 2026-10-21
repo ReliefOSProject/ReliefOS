@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 INCLUDES = [
     "-Ikernel/reliefnt/include",
     "-Ikernel/reliefnt/include/uapi",
-    "-Ikernel/reliefnt/kernel/reliefnt/include",
+    "-Ikernel/reliefnt/include",
     "-Iinclude",
 ]
 FIXTURES = [

@@ -14,7 +14,7 @@ static int windowd_vt_active(void);
 #undef main
 #undef WINDOWD_VT_TEST
 #undef syscall3
-#include "../../kernel/reliefnt/kernel/reliefnt/input.c"
+#include "../../kernel/reliefnt/drivers/tty/input/input.c"
 #include "../../userland/runtime/src/ui_input.c"
 #include "../../kernel/reliefnt/arch/x86_64/keyboard_led.h"
 

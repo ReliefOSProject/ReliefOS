@@ -23,15 +23,15 @@ def main():
     with tempfile.TemporaryDirectory(prefix="reliefos-ext4-read-") as directory:
         work = Path(directory)
         binary = work / "read-test"
-        sources = [FS / f"storage_ext4_{name}.c" for name in
+        sources = [FS / f"ext4/{name}.c" for name in
                    ("format", "checksum", "cache", "alloc", "extent", "ops", "xattr", "journal")]
         run(["cc", "-std=c11", "-O1", "-g", "-D_GNU_SOURCE",
              "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
              "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
              "-DRELIEFOS_STORAGE_STANDALONE_TU", "-Ikernel/reliefnt/include",
              "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-             "-Ikernel/reliefnt/kernel/reliefnt/include", "-include",
-             str(STORAGE / "storage_internal.h"),
+             "-Ikernel/reliefnt/include", "-include",
+             str(STORAGE / "core/storage_internal.h"),
              str(ROOT / "tools/tests/ext4_extent_test.c"), *map(str, sources),
              "-o", str(binary)])
         env = dict(os.environ, ASAN_OPTIONS="detect_leaks=1",
@@ -41,8 +41,8 @@ def main():
             run(["cc", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
                  "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                  "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                 "-Ikernel/reliefnt/kernel/reliefnt/include", "tools/tests/ext4_vfs_read_test.c",
-                 "kernel/reliefnt/fs/tmpfs.c",
+                 "-Ikernel/reliefnt/include", "tools/tests/ext4_vfs_read_test.c",
+                 "kernel/reliefnt/fs/tmpfs/core.c",
                  "-o", str(vfs_binary)])
         if args.case in ("all", "unit"):
             run([str(binary)], env=env)

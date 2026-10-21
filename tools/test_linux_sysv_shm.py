@@ -11,7 +11,7 @@ FIXTURE = ROOT / 'tools/tests/fixtures/sysv-shm-uapi/linux-v6.14'
 for entry in json.loads((FIXTURE / 'manifest.json').read_text()):
     assert hashlib.sha256((FIXTURE / entry['path']).read_bytes()).hexdigest() == entry['sha256'], entry['path']
 COMMON = ["-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-          "-Ikernel/reliefnt/kernel/reliefnt/include"]
+          "-Ikernel/reliefnt/include"]
 
 with tempfile.TemporaryDirectory(prefix="reliefos-sysv-shm-") as directory:
     output = str(Path(directory) / "sysv_shm")

@@ -9,10 +9,10 @@
 #include "audio_fixture.h"
 #include "audio_fake_card.h"
 
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/pcm.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pcm.h"
 #ifndef AUDIO_ALSA_IOCTL_RED
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/alsa_pcm.c"
+#include "../../kernel/reliefnt/sound/core/alsa_pcm.c"
 #else
 int audio_alsa_ioctl(struct audio_pcm *pcm, uint64_t request, void *argument);
 #endif

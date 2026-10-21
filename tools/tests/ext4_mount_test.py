@@ -65,7 +65,7 @@ def compile_test(work: Path, name: str, extra_flags: tuple[str, ...] = ()) -> Pa
         *extra_flags,
         "-Ikernel/reliefnt/include", "-Iinclude",
         "-Ikernel/reliefnt/include/uapi",
-        "-Ikernel/reliefnt/kernel/reliefnt/include",
+        "-Ikernel/reliefnt/include",
         "tools/tests/ext4_mount_test.c", "-o", str(binary),
     ], cwd=ROOT)
     return binary

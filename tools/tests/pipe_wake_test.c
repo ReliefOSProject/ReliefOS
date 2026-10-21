@@ -6,12 +6,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/kernel/reliefnt/wait.c"
+#include "../../kernel/reliefnt/kernel/sync/wait.c"
 
 #ifdef PIPE_WAKE_IPC_SOURCE
 #include PIPE_WAKE_IPC_SOURCE
 #else
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_ipc.c"
+#include "../../kernel/reliefnt/kernel/syscall/ipc/ipc.c"
 #endif
 
 #define TEST_TASK_COUNT 6u

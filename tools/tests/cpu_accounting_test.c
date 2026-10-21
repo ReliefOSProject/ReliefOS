@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#include "../../kernel/reliefnt/tools/tests/modules/scheduler.h"
 #include "sysv_shm_fixture_stubs.h"
 
 static uint32_t fixture_cpu;

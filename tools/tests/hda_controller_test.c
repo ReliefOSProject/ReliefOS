@@ -22,7 +22,7 @@ static uint64_t hda_test_irq_save(void);
 static void hda_test_irq_restore(uint64_t flags);
 static void hda_test_before_sleep(const struct hda_controller *c);
 
-#include "../../kernel/reliefnt/drivers/sound/hda/controller.c"
+#include "../../kernel/reliefnt/tools/tests/modules/hda_controller.h"
 #include "../../kernel/reliefnt/drivers/sound/hda/controls.c"
 
 #define FAKE_REGS_BYTES 0x4000u

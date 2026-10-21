@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/input.c"
+#include "../../kernel/reliefnt/tools/tests/modules/syscall_dispatch.h"
+#include "../../kernel/reliefnt/drivers/tty/input/input.c"
 
 void drm_file_close(struct task_file *file)
 { if (file) file->drm_file = NULL; }

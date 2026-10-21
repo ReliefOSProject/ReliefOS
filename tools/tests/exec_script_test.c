@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
+#include "../../kernel/reliefnt/tools/tests/modules/syscall_dispatch.h"
 
 void drm_file_close(struct task_file *file)
 { if (file) file->drm_file = NULL; }

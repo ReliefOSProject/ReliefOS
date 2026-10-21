@@ -64,8 +64,8 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
   `syscall`；参数使用 `rax/rdi/rsi/rdx/r10/r8/r9`，负返回值为
   `-errno`。已实现接口才可视为可用，未知 syscall 返回 `-ENOSYS`。
 - 内核负责用户指针与长度验证、页表/进程资源、硬件和最终授权。
-- 内核内部能力按职责直接落在内核子仓的 `kernel/reliefnt/kernel/reliefnt/`（含 `lib/` 工具）和
-  `kernel/reliefnt/drivers/bootstrap/storage/`（文件系统与 `LEONACL.SYS` 权限元数据），全部编译进
+- 内核内部能力按职责落在内核子仓的 `kernel/`、`lib/`、`mm/`、`net/`、
+  `fs/`、`block/`、`sound/` 和 `drivers/` 等目录（均相对于 `kernel/reliefnt/`），全部编译进
   kernel.sys；不存在跨模块 callback 表或第二个启动镜像。用户态与内核之间只有
   syscall/ioctl ABI 和 GUI IPC。职责归属与旧数据格式的兼容策略见
   `docs/KERNEL_USERSPACE_BOUNDARIES.md`。
@@ -83,7 +83,7 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 都要逐项检查以下闭环，不能只修改一处：
 
 1. `include/reliefos/*.h`：公共定义、常量、结构布局、权限语义和返回值。
-2. `kernel/reliefnt/kernel/reliefnt/`（内核子仓）：编号、用户范围检查、权限检查、实现和错误路径。
+2. `kernel/reliefnt/kernel/`（内核子仓）：编号、用户范围检查、权限检查、实现和错误路径。
 3. `userland/runtime/include/` 与 `userland/runtime/src/`：声明、包装和实现。
 4. 使用该 API 的系统应用、窗口服务器及相关测试程序。
 5. `configs/header-export.list` 白名单与 `headers_install` 导出：SDK/用户态只消费
@@ -218,6 +218,8 @@ make test-smoke
 - 源码成员显式登记在相应 Kbuild 中；增加/删除文件时同步对象清单。源码、头文件、
   编译/链接参数和对象清单变化、多输出成员缺失必须正确触发重建。
   对目录 stage 使用完整成员清单，临时树完成并校验后再发布，不能以 stamp 代替存在性检查。
+- 内核每个生产代码目录由本地 `Kbuild` 管理对象和直接子目录；根目录不维护全局
+  源码清单。模块边界、私有共享状态与迁移追溯见 `kernel/reliefnt/docs/KERNEL_MODULES.md`。
 - 同一 O 的真实构建互斥，不手工伪造 RELIEFOS_BUILD_OWNER。不同 O 可并行。
   `-n/-q` 不重建被包含的配置，避免干扰持锁构建；首次预览应用和产品前先 defconfig、config-sync。
 - `all` 包括 kernel、userland、runtime、sdk、apk-repo、image-vmdk、iso、installer；
@@ -261,7 +263,7 @@ make test-smoke
 
 ## 8. 代码注释规范
 
-`kernel/reliefnt/kernel/reliefnt/`（内核子仓）中的每个函数定义和公共函数声明必须紧贴
+`kernel/reliefnt/kernel/`（内核子仓）中的每个函数定义和公共函数声明必须紧贴
 Doxygen 风格块注释。C 与汇编预处理源统一使用 `/** ... */`，格式如下：
 
 ```c

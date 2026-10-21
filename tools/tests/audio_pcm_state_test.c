@@ -7,8 +7,8 @@
 #include "audio_fixture.h"
 #include "audio_fake_card.h"
 
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/pcm.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pcm.h"
 
 /* The PCM fixture links the core directly and does not include timer.c. */
 void audio_timer_period_elapsed(uint32_t card, uint32_t device,

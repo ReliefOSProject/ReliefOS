@@ -6,6 +6,8 @@ import subprocess
 import tempfile
 import unittest
 
+from kernel_test_sources import kernel_sources, module_text
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -20,9 +22,9 @@ class LinuxMemoryTests(unittest.TestCase):
 
     def test_memory_ownership_and_elf_page_boundaries(self):
         cases = (("physical_pages", []), ("paging_protection", []), ("private_anon_fault", []), ("elf_interpreter", []),
-                 ("elf_file_page", ["kernel/reliefnt/mm/page_cache.c"]), ("user_mmap_arena", []),
-                 ("mprotect_vma_growth", ["kernel/reliefnt/kernel/reliefnt/sched/sched.c"]),
-                 ("brk_collision", ["kernel/reliefnt/kernel/reliefnt/syscall_mm.c"]))
+                 ("elf_file_page", ["kernel/reliefnt/mm/cache/page_cache.c"]), ("user_mmap_arena", []),
+                 ("mprotect_vma_growth", [*kernel_sources("scheduler")]),
+                 ("brk_collision", [*kernel_sources("user_memory")]))
         for name, sources in cases:
             with self.subTest(name=name), tempfile.TemporaryDirectory(prefix="reliefos-mm-") as tmp:
                 executable = str(Path(tmp) / name)
@@ -30,7 +32,7 @@ class LinuxMemoryTests(unittest.TestCase):
                     "cc", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
                     "-fno-omit-frame-pointer", "-ffunction-sections", "-fdata-sections",
                     "-Wl,--gc-sections",
-                    "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+                    "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                     f"tools/tests/{name}_test.c", *sources, "-o", executable,
                 ], cwd=ROOT, check=True)
                 subprocess.run([executable], cwd=ROOT, check=True, timeout=30)

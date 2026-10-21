@@ -23,7 +23,7 @@ def host():
     executable=WORK/'inventory-host'
     run(['cc','-std=c11','-O1','-g','-fsanitize=address,undefined','-ffunction-sections','-fdata-sections','-Wl,--gc-sections',
          '-Iinclude','-Ikernel/reliefnt/include','-Ikernel/reliefnt/include/uapi',
-         '-Ikernel/reliefnt/kernel/reliefnt/include','tools/tests/linux_inventory_test.c','-o',executable])
+         '-Ikernel/reliefnt/include','tools/tests/linux_inventory_test.c','-o',executable])
     run([executable])
 
 def guest(args):

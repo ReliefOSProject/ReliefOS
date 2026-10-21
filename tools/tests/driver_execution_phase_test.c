@@ -42,10 +42,10 @@ void kernel_irq_restore(uint64_t flags)
     fixture_irq_flags = flags & (1ULL << 9);
 }
 
-#include "../../kernel/reliefnt/kernel/reliefnt/lock.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/driver_manager_phase.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/pcm.c"
+#include "../../kernel/reliefnt/kernel/sync/lock.c"
+#include "../../kernel/reliefnt/kernel/device/driver_manager_phase.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pcm.h"
 
 /* The phase fixture links the PCM core without the ALSA timer module. */
 void audio_timer_period_elapsed(uint32_t card, uint32_t device,

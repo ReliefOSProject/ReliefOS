@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/net/net_packet.c"
+#include "../../kernel/reliefnt/net/socket/packet.c"
 static struct task current;
 static struct task_file description;
 static uint8_t sent[1514];

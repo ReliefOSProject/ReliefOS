@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/arch/x86_64/smp.c"
+#include "../../kernel/reliefnt/arch/x86_64/cpu/smp.c"
 
 static uint32_t fixture_apic_id_value;
 

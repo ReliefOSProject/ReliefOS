@@ -177,7 +177,7 @@ userland/apps/shell/main.c
     fi
     if grep -qx 'kernel_name=ReliefNT' "$root/kernel/reliefnt/configs/build-version" &&
        grep -q 'LINUX_UTS_SYSNAME "ReliefNT"' \
-           "$root/kernel/reliefnt/kernel/reliefnt/include/reliefnt/uts.h" &&
+           "$root/kernel/reliefnt/include/reliefnt/uts.h" &&
        grep -q 'info.kernel_name' "$root/userland/apps/osver/main.cpp"; then
         ok 'system information surfaces the ReliefNT kernel name'
     else

@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#include "../../kernel/reliefnt/tools/tests/modules/user_memory.h"
 #include "sysv_shm_fixture_stubs.h"
 
 uint32_t sched_task_vma_capacity(const struct task *task) { (void)task; return SCHED_TASK_VMA_MAX; }

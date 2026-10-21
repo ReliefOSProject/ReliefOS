@@ -18,9 +18,9 @@ void audio_timer_period_elapsed(uint32_t card, uint32_t device,
     (void)card; (void)device; (void)direction; (void)frames; (void)error;
 }
 
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/core.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/pcm.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/audio/alsa_pcm.c"
+#include "../../kernel/reliefnt/sound/core/core.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pcm.h"
+#include "../../kernel/reliefnt/sound/core/alsa_pcm.c"
 
 static void audio_test_hw_any(struct snd_pcm_hw_params *params)
 {

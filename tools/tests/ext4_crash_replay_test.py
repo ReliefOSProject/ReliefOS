@@ -30,7 +30,7 @@ def main():
              "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
              "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
              "-DRELIEFOS_STORAGE_STANDALONE_TU", "-Ikernel/reliefnt/include", "-Iinclude",
-             "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+             "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
              "-include", str(storage / "storage_internal.h"),
              "tools/tests/ext4_journal_test.c",
              *[str(fs / f"storage_ext4_{name}.c") for name in
@@ -40,8 +40,8 @@ def main():
         run(["cc", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
              "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
              "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-             "-Ikernel/reliefnt/kernel/reliefnt/include", "tools/tests/ext4_vfs_read_test.c",
-             "kernel/reliefnt/fs/tmpfs.c", "-o", str(vfs)])
+             "-Ikernel/reliefnt/include", "tools/tests/ext4_vfs_read_test.c",
+             "kernel/reliefnt/fs/tmpfs/core.c", "-o", str(vfs)])
         stage = work / "stage"
         stage.mkdir()
         (stage / "payload").write_bytes(b"original" * 1024)

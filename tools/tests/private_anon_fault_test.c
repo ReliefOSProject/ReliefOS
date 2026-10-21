@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/arch/x86_64/paging.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#include "../../kernel/reliefnt/arch/x86_64/mm/paging.c"
+#include "../../kernel/reliefnt/tools/tests/modules/user_memory.h"
 #include "sysv_shm_fixture_stubs.h"
 
 static unsigned allocated;

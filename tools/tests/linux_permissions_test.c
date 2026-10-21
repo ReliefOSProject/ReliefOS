@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../../kernel/reliefnt/fs/permissions.c"
+#include "../../kernel/reliefnt/fs/security/access.c"
 
 static struct fixture {
     const char *path;

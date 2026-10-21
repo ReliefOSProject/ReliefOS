@@ -20,7 +20,7 @@ def main() -> int:
             "-Wno-unused-function",
             "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
             "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
-            "-Ikernel/reliefnt/kernel/reliefnt/include", "-Iinclude",
+            "-Ikernel/reliefnt/include", "-Iinclude",
             "tools/tests/fbdev_abi_test.c",
             "kernel/reliefnt/drivers/video/framebuffer/fbdev.c",
             "-o", str(binary),

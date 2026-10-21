@@ -6,7 +6,7 @@
 
 #include "../../kernel/reliefnt/arch/x86_64/port.h"
 #include "../../kernel/reliefnt/drivers/input/mouse/mouse.c"
-#include "../../kernel/reliefnt/arch/x86_64/irq.c"
+#include "../../kernel/reliefnt/arch/x86_64/interrupt/irq.c"
 
 struct controller_byte {
     uint8_t status;

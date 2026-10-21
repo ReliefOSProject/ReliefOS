@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <reliefnt/lock.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#include "../../kernel/reliefnt/tools/tests/modules/user_memory.h"
 #include "sysv_shm_fixture_stubs.h"
 
 static unsigned char file_bytes[8192];

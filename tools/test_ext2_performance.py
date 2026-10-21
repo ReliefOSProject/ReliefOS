@@ -28,7 +28,7 @@ def main():
                         "-O", "none,filetype", "-F", image, "32768"], check=True)
         subprocess.run(["cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
                         "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
-                        "-Wl,--gc-sections", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+                        "-Wl,--gc-sections", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                         "tools/tests/ext2_performance_test.c", "-o", executable], cwd=ROOT, check=True)
         output = subprocess.check_output([executable, image], cwd=ROOT, text=True, timeout=180)
         result = [json.loads(line) for line in output.splitlines()]

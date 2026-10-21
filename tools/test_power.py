@@ -13,7 +13,7 @@ with tempfile.TemporaryDirectory(prefix="reliefos-power-") as directory:
     subprocess.run([
         "cc", "-std=c11", "-O2", "-flto", "-fwhole-program",
         "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-        "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+        "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
         "tools/tests/reboot_syscall_test.c", "-o", output,
     ], cwd=ROOT, check=True)
     subprocess.run([output], cwd=ROOT, check=True, timeout=10)

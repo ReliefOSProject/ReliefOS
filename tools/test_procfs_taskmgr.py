@@ -5,6 +5,8 @@ import tempfile
 import unittest
 
 
+from kernel_test_sources import kernel_sources, module_text
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -23,17 +25,17 @@ class ProcfsTaskmgrTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="reliefos-procfs-") as directory:
             executable = str(Path(directory) / "procfs")
             subprocess.run(["cc", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
-                            "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+                            "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                             "tools/tests/procfs_directories_test.c", "-o", executable],
                            cwd=ROOT, check=True)
             subprocess.run([executable], check=True, timeout=10)
 
     def test_proc_pid_paths_start_after_proc_slash(self):
-        source = (ROOT / "kernel/reliefnt/fs/procfs.c").read_text()
+        source = (ROOT / "kernel/reliefnt/fs/proc/procfs.c").read_text()
         self.assertIn("const char *p = path + 6;", source)
 
     def test_procfs_exports_cpu_runtime_stats(self):
-        source = (ROOT / "kernel/reliefnt/fs/procfs.c").read_text()
+        source = (ROOT / "kernel/reliefnt/fs/proc/procfs.c").read_text()
         libc = (ROOT / "userland/runtime/src/procsys.c").read_text()
         self.assertIn('proc_text_eq(path, "/proc/stat")', source)
         self.assertIn('ps_read_file("/proc/stat"', libc)
@@ -76,7 +78,7 @@ class ProcfsTaskmgrTests(unittest.TestCase):
         self.assertIn("else close(m);", source)
 
     def test_pty_hangup_preserves_pending_canonical_input(self):
-        source = (ROOT / "kernel/reliefnt/kernel/reliefnt/pty.c").read_text()
+        source = module_text("pty")
         start = source.index("int pty_destroy(")
         end = source.index("/**", start)
         destroy = source[start:end]

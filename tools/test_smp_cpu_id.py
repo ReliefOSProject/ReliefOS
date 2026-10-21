@@ -39,7 +39,7 @@ def main() -> None:
             "-fno-sanitize-recover=all", "-fno-omit-frame-pointer",
             "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
             "-Ikernel/reliefnt/include", "-Iinclude",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             "tools/tests/smp_cpu_id_test.c", "-o", executable,
         ], cwd=ROOT, env=env, check=True)
         original_affinity = os.sched_getaffinity(0)

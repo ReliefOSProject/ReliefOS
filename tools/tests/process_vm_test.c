@@ -8,8 +8,8 @@
 #include <linux/capability.h>
 #undef RELIEFNT_KERNEL_DIRECT_MAP_BASE
 #define RELIEFNT_KERNEL_DIRECT_MAP_BASE 0
-#include "../../kernel/reliefnt/arch/x86_64/paging.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_process_vm.c"
+#include "../../kernel/reliefnt/arch/x86_64/mm/paging.c"
+#include "../../kernel/reliefnt/kernel/syscall/process/process_vm.c"
 
 static struct task caller, target;
 static unsigned allocations, faults;

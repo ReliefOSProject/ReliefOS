@@ -117,7 +117,7 @@ def run_pcm() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(PCM_PROBE), "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)
@@ -135,7 +135,7 @@ def run_device() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(DEVICE_PROBE), "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)
@@ -146,7 +146,7 @@ def run_device() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             "tools/tests/audio_devfs_test.c", "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)
@@ -163,7 +163,7 @@ def run_vma() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(VMA_PROBE), "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)
@@ -181,7 +181,7 @@ def run_params() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(PARAMS_PROBE), "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)
@@ -199,7 +199,7 @@ def run_ioctl() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(IOCTL_PROBE), "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)
@@ -217,7 +217,7 @@ def run_mmap() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(MMAP_PROBE), "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)
@@ -235,7 +235,7 @@ def run_control() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(CONTROL_PROBE), "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)
@@ -253,7 +253,7 @@ def run_oss() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(OSS_PROBE), "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)
@@ -262,7 +262,7 @@ def run_oss() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(OSS_WAIT_PROBE), "-o", str(wait_binary),
         ], cwd=ROOT, check=True, timeout=20)
         failures = []
@@ -286,7 +286,7 @@ def run_mixer() -> int:
             "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-no-pie", "-pthread",
             "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             str(MIXER_PROBE), "-o", str(binary),
         ], cwd=ROOT, check=True, timeout=20)
         subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=10)

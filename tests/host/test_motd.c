@@ -5,7 +5,7 @@
 #include <string.h>
 #include <wchar.h>
 #include "userland/apps/motd/format.h"
-#include "kernel/reliefnt/kernel/reliefnt/include/reliefnt/loadavg.h"
+#include "kernel/reliefnt/include/reliefnt/loadavg.h"
 
 static void check_width(const char *text, size_t limit)
 {

@@ -23,7 +23,7 @@ def run_host_fixture() -> None:
             compiler, "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
             "-fno-omit-frame-pointer", "-ffunction-sections", "-fdata-sections",
             "-Wl,--gc-sections", "-Ikernel/reliefnt/include", "-Iinclude",
-            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+            "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
             "tools/tests/sched_resume_test.c", "-o", executable,
         ], cwd=ROOT, env=env, check=True)
         subprocess.run([executable], cwd=ROOT, env=env, check=True, timeout=30)

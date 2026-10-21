@@ -5,7 +5,7 @@
 
 #include <linux/errno.h>
 #include "../../kernel/reliefnt/drivers/video/svga/svga_protocol.h"
-#include "../../kernel/reliefnt/drivers/video/drm/drm_vmwgfx_execbuf_parser.c"
+#include "../../kernel/reliefnt/drivers/video/drm/vmwgfx/execbuf_parser.c"
 
 static uint32_t append_packet(uint8_t *dst, uint32_t at, uint32_t id,
                               const void *payload, uint32_t payload_bytes)

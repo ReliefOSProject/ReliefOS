@@ -10,14 +10,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class GpuAbiTests(unittest.TestCase):
     def test_syscall_and_copyout(self):
-        for name, source in (("gpu_syscall", "kernel/reliefnt/kernel/reliefnt/gpu.c"),
+        for name, source in (("gpu_syscall", "kernel/reliefnt/drivers/video/core/gpu.c"),
                              ("gpu_usercopy", "kernel/reliefnt/kernel/exec/usercopy.c")):
             with self.subTest(name=name), tempfile.TemporaryDirectory(prefix="reliefos-gpu-") as tmp:
                 executable = str(Path(tmp) / name)
                 subprocess.run([
                     "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
                     "-fsanitize=address,undefined", "-fno-omit-frame-pointer",
-                    "-Ikernel/reliefnt/kernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
+                    "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
                     f"tools/tests/{name}_test.c", source, "-o", executable,
                 ], cwd=ROOT, check=True)
                 subprocess.run([executable], cwd=ROOT, check=True, timeout=30)

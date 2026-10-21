@@ -6,6 +6,8 @@ import json
 import re
 
 
+from kernel_test_sources import kernel_sources, module_text
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -33,8 +35,8 @@ def test_linux_numbers_and_flags() -> None:
 
 def test_native_syscall_entry_and_stack_protocol() -> None:
     syscall_asm = read("userland/runtime/src/syscall.S")
-    boot_asm = read("kernel/reliefnt/arch/x86_64/boot.S")
-    gdt = read("kernel/reliefnt/arch/x86_64/gdt.c")
+    boot_asm = read("kernel/reliefnt/arch/x86_64/boot/boot.S")
+    gdt = read("kernel/reliefnt/arch/x86_64/cpu/gdt.c")
     userland = read("kernel/reliefnt/kernel/exec/userland.c")
     assert "syscall" in syscall_asm and "int $0x80" not in syscall_asm
     assert "x86_64_syscall_entry" in boot_asm
@@ -43,10 +45,10 @@ def test_native_syscall_entry_and_stack_protocol() -> None:
 
 
 def test_contract_fixes_are_present() -> None:
-    syscall_h = read("kernel/reliefnt/kernel/reliefnt/include/reliefnt/syscall.h")
-    process = read("kernel/reliefnt/kernel/reliefnt/syscall_process.c")
-    syscall = read("kernel/reliefnt/kernel/reliefnt/syscall.c")
-    ipc = read("kernel/reliefnt/kernel/reliefnt/syscall_ipc.c")
+    syscall_h = read("kernel/reliefnt/include/reliefnt/syscall.h")
+    process = read("kernel/reliefnt/kernel/syscall/process/process.c")
+    syscall = module_text("syscall_dispatch")
+    ipc = read("kernel/reliefnt/kernel/syscall/ipc/ipc.c")
     assert "LINUX_SYS_PAUSE" in syscall_h
     assert "LINUX_SYS_NICE __NR_nice" not in syscall_h
     assert "SIG_BLOCK=0" in process or "SIG_BLOCK" in process

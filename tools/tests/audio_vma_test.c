@@ -6,7 +6,7 @@
 #define main paging_fixture_main
 #include "paging_protection_test.c"
 #undef main
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_mm.c"
+#include "../../kernel/reliefnt/tools/tests/modules/user_memory.h"
 
 void storage_inode_retain(struct storage_inode_ref *inode) { assert(!inode); }
 int storage_inode_put(struct storage_inode_ref *inode) { assert(!inode); return 0; }

@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_socket_batch.c"
+#include "../../kernel/reliefnt/kernel/syscall/ipc/socket_batch.c"
 
 static struct task current;
 static struct task_file socket_file = {.flags = TASK_FILE_FLAG_SOCKET | TASK_FILE_FLAG_SOCKET_UNIX};

@@ -6,7 +6,7 @@
 #include <reliefnt/console.h>
 #include <reliefnt/smp.h>
 #include <reliefnt/vdso_data.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/time.c"
+#include "../../kernel/reliefnt/kernel/time/time.c"
 
 static unsigned held;
 static uint64_t fake_tsc;

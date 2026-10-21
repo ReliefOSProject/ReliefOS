@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/pty.c"
+#include "../../kernel/reliefnt/tools/tests/modules/pty.h"
 
 static struct task owner;
 static unsigned signals;

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
-#include "../../kernel/reliefnt/mm/mm.c"
+#include "../../kernel/reliefnt/mm/physical/mm.c"
 
 void console_printf(const char *format, ...) { (void)format; }
 

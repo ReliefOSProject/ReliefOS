@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_time.c"
+#include "../../kernel/reliefnt/kernel/syscall/time/time.c"
 
 static struct task current;
 static uint64_t ticks = 100;

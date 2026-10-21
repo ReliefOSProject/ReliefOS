@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../kernel/reliefnt/net/net.c"
+#include "../../kernel/reliefnt/tools/tests/modules/network.h"
 
 static uint64_t now_ms;
 static uint8_t sent_frame[2048];

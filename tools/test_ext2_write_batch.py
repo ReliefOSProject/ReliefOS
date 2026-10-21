@@ -17,7 +17,7 @@ with tempfile.TemporaryDirectory(prefix="ext2-write-batch-", dir=ROOT / "build")
     executable = work / "batch"
     subprocess.run(["cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
                     "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
-                    "-Wl,--gc-sections", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
+                    "-Wl,--gc-sections", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                     "tools/tests/ext2_write_batch_test.c", "-o", executable], cwd=ROOT, check=True)
     for bs in (1024, 2048, 4096):
         for failure in range(7):

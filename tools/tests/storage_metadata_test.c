@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/block/storage_internal.h"
-#include "../../kernel/reliefnt/block/storage_state_data.c"
+#include "../../kernel/reliefnt/block/core/storage_internal.h"
+#include "../../kernel/reliefnt/block/core/storage_state_data.c"
 
 static FILE *disk;
 static unsigned locked;
@@ -73,8 +73,8 @@ uint32_t ext4_get_le32(const uint8_t *p)
 { return p[0]|((uint32_t)p[1]<<8)|((uint32_t)p[2]<<16)|((uint32_t)p[3]<<24); }
 const struct storage_ext4_operations storage_ext4_ops={0};
 
-#include "../../kernel/reliefnt/fs/storage_permissions.c"
-#include "../../kernel/reliefnt/fs/storage_statfs.c"
+#include "../../kernel/reliefnt/fs/security/permissions.c"
+#include "../../kernel/reliefnt/fs/vfs/statfs.c"
 
 int main(int argc, char **argv)
 {

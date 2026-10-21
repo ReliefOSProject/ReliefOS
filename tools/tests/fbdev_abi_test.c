@@ -6,7 +6,7 @@
 #include <linux/errno.h>
 #include <linux/fb.h>
 #include <reliefnt/framebuffer.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
+#include "../../kernel/reliefnt/tools/tests/modules/syscall_dispatch.h"
 
 _Static_assert(FB_ACTIVATE_NOW == 0 && FB_ACTIVATE_NXTOPEN == 1 &&
                    FB_ACTIVATE_TEST == 2 && FB_ACTIVATE_MASK == 15 &&

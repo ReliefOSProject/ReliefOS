@@ -1,10 +1,10 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/sched/sched.c"
+#include "../../kernel/reliefnt/tools/tests/modules/scheduler.h"
 #include "sysv_shm_fixture_stubs.h"
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_time.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/signal_queue.c"
+#include "../../kernel/reliefnt/kernel/syscall/time/time.c"
+#include "../../kernel/reliefnt/kernel/signal/signal_queue.c"
 
 static struct task members[3];
 static struct task *table[] = {&members[0], &members[1], &members[2]};

@@ -32,7 +32,7 @@ if ! flock -n 9; then
     exit 1
 fi
 
-probe_sched="$reliefnt/kernel/reliefnt/include/reliefnt/sched.h"
+probe_sched="$reliefnt/include/reliefnt/sched.h"
 probe_fsabi="$reliefnt/include/uapi/reliefos/fs_abi.h"
 
 # A run killed between marker append and restore leaves the marker behind for
@@ -97,7 +97,6 @@ build() {
 }
 
 cc_actions() { grep -cE '^  CC ' "$1" || true; }
-install_actions() { grep -cE '^  INSTALL ' "$1" || true; }
 
 export_include="$O/kernel-export/include"
 
@@ -126,11 +125,12 @@ cp "$backup_dir/sched.h" "$probe_sched"
 printf '\n/* header-boundary probe */\n' >> "$probe_fsabi"
 advance_clock
 build "$work/2.log" runtime
-if [ "$(install_actions "$work/2.log")" -ge 1 ] && [ "$(cc_actions "$work/2.log")" -ge 1 ]; then
+if cmp -s "$probe_fsabi" "$export_include/reliefos/fs_abi.h" &&
+        [ "$(cc_actions "$work/2.log")" -ge 1 ]; then
     pass "UAPI content change reinstalled export and recompiled consumers"
 else
     fail "UAPI content change did not propagate" \
-        "INSTALL=$(install_actions "$work/2.log") CC=$(cc_actions "$work/2.log")"
+        "export bytes must match the changed source; CC=$(cc_actions "$work/2.log")"
 fi
 cp "$backup_dir/fs_abi.h" "$probe_fsabi"
 

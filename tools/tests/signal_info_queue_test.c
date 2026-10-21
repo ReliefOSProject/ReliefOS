@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/signal.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/signal_queue.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall_time.c"
+#include "../../kernel/reliefnt/kernel/signal/signal.c"
+#include "../../kernel/reliefnt/kernel/signal/signal_queue.c"
+#include "../../kernel/reliefnt/kernel/syscall/time/time.c"
 
 static struct task people[3], *current;
 static uint64_t ticks = 100, inaccessible;

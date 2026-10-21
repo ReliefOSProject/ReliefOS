@@ -1,7 +1,7 @@
 #include <reliefnt/console.h>
 #include <assert.h>
 #include <stdio.h>
-#include "../../kernel/reliefnt/kernel/reliefnt/time.c"
+#include "../../kernel/reliefnt/kernel/time/time.c"
 static unsigned held;
 static unsigned display_ticks;
 void kernel_spin_lock_irqsave(struct kernel_spinlock *lock, uint64_t *flags)

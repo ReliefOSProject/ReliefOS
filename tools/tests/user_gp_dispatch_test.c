@@ -13,9 +13,9 @@
 #include <reliefnt/time.h>
 #include <reliefnt/userland.h>
 
-#include "../../kernel/reliefnt/arch/x86_64/idt.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/signal.c"
-#include "../../kernel/reliefnt/kernel/reliefnt/signal_queue.c"
+#include "../../kernel/reliefnt/arch/x86_64/interrupt/idt.c"
+#include "../../kernel/reliefnt/kernel/signal/signal.c"
+#include "../../kernel/reliefnt/kernel/signal/signal_queue.c"
 
 static struct task current_task;
 static struct task next_task;

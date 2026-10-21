@@ -2,7 +2,7 @@
  * Host unit test for the Linux ioctl close-on-exec descriptor flags.
  *
  * The test compiles and links the real kernel translation unit
- * (kernel/reliefnt/kernel/reliefnt/syscall.c) so it exercises the actual descriptor helpers,
+ * (kernel/reliefnt/kernel/syscall/dispatch.c and its module sources) so it exercises the actual descriptor helpers,
  * descriptor tables and error paths rather than a re-implementation.  It is
  * the host-side half of the ioctl(FIOCLEX/FIONCLEX) regression; the guest half
  * is tools/tests/linux_ioctl_cloexec_test.c, which runs the same Linux ABI on
@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../kernel/reliefnt/kernel/reliefnt/syscall.c"
+#include "../../kernel/reliefnt/tools/tests/modules/syscall_dispatch.h"
 
 void drm_file_close(struct task_file *file)
 { if (file) file->drm_file = NULL; }

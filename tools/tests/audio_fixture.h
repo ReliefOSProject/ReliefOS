@@ -22,7 +22,7 @@ uint64_t kernel_irq_save(void) {
     return saved;
 }
 void kernel_irq_restore(uint64_t flags) { audio_fixture_irq_flags = flags & (1ULL << 9); }
-#include "../../kernel/reliefnt/kernel/reliefnt/lock.c"
+#include "../../kernel/reliefnt/kernel/sync/lock.c"
 
 #include <linux/time.h>
 /* Hardware clock boundary only; all PCM state and ABI logic stays production. */

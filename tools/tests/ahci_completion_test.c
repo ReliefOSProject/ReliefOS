@@ -3,8 +3,8 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../kernel/reliefnt/block/storage_internal.h"
-#include "../../kernel/reliefnt/block/storage_state_data.c"
+#include "../../kernel/reliefnt/block/core/storage_internal.h"
+#include "../../kernel/reliefnt/block/core/storage_state_data.c"
 
 static int task_file_errors;
 static int timeouts;

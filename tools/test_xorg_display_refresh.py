@@ -21,9 +21,9 @@ class DisplayRefreshTests(unittest.TestCase):
                 "cc", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                "-Ikernel/reliefnt/kernel/reliefnt/include",
+                "-Ikernel/reliefnt/include",
                 "tools/tests/timekeeper_discipline_test.c",
-                "kernel/reliefnt/kernel/reliefnt/time_discipline.c",
+                "kernel/reliefnt/kernel/time/time_discipline.c",
                 "-o", str(executable),
             ], cwd=ROOT, check=True)
             subprocess.run([str(executable)], cwd=ROOT, check=True, timeout=15)

@@ -5,7 +5,7 @@
 
 #include <reliefnt/port.h>
 #include <reliefnt/svga.h>
-#include "../../kernel/reliefnt/drivers/video/framebuffer/framebuffer.c"
+#include "../../kernel/reliefnt/tools/tests/modules/framebuffer.h"
 
 struct svga_device svga;
 
