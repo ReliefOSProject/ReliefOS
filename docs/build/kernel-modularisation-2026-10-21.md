@@ -135,3 +135,33 @@ b2a5266d7f11744dce3ae722078fd75caf1f02946d66435ab504eec72ad56bfc
 ReliefOS 分支截至 `ce246574` 的发布文档、署名和 ReliefMail/CA 更新，保留这些
 远端内容。本次重构的内核源码没有因这些更新改变。上面的镜像和 QEMU 记录仍
 对应明确列出的原验证基线，不作为新增远端用户态代码的运行验收。
+
+## 发布后 CI 漏文件修复
+
+ReliefNT Actions run `39622766793` 在 `7b502f5` 的干净检出中失败：
+`mm/Kbuild` 引用 `mm/cache/`，但子仓的 `cache/` 忽略规则把生产目录中的
+`Kbuild` 和 `page_cache.c` 一同排除，导致两个文件未进入提交。本地源码副本
+包含它们，因此先前的本地构建通过并不能证明发布提交完整；这是该检查的遗漏。
+
+修复把下载缓存规则收窄为根目录 `/cache/`，补入原有两个生产文件，并让模块
+布局检查调用 Git 实际忽略规则，拒绝被忽略的生产源码和 Kbuild。无 Git 元数据的
+源码归档继续执行结构、源码覆盖和上游引擎校验。CI 在下载依赖前执行这项静态检查。
+恢复的 `page_cache.c` 与重构基线的 `mm/page_cache.c` 字节一致。
+
+本地以原提交的 Git archive 复现 `missing Kbuild: mm/cache` 和 `make all`
+退出 2；从临时 Git index 导出的完整修复候选在独立输出目录执行 `make -j4 all`
+退出 0，生成 `kernel.sys`、`kernel.debug` 和 `kerneldebug.sys`，包括实际编译的
+`mm/cache/page_cache.o`。测试先在旧规则下报出两个 ignored production input，
+收窄规则后通过。证据保存在 `out/dualboot/logs/ci-{before,fixed}-*.log`。
+
+同一干净源码候选的 `make -k -j4 test` 退出 2，唯一失败仍是上文列出的
+`test-abi`（168 → 296）；其余宿主、ASan/UBSan、头导出、vDSO、Logo、panic
+和模块布局目标通过。未重生成 golden。本修复未改变内核执行逻辑；未重新运行
+QEMU 或 VMware。**VMware 验证未完成**。
+
+用户于 2026-10-22 授权先提交推送本修复。ReliefNT 修复提交为
+`dbf3b294470c78f7b13e0653f6f35eb75e8b10de`，已先推送至 `main`，触发
+[新的 Build ReliefNT run](https://github.com/ReliefOSProject/ReliefNT/actions/runs/39690836331)。
+记录此时远端构建仍在运行，本地干净源码编译通过不替代其最终结果。
+父仓接入同分支 `2799815e` 的计算器更新后，只提交本修复的子模块引用和此记录，
+未将双启动设计、计划或实现纳入本次修复提交；不把旧 QEMU 证据用作计算器更新验收。
