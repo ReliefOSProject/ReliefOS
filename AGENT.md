@@ -340,11 +340,10 @@ int subsystem_handle(const struct request *request, struct result *out_result);
 - ReliefOS 只写主仓自身变更，排除 ReliefNT 实现和纯 gitlink 更新；ReliefNT
   只写内核仓变更。两份说明的章节格式相同，正文独立；合并去重，不能把已撤销
   的功能或计划当作交付，不列“更新版本号到 x.x.x”等无用更新。
-- 说明必须包括：发布范围、更新内容、是否破坏性更新、更新与迁移注意事项、
-  开发者提示、验证与已知限制、获取与追溯；归档到 `docs/releases/<版本>.md`。
+- 说明必须包括：更新内容、是否破坏性更新、更新与迁移注意事项、开发者提示；
+  归档到 `docs/releases/<版本>.md`。
 - 先推送内核版本提交，再更新父仓 gitlink 并推送；标签与 GitHub Release
   必须固定到各自精确版本提交。使用 `gh` 和审阅过的正文文件发布，回读核对。
 - `/etc/os-release` 的 `VERSION_ID` 与主仓发布版本一致；保留品牌显示规则。
   二进制仅在明确要求时从本版本重建并附校验和，不上传旧产物。预发布标记
   prerelease；不自动重写标签或 Release，不自动合并开发分支。
-- 编译、打包、QEMU、VMware、硬件验证分别报告；VMware 验证未完成时必须明示。
