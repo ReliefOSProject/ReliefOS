@@ -217,6 +217,25 @@ config RELIEFOS_COMPONENT_APP_PAINT_SDK
     default n
     depends on RELIEFOS_COMPONENT_APP_PAINT_BUILD
 
+config RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_BUILD
+    bool "Build ReliefCapture"
+    default y
+
+config RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_IMAGE
+    bool "Include ReliefCapture in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_ENTRY
+    bool "Generate a desktop entry for ReliefCapture"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_SDK
+    bool "Include ReliefCapture in the developer SDK"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_BUILD
+
 config RELIEFOS_COMPONENT_APP_OSHLP_BUILD
     bool "Build Help viewer"
     default y

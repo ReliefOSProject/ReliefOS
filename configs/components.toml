@@ -710,6 +710,20 @@ open_with = true
 extensions = [".bmp", ".dib", ".png"]
 
 [[components]]
+id = "reliefcapture"
+symbol = "APP_RELIEFCAPTURE"
+label = "ReliefCapture"
+category = "Desktop applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+open_with = false
+
+[[components]]
 id = "reliefplayer"
 symbol = "APP_RELIEFPLAYER"
 label = "ReliefPlayer"

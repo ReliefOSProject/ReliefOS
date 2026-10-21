@@ -59,6 +59,11 @@ make_package x11-dev-xorgproto usr/include/X11/extensions/Xproto.h
 make_package alpine-libfltk usr/lib/libfltk.so.1.3
 make_package alpine-libstdc++ usr/lib/libstdc++.so.6
 make_package alpine-libgcc usr/lib/libgcc_s.so.1
+make_package alpine-libx11 usr/lib/libX11.so.6.4.0
+ln -sf libX11.so.6.4.0 "$package_root/x11-dev-libx11/usr/lib/libX11.so"
+(cd "$package_root/x11-dev-libx11" && tar -czf "$cache/x11-dev-libx11.apk" usr)
+ln -s libX11.so.6.4.0 "$package_root/alpine-libx11/usr/lib/libX11.so.6"
+(cd "$package_root/alpine-libx11" && tar -czf "$cache/alpine-libx11.apk" usr)
 
 mkdir -p "$stage/usr/include/Xm" "$stage/usr/lib"
 printf 'old Motif header\n' >"$stage/usr/include/Xm/Xm.h"
@@ -87,6 +92,8 @@ test -f "$stage/usr/include/X11/Xlib.h"
 test -f "$stage/usr/lib/libfltk.so.1.3"
 test -f "$stage/usr/lib/libstdc++.so.6"
 test -f "$stage/usr/lib/libgcc_s.so.1"
+test -f "$stage/usr/lib/libX11.so"
+test -f "$stage/usr/lib/libX11.so.6"
 test ! -e "$stage/usr/include/Xm/Xm.h"
 test ! -e "$stage/usr/lib/libXm.so"
 printf 'x11-development staging replacement tests passed\n'

@@ -434,6 +434,19 @@ def icon_extra(c, name):
             fill(c, x, 12-height, 1, height, BLUE)
         for x in range(5):
             fill(c, 9+x, 4+x//2, 1, 7-x, GREEN)
+    elif name == "reliefcapture":
+        fill(c, 1, 2, 13, 10, WHITE); rect(c, 1, 2, 13, 10, DARK)
+        fill(c, 2, 3, 11, 2, BLUE)
+        put(c, 4, 4, WHITE); put(c, 6, 4, WHITE); put(c, 8, 4, WHITE)
+        fill(c, 3, 6, 9, 5, rgba(190, 226, 242))
+        put(c, 10, 7, YELLOW); put(c, 11, 7, YELLOW)
+        line(c, 3, 10, 6, 7, GREEN); line(c, 6, 7, 8, 9, GREEN)
+        line(c, 8, 9, 10, 7, GREEN); line(c, 10, 7, 12, 10, GREEN)
+        line(c, 3, 11, 12, 11, BLUE)
+        line(c, 6, 13, 10, 10, DARK); line(c, 6, 13, 12, 15, DARK)
+        fill(c, 10, 8, 3, 3, ORANGE); put(c, 11, 9, WHITE)
+        fill(c, 12, 11, 3, 3, ORANGE); put(c, 13, 12, WHITE)
+        put(c, 6, 13, ORANGE)
     elif name == "reliefdiagram":
         line(c, 5, 8, 11, 3, BLUE); line(c, 5, 8, 11, 8, BLUE); line(c, 5, 8, 11, 13, BLUE)
         fill(c, 1, 6, 5, 5, BLUE); rect(c, 1, 6, 5, 5, DARK)

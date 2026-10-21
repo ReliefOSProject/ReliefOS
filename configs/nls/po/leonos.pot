@@ -10789,3 +10789,283 @@ msgstr ""
 #: userland/apps/reliefplayer/window.cpp
 msgid "Stereo audio"
 msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "10 seconds"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "3 seconds"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "5 seconds"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "A screenshot operation is already running"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Annotation"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Annotation text"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Black"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Capture canceled"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Capture in %d seconds; click Cancel to stop"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Capture mode"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not add the annotation; check its length or the annotation limit"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not configure the screenshot channel"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not connect to the X11 display"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not contact the existing screenshot window"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not create the screenshot channel"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not create the temporary screenshot"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not crop the screenshot"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not encode the screenshot"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not inspect the destination"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not open the destination folder"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not read the screen image"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not read the screenshot process reply"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not register the screenshot window"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not render the screenshot"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not save the screenshot"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not start the screenshot process"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Delay"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Discard annotations and take a new screenshot?"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Drag a region · R: region · W: window · F: full screen · Esc: cancel"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Finishing the screenshot save before closing..."
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Fit to window"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Full screen"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Image copied; keep ReliefCapture open while pasting"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Invalid destination path"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Invalid screenshot process reply"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Line width"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "New capture"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "No delay"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "No screenshot"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Not saved"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Orange"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Pen"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Preparing screenshot..."
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Ready to capture"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Region"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Replace the existing screenshot?"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Save PNG..."
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Save screenshot"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Save this screenshot before closing?"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Saved"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Saving screenshot..."
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Screenshot saved"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Screenshot saved, but folder synchronization failed"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Text size"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "The destination changed; choose Save again"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "The destination must be a regular file"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "The pen stroke reached its point limit; start a new stroke"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "The screen is too large or its pixel format is unsupported"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "The screenshot operation timed out"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "The screenshot process stopped unexpectedly"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "There is no screenshot to save"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Wait for the current screenshot operation to finish"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "White"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Win+Shift+S: select a screenshot\nCtrl+N: new capture\nCtrl+C: copy image\nCtrl+S: save PNG\nCtrl+Z: undo\nCtrl+Y / Ctrl+Shift+Z: redo\n\nSelection: R region, W window, F full screen, Esc cancel.\nWindow captures include visible decorations and occlusions.\nImages remain in the clipboard while ReliefCapture is running."
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "The screenshot operation failed"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "ReliefCapture"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Screenshot queued; finish the current dialog first"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "Could not reserve Escape for capture cancellation"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "New capture (Ctrl+N); Win+Shift+S selects a region"
+msgstr ""
+
+#: userland/apps/reliefcapture/window.cpp
+msgid "No screenshot. Click New capture or press Win+Shift+S."
+msgstr ""

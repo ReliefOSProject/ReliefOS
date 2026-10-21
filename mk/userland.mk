@@ -24,7 +24,7 @@ USERLAND_CXX_FLAGS := $(filter-out -std=% -ffreestanding,$(USERLAND_FLAGS) $(USE
 USERLAND_LDFLAGS ?=
 
 X11_DEVELOPMENT_ROOT := $(O)/upstream/x11-development
-X11_DEVELOPMENT_PRODUCTS := $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/FL/Fl.H usr/include/X11/Xlib.h usr/include/X11/X.h usr/lib/libfltk.so usr/lib/libstdc++.so.6 usr/lib/libgcc_s.so.1)
+X11_DEVELOPMENT_PRODUCTS := $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/FL/Fl.H usr/include/X11/Xlib.h usr/include/X11/X.h usr/lib/libfltk.so usr/lib/libstdc++.so.6 usr/lib/libgcc_s.so.1 usr/lib/libX11.so usr/lib/libX11.so.6)
 $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK)
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(X11_DEVELOPMENT_ROOT))
 	$(Q)touch $(X11_DEVELOPMENT_PRODUCTS)
@@ -35,6 +35,8 @@ $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_LIBS_$(app) += $(USERLAND_FL
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_DEPS_$(app) += $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
 USERLAND_SHARED_SOURCES_reliefmathpp := userland/apps/relieftodo/file_io.cpp
 USERLAND_SHARED_SOURCES_reliefdiagram := userland/apps/relieftodo/file_io.cpp
+USERLAND_LIBS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
+USERLAND_DEPS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
 # ReliefMail uses SQLite's standard POSIX VFS in its private wrapper.
 USERLAND_EXTRA_reliefmail := -I$(UPSTREAM_APP_DIR)
 USERLAND_DEPS_reliefmail += $(SQLITE_HEADER) $(SQLITE_AMALGAMATION)

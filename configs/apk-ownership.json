@@ -27,6 +27,12 @@
       "paths": ["usr/bin/reliefplayer", "usr/share/applications/reliefos-reliefplayer.desktop"],
       "reason": "ReliefPlayer audio executable, launcher, desktop entry and component artwork are installed and removed together. minimp3 remains embedded in its consumers."
     },
+    "reliefos-reliefcapture": {
+      "destination": "reliefos",
+      "components": ["reliefcapture"],
+      "paths": ["usr/bin/reliefcapture", "usr/share/applications/reliefos-reliefcapture.desktop"],
+      "reason": "ReliefCapture screenshot and annotation executable, launcher, desktop entry and component artwork are installed and removed together."
+    },
     "reliefos-reliefdiagram": {
       "destination": "reliefos",
       "components": ["reliefdiagram"],

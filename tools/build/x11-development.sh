@@ -35,7 +35,7 @@ cleanup() {
 }
 trap cleanup EXIT
 trap 'exit 130' HUP INT TERM
-for id in x11-dev-fltk x11-dev-libx11 x11-dev-xorgproto alpine-libfltk alpine-libstdc++ alpine-libgcc; do
+for id in x11-dev-fltk x11-dev-libx11 x11-dev-xorgproto alpine-libfltk alpine-libstdc++ alpine-libgcc alpine-libx11; do
     url=$("$deps" --lock "$lock" --id "$id" --print url)
     digest=$("$deps" --lock "$lock" --id "$id" --print sha256)
     archive=$cache/${url##*/}
@@ -63,6 +63,8 @@ test -f "$stage/usr/lib/libfltk.so"
 test -f "$stage/usr/lib/libfltk.so.1.3"
 test -f "$stage/usr/lib/libstdc++.so.6"
 test -f "$stage/usr/lib/libgcc_s.so.1"
+test -f "$stage/usr/lib/libX11.so"
+test -f "$stage/usr/lib/libX11.so.6"
 touch "$stage/.complete"
 
 if [ -e "$root" ]; then
