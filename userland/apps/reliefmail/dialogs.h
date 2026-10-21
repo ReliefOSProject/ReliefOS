@@ -13,7 +13,7 @@
 
 namespace rmail {
 
-enum class AccountDialogAction : uint8_t { Save, TestIncoming, TestOutgoing, Delete, Cancel };
+enum class AccountDialogAction : uint8_t { Save, TestIncoming, TestOutgoing, Delete, Cancel, RepairCertificates };
 
 class AccountSetupDialog : public Fl_Double_Window {
     Fl_Choice *preset_ = nullptr;

@@ -876,6 +876,16 @@ bool make_command(Action action, const Array<Text> &targets, const Settings &set
                   bool simulate, Command &command, Text &error) {
     clear_command(command);
     error.clear();
+    if (action == Action::RepairCa) {
+        if (!settings_valid(settings) || settings.offline || targets.size() != 1 ||
+            !exact_c_string(targets[0]) || !(targets[0] == CertificatePackage))
+            return command_error(command, error, "certificate repair requires the fixed CA package and online mode");
+        Array<Text> args;
+        if (!append_arg(args, WorkerPath) || !append_arg(args, "--ca-command") ||
+            !append_arg(args, simulate ? "--simulate" : "--apply"))
+            return command_error(command, error, "out of memory");
+        return complete_command(command, args, !simulate, !simulate, simulate);
+    }
     if (simulate && !simulation_action(action))
         return command_error(command, error, "simulation is not supported for this action");
     if (action == Action::Keys)
@@ -928,6 +938,7 @@ bool make_command(Action action, const Array<Text> &targets, const Settings &set
     bool privileged = false, mutating = false;
     const char *name = nullptr;
     switch (action) {
+    case Action::RepairCa: return command_error(command, error, "certificate repair is unavailable");
     case Action::Install: name = "add"; privileged = mutating = true; break;
     case Action::Remove: name = "del"; privileged = mutating = true; break;
     case Action::Upgrade: name = "fix"; privileged = mutating = true; break;
@@ -956,6 +967,7 @@ bool make_command(Action action, const Array<Text> &targets, const Settings &set
 
     bool okay = true;
     switch (action) {
+    case Action::RepairCa: break;
     case Action::Install:
     case Action::Remove:
     case Action::Upgrade:
@@ -1033,6 +1045,21 @@ bool make_command(Action action, const Array<Text> &targets, const Settings &set
     bool cancelable = !mutating || action == Action::Fetch || action == Action::CacheDownload ||
         action == Action::Update;
     return complete_command(command, args, privileged, mutating, cancelable);
+}
+
+bool certificate_apk_command(bool reinstall, bool simulate, Command &command, Text &error) {
+    clear_command(command);
+    error.clear();
+    Settings settings;
+    settings.cache_max_age = 0;
+    Array<Text> args;
+    if (!append_global_options(args, settings) || !append_arg(args, "--no-cache") ||
+        !append_arg(args, "--check-certificate") || !append_arg(args, reinstall ? "fix" : "add") ||
+        !append_arg(args, reinstall ? "--reinstall" : "--upgrade") ||
+        (simulate && !append_arg(args, "--simulate")) || !append_arg(args, "--") ||
+        !append_arg(args, CertificateSourcesPackage) || !append_arg(args, CertificatePackage))
+        return command_error(command, error, "could not prepare the certificate package operation");
+    return complete_command(command, args, !simulate, !simulate, simulate);
 }
 
 bool query_command(int filter, const Settings &settings, Command &command, Text &error) {

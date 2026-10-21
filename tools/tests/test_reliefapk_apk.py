@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import shutil
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -121,6 +122,68 @@ def main():
         assert (root / "usr/share/ra/ra-demo").read_text() == "2.0-r0\n"
         for filter in (0, 1, 3, 4):
             query(filter)
+        # Replay the fixed certificate workflow against signed real packages.
+        # A missing package is installed; a missing/corrupt file is reinstalled;
+        # upgrading may replace the bundle. Simulations never change files.
+        ca_repositories = []
+        for version in ("1.0-r0", "2.0-r0"):
+            repository = work / ("ca-" + version)
+            repository.mkdir()
+            payload = work / ("ca-payload-" + version)
+            (payload / "etc/ssl/certs").mkdir(parents=True)
+            (payload / "etc/ssl/certs/ca-certificates.crt").write_text(version + "\n")
+            sources = work / ("ca-sources-" + version)
+            (sources / "usr/share/ca-certificates").mkdir(parents=True)
+            (sources / "usr/share/ca-certificates/test.crt").write_text(version + "\n")
+            sources_package = repository / ("ca-certificates-" + version + ".apk")
+            make_package(apk, key, sources, sources_package, "ca-certificates", version, [])
+            package = repository / ("ca-certificates-bundle-" + version + ".apk")
+            make_package(apk, key, payload, package, "ca-certificates-bundle", version, [])
+            run([apk, "mkndx", "--keys-dir", keys, "--sign-key", key,
+                 "--output", repository / "packages.adb", package, sources_package])
+            ca_repositories.append(repository)
+        installed_ca = root / "etc/ssl/certs/ca-certificates.crt"
+        protections = root / "etc/apk/protected_paths.d"
+        protections.mkdir(parents=True, exist_ok=True)
+        for rule in (ROOT / "system/rootfs/etc/apk/protected_paths.d").glob("*.list"):
+            shutil.copyfile(rule, protections / rule.name)
+        repository = ca_repositories[0]
+        command("certificate", 0, "simulate")
+        assert not installed_ca.exists()
+        command("certificate", 0, "run")
+        assert installed_ca.read_text() == "1.0-r0\n"
+        installed_ca.unlink()
+        command("certificate", 1, "simulate")
+        assert not installed_ca.exists()
+        command("certificate", 1, "run")
+        assert installed_ca.read_text() == "1.0-r0\n"
+        source_ca = root / 'usr/share/ca-certificates/test.crt'
+        source_ca.unlink()
+        command("certificate", 1, "simulate")
+        assert not source_ca.exists()
+        command("certificate", 1, "run")
+        assert source_ca.read_text() == '1.0-r0\n'
+        # /etc package protection must not leave a damaged trust store behind.
+        installed_ca.write_text("broken CA data\n")
+        private_ca = installed_ca.parent / "private-enterprise-ca.pem"
+        private_ca.write_text("administrator certificate\n")
+        repair_output = command("certificate", 1, "run")
+        assert installed_ca.read_text() == "1.0-r0\n", (installed_ca.read_text(), repair_output,
+            list(installed_ca.parent.glob("*.apk-new")))
+        assert private_ca.read_text() == "administrator certificate\n"
+        # An old image may pin the source package in world. Refresh the pair
+        # with add first; otherwise its trigger could recreate an older bundle.
+        world = root / 'etc/apk/world'
+        world.write_text(world.read_text().replace('ca-certificates\n', 'ca-certificates=1.0-r0\n'))
+        repository = ca_repositories[1]
+        before_world = world.read_bytes()
+        command("certificate", 0, "simulate")
+        assert world.read_bytes() == before_world
+        command("certificate", 0, "run")
+        command("certificate", 1, "run")
+        assert installed_ca.read_text() == "2.0-r0\n"
+        assert (root / 'usr/share/ca-certificates/test.crt').read_text() == '2.0-r0\n'
+        assert 'ca-certificates=1.0-r0' not in world.read_text()
         print(f"ReliefAPK real apk integration: {checks} commands passed; "
               "query, install, dependencies, upgrade, reinstall, repair, removal, local APK, "
               "failure, download, verify and diagnostics verified")

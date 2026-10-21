@@ -1,4 +1,5 @@
 #include "window.h"
+#include "certificates.h"
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -85,6 +86,12 @@ int worker(int argc, char **argv) {
         fputs("Root authentication required\n", stderr);
         return 126;
     }
+    if (argc == 3 && !strcmp(argv[0], ra::WorkerPath) && !strcmp(argv[1], "--ca-command") &&
+        !strcmp(argv[2], "--apply")) {
+        fputs("__RELIEFAPK_WORKER_READY__\n", stderr);
+        fflush(stderr);
+        return ra::certificate_command(false);
+    }
     if (argc == 5 && !strcmp(argv[0], ra::WorkerPath) && !strcmp(argv[1], "--save-repositories") &&
         ra::standard_repository_path(argv[2])) {
         fputs("__RELIEFAPK_WORKER_READY__\n", stderr);
@@ -112,6 +119,11 @@ void ready(void *data) {
     app->request_catalog();
     if (!app->initial_path.empty())
         app->queue_target(ra::Action::Install, app->initial_path.c_str());
+    if (app->initial_ca_repair) {
+        app->settings.offline = false;
+        app->queue_target(ra::Action::RepairCa, ra::CertificatePackage);
+        app->preview_queue();
+    }
     puts("[reliefapk.elf] FLTK package manager ready");
     fflush(stdout);
 }
@@ -121,12 +133,20 @@ int main(int argc, char **argv) {
         return worker(argc - 2, argv + 2);
     if (argc >= 2 && !strcmp(argv[1], "--save-repositories"))
         return save_config(argc - 1, argv + 1);
-    if (argc > 2 || (argc == 2 && !(ra::valid_constraint(argv[1]) || ra::valid_constraint(argv[1], true)))) {
-        fputs("Usage: reliefapk [/absolute/path/package.apk]\n", stderr);
+    if (argc >= 2 && !strcmp(argv[1], "--ca-command")) {
+        if (argc == 3 && !strcmp(argv[2], "--simulate")) return ra::certificate_command(true);
+        if (argc == 3 && !strcmp(argv[2], "--apply") && geteuid() == 0)
+            return ra::certificate_command(false);
+        return 126;
+    }
+    const bool ca_repair = argc == 2 && !strcmp(argv[1], "--repair-ca");
+    if (argc > 2 || (argc == 2 && !ca_repair && !(ra::valid_constraint(argv[1]) || ra::valid_constraint(argv[1], true)))) {
+        fputs("Usage: reliefapk [package | /absolute/path/package.apk | --repair-ca]\n", stderr);
         return 2;
     }
     reliefos_fltk::init("reliefapk");
-    ra::App app(argc == 2 ? argv[1] : nullptr);
+    ra::App app(argc == 2 && !ca_repair ? argv[1] : nullptr);
+    app.initial_ca_repair = ca_repair;
     app.show();
     Fl::add_timeout(.05, ready, &app);
     return Fl::run();

@@ -20,7 +20,6 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Tile.H>
 namespace ra {
-constexpr const char *WorkerPath = "/usr/lib/reliefos/apps/reliefapk/reliefapk.elf";
 class App;
 class RepositoryDialog;
 void repository_finished(RepositoryDialog *, bool);
@@ -52,6 +51,7 @@ class App : public Fl_Double_Window {
     size_t current_group = 0, out_seen = 0, err_seen = 0;
     OperationMode mode = OperationMode::Idle;
     bool op_pending = false, op_error = false, quitting = false, repo_dirty = false;
+    bool initial_ca_repair = false;
     unsigned selected_count = 0;
     Fl_Menu_Bar *menu = nullptr;
     Fl_Button *refresh_button = nullptr, *index_button = nullptr, *upgrade_button = nullptr,

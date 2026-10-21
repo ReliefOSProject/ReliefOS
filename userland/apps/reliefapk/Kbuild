@@ -1,7 +1,7 @@
 RELIEFOS_APP_NAME := reliefapk
-RELIEFOS_APP_OBJECTS := dialogs.o main.o model.o process.o repositories.o window.o
+RELIEFOS_APP_OBJECTS := certificate_io.o certificates.o dialogs.o main.o model.o process.o repositories.o window.o
 RELIEFOS_APP_C_OBJECTS :=
-RELIEFOS_APP_CXX_OBJECTS := dialogs.o main.o model.o process.o repositories.o window.o
+RELIEFOS_APP_CXX_OBJECTS := certificate_io.o certificates.o dialogs.o main.o model.o process.o repositories.o window.o
 RELIEFOS_APP_ASM_OBJECTS :=
 ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
 include $(srctree)/scripts/reliefos/Makefile.app-kbuild

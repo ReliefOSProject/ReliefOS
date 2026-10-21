@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 using namespace rmail;
 
@@ -39,9 +42,11 @@ static bool bytes_contain(const Bytes &bytes, const char *needle) {
     return false;
 }
 
+static uint64_t monotonic_ms();
+
 static OperationContext test_context() {
     OperationContext context;
-    context.deadline_monotonic_ms = UINT64_MAX;
+    context.deadline_monotonic_ms = monotonic_ms() + 30000;
     return context;
 }
 
@@ -91,6 +96,76 @@ static Account smtp_account(uint32_t port, TransportSecurity security, const cha
 
 static bool cancelled_now(void *) { return true; }
 
+/* A bundle can contain an unsupported certificate alongside a trusted root.
+ * Rejecting mbedTLS's positive partial-success return must not prevent a
+ * verified connection through the usable root, nor bypass identity checks. */
+static void test_transport_accepts_usable_roots_in_a_partial_bundle(const char *ready,
+    const char *ca_path) {
+    char path[4096];
+    const char *temporary = getenv("TMPDIR");
+    assert(temporary && *temporary);
+    assert(snprintf(path, sizeof(path), "%s/mail-partial-ca.XXXXXX", temporary) > 0);
+    const int fd = mkstemp(path);
+    assert(fd >= 0);
+    FILE *output = fdopen(fd, "wb");
+    FILE *input = fopen(ca_path, "rb");
+    assert(output && input);
+    unsigned char buffer[4096];
+    size_t count;
+    while ((count = fread(buffer, 1, sizeof(buffer), input)) > 0)
+        assert(fwrite(buffer, 1, count, output) == count);
+    assert(!ferror(input));
+    assert(fclose(input) == 0);
+    assert(fputs("\n-----BEGIN CERTIFICATE-----\nAQID\n-----END CERTIFICATE-----\n", output) >= 0);
+    assert(fclose(output) == 0);
+
+    Text error;
+    Stream valid;
+    const bool connected = valid.connect("localhost", endpoint_port(ready, "tls-valid"),
+        TransportSecurity::ImplicitTls, path, test_context(), error);
+    if (!connected) fprintf(stderr, "partial CA bundle: %s\n", error.c_str());
+    assert(connected);
+    TransportDiagnostics diagnostics;
+    assert(valid.diagnostics(diagnostics) && diagnostics.certificate_verified);
+    assert(diagnostics.certificate_verify_flags == 0);
+    valid.close();
+
+    Stream wrong_host;
+    assert(!wrong_host.connect("127.0.0.1", endpoint_port(ready, "tls-valid"),
+        TransportSecurity::ImplicitTls, path, test_context(), error));
+    assert(strstr(error.c_str(), "hostname"));
+    assert(transport_problem(error) == TransportProblem::HostnameMismatch);
+    assert(unlink(path) == 0);
+}
+
+static void test_transport_reports_unusable_ca_files_without_hanging(const char *ready) {
+    char folder[4096];
+    assert(snprintf(folder, sizeof(folder), "%s/mail-ca-files.XXXXXX", getenv("TMPDIR")) > 0);
+    assert(mkdtemp(folder));
+    const char *names[] = {"missing", "empty", "invalid", "fifo", "large"};
+    for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); ++i) {
+        char path[4608];
+        assert(snprintf(path, sizeof(path), "%s/%s", folder, names[i]) > 0);
+        if (i == 3) assert(mkfifo(path, 0600) == 0);
+        else if (i != 0) {
+            const int fd = open(path, O_WRONLY | O_CREAT | O_EXCL, 0600);
+            assert(fd >= 0);
+            if (i == 2) assert(write(fd, "not a CA bundle", 15) == 15);
+            if (i == 4) assert(ftruncate(fd, 4 * 1024 * 1024 + 1) == 0);
+            assert(close(fd) == 0);
+        }
+        Text error;
+        Stream stream;
+        const uint64_t before = monotonic_ms();
+        assert(!stream.connect("localhost", endpoint_port(ready, "tls-valid"),
+            TransportSecurity::ImplicitTls, path, test_context(), error));
+        assert(transport_problem(error) == (i == 0 ? TransportProblem::CaUnavailable : TransportProblem::CaInvalid));
+        assert(monotonic_ms() - before < 5000);
+        if (i != 0) assert(unlink(path) == 0);
+    }
+    assert(rmdir(folder) == 0);
+}
+
 static void test_transport_verifies_identity_and_cancels_reads(const char *ready,
     const char *ca_path, const char *untrusted_ca_path) {
     const OperationContext context = test_context();
@@ -112,14 +187,24 @@ static void test_transport_verifies_identity_and_cancels_reads(const char *ready
     Stream wrong_host;
     assert(!wrong_host.connect("127.0.0.1", endpoint_port(ready, "tls-valid"),
         TransportSecurity::ImplicitTls, ca_path, context, error));
+    assert(strstr(error.c_str(), "hostname"));
 
     Stream wrong_ca;
     assert(!wrong_ca.connect("localhost", endpoint_port(ready, "tls-valid"),
         TransportSecurity::ImplicitTls, untrusted_ca_path, context, error));
+    assert(strstr(error.c_str(), "trusted"));
+    assert(transport_problem(error) == TransportProblem::UntrustedCertificate);
 
     Stream expired;
     assert(!expired.connect("localhost", endpoint_port(ready, "tls-expired"),
         TransportSecurity::ImplicitTls, ca_path, context, error));
+    assert(strstr(error.c_str(), "expired"));
+    assert(transport_problem(error) == TransportProblem::CertificateTime);
+
+    Stream plain;
+    assert(!plain.connect("localhost", endpoint_port(ready, "tls-not-tls"),
+        TransportSecurity::ImplicitTls, ca_path, context, error));
+    assert(transport_problem(error) == TransportProblem::Handshake);
 
     Stream slow;
     assert(slow.connect("localhost", endpoint_port(ready, "tls-slow"),
@@ -846,7 +931,9 @@ int main(int argc, char **argv) {
     assert(argc == 4);
     const char *focus = getenv("RELIEFMAIL_PROTOCOL_FOCUS");
     if (focus) {
-        if (!strcmp(focus, "status")) {
+        if (!strcmp(focus, "ca")) {
+            test_transport_accepts_usable_roots_in_a_partial_bundle(argv[1], argv[2]);
+        } else if (!strcmp(focus, "status")) {
             test_imap_status_matches_only_requested_mailbox(argv[1], argv[2]);
         } else if (!strcmp(focus, "smtp-terminal") || !strcmp(focus, "smtp-rset")) {
             test_smtp_untrustworthy_sessions_are_closed(argv[1], argv[2]);
@@ -859,6 +946,8 @@ int main(int argc, char **argv) {
         puts("Focused ReliefMail protocol regression passed");
         return 0;
     }
+    test_transport_accepts_usable_roots_in_a_partial_bundle(argv[1], argv[2]);
+    test_transport_reports_unusable_ca_files_without_hanging(argv[1]);
     test_transport_verifies_identity_and_cancels_reads(argv[1], argv[2], argv[3]);
     test_starttls_is_mandatory_and_never_downgrades(argv[1], argv[2], argv[3]);
     test_split_imap_literals_and_uid_identity(argv[1], argv[2]);

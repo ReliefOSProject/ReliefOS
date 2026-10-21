@@ -35,12 +35,17 @@ struct Settings {
 enum class Action {
     Install, Remove, Upgrade, Reinstall, Fix, UpgradeAll, Update, CacheClean,
     CacheDownload, Fetch, Verify, Audit, Stats, Policy, Contents, Depends,
-    ReverseDepends, Owner, World, Version, Dot, Manifest, Keys
+    ReverseDepends, Owner, World, Version, Dot, Manifest, Keys, RepairCa
 };
+constexpr const char *WorkerPath = "/usr/lib/reliefos/apps/reliefapk/reliefapk.elf";
+constexpr const char *CertificatePackage = "ca-certificates-bundle";
+constexpr const char *CertificateSourcesPackage = "ca-certificates";
+constexpr const char *BootstrapCaBundle = "/usr/share/reliefos/certs/ca-certificates.crt";
 struct Command { Array<Text> args; bool privileged = false, mutating = false, cancelable = true; };
 
 bool make_command(Action action, const Array<Text> &targets, const Settings &settings,
                   bool simulate, Command &command, Text &error);
+bool certificate_apk_command(bool reinstall, bool simulate, Command &command, Text &error);
 bool query_command(int filter, const Settings &settings, Command &command, Text &error);
 bool metadata_command(const char *name, const Settings &settings, Command &command, Text &error);
 bool valid_constraint(const char *value, bool local = false);

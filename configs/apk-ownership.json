@@ -162,7 +162,7 @@
     "trust": {
       "destination": "alpine-after-validation",
       "components": [],
-      "paths": ["etc/ssl/certs", "etc/ssl/cert.pem", "etc/apk/keys", "etc/apk/ca.pem", "usr/share/licenses/alpine-keys"],
+      "paths": ["etc/ssl/certs", "etc/ssl/cert.pem", "etc/apk/keys", "etc/apk/ca.pem", "etc/apk/protected_paths.d/reliefos-ca-bundle.list", "usr/share/reliefos/certs", "usr/share/licenses/alpine-keys"],
       "alpine_candidates": ["ca-certificates", "alpine-keys"],
       "reason": "Transfer trust data via authenticated packages; validate certificate update triggers on ReliefOS."
     },

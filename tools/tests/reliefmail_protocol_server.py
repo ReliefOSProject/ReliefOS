@@ -70,6 +70,7 @@ SCENARIOS = (
     "tls-valid",
     "tls-expired",
     "tls-slow",
+    "tls-not-tls",
     "imap-starttls",
     "imap-starttls-no-extension",
     "imap-starttls-untrusted",
@@ -767,10 +768,10 @@ def _server_tls(conn: socket.socket, name: str) -> ssl.SSLSocket:
     return context.wrap_socket(conn, server_side=True)
 
 
-def _serve_one(name: str, listener: socket.socket, record: dict) -> None:
+def _serve_one(name: str, listener: socket.socket, record: dict, accept_timeout: float = 120.0) -> None:
     listener.settimeout(0.4)
-    max_connections = 10 if name == "imap-worker-mail" else 4 if name == "tls-valid" else 1 if name == "smtp-worker-lost" else 2
-    accept_deadline = time.monotonic() + 120.0
+    max_connections = 24 if name == "tls-valid" else 10 if name == "imap-worker-mail" else 1 if name == "smtp-worker-lost" else 2
+    accept_deadline = time.monotonic() + accept_timeout
     for _ in range(max_connections):
         conn = None
         while conn is None and time.monotonic() < accept_deadline:
@@ -788,6 +789,10 @@ def _serve_one(name: str, listener: socket.socket, record: dict) -> None:
             name.startswith("smtp-") and name not in ("smtp-starttls", "smtp-starttls-no-extension")
         ) or (name.startswith("imap-") and not name.startswith("imap-starttls"))
         try:
+            if name == "tls-not-tls":
+                conn.sendall(b"This endpoint does not speak TLS\r\n")
+                conn.close()
+                continue
             if tls_active:
                 try:
                     conn = _server_tls(conn, name)

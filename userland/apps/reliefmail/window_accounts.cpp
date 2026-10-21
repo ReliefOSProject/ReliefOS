@@ -4,6 +4,9 @@
 #include <FL/fl_ask.H>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 namespace rmail {
 namespace {
@@ -352,6 +355,7 @@ void MailWindow::handle_account_dialog(AccountSetupDialog &dialog, AccountDialog
     if (action == AccountDialogAction::Save) { start_account_save(dialog); return; }
     if (action == AccountDialogAction::TestIncoming) { start_account_test(dialog, false); return; }
     if (action == AccountDialogAction::TestOutgoing) { start_account_test(dialog, true); return; }
+    if (action == AccountDialogAction::RepairCertificates) { repair_system_certificates(); return; }
     if (action == AccountDialogAction::Delete) {
         Account account;
         SecretBytes imap_password, smtp_password;
@@ -412,12 +416,71 @@ void MailWindow::start_account_test(AccountSetupDialog &dialog, bool smtp) {
     WorkerRequest request;
     PendingUiRequest pending;
     pending.purpose = smtp ? PendingPurpose::AccountTestSmtp : PendingPurpose::AccountTestImap;
+    pending.account = candidate;
     if (!submit_task(smtp ? WorkerTaskKind::AccountTestSmtp : WorkerTaskKind::AccountTestImap,
             request, &input, static_cast<SecretBytes &&>(credential),
             static_cast<PendingUiRequest &&>(pending), error)) {
         fl_alert("%s", error.c_str()); return;
     }
     dialog.clear_passwords();
+}
+
+void MailWindow::account_test_failed(const PendingUiRequest &pending, const Text &diagnostic) {
+    const TransportProblem problem = transport_problem(diagnostic);
+    const char *hint = T("Connection test failed. Review the diagnostic below.");
+    switch (problem) {
+    case TransportProblem::CaUnavailable:
+    case TransportProblem::CaInvalid:
+        hint = pending.account.custom_ca_file.empty() ?
+            T("The system CA certificate bundle could not be loaded. Repair the system certificates, then test again.") :
+            T("The custom CA file could not be loaded. Check its path and contents, or leave it blank to use system certificates.");
+        break;
+    case TransportProblem::UntrustedCertificate:
+        hint = T("The server certificate chain is not trusted. Check the server address and certificate chain; the system CA bundle may need updating.");
+        break;
+    case TransportProblem::CertificateTime:
+        hint = T("The certificate is expired or not yet valid. Check the system date and time, then the server certificate.");
+        break;
+    case TransportProblem::HostnameMismatch:
+        hint = T("The certificate does not match the server hostname. Check the IMAP/SMTP server address; updating CAs will not fix a hostname mismatch.");
+        break;
+    case TransportProblem::Handshake:
+        hint = T("TLS negotiation failed before verification completed. Check the port, TLS/STARTTLS setting and network connection.");
+        break;
+    case TransportProblem::Other: break;
+    }
+    last_error_ = diagnostic;
+    set_status(hint);
+    const bool repairable = pending.account.custom_ca_file.empty() &&
+        (problem == TransportProblem::CaUnavailable || problem == TransportProblem::CaInvalid ||
+            problem == TransportProblem::UntrustedCertificate);
+    if (repairable) {
+        if (fl_choice("%s\n\n%s", T("Later"), T("Repair certificates"), nullptr,
+                hint, diagnostic.c_str()) == 1) repair_system_certificates();
+    } else fl_alert("%s\n\n%s", hint, diagnostic.c_str());
+}
+
+void MailWindow::repair_system_certificates() {
+    if (closing_ || close_complete_) return;
+    if (certificate_repair_pid_ > 0) {
+        set_status(T("Certificate repair is already open in ReliefAPK."));
+        return;
+    }
+    if (access("/usr/bin/reliefapk", X_OK) != 0) {
+        fl_alert("%s", T("ReliefAPK is not installed. Install the signed ca-certificates-bundle package with your system package manager."));
+        return;
+    }
+    const pid_t pid = fork();
+    if (pid < 0) {
+        fl_alert("%s", T("Could not start the certificate repair tool."));
+        return;
+    }
+    if (pid == 0) {
+        execl("/usr/bin/reliefapk", "reliefapk", "--repair-ca", static_cast<char *>(nullptr));
+        _exit(127);
+    }
+    certificate_repair_pid_ = static_cast<long>(pid);
+    set_status(T("Review certificate repair in ReliefAPK. After completion, test the mail connection again."));
 }
 
 void MailWindow::start_account_save(AccountSetupDialog &dialog) {

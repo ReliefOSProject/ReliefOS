@@ -200,6 +200,7 @@ class MailWindow : public Fl_Double_Window {
     bool all_mail_navigation_selected_ = false;
     bool closing_ = false;
     bool close_complete_ = false;
+    long certificate_repair_pid_ = -1;
     bool preserve_selection_on_query_ = false;
     size_t action_batch_pending_ = 0;
     size_t tool_pending_count_ = 0;
@@ -277,6 +278,8 @@ class MailWindow : public Fl_Double_Window {
     void open_account_dialog(bool add_new = false);
     void handle_account_dialog(AccountSetupDialog &, AccountDialogAction);
     void start_account_test(AccountSetupDialog &, bool smtp);
+    void account_test_failed(const PendingUiRequest &, const Text &diagnostic);
+    void repair_system_certificates();
     void start_account_save(AccountSetupDialog &);
     void refresh_after_account_mutation(uint64_t deleted_account_id = 0);
     void select_account(size_t index);

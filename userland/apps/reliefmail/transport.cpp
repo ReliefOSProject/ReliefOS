@@ -208,16 +208,21 @@ bool connect_socket(TransportState &state, const char *host, uint32_t port,
 
 bool read_ca_bundle(mbedtls_x509_crt &chain, const char *path, Text &error) {
     const char *selected_path = path && *path ? path : SystemCaBundle;
-    const int fd = open(selected_path, O_RDONLY);
+    /* O_NONBLOCK also makes an accidentally selected FIFO fail validation
+     * rather than waiting indefinitely before the worker can cancel. */
+    const int fd = open(selected_path, O_RDONLY | O_NONBLOCK | O_CLOEXEC);
     if (fd < 0) {
-        error.set("could not open the configured CA certificate file");
+        char message[2048];
+        snprintf(message, sizeof(message), "[CA:unavailable] %s CA file: %.1400s (errno=%d: %s)",
+            path && *path ? "custom" : "system", selected_path, errno, strerror(errno));
+        error.set(message);
         return false;
     }
     struct stat info;
     if (fstat(fd, &info) != 0 || !S_ISREG(info.st_mode) || info.st_size <= 0 ||
         static_cast<uint64_t>(info.st_size) > MaxCaBundleBytes) {
         close(fd);
-        error.set("CA certificate file is invalid or exceeds the size limit");
+        error.set("[CA:invalid] CA file must be a non-empty regular file no larger than 4 MiB");
         return false;
     }
     const size_t length = static_cast<size_t>(info.st_size);
@@ -234,7 +239,7 @@ bool read_ca_bundle(mbedtls_x509_crt &chain, const char *path, Text &error) {
         if (count < 0 && errno == EINTR) continue;
         free(bytes);
         close(fd);
-        error.set("could not read CA certificate file");
+        error.set("[CA:unavailable] could not read the complete CA file");
         return false;
     }
     close(fd);
@@ -242,11 +247,42 @@ bool read_ca_bundle(mbedtls_x509_crt &chain, const char *path, Text &error) {
     const int parsed = mbedtls_x509_crt_parse(&chain, bytes, length + 1);
     memset(bytes, 0, length + 1);
     free(bytes);
-    if (parsed != 0 || !chain.raw.p) {
-        error.set("CA certificate file could not be parsed");
+    size_t roots = 0;
+    for (const mbedtls_x509_crt *certificate = &chain; certificate; certificate = certificate->next)
+        if (certificate->raw.p && certificate->version > 0) ++roots;
+    if (parsed < 0 || roots == 0) {
+        char message[160];
+        snprintf(message, sizeof(message), "[CA:invalid] no usable CA certificates (parse=%d, loaded=%zu)",
+            parsed, roots);
+        error.set(message);
         return false;
     }
+    /* A positive result counts unsupported/bad members, not failure of the
+     * usable roots. The server chain, hostname and time are still verified. */
+    fprintf(stderr, "[reliefmail.tls] CA loaded source=%s roots=%zu skipped=%d\n",
+        path && *path ? "custom" : "system", roots, parsed);
     return true;
+}
+
+void describe_tls_failure(TransportState &state, int result, Text &error) {
+    const uint32_t flags = mbedtls_ssl_get_verify_result(&state.ssl);
+    const char *reason = "[TLS:handshake] TLS handshake failed before verified authentication";
+    /* UINT32_MAX means verification has not produced a result. A connection
+     * reset or a protocol mismatch must not become a misleading CA error. */
+    if (flags != UINT32_MAX && flags != 0) {
+        if (flags & MBEDTLS_X509_BADCERT_CN_MISMATCH)
+            reason = "[TLS:hostname] certificate hostname does not match the configured server";
+        else if (flags & (MBEDTLS_X509_BADCERT_EXPIRED | MBEDTLS_X509_BADCERT_FUTURE |
+                MBEDTLS_X509_BADCRL_EXPIRED | MBEDTLS_X509_BADCRL_FUTURE))
+            reason = "[TLS:time] certificate is expired or not yet valid; check the system clock and server certificate";
+        else if (flags & MBEDTLS_X509_BADCERT_NOT_TRUSTED)
+            reason = "[TLS:trust] server certificate chain is not trusted by the selected CA bundle";
+        else reason = "[TLS:trust] server certificate failed the required security checks";
+    }
+    char message[512];
+    snprintf(message, sizeof(message), "%s (TLS=%d, verify=0x%08x, unix_time=%lld)",
+        reason, result, static_cast<unsigned int>(flags), static_cast<long long>(time(nullptr)));
+    error.set(message);
 }
 
 void release_tls(TransportState &state) {
@@ -339,16 +375,14 @@ bool begin_tls(TransportState &state, const char *ca_path,
             release_tls(state);
             return false;
         }
-        if (mbedtls_ssl_get_verify_result(&state.ssl) != 0)
-            error.set("TLS certificate or server identity verification failed");
-        else error.set("TLS handshake failed");
+        describe_tls_failure(state, result, error);
         state.operation = nullptr;
         release_tls(state);
         return false;
     }
     state.operation = nullptr;
     if (mbedtls_ssl_get_verify_result(&state.ssl) != 0) {
-        error.set("TLS certificate or server identity verification failed");
+        describe_tls_failure(state, MBEDTLS_ERR_X509_CERT_VERIFY_FAILED, error);
         release_tls(state);
         return false;
     }
@@ -364,6 +398,21 @@ TransportState *make_state(Text &error) {
 }
 
 } // namespace
+
+TransportProblem transport_problem(const Text &diagnostic) {
+    struct Tag { const char *prefix; TransportProblem problem; };
+    const Tag tags[] = {
+        {"[CA:unavailable]", TransportProblem::CaUnavailable},
+        {"[CA:invalid]", TransportProblem::CaInvalid},
+        {"[TLS:trust]", TransportProblem::UntrustedCertificate},
+        {"[TLS:time]", TransportProblem::CertificateTime},
+        {"[TLS:hostname]", TransportProblem::HostnameMismatch},
+        {"[TLS:handshake]", TransportProblem::Handshake},
+    };
+    for (const Tag &tag : tags)
+        if (!strncmp(diagnostic.c_str(), tag.prefix, strlen(tag.prefix))) return tag.problem;
+    return TransportProblem::Other;
+}
 
 Stream::Stream() = default;
 

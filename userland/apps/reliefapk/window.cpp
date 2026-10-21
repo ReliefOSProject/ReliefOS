@@ -136,6 +136,8 @@ void print_command(Fl_Text_Buffer &buffer, const Command &command) {
 } // namespace
 const char *action_name(Action action) {
     switch (action) {
+    case Action::RepairCa:
+        return T("Repair/update system certificates");
     case Action::Install:
         return T("Install");
     case Action::Remove:
@@ -817,7 +819,7 @@ void App::preview_queue() {
         return;
     }
     groups.clear();
-    Action order[] = {Action::Install, Action::Upgrade, Action::Reinstall,
+    Action order[] = {Action::RepairCa, Action::Install, Action::Upgrade, Action::Reinstall,
                       Action::Fix,     Action::Remove,  Action::UpgradeAll};
     for (auto action : order)
         for (size_t i = 0; i < queue.size(); ++i)
@@ -1031,7 +1033,9 @@ void App::finish_operation() {
         }
         mode = OperationMode::Await;
         clear_button->deactivate();
-        op_status->value(T("Simulation completed. Review the output, then apply."));
+        op_status->value(groups.size() == 1 && groups[0] == Action::RepairCa ?
+            T("Certificate recovery checked. Review the recovery plan and package output, then apply.") :
+            T("Simulation completed. Review the output, then apply."));
         progress->value(100);
         apply_button->activate();
         cancel_button->copy_label(T("Close"));

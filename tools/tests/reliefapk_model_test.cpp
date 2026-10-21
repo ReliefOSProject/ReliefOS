@@ -507,6 +507,40 @@ static void test_settings_local_paths_and_fetch() {
     CHECK(!query_command(0, invalid, command, error));
 }
 
+static void test_fixed_certificate_repair_request() {
+    Array<Text> targets;
+    CHECK(targets.push(text(CertificatePackage)));
+    Settings settings;
+    Command command;
+    Text error;
+    const bool prepared = make_command(Action::RepairCa, targets, settings, true, command, error);
+    CHECK(prepared);
+    if (!prepared) return;
+    CHECK(!command.privileged && !command.mutating && command.cancelable);
+    CHECK(command.args.size() == 3);
+    CHECK(arg_is(command, 0, WorkerPath));
+    CHECK(arg_is(command, 1, "--ca-command"));
+    CHECK(arg_is(command, 2, "--simulate"));
+    CHECK(make_command(Action::RepairCa, targets, settings, false, command, error));
+    CHECK(command.privileged && command.mutating && !command.cancelable);
+    CHECK(arg_is(command, 2, "--apply"));
+    CHECK(certificate_apk_command(true, true, command, error));
+    bool no_cache = false, check_certificate = false;
+    for (size_t i = 0; i < command.args.size(); ++i) {
+        no_cache |= arg_is(command, i, "--no-cache");
+        check_certificate |= arg_is(command, i, "--check-certificate");
+    }
+    CHECK(no_cache && check_certificate);
+    targets.clear();
+    CHECK(targets.push(text("busybox")));
+    CHECK(!make_command(Action::RepairCa, targets, settings, false, command, error));
+    CHECK(command.args.empty());
+    targets.clear();
+    CHECK(targets.push(text(CertificatePackage)));
+    settings.offline = true;
+    CHECK(!make_command(Action::RepairCa, targets, settings, false, command, error));
+}
+
 int main() {
     test_parser_fields_and_unicode();
     test_parser_budget_and_atomic_error();
@@ -521,6 +555,7 @@ int main() {
     test_command_argv_and_policy();
     test_action_mapping_and_size_format();
     test_settings_local_paths_and_fetch();
+    test_fixed_certificate_repair_request();
     if (failures) {
         fprintf(stderr, "%u ReliefAPK model checks failed\n", failures);
         return 1;

@@ -14,7 +14,10 @@ int main(int argc, char **argv) {
     ra::Command command;
     ra::Text error;
     bool ok;
-    if (!strcmp(argv[1], "query")) {
+    if (!strcmp(argv[1], "certificate")) {
+        if (argc != 4) return 2;
+        ok = ra::certificate_apk_command(!strcmp(argv[2], "1"), !strcmp(argv[3], "simulate"), command, error);
+    } else if (!strcmp(argv[1], "query")) {
         ok = ra::query_command(atoi(argv[2]), settings, command, error);
     } else if (!strcmp(argv[1], "metadata")) {
         ok = ra::metadata_command(argv[2], settings, command, error);

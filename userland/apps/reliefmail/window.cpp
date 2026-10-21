@@ -13,6 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 namespace rmail {
 
@@ -415,6 +416,15 @@ void MailWindow::tick_cb(void *context) {
 }
 
 void MailWindow::pump_once() {
+    if (certificate_repair_pid_ > 0) {
+        int status = 0;
+        if (waitpid(static_cast<pid_t>(certificate_repair_pid_), &status, WNOHANG) > 0) {
+            certificate_repair_pid_ = -1;
+            set_status(WIFEXITED(status) && WEXITSTATUS(status) == 127 ?
+                T("Could not start the certificate repair tool.") :
+                T("ReliefAPK closed. If certificate repair completed, test the connection again."));
+        }
+    }
     if (!coordinator_open_ || close_complete_) return;
     Text error;
     if (!coordinator_.pump(error) && !error.empty()) {
@@ -495,6 +505,11 @@ void MailWindow::handle_result(WorkerResult &result) {
     }
     Text error;
     if (!result.ok()) {
+        if (pending.purpose == PendingPurpose::AccountTestImap ||
+            pending.purpose == PendingPurpose::AccountTestSmtp) {
+            if (!closing_) account_test_failed(pending, result.diagnostic);
+            return;
+        }
         if (pending.purpose == PendingPurpose::VaultStatus && startup_query_waiting_for_vault_) {
             startup_query_waiting_for_vault_ = false;
             last_error_.set(result.diagnostic.c_str());

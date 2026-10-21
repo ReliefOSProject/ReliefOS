@@ -11069,3 +11069,75 @@ msgstr ""
 #: userland/apps/reliefcapture/window.cpp
 msgid "No screenshot. Click New capture or press Win+Shift+S."
 msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:465
+msgid "Certificate repair is already open in ReliefAPK."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:430
+msgid "Connection test failed. Review the diagnostic below."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:424
+msgid "Could not start the certificate repair tool."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:196
+msgid "Custom CA file (optional)"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:198
+msgid "Leave blank to use the system certificates. Private CAs are provided by your administrator."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:425
+msgid "ReliefAPK closed. If certificate repair completed, test the connection again."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:214
+msgid "ReliefAPK downloads the signed CA package and requests administrator authentication. Test the connection again after repair."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:469
+msgid "ReliefAPK is not installed. Install the signed ca-certificates-bundle package with your system package manager."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:140
+msgid "Repair/update system certificates"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:458
+msgid "Repair certificates"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:482
+msgid "Review certificate repair in ReliefAPK. After completion, test the mail connection again."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:448
+msgid "TLS negotiation failed before verification completed. Check the port, TLS/STARTTLS setting and network connection."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:445
+msgid "The certificate does not match the server hostname. Check the IMAP/SMTP server address; updating CAs will not fix a hostname mismatch."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:442
+msgid "The certificate is expired or not yet valid. Check the system date and time, then the server certificate."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:436
+msgid "The custom CA file could not be loaded. Check its path and contents, or leave it blank to use system certificates."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:439
+msgid "The server certificate chain is not trusted. Check the server address and certificate chain; the system CA bundle may need updating."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:435
+msgid "The system CA certificate bundle could not be loaded. Repair the system certificates, then test again."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp
+msgid "Certificate recovery checked. Review the recovery plan and package output, then apply."
+msgstr ""

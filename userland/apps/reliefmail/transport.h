@@ -5,6 +5,15 @@
 
 namespace rmail {
 
+enum class TransportProblem : uint8_t {
+    Other, CaUnavailable, CaInvalid, UntrustedCertificate, CertificateTime,
+    HostnameMismatch, Handshake
+};
+
+/* Stable diagnostic tags survive worker IPC; descriptive details contain no
+ * authentication data. They must never be used to relax verification. */
+TransportProblem transport_problem(const Text &diagnostic);
+
 /* Absolute CLOCK_MONOTONIC deadline in milliseconds; UINT64_MAX means none. */
 using CancellationCheck = bool (*)(void *context);
 

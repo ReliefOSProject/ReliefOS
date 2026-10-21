@@ -194,6 +194,10 @@ AccountSetupDialog::AccountSetupDialog(const Account *account,
         kAccountPageHeight, T("Advanced"));
     ca_file_ = add_input(advanced, 204, 94, 564, 28);
     add_field_label(advanced, ca_file_, 24, 94, 172, 28, T("Custom CA file (optional)"));
+    Fl_Box *ca_note = new Fl_Box(204, 123, 564, 19,
+        T("Leave blank to use the system certificates. Private CAs are provided by your administrator."));
+    ca_note->labelsize(12);
+    ca_note->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
     connect_timeout_ = add_input(advanced, 204, 146, 154, 28);
     add_field_label(advanced, connect_timeout_, 24, 146, 172, 28, T("Connect timeout ms"));
     io_timeout_ = add_input(advanced, 614, 146, 154, 28);
@@ -202,6 +206,14 @@ AccountSetupDialog::AccountSetupDialog(const Account *account,
     add_field_label(advanced, poll_interval_, 24, 194, 172, 28, T("Poll minutes"));
     cache_days_ = add_input(advanced, 614, 194, 154, 28);
     add_field_label(advanced, cache_days_, 414, 194, 192, 28, T("Cache days"));
+
+    Fl_Button *repair_ca = new Fl_Button(204, 240, 340, 30, T("Repair/update system certificates"));
+    repair_ca->callback(action_cb,
+        reinterpret_cast<void *>(static_cast<intptr_t>(AccountDialogAction::RepairCertificates) + 1));
+    Fl_Box *repair_note = new Fl_Box(204, 280, 564, 50,
+        T("ReliefAPK downloads the signed CA package and requests administrator authentication. Test the connection again after repair."));
+    repair_note->labelsize(12);
+    repair_note->align(FL_ALIGN_LEFT | FL_ALIGN_TOP | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
 
     advanced->end();
 
