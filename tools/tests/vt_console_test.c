@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "../../kernel/reliefnt/drivers/console/console.c"
+#include "../../kernel/reliefnt/drivers/video/framebuffer/boot_logo.c"
 
 void *kernel_malloc(size_t size) { return malloc(size); }
 void kernel_free(void *ptr) { free(ptr); }
@@ -59,6 +60,7 @@ uint64_t time_uptime_us(void) { return 0; }
 uint64_t kernel_irq_save(void) { return 0; }
 void kernel_irq_restore(uint64_t flags) { (void)flags; }
 uint32_t smp_current_cpu(void) { return 0; }
+uint32_t smp_cpu_count(void) { return 1; }
 void smp_membarrier_poll(void) {}
 
 int main(void)
