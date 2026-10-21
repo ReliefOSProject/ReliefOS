@@ -53,7 +53,7 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 | `system/` | 被 staging 的系统配置、字体、壁纸、证书、图标、应用资源和默认内容。 |
 | `configs/` | 动态组件清单、可提交 build profile 与默认配置。 |
 | `tools/` | 构建、Kconfig 同步、镜像、安装器、SDK、资源生成和验证脚本。 |
-| `mk/`、`tools/host/`、`tools/build/` | Make 依赖规则、C 工具及上游适配器。 |
+| `Kbuild`、`scripts/reliefos/`、`tools/host/`、`tools/build/` | 原生 Kbuild、产品集成、C 工具及上游适配器。 |
 | `docs/` | 架构、ABI、构建、文件系统、驱动、安全等项目文档。 |
 | `third_party/` | 通过 Git submodule 引入的上游源码；见 `.gitmodules`。 |
 | `build/` | 可再生产物与 staging 输出；不可作为手写源码的唯一来源。 |
@@ -180,10 +180,13 @@ UI 修改必须横向检查，而不是只改一个应用。典型关联范围�
 
 ## 6. 构建系统和动态 Menuconfig
 
-根 `Makefile` 是唯一受支持的生产入口。GNU Make 负责依赖图、增量判断及 jobserver；
-`mk/*.mk` 声明规则，`tools/host/` 的 C 程序只转换数据，`tools/build/` 的短 Shell 脚本
-适配上游 configure/Make 和镜像格式工具。不得另建调度器、调用旧 Python 引擎，或让生产链
-执行 Python、Meson、Ninja。生产链只编译 C 与汇编，不要求 Rust 工具链。
+根 `Makefile` 是受支持的生产入口。自研 C、C++、汇编和宿主工具使用固定的 Linux 6.12
+Kbuild；原版引擎、Kconfig 和许可证由 `scripts/kbuild-source.json` 逐文件记录，不直接修改。
+项目扩展放在单独的 `scripts/Makefile.*` 与目录 `Kbuild`，沿用 `.cmd`、fixdep 和 jobserver。
+`scripts/reliefos/` 集成第三方、SDK、镜像、运行和测试；`tools/host/` 的 C 程序转换数据，
+`tools/build/` 适配上游 configure/Make 与镜像格式工具。第三方维持其原有构建边界。
+不得增加平行的自研编译链、调用旧 Python 构建引擎，或让生产链执行 Python、Meson、Ninja。
+不要求 Rust 工具链。
 
 ```sh
 make help
@@ -205,16 +208,18 @@ make test-smoke
 
 - 默认 O 为 `out/<arch>/<profile>`，支持 `ARCH=x86_64`、`PROFILE=release|debug`。
   修改输出目录用 O，修改目标工具用显式 CC/CXX/LD/AR；HOSTCC 独立。
-- `O/config/.config` 是当前配置，Kconfig、Kconfig.components 与 configs/components.toml
+- `O/.config` 是当前配置，Kconfig、Kconfig.components 与 configs/components.toml
   是受跟踪输入。组件 BUILD、IMAGE、ENTRY、SDK、API 选择不得混用；required 组件不可关闭。
   修改组件元数据时保持 Kconfig.components 同步，运行组件 fixture。
-- 生成的 C 配置和版本头写入 O。生产构建不得改写源码目录、递增版本计数，或使用
+- 原版 Kconfig 生成 `O/include/config/auto.conf` 与 `O/include/generated/autoconf.h`；
+  许可证别名由独立 policy header 提供，不改写原版配置头。生成的配置和版本头写入 O。生产构建不得改写源码目录、递增版本计数，或使用
   当前时钟/随机 UUID 破坏可重现性；SOURCE_DATE_EPOCH 默认来自提交时间。
 - 下载只能出现在显式 fetch；生产消费已校验缓存，不允许隐式联网。依赖锁是唯一下载身份来源。
-- 新源文件、删除源文件、编译/链接参数变化、多输出成员缺失必须正确触发重建。
+- 源码成员显式登记在相应 Kbuild 中；增加/删除文件时同步对象清单。源码、头文件、
+  编译/链接参数和对象清单变化、多输出成员缺失必须正确触发重建。
   对目录 stage 使用完整成员清单，临时树完成并校验后再发布，不能以 stamp 代替存在性检查。
 - 同一 O 的真实构建互斥，不手工伪造 RELIEFOS_BUILD_OWNER。不同 O 可并行。
-  `-n/-q` 不重建被包含的配置，避免干扰持锁构建；首次准确预览前先 defconfig。
+  `-n/-q` 不重建被包含的配置，避免干扰持锁构建；首次预览应用和产品前先 defconfig、config-sync。
 - `all` 包括 kernel、userland、runtime、sdk、apk-repo、image-vmdk、iso、installer；
   `release` 再加本地 rpr-pages。run/run-debug/run-iso/run-installer 只负责运行对应产物。
 - SDK 必须用随包 C 编译器驱动实际编译/链接，覆盖路径含空格的重定位和静态/动态程序。

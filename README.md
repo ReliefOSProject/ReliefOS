@@ -11,7 +11,7 @@
 ## 编译源代码
 
 构建环境为 Linux/WSL，入口为 GNU Make 4.3+。项目自己的构建工具使用 C，生产构建不运行
-Python、Meson 或 Ninja；生产链只编译 C 与汇编，不要求 Rust 工具链。
+Python、Meson 或 Ninja；自研 C、C++ 与汇编由 Linux Kbuild 编译，不要求 Rust 工具链。
 
 Debian/Ubuntu 的典型依赖：
 
@@ -53,9 +53,9 @@ RPR 子树。`run-iso`、`run-installer` 启动对应镜像，`QEMU_KVM=0` 可�
 - `packages/reliefos-musl-sdk.tar.gz`
 - `packages/apk/repository/`、`rootfs/manifest.json`、`rpr-pages/`、`pages/`
 
-`make menuconfig` 编辑所选 `O/config/.config`；`make olddefconfig` 保留选择并补全新项。
+`make menuconfig` 编辑所选 `O/.config`；`make olddefconfig` 保留选择并补全新项。
 用 `O=out/my-build PROFILE=debug` 隔离不同配置。`V=1` 显示命令，`make --trace` 和
-`make -n` 检查依赖；首次准确预览前先 `make defconfig`。同一 O 的两个真实构建互斥。
+`make -n` 检查依赖；首次预览应用和产品前先 `make defconfig`、`make config-sync`。同一 O 的两个真实构建互斥。
 
 `SOURCE_DATE_EPOCH` 默认取提交时间，仅用于时间元数据与可复现打包。内核版本取
 `configs/build-version`，不附加构建号；Git 身份单独记录。签名密钥默认保存在用户目录，可用 `APK_SIGNING_KEY` 指定，绝不会放入发行目录。
@@ -79,7 +79,7 @@ RPR 子树。`run-iso`、`run-installer` 启动对应镜像，`QEMU_KVM=0` 可�
 
 - `arch/`：各架构相关说明和预留代码（当前主要支持 x86_64）。
 - `boot/`：GRUB 配置与 EFI 模块。
-- `Makefile` 与 `mk/`：GNU Make 构建入口和依赖规则。
+- `Makefile`、`Kbuild` 与 `scripts/reliefos/`：构建入口、源码声明和产品集成。
 - `tools/host/`、`tools/build/`：C 数据工具和短上游构建适配器。
 - `configs/`：组件清单、默认配置和可提交的构建 profile。
 - `docs/`：架构、ABI、构建、文件系统、安全和工具文档。

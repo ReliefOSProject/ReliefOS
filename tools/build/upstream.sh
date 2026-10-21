@@ -3,6 +3,8 @@
 set -eu
 MAKEFLAGS=${MAKEFLAGS-}
 case ${MAKEFLAGS%% *} in *n*) exit 0 ;; esac
+. "$(CDPATH= cd -- "$(dirname "$0")" && pwd)/upstream-make-environment.sh"
+reliefos_upstream_make_environment
 [ "$#" = 12 ] || { echo 'usage: upstream.sh PACKAGE SRC DEPS LOCK CACHE WORK STAGE MUSL AUTH PAM CC TARGET' >&2; exit 2; }
 pkg=$1 src=$2 deps=$3 lock=$4 cache=$5 work=$6 stage=$7 musl=$8 auth=$9
 shift 9
@@ -38,7 +40,6 @@ CPPFLAGS="-I$auth/usr/include -I$pam/usr/include"
 LDFLAGS="-Wl,-z,relro,-z,now -L$auth/lib -L$auth/usr/lib -L$pam/lib -Wl,-rpath-link,$auth/lib -Wl,-rpath-link,$pam/lib"
 LIBS= PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR="$auth/lib/pkgconfig:$auth/usr/lib/pkgconfig:$pam/lib/pkgconfig" PKG_CONFIG_SYSROOT_DIR="$auth"
 export CC AR RANLIB STRIP BUILD_CC CFLAGS CPPFLAGS LDFLAGS LIBS PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PKG_CONFIG_SYSROOT_DIR
-MAKEFLAGS=${MAKEFLAGS%% -- *}; export MAKEFLAGS; unset MAKEOVERRIDES
 set -- --host="$target" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib
 case $pkg in
 libmd|libbsd) set -- "$@" --libdir=/lib ;;

@@ -24,30 +24,39 @@ awk '/^config RELIEFOS_COMPONENT_APP_RELIEFMATH_BUILD$/{found=1;next} found && /
     exit 1
 }
 
-# The caller adds worker prerequisites while RELIEFOS_APP is being expanded.
-macro_end=$(awk '/^define RELIEFOS_APP$/{inside=1;next} inside && /^endef$/{print NR;exit}' "$src/mk/userland.mk")
-include_line=$(grep -nF 'include $(RELIEFOS_SRC)/mk/components/reliefmath.mk' "$src/mk/userland.mk" | cut -d: -f1)
-foreach_line=$(grep -nF '$(foreach app,$(USERLAND_APPS),$(eval $(call RELIEFOS_APP' "$src/mk/userland.mk" | cut -d: -f1)
-test -n "$macro_end" && test -n "$include_line" && test -n "$foreach_line"
-test "$macro_end" -lt "$include_line" && test "$include_line" -lt "$foreach_line"
-grep -Fqx 'reliefmath' "$src/configs/fltk-apps.list"
-grep -Fq 'USERLAND_FLTK_APPS := $(strip $(file <$(RELIEFOS_SRC)/configs/fltk-apps.list))' "$src/mk/userland.mk"
-for target in reliefmath-development app-reliefmath-render reliefmath-backend-probe; do
-    grep -Fq ".PHONY: $target" "$src/mk/components/reliefmath.mk"
+# Inspect the production Kbuild declarations rather than the retired source
+# glob/signature engine. The separate graph regression executes native C++.
+cat > "$work/inspect.mk" <<'MAKE'
+RELIEFOS_SRC := $(ROOT)
+RELIEFOS_PASSIVE := 1
+RELIEFOS_COMPONENT_APPS := reliefmath
+O := $(WORK)/out
+TARGET_CC := cc
+include $(ROOT)/scripts/reliefos/Makefile.userland
+.PHONY: inspect
+inspect:
+	@printf '%s\n' '$(RELIEFMATH_WORKER_OBJECTS)' '$(USERLAND_DEPS_reliefmath)' '$(RELIEFMATH_WORKER_LIBS)' '$(obj-y)'
+MAKE
+make -s -f "$work/inspect.mk" ROOT="$src" WORK="$work" inspect > "$work/worker-declarations"
+for member in model protocol render_types boxes font main output parser renderer scene; do
+    grep -Fq "/userland/apps/reliefmath/worker/$member.o" "$work/worker-declarations"
 done
-grep -Fq 'USERLAND_DEPS_reliefmath += $(USERLAND_DIR)/reliefmath-render.elf' "$src/mk/components/reliefmath.mk"
-grep -Fq 'RELIEFMATH_WORKER_CORE := model.cpp render_types.cpp protocol.cpp' "$src/mk/components/reliefmath.mk"
-grep -Fq 'RELIEFOS_SIG_reliefmath-worker-cc := cxx=$(TARGET_CXX)|flags=$(RELIEFMATH_WORKER_FLAGS)|sources=$(RELIEFMATH_WORKER_SOURCES)' "$src/mk/components/reliefmath.mk"
-grep -Fq 'RELIEFOS_SIG_reliefmath-worker-ld := ld=$(TARGET_LD)|flags=$(USERLAND_LINK_FLAGS)|sources=$(RELIEFMATH_WORKER_SOURCES)|libs=$(RELIEFMATH_WORKER_LIBS)' "$src/mk/components/reliefmath.mk"
-grep -Fq '$(if $(filter reliefmath,$(RELIEFOS_COMPONENT_APPS)),$(USERLAND_DIR)/reliefmath-render.elf)' "$src/mk/rootfs.mk"
-grep -Fq '$(RELIEFOS_SRC)/resources/reliefmath' "$src/mk/rootfs.mk"
-grep -Fq '$(RELIEFOS_SRC)/resources/licenses/reliefmath' "$src/mk/rootfs.mk"
-grep -Fq 'reliefmath-resources-stage.sh' "$src/mk/rootfs.mk"
+grep -Fq 'userland/apps/reliefmath/worker/' "$work/worker-declarations"
+grep -Fq '/userland/reliefmath-render.elf' "$work/worker-declarations"
+grep -Fq '$(call if_changed_dep,cxx_o_cpp)' "$src/userland/apps/reliefmath/worker/Kbuild"
+grep -Fqx 'reliefmath' "$src/configs/fltk-apps.list"
+for target in reliefmath-development app-reliefmath-render reliefmath-backend-probe; do
+    grep -Fq ".PHONY: $target" "$src/scripts/reliefos/Makefile.components.reliefmath"
+done
+grep -Fq '$(if $(filter reliefmath,$(RELIEFOS_COMPONENT_APPS)),$(USERLAND_DIR)/reliefmath-render.elf)' "$src/scripts/reliefos/Makefile.rootfs"
+grep -Fq '$(RELIEFOS_SRC)/resources/reliefmath' "$src/scripts/reliefos/Makefile.rootfs"
+grep -Fq '$(RELIEFOS_SRC)/resources/licenses/reliefmath' "$src/scripts/reliefos/Makefile.rootfs"
+grep -Fq 'reliefmath-resources-stage.sh' "$src/scripts/reliefos/Makefile.rootfs"
 grep -Fq 'reliefmath-resources-stage.sh' "$src/tools/build/rootfs-stage.sh"
-grep -Fq 'RELIEFMATH_WORKER_LIBS :=' "$src/mk/components/reliefmath.mk"
-grep -Fq 'libcairo.so $(RELIEFMATH_DEV)/usr/lib/libfreetype.so' "$src/mk/components/reliefmath.mk"
+grep -Fq 'RELIEFMATH_WORKER_LIBS :=' "$src/scripts/reliefos/Makefile.components.reliefmath"
+grep -Fq 'libcairo.so $(RELIEFMATH_DEV)/usr/lib/libfreetype.so' "$src/scripts/reliefos/Makefile.components.reliefmath"
 grep -Fq 'grep -Fxq "$soname" "$scratch/upstream-sonames"' "$src/tools/build/apk-stage.sh"
-if grep -Fq 'reliefmath-backend-probe' "$src/mk/rootfs.mk" "$src/tools/build/rootfs-stage.sh"; then
+if grep -Fq 'reliefmath-backend-probe' "$src/scripts/reliefos/Makefile.rootfs" "$src/tools/build/rootfs-stage.sh"; then
     echo 'ReliefMath backend probe must not enter a product root' >&2
     exit 1
 fi

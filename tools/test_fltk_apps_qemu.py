@@ -132,8 +132,12 @@ def validate_target_elf(elf: Path, *, sysroot: Path,
     return needed
 
 
-def target_compile_probe(output: Path, sysroot: Path, cxx: str, ld: str) -> Path:
+def target_compile_probe(output: Path, sysroot: Path, cxx: str, ld: str,
+                         *, build_dir: Path | None = None) -> Path:
     """Build only the smoke probe, with the same musl/FLTK boundary as apps."""
+    probe_build = OUT if build_dir is None else build_dir
+    x11_root = X11_ROOT if build_dir is None else build_dir / "upstream/x11-development"
+    managed_root = MANAGED_ROOT if build_dir is None else build_dir / "rootfs/managed"
     resource_dir = Path(subprocess.check_output(
         [cxx, "-print-resource-dir"], cwd=ROOT, text=True).strip())
     source = ROOT / "tools/tests/fltk_ui_probe.cpp"
@@ -144,12 +148,12 @@ def target_compile_probe(output: Path, sysroot: Path, cxx: str, ld: str) -> Path
     compile_command = [
         cxx, "--target=x86_64-linux-musl", "-O0", "-g", "-fPIE",
         "-nostdinc", "-nostdinc++", "-isystem", sysroot / "include",
-        "-isystem", resource_dir / "include", "-isystem", X11_ROOT / "usr/include",
+        "-isystem", resource_dir / "include", "-isystem", x11_root / "usr/include",
         "-I", ROOT / "userland/apps", "-I", ROOT / "include",
-        "-I", OUT / "include", "-I", OUT / "sdk/reliefos-musl-sdk/include",
+        "-I", probe_build / "include", "-I", probe_build / "sdk/reliefos-musl-sdk/include",
         "-D_POSIX_C_SOURCE=200809L", "-D_GNU_SOURCE", "-std=c++17",
         "-fno-exceptions", "-fno-rtti", "-Wall", "-Wextra",
-        "-include", OUT / "include/generated/autoconf.h", "-c", source,
+        "-include", probe_build / "include/generated/autoconf.h", "-c", source,
         "-o", obj,
     ]
     link_command = [
@@ -158,9 +162,9 @@ def target_compile_probe(output: Path, sysroot: Path, cxx: str, ld: str) -> Path
         "-rpath", "/usr/lib/reliefos:/lib:/usr/lib", "--build-id=none",
         "-o", elf, sysroot / "lib/Scrt1.o", sysroot / "lib/crti.o", obj,
         "-L", sysroot / "lib", "-l:libmimalloc.so.3", "--start-group",
-        X11_ROOT / "usr/lib/libfltk.so", X11_ROOT / "usr/lib/libstdc++.so.6",
-        X11_ROOT / "usr/lib/libgcc_s.so.1",
-        MANAGED_ROOT / "usr/lib/libX11.so.6", "-lc", "--end-group",
+        x11_root / "usr/lib/libfltk.so", x11_root / "usr/lib/libstdc++.so.6",
+        x11_root / "usr/lib/libgcc_s.so.1",
+        managed_root / "usr/lib/libX11.so.6", "-lc", "--end-group",
         sysroot / "lib/crtn.o",
     ]
     command_log.write_text(json.dumps({"compile": [str(x) for x in compile_command],

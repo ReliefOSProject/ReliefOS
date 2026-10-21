@@ -1,5 +1,7 @@
 # SDK Make migration report
 
+> 历史验证记录：以下路径、命令和结果对应记录时的构建链。当前 Kbuild 接口与验收见 [Kbuild 迁移记录](kbuild-migration.md)。
+
 ## Scope
 
 The Make production graph now builds both the relocatable musl SDK and the

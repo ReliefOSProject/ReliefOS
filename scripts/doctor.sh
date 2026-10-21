@@ -131,10 +131,10 @@ fi
 
 group ''
 group 'third-party build inputs'
-if [ -f third_party/kconfig-frontends/configure.ac ]; then
-    reliefos_log OK 'kconfig-frontends submodule present'
+if [ -f scripts/kconfig/conf.c ] && [ -f scripts/Makefile.build ]; then
+    reliefos_log OK 'vendored Linux Kbuild / Kconfig source present'
 else
-    missing 'third_party/kconfig-frontends (git submodule update --init --recursive)'
+    missing 'scripts/Makefile.build or scripts/kconfig/conf.c'
 fi
 if [ -f third_party/zlib/contrib/puff/puff.c ]; then
     reliefos_log OK 'zlib reference inflate (contrib/puff) present'

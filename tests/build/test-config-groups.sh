@@ -1,51 +1,68 @@
 #!/bin/sh
-# Exercise the production fragment with counting transforms under parallel make.
+# Exercise native syncconfig, parallel consumers, missing-member repair and policy.
 set -eu
 repo=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd -P)
 w=$(mktemp -d)
-trap 'rm -rf "$w"' EXIT
-mkdir -p "$w/src/configs" "$w/src/tools/build" "$w/out/config" "$w/out/host/kconfig-frontends/bin" "$w/out/generated"
-touch "$w/src/configs/default.conf" "$w/src/Kconfig" "$w/src/Kconfig.components" "$w/src/puff.c"
-cat > "$w/src/tools/build/kconfig-frontends.sh" <<'SH'
-set -eu
-printf 'build\n' >> "$TEST_WORK/frontend-count"
-mkdir -p "$TEST_WORK/out/host/kconfig-frontends/bin"
-touch "$TEST_WORK/out/host/kconfig-frontends/bin/kconfig-conf" "$TEST_WORK/out/host/kconfig-frontends/bin/kconfig-mconf"
-SH
-cat > "$w/config-tool" <<'SH'
-#!/bin/sh
-set -eu
-printf 'generate\n' >> "$TEST_WORK/config-count"
-while [ "$#" -gt 0 ]; do
- case "$1" in --out-header|--out-installer-header|--make-include) shift; touch "$1";; esac
- shift
+trap 'rm -rf "$w"' EXIT HUP INT TERM
+make -s -C "$repo" O="$w/out" defconfig
+# defconfig creates native Kconfig files, but product inspection needs the
+# separately generated component selection as well. Refuse an incomplete graph
+# without touching the output tree under any inspection mode.
+test ! -e "$w/out/config/components.mk"
+find "$w/out" -printf '%y %P %T@\n' | LC_ALL=C sort > "$w/defconfig.before"
+for goal in userland all; do
+    if make -s -n -C "$repo" O="$w/out" "$goal" >"$w/dry-$goal.log" 2>&1; then
+        echo "make -n $goal accepted a missing component selection" >&2
+        exit 1
+    fi
+    grep -Fq 'config-sync' "$w/dry-$goal.log"
+    find "$w/out" -printf '%y %P %T@\n' | LC_ALL=C sort > "$w/defconfig.after"
+    cmp "$w/defconfig.before" "$w/defconfig.after"
 done
-SH
-chmod +x "$w/config-tool"
-cat > "$w/test.mk" <<'MAKE'
-RELIEFOS_SRC := $(TEST_WORK)/src
-O_CONFIG := $(TEST_WORK)/out/config
-O_HOST := $(TEST_WORK)/out/host
-O_INCLUDE := $(TEST_WORK)/out/include
-O_GENERATED := $(TEST_WORK)/out/generated
-RELIEFOS_HOST_PUFF_SRC := puff.c
-RELIEFOS_CONFIG_TOOL := $(TEST_WORK)/config-tool
-RELIEFOS_PASSIVE := 1
-include $(TEST_REPO)/mk/config.mk
-.PHONY: front derived
-front: $(KCONFIG_CONF) $(KCONFIG_MCONF)
-derived: $(AUTOCONF_H) $(AUTOCONF_INSTALLER_H) $(RELIEFOS_AUTOCONF_MK)
-$(O_INCLUDE)/generated:
-	@mkdir -p $@
-MAKE
-export TEST_WORK="$w" TEST_REPO="$repo"
-make -s -j8 -f "$w/test.mk" front
-fail=0
-if [ "$(wc -l < "$w/frontend-count")" -eq 1 ]; then echo 'ok: frontend runs once'; else echo 'FAIL: frontend executed multiple times'; fail=1; fi
-touch "$w/out/config/.config"
-make -s -j8 -f "$w/test.mk" derived
-if [ "$(wc -l < "$w/config-count")" -eq 1 ]; then echo 'ok: config transform runs once'; else echo 'FAIL: config transform executed multiple times'; fail=1; fi
-rm "$w/out/config/autoconf.mk"
-make -s -j8 -f "$w/test.mk" derived
-if [ -f "$w/out/config/autoconf.mk" ] && [ "$(wc -l < "$w/config-count")" -eq 2 ]; then echo 'ok: missing grouped output regenerated'; else echo 'FAIL: missing grouped output not regenerated once'; fail=1; fi
-exit "$fail"
+if make -s -q -C "$repo" O="$w/out" all >"$w/query.log" 2>&1; then
+    echo 'make -q all accepted a missing component selection' >&2
+    exit 1
+else
+    status=$?
+fi
+[ "$status" -eq 2 ]
+grep -Fq 'config-sync' "$w/query.log"
+find "$w/out" -printf '%y %P %T@\n' | LC_ALL=C sort > "$w/defconfig.after"
+cmp "$w/defconfig.before" "$w/defconfig.after"
+make -s -j8 -C "$repo" O="$w/out" config-sync
+for path in .config include/config/auto.conf include/config/auto.conf.cmd include/generated/autoconf.h include/generated/autoconf-installer.h config/components.mk; do
+    test -s "$w/out/$path"
+done
+cp "$w/out/include/generated/autoconf.h" "$w/native.before"
+rm "$w/out/include/generated/autoconf.h"
+make -s -j8 -C "$repo" O="$w/out" config-sync
+cmp "$w/native.before" "$w/out/include/generated/autoconf.h"
+# Switch only the normal policy, leaving the installer policy disabled.
+sed -i 's/^# CONFIG_VMDK_REQUIRE_LICENSE is not set$/CONFIG_VMDK_REQUIRE_LICENSE=y/' "$w/out/.config"
+make -s -C "$repo" O="$w/out" olddefconfig
+make -s -j8 -C "$repo" O="$w/out" config-sync
+printf 'RELIEFOS_LICENSE_REQUIRE\n' > "$w/policy.c"
+cc=${HOSTCC:-cc}
+"$cc" -E -P -I"$w/out/include" -include "$repo/userland/runtime/include/build_policy.h" "$w/policy.c" > "$w/normal"
+grep -qx 1 "$w/normal"
+"$cc" -E -P -I"$w/out/include" -include "$w/out/include/generated/autoconf-installer.h" -include "$repo/userland/runtime/include/build_policy.h" "$w/policy.c" > "$w/installer"
+grep -qx 0 "$w/installer"
+# -n and -q are inspections; even missing native object directories stay absent.
+rm -rf "$w/out/tools"
+find "$w/out" -printf '%y %P %T@\n' | LC_ALL=C sort > "$w/before"
+make -s -n -C "$repo" O="$w/out" tools > "$w/dry.log"
+if make -s -q -C "$repo" O="$w/out" tools > "$w/query.log" 2>&1; then status=0; else status=$?; fi
+[ "$status" -le 1 ]
+find "$w/out" -printf '%y %P %T@\n' | LC_ALL=C sort > "$w/after"
+cmp "$w/before" "$w/after"
+# clean keeps the selected config, distclean removes it, both preserve unknown files.
+cp "$w/out/.config" "$w/selected"
+touch "$w/out/user-owned-image.vmdk"
+make -s -C "$repo" O="$w/out" clean
+cmp "$w/selected" "$w/out/.config"
+test -f "$w/out/user-owned-image.vmdk"
+test ! -e "$w/out/scripts"
+make -s -C "$repo" O="$w/out" distclean
+test ! -e "$w/out/.config"
+test -f "$w/out/user-owned-image.vmdk"
+printf 'native config: parallel consumers, repair, policy and inspection passed\n'

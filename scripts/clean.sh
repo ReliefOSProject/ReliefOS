@@ -61,9 +61,9 @@ fi
 
 # Explicit list rather than a glob: an unknown entry in the tree is not ours to
 # delete, and this is what makes `clean` auditable.
-# third-party holds upstream build directories this configuration owns (see mk/third-party.mk).
-# ntclks is the kernel checkout's own sub-build output directory (mk/kernel.mk).
-products="userland userland-installer userland-installer-policy upstream rootfs resources rpr-apps rpr-pages obj generated host include auth pam system musl installer sdk sysroot stage packages images logs meta third-party kernel-export kernel-install reliefnt ntclks"
+# third-party holds upstream build directories this configuration owns (see scripts/reliefos/Makefile.third-party).
+# ntclks is the kernel checkout's own sub-build output directory (scripts/reliefos/Makefile.kernel).
+products="scripts tools userland userland-installer userland-installer-policy upstream rootfs resources rpr-apps rpr-pages obj generated host include auth pam system musl installer sdk sysroot stage packages images logs meta third-party kernel-export kernel-install reliefnt ntclks"
 if [ "$keep" = 0 ]; then
     products="$products config"
 fi
@@ -76,6 +76,7 @@ for entry in $products; do
     fi
 done
 if [ "$keep" = 0 ]; then
+    rm -f -- "$resolved/.config" "$resolved/.config.old"
     for marker_name in .reliefos-out .leonos-out; do
         if [ -e "$resolved/$marker_name" ]; then
             printf '  remove %s\n' "$marker_name"

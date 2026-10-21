@@ -1,0 +1,8 @@
+RELIEFOS_APP_NAME := browser
+RELIEFOS_APP_OBJECTS := auth.o bookmarks.o cookies.o embed.o forms.o input.o litehtml_core.o main.o navigation.o state.o util.o view.o
+RELIEFOS_APP_C_OBJECTS := auth.o bookmarks.o cookies.o embed.o forms.o input.o litehtml_core.o main.o navigation.o state.o util.o view.o
+RELIEFOS_APP_CXX_OBJECTS :=
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+endif

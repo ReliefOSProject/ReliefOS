@@ -1,0 +1,131 @@
+# Component selection is parsed by a constrained C TOML reader, never a shell
+# pattern. Required applications ignore obsolete disabled config symbols.
+RELIEFOS_COMPONENT_TOOL := $(RELIEFOS_HOST_BIN)/reliefos-components
+RELIEFOS_COMPONENT_MK := $(O_CONFIG)/components.mk
+$(RELIEFOS_COMPONENT_MK): | $(O_CONFIG)
+$(RELIEFOS_COMPONENT_MK): $(RELIEFOS_SRC)/configs/components.toml $(RELIEFOS_CONFIG_FILE) $(RELIEFOS_COMPONENT_TOOL)
+	$(Q)$(RELIEFOS_COMPONENT_TOOL) --input $(RELIEFOS_SRC)/configs/components.toml --config $(RELIEFOS_CONFIG_FILE) --output $@
+ifeq ($(RELIEFOS_PASSIVE),)
+ifneq ($(RELIEFOS_INSPECT),)
+$(eval $(file <$(RELIEFOS_COMPONENT_MK)))
+else
+include $(RELIEFOS_COMPONENT_MK)
+endif
+endif
+
+USERLAND_EXTERNAL_APPS := fastfetch pleditor stardusthello stardustlayout stardustshowcase
+USERLAND_APPS := $(filter-out $(USERLAND_EXTERNAL_APPS),$(RELIEFOS_COMPONENT_APPS))
+USERLAND_DIR := $(O)/userland
+USERLAND_FLAGS := $(RUNTIME_FLAGS) -fPIE -nostdinc -isystem $(if $(RELIEFOS_PASSIVE),deferred,$(shell $(TARGET_CC) -print-resource-dir 2>/dev/null))/include -D_POSIX_C_SOURCE=200809L
+USERLAND_CFLAGS ?=
+USERLAND_CXXFLAGS ?=
+USERLAND_CXX_FLAGS := $(filter-out -std=% -ffreestanding,$(USERLAND_FLAGS) $(USERLAND_CFLAGS) $(USERLAND_CXXFLAGS)) -std=c++17 -nostdinc++ -fno-exceptions -fno-rtti
+USERLAND_LDFLAGS ?=
+USERLAND_LINK_FLAGS := $(RELIEFOS_LINK_POLICY_FLAGS) --gc-sections -z max-page-size=0x1000 -pie --hash-style=both --dynamic-linker /lib/ld-musl-x86_64.so.1 -rpath /usr/lib/reliefos:/lib:/usr/lib
+USERLAND_CRT := $(MUSL_SYSROOT)/lib/Scrt1.o $(MUSL_SYSROOT)/lib/crti.o $(MUSL_SYSROOT)/lib/crtn.o
+
+export USERLAND_FLAGS USERLAND_CFLAGS USERLAND_CXXFLAGS USERLAND_CXX_FLAGS USERLAND_LDFLAGS
+export USERLAND_CRT USERLAND_LINK_FLAGS USERLAND_DIR
+export AUTOCONF_H HEADER_EXPORT_INCLUDE HEADER_EXPORT_MANIFEST RELIEFOS_CC_ID RELIEFOS_CXX_ID RELIEFOS_AR_ID
+
+X11_DEVELOPMENT_ROOT := $(O)/upstream/x11-development
+X11_DEVELOPMENT_PRODUCTS := $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/FL/Fl.H usr/include/X11/Xlib.h usr/include/X11/X.h usr/lib/libfltk.so usr/lib/libstdc++.so.6 usr/lib/libgcc_s.so.1 usr/lib/libX11.so usr/lib/libX11.so.6)
+$(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK)
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(X11_DEVELOPMENT_ROOT))
+	$(Q)touch $(X11_DEVELOPMENT_PRODUCTS)
+USERLAND_FLTK_APPS := $(strip $(file <$(RELIEFOS_SRC)/configs/fltk-apps.list))
+USERLAND_FLTK_LIBS := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libfltk.so libstdc++.so.6 libgcc_s.so.1)
+$(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_CXX_EXTRA_$(app) := -I$(RELIEFOS_SRC)/userland/apps -isystem $(X11_DEVELOPMENT_ROOT)/usr/include))
+$(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_LIBS_$(app) += $(USERLAND_FLTK_LIBS)))
+$(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_DEPS_$(app) += $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
+
+USERLAND_LIBS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
+USERLAND_DEPS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
+USERLAND_EXTRA_reliefmail := -I$(UPSTREAM_APP_DIR)
+USERLAND_DEPS_reliefmail += $(SQLITE_HEADER) $(SQLITE_AMALGAMATION)
+USERLAND_DEPS_osver += $(BUILD_INFO_HEADER)
+USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric -I$(AUDIO_OPL_ROOT)/usr/include
+USERLAND_LIBS_doom += $(AUDIO_OPL_ROOT)/usr/lib/libopl3.so.1 $(RUNTIME_BUILTINS)
+USERLAND_DEPS_doom += $(upstream_nuked-opl3_products)
+USERLAND_EXTRA_mp3play := -I$(RELIEFOS_SRC)/third_party/minimp3
+USERLAND_EXTRA_reliefplayer := -I$(RELIEFOS_SRC)/third_party/minimp3
+USERLAND_EXTRA_glxgears = -I$(RELIEFOS_SRC)/third_party/portablegl -I$(RELIEFOS_SRC)/userland/apps/glxgears -I$(dir $(GLXGEARS_SOURCE))
+USERLAND_LIBS_glxgears = $(PORTABLEGL_SO)
+USERLAND_DEPS_glxgears = $(GLXGEARS_SOURCE)
+
+# The historical port-script compiler flags for pleditor are intentionally
+# retained. Only the transform/copy stage stays in the adapter; Kbuild compiles
+# its generated first-party C and local platform source.
+USERLAND_APP_FLAGS_pleditor := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_FLAGS) -std=gnu11 -ffreestanding -fno-stack-protector -fPIC -ffunction-sections -fdata-sections -nostdinc -isystem $(shell $(TARGET_CC) -print-resource-dir 2>/dev/null)/include -I$(MUSL_SYSROOT)/include -I$(RELIEFOS_SRC)/userland/runtime/include -I$(RELIEFOS_SRC)/include -I$(HEADER_EXPORT_INCLUDE) -I$(UPSTREAM_APP_DIR)/pleditor-generated/src -I$(RELIEFOS_SRC)/third_party/pl_editor/src -DRELIEFOS_USE_MUSL -D_GNU_SOURCE -D_POSIX_C_SOURCE=200809L -fPIE
+
+USERLAND_DOOM_EXCLUDE := doomgeneric_allegro.c doomgeneric_emscripten.c doomgeneric_linuxvt.c doomgeneric_sdl.c doomgeneric_soso.c doomgeneric_sosox.c doomgeneric_win.c doomgeneric_xlib.c i_allegromusic.c i_allegrosound.c i_sdlsound.c i_sdlmusic.c i_cdmus.c mus2mid.c
+
+USERLAND_KBUILD_APPS := $(sort $(USERLAND_APPS) pleditor stardusthello stardustlayout stardustshowcase gptinit motd dynlinkerror)
+define RELIEFOS_APP_KBUILD_CAPTURE
+RELIEFOS_APP_OBJECTS :=
+RELIEFOS_APP_C_OBJECTS :=
+RELIEFOS_APP_CXX_OBJECTS :=
+RELIEFOS_APP_ASM_OBJECTS :=
+RELIEFOS_CAPTURE_APP_KBUILD := 1
+include $(RELIEFOS_SRC)/userland/apps/$(1)/Kbuild
+USERLAND_OBJECTS_$(1) := $$(addprefix $$(O)/userland/apps/$(1)/,$$(RELIEFOS_APP_OBJECTS))
+USERLAND_C_OBJECTS_$(1) := $$(addprefix $$(O)/userland/apps/$(1)/,$$(RELIEFOS_APP_C_OBJECTS) $$(RELIEFOS_APP_ASM_OBJECTS))
+USERLAND_CXX_OBJECTS_$(1) := $$(addprefix $$(O)/userland/apps/$(1)/,$$(RELIEFOS_APP_CXX_OBJECTS))
+endef
+$(foreach app,$(USERLAND_KBUILD_APPS),$(eval $(call RELIEFOS_APP_KBUILD_CAPTURE,$(app))))
+RELIEFOS_CAPTURE_APP_KBUILD :=
+obj-y += $(addprefix userland/apps/,$(addsuffix /,$(USERLAND_KBUILD_APPS)))
+
+USERLAND_CXX_EXTRA_glxgears :=
+
+# Each app directory compiles its own Kbuild object list. The directory archive
+# is only a freshness edge: final executables preserve the former direct-object
+# link order and never link a broad archive by accident.
+define RELIEFOS_APP
+USERLAND_CRT_$(1) := $(USERLAND_CRT)
+RELIEFOS_APP_BUILTIN_$(1) := $(O)/userland/apps/$(1)/built-in.a
+userland/apps/$(1): $(AUTOCONF_H) $(MUSL_STAMP) $(PNG_CONFIG) $(HEADER_EXPORT_MANIFEST) $$(USERLAND_DEPS_$(1)) $$(if $$(USERLAND_C_OBJECTS_$(1)),$$(RELIEFOS_CC_ID)) $$(if $$(USERLAND_CXX_OBJECTS_$(1)),$$(RELIEFOS_CXX_ID)) $$(RELIEFOS_AR_ID)
+quiet_cmd_reliefos_app_link_$(1) = LD      $$@
+      cmd_reliefos_app_link_$(1) = $$(TARGET_LD) $$(USERLAND_LINK_FLAGS) $$(USERLAND_LDFLAGS) -o $$@.tmp $$(MUSL_SYSROOT)/lib/Scrt1.o $$(MUSL_SYSROOT)/lib/crti.o $$(USERLAND_OBJECTS_$(1)) -L$$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 --start-group $(5) $$(USERLAND_LIBS_$(1)) -lc --end-group $$(MUSL_SYSROOT)/lib/crtn.o; mv $$@.tmp $$@
+$(3): $$(RELIEFOS_APP_BUILTIN_$(1)) $(5) $$(USERLAND_LIBS_$(1)) $$(USERLAND_DEPS_$(1)) $$(USERLAND_CRT) $$(MUSL_SYSROOT)/lib/libc.so $$(MUSL_SYSROOT)/lib/libmimalloc.so.3 $$(RELIEFOS_LD_ID) FORCE
+	$$(call if_changed,reliefos_app_link_$(1))
+targets += $(3)
+.PHONY: app-$(1)
+app-$(1): $(3)
+endef
+
+include $(RELIEFOS_SRC)/scripts/reliefos/Makefile.components.graphics
+include $(RELIEFOS_SRC)/scripts/reliefos/Makefile.components.reliefmath
+# GNU make does not treat names passed to a plain export directive as a glob.
+# Export each selected app's context explicitly so recursive Kbuild sees its
+# app-specific include paths, defines, C++ flags, and link dependencies.
+$(foreach app,$(USERLAND_KBUILD_APPS),$(eval export USERLAND_EXTRA_$(app) USERLAND_APP_FLAGS_$(app) USERLAND_CXX_EXTRA_$(app) USERLAND_CXXFLAGS_$(app) USERLAND_LIBS_$(app) USERLAND_DEPS_$(app)))
+$(foreach app,$(USERLAND_APPS),$(eval $(call RELIEFOS_APP,$(app),$(app),$(USERLAND_DIR)/$(app).elf,$(AUTOCONF_H),$(RUNTIME_SO))))
+USERLAND_DEPS_pleditor := $(addprefix $(UPSTREAM_APP_DIR)/pleditor-generated/src/,main.c pleditor.c syntax.c)
+$(eval $(call RELIEFOS_APP,pleditor,pleditor,$(USERLAND_DIR)/pleditor.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
+
+$(eval $(call RELIEFOS_APP,gptinit,gptinit,$(O)/userland-installer/gptinit.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
+
+# Only manifest-owned disabled ELF outputs may be removed; arbitrary files in
+# this directory and old build/ images are outside this rule's ownership.
+.PHONY: userland userland-prune installer-userland
+userland-prune:
+	$(Q)$(foreach app,$(RELIEFOS_DISABLED_APPS),rm -f $(USERLAND_DIR)/$(app).elf;) :
+userland: userland-prune $(addprefix $(USERLAND_DIR)/,$(addsuffix .elf,$(RELIEFOS_COMPONENT_APPS)))
+installer-userland: $(O)/userland-installer/gptinit.elf
+
+# Loader failures must still display a GUI when a shared library is absent.
+# Keep this helper fully static, with the same mimalloc and musl startup policy.
+DYNLINKERROR_OBJ := $(O)/userland/apps/dynlinkerror/main.o
+DYNLINKERROR_BUILTIN := $(O)/userland/apps/dynlinkerror/built-in.a
+userland/apps/dynlinkerror: $(AUTOCONF_H) $(MUSL_STAMP) $(PNG_CONFIG) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID) $(RELIEFOS_AR_ID)
+quiet_cmd_reliefos_dynlinkerror = LD      $@
+      cmd_reliefos_dynlinkerror = $(TARGET_LD) --gc-sections -z max-page-size=0x1000 $(RELIEFOS_LINK_POLICY_FLAGS) $(USERLAND_LDFLAGS) -static --image-base=0x4000000 -o $@.tmp $(MUSL_SYSROOT)/lib/crt1.o $(MUSL_SYSROOT)/lib/crti.o $(DYNLINKERROR_OBJ) -L$(MUSL_SYSROOT)/lib $(MUSL_SYSROOT)/lib/mimalloc.o --start-group $(RUNTIME_ARCHIVE) $(RUNTIME_BUILTINS) -lc --end-group $(MUSL_SYSROOT)/lib/crtn.o; mv $@.tmp $@
+$(USERLAND_DIR)/dynlinkerror.elf: $(DYNLINKERROR_BUILTIN) $(RUNTIME_ARCHIVE) $(RUNTIME_BUILTINS) $(MUSL_SYSROOT)/lib/crt1.o $(MUSL_SYSROOT)/lib/crti.o $(MUSL_SYSROOT)/lib/crtn.o $(MUSL_SYSROOT)/lib/libc.a $(MUSL_SYSROOT)/lib/mimalloc.o $(RELIEFOS_LD_ID) FORCE
+	$(call if_changed,reliefos_dynlinkerror)
+targets += $(USERLAND_DIR)/dynlinkerror.elf
+userland: $(USERLAND_DIR)/dynlinkerror.elf
+
+# PAM helper: ordinary musl/POSIX process, without a desktop component entry.
+$(eval $(call RELIEFOS_APP,motd,motd,$(USERLAND_DIR)/motd.elf,$(AUTOCONF_H),))
+userland: $(USERLAND_DIR)/motd.elf

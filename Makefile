@@ -5,7 +5,7 @@
 # scripts under tools/build/ drive third-party builds. Nothing here shells out to
 # a second scheduler, and no production path runs Python, Meson or Ninja.
 #
-# Contract: docs/superpowers/plans/2026-09-19-make-c-build-rewrite.md
+# Kbuild migration: docs/superpowers/specs/2026-10-21-kbuild-migration-design.md
 
 # --- GNU Make version ------------------------------------------------------
 # Grouped targets ('&:') and the $(file) function both need 4.3.
@@ -21,14 +21,14 @@ RELIEFOS_SRC := $(patsubst %/,%,$(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 # ARCH, PROFILE and O may come from the command line or from these defaults
 # only. An inherited environment value is ignored on purpose: an unrelated shell
 # setting must not silently change what gets built (plan section 6.2).
-ifeq ($(origin ARCH),undefined)
-ARCH := x86_64
+ifneq ($(origin ARCH),command line)
+override ARCH := x86_64
 endif
-ifeq ($(origin PROFILE),undefined)
-PROFILE := release
+ifneq ($(origin PROFILE),command line)
+override PROFILE := release
 endif
-ifeq ($(origin O),undefined)
-O := $(RELIEFOS_SRC)/out/$(ARCH)/$(PROFILE)
+ifneq ($(origin O),command line)
+override O := $(RELIEFOS_SRC)/out/$(ARCH)/$(PROFILE)
 endif
 
 V ?= 0
@@ -50,6 +50,10 @@ O := $(patsubst %/,%,$(O))
 RELIEFOS_ALLOWED_CHARS := a b c d e f g h i j k l m n o p q r s t u v w x y z \
 	A B C D E F G H I J K L M N O P Q R S T U V W X Y Z \
 	0 1 2 3 4 5 6 7 8 9 . _ / -
+RELIEFOS_TOOL_SAFE_CHARS := $(RELIEFOS_ALLOWED_CHARS) + = : @
+reliefos_empty :=
+reliefos_space := $(reliefos_empty) $(reliefos_empty)
+reliefos_comma := ,
 
 # $(call strip_allowed,text,chars): keep only characters outside the allow-list.
 strip_allowed = $(if $(2),$(call strip_allowed,$(subst $(firstword $(2)),,$(1)),$(wordlist 2,9999,$(2))),$(1))
@@ -87,9 +91,16 @@ else
 $(error unsupported PROFILE '$(PROFILE)'; use PROFILE=debug or PROFILE=release)
 endif
 
+# Reject misspelled configuration overrides before any output is created.
+reliefos_config_symbols := $(shell awk '$$1 == "config" || $$1 == "menuconfig" { print "CONFIG_" $$2 }' $(RELIEFOS_SRC)/Kconfig $(RELIEFOS_SRC)/Kconfig.components)
+reliefos_config_cli := $(foreach key,$(filter CONFIG_%,$(.VARIABLES)),$(if $(filter command line,$(origin $(key))),$(key)))
+reliefos_config_unknown := $(filter-out CONFIG_SHELL $(reliefos_config_symbols),$(reliefos_config_cli))
+ifneq ($(strip $(reliefos_config_unknown)),)
+$(error unknown configuration override: $(reliefos_config_unknown))
+endif
+
 # --- output layout ----------------------------------------------------------
 O_HOST      := $(O)/host
-O_OBJ       := $(O)/obj
 O_GENERATED := $(O)/generated
 O_INCLUDE   := $(O)/include
 O_CONFIG    := $(O)/config
@@ -99,9 +110,8 @@ O_PACKAGES  := $(O)/packages
 O_IMAGES    := $(O)/images
 O_LOGS      := $(O)/logs
 O_META      := $(O)/meta
-# Where upstream build directories live. Not in the plan's list of output
-# subdirectories, but an out-of-tree upstream build needs somewhere to write,
-# and `obj/` is this project's own objects.
+# Third-party build directories stay separate from source-relative native
+# Kbuild objects under tools/ and userland/.
 O_THIRD_PARTY := $(O)/third-party
 # Staged root filesystem fragment for the upstream authentication libraries
 # (Linux-PAM, libxcrypt, ...). Same status as third-party: a layout extension,
@@ -117,6 +127,13 @@ RELIEFOS_CACHE ?= $(if $(strip $(LEONOS_CACHE)),$(LEONOS_CACHE),$(RELIEFOS_SRC)/
 # deleted, so `clean` can never operate on a directory it does not own.
 RELIEFOS_O_MARKER := $(O)/.reliefos-out
 
+# Read-only public input aliases are also available to help/doctor callers.
+include $(RELIEFOS_SRC)/scripts/reliefos/Makefile.host
+RELIEFOS_LOCK ?= $(if $(strip $(LEONOS_LOCK)),$(LEONOS_LOCK),$(RELIEFOS_SRC)/configs/dependencies.lock.json)
+RELIEFOS_FETCH_SCRIPT ?= $(if $(strip $(LEONOS_FETCH_SCRIPT)),$(LEONOS_FETCH_SCRIPT),$(RELIEFOS_SRC)/tools/build/fetch.sh)
+RELIEFOS_QEMU_IDE ?= $(LEONOS_QEMU_IDE)
+RELIEFOS_QEMU_NVME ?= $(LEONOS_QEMU_NVME)
+
 # Older wrappers may still pass the lock ownership token under its former
 # name. The ReliefOS spelling wins whenever both are supplied.
 ifeq ($(origin RELIEFOS_BUILD_OWNER),undefined)
@@ -128,7 +145,7 @@ export RELIEFOS_BUILD_OWNER
 
 # --- same-output-directory mutual exclusion ---------------------------------
 # Two top-level makes sharing one O would race on objects, generated headers and
-# signature files, so one of them has to be refused outright (plan section 6.3).
+# command records, so one of them has to be refused outright (plan section 6.3).
 # Different O directories are independent and may build concurrently.
 #
 # The owner is the make process that acquired the lock, and the token names the
@@ -163,42 +180,17 @@ endif
 export RELIEFOS_BUILD_OWNER
 endif
 
-# --- fragment includes ------------------------------------------------------
-include $(RELIEFOS_SRC)/mk/logging.mk
-include $(RELIEFOS_SRC)/mk/host.mk
-include $(RELIEFOS_SRC)/mk/toolchain.mk
-include $(RELIEFOS_SRC)/mk/config.mk
-include $(RELIEFOS_SRC)/mk/kernel.mk
-include $(RELIEFOS_SRC)/mk/headers.mk
-include $(RELIEFOS_SRC)/mk/boot.mk
-include $(RELIEFOS_SRC)/mk/third-party.mk
-include $(RELIEFOS_SRC)/mk/pam.mk
-include $(RELIEFOS_SRC)/mk/runtime.mk
-include $(RELIEFOS_SRC)/mk/upstream.mk
-include $(RELIEFOS_SRC)/mk/components/audio.mk
-include $(RELIEFOS_SRC)/mk/userland.mk
-include $(RELIEFOS_SRC)/mk/resources.mk
-include $(RELIEFOS_SRC)/mk/nls.mk
-include $(RELIEFOS_SRC)/mk/sdk.mk
-include $(RELIEFOS_SRC)/mk/rootfs.mk
-include $(RELIEFOS_SRC)/mk/apk.mk
-include $(RELIEFOS_SRC)/mk/images.mk
-include $(RELIEFOS_SRC)/mk/rpr.mk
-include $(RELIEFOS_SRC)/mk/site.mk
-include $(RELIEFOS_SRC)/mk/run.mk
-include $(RELIEFOS_SRC)/mk/tests.mk
-
-# --- public goals -----------------------------------------------------------
+# The source entry only validates and delegates. All production rules are Kbuild.
 .DEFAULT_GOAL := help
-# Source inventories are inputs, never implicit host executable targets.
-.SUFFIXES:
-
-.PHONY: help doctor fetch fetch-check defconfig olddefconfig menuconfig tools headers_install \
-	kernel userland runtime sdk rootfs apk-repo image-vmdk iso installer all \
-	pages site download-page \
-	run run-iso run-installer test test-tools test-build test-long test-smoke \
-	test-legacy clean distclean migrate-config regen-component-kconfig
-
+ifeq ($(V),1)
+Q :=
+else
+Q := @
+endif
+ifneq ($(filter doctor,$(MAKECMDGOALS)),)
+include $(RELIEFOS_SRC)/scripts/reliefos/Makefile.toolchain
+endif
+.PHONY: help doctor clean distclean __kbuild
 help:
 	@V='$(V)' O='$(O)' ARCH='$(ARCH)' PROFILE='$(PROFILE)' CPUS='$(CPUS)' \
 	TOOLCHAIN='$(TOOLCHAIN)' SRC='$(RELIEFOS_SRC)' CACHE='$(RELIEFOS_CACHE)' \
@@ -214,50 +206,76 @@ doctor:
 	DEPS='$(RELIEFOS_DEPS_TOOL)' LOCK='$(RELIEFOS_LOCK)' CACHE='$(RELIEFOS_CACHE)' \
 	sh $(RELIEFOS_SRC)/scripts/doctor.sh
 
-defconfig olddefconfig menuconfig: $(RELIEFOS_O_MARKER) $(KCONFIG_CONF) $(KCONFIG_MCONF) | $(O_CONFIG)
-	$(Q)sh $(RELIEFOS_SRC)/tools/build/kconfig-frontends.sh run \
-		--conf $(abspath $(KCONFIG_CONF)) --mconf $(abspath $(KCONFIG_MCONF)) \
-		--kconfig $(KCONFIG_ROOT) --config $(abspath $(RELIEFOS_CONFIG_FILE)) \
-		--seed $(KCONFIG_SEED) --mode $@
-
-# Existing component selections change only when the maintainer requests it.
-.PHONY: migrate-config
-migrate-config:
-	@test -f '$(RELIEFOS_CONFIG_FILE)' || { \
-	    echo 'config-migrate: no existing $(RELIEFOS_CONFIG_FILE)' >&2; exit 1; }
-	@sh $(RELIEFOS_SRC)/tools/build/reliefos-config-migrate.sh --in-place '$(RELIEFOS_CONFIG_FILE)'
-
-# Explicit maintenance entry point; normal build paths never invoke Python.
-regen-component-kconfig:
-	@python3 $(RELIEFOS_SRC)/tools/generate_component_kconfig.py
-
-tools: $(RELIEFOS_HOST_TOOLS)
-
-kernel: $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_DEBUG)
-
-test: test-tools test-build
-
 clean:
-	@O='$(O)' SRC='$(RELIEFOS_SRC)' KEEP_CONFIG=1 sh $(RELIEFOS_SRC)/scripts/clean.sh
+	@O='$(reliefos_O_absolute)' SRC='$(RELIEFOS_SRC)' KEEP_CONFIG=1 sh $(RELIEFOS_SRC)/scripts/clean.sh
 
 distclean:
-	@O='$(O)' SRC='$(RELIEFOS_SRC)' KEEP_CONFIG=0 sh $(RELIEFOS_SRC)/scripts/clean.sh
+	@O='$(reliefos_O_absolute)' SRC='$(RELIEFOS_SRC)' KEEP_CONFIG=0 sh $(RELIEFOS_SRC)/scripts/clean.sh
 
-test-smoke: image-vmdk iso installer
-	@QEMU='$(QEMU)' sh $(RELIEFOS_SRC)/scripts/test-smoke.sh $(O_IMAGES) $(O_LOGS) '$(QEMU_FIRMWARE)'
+reliefos_goals := $(filter-out help doctor clean distclean,$(MAKECMDGOALS))
+reliefos_kbuild_goals := $(patsubst $(reliefos_O_absolute)/%,%,$(patsubst $(O)/%,%,$(reliefos_goals)))
+ifneq ($(strip $(reliefos_goals)),)
+.PHONY: $(reliefos_goals)
+$(reliefos_goals): __kbuild ;
+endif
 
-test-legacy:
-	@sh $(RELIEFOS_SRC)/scripts/test-legacy.sh $(RELIEFOS_SRC)
+# Inspection never creates O. Configuration-independent goals may inspect an
+# existing host-only tree without creating a .config as a side effect.
+reliefos_config_free_goals := tools fetch fetch-check reliefnt-fetch ntclks-fetch reliefnt-fetch-check ntclks-fetch-check headers_install defconfig olddefconfig menuconfig migrate-config regen-component-kconfig
+ifneq ($(strip $(reliefos_lock_skip)),)
+ifneq ($(strip $(reliefos_goals)),)
+ifeq ($(wildcard $(reliefos_O_absolute)),)
+$(error initialize this output with make O=$(O) defconfig before -n/-q)
+endif
+ifneq ($(strip $(filter-out $(reliefos_config_free_goals),$(reliefos_goals))),)
+ifeq ($(wildcard $(reliefos_O_absolute)/.config),)
+$(error initialize this output with make O=$(O) defconfig before -n/-q)
+endif
+reliefos_component_goals := all userland sdk apk-repo rootfs rootfs-raw image-vmdk iso installer \
+	image-iso release test-smoke run run-debug run-iso run-installer rpr-apps rpr-pages
+reliefos_selection_goals := $(filter $(reliefos_component_goals),$(reliefos_goals)) \
+	$(filter app-% userland/apps/%,$(reliefos_goals))
+ifneq ($(strip $(reliefos_selection_goals)),)
+ifeq ($(wildcard $(reliefos_O_absolute)/config/components.mk),)
+$(error configuration selection is incomplete at '$(reliefos_O_absolute)/config/components.mk'; run 'make O=$(O) config-sync' before -n/-q)
+endif
+endif
+endif
+endif
+endif
 
-rootfs: apk-repo
+# HOSTCC is a whitespace-separated command with optional wrapper/driver words.
+# Keep its syntax shell-safe before interpolating the words into the native
+# command, then hash every command word that resolves to a file so launcher and
+# wrapped-driver replacements both invalidate .cmd records.
+reliefos_hostcc_command := $(if $(strip $(HOSTCC)),$(HOSTCC),cc)
+ifneq ($(findstring $(reliefos_comma),$(reliefos_hostcc_command)),)
+$(error HOSTCC does not support comma characters; use simple command words and arguments)
+endif
+reliefos_hostcc_residual := $(call strip_allowed,$(subst $(reliefos_space),,$(reliefos_hostcc_command)),$(RELIEFOS_TOOL_SAFE_CHARS))
+ifneq ($(strip $(reliefos_hostcc_residual)),)
+$(error HOSTCC contains unsupported shell characters: [$(reliefos_hostcc_residual)]; use simple command words and arguments)
+endif
+# Include the actual host compiler identity in native saved commands. This
+# covers in-place tool replacement even when the command path and flags match.
+# It is evaluated only for build delegation, never by help/doctor.
+reliefos_hostcc_fingerprint = $(shell sh $(RELIEFOS_SRC)/scripts/reliefos/hostcc-identity.sh $(reliefos_hostcc_command))
+reliefos_native_hostcc = env RELIEFOS_HOST_COMPILER_ID=$(reliefos_hostcc_fingerprint) $(reliefos_hostcc_command)
 
-all: kernel userland runtime sdk apk-repo image-vmdk iso installer
+__kbuild:
+	$(Q)mkdir -p '$(reliefos_O_absolute)'
+	$(Q)test -f '$(RELIEFOS_O_MARKER)' || printf 'reliefos-build-out version=1 root=%s\n' '$(RELIEFOS_SRC)' > '$(RELIEFOS_O_MARKER)'
+	+$(Q)CONFIG_SHELL=/bin/sh AWK=awk srctree='$(RELIEFOS_SRC)' objtree=. VPATH='$(RELIEFOS_SRC)' \
+	    $(MAKE) --no-print-directory -rR -C '$(reliefos_O_absolute)' \
+	    -f '$(RELIEFOS_SRC)/scripts/Makefile.port' -f '$(RELIEFOS_SRC)/scripts/Makefile.build' \
+	    obj=scripts/basic KBUILD_HOSTCFLAGS='-O2 -I$(RELIEFOS_SRC)/scripts/include' \
+	    HOSTCC='$(reliefos_native_hostcc)'
+	+$(Q)CONFIG_SHELL=/bin/sh AWK=awk srctree='$(RELIEFOS_SRC)' objtree=. VPATH='$(RELIEFOS_SRC)' \
+	    RELIEFOS_SRC='$(RELIEFOS_SRC)' ARCH='$(ARCH)' PROFILE='$(PROFILE)' \
+	    SOURCE_DATE_EPOCH='$(SOURCE_DATE_EPOCH)' TOOLCHAIN='$(TOOLCHAIN)' \
+	    $(MAKE) --no-print-directory -rR -C '$(reliefos_O_absolute)' \
+	    -f '$(RELIEFOS_SRC)/scripts/Makefile.port' -f '$(RELIEFOS_SRC)/scripts/Makefile.build' \
+	    obj=. KBUILD_BUILTIN=1 HOSTCC='$(reliefos_native_hostcc)' $(reliefos_kbuild_goals)
 
-.PHONY: image-iso release config-sync build-info test-all
-image-iso: iso
-# `release` is gated by the ReliefNT release guard (mk/rpr.mk): release builds
-# must come from a clean kernel/reliefnt submodule at the committed gitlink.
-release: reliefnt-release-guard all pages
-config-sync: $(AUTOCONF_H) $(AUTOCONF_INSTALLER_H) $(RELIEFOS_COMPONENT_MK)
-build-info: $(BUILD_INFO_HEADER)
-test-all: test test-long test-legacy test-smoke
+# The source Makefile itself is never an implicit product.
+$(firstword $(MAKEFILE_LIST)): ;

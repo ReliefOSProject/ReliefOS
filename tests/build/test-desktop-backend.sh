@@ -15,7 +15,7 @@ if grep -q 'DESKTOP_BACKEND' Kconfig configs/default.conf; then
 fi
 
 make -s O="$work/default" defconfig
-if grep -q 'DESKTOP_BACKEND' "$work/default/config/.config"; then
+if grep -q 'DESKTOP_BACKEND' "$work/default/.config"; then
     echo 'defconfig still emits desktop backend symbols' >&2
     exit 1
 fi

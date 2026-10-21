@@ -1,0 +1,45 @@
+# ReliefMath has a separate C-API graphics development tree and process.
+RELIEFMATH_DEV := $(O)/upstream/reliefmath-development
+RELIEFMATH_DEV_MEMBERS := $(sort usr/include/cairo/cairo.h usr/include/freetype2/ft2build.h usr/lib/libcairo.so usr/lib/libcairo.so.2 usr/lib/libfreetype.so usr/lib/libfreetype.so.6 $(shell cat $(RELIEFMATH_DEV)/.members 2>/dev/null))
+RELIEFMATH_DEV_PRODUCTS := $(RELIEFMATH_DEV)/.members $(addprefix $(RELIEFMATH_DEV)/,$(RELIEFMATH_DEV_MEMBERS))
+$(RELIEFMATH_DEV)/.complete $(RELIEFMATH_DEV_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/reliefmath-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK)
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/reliefmath-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(RELIEFMATH_DEV))
+.PHONY: reliefmath-development
+reliefmath-development: $(RELIEFMATH_DEV)/.complete $(RELIEFMATH_DEV_PRODUCTS)
+
+RELIEFMATH_WORKER_FLAGS := $(USERLAND_CXX_FLAGS) -iquote $(RELIEFOS_SRC)/userland/apps/reliefmath -isystem $(RELIEFMATH_DEV)/usr/include/cairo -isystem $(RELIEFMATH_DEV)/usr/include/freetype2
+RELIEFMATH_WORKER_LIBS := $(RELIEFMATH_DEV)/usr/lib/libcairo.so $(RELIEFMATH_DEV)/usr/lib/libfreetype.so
+RELIEFOS_CAPTURE_WORKER_KBUILD := 1
+include $(RELIEFOS_SRC)/userland/apps/reliefmath/worker/Kbuild
+RELIEFOS_CAPTURE_WORKER_KBUILD :=
+RELIEFMATH_WORKER_OBJECTS := $(addprefix $(O)/userland/apps/reliefmath/worker/,$(RELIEFOS_WORKER_OBJECTS))
+RELIEFMATH_WORKER_BUILTIN := $(O)/userland/apps/reliefmath/worker/built-in.a
+obj-y += userland/apps/reliefmath/worker/
+export RELIEFMATH_WORKER_FLAGS
+userland/apps/reliefmath/worker: $(AUTOCONF_H) $(MUSL_STAMP) $(HEADER_EXPORT_MANIFEST) $(RELIEFMATH_DEV_PRODUCTS) $(RELIEFOS_CXX_ID) $(RELIEFOS_AR_ID)
+
+quiet_cmd_reliefos_reliefmath_worker = LD      $@
+      cmd_reliefos_reliefmath_worker = $(TARGET_LD) $(USERLAND_LINK_FLAGS) -o $@.tmp $(MUSL_SYSROOT)/lib/Scrt1.o $(MUSL_SYSROOT)/lib/crti.o $(RELIEFMATH_WORKER_OBJECTS) -L$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 $(RELIEFMATH_WORKER_LIBS) -lc $(MUSL_SYSROOT)/lib/crtn.o; mv $@.tmp $@
+$(USERLAND_DIR)/reliefmath-render.elf: $(RELIEFMATH_WORKER_BUILTIN) $(RELIEFMATH_WORKER_LIBS) $(USERLAND_CRT) $(MUSL_SYSROOT)/lib/libc.so $(MUSL_SYSROOT)/lib/libmimalloc.so.3 $(RELIEFOS_LD_ID) FORCE
+	$(call if_changed,reliefos_reliefmath_worker)
+targets += $(USERLAND_DIR)/reliefmath-render.elf
+.PHONY: app-reliefmath-render
+app-reliefmath-render: $(USERLAND_DIR)/reliefmath-render.elf
+USERLAND_DEPS_reliefmath += $(USERLAND_DIR)/reliefmath-render.elf
+
+# This probe is a product-only build target, not a member of userland/all.
+RELIEFOS_CAPTURE_RELIEFMATH_PROBE_KBUILD := 1
+include $(RELIEFOS_SRC)/userland/reliefmath-probe/Kbuild
+RELIEFOS_CAPTURE_RELIEFMATH_PROBE_KBUILD :=
+RELIEFMATH_PROBE_BUILTIN := $(O)/userland/reliefmath-probe/built-in.a
+RELIEFMATH_PROBE_OBJ := $(O)/userland/reliefmath-probe/reliefmath_backend_probe.o
+obj-y += userland/reliefmath-probe/
+userland/reliefmath-probe: $(AUTOCONF_H) $(MUSL_STAMP) $(HEADER_EXPORT_MANIFEST) $(RELIEFMATH_DEV_PRODUCTS) $(RELIEFOS_CXX_ID) $(RELIEFOS_AR_ID)
+
+quiet_cmd_reliefos_reliefmath_probe = LD      $@
+      cmd_reliefos_reliefmath_probe = $(TARGET_LD) $(USERLAND_LINK_FLAGS) -o $@.tmp $(MUSL_SYSROOT)/lib/Scrt1.o $(MUSL_SYSROOT)/lib/crti.o $(RELIEFMATH_PROBE_OBJ) $(filter-out %/main.o,$(RELIEFMATH_WORKER_OBJECTS)) -L$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 $(RELIEFMATH_WORKER_LIBS) -lc $(MUSL_SYSROOT)/lib/crtn.o; mv $@.tmp $@
+$(O)/tests/reliefmath-backend-probe.elf: $(RELIEFMATH_PROBE_BUILTIN) $(RELIEFMATH_WORKER_BUILTIN) $(RELIEFMATH_WORKER_LIBS) $(USERLAND_CRT) $(MUSL_SYSROOT)/lib/libc.so $(MUSL_SYSROOT)/lib/libmimalloc.so.3 $(RELIEFOS_LD_ID) FORCE
+	$(call if_changed,reliefos_reliefmath_probe)
+targets += $(O)/tests/reliefmath-backend-probe.elf
+.PHONY: reliefmath-backend-probe
+reliefmath-backend-probe: $(O)/tests/reliefmath-backend-probe.elf

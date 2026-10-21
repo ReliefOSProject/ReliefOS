@@ -37,6 +37,7 @@ for suffix in 'bad/flag' 'bad"flag' 'abcdefghijklmnopqrstuvwxyz0123456789'; do
 done
 render --extra-version '' --local-version ''
 grep -Fqx "#define RELIEFOS_KERNEL_VERSION \"$kernel_release\"" "$work/build.h"
+make -s -C "$src" O="$work/out" defconfig >"$work/configure.log" 2>&1
 make -s -n -C "$src" O="$work/out" EXTRAVERSION=-perf LOCALVERSION=-test kernel >"$work/plan"
 grep -Fq "EXTRAVERSION='-perf' LOCALVERSION='-test'" "$work/plan"
 if make -s -n -C "$src" O="$work/out" EXTRAVERSION='bad/flag' kernel >"$work/rejected.log" 2>&1; then

@@ -1,0 +1,8 @@
+RELIEFOS_APP_NAME := reliefcapture
+RELIEFOS_APP_OBJECTS := capture.o instance.o job.o keyboard.o main.o model.o overlay.o png_io.o render.o window.o
+RELIEFOS_APP_C_OBJECTS :=
+RELIEFOS_APP_CXX_OBJECTS := capture.o instance.o job.o keyboard.o main.o model.o overlay.o png_io.o render.o window.o
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+endif

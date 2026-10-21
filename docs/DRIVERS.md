@@ -10,8 +10,8 @@ modules and no driver files on disk.
   USB UHCI/HID implementations that are linked into `kernel.sys`.
 - `kernel/reliefnt/drivers/mouse`, `kernel/reliefnt/drivers/serial`, `kernel/reliefnt/drivers/e1000`, `kernel/reliefnt/drivers/ac97`,
   `kernel/reliefnt/drivers/es1371`, and `kernel/reliefnt/drivers/hda`: device drivers compiled
-  into `kernel.sys` alongside the bootstrap drivers (see `KERNEL_SOURCE_DIRS`
-  in `kernel/reliefnt/mk/kernel.mk`).
+  into `kernel.sys` alongside the bootstrap drivers (see the explicit object list
+  in `kernel/reliefnt/Kbuild`).
 
 ## Module ABI
 

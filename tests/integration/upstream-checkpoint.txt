@@ -6,7 +6,7 @@ file/libmagic/less/ncurses runtime/vim are fetched as signed upstream Alpine APK
 instead of being compiled; tinycc and lua are ordinary `apk add` installs.
 
 Implementation:
-- mk/upstream.mk; include after third-party.mk, pam.mk and runtime.mk. Root Makefile already includes it.
+- scripts/reliefos/Makefile.upstream; include after third-party.mk, pam.mk and runtime.mk. Root Makefile already includes it.
 - tools/build/upstream.sh: libmd, libbsd, util-linux, sudo, shadow, e2fsprogs, dosfstools, exfatprogs (pinned tarballs, configure/Make, offline SHA verification, isolated atomic staging).
 - upstream-terminal.sh: pinned ncurses; embedded fallback terminfo and case-fold dedup retained.
 - upstream-app.sh: sl, sqlite, pleditor, cmd. The original port patch is a source-only embedded diff in upstream-cmd-patch.sh. No old binaries copied.

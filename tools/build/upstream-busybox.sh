@@ -2,6 +2,8 @@
 set -eu
 MAKEFLAGS=${MAKEFLAGS-}
 case ${MAKEFLAGS%% *} in *n*) exit 0 ;; esac
+. "$(CDPATH= cd -- "$(dirname "$0")" && pwd)/upstream-make-environment.sh"
+reliefos_upstream_make_environment
 [ "$#" = 9 ] || { echo 'usage: upstream-busybox.sh SRC WORK OUTPUT MUSL HEADERS CC DEPS LOCK EPOCH' >&2; exit 2; }
 src=$1 work=$2 output=$3 musl=$4 headers=$5 cc=$6 deps=$7 lock=$8 epoch=$9
 revision=$("$deps" --lock "$lock" --id busybox --print commit)

@@ -1,0 +1,6 @@
+# Host unit tests; scripts/Makefile.host owns compilation and linking.
+hostprogs-always-y := test_common test_json test_locale_conf
+host_test_common := tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o
+test_common-objs := tests/host/test_common.o $(host_test_common)
+test_json-objs := tests/host/test_json.o tools/host/manifest/json.o $(host_test_common)
+test_locale_conf-objs := tests/host/test_locale_conf.o userland/runtime/src/locale_conf.o

@@ -1,0 +1,42 @@
+RELIEFOS_LIBPNG_OBJECTS := png.o pngerror.o pngget.o pngmem.o pngpread.o pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
+RELIEFOS_LIBPNG_C_OBJECTS := png.o pngerror.o pngget.o pngmem.o pngpread.o pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
+RELIEFOS_LIBPNG_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_RUNTIME_KBUILD),1)
+obj-y := $(RELIEFOS_LIBPNG_OBJECTS)
+ccflags-y += $(RUNTIME_FLAGS) $(RUNTIME_CFLAGS) -include $(AUTOCONF_H)
+asflags-y += --target=$(TRIPLE_USER) -fPIC -I$(HEADER_EXPORT_INCLUDE)
+$(addprefix $(obj)/,$(RELIEFOS_LIBPNG_C_OBJECTS)): $(AUTOCONF_H) $(GBK_TABLE) $(PNG_CONFIG) $(MUSL_STAMP) $(RUNTIME_HEADERS) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID)
+$(addprefix $(obj)/,$(RELIEFOS_LIBPNG_ASM_OBJECTS)): $(AUTOCONF_H) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID)
+
+ccflags-y += -DRELIEFOS_LIBPNG_FIXED_POINT=3
+$(obj)/png.o: $(srctree)/third_party/libpng/png.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngerror.o: $(srctree)/third_party/libpng/pngerror.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngget.o: $(srctree)/third_party/libpng/pngget.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngmem.o: $(srctree)/third_party/libpng/pngmem.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngpread.o: $(srctree)/third_party/libpng/pngpread.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngread.o: $(srctree)/third_party/libpng/pngread.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngrio.o: $(srctree)/third_party/libpng/pngrio.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngrtran.o: $(srctree)/third_party/libpng/pngrtran.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngrutil.o: $(srctree)/third_party/libpng/pngrutil.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngset.o: $(srctree)/third_party/libpng/pngset.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngtrans.o: $(srctree)/third_party/libpng/pngtrans.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngwio.o: $(srctree)/third_party/libpng/pngwio.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngwrite.o: $(srctree)/third_party/libpng/pngwrite.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngwtran.o: $(srctree)/third_party/libpng/pngwtran.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pngwutil.o: $(srctree)/third_party/libpng/pngwutil.c FORCE
+	$(call if_changed_dep,cc_o_c)
+endif

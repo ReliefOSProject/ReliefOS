@@ -1,5 +1,5 @@
 #!/bin/sh
-# Contract tests for the ReliefNT kernel adapter (mk/kernel.mk, mk/headers.mk).
+# Contract tests for the ReliefNT kernel adapter (scripts/reliefos/Makefile.kernel, scripts/reliefos/Makefile.headers).
 #
 # The kernel products are built by the standalone checkout and published here;
 # this suite covers the adapter's failure and recovery surface: a missing
@@ -49,14 +49,32 @@ adapter_contract() {
         fail 'contract configuration is isolated under a temporary O' \
             "$(head -c 300 "$work/contract-defconfig.log")"
     fi
+    if make -s -j8 O="$work/contract-config" config-sync \
+            >"$work/contract-sync.log" 2>&1; then
+        pass 'contract configuration has a synchronized component graph'
+    else
+        fail 'contract configuration has a synchronized component graph' \
+            "$(head -c 300 "$work/contract-sync.log")"
+    fi
+
+    # Product previews use an initialized output, without generating any config.
+    for name in plan-new plan-old plan-priority plan-missing fetch-reliefnt-fetch fetch-ntclks-fetch; do
+        mkdir -p "$work/$name"
+        cp "$work/contract-config/.config" "$work/$name/.config"
+        mkdir -p "$work/$name/config"
+        cp "$work/contract-config/config/components.mk" "$work/$name/config/components.mk"
+    done
 
     if make -s -n O="$work/plan-new" \
-            RELIEFNT_DIR="$work/new-kernel" RELIEFNT_O="$work/new-out" kernel \
+            RELIEFNT_DIR="$work/new-kernel" RELIEFNT_O="$work/new-out" \
+            CC='ccache clang' CXX='sccache clang++' kernel \
             >"$work/plan-new.log" 2>&1 &&
-            grep -Fq -- "-C '$work/new-kernel' O='$work/new-out'" "$work/plan-new.log"; then
-        pass 'RELIEFNT_DIR and RELIEFNT_O control the delegated build'
+            grep -Fq -- "-C '$work/new-kernel' O='$work/new-out'" "$work/plan-new.log" &&
+            grep -Fq "CC='ccache clang'" "$work/plan-new.log" &&
+            grep -Fq "CXX='sccache clang++'" "$work/plan-new.log"; then
+        pass 'RELIEFNT_DIR, RELIEFNT_O and quoted tool commands reach the delegated build'
     else
-        fail 'RELIEFNT_DIR and RELIEFNT_O control the delegated build' \
+        fail 'RELIEFNT_DIR, RELIEFNT_O and quoted tool commands reach the delegated build' \
             "$(head -c 300 "$work/plan-new.log")"
     fi
 

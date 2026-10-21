@@ -1,11 +1,13 @@
-# Make 全量迁移：当前接口
+# Make 全量迁移：2026-09-19 历史接口
 
-2026-09-19：旧的 P0/P1 盘点是历史记录；以下为当前生产接口。历史验收证据保存在 verification.md。
+本文记录 2026-09-19 的迁移结果，包含当时的路径和组件，不代表当前生产接口。
+当前 Linux Kbuild 接口见 [BUILDSYSTEM](../BUILDSYSTEM.md)，本次验收见 [Kbuild 迁移](kbuild-migration.md)。
+历史验收证据保存在 verification.md。
 
 | 功能 | 当前目标 / 实现 | 产物 |
 | --- | --- | --- |
 | 配置、版本、依赖 | defconfig / olddefconfig / menuconfig / fetch；C host helpers | O/config、O/include/generated、cache/downloads |
-| 内核、驱动、loader、Rust middlelayer | kernel / drivers / loader / middlelayer；mk/kernel.mk、boot.mk | O/generated/system、drivers、loader |
+| 内核、驱动、loader、Rust middlelayer | kernel / drivers / loader / middlelayer；scripts/reliefos/Makefile.kernel、boot.mk | O/generated/system、drivers、loader |
 | 运行库、认证、应用 | runtime / leonos-pam / userland / leonos-upstream | O/system、O/userland、独立上游安装树 |
 | SDK | sdk / musl-sdk；C 编译驱动，按 SDK 选择导出 | O/packages/LeonOS4-Developer-SDK.zip、leonos-musl-sdk.tar.gz |
 | 根文件系统 | rootfs-raw / rootfs；C stage 清单与签名 APK 安装 | O/rootfs/{raw,managed}、manifest.json |
@@ -74,7 +76,7 @@ run-debug, run-iso, menuconfig, defconfig, clean`。其余 100 多个目标由�
 | `run` / `run-debug` / `run-iso` | `make run` / `run-iso` | P3 | 来宾成功标记 + 退出码 |
 | `clean` | `make clean` / `make distclean` | P1 | A12：拒绝空值、`/`、源码根、无所有权标记的 O |
 | `test component-config` 等 | `make test-legacy` | P2/P3 | 显式列出 Python 依赖 |
-| `musl-*`、`busybox`、`lua`、`file`、`sqlite`、`nano`、`sl`、`cmd`、`less`、`tcc`、`portablegl`、`fastfetch`、`python`、`storage-upstream`、`auth-upstream` | `make fetch` + `mk/third-party.mk` | P2/P3 | 锁文件摘要校验、离线全量构建 |
+| `musl-*`、`busybox`、`lua`、`file`、`sqlite`、`nano`、`sl`、`cmd`、`less`、`tcc`、`portablegl`、`fastfetch`、`python`、`storage-upstream`、`auth-upstream` | `make fetch` + `scripts/reliefos/Makefile.third-party` | P2/P3 | 锁文件摘要校验、离线全量构建 |
 | `apk-*`、`openrc`、`rpr-*`、`app-manifests`、`grub-*`、`gbk-table`、`image-*` 资源 | `make apk-repo` / `make rootfs` / 资源 C 生成器 | P3 | 包归属/签名、镜像内容比对 |
 | `staging-prune`（`build.py:2553-2660`） | 无等价物：改为"空 staging 起步 + 成员清单 + 原子发布" | P3 | A06、A12 |
 
@@ -82,7 +84,7 @@ run-debug, run-iso, menuconfig, defconfig, clean`。其余 100 多个目标由�
 
 上表中 `musl-*` 行的 **musl + mimalloc sysroot** 与 **`make fetch`/锁文件** 两半已落地：
 `configs/dependencies.lock.json`（41 条，`schema_version=1`）+ `tools/host/manifest/{json.c,leonos-deps.c}`
-+ `tools/build/fetch.sh` + `mk/third-party.mk` + `tools/build/musl-sysroot.sh`。
++ `tools/build/fetch.sh` + `scripts/reliefos/Makefile.third-party` + `tools/build/musl-sysroot.sh`。
 产物等价性与逐字节比对结果记在 `verification.md` 第 6 节。
 
 同一次改动把 `configs/auth-upstream.json`、`configs/storage-upstream.json`、
@@ -202,7 +204,7 @@ P2-a（依赖锁、`make fetch`、musl sysroot）、P2-b/P2-c（同 O 互斥、A
   两条打包路径；A16 目前**无法**覆盖 SDK，因为包装器还是 Python。
 - **P3**：资源生成器（字体/图标/GBK 表）、APK 仓库、rootfs 组装与 staging 剪枝、三类镜像；
   含 `time_ns()`/`uuid4()` 两处不可重现源（`apk_distribution.py:421`、`make_image.py:114,128`）。
-- **P3/P5 运行验证**：`mk/run.mk` + QMP/截图成功标记判定（5.1 节的受阻项），以及安装升级
+- **P3/P5 运行验证**：`scripts/reliefos/Makefile.run` + QMP/截图成功标记判定（5.1 节的受阻项），以及安装升级
   保留用户环境的实测。
 - **P4 旧实现删除**：见 `legacy-removal.md`。`build.py`(4958 行)、`buildsystem/**`(48 个 py)、
   `tools/*.py`(198) 全部仍在；两个 GitHub 工作流与 `AGENT.md`/`README.md`/`docs/BUILDSYSTEM.md`

@@ -108,3 +108,13 @@ license. Preserve copyright notices, license texts, disclaimers, and required
 attribution in the source tree and in the installed image. Do not describe the
 entire distribution as Apache-2.0 unless the statement is explicitly limited
 to ReliefOS-owned code and all third-party terms remain visible.
+
+Linux Kbuild and Kconfig build tools
+----------------------------------
+The build/configuration files listed in scripts/kbuild-source.json come from
+Linux 6.12 (https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.12.tar.xz).
+Their original SPDX identifiers and copyright notices are preserved. They are
+covered by their own GPL-2.0 terms, with texts in LICENSES/preferred/GPL-2.0
+and LICENSES/kbuild/COPYING. Project compiler-policy adapters are separate
+files. These build-tool terms do not relabel the ReliefOS-owned application
+or operating-system source.

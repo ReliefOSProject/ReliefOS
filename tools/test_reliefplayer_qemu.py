@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'out/xorg-vmware-debug'
 
 
-def prepare(image, kernel, output):
+def prepare(image, kernel, output, build_dir=OUT):
     output.mkdir(parents=True, exist_ok=False)
     fixtures = output / 'fixtures'
     fixtures.mkdir()
@@ -40,7 +40,8 @@ def prepare(image, kernel, output):
                     'sine=frequency=660:sample_rate=32000:duration=20',
                     '-c:a', 'libmp3lame', '-q:a', '4', str(fixtures / 'sample.mp3')], check=True)
     (fixtures / 'invalid.wav').write_bytes(b'RIFF\xff\xff\xff\xffWAVEbad')
-    probe = fltk.target_compile_probe(output, OUT / 'sysroot/musl', 'clang++', 'ld.lld')
+    probe = fltk.target_compile_probe(output, build_dir / 'sysroot/musl', 'clang++', 'ld.lld',
+                                      build_dir=build_dir)
     runner = output / 'runner'
     runner.write_text('''#!/bin/sh
 export LC_ALL=zh_CN.UTF-8 LANG=zh_CN.UTF-8
@@ -56,14 +57,14 @@ status=$?
 kill "$watcher" 2>/dev/null
 echo "RP_EXIT status=$status" >/dev/ttyS0
 ''')
-    payload = [(OUT / 'userland/reliefplayer.elf', '/usr/lib/reliefos/apps/reliefplayer/reliefplayer.elf', 0o100755),
+    payload = [(build_dir / 'userland/reliefplayer.elf', '/usr/lib/reliefos/apps/reliefplayer/reliefplayer.elf', 0o100755),
                (ROOT / 'resources/build-art/app-icons/reliefplayer.bmp', '/usr/lib/reliefos/apps/reliefplayer/reliefplayer.bmp', 0o100644),
                (ROOT / 'userland/apps/reliefplayer/reliefplayer.desktop', '/usr/share/applications/reliefos-reliefplayer.desktop', 0o100644),
-               (OUT / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
+               (build_dir / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
                (probe, fltk.PROBE_GUEST, 0o100755), (runner, '/usr/bin/rptest', 0o100755)]
     for name in ('sample.wav', 'sample.mp3', 'short.wav', 'invalid.wav'):
         payload.append((fixtures / name, '/home/test/' + name, 0o100644))
-    fltk.validate_target_elf(OUT / 'userland/reliefplayer.elf', sysroot=OUT / 'sysroot/musl', required_needed=('libfltk.so.1.3',))
+    fltk.validate_target_elf(build_dir / 'userland/reliefplayer.elf', sysroot=build_dir / 'sysroot/musl', required_needed=('libfltk.so.1.3',))
     metadata = fltk.prepare_disk(image, kernel, output, payload)
     (output / 'prepare.json').write_text(json.dumps(metadata, indent=2) + '\n')
     return metadata
@@ -232,13 +233,16 @@ def inspect_audio(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--image', type=Path, required=True)
-    parser.add_argument('--kernel', type=Path, default=fltk.DEFAULT_KERNEL)
+    parser.add_argument('--build-dir', type=Path, default=OUT)
+    parser.add_argument('--kernel', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     output = args.output.resolve()
     if output == ROOT / 'out' or not output.is_relative_to(ROOT / 'out'):
         parser.error('output must be a fresh repository out subdirectory')
-    metadata = prepare(args.image.resolve(), args.kernel.resolve(), output)
+    build_dir = args.build_dir.resolve()
+    kernel = args.kernel.resolve() if args.kernel else build_dir / 'generated/system/kernel.sys'
+    metadata = prepare(args.image.resolve(), kernel, output, build_dir)
     session = None
     try:
         session = Session(output)

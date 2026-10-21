@@ -1,17 +1,19 @@
 # VS Code development support
 
-The C/C++ configurations in `.vscode/c_cpp_properties.json` are split by
-compilation boundary: kernel, UEFI loader, ReliefOS libc, and ordinary
-userland.  They all consume the generated database at
-`build/vscode/compile_commands.json`, so completion and diagnostics follow the
-same target flags as the build graph.
+The editor database is exported from the real Kbuild `.cmd` records after a
+build. It contains the exact compiler arguments and native working directory
+for each built source, including separate application contexts. No independent
+set of guessed build flags is maintained.
 
-The database deliberately stores relative paths.  This keeps IntelliSense
-working when the checkout is opened through a Windows junction (for example,
-`LeonOS-4`) or from a Remote-WSL path with a different spelling.
+The database is `out/vscode/compile_commands.json`. Build `out/x86_64/release`
+first, or select another completed tree:
 
-Run `ReliefOS: Generate compile database (all regions)` once after checkout or
-after changing generated headers.  Region-specific generation and clang-tidy
+```sh
+python3 tools/vscode/generate_compile_commands.py --build-dir out/my-build
+```
+
+Run `ReliefOS: Generate compile database (all regions)` after building the selected
+output tree.  Region-specific generation and clang-tidy
 tasks are available from the command palette.  The tasks execute in WSL using
 the project path from `leonos.wslProjectRoot`.
 

@@ -1,6 +1,8 @@
 # 旧构建实现删除台账
 
-2026-09-19 全量 Make 迁移收尾。用户明确允许删除旧 Python 构建系统。
+2026-09-19 Python → Make 迁移的历史记录。当前构建已改用 Linux Kbuild / Kconfig，
+见 [Kbuild 迁移记录](kbuild-migration.md)；下表中的旧 Make 结构描述该次迁移完成时的状态。
+用户明确允许删除旧 Python 构建系统。
 `retired-build-files.txt` 是本轮逐文件删除清单；只删除源码，不删除本机 `build/`、
 `buildsystem/cache/`、`buildsystem/deps/` 或旧镜像。
 
@@ -10,9 +12,9 @@
 | --- | --- |
 | `build.py`、受跟踪的 `buildsystem/core/`、组件调度与构建计数状态 | 根 Makefile、`mk/*.mk`；Make owns graph/jobserver；版本由 epoch/显式 BUILD_ID 派生 |
 | musl、认证、存储、BusyBox、终端及应用 Python 构建驱动 | `mk/{third-party,pam,upstream,runtime,userland}.mk`、`tools/build/*.sh`；Linux-PAM 使用本项目 Make 移植 |
-| Python SDK 打包器及编译器包装器 | `mk/sdk.mk`、`tools/build/{musl-sdk,developer-sdk}.sh`、`tools/host/sdk/leonos-musl-cc.c` |
-| Python RPR 构建器 | `mk/rpr.mk`、`tools/build/rpr-{apps,pages}.sh` |
-| Python Kconfig 同步和应用清单生成 | C 配置/组件工具、`mk/config.mk`、`tools/build/rootfs-stage.sh`；Kconfig.components 是受跟踪输入 |
+| Python SDK 打包器及编译器包装器 | `scripts/reliefos/Makefile.sdk`、`tools/build/{musl-sdk,developer-sdk}.sh`、`tools/host/sdk/leonos-musl-cc.c` |
+| Python RPR 构建器 | `scripts/reliefos/Makefile.rpr`、`tools/build/rpr-{apps,pages}.sh` |
+| Python Kconfig 同步和应用清单生成 | C 配置/组件工具、`scripts/reliefos/Makefile.config`、`tools/build/rootfs-stage.sh`；Kconfig.components 是受跟踪输入 |
 | 自研引擎内部图和缓存的特定测试 | Shell/C graph、lock、incremental、bootstrap、components、SDK、APK 和 stage fixture；不再维护已删除类的 mock 测试 |
 | `scripts/not-migrated.sh` | 生产目标均有实际规则；test-smoke/test-legacy 也有真实执行入口 |
 

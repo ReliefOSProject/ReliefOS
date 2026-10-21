@@ -144,21 +144,21 @@ main	compatibility	include/leonos/tar.h	逐文件确认含 canonical reliefos/re
 main	compatibility	include/leonos/text.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/text_input.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/reliefos/layout.h	frozen task 6 guest layout values
-main	compatibility	mk/apk.mk	沿用用户已存在签名私钥路径、旧工具脚本源文件及兼容 APK protected_paths 文件名
-main	history	mk/components/INTEGRATION.md	该文件是有日期的历史设计/执行/审计/旧构建材料；旧路径、命令、SHA 与原结果为证据，不能重写成新产物
-main	compatibility	mk/host.mk	LEONOS_* 旧输入变量回退，RELIEFOS_* 优先
-main	compatibility	mk/kernel.mk	NTCLKS_DIR/O 输入兼容及 ntclks-fetch 目标别名；旧外部 URL 说明
-main	compatibility	mk/nls.mk	已发布 gettext domain 数据文件 leonos.mo 与应用 textdomain 配对
-main	compatibility	mk/pam.mk	PAM 已发布模块名 pam_leonos_password.so、旧源路径及 leonos-pam 目标别名
-main	compatibility	mk/resources.mk	冻结字体输出文件名 leonos-metro/win95.ttf 和 PF2/BDF 字体引用
-main	compatibility	mk/rpr.mk	旧 ntclks-release-guard Make 目标仅转发新目标
-main	compatibility	mk/run.mk	LEONOS_QEMU_* 旧输入别名；NVMe serial 是现有设备身份值，应保持旧磁盘识别
-main	compatibility	mk/runtime.mk	从同一对象集产出旧 libleonos SONAME/archive 供已发布 ELF 与旧 SDK
-main	compatibility	mk/sdk.mk	SDK 打包旧转发头与旧 SONAME/archive，兼容旧源码和 ELF
-main	compatibility	mk/tests.mk	旧测试目标别名与兼容输入环境注入；新 RELIEFOS 工具提供实际执行
-main	compatibility	mk/third-party.mk	旧依赖配置变量和 leonos-* Make 目标的显式输入别名
-main	compatibility	mk/upstream.mk	leonos-upstream/storage 等旧 Make 目标转发新目标
-main	compatibility	mk/userland.mk	同时定义 LEONOS_DOOM 与 RELIEFOS_DOOM 供未改动第三方 Doom port 条件编译
+main	compatibility	scripts/reliefos/Makefile.apk	沿用用户已存在签名私钥路径、旧工具脚本源文件及兼容 APK protected_paths 文件名
+main	history	docs/build/userland-integration.md	该文件是有日期的历史设计/执行/审计/旧构建材料；旧路径、命令、SHA 与原结果为证据，不能重写成新产物
+main	compatibility	scripts/reliefos/Makefile.host	LEONOS_* 旧输入变量回退，RELIEFOS_* 优先
+main	compatibility	scripts/reliefos/Makefile.kernel	NTCLKS_DIR/O 输入兼容及 ntclks-fetch 目标别名；旧外部 URL 说明
+main	compatibility	scripts/reliefos/Makefile.nls	已发布 gettext domain 数据文件 leonos.mo 与应用 textdomain 配对
+main	compatibility	scripts/reliefos/Makefile.pam	PAM 已发布模块名 pam_leonos_password.so、旧源路径及 leonos-pam 目标别名
+main	compatibility	scripts/reliefos/Makefile.resources	冻结字体输出文件名 leonos-metro/win95.ttf 和 PF2/BDF 字体引用
+main	compatibility	scripts/reliefos/Makefile.rpr	旧 ntclks-release-guard Make 目标仅转发新目标
+main	compatibility	scripts/reliefos/Makefile.run	LEONOS_QEMU_* 旧输入别名；NVMe serial 是现有设备身份值，应保持旧磁盘识别
+main	compatibility	scripts/reliefos/Makefile.runtime	从同一对象集产出旧 libleonos SONAME/archive 供已发布 ELF 与旧 SDK
+main	compatibility	scripts/reliefos/Makefile.sdk	SDK 打包旧转发头与旧 SONAME/archive，兼容旧源码和 ELF
+main	compatibility	scripts/reliefos/Makefile.tests	旧测试目标别名与兼容输入环境注入；新 RELIEFOS 工具提供实际执行
+main	compatibility	scripts/reliefos/Makefile.third-party	旧依赖配置变量和 leonos-* Make 目标的显式输入别名
+main	compatibility	scripts/reliefos/Makefile.upstream	leonos-upstream/storage 等旧 Make 目标转发新目标
+main	compatibility	scripts/reliefos/Makefile.userland	同时定义 LEONOS_DOOM 与 RELIEFOS_DOOM 供未改动第三方 Doom port 条件编译
 main	attribution	patches/linux-pam/0003-limits-handle-unimplemented-resources.patch	补丁 From: LeonOS maintainers 与其原文来源归属
 main	compatibility	scripts/clean.sh	旧 .leonos-out 所有权标记双识别，防止误清用户目录；旧 ntclks 输出目录历史注释可规范化
 main	compatibility	scripts/help.sh	帮助明确说明旧目标/LEONOS_* 输入别名，不是 canonical 输出
@@ -229,12 +229,12 @@ main	compatibility	third_party/doomgeneric/doomgeneric/i_system.c	固定第三�
 main	compatibility	tools/analyze_boot_log.py	同时接受新旧内核日志前缀，诊断明确指出旧盘回滚路径
 main	compatibility	tools/apk_distribution.py	旧签名密钥位置/输入兼容、旧 updater 链接和公钥名、旧 APK 包名迁移与旧 ESP 排除
 main	compatibility	tools/build/apk-stage.sh	保留旧 license 元数据目录、签名公钥、protected_paths 文件与 updater 别名，并排除旧 ESP
-main	compatibility	tools/build/auth-upstream.sh	现有构建输出的 .leonos-auth-inputs/.leonos-auth.json 缓存格式，与 mk/third-party.mk 及恢复测试配对。
+main	compatibility	tools/build/auth-upstream.sh	现有构建输出的 .leonos-auth-inputs/.leonos-auth.json 缓存格式，与 scripts/reliefos/Makefile.third-party 及恢复测试配对。
 main	compatibility	tools/build/efi-stage.sh	新旧 ESP 成套内核/display.conf 同步；PF2 文件名冻结
 main	compatibility	tools/build/images.sh	PROFILE 字节值冻结；LEONOS_EXT2_TIME 为新变量之后回退的旧输入。
 main	compatibility	tools/build/iso.sh	canonical installer marker 之外同步旧 marker，兼容旧 GRUB/介质搜索。
 main	compatibility	tools/build/musl-sdk.sh	新旧 runtime/archive 作为不同输入装入同一 SDK，旧头转发
-main	compatibility	tools/build/musl-sysroot.sh	现有 sysroot .leonos-unpacked/.leonos-musl.json 持久缓存标记；mk/third-party.mk 显式依赖。
+main	compatibility	tools/build/musl-sysroot.sh	现有 sysroot .leonos-unpacked/.leonos-musl.json 持久缓存标记；scripts/reliefos/Makefile.third-party 显式依赖。
 main	compatibility	tools/build/pam-stage.sh	已发布 PAM 模块文件名与现有源文件路径，不修改 PAM 配置入口
 main	compatibility	tools/build/reliefos-config-migrate.sh	imports legacy config and retains its backup
 main	compatibility	tools/build/rootfs-stage.sh	旧数据库拒绝策略、双 SONAME/搜索路径、旧 helper 命令、账户角色组、字体/配置/gettext 文件名均为具体已有兼容面。

@@ -1,0 +1,69 @@
+# PortableGL and freestanding StardustUI, using the same ABI as their callers.
+PORTABLEGL_SO := $(O)/system/lib/libportablegl.so.1
+PORTABLEGL_ARCHIVE := $(O)/userland/libportablegl.a
+GLXGEARS_SOURCE := $(O_GENERATED)/glxgears/gears-upstream.c
+RELIEFOS_GEARS_TOOL := $(RELIEFOS_HOST_BIN)/reliefos-gears
+$(GLXGEARS_SOURCE): $(RELIEFOS_SRC)/third_party/portablegl/examples/classic/gears.c $(RELIEFOS_GEARS_TOOL)
+	$(Q)mkdir -p $(dir $@)
+	$(Q)$(RELIEFOS_GEARS_TOOL) --input $< --output $@
+
+PORTABLEGL_OBJ := $(O)/userland/portablegl/reliefos_pgl.o
+PORTABLEGL_FLAGS := $(filter-out -fPIE,$(USERLAND_FLAGS)) -std=c99 -Wno-unused-parameter -I$(RELIEFOS_SRC)/third_party/portablegl -I$(RELIEFOS_SRC)/userland/portablegl
+RELIEFOS_CAPTURE_PORTABLEGL_KBUILD := 1
+include $(RELIEFOS_SRC)/userland/portablegl/Kbuild
+RELIEFOS_CAPTURE_PORTABLEGL_KBUILD :=
+obj-y += userland/portablegl/
+export PORTABLEGL_FLAGS
+userland/portablegl: $(AUTOCONF_H) $(MUSL_STAMP) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID) $(RELIEFOS_AR_ID)
+
+quiet_cmd_reliefos_portablegl_shared = LD      $@
+      cmd_reliefos_portablegl_shared = $(TARGET_LD) -shared --no-undefined --hash-style=both -z max-page-size=0x1000 -soname libportablegl.so.1 $(RELIEFOS_LINK_POLICY_FLAGS) -o $@.tmp $(PORTABLEGL_OBJ) -L$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 $(RUNTIME_SO) -lc; mv $@.tmp $@
+$(PORTABLEGL_SO): $(O)/userland/portablegl/built-in.a $(RUNTIME_SO) $(MUSL_SYSROOT)/lib/libc.so $(MUSL_SYSROOT)/lib/libmimalloc.so.3 $(RELIEFOS_LD_ID) FORCE
+	$(call if_changed,reliefos_portablegl_shared)
+targets += $(PORTABLEGL_SO)
+
+quiet_cmd_reliefos_portablegl_archive = AR      $@
+      cmd_reliefos_portablegl_archive = rm -f $@.tmp; $(TARGET_AR) rcsD $@.tmp $(PORTABLEGL_OBJ); mv $@.tmp $@
+$(PORTABLEGL_ARCHIVE): $(O)/userland/portablegl/built-in.a $(RELIEFOS_AR_ID) FORCE
+	$(call if_changed,reliefos_portablegl_archive)
+targets += $(PORTABLEGL_ARCHIVE)
+
+STARDUSTUI_ARCHIVE := $(O)/userland/libstardustui.a
+STARDUSTUI_FLAGS := $(filter-out -std=c11 -fPIE,$(USERLAND_FLAGS)) -std=c++17 -nostdinc++ -fno-exceptions -fno-rtti -fno-use-cxa-atexit -fno-threadsafe-statics -Wno-unused-parameter -DSTARDUSTUI_LINUX -I$(RELIEFOS_SRC)/userland/stardustui/include -I$(RELIEFOS_SRC)/third_party/stardustui/includes -I$(RELIEFOS_SRC)/third_party/stardustui
+STARDUSTUI_EXAMPLE_stardusthello := helloworld/helloworld.cpp
+STARDUSTUI_EXAMPLE_stardustlayout := layout/layout.cpp
+STARDUSTUI_EXAMPLE_stardustshowcase := showcase/showcase.cpp
+STARDUSTUI_EXAMPLE_OBJECT_stardusthello := third_party/stardustui/examples/helloworld/helloworld.o
+STARDUSTUI_EXAMPLE_OBJECT_stardustlayout := third_party/stardustui/examples/layout/layout.o
+STARDUSTUI_EXAMPLE_OBJECT_stardustshowcase := third_party/stardustui/examples/showcase/showcase.o
+RELIEFOS_STARDUSTUI_EXAMPLES_SELECTED := $(foreach app,$(filter stardusthello stardustlayout stardustshowcase,$(RELIEFOS_COMPONENT_APPS)),$(STARDUSTUI_EXAMPLE_OBJECT_$(app)))
+export RELIEFOS_STARDUSTUI_EXAMPLES_SELECTED STARDUSTUI_FLAGS
+RELIEFOS_CAPTURE_STARDUSTUI_KBUILD := 1
+include $(RELIEFOS_SRC)/userland/stardustui/Kbuild
+RELIEFOS_CAPTURE_STARDUSTUI_KBUILD :=
+STARDUSTUI_LIBRARY_OBJECTS := $(addprefix $(O)/userland/stardustui/,$(RELIEFOS_STARDUSTUI_LIBRARY_OBJECTS))
+STARDUSTUI_EXAMPLE_OBJECTS := $(addprefix $(O)/userland/stardustui/,$(RELIEFOS_STARDUSTUI_EXAMPLES_SELECTED))
+STARDUSTUI_OBJECTS := $(STARDUSTUI_LIBRARY_OBJECTS) $(STARDUSTUI_EXAMPLE_OBJECTS)
+STARDUSTUI_BUILTIN := $(O)/userland/stardustui/built-in.a
+ifneq ($(filter stardustui stardusthello stardustlayout stardustshowcase,$(RELIEFOS_COMPONENTS_ENABLED) $(RELIEFOS_COMPONENT_APPS) $(MAKECMDGOALS)),)
+obj-y += userland/stardustui/
+userland/stardustui: $(AUTOCONF_H) $(MUSL_STAMP) $(PNG_CONFIG) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CXX_ID) $(RELIEFOS_AR_ID)
+endif
+
+quiet_cmd_reliefos_stardustui_archive = AR      $@
+      cmd_reliefos_stardustui_archive = rm -f $@.tmp; $(TARGET_AR) rcsD $@.tmp $(STARDUSTUI_LIBRARY_OBJECTS); mv $@.tmp $@
+$(STARDUSTUI_ARCHIVE): $(STARDUSTUI_BUILTIN) $(RELIEFOS_AR_ID) FORCE
+	$(call if_changed,reliefos_stardustui_archive)
+targets += $(STARDUSTUI_ARCHIVE)
+
+define RELIEFOS_STARDUST_EXAMPLE
+USERLAND_LIBS_$(1) := $(STARDUSTUI_ARCHIVE) $(addprefix $(O)/userland/stardustui/,$(STARDUSTUI_EXAMPLE_OBJECT_$(1)))
+USERLAND_DEPS_$(1) += userland/stardustui
+$$(eval $$(call RELIEFOS_APP,$(1),$(1),$(USERLAND_DIR)/$(1).elf,$(AUTOCONF_H),$(RUNTIME_SO)))
+endef
+$(foreach app,$(filter stardusthello stardustlayout stardustshowcase,$(RELIEFOS_COMPONENT_APPS)),$(eval $(call RELIEFOS_STARDUST_EXAMPLE,$(app))))
+
+.PHONY: portablegl stardustui
+portablegl: $(PORTABLEGL_SO) $(PORTABLEGL_ARCHIVE)
+stardustui: $(STARDUSTUI_ARCHIVE)
+userland: $(if $(filter portablegl,$(RELIEFOS_COMPONENTS_ENABLED)),$(PORTABLEGL_SO) $(PORTABLEGL_ARCHIVE)) $(if $(filter stardustui,$(RELIEFOS_COMPONENTS_ENABLED)),$(STARDUSTUI_ARCHIVE))

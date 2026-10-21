@@ -58,6 +58,10 @@ TMPDIR="$PWD/out/tmp" make O=out/xorg-vmware-debug PROFILE=debug -j4 app-reliefp
 双声道 WAV 和 660 Hz 单声道 MP3。测试需要宿主机 QEMU/KVM、ffmpeg、Pillow
 及 Tesseract，不属于生产构建链。
 
+程序对象由本目录 `Kbuild` 登记。测试工具可用 `--build-dir <O>` 指定实际
+构建输出，未单独指定 `--kernel` 时，内核取该输出的 `generated/system/kernel.sys`。
+`--image` 接受带测试账户的 RAW 镜像；工具仅修改它的私有副本。
+
 VMware 验证未完成；真实硬件未验证。基线私有副本的运行结果不代表默认 VMDK
 已经启动验收。实际完成的验证在本次实施计划末尾记录。
 

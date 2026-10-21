@@ -147,7 +147,7 @@ jobs:
           : "${KCONFIG_LICENSE_SERVER_URL:=http://127.0.0.1:30301}"
           : "${KCONFIG_LICENSE_DEBUG_LOG:=true}"
 
-          config_path=out/x86_64/release/config/.config
+          config_path=out/x86_64/release/.config
           # Always start from the checked-in defconfig.  This also runs the
           # component/Kconfig synchronizer, so removed symbols cannot leak
           # into a fresh CI checkout from a stale workspace configuration.
@@ -262,7 +262,7 @@ jobs:
             out/x86_64/release/images/reliefos.vmdk
             out/x86_64/release/images/reliefos-live.iso
             out/x86_64/release/images/reliefos-installer.iso
-            out/x86_64/release/config/.config
+            out/x86_64/release/.config
             build-summary.md                       # 包含摘要文档
           if-no-files-found: error
           compression-level: 0

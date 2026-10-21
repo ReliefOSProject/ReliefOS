@@ -85,8 +85,9 @@ should remain useful when the full C++ litehtml container becomes available.
 
 To integrate real litehtml, do these in order:
 
-1. Add a userland C++ build mode to the GNU Make build system
-   (`mk/userland.mk` and the component graph).
+1. Register renderer sources in `userland/apps/browser/Kbuild`. Native C++
+   compilation is supplied by `scripts/Makefile.cxx`; application flags and
+   component selection live in `scripts/reliefos/Makefile.userland`.
 2. Provide a minimal C++ runtime surface for constructors, destructors,
    allocation, exceptions-disabled builds, and required ABI helpers.
 3. Port or provide an STL subset/libc++ profile that satisfies litehtml.

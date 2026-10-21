@@ -1,5 +1,7 @@
 # TTY / VT 改造交接与验收记录
 
+> 历史验证记录：以下路径、命令和结果对应记录时的构建链。当前 Kbuild 接口与验收见 [Kbuild 迁移记录](build/kbuild-migration.md)。
+
 更新日期：2026-09-23。分支：`feature/new-tty`。功能与接口说明见 [TTY_VT.md](TTY_VT.md)。
 
 改造与 QEMU 验收已完成。本文件替代此前的暂停交接；默认 GRUB、图形登录、VT_WAITACTIVE 及实际安装/启动均已验证。

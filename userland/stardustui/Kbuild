@@ -1,0 +1,45 @@
+RELIEFOS_STARDUSTUI_LIBRARY_OBJECTS := third_party/stardustui/src/file.o third_party/stardustui/src/network.o third_party/stardustui/src/sytel.o third_party/stardustui/src/theme.o third_party/stardustui/src/window.o third_party/stardustui/src/text/font.o src/platform_reliefos.o third_party/stardustui/src/components/base.o third_party/stardustui/src/components/button.o third_party/stardustui/src/components/canvas.o third_party/stardustui/src/components/checkbox.o third_party/stardustui/src/components/flex.o third_party/stardustui/src/components/lable.o third_party/stardustui/src/components/radiobutton.o third_party/stardustui/src/components/scrollbar.o third_party/stardustui/src/components/textbox.o
+RELIEFOS_STARDUSTUI_EXAMPLE_OBJECTS := third_party/stardustui/examples/helloworld/helloworld.o third_party/stardustui/examples/layout/layout.o third_party/stardustui/examples/showcase/showcase.o
+RELIEFOS_STARDUSTUI_OBJECTS := $(RELIEFOS_STARDUSTUI_LIBRARY_OBJECTS) $(RELIEFOS_STARDUSTUI_EXAMPLE_OBJECTS)
+ifneq ($(RELIEFOS_CAPTURE_STARDUSTUI_KBUILD),1)
+obj-y := $(RELIEFOS_STARDUSTUI_LIBRARY_OBJECTS) $(RELIEFOS_STARDUSTUI_EXAMPLES_SELECTED)
+cxxflags-y += $(STARDUSTUI_FLAGS) -include $(AUTOCONF_H)
+$(addprefix $(obj)/,$(RELIEFOS_STARDUSTUI_OBJECTS)): $(AUTOCONF_H) $(MUSL_STAMP) $(PNG_CONFIG) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CXX_ID)
+include $(srctree)/scripts/Makefile.cxx
+$(obj)/third_party/stardustui/src/file.o: $(srctree)/third_party/stardustui/src/file.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/network.o: $(srctree)/third_party/stardustui/src/network.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/sytel.o: $(srctree)/third_party/stardustui/src/sytel.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/theme.o: $(srctree)/third_party/stardustui/src/theme.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/window.o: $(srctree)/third_party/stardustui/src/window.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/text/font.o: $(srctree)/third_party/stardustui/src/text/font.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/components/base.o: $(srctree)/third_party/stardustui/src/components/base.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/components/button.o: $(srctree)/third_party/stardustui/src/components/button.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/components/canvas.o: $(srctree)/third_party/stardustui/src/components/canvas.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/components/checkbox.o: $(srctree)/third_party/stardustui/src/components/checkbox.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/components/flex.o: $(srctree)/third_party/stardustui/src/components/flex.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/components/lable.o: $(srctree)/third_party/stardustui/src/components/lable.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/components/radiobutton.o: $(srctree)/third_party/stardustui/src/components/radiobutton.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/components/scrollbar.o: $(srctree)/third_party/stardustui/src/components/scrollbar.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/src/components/textbox.o: $(srctree)/third_party/stardustui/src/components/textbox.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/examples/helloworld/helloworld.o: $(srctree)/third_party/stardustui/examples/helloworld/helloworld.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/examples/layout/layout.o: $(srctree)/third_party/stardustui/examples/layout/layout.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/third_party/stardustui/examples/showcase/showcase.o: $(srctree)/third_party/stardustui/examples/showcase/showcase.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+endif

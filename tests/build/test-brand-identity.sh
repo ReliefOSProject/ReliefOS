@@ -219,9 +219,8 @@ check_paths() {
     else
         fail 'host version generator must use the ReliefNT identity'
     fi
-    if grep -Fq '/etc/reliefos/locale.conf' "$root/Kconfig" &&
-       grep -Fq '/etc/reliefos/locale.conf' "$root/kernel/reliefnt/Kconfig"; then
-        ok 'both configuration menus describe the canonical locale path'
+    if grep -Fq '/etc/reliefos/locale.conf' "$root/Kconfig"; then
+        ok 'product configuration describes the canonical locale path'
     else
         fail 'configuration menus must describe /etc/reliefos/locale.conf'
     fi
@@ -280,10 +279,10 @@ check_headers_libs() {
     else
         ok 'host installer tools use canonical ReliefOS layout constants'
     fi
-    if grep -rq 'libreliefos\.so\.2' "$root/mk" "$root/tools/build" 2>/dev/null; then
+    if grep -rq 'libreliefos\.so\.2' "$root/scripts/reliefos" "$root/tools/build" 2>/dev/null; then
         ok 'build graph produces libreliefos.so.2'
     else
-        fail 'mk/ and tools/build/ must produce libreliefos.so.2'
+        fail 'Kbuild integration and tools/build/ must produce libreliefos.so.2'
     fi
     if grep -q '^include/uapi/reliefos/' "$root/configs/header-export.list"; then
         ok 'header export lists include/uapi/reliefos/'
@@ -294,22 +293,22 @@ check_headers_libs() {
 
 # Layer 4: build product names.
 check_artifacts() {
-    if grep -q 'reliefos\.vmdk' "$root/mk/images.mk" 2>/dev/null; then
+    if grep -q 'reliefos\.vmdk' "$root/scripts/reliefos/Makefile.images" 2>/dev/null; then
         ok 'images.mk produces reliefos.vmdk'
     else
-        fail 'mk/images.mk must produce reliefos.vmdk'
+        fail 'scripts/reliefos/Makefile.images must produce reliefos.vmdk'
     fi
-    if grep -q 'reliefos-live\.iso' "$root/mk/images.mk" 2>/dev/null; then
+    if grep -q 'reliefos-live\.iso' "$root/scripts/reliefos/Makefile.images" 2>/dev/null; then
         ok 'images.mk produces reliefos-live.iso'
     else
-        fail 'mk/images.mk must produce reliefos-live.iso'
+        fail 'scripts/reliefos/Makefile.images must produce reliefos-live.iso'
     fi
-    if grep -q 'reliefos-installer\.iso' "$root/mk/images.mk" 2>/dev/null; then
+    if grep -q 'reliefos-installer\.iso' "$root/scripts/reliefos/Makefile.images" 2>/dev/null; then
         ok 'images.mk produces reliefos-installer.iso'
     else
-        fail 'mk/images.mk must produce reliefos-installer.iso'
+        fail 'scripts/reliefos/Makefile.images must produce reliefos-installer.iso'
     fi
-    if grep -rq 'reliefos-musl-sdk' "$root/mk" "$root/tools/build" 2>/dev/null; then
+    if grep -rq 'reliefos-musl-sdk' "$root/scripts/reliefos" "$root/tools/build" 2>/dev/null; then
         ok 'SDK archive is named reliefos-musl-sdk'
     else
         fail 'SDK archive must be named reliefos-musl-sdk'

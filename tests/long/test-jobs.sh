@@ -15,9 +15,18 @@ repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd -P)
 cd "$repo_root" || exit 1
 
 # The kernel checkout under test (env-overridable, see tests/build/test-incremental.sh).
-reliefnt=${RELIEFNT_DIR:-${NTCLKS_DIR:-$repo_root/kernel/reliefnt}}
+source_kernel=${RELIEFNT_DIR:-${NTCLKS_DIR:-$repo_root/kernel/reliefnt}}
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-jobs.XXXXXX") || exit 1
+# Invalidations and interruption must not touch the shared source checkout.
+reliefnt=$work/kernel
+python3 - "$source_kernel" "$reliefnt" <<'PYCOPY'
+from pathlib import Path
+import shutil, sys
+source, destination = map(Path, sys.argv[1:])
+shutil.copytree(source, destination, ignore=shutil.ignore_patterns('.git', 'out', 'cache', '__pycache__'))
+shutil.copytree(source / 'cache', destination / 'cache')
+PYCOPY
 failures=0
 checks=0
 
@@ -48,7 +57,7 @@ rounds=3
 # different names, and a comparison that includes them measures the test fixture
 # rather than the work Make chose to do.
 snapshot() {
-    find "$1/reliefnt/obj/kernel" -name '*.o' -printf '%P %T@\n' 2>/dev/null | LC_ALL=C sort
+    find "$1/reliefnt" -name '*.o' -printf '%P %T@\n' 2>/dev/null | LC_ALL=C sort
 }
 
 changed_between() {
@@ -65,7 +74,7 @@ $reliefnt/arch/x86_64/linker.ld"
 printf '=== A08: -j1 and -j8 from clean output directories ===\n'
 for level in $jobs; do
     tree=$work/j$level
-    make -s O="$tree" -j"$level" SOURCE_DATE_EPOCH=$epoch \
+    make RELIEFNT_DIR="$reliefnt" -s O="$tree" -j"$level" SOURCE_DATE_EPOCH=$epoch \
         kernel >"$work/clean-j$level.log" 2>&1
     status=$?
     if [ "$status" -eq 0 ] && [ -s "$tree/generated/system/kernel.sys" ]; then
@@ -82,34 +91,30 @@ for level in $jobs; do
     else
         pass "-j$level clean build reports no missing-file or rule error"
     fi
-    # Every action class `kernel` uses must have published its signature; a class
-    # this goal never reaches (the sysroot, the sanitised host build) legitimately
-    # has none, so the check names exactly the four it expects.
-    missing_sig=''
-    for class in kernel-cc kernel-as kernel-link kernel-objcopy; do
-        [ -f "$tree/reliefnt/meta/$class.sig" ] || missing_sig="$missing_sig $class"
+    # Native records identify the exact actions rather than broad action-class
+    # signatures. Normalise O when comparing the same build at two job levels.
+    missing_record=''
+    for record in arch/x86_64/.apic.o.cmd arch/x86_64/.boot.o.cmd generated/system/.kernel.unstripped.cmd generated/system/.kernel.sys.cmd; do
+        [ -s "$tree/reliefnt/$record" ] || missing_record="$missing_record $record"
     done
-    if [ -z "$missing_sig" ]; then
-        pass "-j$level publishes a signature for every kernel action class"
+    if [ -z "$missing_record" ]; then
+        pass "-j$level publishes native records for C, ASM, link and objcopy"
     else
-        fail "-j$level publishes a signature for every kernel action class" \
-            "missing:$missing_sig"
+        fail "-j$level publishes native action records" "missing:$missing_record"
     fi
-    # The signature legitimately contains -I$(O)/include, so normalise the tree
-    # path before comparing: what must agree is the tool, its identity and flags.
-    sed "s#$tree#<O>#g" "$tree/reliefnt/meta/kernel-cc.sig" >"$work/sig-j$level" 2>/dev/null ||
-        : >"$work/sig-j$level"
+    sed "s#$tree#<O>#g" "$tree/reliefnt/arch/x86_64/.apic.o.cmd" >"$work/command-j$level" 2>/dev/null || : >"$work/command-j$level"
+
 done
 
-if [ -s "$work/sig-j1" ] && [ -s "$work/sig-j8" ]; then
-    if cmp -s "$work/sig-j1" "$work/sig-j8"; then
+if [ -s "$work/command-j1" ] && [ -s "$work/command-j8" ]; then
+    if cmp -s "$work/command-j1" "$work/command-j8"; then
         pass 'both job levels compiled with the same tool, identity and flags'
     else
         fail 'both job levels compiled with the same tool, identity and flags'
-        diff -u "$work/sig-j1" "$work/sig-j8" | tail -n 6 | sed 's/^/       | /'
+        diff -u "$work/command-j1" "$work/command-j8" | tail -n 6 | sed 's/^/       | /'
     fi
 else
-    fail 'both job levels produced a kernel-cc signature to compare'
+    fail 'both job levels produced a native C command record to compare'
 fi
 
 printf '\n=== A08: the same invalidations at both job levels, three rounds ===\n'
@@ -139,7 +144,7 @@ for round in 1 2 3; do
     done
     for level in $jobs; do
         tree=$work/j$level
-        make -s O="$tree" -j"$level" SOURCE_DATE_EPOCH=$epoch \
+        make RELIEFNT_DIR="$reliefnt" -s O="$tree" -j"$level" SOURCE_DATE_EPOCH=$epoch \
             kernel >"$work/round-j$level-$round.log" 2>&1
         status=$?
         snapshot "$tree" >"$work/after-j$level-$round"
@@ -167,7 +172,7 @@ done
 
 printf '\n=== A08: comparable output content ===\n'
 for product in generated/system/kernel.sys generated/system/kernel.debug \
-        reliefnt/generated/system/kernel.unstripped reliefnt/obj/kernel/sources.list \
+        reliefnt/generated/system/kernel.unstripped reliefnt/built-in.a \
         include/generated/autoconf.h reliefnt/include/generated/build_info.h; do
     a=$work/j1/$product
     b=$work/j8/$product
@@ -189,7 +194,7 @@ printf '\n=== A10: an interrupted parallel build leaves no false product ===\n'
 # objects to recompile gives the section room to land the signal in the middle of
 # real work, which the first assertion then proves rather than assumes.
 victim=$work/interrupt
-make -s O="$victim" -j8 SOURCE_DATE_EPOCH=$epoch kernel \
+make RELIEFNT_DIR="$reliefnt" -s O="$victim" -j8 SOURCE_DATE_EPOCH=$epoch kernel \
         >"$work/interrupt-base.log" 2>&1
 good=$work/interrupt-image
 cp "$victim/generated/system/kernel.sys" "$good"
@@ -207,12 +212,12 @@ done
 # Make handles both signals through the same cleanup path that honours
 # .DELETE_ON_ERROR; the interactive Ctrl-C case needs a pty and is not covered.
 : >"$work/interrupt-trigger"
-make -s O="$victim" -j2 SOURCE_DATE_EPOCH=$epoch kernel \
+make RELIEFNT_DIR="$reliefnt" -s O="$victim" -j2 SOURCE_DATE_EPOCH=$epoch kernel \
         >"$work/interrupt.log" 2>&1 &
 victim_pid=$!
 waited=0
 while [ "$waited" -lt 200 ]; do
-    if [ -n "$(find "$victim/reliefnt/obj/kernel" -name '*.o' -newer "$work/interrupt-trigger" \
+    if [ -n "$(find "$victim/reliefnt/kernel" -name '*.o' -newer "$work/interrupt-trigger" \
             -print -quit 2>/dev/null)" ]; then
         break
     fi
@@ -240,7 +245,7 @@ else
     pass 'an interrupted build does not leave a partial image claimed as current'
 fi
 # The rerun has to recover on its own.
-make -s O="$victim" -j8 SOURCE_DATE_EPOCH=$epoch kernel \
+make RELIEFNT_DIR="$reliefnt" -s O="$victim" -j8 SOURCE_DATE_EPOCH=$epoch kernel \
         >"$work/recover.log" 2>&1
 status=$?
 if [ "$status" -eq 0 ] && cmp -s "$victim/generated/system/kernel.sys" "$good"; then

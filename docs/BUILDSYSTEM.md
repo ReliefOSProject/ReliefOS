@@ -1,8 +1,12 @@
-# GNU Make + C 构建系统
+# Linux Kbuild / Kconfig 构建系统
 
 根 Makefile 是生产入口，要求 GNU Make 4.3+ 和 Linux/WSL。运行 `make help` 查看完整公共接口。
-项目 C 工具负责格式转换与校验，Make 负责调度，不执行 Python/Meson/Ninja。
-生产链只编译 C 与汇编，不再需要 Rust 工具链或 `x86_64-unknown-none` target。
+自研生产 C、C++、汇编与宿主工具由固定的 Linux 6.12 原版 Kbuild 规则编译。
+项目 C 工具负责格式转换与校验，产品 Make 规则集成第三方、SDK、包、镜像与测试。
+第三方项目保持现有原生构建与移植边界；生产链不执行 Python/Meson/Ninja，不需要 Rust 工具链。
+
+上游来源、摘要与许可证见 `scripts/kbuild-source.json` 和 `LICENSES/`。项目扩展与原版文件
+分开，C++ 扩展沿用 `if_changed_dep` 与 fixdep。迁移证据和残留审计见 [迁移记录](build/kbuild-migration.md)。
 
 ## 开始构建
 
@@ -20,9 +24,13 @@ ext2fs 头文件/库和镜像工具。fetch 校验锁定摘要，是唯一联网
 ## 输出与配置
 
 默认 `O=out/x86_64/release`；`ARCH=x86_64 PROFILE=debug|release` 选择配置隔离。
-`make O=out/custom menuconfig` 编辑该树 `config/.config`；olddefconfig 保留设置并补充新项，
+`make O=out/custom menuconfig` 编辑该树 `.config`；olddefconfig 保留设置并补充新项，
 defconfig 重置为 configs/default.conf。可以复制 `.config` 保存配置，再 olddefconfig。
 Kconfig 菜单（Build、Image defaults 等）决定默认配置，configs/components.toml 用 stage/entry/sdk/api 字段区分组件归属；required 组件强制开启。
+
+从旧构建目录沿用配置时，先将旧目录的 `config/.config` 复制到新 O 的 `.config`，再运行
+`make O=新目录 olddefconfig`。推荐使用新 O 验证迁移；旧镜像、下载缓存及其他用户文件不会被迁移脚本删除。
+旧对象、`.o.d` 和签名文件不作为新 Kbuild 的输入。
 
 生成文件只写 O。`SOURCE_DATE_EPOCH` 默认为提交时间，仅用于时间元数据与可复现打包；
 版本为 `major.minor.patch`，没有构建号覆盖或计数器，提交身份另存 RELIEFOS_SOURCE_ID。
@@ -50,7 +58,7 @@ make -j8 kernel                                  # 5.1.0（默认无后缀）
 
 | 目标 | 输出 |
 | --- | --- |
-| kernel / loader / drivers | generated/system、generated/boot、generated/drivers |
+| kernel / kerneldebug | ReliefNT 独立 Kbuild；发布到 generated/system |
 | runtime / userland / reliefos-pam / reliefos-upstream | 运行库、应用、独立上游安装树 |
 | sdk / musl-sdk | packages/reliefos-musl-sdk.tar.gz |
 | rootfs-raw / rootfs / apk-repo | rootfs/raw、managed、manifest.json；packages/apk/repository |
@@ -64,11 +72,14 @@ make -j8 kernel                                  # 5.1.0（默认无后缀）
 ## 增量、并发和诊断
 
 `-jN` 由 Make jobserver 控制，嵌套上游 Make 继承它。项目组件不嵌套另一个调度器。
-每类编译/链接参数都有稳定签名；配置、源列表及文件依赖可使最小范围失效。
+原生 `.cmd` 保存真实命令，fixdep 跟踪头文件与配置依赖。源码成员显式登记在 Kbuild；
+增加或删除源码时同步对象清单。产品参数清单由原版 `if_changed` 生成，不另建编译签名引擎。
 同一 O 的两个真实构建互斥；不同 O 可以并行。不要手工设置内部锁 token。
 
 `V=1` 显示命令，`--trace` 解释规则，`-n` 预览，`-p` 查看数据库。
-检查模式不会重建被包含的配置文件。首次准确预览先 defconfig。
+检查模式不会重建被包含的配置文件。首次预览应用和产品先 defconfig、config-sync。
+`-n/-q` 在未初始化输出树上要求先执行 defconfig；产品选择清单缺失时要求 config-sync。
+检查不会创建输出目录或补写选择清单。
 目录 stage 从空树组装并记录所有成员；缺失非主文件或权限/链接变化可触发重建。
 上游 package 保持独立 root；rootfs 冲突需要显式 override。
 

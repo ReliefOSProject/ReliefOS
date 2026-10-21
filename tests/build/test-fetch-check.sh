@@ -1,6 +1,6 @@
 #!/bin/sh
 # Contract tests for the URL liveness check: tools/build/fetch-check.sh and the
-# `make fetch-check` delegation into the ReliefNT checkout (mk/kernel.mk).
+# `make fetch-check` delegation into the ReliefNT checkout (scripts/reliefos/Makefile.kernel).
 #
 #   1. a locked URL that answers 2xx is reported OK and the check passes;
 #   2. a locked URL that answers 404 fails the check, named by id and URL;
@@ -22,7 +22,7 @@ export LC_ALL
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd -P)
 cd "$repo_root" || exit 1
 
-deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:?set by mk/tests.mk}}
+deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:?set by scripts/reliefos/Makefile.tests}}
 check_script=./tools/build/fetch-check.sh
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-fetch-check.XXXXXX") || exit 1

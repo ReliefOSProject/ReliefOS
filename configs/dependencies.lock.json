@@ -2481,19 +2481,10 @@
       "url": "https://github.com/VasilyZa/fastfetch/releases/download/2.68.1/fastfetch",
       "sha256": "25107efd56d0286059487bab17d964a6ec72275263de2ab09095a46637b06be1",
       "directory": "fastfetch-2.68.1-leonos-x86_64-linux-musl",
-      "script": "mk/upstream.mk",
+      "script": "scripts/reliefos/Makefile.upstream",
       "target": "fastfetch",
       "note": "upstream musl binary; the cache file is named after the directory",
       "license": "userland/fastfetch/LICENSE"
-    },
-    {
-      "id": "kconfig-frontends",
-      "kind": "submodule",
-      "commit": "75d35b172fc0f7b6620dd659af41f2ce04edc4e6",
-      "directory": "third_party/kconfig-frontends",
-      "script": "tools/build/kconfig-frontends.sh",
-      "target": "kconfig-frontends",
-      "license": "third_party/kconfig-frontends/COPYING"
     },
     {
       "id": "libbsd",
@@ -2663,7 +2654,7 @@
       "kind": "submodule",
       "commit": "7cf39dc1741ea2be60ce3bd327f6e5337f60207f",
       "directory": "third_party/portablegl",
-      "script": "mk/components/graphics.mk",
+      "script": "scripts/reliefos/Makefile.components.graphics",
       "target": "portablegl",
       "license": "third_party/portablegl/LICENSE"
     },
@@ -2725,7 +2716,7 @@
       "url": "https://unifoundry.com/pub/unifont/unifont-16.0.04/font-builds/unifont_all-16.0.04.hex.gz",
       "sha256": "20e8b505f602488697979eefc69857f7f6106bceab702f5ac559f4f84e0e7494",
       "directory": "unifont_all-16.0.04.hex.gz",
-      "script": "mk/resources.mk",
+      "script": "scripts/reliefos/Makefile.resources",
       "target": "kernel",
       "license": "resources/licenses/unifont-LICENSE"
     },

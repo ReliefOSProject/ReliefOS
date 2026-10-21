@@ -126,10 +126,11 @@ from the installer ISO. The default for both license gates is enabled.
 The system group controls the license platform URL that is compiled into
 userland binaries. The default is `http://127.0.0.1:30301`.
 
-The Make/Kconfig front end normalizes `.config`, writes `autoconf.h` with the
-VMDK `RELIEFOS_LICENSE_REQUIRE` policy, writes `autoconf-installer.h` with the
-installer-installed-system policy, and writes `CONFIG_LICENSE_SERVER_URL` into
-both headers. License binaries read that compiled macro directly; there is no
+Native Linux Kconfig normalizes `O/.config` and writes `include/config/auto.conf`
+and `include/generated/autoconf.h`. The separate runtime `build_policy.h` maps the
+VMDK `RELIEFOS_LICENSE_REQUIRE` policy; `autoconf-installer.h` supplies the
+installer-installed-system policy. `CONFIG_LICENSE_SERVER_URL` comes from the
+native configuration header included by both policies. License binaries read that compiled macro directly; there is no
 runtime `/etc/reliefos/license.conf` server override.
 
 ## Main outputs

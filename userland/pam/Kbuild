@@ -1,0 +1,9 @@
+RELIEFOS_PAM_OBJECTS := pam_leonos_password.o auth_password.o
+RELIEFOS_PAM_C_OBJECTS := $(RELIEFOS_PAM_OBJECTS)
+ifneq ($(RELIEFOS_CAPTURE_PAM_KBUILD),1)
+obj-y := $(RELIEFOS_PAM_OBJECTS)
+ccflags-y += $(PAM_CFLAGS)
+$(addprefix $(obj)/,$(RELIEFOS_PAM_C_OBJECTS)): $(PAM_STAMP) $(PAM_HEADER) $(MUSL_STAMP) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID)
+$(obj)/auth_password.o: $(srctree)/userland/runtime/src/auth_password.c FORCE
+	$(call if_changed_dep,cc_o_c)
+endif

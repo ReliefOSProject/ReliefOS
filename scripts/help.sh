@@ -4,7 +4,7 @@
 set -u
 
 cat <<'HELP'
-ReliefOS build system (GNU Make + C host tools)
+ReliefOS build system (Linux Kbuild / Kconfig)
 
   make                 same as `make help`; never downloads or builds
   make help            this message
@@ -14,10 +14,10 @@ ReliefOS build system (GNU Make + C host tools)
   make fetch-check     probe every locked URL without downloading anything;
                        name the packages whose address answers 404 or nothing
 
-  make defconfig       start $(O)/config/.config from configs/default.conf
+  make defconfig       start $(O)/.config from configs/default.conf
   make olddefconfig    resolve new symbols non-interactively, keep user choices
   make menuconfig      edit the configuration of the selected output directory
-  make migrate-config  explicitly rename old component symbols in O/config/.config
+  make migrate-config  explicitly rename old component symbols in O/.config
   make regen-component-kconfig  regenerate Kconfig.components from components.toml
 
   make tools           build this project's C host tools (HOSTCC only)

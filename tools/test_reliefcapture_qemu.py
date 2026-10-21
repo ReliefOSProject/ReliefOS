@@ -18,9 +18,10 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'out/xorg-vmware-debug'
 
 
-def prepare(image, kernel, output):
+def prepare(image, kernel, output, build_dir=OUT):
     output.mkdir(parents=True, exist_ok=False)
-    probe = fltk.target_compile_probe(output, OUT / 'sysroot/musl', 'clang++', 'ld.lld')
+    probe = fltk.target_compile_probe(output, build_dir / 'sysroot/musl', 'clang++', 'ld.lld',
+                                      build_dir=build_dir)
     template = json.loads((output / 'probe-build.command.json').read_text())
     commands = {key: list(value) for key, value in template.items()}
     source = ROOT / 'tools/tests/reliefcapture_clipboard.cpp'
@@ -52,13 +53,13 @@ status=$?
 kill "$watcher" 2>/dev/null
 echo "RC_EXIT status=$status" >/dev/ttyS0
 ''')
-    elf = OUT / 'userland/reliefcapture.elf'
-    fltk.validate_target_elf(elf, sysroot=OUT / 'sysroot/musl', required_needed=('libfltk.so.1.3', 'libX11.so.6'))
+    elf = build_dir / 'userland/reliefcapture.elf'
+    fltk.validate_target_elf(elf, sysroot=build_dir / 'sysroot/musl', required_needed=('libfltk.so.1.3', 'libX11.so.6'))
     payload = [(elf, '/usr/lib/reliefos/apps/reliefcapture/reliefcapture.elf', 0o100755),
                (ROOT / 'resources/build-art/app-icons/reliefcapture.bmp', '/usr/lib/reliefos/apps/reliefcapture/reliefcapture.bmp', 0o100644),
                (ROOT / 'userland/apps/reliefcapture/reliefcapture.desktop', '/usr/share/applications/reliefos-reliefcapture.desktop', 0o100644),
-               (OUT / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
-               (OUT / 'upstream/x11-development/usr/lib/libX11.so', '/usr/lib/libX11.so.6', 0o100755),
+               (build_dir / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
+               (build_dir / 'upstream/x11-development/usr/lib/libX11.so', '/usr/lib/libX11.so.6', 0o100755),
                (ROOT / 'system/xorg/icewm/keys', '/etc/reliefos/icewm/keys', 0o100644),
                (runner, '/usr/bin/reliefcapture', 0o100755), (probe, fltk.PROBE_GUEST, 0o100755),
                (output / 'clipboard.elf', '/usr/lib/reliefos/tests/reliefcapture-clipboard', 0o100755)]
@@ -401,14 +402,17 @@ def verify(output, metadata, sizes):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--image', type=Path, required=True)
-    parser.add_argument('--kernel', type=Path, default=fltk.DEFAULT_KERNEL)
+    parser.add_argument('--build-dir', type=Path, default=OUT)
+    parser.add_argument('--kernel', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--interactive', action='store_true', help='keep this owned VM available for debugging a failed assertion')
     args = parser.parse_args()
     output = args.output.resolve()
     if output == ROOT / 'out' or not output.is_relative_to(ROOT / 'out'):
         parser.error('output must be a fresh repository out subdirectory')
-    metadata = prepare(args.image.resolve(), args.kernel.resolve(), output)
+    build_dir = args.build_dir.resolve()
+    kernel = args.kernel.resolve() if args.kernel else build_dir / 'generated/system/kernel.sys'
+    metadata = prepare(args.image.resolve(), kernel, output, build_dir)
     s = None
     try:
         s = Session(output)
