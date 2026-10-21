@@ -1,6 +1,6 @@
 #include "engine.h"
 #include "debug_click.h"
-#include "model.h"
+#include "taskmgr/model.h"
 #include "installer/model.h"
 #include "doomlauncher/model.h"
 #include "imageview/model.h"

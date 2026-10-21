@@ -11141,3 +11141,1009 @@ msgstr ""
 #: userland/apps/reliefapk/window.cpp
 msgid "Certificate recovery checked. Review the recovery plan and package output, then apply."
 msgstr ""
+
+#: userland/apps/calc/actions.cpp:45
+#, c-format
+msgid "%s (position %u)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:222
+#, c-format
+msgid "%u values"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:149
+msgid "16 bits"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:149
+msgid "32 bits"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:149
+msgid "64 bits"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:149
+msgid "8 bits"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:283
+msgid "<p><b>Standard and scientific</b><br>Use + - * / ^, parentheses, postfix % and !. 200*10% = 20. ans is the last answer, mem is memory. Powers associate right to left; -2^2 = -4. Use explicit multiplication: 2*pi.</p><p>Functions: sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, ln, log, exp, abs, floor, ceil, round; pow(a,b), min(a,b), max(a,b), hypot(a,b), mod(a,b), atan2(y,x). Choose degrees or radians.</p><p><b>Programmer</b><br>Integer DEC/HEX/OCT/BIN, 8/16/32/64 bits. Prefixes: 0d, 0x, 0o, 0b. Operators: + - * / %, AND OR XOR NOT, &amp; | ^ ~, &lt;&lt; &gt;&gt;; rol(value,count), ror(value,count). Arithmetic wraps to the word width. Signed mode uses two's complement, signed division and arithmetic right shift. Shift counts must be smaller than the width. Calculated values keep their bit pattern when the base changes.</p><p><b>Conversions</b><br>Choose units and enter a value or expression. Preview is automatic; Convert adds history. Temperatures below absolute zero are rejected. MB is decimal, MiB is binary. US and UK volumes are distinct.</p><p><b>Statistics and dates</b><br>Up to 1024 finite numbers; sample variance requires two. Dates use the Gregorian calendar (0001 to 9999). Differences exclude the end date. Weekdays exclude Saturday and Sunday, without holidays. Add days uses whole calendar days.</p><p>Ctrl+1..6 switches mode. Enter calculates; Ctrl+Enter calculates statistics. Esc clears input. Ctrl+Shift+C copies the result. Double-click history to reuse an expression (other modes copy the result). Memory and history last for this session.</p>"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:151
+msgid "Acceleration"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:22
+msgid "Acre"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:261
+msgid "Add days"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:103
+msgid "Add to memory"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:64
+msgid "All modes work\noffline."
+msgstr ""
+
+#: userland/apps/calc/units.cpp:152
+msgid "Angle"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:108
+msgid "Angle unit"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:70
+msgid "Arcminute"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:70
+msgid "Arcsecond"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:145
+msgid "Area"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:33
+msgid "At least two values are required."
+msgstr ""
+
+#: userland/apps/calc/units.cpp:93
+msgid "BTU (IT) per hour"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:74
+msgid "Bar"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:147
+msgid "Binary (BIN)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:106
+msgid "Bit (bit)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:179
+msgid "Bit editor: high bits at left; click to toggle"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:118
+msgid "Bits per second (bit/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:85
+msgid "British thermal unit (IT)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:106
+msgid "Byte (B)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:122
+msgid "Bytes per second (B/s)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:227
+msgid "Calculate"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:282
+msgid "Calculator help"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:254
+msgid "Calendar days (end minus start)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:26
+msgid "Cannot divide by zero."
+msgstr ""
+
+#: userland/apps/calc/units.cpp:46
+msgid "Celsius (C)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:13
+msgid "Centimetre (cm)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:59
+msgid "Centimetres per second (cm/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:63
+msgid "Centimetres per second squared (cm/s2)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:47
+msgid "Clear history"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:46
+msgid "Clear input"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:103
+msgid "Clear memory"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:253
+msgid "Compare dates"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:213
+msgid "Convert"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:211
+msgid "Converted value"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:45
+msgid "Copy result"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:211
+msgid "Count"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:61
+msgid "Ctrl+1..6: mode\nEnter: calculate\nEsc: clear input\nF1: help"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:28
+msgid "Cubic centimetre (cm3)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:29
+msgid "Cubic foot (ft3)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:29
+msgid "Cubic inch (in3)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:28
+msgid "Cubic metre (m3)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:158
+msgid "Data storage"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:159
+msgid "Data transfer rate"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:56
+msgid "Date calculation"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:238
+msgid "Date difference"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:53
+msgid "Day (24 h)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:258
+msgid "Days to add to the start date (negative subtracts)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:146
+msgid "Decimal (DEC)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:138
+msgid "Decimal arithmetic, parentheses and percentage expressions"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:15
+msgid "Decimetre (dm)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:68
+msgid "Degree (deg)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:110
+msgid "Degrees (DEG)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:160
+msgid "Density"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:78
+msgid "Double-click to reuse"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:97
+msgid "Dyne (dyn)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:84
+msgid "Electronvolt (eV)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:245
+msgid "End date (YYYY-MM-DD)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:154
+msgid "Energy"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:23
+msgid "Enter a value or expression."
+msgstr ""
+
+#: userland/apps/calc/window.cpp:223
+msgid "Enter up to 1024 numbers separated by spaces, commas, semicolons or new lines."
+msgstr ""
+
+#: userland/apps/calc/window.cpp:215
+msgid "Equivalent values"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:94
+msgid "Expression"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:46
+msgid "Fahrenheit (F)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:58
+msgid "Feet per second (ft/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:64
+msgid "Feet per second squared (ft/s2)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:16
+msgid "Foot (ft)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:86
+msgid "Foot pound-force (ft lbf)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:156
+msgid "Force units"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:157
+msgid "Frequency"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Friday"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:206
+msgid "From unit"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:115
+msgid "Gibibit (Gibit)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:111
+msgid "Gibibyte (GiB, 1024 MiB)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:128
+msgid "Gibibytes per second (GiB/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:121
+msgid "Gigabits per second (Gbit/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:108
+msgid "Gigabyte (GB, 1000 MB)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:125
+msgid "Gigabytes per second (GB/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:102
+msgid "Gigahertz (GHz)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:69
+msgid "Gradian (gon)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:43
+msgid "Grain (gr)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:38
+msgid "Gram (g)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:132
+msgid "Grams per cubic centimetre (g/cm3)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:133
+msgid "Grams per litre (g/L)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:22
+msgid "Hectare (ha)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:101
+msgid "Hertz (Hz)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:146
+msgid "Hexadecimal (HEX)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:74
+msgid "History"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:52
+msgid "Hour (h)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:15
+msgid "Inch (in)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:25
+msgid "Input or nesting limit exceeded."
+msgstr ""
+
+#: userland/apps/calc/window.cpp:228
+msgid "Insert example"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:29
+msgid "Invalid digit for the selected number base."
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:24
+msgid "Invalid expression. Check operators and parentheses."
+msgstr ""
+
+#: userland/apps/calc/units.cpp:79
+msgid "Joule (J)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:54
+msgid "Julian year (365.25 d)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:47
+msgid "Kelvin (K)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:114
+msgid "Kibibit (Kibit)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:110
+msgid "Kibibyte (KiB, 1024 B)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:126
+msgid "Kibibytes per second (KiB/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:119
+msgid "Kilobits per second (kbit/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:107
+msgid "Kilobyte (kB, 1000 B)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:123
+msgid "Kilobytes per second (kB/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:38
+msgid "Kilogram (kg)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:98
+msgid "Kilogram-force (kgf)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:131
+msgid "Kilograms per cubic metre (kg/m3)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:101
+msgid "Kilohertz (kHz)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:79
+msgid "Kilojoule (kJ)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:12
+msgid "Kilometre (km)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:57
+msgid "Kilometres per hour (km/h)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:96
+msgid "Kilonewton (kN)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:138
+msgid "Kilonewton metre (kN m)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:73
+msgid "Kilopascal (kPa)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:89
+msgid "Kilowatt (kW)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:81
+msgid "Kilowatt hour (kWh)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:59
+msgid "Knot (kn)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:144
+msgid "Length"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:27
+msgid "Litre (L)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:147
+msgid "Mass"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:211
+msgid "Mean"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:114
+msgid "Mebibit (Mibit)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:110
+msgid "Mebibyte (MiB, 1024 KiB)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:127
+msgid "Mebibytes per second (MiB/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:91
+msgid "Mechanical horsepower (hp)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:211
+msgid "Median"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:120
+msgid "Megabits per second (Mbit/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:107
+msgid "Megabyte (MB, 1000 kB)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:124
+msgid "Megabytes per second (MB/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:102
+msgid "Megahertz (MHz)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:80
+msgid "Megajoule (MJ)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:74
+msgid "Megapascal (MPa)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:90
+msgid "Megawatt (MW)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:12
+msgid "Metre (m)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:57
+msgid "Metres per second (m/s)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:62
+msgid "Metres per second squared (m/s2)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:43
+msgid "Metric carat (ct)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:92
+msgid "Metric horsepower (PS)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:39
+msgid "Microgram (ug)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:14
+msgid "Micrometre (um)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:51
+msgid "Microsecond (us)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:17
+msgid "Mile (mi)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:58
+msgid "Miles per hour (mph)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:75
+msgid "Millibar (mbar)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:39
+msgid "Milligram (mg)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:27
+msgid "Millilitre (mL)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:13
+msgid "Millimetre (mm)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:50
+msgid "Millisecond (ms)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:52
+msgid "Minute (min)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Monday"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:14
+msgid "Nanometre (nm)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:51
+msgid "Nanosecond (ns)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:17
+msgid "Nautical mile (nmi)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:96
+msgid "Newton (N)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:137
+msgid "Newton centimetre (N cm)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:137
+msgid "Newton metre (N m)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:216
+msgid "Not available"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:147
+msgid "Octal (OCT)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:41
+msgid "Ounce (oz)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:73
+msgid "Pascal (Pa)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:113
+msgid "Pebibyte (PiB, 1024 TiB)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:109
+msgid "Petabyte (PB, 1000 TB)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:212
+msgid "Population std. deviation"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:212
+msgid "Population variance"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:40
+msgid "Pound (lb)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:97
+msgid "Pound-force (lbf)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:139
+msgid "Pound-force foot (lbf ft)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:140
+msgid "Pound-force inch (lbf in)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:134
+msgid "Pounds per cubic foot (lb/ft3)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:76
+msgid "Pounds per square inch (psi)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:155
+msgid "Power units"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:153
+msgid "Pressure"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:56
+msgid "Programmer"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:68
+msgid "Radian (rad)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:110
+msgid "Radians (RAD)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:47
+msgid "Rankine (R)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:103
+msgid "Recall memory"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:267
+msgid "Result copied to clipboard."
+msgstr ""
+
+#: userland/apps/calc/units.cpp:103
+msgid "Revolutions per minute (rpm)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:212
+msgid "Sample std. deviation"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:212
+msgid "Sample variance"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:237
+msgid "Sample variance and deviation require at least two values."
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Saturday"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:56
+msgid "Scientific"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:50
+msgid "Second (s)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:30
+msgid "Shift and rotation counts must be smaller than the word width."
+msgstr ""
+
+#: userland/apps/calc/window.cpp:151
+msgid "Signed (two's complement)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:150
+msgid "Speed"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:21
+msgid "Square centimetre (cm2)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:23
+msgid "Square foot (ft2)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:23
+msgid "Square inch (in2)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:20
+msgid "Square kilometre (km2)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:20
+msgid "Square metre (m2)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:21
+msgid "Square millimetre (mm2)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:24
+msgid "Square yard (yd2)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:75
+msgid "Standard atmosphere (atm)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:65
+msgid "Standard gravity (g0)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:244
+msgid "Start date (YYYY-MM-DD)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:222
+msgid "Statistics"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:32
+msgid "Statistics accepts at most 1024 values."
+msgstr ""
+
+#: userland/apps/calc/units.cpp:41
+msgid "Stone (st)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:103
+msgid "Store in memory"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:103
+msgid "Subtract from memory"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:211
+msgid "Sum"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Sunday"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:212
+msgid "Swap units"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:112
+msgid "Tebibyte (TiB, 1024 GiB)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:148
+msgid "Temperature"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:108
+msgid "Terabyte (TB, 1000 GB)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:256
+msgid "The end date is excluded. Weekdays do not account for public holidays."
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:28
+msgid "The number exceeds the supported range."
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:157
+msgid "The result was truncated to the selected word width (modular arithmetic)."
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:27
+msgid "The value is outside the supported mathematical or physical domain."
+msgstr ""
+
+#: userland/apps/calc/units.cpp:82
+msgid "Thermochemical calorie (cal)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:83
+msgid "Thermochemical kilocalorie (kcal)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Thursday"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:149
+msgid "Time"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:206
+msgid "To unit"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:40
+msgid "Tonne (t)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:161
+msgid "Torque"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:76
+msgid "Torr"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Tuesday"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:69
+msgid "Turn (rev)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:30
+msgid "UK imperial gallon"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:42
+msgid "UK long ton"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:35
+msgid "US customary cup"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:32
+msgid "US fluid ounce"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:30
+msgid "US liquid gallon"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:31
+msgid "US liquid pint"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:31
+msgid "US liquid quart"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:42
+msgid "US short ton"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:33
+msgid "US tablespoon"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:34
+msgid "US teaspoon"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:56
+msgid "Unit conversion"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:31
+msgid "Use a valid date from 0001-01-01 to 9999-12-31."
+msgstr ""
+
+#: userland/apps/calc/window.cpp:203
+msgid "Value or expression"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:146
+msgid "Volume (capacity)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:89
+msgid "Watt (W)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:80
+msgid "Watt hour (Wh)"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Wednesday"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:53
+msgid "Week (7 d)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:255
+msgid "Weekdays (Monday to Friday)"
+msgstr ""
+
+#: userland/apps/calc/units.cpp:16
+msgid "Yard (yd)"
+msgstr ""
+
+#: userland/apps/calc/window.cpp:138
+msgid "^ power   ! factorial   ans last answer   mem stored value"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:237
+msgid "calendar days"
+msgstr ""
+
+#: userland/apps/calc/actions.cpp:237
+msgid "weekdays"
+msgstr ""

@@ -55,7 +55,7 @@ FONT_PROBE_GUEST = TEST_DIR + "/fltk-font-probe"
 FILEMAN_VERIFY_GUEST = TEST_DIR + "/fltk-fileman-verify"
 PAINT_VERIFY_GUEST = TEST_DIR + "/fltk-paint-verify"
 CHINESE_EXPECTATIONS = {
-    "calc": "计算器",
+    "calc": "标准",
     "osver": "关于",
     "fileman": "新建文件夹",
     "taskmgr": "刷新",
@@ -66,7 +66,7 @@ CHINESE_EXPECTATIONS = {
     "installer": "安装",
 }
 CLIENT_OCR_ANCHORS = {
-    "calc": (14, 348, 312, 28),
+    "calc": (12, 78, 140, 26),
     "osver": (20, 46, 750, 28),
     "fileman": (12, 74, 108, 28),
     "taskmgr": (20, 66, 80, 30),
@@ -1768,8 +1768,8 @@ def run_one_app(app: str, probe, serial: Path, process, baseline,
             probe.key(key)
         operated = probe.frame("app-calc-after-3-plus-4")
         # Exclude number buttons and terminal text from calculation evidence.
-        display = operated.crop((window_x + 14, window_y + 58,
-                                 window_x + 326, window_y + 90))
+        display = operated.crop((window_x + 166, window_y + 122,
+                                 window_x + 740, window_y + 166))
         display.save(output / "app-calc-result.png")
         operated_text = tesseract_ocr(display, output, "app-calc-result", psm=7)
         interaction = {"performed": True, "action": "keyboard 3 + 4 =",

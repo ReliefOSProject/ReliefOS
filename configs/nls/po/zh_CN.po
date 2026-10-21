@@ -15539,3 +15539,1009 @@ msgstr "无法加载系统 CA 证书库。请修复系统证书，然后重新�
 #: userland/apps/reliefapk/window.cpp
 msgid "Certificate recovery checked. Review the recovery plan and package output, then apply."
 msgstr "证书恢复检查完成。请查看恢复计划和软件包输出，然后应用。"
+
+#: userland/apps/calc/actions.cpp:45
+#, c-format
+msgid "%s (position %u)"
+msgstr "%s（位置 %u）"
+
+#: userland/apps/calc/actions.cpp:222
+#, c-format
+msgid "%u values"
+msgstr "%u 个数"
+
+#: userland/apps/calc/window.cpp:149
+msgid "16 bits"
+msgstr "16 位"
+
+#: userland/apps/calc/window.cpp:149
+msgid "32 bits"
+msgstr "32 位"
+
+#: userland/apps/calc/window.cpp:149
+msgid "64 bits"
+msgstr "64 位"
+
+#: userland/apps/calc/window.cpp:149
+msgid "8 bits"
+msgstr "8 位"
+
+#: userland/apps/calc/actions.cpp:283
+msgid "<p><b>Standard and scientific</b><br>Use + - * / ^, parentheses, postfix % and !. 200*10% = 20. ans is the last answer, mem is memory. Powers associate right to left; -2^2 = -4. Use explicit multiplication: 2*pi.</p><p>Functions: sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, ln, log, exp, abs, floor, ceil, round; pow(a,b), min(a,b), max(a,b), hypot(a,b), mod(a,b), atan2(y,x). Choose degrees or radians.</p><p><b>Programmer</b><br>Integer DEC/HEX/OCT/BIN, 8/16/32/64 bits. Prefixes: 0d, 0x, 0o, 0b. Operators: + - * / %, AND OR XOR NOT, &amp; | ^ ~, &lt;&lt; &gt;&gt;; rol(value,count), ror(value,count). Arithmetic wraps to the word width. Signed mode uses two's complement, signed division and arithmetic right shift. Shift counts must be smaller than the width. Calculated values keep their bit pattern when the base changes.</p><p><b>Conversions</b><br>Choose units and enter a value or expression. Preview is automatic; Convert adds history. Temperatures below absolute zero are rejected. MB is decimal, MiB is binary. US and UK volumes are distinct.</p><p><b>Statistics and dates</b><br>Up to 1024 finite numbers; sample variance requires two. Dates use the Gregorian calendar (0001 to 9999). Differences exclude the end date. Weekdays exclude Saturday and Sunday, without holidays. Add days uses whole calendar days.</p><p>Ctrl+1..6 switches mode. Enter calculates; Ctrl+Enter calculates statistics. Esc clears input. Ctrl+Shift+C copies the result. Double-click history to reuse an expression (other modes copy the result). Memory and history last for this session.</p>"
+msgstr "<p><b>标准与科学模式</b><br>支持 + - * / ^、括号、后缀百分号 % 和阶乘 !。200*10% = 20。ans 为上次结果，mem 为内存值。乘方从右向左结合；-2^2 = -4。乘法必须显式输入，如 2*pi。</p><p>函数：sin、cos、tan、asin、acos、atan、sinh、cosh、tanh、sqrt、cbrt、ln、log、exp、abs、floor、ceil、round；双参数函数 pow(a,b)、min(a,b)、max(a,b)、hypot(a,b)、mod(a,b)、atan2(y,x)。三角函数可选角度或弧度。</p><p><b>程序员模式</b><br>支持二、八、十、十六进制与 8/16/32/64 位整数。前缀 0d、0x、0o、0b 可指定字面量进制。运算：+ - * / %、AND OR XOR NOT、&amp; | ^ ~、&lt;&lt; &gt;&gt;，以及 rol(值,位数)、ror(值,位数)。算术结果按位宽截断。有符号模式使用补码、有符号除法和算术右移。移位数必须小于字长。已计算结果在切换进制后保留位模式。</p><p><b>单位换算</b><br>选择单位后输入数值或表达式即可实时预览；点击换算将结果加入历史。温度不能低于绝对零度。MB 为十进制，MiB 为二进制，英美制容量单位分开列出。</p><p><b>统计与日期</b><br>最多输入 1024 个有限数值，样本方差需要至少两个数。日期使用公历，支持 0001 至 9999 年；日期差不含结束日期，工作日仅排除周六日，不考虑节假日。增加天数按整日计算。</p><p>Ctrl+1..6 切换模式；Enter 计算，统计输入区用 Ctrl+Enter 计算；Esc 清空输入；Ctrl+Shift+C 复制结果。双击历史可恢复表达式，其他模式复制记录结果。内存与历史仅在本次运行中保留。</p>"
+
+#: userland/apps/calc/units.cpp:151
+msgid "Acceleration"
+msgstr "加速度"
+
+#: userland/apps/calc/units.cpp:22
+msgid "Acre"
+msgstr "英亩"
+
+#: userland/apps/calc/window.cpp:261
+msgid "Add days"
+msgstr "增加天数"
+
+#: userland/apps/calc/window.cpp:103
+msgid "Add to memory"
+msgstr "内存加"
+
+#: userland/apps/calc/window.cpp:64
+msgid "All modes work\noffline."
+msgstr "所有模式均可\n离线使用。"
+
+#: userland/apps/calc/units.cpp:152
+msgid "Angle"
+msgstr "角度"
+
+#: userland/apps/calc/window.cpp:108
+msgid "Angle unit"
+msgstr "角度单位"
+
+#: userland/apps/calc/units.cpp:70
+msgid "Arcminute"
+msgstr "角分"
+
+#: userland/apps/calc/units.cpp:70
+msgid "Arcsecond"
+msgstr "角秒"
+
+#: userland/apps/calc/units.cpp:145
+msgid "Area"
+msgstr "面积"
+
+#: userland/apps/calc/actions.cpp:33
+msgid "At least two values are required."
+msgstr "需要至少两个数。"
+
+#: userland/apps/calc/units.cpp:93
+msgid "BTU (IT) per hour"
+msgstr "英热单位（IT）每小时"
+
+#: userland/apps/calc/units.cpp:74
+msgid "Bar"
+msgstr "巴"
+
+#: userland/apps/calc/window.cpp:147
+msgid "Binary (BIN)"
+msgstr "二进制（BIN）"
+
+#: userland/apps/calc/units.cpp:106
+msgid "Bit (bit)"
+msgstr "比特 (bit)"
+
+#: userland/apps/calc/window.cpp:179
+msgid "Bit editor: high bits at left; click to toggle"
+msgstr "位编辑器：高位在左，点击切换 0 / 1"
+
+#: userland/apps/calc/units.cpp:118
+msgid "Bits per second (bit/s)"
+msgstr "比特每秒 (bit/s)"
+
+#: userland/apps/calc/units.cpp:85
+msgid "British thermal unit (IT)"
+msgstr "英热单位 (IT)"
+
+#: userland/apps/calc/units.cpp:106
+msgid "Byte (B)"
+msgstr "字节 (B)"
+
+#: userland/apps/calc/units.cpp:122
+msgid "Bytes per second (B/s)"
+msgstr "字节每秒 (B/s)"
+
+#: userland/apps/calc/window.cpp:227
+msgid "Calculate"
+msgstr "计算"
+
+#: userland/apps/calc/actions.cpp:282
+msgid "Calculator help"
+msgstr "计算器帮助"
+
+#: userland/apps/calc/window.cpp:254
+msgid "Calendar days (end minus start)"
+msgstr "相差天数（结束减起始）"
+
+#: userland/apps/calc/actions.cpp:26
+msgid "Cannot divide by zero."
+msgstr "除数不能为零。"
+
+#: userland/apps/calc/units.cpp:46
+msgid "Celsius (C)"
+msgstr "摄氏度 (C)"
+
+#: userland/apps/calc/units.cpp:13
+msgid "Centimetre (cm)"
+msgstr "厘米 (cm)"
+
+#: userland/apps/calc/units.cpp:59
+msgid "Centimetres per second (cm/s)"
+msgstr "厘米每秒 (cm/s)"
+
+#: userland/apps/calc/units.cpp:63
+msgid "Centimetres per second squared (cm/s2)"
+msgstr "厘米每二次方秒 (cm/s2)"
+
+#: userland/apps/calc/window.cpp:47
+msgid "Clear history"
+msgstr "清空历史"
+
+#: userland/apps/calc/window.cpp:46
+msgid "Clear input"
+msgstr "清空输入"
+
+#: userland/apps/calc/window.cpp:103
+msgid "Clear memory"
+msgstr "清空内存"
+
+#: userland/apps/calc/window.cpp:253
+msgid "Compare dates"
+msgstr "计算日期差"
+
+#: userland/apps/calc/window.cpp:213
+msgid "Convert"
+msgstr "换算"
+
+#: userland/apps/calc/window.cpp:211
+msgid "Converted value"
+msgstr "换算结果"
+
+#: userland/apps/calc/window.cpp:45
+msgid "Copy result"
+msgstr "复制结果"
+
+#: userland/apps/calc/actions.cpp:211
+msgid "Count"
+msgstr "个数"
+
+#: userland/apps/calc/window.cpp:61
+msgid "Ctrl+1..6: mode\nEnter: calculate\nEsc: clear input\nF1: help"
+msgstr "Ctrl+1..6：模式\nEnter：计算\nEsc：清空输入\nF1：帮助"
+
+#: userland/apps/calc/units.cpp:28
+msgid "Cubic centimetre (cm3)"
+msgstr "立方厘米 (cm3)"
+
+#: userland/apps/calc/units.cpp:29
+msgid "Cubic foot (ft3)"
+msgstr "立方英尺 (ft3)"
+
+#: userland/apps/calc/units.cpp:29
+msgid "Cubic inch (in3)"
+msgstr "立方英寸 (in3)"
+
+#: userland/apps/calc/units.cpp:28
+msgid "Cubic metre (m3)"
+msgstr "立方米 (m3)"
+
+#: userland/apps/calc/units.cpp:158
+msgid "Data storage"
+msgstr "数据存储"
+
+#: userland/apps/calc/units.cpp:159
+msgid "Data transfer rate"
+msgstr "数据传输速率"
+
+#: userland/apps/calc/window.cpp:56
+msgid "Date calculation"
+msgstr "日期计算"
+
+#: userland/apps/calc/actions.cpp:238
+msgid "Date difference"
+msgstr "日期差"
+
+#: userland/apps/calc/units.cpp:53
+msgid "Day (24 h)"
+msgstr "日 (24 h)"
+
+#: userland/apps/calc/window.cpp:258
+msgid "Days to add to the start date (negative subtracts)"
+msgstr "在起始日期上增加天数（负数表示减去）"
+
+#: userland/apps/calc/window.cpp:146
+msgid "Decimal (DEC)"
+msgstr "十进制（DEC）"
+
+#: userland/apps/calc/window.cpp:138
+msgid "Decimal arithmetic, parentheses and percentage expressions"
+msgstr "支持小数、括号与百分比表达式"
+
+#: userland/apps/calc/units.cpp:15
+msgid "Decimetre (dm)"
+msgstr "分米 (dm)"
+
+#: userland/apps/calc/units.cpp:68
+msgid "Degree (deg)"
+msgstr "度 (deg)"
+
+#: userland/apps/calc/window.cpp:110
+msgid "Degrees (DEG)"
+msgstr "角度（DEG）"
+
+#: userland/apps/calc/units.cpp:160
+msgid "Density"
+msgstr "密度"
+
+#: userland/apps/calc/window.cpp:78
+msgid "Double-click to reuse"
+msgstr "双击使用记录"
+
+#: userland/apps/calc/units.cpp:97
+msgid "Dyne (dyn)"
+msgstr "达因 (dyn)"
+
+#: userland/apps/calc/units.cpp:84
+msgid "Electronvolt (eV)"
+msgstr "电子伏特 (eV)"
+
+#: userland/apps/calc/window.cpp:245
+msgid "End date (YYYY-MM-DD)"
+msgstr "结束日期（年-月-日）"
+
+#: userland/apps/calc/units.cpp:154
+msgid "Energy"
+msgstr "能量"
+
+#: userland/apps/calc/actions.cpp:23
+msgid "Enter a value or expression."
+msgstr "请输入数值或表达式。"
+
+#: userland/apps/calc/window.cpp:223
+msgid "Enter up to 1024 numbers separated by spaces, commas, semicolons or new lines."
+msgstr "输入最多 1024 个数，以空格、逗号、分号或换行分隔。"
+
+#: userland/apps/calc/window.cpp:215
+msgid "Equivalent values"
+msgstr "其他等价值"
+
+#: userland/apps/calc/window.cpp:94
+msgid "Expression"
+msgstr "表达式"
+
+#: userland/apps/calc/units.cpp:46
+msgid "Fahrenheit (F)"
+msgstr "华氏度 (F)"
+
+#: userland/apps/calc/units.cpp:58
+msgid "Feet per second (ft/s)"
+msgstr "英尺每秒 (ft/s)"
+
+#: userland/apps/calc/units.cpp:64
+msgid "Feet per second squared (ft/s2)"
+msgstr "英尺每二次方秒 (ft/s2)"
+
+#: userland/apps/calc/units.cpp:16
+msgid "Foot (ft)"
+msgstr "英尺 (ft)"
+
+#: userland/apps/calc/units.cpp:86
+msgid "Foot pound-force (ft lbf)"
+msgstr "英尺磅力 (ft lbf)"
+
+#: userland/apps/calc/units.cpp:156
+msgid "Force units"
+msgstr "力"
+
+#: userland/apps/calc/units.cpp:157
+msgid "Frequency"
+msgstr "频率"
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Friday"
+msgstr "星期五"
+
+#: userland/apps/calc/window.cpp:206
+msgid "From unit"
+msgstr "原单位"
+
+#: userland/apps/calc/units.cpp:115
+msgid "Gibibit (Gibit)"
+msgstr "二进制吉比特 (Gibit)"
+
+#: userland/apps/calc/units.cpp:111
+msgid "Gibibyte (GiB, 1024 MiB)"
+msgstr "二进制吉字节 (GiB, 1024 MiB)"
+
+#: userland/apps/calc/units.cpp:128
+msgid "Gibibytes per second (GiB/s)"
+msgstr "二进制吉字节每秒 (GiB/s)"
+
+#: userland/apps/calc/units.cpp:121
+msgid "Gigabits per second (Gbit/s)"
+msgstr "吉比特每秒 (Gbit/s)"
+
+#: userland/apps/calc/units.cpp:108
+msgid "Gigabyte (GB, 1000 MB)"
+msgstr "吉字节 (GB, 1000 MB)"
+
+#: userland/apps/calc/units.cpp:125
+msgid "Gigabytes per second (GB/s)"
+msgstr "吉字节每秒 (GB/s)"
+
+#: userland/apps/calc/units.cpp:102
+msgid "Gigahertz (GHz)"
+msgstr "吉赫 (GHz)"
+
+#: userland/apps/calc/units.cpp:69
+msgid "Gradian (gon)"
+msgstr "百分度 (gon)"
+
+#: userland/apps/calc/units.cpp:43
+msgid "Grain (gr)"
+msgstr "格令 (gr)"
+
+#: userland/apps/calc/units.cpp:38
+msgid "Gram (g)"
+msgstr "克 (g)"
+
+#: userland/apps/calc/units.cpp:132
+msgid "Grams per cubic centimetre (g/cm3)"
+msgstr "克每立方厘米 (g/cm3)"
+
+#: userland/apps/calc/units.cpp:133
+msgid "Grams per litre (g/L)"
+msgstr "克每升 (g/L)"
+
+#: userland/apps/calc/units.cpp:22
+msgid "Hectare (ha)"
+msgstr "公顷 (ha)"
+
+#: userland/apps/calc/units.cpp:101
+msgid "Hertz (Hz)"
+msgstr "赫兹 (Hz)"
+
+#: userland/apps/calc/window.cpp:146
+msgid "Hexadecimal (HEX)"
+msgstr "十六进制（HEX）"
+
+#: userland/apps/calc/window.cpp:74
+msgid "History"
+msgstr "历史记录"
+
+#: userland/apps/calc/units.cpp:52
+msgid "Hour (h)"
+msgstr "小时 (h)"
+
+#: userland/apps/calc/units.cpp:15
+msgid "Inch (in)"
+msgstr "英寸 (in)"
+
+#: userland/apps/calc/actions.cpp:25
+msgid "Input or nesting limit exceeded."
+msgstr "输入长度或嵌套层数超出限制。"
+
+#: userland/apps/calc/window.cpp:228
+msgid "Insert example"
+msgstr "填入示例"
+
+#: userland/apps/calc/actions.cpp:29
+msgid "Invalid digit for the selected number base."
+msgstr "数字不符合所选进制。"
+
+#: userland/apps/calc/actions.cpp:24
+msgid "Invalid expression. Check operators and parentheses."
+msgstr "表达式无效，请检查运算符和括号。"
+
+#: userland/apps/calc/units.cpp:79
+msgid "Joule (J)"
+msgstr "焦耳 (J)"
+
+#: userland/apps/calc/units.cpp:54
+msgid "Julian year (365.25 d)"
+msgstr "儒略年 (365.25 d)"
+
+#: userland/apps/calc/units.cpp:47
+msgid "Kelvin (K)"
+msgstr "开尔文 (K)"
+
+#: userland/apps/calc/units.cpp:114
+msgid "Kibibit (Kibit)"
+msgstr "二进制千比特 (Kibit)"
+
+#: userland/apps/calc/units.cpp:110
+msgid "Kibibyte (KiB, 1024 B)"
+msgstr "二进制千字节 (KiB, 1024 B)"
+
+#: userland/apps/calc/units.cpp:126
+msgid "Kibibytes per second (KiB/s)"
+msgstr "二进制千字节每秒 (KiB/s)"
+
+#: userland/apps/calc/units.cpp:119
+msgid "Kilobits per second (kbit/s)"
+msgstr "千比特每秒 (kbit/s)"
+
+#: userland/apps/calc/units.cpp:107
+msgid "Kilobyte (kB, 1000 B)"
+msgstr "千字节 (kB, 1000 B)"
+
+#: userland/apps/calc/units.cpp:123
+msgid "Kilobytes per second (kB/s)"
+msgstr "千字节每秒 (kB/s)"
+
+#: userland/apps/calc/units.cpp:38
+msgid "Kilogram (kg)"
+msgstr "千克 (kg)"
+
+#: userland/apps/calc/units.cpp:98
+msgid "Kilogram-force (kgf)"
+msgstr "千克力 (kgf)"
+
+#: userland/apps/calc/units.cpp:131
+msgid "Kilograms per cubic metre (kg/m3)"
+msgstr "千克每立方米 (kg/m3)"
+
+#: userland/apps/calc/units.cpp:101
+msgid "Kilohertz (kHz)"
+msgstr "千赫 (kHz)"
+
+#: userland/apps/calc/units.cpp:79
+msgid "Kilojoule (kJ)"
+msgstr "千焦 (kJ)"
+
+#: userland/apps/calc/units.cpp:12
+msgid "Kilometre (km)"
+msgstr "千米 (km)"
+
+#: userland/apps/calc/units.cpp:57
+msgid "Kilometres per hour (km/h)"
+msgstr "千米每小时 (km/h)"
+
+#: userland/apps/calc/units.cpp:96
+msgid "Kilonewton (kN)"
+msgstr "千牛 (kN)"
+
+#: userland/apps/calc/units.cpp:138
+msgid "Kilonewton metre (kN m)"
+msgstr "千牛顿米 (kN m)"
+
+#: userland/apps/calc/units.cpp:73
+msgid "Kilopascal (kPa)"
+msgstr "千帕 (kPa)"
+
+#: userland/apps/calc/units.cpp:89
+msgid "Kilowatt (kW)"
+msgstr "千瓦 (kW)"
+
+#: userland/apps/calc/units.cpp:81
+msgid "Kilowatt hour (kWh)"
+msgstr "千瓦时 (kWh)"
+
+#: userland/apps/calc/units.cpp:59
+msgid "Knot (kn)"
+msgstr "节 (kn)"
+
+#: userland/apps/calc/units.cpp:144
+msgid "Length"
+msgstr "长度"
+
+#: userland/apps/calc/units.cpp:27
+msgid "Litre (L)"
+msgstr "升 (L)"
+
+#: userland/apps/calc/units.cpp:147
+msgid "Mass"
+msgstr "质量"
+
+#: userland/apps/calc/actions.cpp:211
+msgid "Mean"
+msgstr "平均值"
+
+#: userland/apps/calc/units.cpp:114
+msgid "Mebibit (Mibit)"
+msgstr "二进制兆比特 (Mibit)"
+
+#: userland/apps/calc/units.cpp:110
+msgid "Mebibyte (MiB, 1024 KiB)"
+msgstr "二进制兆字节 (MiB, 1024 KiB)"
+
+#: userland/apps/calc/units.cpp:127
+msgid "Mebibytes per second (MiB/s)"
+msgstr "二进制兆字节每秒 (MiB/s)"
+
+#: userland/apps/calc/units.cpp:91
+msgid "Mechanical horsepower (hp)"
+msgstr "机械马力 (hp)"
+
+#: userland/apps/calc/actions.cpp:211
+msgid "Median"
+msgstr "中位数"
+
+#: userland/apps/calc/units.cpp:120
+msgid "Megabits per second (Mbit/s)"
+msgstr "兆比特每秒 (Mbit/s)"
+
+#: userland/apps/calc/units.cpp:107
+msgid "Megabyte (MB, 1000 kB)"
+msgstr "兆字节 (MB, 1000 kB)"
+
+#: userland/apps/calc/units.cpp:124
+msgid "Megabytes per second (MB/s)"
+msgstr "兆字节每秒 (MB/s)"
+
+#: userland/apps/calc/units.cpp:102
+msgid "Megahertz (MHz)"
+msgstr "兆赫 (MHz)"
+
+#: userland/apps/calc/units.cpp:80
+msgid "Megajoule (MJ)"
+msgstr "兆焦 (MJ)"
+
+#: userland/apps/calc/units.cpp:74
+msgid "Megapascal (MPa)"
+msgstr "兆帕 (MPa)"
+
+#: userland/apps/calc/units.cpp:90
+msgid "Megawatt (MW)"
+msgstr "兆瓦 (MW)"
+
+#: userland/apps/calc/units.cpp:12
+msgid "Metre (m)"
+msgstr "米 (m)"
+
+#: userland/apps/calc/units.cpp:57
+msgid "Metres per second (m/s)"
+msgstr "米每秒 (m/s)"
+
+#: userland/apps/calc/units.cpp:62
+msgid "Metres per second squared (m/s2)"
+msgstr "米每二次方秒 (m/s2)"
+
+#: userland/apps/calc/units.cpp:43
+msgid "Metric carat (ct)"
+msgstr "公制克拉 (ct)"
+
+#: userland/apps/calc/units.cpp:92
+msgid "Metric horsepower (PS)"
+msgstr "公制马力 (PS)"
+
+#: userland/apps/calc/units.cpp:39
+msgid "Microgram (ug)"
+msgstr "微克 (ug)"
+
+#: userland/apps/calc/units.cpp:14
+msgid "Micrometre (um)"
+msgstr "微米 (um)"
+
+#: userland/apps/calc/units.cpp:51
+msgid "Microsecond (us)"
+msgstr "微秒 (us)"
+
+#: userland/apps/calc/units.cpp:17
+msgid "Mile (mi)"
+msgstr "英里 (mi)"
+
+#: userland/apps/calc/units.cpp:58
+msgid "Miles per hour (mph)"
+msgstr "英里每小时 (mph)"
+
+#: userland/apps/calc/units.cpp:75
+msgid "Millibar (mbar)"
+msgstr "毫巴 (mbar)"
+
+#: userland/apps/calc/units.cpp:39
+msgid "Milligram (mg)"
+msgstr "毫克 (mg)"
+
+#: userland/apps/calc/units.cpp:27
+msgid "Millilitre (mL)"
+msgstr "毫升 (mL)"
+
+#: userland/apps/calc/units.cpp:13
+msgid "Millimetre (mm)"
+msgstr "毫米 (mm)"
+
+#: userland/apps/calc/units.cpp:50
+msgid "Millisecond (ms)"
+msgstr "毫秒 (ms)"
+
+#: userland/apps/calc/units.cpp:52
+msgid "Minute (min)"
+msgstr "分钟 (min)"
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Monday"
+msgstr "星期一"
+
+#: userland/apps/calc/units.cpp:14
+msgid "Nanometre (nm)"
+msgstr "纳米 (nm)"
+
+#: userland/apps/calc/units.cpp:51
+msgid "Nanosecond (ns)"
+msgstr "纳秒 (ns)"
+
+#: userland/apps/calc/units.cpp:17
+msgid "Nautical mile (nmi)"
+msgstr "海里 (nmi)"
+
+#: userland/apps/calc/units.cpp:96
+msgid "Newton (N)"
+msgstr "牛顿 (N)"
+
+#: userland/apps/calc/units.cpp:137
+msgid "Newton centimetre (N cm)"
+msgstr "牛顿厘米 (N cm)"
+
+#: userland/apps/calc/units.cpp:137
+msgid "Newton metre (N m)"
+msgstr "牛顿米 (N m)"
+
+#: userland/apps/calc/actions.cpp:216
+msgid "Not available"
+msgstr "不适用"
+
+#: userland/apps/calc/window.cpp:147
+msgid "Octal (OCT)"
+msgstr "八进制（OCT）"
+
+#: userland/apps/calc/units.cpp:41
+msgid "Ounce (oz)"
+msgstr "盎司 (oz)"
+
+#: userland/apps/calc/units.cpp:73
+msgid "Pascal (Pa)"
+msgstr "帕斯卡 (Pa)"
+
+#: userland/apps/calc/units.cpp:113
+msgid "Pebibyte (PiB, 1024 TiB)"
+msgstr "二进制拍字节 (PiB, 1024 TiB)"
+
+#: userland/apps/calc/units.cpp:109
+msgid "Petabyte (PB, 1000 TB)"
+msgstr "拍字节 (PB, 1000 TB)"
+
+#: userland/apps/calc/actions.cpp:212
+msgid "Population std. deviation"
+msgstr "总体标准差"
+
+#: userland/apps/calc/actions.cpp:212
+msgid "Population variance"
+msgstr "总体方差"
+
+#: userland/apps/calc/units.cpp:40
+msgid "Pound (lb)"
+msgstr "磅 (lb)"
+
+#: userland/apps/calc/units.cpp:97
+msgid "Pound-force (lbf)"
+msgstr "磅力 (lbf)"
+
+#: userland/apps/calc/units.cpp:139
+msgid "Pound-force foot (lbf ft)"
+msgstr "磅力英尺 (lbf ft)"
+
+#: userland/apps/calc/units.cpp:140
+msgid "Pound-force inch (lbf in)"
+msgstr "磅力英寸 (lbf in)"
+
+#: userland/apps/calc/units.cpp:134
+msgid "Pounds per cubic foot (lb/ft3)"
+msgstr "磅每立方英尺 (lb/ft3)"
+
+#: userland/apps/calc/units.cpp:76
+msgid "Pounds per square inch (psi)"
+msgstr "磅每平方英寸 (psi)"
+
+#: userland/apps/calc/units.cpp:155
+msgid "Power units"
+msgstr "功率"
+
+#: userland/apps/calc/units.cpp:153
+msgid "Pressure"
+msgstr "压力"
+
+#: userland/apps/calc/window.cpp:56
+msgid "Programmer"
+msgstr "程序员"
+
+#: userland/apps/calc/units.cpp:68
+msgid "Radian (rad)"
+msgstr "弧度 (rad)"
+
+#: userland/apps/calc/window.cpp:110
+msgid "Radians (RAD)"
+msgstr "弧度（RAD）"
+
+#: userland/apps/calc/units.cpp:47
+msgid "Rankine (R)"
+msgstr "兰氏度 (R)"
+
+#: userland/apps/calc/window.cpp:103
+msgid "Recall memory"
+msgstr "读取内存"
+
+#: userland/apps/calc/actions.cpp:267
+msgid "Result copied to clipboard."
+msgstr "结果已复制到剪贴板。"
+
+#: userland/apps/calc/units.cpp:103
+msgid "Revolutions per minute (rpm)"
+msgstr "转每分钟 (rpm)"
+
+#: userland/apps/calc/actions.cpp:212
+msgid "Sample std. deviation"
+msgstr "样本标准差"
+
+#: userland/apps/calc/actions.cpp:212
+msgid "Sample variance"
+msgstr "样本方差"
+
+#: userland/apps/calc/window.cpp:237
+msgid "Sample variance and deviation require at least two values."
+msgstr "样本方差和样本标准差需要至少两个数。"
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Saturday"
+msgstr "星期六"
+
+#: userland/apps/calc/window.cpp:56
+msgid "Scientific"
+msgstr "科学"
+
+#: userland/apps/calc/units.cpp:50
+msgid "Second (s)"
+msgstr "秒 (s)"
+
+#: userland/apps/calc/actions.cpp:30
+msgid "Shift and rotation counts must be smaller than the word width."
+msgstr "移位和循环移位的位数必须小于字长。"
+
+#: userland/apps/calc/window.cpp:151
+msgid "Signed (two's complement)"
+msgstr "有符号（补码）"
+
+#: userland/apps/calc/units.cpp:150
+msgid "Speed"
+msgstr "速度"
+
+#: userland/apps/calc/units.cpp:21
+msgid "Square centimetre (cm2)"
+msgstr "平方厘米 (cm2)"
+
+#: userland/apps/calc/units.cpp:23
+msgid "Square foot (ft2)"
+msgstr "平方英尺 (ft2)"
+
+#: userland/apps/calc/units.cpp:23
+msgid "Square inch (in2)"
+msgstr "平方英寸 (in2)"
+
+#: userland/apps/calc/units.cpp:20
+msgid "Square kilometre (km2)"
+msgstr "平方千米 (km2)"
+
+#: userland/apps/calc/units.cpp:20
+msgid "Square metre (m2)"
+msgstr "平方米 (m2)"
+
+#: userland/apps/calc/units.cpp:21
+msgid "Square millimetre (mm2)"
+msgstr "平方毫米 (mm2)"
+
+#: userland/apps/calc/units.cpp:24
+msgid "Square yard (yd2)"
+msgstr "平方码 (yd2)"
+
+#: userland/apps/calc/units.cpp:75
+msgid "Standard atmosphere (atm)"
+msgstr "标准大气压 (atm)"
+
+#: userland/apps/calc/units.cpp:65
+msgid "Standard gravity (g0)"
+msgstr "标准重力加速度 (g0)"
+
+#: userland/apps/calc/window.cpp:244
+msgid "Start date (YYYY-MM-DD)"
+msgstr "起始日期（年-月-日）"
+
+#: userland/apps/calc/actions.cpp:222
+msgid "Statistics"
+msgstr "统计"
+
+#: userland/apps/calc/actions.cpp:32
+msgid "Statistics accepts at most 1024 values."
+msgstr "统计模式最多接受 1024 个数。"
+
+#: userland/apps/calc/units.cpp:41
+msgid "Stone (st)"
+msgstr "英石 (st)"
+
+#: userland/apps/calc/window.cpp:103
+msgid "Store in memory"
+msgstr "存入内存"
+
+#: userland/apps/calc/window.cpp:103
+msgid "Subtract from memory"
+msgstr "内存减"
+
+#: userland/apps/calc/actions.cpp:211
+msgid "Sum"
+msgstr "总和"
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Sunday"
+msgstr "星期日"
+
+#: userland/apps/calc/window.cpp:212
+msgid "Swap units"
+msgstr "交换单位"
+
+#: userland/apps/calc/units.cpp:112
+msgid "Tebibyte (TiB, 1024 GiB)"
+msgstr "二进制太字节 (TiB, 1024 GiB)"
+
+#: userland/apps/calc/units.cpp:148
+msgid "Temperature"
+msgstr "温度"
+
+#: userland/apps/calc/units.cpp:108
+msgid "Terabyte (TB, 1000 GB)"
+msgstr "太字节 (TB, 1000 GB)"
+
+#: userland/apps/calc/window.cpp:256
+msgid "The end date is excluded. Weekdays do not account for public holidays."
+msgstr "不包含结束日期；工作日计算不考虑法定节假日。"
+
+#: userland/apps/calc/actions.cpp:28
+msgid "The number exceeds the supported range."
+msgstr "数值超出支持范围。"
+
+#: userland/apps/calc/actions.cpp:157
+msgid "The result was truncated to the selected word width (modular arithmetic)."
+msgstr "结果已按所选位宽截断（模运算）。"
+
+#: userland/apps/calc/actions.cpp:27
+msgid "The value is outside the supported mathematical or physical domain."
+msgstr "数值超出数学定义域或物理允许范围。"
+
+#: userland/apps/calc/units.cpp:82
+msgid "Thermochemical calorie (cal)"
+msgstr "热化学卡 (cal)"
+
+#: userland/apps/calc/units.cpp:83
+msgid "Thermochemical kilocalorie (kcal)"
+msgstr "热化学千卡 (kcal)"
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Thursday"
+msgstr "星期四"
+
+#: userland/apps/calc/units.cpp:149
+msgid "Time"
+msgstr "时间"
+
+#: userland/apps/calc/window.cpp:206
+msgid "To unit"
+msgstr "目标单位"
+
+#: userland/apps/calc/units.cpp:40
+msgid "Tonne (t)"
+msgstr "吨 (t)"
+
+#: userland/apps/calc/units.cpp:161
+msgid "Torque"
+msgstr "力矩"
+
+#: userland/apps/calc/units.cpp:76
+msgid "Torr"
+msgstr "托"
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Tuesday"
+msgstr "星期二"
+
+#: userland/apps/calc/units.cpp:69
+msgid "Turn (rev)"
+msgstr "周 (rev)"
+
+#: userland/apps/calc/units.cpp:30
+msgid "UK imperial gallon"
+msgstr "英制加仑"
+
+#: userland/apps/calc/units.cpp:42
+msgid "UK long ton"
+msgstr "英制长吨"
+
+#: userland/apps/calc/units.cpp:35
+msgid "US customary cup"
+msgstr "美制惯用杯"
+
+#: userland/apps/calc/units.cpp:32
+msgid "US fluid ounce"
+msgstr "美制液体盎司"
+
+#: userland/apps/calc/units.cpp:30
+msgid "US liquid gallon"
+msgstr "美制液体加仑"
+
+#: userland/apps/calc/units.cpp:31
+msgid "US liquid pint"
+msgstr "美制液体品脱"
+
+#: userland/apps/calc/units.cpp:31
+msgid "US liquid quart"
+msgstr "美制液体夸脱"
+
+#: userland/apps/calc/units.cpp:42
+msgid "US short ton"
+msgstr "美制短吨"
+
+#: userland/apps/calc/units.cpp:33
+msgid "US tablespoon"
+msgstr "美制汤匙"
+
+#: userland/apps/calc/units.cpp:34
+msgid "US teaspoon"
+msgstr "美制茶匙"
+
+#: userland/apps/calc/window.cpp:56
+msgid "Unit conversion"
+msgstr "单位换算"
+
+#: userland/apps/calc/actions.cpp:31
+msgid "Use a valid date from 0001-01-01 to 9999-12-31."
+msgstr "请输入 0001-01-01 至 9999-12-31 范围内的有效日期。"
+
+#: userland/apps/calc/window.cpp:203
+msgid "Value or expression"
+msgstr "数值或表达式"
+
+#: userland/apps/calc/units.cpp:146
+msgid "Volume (capacity)"
+msgstr "体积与容量"
+
+#: userland/apps/calc/units.cpp:89
+msgid "Watt (W)"
+msgstr "瓦 (W)"
+
+#: userland/apps/calc/units.cpp:80
+msgid "Watt hour (Wh)"
+msgstr "瓦时 (Wh)"
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Wednesday"
+msgstr "星期三"
+
+#: userland/apps/calc/units.cpp:53
+msgid "Week (7 d)"
+msgstr "周 (7 d)"
+
+#: userland/apps/calc/window.cpp:255
+msgid "Weekdays (Monday to Friday)"
+msgstr "工作日数（周一至周五）"
+
+#: userland/apps/calc/units.cpp:16
+msgid "Yard (yd)"
+msgstr "码 (yd)"
+
+#: userland/apps/calc/window.cpp:138
+msgid "^ power   ! factorial   ans last answer   mem stored value"
+msgstr "^ 乘方　! 阶乘　ans 上次结果　mem 内存值"
+
+#: userland/apps/calc/actions.cpp:237
+msgid "calendar days"
+msgstr "天"
+
+#: userland/apps/calc/actions.cpp:237
+msgid "weekdays"
+msgstr "个工作日"
