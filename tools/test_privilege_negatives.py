@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Privilege negative guest regression for the ntclks separation (phase 4).
 
-Boots a disposable copy of a ReliefOS image in QEMU and pins today's privilege
-boundaries from docs/superpowers/ntclks-separation/03-permission-matrix.md
-BEFORE any decoupling work (plan rule: negatives first, never remove a check
-before the tests exist):
+Legacy separation-era guest probes, using a disposable image copy in QEMU.
+These assertions record their original migration baseline, not a complete
+specification of today's permissions. In particular M10 still asserts the
+retired raw-block role gate; current DAC/fd/CAP_SYS_ADMIN behavior is described
+in Documentation/admin-guide/accounts.rst. This documentation migration does
+not change or certify these legacy assertions:
 
   M1/M14  service impersonation negatives (non-root exec at the service paths,
           user-writable copies at service-looking paths), the M3 fork-child
@@ -17,9 +19,8 @@ before the tests exist):
           root bypass, for non-root and for installed-system root
   M17     forged SCM_CREDENTIALS over a unix socket rejected
   M1(c)   case-variant path impersonation: authority rides on the inode's
-          role gid (phase 5.7 equivalent replacement, 09-m1-authority-design-
-          review.md), so an unmarked copy at a look-alike path must not be
-          tagged; the check keeps its Xfail reporting path as the standing
+          role gid in its original phase-5.7 baseline, so an unmarked copy at a
+          look-alike path must not be tagged; the check keeps its Xfail reporting path as the standing
           rule if a grant ever reappears
 
 Observables: every check runs a tiny probe ELF (tools/tests/

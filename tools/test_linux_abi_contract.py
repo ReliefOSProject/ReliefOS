@@ -70,7 +70,7 @@ def test_audio_export_closure() -> None:
 
 
 def test_audio_support_manifest() -> None:
-    manifest = json.loads(read("docs/audio-abi-support.json"))
+    manifest = json.loads(read("configs/audio-abi-support.json"))
     assert manifest["uapi"] == "Linux v6.14 native x86-64"
     expected = set(re.findall(r"^#define\s+(SNDRV_(?:PCM|CTL)_IOCTL_\w+)",
                               read("kernel/reliefnt/include/uapi/sound/asound.h"), re.M))

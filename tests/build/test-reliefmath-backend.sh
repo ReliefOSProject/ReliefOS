@@ -33,7 +33,7 @@ case $mode in
     grep -q 'libcairo.so.2' "$work/target-dynamic.txt"
     ;;
 --check-evidence)
-    test -s "$src/docs/RELIEFMATH_BACKEND.md"
+    test -s "$src/Documentation/applications/reliefmath-rendering.rst"
     test -s "$src/resources/licenses/reliefmath/STIX-OFL.txt"
     test "$(sha256sum "$src/resources/reliefmath/STIXTwoMath-Regular.otf" | cut -d' ' -f1)" = 3a5f3f26f40d5698b3c62dd085d48d6663696a3f80825aab8b553d5097518e8c
     test -s "$work/images/probe-4.svg"

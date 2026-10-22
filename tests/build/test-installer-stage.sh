@@ -6,7 +6,7 @@ w=$(mktemp -d)
 trap 'rm -rf "$w"' EXIT HUP INT TERM
 ${HOSTCC:-cc} -std=c11 -O2 -Wall -Wextra -Werror "$src/tools/host/manifest/reliefos-dedup.c" -o "$w/dedup"
 export INSTALLER_DEDUP_TOOL="$w/dedup"
-mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/src/configs" "$w/src/userland/apps/installer" "$w/src/system/xorg" \
+mkdir -p "$w/src/tools/build" "$w/src/Documentation/admin-guide" "$w/src/configs" "$w/src/userland/apps/installer" "$w/src/system/xorg" \
     "$w/out/userland" "$w/out/userland-installer" \
     "$w/raw/usr/lib/reliefos/apps/settings" "$w/raw/usr/lib/leonos" "$w/raw/usr/bin" \
     "$w/raw/etc/reliefos/icewm" "$w/raw/etc/runlevels/default" \
@@ -16,7 +16,7 @@ mkdir -p "$w/src/tools/build" "$w/src/docs" "$w/src/configs" "$w/src/userland/ap
     "$w/raw/usr/share/licenses/reliefmath" "$w/raw/usr/share/mime/packages" \
     "$w/raw/usr/share/fonts/reliefos" "$w/raw/usr/share/reliefos" \
     "$w/esp/EFI/BOOT" "$w/esp/reliefos" "$w/esp/leonos" "$w/esp/grub"
-printf 'guide\n' > "$w/src/docs/ADVANCED_INSTALL.txt"
+printf 'guide\n' > "$w/src/Documentation/admin-guide/installation.rst"
 cp "$src/configs/fltk-apps.list" "$w/src/configs/fltk-apps.list"
 printf 'future-fltk\n' >> "$w/src/configs/fltk-apps.list"
 printf '[Desktop Entry]\n' > "$w/src/userland/apps/installer/installer.desktop"

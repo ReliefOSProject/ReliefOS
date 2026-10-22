@@ -63,7 +63,7 @@ fi
 # delete, and this is what makes `clean` auditable.
 # third-party holds upstream build directories this configuration owns (see scripts/reliefos/Makefile.third-party).
 # ntclks is the kernel checkout's own sub-build output directory (scripts/reliefos/Makefile.kernel).
-products="scripts tools userland userland-installer userland-installer-policy upstream grub-host grub-efi rootfs resources rpr-apps rpr-pages obj generated host include auth pam system musl installer sdk sysroot stage packages images logs meta third-party kernel-export kernel-install reliefnt ntclks"
+products="scripts tools userland userland-installer userland-installer-policy upstream grub-host grub-efi rootfs resources rpr-apps rpr-pages pages Documentation obj generated host include auth pam system musl installer sdk sysroot stage packages images logs meta third-party kernel-export kernel-install reliefnt ntclks"
 if [ "$keep" = 0 ]; then
     products="$products config"
 fi

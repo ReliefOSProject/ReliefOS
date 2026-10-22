@@ -83,7 +83,7 @@ $(DISK_ROOT_EXT4): $(O_STAGE)/disk-root.complete $(RELIEFOS_EXT4_TIME) $(RELIEFO
 RELIEFOS_DEDUP_TOOL := $(RELIEFOS_HOST_BIN)/reliefos-dedup
 tools: $(RELIEFOS_DEDUP_TOOL)
 $(INSTALLER_STAGE_STAMP): $(RELIEFOS_DEDUP_TOOL) $(APK_STAGE_INPUTS)
-$(INSTALLER_STAGE_STAMP): $(ROOTFS_RAW_STAMP) $(ESP_STAMP) $(USERLAND_DIR)/installer.elf $(O)/userland-installer/gptinit.elf $(APK_MANAGED_ROOT)/.apk-complete $(RELIEFOS_SRC)/tools/build/installer-stage.sh $(RELIEFOS_SRC)/tools/build/installer-console-profile.sh $(RELIEFOS_SRC)/configs/fltk-apps.list $(RELIEFOS_SRC)/system/xorg/installer-session $(RELIEFOS_SRC)/userland/apps/installer/installer.desktop $(APK_STAGE_SCRIPT) $(RELIEFOS_SRC)/docs/ADVANCED_INSTALL.txt $(O_META)/images.parameters
+$(INSTALLER_STAGE_STAMP): $(ROOTFS_RAW_STAMP) $(ESP_STAMP) $(USERLAND_DIR)/installer.elf $(O)/userland-installer/gptinit.elf $(APK_MANAGED_ROOT)/.apk-complete $(RELIEFOS_SRC)/tools/build/installer-stage.sh $(RELIEFOS_SRC)/tools/build/installer-console-profile.sh $(RELIEFOS_SRC)/configs/fltk-apps.list $(RELIEFOS_SRC)/system/xorg/installer-session $(RELIEFOS_SRC)/userland/apps/installer/installer.desktop $(APK_STAGE_SCRIPT) $(RELIEFOS_SRC)/Documentation/admin-guide/installation.rst $(O_META)/images.parameters
 	$(Q)mkdir -p $(O_LOGS)
 	$(Q)APK_TOOL=$(abspath $(UPSTREAM_APK)) APK_UPSTREAM=$(abspath $(UPSTREAM_APK_ROOT)) APK_OWN_TOOL=$(abspath $(RELIEFOS_APK_OWN)) APK_KEY='$(APK_SIGNING_KEY)' APK_VERSION='$(APK_BUILD_VERSION)' sh $(RELIEFOS_SRC)/tools/build/run-logged.sh $(O_LOGS)/installer-stage.log sh $(RELIEFOS_SRC)/tools/build/installer-stage.sh $(RELIEFOS_SRC) $(abspath $(O)) $(abspath $(ROOTFS_RAW)) $(abspath $(ESP_STAGE)) $(abspath $(INSTALLER_ROOT)) $(SOURCE_DATE_EPOCH)
 	$(Q)touch $@

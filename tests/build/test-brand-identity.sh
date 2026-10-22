@@ -9,7 +9,7 @@
 #   old_names    - every remaining old-name hit must be listed in
 #                  tests/build/brand-allowlist.tsv with a valid category.
 #                  Any unlisted hit is a FAIL. Categories are defined in
-#                  docs/branding-compatibility.md section 3; the transitional
+#                  Documentation/userspace-api/abi.rst; the transitional
 #                  'migration' category is reported but only rejected when
 #                  BRAND_STRICT=1 (final review, plan task 11).
 #
@@ -186,26 +186,24 @@ userland/apps/shell/main.c
 }
 
 check_current_docs() {
-    if grep -qx '# ReliefOS 高级安装教程' "$root/docs/ADVANCED_INSTALL.md" &&
-       grep -q '^ReliefOS Installer ISO - Advanced Installation Quick Guide$' \
-           "$root/docs/ADVANCED_INSTALL.txt" &&
-       grep -q 'Install ReliefOS (console session)' "$root/docs/ADVANCED_INSTALL.txt"; then
-        ok 'current installer guides use ReliefOS'
+    if grep -qx '安装 ReliefOS' "$root/Documentation/admin-guide/installation.rst" &&
+       grep -q 'Install ReliefOS (console session)' "$root/Documentation/admin-guide/installation.rst"; then
+        ok 'current installer guide uses ReliefOS'
     else
-        fail 'current installer guides must use ReliefOS'
+        fail 'current installer guide must use ReliefOS'
     fi
-    if grep -q 'kernel/reliefnt/drivers/' "$root/docs/DRIVERS.md" &&
-       ! grep -q 'kernel/ntclks/drivers/' "$root/docs/DRIVERS.md"; then
+    if grep -q 'kernel/reliefnt/drivers/' "$root/Documentation/userspace-api/graphics.rst" &&
+       ! grep -q 'kernel/ntclks/drivers/' "$root/Documentation/userspace-api/graphics.rst"; then
         ok 'driver guide uses the ReliefNT submodule path'
     else
         fail 'driver guide must use kernel/reliefnt/drivers/'
     fi
-    if grep -q 'about:reliefos' "$root/docs/BROWSER.md"; then
+    if grep -q 'about:reliefos' "$root/Documentation/applications/system-tools.rst"; then
         ok 'browser guide documents the ReliefOS home URI'
     else
         fail 'browser guide must document about:reliefos'
     fi
-    if grep -q 'About ReliefOS' "$root/docs/KERNEL_DEBUG.md"; then
+    if grep -q 'About ReliefOS' "$root/Documentation/admin-guide/console.rst"; then
         ok 'kernel debugger guide uses the ReliefOS product name'
     else
         fail 'kernel debugger guide must use About ReliefOS'
@@ -333,6 +331,9 @@ audit_repo() {
     git -C "$hit_dir" ls-files | grep -Ei 'leonos|ntclks' >> "$hits" || true
     sort -u "$hits" | while IFS= read -r hit_path; do
         [ -n "$hit_path" ] || continue
+        # ls-files still includes unstaged deletions; they are no longer part
+        # of the source tree being verified. Audit remaining symlinks too.
+        [ -e "$hit_dir/$hit_path" ] || [ -L "$hit_dir/$hit_path" ] || continue
         if ! hit_allowed "$hit_scope" "$hit_path"; then
             printf 'FAIL - non-allowlisted old name in %s:%s (rename it or add a categorised entry to brand-allowlist.tsv)\n' \
                 "$hit_scope" "$hit_path"

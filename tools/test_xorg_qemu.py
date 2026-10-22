@@ -21,8 +21,8 @@ EVENTS = [
 def source_check():
     errors = []
     required = {
-        "docs/XORG.md": ["IceWM", "make fetch", "Dillo", "QEMU"],
-        "docs/APK_PREPARATION.md": ["feature=xorg", "xdm", "v3.24"],
+        "Documentation/admin-guide/desktop.rst": ["IceWM", "make fetch", "Dillo", "QEMU",
+                                                  "feature=xorg", "xdm", "v3.24"],
         "system/xorg/xdm-Xservers": ["/usr/lib/reliefos/xorg-tty-wrapper", "vt1", "-keeptty"],
         "system/xorg/xdm-session": ["/usr/bin/icewm", "/usr/bin/st",
                                     "xdg-user-dirs-update"],

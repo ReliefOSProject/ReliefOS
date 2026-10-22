@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Inventory the M1 service role marks (ntclks separation, phase 5.7).
 
-The M1 authority decision (docs/superpowers/ntclks-separation/
-09-m1-authority-design-review.md) rides on reserved role gids recorded in the
-image inode.  The windowd stack (desktop.elf/windowd.elf/imd.elf) that used to
+The authority boundary (Documentation/admin-guide/accounts.rst) rides on reserved
+role gids recorded in the image inode.  The windowd stack
+(desktop.elf/windowd.elf/imd.elf) that used to
 carry those marks is out of the image, so the userspace side of the mark is
 gone and the kernel grants stay dormant.  This test pins that end state:
 

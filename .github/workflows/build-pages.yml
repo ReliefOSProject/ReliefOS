@@ -43,7 +43,7 @@ jobs:
             grub-efi-amd64-bin grub-pc-bin grub-common xorriso mtools \
             dosfstools e2fsprogs libext2fs-dev fdisk fakeroot gdisk qemu-utils zip \
             git make bison flex bc pkg-config autoconf automake libtool \
-            libtool-bin gawk gperf gettext libncurses-dev ncurses-bin exfatprogs openssl perl
+            libtool-bin gawk gperf gettext libncurses-dev ncurses-bin exfatprogs openssl perl python3-sphinx
           msgfmt --version
 
       # APK staging executes package triggers chrooted inside the target root

@@ -12,7 +12,7 @@ from pathlib import Path
 from make_ext2_root import write_ext2_root
 
 ROOT = Path(__file__).resolve().parents[1]
-ADVANCED_INSTALL_GUIDE = ROOT / "docs/ADVANCED_INSTALL.txt"
+ADVANCED_INSTALL_GUIDE = ROOT / "Documentation/admin-guide/installation.rst"
 sys.path.insert(0, str(ROOT / "tools"))
 from reliefos_layout import (  # noqa: E402
     BIN,
@@ -141,7 +141,7 @@ def stage_runtime_payload(esp_tree: Path, stage: Path,
     )
     copy_file(esp_tree / RELIEFOS_APPS / "dynlinkerror" / "dynlinkerror.elf",
               stage / RELIEFOS_APPS / "dynlinkerror" / "dynlinkerror.elf")
-    copy_file(ADVANCED_INSTALL_GUIDE, stage / "root/ADVANCED_INSTALL.txt")
+    copy_file(ADVANCED_INSTALL_GUIDE, stage / "root/installation.rst")
     for app in ("installer", "gptinit"):
         link, target = command_symlink(app, f"{RELIEFOS_APPS}/{app}/{app}.elf")
         path = stage / link

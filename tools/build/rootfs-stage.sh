@@ -249,7 +249,7 @@ file "$src/system/resources/mouse.bmp" usr/share/reliefos/resources/mouse.bmp
 file "$src/system/resources/wallpaper-metro.bmp" usr/share/reliefos/resources/wallpaper-metro.bmp
 file "$src/system/certs/cacert.pem" etc/ssl/certs/ca-certificates.crt
 file "$src/system/certs/cacert.pem" usr/share/reliefos/certs/ca-certificates.crt 0644 trust
-file "$src/docs/APK_PREPARATION.md" usr/share/doc/reliefos/APK_PREPARATION.md
+file "$src/Documentation/admin-guide/packages.rst" usr/share/doc/reliefos/packages.rst
 file "$src/configs/apk-ownership.json" usr/share/reliefos/apk-ownership.json
 file "$src/third_party/portablegl/LICENSE" usr/share/doc/reliefos/PORTABLEGL-LICENSE
 for name in leonos-metro.ttf leonos-win95.ttf; do file "$out/generated/fonts/$name" "usr/share/fonts/reliefos/$name"; done

@@ -192,8 +192,8 @@ def check_images():
                 entry = package_files["/" + name]
                 assert hashlib.sha256(debugfs(image, f"cat /{prefix}{name}")).hexdigest() == entry["sha256"], (image, prefix, name)
                 stat(image, prefix + name, "regular", int(entry["mode"], 8))
-            assert debugfs(image, f"cat /{prefix}usr/share/doc/reliefos/APK_PREPARATION.md") == (
-                ROOT / "docs/APK_PREPARATION.md").read_bytes()
+            assert debugfs(image, f"cat /{prefix}usr/share/doc/reliefos/packages.rst") == (
+                ROOT / "Documentation/admin-guide/packages.rst").read_bytes()
             print(f"PASS {image.relative_to(ROOT)} {prefix or '/'}: real APK database, executable, repository, modes and trust")
 
 

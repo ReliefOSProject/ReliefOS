@@ -3,9 +3,10 @@
 # GNU Make owns the dependency graph, the parallel schedule and the incremental
 # decisions. C helpers under tools/host/ perform data transforms only; short
 # scripts under tools/build/ drive third-party builds. Nothing here shells out to
-# a second scheduler, and no production path runs Python, Meson or Ninja.
+# a second scheduler. OS compilation runs no Python, Meson or Ninja; Sphinx
+# serves only the separate documentation and Pages targets.
 #
-# Kbuild migration: docs/superpowers/specs/2026-10-21-kbuild-migration-design.md
+# Kbuild migration: Documentation/process/testing.rst
 
 # --- GNU Make version ------------------------------------------------------
 # Grouped targets ('&:') and the $(file) function both need 4.3.
@@ -190,7 +191,7 @@ endif
 ifneq ($(filter doctor,$(MAKECMDGOALS)),)
 include $(RELIEFOS_SRC)/scripts/reliefos/Makefile.toolchain
 endif
-.PHONY: help doctor clean distclean __kbuild
+.PHONY: help doctor clean distclean htmldocs __kbuild
 help:
 	@V='$(V)' O='$(O)' ARCH='$(ARCH)' PROFILE='$(PROFILE)' CPUS='$(CPUS)' \
 	TOOLCHAIN='$(TOOLCHAIN)' SRC='$(RELIEFOS_SRC)' CACHE='$(RELIEFOS_CACHE)' \
@@ -212,7 +213,18 @@ clean:
 distclean:
 	@O='$(reliefos_O_absolute)' SRC='$(RELIEFOS_SRC)' KEEP_CONFIG=0 sh $(RELIEFOS_SRC)/scripts/clean.sh
 
-reliefos_goals := $(filter-out help doctor clean distclean,$(MAKECMDGOALS))
+SPHINXBUILD ?= sphinx-build
+SPHINXOPTS ?=
+$(RELIEFOS_O_MARKER):
+	$(Q)mkdir -p $(O)
+	$(Q)printf 'reliefos-build-out version=1 root=%s\n' '$(RELIEFOS_SRC)' > $@.tmp
+	$(Q)mv -f $@.tmp $@
+
+htmldocs: $(RELIEFOS_O_MARKER)
+	$(Q)SPHINXBUILD='$(SPHINXBUILD)' SPHINXOPTS='$(SPHINXOPTS)' \
+	    sh $(RELIEFOS_SRC)/scripts/build-docs.sh $(RELIEFOS_SRC)/Documentation $(O)/Documentation/html
+
+reliefos_goals := $(filter-out help doctor clean distclean htmldocs,$(MAKECMDGOALS))
 reliefos_kbuild_goals := $(patsubst $(reliefos_O_absolute)/%,%,$(patsubst $(O)/%,%,$(reliefos_goals)))
 ifneq ($(strip $(reliefos_goals)),)
 .PHONY: $(reliefos_goals)

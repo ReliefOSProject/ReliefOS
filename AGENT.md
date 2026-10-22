@@ -41,7 +41,7 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 启动载荷）、`/install/root`（Xorg 运行时根载荷）和 `/install/root-console`
 （纯控制台载荷）。不要把“安装器运行时镜像内容”和“安装后系统内容”混为一谈。
 新安装默认同时安装 BIOS / UEFI loader，可分别取消；旧系统更新不重分区。
-具体布局、引导身份和已验证边界见 `docs/BOOT_AND_INTEGRITY.md` 及双启动验收记录。
+具体布局、引导身份和已验证边界见 `Documentation/admin-guide/installation.rst` 及其中的双启动说明。
 
 ### 根目录职责
 
@@ -57,7 +57,7 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 | `configs/` | 动态组件清单、可提交 build profile 与默认配置。 |
 | `tools/` | 构建、Kconfig 同步、镜像、安装器、SDK、资源生成和验证脚本。 |
 | `Kbuild`、`scripts/reliefos/`、`tools/host/`、`tools/build/` | 原生 Kbuild、产品集成、C 工具及上游适配器。 |
-| `docs/` | 架构、ABI、构建、文件系统、驱动、安全等项目文档。 |
+| `Documentation/` | 架构、ABI、构建、文件系统、驱动、安全等项目文档。 |
 | `third_party/` | 通过 Git submodule 引入的上游源码；见 `.gitmodules`。 |
 | `build/` | 可再生产物与 staging 输出；不可作为手写源码的唯一来源。 |
 
@@ -71,13 +71,13 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
   `fs/`、`block/`、`sound/` 和 `drivers/` 等目录（均相对于 `kernel/reliefnt/`），全部编译进
   kernel.sys；不存在跨模块 callback 表或第二个启动镜像。用户态与内核之间只有
   syscall/ioctl ABI 和 GUI IPC。职责归属与旧数据格式的兼容策略见
-  `docs/KERNEL_USERSPACE_BOUNDARIES.md`。
+  `Documentation/userspace-api/abi.rst`。
 - GUI 客户端与 `desktop.elf` 通过 GUI IPC/ioctl 通信，而不是共享窗口服务器
   的私有像素内存。应用提交自己的缓冲内容；不要把窗口服务器内部 buffer
   当作公共 ABI。
 - 来宾运行路径使用 Unix 根目录格式，例如 `/usr/lib/reliefos/apps/desktop/desktop.elf`；
-  仓库源码路径（`system/`、`kernel/reliefnt/drivers/`、`docs/`）是构建输入，不等于来宾路径。
-  现行 rootfs 契约见 `docs/ROOTFS_LAYOUT_AND_MIGRATION.md`。
+  仓库源码路径（`system/`、`kernel/reliefnt/drivers/`、`Documentation/`）是构建输入，不等于来宾路径。
+  现行 rootfs 契约见 `Documentation/userspace-api/filesystem.rst`。
   相对路径依赖任务当前目录；路径统一使用 Unix 根目录语义。
 
 ## 3. 公共 ABI、库和 SDK 的联动规则
@@ -92,7 +92,7 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 5. `configs/header-export.list` 白名单与 `headers_install` 导出：SDK/用户态只消费
    导出结果，由 `tools/test_header_export.py` 校验；不维护手工 ABI 镜像副本。
 6. `packages/reliefos-musl-sdk.tar.gz` 装配规则与归属/许可证文本。
-7. `docs/ABI.md`、`docs/SYSCALLS.md` 或对应专题文档。
+7. `Documentation/userspace-api/abi.rst` 或对应专题文档。
 
 公开结构应采用定宽类型，校验用户提供的指针、容量、长度、枚举值和版本。
 不要在 ABI 中泄漏内核指针、窗口服务器私有地址或未经界定的可变对象。扩展
@@ -188,7 +188,7 @@ Kbuild；原版引擎、Kconfig 和许可证由 `scripts/kbuild-source.json` 逐
 项目扩展放在单独的 `scripts/Makefile.*` 与目录 `Kbuild`，沿用 `.cmd`、fixdep 和 jobserver。
 `scripts/reliefos/` 集成第三方、SDK、镜像、运行和测试；`tools/host/` 的 C 程序转换数据，
 `tools/build/` 适配上游 configure/Make 与镜像格式工具。第三方维持其原有构建边界。
-不得增加平行的自研编译链、调用旧 Python 构建引擎，或让生产链执行 Python、Meson、Ninja。
+不得增加平行的自研编译链、调用旧 Python 构建引擎，或让生产链执行 Python、Meson、Ninja。Sphinx 仅用于独立文档与 Pages 目标。
 不要求 Rust 工具链。
 
 ```sh
@@ -222,7 +222,7 @@ make test-smoke
   编译/链接参数和对象清单变化、多输出成员缺失必须正确触发重建。
   对目录 stage 使用完整成员清单，临时树完成并校验后再发布，不能以 stamp 代替存在性检查。
 - 内核每个生产代码目录由本地 `Kbuild` 管理对象和直接子目录；根目录不维护全局
-  源码清单。模块边界、私有共享状态与迁移追溯见 `kernel/reliefnt/docs/KERNEL_MODULES.md`。
+  源码清单。模块边界、私有共享状态与迁移追溯见 `kernel/reliefnt/Documentation/core-api/modules.rst`。
 - 同一 O 的真实构建互斥，不手工伪造 RELIEFOS_BUILD_OWNER。不同 O 可并行。
   `-n/-q` 不重建被包含的配置，避免干扰持锁构建；首次预览应用和产品前先 defconfig、config-sync。
 - `all` 包括 kernel、userland、runtime、sdk、apk-repo、image-vmdk、iso、installer；
@@ -234,7 +234,7 @@ make test-smoke
 - clean/distclean 仅清有所有权标记的 O，拒绝 symlink/源码根/不明目录，保留下载缓存。
   不删除用户旧 build/、buildsystem/cache/、buildsystem/deps/、ISO 或 VMDK。
 - Python 仅允许现存非生产 OS 测试、维护工具及上游参考代码。详见
-  `docs/build/legacy-removal.md`；不以保留的参考实现冒充新链验收。
+  `Documentation/kbuild/building.rst`；不以保留的参考实现冒充新链验收。
 
 ## 7. 验证要求
 
@@ -261,8 +261,9 @@ make test-smoke
   `/home/xiaobai/Projects/Projects/.reliefos-qmp-<id>.sock`；不要使用 `/tmp` 或 tmpfs。
 - 遇到概率性失败，记录平台、镜像、网络、操作步骤和关键日志，重复定向验证；
   不要以单次成功或失败就宣布根因。
-- 新增安全审计报告时，使用简体中文，归档为 `docs/security/YYYY-MM-DD.md`，
-  明确静态覆盖范围和未做的 PoC/QEMU 验证，不能虚构修复版本或利用结论。
+- 新增安全审计记录时，使用简体中文，原始输出临时放在 `out/security/`；
+  经确认的长期约束写入 `Documentation/process/security.rst`。明确静态覆盖范围
+  和未做的 PoC/QEMU 验证，不能虚构修复版本或利用结论。
 
 ## 8. 代码注释规范
 
@@ -293,7 +294,7 @@ int subsystem_handle(const struct request *request, struct result *out_result);
 ## 9. 文档、日志和交付质量
 
 - 新功能、公开 API、构建开关、镜像布局或第三方移植发生变化时，更新相关
-  `docs/`、SDK 说明、示例和归属/许可证文本。文档只能描述
+  `Documentation/`、SDK 说明、示例和归属/许可证文本。文档只能描述
   已确认存在的接口；计划中的接口必须明确标为计划。
 - 日志应使用稳定前缀（例如 `[reliefnt]`，兼容期 `[ntclks]`、`[desktop.elf]`、`[tls]`），包含足够的
   阶段、返回码和状态来定位问题，但不能泄露令牌、密码、Cookie、私钥或请求体。
@@ -339,14 +340,14 @@ int subsystem_handle(const struct request *request, struct result *out_result);
 
 ## 12. 版本发布的长期规则
 
-- 发布前必须阅读并遵循 [发布规范](docs/RELEASE_PROCESS.md)。Release 更新范围是
+- 发布前必须阅读并遵循 [发布规范](Documentation/process/releasing.rst)。Release 更新范围是
   `(上一版本号提交, 本次版本号提交]`，不是发布日期之间或任意最近 tag 之间。
   例如 5.1.0 从“改为 5.0.0”的提交之后统计到“改为 5.1.0”的提交。
 - ReliefOS 只写主仓自身变更，排除 ReliefNT 实现和纯 gitlink 更新；ReliefNT
   只写内核仓变更。两份说明的章节格式相同，正文独立；合并去重，不能把已撤销
   的功能或计划当作交付，不列“更新版本号到 x.x.x”等无用更新。
 - 说明必须包括：更新内容、是否破坏性更新、更新与迁移注意事项、开发者提示；
-  归档到 `docs/releases/<版本>.md`。
+  归档到 `Documentation/releases/<版本>.rst`。
 - 先推送内核版本提交，再更新父仓 gitlink 并推送；标签与 GitHub Release
   必须固定到各自精确版本提交。使用 `gh` 和审阅过的正文文件发布，回读核对。
 - `/etc/os-release` 的 `VERSION_ID` 与主仓发布版本一致；保留品牌显示规则。

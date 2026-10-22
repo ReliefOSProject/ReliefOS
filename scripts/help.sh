@@ -29,14 +29,15 @@ ReliefOS build system (Linux Kbuild / Kconfig)
   make sdk             alias of musl-sdk (built from build output)
   make rootfs          staged root filesystem
   make apk-repo        signed local package repository
+  make htmldocs        strict Sphinx manual in O/Documentation/html
   make image-vmdk      BIOS + UEFI GPT disk image
   make iso             BIOS + UEFI live ISO
   make installer       BIOS + UEFI installer ISO
-  make rpr-pages       local signed APK/kernel Pages tree (does not publish)
+  make rpr-pages       local signed APK/kernel subtree (does not publish)
   make pages           full GitHub Pages tree: home, download/, rpr/, docs/ (does not publish)
   make site            alias of pages
   make download-page   alias of pages (single atomic output)
-  make docs-page       alias of pages (documentation rendered from docs/)
+  make docs-page       alias of pages (separate Documentation/ manuals from both repositories)
   make release         all plus pages
   make all             kernel userland runtime sdk apk-repo image-vmdk iso installer
 

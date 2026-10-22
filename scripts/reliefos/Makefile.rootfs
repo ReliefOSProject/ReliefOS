@@ -8,7 +8,7 @@ APK_RAW_ROOT := $(ROOTFS_RAW)
 APK_RAW_STAMP := $(ROOTFS_RAW_STAMP)
 ROOTFS_SOURCE_DIRS := $(RELIEFOS_SRC)/system $(RELIEFOS_SRC)/resources/build-art $(RELIEFOS_SRC)/userland/storage $(RELIEFOS_SRC)/userland/apps
 ROOTFS_SOURCE_DIRS += $(RELIEFOS_SRC)/resources/reliefmath $(RELIEFOS_SRC)/resources/licenses/reliefmath
-ROOTFS_SOURCE_DIRS += $(RELIEFOS_SRC)/userland/fastfetch $(RELIEFOS_SRC)/logo.png $(RELIEFOS_SRC)/test/test.mp3 $(RELIEFOS_SRC)/docs/APK_PREPARATION.md $(RELIEFOS_SRC)/configs/apk-ownership.json $(RELIEFOS_SRC)/third_party/stardustui/docs/zh-cn/example
+ROOTFS_SOURCE_DIRS += $(RELIEFOS_SRC)/userland/fastfetch $(RELIEFOS_SRC)/logo.png $(RELIEFOS_SRC)/test/test.mp3 $(RELIEFOS_SRC)/Documentation/admin-guide/packages.rst $(RELIEFOS_SRC)/configs/apk-ownership.json $(RELIEFOS_SRC)/third_party/stardustui/docs/zh-cn/example
 ROOTFS_SOURCE_DIRS += $(wildcard $(addprefix $(RELIEFOS_SRC)/third_party/,busybox/LICENSE sl/LICENSE pl_editor/LICENSE portablegl/LICENSE))
 ROOTFS_SOURCE_DIRS += $(RELIEFOS_SRC)/tools/build/rpr-config.sh
 $(O_META)/rootfs-sources.parameters: FORCE $(RELIEFOS_SRC)/tools/build/tree-signature.sh

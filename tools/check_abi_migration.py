@@ -18,7 +18,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TEXT_SUFFIXES = {".c", ".h", ".cc", ".cpp", ".S", ".rs", ".py", ".toml", ".md"}
+TEXT_SUFFIXES = {".c", ".h", ".cc", ".cpp", ".S", ".rs", ".py", ".toml", ".md", ".rst"}
 EXCLUDED_PREFIXES = ("third_party/", "build/", ".git/")
 # Service daemons are the server side of a migrated protocol. They may use
 # the versioned wire structs that applications are no longer allowed to see.
@@ -94,7 +94,7 @@ def deleted_private_uses() -> list[str]:
         path = Path(relative)
         if path.suffix not in TEXT_SUFFIXES or relative.startswith(EXCLUDED_PREFIXES):
             continue
-        if relative.startswith("docs/") or relative.startswith("tools/") or \
+        if relative.startswith("Documentation/") or relative.startswith("tools/") or \
                 relative.startswith("los2w/") or relative == "tools/check_abi_migration.py":
             continue
         try:

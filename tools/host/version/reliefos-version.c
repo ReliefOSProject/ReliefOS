@@ -3,7 +3,7 @@
  *
  * The old system incremented a version-controlled counter and stamped the wall
  * clock on every invocation, which dirtied the tree and forced every kernel to
- * relink (docs/build/migration-inventory.md section 3). This tool derives its
+ * relink. This tool derives its
  * text from reviewed inputs only: the release version file, a fixed source
  * identifier and a timestamp supplied by
  * SOURCE_DATE_EPOCH or a commit time (plan section 7).

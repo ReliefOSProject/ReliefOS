@@ -71,7 +71,7 @@ commands=gptinit
 MANIFEST
 ln -s ../lib/reliefos/apps/gptinit/gptinit.elf "$work/runtime-raw/usr/bin/gptinit"
 printf 'installer\n' > "$work/runtime-raw/etc/reliefos/installer-runtime"
-cp "$src/docs/ADVANCED_INSTALL.txt" "$work/runtime-raw/root/ADVANCED_INSTALL.txt"
+cp "$src/Documentation/admin-guide/installation.rst" "$work/runtime-raw/root/installation.rst"
 package_root "$work/runtime-raw" "$work/runtime" "$out/packages/apk-installer-runtime"
 [ -x "$work/runtime/usr/lib/reliefos/apps/installer/installer.elf" ] || {
     echo 'installer runtime package is missing installer.elf' >&2

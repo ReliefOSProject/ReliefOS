@@ -34,15 +34,17 @@ for f in index.html download/index.html download/reliefos-installer.iso download
 done
 
 # --- Documentation section --------------------------------------------------
-# The docs are rendered from the repository docs/ tree at build time, so the
-# index and at least one rendered document must exist, and no raw Markdown may
+# The manuals are rendered from each repository's Documentation/ tree, so the
+# index and at least one rendered document must exist, and no raw source may
 # leak into the published tree (only generated HTML and copied assets).
-[ -e "$site/docs/index.html" ] || report "missing docs/index.html"
+for manual in index.html reliefos/index.html reliefnt/index.html; do
+    [ -s "$site/docs/$manual" ] || report "missing docs/$manual"
+done
 if [ -z "$(find "$site/docs" -name index.html 2>/dev/null | tail -n +2)" ]; then
     report "no rendered documentation pages under docs/"
 fi
-md_leak=$(find "$site/docs" -type f -name '*.md' 2>/dev/null || true)
-[ -z "$md_leak" ] || report "raw Markdown leaked into published docs: $md_leak"
+md_leak=$(find "$site/docs" -type f \( -name '*.md' -o -name '*.rst' -o -name '*.rst.txt' -o -name '*.pickle' \) 2>/dev/null || true)
+[ -z "$md_leak" ] || report "raw source or doctrees leaked into published docs: $md_leak"
 
 # --- JavaScript must be absent ----------------------------------------------
 js=$(find "$site" -type f \( -name '*.js' -o -name '*.mjs' -o -name '*.cjs' \) -print 2>/dev/null || true)
@@ -103,6 +105,7 @@ for page in $(find "$site" -name '*.html' -print); do
                 http://*|https://*|mailto:*) continue ;;
             esac
             target="${href%%#*}"
+            target="${target%%\?*}"
             [ -n "$target" ] || continue
             [ -e "$dir/$target" ] || printf '%s: broken href %s\n' "${page#"$site"/}" "$href" >> "$linkfails"
         done

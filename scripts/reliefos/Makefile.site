@@ -12,26 +12,26 @@
 # are wired to the same atomic assembly: the download page cannot be published
 # without the shared stylesheet at the site root, so a partial tree would ship
 # broken links. Keeping one output is what makes the release atomic (plan §45).
-# `rpr-pages` remains independently usable for local RPR-only generation.
+# `rpr-pages` generates only the local package/kernel subtree; site navigation
+# and documentation links require this complete Pages assembly.
 SITE_CSS     := $(RELIEFOS_SRC)/resources/pages/css/reliefos.css
 SITE_SCRIPTS := $(RELIEFOS_SRC)/tools/build/site.sh \
                 $(RELIEFOS_SRC)/tools/build/download-page.sh \
                 $(RELIEFOS_SRC)/tools/build/home-page.sh \
                 $(RELIEFOS_SRC)/tools/build/docs-page.sh \
-                $(RELIEFOS_SRC)/tools/build/md2html.awk \
+                $(RELIEFOS_SRC)/scripts/build-docs.sh \
                 $(RELIEFOS_SRC)/tools/build/site-common.sh
-# The Documentation section is rendered from the real docs/ tree, so every
-# source document is a prerequisite of the assembled site: a docs edit must
-# regenerate the Pages tree just like an ISO or CSS change would.
-SITE_DOCS    := $(shell find $(RELIEFOS_SRC)/docs -name '*.md' 2>/dev/null | LC_ALL=C sort) \
-                $(shell find $(RELIEFOS_SRC)/docs -type f ! -name '*.md' 2>/dev/null | LC_ALL=C sort)
+# Each repository owns its Documentation/ tree. Directory prerequisites also
+# track removed pages, so deleted source cannot linger in a published manual.
+SITE_DOCS    := $(shell find $(RELIEFOS_SRC)/Documentation $(RELIEFNT_DIR)/Documentation \( -type f -o -type d \) | LC_ALL=C sort) \
+                $(RELIEFOS_SRC)/configs/build-version $(RELIEFNT_DIR)/configs/build-version
 PAGES        := $(O)/pages
 
 $(PAGES)/.site-complete $(PAGES)/index.html &: \
         $(RPR_PAGES)/.complete $(RPR_PAGES)/manifest.json \
         $(INSTALLER_ISO) $(BUILD_INFO_HEADER) $(SITE_CSS) $(SITE_SCRIPTS) $(SITE_DOCS)
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/site.sh \
-		$(RPR_PAGES) $(INSTALLER_ISO) $(BUILD_INFO_HEADER) $(SITE_CSS) $(PAGES)
+		$(RPR_PAGES) $(INSTALLER_ISO) $(BUILD_INFO_HEADER) $(SITE_CSS) $(PAGES) $(RELIEFNT_DIR)/Documentation
 
 .PHONY: pages site download-page docs-page
 pages: $(PAGES)/.site-complete
