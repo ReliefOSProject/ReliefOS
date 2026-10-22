@@ -2,4 +2,4 @@
 # not code: reliefos-version reads it so that no product name or version number is
 # duplicated inside a C constant (plan section 7).
 kernel_name=ReliefNT
-release_version=5.1.1
+release_version=5.1.2
