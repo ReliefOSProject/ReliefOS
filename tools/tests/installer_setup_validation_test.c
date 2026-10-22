@@ -7,12 +7,21 @@ int main(void)
 {
     struct installer_setup setup = {0};
     assert(setup.skip_xorg == 0);
+    assert(setup.skip_bios == 0 && setup.skip_uefi == 0);
     strcpy(setup.username, "alice");
     strcpy(setup.password, "user!");
     strcpy(setup.password_confirm, "user!");
     strcpy(setup.root_password, "root!");
     strcpy(setup.root_password_confirm, "root!");
     assert(installer_setup_valid(&setup));
+    for (unsigned modes = 0; modes < 4; ++modes) {
+        setup.skip_bios = modes & 1;
+        setup.skip_uefi = (modes >> 1) & 1;
+        assert(installer_setup_valid(&setup));
+    }
+    setup.skip_bios = 2;
+    assert(!installer_setup_valid(&setup));
+    setup.skip_bios = setup.skip_uefi = 0;
     strcpy(setup.username, "root");
     assert(!installer_setup_valid(&setup));
     strcpy(setup.username, "../alice");

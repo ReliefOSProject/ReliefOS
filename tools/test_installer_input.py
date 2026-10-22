@@ -8,14 +8,66 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallerInputTests(unittest.TestCase):
+    def test_capacity_measurement_and_checked_limits(self):
+        """Measure actual trees without following links; reject bytes and inode overflow."""
+        with tempfile.TemporaryDirectory(prefix="installer-capacity-") as tmp:
+            executable = str(Path(tmp) / "capacity")
+            subprocess.run([
+                "cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g",
+                "-fsanitize=address,undefined", "-Wall", "-Wextra", "-Werror",
+                "tools/tests/installer_capacity_test.c",
+                "userland/apps/installer/installer_capacity.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable, tmp], cwd=ROOT, check=True, timeout=20)
+
+    def test_fresh_copy_sync_error_blocks_boot_publication(self):
+        """Batch only a fresh root; require its Linux filesystem barrier to pass."""
+        with tempfile.TemporaryDirectory(prefix="installer-sync-") as tmp:
+            executable = str(Path(tmp) / "copy-sync")
+            subprocess.run([
+                "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-idirafter", "userland/runtime/include", "-idirafter", "include",
+                "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
+                "tools/tests/installer_copy_sync_test.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable, tmp], cwd=ROOT, check=True, timeout=20)
+
+    def test_exclusive_block_open_distinguishes_optical_and_mounted_disks(self):
+        """Keep mounted partitions protected while allowing a separate blank disk."""
+        with tempfile.TemporaryDirectory(prefix="block-exclusive-") as tmp:
+            executable = str(Path(tmp) / "exclusive")
+            subprocess.run([
+                "cc", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-Wno-address-of-packed-member", "-Ikernel/reliefnt/include",
+                "-Iinclude", "-Ikernel/reliefnt/include/uapi",
+                "tools/tests/block_exclusive_mount_test.c", "kernel/reliefnt/fs/tmpfs/core.c",
+                "kernel/reliefnt/lib/text_utf16.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable], cwd=ROOT, check=True, timeout=20)
+
+    def test_copy_progress_does_not_log_every_short_io_slice(self):
+        """Bound presentation overhead while preserving the next timed update."""
+        with tempfile.TemporaryDirectory(prefix="installer-progress-") as tmp:
+            executable = str(Path(tmp) / "progress")
+            subprocess.run([
+                "cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-idirafter", "userland/runtime/include", "-idirafter", "include",
+                "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
+                "tools/tests/installer_progress_test.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
+
     def test_update_to_fresh_mount_transition(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-installer-mount-") as tmp:
             executable = str(Path(tmp) / "mount-transition")
             subprocess.run([
                 "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections", "-Wl,--wrap=open",
                 "-idirafter", "include", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-                "tools/tests/installer_mount_transition_test.c", "-o", executable,
+                "tools/tests/installer_mount_transition_test.c", "userland/apps/installer/installer_partitions.c", "userland/apps/installer/installer_capacity.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 

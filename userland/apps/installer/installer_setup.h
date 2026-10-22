@@ -10,6 +10,8 @@ struct installer_setup {
     char root_password[RELIEFOS_AUTH_PASSWORD_LEN];
     char root_password_confirm[RELIEFOS_AUTH_PASSWORD_LEN];
     uint8_t skip_xorg;
+    uint8_t skip_bios;
+    uint8_t skip_uefi;
 };
 
 #ifdef __cplusplus

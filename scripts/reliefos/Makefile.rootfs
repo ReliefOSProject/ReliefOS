@@ -14,9 +14,11 @@ ROOTFS_SOURCE_DIRS += $(RELIEFOS_SRC)/tools/build/rpr-config.sh
 $(O_META)/rootfs-sources.parameters: FORCE $(RELIEFOS_SRC)/tools/build/tree-signature.sh
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/tree-signature.sh $@ $(ROOTFS_SOURCE_DIRS)
 ROOTFS_UPSTREAM_PRODUCTS = $(foreach package,$(UPSTREAM_PACKAGES) ncurses,$(UPSTREAM_ROOT)/$(package)/root/.complete $(upstream_$(package)_products))
+ROOTFS_UPSTREAM_PRODUCTS += $(GRUB_GUEST_ROOT)/.complete $(GRUB_GUEST_PRODUCTS)
 ROOTFS_APP_PRODUCTS = $(USERLAND_DIR)/motd.elf $(addprefix $(USERLAND_DIR)/,$(addsuffix .elf,$(RELIEFOS_COMPONENT_APPS))) $(USERLAND_DIR)/dynlinkerror.elf $(BUSYBOX_ELF) $(BUSYBOX_LINKS) $(SQLITE_SO) $(PORTABLEGL_SO) $(USERLAND_DIR)/sl.elf
 ROOTFS_APP_PRODUCTS += $(if $(filter settings soundctl,$(RELIEFOS_COMPONENT_APPS)),$(AUDIO_CONTROL_SO))
 ROOTFS_APP_PRODUCTS += $(if $(filter reliefmath,$(RELIEFOS_COMPONENT_APPS)),$(USERLAND_DIR)/reliefmath-render.elf)
+ROOTFS_APP_PRODUCTS += $(USERLAND_DIR)/bootinstall.elf
 $(ROOTFS_RAW_STAMP) $(ROOTFS_MANIFEST): $(NLS_MO) $(NLS_MUSL_MO) $(RELIEFOS_SRC)/configs/nls/LINGUAS
 RELIEFOS_PARAMETERS_rootfs := epoch=$(SOURCE_DATE_EPOCH)|sources=$(O_META)/rootfs-sources.parameters|components=$(RELIEFOS_COMPONENTS_ENABLED)
 $(if $(RELIEFOS_PASSIVE),,$(eval $(call KBUILD_PARAMETERS,rootfs)))

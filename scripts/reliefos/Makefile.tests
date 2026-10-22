@@ -58,6 +58,8 @@ define RELIEFOS_RUN_CONTRACT_TESTS
 	       LEONOS_DEPS='$(RELIEFOS_DEPS_TOOL)' \
 	       RELIEFOS_LOCK='$(RELIEFOS_SRC)/configs/dependencies.lock.json' \
 	       LEONOS_LOCK='$(RELIEFOS_SRC)/configs/dependencies.lock.json' \
+	       GRUB_HOST_ROOT='$(GRUB_HOST_ROOT)' \
+	       GRUB_EFI_DIR='$(GRUB_EFI_DIR)' \
 	       RELIEFOS_EMIT='$(RELIEFOS_EMIT)' \
 	       LEONOS_EMIT='$(RELIEFOS_EMIT)' \
 	       sh $$contract_test >$$report 2>&1; then status=0; else status=1; fi; \
@@ -78,7 +80,7 @@ test-build: test-tools $(RELIEFOS_HOST_TOOLS)
 	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_BUILD_TESTS))
 	@$(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_xorg_qemu.py --source-only
 
-test-long: $(RELIEFOS_HOST_TOOLS)
+test-long: $(RELIEFOS_HOST_TOOLS) grub-host grub-efi
 	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_LONG_TESTS))
 
 # Audio userland is an explicit host gate because it needs the staged ALSA and

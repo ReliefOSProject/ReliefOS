@@ -4,14 +4,22 @@
 
 ReliefOS boots through GRUB, which loads `kernel.sys` directly:
 
-The image build uses the tracked GRUB 2.12 EFI kernel and modules in
-`boot/grub_modules_x86_64-efi`. The host `grub-mkstandalone` assembles these
-inputs into each new EFI image. `GRUB_EFI_DIR` can explicitly select another
-validated module set. Unpatched GRUB 2.14 EFI modules fault while patching
-read-only relocator stubs during Multiboot2 boot; upstream fixes this in
-[commit 62289192](https://github.com/rhboot/grub2/commit/62289192bb45bd90f5917c53fd29083d9a9672b1).
+The host BIOS and EFI tools/modules are built from the same SHA-256-locked
+GNU GRUB 2.12 release using its native build system. EFI modules are staged
+under `$(O)/grub-efi/lib/grub/x86_64-efi`; PC modules are under
+`$(O)/grub-host/lib/grub/i386-pc`. The locked host `grub-mkstandalone`
+assembles the EFI application. `GRUB_EFI_DIR`/`GRUB_BIOS_DIR` can explicitly
+select another complete compatible platform input tree. The former prebuilt
+EFI core does not expose `cmdpath` and has been removed from the source tree.
 
-1. GRUB starts `kernel.sys` through Multiboot2. `kernel.sys` carries its own
+The default disk GPT contains an unformatted 1 MiB BIOS Boot partition, a
+FAT32 ESP, and an ext4 root. The locked i386-pc GRUB embeds its core only in
+the protective MBR boot-code area and BIOS Boot partition. Both ISOs have
+BIOS platform 0 and UEFI platform 0xef El Torito boot entries.
+
+1. GRUB starts the same `kernel.sys` through Multiboot2 on both firmwares.
+   BIOS enters its 32-bit protected-mode trampoline, validates long-mode CPU
+   features and sets up paging; EFI amd64 enters through the EFI64 header tag. `kernel.sys` carries its own
    Multiboot2 header and is the single boot image; there is no intermediate
    stage between GRUB and the kernel.
 2. GRUB passes the Multiboot2 information, including the framebuffer and
@@ -23,12 +31,19 @@ read-only relocator stubs during Multiboot2 boot; upstream fixes this in
 
 During early boot, normal disk images load components from the FAT32 ESP:
 
-- `/reliefos/kernel.sys` (the legacy rollback entry boots `/leonos/kernel.sys`
-  on old disks)
+- `/reliefos/kernel.sys`; `/leonos/kernel.sys` is preserved for recovery.
+  The automatic rollback entry is shown only when both files are byte-identical.
+  Imported older kernels may ignore PARTUUID, so differing rollback kernels need
+  manual recovery with only the intended system disk attached.
 
 After the kernel starts, its storage layer mounts the separate ext4 partition
-as the normal `/` runtime root. The ESP stays separate so a full root cannot
-consume UEFI boot space.
+as the normal `/` runtime root. The menu preserves the loader-selected ESP
+and reads `/reliefos/config/root.cfg` for Linux `root=PARTUUID=...`. The
+kernel resolves that unique GPT identity after disk discovery, rejecting
+missing/duplicate/invalid requests instead of mounting another disk. Legacy
+`root=/` retains its automatic discovery behavior. Fresh installations use
+independent UUIDv4 identities from `/dev/urandom`. The ESP stays separate so
+a full root cannot consume boot space.
 
 Installer and live ISOs boot the same kernel and pass the installer root as a
 GRUB module:
@@ -98,13 +113,24 @@ and is supported for ISO reads.
 
 The installer payload is built from the same matched runtime staging tree:
 
-- `build/esp` contains the kernel, resources, config, and
-  userland applications for the installed system.
-- `tools/make_installer_root.py` splits `build/esp` into `install/esp` (the
-  FAT32 ESP boot subset) and `install/root` (the ext4 runtime root) inside
-  `build/install/root.fat`.
-- `tools/make_installer_iso.py` stages top-level installer copies of
-  `system/kernel.sys` and `install/root.fat`.
+- `$(O)/stage/esp` contains matched kernel, GRUB modules and configuration.
+- `tools/build/installer-stage.sh` stages `install/esp`, signed desktop and
+  console roots, GNU GRUB guest tools and the shared boot-install CLI.
+- `tools/build/images.sh` creates the installer ext4 root;
+  `tools/build/iso.sh` publishes both El Torito entries in the same ISO.
+
+GUI and TTY installers default to both firmware loaders, with independent
+choices. Updates detect existing modes and retain them when skipped. The
+shared `/usr/sbin/reliefos-boot-install` validates whole-disk/ESP ownership,
+read-only/mounted/source-target conflicts, BIOS embedding space and payload
+before publication. GNU `grub-install --target=i386-pc --force-file-id` owns BIOS
+installation; the prebuilt EFI application uses its actual `cmdpath` device.
+The common publisher writes the menu last. Firmware/disk writes as a whole
+cannot be made power-failure atomic; a tool error is reported as failure.
+Old two-partition UEFI disks can update without repartitioning; adding BIOS
+requires an existing dedicated BIOS Boot partition and otherwise fails before
+publication. The legacy `leonos-grub-installer` command only forwards to this
+shared implementation in UEFI-only update mode.
 
 This keeps a freshly installed system consistent with the published boot
 layout, and the installer retires any `loader.elf` left over from a

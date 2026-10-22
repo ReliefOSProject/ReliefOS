@@ -44,6 +44,14 @@ for package in $rootfs_upstream_packages; do
         if [ -d "$input" ]; then tree "$input" "$directory" "$package"; fi
     done
 done
+# GRUB is built from the locked GNU source for the guest musl ABI. Publish only
+# the install/probe/image commands and their platform data, not host binaries.
+for command in sbin/grub-install sbin/grub-bios-setup sbin/grub-probe bin/grub-mkimage; do
+    file "$out/upstream/grub/root/usr/$command" "usr/$command" 0755 grub
+done
+tree "$out/upstream/grub/root/usr/lib/grub" usr/lib/grub grub
+tree "$out/upstream/grub/root/usr/share/licenses/grub" usr/share/licenses/grub grub
+file "$out/userland/bootinstall.elf" usr/sbin/reliefos-boot-install 0755 reliefos-boot-tools
 for spec in auth pam; do
     for directory in lib usr etc sbin bin; do
         input=$out/$spec/root/$directory

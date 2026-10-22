@@ -4,6 +4,7 @@
 set -eu
 
 src=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd -P)
+. "$src/tests/build/grub-fixture.sh"
 tmp_base=${TMPDIR:-$src/out/kbuild-migration}
 mkdir -p "$tmp_base"
 work=$(mktemp -d "$tmp_base/grub-kbuild-inputs.XXXXXX")
@@ -11,8 +12,9 @@ trap 'rm -rf "$work"' EXIT HUP INT TERM
 
 fixture=$work/fixture
 mkdir -p "$fixture"
-git -C "$src" archive HEAD boot/grub_modules_x86_64-efi | tar -x -C "$fixture"
-modules=$fixture/boot/grub_modules_x86_64-efi
+modules=$fixture/efi-modules
+grub_fixture_efi "$modules"
+grub_fixture_bios "$work/bios-modules"
 test -s "$modules/normal.mod"
 test "$(LC_ALL=C file -b "$modules/normal.mod" | cut -d' ' -f1)" = ELF
 
@@ -78,6 +80,7 @@ run_esp() {
             RELIEFOS_CONFIG_FILE="$target_out/.config" \
             RELIEFOS_EMIT="$target_out/host/bin/reliefos-emit" \
             GRUB_FONT="$target_out/generated/grub/leonos-unicode.pf2" \
+            GRUB_BIOS_DIR="$work/bios-modules" GRUB_MKSTANDALONE=grub-mkstandalone \
             GRUB_EFI_DIR="$module_dir" SOURCE_DATE_EPOCH=1700000000 esp
 }
 
@@ -116,7 +119,7 @@ test "$(wc -l < "$work/grub-stub.log" | tr -d ' ')" = 1 || {
 
 # The wildcard dependency list alone is insufficient: Make drops an absent
 # path before dependency resolution. The fixed modules requested by
-# efi-stage.sh must remain explicit prerequisites so a missing source errors.
+# boot-stage.sh must retain explicit prerequisites so a missing source errors.
 missing_modules=$work/missing-modules
 cp -a "$modules" "$missing_modules"
 rm "$missing_modules/normal.mod"
@@ -137,4 +140,15 @@ test ! -e "$work/missing-stub.log" || {
     exit 1
 }
 
-printf 'GRUB Kbuild input regression passed: ELF inputs preserved, no-op repeat stable, missing required source rejected\n'
+# BIOS .mod files are equally protected; absent generated inputs must not
+# become Kbuild's plain-text module lists.
+rm "$work/bios-modules/biosdisk.mod"
+prepare_output "$work/missing-bios-output"
+if run_esp "$work/missing-bios-output" "$modules" "$work/missing-bios-stub.log" \
+    > "$work/missing-bios.log" 2>&1; then
+    echo 'FAIL - ESP target accepted a missing required BIOS module' >&2; exit 1
+fi
+grep -Fq 'missing required GRUB BIOS input' "$work/missing-bios.log"
+test ! -e "$work/bios-modules/biosdisk.mod"
+test ! -e "$work/missing-bios-stub.log"
+printf 'GRUB Kbuild input regression passed: EFI/BIOS ELF inputs preserved, no-op repeat stable, missing required sources rejected\n'

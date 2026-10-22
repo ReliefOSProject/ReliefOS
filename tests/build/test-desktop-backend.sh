@@ -58,6 +58,15 @@ printf '%s\n' fixture > "$work/out/generated/fonts/${legacy_brand}-metro.ttf"
 printf '%s\n' fixture > "$work/out/generated/fonts/${legacy_brand}-win95.ttf"
 printf '%s\n' fixture > "$work/out/userland/motd.elf"
 printf '%s\n' fixture > "$work/out/userland/dynlinkerror.elf"
+printf '%s\n' fixture > "$work/out/userland/bootinstall.elf"
+for command in sbin/grub-install sbin/grub-bios-setup sbin/grub-probe bin/grub-mkimage; do
+    mkdir -p "$work/out/upstream/grub/root/usr/${command%/*}"
+    printf '%s\n' fixture > "$work/out/upstream/grub/root/usr/$command"
+done
+mkdir -p "$work/out/upstream/grub/root/usr/lib/grub/i386-pc" \
+    "$work/out/upstream/grub/root/usr/share/licenses/grub"
+printf '%s\n' fixture > "$work/out/upstream/grub/root/usr/lib/grub/i386-pc/boot.img"
+printf '%s\n' fixture > "$work/out/upstream/grub/root/usr/share/licenses/grub/COPYING"
 for locale in $(cat configs/nls/LINGUAS); do
     mkdir -p "$work/out/generated/nls/$locale/LC_MESSAGES"
     printf '%s\n' fixture > "$work/out/generated/nls/$locale/LC_MESSAGES/${legacy_brand}.mo"

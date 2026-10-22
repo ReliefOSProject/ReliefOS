@@ -1,6 +1,6 @@
 RELIEFOS_APP_NAME := installer
-RELIEFOS_APP_OBJECTS := install_ops.o installer_setup.o installer_tty.o main.o model.o
-RELIEFOS_APP_C_OBJECTS := install_ops.o installer_setup.o installer_tty.o model.o
+RELIEFOS_APP_OBJECTS := install_ops.o installer_capacity.o installer_partitions.o installer_setup.o installer_tty.o main.o model.o
+RELIEFOS_APP_C_OBJECTS := install_ops.o installer_capacity.o installer_partitions.o installer_setup.o installer_tty.o model.o
 RELIEFOS_APP_CXX_OBJECTS := main.o
 RELIEFOS_APP_ASM_OBJECTS :=
 ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)

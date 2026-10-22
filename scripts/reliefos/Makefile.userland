@@ -60,7 +60,7 @@ USERLAND_APP_FLAGS_pleditor := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_F
 
 USERLAND_DOOM_EXCLUDE := doomgeneric_allegro.c doomgeneric_emscripten.c doomgeneric_linuxvt.c doomgeneric_sdl.c doomgeneric_soso.c doomgeneric_sosox.c doomgeneric_win.c doomgeneric_xlib.c i_allegromusic.c i_allegrosound.c i_sdlsound.c i_sdlmusic.c i_cdmus.c mus2mid.c
 
-USERLAND_KBUILD_APPS := $(sort $(USERLAND_APPS) pleditor stardusthello stardustlayout stardustshowcase gptinit motd dynlinkerror)
+USERLAND_KBUILD_APPS := $(sort $(USERLAND_APPS) pleditor stardusthello stardustlayout stardustshowcase gptinit motd dynlinkerror bootinstall)
 define RELIEFOS_APP_KBUILD_CAPTURE
 RELIEFOS_APP_OBJECTS :=
 RELIEFOS_APP_C_OBJECTS :=
@@ -105,13 +105,14 @@ USERLAND_DEPS_pleditor := $(addprefix $(UPSTREAM_APP_DIR)/pleditor-generated/src
 $(eval $(call RELIEFOS_APP,pleditor,pleditor,$(USERLAND_DIR)/pleditor.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
 
 $(eval $(call RELIEFOS_APP,gptinit,gptinit,$(O)/userland-installer/gptinit.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
+$(eval $(call RELIEFOS_APP,bootinstall,bootinstall,$(USERLAND_DIR)/bootinstall.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
 
 # Only manifest-owned disabled ELF outputs may be removed; arbitrary files in
 # this directory and old build/ images are outside this rule's ownership.
 .PHONY: userland userland-prune installer-userland
 userland-prune:
 	$(Q)$(foreach app,$(RELIEFOS_DISABLED_APPS),rm -f $(USERLAND_DIR)/$(app).elf;) :
-userland: userland-prune $(addprefix $(USERLAND_DIR)/,$(addsuffix .elf,$(RELIEFOS_COMPONENT_APPS)))
+userland: userland-prune $(addprefix $(USERLAND_DIR)/,$(addsuffix .elf,$(RELIEFOS_COMPONENT_APPS))) $(USERLAND_DIR)/bootinstall.elf
 installer-userland: $(O)/userland-installer/gptinit.elf
 
 # Loader failures must still display a GUI when a shared library is absent.

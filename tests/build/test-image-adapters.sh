@@ -1,6 +1,7 @@
 #!/bin/sh
 set -eu
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+. "$src/tests/build/grub-fixture.sh"
 w=$(mktemp -d); trap 'rm -rf "$w"' EXIT HUP INT TERM
 ${HOSTCC:-cc} -std=c11 -O2 -Wall -Wextra -Werror "$src/tools/host/images/reliefos-ext2-time.c" -lext2fs -lcom_err -o "$w/time"
 cat > "$w/reliefos-time" <<EOF
@@ -56,8 +57,9 @@ mkdir -p "\$(dirname "\$out")"
 printf 'efi-stub\\n' > "\$out"
 EOF
 chmod +x "$w/fake-bin/grub-mkstandalone"
-PATH="$w/fake-bin:$PATH" sh "$src/tools/build/efi-stage.sh" \
-    "$src" "$w/modules" "$w/kernel.sys" "$w/font.pf2" \
+grub_fixture_bios "$w/bios-modules"
+PATH="$w/fake-bin:$PATH" sh "$src/tools/build/boot-stage.sh" \
+    "$src" "$w/modules" "$w/bios-modules" "$w/kernel.sys" "$w/font.pf2" \
     "$w/display.conf" "$w/esp" 1700000000
 failures=0
 require_file() {
@@ -124,6 +126,13 @@ if [ "$failures" -ne 0 ]; then exit 1; fi
 # the old configuration, its rollback kernel, and any stale loader.elf the old
 # menu may still reference available for the next boot; the stale loader is
 # retired only after the new grub.cfg is published.
+${HOSTCC:-cc} -std=gnu11 -D_GNU_SOURCE -O1 -Wno-address-of-packed-member \
+    -I"$src/userland/runtime/include" "$src/userland/apps/bootinstall/main.c" \
+    "$src/userland/runtime/src/bootloader.c" "$src/userland/runtime/src/bootloader_publish.c" \
+    "$src/userland/runtime/src/bootloader_process.c" "$src/userland/runtime/src/blockdev.c" \
+    -o "$w/boot-install"
+require_text "$src/userland/storage/leonos-grub-installer" 'exec /usr/sbin/reliefos-boot-install' 'legacy command forwards to shared publisher'
+require_text "$src/userland/storage/leonos-grub-installer" '--bios=no --uefi=yes --update' 'legacy command preserves UEFI-only update semantics'
 mkdir -p "$w/install-source" "$w/rollback-esp/grub" "$w/rollback-esp/leonos" \
     "$w/rollback-esp/reliefos" "$w/rollback-esp/EFI/BOOT"
 cp -a "$w/esp/." "$w/install-source/"
@@ -132,8 +141,8 @@ printf 'old-stale-loader\n' > "$w/rollback-esp/loader.elf"
 printf 'old-stale-loader\n' > "$w/rollback-esp/reliefos/loader.elf"
 printf 'old-rollback-kernel\n' > "$w/rollback-esp/leonos/kernel.sys"
 chmod 555 "$w/rollback-esp/grub"
-if sh "$src/userland/storage/leonos-grub-installer" --source "$w/install-source" \
-    "$w/rollback-esp" >"$w/grub-installer-fail.log" 2>&1; then
+if "$w/boot-install" --source "$w/install-source" --boot-directory "$w/rollback-esp" \
+    --bios=no --uefi=yes --update >"$w/grub-installer-fail.log" 2>&1; then
     echo 'FAIL - interrupted installer publication unexpectedly succeeded'
     exit 1
 fi
@@ -147,8 +156,8 @@ else
     printf 'FAIL - interrupted publication damaged the old GRUB rollback entry\n'
     exit 1
 fi
-sh "$src/userland/storage/leonos-grub-installer" --source "$w/install-source" \
-    "$w/rollback-esp" >"$w/grub-installer-success.log"
+"$w/boot-install" --source "$w/install-source" --boot-directory "$w/rollback-esp" \
+    --bios=no --uefi=yes --update >"$w/grub-installer-success.log"
 if cmp -s "$w/install-source/reliefos/kernel.sys" "$w/rollback-esp/reliefos/kernel.sys" &&
     [ "$(cat "$w/rollback-esp/leonos/kernel.sys")" = 'old-rollback-kernel' ] &&
     [ "$(cat "$w/rollback-esp/grub/grub.cfg")" = "$(cat "$w/install-source/grub/grub.cfg")" ] &&

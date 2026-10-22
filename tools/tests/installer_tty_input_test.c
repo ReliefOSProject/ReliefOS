@@ -87,6 +87,15 @@ int main(void)
     feed("");
     setup.skip_xorg = 0;
     assert(tty_install_xorg(&setup) == 0 && setup.skip_xorg == 0);
-    puts("installer input: line handling, Xorg choice, and terminal restoration PASS");
+    for (unsigned modes = 0; modes < 4; ++modes) {
+        setup.skip_bios = modes & 1;
+        setup.skip_uefi = (modes >> 1) & 1;
+        feed("\n\n");
+        assert(tty_bootloaders(&setup) == 1);
+        assert(setup.skip_bios == (modes & 1) && setup.skip_uefi == ((modes >> 1) & 1));
+    }
+    feed("invalid\nYeS\nnO\n");
+    assert(tty_bootloaders(&setup) == 1 && !setup.skip_bios && setup.skip_uefi);
+    puts("installer input: line handling, Xorg/BIOS/UEFI choices and terminal restoration PASS");
     return 0;
 }

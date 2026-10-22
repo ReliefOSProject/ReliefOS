@@ -189,7 +189,7 @@ check_current_docs() {
     if grep -qx '# ReliefOS 高级安装教程' "$root/docs/ADVANCED_INSTALL.md" &&
        grep -q '^ReliefOS Installer ISO - Advanced Installation Quick Guide$' \
            "$root/docs/ADVANCED_INSTALL.txt" &&
-       grep -q 'Install ReliefOS (TTY mode)' "$root/docs/ADVANCED_INSTALL.txt"; then
+       grep -q 'Install ReliefOS (console session)' "$root/docs/ADVANCED_INSTALL.txt"; then
         ok 'current installer guides use ReliefOS'
     else
         fail 'current installer guides must use ReliefOS'
@@ -232,8 +232,9 @@ check_paths() {
     else
         fail 'APK input method registration must use canonical application paths'
     fi
-    if grep -Fq '$images/reliefos.vmdk' "$root/scripts/test-smoke.sh" &&
-       grep -Fq '$images/reliefos-$variant.iso' "$root/scripts/test-smoke.sh"; then
+    if grep -Fq 'tools/test_dual_boot_qemu.py' "$root/scripts/test-smoke.sh" &&
+       grep -Fq 'images / "reliefos.vmdk"' "$root/tools/test_dual_boot_qemu.py" &&
+       grep -Fq 'f"reliefos-{medium}.iso"' "$root/tools/test_dual_boot_qemu.py"; then
         ok 'VM smoke test consumes the canonical release artifact names'
     else
         fail 'VM smoke test must consume canonical release artifact names'

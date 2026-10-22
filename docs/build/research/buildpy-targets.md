@@ -1,5 +1,8 @@
 # LeonOS 4 旧构建系统：生产目标全量清单（P0-a 事实底稿）
 
+> 历史研究，保留当时路径和行号。当前构建采用 Kbuild；旧预编译 EFI 树和宿主模块回退已移除，
+> 现行双平台引导契约见 [2026-10-22 双启动记录](../dual-boot-2026-10-22.md)。
+
 > 供主 Agent 撰写 `docs/build/migration-inventory.md` 使用。
 > 全部行号基于 2026-09-19 工作区 `build.py`（4958 行）与 `buildsystem/`。
 > 本文件位于 gitignore 的 `buildsystem/logs/` 下，不是交付物本身。

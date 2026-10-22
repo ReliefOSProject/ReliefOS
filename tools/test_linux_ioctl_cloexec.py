@@ -241,15 +241,11 @@ def stage_root(base: Path, probe: Path, image: Path) -> None:
     print(f"  staged {PROBE_GUEST_PATH} and the CPython 3.15 tree in {image}")
 
 
-def grub_efi_dir() -> str:
-    """Use the pinned GRUB modules like build.py; the host GRUB build boots a
-    different, unvalidated firmware image on this ISO layout."""
-    repo = ROOT / "boot/grub_modules_x86_64-efi"
-    if (repo / "modinfo.sh").is_file():
-        return "boot/grub_modules_x86_64-efi"
-    system = Path("/usr/lib/grub/x86_64-efi")
-    assert (system / "modinfo.sh").is_file(), "no GRUB x86_64-efi modules available"
-    return str(system)
+def grub_efi_dir(output=None) -> str:
+    """Consume the locked native platform output; never substitute host modules."""
+    modules = (output or ROOT / "out/x86_64/release") / "grub-efi/lib/grub/x86_64-efi"
+    assert (modules / "modinfo.sh").is_file(), f"build grub-efi first: {modules}"
+    return str(modules)
 
 
 def build_iso(root: Path, output: Path, config: Path, work: Path) -> Path:

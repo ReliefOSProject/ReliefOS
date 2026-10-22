@@ -9,6 +9,11 @@ set -eu
 [ "$#" = 6 ] || { echo 'usage: installer-stage SRC O RAW_ROOT ESP OUTPUT EPOCH' >&2; exit 2; }
 src=$1 out=$2 raw=$3 esp=$4 output=$5 epoch=$6
 : "${APK_TOOL:?}" "${APK_UPSTREAM:?}" "${APK_OWN_TOOL:?}" "${APK_KEY:?}" "${APK_VERSION:?}"
+for path in usr/sbin/reliefos-boot-install usr/sbin/grub-install \
+    usr/sbin/grub-bios-setup usr/sbin/grub-probe usr/bin/grub-mkimage \
+    usr/lib/grub/i386-pc/boot.img; do
+    [ -s "$raw/$path" ] || { echo "installer root is missing required boot tool/data: $path" >&2; exit 1; }
+done
 mkdir -p "$(dirname "$output")"
 work=$(mktemp -d "$output.new.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -25,6 +30,13 @@ package_root "$work/installed-raw" "$work/installed" "$out/packages/apk-installe
 cp -a "$work/installed-raw" "$work/console-raw"
 sh "$src/tools/build/installer-console-profile.sh" "$work/console-raw"
 package_root "$work/console-raw" "$work/console-installed" "$out/packages/apk-console"
+for root in "$work/installed" "$work/console-installed"; do
+    for path in usr/sbin/reliefos-boot-install usr/sbin/grub-install \
+        usr/sbin/grub-bios-setup usr/sbin/grub-probe usr/bin/grub-mkimage \
+        usr/lib/grub/i386-pc/boot.img; do
+        [ -s "$root/$path" ] || { echo "signed target is missing required boot tool/data: $path" >&2; exit 1; }
+    done
+done
 cp -a "$raw" "$work/runtime-raw"
 mkdir -p "$work/runtime-raw/usr/lib/reliefos/apps/installer"
 cp "$out/userland/installer.elf" "$work/runtime-raw/usr/lib/reliefos/apps/installer/installer.elf"

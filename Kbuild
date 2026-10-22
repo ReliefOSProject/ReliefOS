@@ -12,6 +12,7 @@ include $(srctree)/scripts/reliefos/Makefile.third-party
 include $(srctree)/scripts/reliefos/Makefile.pam
 include $(srctree)/scripts/reliefos/Makefile.runtime
 include $(srctree)/scripts/reliefos/Makefile.upstream
+include $(srctree)/scripts/reliefos/Makefile.grub
 include $(srctree)/scripts/reliefos/Makefile.components.audio
 include $(srctree)/scripts/reliefos/Makefile.userland
 include $(srctree)/scripts/reliefos/Makefile.resources
@@ -32,7 +33,7 @@ kernel: $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_DEBUG)
 test: test-tools test-build
 
 test-smoke: image-vmdk iso installer
-	@QEMU='$(QEMU)' sh $(RELIEFOS_SRC)/scripts/test-smoke.sh $(O_IMAGES) $(O_LOGS) '$(QEMU_FIRMWARE)'
+	@QEMU='$(QEMU)' DUAL_BOOT_ACCEL='$(if $(filter 1,$(QEMU_KVM)),kvm,tcg)' DUAL_BOOT_CPU='$(if $(filter 1,$(QEMU_KVM)),host,max)' sh $(RELIEFOS_SRC)/scripts/test-smoke.sh $(O_IMAGES) $(O_LOGS) '$(QEMU_FIRMWARE)'
 
 test-legacy:
 	@sh $(RELIEFOS_SRC)/scripts/test-legacy.sh $(RELIEFOS_SRC)

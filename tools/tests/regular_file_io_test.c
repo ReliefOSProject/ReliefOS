@@ -8,6 +8,10 @@ static unsigned char disk[1048576], data[1048576];
 static uint64_t disk_size = sizeof(disk), error_offset = UINT64_MAX;
 static int injected_error;
 static uint64_t clock_step, clock_us;
+static unsigned disk_syncs, volume_syncs;
+static int sync_error;
+int storage_sync_disk(uint32_t id) { (void)id; ++disk_syncs; return sync_error; }
+int storage_sync_volume(uint32_t id) { (void)id; ++volume_syncs; return sync_error; }
 uint64_t time_uptime_us(void) { clock_us += clock_step; return clock_us; }
 void storage_release_task_io(uint32_t pid) { assert(pid == 10); }
 static int transfer(uint64_t offset, void *buffer, uint32_t length, uint32_t *done, bool writing)
@@ -134,6 +138,15 @@ int main(void)
     file.node.first_cluster = STORAGE_DEV_KIND_DISK;
     assert(syscall_regular_io(task, &file, (uintptr_t)data, 2, 510, false, true) == 2);
     assert(!memcmp(data, disk + 510, 2));
+    task->syscall_file_number = LINUX_SYS_PWRITE64;
+    file.flags |= LINUX_O_SYNC;
+    assert(syscall_regular_io(task, &file, (uintptr_t)data, 512, 0, true, true) == 512);
+    assert(disk_syncs == 1 && volume_syncs == 0);
+    file.flags &= ~(TASK_FILE_FLAG_DEV_BLOCK | TASK_FILE_FLAG_DEV_NODE);
+    assert(syscall_regular_io(task, &file, (uintptr_t)data, 512, 0, true, true) == 512);
+    assert(disk_syncs == 1 && volume_syncs == 1);
+    sync_error = -LINUX_EIO;
+    assert(syscall_regular_io(task, &file, (uintptr_t)data, 512, 0, true, true) == -LINUX_EIO);
     free(task);
     free(other);
     puts("PASS full file transfers, async continuation, shared offsets, EOF, error progress and genuine block-node validation");

@@ -17,8 +17,8 @@ Debian/Ubuntu 的典型依赖：
 
 ```sh
 sudo apt install build-essential clang lld llvm libclang-rt-dev \
-  autoconf automake libtool libtool-bin pkg-config bison flex gperf gettext libncurses-dev \
-  grub-efi-amd64-bin grub-common xorriso mtools dosfstools e2fsprogs libext2fs-dev \
+  autoconf automake libtool libtool-bin pkg-config bison flex gperf gettext texinfo libncurses-dev \
+  grub-common xorriso mtools dosfstools e2fsprogs libext2fs-dev \
   fakeroot fdisk qemu-utils qemu-system-x86 ovmf zip curl xz-utils patch git
 ```
 
@@ -45,7 +45,9 @@ GitHub Pages 网站，不自动上传。`pages` 依赖 `installer` 与 `rpr-page
 `out/x86_64/release/pages/`，遵循一次构建、一次发布（详见 `docs/RPR.md`）。RPR、下载页
 与文档页共用同一份蓝色简洁静态 HTML/CSS，全站禁止 JavaScript；文档页由构建系统扫描
 `docs/` 目录、用纯 awk 把 Markdown 渲染为静态 HTML 生成。`rpr-pages` 仍可单独用于本地仅生成
-RPR 子树。`run-iso`、`run-installer` 启动对应镜像，`QEMU_KVM=0` 可使用 TCG。
+RPR 子树。`run-iso`、`run-installer` 启动对应镜像，`QEMU_KVM=0` 可使用 TCG。三种默认镜像同时支持 BIOS 与 UEFI；
+运行目标默认 `QEMU_BOOT=uefi`，可用 `QEMU_BOOT=bios` 选择 SeaBIOS。
+安装器默认同时安装两类引导程序，GUI/TTY 均可独立取消；取消全部时需另行配置引导。
 
 默认产物在 `out/x86_64/release/`：
 
@@ -64,7 +66,8 @@ RPR 子树。`run-iso`、`run-installer` 启动对应镜像，`QEMU_KVM=0` 可�
 
 验证入口为 `make test`、`make test-long`、`make test-legacy` 和 `make test-smoke`。
 后两者分别运行显式 Python OS 回归和真实 QEMU 启动；主机产物生成成功不等于来宾验收通过。
-本机 GRUB/OVMF 在 loader 之前的页错误及其验证边界见 [验收记录](docs/build/verification.md)。
+当前 BIOS / UEFI 构建、安装选择和分层验证见 [双启动验收记录](docs/build/dual-boot-2026-10-22.md)；
+旧构建链的历史故障见 [历史验收记录](docs/build/verification.md)。
 
 `make clean` 清产物并保留配置，`distclean` 同时清配置；均保留下载缓存和旧 `build/` 镜像。
 详细规则见 [构建系统文档](docs/BUILDSYSTEM.md)。
@@ -78,7 +81,7 @@ RPR 子树。`run-iso`、`run-installer` 启动对应镜像，`QEMU_KVM=0` 可�
 根目录中的主要源码、构建输入和工具按职责组织如下：
 
 - `arch/`：各架构相关说明和预留代码（当前主要支持 x86_64）。
-- `boot/`：GRUB 配置与 EFI 模块。
+- `boot/`：GRUB 配置、主题与历史 EFI 输入；默认双平台模块从锁定源码构建。
 - `Makefile`、`Kbuild` 与 `scripts/reliefos/`：构建入口、源码声明和产品集成。
 - `tools/host/`、`tools/build/`：C 数据工具和短上游构建适配器。
 - `configs/`：组件清单、默认配置和可提交的构建 profile。

@@ -29,9 +29,9 @@ ReliefOS build system (Linux Kbuild / Kconfig)
   make sdk             alias of musl-sdk (built from build output)
   make rootfs          staged root filesystem
   make apk-repo        signed local package repository
-  make image-vmdk      bootable disk image
-  make iso             live ISO
-  make installer       installer ISO
+  make image-vmdk      BIOS + UEFI GPT disk image
+  make iso             BIOS + UEFI live ISO
+  make installer       BIOS + UEFI installer ISO
   make rpr-pages       local signed APK/kernel Pages tree (does not publish)
   make pages           full GitHub Pages tree: home, download/, rpr/, docs/ (does not publish)
   make site            alias of pages
@@ -49,7 +49,7 @@ ReliefOS build system (Linux Kbuild / Kconfig)
   make test-vdso       vDSO ELF, timekeeper and mapping/auxv regression tests
   make test            test-tools plus test-build
   make test-long       repeated -j1/-j8 comparisons and interrupt recovery
-  make test-smoke      QEMU boot tests (long; explicit)
+  make test-smoke      BIOS + UEFI QEMU checks for all three media (sequential)
   make test-legacy     pre-existing regression tests, some need Python
 
   make clean           remove built products in $(O), keep configuration
@@ -61,6 +61,8 @@ Variables
   PROFILE=debug|release  compile policy; anything else is an error
   O=PATH               output directory, default out/<arch>/<profile>
   V=1                  echo the real command, its working directory and overrides
+  QEMU_BOOT=uefi|bios   run firmware, default uefi
+  QEMU_FIRMWARE=FILE   OVMF firmware for uefi; unused for bios
   CPUS=n               override Kconfig guest CPU count
   MEMORY=4G            guest memory for the run targets
   TOOLCHAIN=FILE       toolchain description, default configs/toolchains/llvm-x86_64.mk

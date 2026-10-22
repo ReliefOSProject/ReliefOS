@@ -1,161 +1,119 @@
 ReliefOS Installer ISO - Advanced Installation Quick Guide
 ==========================================================
 
-Read this guide with: less /root/ADVANCED_INSTALL.txt
+Read: less /root/ADVANCED_INSTALL.txt
 
-Select "Install ReliefOS (TTY mode)" from the Installer ISO boot menu. The
-entry starts a root Ash shell. Run "installer" to launch the interactive TTY
-installer, or continue with this guide for a manual installation.
+The same Installer ISO supports Legacy BIOS and UEFI. Select
+"Install ReliefOS (console session)" to start a root Bash shell; run installer for the supported interactive installer.
+GUI and TTY fresh installs default to Xorg and both bootloaders. Each loader
+can be skipped independently. Skipping both on a new disk requires an external
+bootloader. Updates retain the detected desktop profile and existing loaders.
 
-For a fresh installation, the confirmation page offers "Install Xorg desktop
-environment", enabled by default. Clear it to install a text-login system
-without Xorg, IceWM, or the X11 applications. The TTY installer asks the same
-question; press Enter for the desktop or answer n for text login. This choice
-affects the installed disk; the installation media retains its graphical UI.
-In-place updates retain the target's desktop or text-login profile.
+Manual copying does not provision accounts or the installed-system marker.
+Use the regular installer for a supported root/user login and sudo policy.
+These steps are for repair and development. They require a 512-byte logical
+sector disk and enough space for /install/root plus future data.
 
-The TTY environment provides standard Linux command-line tools: fdisk, mount,
-lsblk, and blkid from util-linux; mkfs.ext4 and fsck.ext4 from e2fsprogs;
-mkfs.fat and fsck.fat from dosfstools; mkfs.exfat and fsck.exfat from
-exfatprogs; and the standard BusyBox file utilities.
+WARNING: The partitioning/formatting commands below destroy target data.
+Verify the disk using lsblk and fdisk -l. /dev/sda is only an example; NVMe
+uses /dev/nvme0n1 and /dev/nvme0n1p1 etc. Never select the installation medium.
 
-WARNING
--------
+1. Check the source and target
+------------------------------
 
-The partitioning and formatting commands below destroy data on the target
-disk. The examples use /dev/sda. NVMe disks use /dev/nvmeXnY and partitions
-use /dev/nvmeXnYpZ. Verify the actual target by its size and controller, and
-do not overwrite the Installer ISO or another data disk.
-
-Copying the payload manually does not run the regular installer's account
-transaction and does not create the installed-system marker. Use the regular
-installer when you need a supported root account, ordinary user account,
-wheel/sudo policy, and a system that is immediately ready for login. This
-guide is primarily intended for low-level installation, repair, and
-development.
-
-1. Check the installation source and target disk
-------------------------------------------------
-
-ls /install/root
-ls /install/root-console
-ls /install/esp
+ls /install/root /install/root-console /install/esp
 lsblk
 blkid
 fdisk -l
 
-2. Create a GPT and two partitions
-----------------------------------
+2. Create the default three-partition GPT
+-----------------------------------------
 
-Run:
+The upstream sfdisk command below replaces the target partition table.
+Do not run it on an existing system you intend to update.
 
-fdisk /dev/sda
+sfdisk /dev/sda <<'TABLE'
+label: gpt
+unit: sectors
 
-Enter the following commands in order. A blank line means accept the default:
-
-g
-n
-1
-
-+128M
-n
-2
-
-
-t
-1
-1
-p
-
-The result should contain partition 1 as an approximately 128 MiB EFI System
-partition and partition 2 as a Linux filesystem partition using the remaining
-space. Enter w to write the table when it is correct, or q to quit without
-saving.
-
-Partition names are optional. To assign names before entering w, use the
-expert menu:
-
-x
-n
-1
-LeonOS 4 ESP
-n
-2
-LEONOS4_ROOT
-r
-
-Use p to inspect the result and then enter w. The g command in the current
-fdisk creates a GPT directly; running gptinit first is no longer necessary.
-
-Check the new partition table and device nodes:
-
+start=2048,size=2048,type=21686148-6449-6E6F-744E-656564454649,name=RELIEFOS_BIOS
+start=4096,size=262144,type=U,name=RELIEFOS_ESP
+type=L,name=RELIEFOS_ROOT
+TABLE
 sync
+sfdisk --verify /dev/sda
 lsblk /dev/sda
-fdisk -l /dev/sda
 
-3. Format and check the filesystems
-----------------------------------
+Partition 1: unformatted 1 MiB BIOS Boot space. NEVER format or mount it.
+Partition 2: 128 MiB FAT32 ESP shared by BIOS GRUB files and UEFI application.
+Partition 3: ext4 root using remaining space.
+Manual layouts may use different indices; supply actual device paths below.
 
-mkfs.fat -F 32 -n LEONOS4ESP /dev/sda1
-mkfs.ext4 -F -L LEONOS4ROOT /dev/sda2
-fsck.fat -n /dev/sda1
-fsck.ext4 -f -n /dev/sda2
-blkid /dev/sda1 /dev/sda2
+3. Format and check only ESP and root
+-------------------------------------
 
-mkfs.fat32 is only a link to mkfs.fat. You must still pass -F 32 when using
-that name. Do not format the whole /dev/sda device, and do not format a
-mounted partition.
+mkfs.fat -F 32 -n RELIEFOS /dev/sda2
+mkfs.ext4 -F -L RELIEFOS_ROOT /dev/sda3
+fsck.fat -n /dev/sda2
+fsck.ext4 -f -n /dev/sda3
+blkid /dev/sda2 /dev/sda3
 
-4. Mount the target filesystems
-------------------------------
+Do not format a whole disk or mounted partition. mkfs.fat32 is an alias for
+mkfs.fat and still needs the explicit -F 32 option.
+
+4. Mount and copy
+-----------------
 
 mkdir -p /mnt/root /mnt/esp
-mount -t ext4 /dev/sda2 /mnt/root
-mount -t vfat /dev/sda1 /mnt/esp
-mount
-
-5. Copy the system
-------------------
-
+mount -t ext4 /dev/sda3 /mnt/root
+mount -t vfat /dev/sda2 /mnt/esp
 cp -a /install/root/. /mnt/root/
 
-The -a option preserves symbolic links, permissions, and timestamps. Check
-the copied runtime:
+For a text-login installation copy /install/root-console instead.
+-a preserves links, permissions and timestamps. Do not copy into /target,
+which belongs to the regular installer.
 
-ls -l /mnt/root/usr/lib/reliefos/apps/desktop/desktop.elf
-ls -l /mnt/root/lib/ld-musl-x86_64.so.1
+5. Bind the root and ESP identities
+-----------------------------------
 
-6. Write /etc/fstab
--------------------
-
-ROOT_PARTUUID="$(blkid -s PARTUUID -o value /dev/sda2)"
-ESP_PARTUUID="$(blkid -s PARTUUID -o value /dev/sda1)"
+ROOT_PARTUUID="$(blkid -s PARTUUID -o value /dev/sda3)"
+ESP_PARTUUID="$(blkid -s PARTUUID -o value /dev/sda2)"
 printf 'root=%s\nesp=%s\n' "$ROOT_PARTUUID" "$ESP_PARTUUID"
 
-Both values must be non-empty UUIDs. Then enter:
+Both values must be nonempty unique UUIDs; otherwise stop and inspect GPT.
 
-cat > /mnt/root/etc/fstab <<EOF
-# <source> <mountpoint> <type> <options> <dump> <pass>
+cat > /mnt/root/etc/fstab <<EOF_FSTAB
+# source mountpoint type options dump pass
 /dev/disk/by-partuuid/$ROOT_PARTUUID / ext4 defaults 0 1
 /dev/disk/by-partuuid/$ESP_PARTUUID /boot vfat defaults 0 2
-EOF
+EOF_FSTAB
 
-Verify the result:
+6. Install both bootloaders through the shared API
+--------------------------------------------------
 
-cat /mnt/root/etc/fstab
+reliefos-boot-install --source /install/esp --boot-directory /mnt/esp \
+    --disk /dev/sda --root-partuuid "$ROOT_PARTUUID" --bios=yes --uefi=yes --check
+reliefos-boot-install --source /install/esp --boot-directory /mnt/esp \
+    --disk /dev/sda --root-partuuid "$ROOT_PARTUUID" --bios=yes --uefi=yes
 
-7. Install the prebuilt UEFI/GRUB payload
-----------------------------------------
+--check validates without publication. --bios=no or --uefi=no skips that
+loader. --update preserves prior rollback files and detected mode records.
+BIOS installation invokes GNU grub-install with explicit argv; it requires
+unmounted dedicated BIOS Boot space. UEFI uses EFI/BOOT/BOOTX64.EFI without
+NVRAM registration. Both share the current kernel and menu. root.cfg records
+the selected PARTUUID, so another disk with the same filenames is not selected.
 
-leonos-grub-installer /mnt/esp
+The old leonos-grub-installer command is a UEFI-only update wrapper. It does
+not create BIOS embedding space. Existing two-partition UEFI installations
+can update with BIOS skipped, without changing partition tables or user files.
+A request to add BIOS without BIOS Boot space is rejected before publication.
 
-This command copies EFI/BOOT/BOOTX64.EFI, reliefos/kernel.sys,
-leonos/kernel.sys, and the grub directory from /install/esp. It is not
-GNU grub-install. It does not format or mount the ESP and does not create a
-firmware NVRAM boot entry.
+A complete boot transaction is not power-failure atomic. On an error, inspect
+the reported stage before rebooting; do not assume a failed tool rolled back
+all disk writes. The common menu is published only after successful stages.
 
-8. Synchronize, unmount, and reboot
-----------------------------------
+7. Finish
+----------
 
 sync
 cd /
@@ -163,41 +121,17 @@ umount /mnt/esp
 umount /mnt/root
 reboot
 
-If umount reports that a target is busy, make sure the shell is not inside the
-mount point and close programs using files on that filesystem. Remove the
-Installer ISO before rebooting, or select the target disk in the firmware boot
-menu.
-
-Optional exFAT root filesystem
-------------------------------
-
-ext4 is the default. To use exFAT, set partition 2 to the Microsoft basic data
-GPT type and replace the ext4 format, check, and mount commands with:
-
-mkfs.exfat -L LEONOS4ROOT /dev/sda2
-fsck.exfat -n /dev/sda2
-mount -t exfat /dev/sda2 /mnt/root
-
-Also change the root filesystem type in /etc/fstab from ext4 to exfat.
+Remove the ISO or choose the installed disk in the firmware boot menu.
+If unmount reports busy, close programs and leave the mount directory first.
 
 Troubleshooting
 ---------------
-
-fdisk reports no partition table:
-  Open the disk in fdisk and enter g to create a GPT.
-
-The ESP was not formatted as FAT32:
-  mkfs.fat requires the explicit -F 32 option.
-
-mkfs reports that the device is busy:
-  Use an unmounted /dev/sdXN or /dev/nvmeXnYpZ partition device.
-
-PARTUUID output is empty:
-  Do not write fstab. Check the GPT and device nodes with fdisk -l and lsblk.
-
-Copying the boot files fails:
-  Check that /install/esp is complete and /mnt/esp is the mounted ESP.
-
-The installed system has no usable login account:
-  Manual payload copying does not provision supported accounts. Use the
-  regular installer instead.
+No BIOS Boot space: use the regular fresh installer or intentionally create
+  dedicated unformatted BIOS Boot space; do not overwrite an existing partition.
+Preflight rejects the disk: confirm the whole disk, writable state, source/target
+  separation, mounted ESP ownership, partition types and selected root UUID.
+UEFI-only manual disk: select --bios=no. Do not repartition an update target.
+No login after manual copying: manual copying omits account provisioning;
+  use the supported regular installer.
+Firmware cannot see NVMe: kernel NVMe support does not add an NVMe driver to
+  legacy firmware. Use firmware that can load GRUB from that device.

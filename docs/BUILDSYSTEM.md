@@ -99,15 +99,18 @@ APK 使用上游 apk 的真实 mkpkg/mkndx/add，包含数据库和签名。
 本地 world 请求保持未锁定，升级可替换系统包；外部包与受保护配置保留。
 
 `make run`、run-debug、run-iso、run-installer 使用 Kconfig QEMU 设置。
-可覆盖 CPUS、MEMORY、QEMU_FIRMWARE、QEMU_KVM、QEMU_DISPLAY、QEMU_SERIAL、QEMU_AUDIO；
-无 KVM 的主机用 `QEMU_KVM=0`。UEFI 固件必须存在，不静默转 BIOS。
+可覆盖 CPUS、MEMORY、QEMU_BOOT、QEMU_FIRMWARE、QEMU_KVM、QEMU_DISPLAY、QEMU_SERIAL、QEMU_AUDIO。
+`QEMU_BOOT=uefi` 为默认值，要求 OVMF 固件；`QEMU_BOOT=bios` 使用 SeaBIOS，
+不需要 OVMF。未知值报错。无 KVM 的主机用 `QEMU_KVM=0`。
+同一 Installer ISO、Live ISO、VMDK 默认均可通过两种固件启动；输出路径不变。
 
 ## 验收边界
 
 - test：C 单元测试及 ASan/UBSan、Shell 构建契约。
 - test-long：生产 execve、并行/中断恢复、缺失 stage 恢复；需要较多磁盘临时空间。
 - test-legacy：明确选择的既有 Python OS 主机回归，不参与生产构建。
-- test-smoke：三种介质的真实 QEMU 启动；检查 ReliefNT 启动标记，兼容期同时接受 `[ntclks]` 与 `[reliefnt]` 前缀。
+- test-smoke：顺序覆盖三种介质的 BIOS/UEFI 启动；检查对应固件、内核完成、PID 1 和用户环境。
+  每次运行保存全新日志、截图和输入哈希，超时及 GRUB 横幅均不能算通过。
 
 可用 `TMPDIR=$PWD/out/test-tmp` 避免 tmpfs 太小。结果以 verification.md 最新记录为准；
 生成镜像或通过主机测试均不能替代来宾安装/升级验收。历史参考 Python 的保留边界见 legacy-removal.md。

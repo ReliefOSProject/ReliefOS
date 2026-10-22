@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install the new boot payload atomically while leaving the rollback payload.
+# Compatibility spelling for the shared UEFI-only boot publisher.
 set -eu
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 export PATH
@@ -13,68 +13,5 @@ fi
     printf '%s\n' 'Usage: reliefos-grub-installer [--source DIR] ESP-MOUNTPOINT' >&2
     exit 2
 }
-esp=$1
-
-# Validate the payload before touching the target. kernel.sys carries its own
-# Multiboot2 header and is the single boot image; the /leonos copy is the
-# rollback payload used by the legacy GRUB menu entry.
-for file in EFI/BOOT/BOOTX64.EFI reliefos/kernel.sys leonos/kernel.sys \
-            grub/grub.cfg; do
-    [ -f "$source/$file" ] || { printf 'Missing boot payload: %s\n' "$file" >&2; exit 1; }
-done
-[ -d "$source/grub" ] || { printf 'Missing GRUB payload: %s\n' "$source/grub" >&2; exit 1; }
-
-temporary=
-cleanup() {
-    [ -z "$temporary" ] || rm -f -- "$temporary"
-}
-trap cleanup EXIT HUP INT TERM
-
-publish_file() {
-    src=$1
-    dst=$2
-    [ -f "$src" ] || { printf 'Missing boot payload: %s\n' "$src" >&2; return 1; }
-    case "$dst" in */*) parent=${dst%/*} ;; *) parent=. ;; esac
-    mkdir -p -- "$parent"
-    temporary=$(mktemp "$dst.reliefos-copy.XXXXXX") || return 1
-    cp -- "$src" "$temporary" || return 1
-    cmp -s -- "$src" "$temporary" || { printf 'Boot payload copy verification failed: %s\n' "$dst" >&2; return 1; }
-    mv -f -- "$temporary" "$dst" || return 1
-    temporary=
-}
-
-publish_if_missing() {
-    src=$1
-    dst=$2
-    if [ -L "$dst" ]; then
-        printf 'Refusing unsafe legacy boot path: %s\n' "$dst" >&2
-        return 1
-    fi
-    [ -e "$dst" ] || publish_file "$src" "$dst"
-}
-
-mkdir -p -- "$esp/reliefos" "$esp/leonos" "$esp/grub" "$esp/EFI/BOOT"
-publish_file "$source/reliefos/kernel.sys" "$esp/reliefos/kernel.sys"
-# Do not replace the rollback payload in an existing layout.
-publish_if_missing "$source/leonos/kernel.sys" "$esp/leonos/kernel.sys"
-publish_file "$source/EFI/BOOT/BOOTX64.EFI" "$esp/EFI/BOOT/BOOTX64.EFI"
-
-for entry in "$source/grub/"*; do
-    [ -e "$entry" ] || continue
-    name=${entry##*/}
-    [ "$name" = grub.cfg ] && continue
-    if [ -d "$entry" ]; then
-        mkdir -p -- "$esp/grub/$name"
-        cp -R -- "$entry/." "$esp/grub/$name/"
-    else
-        publish_file "$entry" "$esp/grub/$name"
-    fi
-done
-
-# The new default entry is exposed only after all payloads are present.
-publish_file "$source/grub/grub.cfg" "$esp/grub/grub.cfg"
-
-# The menu no longer references the retired second-stage loader; remove any
-# stale copies only now that the published config cannot name them.
-rm -f -- "$esp/loader.elf" "$esp/reliefos/loader.elf" "$esp/leonos/loader.elf"
-printf 'ReliefOS boot payload installed to %s; rollback payload retained.\n' "$esp"
+exec /usr/sbin/reliefos-boot-install --source "$source" --boot-directory "$1" \
+    --bios=no --uefi=yes --update

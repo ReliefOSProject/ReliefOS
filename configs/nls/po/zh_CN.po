@@ -545,9 +545,9 @@ msgstr "自动伸缩绝对值符号"
 msgid "Automatic curly brackets"
 msgstr "自动伸缩花括号"
 
-#: userland/apps/installer/main.cpp:808
-msgid "Automatic layout creates a 128 MiB FAT32 ESP and an ext4 root."
-msgstr "自动布局将创建 128 MiB 的 FAT32 EFI 系统分区和 ext4 根分区。"
+#: userland/apps/installer/main.cpp:812
+msgid "Automatic layout creates 1 MiB BIOS Boot, 128 MiB FAT32 ESP and ext4 root."
+msgstr "自动布局将创建 1 MiB BIOS 引导分区、128 MiB FAT32 EFI 系统分区和 ext4 根分区。"
 
 #: userland/apps/installer/install_ops.c:223
 msgid "Automatic mode replaces its partition table; manual mode can preserve other partitions."
@@ -3917,9 +3917,9 @@ msgstr "请输入："
 msgid "Enter filesystem and label (for example: ext4 RELIEFOS_DATA):"
 msgstr "输入文件系统和卷标（例如：ext4 RELIEFOS_DATA）："
 
-#: userland/apps/installer/main.cpp:685
-msgid "Enter size_MiB filesystem name (ext4/ext2/fat32/exfat):"
-msgstr "输入大小（MiB）、文件系统和名称（ext4/ext2/fat32/exfat）："
+#: userland/apps/installer/main.cpp:689
+msgid "Enter size_MiB filesystem name (ext4/ext2/fat32/exfat/raw):"
+msgstr "输入大小（MiB）、文件系统和名称（ext4/ext2/fat32/exfat/raw）；raw 表示不格式化："
 
 #: userland/apps/installer/main.cpp:689
 msgid "Enter the GPT partition name:"
@@ -4689,9 +4689,9 @@ msgstr "管理 GPT 分区"
 msgid "Manual"
 msgstr "手动启动"
 
-#: userland/apps/installer/main.cpp:809
-msgid "Manual layout: select partitions, then assign ESP and root roles."
-msgstr "手动布局：选择分区，然后指定 EFI 系统分区和根分区。"
+#: userland/apps/installer/main.cpp:813
+msgid "Manual layout: assign BIOS Boot, ESP and root roles. BIOS Boot stays unformatted."
+msgstr "手动布局：指定 BIOS 引导分区、ESP 和根分区。BIOS 引导分区不格式化。"
 
 #: userland/apps/fileman/main.cpp:757
 msgid "Mark All"
@@ -6509,9 +6509,9 @@ msgstr "类型"
 msgid "Type / Name (Ctrl or Shift for multiple selection)"
 msgstr "类型 / 名称（按住 Ctrl 或 Shift 多选）"
 
-#: userland/apps/installer/main.cpp:681
-msgid "Type AUTO to erase the disk and create an ESP and root partition:"
-msgstr "输入 AUTO 以清空磁盘并创建 EFI 系统分区和根分区："
+#: userland/apps/installer/main.cpp:685
+msgid "Type AUTO to erase the disk and create BIOS Boot, ESP and root partitions:"
+msgstr "输入 AUTO 以清空磁盘并创建 BIOS 引导分区、EFI 系统分区和根分区："
 
 #: userland/apps/installer/main.cpp:693
 msgid "Type DELETE to remove the selected partition:"
@@ -16545,3 +16545,48 @@ msgstr "天"
 #: userland/apps/calc/actions.cpp:237
 msgid "weekdays"
 msgstr "个工作日"
+
+
+#: userland/apps/installer/main.cpp:840
+msgid "Set BIOS Boot"
+msgstr "设为 BIOS 引导分区"
+
+
+#: userland/apps/installer/main.cpp:999
+msgid "Install or update BIOS bootloader"
+msgstr "安装或更新 BIOS 引导程序"
+
+
+#: userland/apps/installer/main.cpp:1004
+msgid "Install or update UEFI bootloader"
+msgstr "安装或更新 UEFI 引导程序"
+
+
+#: userland/apps/installer/installer_tty.c:145
+msgid "Install or update BIOS bootloader?"
+msgstr "是否安装或更新 BIOS 引导程序？"
+
+
+#: userland/apps/installer/installer_tty.c:146
+msgid "Install or update UEFI bootloader?"
+msgstr "是否安装或更新 UEFI 引导程序？"
+
+
+#: userland/apps/installer/main.cpp:953 userland/apps/installer/main.cpp:1009 userland/apps/installer/installer_tty.c:148
+msgid "No bootloader selected. A new installation will need a separately configured bootloader."
+msgstr "未选择引导程序。新安装的系统需要另行配置引导程序才能启动。"
+
+
+#: userland/apps/installer/main.cpp:954 userland/apps/installer/main.cpp:1010
+msgid "BIOS requires an unformatted BIOS Boot partition. Skipped existing bootloaders are preserved."
+msgstr "BIOS 引导需要未格式化的 BIOS Boot 分区。未选中的现有引导程序将保留。"
+
+
+#: userland/apps/installer/install_ops.c:1521 userland/apps/installer/install_ops.c:1579 userland/apps/installer/install_ops.c:1590 userland/apps/installer/install_ops.c:1670
+msgid "Boot installation checks failed"
+msgstr "引导安装预检查失败"
+
+
+#: userland/apps/installer/installer_tty.c:138
+msgid "Please answer yes or no."
+msgstr "请输入 yes 或 no。"

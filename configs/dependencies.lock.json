@@ -2800,6 +2800,19 @@
       "feature": "xorg",
       "note": "Build-only C API headers and linker symlink for ReliefMath worker; matches the locked Alpine runtime; verified APK signature.",
       "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "grub",
+      "kind": "tarball",
+      "version": "2.12",
+      "url": "https://ftp.gnu.org/gnu/grub/grub-2.12.tar.xz",
+      "sha256": "f3c97391f7c4eaa677a78e090c7e97e6dc47b16f655f04683ebd37bef7fe0faa",
+      "directory": "grub-2.12",
+      "script": "tools/build/grub.sh",
+      "target": "grub-host upstream-grub",
+      "license_in_source": "COPYING",
+      "checksum_source": "https://lists.buildroot.org/pipermail/buildroot/2023-December/366754.html",
+      "note": "GNU release signature fingerprint BE5C23209ACDDACEB20DB0A28C8189F1988C2166; keep BIOS modules and tools at the same version; existing validated EFI modules remain separate."
     }
   ]
 }

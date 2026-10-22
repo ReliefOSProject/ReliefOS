@@ -72,6 +72,7 @@ static Fl_Hold_Browser *disk_browser;
 static Fl_Hold_Browser *partition_browser;
 static Fl_Input *confirm_input;
 static Fl_Check_Button *xorg_checkbox;
+static Fl_Box *bootloader_hint;
 static Fl_Input *account_inputs[5];
 static Fl_Box *account_hint;
 static Fl_Box *status_box;
@@ -498,9 +499,12 @@ static void build_welcome_page(void)
                CONTENT_X, 218, CONTENT_W, 32, 15, 1);
 }
 
+/** @brief Start a fresh mode with both firmware defaults after leaving update mode. */
 static void mode_selected(Fl_Widget *widget, void *data)
 {
     if (!static_cast<Fl_Round_Button *>(widget)->value()) return;
+    if ((uint8_t)(uintptr_t)data == INSTALLER_MODE_FRESH && install_mode != INSTALLER_MODE_FRESH)
+        setup.skip_bios = setup.skip_uefi = 0;
     install_mode = (uint8_t)(uintptr_t)data;
     schedule_render();
 }
@@ -678,11 +682,11 @@ static const char *partition_prompt_text(enum partition_prompt_action action)
 {
     switch (action) {
     case PARTITION_PROMPT_AUTO:
-        return T("Type AUTO to erase the disk and create an ESP and root partition:");
+        return T("Type AUTO to erase the disk and create BIOS Boot, ESP and root partitions:");
     case PARTITION_PROMPT_INITIALIZE:
         return T("Type INITIALIZE to replace the partition table:");
     case PARTITION_PROMPT_CREATE:
-        return T("Enter size_MiB filesystem name (ext4/ext2/fat32/exfat):");
+        return T("Enter size_MiB filesystem name (ext4/ext2/fat32/exfat/raw):");
     case PARTITION_PROMPT_RESIZE:
         return T("Enter the new partition size in MiB:");
     case PARTITION_PROMPT_RENAME:
@@ -750,7 +754,7 @@ static void partition_prompt_pressed(Fl_Widget *, void *data)
         if (partition_collect_name(name, sizeof(name), name_word, &cursor) < 0)
             name[0] = 0;
         if (!partition_number(word, &number) &&
-            filesystem != RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN && name[0])
+            (filesystem != RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN || text_eq(filesystem_name, "raw")) && name[0])
             ret = installer_partition_create(filesystem, number, name);
     } else if (action == PARTITION_PROMPT_RESIZE) {
         if (!partition_number(word, &number))
@@ -805,8 +809,8 @@ static void build_partition_page(void)
 
     make_heading(T("Configure partitions"), 16);
     make_label(installer_partition_auto
-                   ? T("Automatic layout creates a 128 MiB FAT32 ESP and an ext4 root.")
-                   : T("Manual layout: select partitions, then assign ESP and root roles."),
+                   ? T("Automatic layout creates 1 MiB BIOS Boot, 128 MiB FAT32 ESP and ext4 root.")
+                   : T("Manual layout: assign BIOS Boot, ESP and root roles. BIOS Boot stays unformatted."),
                CONTENT_X, 52, CONTENT_W, 38, 14, 1);
     partition_browser = new Fl_Hold_Browser(CONTENT_X, 96, CONTENT_W, 280);
     partition_browser->callback(select_partition);
@@ -833,6 +837,9 @@ static void build_partition_page(void)
     make_button(T("Data type"), CONTENT_X + 320, 432, 150, 36,
                 partition_role_pressed,
                 (void *)(uintptr_t)RELIEFOS_BLOCK_GPT_BASIC_DATA);
+    make_button(T("Set BIOS Boot"), CONTENT_X + 480, 432, 170, 36,
+                partition_role_pressed,
+                (void *)(uintptr_t)RELIEFOS_BLOCK_GPT_BIOS_BOOT);
 
     status_box = make_label(status_text, CONTENT_X, 480, CONTENT_W, 30, 13, 1);
     detail_box = make_label(detail_text, CONTENT_X, 512, CONTENT_W, 38, 13, 1);
@@ -935,6 +942,20 @@ static void xorg_install_changed(Fl_Widget *widget, void *)
     setup.skip_xorg = static_cast<Fl_Check_Button *>(widget)->value() ? 0 : 1;
 }
 
+/** @brief Apply one firmware choice and explain the effect of skipping both. */
+static void bootloader_install_changed(Fl_Widget *widget, void *data)
+{
+    uint8_t skip = static_cast<Fl_Check_Button *>(widget)->value() ? 0 : 1;
+    if ((uintptr_t)data == 1) setup.skip_bios = skip;
+    else setup.skip_uefi = skip;
+    if (bootloader_hint) {
+        bootloader_hint->copy_label(setup.skip_bios && setup.skip_uefi
+            ? T("No bootloader selected. A new installation will need a separately configured bootloader.")
+            : T("BIOS requires an unformatted BIOS Boot partition. Skipped existing bootloaders are preserved."));
+        bootloader_hint->redraw();
+    }
+}
+
 static void build_confirm_page(void)
 {
     char line[160];
@@ -974,6 +995,20 @@ static void build_confirm_page(void)
         xorg_checkbox->callback(xorg_install_changed);
         reliefos_fltk::style(xorg_checkbox);
     }
+    Fl_Check_Button *bios = new Fl_Check_Button(CONTENT_X, 366, CONTENT_W, 32,
+                                                T("Install or update BIOS bootloader"));
+    bios->value(setup.skip_bios ? 0 : 1);
+    bios->callback(bootloader_install_changed, (void *)(uintptr_t)1);
+    reliefos_fltk::style(bios);
+    Fl_Check_Button *uefi = new Fl_Check_Button(CONTENT_X, 406, CONTENT_W, 32,
+                                                T("Install or update UEFI bootloader"));
+    uefi->value(setup.skip_uefi ? 0 : 1);
+    uefi->callback(bootloader_install_changed, (void *)(uintptr_t)2);
+    reliefos_fltk::style(uefi);
+    bootloader_hint = make_label(setup.skip_bios && setup.skip_uefi
+        ? T("No bootloader selected. A new installation will need a separately configured bootloader.")
+        : T("BIOS requires an unformatted BIOS Boot partition. Skipped existing bootloaders are preserved."),
+        CONTENT_X, 454, CONTENT_W, 70, 13, 1);
 }
 
 static void build_progress_page(void)
@@ -1031,6 +1066,7 @@ static void clear_page_widgets(void)
     partition_browser = NULL;
     confirm_input = NULL;
     xorg_checkbox = NULL;
+    bootloader_hint = NULL;
     account_hint = NULL;
     status_box = NULL;
     detail_box = NULL;

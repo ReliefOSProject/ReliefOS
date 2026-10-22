@@ -1,0 +1,1 @@
+biosdisk part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file configfile echo serial terminal video video_bochs video_cirrus vbe all_video font gfxterm gfxmenu

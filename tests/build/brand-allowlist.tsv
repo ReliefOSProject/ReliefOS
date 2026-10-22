@@ -231,7 +231,7 @@ main	compatibility	tools/analyze_boot_log.py	同时接受新旧内核日志前�
 main	compatibility	tools/apk_distribution.py	旧签名密钥位置/输入兼容、旧 updater 链接和公钥名、旧 APK 包名迁移与旧 ESP 排除
 main	compatibility	tools/build/apk-stage.sh	保留旧 license 元数据目录、签名公钥、protected_paths 文件与 updater 别名，并排除旧 ESP
 main	compatibility	tools/build/auth-upstream.sh	现有构建输出的 .leonos-auth-inputs/.leonos-auth.json 缓存格式，与 scripts/reliefos/Makefile.third-party 及恢复测试配对。
-main	compatibility	tools/build/efi-stage.sh	新旧 ESP 成套内核/display.conf 同步；PF2 文件名冻结
+main	compatibility	tools/build/boot-stage.sh	新旧 ESP 成套内核/display.conf 同步；PF2 文件名冻结
 main	compatibility	tools/build/images.sh	PROFILE 字节值冻结；LEONOS_EXT2_TIME 为新变量之后回退的旧输入。
 main	compatibility	tools/build/iso.sh	canonical installer marker 之外同步旧 marker，兼容旧 GRUB/介质搜索。
 main	compatibility	tools/build/musl-sdk.sh	新旧 runtime/archive 作为不同输入装入同一 SDK，旧头转发
@@ -453,3 +453,10 @@ main	compatibility	tests/build/test-fetch-check.sh	旧 LEONOS_* 环境/命令行
 main	compatibility	userland/apps/installer/install_ops.h	旧 ESP 启动载荷路径 TARGET_ESP_KERNEL_LEGACY，旧载荷保留回滚契约
 main	compatibility	userland/apps/installer/install_ops.c	安装器升级时清理旧 ESP 遗留载荷文件与 /etc/leonos 等旧目录、libleonos.so.2 兼容库路径清单
 main	compatibility	tools/test_fltk_apps_qemu.py	验收镜像保留已发布 gettext catalog 文件名与旧独立兼容 SONAME/目录，不作为 UI 展示品牌
+main	history	docs/superpowers/plans/2026-10-22-legacy-bios-dual-boot.md	2026-10-22 双启动执行计划记录旧兼容命令及冻结字体文件名，不是现行显示品牌
+main	compatibility	tests/long/test-boot-stage.sh	真实引导载荷测试校验旧 ESP 回滚路径的字节兼容
+main	compatibility	tests/long/test-legacy-iso-adapter.sh	双启动兼容 CLI 测试消费已冻结的 GRUB 字体文件名
+main	compatibility	tools/test_bootloader_install.py	共用引导安装测试验证旧 ESP 回滚文件和冻结字体载荷
+main	compatibility	tools/test_dual_boot_regressions.py	旧 UEFI 真实更新后读取冻结的旧内核回滚路径
+main	compatibility	userland/runtime/src/bootloader.c	共用引导预检识别冻结的旧 ESP 内核回滚路径及 GRUB 字体文件名
+main	compatibility	userland/runtime/src/bootloader_publish.c	共用引导发布保留旧 ESP 回滚内核并清理旧 loader 文件，不能破坏已安装磁盘兼容

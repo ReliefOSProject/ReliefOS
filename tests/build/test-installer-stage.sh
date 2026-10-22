@@ -71,6 +71,12 @@ printf 'license\n' > "$w/raw/etc/license.conf"
 ln -s ../../init.d/reliefos-audio "$w/raw/etc/runlevels/default/reliefos-audio"
 printf 'gptinit\n' > "$w/out/userland-installer/gptinit.elf"
 printf 'installer\n' > "$w/out/userland/installer.elf"
+for path in usr/sbin/reliefos-boot-install usr/sbin/grub-install \
+    usr/sbin/grub-bios-setup usr/sbin/grub-probe usr/bin/grub-mkimage \
+    usr/lib/grub/i386-pc/boot.img; do
+    mkdir -p "$w/raw/${path%/*}"
+    printf 'boot tool fixture\n' > "$w/raw/$path"
+done
 chmod 755 "$w/out/userland/installer.elf" "$w/out/userland-installer/gptinit.elf"
 printf 'efi\n' > "$w/esp/EFI/BOOT/BOOTX64.EFI"
 printf 'new-kernel\n' > "$w/esp/reliefos/kernel.sys"
@@ -118,6 +124,13 @@ done
 [ "$(cat "$w/stage/etc/reliefos/desktop-backend")" = xorg ]
 [ "$(cat "$w/stage/install/root/etc/reliefos/desktop-backend")" = xorg ]
 [ "$(cat "$w/stage/install/root-console/etc/reliefos/desktop-backend")" = console ]
+for profile in "$w/stage" "$w/stage/install/root" "$w/stage/install/root-console"; do
+    for path in usr/sbin/reliefos-boot-install usr/sbin/grub-install \
+        usr/sbin/grub-bios-setup usr/sbin/grub-probe usr/bin/grub-mkimage \
+        usr/lib/grub/i386-pc/boot.img; do
+        cmp "$w/raw/$path" "$profile/$path"
+    done
+done
 for path in etc/X11/xdm/xdm-config etc/X11/xdm/Xservers \
     etc/X11/xdm/Xresources usr/lib/X11/xdm/Xsession \
     usr/lib/X11/xdm/Xsetup_0; do

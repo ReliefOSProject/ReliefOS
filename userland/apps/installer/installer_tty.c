@@ -7,9 +7,12 @@
 #include <stdio.h>
 #include <termios.h>
 #include <string.h>
+#include <libintl.h>
 
 #include "installer_tty.h"
 #include "model.h"
+
+#define T(s) gettext(s)
 
 static int tty_read_line(const char *prompt, char *buffer, uint32_t capacity)
 {
@@ -118,6 +121,34 @@ static int tty_install_xorg(struct installer_setup *setup)
     }
 }
 
+/** @brief Preserve the detected/default mode on Enter; accept explicit yes/no. */
+static int tty_select_loader(const char *name, uint8_t *skip)
+{
+    char input[16], prompt[160];
+    snprintf(prompt, sizeof(prompt), "%s %s: ", name, *skip ? "[y/N]" : "[Y/n]");
+    for (;;) {
+        errno = 0;
+        if (!tty_read_line(prompt, input, sizeof(input))) {
+            if (errno == EOVERFLOW) continue;
+            return 0;
+        }
+        if (!input[0]) return 1;
+        if (tty_line_is(input, "yes") || tty_line_is(input, "y")) { *skip = 0; return 1; }
+        if (tty_line_is(input, "no") || tty_line_is(input, "n")) { *skip = 1; return 1; }
+        puts(T("Please answer yes or no."));
+    }
+}
+
+/** @brief Present independent firmware choices before destructive confirmation. */
+static int tty_bootloaders(struct installer_setup *setup)
+{
+    if (!tty_select_loader(T("Install or update BIOS bootloader?"), &setup->skip_bios) ||
+        !tty_select_loader(T("Install or update UEFI bootloader?"), &setup->skip_uefi)) return 0;
+    if (setup->skip_bios && setup->skip_uefi)
+        puts(T("No bootloader selected. A new installation will need a separately configured bootloader."));
+    return 1;
+}
+
 static void tty_print_disks(const struct installer_tty_context *context)
 {
     char line[160];
@@ -187,11 +218,11 @@ static int tty_partition_menu(const struct installer_tty_context *context)
     for (;;) {
         tty_print_partitions(context);
         puts("Commands: auto, init, create SIZE FS NAME, resize SIZE, rename NAME,");
-        puts("format FS LABEL, esp, root, data, delete, refresh, done.");
+        puts("format FS LABEL, bios, esp, root, data, delete, refresh, done. FS raw creates an unformatted partition.");
         if (!tty_read_line("partition> ", input, sizeof(input))) return 0;
         if (tty_line_is(input, "done")) {
             if (context->partition_plan_valid()) return 1;
-            puts("Select an ESP and a root partition, or use auto.");
+            puts("Select BIOS Boot, ESP and root partitions for dual boot, or use auto.");
             continue;
         }
         if (tty_line_is(input, "auto")) {
@@ -203,7 +234,7 @@ static int tty_partition_menu(const struct installer_tty_context *context)
         } else if (!strncmp(input, "create ", 7) &&
                    sscanf(input + 7, "%lu %15s %79[^\n]", &value, fs_name, partition_name) == 3) {
             int filesystem = tty_fs(fs_name);
-            if (value > 0xffffffffUL || filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN ||
+            if (value > 0xffffffffUL || (filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN && strcmp(fs_name, "raw")) ||
                 context->partition_create((uint32_t)filesystem, (uint32_t)value,
                                           partition_name) < 0)
                 puts("Create failed.");
@@ -222,9 +253,10 @@ static int tty_partition_menu(const struct installer_tty_context *context)
         } else if (tty_line_is(input, "delete")) {
             if (context->partition_delete() < 0) puts("Delete failed.");
         } else if (tty_line_is(input, "esp") || tty_line_is(input, "root") ||
-                   tty_line_is(input, "data")) {
+                   tty_line_is(input, "data") || tty_line_is(input, "bios")) {
             uint32_t type = tty_line_is(input, "esp") ? RELIEFOS_BLOCK_GPT_ESP :
                             tty_line_is(input, "root") ? RELIEFOS_BLOCK_GPT_LINUX :
+                            tty_line_is(input, "bios") ? RELIEFOS_BLOCK_GPT_BIOS_BOOT :
                             RELIEFOS_BLOCK_GPT_BASIC_DATA;
             if (*context->selected_partition < 0 ||
                 (uint32_t)*context->selected_partition >= *context->partition_count ||
@@ -289,6 +321,7 @@ int installer_tty_main(const struct installer_tty_context *context)
         if (*context->page == INSTALLER_PAGE_FINISH && !*context->install_success) {
             return 1;
         }
+        if (!tty_bootloaders(context->setup)) return 1;
         if (!tty_read_line("Type UPDATE to confirm an in-place update: ",
                            input, sizeof(input)) || !tty_line_is(input, "UPDATE")) {
             puts("Update not confirmed. Installation cancelled.");
@@ -309,6 +342,7 @@ int installer_tty_main(const struct installer_tty_context *context)
             puts("Desktop selection cancelled.");
             return 1;
         }
+        if (!tty_bootloaders(context->setup)) return 1;
         if (!tty_read_line("Type INSTALL to confirm the partition layout and installation: ",
                            input, sizeof(input)) || !tty_line_is(input, "INSTALL")) {
             puts("Installation not confirmed. Installation cancelled.");

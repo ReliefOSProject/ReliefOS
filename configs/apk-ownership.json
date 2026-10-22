@@ -3,6 +3,12 @@
   "current_distributor": "reliefos-build",
   "apk_registration": "not-installed",
   "groups": {
+    "reliefos-grub": {
+      "destination": "reliefos",
+      "components": [],
+      "paths": ["usr/sbin/grub-install", "usr/sbin/grub-bios-setup", "usr/sbin/grub-probe", "usr/bin/grub-mkimage", "usr/lib/grub", "usr/share/licenses/grub", "usr/sbin/reliefos-boot-install", "usr/sbin/leonos-grub-installer", "usr/sbin/reliefos-grub-installer"],
+      "reason": "GNU GRUB 2.12 built from locked source for musl, its BIOS platform modules and GPL notices, and the shared ReliefOS boot installer CLI. Console tools have no desktop icons."
+    },
     "reliefos-xdm-config": {
       "destination": "reliefos",
       "components": [],

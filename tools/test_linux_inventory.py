@@ -62,7 +62,8 @@ def guest(args):
         grub_config=WORK/'grub.cfg'
         grub_config.write_text(iso_tools.GRUB_TEMPLATE, encoding='ascii')
         run([sys.executable,'tools/make_installer_iso.py','--out',str(iso.relative_to(ROOT)),
-             '--grub-efi-dir',iso_tools.grub_efi_dir(),
+             '--build-output',str(release_dir),
+             '--grub-efi-dir',iso_tools.grub_efi_dir(release_dir),
              '--stage',str((WORK/'iso').relative_to(ROOT)),
              '--boot-image',str((WORK/'efiboot.img').relative_to(ROOT)),
              '--kernel',str((release_dir/'generated/system/kernel.sys').relative_to(ROOT)),

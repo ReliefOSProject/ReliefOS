@@ -1,151 +1,64 @@
 #!/usr/bin/env python3
-from __future__ import annotations
-
+"""Compatibility arguments for the native, shared BIOS/UEFI ISO producer."""
 import argparse
-import shutil
-import subprocess
+import os
 from pathlib import Path
-
+import subprocess
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
-GRUB_MODULES = (
-    "part_gpt fat iso9660 multiboot2 normal search search_fs_file configfile echo serial "
-    "terminal video video_bochs video_cirrus efi_gop efi_uga all_video font gfxterm gfxmenu"
-)
 
 
-def run(cmd: list[str]) -> None:
-    print("+", " ".join(cmd))
-    subprocess.run(cmd, cwd=ROOT, check=True)
-
-
-def copy_file(src: Path, dst: Path) -> None:
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(src, dst)
-
-
-def build_installer_boot_efi(out: Path, grub_efi_dir: Path) -> Path:
-    out.parent.mkdir(parents=True, exist_ok=True)
-    run([
-        "grub-mkstandalone",
-        "-d",
-        str(grub_efi_dir),
-        "-O",
-        "x86_64-efi",
-        "-o",
-        str(out),
-        f"--modules={GRUB_MODULES}",
-        "boot/grub/grub.cfg=boot/grub/installer_embedded.cfg",
-    ])
-    return out
-
-
-def stage_installer_tree(
-    stage: Path,
-    boot_image: Path,
-    boot_efi: Path,
-    kernel: Path,
-    installer_root: Path,
-    grub_font: Path,
-    grub_config: Path,
-) -> None:
-    if stage.exists():
-        shutil.rmtree(stage)
-    stage.mkdir(parents=True)
-    copy_file(boot_efi, stage / "EFI/BOOT/BOOTX64.EFI")
-    copy_file(grub_config, stage / "grub/grub.cfg")
-    copy_file(grub_font, stage / "grub/fonts/leonos-unicode.pf2")
-    copy_file(ROOT / "boot/grub/theme/theme.txt", stage / "grub/theme/theme.txt")
-    for namespace in ("reliefos", "leonos"):
-        (stage / f"{namespace}-installer-iso.marker").write_text("ReliefOS installer ISO volume\n", encoding="ascii")
-        copy_file(kernel, stage / namespace / "kernel.sys")
-    copy_file(installer_root, stage / "install/root.fat")
-    copy_file(boot_image, stage / "boot/efiboot.img")
-
-
-def create_boot_image(boot_image: Path, boot_efi: Path, boot_stage: Path) -> None:
-    if boot_stage.exists():
-        shutil.rmtree(boot_stage)
-    boot_stage.mkdir(parents=True)
-    copy_file(boot_efi, boot_stage / "EFI/BOOT/BOOTX64.EFI")
-
-    payload_bytes = sum(item.stat().st_size for item in boot_stage.rglob("*") if item.is_file())
-    required_mib = (payload_bytes + (1024 * 1024 - 1)) // (1024 * 1024)
-    size_mib = required_mib + 8
-    if size_mib < 16:
-        size_mib = 16
-
-    boot_image.parent.mkdir(parents=True, exist_ok=True)
-    if boot_image.exists():
-        boot_image.unlink()
-    run(["truncate", "-s", f"{size_mib}M", str(boot_image)])
-    run(["mkfs.fat", "-F", "16", "-n", "RELIEFOS", str(boot_image)])
-    for item in sorted(boot_stage.iterdir()):
-        run(["mcopy", "-s", "-i", str(boot_image), str(item), "::/"])
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Create ReliefOS UEFI installer ISO")
-    parser.add_argument("--out", default="build/images/reliefos-installer.iso")
-    parser.add_argument("--stage", default="build/installer-iso")
-    parser.add_argument("--boot-image", default="build/install/installer-efiboot.img")
-    parser.add_argument("--kernel", default="build/system/kernel.sys")
-    parser.add_argument("--installer-root", default="build/install/root.fat")
-    parser.add_argument("--grub-font", default="build/generated/grub/leonos-unicode.pf2")
-    parser.add_argument("--work-dir", default="build/install")
-    parser.add_argument("--grub-efi-dir", default="/usr/lib/grub/x86_64-efi")
-    parser.add_argument("--grub-config", default="boot/grub/installer.cfg")
-    parser.add_argument("--bios", action="store_true", help="Also include the BIOS GRUB boot path")
+def main():
+    """Stage private inputs; delegate all firmware/image formats to native rules."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--build-output", type=Path, default=ROOT / "out/x86_64/release")
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--stage", type=Path)
+    parser.add_argument("--boot-image", type=Path, help="Optional extracted EFI boot image for old callers")
+    parser.add_argument("--kernel", type=Path)
+    parser.add_argument("--installer-root", type=Path)
+    parser.add_argument("--grub-font", type=Path)
+    parser.add_argument("--work-dir", type=Path)
+    parser.add_argument("--grub-efi-dir", type=Path)
+    parser.add_argument("--grub-bios-dir", type=Path)
+    parser.add_argument("--grub-mkimage", type=Path)
+    parser.add_argument("--grub-mkstandalone", type=Path)
+    parser.add_argument("--grub-config", type=Path, default=ROOT / "boot/grub/installer.cfg")
+    parser.add_argument("--bios", action="store_true", help="Compatibility option; both platforms are always included")
     args = parser.parse_args()
-
-    out = ROOT / args.out
-    stage = ROOT / args.stage
-    boot_image = ROOT / args.boot_image
-    kernel = ROOT / args.kernel
-    installer_root = ROOT / args.installer_root
-    grub_font = ROOT / args.grub_font
-    work_dir = ROOT / args.work_dir
-    grub_efi_dir = Path(args.grub_efi_dir)
-    if not grub_efi_dir.is_absolute():
-        grub_efi_dir = ROOT / grub_efi_dir
-
-    out.parent.mkdir(parents=True, exist_ok=True)
-    if out.exists():
-        out.unlink()
-
-    boot_efi = build_installer_boot_efi(work_dir / "installer-BOOTX64.EFI", grub_efi_dir)
-    create_boot_image(boot_image, boot_efi, work_dir / "efi-boot")
-    stage_installer_tree(stage, boot_image, boot_efi, kernel,
-                         installer_root, grub_font, ROOT / args.grub_config)
-    if args.bios:
-        copy_file(ROOT / args.grub_config, stage / "boot/grub/grub.cfg")
-        bios_dir = Path("/usr/lib/grub/i386-pc")
-        core = work_dir / "bios-core.img"
-        run(["grub-mkimage", "-d", str(bios_dir), "-O", "i386-pc", "-p", "/boot/grub",
-             "-o", str(core), "biosdisk", "iso9660", "normal", "configfile", "multiboot2",
-             "search", "search_fs_file", "serial", "terminal", "all_video", "font", "gfxterm"])
-        # Keep the known EFI standalone image; the host grub-mkrescue EFI
-        # build may differ from the repository's validated GRUB modules.
-        (stage / "boot/grub/eltorito.img").write_bytes((bios_dir / "cdboot.img").read_bytes() + core.read_bytes())
-    run([
-        "xorriso",
-        "-as",
-        "mkisofs",
-        "-iso-level",
-        "3",
-        "-R",
-        "-J",
-        "-V",
-        "RELIEFOSINST",
-        *(("-b", "boot/grub/eltorito.img", "-no-emul-boot", "-boot-load-size", "4",
-           "-boot-info-table", "-eltorito-alt-boot") if args.bios else ()),
-        "-e",
-        "boot/efiboot.img",
-        "-no-emul-boot",
-        "-o",
-        str(out),
-        str(stage),
-    ])
+    output = args.build_output.resolve()
+    iso = (args.out or output / "images/reliefos-installer.iso").resolve()
+    kernel = (args.kernel or output / "generated/system/kernel.sys").resolve()
+    root = (args.installer_root or output / "images/installer-root.ext4").resolve()
+    font = (args.grub_font or output / "generated/grub/leonos-unicode.pf2").resolve()
+    efi = (args.grub_efi_dir or output / "grub-efi/lib/grub/x86_64-efi").resolve()
+    bios = (args.grub_bios_dir or output / "grub-host/lib/grub/i386-pc").resolve()
+    mkimage = (args.grub_mkimage or output / "grub-host/bin/grub-mkimage").resolve()
+    standalone = (args.grub_mkstandalone or output / "grub-host/bin/grub-mkstandalone").resolve()
+    for item in (kernel, root, font, args.grub_config, efi / "kernel.img", bios / "kernel.img", mkimage, standalone):
+        if not item.is_file():
+            parser.error(f"missing explicit build input {item}; build grub-host grub-efi esp first")
+    parent = (args.work_dir or output / "tmp").resolve()
+    parent.mkdir(parents=True, exist_ok=True)
+    environment = dict(os.environ, GRUB_MKSTANDALONE=str(standalone))
+    epoch = environment.get("SOURCE_DATE_EPOCH", "0")
+    with tempfile.TemporaryDirectory(prefix="dual-iso-", dir=parent) as directory:
+        work = Path(directory)
+        stage = (args.stage or work / "esp").resolve()
+        if any(item.is_relative_to(stage) for item in (iso, kernel, root, font, args.grub_config.resolve())):
+            parser.error("stage must not contain source inputs or the published ISO")
+        display = work / "display.conf"
+        display.write_text("theme=metro\nwallpaper.mode=fill\n")
+        subprocess.run(["sh", ROOT / "tools/build/boot-stage.sh", ROOT, efi, bios,
+                        kernel, font, display, stage, epoch], env=environment, check=True)
+        subprocess.run(["sh", ROOT / "tools/build/iso.sh", ROOT, efi, stage, root,
+                        args.grub_config.resolve(), iso, epoch, "RELIEFOSINST", bios, mkimage],
+                       env=environment, check=True)
+    if args.boot_image:
+        args.boot_image.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["xorriso", "-osirrox", "on", "-indev", iso,
+                        "-extract", "/boot/efiboot.img", args.boot_image.resolve()], check=True)
     return 0
 
 

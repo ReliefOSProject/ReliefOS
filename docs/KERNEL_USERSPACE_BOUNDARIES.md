@@ -56,7 +56,7 @@ owner paths for the renamed tree are listed above.
 ## Build and packaging removals
 
 `make middlelayer`, `MIDDLELAYER_SYS`, the middlelayer link step, the
-`middlelayer.sys` copies in `tools/build/efi-stage.sh` and
+`middlelayer.sys` copies in `tools/build/boot-stage.sh` and
 `tools/build/rpr-pages.sh`, `LEONOS_LOADER_MIDDLELAYER_SHA256`,
 `middlelayer_name` in `configs/build-version`, and the
 `module2 /leonos/middlelayer.sys` lines in `boot/grub/installer.cfg` and

@@ -235,30 +235,46 @@ def assert_desktop_profile(image, skip_xorg):
         assert not unexpected_apps, f"Console image includes Xorg applications: {unexpected_apps}"
 
 
+def installer_finish_log(probe, serial, process):
+    """Read current redirected output through the real installer rescue terminal."""
+    start = serial.stat().st_size
+    probe.key("ctrl-alt-f2")
+    time.sleep(1)
+    probe.text("cat /var/log/installer-session.log > /dev/ttyS0; echo INSTALLER_LOG_READ_DONE > /dev/ttyS0")
+    probe.key("ret")
+    deadline = time.monotonic() + 60
+    while time.monotonic() < deadline:
+        assert process.poll() is None, "QEMU exited before reading installer results"
+        with serial.open("r", errors="replace") as stream:
+            stream.seek(start)
+            text = stream.read()
+        if "INSTALLER_LOG_READ_DONE" in text:
+            probe.key("ctrl-alt-f1")
+            time.sleep(1)
+            (probe.output / "installer-finish.log").write_text(text)
+            return text
+        time.sleep(.2)
+    raise AssertionError("Installer rescue terminal did not return its real log")
+
+
 def wait_install(probe, serial, process, *, tty=False):
+    """Require the real completion marker and finish UI; cached RAM logs are diagnostic."""
     deadline = time.monotonic() + 2400
     while time.monotonic() < deadline:
         log = serial.read_text(errors="replace")
-        if "[installer.elf] installation completed successfully" in log:
-            probe.frame("installed")
-            return
         if any("[installer.elf]" in line and " ret=-" in line for line in log.splitlines()):
             raise AssertionError("Installer failed; see serial.log and last-frame.png")
-        if process.poll() is not None: raise RuntimeError("QEMU exited during installation")
-        if tty:
-            if "Reboot now? [Y/n]: " in log:
-                guest_log = installer_log(probe, serial)
-                assert "[installer.elf] installation completed successfully" in guest_log, guest_log
-                probe.frame("installed")
-                return
-            time.sleep(5)
-            continue
-        frame = probe.frame("progress")
-        # Use the shared page detector so this is independent of the current
-        # installer theme's page highlight.
-        if probe.visible_page(frame) == 9:
-            guest_log = installer_log(probe, serial)
-            assert "[installer.elf] installation completed successfully" in guest_log, guest_log
+        if process.poll() is not None:
+            raise RuntimeError("QEMU exited during installation")
+        completed = "[installer.elf] installation completed successfully" in log
+        frame = probe.frame("tty-install-progress" if tty else "progress")
+        finished = "Reboot now?" in log if tty else probe.visible_page(frame) == 9
+        if finished and not tty:
+            current = installer_finish_log(probe, serial, process)
+            assert "[installer.elf] installation completed successfully" in current, current[-10000:]
+            probe.frame("installed")
+            return
+        if completed and finished:
             probe.frame("installed")
             return
         time.sleep(5)
@@ -296,7 +312,8 @@ def xorg_checkbox_checked(indicator):
                       for index, channel in enumerate(color)) > 40) >= 3
 
 
-def install_gui(probe, serial, process, *, skip_xorg=False):
+def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False):
+    """Complete the real GUI, optionally selecting Chinese before account setup."""
     probe.enable_installer_geometry()
     wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
     frame = wait_installer_sidebar(probe, process, "language")
@@ -312,6 +329,9 @@ def install_gui(probe, serial, process, *, skip_xorg=False):
     next_x, next_y = probe.footer_point()
     if not (0 <= next_x < probe.width and 0 <= next_y < probe.height):
         raise AssertionError("Installer FLTK Next button is outside the visible screen")
+    if chinese:
+        probe.click(probe.content_left + 30, probe.sidebar_top + 191)
+        probe.frame("language-chinese")
     for expected_page in range(1, 7):
         next_page(probe, expected_page)
     for index, text in enumerate(("alice", USER_PASSWORD, USER_PASSWORD, ROOT_PASSWORD, ROOT_PASSWORD)):
@@ -356,10 +376,27 @@ def install_gui(probe, serial, process, *, skip_xorg=False):
     wait_install(probe, serial, process)
 
 
-def install_tty(probe, serial, process, components="none", *, skip_xorg=False):
-    time.sleep(3)
-    probe.key("down")
-    probe.key("ret")
+def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
+                install_bios=True, install_uefi=True, select_entry=True):
+    """Answer the real TTY installer, including both independent loader choices."""
+    if select_entry:
+        from test_vt_qemu import ocr
+        # Stop the five-second menu timer before OCR can consume that window.
+        # Up preserves entry zero and is harmless during firmware startup.
+        deadline = time.monotonic() + 45
+        while time.monotonic() < deadline:
+            probe.key("up")
+            if "install reliefos" in ocr(probe.frame("grub-console-entry")).lower().replace("0", "o"):
+                break
+        else:
+            raise AssertionError("Installer GRUB menu did not appear")
+        probe.key("down")
+        probe.key("ret")
+        wait_log(serial, "path=/bin/bash", process)
+        # Preserve the real keyboard TTY as stdin; tee mirrors visible prompts
+        # to serial for exact, bounded assertions without OCR transcription.
+        probe.text("installer 2>/var/log/installer-session.log | tee /dev/ttyS0")
+        probe.key("ret")
     answers = (("Mode [install/update]: ", "install"),
                ("Select disk number (r to refresh, q to quit): ", "0"),
                ("partition> ", "auto"), ("partition> ", "done"),
@@ -367,9 +404,11 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False):
                ("Confirm password: ", USER_PASSWORD), ("root password: ", ROOT_PASSWORD),
                ("Confirm root password: ", ROOT_PASSWORD),
                ("Install Xorg desktop environment? [Y/n]: ", "n" if skip_xorg else ""),
+               ("Install or update BIOS bootloader? [Y/n]: ", "" if install_bios else "n"),
+               ("Install or update UEFI bootloader? [Y/n]: ", "" if install_uefi else "n"),
                ("Type INSTALL to confirm the partition layout and installation: ", "INSTALL"))
     for prompt, answer in answers:
-        wait_log(serial, prompt, process)
+        wait_log(serial, prompt, process, timeout=120)
         probe.text(answer)
         probe.key("ret")
     wait_install(probe, serial, process, tty=True)
