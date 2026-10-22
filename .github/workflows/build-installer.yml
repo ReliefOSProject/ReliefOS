@@ -148,9 +148,8 @@ jobs:
           : "${KCONFIG_LICENSE_DEBUG_LOG:=true}"
 
           config_path=out/x86_64/release/.config
-          # Always start from the checked-in defconfig.  This also runs the
-          # component/Kconfig synchronizer, so removed symbols cannot leak
-          # into a fresh CI checkout from a stale workspace configuration.
+          # Start from native Kconfig and the checked-in product seed, so
+          # removed symbols cannot leak from a stale workspace configuration.
           make fetch
           # kernel/reliefnt submodule cache (unifont); its cache/ is untracked
           make -C kernel/reliefnt fetch

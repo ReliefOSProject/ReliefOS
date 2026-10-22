@@ -14,7 +14,8 @@ sdk = false
 api = false
 
 # The component manifest is the source for optional build, image and entry
-# switches. Core services remain explicit in Kconfig and cannot be disabled.
+# switches. Required components cannot be disabled. SDK/API fields describe
+# retained metadata; the current SDK is a fixed sysroot, not a menu selection.
 
 [[components]]
 id = "imd"
@@ -965,6 +966,7 @@ kind = "library"
 default = true
 required = false
 stage = false
+image_supported = false
 entry = false
 sdk = true
 api = false

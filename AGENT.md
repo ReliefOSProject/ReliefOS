@@ -212,7 +212,8 @@ make test-smoke
 - 默认 O 为 `out/<arch>/<profile>`，支持 `ARCH=x86_64`、`PROFILE=release|debug`。
   修改输出目录用 O，修改目标工具用显式 CC/CXX/LD/AR；HOSTCC 独立。
 - `O/.config` 是当前配置，Kconfig、Kconfig.components 与 configs/components.toml
-  是受跟踪输入。组件 BUILD、IMAGE、ENTRY、SDK、API 选择不得混用；required 组件不可关闭。
+  是受跟踪输入。组件 BUILD、IMAGE、ENTRY 的作用不得混用；required 组件不可关闭。
+  SDK/API 字段仅保留为兼容元数据，不是可选构建控制；SDK 内容由实际产品清单定义。
   修改组件元数据时保持 Kconfig.components 同步，运行组件 fixture。
 - 原版 Kconfig 生成 `O/include/config/auto.conf` 与 `O/include/generated/autoconf.h`；
   许可证别名由独立 policy header 提供，不改写原版配置头。生成的配置和版本头写入 O。生产构建不得改写源码目录、递增版本计数，或使用
