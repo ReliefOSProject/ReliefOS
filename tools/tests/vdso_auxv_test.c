@@ -14,11 +14,21 @@ uint64_t address_space_user_page_phys(const struct address_space *as, uint64_t a
     return (uint64_t)(uintptr_t)(stack + ((address - (top - sizeof(stack))) & ~4095ULL));
 }
 
+int syscall_mm_prepare_exec_stack(struct task *task, uint64_t low)
+{
+    return low >= task->stack_top - sizeof(stack) ? 0 : -7;
+}
+
 int main(void)
 {
     struct task *task = calloc(1, sizeof(*task));
     assert(task);
     task->stack_top = top;
+    task->stack_low = top - sizeof(stack);
+    task->limits.stack.rlim_cur = 8u * 1024u * 1024u;
+    char data[] = "probe";
+    char *argv[] = {data, NULL}, *envp[] = {NULL};
+    task->exec_data = data; task->exec_argv = argv; task->exec_envp = envp;
     strcpy(task->path, "/probe");
     task->exec_argc = 1;
     strcpy(task->exec_data, "probe");
@@ -31,7 +41,7 @@ int main(void)
     const uint64_t vdso = 0x28000000;
     assert(prepare_user_exec_stack(task, task->path, vdso) == 0);
     assert(!(task->frame.rsp & 15));
-    uint64_t *words = (void *)(stack + task->frame.rsp - (top - sizeof(stack)));
+    uint64_t *words = (void *)(stack + (task->frame.rsp - (top - sizeof(stack))));
     assert(words[0] == 1 && words[1] && words[2] == 0 && words[3] == 0);
     uint64_t *aux = words + 4;
     unsigned count = 0, seen_vdso = 0, seen_random = 0;
@@ -39,7 +49,7 @@ int main(void)
         assert(count < 17);
         if (aux[0] == 33) { assert(aux[1] == vdso); ++seen_vdso; }
         if (aux[0] == 25) {
-            const unsigned char *random = stack + aux[1] - (top - sizeof(stack));
+            const unsigned char *random = stack + (aux[1] - (top - sizeof(stack)));
             for (unsigned i = 0; i < 16; ++i) assert(random[i] == i + 1);
             ++seen_random;
         }

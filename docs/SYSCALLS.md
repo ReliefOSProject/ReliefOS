@@ -179,8 +179,18 @@ large page-aligned free blocks with `munmap`.
 parent receives the child PID and the child receives zero. `execve(path, argv,
 envp)` validates and copies the user argument vectors, then replaces the
 current process image while preserving its PID, working directory, identity,
-PTY and descriptors not marked `FD_CLOEXEC`. Use `fork()` followed by
+PTY and descriptors not marked `FD_CLOEXEC`. Argument/environment strings and
+pointer words share the Linux stack-derived budget (2 MiB at the default 8 MiB
+soft stack limit, with a 128 KiB floor and 6 MiB ceiling); each string is limited
+to 128 KiB including its NUL. Excess input returns `E2BIG`. See
+[the kernel argument contract](../kernel/reliefnt/docs/EXEC_ARGUMENTS.md).
+Use `fork()` followed by
 `execve()` to start a child; GUI applications can use `leonos_spawn_argv()`.
+
+`utimensat(fd, NULL, times, 0)` supports the Linux fd-only form used by
+`futimens()` and GNU `cp -p`; it updates the held inode across rename/unlink,
+requires zero flags, and rejects invalid or `O_PATH` descriptors with `EBADF`.
+The pathname and `AT_EMPTY_PATH` forms retain their lookup policies.
 
 `wait4(pid, status, options, rusage)` waits for a child process. `options` and
 `rusage` are accepted for ABI shape but are not a full Linux wait
