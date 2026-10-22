@@ -1,7 +1,7 @@
 RELIEFOS_APP_NAME := diskmgr
-RELIEFOS_APP_OBJECTS := main.o
-RELIEFOS_APP_C_OBJECTS := main.o
-RELIEFOS_APP_CXX_OBJECTS :=
+RELIEFOS_APP_OBJECTS := backend.o elevation.o main.o model.o worker.o
+RELIEFOS_APP_C_OBJECTS :=
+RELIEFOS_APP_CXX_OBJECTS := backend.o elevation.o main.o model.o worker.o
 RELIEFOS_APP_ASM_OBJECTS :=
 ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
 include $(srctree)/scripts/reliefos/Makefile.app-kbuild

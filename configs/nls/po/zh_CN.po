@@ -10,7 +10,6 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: userland/apps/diskmgr/main.c:817
 msgid "   Partitions: "
 msgstr "   分区: "
 
@@ -309,11 +308,11 @@ msgstr "已选中地址"
 msgid "Admin"
 msgstr "管理员"
 
+#: userland/apps/diskmgr/main.cpp:446
 #: userland/apps/settings/main.c:391
 msgid "Administrator"
 msgstr "管理员"
 
-#: userland/apps/diskmgr/main.c:501
 msgid "Administrator approval is required"
 msgstr "需要管理员授权"
 
@@ -453,11 +452,10 @@ msgstr "应用程序："
 msgid "Applications are still running"
 msgstr "仍有应用程序正在运行"
 
-#: userland/apps/diskmgr/main.c:711
+#: userland/apps/diskmgr/main.cpp:221
 msgid "Apply"
 msgstr "应用"
 
-#: userland/apps/diskmgr/main.c:711
 msgid "Apply again"
 msgstr "再次应用"
 
@@ -649,7 +647,6 @@ msgstr "启动"
 msgid "Boot and service runtime should request an address automatically."
 msgstr "启动和服务运行时自动请求地址。"
 
-#: userland/apps/diskmgr/main.c:188
 msgid "Boot disk"
 msgstr "启动磁盘"
 
@@ -745,6 +742,7 @@ msgstr "CPU 时间:"
 msgid "Calculator"
 msgstr "计算器"
 
+#: userland/apps/diskmgr/main.cpp:288
 #: userland/apps/apiapp/main.c:362
 msgid "Cancel"
 msgstr "取消"
@@ -977,11 +975,9 @@ msgstr "无法存储矢量路径"
 msgid "Cannot write artifact response"
 msgstr "无法写入产物响应"
 
-#: userland/apps/diskmgr/main.c:727
 msgid "Capacity"
 msgstr "容量"
 
-#: userland/apps/diskmgr/main.c:666
 msgid "Capacity:"
 msgstr "容量:"
 
@@ -1173,7 +1169,6 @@ msgstr "清除标记"
 msgid "Clearing recovery snapshot..."
 msgstr "正在清除恢复快照…"
 
-#: userland/apps/diskmgr/main.c:540
 msgid "Click Apply again to continue"
 msgstr "再次点击应用以继续"
 
@@ -1185,6 +1180,7 @@ msgstr "剪贴板为空"
 msgid "Clock failure"
 msgstr "时钟失败"
 
+#: userland/apps/diskmgr/main.cpp:439
 #: userland/apps/apiapp/main.c:794
 msgid "Close"
 msgstr "关闭"
@@ -1281,11 +1277,10 @@ msgstr "确认注销"
 msgid "Confirm Update"
 msgstr "确认更新"
 
-#: userland/apps/diskmgr/main.c:708
 msgid "Confirm:"
 msgstr "确认:"
 
-#: userland/apps/diskmgr/main.c:535
+#: userland/apps/diskmgr/main.cpp:242
 msgid "Confirmation word does not match"
 msgstr "确认词不匹配"
 
@@ -1501,7 +1496,6 @@ msgstr "创建新目录"
 msgid "Create desktop shortcut"
 msgstr "创建桌面快捷方式"
 
-#: userland/apps/diskmgr/main.c:691
 msgid "Create partition"
 msgstr "创建分区"
 
@@ -1697,7 +1691,7 @@ msgstr "DOOM 已不再运行"
 msgid "DPI:"
 msgstr "DPI："
 
-#: userland/apps/diskmgr/main.c:247
+#: userland/apps/diskmgr/main.cpp:62
 msgid "Data"
 msgstr "数据"
 
@@ -1757,7 +1751,7 @@ msgstr "删除书签"
 msgid "Delete canceled"
 msgstr "已取消删除"
 
-#: userland/apps/diskmgr/main.c:690
+#: userland/apps/diskmgr/main.cpp:49
 msgid "Delete partition"
 msgstr "删除分区"
 
@@ -1889,27 +1883,26 @@ msgstr "放弃更改？"
 msgid "Discard snapshot"
 msgstr "丢弃快照"
 
+#: userland/apps/diskmgr/main.cpp:435
 #: userland/apps/installer/main.cpp:214
 msgid "Disk"
 msgstr "硬盘"
 
-#: userland/apps/diskmgr/main.c:1069
+#: userland/apps/diskmgr/main.cpp:387
 msgid "Disk Manager"
 msgstr "磁盘管理器"
 
-#: userland/apps/diskmgr/main.c:447
+#: userland/apps/diskmgr/main.cpp:407
 msgid "Disk list refreshed"
 msgstr "磁盘列表已刷新"
 
-#: userland/apps/diskmgr/main.c:427
 msgid "Disk refresh failed"
 msgstr "磁盘刷新失败"
 
-#: userland/apps/diskmgr/main.c:746
+#: userland/apps/diskmgr/main.cpp:449
 msgid "Disks"
 msgstr "磁盘"
 
-#: userland/apps/diskmgr/main.c:815
 msgid "Disks: "
 msgstr "磁盘: "
 
@@ -3905,7 +3898,7 @@ msgstr "输入文件路径并按回车"
 msgid "Enter a valid custom IPv4 DNS address."
 msgstr "请输入有效的自定义 IPv4 DNS 地址。"
 
-#: userland/apps/diskmgr/main.c:576
+#: userland/apps/diskmgr/main.cpp:228
 msgid "Enter a valid size in MiB"
 msgstr "请输入有效的 MiB 大小"
 
@@ -4033,11 +4026,9 @@ msgstr "文件名："
 msgid "File not found "
 msgstr "找不到文件："
 
-#: userland/apps/diskmgr/main.c:733
 msgid "File system"
 msgstr "文件系统"
 
-#: userland/apps/diskmgr/main.c:697
 msgid "File system:"
 msgstr "文件系统:"
 
@@ -4133,7 +4124,6 @@ msgstr "是否强制关闭剩余应用程序？"
 msgid "Form reset"
 msgstr "表单已重置"
 
-#: userland/apps/diskmgr/main.c:689
 msgid "Format partition"
 msgstr "格式化分区"
 
@@ -4569,7 +4559,6 @@ msgstr "内核版本"
 msgid "Kind:"
 msgstr "类型:"
 
-#: userland/apps/diskmgr/main.c:704
 msgid "Label:"
 msgstr "卷标:"
 
@@ -4681,7 +4670,6 @@ msgstr "管理书签..."
 msgid "Manage Favorites"
 msgstr "管理收藏夹"
 
-#: userland/apps/diskmgr/main.c:1070
 msgid "Manage GPT partitions"
 msgstr "管理 GPT 分区"
 
@@ -4757,11 +4745,10 @@ msgstr "模式"
 msgid "Mode (octal)"
 msgstr "权限（八进制）"
 
-#: userland/apps/diskmgr/main.c:809
+#: userland/apps/diskmgr/main.cpp:50
 msgid "Mount"
 msgstr "挂载"
 
-#: userland/apps/diskmgr/main.c:830
 msgid "Mount exFAT, FAT32, ext4, or legacy ext2 data partitions at stable /mnt paths."
 msgstr ""
 
@@ -4769,19 +4756,15 @@ msgstr ""
 msgid "Mount failed"
 msgstr "挂载失败"
 
-#: userland/apps/diskmgr/main.c:611
 msgid "Mount-point creation failed"
 msgstr "挂载点创建失败"
 
-#: userland/apps/diskmgr/main.c:239
 msgid "Mounted "
 msgstr "已挂载 "
 
-#: userland/apps/diskmgr/main.c:620
 msgid "Mounted as "
 msgstr "已挂载为 "
 
-#: userland/apps/diskmgr/main.c:235
 msgid "Mounted target"
 msgstr "已挂载目标"
 
@@ -4821,7 +4804,7 @@ msgstr "NTP 运行状态:"
 msgid "NTP time sync"
 msgstr "NTP 时间同步"
 
-#: userland/apps/diskmgr/main.c:725
+#: userland/apps/diskmgr/main.cpp:99
 msgid "Name"
 msgstr "名称"
 
@@ -4829,7 +4812,7 @@ msgstr "名称"
 msgid "Name        State"
 msgstr "名称        状态"
 
-#: userland/apps/diskmgr/main.c:664
+#: userland/apps/diskmgr/main.cpp:270
 msgid "Name:"
 msgstr "名称:"
 
@@ -4889,7 +4872,7 @@ msgstr "新名称为空"
 msgid "New name:"
 msgstr "新名称:"
 
-#: userland/apps/diskmgr/main.c:800
+#: userland/apps/diskmgr/main.cpp:47
 msgid "New partition"
 msgstr "新建分区"
 
@@ -4937,7 +4920,6 @@ msgstr "没有 TCP 客户端 socket。"
 msgid "No device selected"
 msgstr "未选择设备"
 
-#: userland/apps/diskmgr/main.c:672
 msgid "No disk selected."
 msgstr "未选择磁盘。"
 
@@ -5049,6 +5031,7 @@ msgstr "只有带地址的页面可以加入书签"
 msgid "Only the selected ESP and root partitions will be formatted; other partitions are preserved."
 msgstr "仅格式化选中的 EFI 系统分区和根分区，保留其他分区。"
 
+#: userland/apps/diskmgr/main.cpp:330
 #: userland/apps/browser/bookmarks.c:306
 msgid "Open"
 msgstr "打开"
@@ -5125,7 +5108,6 @@ msgstr "已打开："
 msgid "Opening page..."
 msgstr "正在打开页面..."
 
-#: userland/apps/diskmgr/main.c:956
 msgid "Operation cancelled"
 msgstr "操作已取消"
 
@@ -5177,27 +5159,24 @@ msgstr "父 PID:"
 msgid "Parse failed"
 msgstr "解析失败"
 
-#: userland/apps/diskmgr/main.c:589
+#: userland/apps/diskmgr/main.cpp:407
 msgid "Partition created and formatted"
 msgstr "分区已创建并格式化"
 
-#: userland/apps/diskmgr/main.c:582
 msgid "Partition creation failed"
 msgstr "创建分区失败"
 
-#: userland/apps/diskmgr/main.c:563
 msgid "Partition deletion failed"
 msgstr "删除分区失败"
 
-#: userland/apps/diskmgr/main.c:569
+#: userland/apps/diskmgr/main.cpp:408
 msgid "Partition entry deleted"
 msgstr "分区条目已删除"
 
-#: userland/apps/diskmgr/main.c:551
 msgid "Partition format failed"
 msgstr "分区格式化失败"
 
-#: userland/apps/diskmgr/main.c:557
+#: userland/apps/diskmgr/main.cpp:408
 msgid "Partition formatted"
 msgstr "分区格式化完成"
 
@@ -5205,7 +5184,6 @@ msgstr "分区格式化完成"
 msgid "Partition layout updated"
 msgstr "已更新分区布局"
 
-#: userland/apps/diskmgr/main.c:615
 msgid "Partition mount failed"
 msgstr "分区挂载失败"
 
@@ -5213,7 +5191,6 @@ msgstr "分区挂载失败"
 msgid "Partition operation failed"
 msgstr "分区操作失败"
 
-#: userland/apps/diskmgr/main.c:393
 msgid "Partition refresh failed"
 msgstr "分区刷新失败"
 
@@ -5221,19 +5198,16 @@ msgstr "分区刷新失败"
 msgid "Partition role updated."
 msgstr "已更新分区用途。"
 
-#: userland/apps/diskmgr/main.c:828
 msgid "Partition safety"
 msgstr "分区安全"
 
-#: userland/apps/diskmgr/main.c:648
 msgid "Partition unmount failed"
 msgstr "分区卸载失败"
 
-#: userland/apps/diskmgr/main.c:653
+#: userland/apps/diskmgr/main.cpp:409
 msgid "Partition unmounted"
 msgstr "分区已卸载"
 
-#: userland/apps/diskmgr/main.c:772
 msgid "Partitions"
 msgstr "分区"
 
@@ -5245,6 +5219,7 @@ msgstr "密码"
 msgid "Password (kept only for this browser session):"
 msgstr "密码（只保存在本次浏览器会话中）:"
 
+#: userland/apps/diskmgr/main.cpp:329
 #: userland/apps/sudod/main.c:287
 msgid "Password:"
 msgstr "密码："
@@ -5349,7 +5324,6 @@ msgstr "请选择已存在的文件！"
 msgid "Please keep this window open until installation completes."
 msgstr "请保持此窗口打开，直到安装完成。"
 
-#: userland/apps/diskmgr/main.c:726
 msgid "Port"
 msgstr "端口"
 
@@ -5357,7 +5331,6 @@ msgstr "端口"
 msgid "Port must be 1-65535"
 msgstr "端口必须是 1-65535"
 
-#: userland/apps/diskmgr/main.c:665
 msgid "Port:"
 msgstr "端口:"
 
@@ -5437,7 +5410,6 @@ msgstr "属性"
 msgid "Properties failed"
 msgstr "属性操作失败"
 
-#: userland/apps/diskmgr/main.c:244
 msgid "Protected"
 msgstr "受保护"
 
@@ -5493,6 +5465,7 @@ msgstr "准备安装："
 msgid "Red"
 msgstr "红色"
 
+#: userland/apps/diskmgr/main.cpp:52
 #: userland/apps/browser/input.c:172
 msgid "Refresh"
 msgstr "刷新"
@@ -5849,7 +5822,6 @@ msgstr "请选择一个文件"
 msgid "Select a file in "
 msgstr "请在以下位置选择文件："
 
-#: userland/apps/diskmgr/main.c:632
 msgid "Select a mounted data partition"
 msgstr "请选择已挂载的数据分区"
 
@@ -5861,11 +5833,9 @@ msgstr "请选择一个tar文件"
 msgid "Select an item"
 msgstr "请选择一个项目"
 
-#: userland/apps/diskmgr/main.c:600
 msgid "Select an unmounted exFAT, FAT32, ext4, or legacy ext2 data partition"
 msgstr ""
 
-#: userland/apps/diskmgr/main.c:497
 msgid "Select an unprotected non-boot disk partition"
 msgstr "请选择未受保护的非启动磁盘分区"
 
@@ -5877,7 +5847,6 @@ msgstr "请选择要更新的硬盘"
 msgid "Select the target disk"
 msgstr "请选择目标硬盘"
 
-#: userland/apps/diskmgr/main.c:660
 msgid "Selected disk"
 msgstr "选中磁盘"
 
@@ -5893,7 +5862,6 @@ msgstr "所选路径不是文件"
 msgid "Selection changed"
 msgstr "选项已更改"
 
-#: userland/apps/diskmgr/main.c:545
 msgid "Selection changed; operation cancelled"
 msgstr "选择已变更；操作已取消"
 
@@ -6057,11 +6025,10 @@ msgstr "注销"
 msgid "Sign out of ReliefOS now?"
 msgstr "是否立即注销 ReliefOS？"
 
-#: userland/apps/diskmgr/main.c:734
+#: userland/apps/diskmgr/main.cpp:99
 msgid "Size"
 msgstr "大小"
 
-#: userland/apps/diskmgr/main.c:701
 msgid "Size MiB:"
 msgstr "大小 MiB:"
 
@@ -6169,6 +6136,7 @@ msgstr "状态:"
 msgid "Static fallback"
 msgstr "静态回退"
 
+#: userland/apps/diskmgr/main.cpp:136
 #: userland/apps/devmgr/main.c:207
 msgid "Status"
 msgstr "状态"
@@ -6281,7 +6249,6 @@ msgstr "解压 tar 失败，请检查归档和目标目录权限"
 msgid "Target disk is ready."
 msgstr "目标硬盘已准备就绪。"
 
-#: userland/apps/diskmgr/main.c:192
 msgid "Target mounted"
 msgstr "目标已挂载"
 
@@ -6453,7 +6420,6 @@ msgstr "此输入法没有可配置选项。"
 msgid "This operation is destructive."
 msgstr "此操作会清空目标硬盘。"
 
-#: userland/apps/diskmgr/main.c:694
 msgid "This removes the GPT entry. Existing data is not securely erased."
 msgstr "这会移除 GPT 条目，原有数据不会被安全擦除。"
 
@@ -6529,7 +6495,6 @@ msgstr "输入 INSTALL 以启用安装按钮。"
 msgid "Type UPDATE to enable the Update button."
 msgstr "输入 UPDATE 以启用更新按钮。"
 
-#: userland/apps/diskmgr/main.c:525
 msgid "Type the confirmation word and click Apply twice"
 msgstr "输入确认词后点击两次应用"
 
@@ -6557,7 +6522,7 @@ msgstr "不可用"
 msgid "Unchecked"
 msgstr "未选中"
 
-#: userland/apps/diskmgr/main.c:216
+#: userland/apps/diskmgr/main.cpp:63
 msgid "Unknown"
 msgstr "未知"
 
@@ -6577,15 +6542,13 @@ msgstr "未加载"
 msgid "Unmark"
 msgstr "取消标记"
 
-#: userland/apps/diskmgr/main.c:812
+#: userland/apps/diskmgr/main.cpp:51
 msgid "Unmount"
 msgstr "卸载"
 
-#: userland/apps/diskmgr/main.c:646
 msgid "Unmount blocked: close files and leave the mount first"
 msgstr "卸载被阻止：请先关闭文件并离开该挂载点"
 
-#: userland/apps/diskmgr/main.c:833
 msgid "Unmount requires administrator approval and no task may use the mount."
 msgstr "卸载需要管理员授权，且不能有进程正在使用该挂载点。"
 
@@ -10779,6 +10742,7 @@ msgstr "文件的绝对路径："
 msgid "Address:"
 msgstr "地址："
 
+#: userland/apps/diskmgr/main.cpp:325
 #: userland/apps/reliefapk/dialogs.cpp:27
 msgid "Administrator authentication"
 msgstr "管理员身份验证"
@@ -12706,6 +12670,7 @@ msgstr "保存草稿"
 msgid "Message"
 msgstr "邮件"
 
+#: userland/apps/diskmgr/main.cpp:48
 #: userland/apps/reliefmail/compose_window.cpp
 msgid "Format"
 msgstr "格式"
@@ -16590,3 +16555,160 @@ msgstr "引导安装预检查失败"
 #: userland/apps/installer/installer_tty.c:138
 msgid "Please answer yes or no."
 msgstr "请输入 yes 或 no。"
+
+#: userland/apps/diskmgr/main.cpp:165
+msgid "    Contains mounted partitions"
+msgstr "    含有已挂载分区"
+
+#: userland/apps/diskmgr/main.cpp:165
+msgid "    Read-only"
+msgstr "    只读"
+
+#: userland/apps/diskmgr/main.cpp:260
+msgid "A new partition will be created and formatted in free space."
+msgstr "将在空闲空间创建并格式化新分区。"
+
+#: userland/apps/diskmgr/main.cpp:261
+msgid "All data on this partition will be erased."
+msgstr "此分区上的全部数据将被清除。"
+
+#: userland/apps/diskmgr/main.cpp:338
+msgid "Authenticating; waiting for the administrator window…"
+msgstr "正在验证身份，等待管理员窗口启动…"
+
+#: userland/apps/diskmgr/main.cpp:422
+msgid "Authentication or administrator startup failed. Check your password and sudo permission."
+msgstr "身份验证或管理员窗口启动失败，请检查密码和 sudo 权限。"
+
+#: userland/apps/diskmgr/main.cpp:241
+msgid "Click Confirm again to write these changes."
+msgstr "再次点击“确认执行”，才会将更改写入磁盘。"
+
+#: userland/apps/diskmgr/main.cpp:243
+msgid "Confirm again"
+msgstr "确认执行"
+
+#: userland/apps/diskmgr/main.cpp:459
+msgid "Create and format a partition in free space on an unmounted GPT disk."
+msgstr "在未挂载的 GPT 磁盘空闲空间中创建并格式化分区。"
+
+#: userland/apps/diskmgr/main.cpp:461
+msgid "Delete a partition entry on an unmounted disk."
+msgstr "删除未挂载磁盘上的分区表项。"
+
+#: userland/apps/diskmgr/main.cpp:60
+msgid "EFI System"
+msgstr "EFI 系统分区"
+
+#: userland/apps/diskmgr/main.cpp:327
+msgid "Enter your sudo password to open Disk Manager as administrator."
+msgstr "输入你的 sudo 密码，以管理员身份打开磁盘管理器。"
+
+#: userland/apps/diskmgr/main.cpp:99
+msgid "Filesystem"
+msgstr "文件系统"
+
+#: userland/apps/diskmgr/main.cpp:275
+msgid "Filesystem:"
+msgstr "文件系统："
+
+#: userland/apps/diskmgr/main.cpp:460
+msgid "Format the selected unmounted partition. This erases its data."
+msgstr "格式化选中的未挂载分区，将清除其中的数据。"
+
+#: userland/apps/diskmgr/main.cpp:100
+msgid "GPT type"
+msgstr "GPT 类型"
+
+#: userland/apps/diskmgr/main.cpp:462
+msgid "Mount the selected filesystem below /mnt."
+msgstr "将选中的文件系统挂载到 /mnt 下。"
+
+#: userland/apps/diskmgr/main.cpp:137
+msgid "Mounted"
+msgstr "已挂载"
+
+#: userland/apps/diskmgr/main.cpp:100
+msgid "Mounted at"
+msgstr "挂载位置"
+
+#: userland/apps/diskmgr/main.cpp:166
+msgid "No disk selected"
+msgstr "未选择磁盘"
+
+#: userland/apps/diskmgr/main.cpp:405
+msgid "No readable disks found. Open as administrator if access is restricted."
+msgstr "未找到可读取的磁盘；若访问受限，请以管理员身份打开。"
+
+#: userland/apps/diskmgr/main.cpp:138
+msgid "Not mounted"
+msgstr "未挂载"
+
+#: userland/apps/diskmgr/main.cpp:437
+msgid "Open as administrator…"
+msgstr "以管理员身份打开…"
+
+#: userland/apps/diskmgr/main.cpp:99
+msgid "Partition"
+msgstr "分区"
+
+#: userland/apps/diskmgr/main.cpp:409
+msgid "Partition mounted"
+msgstr "分区已挂载"
+
+#: userland/apps/diskmgr/main.cpp:138
+msgid "Read-only"
+msgstr "只读"
+
+#: userland/apps/diskmgr/main.cpp:446
+msgid "Read-only view · administrator required for changes"
+msgstr "只读浏览 · 修改磁盘需要管理员权限"
+
+#: userland/apps/diskmgr/main.cpp:139
+msgid "Sectors"
+msgstr "扇区范围"
+
+#: userland/apps/diskmgr/main.cpp:132
+msgid "Select a partition to see its identity and mount status."
+msgstr "选择一个分区，查看其身份和挂载状态。"
+
+#: userland/apps/diskmgr/main.cpp:267
+msgid "Size (MiB):"
+msgstr "容量（MiB）："
+
+#: userland/apps/diskmgr/main.cpp:137
+msgid "System partition"
+msgstr "系统分区"
+
+#: userland/apps/diskmgr/main.cpp:258
+msgid "Target"
+msgstr "目标"
+
+#: userland/apps/diskmgr/main.cpp:262
+msgid "The partition entry will be removed. Its files will become inaccessible."
+msgstr "将删除分区表项，分区内的文件将无法访问。"
+
+#: userland/apps/diskmgr/main.cpp:231
+msgid "The partition name is too long."
+msgstr "分区名称过长。"
+
+#: userland/apps/diskmgr/main.cpp:71
+msgid "The partition was created, but formatting failed."
+msgstr "分区已创建，但格式化失败，请检查当前分区状态。"
+
+#: userland/apps/diskmgr/main.cpp:281
+#, c-format
+msgid "Type %s to confirm:"
+msgstr "输入 %s 确认："
+
+#: userland/apps/diskmgr/main.cpp:463
+msgid "Unmount the selected filesystem from its actual mount point."
+msgstr "从实际挂载位置卸载选中的文件系统。"
+
+#: userland/apps/diskmgr/main.cpp:364
+msgid "Wait for the current operation to finish before closing."
+msgstr "请等待当前操作完成后再关闭窗口。"
+
+#: userland/apps/diskmgr/main.cpp:164
+msgid "bytes/sector"
+msgstr "字节/扇区"

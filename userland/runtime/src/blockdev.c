@@ -459,23 +459,60 @@ static int block_guid_make(uint8_t guid[16])
     return 0;
 }
 
-static void block_name_set(uint16_t name[36], const char *text)
+/** @brief Encode valid UTF-8 as GPT UTF-16LE without truncating names or splitting surrogates. */
+static int block_name_set(uint16_t name[36], const char *text)
 {
-    uint32_t i = 0;
-    for (; i < 36u && text && text[i]; ++i)
-        name[i] = (uint8_t)text[i] >= 32u && (uint8_t)text[i] <= 126u ? (uint8_t)text[i] : '?';
-    for (; i < 36u; ++i) name[i] = 0;
+    uint16_t encoded[36] = {0};
+    uint32_t used = 0;
+    const uint8_t *p = (const uint8_t *)(text ? text : "");
+    while (*p) {
+        uint32_t code = *p++, continuation = 0, minimum = 0;
+        if (code >= 0xc2u && code <= 0xdfu) { code &= 0x1fu; continuation = 1; minimum = 0x80; }
+        else if (code >= 0xe0u && code <= 0xefu) { code &= 0x0fu; continuation = 2; minimum = 0x800; }
+        else if (code >= 0xf0u && code <= 0xf4u) { code &= 7u; continuation = 3; minimum = 0x10000; }
+        else if (code >= 0x80u) return -EILSEQ;
+        for (uint32_t i = 0; i < continuation; ++i) {
+            if ((*p & 0xc0u) != 0x80u) return -EILSEQ;
+            code = (code << 6) | (*p++ & 0x3fu);
+        }
+        if (code < minimum || code > 0x10ffffu || (code >= 0xd800u && code <= 0xdfffu)) return -EILSEQ;
+        uint32_t units = code >= 0x10000u ? 2u : 1u;
+        if (units > 36u - used) return -ENAMETOOLONG;
+        if (units == 2) {
+            code -= 0x10000u;
+            encoded[used++] = (uint16_t)(0xd800u | (code >> 10));
+            encoded[used++] = (uint16_t)(0xdc00u | (code & 0x3ffu));
+        } else encoded[used++] = (uint16_t)code;
+    }
+    memcpy(name, encoded, sizeof(encoded));
+    return 0;
 }
 
+/** @brief Decode GPT UTF-16LE to bounded UTF-8; malformed disk surrogates become U+FFFD. */
 static void block_name_get(char *text, uint32_t capacity, const uint16_t name[36])
 {
-    uint32_t i = 0;
+    uint16_t units[36];
+    uint32_t written = 0;
     if (!text || !capacity) return;
-    while (i < 36u && name[i] && i + 1u < capacity) {
-        text[i] = name[i] < 128u ? (char)name[i] : '?';
-        ++i;
+    memcpy(units, name, sizeof(units));
+    for (uint32_t i = 0; i < 36u && units[i]; ++i) {
+        uint32_t code = units[i];
+        if (code >= 0xd800u && code <= 0xdbffu) {
+            if (i + 1 < 36u && units[i + 1] >= 0xdc00u && units[i + 1] <= 0xdfffu) {
+                code = 0x10000u + ((code - 0xd800u) << 10) + (units[i + 1] - 0xdc00u); ++i;
+            } else code = 0xfffd;
+        } else if (code >= 0xdc00u && code <= 0xdfffu) code = 0xfffd;
+        uint32_t bytes = code < 0x80u ? 1u : code < 0x800u ? 2u : code < 0x10000u ? 3u : 4u;
+        if (bytes >= capacity - written) break;
+        if (bytes == 1) text[written++] = (char)code;
+        else {
+            text[written++] = (char)((bytes == 2 ? 0xc0u : bytes == 3 ? 0xe0u : 0xf0u) |
+                                      (code >> (6u * (bytes - 1u))));
+            for (uint32_t j = bytes - 1; j; --j)
+                text[written++] = (char)(0x80u | ((code >> (6u * (j - 1u))) & 0x3fu));
+        }
     }
-    text[i] = 0;
+    text[written] = 0;
 }
 
 static int block_gpt_header_valid(const struct block_gpt_header *header, uint64_t sectors)
@@ -925,8 +962,9 @@ static int block_create_entry(struct block_gpt_table *table, void *context)
             if (result) return result;
             table->entries[free_index].first_lba = cursor;
             table->entries[free_index].last_lba = end;
-            block_name_set(table->entries[free_index].name,
-                           request->name && request->name[0] ? request->name : "ReliefOS Data");
+            result = block_name_set(table->entries[free_index].name,
+                                    request->name && request->name[0] ? request->name : "ReliefOS Data");
+            if (result) return result;
             request->index = free_index;
             return 0;
         }
@@ -976,8 +1014,7 @@ static int block_set_name_entry(struct block_gpt_table *table, void *context)
 {
     struct block_index_request *request = context;
     if (request->index >= table->primary.partition_entry_count || block_guid_empty(table->entries[request->index].type_guid)) return -BLOCK_ENOENT;
-    block_name_set(table->entries[request->index].name, request->name);
-    return 0;
+    return block_name_set(table->entries[request->index].name, request->name);
 }
 int reliefos_block_gpt_delete(const char *disk_path, uint32_t index)
 {

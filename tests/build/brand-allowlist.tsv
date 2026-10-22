@@ -327,7 +327,6 @@ main	history	userland/apps/desktop/autospawn.c	注释引用既有 ntclks separat
 main	compatibility	userland/apps/desktop/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/device-agent/main.c	/proc/leonos-drivers 是冻结运行时接口值
 main	compatibility	userland/apps/devmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/diskmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/downloadmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/drvmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/dynlinkerror/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌

@@ -158,6 +158,16 @@ static void test_eventfd_results(void)
     assert(file.aux == 2);
 }
 
+static void test_path_descriptor_write(void)
+{
+    reset_pipe();
+    struct task_file file = {.used = 1, .flags = TASK_FILE_FLAG_PATH |
+        TASK_FILE_FLAG_DEV_NODE | TASK_FILE_FLAG_DEV_BLOCK | RELIEFOS_O_WRONLY};
+    pin(&test_tasks[0], 3, &file);
+    assert(syscall_io_write(3, (uintptr_t)user_bytes, 512) == -RELIEFOS_EBADF);
+    assert(syscall_io_write(3, (uintptr_t)user_bytes, 0) == -RELIEFOS_EBADF);
+}
+
 int main(void)
 {
     assert(pipe_wake_regressions() == 0);
@@ -165,6 +175,7 @@ int main(void)
     test_pipe_wait_retry_eof_and_signal();
     test_null_access_and_full_count();
     test_eventfd_results();
+    test_path_descriptor_write();
     puts("syscall I/O: redirected stdio, EFAULT, EBADF, pipe wait/retry/EOF/SIGPIPE, null and eventfd passed");
     return 0;
 }
