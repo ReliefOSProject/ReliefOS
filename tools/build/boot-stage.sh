@@ -16,7 +16,7 @@ trap 'rm -rf "$work"' EXIT HUP INT TERM
 mkdir -p "$work/EFI/BOOT" "$work/grub/fonts" "$work/grub/theme" \
     "$work/reliefos/config" "$work/leonos/config" "$work/grub/i386-pc"
 "${GRUB_MKSTANDALONE:-grub-mkstandalone}" -d "$modules" -O x86_64-efi -o "$work/EFI/BOOT/BOOTX64.EFI" \
- --modules='part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file regexp configfile echo serial terminal video video_bochs video_cirrus efi_gop efi_uga all_video font gfxterm gfxmenu' \
+ --modules='part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file regexp configfile echo serial terminal video video_bochs video_cirrus efi_gop all_video font gfxterm gfxmenu' \
  "boot/grub/grub.cfg=$src/boot/grub/embedded.cfg"
 cp "$kernel" "$work/reliefos/kernel.sys"
 # New images keep a byte-identical legacy payload so a prior GRUB menu entry

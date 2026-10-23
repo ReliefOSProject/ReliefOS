@@ -10,6 +10,14 @@
 Linux 6.12 Kbuild/Kconfig 的来源与逐文件摘要见 ``scripts/kbuild-source.json``。
 不能直接修改上游引擎来绕过项目边界。
 
+``make fetch-check`` 检查锁定下载地址的可用性，不比较上游版本。
+依赖升级需要另行核对对应 Alpine 仓库索引或上游正式发布，并同步版本、
+下载地址、SHA256、补丁和构建适配中的版本信息。APK 同时验证官方签名；
+运行库与开发包采用匹配版本，升级后重新检查构建与运行行为。
+
+当前 GRUB 2.16 的 EFI 路径使用 GOP；上游已移除仅用于旧固件的 UGA 支持，
+镜像模块清单不再请求 ``efi_uga``。Legacy BIOS 的引导路径保持独立。
+
 musl、BusyBox、SQLite、FLTK、Xorg/Mesa、GRUB、认证库等保留各自原生构建与
 移植边界。目标程序与开发 SDK 的 staging 不可混用。上游 README、许可证、
 COPYING、归属和字体许可是来源资料，保留原文，不属于待清理的过程报告。

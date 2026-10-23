@@ -168,7 +168,7 @@ int main(int argc, char **argv)
     const char *directory = argc > 1 ? argv[1] : "/usr/lib/reliefos/tests/pam.d";
 #endif
     setvbuf(stdout, NULL, _IONBF, 0);
-    puts("[pam-runtime] BEGIN Linux-PAM 1.7.2 / pinned musl, production DSOs");
+    puts("[pam-runtime] BEGIN Linux-PAM 1.7.3 / pinned musl, production DSOs");
     struct { const char *name; int expected; } cases[] = {
         {"permit", PAM_SUCCESS}, {"deny", PAM_AUTH_ERR},
         {"required", PAM_AUTH_ERR}, {"sufficient", PAM_SUCCESS},

@@ -7,7 +7,7 @@ GRUB_EFI_INPUTS := $(wildcard $(GRUB_EFI_DIR)/*)
 # wildcard drops absent files, so list these paths explicitly to make a missing
 # required prebuilt module fail instead of falling through to Kbuild's generic
 # $(obj)/%.mod rule.
-GRUB_EFI_REQUIRED_MODULES := part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file regexp configfile echo serial terminal video video_bochs video_cirrus efi_gop efi_uga all_video font gfxterm gfxmenu
+GRUB_EFI_REQUIRED_MODULES := part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file regexp configfile echo serial terminal video video_bochs video_cirrus efi_gop all_video font gfxterm gfxmenu
 GRUB_EFI_REQUIRED_INPUTS := $(addprefix $(GRUB_EFI_DIR)/,$(addsuffix .mod,$(GRUB_EFI_REQUIRED_MODULES)))
 GRUB_EFI_PROTECTED_INPUTS := $(sort $(GRUB_EFI_INPUTS) $(GRUB_EFI_REQUIRED_INPUTS))
 # These are prebuilt image inputs, not Kbuild outputs. Explicit file rules with

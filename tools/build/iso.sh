@@ -15,7 +15,7 @@ trap 'rm -rf "$work"' EXIT HUP INT TERM
 cp -a "$esp" "$work/tree"
 mkdir -p "$work/tree/install" "$work/tree/boot/grub" "$work/efi/EFI/BOOT"
 "${GRUB_MKSTANDALONE:-grub-mkstandalone}" -d "$modules" -O x86_64-efi -o "$work/efi/EFI/BOOT/BOOTX64.EFI" \
- --modules='part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file configfile echo serial terminal video video_bochs video_cirrus efi_gop efi_uga all_video font gfxterm gfxmenu' \
+ --modules='part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file configfile echo serial terminal video video_bochs video_cirrus efi_gop all_video font gfxterm gfxmenu' \
  "boot/grub/grub.cfg=$src/boot/grub/installer_embedded.cfg"
 "$mkimage" -O i386-pc-eltorito -d "$bios" -p /grub \
     -c "$src/boot/grub/installer_embedded.cfg" -o "$work/tree/boot/grub/bios.img" \

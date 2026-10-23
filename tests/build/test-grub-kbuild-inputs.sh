@@ -33,6 +33,7 @@ if [ "${1-}" = --version ]; then
 fi
 output=
 module_dir=
+requested_modules=
 while [ "$#" -gt 0 ]; do
     if [ "$1" = -d ]; then
         module_dir=$2
@@ -40,12 +41,21 @@ while [ "$#" -gt 0 ]; do
     elif [ "$1" = -o ]; then
         output=$2
         shift 2
+    elif [ "${1#--modules=}" != "$1" ]; then
+        requested_modules=${1#--modules=}
+        shift
     else
         shift
     fi
 done
 test -n "$output"
 test "$module_dir" = "$GRUB_EXPECTED_MODULES"
+for name in $requested_modules; do
+    test -s "$module_dir/$name.mod" || {
+        echo "requested unavailable EFI module: $name" >&2
+        exit 1
+    }
+done
 mkdir -p "$(dirname "$output")"
 printf 'fixture EFI payload\n' > "$output"
 printf 'built\n' >> "$GRUB_STUB_LOG"

@@ -136,7 +136,7 @@ EOF
 
 cc=${HOSTCC:-cc}
 common_flags='-std=c11 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -Werror -Wformat=2 -Wshadow -Wstrict-prototypes'
-"$cc" $common_flags \
+$cc $common_flags \
     -I"$src/include" -I"$src/userland/runtime/include" \
     -I"$src/kernel/reliefnt/include/uapi" \
     "$src/userland/apps/driverinfo/main.c" "$work/stub.c" -o "$work/driverinfo"
@@ -178,7 +178,7 @@ if "$work/driverinfo" --bad >"$work/usage.out" 2>&1; then
 fi
 grep -Fq 'Usage:' "$work/usage.out"
 
-"$cc" $common_flags \
+$cc $common_flags \
     -I"$src/include" -I"$src/userland/runtime/include" \
     -I"$src/kernel/reliefnt/include/uapi" \
     "$src/userland/apps/driverinfo/main.c" "$work/fail.c" -o "$work/driverinfo-fail"

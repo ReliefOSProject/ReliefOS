@@ -14,7 +14,7 @@ for command in curl wget; do
     chmod +x "$work/bin/$command"
 done
 for state in missing corrupt; do
-    if [ "$state" = corrupt ]; then printf 'corrupt archive\n' > "$work/cache/grub-2.12.tar.xz"; fi
+    if [ "$state" = corrupt ]; then printf 'corrupt archive\n' > "$work/cache/grub-2.16.tar.xz"; fi
     if PATH="$work/bin:$PATH" sh "$src/tools/build/grub.sh" host "$deps" \
         "$src/configs/dependencies.lock.json" "$work/cache" "$work/work" "$work/stage" - cc unused \
         > "$work/$state.log" 2>&1; then

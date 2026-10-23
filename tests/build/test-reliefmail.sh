@@ -80,7 +80,7 @@ run_protocol() {
 build_sqlite_core() {
     if [ -f "$work/sqlite_core.o" ]; then return; fi
     generated="$src/out/xorg-vmware-debug/upstream/app-sqlite/generated"
-    "${HOSTCC:-cc}" -std=c11 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -Werror \
+    ${HOSTCC:-cc} -std=c11 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -Werror \
         -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION=1 -DSQLITE_OMIT_WAL=1 \
         -DSQLITE_MAX_MMAP_SIZE=0 -DSQLITE_DEFAULT_MEMSTATUS=0 -I"$generated" -c \
         "$src/userland/apps/reliefmail/sqlite_core.c" -o "$work/sqlite_core.o"

@@ -6,7 +6,7 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 cd "$src"
 cc=${HOSTCC:-cc}
-"$cc" -std=c11 -D_GNU_SOURCE -O1 -g \
+$cc -std=c11 -D_GNU_SOURCE -O1 -g \
     -fsanitize=address,undefined -fno-sanitize-recover=all \
     -ffunction-sections -fdata-sections -Wl,--gc-sections \
     -Iinclude -Ikernel/reliefnt/include/uapi -idirafter userland/runtime/include \
@@ -14,7 +14,7 @@ cc=${HOSTCC:-cc}
 for scenario in cursor assets alpha; do
     "$work/desktop" "$scenario"
 done
-"$cc" -std=c11 -O1 -g \
+$cc -std=c11 -O1 -g \
     -fsanitize=address,undefined -fno-sanitize-recover=all \
     -ffunction-sections -fdata-sections -Wl,--gc-sections \
     -DRELIEFOS_STORAGE_STANDALONE_TU -Iinclude -Ikernel/reliefnt/include/uapi \

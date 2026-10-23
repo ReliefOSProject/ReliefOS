@@ -104,11 +104,11 @@ printf 'BusyBox fixture\n' > "$work/out/userland/busybox.elf"
 printf '%s\n' /bin/sh /bin/ash /bin/false /bin/ping /bin/ping6 /bin/hexdump \
     /usr/bin/clear /usr/bin/reset /sbin/mkfs.ext4 /bin/passwd /usr/bin/tree > "$work/out/userland/busybox.links"
 
-"$hostcc" -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
+$hostcc -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
     "$repo_root/tools/host/manifest/reliefos-stage.c" \
     "$repo_root/tools/host/common/io.c" "$repo_root/tools/host/common/buffer.c" \
     "$repo_root/tools/host/manifest/json.c" -o "$work/stage"
-"$hostcc" -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
+$hostcc -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
     "$repo_root/tools/host/manifest/reliefos-layout.c" -o "$work/layout"
 
 cat > "$work/rootfs.config" <<CONFIG

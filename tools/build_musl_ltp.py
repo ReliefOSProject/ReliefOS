@@ -10,10 +10,10 @@ import subprocess
 import tarfile
 
 ROOT = Path(__file__).resolve().parents[1]
-LTP_REVISION = "3a64d78f58bdceba93ed321e91215fb969a047ed"
+LTP_REVISION = "2279d708c817db657611a30c427c7d06c4360049"
 SOURCES = (
-    ("ltp-20260529.tar.gz", f"https://codeload.github.com/linux-test-project/ltp/tar.gz/{LTP_REVISION}",
-     "aeffe1bc6acbdb8788614deec223e94a723eea0bc4d5b07764b78b465d21144b", f"ltp-{LTP_REVISION}"),
+    ("ltp-20260930.tar.gz", f"https://codeload.github.com/linux-test-project/ltp/tar.gz/{LTP_REVISION}",
+     "35146cb1d0e82517aac8dbefbd88bd96300ce383736aae069e435fd991ea50bb", f"ltp-{LTP_REVISION}"),
     ("linux-6.12.tar.xz", "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.12.tar.xz",
      "b1a2562be56e42afb3f8489d4c2a7ac472ac23098f1ef1c1e40da601f54625eb", "linux-6.12"),
 )

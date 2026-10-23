@@ -43,9 +43,9 @@ make -s -C "$repo" O="$w/out" olddefconfig
 make -s -j8 -C "$repo" O="$w/out" config-sync
 printf 'RELIEFOS_LICENSE_REQUIRE\n' > "$w/policy.c"
 cc=${HOSTCC:-cc}
-"$cc" -E -P -I"$w/out/include" -include "$repo/userland/runtime/include/build_policy.h" "$w/policy.c" > "$w/normal"
+$cc -E -P -I"$w/out/include" -include "$repo/userland/runtime/include/build_policy.h" "$w/policy.c" > "$w/normal"
 grep -qx 1 "$w/normal"
-"$cc" -E -P -I"$w/out/include" -include "$w/out/include/generated/autoconf-installer.h" -include "$repo/userland/runtime/include/build_policy.h" "$w/policy.c" > "$w/installer"
+$cc -E -P -I"$w/out/include" -include "$w/out/include/generated/autoconf-installer.h" -include "$repo/userland/runtime/include/build_policy.h" "$w/policy.c" > "$w/installer"
 grep -qx 0 "$w/installer"
 # -n and -q are inspections; even missing native object directories stay absent.
 rm -rf "$w/out/tools"

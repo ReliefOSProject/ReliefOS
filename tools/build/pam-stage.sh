@@ -18,7 +18,8 @@ mkdir -p "$work" "$(dirname "$stage")"
 "$deps" --lock "$lock" --id linux-pam --list-patches > "$work/patches"
 { printf '%s\n' "$digest"; cat "$work/patches"; } > "$work/source-key.new"
 if ! cmp -s "$work/source-key.new" "$work/source-key"; then
-    rm -rf "$work/src"
+    # Dependency files retain absolute source paths from the previous release.
+    rm -rf "$work/src" "$work/build"
     mkdir -p "$work/src"
     tar -xf "$archive" -C "$work/src" --no-same-owner
     while read -r expected path; do

@@ -8,7 +8,7 @@ work=$(mktemp -d "$tmp_base/reliefcapture-ownership.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 hostcc=$(printenv HOSTCC || true)
 if [ -z "$hostcc" ]; then hostcc=cc; fi
-"$hostcc" -std=c11 -Wall -Wextra -Werror -I"$src" \
+$hostcc -std=c11 -Wall -Wextra -Werror -I"$src" \
     "$src/tools/host/apk/reliefos-apk-own.c" "$src/tools/host/manifest/json.c" \
     "$src/tools/host/common/buffer.c" "$src/tools/host/common/io.c" -o "$work/own"
 mkdir -p "$work/root/usr/lib/reliefos/apps/reliefcapture" \

@@ -8,7 +8,7 @@ case $mode in host|efi|guest) ;; *) exit 2;; esac
 . "$(CDPATH= cd -- "$(dirname "$0")" && pwd)/upstream-make-environment.sh"
 reliefos_upstream_make_environment
 get() { "$deps" --lock "$lock" --id grub --print "$1"; }
-url=$(get url) digest=$(get sha256) directory=$(get directory)
+url=$(get url) digest=$(get sha256) directory=$(get directory) version=$(get version)
 archive=$cache/${url##*/}
 [ -f "$archive" ] || { echo 'missing grub archive; run make fetch' >&2; exit 1; }
 [ "$(sha256sum "$archive" | cut -d' ' -f1)" = "$digest" ] || { echo 'grub: archive digest mismatch' >&2; exit 1; }
@@ -19,9 +19,8 @@ rm -rf "$work/source" "$work/build"
 mkdir -p "$work/source" "$work/build"
 tar -xf "$archive" -C "$work/source" --no-same-owner
 source=$work/source/$directory
-# GRUB 2.12's release omits this empty generated input (also restored by its
-# upstream packaging consumers). No target or utility source is modified.
-touch "$source/grub-core/extra_deps.lst"
+# Upstream generates extra_deps.lst in the build tree. A source-tree copy would
+# shadow that rule through VPATH and leave the build-tree input missing.
 patch -d "$source" -p1 < "$repo/patches/grub/0001-explicit-root-for-raw-image-setup.patch"
 tmp=$(mktemp -d "$stage.new.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
@@ -70,7 +69,7 @@ mkdir -p "$license_dir"
 cp "$source/COPYING" "$license_dir/"
 mkdir -p "$license_dir/patches"
 cp "$repo/patches/grub/"*.patch "$license_dir/patches/"
-printf 'GNU GRUB 2.12\nSource: %s\nSHA-256: %s\n' "$url" "$digest" > "$license_dir/SOURCE"
+printf 'GNU GRUB %s\nSource: %s\nSHA-256: %s\n' "$version" "$url" "$digest" > "$license_dir/SOURCE"
 printf 'Local integration changes are included in patches/ and maintained with ReliefOS tools/build/grub.sh.\n' >> "$license_dir/SOURCE"
 printf '%s\n' "$digest $mode" > "$installed/.complete"
 # Record every installed input, including non-primary modules and notices, so

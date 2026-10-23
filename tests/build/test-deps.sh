@@ -106,10 +106,10 @@ fi
 expect_output_is 'a submodule reports its pinned commit' 9fa28ece75d8a2191de7c5bb53bed224c5947417 \
     "$deps" --lock "$lock" --id musl --print commit
 expect_output_is 'a tarball reports its digest' \
-    ac15ffb8430502fbaccdec66c5a82ee0eab0b0f36220df56710feadfeb13d0a0 \
+    fc0f1eb6b6766470326f2c014693809190e67dba84274a6fbae9d4912d066706 \
     "$deps" --lock "$lock" --id libmd --print sha256
 expect_output_is 'a tarball reports its download url' \
-    https://libbsd.freedesktop.org/releases/libmd-1.2.0.tar.xz \
+    https://libbsd.freedesktop.org/releases/libmd-1.3.0.tar.xz \
     "$deps" --lock "$lock" --id libmd --print url
 expect_failure 'an unknown id fails rather than printing nothing' \
     "$deps" --lock "$lock" --id does-not-exist --print commit
@@ -128,7 +128,7 @@ else
     printf 'ok   - submodules are excluded from the fetch list\n'
 fi
 checks=$((checks + 1))
-if printf '%s\n' "$fetch_list" | grep -q 'libmd-1.2.0.tar.xz'; then
+if printf '%s\n' "$fetch_list" | grep -q 'libmd-1.3.0.tar.xz'; then
     printf 'ok   - downloaded tarballs appear in the fetch list\n'
 else
     printf 'FAIL - downloaded tarballs must appear in the fetch list\n'

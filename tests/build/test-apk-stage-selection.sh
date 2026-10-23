@@ -8,7 +8,7 @@ w=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-apk-stage-selection.XXXXXX")
 trap 'rm -rf "$w"' EXIT HUP INT TERM
 
 hostcc=${HOSTCC:-cc}
-"$hostcc" -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$root" \
+$hostcc -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$root" \
     "$root/tools/host/manifest/reliefos-layout.c" -o "$w/layout"
 
 mkdir -p "$w/bin" "$w/upstream/packages" "$w/raw/etc/reliefos" \
@@ -328,9 +328,9 @@ expect_grep "$w/broken-feature/stderr" 'broken-feature'
 
 # A real local ELF may depend on a SONAME advertised by a selected upstream APK.
 printf 'int fixture_value(void) { return 7; }\n' > "$w/library.c"
-"$hostcc" -shared -fPIC -nostdlib -Wl,-soname,libfixture.so.1 "$w/library.c" -o "$w/libfixture.so.1"
+$hostcc -shared -fPIC -nostdlib -Wl,-soname,libfixture.so.1 "$w/library.c" -o "$w/libfixture.so.1"
 printf 'extern int fixture_value(void); int main(void) { return fixture_value(); }\n' > "$w/client.c"
-"$hostcc" -nostdlib -Wl,-e,main "$w/client.c" "$w/libfixture.so.1" -o "$w/raw/usr/bin/library-client"
+$hostcc -nostdlib -Wl,-e,main "$w/client.c" "$w/libfixture.so.1" -o "$w/raw/usr/bin/library-client"
 cp "$w/libfixture.so.1" "$w/pack.xterm/libfixture.so.1"
 printf 'provides = so:libfixture.so.1=1\n' >> "$w/pack.xterm/.PKGINFO"
 (cd "$w/pack.xterm" && tar -czf "$w/upstream/packages/xterm-0.1.apk" .PKGINFO usr/bin/xterm libfixture.so.1)

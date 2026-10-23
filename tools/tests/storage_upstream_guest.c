@@ -230,8 +230,8 @@ int main(void)
     RUN("boot missing payload rejected", NULL, "REJECT_OK", "/bin/sh", "-c",
         "if /usr/sbin/leonos-grub-installer --source /tmp/missing-boot-payload '/tmp/storage copy target'; "
         "then exit 1; else echo REJECT_OK; fi");
-    RUN("fdisk version", NULL, "util-linux 2.41.6", "/usr/sbin/fdisk", "--version");
-    RUN("mount version", NULL, "util-linux 2.41.6", "/bin/mount", "--version");
+    RUN("fdisk version", NULL, "util-linux 2.42.4", "/usr/sbin/fdisk", "--version");
+    RUN("mount version", NULL, "util-linux 2.42.4", "/bin/mount", "--version");
     RUN("mount listing", NULL, " on /", "/bin/mount");
     RUN("lsblk inventory", NULL, "blockdevices", "/bin/lsblk", "--json", "--output", "NAME,TYPE");
     RUN("lsblk actual disk and partition",NULL,"sda1","/bin/lsblk","--bytes","--output","NAME,TYPE,SIZE,MAJ:MIN");

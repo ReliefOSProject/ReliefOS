@@ -5,7 +5,7 @@ root=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd -P)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 cc=${HOSTCC:-cc}
-"$cc" -std=c11 -Wall -Wextra -Wpedantic -Werror -I"$root" \
+$cc -std=c11 -Wall -Wextra -Wpedantic -Werror -I"$root" \
     "$root/tools/host/assets/reliefos-gbk.c" \
     "$root/tools/host/common/io.c" "$root/tools/host/common/buffer.c" -o "$work/gen"
 "$work/gen" "$root/third_party/litehtml/src/encodings.cpp" "$work/table.h"
@@ -32,7 +32,7 @@ int main(void) {
     assert(reliefos_gbk_to_unicode[(0xce - 0x81)*190+(0xc4 - 0x41)] == 0x6587);
 }
 EOF
-"$cc" -std=c11 -Wall -Werror "$work/check.c" -o "$work/check"
+$cc -std=c11 -Wall -Werror "$work/check.c" -o "$work/check"
 "$work/check"
 before=$(stat -c '%y' "$work/table.h")
 "$work/gen" "$root/third_party/litehtml/src/encodings.cpp" "$work/table.h"

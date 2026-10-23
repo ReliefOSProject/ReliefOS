@@ -191,7 +191,9 @@ printf '\n=== the stage leaves the output tree as the layout declares ===\n'
 # its own build directory, a whole kernel tree appears inside this project's
 # output directory -- so the top level of O is asserted against the layout rather
 # than trusted.
-allowed="auth config generated host images include logs meta obj packages stage sysroot third-party"
+# Native Kbuild also creates its declared object directories while parsing the
+# product graph, even when this invocation only builds authentication inputs.
+allowed="auth config generated host images include logs meta musl obj packages pam scripts stage sysroot system tests third-party tools userland userland-installer"
 stray=''
 for entry in "$O"/*; do
     name=${entry##*/}
