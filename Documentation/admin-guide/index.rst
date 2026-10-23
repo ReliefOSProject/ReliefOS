@@ -10,6 +10,7 @@
    installation
    desktop
    packages
+   openrc-controller
    accounts
    console
    limitations

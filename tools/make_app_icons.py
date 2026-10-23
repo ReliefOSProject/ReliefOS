@@ -537,6 +537,13 @@ def draw_icon(name: str) -> list[list[tuple[int, int, int, int]]]:
         icon_servicemgr(c)
     elif name == "servicemgr":
         icon_servicemgr(c)
+    elif name == "openrc-controller":
+        icon_servicemgr(c)
+        fill(c, 9, 8, 6, 6, WHITE)
+        rect(c, 9, 8, 6, 6, DARK)
+        line(c, 11, 10, 13, 11, GREEN)
+        line(c, 13, 11, 11, 12, GREEN)
+        line(c, 11, 12, 11, 10, GREEN)
     elif name == "httpget":
         icon_httpget(c)
     elif name == "downloadmgr":

@@ -124,6 +124,10 @@ $(eval $(call RELIEFOS_NATIVE_HOST_TESTS,sanitised,$(O_HOST)/tests-sanitised,$(R
 .PHONY: test test-tools test-build test-long
 
 .PHONY: test-reliefapk
+.PHONY: test-openrc-controller
+test-openrc-controller:
+	$(Q)TMPDIR='$(abspath $(O))/tmp' sh $(RELIEFOS_SRC)/tests/build/test-openrc-controller.sh
+
 test-reliefapk:
 	$(Q)TMPDIR='$(abspath $(O))/tmp' sh $(RELIEFOS_SRC)/tests/build/test-reliefapk-model.sh
 	$(Q)TMPDIR='$(abspath $(O))/tmp' sh $(RELIEFOS_SRC)/tests/build/test-reliefapk-process.sh

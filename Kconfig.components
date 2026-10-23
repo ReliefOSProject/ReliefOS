@@ -663,6 +663,26 @@ config RELIEFOS_COMPONENT_APP_DRIVERINFO_ENTRY
     default y
     depends on RELIEFOS_COMPONENT_APP_DRIVERINFO_IMAGE
 
+menuconfig RELIEFOS_COMPONENT_APP_OPENRC_CONTROLLER_BUILD
+    bool "OpenRC Controller"
+    default y
+    select RELIEFOS_COMPONENT_APP_SUDO_BUILD
+    select RELIEFOS_COMPONENT_APP_SU_BUILD
+    help
+      Enable OpenRC Controller (openrc-controller). Dependencies may enable it
+      automatically. Libraries may also be built when another product
+      needs them; image membership is controlled separately below.
+
+config RELIEFOS_COMPONENT_APP_OPENRC_CONTROLLER_IMAGE
+    bool "Include in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_OPENRC_CONTROLLER_BUILD
+
+config RELIEFOS_COMPONENT_APP_OPENRC_CONTROLLER_ENTRY
+    bool "Enable the legacy application-registry entry"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_OPENRC_CONTROLLER_IMAGE
+
 menuconfig RELIEFOS_COMPONENT_APP_RELIEFAPK_BUILD
     bool "ReliefAPK"
     default y

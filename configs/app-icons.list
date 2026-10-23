@@ -4,6 +4,7 @@ apiapp
 browser
 bugtest
 calc
+openrc-controller
 cjktest
 devmgr
 diskmgr

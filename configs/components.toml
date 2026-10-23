@@ -188,6 +188,20 @@ sdk = false
 api = false
 
 [[components]]
+id = "openrc-controller"
+symbol = "APP_OPENRC_CONTROLLER"
+label = "OpenRC Controller"
+category = "System applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+depends = ["sudo", "su"]
+
+[[components]]
 id = "reliefapk"
 symbol = "APP_RELIEFAPK"
 label = "ReliefAPK"

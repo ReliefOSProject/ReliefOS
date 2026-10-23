@@ -23,7 +23,7 @@
     },
     "reliefos-apps": {
       "destination": "reliefos",
-      "components": ["installer", "login", "device-agent", "soundctl", "rcctl", "shell", "fileman", "taskmgr", "osver", "diskmgr", "driverinfo", "sudod", "reliefaskpass", "calc", "reliefapk", "reliefexcel", "reliefmail", "reliefword", "reliefppt", "paint", "minesweeper", "snake", "matrix", "memtest", "smptest", "abittest", "ipctest", "rprfetch", "imageview", "wavplay", "pleditor", "doomlauncher", "doom", "leonmmcoset", "xiaobai"],
+      "components": ["installer", "login", "device-agent", "soundctl", "rcctl", "shell", "fileman", "taskmgr", "osver", "diskmgr", "driverinfo", "sudod", "reliefaskpass", "calc", "openrc-controller", "reliefapk", "reliefexcel", "reliefmail", "reliefword", "reliefppt", "paint", "minesweeper", "snake", "matrix", "memtest", "smptest", "abittest", "ipctest", "rprfetch", "imageview", "wavplay", "pleditor", "doomlauncher", "doom", "leonmmcoset", "xiaobai"],
       "paths": ["usr/lib/leonos", "usr/lib/reliefos", "usr/share/reliefos", "usr/share/fonts/reliefos", "etc/reliefos", "etc/icewm", "usr/sbin/leonos-rpr-apkcheck", "usr/sbin/leonos-rpr-ping", "usr/sbin/leonos-kernel-update", "usr/sbin/leonos-check-update", "usr/sbin/reliefos-rpr-apkcheck", "usr/sbin/reliefos-rpr-ping", "usr/sbin/reliefos-kernel-update", "usr/sbin/reliefos-check-update"],
       "reason": "Native desktop, service, graphics and application interfaces. Embedded dependencies remain part of their actual consumers."
     },

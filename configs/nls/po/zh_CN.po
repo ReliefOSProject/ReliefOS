@@ -15566,8 +15566,6 @@ msgstr "工作进程错误"
 #~ msgid "Recycle Bin is unavailable"
 #~ msgstr "回收站不可用"
 
-#~ msgid "Restore"
-#~ msgstr "还原"
 
 #~ msgid "Restore Conflict"
 #~ msgstr "还原冲突"
@@ -16337,3 +16335,523 @@ msgstr "工作进程错误"
 
 #~ msgid "Stereo"
 #~ msgstr "立体声"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "%zu / %zu services · current: %s"
+msgstr "%zu / %zu 项服务 · 当前运行级别：%s"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Add services to runlevel…"
+msgstr "将服务加入运行级别…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Add the selected services to this runlevel? This changes startup configuration."
+msgstr "将所选服务加入此运行级别？这会修改启动配置。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Administrator permission is required to manage OpenRC services."
+msgstr "管理 OpenRC 服务需要管理员权限。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Administrator session ended. Close and reopen the application."
+msgstr "管理员会话已结束，请关闭后重新打开程序。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Advanced service action"
+msgstr "高级服务操作"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Advanced service action…"
+msgstr "高级服务操作…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Advanced…"
+msgstr "高级操作…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "All runlevel states"
+msgstr "所有运行级别状态"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "All services"
+msgstr "全部服务"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "An operation is running. Closing cancels it; check service state before retrying."
+msgstr "仍有操作正在运行。关闭程序将取消它；重试前请检查服务状态。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Authenticate with"
+msgstr "认证方式"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Authenticating…"
+msgstr "正在认证…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Authentication failed. Check the password or choose another method."
+msgstr "认证失败，请检查密码或选择其他认证方式。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Boot log"
+msgstr "启动日志"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Cancel operation"
+msgstr "取消操作"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Canceling operation…"
+msgstr "正在取消操作…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Cannot create the output file."
+msgstr "无法创建输出文件。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Cannot parse OpenRC status."
+msgstr "无法解析 OpenRC 状态。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Cannot parse the OpenRC service catalog."
+msgstr "无法解析 OpenRC 服务清单。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Cannot send request to the privileged worker."
+msgstr "无法向特权工作进程发送请求。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Cannot start the OpenRC worker."
+msgstr "无法启动 OpenRC 工作进程。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Cannot start the authentication program."
+msgstr "无法启动认证程序。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Changing runlevel may stop services and disconnect the desktop. Start only keeps existing services running."
+msgstr "切换运行级别可能停止服务并断开桌面会话。“仅启动”会保留已运行的服务。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Choose a service configuration or global rc.conf."
+msgstr "请选择服务配置或全局 rc.conf。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Condition / mode"
+msgstr "条件／模式"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Configuration"
+msgstr "配置"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Configuration has unsaved changes."
+msgstr "配置尚有未保存的修改。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Connecting to OpenRC…"
+msgstr "正在连接 OpenRC…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Could not completely write the output file."
+msgstr "未能完整写入输出文件。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Crashed"
+msgstr "已崩溃"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Crashed services"
+msgstr "崩溃的服务"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Create runlevel…"
+msgstr "创建运行级别…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Create this runlevel before adding services."
+msgstr "请先创建此运行级别，再添加服务。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Debug output"
+msgstr "调试输出"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Delete empty runlevel…"
+msgstr "删除空运行级别…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Delete this empty, inactive, unreferenced custom runlevel?"
+msgstr "删除此空的、未使用且未被引用的自定义运行级别？"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Dependencies…"
+msgstr "依赖关系…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Dependency type: ineed, iuse, iwant, iafter, ibefore; reverse: needsme, usesme, wantsme, beforeme, afterme"
+msgstr "依赖类型：ineed、iuse、iwant、iafter、ibefore；反向依赖：needsme、usesme、wantsme、beforeme、afterme"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Description / commands"
+msgstr "描述与命令"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Description and commands"
+msgstr "描述与可用命令"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Diagnostic report"
+msgstr "诊断报告"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Disable…"
+msgstr "停用…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Dry run"
+msgstr "模拟执行"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Edit configuration"
+msgstr "编辑配置"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Edit global rc.conf"
+msgstr "编辑全局 rc.conf"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Edit service configuration"
+msgstr "编辑服务配置"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Enable…"
+msgstr "启用…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Enter your password to continue authentication."
+msgstr "请输入密码以继续认证。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Export output"
+msgstr "导出输出"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Export output…"
+msgstr "导出输出…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Failed / crashed"
+msgstr "失败／崩溃"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Ignore dependencies"
+msgstr "忽略依赖"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "In transition"
+msgstr "状态过渡中"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Inactive"
+msgstr "未激活"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Invalid configuration response."
+msgstr "配置响应无效。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Invalid password input."
+msgstr "密码输入无效。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Invalid runlevel name."
+msgstr "运行级别名称无效。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Invalid service command."
+msgstr "服务命令无效。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Invalid service, runlevel, or operation."
+msgstr "服务、运行级别或操作无效。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Load a configuration first."
+msgstr "请先加载配置文件。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Manually started services"
+msgstr "手动启动的服务"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "More selected services…"
+msgstr "还有更多所选服务…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Not enough memory."
+msgstr "内存不足。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Only if crashed"
+msgstr "仅在崩溃时"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Only if inactive"
+msgstr "仅在未激活时"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Only if not started"
+msgstr "仅在未启动时"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Only if started"
+msgstr "仅在已启动时"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Only if stopped"
+msgstr "仅在已停止时"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "OpenRC Controller\nC++ / FLTK service and runlevel manager for ReliefOS.\nUses the system OpenRC commands and native FLTK gtk+ controls."
+msgstr "OpenRC Controller\nReliefOS 的 C++ / FLTK 服务与运行级别管理器。\n使用系统 OpenRC 命令和 FLTK 原生 gtk+ 控件。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "OpenRC authentication"
+msgstr "OpenRC 权限认证"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "OpenRC diagnostics"
+msgstr "OpenRC 诊断"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "OpenRC log"
+msgstr "OpenRC 日志"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Operation completed"
+msgstr "操作完成"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Operation failed (exit %d). Remaining operations were stopped."
+msgstr "操作失败（退出码 %d），已停止后续操作。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Output exported"
+msgstr "输出已导出"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Overview"
+msgstr "概览"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Parent runlevel (the selected runlevel is stacked into this level):"
+msgstr "父运行级别（将所选运行级别堆叠到此级别）："
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Query dependencies…"
+msgstr "查询依赖…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Querying dependency tree…"
+msgstr "正在查询依赖树…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Read service script"
+msgstr "查看服务脚本"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Reading configuration…"
+msgstr "正在读取配置…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Reading service script…"
+msgstr "正在读取服务脚本…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Reading service states…"
+msgstr "正在读取服务状态…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Reading services and runlevels…"
+msgstr "正在读取服务与运行级别…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Ready · administrator session active"
+msgstr "就绪 · 管理员会话有效"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Rebuild dependency cache"
+msgstr "重建依赖缓存"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Refresh every 10 seconds"
+msgstr "每 10 秒刷新"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Reloading saved configuration…"
+msgstr "正在重载已保存的配置…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Remove services from runlevel…"
+msgstr "从运行级别移除服务…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Remove the selected services from this runlevel? This does not stop them immediately."
+msgstr "将所选服务从此运行级别移除？这不会立即停止服务。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Replace the current configuration with its last backup? Unsaved editor changes will be discarded."
+msgstr "用上次备份替换当前配置？编辑器中未保存的修改将被丢弃。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Restore"
+msgstr "恢复"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Restore backup"
+msgstr "恢复备份"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Retry"
+msgstr "重试"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Run this advanced command for the selected services? zap only resets OpenRC state; it does not stop a running process."
+msgstr "对所选服务执行此高级命令？zap 仅重置 OpenRC 状态，不会终止正在运行的进程。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Runlevel name (use Tools / all runlevel states to inspect membership):"
+msgstr "运行级别名称（可通过“工具／所有运行级别状态”查看成员）："
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Runlevel name:"
+msgstr "运行级别名称："
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Runlevels"
+msgstr "运行级别"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Saving configuration…"
+msgstr "正在保存配置…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Scheduled"
+msgstr "已调度"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Select at least one service."
+msgstr "请至少选择一项服务。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Select at most 512 services per operation."
+msgstr "每次操作最多选择 512 项服务。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Select exactly one service."
+msgstr "请仅选择一项服务。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Select services and use the toolbar or Service menu. Ctrl/Shift selects multiple services; column headers sort.\n\nEnabling changes runlevel membership; starting changes the current running state. Use the Configuration tab to edit conf.d or global rc.conf; saving makes a backup and detects external changes.\n\nAdvanced actions support conditions, dry run, zap and custom service commands. Canceling may leave OpenRC in a transitional state; inspect status before using zap.\n\nThe application never invokes shutdown, reboot, boot or sysinit runlevels. Logs are available when the corresponding system logger is configured."
+msgstr "选择服务后使用工具栏或“服务”菜单；按 Ctrl／Shift 可多选，单击列标题可排序。\n\n启用会改变运行级别成员，启动会改变当前运行状态。在“配置”页编辑 conf.d 或全局 rc.conf；保存会生成备份并检测外部修改冲突。\n\n高级操作支持条件执行、模拟执行、zap 和脚本自定义命令。取消操作可能留下过渡状态，使用 zap 前请检查实际状态。\n\n本程序不直接调用 shutdown、reboot、boot 或 sysinit 运行级别。相应日志需要先配置系统日志服务。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Select services to inspect them. Ctrl/Shift selects multiple rows."
+msgstr "选择服务以查看详情，按 Ctrl／Shift 可多选。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Service status"
+msgstr "服务状态"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Stack runlevel…"
+msgstr "堆叠运行级别…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Start only"
+msgstr "仅启动"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Stop and close"
+msgstr "停止并关闭"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Stopping"
+msgstr "正在停止"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Supervised services"
+msgstr "受监督的服务"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Switch fully"
+msgstr "完整切换"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Switch runlevel…"
+msgstr "切换运行级别…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "System log"
+msgstr "系统日志"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "System messages"
+msgstr "系统消息"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "The privileged session has ended. Reopen the application."
+msgstr "特权会话已结束，请重新打开程序。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "This operation may interrupt networking, audio, or services required by other programs. Continue?"
+msgstr "此操作可能中断网络、音频或其他程序依赖的服务，是否继续？"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Unassigned"
+msgstr "未分配"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Unassigned services"
+msgstr "未分配的服务"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Unstack runlevel…"
+msgstr "取消运行级别堆叠…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Unsupervised"
+msgstr "未被监督"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Updating runlevel…"
+msgstr "正在更新运行级别…"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Uptime"
+msgstr "运行时间"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Usage and precautions"
+msgstr "使用说明与注意事项"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Use an OpenRC command such as start, stop, reload, zap, or a command advertised by the service."
+msgstr "请输入 start、stop、reload、zap 等 OpenRC 命令，或服务提供的自定义命令。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "Wait for the current operation or cancel it first."
+msgstr "请等待当前操作完成，或先取消操作。"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "root account password"
+msgstr "root 账户密码"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "sudo: current user password"
+msgstr "sudo：当前用户密码"
+
+#: userland/apps/openrc-controller/window.cpp
+msgid "No crashed services were reported."
+msgstr "未检测到崩溃的服务。"
