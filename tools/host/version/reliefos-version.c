@@ -28,7 +28,7 @@
 #include "tools/host/common/io.h"
 
 #define TOOL_NAME "reliefos-version"
-#define COPYRIGHT_HOLDER "LeonMMcoset"
+#define COPYRIGHT_HOLDER "ReliefOS Project Team"
 #define COPYRIGHT_FIRST_YEAR 2021
 #define LINE_LIMIT 256
 
