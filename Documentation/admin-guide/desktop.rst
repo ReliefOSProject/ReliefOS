@@ -34,6 +34,21 @@ XDM 使用 ``/etc/X11/xdm/`` 下的标准配置和 Xresources；IceWM 的背景�
 显示字体、键盘布局和输入法是不同配置，见 :doc:`../userspace-api/locale`。
 密码输入不能交给第三方输入法。
 
+Dillo 使用标准 ``~/.dillo/dillorc`` 和 ``~/.dillo/style.css``。新账户从
+``/etc/skel/.dillo/`` 获得默认文件；已有账户登录 XDM 时只补缺失文件，已有
+个人配置、空文件与符号链接均不覆盖。也可在自己的会话中运行
+``/usr/lib/reliefos/dillo-config-init`` 补齐缺失文件，然后重新启动 Dillo。
+
+默认正文与界面字体为宋体（SimSun），代码区为新宋体（NSimSun）。配置使用
+FLTK 1.3 稳定的内置字体名，避免中英文字体族名随 locale 改变而未被识别。
+``/etc/fonts/conf.d/09-reliefos-dillo-cjk.conf`` 只将 Dillo 请求的通用字体映射到
+这些中文字库，不改变其他应用或 Dillo 明确指定的自定义字体。
+由于现有 FLTK 1.3 绘制路径不提供逐字缺字回退，用户样式以 ``!important``
+固定字体族，覆盖网页指定的西文字体；网页的字号、粗斜体、颜色和布局仍保留。
+Dillo 只从用户目录读取该样式，不能改放到 ``/etc/dillo/style.css``。
+已有自定义配置的用户可自行合并模板中的字体规则；要恢复网页原有字体，
+编辑自己的样式文件删除或调整这两条规则。清空该文件也会保留用户选择。
+
 记录启动固件、CPU/内存、Xorg 日志、用户身份、主题和复现步骤。
 通过 VT 切换或串口确认系统是否仍可调度，再区分 Xorg、窗口管理器和应用故障。
 编译压力下的拖动与硬关机后的锁文件问题见 :doc:`limitations`。

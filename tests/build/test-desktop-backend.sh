@@ -201,6 +201,13 @@ test -f "$xorg_root/etc/X11/xdm/Xservers"
 test -f "$xorg_root/etc/X11/xdm/Xresources"
 test -x "$xorg_root/usr/lib/X11/xdm/Xsession"
 test -x "$xorg_root/usr/lib/X11/xdm/Xsetup_0"
+test -x "$xorg_root/usr/lib/reliefos/dillo-config-init"
+cmp "$repo_root/system/rootfs/etc/fonts/conf.d/09-reliefos-dillo-cjk.conf" "$xorg_root/etc/fonts/conf.d/09-reliefos-dillo-cjk.conf"
+test "$(stat -c %a "$xorg_root/etc/skel/.dillo")" = 700
+for name in dillorc style.css; do
+    cmp "$repo_root/system/rootfs/etc/skel/.dillo/$name" "$xorg_root/etc/skel/.dillo/$name"
+    test "$(stat -c %a "$xorg_root/etc/skel/.dillo/$name")" = 600
+done
 test ! -e "$xorg_root/etc/reliefos/wallpaper.png"
 test -x "$xorg_root/usr/lib/reliefos/reliefos-xdm"
 test -x "$xorg_root/usr/lib/reliefos/xorg-tty-wrapper"

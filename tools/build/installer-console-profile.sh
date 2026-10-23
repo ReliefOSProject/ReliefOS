@@ -65,7 +65,10 @@ for path in \
     etc/reliefos/wallpaper.png \
     etc/pam.d/xdm \
     etc/icewm \
+    etc/skel/.dillo \
+    etc/fonts/conf.d/09-reliefos-dillo-cjk.conf \
     usr/lib/reliefos/reliefos-xdm \
+    usr/lib/reliefos/dillo-config-init \
     usr/lib/reliefos/xorg-tty-wrapper \
     usr/lib/reliefos/xdm-session \
     usr/lib/reliefos/xdm-setup \

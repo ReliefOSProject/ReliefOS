@@ -97,6 +97,12 @@ if test -x /usr/bin/xdg-user-dirs-update; then
     /usr/bin/xdg-user-dirs-update || :
 fi
 
+# New homes receive /etc/skel; existing accounts need the same Dillo defaults.
+# The helper only creates missing standard user files and keeps personal edits.
+if test -x /usr/lib/reliefos/dillo-config-init; then
+    /usr/lib/reliefos/dillo-config-init || event 'Dillo defaults could not be initialized'
+fi
+
 # IceWM's native session supervisor starts icewmbg, which reads background
 # preferences from the selected theme and follows subsequent theme changes.
 start_child icewm /usr/bin/icewm-session || exit 1

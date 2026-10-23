@@ -1,0 +1,9 @@
+# Use the installed Unicode fonts for both web text and Dillo's FLTK UI.
+# FLTK's built-in names are locale-independent; Fontconfig maps Dillo's
+# generic requests to SimSun/NSimSun in 09-reliefos-dillo-cjk.conf.
+# Unlisted options retain Dillo's built-in defaults. Personal edits are kept.
+font_serif="serif"
+font_sans_serif="sans"
+font_cursive="serif"
+font_fantasy="serif"
+font_monospace="mono"

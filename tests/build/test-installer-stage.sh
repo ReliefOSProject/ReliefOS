@@ -10,7 +10,7 @@ mkdir -p "$w/src/tools/build" "$w/src/Documentation/admin-guide" "$w/src/configs
     "$w/out/userland" "$w/out/userland-installer" \
     "$w/raw/usr/lib/reliefos/apps/soundctl" "$w/raw/usr/lib/leonos" "$w/raw/usr/bin" \
     "$w/raw/etc/reliefos/icewm" "$w/raw/etc/runlevels/default" \
-    "$w/raw/etc/X11/xdm" "$w/raw/etc/pam.d" "$w/raw/usr/share/applications" \
+    "$w/raw/etc/X11/xdm" "$w/raw/etc/pam.d" "$w/raw/etc/skel/.dillo" "$w/raw/etc/fonts/conf.d" "$w/raw/usr/share/applications" \
     "$w/raw/usr/lib/X11/xdm" \
     "$w/raw/usr/lib/reliefos/apps" "$w/raw/usr/share/reliefmath" \
     "$w/raw/usr/share/licenses/reliefmath" "$w/raw/usr/share/mime/packages" \
@@ -36,6 +36,10 @@ chmod 755 "$w/raw/usr/lib/X11/xdm/Xsession" "$w/raw/usr/lib/X11/xdm/Xsetup_0"
 printf 'toolbar\n' > "$w/raw/etc/reliefos/icewm/toolbar"
 printf 'icewm pam\n' > "$w/raw/etc/pam.d/xdm"
 printf 'wallpaper\n' > "$w/raw/etc/reliefos/wallpaper.png"
+cp "$src/system/rootfs/etc/skel/.dillo/dillorc" "$w/raw/etc/skel/.dillo/dillorc"
+cp "$src/system/rootfs/etc/skel/.dillo/style.css" "$w/raw/etc/skel/.dillo/style.css"
+cp "$src/system/rootfs/usr/lib/reliefos/dillo-config-init" "$w/raw/usr/lib/reliefos/dillo-config-init"
+cp "$src/system/rootfs/etc/fonts/conf.d/09-reliefos-dillo-cjk.conf" "$w/raw/etc/fonts/conf.d/09-reliefos-dillo-cjk.conf"
 for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper; do
     mkdir -p "$w/raw/${path%/*}"
     printf 'Xorg helper\n' > "$w/raw/$path"
@@ -136,6 +140,14 @@ for path in etc/X11/xdm/xdm-config etc/X11/xdm/Xservers \
     [ -f "$w/stage/$path" ]
     [ -f "$w/stage/install/root/$path" ]
     [ ! -e "$w/stage/install/root-console/$path" ]
+done
+# Browser configuration is retained by graphical payloads and omitted by the
+# console-only installation alongside the browser's other Xorg dependencies.
+for path in etc/skel/.dillo/dillorc etc/skel/.dillo/style.css \
+    usr/lib/reliefos/dillo-config-init etc/fonts/conf.d/09-reliefos-dillo-cjk.conf; do
+    cmp "$w/raw/$path" "$w/stage/$path"
+    cmp "$w/raw/$path" "$w/stage/install/root/$path"
+    test ! -e "$w/stage/install/root-console/$path"
 done
 # No package root installs the former ReliefOS-specific XDM config or script
 # paths after the move to XDM's standard directories.

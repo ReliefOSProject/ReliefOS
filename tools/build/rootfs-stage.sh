@@ -60,6 +60,11 @@ for spec in auth pam; do
 done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
+# Match the private files created for existing accounts on their first login.
+record d - /etc/skel/.dillo 0700 product-policy override
+for name in dillorc style.css; do
+    file "$src/system/rootfs/etc/skel/.dillo/$name" "etc/skel/.dillo/$name" 0600 product-policy override
+done
 # The source lives in the product rootfs tree, but ReliefMath owns its package
 # and must only contribute it when the application component is selected.
 record x - /usr/share/mime/packages/reliefmath.xml 0000 product-policy override
