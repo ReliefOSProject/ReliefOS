@@ -1026,10 +1026,12 @@ static void test_fifo_wakeup(void)
     assert(!expect_guest_fifo_busy);
     assert(sync_writes == wakes + 1);
     assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
-    assert(sync_writes == wakes + 2);
+    /* BUSY promises that newly published commands will be consumed before
+     * the host sleeps. Do not send redundant monitor doorbells. */
+    assert(sync_writes == wakes + 1);
     svga_handle fence;
     assert(svga_fence_insert(&fence) == 0);
-    assert(sync_writes == wakes + 3);
+    assert(sync_writes == wakes + 1);
     assert(fifo[SVGA_FIFO_BUSY] == 1);
     stalled = false;
     consume();
@@ -1037,9 +1039,11 @@ static void test_fifo_wakeup(void)
     uint32_t reads = busy_reads;
     wakes = sync_writes;
     assert(svga_fence_wait(fence) == 0);
-    assert(sync_writes == wakes + 1 && busy_reads == reads);
+    /* An already completed fence needs neither a wake nor synchronous BUSY
+     * processing. A new idle-to-active transition must still wake the host. */
+    assert(sync_writes == wakes && busy_reads == reads);
     assert(svga_fifo_packet_locked(SVGA_CMD_UPDATE, false, &span, 1) == 0);
-    assert(sync_writes == wakes + 2 && visible_updates == updates + 3);
+    assert(sync_writes == wakes + 1 && visible_updates == updates + 3);
     assert(svga3d_shutdown() == 0);
 
     /* Four-register FIFO: never treat a command word as the BUSY register. */
@@ -1349,6 +1353,82 @@ static void test_effective_surface_limit_snapshot(void)
            info.compat_surface_limit_bytes == 32u * 1024u * 1024u);
     assert(svga3d_shutdown() == 0);
 }
+static void test_present_try(void)
+{
+    for (unsigned gb = 0; gb < 2; ++gb) {
+        setup(gb ? 0x1dffc3e2u : SVGA_CAP_3D | SVGA_CAP_EXTENDED_FIFO | SVGA_CAP_GMR,
+              gb ? 0x77fu : SVGA_FIFO_CAP_FENCE | SVGA_FIFO_CAP_RESERVE,
+              gb ? 0 : SVGA3D_HWVERSION_WS8_B1);
+        assert(!svga3d_init());
+        struct svga_surface_desc desc = {SVGA3D_X8R8G8B8,
+            SVGA3D_SURFACE_HINT_RENDERTARGET, 64, 64, 1, 1};
+        svga_handle surface = 0, fence = 1;
+        assert(!svga3d_surface_try_create(&desc, &surface));
+        uint32_t pages = live_pages;
+        uint32_t heap_before = heap_alloc_calls;
+        heap_fail_after = heap_alloc_calls;
+        struct svga_present_rect rect = {0, 0, 64, 64, 0, 0};
+        uint64_t flags = svga_lock();
+        assert(svga3d_present_try(surface, &rect, 1, &fence) == SVGA_EBUSY && !fence);
+        svga_unlock(flags);
+
+        const uint32_t next = fifo[SVGA_FIFO_NEXT_CMD];
+        const uint32_t issued = svga.issued_fence;
+        rect.srcx = UINT32_MAX;
+        assert(svga3d_present_try(surface, &rect, 1, &fence) == SVGA_EINVAL && !fence);
+        rect.srcx = 0;
+        rect.w = 65;
+        assert(svga3d_present_try(surface, &rect, 1, &fence) == SVGA_EINVAL && !fence);
+        rect.w = 64;
+        assert(svga3d_present_try(surface, NULL, 1, &fence) == SVGA_EINVAL);
+        assert(svga3d_present_try(surface, &rect, 0, &fence) == SVGA_EINVAL);
+        assert(svga3d_present_try(surface, &rect, 65, &fence) == SVGA_EINVAL);
+        assert(svga3d_present_try(surface, &rect, 1, NULL) == SVGA_EINVAL);
+        assert(fifo[SVGA_FIFO_NEXT_CMD] == next && svga.issued_fence == issued);
+
+        stalled = true;
+        fifo[SVGA_FIFO_STOP] = next + 32u;
+        assert(svga3d_present_try(surface, &rect, 1, &fence) == SVGA_EBUSY && !fence);
+        assert(fifo[SVGA_FIFO_NEXT_CMD] == next && svga.issued_fence == issued);
+        fifo[SVGA_FIFO_STOP] = next;
+        uint32_t reads_before = busy_reads;
+        assert(!svga3d_present_try(surface, &rect, 1, &fence) && fence);
+        assert(heap_alloc_calls == heap_before && busy_reads == reads_before);
+        int id = svga_find_surface(surface);
+        assert(id >= 0 && svga.surfaces[id].last_use_fence == fence);
+        assert(peek(next, 0) == SVGA_3D_CMD_PRESENT && peek(next, 1) == 28u &&
+               peek(next, 2) == (uint32_t)id &&
+               peek(next, 3) == rect.x && peek(next, 4) == rect.y &&
+               peek(next, 5) == rect.w && peek(next, 6) == rect.h &&
+               peek(next, 7) == rect.srcx && peek(next, 8) == rect.srcy &&
+               peek(next, 9) == SVGA_CMD_FENCE && peek(next, 10) == (uint32_t)fence);
+        struct svga_present_rect many[64];
+        for (unsigned i = 0; i < 64; ++i)
+            many[i] = (struct svga_present_rect){i, i, 1, 1, i, i};
+        uint32_t next_many = fifo[SVGA_FIFO_NEXT_CMD];
+        many[63].srcx = 64;
+        assert(svga3d_present_try(surface, many, 64, &fence) == SVGA_EINVAL && !fence);
+        assert(fifo[SVGA_FIFO_NEXT_CMD] == next_many);
+        many[63].srcx = 63;
+        assert(!svga3d_present_try(surface, many, 64, &fence) && fence);
+        assert(peek(next_many, 1) == 4u + 64u * 24u &&
+               peek(next_many, 3u + 63u * 6u + 4u) == 63u &&
+               svga.surfaces[id].last_use_fence == fence &&
+               heap_alloc_calls == heap_before && busy_reads == reads_before);
+        bool signaled = true;
+        assert(!svga_fence_status(fence, &signaled) && !signaled);
+        assert(svga3d_surface_try_destroy(surface) == SVGA_EBUSY);
+        assert(live_pages == pages);
+        assert(svga3d_present_try(surface, &rect, 1, &fence) == SVGA_EINVAL && !fence);
+        heap_fail_after = UINT32_MAX;
+        stalled = false;
+        consume();
+        assert(!svga3d_surface_try_destroy(surface));
+        assert(svga3d_present_try(surface, &rect, 1, &fence) == SVGA_EINVAL && !fence);
+        assert(!svga3d_shutdown() && !live_pages);
+    }
+}
+
 static void test_resources(void)
 {
     for (uint32_t gmr2 = 0; gmr2 < 3; ++gmr2) {
@@ -3311,6 +3391,86 @@ static void release_borrowed_test_owner(void *opaque)
     deallocate(owner->phys, owner->pages);
 }
 
+static void test_borrowed_mapping_queues_before_host_completion(void)
+{
+    setup(0x1dffc3e2u, 0x77fu, 0);
+    uint32_t baseline = live_pages;
+    struct borrowed_test_owner owner = {.pages = 300};
+    owner.phys = allocate(owner.pages);
+    assert(owner.phys);
+    svga_handle attachment = 0;
+    stall_command = SVGA_CMD_REMAP_GMR2;
+    assert(svga_gmr_borrowed_attach(owner.phys, owner.pages * 4096u,
+        &owner, release_borrowed_test_owner, &attachment) == SVGA_EBUSY);
+    uint32_t mob = UINT32_MAX;
+    assert(svga_gmr_borrowed_mob_id(attachment, &mob) == SVGA_EBUSY);
+    /* No CPU retry or intermediate fence completion is needed to enqueue
+     * both mapping packets. The FIFO orders their inline PPN arrays. */
+    stalled = false;
+    consume();
+    uint32_t id = svga_resource_id(attachment);
+    assert(host_gmr_ppn[id][299] == (uint32_t)(owner.phys >> 12) + 299);
+    assert(owner.puts == 0);
+    assert(!svga_gmr_borrowed_attach(owner.phys, owner.pages * 4096u,
+        &owner, release_borrowed_test_owner, &attachment));
+    assert(!svga_gmr_borrowed_mob_id(attachment, &mob));
+    assert(svga_gmr_borrowed_detach(attachment) == SVGA_EBUSY);
+    consume();
+    assert(!svga_gmr_borrowed_detach(attachment));
+    assert(owner.puts == 1 && live_pages == baseline);
+    assert(!svga3d_shutdown() && !live_pages);
+}
+
+static void test_borrowed_mapping_partial_fifo_pressure(void)
+{
+    setup(0x1dffc3e2u, 0x77fu, 0);
+    uint32_t baseline = live_pages;
+    const uint32_t original_bytes = svga.fifo_bytes;
+    /* One complete 256-page packet fits; the following 44-page packet does
+     * not. The shared ring is otherwise valid and initially empty. */
+    svga.fifo_bytes = fifo[SVGA_FIFO_MAX] = svga.min + 1280u;
+    fifo[SVGA_FIFO_NEXT_CMD] = fifo[SVGA_FIFO_STOP] = svga.min;
+    struct borrowed_test_owner owner = {.pages = 300};
+    owner.phys = allocate(owner.pages);
+    assert(owner.phys);
+    svga_handle attachment = 0;
+    stalled = true;
+    assert(svga_gmr_borrowed_attach(owner.phys, owner.pages * 4096u,
+        &owner, release_borrowed_test_owner, &attachment) == SVGA_EBUSY);
+    uint32_t id = svga_resource_id(attachment);
+    struct svga_gmr *gmr = &svga.gmrs[id];
+    assert(gmr->map_inflight && gmr->mapped_pages == 0 &&
+           gmr->map_pending_pages == 256 && owner.puts == 0);
+    svga_handle prefix_fence = gmr->progress_fence;
+    uint32_t prefix_end = fifo[SVGA_FIFO_NEXT_CMD];
+    assert(svga_gmr_borrowed_attach(owner.phys, owner.pages * 4096u,
+        &owner, release_borrowed_test_owner, &attachment) == SVGA_EBUSY);
+    assert(gmr->map_pending_pages == 256 &&
+           gmr->progress_fence == prefix_fence &&
+           fifo[SVGA_FIFO_NEXT_CMD] == prefix_end);
+    uint32_t mob;
+    assert(svga_gmr_borrowed_mob_id(attachment, &mob) == SVGA_EBUSY);
+    stalled = false;
+    consume();
+    assert(host_gmr_ppn[id][255] == (uint32_t)(owner.phys >> 12) + 255u);
+    assert(svga_gmr_borrowed_attach(owner.phys, owner.pages * 4096u,
+        &owner, release_borrowed_test_owner, &attachment) == SVGA_EBUSY);
+    assert(!svga_gmr_borrowed_attach(owner.phys, owner.pages * 4096u,
+        &owner, release_borrowed_test_owner, &attachment));
+    for (uint32_t page = 0; page < owner.pages; ++page)
+        assert(host_gmr_ppn[id][page] == (uint32_t)(owner.phys >> 12) + page);
+    assert(!svga_gmr_borrowed_mob_id(attachment, &mob));
+    stalled = true;
+    assert(svga_gmr_borrowed_detach(attachment) == SVGA_EBUSY);
+    assert(svga_gmr_borrowed_detach(attachment) == SVGA_EBUSY && !owner.puts);
+    stalled = false;
+    consume();
+    assert(!svga_gmr_borrowed_detach(attachment));
+    assert(owner.puts == 1 && live_pages == baseline);
+    svga.fifo_bytes = fifo[SVGA_FIFO_MAX] = original_bytes;
+    assert(!svga3d_shutdown() && !live_pages);
+}
+
 static void test_borrowed_gmr_mob_lifetime(void)
 {
     setup(0x1dffc3e2u, 0x77fu, 0);
@@ -3334,14 +3494,13 @@ static void test_borrowed_gmr_mob_lifetime(void)
     assert(live_pages == baseline + owner.pages + 1 && owner.puts == 0);
     stalled = false;
     consume();
-    int ret;
-    do {
+    int ret = SVGA_EBUSY;
+    for (uint32_t attempt = 0; attempt < 8u && ret == SVGA_EBUSY; ++attempt) {
         ret = svga_gmr_borrowed_attach(owner.phys, owner.pages * 4096u,
                     &owner, release_borrowed_test_owner, &attachment);
-    } while (ret == SVGA_EBUSY && svga.gmrs[svga_resource_id(attachment)].mapped_pages == 0);
-    assert(ret == SVGA_EBUSY);
-    assert(!svga_gmr_borrowed_attach(owner.phys, owner.pages * 4096u,
-             &owner, release_borrowed_test_owner, &attachment));
+        consume();
+    }
+    assert(!ret);
     assert(!svga_gmr_borrowed_mob_id(attachment, &mapped_mob));
     uint32_t gmr_id = svga_resource_id(attachment);
     assert(mapped_mob == SVGA_EXTERNAL_MOB_BASE + gmr_id);
@@ -3847,7 +4006,7 @@ int main(void)
     test_cache_policy_failure_restores_legacy_fifo();
     test_cache_policy_reports_with_svga_lock_released();
     test_effective_surface_limit_snapshot();
-    test_resources(); test_surface_size_rejects_mip_sum_overflow();
+    test_present_try(); test_resources(); test_surface_size_rejects_mip_sum_overflow();
     test_gpu(); test_gpu_diagnostic_skips_unadvertised_fifo_busy();
     test_gb_recovery();
     test_vgpu9_shader_backend();
@@ -3858,6 +4017,8 @@ int main(void)
     test_sized_batch_and_fence_progress();
     test_empty_fence_submission_is_real_and_nonblocking();
     test_old_generation_quiescence_requires_sync_evidence();
+    test_borrowed_mapping_queues_before_host_completion();
+    test_borrowed_mapping_partial_fifo_pressure();
     test_borrowed_gmr_mob_lifetime();
     test_shutdown_refuses_borrowed_attachment();
     test_vgpu9_occlusion_query_lifetime();

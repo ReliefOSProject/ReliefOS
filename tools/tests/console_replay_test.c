@@ -67,6 +67,14 @@ uint64_t time_uptime_us(void) { return 123456789ULL; }
 uint64_t kernel_irq_save(void) { return 0; }
 void kernel_irq_restore(uint64_t flags) { (void)flags; }
 uint32_t smp_current_cpu(void) { return 0; }
+uint32_t smp_cpu_count(void) { return 1; }
+/* Boot logos have their own real-renderer tests. This fixture compares the
+ * console's shadow and direct rendering below the zero-height boot banner. */
+uint32_t boot_logo_draw(const struct framebuffer *target, uint32_t cpu_count)
+{
+    (void)target; (void)cpu_count;
+    return 0;
+}
 void smp_membarrier_poll(void) {}
 
 static void set_default_rgb_format(struct framebuffer *target)

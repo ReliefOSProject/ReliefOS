@@ -1019,6 +1019,13 @@ static int expect_bo(void)
     sync.flags = 0;
     if (ioctl(reopened, DRM_IOCTL_VMW_SYNCCPU, &sync) != -1 || errno != EINVAL)
         return bo_failure("synccpu-flags", 70);
+    sync.flags = drm_vmw_synccpu_read | drm_vmw_synccpu_allow_cs;
+    if (ioctl(reopened, DRM_IOCTL_VMW_SYNCCPU, &sync) < 0)
+        return bo_failure("synccpu-allow-cs-grab", 70);
+    sync.op = drm_vmw_synccpu_release;
+    if (ioctl(reopened, DRM_IOCTL_VMW_SYNCCPU, &sync) < 0 ||
+        ioctl(reopened, DRM_IOCTL_VMW_SYNCCPU, &sync) < 0)
+        return bo_failure("synccpu-allow-cs-release", 70);
 
     /* The ioctl reply overlays alloc.req, so retain the request size before
      * submission instead of reading the union's now-overwritten request. */

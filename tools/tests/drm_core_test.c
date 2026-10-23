@@ -164,6 +164,7 @@ static uint32_t drm_test_batch_busy_submits;
 static int drm_test_batch_submit_failure;
 static bool drm_test_batch_abort_rewrites_failure;
 static uint32_t drm_test_present_sid;
+static uint32_t drm_test_present_submit_calls, drm_test_present_busy_submits;
 static struct svga_present_rect drm_test_present_rect;
 static struct svga_batch *drm_test_pending_present_batch;
 static uint32_t drm_test_pending_present_rect_word;
@@ -397,6 +398,27 @@ int svga_batch_submit(struct svga_batch *batch, svga_handle *fence)
     batch->metadata = NULL;
     uint32_t seq = ++drm_test_fence_issued;
     *fence = ((uint64_t)drm_test_svga_info.generation << 32) | seq;
+    return 0;
+}
+
+/* Model only publication and backpressure; the production-device fixture
+ * separately verifies packet validation, fences and allocation-free operation. */
+int svga3d_present_try(svga_handle surface, const struct svga_present_rect *rects,
+                      uint32_t count, svga_handle *fence)
+{
+    assert(surface && rects && count == 1 && fence);
+    *fence = 0;
+    ++drm_test_present_submit_calls;
+    drm_test_present_sid = svga_resource_id(surface);
+    drm_test_present_rect = *rects;
+    if (drm_test_present_busy_submits) {
+        --drm_test_present_busy_submits;
+        return SVGA_EBUSY;
+    }
+    drm_test_published_present_rect = *rects;
+    ++drm_test_present_submitted;
+    *fence = ((uint64_t)drm_test_svga_info.generation << 32) |
+             ++drm_test_fence_issued;
     return 0;
 }
 
@@ -1521,6 +1543,33 @@ static void test_dumb_and_vmwgfx_bo_contract(void)
     assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_VMW_SYNCCPU, &sync) ==
            -LINUX_EINVAL);
 
+    /* Linux ALLOW_CS waits for existing work but does not exclude later
+     * submissions. Its release is a handle-validated no-op, including when
+     * new GPU work is already using the buffer. */
+    sync.op = drm_vmw_synccpu_grab;
+    sync.flags = drm_vmw_synccpu_read | drm_vmw_synccpu_allow_cs;
+    assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_VMW_SYNCCPU, &sync) == 0);
+    assert(drm_bo_gpu_reserve(mapped_bo) == 0);
+    sync.op = drm_vmw_synccpu_release;
+    assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_VMW_SYNCCPU, &sync) == 0);
+    assert(drm_bo_gpu_busy(mapped_bo));
+    drm_bo_gpu_release(mapped_bo);
+    sync.handle = UINT32_MAX;
+    assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_VMW_SYNCCPU, &sync) ==
+           -LINUX_EINVAL);
+    sync.handle = alloc.rep.handle;
+    sync.op = drm_vmw_synccpu_grab;
+    sync.flags = drm_vmw_synccpu_write;
+    assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_VMW_SYNCCPU, &sync) == 0);
+    sync.op = drm_vmw_synccpu_release;
+    sync.flags |= drm_vmw_synccpu_allow_cs;
+    assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_VMW_SYNCCPU, &sync) == 0);
+    assert(drm_bo_gpu_reserve(mapped_bo) == -LINUX_EBUSY);
+    sync.flags = drm_vmw_synccpu_write;
+    assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_VMW_SYNCCPU, &sync) == 0);
+    assert(drm_bo_gpu_reserve(mapped_bo) == 0);
+    drm_bo_gpu_release(mapped_bo);
+
     /* Repeated valid grabs aggregate in the per-handle record, without
      * allocating one kernel heap node per ioctl. */
     const unsigned repeated_grabs = 1024;
@@ -1836,11 +1885,6 @@ static void drm_test_assert_present_job_rect(
     assert(job);
     assert(job->x1 == x1 && job->y1 == y1 &&
            job->x2 == x2 && job->y2 == y2);
-    struct SVGA3dCopyRect rect;
-    __builtin_memcpy(&rect, &job->output[3], sizeof(rect));
-    assert(rect.x == x1 && rect.y == y1 &&
-           rect.w == x2 - x1 && rect.h == y2 - y1 &&
-           rect.srcx == x1 && rect.srcy == y1);
 }
 
 static void drm_test_kms_pending_damage_union(
@@ -1853,29 +1897,29 @@ static void drm_test_kms_pending_damage_union(
         .clips_ptr = (uint64_t)(uintptr_t)&first,
     };
     const uint32_t submitted_before = drm_test_present_submitted;
-    const uint32_t submits_before = drm_test_batch_submit_calls;
-    drm_test_batch_busy_submits = 2;
+    const uint32_t submits_before = drm_test_present_submit_calls;
+    drm_test_present_busy_submits = 2;
 
     assert(ioctl_call(task, file, DRM_IOCTL_MODE_DIRTYFB, &dirty) == 0);
     struct drm_kms_present_job *job = drm_kms_pending_job;
-    assert(job && !job->submitted && job->batch_open);
-    assert(drm_test_batch_busy_submits == 1u);
+    assert(job && !job->submitted);
+    assert(drm_test_present_busy_submits == 1u);
     drm_test_assert_present_job_rect(job, first.x1, first.y1,
                                     first.x2, first.y2);
 
     dirty.clips_ptr = (uint64_t)(uintptr_t)&second;
     assert(ioctl_call(task, file, DRM_IOCTL_MODE_DIRTYFB, &dirty) == 0);
     assert(drm_kms_pending_job == job);
-    assert(!job->submitted && job->batch_open);
-    assert(drm_test_batch_busy_submits == 0u);
-    assert(drm_test_batch_submit_calls == submits_before + 2u);
+    assert(!job->submitted);
+    assert(drm_test_present_busy_submits == 0u);
+    assert(drm_test_present_submit_calls == submits_before + 2u);
     assert(drm_test_present_submitted == submitted_before);
     drm_test_assert_present_job_rect(job, x1, y1, x2, y2);
 
     drm_vmwgfx_process_retirements(1);
     assert(drm_kms_pending_job == NULL);
-    assert(job->submitted && !job->batch_open);
-    assert(drm_test_batch_submit_calls == submits_before + 3u);
+    assert(job->submitted);
+    assert(drm_test_present_submit_calls == submits_before + 3u);
     assert(drm_test_present_submitted == submitted_before + 1u);
     assert(drm_test_published_present_rect.x == x1 &&
            drm_test_published_present_rect.y == y1 &&
@@ -1950,7 +1994,11 @@ static void test_kms_surface_present_pressure(void)
         .mode = mode,
     };
     uint32_t submitted_before = drm_test_present_submitted;
+    /* A scanout PRESENT needs only its fence-owned job. Exhaust the heap
+     * after that allocation: generic render-batch metadata is unnecessary. */
+    fail_kernel_malloc_after = 1;
     assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_MODE_SETCRTC, &set) == 0);
+    fail_kernel_malloc_after = -1;
     assert(drm_test_present_submitted == submitted_before + 1u);
     struct drm_vmwgfx_surface *present_surface =
         drm_vmwgfx_surface_lookup_get(owner.drm_file,
@@ -1986,11 +2034,11 @@ static void test_kms_surface_present_pressure(void)
         .fb_id = fb.fb_id, .num_clips = 1,
         .clips_ptr = (uint64_t)(uintptr_t)&clip,
     };
-    drm_test_batch_busy_submits = 1;
-    unsigned submits_before_busy = drm_test_batch_submit_calls;
+    drm_test_present_busy_submits = 1;
+    unsigned submits_before_busy = drm_test_present_submit_calls;
     assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_MODE_DIRTYFB,
                       &dirty) == 0);
-    assert(drm_test_batch_submit_calls == submits_before_busy + 1u);
+    assert(drm_test_present_submit_calls == submits_before_busy + 1u);
     assert(drm_test_present_submitted == submitted_before + 1u);
     /* The modesetting client empties Damage after DIRTYFB returns. The idle
      * service must therefore publish the retained last rectangle without a
@@ -2009,7 +2057,7 @@ static void test_kms_surface_present_pressure(void)
      * they retire; retry service after the transition must not publish the
      * stale damage. */
     clip = (struct drm_clip_rect){20, 21, 24, 25};
-    drm_test_batch_busy_submits = 1;
+    drm_test_present_busy_submits = 1;
     assert(ioctl_call(&owner_task, &owner, DRM_IOCTL_MODE_DIRTYFB,
                       &dirty) == 0);
     assert(drm_test_present_submitted == submitted_before + 2u);
@@ -4485,7 +4533,7 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
     uint32_t reset_work_bytes = drm_vmwgfx_exec_work_bytes;
     struct drm_vmw_execbuf_arg over_reset_limit = {.version = 1};
     assert(ioctl_call(&reset_budget_task, &client, DRM_IOCTL_VMW_EXECBUF,
-                      &over_reset_limit) == -LINUX_ENOMEM);
+                      &over_reset_limit) == -LINUX_EBUSY);
 
     ++drm_test_svga_info.generation;
     drm_test_fence_issued = 0;
@@ -4505,7 +4553,7 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
             .handle = query_bo.rep.handle,
         }) == -LINUX_EBUSY);
     assert(ioctl_call(&reset_budget_task, &client, DRM_IOCTL_VMW_EXECBUF,
-                      &over_reset_limit) == -LINUX_ENOMEM);
+                      &over_reset_limit) == -LINUX_EBUSY);
     assert(drm_vmwgfx_exec_work_count == DRM_VMW_EXEC_WORK_MAX &&
            drm_vmwgfx_exec_work_bytes == reset_work_bytes);
 
@@ -5472,7 +5520,7 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
     struct drm_vmw_execbuf_arg over_limit_exec = {.version = 1};
     assert(ioctl_call(&pressure_task, &pressure_file,
                       DRM_IOCTL_VMW_EXECBUF, &over_limit_exec) ==
-           -LINUX_ENOMEM);
+           -LINUX_EBUSY);
     pressure_task.syscall_file = NULL;
     drm_file_close(&pressure_file);
 
@@ -5485,7 +5533,7 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
     struct drm_vmw_execbuf_arg reopened_over_limit = {.version = 1};
     assert(ioctl_call(&reopened_task, &reopened_file,
                       DRM_IOCTL_VMW_EXECBUF, &reopened_over_limit) ==
-           -LINUX_ENOMEM);
+           -LINUX_EBUSY);
     assert(drm_vmwgfx_exec_work_count == DRM_VMW_EXEC_WORK_MAX);
     drm_test_fence_passed = pressure_fence_last;
     for (unsigned i = 0; i < DRM_VMW_EXEC_WORK_MAX / 8u; ++i)
@@ -5494,8 +5542,27 @@ static void test_vgpu9_execbuf_v1_empty_fence_abi(void)
     struct drm_vmw_execbuf_arg after_reap = {.version = 1};
     assert(ioctl_call(&reopened_task, &reopened_file,
                       DRM_IOCTL_VMW_EXECBUF, &after_reap) == 0);
+    /* Completed work must be reclaimed on quota pressure without requiring
+     * unrelated syscalls. Outstanding work remains charged until its fence. */
+    while (drm_vmwgfx_exec_work_count < DRM_VMW_EXEC_WORK_MAX) {
+        struct drm_vmw_execbuf_arg pending = {.version = 1};
+        assert(ioctl_call(&reopened_task, &reopened_file,
+                          DRM_IOCTL_VMW_EXECBUF, &pending) == 0);
+    }
+    uint32_t quota_sequence = drm_test_fence_issued;
+    assert(ioctl_call(&reopened_task, &reopened_file,
+                      DRM_IOCTL_VMW_EXECBUF, &after_reap) == -LINUX_EBUSY);
+    assert(drm_vmwgfx_exec_work_count == DRM_VMW_EXEC_WORK_MAX &&
+           drm_test_fence_issued == quota_sequence);
+    drm_test_fence_passed = quota_sequence;
+    assert(ioctl_call(&reopened_task, &reopened_file,
+                      DRM_IOCTL_VMW_EXECBUF, &after_reap) == 0);
+    assert(drm_vmwgfx_exec_work_count < DRM_VMW_EXEC_WORK_MAX &&
+           drm_test_fence_issued == quota_sequence + 1u);
     drm_test_fence_passed = drm_test_fence_issued;
-    drm_vmwgfx_execbuf_process_retirements(8);
+    for (unsigned i = 0; i < DRM_VMW_EXEC_WORK_MAX / 8u; ++i)
+        drm_vmwgfx_execbuf_process_retirements(8);
+    assert(drm_vmwgfx_exec_work_count == 0u);
     reopened_task.syscall_file = NULL;
     drm_file_close(&reopened_file);
 
@@ -5613,6 +5680,36 @@ static void test_faildiag_real_bo_failures(void)
     drm_test_diag_log_reset();
 }
 
+/* Byte pressure is also transient while other work owns the budget. A real
+ * heap failure must retain ENOMEM and roll back its reservation separately. */
+static void test_exec_work_byte_pressure(void)
+{
+    assert(!drm_vmwgfx_exec_work_count && !drm_vmwgfx_exec_work_bytes);
+    unsigned allocations_before = allocations;
+    struct drm_vmwgfx_exec_work *held[DRM_VMW_EXEC_WORK_MAX];
+    unsigned count = 0;
+    int error = 0;
+    while (count < DRM_VMW_EXEC_WORK_MAX) {
+        struct drm_vmwgfx_exec_work *work = drm_vmwgfx_exec_work_alloc(
+            DRM_VMW_EXECBUF_MAX_COMMAND_BYTES, 0, &error, NULL);
+        if (!work) break;
+        held[count++] = work;
+    }
+    assert(count && count < DRM_VMW_EXEC_WORK_MAX && error == -LINUX_EBUSY);
+    assert(drm_vmwgfx_exec_work_count == count &&
+           drm_vmwgfx_exec_work_bytes <= DRM_VMW_EXEC_WORK_BYTES_MAX);
+    for (unsigned i = 0; i < count; ++i)
+        drm_vmwgfx_exec_work_release(held[i]);
+    assert(!drm_vmwgfx_exec_work_count && !drm_vmwgfx_exec_work_bytes);
+    assert(!drm_vmwgfx_exec_work_alloc(UINT32_MAX, 0, &error, NULL) &&
+           error == -LINUX_ENOMEM);
+    fail_kernel_malloc_after = 0;
+    assert(!drm_vmwgfx_exec_work_alloc(0, 0, &error, NULL) && error == -LINUX_ENOMEM);
+    fail_kernel_malloc_after = -1;
+    assert(!drm_vmwgfx_exec_work_count && !drm_vmwgfx_exec_work_bytes);
+    assert(allocations == allocations_before);
+}
+
 /* Empty maintenance must not bounce unrelated GPU locks on every read/write.
  * Queue a real continuation afterwards to catch a stale empty publication. */
 static void test_idle_retirement_and_reactivation(void)
@@ -5651,6 +5748,7 @@ int main(void)
     test_kms_surface_format_compatibility();
     test_kms_surface_present_pressure();
     test_vgpu9_execbuf_v1_empty_fence_abi();
+    test_exec_work_byte_pressure();
     assert(mm_pages_freed == mm_pages_allocated);
     puts("drm-core: PASS");
     return 0;

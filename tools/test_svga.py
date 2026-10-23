@@ -7,7 +7,7 @@ from test_gpu import GpuAbiTests
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = [ROOT / "kernel/reliefnt/drivers/video/svga" / name for name in
-           ("fifo.c", "batch_state.c", "device.c", "gmr.c", "gb.c", "svga3d.c", "shader.c",
+           ("fifo.c", "batch_state.c", "device.c", "gmr.c", "gb.c", "present.c", "svga3d.c", "shader.c",
             "borrowed.c", "query.c", "triangle.c", "render.c")]
 
 
