@@ -37,18 +37,6 @@ def run(command: list[str], **kwargs) -> subprocess.CompletedProcess:
 # OS diagnostic hooks for the optional full-image guest stage.
 # --------------------------------------------------------------------------- #
 
-def test_guest_hooks():
-    # Diagnostic guest hooks used by the ISO produced by --guest. Since the
-    # stage-4 M5 migration the spawn authority is the desktop autospawn table
-    # (exact-token "autospawn=<name>" parsed from /proc/cmdline), not the
-    # kernel; the hook names must stay registered there.
-    autospawn = read("userland/apps/desktop/autospawn.c")
-    assert 'strncmp(token, "autospawn=", 10)' in autospawn, \
-        "autospawn must match exact cmdline tokens, not substrings"
-    for hook in ("ioctlcloexec", "python315"):
-        assert f'{{"{hook}",' in autospawn, f"missing diagnostic hook {hook}"
-    print("  desktop diagnostic autospawn hooks verified")
-
 # --------------------------------------------------------------------------- #
 # Build with the OS SDK and run on the host Linux reference kernel.
 # --------------------------------------------------------------------------- #
@@ -380,8 +368,7 @@ def write_evidence(host_output: str, host: dict, guest_text: str | None,
         for index, line in enumerate(serial_lines):
             if any(marker in line for marker in (
                     "[ioctl-clex]", "Hello from Python", "Numbers:", "Sum:", "Fibonacci:",
-                    "name=python3.15 code=", "[desktop] autospawn ioctlcloexec",
-                    "[desktop] autospawn python315", "5451")):
+                    "name=python3.15 code=", "5451")):
                 lines.append(line.strip())
                 # Keep the syscall-trace result line that follows a FIOCLEX call.
                 if "5451" in line and index + 1 < len(serial_lines):
@@ -421,7 +408,6 @@ def main() -> int:
         parser.error("--terminal requires --guest")
 
     print(f"ioctl close-on-exec regression ({FORMAT})")
-    test_guest_hooks()
     probe = build_probe(ROOT / "build/ioctl-cloexec/linux-ioctl-cloexec.elf", args.sdk)
     host_output = subprocess.run([str(probe)], cwd=ROOT, stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT, text=True,

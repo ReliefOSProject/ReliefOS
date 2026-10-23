@@ -84,10 +84,6 @@ configs/nls/po/zh_CN.po
 userland/apps/installer/main.cpp
 userland/apps/installer/installer_tty.c
 userland/apps/login/main.c
-userland/apps/desktop/desktop.h
-userland/apps/desktop/start_menu.c
-userland/apps/desktop/render.c
-userland/apps/desktop/screen.c
 userland/apps/osver/main.cpp
 userland/apps/settings/main.c
 userland/apps/run/main.c

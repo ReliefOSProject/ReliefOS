@@ -26,7 +26,7 @@ cp -a system/rootfs "$work/src/system/rootfs"
 for name in certs config docs fonts resources test-accounts xorg; do
     ln -s "$repo_root/system/$name" "$work/src/system/$name"
 done
-for name in configs docs resources test third_party tools userland; do
+for name in configs Documentation resources test third_party tools userland; do
     ln -s "$repo_root/$name" "$work/src/$name"
 done
 cp logo.png "$work/src/logo.png"
@@ -54,10 +54,7 @@ legacy_brand=leon
 legacy_brand=${legacy_brand}os
 printf '%s\n' fixture > "$work/out/system/lib/lib${legacy_brand}.so.2"
 printf '%s\n' fixture > "$work/out/generated/system/kerneldebug.sys"
-printf '%s\n' fixture > "$work/out/generated/fonts/${legacy_brand}-metro.ttf"
-printf '%s\n' fixture > "$work/out/generated/fonts/${legacy_brand}-win95.ttf"
 printf '%s\n' fixture > "$work/out/userland/motd.elf"
-printf '%s\n' fixture > "$work/out/userland/dynlinkerror.elf"
 printf '%s\n' fixture > "$work/out/userland/bootinstall.elf"
 for command in sbin/grub-install sbin/grub-bios-setup sbin/grub-probe bin/grub-mkimage; do
     mkdir -p "$work/out/upstream/grub/root/usr/${command%/*}"

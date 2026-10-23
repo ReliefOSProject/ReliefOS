@@ -23,7 +23,6 @@ EXCLUDED_PREFIXES = ("third_party/", "build/", ".git/")
 # Service daemons are the server side of a migrated protocol. They may use
 # the versioned wire structs that applications are no longer allowed to see.
 SERVICE_APP_PREFIXES = (
-    "userland/apps/windowd/",
     "userland/apps/imd/",
     "userland/apps/authd/",
     "userland/apps/sessiond/",

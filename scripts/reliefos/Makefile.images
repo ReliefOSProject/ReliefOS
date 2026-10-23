@@ -32,7 +32,7 @@ ESP_STAMP := $(O_STAGE)/esp.complete
 IMAGE_DISPLAY := $(O_GENERATED)/config/display.conf
 $(IMAGE_DISPLAY): $(RELIEFOS_CONFIG_FILE) $(RELIEFOS_EMIT)
 	$(Q)mkdir -p $(@D)
-	$(Q)awk 'BEGIN{theme="metro";mode="fill"} /^CONFIG_VMDK_DEFAULT_THEME_WIN95=y$$/{theme="win95"} /^CONFIG_VMDK_WALLPAPER_STRETCH=y$$/{mode="stretch"} /^CONFIG_VMDK_WALLPAPER_CENTER=y$$/{mode="center"} END{print "theme="theme;print "wallpaper.mode="mode}' $< | $(RELIEFOS_EMIT) --input - --output $@
+	$(Q)awk 'BEGIN{theme="metro"} /^CONFIG_VMDK_DEFAULT_THEME_WIN95=y$$/{theme="win95"} END{print "theme="theme}' $< | $(RELIEFOS_EMIT) --input - --output $@
 RELIEFOS_EXT4_FEATURES := none,filetype,extents,dir_index,metadata_csum,64bit,flex_bg,has_journal,large_file,huge_file,extra_isize
 RELIEFOS_PARAMETERS_images := epoch=$(SOURCE_DATE_EPOCH)|boot=gpt-bios-uefi|root-fs=ext4|ext4-features=$(RELIEFOS_EXT4_FEATURES)|grub=$(GRUB_EFI_DIR)|bios=$(GRUB_BIOS_DIR)|grub-tool=$(GRUB_MKSTANDALONE)|grub-mkimage=$(GRUB_MKIMAGE)|grub-bios-setup=$(GRUB_BIOS_SETUP)|mke2fs=$(shell mke2fs -V 2>&1 | head -n1)|mtools=$(shell mcopy -V 2>&1 | head -n1)|disk-size=$(CONFIG_IMAGE_SIZE_MIB)|installer-size=$(CONFIG_INSTALLER_ROOT_SIZE_MIB)|qemu-img=$(shell qemu-img --version 2>/dev/null | head -n1)|xorriso=$(shell xorriso -version 2>/dev/null | head -n1)|sfdisk=$(shell sfdisk --version 2>/dev/null)
 $(if $(RELIEFOS_PASSIVE),,$(eval $(call KBUILD_PARAMETERS,images)))

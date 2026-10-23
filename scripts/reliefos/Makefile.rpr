@@ -1,13 +1,9 @@
-RELIEFOS_OSCHINPT_INDEX := $(RELIEFOS_HOST_BIN)/reliefos-oschinpt-index
-OSCHINPT_INDEX := $(O_GENERATED)/rpr/pinyin_simp.idx
-$(OSCHINPT_INDEX): $(RELIEFOS_SRC)/third_party/rime-pinyin-simp/pinyin_simp.dict.yaml $(RELIEFOS_OSCHINPT_INDEX)
-	$(Q)mkdir -p $(@D)
-	$(Q)$(RELIEFOS_OSCHINPT_INDEX) $< $@
 RPR_APPS := $(O)/rpr-apps/repository
 RPR_APP_PACKAGES := $(RPR_APPS)/.complete $(RPR_APPS)/packages.list
-RPR_INPUTS := $(wildcard $(RELIEFOS_SRC)/third_party/rime-pinyin-simp/* $(RELIEFOS_SRC)/tools/oschinpt-apk-* $(RELIEFOS_SRC)/userland/apps/oschinpt/settings.ini) $(RELIEFOS_SRC)/third_party/doomgeneric/freedoom1.wad $(RELIEFOS_SRC)/third_party/doomgeneric/LICENSE $(RELIEFOS_SRC)/third_party/doomgeneric/FREEDOOM-COPYING.txt $(RELIEFOS_SRC)/resources/build-art/app-icons/helloworld.bmp
-$(RPR_APP_PACKAGES) &: $(addprefix $(USERLAND_DIR)/,helloworld.elf doom.elf doomlauncher.elf oschinpt.elf) $(OSCHINPT_INDEX) $(BUILD_INFO_HEADER) $(RPR_INPUTS) $(APK_MANIFEST) $(RELIEFOS_SRC)/tools/build/rpr-apps.sh
-	$(Q)sh $(RELIEFOS_SRC)/tools/build/rpr-apps.sh $(RELIEFOS_SRC) $(O) $(BUILD_INFO_HEADER) $(OSCHINPT_INDEX) $(UPSTREAM_APK) '$(APK_SIGNING_KEY)' $(RPR_APPS) $(SOURCE_DATE_EPOCH)
+# Only applications with a supported frontend are published.
+RPR_INPUTS := $(RELIEFOS_SRC)/third_party/doomgeneric/freedoom1.wad $(RELIEFOS_SRC)/third_party/doomgeneric/LICENSE $(RELIEFOS_SRC)/third_party/doomgeneric/FREEDOOM-COPYING.txt
+$(RPR_APP_PACKAGES) &: $(addprefix $(USERLAND_DIR)/,doom.elf doomlauncher.elf) $(BUILD_INFO_HEADER) $(RPR_INPUTS) $(APK_MANIFEST) $(RELIEFOS_SRC)/tools/build/rpr-apps.sh
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/rpr-apps.sh $(RELIEFOS_SRC) $(O) $(BUILD_INFO_HEADER) $(UPSTREAM_APK) '$(APK_SIGNING_KEY)' $(RPR_APPS) $(SOURCE_DATE_EPOCH)
 RPR_PAGES := $(O)/rpr-pages
 # --- release guard (design §8: 开发构建可 dirty，发布构建必须拒绝) -----------
 # Release artifacts (rpr-pages and `make release`) must come from a clean
@@ -37,4 +33,3 @@ $(RPR_PAGES)/.complete $(RPR_PAGES)/manifest.json: $(O_META)/rpr-pages-present.p
 .PHONY: rpr-apps rpr-pages
 rpr-apps: $(RPR_APP_PACKAGES)
 rpr-pages: reliefnt-release-guard $(RPR_PAGES)/.complete $(RPR_PAGES)/manifest.json
-tools: $(RELIEFOS_OSCHINPT_INDEX)

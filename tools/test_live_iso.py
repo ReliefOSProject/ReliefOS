@@ -21,7 +21,7 @@ class LiveRootTests(unittest.TestCase):
                 "EFI/BOOT/BOOTX64.EFI": b"boot",
                 "grub/grub.cfg": b"set root=(hd0,gpt1)",
                 "reliefos/kernel.sys": b"kernel",
-                "usr/lib/reliefos/apps/desktop/desktop.elf": b"desktop",
+                "usr/bin/icewm": b"desktop",
                 "usr/lib/reliefos/apps/terminal/terminal.elf": b"terminal",
                 "bin/busybox": b"shell",
                 "usr/bin/vim": b"unmodified Linux executable",

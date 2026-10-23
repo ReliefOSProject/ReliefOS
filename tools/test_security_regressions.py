@@ -15,7 +15,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 PEERCRED_PATHS = (
-    "userland/apps/windowd/main.c",
     "userland/apps/device-agent/main.c",
     "userland/apps/sessiond/main.c",
 )

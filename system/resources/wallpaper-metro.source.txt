@@ -1,9 +1,0 @@
-Metro desktop wallpaper source
-
-NASA Image and Video Library, asset PIA18033
-https://images-assets.nasa.gov/image/PIA18033/PIA18033~large.jpg
-https://images.nasa.gov/details-PIA18033
-
-The image was downloaded on 2026-07-10, centered on a dark-blue 1280x720 canvas,
-and converted to an uncompressed 24-bit BMP for ReliefOS. Credit: NASA.
-NASA media usage guidelines: https://www.nasa.gov/nasa-brand-center/images-and-media/

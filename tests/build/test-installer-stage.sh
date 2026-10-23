@@ -8,7 +8,7 @@ ${HOSTCC:-cc} -std=c11 -O2 -Wall -Wextra -Werror "$src/tools/host/manifest/relie
 export INSTALLER_DEDUP_TOOL="$w/dedup"
 mkdir -p "$w/src/tools/build" "$w/src/Documentation/admin-guide" "$w/src/configs" "$w/src/userland/apps/installer" "$w/src/system/xorg" \
     "$w/out/userland" "$w/out/userland-installer" \
-    "$w/raw/usr/lib/reliefos/apps/settings" "$w/raw/usr/lib/leonos" "$w/raw/usr/bin" \
+    "$w/raw/usr/lib/reliefos/apps/soundctl" "$w/raw/usr/lib/leonos" "$w/raw/usr/bin" \
     "$w/raw/etc/reliefos/icewm" "$w/raw/etc/runlevels/default" \
     "$w/raw/etc/X11/xdm" "$w/raw/etc/pam.d" "$w/raw/usr/share/applications" \
     "$w/raw/usr/lib/X11/xdm" \
@@ -24,7 +24,7 @@ cp "$src/system/xorg/installer-session" "$w/src/system/xorg/installer-session"
 ln -s "$src/resources" "$w/src/resources"
 printf 'canonical runtime\n' > "$w/raw/usr/lib/reliefos/libreliefos.so.2"
 printf 'compat runtime\n' > "$w/raw/usr/lib/leonos/libleonos.so.2"
-printf 'settings\n' > "$w/raw/usr/lib/reliefos/apps/settings/settings.elf"
+printf 'sound controls\n' > "$w/raw/usr/lib/reliefos/apps/soundctl/soundctl.elf"
 printf 'xorg\n' > "$w/raw/etc/reliefos/desktop-backend"
 printf 'xorg server config\n' > "$w/raw/etc/X11/xorg.conf"
 printf 'xdm conf\n' > "$w/raw/etc/X11/xdm/xdm-config"
@@ -41,7 +41,7 @@ for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper; do
     printf 'Xorg helper\n' > "$w/raw/$path"
 done
 ln -s reliefos/icewm "$w/raw/etc/icewm"
-for app in $(cat "$w/src/configs/fltk-apps.list") glxgears portablegl; do
+for app in $(cat "$w/src/configs/fltk-apps.list"); do
     [ "$app" != installer ] || continue
     mkdir -p "$w/raw/usr/lib/reliefos/apps/$app"
     printf '%s executable\n' "$app" > "$w/raw/usr/lib/reliefos/apps/$app/$app.elf"
@@ -66,7 +66,6 @@ for size in 16 32 48 64 128 256; do
     mkdir -p "$w/raw/usr/share/icons/hicolor/${size}x${size}/apps"
     printf 'math icon\n' > "$w/raw/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-reliefmath.png"
 done
-printf 'portablegl library\n' > "$w/raw/usr/lib/libportablegl.so.1"
 printf 'license\n' > "$w/raw/etc/license.conf"
 ln -s ../../init.d/reliefos-audio "$w/raw/etc/runlevels/default/reliefos-audio"
 printf 'gptinit\n' > "$w/out/userland-installer/gptinit.elf"
@@ -163,7 +162,7 @@ done
 for path in usr/lib/reliefos/reliefos-xdm usr/lib/reliefos/xorg-tty-wrapper; do
     [ ! -e "$w/stage/install/root-console/$path" ]
 done
-for app in $(cat "$w/src/configs/fltk-apps.list") glxgears portablegl; do
+for app in $(cat "$w/src/configs/fltk-apps.list"); do
     [ ! -e "$w/stage/install/root-console/usr/lib/reliefos/apps/$app" ]
     [ ! -e "$w/stage/install/root-console/usr/bin/$app" ]
     [ ! -e "$w/stage/install/root-console/usr/share/applications/reliefos-$app.desktop" ]
@@ -200,8 +199,7 @@ done
 [ -f "$w/stage/install/root/usr/share/mime/packages/reliefmath.xml" ]
 [ -f "$w/stage/install/root-console/usr/share/fonts/reliefos/simsun.ttc" ]
 [ -f "$w/stage/install/root-console/usr/share/reliefos/other-app-data" ]
-[ ! -e "$w/stage/install/root-console/usr/lib/libportablegl.so.1" ]
-[ -d "$w/stage/install/root-console/usr/lib/reliefos/apps/settings" ]
+[ -d "$w/stage/install/root-console/usr/lib/reliefos/apps/soundctl" ]
 [ -f "$w/stage/install/root-console/usr/lib/reliefos/libreliefos.so.2" ]
 [ -f "$w/stage/etc/license.conf" ]
 inode() { stat -c '%d:%i' "$1"; }
@@ -234,8 +232,8 @@ console_marker=$w/stage/install/root-console/etc/reliefos/desktop-backend
 cmp "$w/raw/usr/lib/reliefos/libreliefos.so.2" "$w/stage/usr/lib/reliefos/libreliefos.so.2"
 cmp "$w/raw/usr/lib/reliefos/libreliefos.so.2" "$w/stage/install/root/usr/lib/reliefos/libreliefos.so.2"
 cmp "$w/raw/usr/lib/leonos/libleonos.so.2" "$w/stage/install/root/usr/lib/leonos/libleonos.so.2"
-cmp "$w/raw/usr/lib/reliefos/apps/settings/settings.elf" \
-    "$w/stage/install/root/usr/lib/reliefos/apps/settings/settings.elf"
+cmp "$w/raw/usr/lib/reliefos/apps/soundctl/soundctl.elf" \
+    "$w/stage/install/root/usr/lib/reliefos/apps/soundctl/soundctl.elf"
 [ ! -e "$w/stage/install/root/$program" ]
 [ ! -e "$w/stage/install/root/etc/license.conf" ]
 [ -f "$w/stage/install/esp/reliefos/kernel.sys" ]

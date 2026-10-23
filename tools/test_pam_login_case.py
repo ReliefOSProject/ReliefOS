@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exercise production GUI PAM login with real musl PAM DSOs in an isolated host namespace."""
+"""Exercise production PAM session login with real musl PAM DSOs in an isolated host namespace."""
 import json
 import os
 from pathlib import Path

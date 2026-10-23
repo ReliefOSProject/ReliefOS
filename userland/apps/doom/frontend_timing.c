@@ -1,6 +1,6 @@
 /* Audio pacing is shared by the FLTK frontend and the headless game mode. */
 #include <stdint.h>
-#include <reliefos/gui.h>
+#include <reliefos/system.h>
 #include <reliefos/syscall.h>
 #include "doomgeneric.h"
 #include "i_sound.h"

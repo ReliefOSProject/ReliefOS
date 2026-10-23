@@ -105,7 +105,6 @@ main	compatibility	tests/build/test-lock-safety.sh	针对 test-lock-safety 的�
 main	compatibility	tests/build/test-nls-stage.sh	针对 test-nls-stage 的旧配置/旧变量/头库/路径/目标输入与新 canonical 共存回归；旧临时前缀可独立规范化
 main	compatibility	tests/build/test-ntclks-fetch.sh	旧构建变量和目标兼容回归；旧真实子仓 URL 保持不变
 main	compatibility	tests/build/test-pages.sh	针对 test-pages 的旧配置/旧变量/头库/路径/目标输入与新 canonical 共存回归；旧临时前缀可独立规范化
-main	compatibility	tests/build/test-portablegl-abi.sh	checks old and new PortableGL exports
 main	compatibility	tests/build/test-relative-kernel-output.sh	针对 test-relative-kernel-output 的旧配置/旧变量/头库/路径/目标输入与新 canonical 共存回归；旧临时前缀可独立规范化
 main	compatibility	tests/build/test-reliefos-aliases.sh	checks legacy build environment aliases
 main	compatibility	tests/build/test-reliefos-migration.sh	fixtures verify migration from legacy configuration and data
@@ -173,13 +172,10 @@ main	history	tools/run_gcc_probe_qemu.py	仅 docstring 中保留旧 build.py + L
 main	compatibility	tools/storage_tools.py	提供旧 sbin/leonos-grub-installer 路径转发
 main	compatibility	tools/test_apk_layout.py	验证旧 Python 导入别名、protected_paths 旧目录和兼容 SONAME
 main	compatibility	tools/test_auth_guest.py	测试镜像更新既有 /leonos 回滚内核载荷；libleonos.so.2 是显式兼容库
-main	compatibility	tools/test_capslock_qemu.py	QEMU fixture 同时更新新旧 ESP 命名空间与兼容库，旧路径用于回滚核对
 main	compatibility	tools/test_console_boot_policy.py	负向回归明确禁止旧 LEONOS_BOOT_MODE 和旧 desktop runlevel 残留
-main	compatibility	tools/test_desktop_fps_qemu.py	QEMU fixture 同时更新新旧 ESP 命名空间与兼容库，旧路径用于回滚核对
 main	compatibility	tools/test_execution_lock_qemu.py	仅校验生成 ISO 中保留的 legacy /leonos/kernel.sys 副本哈希。
 main	compatibility	tools/test_gpu.py	负向回归禁止退役 devtools/include/leonos 重新出现
 main	compatibility	tools/test_header_export.py	新旧公共头导出关系与禁止 ntclks 私有头外泄规则
-main	compatibility	tools/test_hyfetch_qemu.py	仅锁定 Fastfetch/Hyfetch 已发布 leonos-ascii.txt 配置文件名。
 main	compatibility	tools/test_installer_payload.py	真实安装器旧目标识别、拒绝 canonical 路径放旧 basename、要求双 SONAME 与旧 ESP 回滚载荷的回归 fixture
 main	compatibility	tools/test_installer_setup.py	LEONOS_TEST_PASSWORD_HASH 是既有宿主测试驱动与 C fixture 共享输入键
 main	compatibility	tools/test_installer_update_qemu.py	断言旧 leonos-* APK 包经升级改变版本，必须保留旧包前缀识别。
@@ -197,7 +193,6 @@ main	compatibility	tools/test_packaging_brand_paths.py	新旧 ESP 排除、双�
 main	history	tools/test_pam_helper_reference.py	独立旧 PAM helper 参考 fixture 加载旧 SONAME
 main	compatibility	tools/test_pam_login_switch_qemu.py	QEMU fixture 同时更新新旧 ESP 命名空间与兼容库，旧路径用于回滚核对
 main	compatibility	tools/test_power_qemu.py	只保留新旧内核启动日志前缀双接受，默认 ISO 已 canonical。
-main	compatibility	tools/test_privilege_negatives.py	冻结 LeonOSFlags 进程状态字段/旧服务组身份；历史内核分离设计引用
 main	compatibility	tools/test_python_package.py	读取旧独立发行夹具的 .leonos-package.json 校验清单。
 main	compatibility	tools/test_security_regressions.py	禁止新旧 ioctl 私有扩展的双命名负向扫描表达式
 main	compatibility	tools/test_service_marker.py	冻结 LeonOSFlags 进程状态字段/旧服务组身份；历史内核分离设计引用
@@ -222,12 +217,9 @@ main	history	tools/tests/legacy_authd/sudo_policy.h	文件声明 Historical regr
 main	compatibility	tools/tests/openrc_authorization_test.c	显式使用已发布旧 OpenRC 服务名测试授权/参数注入，服务脚本仍有旧转发入口。
 main	history	tools/tests/pam_runtime_probe.c	退役 authd.sock 的独立旧 PAM 原型参考 fixture；独立环境变量隔离键
 main	compatibility	tools/tests/password_policy_runtime_probe.c	存在旧 authd 才等待旧 socket；PAM pam_leonos_password.so 为冻结模块文件名。
-main	compatibility	tools/tests/privilege_negatives_probe.c	冻结 proc LeonOSFlags 字段及历史 separation 来源说明
 main	compatibility	tools/tests/storage_upstream_guest.c	使用旧 leonos-grub-installer 和旧 ESP payload 输入验证存储命令兼容复制。
 main	compatibility	userland/apps/apiapp/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/browser/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	history	userland/apps/desktop/autospawn.c	注释引用既有 ntclks separation M5 历史架构阶段
-main	compatibility	userland/apps/desktop/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/device-agent/main.c	/proc/leonos-drivers 是冻结运行时接口值
 main	compatibility	userland/apps/devmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/downloadmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
@@ -261,33 +253,27 @@ main	compatibility	userland/fastfetch/hyfetch.json	现有用户 Fastfetch/Hyfetc
 main	compatibility	userland/fastfetch/leonos-ascii.txt	现有 Fastfetch/Hyfetch 配置依赖的 ASCII 文件名；文本本体未命中旧名
 main	compatibility	userland/musl-gcc/launcher.c	旧 leonos-musl-cc 启动名输入回退到 gcc
 main	compatibility	userland/pam/pam_leonos_password.c	仅已发布 pam_leonos_password 模块源文件名；内容无旧品牌
-main	compatibility	userland/portablegl/reliefos_pgl.c	exports legacy PGL ELF aliases
 main	compatibility	userland/runtime/include/leonos/app.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/blockdev.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/devmand.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/devmgr_service.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/environment.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/gpu_sdk.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-main	compatibility	userland/runtime/include/leonos/gui.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/inputm.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/inputmd.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/launch.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/launch_result.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/layout.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-main	compatibility	userland/runtime/include/leonos/mouse.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/net_service.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/openrc.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/pam_session.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-main	compatibility	userland/runtime/include/leonos/pgl.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/sessiond.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/stdio.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/sudo.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/syscall.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/text_input.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/tls.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-main	compatibility	userland/runtime/include/leonos/ui.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/unix_ipc.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-main	compatibility	userland/runtime/include/leonos/windowd.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos_mbedtls_config.h	旧 mbedTLS 配置头转发 canonical 并给旧 time 宏别名
 main	compatibility	userland/runtime/include/ncurses.h	canonical guard/库说明已为 RELIEFOS/libreliefos；仅 leonos_curses_window 旧公开类型宏别名。
 main	compatibility	userland/runtime/include/reliefos/unix_ipc.h	frozen task 6 guest socket paths
@@ -318,19 +304,7 @@ main	compatibility	userland/runtime/src/syscall.S	汇编 .set 为旧 leonos_rt_s
 main	compatibility	userland/runtime/src/tar.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
 main	compatibility	userland/runtime/src/text_encoding.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
 main	compatibility	userland/runtime/src/tls.c	旧 leonos_* 已发布 ELF alias 符号，转发到当前 reliefos_* 实现
-main	compatibility	userland/runtime/src/ui.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_edit.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_input.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_listview.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_surface.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_tabs.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_text.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_theme.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_treeview.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_value_inputs.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/ui_widgets.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
 main	compatibility	userland/runtime/src/unix_ipc.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/wind.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
 main	compatibility	userland/sqlite/leonos_sqlite_vfs.c	仅文件名与 .zName="leonos" 为已注册 SQLite VFS 标识；私有 C 类型/函数已迁 reliefos。
 main	compatibility	userland/storage/leonos-apk-update	旧脚本名入口与旧 world/package prefix 显式迁到新包，不能清零升级识别
 main	compatibility	third_party/doomgeneric/README.leonos.md	保留既有端口说明文件名；当前标题正文已 ReliefOS
@@ -360,3 +334,5 @@ main	compatibility	Documentation/userspace-api/abi.rst	旧 SONAME、转发头和
 main	compatibility	Documentation/userspace-api/locale.rst	现行 gettext leonos domain 与 MO 文件名保持字节兼容
 main	compatibility	Documentation/process/assets.rst	历史来源渲染器文件名用于资产来源说明
 main	history	Documentation/releases/5.1.2.rst	已发布 5.1.2 正文的独立 RST 归档，外部标签链接保持历史原值
+main	compatibility	tests/build/test-x11-only.sh	负向检查退休的旧窗口头与协议服务不存在，不提供兼容实现。
+main	compatibility	userland/runtime/src/fb.c	既有 fbdev ELF 别名移出已删除的窗口传输，指向同一个独立设备实现。

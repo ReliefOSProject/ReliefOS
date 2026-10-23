@@ -1,6 +1,5 @@
-"""Test the SDK header boundary, task-manager GPU sampler and glxgears."""
+"""Test the SDK header boundary and native task-manager GPU sampler."""
 from pathlib import Path
-import os
 import subprocess
 import tempfile
 import unittest
@@ -27,17 +26,6 @@ class GpuAbiTests(unittest.TestCase):
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=30)
 
-    def test_gears_backend(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-gears-source-") as tmp:
-            upstream = ROOT / "third_party/portablegl/examples/classic/gears.c"
-            source = upstream.read_text()
-            marker = "#define PORTABLEGL_IMPLEMENTATION"
-            self.assertEqual(source.count(marker), 1)
-            (Path(tmp) / "gears-upstream.c").write_text(
-                source.replace(marker, "/* Test uses the existing PortableGL API. */", 1))
-            env = dict(os.environ, GLXGEARS_GENERATED_DIR=tmp)
-            subprocess.run(["sh", "userland/apps/glxgears/tests/run_host_tests.sh"],
-                           cwd=ROOT, env=env, check=True, timeout=60)
 
 
 if __name__ == "__main__":

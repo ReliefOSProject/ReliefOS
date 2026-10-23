@@ -69,7 +69,6 @@ for path in \
     usr/lib/reliefos/xorg-tty-wrapper \
     usr/lib/reliefos/xdm-session \
     usr/lib/reliefos/xdm-setup \
-    usr/lib/libportablegl.so.1 \
     usr/share/reliefmath \
     usr/share/licenses/reliefmath \
     usr/share/mime/packages/reliefmath.xml \
@@ -100,8 +99,6 @@ while IFS= read -r app || [ -n "$app" ]; do
     esac
     remove_app "$app"
 done <"$fltk_apps"
-for app in glxgears portablegl; do
-    remove_app "$app"
-done
+
 
 printf '%s\n' console >"$marker"

@@ -27,36 +27,33 @@ set_option() {
 
 # A dependent build is enabled by native Kconfig; an entry cannot outlive its
 # image member, even if an old config explicitly requested the entry.
-set_option CONFIG_RELIEFOS_COMPONENT_APP_TASKMGR_BUILD y
-set_option CONFIG_RELIEFOS_COMPONENT_APP_SERVICEMGR_BUILD n
-set_option CONFIG_RELIEFOS_COMPONENT_APP_TASKMGR_IMAGE n
-set_option CONFIG_RELIEFOS_COMPONENT_APP_TASKMGR_ENTRY y
+set_option CONFIG_RELIEFOS_COMPONENT_APP_RELIEFMAIL_BUILD y
+set_option CONFIG_RELIEFOS_COMPONENT_LIB_SQLITE_BUILD n
+set_option CONFIG_RELIEFOS_COMPONENT_APP_RELIEFMAIL_IMAGE n
+set_option CONFIG_RELIEFOS_COMPONENT_APP_RELIEFMAIL_ENTRY y
 make -s -C "$src" O="$work/out" olddefconfig
 make -s -C "$src" O="$work/out" config-sync
-grep -qx 'CONFIG_RELIEFOS_COMPONENT_APP_SERVICEMGR_BUILD=y' "$config"
-if grep -qx 'CONFIG_RELIEFOS_COMPONENT_APP_TASKMGR_ENTRY=y' "$config"; then
+grep -qx 'CONFIG_RELIEFOS_COMPONENT_LIB_SQLITE_BUILD=y' "$config"
+if grep -qx 'CONFIG_RELIEFOS_COMPONENT_APP_RELIEFMAIL_ENTRY=y' "$config"; then
     fail 'native Kconfig kept an entry for an excluded image member'
 fi
 tool=$work/out/host/bin/reliefos-components
 "$tool" --input "$src/configs/components.toml" --config "$config" \
     --output "$work/selected.mk" --metadata "$work/selected.tsv"
-awk -F '\t' '$1=="taskmgr" {found=1;if($3!=1 || $4!=0 || $5!=0)exit 1} END{if(!found)exit 1}' "$work/selected.tsv"
+awk -F '\t' '$1=="reliefmail" {found=1;if($3!=1 || $4!=0 || $5!=0)exit 1} END{if(!found)exit 1}' "$work/selected.tsv"
 
 # Obsolete SDK and unsupported library image/entry keys must not remain a
 # second configuration interface behind the native frontend.
 cat > "$work/obsolete.config" <<'CONFIG'
-CONFIG_RELIEFOS_COMPONENT_APP_HELLO_SDK=y
+CONFIG_RELIEFOS_COMPONENT_APP_MEMTEST_SDK=y
 CONFIG_RELIEFOS_COMPONENT_LIB_NCURSES_BUILD=y
 # CONFIG_RELIEFOS_COMPONENT_LIB_NCURSES_SDK is not set
 CONFIG_RELIEFOS_COMPONENT_LIB_NCURSES_ENTRY=y
-CONFIG_RELIEFOS_COMPONENT_LIB_STARDUSTUI_BUILD=y
-CONFIG_RELIEFOS_COMPONENT_LIB_STARDUSTUI_IMAGE=y
 CONFIG
 "$tool" --input "$src/configs/components.toml" --config "$work/obsolete.config" \
     --output "$work/obsolete.mk" --metadata "$work/obsolete.tsv"
-awk -F '\t' '$1=="hello" {found=1;if($6!=0)exit 1} END{if(!found)exit 1}' "$work/obsolete.tsv"
+awk -F '\t' '$1=="memtest" {found=1;if($6!=0)exit 1} END{if(!found)exit 1}' "$work/obsolete.tsv"
 awk -F '\t' '$1=="ncurses" {found=1;if($5!=0 || $6!=1)exit 1} END{if(!found)exit 1}' "$work/obsolete.tsv"
-awk -F '\t' '$1=="stardustui" {found=1;if($4!=0 || $5!=0)exit 1} END{if(!found)exit 1}' "$work/obsolete.tsv"
 
 cp "$config" "$work/before"
 make -s -C "$src" O="$work/out" olddefconfig

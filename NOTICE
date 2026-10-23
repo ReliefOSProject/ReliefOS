@@ -90,10 +90,6 @@ Data, dictionaries, and visual resources
   are subject to the applicable Microsoft license terms. They are not covered
   by the root LICENSE; verify redistribution rights before publishing
   an image containing them.
-* Metro desktop wallpaper: NASA Image and Video Library asset PIA18033.
-  Source and credit are recorded in
-  system/resources/wallpaper-metro.source.txt. Use is subject to NASA media
-  usage guidance and applicable trademark restrictions.
 * Mozilla CA root certificates distributed as the curl CA Extract:
   system/certs/cacert.pem. The file contains Mozilla certificate data and its
   source, conversion, date, and checksum comments. See

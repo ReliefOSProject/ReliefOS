@@ -155,14 +155,12 @@ P_LIBRELIEFOS = "/usr/lib/reliefos/libreliefos.so.2"
 # Configuration files.
 P_RELIEFOS_CONF = P_ETC_RELIEFOS + "/leonos.conf"
 P_DISPLAY_CONF = P_ETC_RELIEFOS + "/display.conf"
-P_TASKBAR_CFG = P_ETC_RELIEFOS + "/taskbar.cfg"
 P_NETWORK_CONF = P_ETC_RELIEFOS + "/network.conf"
 P_NETWORK_BAK = P_ETC_RELIEFOS + "/network.conf.bak"
 P_NETWORK_TMP = P_ETC_RELIEFOS + "/network.conf.tmp"
 P_LOCALE_CONF = P_ETC_RELIEFOS + "/locale.conf"
 P_ENVIRONMENT_CONF = P_ETC_RELIEFOS + "/environment.conf"
 P_FILEASSOC_CFG = P_ETC_RELIEFOS + "/fileassoc.cfg"
-P_DESKTOP_ENTRIES_CONF = P_ETC_RELIEFOS + "/desktop-entries.conf"
 P_LESSKEY = P_ETC_RELIEFOS + "/lesskey"
 
 # Persistent state and volatile runtime state.

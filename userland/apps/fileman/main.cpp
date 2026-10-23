@@ -63,7 +63,7 @@ int file_columns[2];
 struct ToolbarAction { Fl_Button *button; uint32_t action; };
 ToolbarAction toolbar_actions[8];
 unsigned toolbar_action_count;
-struct reliefos_ui_tree_item tree_items[FILEMAN_TREE_MAX_NODES];
+struct fileman_tree_item tree_items[FILEMAN_TREE_MAX_NODES];
 uint32_t tree_count;
 int updating;
 
@@ -839,8 +839,8 @@ void refresh_tree()
     folders->format_char(0);
     for (uint32_t i = 0; i < tree_count; ++i) {
         char line[RELIEFOS_FS_NAME_LEN + 512];
-        const char *marker = tree_items[i].flags & RELIEFOS_UI_TREE_LEAF ? " " :
-            (tree_items[i].flags & RELIEFOS_UI_TREE_EXPANDED ? "-" : "+");
+        const char *marker = tree_items[i].flags & FILEMAN_TREE_LEAF ? " " :
+            (tree_items[i].flags & FILEMAN_TREE_EXPANDED ? "-" : "+");
         unsigned indent = tree_items[i].depth * 2U;
         if (indent > sizeof(line) - 4U) indent = sizeof(line) - 4U;
         memset(line, ' ', indent);
@@ -1025,14 +1025,14 @@ void show_context_menu()
 {
     if (!context_menu) return;
     context_menu->clear();
-    struct reliefos_ui_context_menu_item items[FILEMAN_CONTEXT_MENU_COUNT];
+    struct fileman_context_menu_item items[FILEMAN_CONTEXT_MENU_COUNT];
     build_context_menu_items(items, FILEMAN_CONTEXT_MENU_COUNT);
     for (uint32_t i = 0; i < FILEMAN_CONTEXT_MENU_COUNT; ++i) {
-        if (items[i].flags & RELIEFOS_UI_MENU_SEPARATOR) {
+        if (items[i].flags & FILEMAN_MENU_SEPARATOR) {
             if (i) context_menu->add(" ", 0, NULL, NULL, FL_MENU_DIVIDER | FL_MENU_INACTIVE);
             continue;
         }
-        int flags = items[i].flags & RELIEFOS_UI_MENU_DISABLED ? FL_MENU_INACTIVE : 0;
+        int flags = items[i].flags & FILEMAN_MENU_DISABLED ? FL_MENU_INACTIVE : 0;
         context_menu->add(items[i].label, 0, NULL,
                           (void *)(uintptr_t)items[i].id, flags);
     }
@@ -1253,10 +1253,8 @@ extern "C" void show_details_selected(void)
     show_details();
 }
 
-extern "C" void present_fileman(uint32_t window_id, struct reliefos_ui_surface *ui)
+extern "C" void fileman_refresh_view(void)
 {
-    (void)window_id;
-    (void)ui;
     update_status();
     // Progress is called inside synchronous C file operations. Dispatching
     // input here could re-enter them and change their selection/path state.
@@ -1271,7 +1269,6 @@ int main(int argc, char **argv)
     fileman_tree_reset();
     file_list.selected = -1;
     file_list.visible_rows = 24;
-    fileman_window_id = 1;
     const char *initial = argc > 1 ? argv[1] : (home_path[0] ? home_path : "/");
     if (navigate_to_path(initial) < 0) (void)navigate_to_path("/");
     (void)fileman_tree_toggle(1);

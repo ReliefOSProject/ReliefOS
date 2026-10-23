@@ -60,9 +60,6 @@ SDK_LICENSES: dict[str, tuple[str, ...]] = {
     "libpng.a": ("THIRD_PARTY/LIBPNG-LICENSE",),
     "sqlite.a": ("THIRD_PARTY/SQLITE-LICENSE",),
     "sqlite.so.3": ("THIRD_PARTY/SQLITE-LICENSE",),
-    "libstardustui.a": ("THIRD_PARTY/STARDUSTUI-LICENSE",),
-    "libportablegl.a": ("THIRD_PARTY/PORTABLEGL-LICENSE",),
-    "libportablegl.so.1": ("THIRD_PARTY/PORTABLEGL-LICENSE",),
 }
 
 

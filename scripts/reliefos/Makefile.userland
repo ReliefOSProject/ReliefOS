@@ -13,7 +13,7 @@ include $(RELIEFOS_COMPONENT_MK)
 endif
 endif
 
-USERLAND_EXTERNAL_APPS := fastfetch pleditor stardusthello stardustlayout stardustshowcase
+USERLAND_EXTERNAL_APPS := fastfetch pleditor
 USERLAND_APPS := $(filter-out $(USERLAND_EXTERNAL_APPS),$(RELIEFOS_COMPONENT_APPS))
 USERLAND_DIR := $(O)/userland
 USERLAND_FLAGS := $(RUNTIME_FLAGS) -fPIE -nostdinc -isystem $(if $(RELIEFOS_PASSIVE),deferred,$(shell $(TARGET_CC) -print-resource-dir 2>/dev/null))/include -D_POSIX_C_SOURCE=200809L
@@ -47,11 +47,7 @@ USERLAND_DEPS_osver += $(BUILD_INFO_HEADER)
 USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric -I$(AUDIO_OPL_ROOT)/usr/include
 USERLAND_LIBS_doom += $(AUDIO_OPL_ROOT)/usr/lib/libopl3.so.1 $(RUNTIME_BUILTINS)
 USERLAND_DEPS_doom += $(upstream_nuked-opl3_products)
-USERLAND_EXTRA_mp3play := -I$(RELIEFOS_SRC)/third_party/minimp3
 USERLAND_EXTRA_reliefplayer := -I$(RELIEFOS_SRC)/third_party/minimp3
-USERLAND_EXTRA_glxgears = -I$(RELIEFOS_SRC)/third_party/portablegl -I$(RELIEFOS_SRC)/userland/apps/glxgears -I$(dir $(GLXGEARS_SOURCE))
-USERLAND_LIBS_glxgears = $(PORTABLEGL_SO)
-USERLAND_DEPS_glxgears = $(GLXGEARS_SOURCE)
 
 # The historical port-script compiler flags for pleditor are intentionally
 # retained. Only the transform/copy stage stays in the adapter; Kbuild compiles
@@ -60,7 +56,7 @@ USERLAND_APP_FLAGS_pleditor := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_F
 
 USERLAND_DOOM_EXCLUDE := doomgeneric_allegro.c doomgeneric_emscripten.c doomgeneric_linuxvt.c doomgeneric_sdl.c doomgeneric_soso.c doomgeneric_sosox.c doomgeneric_win.c doomgeneric_xlib.c i_allegromusic.c i_allegrosound.c i_sdlsound.c i_sdlmusic.c i_cdmus.c mus2mid.c
 
-USERLAND_KBUILD_APPS := $(sort $(USERLAND_APPS) pleditor stardusthello stardustlayout stardustshowcase gptinit motd dynlinkerror bootinstall)
+USERLAND_KBUILD_APPS := $(sort $(USERLAND_APPS) pleditor gptinit motd bootinstall)
 define RELIEFOS_APP_KBUILD_CAPTURE
 RELIEFOS_APP_OBJECTS :=
 RELIEFOS_APP_C_OBJECTS :=
@@ -76,7 +72,6 @@ $(foreach app,$(USERLAND_KBUILD_APPS),$(eval $(call RELIEFOS_APP_KBUILD_CAPTURE,
 RELIEFOS_CAPTURE_APP_KBUILD :=
 obj-y += $(addprefix userland/apps/,$(addsuffix /,$(USERLAND_KBUILD_APPS)))
 
-USERLAND_CXX_EXTRA_glxgears :=
 
 # Each app directory compiles its own Kbuild object list. The directory archive
 # is only a freshness edge: final executables preserve the former direct-object
@@ -94,7 +89,6 @@ targets += $(3)
 app-$(1): $(3)
 endef
 
-include $(RELIEFOS_SRC)/scripts/reliefos/Makefile.components.graphics
 include $(RELIEFOS_SRC)/scripts/reliefos/Makefile.components.reliefmath
 # GNU make does not treat names passed to a plain export directive as a glob.
 # Export each selected app's context explicitly so recursive Kbuild sees its
@@ -114,18 +108,6 @@ userland-prune:
 	$(Q)$(foreach app,$(RELIEFOS_DISABLED_APPS),rm -f $(USERLAND_DIR)/$(app).elf;) :
 userland: userland-prune $(addprefix $(USERLAND_DIR)/,$(addsuffix .elf,$(RELIEFOS_COMPONENT_APPS))) $(USERLAND_DIR)/bootinstall.elf
 installer-userland: $(O)/userland-installer/gptinit.elf
-
-# Loader failures must still display a GUI when a shared library is absent.
-# Keep this helper fully static, with the same mimalloc and musl startup policy.
-DYNLINKERROR_OBJ := $(O)/userland/apps/dynlinkerror/main.o
-DYNLINKERROR_BUILTIN := $(O)/userland/apps/dynlinkerror/built-in.a
-userland/apps/dynlinkerror: $(AUTOCONF_H) $(MUSL_STAMP) $(PNG_CONFIG) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID) $(RELIEFOS_AR_ID)
-quiet_cmd_reliefos_dynlinkerror = LD      $@
-      cmd_reliefos_dynlinkerror = $(TARGET_LD) --gc-sections -z max-page-size=0x1000 $(RELIEFOS_LINK_POLICY_FLAGS) $(USERLAND_LDFLAGS) -static --image-base=0x4000000 -o $@.tmp $(MUSL_SYSROOT)/lib/crt1.o $(MUSL_SYSROOT)/lib/crti.o $(DYNLINKERROR_OBJ) -L$(MUSL_SYSROOT)/lib $(MUSL_SYSROOT)/lib/mimalloc.o --start-group $(RUNTIME_ARCHIVE) $(RUNTIME_BUILTINS) -lc --end-group $(MUSL_SYSROOT)/lib/crtn.o; mv $@.tmp $@
-$(USERLAND_DIR)/dynlinkerror.elf: $(DYNLINKERROR_BUILTIN) $(RUNTIME_ARCHIVE) $(RUNTIME_BUILTINS) $(MUSL_SYSROOT)/lib/crt1.o $(MUSL_SYSROOT)/lib/crti.o $(MUSL_SYSROOT)/lib/crtn.o $(MUSL_SYSROOT)/lib/libc.a $(MUSL_SYSROOT)/lib/mimalloc.o $(RELIEFOS_LD_ID) FORCE
-	$(call if_changed,reliefos_dynlinkerror)
-targets += $(USERLAND_DIR)/dynlinkerror.elf
-userland: $(USERLAND_DIR)/dynlinkerror.elf
 
 # PAM helper: ordinary musl/POSIX process, without a desktop component entry.
 $(eval $(call RELIEFOS_APP,motd,motd,$(USERLAND_DIR)/motd.elf,$(AUTOCONF_H),))

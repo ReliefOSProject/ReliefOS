@@ -20,7 +20,7 @@
 #define RELIEFOS_ASSOC_CONFIG_MAX 1024U
 #define RELIEFOS_SHORTCUT_MAX_BYTES 384U
 #define RELIEFOS_SHORTCUT_MAX_DEPTH 8U
-#define RELIEFOS_TERMINAL_APP_PATH RELIEFOS_LAYOUT_RELIEFOS_APPS "/terminal/terminal.elf"
+#define RELIEFOS_TERMINAL_APP_PATH "/usr/bin/st"
 
 static int launch_fail(int code)
 {
@@ -148,11 +148,6 @@ static int ends_with_ignore_case(const char *text, const char *suffix)
     return text_eq_ignore_case(text + text_n - suffix_n, suffix);
 }
 
-static int is_system_desktop_path(const char *path)
-{
-    return text_eq_ignore_case(path, RELIEFOS_LAYOUT_RELIEFOS_APPS "/desktop/desktop.elf");
-}
-
 static const char *path_basename(const char *path)
 {
     const char *base = path;
@@ -205,7 +200,7 @@ static int launch_in_terminal(char *argv[])
         terminal = terminal_path;
     }
     terminal_argv[0] = (char *)terminal;
-    terminal_argv[1] = "--run";
+    terminal_argv[1] = "-e";
     while (argv[argc]) {
         if (argc >= RELIEFOS_LAUNCH_MAX_ARGS) {
             return launch_fail(RELIEFOS_LAUNCH_ERR_TOO_MANY_ARGS);
@@ -968,11 +963,7 @@ static int reliefos_launch_argv_depth(char *argv[], uint32_t depth)
         if (app_requires_terminal(path)) {
             return launch_in_terminal(argv);
         }
-        int ret = reliefos_spawn_argv(path, argv);
-        if (ret == -RELIEFOS_EEXIST && is_system_desktop_path(path)) {
-            return launch_fail(RELIEFOS_LAUNCH_ERR_ALREADY_RUNNING);
-        }
-        return ret;
+        return reliefos_spawn_argv(path, argv);
     }
     if (reliefos_stat_legacy(path, &st) < 0) {
         return launch_fail(RELIEFOS_LAUNCH_ERR_NOT_FOUND);

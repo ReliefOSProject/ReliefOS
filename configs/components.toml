@@ -18,40 +18,14 @@ api = false
 # retained metadata; the current SDK is a fixed sysroot, not a menu selection.
 
 [[components]]
-id = "imd"
-symbol = "APP_IMD"
-label = "Input method daemon"
+id = "reliefaskpass"
+symbol = "APP_RELIEFASKPASS"
+label = "X11 authentication prompt"
 category = "Core services"
 kind = "system-app"
-default = false
+default = true
 required = false
-stage = false
-entry = false
-sdk = false
-api = false
-
-[[components]]
-id = "windowd"
-symbol = "APP_WINDOWD"
-label = "Window server daemon"
-category = "Core services"
-kind = "system-app"
-default = false
-required = false
-stage = false
-entry = false
-sdk = false
-api = false
-
-[[components]]
-id = "desktop"
-symbol = "APP_DESKTOP"
-label = "Desktop window server"
-category = "Core services"
-kind = "system-app"
-default = false
-required = false
-stage = false
+stage = true
 entry = false
 sdk = false
 api = false
@@ -120,78 +94,12 @@ stage = true
 entry = true
 sdk = false
 api = false
-depends = ["servicemgr"]
-
-[[components]]
-id = "settings"
-symbol = "APP_SETTINGS"
-label = "Settings"
-category = "Desktop applications"
-kind = "system-app"
-default = true
-required = true
-stage = true
-entry = true
-sdk = false
-api = false
-
-[[components]]
-id = "terminal"
-symbol = "APP_TERMINAL"
-label = "Terminal"
-category = "Developer applications"
-kind = "system-app"
-default = true
-required = true
-stage = true
-entry = true
-sdk = false
-api = false
-
-[[components]]
-id = "run"
-symbol = "APP_RUN"
-label = "Run dialog"
-category = "Desktop applications"
-kind = "system-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
 
 [[components]]
 id = "osver"
 symbol = "APP_OSVER"
 label = "System information"
 category = "Desktop applications"
-kind = "system-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-
-[[components]]
-id = "netctl"
-symbol = "APP_NETCTL"
-label = "Network controller"
-category = "Network and multimedia"
-kind = "system-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-
-[[components]]
-id = "servicemgr"
-symbol = "APP_SERVICEMGR"
-label = "Service control"
-category = "System applications"
 kind = "system-app"
 default = true
 required = false
@@ -214,32 +122,6 @@ sdk = false
 api = false
 
 [[components]]
-id = "devmgr"
-symbol = "APP_DEVMGR"
-label = "Device manager"
-category = "System applications"
-kind = "system-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-
-[[components]]
-id = "drvmgr"
-symbol = "APP_DRVMGR"
-label = "Driver manager"
-category = "System applications"
-kind = "system-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-
-[[components]]
 id = "driverinfo"
 symbol = "APP_DRIVERINFO"
 label = "Driver information"
@@ -251,34 +133,6 @@ stage = true
 entry = true
 sdk = false
 api = false
-
-[[components]]
-id = "sysconfdialog"
-symbol = "APP_SYSCONFDIALOG"
-label = "System configuration dialog"
-category = "System applications"
-kind = "system-app"
-default = true
-required = false
-stage = true
-entry = false
-sdk = false
-api = false
-
-[[components]]
-id = "apiapp"
-symbol = "APP_APIAPP"
-label = "API installer"
-category = "System applications"
-kind = "system-app"
-default = true
-required = true
-stage = true
-entry = false
-sdk = false
-api = false
-open_with = true
-extensions = [".api"]
 
 [[components]]
 id = "sudo"
@@ -319,60 +173,6 @@ stage = true
 entry = false
 sdk = false
 api = false
-
-[[components]]
-id = "hello"
-symbol = "APP_HELLO"
-label = "Hello"
-category = "Developer applications"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-
-[[components]]
-id = "uidemo"
-symbol = "APP_UIDEMO"
-label = "UI demo"
-category = "Developer applications"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-
-[[components]]
-id = "cjktest"
-symbol = "APP_CJKTEST"
-label = "CJK test"
-category = "Developer applications"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = false
-sdk = false
-api = false
-
-[[components]]
-id = "notepad"
-symbol = "APP_NOTEPAD"
-label = "Notepad"
-category = "Desktop applications"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-open_with = true
-extensions = [".txt", ".md", ".log", ".cfg", ".conf", ".ini"]
 
 [[components]]
 id = "calc"
@@ -614,32 +414,6 @@ sdk = false
 api = false
 
 [[components]]
-id = "bugtest"
-symbol = "APP_BUGTEST"
-label = "Bug test"
-category = "Developer applications"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = false
-sdk = false
-api = false
-
-[[components]]
-id = "httpget"
-symbol = "APP_HTTPGET"
-label = "HTTP client"
-category = "Network and multimedia"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = false
-sdk = false
-api = false
-
-[[components]]
 id = "rprfetch"
 symbol = "APP_RPRFETCH"
 label = "RPR HTTPS fetch helper"
@@ -651,34 +425,6 @@ stage = true
 entry = false
 sdk = false
 api = false
-
-[[components]]
-id = "downloadmgr"
-symbol = "APP_DOWNLOADMGR"
-label = "Download manager"
-category = "Network and multimedia"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-
-[[components]]
-id = "browser"
-symbol = "APP_BROWSER"
-label = "Browser"
-category = "Network and multimedia"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-open_with = true
-extensions = [".html", ".htm"]
 
 [[components]]
 id = "imageview"
@@ -755,62 +501,6 @@ open_with = true
 extensions = [".wav"]
 
 [[components]]
-id = "mp3play"
-symbol = "APP_MP3PLAY"
-label = "MP3 player"
-category = "Network and multimedia"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = false
-sdk = false
-api = false
-open_with = true
-extensions = [".mp3"]
-
-[[components]]
-id = "oshlp"
-symbol = "APP_OSHLP"
-label = "Help viewer"
-category = "Desktop applications"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-open_with = true
-extensions = [".hlp"]
-
-[[components]]
-id = "helloworld"
-symbol = "APP_HELLOWORLD"
-label = "Hello World"
-category = "Developer applications"
-kind = "program-app"
-default = true
-required = false
-stage = false
-entry = false
-sdk = false
-api = false
-
-[[components]]
-id = "guitest"
-symbol = "APP_GUITEST"
-label = "GUI test"
-category = "Developer applications"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = false
-sdk = false
-api = false
-
-[[components]]
 id = "ncurses"
 symbol = "LIB_NCURSES"
 label = "ncurses wide-character terminal library"
@@ -863,48 +553,6 @@ sdk = false
 api = false
 
 [[components]]
-id = "stardusthello"
-symbol = "APP_STARDUSTHELLO"
-label = "StardustUI hello"
-category = "Third-party UI"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = true
-api = false
-depends = ["stardustui"]
-
-[[components]]
-id = "stardustlayout"
-symbol = "APP_STARDUSTLAYOUT"
-label = "StardustUI layout"
-category = "Third-party UI"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = true
-api = false
-depends = ["stardustui"]
-
-[[components]]
-id = "stardustshowcase"
-symbol = "APP_STARDUSTSHOWCASE"
-label = "StardustUI showcase"
-category = "Third-party UI"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = true
-api = false
-depends = ["stardustui"]
-
-[[components]]
 id = "doomlauncher"
 symbol = "APP_DOOMLAUNCHER"
 label = "DOOM launcher"
@@ -932,19 +580,6 @@ sdk = false
 api = false
 
 [[components]]
-id = "oschinpt"
-symbol = "APP_OSCHINPT"
-label = "ReliefOS Chinese Input"
-category = "Input methods"
-kind = "package-app"
-default = true
-required = false
-stage = false
-entry = false
-sdk = false
-api = false
-
-[[components]]
 id = "busybox"
 symbol = "TOOL_BUSYBOX"
 label = "BusyBox"
@@ -955,20 +590,6 @@ required = false
 stage = true
 entry = false
 sdk = false
-api = false
-
-[[components]]
-id = "stardustui"
-symbol = "LIB_STARDUSTUI"
-label = "StardustUI library"
-category = "Third-party UI"
-kind = "library"
-default = true
-required = false
-stage = false
-image_supported = false
-entry = false
-sdk = true
 api = false
 
 [[components]]
@@ -983,33 +604,6 @@ stage = true
 entry = false
 sdk = true
 api = false
-
-[[components]]
-id = "portablegl"
-symbol = "LIB_PORTABLEGL"
-label = "PortableGL 3D renderer"
-category = "Third-party libraries"
-kind = "library"
-default = true
-required = false
-stage = true
-entry = false
-sdk = true
-api = false
-
-[[components]]
-id = "glxgears"
-symbol = "APP_GLXGEARS"
-label = "PortableGL renderer test"
-category = "Developer applications"
-kind = "program-app"
-default = true
-required = false
-stage = true
-entry = true
-sdk = false
-api = false
-depends = ["portablegl"]
 
 [[components]]
 id = "leonmmcoset"
@@ -1033,19 +627,6 @@ kind = "program-app"
 default = true
 required = false
 stage = true
-entry = false
-sdk = false
-api = false
-
-[[components]]
-id = "sessiond"
-symbol = "APP_SESSIOND"
-label = "Desktop session startup protocol"
-category = "Core services"
-kind = "system-app"
-default = false
-required = false
-stage = false
 entry = false
 sdk = false
 api = false

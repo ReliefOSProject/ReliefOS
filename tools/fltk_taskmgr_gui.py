@@ -315,13 +315,11 @@ def _performance_fields(support: Any, frame: Any,
 
 def _startup_regions(window_width: int) -> dict[str, tuple[int, int, int, int]]:
     """Return inset label crops for the startup controls from layout_ui."""
-    manager_x = window_width - 214
     # Inset each crop from the button frame so disabled-state bevels do not
     # enter OCR; retain the complete centered label area.
     return {
         "enable": (26, 110, 84, 22),
         "remove": (135, 111, 74, 20),
-        "service_manager": (manager_x + 6, 70, 190, 20),
         "tab_strip": (12, 34, max(1, window_width - 24), 22),
     }
 
@@ -867,7 +865,7 @@ def exercise_taskmgr(probe: Any, geometry: tuple[int, int, int, int],
             maxcolors=startup_list_crop.width * startup_list_crop.height)
         startup_regions = _startup_regions(width)
         startup_control_text: dict[str, str] = {}
-        for name in ("enable", "remove", "service_manager", "tab_strip"):
+        for name in ("enable", "remove", "tab_strip"):
             region = support.client_crop(
                 startup_frame, x + startup_regions[name][0],
                 y + startup_regions[name][1], startup_regions[name][2],
@@ -886,8 +884,6 @@ def exercise_taskmgr(probe: Any, geometry: tuple[int, int, int, int],
                 support, startup_control_text["tab_strip"], "启动应用程序"),
             "enable": _normalized(support, startup_control_text["enable"], "启用"),
             "remove": _normalized(support, startup_control_text["remove"], "删除"),
-            "service_manager_button": _normalized(
-                support, startup_control_text["service_manager"], "打开服务管理器"),
             "entry_list_visible": bool(list_colors and len(list_colors) > 1),
         }
         if not all(startup_labels.values()):

@@ -18,7 +18,7 @@ class InstallerLayoutTests(unittest.TestCase):
             for name in ("installer", "busybox"):
                 (apps / f"{name}.elf").write_bytes(b"fixture")
             for name in (
-                "usr/lib/reliefos/apps/dynlinkerror/dynlinkerror.elf",
+                "usr/lib/reliefos/apps/fileman/fileman.elf",
                 "usr/lib/reliefos/libreliefos.so.2",
                 "usr/lib/leonos/libleonos.so.2",
                 "EFI/BOOT/BOOTX64.EFI", "grub/grub.cfg",
@@ -35,6 +35,8 @@ class InstallerLayoutTests(unittest.TestCase):
             self.assertEqual((root / "etc/reliefos/installer-runtime").read_text(), "installer\n")
             self.assertEqual((root / "usr/lib/reliefos/apps/installer/installer.elf").read_bytes(),
                              b"fixture")
+            self.assertEqual((root / "usr/lib/reliefos/apps/fileman/fileman.elf").read_bytes(),
+                             (source / "usr/lib/reliefos/apps/fileman/fileman.elf").read_bytes())
             desktop = root / "usr/share/applications/reliefos-installer.desktop"
             session = root / "usr/lib/reliefos/installer-session"
             self.assertTrue(desktop.is_file(), "live installer desktop entry is missing")
@@ -47,7 +49,7 @@ class InstallerLayoutTests(unittest.TestCase):
             self.assertEqual((root / "usr/lib/leonos/libleonos.so.2").read_bytes(),
                              (source / "usr/lib/leonos/libleonos.so.2").read_bytes())
             self.assertFalse((root / "usr/lib/reliefos/libleonos.so.2").exists())
-            for stale in ("windowd", "desktop", "imd", "sessiond"):
+            for stale in ("windowd", "desktop", "imd", "sessiond", "dynlinkerror"):
                 self.assertFalse((root / "usr/lib/reliefos/apps" / stale).exists(), stale)
             stage_installed_payloads(source, work / "stage")
             for namespace in ("reliefos", "leonos"):

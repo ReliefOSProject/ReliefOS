@@ -56,15 +56,4 @@ int text_input_set_context(const text_input_context_t *context);
 int text_input_get_state(uint32_t uid, text_input_state_t *state);
 int text_input_notify_config(uint32_t uid);
 
-/* GUI integration helpers. */
-int text_input_observe_gui_key(uint32_t window_id, uint8_t *keycode,
-                               uint8_t pressed);
-int text_input_poll_gui_commit(uint32_t window_id);
-int text_input_take_text(char *buffer, uint32_t capacity);
-int text_input_take_key(uint8_t *keycode, uint8_t *pressed);
-void text_input_note_gui_window(uint32_t window_id);
-int text_input_set_current_context(uint32_t flags, int32_t caret_x,
-                                   int32_t caret_y, uint32_t caret_w,
-                                   uint32_t caret_h);
-
 #endif

@@ -48,10 +48,10 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 | 路径 | 职责 |
 | --- | --- |
 | `boot/` | GRUB 配置与 BIOS 模块清单；两平台模块由锁定源码构建。 |
-| `kernel/reliefnt/` | ReliefNT 子仓（gitlink，URL 为 github.com/ReliefOSProject/ReliefNT）：内核核心（调度、内存、ELF 进程、syscall、GUI IPC、网络、驱动管理、权限判定与 `lib/` 内部工具）、`drivers/`、`include/uapi` 与内核侧 `include/reliefnt/`。首次使用执行 `git submodule update --init --recursive`，并在子仓内 `make fetch`（其缓存不入库）。 |
-| `userland/runtime/` | ReliefOS libc、syscall 包装、UI/字体、网络/HTTP/TLS、PTY 等公共实现。 |
-| `userland/apps/` | Ring-3 系统与桌面应用；`desktop/` 是窗口服务器，其他应用为它的客户端。 |
-| `userland/{busybox,stardustui}/` | 第三方软件的 ReliefOS 端口、适配层与构建输入。 |
+| `kernel/reliefnt/` | ReliefNT 子仓（gitlink，URL 为 github.com/ReliefOSProject/ReliefNT）：内核核心（调度、内存、ELF 进程、syscall、网络、驱动管理、权限判定与 `lib/` 内部工具）、`drivers/`、`include/uapi` 与内核侧 `include/reliefnt/`。首次使用执行 `git submodule update --init --recursive`，并在子仓内 `make fetch`（其缓存不入库）。 |
+| `userland/runtime/` | ReliefOS libc、syscall 包装、字体、网络/HTTP/TLS、PTY 等公共实现。 |
+| `userland/apps/` | Ring-3 系统与桌面应用；当前图形应用使用 FLTK/X11；未迁移的旧图形应用源码保留但不构建、不打包。 |
+| `userland/busybox/` 等第三方端口目录 | 第三方软件的 ReliefOS 适配层与构建输入。 |
 | `include/reliefos/` | 公共 C ABI 头文件；旧 `include/leonos/` 转发头保持兼容。 |
 | `system/` | 被 staging 的系统配置、字体、壁纸、证书、图标、应用资源和默认内容。 |
 | `configs/` | 动态组件清单、可提交 build profile 与默认配置。 |
@@ -70,12 +70,11 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 - 内核内部能力按职责落在内核子仓的 `kernel/`、`lib/`、`mm/`、`net/`、
   `fs/`、`block/`、`sound/` 和 `drivers/` 等目录（均相对于 `kernel/reliefnt/`），全部编译进
   kernel.sys；不存在跨模块 callback 表或第二个启动镜像。用户态与内核之间只有
-  syscall/ioctl ABI 和 GUI IPC。职责归属与旧数据格式的兼容策略见
+  syscall/ioctl ABI；图形会话通过 Xorg 的 X11 协议通信。职责归属与旧数据格式的兼容策略见
   `Documentation/userspace-api/abi.rst`。
-- GUI 客户端与 `desktop.elf` 通过 GUI IPC/ioctl 通信，而不是共享窗口服务器
-  的私有像素内存。应用提交自己的缓冲内容；不要把窗口服务器内部 buffer
-  当作公共 ABI。
-- 来宾运行路径使用 Unix 根目录格式，例如 `/usr/lib/reliefos/apps/desktop/desktop.elf`；
+- X11 应用连接 Xorg，由 IceWM 管理窗口。不得恢复已移除的自研窗口服务器、
+  私有窗口 IPC、UI 传输兼容层或按可执行文件 GID 授予服务身份的旧逻辑。
+- 来宾运行路径使用 Unix 根目录格式，例如 `/usr/lib/reliefos/apps/fileman/fileman.elf`；
   仓库源码路径（`system/`、`kernel/reliefnt/drivers/`、`Documentation/`）是构建输入，不等于来宾路径。
   现行 rootfs 契约见 `Documentation/userspace-api/filesystem.rst`。
   相对路径依赖任务当前目录；路径统一使用 Unix 根目录语义。
@@ -88,7 +87,7 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 1. `include/reliefos/*.h`：公共定义、常量、结构布局、权限语义和返回值。
 2. `kernel/reliefnt/kernel/`（内核子仓）：编号、用户范围检查、权限检查、实现和错误路径。
 3. `userland/runtime/include/` 与 `userland/runtime/src/`：声明、包装和实现。
-4. 使用该 API 的系统应用、窗口服务器及相关测试程序。
+4. 使用该 API 的系统应用、Xorg 适配及相关测试程序。
 5. `configs/header-export.list` 白名单与 `headers_install` 导出：SDK/用户态只消费
    导出结果，由 `tools/test_header_export.py` 校验；不维护手工 ABI 镜像副本。
 6. `packages/reliefos-musl-sdk.tar.gz` 装配规则与归属/许可证文本。
@@ -116,30 +115,21 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 
 UI 修改必须横向检查，而不是只改一个应用。典型关联范围包括：
 
-- `userland/apps/desktop/`：窗口管理、桌面、任务栏、开始菜单、状态栏、
-  覆盖层、主题广播、图标和壁纸。
-- `userland/runtime/src/ui*.c` 及公开 UI 头文件：控件、布局、绘制、文字输入、
-  文件选择、窗口协议、主题状态与字体。
+- `system/xorg/`：XDM、IceWM 会话、窗口管理配置、菜单、键位与主题。
+- `userland/apps/fltk_*.h` 及应用的 FLTK 前端：控件、布局、UTF-8、字体与图标。
 - 所有受影响内置应用：窗口尺寸、焦点、键鼠、文本编辑、主题变化事件、
   图标/快捷方式和高 DPI/分辨率边界。
 - `system/` 中的字体、壁纸、BMP/PNG/图标等 staging 资产，以及
-  `tools/prepare_ui_font.py`、`tools/make_app_icons.py` 等生成步骤。
+  `tools/make_app_icons.py` 等生成步骤。
 - 登录、OOBE、Installer 与早期 framebuffer：它们可能使用不同的启动阶段和
   配置读取时机，不能仅以登录后桌面正常就宣布完成。
 
 ### 主题与个性化
 
-- 用户个性化数据属于 `/home/<name>/appearance.conf`；Metro 与 Win95
-  的基础色配置相互独立，不能相互覆盖。
-- `/etc/reliefos/display.conf` 是尚无用户会话时的启动/默认外观，用于早期
-  framebuffer、bugcheck、登录、OOBE 和安装器等场景。它不能替代每用户配置。
-- 修改个性化设置后应立即经 Desktop 发布状态并让已打开应用收到主题变化；
-  不要只写文件、等下次启动才生效。
-- 现有壁纸 BMP 处理有安全上限：最大 1280 x 720，仅接受受支持的未压缩
-  24-bit/32-bit BMP。任何格式、尺寸或缩放策略扩展都需检查解码器、内存占用、
-  绘制与错误显示。
-- TTF/字体加载、壁纸加载、目录扫描和图标读取不得长期阻塞 Desktop 主循环。
-  需要分段、异步或有界处理时，保持 UI 可响应并保留明确的失败状态。
+- IceWM 的用户主题与会话设置位于 `~/.icewm/`，系统默认值来自 `system/xorg/`。
+- FLTK 控件统一使用默认 `gtk+` scheme；优先改善排版，不另造控件主题。
+- 登录、安装器和早期 framebuffer 的显示路径分别验证。不要把登录后 X11 正常
+  当作所有阶段的证明；字体、图标和文件读取不得长期阻塞应用事件循环。
 
 ### 输入、窗口与可访问性
 
@@ -304,7 +294,7 @@ int subsystem_handle(const struct request *request, struct result *out_result);
 - 新功能、公开 API、构建开关、镜像布局或第三方移植发生变化时，更新相关
   `Documentation/`、SDK 说明、示例和归属/许可证文本。文档只能描述
   已确认存在的接口；计划中的接口必须明确标为计划。
-- 日志应使用稳定前缀（例如 `[reliefnt]`，兼容期 `[ntclks]`、`[desktop.elf]`、`[tls]`），包含足够的
+- 日志应使用稳定前缀（例如 `[reliefnt]`，兼容期 `[ntclks]`、`[tls]`），包含足够的
   阶段、返回码和状态来定位问题，但不能泄露令牌、密码、Cookie、私钥或请求体。
 - 对用户的最终交付应优先给出结果，然后列出：修改了什么、关键路径、构建/
   打包/运行验证分别是否完成、已知限制和下一步。默认使用简体中文。

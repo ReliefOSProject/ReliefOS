@@ -1413,8 +1413,7 @@ static int write_target_locale(void)
         ? 0 : -errno;
 }
 
-/* The target keeps the image's display.conf theme= line (stamped from the
- * build configuration); setup does not select or rewrite it. */
+/* Console colors come from the boot payload; setup selects only the locale. */
 static int write_target_preferences(void)
 {
     if (install_mode == INSTALL_MODE_FRESH) {

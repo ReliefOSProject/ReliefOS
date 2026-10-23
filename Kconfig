@@ -29,15 +29,15 @@ config INSTALLER_ROOT_SIZE_MIB
       guest RAM before userspace starts; the image builder may enlarge it to
       fit the runtime. Use sufficient guest RAM (normally at least 2 GiB).
 
-menu "Legacy framebuffer appearance"
+menu "Boot console colors"
 
 comment "XDM and IceWM use their own settings and themes"
 
 choice
-    prompt "Legacy framebuffer theme"
+    prompt "Boot console color palette"
     default VMDK_DEFAULT_THEME_METRO
     help
-      Controls /etc/reliefos/display.conf for retained framebuffer programs.
+      Controls the early kernel console and panic display color palette.
       This does not change the XDM login screen or the IceWM desktop theme.
 
 config VMDK_DEFAULT_THEME_METRO
@@ -48,20 +48,7 @@ config VMDK_DEFAULT_THEME_WIN95
 
 endchoice
 
-choice
-    prompt "Legacy framebuffer wallpaper mode"
-    default VMDK_WALLPAPER_FILL
 
-config VMDK_WALLPAPER_FILL
-    bool "Fill"
-
-config VMDK_WALLPAPER_STRETCH
-    bool "Stretch"
-
-config VMDK_WALLPAPER_CENTER
-    bool "Center"
-
-endchoice
 
 endmenu
 endmenu

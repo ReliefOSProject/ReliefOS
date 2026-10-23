@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Exercise userspace power controls and account-service power dispatch."""
+"""Exercise retained account-service power dispatch fixtures."""
 from pathlib import Path
 import subprocess
 import tempfile
@@ -7,14 +7,6 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 
 with tempfile.TemporaryDirectory(prefix="reliefos-power-") as directory:
-    controls = str(Path(directory) / "controls")
-    subprocess.run([
-        "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-        "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-        "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-        "tools/tests/power_controls_test.c", "-o", controls,
-    ], cwd=ROOT, check=True)
-    subprocess.run([controls], cwd=ROOT, check=True, timeout=10)
     daemon = str(Path(directory) / "authd-power")
     subprocess.run([
         "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",

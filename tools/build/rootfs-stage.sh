@@ -116,7 +116,6 @@ printf '/lib:/usr/local/lib:/usr/lib:/usr/lib/reliefos:/usr/lib/leonos\n' > "$wo
 file "$work/data/ld.path" etc/ld-musl-x86_64.path 0644 musl
 file "$out/generated/system/kerneldebug.sys" usr/lib/reliefos/kerneldebug.sys 0755
 file "$out/userland/motd.elf" usr/lib/reliefos/motd-status 0755 reliefos-base
-file "$out/userland/dynlinkerror.elf" usr/lib/reliefos/apps/dynlinkerror/dynlinkerror.elf 0755 reliefos-apps
 # awk reads TSV without collapsing empty label/extension fields. No data is
 # interpreted as a command; only validated component IDs are used in paths.
 awk -F '\t' -v dir="$work/manifests" -v src="$src" '
@@ -146,8 +145,6 @@ while read -r app entry; do
         file "$src/resources/build-art/app-icons/$app.bmp" "usr/lib/reliefos/apps/$app/$app.bmp" 0644 "$app"
     fi
     case $app in sudo|su) continue ;; esac
-    # Role gid marks are gone with the windowd stack: the kernel keeps its
-    # dormant gid grants but no staged binary is marked any more.
     gid=0
     file "$out/userland/$app.elf" "usr/lib/reliefos/apps/$app/$app.elf" 0755 "$app" unique "$gid"
     file "$work/manifests/$app.ini" "usr/lib/reliefos/apps/$app/manifest.ini" 0644 "$app"
@@ -203,7 +200,6 @@ for spec in 'sqlite sqlite.so.3'; do
     set -- $spec
     if enabled "$1"; then file "$out/userland/$2" "usr/lib/$2" 0755 "$1"; fi
 done
-if enabled portablegl || enabled glxgears; then file "$out/system/lib/libportablegl.so.1" usr/lib/libportablegl.so.1 0755 portablegl; fi
 if enabled fastfetch; then
     file "$src/userland/fastfetch/config.jsonc" etc/fastfetch/config.jsonc 0644 fastfetch
     file "$src/userland/fastfetch/leonos-ascii.txt" usr/share/fastfetch/leonos-ascii.txt 0644 fastfetch
@@ -223,10 +219,8 @@ file "$config" etc/reliefos/leonos.conf
 for source in "$src/system/config"/*; do
     [ "${source##*/}" = display.conf ] || file "$source" "etc/reliefos/${source##*/}" 0644 product-policy override
 done
-awk 'BEGIN{theme="metro";mode="fill"} /^CONFIG_VMDK_DEFAULT_THEME_WIN95=y$/{theme="win95"} /^CONFIG_VMDK_WALLPAPER_STRETCH=y$/{mode="stretch"} /^CONFIG_VMDK_WALLPAPER_CENTER=y$/{mode="center"} END{print "theme="theme;print "wallpaper.mode="mode}' "$config" > "$work/data/display.conf"
+awk 'BEGIN{theme="metro"} /^CONFIG_VMDK_DEFAULT_THEME_WIN95=y$/{theme="win95"} END{print "theme="theme}' "$config" > "$work/data/display.conf"
 file "$work/data/display.conf" etc/reliefos/display.conf
-awk -F '\t' 'BEGIN{print "# Generated from component selection."} $4==1 && $5==0 && $2 ~ /-app$/ {print "hide=/usr/lib/reliefos/apps/"$1"/"$1".elf"}' "$metadata" > "$work/data/desktop-entries.conf"
-file "$work/data/desktop-entries.conf" etc/reliefos/desktop-entries.conf
 locale_name=$(awk -F= 'BEGIN{lang="zh_CN.UTF-8"} /^CONFIG_VMDK_DEFAULT_LANG=/{gsub(/"/,"",$2);lang=$2} END{print lang}' "$config")
 case $locale_name in *[!A-Za-z0-9._@-]*|'') echo 'rootfs-stage: invalid locale name' >&2; exit 2;; esac
 printf 'LANG=%s\nMUSL_LOCPATH=/usr/share/musl/locales\n' "$locale_name" > "$work/data/locale.conf"
@@ -245,26 +239,17 @@ for loc in $(cat "$src/configs/nls/LINGUAS"); do
     done
 done
 file "$src/logo.png" usr/share/reliefos/resources/logo.png
-file "$src/system/resources/mouse.bmp" usr/share/reliefos/resources/mouse.bmp
-file "$src/system/resources/wallpaper-metro.bmp" usr/share/reliefos/resources/wallpaper-metro.bmp
 file "$src/system/certs/cacert.pem" etc/ssl/certs/ca-certificates.crt
 file "$src/system/certs/cacert.pem" usr/share/reliefos/certs/ca-certificates.crt 0644 trust
 file "$src/Documentation/admin-guide/packages.rst" usr/share/doc/reliefos/packages.rst
 file "$src/configs/apk-ownership.json" usr/share/reliefos/apk-ownership.json
-file "$src/third_party/portablegl/LICENSE" usr/share/doc/reliefos/PORTABLEGL-LICENSE
-for name in leonos-metro.ttf leonos-win95.ttf; do file "$out/generated/fonts/$name" "usr/share/fonts/reliefos/$name"; done
 for name in simsun.ttc system.psf; do file "$src/system/fonts/$name" "usr/share/fonts/reliefos/$name"; done
 file "$src/system/fonts/times.ttf" usr/share/fonts/reliefos/times-new-roman.ttf
-for source in "$src/resources/build-art/window-buttons"/*.bmp "$src/resources/build-art/minesweeper"/*.bmp; do file "$source" "usr/share/reliefos/resources/${source##*/}"; done
+for source in "$src/resources/build-art/minesweeper"/*.bmp; do file "$source" "usr/share/reliefos/resources/${source##*/}"; done
 file "$src/test/test.mp3" test/test.mp3
 for app in leonmmcoset xiaobai; do
     if enabled "$app"; then file "$src/userland/apps/$app/$app.png" "usr/lib/reliefos/apps/$app/$app.png" 0644 "$app"; fi
 done
-if enabled stardusthello || enabled stardustlayout || enabled stardustshowcase; then
-    for name in md3-light.theme.json md3-dark.theme.json green_light.theme.json green_dark.theme.json; do
-        file "$src/third_party/stardustui/docs/zh-cn/example/$name" "etc/stardustui/theme/$name" 0644 stardustui
-    done
-fi
 # Compatibility links are explicit overrides of upstream aliases.
 link usr/bin/su ../../bin/su authentication override
 for command in fdisk sfdisk runuser fsck blkid mkfs.ext4 fsck.ext4 mkfs.ext2 fsck.ext2 mkfs.fat fsck.fat mkfs.exfat fsck.exfat leonos-grub-installer; do link "sbin/$command" "../usr/sbin/$command" storage override; done

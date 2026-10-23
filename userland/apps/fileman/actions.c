@@ -77,7 +77,7 @@ void create_new_folder(void)
     char name[RELIEFOS_FS_NAME_LEN] = "New Folder";
     char path[RELIEFOS_FS_PATH_LEN];
     int ret;
-    if (!reliefos_ui_show_input_dialog(T("New Folder"), T("Folder name:"), name, sizeof(name))) {
+    if (!fileman_input_dialog(T("New Folder"), T("Folder name:"), name, sizeof(name))) {
         set_status(T("New folder canceled"));
         return;
     }
@@ -131,7 +131,7 @@ void create_shortcut_for_selected(void)
         return;
     }
     build_child_path(target_path, sizeof(target_path), entries[file_list.selected].name);
-    to_desktop = reliefos_ui_show_confirm_dialog(
+    to_desktop = fileman_confirm_dialog(
         T("Create Shortcut"),
         T("Place shortcut on Desktop? No creates it here."),
         1);
@@ -186,7 +186,7 @@ void rename_selected_entry(void)
         return;
     }
     copy_text(name, sizeof(name), entries[file_list.selected].name);
-    if (!reliefos_ui_show_input_dialog(T("Rename"), T("New name:"), name, sizeof(name))) {
+    if (!fileman_input_dialog(T("Rename"), T("New name:"), name, sizeof(name))) {
         set_status(T("Rename canceled"));
         return;
     }
@@ -318,7 +318,7 @@ void extract_tar_with_path(const char *tar_path)
             set_status(T("Cannot create extraction folder"));
             return;
         }
-        if (!reliefos_ui_show_confirm_dialog(T("Extract tar"),
+        if (!fileman_confirm_dialog(T("Extract tar"),
                 T("The extraction folder exists. Existing files may be replaced. Continue?"), 0)) {
             set_status(T("Extraction canceled"));
             return;
@@ -369,7 +369,7 @@ void compress_selected_to_tar(void)
     }
     struct stat existing;
     if (lstat(tar_path, &existing) == 0 &&
-        !reliefos_ui_show_confirm_dialog(T("Archive Conflict"), T("The archive exists. Replace it?"), 0)) {
+        !fileman_confirm_dialog(T("Archive Conflict"), T("The archive exists. Replace it?"), 0)) {
         set_status(T("Compression canceled"));
         return;
     }

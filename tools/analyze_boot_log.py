@@ -79,7 +79,7 @@ DIRECT_RULES = (
         "USERLAND-LOAD", "错误", "用户态启动",
         r"^\[(?:reliefnt|ntclks)\] failed to load (?:init\.elf|desktop\.elf).*",
         "关键用户态程序未能加载",
-        "init.elf 或 desktop.elf 在创建任务时失败，桌面启动无法完成。",
+        "PID 1 或 Xorg 在创建任务时失败，桌面启动无法完成。",
         "先查看前后是否有 ELF 验证、动态解释器或文件查找错误；再检查镜像中对应程序是否完整。",
         "kernel/reliefnt/kernel/exec/userland.c:654",
     ),
@@ -252,7 +252,7 @@ def _task_exit_findings(lines: list[str], radius: int) -> list[Finding]:
             "TASK-EXIT-127", "错误", "用户态启动", f"任务 {name} 因启动失败退出 (127)",
             tuple(location + 1 for location in locations), _context(lines, locations, radius),
             explanation,
-            "查看该任务之前的 ELF 头部、解释器、ABI、段映射或动态库错误；init.elf 和 desktop.elf 失败会阻断系统桌面。",
+            "查看该任务之前的 ELF 头部、解释器、ABI、段映射或动态库错误；PID 1 和 Xorg 失败会阻断系统桌面。",
             "kernel/reliefnt/kernel/sched/core.c",
         ))
     return findings
@@ -333,7 +333,7 @@ def _print_text(analysis: LogAnalysis) -> None:
 
 def _self_test() -> int:
     """Exercise correlations for the ELF and CPU-fault failures seen in practice."""
-    sample = """[ntclks] boot complete: version=4.4.0 root=/ fs=ext2 desktop=desktop.elf
+    sample = """[ntclks] boot complete: version=4.4.0 root=/ fs=ext4 session=xorg
 [ntclks] ELF main header validation failed
 [ntclks] failed to map executable init.elf
 [ntclks] scheduler task exited pid=1 name=init.elf code=127

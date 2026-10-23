@@ -85,7 +85,7 @@ def main():
                 f'command_args="-n -dddd -p 10.0.2.2:{ntp.getsockname()[1]}"\n')
         report = tree / "usr/bin/openrc-probe-report"
         report.write_text("#!/bin/sh\nsleep 20\necho '[openrc-probe] service logs'\n"
-            "for f in /var/log/imd.log /var/log/windowd.log /var/log/desktop.log /var/log/sessiond.log /var/log/device-agent.log /var/log/udhcpc.log /var/log/ntpd.log; do echo \"$f\"; cat \"$f\"; done\n"
+            "for f in /var/log/device-agent.log /var/log/udhcpc.log /var/log/ntpd.log; do echo \"$f\"; cat \"$f\"; done\n"
             "cat /run/reliefos/dhcp-lease /run/reliefos/ntp-state /etc/resolv.conf\n/bin/busybox nslookup pool.ntp.org\n/bin/rc-status -a\necho '[openrc-probe] report end'\n")
         report.chmod(0o755)
         inittab = tree / "etc/inittab"

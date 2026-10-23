@@ -4,5 +4,3 @@ video:x:44:test
 nobody:x:65534:
 test:x:1000:
 uucp:x:14:
-leonos-window-server:x:60001:
-leonos-service:x:60002:

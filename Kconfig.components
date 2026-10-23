@@ -8,77 +8,23 @@ comment "The SDK uses a fixed product sysroot"
 
 menu "Core services"
 
-menuconfig RELIEFOS_COMPONENT_APP_DESKTOP_BUILD
-    bool "Desktop window server"
-    default n
+menuconfig RELIEFOS_COMPONENT_APP_RELIEFASKPASS_BUILD
+    bool "X11 authentication prompt"
+    default y
     help
-      Enable Desktop window server (desktop). Dependencies may enable it
+      Enable X11 authentication prompt (reliefaskpass). Dependencies may enable it
       automatically. Libraries may also be built when another product
       needs them; image membership is controlled separately below.
 
-config RELIEFOS_COMPONENT_APP_DESKTOP_IMAGE
+config RELIEFOS_COMPONENT_APP_RELIEFASKPASS_IMAGE
     bool "Include in system images"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_DESKTOP_BUILD
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFASKPASS_BUILD
 
-config RELIEFOS_COMPONENT_APP_DESKTOP_ENTRY
+config RELIEFOS_COMPONENT_APP_RELIEFASKPASS_ENTRY
     bool "Enable the legacy application-registry entry"
     default n
-    depends on RELIEFOS_COMPONENT_APP_DESKTOP_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_IMD_BUILD
-    bool "Input method daemon"
-    default n
-    help
-      Enable Input method daemon (imd). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_IMD_IMAGE
-    bool "Include in system images"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_IMD_BUILD
-
-config RELIEFOS_COMPONENT_APP_IMD_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_IMD_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_SESSIOND_BUILD
-    bool "Desktop session startup protocol"
-    default n
-    help
-      Enable Desktop session startup protocol (sessiond). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_SESSIOND_IMAGE
-    bool "Include in system images"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_SESSIOND_BUILD
-
-config RELIEFOS_COMPONENT_APP_SESSIOND_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_SESSIOND_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_WINDOWD_BUILD
-    bool "Window server daemon"
-    default n
-    help
-      Enable Window server daemon (windowd). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_WINDOWD_IMAGE
-    bool "Include in system images"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_WINDOWD_BUILD
-
-config RELIEFOS_COMPONENT_APP_WINDOWD_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_WINDOWD_IMAGE
+    depends on RELIEFOS_COMPONENT_APP_RELIEFASKPASS_IMAGE
 
 endmenu
 
@@ -119,42 +65,6 @@ config RELIEFOS_COMPONENT_APP_IMAGEVIEW_ENTRY
     bool "Enable the legacy application-registry entry"
     default y
     depends on RELIEFOS_COMPONENT_APP_IMAGEVIEW_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_NOTEPAD_BUILD
-    bool "Notepad"
-    default y
-    help
-      Enable Notepad (notepad). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_NOTEPAD_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_NOTEPAD_BUILD
-
-config RELIEFOS_COMPONENT_APP_NOTEPAD_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_NOTEPAD_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_OSHLP_BUILD
-    bool "Help viewer"
-    default y
-    help
-      Enable Help viewer (oshlp). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_OSHLP_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_OSHLP_BUILD
-
-config RELIEFOS_COMPONENT_APP_OSHLP_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_OSHLP_IMAGE
 
 menuconfig RELIEFOS_COMPONENT_APP_OSVER_BUILD
     bool "System information"
@@ -210,28 +120,9 @@ config RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_ENTRY
     default y
     depends on RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_IMAGE
 
-menuconfig RELIEFOS_COMPONENT_APP_RUN_BUILD
-    bool "Run dialog"
-    default y
-    help
-      Enable Run dialog (run). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_RUN_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_RUN_BUILD
-
-config RELIEFOS_COMPONENT_APP_RUN_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_RUN_IMAGE
-
 menuconfig RELIEFOS_COMPONENT_APP_TASKMGR_BUILD
     bool "Task manager"
     default y
-    select RELIEFOS_COMPONENT_APP_SERVICEMGR_BUILD
     help
       Enable Task manager (taskmgr). Dependencies may enable it
       automatically. Libraries may also be built when another product
@@ -269,24 +160,6 @@ config RELIEFOS_COMPONENT_APP_ABITEST_ENTRY
     default n
     depends on RELIEFOS_COMPONENT_APP_ABITEST_IMAGE
 
-menuconfig RELIEFOS_COMPONENT_APP_BUGTEST_BUILD
-    bool "Bug test"
-    default y
-    help
-      Enable Bug test (bugtest). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_BUGTEST_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_BUGTEST_BUILD
-
-config RELIEFOS_COMPONENT_APP_BUGTEST_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_BUGTEST_IMAGE
-
 menuconfig RELIEFOS_COMPONENT_TOOL_BUSYBOX_BUILD
     bool "BusyBox"
     default y
@@ -305,24 +178,6 @@ config RELIEFOS_COMPONENT_TOOL_BUSYBOX_ENTRY
     default n
     depends on RELIEFOS_COMPONENT_TOOL_BUSYBOX_IMAGE
 
-menuconfig RELIEFOS_COMPONENT_APP_CJKTEST_BUILD
-    bool "CJK test"
-    default y
-    help
-      Enable CJK test (cjktest). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_CJKTEST_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_CJKTEST_BUILD
-
-config RELIEFOS_COMPONENT_APP_CJKTEST_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_CJKTEST_IMAGE
-
 menuconfig RELIEFOS_COMPONENT_APP_FASTFETCH_BUILD
     bool "fastfetch system summary"
     default y
@@ -340,79 +195,6 @@ config RELIEFOS_COMPONENT_APP_FASTFETCH_ENTRY
     bool "Enable the legacy application-registry entry"
     default n
     depends on RELIEFOS_COMPONENT_APP_FASTFETCH_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_GLXGEARS_BUILD
-    bool "PortableGL renderer test"
-    default y
-    select RELIEFOS_COMPONENT_LIB_PORTABLEGL_BUILD
-    help
-      Enable PortableGL renderer test (glxgears). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_GLXGEARS_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_GLXGEARS_BUILD
-
-config RELIEFOS_COMPONENT_APP_GLXGEARS_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_GLXGEARS_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_GUITEST_BUILD
-    bool "GUI test"
-    default y
-    help
-      Enable GUI test (guitest). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_GUITEST_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_GUITEST_BUILD
-
-config RELIEFOS_COMPONENT_APP_GUITEST_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_GUITEST_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_HELLO_BUILD
-    bool "Hello"
-    default y
-    help
-      Enable Hello (hello). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_HELLO_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_HELLO_BUILD
-
-config RELIEFOS_COMPONENT_APP_HELLO_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_HELLO_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_HELLOWORLD_BUILD
-    bool "Hello World"
-    default y
-    help
-      Enable Hello World (helloworld). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_HELLOWORLD_IMAGE
-    bool "Include in system images"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_HELLOWORLD_BUILD
-
-config RELIEFOS_COMPONENT_APP_HELLOWORLD_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_HELLOWORLD_IMAGE
 
 menuconfig RELIEFOS_COMPONENT_APP_IPCTEST_BUILD
     bool "Unix IPC smoke test"
@@ -521,24 +303,6 @@ config RELIEFOS_COMPONENT_APP_SMPTEST_ENTRY
     bool "Enable the legacy application-registry entry"
     default n
     depends on RELIEFOS_COMPONENT_APP_SMPTEST_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_UIDEMO_BUILD
-    bool "UI demo"
-    default y
-    help
-      Enable UI demo (uidemo). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_UIDEMO_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_UIDEMO_BUILD
-
-config RELIEFOS_COMPONENT_APP_UIDEMO_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_UIDEMO_IMAGE
 
 menuconfig RELIEFOS_COMPONENT_APP_XIAOBAI_BUILD
     bool "Xiaobai easter egg"
@@ -655,28 +419,6 @@ config RELIEFOS_COMPONENT_APP_SNAKE_ENTRY
 
 endmenu
 
-menu "Input methods"
-
-menuconfig RELIEFOS_COMPONENT_APP_OSCHINPT_BUILD
-    bool "ReliefOS Chinese Input"
-    default y
-    help
-      Enable ReliefOS Chinese Input (oschinpt). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_OSCHINPT_IMAGE
-    bool "Include in system images"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_OSCHINPT_BUILD
-
-config RELIEFOS_COMPONENT_APP_OSCHINPT_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_OSCHINPT_IMAGE
-
-endmenu
-
 menu "Libraries"
 
 menuconfig RELIEFOS_COMPONENT_LIB_NCURSES_BUILD
@@ -695,96 +437,6 @@ config RELIEFOS_COMPONENT_LIB_NCURSES_IMAGE
 endmenu
 
 menu "Network and multimedia"
-
-menuconfig RELIEFOS_COMPONENT_APP_BROWSER_BUILD
-    bool "Browser"
-    default y
-    help
-      Enable Browser (browser). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_BROWSER_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_BROWSER_BUILD
-
-config RELIEFOS_COMPONENT_APP_BROWSER_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_BROWSER_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_DOWNLOADMGR_BUILD
-    bool "Download manager"
-    default y
-    help
-      Enable Download manager (downloadmgr). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_DOWNLOADMGR_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_DOWNLOADMGR_BUILD
-
-config RELIEFOS_COMPONENT_APP_DOWNLOADMGR_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_DOWNLOADMGR_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_HTTPGET_BUILD
-    bool "HTTP client"
-    default y
-    help
-      Enable HTTP client (httpget). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_HTTPGET_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_HTTPGET_BUILD
-
-config RELIEFOS_COMPONENT_APP_HTTPGET_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_HTTPGET_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_MP3PLAY_BUILD
-    bool "MP3 player"
-    default y
-    help
-      Enable MP3 player (mp3play). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_MP3PLAY_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_MP3PLAY_BUILD
-
-config RELIEFOS_COMPONENT_APP_MP3PLAY_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_MP3PLAY_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_NETCTL_BUILD
-    bool "Network controller"
-    default y
-    help
-      Enable Network controller (netctl). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_NETCTL_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_NETCTL_BUILD
-
-config RELIEFOS_COMPONENT_APP_NETCTL_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_NETCTL_IMAGE
 
 menuconfig RELIEFOS_COMPONENT_APP_RELIEFPLAYER_BUILD
     bool "ReliefPlayer"
@@ -975,24 +627,6 @@ endmenu
 
 menu "System applications"
 
-menuconfig RELIEFOS_COMPONENT_APP_DEVMGR_BUILD
-    bool "Device manager"
-    default y
-    help
-      Enable Device manager (devmgr). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_DEVMGR_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_DEVMGR_BUILD
-
-config RELIEFOS_COMPONENT_APP_DEVMGR_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_DEVMGR_IMAGE
-
 menuconfig RELIEFOS_COMPONENT_APP_DISKMGR_BUILD
     bool "Disk manager"
     default y
@@ -1029,24 +663,6 @@ config RELIEFOS_COMPONENT_APP_DRIVERINFO_ENTRY
     default y
     depends on RELIEFOS_COMPONENT_APP_DRIVERINFO_IMAGE
 
-menuconfig RELIEFOS_COMPONENT_APP_DRVMGR_BUILD
-    bool "Driver manager"
-    default y
-    help
-      Enable Driver manager (drvmgr). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_DRVMGR_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_DRVMGR_BUILD
-
-config RELIEFOS_COMPONENT_APP_DRVMGR_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_DRVMGR_IMAGE
-
 menuconfig RELIEFOS_COMPONENT_APP_RELIEFAPK_BUILD
     bool "ReliefAPK"
     default y
@@ -1066,24 +682,6 @@ config RELIEFOS_COMPONENT_APP_RELIEFAPK_ENTRY
     bool "Enable the legacy application-registry entry"
     default y
     depends on RELIEFOS_COMPONENT_APP_RELIEFAPK_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_SERVICEMGR_BUILD
-    bool "Service control"
-    default y
-    help
-      Enable Service control (servicemgr). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_SERVICEMGR_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_SERVICEMGR_BUILD
-
-config RELIEFOS_COMPONENT_APP_SERVICEMGR_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_SERVICEMGR_IMAGE
 
 menuconfig RELIEFOS_COMPONENT_APP_SOUNDCTL_BUILD
     bool "Sound controls"
@@ -1139,109 +737,9 @@ config RELIEFOS_COMPONENT_APP_SUDO_ENTRY
     default n
     depends on RELIEFOS_COMPONENT_APP_SUDO_IMAGE
 
-menuconfig RELIEFOS_COMPONENT_APP_SYSCONFDIALOG_BUILD
-    bool "System configuration dialog"
-    default y
-    help
-      Enable System configuration dialog (sysconfdialog). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_SYSCONFDIALOG_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_SYSCONFDIALOG_BUILD
-
-config RELIEFOS_COMPONENT_APP_SYSCONFDIALOG_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default n
-    depends on RELIEFOS_COMPONENT_APP_SYSCONFDIALOG_IMAGE
-
-endmenu
-
-menu "Third-party UI"
-
-menuconfig RELIEFOS_COMPONENT_APP_STARDUSTHELLO_BUILD
-    bool "StardustUI hello"
-    default y
-    select RELIEFOS_COMPONENT_LIB_STARDUSTUI_BUILD
-    help
-      Enable StardustUI hello (stardusthello). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_STARDUSTHELLO_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_STARDUSTHELLO_BUILD
-
-config RELIEFOS_COMPONENT_APP_STARDUSTHELLO_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_STARDUSTHELLO_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_STARDUSTLAYOUT_BUILD
-    bool "StardustUI layout"
-    default y
-    select RELIEFOS_COMPONENT_LIB_STARDUSTUI_BUILD
-    help
-      Enable StardustUI layout (stardustlayout). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_STARDUSTLAYOUT_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_STARDUSTLAYOUT_BUILD
-
-config RELIEFOS_COMPONENT_APP_STARDUSTLAYOUT_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_STARDUSTLAYOUT_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_APP_STARDUSTSHOWCASE_BUILD
-    bool "StardustUI showcase"
-    default y
-    select RELIEFOS_COMPONENT_LIB_STARDUSTUI_BUILD
-    help
-      Enable StardustUI showcase (stardustshowcase). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_APP_STARDUSTSHOWCASE_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_STARDUSTSHOWCASE_BUILD
-
-config RELIEFOS_COMPONENT_APP_STARDUSTSHOWCASE_ENTRY
-    bool "Enable the legacy application-registry entry"
-    default y
-    depends on RELIEFOS_COMPONENT_APP_STARDUSTSHOWCASE_IMAGE
-
-menuconfig RELIEFOS_COMPONENT_LIB_STARDUSTUI_BUILD
-    bool "StardustUI library"
-    default y
-    help
-      Enable StardustUI library (stardustui). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
 endmenu
 
 menu "Third-party libraries"
-
-menuconfig RELIEFOS_COMPONENT_LIB_PORTABLEGL_BUILD
-    bool "PortableGL 3D renderer"
-    default y
-    help
-      Enable PortableGL 3D renderer (portablegl). Dependencies may enable it
-      automatically. Libraries may also be built when another product
-      needs them; image membership is controlled separately below.
-
-config RELIEFOS_COMPONENT_LIB_PORTABLEGL_IMAGE
-    bool "Include in system images"
-    default y
-    depends on RELIEFOS_COMPONENT_LIB_PORTABLEGL_BUILD
 
 menuconfig RELIEFOS_COMPONENT_LIB_SQLITE_BUILD
     bool "SQLite database library"

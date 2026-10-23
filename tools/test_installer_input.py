@@ -1,4 +1,4 @@
-"""Regression tests for installer mouse initialization and window IPC."""
+"""Regressions for installer storage operations and independent Unix IPC."""
 from pathlib import Path
 import subprocess
 import tempfile
@@ -70,28 +70,6 @@ class InstallerInputTests(unittest.TestCase):
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
-    def test_window_buffer_follows_presented_size(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-window-resize-") as tmp:
-            executable = str(Path(tmp) / "window-resize")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-include", "string.h",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-idirafter", "userland/runtime/include", "-idirafter", "include", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
-                "tools/tests/window_resize_test.c", "userland/runtime/src/unix_ipc.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-    def test_window_creation_is_retried_before_present(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-windowd-") as tmp:
-            executable = str(Path(tmp) / "windowd-announce")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-idirafter", "userland/runtime/include", "-idirafter", "include", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
-                "tools/tests/windowd_announce_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
     def test_disconnected_ipc_clients_are_not_reported_as_would_block(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-ipc-disconnect-") as tmp:
             executable = str(Path(tmp) / "ipc-disconnect")
@@ -101,18 +79,6 @@ class InstallerInputTests(unittest.TestCase):
                 "-idirafter", "userland/runtime/include",
                 "tools/tests/unix_ipc_disconnect_test.c", "userland/runtime/src/unix_ipc.c",
                 "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-    def test_mouse_coordinates_survive_evdev_routing(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-pointer-") as tmp:
-            executable = str(Path(tmp) / "pointer")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
-                "-idirafter", "userland/runtime/include",
-                "tools/tests/pointer_routing_test.c", "kernel/reliefnt/tools/tests/input_routing_fixture.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
@@ -139,20 +105,6 @@ class InstallerInputTests(unittest.TestCase):
                 "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-    def test_input_before_fetch_reply_preserves_descriptor(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-wind-") as tmp:
-            executable = str(Path(tmp) / "wind-reply")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-idirafter", "userland/runtime/include", "-idirafter", "include", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
-                "tools/tests/wind_reply_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-
-
 
 
 if __name__ == "__main__":

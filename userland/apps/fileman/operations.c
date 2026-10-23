@@ -20,9 +20,7 @@ static void operation_set(uint32_t percent, const char *text)
 
 void fileman_present_progress(void)
 {
-    if (fileman_window_id) {
-        present_fileman(fileman_window_id, &fileman_ui);
-    }
+    fileman_refresh_view();
 }
 
 static void operation_finish(const char *text)
@@ -95,7 +93,7 @@ static int choose_target_path(const char *dir, const char *name,
     if (reliefos_stat_legacy(dst, &st) < 0) {
         return 0;
     }
-    if (reliefos_ui_show_confirm_dialog(T("File Conflict"),
+    if (fileman_confirm_dialog(T("File Conflict"),
                                       T("The destination exists. Replace it? Choose No to save with another name."),
                                       0)) {
         return 1;
@@ -365,7 +363,7 @@ void delete_selected_entries(void)
         ++count;
     }
     if (!count) { set_status(T("Select an item")); return; }
-    if (!reliefos_ui_show_confirm_dialog(T("Delete"),
+    if (!fileman_confirm_dialog(T("Delete"),
             T("Permanently delete the selected items and all folder contents? This cannot be undone."), 0)) {
         set_status(T("Delete canceled"));
         return;

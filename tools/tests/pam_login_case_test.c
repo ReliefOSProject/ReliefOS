@@ -52,12 +52,14 @@ int getrlimit(int resource, struct rlimit *limit)
     return syscall(SYS_prlimit64, 0, resource, NULL, limit);
 }
 
-int reliefos_ui_show_password_dialog(const char *title, const char *label, char *value, uint32_t size)
-{ (void)title; (void)label; (void)value; (void)size; ++dialogs; return 0; }
-int reliefos_ui_show_input_dialog(const char *title, const char *label, char *value, uint32_t size)
-{ (void)title; (void)label; (void)value; (void)size; ++dialogs; return 0; }
-int reliefos_ui_show_message_box(const char *title, const char *message, const char *button)
-{ (void)title; (void)message; (void)button; ++dialogs; return 1; }
+int misc_conv(int count, const struct pam_message **messages,
+              struct pam_response **responses, void *context)
+{
+    (void)count; (void)messages; (void)context;
+    *responses = NULL;
+    ++dialogs;
+    return PAM_CONV_ERR;
+}
 
 static void write_file(const char *path, const char *text)
 {

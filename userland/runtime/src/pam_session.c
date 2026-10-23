@@ -3,7 +3,7 @@
 #include <fcntl.h>
 #include <grp.h>
 #include <reliefos/pam_session.h>
-#include <reliefos/ui.h>
+#include <security/pam_misc.h>
 #include <reliefos/rootfs.h>
 #include <pwd.h>
 #include <security/pam_appl.h>
@@ -127,7 +127,6 @@ static int conversation(int count, const struct pam_message **messages,
     struct conversation *context = opaque;
     struct pam_response *responses = calloc((size_t)count, sizeof(*responses));
     if (!responses) return PAM_BUF_ERR;
-    char answer[PAM_MAX_RESP_SIZE] = {0};
     for (int i = 0; i < count; ++i) {
         if (!messages[i] || !messages[i]->msg) goto failed;
         int style = messages[i]->msg_style;
@@ -137,30 +136,33 @@ static int conversation(int count, const struct pam_message **messages,
                 explicit_bzero(context->secret, strlen(context->secret));
                 free(context->secret); context->secret = NULL;
             } else {
-                int result = reliefos_ui_show_password_dialog("Authentication", messages[i]->msg, answer, sizeof(answer));
-                if (result != 1) {
-                    context->cancelled = result == 0;
+                struct pam_response *response = NULL;
+                const struct pam_message *message = messages[i];
+                int result = misc_conv(1, &message, &response, NULL);
+                if (result != PAM_SUCCESS || !response) {
+                    context->cancelled = result == PAM_CONV_ERR;
                     goto failed;
                 }
-                responses[i].resp = strdup(answer);
+                responses[i] = response[0];
+                free(response);
             }
-        } else if (style == PAM_PROMPT_ECHO_ON) {
-            int result = reliefos_ui_show_input_dialog("Authentication", messages[i]->msg, answer, sizeof(answer));
-            if (result != 1) {
-                context->cancelled = result == 0;
+        } else if (style == PAM_PROMPT_ECHO_ON || style == PAM_ERROR_MSG ||
+                   style == PAM_TEXT_INFO) {
+            struct pam_response *response = NULL;
+            const struct pam_message *message = messages[i];
+            int result = misc_conv(1, &message, &response, NULL);
+            if (result != PAM_SUCCESS || !response) {
+                context->cancelled = result == PAM_CONV_ERR;
                 goto failed;
             }
-            responses[i].resp = strdup(answer);
-        } else if (style == PAM_ERROR_MSG || style == PAM_TEXT_INFO) {
-            reliefos_ui_show_message_box("Authentication", messages[i]->msg, "OK");
+            responses[i] = response[0];
+            free(response);
         } else goto failed;
-        explicit_bzero(answer, sizeof(answer));
         if ((style == PAM_PROMPT_ECHO_ON || style == PAM_PROMPT_ECHO_OFF) && !responses[i].resp) goto failed;
     }
     *out = responses;
     return PAM_SUCCESS;
 failed:
-    explicit_bzero(answer, sizeof(answer));
     for (int i = 0; i < count; ++i) if (responses[i].resp) {
         explicit_bzero(responses[i].resp, strlen(responses[i].resp)); free(responses[i].resp);
     }

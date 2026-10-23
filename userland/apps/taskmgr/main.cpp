@@ -2,7 +2,7 @@ extern "C" {
 #include "model.h"
 #include "gpu_sample.h"
 #include <reliefos/auth.h>
-#include <reliefos/gui.h>
+#include <reliefos/system.h>
 #include <reliefos/launch.h>
 #include <reliefos/startup.h>
 #include <reliefos/system.h>
@@ -52,7 +52,6 @@ enum {
     TASKMGR_ACTION_STARTUP = 7,
     TASKMGR_ACTION_ENABLE = 8,
     TASKMGR_ACTION_REMOVE = 9,
-    TASKMGR_ACTION_SERVICE_MANAGER = 10,
 };
 
 class TaskWindow;
@@ -75,7 +74,6 @@ Fl_Button *button_end_task;
 Fl_Button *button_details;
 Fl_Button *button_startup_toggle;
 Fl_Button *button_startup_remove;
-Fl_Button *button_startup_service_manager;
 Fl_Menu_Button *process_popup;
 Fl_Widget *performance_widget;
 class PerformanceView;
@@ -803,18 +801,6 @@ void remove_selected_startup_entry()
     update_controls();
 }
 
-void open_service_manager()
-{
-    const char *program = reliefos_launch_builtin_path("servicemgr");
-    if (!program || !program[0]) {
-        set_status(T("Service Manager is unavailable"));
-        return;
-    }
-    char *args[] = {(char *)program, NULL};
-    if (reliefos_launch_argv(args) < 0) set_status(T("Could not open Service Manager"));
-    else set_status(T("Service Manager launched"));
-}
-
 void show_about()
 {
     fl_message_title(T("Task Manager"));
@@ -845,7 +831,6 @@ void perform_action(uint32_t action)
     case TASKMGR_ACTION_STARTUP: select_page(TASKMGR_TAB_STARTUP); break;
     case TASKMGR_ACTION_ENABLE: toggle_selected_startup_entry(); break;
     case TASKMGR_ACTION_REMOVE: remove_selected_startup_entry(); break;
-    case TASKMGR_ACTION_SERVICE_MANAGER: open_service_manager(); break;
     default: break;
     }
 }
@@ -1027,13 +1012,10 @@ void layout_ui(int width, int height)
         update_performance_layout();
     }
 
-    const int manager_x = width - 214;
     if (startup_user_label) startup_user_label->resize(20, 66, 48, 28);
     if (startup_choice) startup_choice->resize(72, 66, 134, 28);
     if (startup_username)
-        startup_username->resize(216, 66, manager_x - 226, 28);
-    if (button_startup_service_manager)
-        button_startup_service_manager->resize(manager_x, 66, 202, 28);
+        startup_username->resize(216, 66, width - 236, 28);
     if (button_startup_toggle) button_startup_toggle->resize(20, 106, 96, 30);
     if (button_startup_remove) button_startup_remove->resize(124, 106, 96, 30);
     if (startup_list_widget)
@@ -1057,7 +1039,6 @@ void build_ui()
     add_menu_action(T("File"), T("Refresh"), TASKMGR_ACTION_REFRESH);
     add_menu_action(T("File"), T("End Task"), TASKMGR_ACTION_END);
     add_menu_action(T("File"), T("Details"), TASKMGR_ACTION_DETAILS, 1);
-    add_menu_action(T("File"), T("Open Service Manager"), TASKMGR_ACTION_SERVICE_MANAGER);
     add_menu_action(T("File"), T("About"), TASKMGR_ACTION_ABOUT);
     add_menu_action(T("Options"), T("Processes"), TASKMGR_ACTION_PROCESSES);
     add_menu_action(T("Options"), T("Performance"), TASKMGR_ACTION_PERFORMANCE);
@@ -1124,11 +1105,6 @@ void build_ui()
     startup_choice->callback(startup_user_selected);
     startup_choice->tooltip(T("Choose which user's startup entries to manage."));
     startup_username = new Fl_Output(216, 66, 560, 28);
-    button_startup_service_manager = new Fl_Button(786, 66, 202, 28,
-                                                    T("Open Service Manager"));
-    button_startup_service_manager->callback(
-        action_callback, (void *)(uintptr_t)TASKMGR_ACTION_SERVICE_MANAGER);
-    button_startup_service_manager->tooltip(T("Open the Service Manager."));
     button_startup_toggle = new Fl_Button(20, 106, 96, 30, T("Enable"));
     button_startup_toggle->callback(action_callback,
                                     (void *)(uintptr_t)TASKMGR_ACTION_ENABLE);

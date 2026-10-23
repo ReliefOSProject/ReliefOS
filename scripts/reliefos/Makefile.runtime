@@ -40,7 +40,7 @@ RUNTIME_FLAGS := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_FLAGS) -std=c11
 	-include $(RELIEFOS_SRC)/userland/runtime/include/build_policy.h \
 	-ffile-prefix-map=$(RELIEFOS_SRC)=. -ffile-prefix-map=$(RELIEFOS_OUTPUT)=out
 RUNTIME_CFLAGS ?=
-RUNTIME_AUTH_LIBS := $(PAM_LIB) $(AUTH_ROOT)/lib/libcrypt.so.2
+RUNTIME_AUTH_LIBS := $(PAM_LIB) $(PAM_MISC_LIB) $(AUTH_ROOT)/lib/libcrypt.so.2
 RUNTIME_HEADERS := $(PAM_HEADER) $(AUTH_ROOT)/usr/include/crypt.h
 RUNTIME_BUILTINS := $(if $(RELIEFOS_PASSIVE),,$(shell $(TARGET_CC) --target=$(TRIPLE_USER) --rtlib=compiler-rt -print-libgcc-file-name 2>/dev/null))
 

@@ -89,7 +89,7 @@ def main():
             probe.key('ctrl-alt-f2')
             wait_text(probe, process, 'exit-recovery-shell', 'built-in shell')
             match = re.search(
-                r'exec pid=(\d+) path=/usr/lib/reliefos/apps/desktop/desktop.elf',
+                r'exec pid=(\d+) path=/usr/bin/Xorg',
                 serial.read_text())
             assert match, 'graphical session pid not recorded'
             probe.text(f'kill {match[1]}')

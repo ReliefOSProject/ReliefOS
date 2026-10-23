@@ -207,7 +207,7 @@ void fileman_apply_settings(void)
     set_status(T("File Manager settings saved"));
 }
 
-void fileman_settings_dialog_rect(struct reliefos_ui_rect *out)
+void fileman_settings_dialog_rect(struct fileman_rect *out)
 {
     uint32_t width = view_w > 16u ? view_w - 16u : view_w;
     uint32_t height = view_h > 16u ? view_h - 16u : view_h;
@@ -228,7 +228,7 @@ void fileman_settings_dialog_rect(struct reliefos_ui_rect *out)
 
 int fileman_handle_settings_click(int32_t x, int32_t y)
 {
-    struct reliefos_ui_rect rect;
+    struct fileman_rect rect;
     uint32_t button_y;
     if (!fileman_settings_open) {
         return 0;
@@ -241,12 +241,12 @@ int fileman_handle_settings_click(int32_t x, int32_t y)
         return 1;
     }
     if (hit_rect_i(x, y, rect.x + (int32_t)rect.w - 168, (int32_t)button_y,
-                   72, RELIEFOS_UI_BUTTON_H)) {
+                   72, FILEMAN_BUTTON_H)) {
         fileman_apply_settings();
         return 1;
     }
     if (hit_rect_i(x, y, rect.x + (int32_t)rect.w - 88, (int32_t)button_y,
-                   72, RELIEFOS_UI_BUTTON_H)) {
+                   72, FILEMAN_BUTTON_H)) {
         fileman_cancel_settings();
         return 1;
     }
@@ -260,7 +260,7 @@ int fileman_handle_settings_key(uint8_t keycode)
     }
     if (keycode == FILEMAN_KEY_ESCAPE) {
         fileman_cancel_settings();
-    } else if (keycode == RELIEFOS_KEY_ENTER) {
+    } else if (keycode == FILEMAN_KEY_ENTER) {
         fileman_apply_settings();
     }
     return 1;
@@ -442,7 +442,7 @@ const char *entry_type_name(const struct reliefos_dir_entry *entry)
     return "FILE";
 }
 
-void build_context_menu_items(struct reliefos_ui_context_menu_item *items,
+void build_context_menu_items(struct fileman_context_menu_item *items,
                                       uint32_t count)
 {
     uint32_t has_item = selected_entry_valid();
@@ -451,45 +451,45 @@ void build_context_menu_items(struct reliefos_ui_context_menu_item *items,
     if (!items || count < FILEMAN_CONTEXT_MENU_COUNT) {
         return;
     }
-    items[0] = (struct reliefos_ui_context_menu_item){
-        T("Open"), FILEMAN_ACTION_OPEN, has_item ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[1] = (struct reliefos_ui_context_menu_item){
-        T("Open With..."), FILEMAN_ACTION_OPEN_WITH, has_file ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[2] = (struct reliefos_ui_context_menu_item){
-        T("Copy"), FILEMAN_ACTION_COPY, has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[3] = (struct reliefos_ui_context_menu_item){
-        T("Cut"), FILEMAN_ACTION_CUT, has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[4] = (struct reliefos_ui_context_menu_item){
+    items[0] = (struct fileman_context_menu_item){
+        T("Open"), FILEMAN_ACTION_OPEN, has_item ? 0 : FILEMAN_MENU_DISABLED};
+    items[1] = (struct fileman_context_menu_item){
+        T("Open With..."), FILEMAN_ACTION_OPEN_WITH, has_file ? 0 : FILEMAN_MENU_DISABLED};
+    items[2] = (struct fileman_context_menu_item){
+        T("Copy"), FILEMAN_ACTION_COPY, has_mutable ? 0 : FILEMAN_MENU_DISABLED};
+    items[3] = (struct fileman_context_menu_item){
+        T("Cut"), FILEMAN_ACTION_CUT, has_mutable ? 0 : FILEMAN_MENU_DISABLED};
+    items[4] = (struct fileman_context_menu_item){
         T("Paste"), FILEMAN_ACTION_PASTE,
-        fileman_clipboard_available() ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[5] = (struct reliefos_ui_context_menu_item){
+        fileman_clipboard_available() ? 0 : FILEMAN_MENU_DISABLED};
+    items[5] = (struct fileman_context_menu_item){
         fileman_entry_marked((uint32_t)(file_list.selected < 0 ? 0 : file_list.selected))
             ? T("Unmark") : T("Mark for Batch"),
-        FILEMAN_ACTION_TOGGLE_MARK, has_item ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[6] = (struct reliefos_ui_context_menu_item){"", 0, RELIEFOS_UI_MENU_SEPARATOR};
-    items[7] = (struct reliefos_ui_context_menu_item){
+        FILEMAN_ACTION_TOGGLE_MARK, has_item ? 0 : FILEMAN_MENU_DISABLED};
+    items[6] = (struct fileman_context_menu_item){"", 0, FILEMAN_MENU_SEPARATOR};
+    items[7] = (struct fileman_context_menu_item){
         T("Rename"), FILEMAN_ACTION_RENAME,
-        has_mutable && fileman_selected_count() <= 1U ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[8] = (struct reliefos_ui_context_menu_item){
+        has_mutable && fileman_selected_count() <= 1U ? 0 : FILEMAN_MENU_DISABLED};
+    items[8] = (struct fileman_context_menu_item){
         T("Delete"), FILEMAN_ACTION_DELETE,
-        has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[9] = (struct reliefos_ui_context_menu_item){
+        has_mutable ? 0 : FILEMAN_MENU_DISABLED};
+    items[9] = (struct fileman_context_menu_item){
         T("Details"), FILEMAN_ACTION_DETAILS,
-        has_item ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[10] = (struct reliefos_ui_context_menu_item){
+        has_item ? 0 : FILEMAN_MENU_DISABLED};
+    items[10] = (struct fileman_context_menu_item){
         T("Refresh"), FILEMAN_ACTION_REFRESH, 0};
-    items[11] = (struct reliefos_ui_context_menu_item){"", 0, RELIEFOS_UI_MENU_SEPARATOR};
-    items[12] = (struct reliefos_ui_context_menu_item){
+    items[11] = (struct fileman_context_menu_item){"", 0, FILEMAN_MENU_SEPARATOR};
+    items[12] = (struct fileman_context_menu_item){
         has_file && ends_with(entries[file_list.selected].name, ".tar")
             ? T("Extract tar")
             : T("Compress to .tar"),
         has_file && ends_with(entries[file_list.selected].name, ".tar")
             ? FILEMAN_ACTION_EXTRACT_TAR
             : FILEMAN_ACTION_COMPRESS_TAR,
-        has_item ? 0 : RELIEFOS_UI_MENU_DISABLED};
+        has_item ? 0 : FILEMAN_MENU_DISABLED};
 }
 
-void build_file_menu_items(struct reliefos_ui_context_menu_item *items, uint32_t count)
+void build_file_menu_items(struct fileman_context_menu_item *items, uint32_t count)
 {
     uint32_t has_item = selected_entry_valid();
     uint32_t has_file = selected_entry_is_file();
@@ -497,46 +497,46 @@ void build_file_menu_items(struct reliefos_ui_context_menu_item *items, uint32_t
     if (!items || count < FILEMAN_FILE_MENU_COUNT) {
         return;
     }
-    items[0] = (struct reliefos_ui_context_menu_item){T("Open"), FILEMAN_ACTION_OPEN,
-                                                     has_item ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[1] = (struct reliefos_ui_context_menu_item){T("Open With..."), FILEMAN_ACTION_OPEN_WITH,
-                                                     has_file ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[2] = (struct reliefos_ui_context_menu_item){T("Default Program..."), FILEMAN_ACTION_DEFAULT_PROGRAM,
-                                                     has_file ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[3] = (struct reliefos_ui_context_menu_item){T("Create Shortcut"), FILEMAN_ACTION_CREATE_SHORTCUT,
-                                                     has_file ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[4] = (struct reliefos_ui_context_menu_item){T("Details"), FILEMAN_ACTION_DETAILS,
-                                                     has_item ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[5] = (struct reliefos_ui_context_menu_item){"", 0, RELIEFOS_UI_MENU_SEPARATOR};
-    items[6] = (struct reliefos_ui_context_menu_item){T("Rename"), FILEMAN_ACTION_RENAME,
-                                                     has_mutable && fileman_selected_count() <= 1U ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[7] = (struct reliefos_ui_context_menu_item){T("New Folder"), FILEMAN_ACTION_NEW_FOLDER, 0};
-    items[8] = (struct reliefos_ui_context_menu_item){T("Refresh"), FILEMAN_ACTION_REFRESH, 0};
+    items[0] = (struct fileman_context_menu_item){T("Open"), FILEMAN_ACTION_OPEN,
+                                                     has_item ? 0 : FILEMAN_MENU_DISABLED};
+    items[1] = (struct fileman_context_menu_item){T("Open With..."), FILEMAN_ACTION_OPEN_WITH,
+                                                     has_file ? 0 : FILEMAN_MENU_DISABLED};
+    items[2] = (struct fileman_context_menu_item){T("Default Program..."), FILEMAN_ACTION_DEFAULT_PROGRAM,
+                                                     has_file ? 0 : FILEMAN_MENU_DISABLED};
+    items[3] = (struct fileman_context_menu_item){T("Create Shortcut"), FILEMAN_ACTION_CREATE_SHORTCUT,
+                                                     has_file ? 0 : FILEMAN_MENU_DISABLED};
+    items[4] = (struct fileman_context_menu_item){T("Details"), FILEMAN_ACTION_DETAILS,
+                                                     has_item ? 0 : FILEMAN_MENU_DISABLED};
+    items[5] = (struct fileman_context_menu_item){"", 0, FILEMAN_MENU_SEPARATOR};
+    items[6] = (struct fileman_context_menu_item){T("Rename"), FILEMAN_ACTION_RENAME,
+                                                     has_mutable && fileman_selected_count() <= 1U ? 0 : FILEMAN_MENU_DISABLED};
+    items[7] = (struct fileman_context_menu_item){T("New Folder"), FILEMAN_ACTION_NEW_FOLDER, 0};
+    items[8] = (struct fileman_context_menu_item){T("Refresh"), FILEMAN_ACTION_REFRESH, 0};
 }
 
-void build_edit_menu_items(struct reliefos_ui_context_menu_item *items, uint32_t count)
+void build_edit_menu_items(struct fileman_context_menu_item *items, uint32_t count)
 {
     uint32_t has_mutable = selected_entry_is_mutable();
     if (!items || count < FILEMAN_EDIT_MENU_COUNT) {
         return;
     }
-    items[0] = (struct reliefos_ui_context_menu_item){T("Copy"), FILEMAN_ACTION_COPY,
-                                                     has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[1] = (struct reliefos_ui_context_menu_item){T("Cut"), FILEMAN_ACTION_CUT,
-                                                     has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[2] = (struct reliefos_ui_context_menu_item){T("Paste"), FILEMAN_ACTION_PASTE,
-                                                     fileman_clipboard_available() ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[3] = (struct reliefos_ui_context_menu_item){"", 0, RELIEFOS_UI_MENU_SEPARATOR};
-    items[4] = (struct reliefos_ui_context_menu_item){
+    items[0] = (struct fileman_context_menu_item){T("Copy"), FILEMAN_ACTION_COPY,
+                                                     has_mutable ? 0 : FILEMAN_MENU_DISABLED};
+    items[1] = (struct fileman_context_menu_item){T("Cut"), FILEMAN_ACTION_CUT,
+                                                     has_mutable ? 0 : FILEMAN_MENU_DISABLED};
+    items[2] = (struct fileman_context_menu_item){T("Paste"), FILEMAN_ACTION_PASTE,
+                                                     fileman_clipboard_available() ? 0 : FILEMAN_MENU_DISABLED};
+    items[3] = (struct fileman_context_menu_item){"", 0, FILEMAN_MENU_SEPARATOR};
+    items[4] = (struct fileman_context_menu_item){
         fileman_entry_marked((uint32_t)(file_list.selected < 0 ? 0 : file_list.selected))
             ? T("Unmark") : T("Mark for Batch"),
-        FILEMAN_ACTION_TOGGLE_MARK, selected_entry_valid() ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[5] = (struct reliefos_ui_context_menu_item){T("Mark All"), FILEMAN_ACTION_SELECT_ALL,
-                                                     entry_count ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[6] = (struct reliefos_ui_context_menu_item){T("Clear Marks"), FILEMAN_ACTION_CLEAR_SELECTION,
-                                                     fileman_selected_count() ? 0 : RELIEFOS_UI_MENU_DISABLED};
-    items[7] = (struct reliefos_ui_context_menu_item){T("Delete"), FILEMAN_ACTION_DELETE,
-                                                     has_mutable ? 0 : RELIEFOS_UI_MENU_DISABLED};
+        FILEMAN_ACTION_TOGGLE_MARK, selected_entry_valid() ? 0 : FILEMAN_MENU_DISABLED};
+    items[5] = (struct fileman_context_menu_item){T("Mark All"), FILEMAN_ACTION_SELECT_ALL,
+                                                     entry_count ? 0 : FILEMAN_MENU_DISABLED};
+    items[6] = (struct fileman_context_menu_item){T("Clear Marks"), FILEMAN_ACTION_CLEAR_SELECTION,
+                                                     fileman_selected_count() ? 0 : FILEMAN_MENU_DISABLED};
+    items[7] = (struct fileman_context_menu_item){T("Delete"), FILEMAN_ACTION_DELETE,
+                                                     has_mutable ? 0 : FILEMAN_MENU_DISABLED};
 }
 
 void format_contains_text(char *buf, uint32_t cap, const struct folder_size_info *info)
@@ -703,7 +703,7 @@ void present_directory(uint32_t count, const char *status_prefix,
     sort_directory_entries(count);
     entry_count = count;
     selected_mask = 0;
-    reliefos_ui_listview_state_set_count(&file_list, entry_count);
+    fileman_list_set_count(&file_list, entry_count);
     file_list.selected = entry_count ? 0 : -1;
     file_list.scroll = 0;
     context_menu_set_active(0);
@@ -736,21 +736,21 @@ int reload_dir(void)
             return 0;
         }
         entry_count = 0;
-        reliefos_ui_listview_state_set_count(&file_list, 0);
+        fileman_list_set_count(&file_list, 0);
         if (ret == 0) {
             set_status_error("Open dir failed ", fd);
         }
         printf("[fileman.elf] list path=%s open=%d\n", current_path, fd);
         return fd;
     }
-    reliefos_ui_listview_state_set_count(&file_list, 0);
+    fileman_list_set_count(&file_list, 0);
     while (count < FILEMAN_MAX_ENTRIES) {
         struct reliefos_dir_entry entry;
         ret = reliefos_readdir(fd, &entry);
         if (ret < 0) {
             close(fd);
             entry_count = 0;
-            reliefos_ui_listview_state_set_count(&file_list, 0);
+            fileman_list_set_count(&file_list, 0);
             set_status_error("Read dir failed ", ret);
             printf("[fileman.elf] list path=%s readdir=%d\n", current_path, ret);
             return ret;
@@ -982,7 +982,7 @@ static void tree_collapse_path(const char *path)
 
 static void tree_scroll_to_path(const char *path)
 {
-    struct reliefos_ui_tree_item items[FILEMAN_TREE_MAX_NODES];
+    struct fileman_tree_item items[FILEMAN_TREE_MAX_NODES];
     struct fileman_layout layout;
     uint32_t count;
     uint32_t visible_rows;
@@ -1047,7 +1047,7 @@ static void fileman_tree_sync_navigation(const char *old_path, const char *new_p
     }
 }
 
-static void tree_append_visible(struct reliefos_ui_tree_item *items, uint32_t cap,
+static void tree_append_visible(struct fileman_tree_item *items, uint32_t cap,
                                 uint32_t *count, uint32_t node_index,
                                 uint32_t depth)
 {
@@ -1059,10 +1059,10 @@ static void tree_append_visible(struct reliefos_ui_tree_item *items, uint32_t ca
     if (!node->used) {
         return;
     }
-    items[(*count)++] = (struct reliefos_ui_tree_item){
+    items[(*count)++] = (struct fileman_tree_item){
         node->label, node->id, depth,
-        node->has_children ? (node->expanded ? RELIEFOS_UI_TREE_EXPANDED : 0)
-                           : RELIEFOS_UI_TREE_LEAF};
+        node->has_children ? (node->expanded ? FILEMAN_TREE_EXPANDED : 0)
+                           : FILEMAN_TREE_LEAF};
     if (!node->expanded) {
         return;
     }
@@ -1073,7 +1073,7 @@ static void tree_append_visible(struct reliefos_ui_tree_item *items, uint32_t ca
     }
 }
 
-uint32_t build_tree_items(struct reliefos_ui_tree_item *items, uint32_t cap)
+uint32_t build_tree_items(struct fileman_tree_item *items, uint32_t cap)
 {
     uint32_t count = 0;
     tree_init_if_needed();
@@ -1162,11 +1162,5 @@ int navigate_to_path(const char *path)
 
 void address_edit_sync_path(void)
 {
-    if (!address_edit.buffer) {
-        return;
-    }
     copy_text(address_input, sizeof(address_input), current_path);
-    reliefos_ui_edit_state_sync(&address_edit);
-    address_edit.focused = 0;
-    address_edit.selecting = 0;
 }

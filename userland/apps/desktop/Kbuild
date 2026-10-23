@@ -1,8 +1,0 @@
-RELIEFOS_APP_NAME := desktop
-RELIEFOS_APP_OBJECTS := autospawn.o desktop_items.o desktop_run.o draw.o input.o inputm.o main.o render.o screen.o services.o start_menu.o state.o switcher.o util.o window.o
-RELIEFOS_APP_C_OBJECTS := autospawn.o desktop_items.o desktop_run.o draw.o input.o inputm.o main.o render.o screen.o services.o start_menu.o state.o switcher.o util.o window.o
-RELIEFOS_APP_CXX_OBJECTS :=
-RELIEFOS_APP_ASM_OBJECTS :=
-ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
-include $(srctree)/scripts/reliefos/Makefile.app-kbuild
-endif

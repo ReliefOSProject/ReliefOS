@@ -9,16 +9,11 @@ mkdir -p "$tmp/src/third_party/rime-pinyin-simp" \
     "$tmp/src/third_party/doomgeneric" "$tmp/src/userland/apps/oschinpt" \
     "$tmp/src/tools" "$tmp/src/resources/build-art/app-icons" \
     "$tmp/out/userland" "$tmp/fake-bin" "$tmp/repository"
-printf 'dictionary\n' > "$tmp/src/third_party/rime-pinyin-simp/pinyin_simp.dict.yaml"
 printf 'license\n' > "$tmp/src/third_party/rime-pinyin-simp/LICENSE"
-printf 'attribution\n' > "$tmp/src/third_party/rime-pinyin-simp/ATTRIBUTION.txt"
-printf 'settings\n' > "$tmp/src/userland/apps/oschinpt/settings.ini"
 printf 'wad\n' > "$tmp/src/third_party/doomgeneric/freedoom1.wad"
 printf 'license\n' > "$tmp/src/third_party/doomgeneric/LICENSE"
 printf 'copying\n' > "$tmp/src/third_party/doomgeneric/FREEDOOM-COPYING.txt"
-printf 'icon\n' > "$tmp/src/resources/build-art/app-icons/helloworld.bmp"
-printf 'index\n' > "$tmp/index"
-for app in helloworld doom doomlauncher oschinpt; do
+for app in doom doomlauncher; do
     printf '%s\n' "$app" > "$tmp/out/userland/$app.elf"
 done
 cat > "$tmp/build_info.h" <<'EOF'
@@ -54,9 +49,9 @@ EOF
 chmod 755 "$tmp/fake-bin/apk"
 
 sh "$src/tools/build/rpr-apps.sh" "$tmp/src" "$tmp/out" "$tmp/build_info.h" \
-    "$tmp/index" "$tmp/fake-bin/apk" "$tmp/key" "$tmp/repository" 123
+    "$tmp/fake-bin/apk" "$tmp/key" "$tmp/repository" 123
 
-for app in helloworld doom oschinpt; do
+for app in doom; do
     package="$tmp/repository/reliefos-$app-4.7.1-r123.apk"
     test -f "$package"
     test ! -e "$tmp/repository/reliefos-$app.apk"
@@ -67,11 +62,7 @@ for app in helloworld doom oschinpt; do
 done
 grep -qx 'icon=' "$tmp/repository/reliefos-doom-4.7.1-r123.apk.app-manifest"
 test ! -s "$tmp/repository/reliefos-doom-4.7.1-r123.apk.icons"
-grep -qx 'icon=helloworld.bmp' "$tmp/repository/reliefos-helloworld-4.7.1-r123.apk.app-manifest"
-printf '%s\n' \
-    reliefos-helloworld-4.7.1-r123.apk \
-    reliefos-doom-4.7.1-r123.apk \
-    reliefos-oschinpt-4.7.1-r123.apk > "$tmp/expected.list"
+printf '%s\n' reliefos-doom-4.7.1-r123.apk > "$tmp/expected.list"
 cmp "$tmp/expected.list" "$tmp/repository/packages.list"
 test "$(cat "$tmp/repository/.complete")" = 4.7.1
 
@@ -103,7 +94,7 @@ test ! -e "$tmp/pages-output"
 # The old RPR public-key URL remains byte-identical for installed clients; the
 # canonical filename points at the same key during the package transition.
 rm "$tmp/pages-apps/reliefos-broken.apk" "$tmp/pages-apps/packages.list"
-printf 'app package\n' > "$tmp/pages-apps/reliefos-helloworld-1-r0.apk"
+printf 'app package\n' > "$tmp/pages-apps/reliefos-doom-1-r0.apk"
 sh "$src/tools/build/rpr-pages.sh" "$tmp/pages-repository" "$tmp/pages-apps" \
     "$tmp/kernel.sys" "$tmp/pages-kernel/manifest.txt" \
     "$tmp/pages-version" "$tmp/fake-bin/apk" "$tmp/pages-key" "$tmp/pages-output"

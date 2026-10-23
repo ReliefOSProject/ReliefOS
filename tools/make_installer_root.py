@@ -139,8 +139,6 @@ def stage_runtime_payload(esp_tree: Path, stage: Path,
         "hidden=1\ncommands=gptinit\n",
         encoding="ascii",
     )
-    copy_file(esp_tree / RELIEFOS_APPS / "dynlinkerror" / "dynlinkerror.elf",
-              stage / RELIEFOS_APPS / "dynlinkerror" / "dynlinkerror.elf")
     copy_file(ADVANCED_INSTALL_GUIDE, stage / "root/installation.rst")
     for app in ("installer", "gptinit"):
         link, target = command_symlink(app, f"{RELIEFOS_APPS}/{app}/{app}.elf")

@@ -53,10 +53,7 @@
 #define leonos_inputm_get_state reliefos_inputm_get_state
 #define leonos_inputm_key_event reliefos_inputm_key_event
 #define leonos_inputm_list reliefos_inputm_list
-#define leonos_inputm_note_gui_window reliefos_inputm_note_gui_window
 #define leonos_inputm_notify_config reliefos_inputm_notify_config
-#define leonos_inputm_observe_gui_key reliefos_inputm_observe_gui_key
-#define leonos_inputm_poll_gui_commit reliefos_inputm_poll_gui_commit
 #define leonos_inputm_poll_result reliefos_inputm_poll_result
 #define leonos_inputm_provider reliefos_inputm_provider
 #define leonos_inputm_provider_list reliefos_inputm_provider_list
@@ -66,10 +63,7 @@
 #define leonos_inputm_result reliefos_inputm_result
 #define leonos_inputm_set_active reliefos_inputm_set_active
 #define leonos_inputm_set_context reliefos_inputm_set_context
-#define leonos_inputm_set_current_context reliefos_inputm_set_current_context
 #define leonos_inputm_state reliefos_inputm_state
 #define leonos_inputm_submit_key reliefos_inputm_submit_key
-#define leonos_inputm_take_key reliefos_inputm_take_key
-#define leonos_inputm_take_text reliefos_inputm_take_text
 #define leonos_inputm_unregister reliefos_inputm_unregister
 #endif /* LEONOS_INPUTMD_H */

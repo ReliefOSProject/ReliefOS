@@ -1,8 +1,8 @@
 #!/bin/sh
 # Optional official application packages; all cryptography/formats use apk.
 set -eu
-[ "$#" = 8 ] || exit 2
-src=$1 out=$2 build=$3 index=$4 apk=$5 key=$6 output=$7 epoch=$8
+[ "$#" = 7 ] || exit 2
+src=$1 out=$2 build=$3 apk=$4 key=$5 output=$6 epoch=$7
 export SOURCE_DATE_EPOCH=$epoch
 version=$(sed -n 's/^#define RELIEFOS_KERNEL_VERSION "\([0-9.]*\)"$/\1/p' "$build")
 printf '%s\n' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo 'invalid release version' >&2; exit 1; }
@@ -18,17 +18,12 @@ mkdir "$work/repository"
 manifest() {
     printf '[app]\nid=%s\nname=%s\nversion=%s\ncategory=%s\nexec=%s\nicon=%s\nentry=%s\nterminal=0\nsystem=0\nhidden=0\nopen_with=0\ncommands=%s\nextensions=\n' "$1" "$2" "$version" "$3" "$4" "$5" "$6" "$7" > "$root/manifest.ini"
 }
-for app in helloworld doom oschinpt; do
+for app in doom; do
     payload=$work/$app
     root=$payload/usr/lib/reliefos/apps/$app
     mkdir -p "$root" "$payload/usr/bin"
     cp "$out/userland/$app.elf" "$root/$app.elf"
     case $app in
-    helloworld)
-        cp "$src/resources/build-art/app-icons/helloworld.bmp" "$root/"
-        manifest helloworld 'Hello World' 'Developer applications' helloworld.elf helloworld.bmp 1 helloworld
-        ln -s ../lib/reliefos/apps/helloworld/helloworld.elf "$payload/usr/bin/helloworld"
-        ;;
     doom)
         cp "$out/userland/doomlauncher.elf" "$root/"
         cp "$src/third_party/doomgeneric/freedoom1.wad" "$src/third_party/doomgeneric/FREEDOOM-COPYING.txt" "$root/"
@@ -37,14 +32,6 @@ for app in helloworld doom oschinpt; do
         ln -s ../lib/reliefos/apps/doom/doomlauncher.elf "$payload/usr/bin/doom"
         ln -s ../lib/reliefos/apps/doom/doomlauncher.elf "$payload/usr/bin/doomlauncher"
         ;;
-    oschinpt)
-        cp "$src/third_party/rime-pinyin-simp/pinyin_simp.dict.yaml" "$src/third_party/rime-pinyin-simp/LICENSE" "$src/third_party/rime-pinyin-simp/ATTRIBUTION.txt" "$root/"
-        cp "$src/userland/apps/oschinpt/settings.ini" "$root/"
-        cp "$index" "$root/oscp.idx"
-        manifest oschinpt 'ReliefOS Chinese Input' 'Input methods' oschinpt.elf '' 0 oschinpt
-        printf 'input_method=1\n' >> "$root/manifest.ini"
-        ln -s ../lib/reliefos/apps/oschinpt/oschinpt.elf "$payload/usr/bin/oschinpt"
-        ;;
     esac
     find "$payload" -exec touch -h -d "@$epoch" {} +
     package_file="$work/repository/reliefos-$app-$package_version.apk"
@@ -52,11 +39,6 @@ for app in helloworld doom oschinpt; do
       --info "version:$package_version" --info arch:x86_64 --info "origin:reliefos-$app" \
       --info "description:ReliefOS application $app" --info license:LicenseRef-See-Bundled-Notices \
       --info 'depends:reliefos-apps reliefos-musl' --info "replaces:leonos-$app" --sign-key "$key"
-    if [ "$app" = oschinpt ]; then
-        set -- "$@" --script "post-install:$src/tools/oschinpt-apk-post-install" \
-          --script "post-upgrade:$src/tools/oschinpt-apk-post-install" \
-          --script "post-deinstall:$src/tools/oschinpt-apk-post-deinstall"
-    fi
     if unshare -Ur true >/dev/null 2>&1; then unshare -Ur "$apk" "$@"
     else fakeroot "$apk" "$@"
     fi
