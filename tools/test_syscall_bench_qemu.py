@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build and run the guest syscall latency/throughput benchmark in QEMU.
 
-Injects tools/tests/syscall_bench.c (static musl) plus a boot-time OpenRC
+Injects kernel/reliefnt/tools/tests/syscall_bench.c (static musl) plus a boot-time OpenRC
 service into a private copy of the release disk, boots q35/KVM, and parses the
 [syscall-bench] serial markers.  Prints one line per measured syscall plus a
 before/after-friendly summary.  The input image is never modified.
@@ -38,7 +38,7 @@ def build_probe() -> Path:
     WORK.mkdir(parents=True, exist_ok=True)
     probe = WORK / "syscall-bench"
     run([MUSL_CC, "-static", "-O2", "-Wall", "-Wextra",
-         "tools/tests/syscall_bench.c", "-o", probe])
+         "kernel/reliefnt/tools/tests/syscall_bench.c", "-o", probe])
     return probe
 
 

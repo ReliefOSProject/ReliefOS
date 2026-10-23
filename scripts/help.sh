@@ -47,11 +47,13 @@ ReliefOS build system (Linux Kbuild / Kconfig)
 
   make test-tools      C host tool tests, plain and under ASan/UBSan
   make test-build      shell contract tests for the build surface
-  make test-vdso       vDSO ELF, timekeeper and mapping/auxv regression tests
+  make test-vdso       delegate vDSO ELF, timekeeper and mapping/auxv checks
+  make test-kernel-host run standalone ReliefNT host regression suites
+  make test-kernel-ownership check standalone ReliefNT test ownership
   make test            test-tools plus test-build
   make test-long       repeated -j1/-j8 comparisons and interrupt recovery
   make test-smoke      BIOS + UEFI QEMU checks for all three media (sequential)
-  make test-legacy     pre-existing regression tests, some need Python
+  make test-legacy     kernel legacy group plus OS userspace regressions
 
   make clean           remove built products in $(O), keep configuration
   make distclean       also remove configuration in $(O); keeps the download cache

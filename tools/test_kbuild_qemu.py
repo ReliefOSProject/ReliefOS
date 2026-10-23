@@ -100,7 +100,7 @@ def prepare(build: Path, output: Path, source: Path) -> tuple[Path, dict]:
     for kind in ("static", "dynamic"):
         binary = output / f"io-runtime-{kind}.elf"
         run([compiler, "-std=gnu11", "-O2",
-             *(["-static"] if kind == "static" else []), ROOT / "tools/tests/syscall_io_runtime_probe.c",
+             *(["-static"] if kind == "static" else []), ROOT / "kernel/reliefnt/tools/tests/syscall_io_runtime_probe.c",
              "-o", binary], stdout=(output / f"compile-{kind}.log").open("w"), stderr=subprocess.STDOUT)
         put(binary, f"{GUEST}/{binary.name}", "0100755")
         records[f"probe-{kind}"] = digest(binary)

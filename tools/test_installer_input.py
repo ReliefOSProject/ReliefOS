@@ -33,19 +33,6 @@ class InstallerInputTests(unittest.TestCase):
             ], cwd=ROOT, check=True)
             subprocess.run([executable, tmp], cwd=ROOT, check=True, timeout=20)
 
-    def test_exclusive_block_open_distinguishes_optical_and_mounted_disks(self):
-        """Keep mounted partitions protected while allowing a separate blank disk."""
-        with tempfile.TemporaryDirectory(prefix="block-exclusive-") as tmp:
-            executable = str(Path(tmp) / "exclusive")
-            subprocess.run([
-                "cc", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Wno-address-of-packed-member", "-Ikernel/reliefnt/include",
-                "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                "tools/tests/block_exclusive_mount_test.c", "kernel/reliefnt/fs/tmpfs/core.c",
-                "kernel/reliefnt/lib/text_utf16.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=20)
 
     def test_copy_progress_does_not_log_every_short_io_slice(self):
         """Bound presentation overhead while preserving the next timed update."""
@@ -71,16 +58,6 @@ class InstallerInputTests(unittest.TestCase):
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
-    def test_keyboard_led_ioctl(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-keyboard-led-") as tmp:
-            executable = str(Path(tmp) / "led")
-            subprocess.run([
-                "clang", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
-                "tools/tests/evdev_led_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
     def test_disk_enumeration_preserves_posix_errors(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-block-errors-") as tmp:
@@ -135,7 +112,7 @@ class InstallerInputTests(unittest.TestCase):
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
                 "-idirafter", "userland/runtime/include",
-                "tools/tests/pointer_routing_test.c", "-o", executable,
+                "tools/tests/pointer_routing_test.c", "kernel/reliefnt/tools/tests/input_routing_fixture.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
@@ -174,40 +151,8 @@ class InstallerInputTests(unittest.TestCase):
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
-    def test_keyboard_irq_rejects_empty_and_auxiliary_output(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-keyboard-irq-") as tmp:
-            executable = str(Path(tmp) / "keyboard-irq")
-            subprocess.run([
-                "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                "-Ikernel/reliefnt/include",
-                "tools/tests/keyboard_irq_ready_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
-    def test_mouse_irq_leaves_interleaved_keyboard_bytes_for_irq1(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-ps2-interleave-") as tmp:
-            executable = str(Path(tmp) / "ps2-interleave")
-            subprocess.run([
-                "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                "-Ikernel/reliefnt/include",
-                "tools/tests/ps2_interleaved_irq_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
-    def test_mouse_parameters_reach_auxiliary_port(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-mouse-") as tmp:
-            executable = str(Path(tmp) / "mouse-init")
-            subprocess.run([
-                "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
-                "tools/tests/mouse_init_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
 
 if __name__ == "__main__":

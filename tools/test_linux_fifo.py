@@ -36,7 +36,7 @@ def main():
     work.mkdir(parents=True, exist_ok=True)
     binary = work / "fifo-abi"
     run(ROOT / "build/musl/sdk/bin/reliefos-musl-cc", "-static", "-O2", "-Wall", "-Wextra", "-Werror",
-        ROOT / "tools/tests/fifo_abi_test.c", "-o", binary)
+        ROOT / "kernel/reliefnt/tools/tests/fifo_abi_test.c", "-o", binary)
     host = run(binary, capture_output=True, text=True, timeout=15)
     (work / "host.log").write_text(host.stdout + host.stderr)
     print(host.stdout, end="")

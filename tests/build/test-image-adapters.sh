@@ -113,13 +113,6 @@ require_text "$src/tools/build/disk.sh" '41A3EE19-BA85-47A0-9705-A5C128374021' '
 require_text "$src/tools/build/disk.sh" '5C13543B-732C-4F81-8652-621124484420' 'published root UUID is unchanged'
 require_text "$src/userland/apps/installer/install_ops.h" 'TARGET_BOOT "/reliefos/kernel.sys"' 'installer detects the canonical ESP kernel path'
 require_text "$src/userland/apps/installer/install_ops.h" 'TARGET_BOOT "/leonos/kernel.sys"' 'installer recognizes a legacy ESP kernel path'
-require_text "$src/kernel/reliefnt/fs/vfs/mount.c" '"reliefos-installer-root"' 'kernel accepts the canonical installer root tag'
-require_text "$src/kernel/reliefnt/fs/vfs/mount.c" '"leonos-installer-root"' 'kernel accepts the legacy installer root tag'
-require_text "$src/kernel/reliefnt/kernel/init/kernel_debug.c" 'KERNEL_DEBUG_MARKER "RELIEFOS-KDBG-1\n"' 'kernel writes the canonical one-shot marker'
-require_text "$src/kernel/reliefnt/include/reliefos/layout.h" 'RELIEFOS_PATH_BOOT_KERNELDEBUG_MARKER "/boot/reliefos/state/kerneldebug.next"' 'kernel reads the canonical one-shot marker'
-require_text "$src/kernel/reliefnt/kernel/init/kernel_debug.c" '"/boot/leonos/state/kerneldebug.next"' 'kernel reads the legacy one-shot marker'
-require_text "$src/kernel/reliefnt/block/core/storage_block.c" '"RELIEFOS_ROOT"' 'kernel recognizes the canonical GPT root name'
-require_text "$src/kernel/reliefnt/block/core/storage_block.c" '"LEONOS4_ROOT"' 'kernel recognizes the legacy GPT root name'
 if [ "$failures" -ne 0 ]; then exit 1; fi
 
 # Exercise installer publication order. A failed GRUB resource copy must leave

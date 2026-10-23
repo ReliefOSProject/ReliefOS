@@ -13,7 +13,7 @@
 验证状态
 ========
 
-机器可读的音频支持清单位于 ``configs/audio-abi-support.json``。
+机器可读的音频支持清单位于 ``kernel/reliefnt/configs/audio-abi-support.json``。
 这份数据在文档整理时保持内容不变；其 guest_runtime/upstream_alsa 语义及
 既有断言冲突仍需按原问题处理，不能通过修改标志掩盖。
 ReliefPlayer 的具体编解码和输出范围见 :doc:`../applications/reliefplayer`。

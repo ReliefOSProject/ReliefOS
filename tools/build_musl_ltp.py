@@ -72,7 +72,7 @@ def main():
              f"-I{headers / 'include'}", f"-I{posix / 'include'}",
              posix / f"conformance/interfaces/{test}/1-1.c", posix / "lib/common.c",
              "-o", output / f"{test}_1-1.elf"])
-    run([sdk / "bin/reliefos-musl-cc", "-O2", "-static", ROOT / "tools/tests/ltp_guest_runner.c",
+    run([sdk / "bin/reliefos-musl-cc", "-O2", "-static", ROOT / "kernel/reliefnt/tools/tests/ltp_guest_runner.c",
          "-o", output / "ltp-runner.elf"])
     shutil.copy2(ltp / "COPYING", output / "COPYING.ltp")
     (output / "manifest.json").write_text(json.dumps({

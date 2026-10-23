@@ -193,7 +193,7 @@ def main():
         probe = work / "network.elf"
         subprocess.run([str(compiler), "-static", "-O2", "-Wall", "-D_GNU_SOURCE", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
                         "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                        "-idirafter", "userland/runtime/include", "tools/tests/network_guest_test.c",
+                        "-idirafter", "userland/runtime/include", "kernel/reliefnt/tools/tests/network_guest_test.c",
                         "userland/runtime/src/ntp.c", "userland/runtime/src/netsock.c", "userland/runtime/src/unix_ipc.c",
                         "-Lbuild/musl/lib", "-Wl,--start-group", "-l:libleonos.a",
                         "-Wl,--end-group", "-o", str(probe)], check=True)

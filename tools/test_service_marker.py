@@ -7,26 +7,24 @@ role gids recorded in the image inode.  The windowd stack
 carry those marks is out of the image, so the userspace side of the mark is
 gone and the kernel grants stay dormant.  This test pins that end state:
 
-1. kernel defines: RELIEFOS_GID_WINDOW_SERVER/RELIEFOS_GID_SERVICE in
-   kernel/reliefnt/kernel/exec/userland.c still carry the pinned values;
-2. staging plan: tools/build/rootfs-stage.sh assigns no role gid to any app;
-3. image build: tools/build/images.sh contains no role-gid re-chown;
-4. guest groups: system/rootfs/etc/group and system/test-accounts/group still
+Kernel credential IDs are checked by ReliefNT tools/test_service_roles.py.
+
+1. staging plan: tools/build/rootfs-stage.sh assigns no role gid to any app;
+2. image build: tools/build/images.sh contains no role-gid re-chown;
+3. guest groups: system/rootfs/etc/group and system/test-accounts/group still
    declare the reserved, memberless groups at the same numbers (installed
    systems may carry the gids on old files);
-5. built manifest (optional, --manifest): no entry carries a role gid at all.
+4. built manifest (optional, --manifest): no entry carries a role gid at all.
 
-Checks 1-4 run against the checked-in sources; check 5 needs a built tree
+Checks 1-3 run against the checked-in sources; check 4 needs a built tree
 (`make O=<dir> all`, manifest at <dir>/rootfs/manifest.json) and is reported
 as skipped when no manifest is available.
 """
 from pathlib import Path
 import argparse
 import json
-import re
 
 ROOT = Path(__file__).resolve().parents[1]
-KERNEL_USERLAND = (ROOT / "kernel/reliefnt/kernel/exec/userland.c")
 ROOTFS_STAGE = ROOT / "tools/build/rootfs-stage.sh"
 IMAGES = ROOT / "tools/build/images.sh"
 GROUP_FILES = [ROOT / "system/rootfs/etc/group", ROOT / "system/test-accounts/group"]
@@ -39,16 +37,6 @@ GROUP_NAMES = {
     "leonos-service": SERVICE_GID,
 }
 
-
-def check_kernel_defines(failures):
-    text = KERNEL_USERLAND.read_text()
-    for name, value in (("RELIEFOS_GID_WINDOW_SERVER", WINDOW_SERVER_GID),
-                        ("RELIEFOS_GID_SERVICE", SERVICE_GID)):
-        match = re.search(rf"^#define {name} (\d+)u$", text, re.M)
-        if not match:
-            failures.append(f"KERNEL: {name} define missing in {KERNEL_USERLAND}")
-        elif int(match.group(1)) != value:
-            failures.append(f"KERNEL: {name}={match.group(1)}, expected {value}")
 
 
 def check_staging_plan(failures):
@@ -107,7 +95,6 @@ def main():
     args = parser.parse_args()
 
     failures = []
-    check_kernel_defines(failures)
     check_staging_plan(failures)
     check_images_rechown(failures)
     check_group_files(failures)

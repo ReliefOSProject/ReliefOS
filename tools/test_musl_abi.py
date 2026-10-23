@@ -3,12 +3,14 @@
 
 import argparse
 from pathlib import Path
+import sys
 import subprocess
 import tempfile
 
-from generate_linux_syscalls import syscall_entries
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "kernel/reliefnt/tools"))
+from generate_linux_syscalls import syscall_entries
 
 
 def run(args):

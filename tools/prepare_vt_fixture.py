@@ -9,7 +9,7 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 
 def prepare(source, output, text_only=False, compiler=None,
-            probe_source='tools/tests/vt_guest_test.c'):
+            probe_source='kernel/reliefnt/tools/tests/vt_guest_test.c'):
     output.mkdir(parents=True, exist_ok=False)
     probe = output / 'vt-probe'
     if compiler is None:
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('--compiler', type=Path, default=None,
                         help='reliefos-musl-cc to build the probe with '
                              '(default: out/x86_64/release/sdk/reliefos-musl-sdk/bin/reliefos-musl-cc)')
-    parser.add_argument('--probe-source', default='tools/tests/vt_guest_test.c',
+    parser.add_argument('--probe-source', default='kernel/reliefnt/tools/tests/vt_guest_test.c',
                         help='guest probe C source to install as /tmp/vt-probe')
     args = parser.parse_args()
     print(prepare(args.image, args.output, args.text_only, args.compiler, args.probe_source))

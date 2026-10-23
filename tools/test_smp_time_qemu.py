@@ -34,7 +34,7 @@ def compile_probe(out: Path, sysroot: Path) -> Path:
     run(['clang', '--target=x86_64-linux-musl', '-nostdinc',
          '-isystem', sysroot / 'include', '-isystem', resource / 'include',
          '-O2', '-Wall', '-Wextra', '-Werror', '-fno-stack-protector',
-         '-mno-avx', '-mno-avx2', '-c', ROOT / 'tools/tests/smp_time_guest_test.c', '-o', obj])
+         '-mno-avx', '-mno-avx2', '-c', ROOT / 'kernel/reliefnt/tools/tests/smp_time_guest_test.c', '-o', obj])
     run(['ld.lld', '-static', '--build-id=none', '-z', 'max-page-size=0x1000',
          '--image-base=0x4000000', '-o', binary, sysroot / 'lib/crt1.o',
          sysroot / 'lib/crti.o', obj, sysroot / 'lib/mimalloc.o', '--start-group',
@@ -91,7 +91,7 @@ start() {
     manifest = {'source': str(image), 'source_sha256_before_after': source_hash,
         'source_unchanged': True, 'kernel': str(kernel), 'kernel_readbacks': kernels,
         'partitions': partitions, 'payload': payload,
-        'raw_sha256': disk.file_sha256(raw), 'probe_source_sha256': disk.file_sha256(ROOT / 'tools/tests/smp_time_guest_test.c'),
+        'raw_sha256': disk.file_sha256(raw), 'probe_source_sha256': disk.file_sha256(ROOT / 'kernel/reliefnt/tools/tests/smp_time_guest_test.c'),
         'controller_sha256': disk.file_sha256(Path(__file__))}
     (out / 'image-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     raw.chmod(0o400)

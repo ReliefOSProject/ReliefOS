@@ -18,7 +18,7 @@ def prepare(cache):
     WORK.mkdir(parents=True, exist_ok=True)
     probe = WORK / "epoll-pty.elf"
     run([ROOT / "build/musl/sdk/bin/reliefos-musl-cc", "-static", "-O2", "-Wall", "-Wextra",
-         ROOT / "tools/tests/linux_epoll_pty_test.c", "-o", probe])
+         ROOT / "kernel/reliefnt/tools/tests/linux_epoll_pty_test.c", "-o", probe])
     run([probe], timeout=10)
     with tempfile.TemporaryDirectory(prefix="stage-", dir=WORK) as directory:
         stage = Path(directory) / "root"

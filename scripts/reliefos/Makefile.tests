@@ -93,53 +93,17 @@ test-audio:
 
 test: test-tools test-build
 
-# The vDSO tests execute its real ELF and the kernel mapping/timekeeper code.
-# Give the standalone ELF build and host fixtures their own output trees so
-# they can run alongside an ordinary kernel build without sharing its lock.
-.PHONY: test-vdso
-RELIEFOS_VDSO_TEST_PYTHON = $(or $(RELIEFOS_TEST_PYTHON),python3)
-test-vdso:
-	$(Q)mkdir -p $(O)/tmp/vdso-tests
-	$(Q)TMPDIR='$(abspath $(O))/tmp/vdso-tests' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFNT_DIR)/tools/test_vdso.py --output '$(abspath $(O))/vdso-tests'
-	$(Q)TMPDIR='$(abspath $(O))/tmp/vdso-tests' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_vdso_time.py
-	$(Q)TMPDIR='$(abspath $(O))/tmp/vdso-tests' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_vdso_mapping.py
-
-# Host-only coverage for AP calibration and CPU-time units. Guest SMP boots
-# remain an explicit validation step rather than an implicit test prerequisite.
-.PHONY: test-smp-time
-test-smp-time:
-	$(Q)mkdir -p $(O)/tmp
-	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_acpi_pm_timer.py
-	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_apic_timer.py
-	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_cpu_accounting.py
-
-.PHONY: test-page-cache-growth
-test-page-cache-growth:
-	$(Q)mkdir -p $(O)/tmp
-	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_page_cache_growth.py
-
-.PHONY: test-user-return
-test-user-return:
-	$(Q)mkdir -p $(O)/tmp
-	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_user_return_gate.py
-	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_execution_lock.py
-	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_sched_resume.py
-
-.PHONY: test-syscall-io
-test-syscall-io:
-	$(Q)mkdir -p $(O)/tmp
-	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_VDSO_TEST_PYTHON) \
-	    $(RELIEFOS_SRC)/tools/test_syscall_io.py
+# Kernel implementation tests are owned and selected by ReliefNT. The parent
+# preserves convenient Make goals and delegates; it owns no kernel suite list.
+RELIEFOS_KERNEL_TEST_GOALS := test-vdso test-smp-time test-page-cache-growth \
+ test-user-return test-syscall-io test-kernel-host test-kernel-ownership
+.PHONY: $(RELIEFOS_KERNEL_TEST_GOALS)
+$(RELIEFOS_KERNEL_TEST_GOALS):
+	$(Q)mkdir -p $(O)/tmp/kernel-tests
+	+$(Q)$(MAKE) -C '$(RELIEFNT_DIR)' O='$(abspath $(O))/kernel-tests/$@' \
+	 TMPDIR='$(or $(TMPDIR),$(abspath $(O))/tmp/kernel-tests)' \
+	 RELIEFNT_TEST_PYTHON='$(or $(RELIEFOS_TEST_PYTHON),python3)' \
+	 $(patsubst test-kernel-%,test-%,$@)
 
 # Each instrumentation mode has its own native output context. Sources and
 # generated dependency files are never shared across the two compiler policies.

@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "host_tmp.h"
+#include "../../kernel/reliefnt/tools/tests/host_tmp.h"
 #include <stdlib.h>
 #include <sys/un.h>
 

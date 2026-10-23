@@ -1,17 +1,6 @@
-# ReliefOS/ReliefNT task 11 reviewed old-name allowlist.
+# ReliefOS task 11 reviewed old-name allowlist.
 # scope<TAB>category<TAB>path<TAB>reason; exact tracked path, no blanket migration exemptions.
 # Rules: Documentation/userspace-api/abi.rst.
-kernel	compatibility	block/core/storage_block.c	识别已有磁盘 GPT 名 LEONOS4_ROOT
-kernel	compatibility	fs/vfs/mount.c	旧 leonos-installer-root 引导 module tag 双接受
-kernel	compatibility	fs/proc/procfs.c	冻结 LeonOSRole/LeonOSFlags 与 /proc/leonos-drivers 接口值
-kernel	compatibility	fs/sysfs/sysfs.c	冻结 /sys/devices/platform/leonos-block 运行时设备路径
-kernel	compatibility	include/reliefos/elf_abi.h	published ELF note and runtime SONAME values
-kernel	compatibility	include/reliefos/layout.h	frozen task 6 guest layout values
-kernel	compatibility	include/uapi/reliefos/rootfs.h	frozen task 6 rootfs paths
-kernel	compatibility	kernel/init/kernel.c	识别旧 installer-root GRUB module tag
-kernel	compatibility	kernel/init/kernel_debug.c	旧 kerneldebug ELF note section 与函数名/hash 双接受
-kernel	compatibility	kernel/syscall/device/input_ioctl.c	冻结设备 ioctl 对外 identity：PS/2 名称与 leonos-fb
-kernel	compatibility	kernel/syscall/device/legacy_ioctl.c	冻结设备 ioctl 对外 identity：PS/2 名称与 leonos-fb
 main	compatibility	.github/workflows/build-installer.yml	上传既有 leonos.conf 配置文件名
 main	external-url	.github/workflows/build-pages.yml	GitHub Secret 旧名回退；优先新 RELIEFOS Secret，不改外部配置
 main	external-url	.github/workflows/sourcehut-sync.yml	real old remote addresses, switch only after new targets verified
@@ -195,7 +184,7 @@ main	compatibility	tools/test_installer_payload.py	真实安装器旧目标识�
 main	compatibility	tools/test_installer_setup.py	LEONOS_TEST_PASSWORD_HASH 是既有宿主测试驱动与 C fixture 共享输入键
 main	compatibility	tools/test_installer_update_qemu.py	断言旧 leonos-* APK 包经升级改变版本，必须保留旧包前缀识别。
 main	compatibility	tools/test_linux_fifo.py	测试镜像更新既有 /leonos 回滚内核载荷；libleonos.so.2 是显式兼容库
-main	compatibility	tools/test_linux_inventory.py	冻结 GRUB 字体路径与新旧内核日志前缀双接受
+main	compatibility	tools/test_fastfetch_qemu.py	冻结 GRUB 字体路径与新旧内核日志前缀双接受
 main	compatibility	tools/test_live_iso.py	旧 users.db 迁移隔离 fixture 与冻结 installer ISO marker
 main	compatibility	tools/test_make_image.py	冻结 GPT/FAT/exFAT 标签与旧 ESP 回滚载荷验证
 main	compatibility	tools/test_make_installer_root.py	实际 installer stage 保留旧 libleonos.so.2 兼容库及旧 ESP；禁止在新目录错放旧库名
@@ -218,7 +207,6 @@ main	compatibility	tools/test_uapi.py	校验保留的 userland/runtime/include/l
 main	compatibility	tools/test_uinxed_guest.py	计算实际打包的旧 ESP 回滚内核载荷哈希
 main	compatibility	tools/test_upstream_tools_runtime.py	旧环境变量输入兼容，禁止引入旧 libleonos SONAME 的依赖负向断言
 main	compatibility	tools/test_vdso_qemu.py	QEMU 镜像回归同时验证 canonical 与旧 /leonos/kernel.sys ESP 内核副本哈希
-main	compatibility	tools/tests/abi_layout_golden.json	旧 UAPI sizeof/offsetof/常量布局 golden，值级对比基线不得随意改写
 main	compatibility	tools/tests/installer_accounts_test.c	LEONOS_TEST_PASSWORD_HASH 是既有宿主测试驱动与 C fixture 共享输入键
 main	history	tools/tests/legacy_authd/accounts.c	文件声明 Historical regression fixture only；已退役 authd 实现仅保留历史回归，不入产品
 main	history	tools/tests/legacy_authd/accounts.h	文件声明 Historical regression fixture only；已退役 authd 实现仅保留历史回归，不入产品
@@ -231,7 +219,6 @@ main	history	tools/tests/legacy_authd/include/leonos/auth_db.h	文件声明 Hist
 main	history	tools/tests/legacy_authd/include/leonos/authd.h	文件声明 Historical regression fixture only；已退役 authd 实现仅保留历史回归，不入产品
 main	history	tools/tests/legacy_authd/main.c	文件声明 Historical regression fixture only；已退役 authd 实现仅保留历史回归，不入产品
 main	history	tools/tests/legacy_authd/sudo_policy.h	文件声明 Historical regression fixture only；已退役 authd 实现仅保留历史回归，不入产品
-main	compatibility	tools/tests/linux_inventory_test.c	sysfs 冻结 leonos-block 接口值的 Linux 清单探针
 main	compatibility	tools/tests/openrc_authorization_test.c	显式使用已发布旧 OpenRC 服务名测试授权/参数注入，服务脚本仍有旧转发入口。
 main	history	tools/tests/pam_runtime_probe.c	退役 authd.sock 的独立旧 PAM 原型参考 fixture；独立环境变量隔离键
 main	compatibility	tools/tests/password_policy_runtime_probe.c	存在旧 authd 才等待旧 socket；PAM pam_leonos_password.so 为冻结模块文件名。
@@ -373,6 +360,3 @@ main	compatibility	Documentation/userspace-api/abi.rst	旧 SONAME、转发头和
 main	compatibility	Documentation/userspace-api/locale.rst	现行 gettext leonos domain 与 MO 文件名保持字节兼容
 main	compatibility	Documentation/process/assets.rst	历史来源渲染器文件名用于资产来源说明
 main	history	Documentation/releases/5.1.2.rst	已发布 5.1.2 正文的独立 RST 归档，外部标签链接保持历史原值
-kernel	compatibility	include/uapi/README.rst	公开旧 libleonos.so.2 独立兼容 SONAME 的使用限制
-kernel	history	configs/kernel-source-map.json	源码拆分映射保留基线名称，仅作审计不进入生产编译
-kernel	history	Documentation/releases/5.1.2.rst	已发布 5.1.2 说明的 RST 归档，保留版本事实

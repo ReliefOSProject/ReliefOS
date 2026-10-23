@@ -18,6 +18,27 @@ test 为宿主/构建契约，test-long 包括长流程与恢复，test-legacy �
 test-build 包含 Pages 文档回归，宿主需要 Sphinx；普通内核和用户态编译不因此依赖它。
 按风险选择定向检查；通过已有失败之前的步骤不能称为全套通过。
 
+仓库边界
+========
+
+ReliefOS 持有应用、运行库、SDK、APK、安装器、镜像与完整系统 QEMU/VMware
+集成测试。内核实现、驱动、文件系统、调度、内存和 Linux UAPI 的测试及原生
+系统调用探针由 ReliefNT 仓库持有，入口见其
+``Documentation/process/testing.rst``。混合套件按实现归属拆开，主仓不保留
+内核夹具副本或旧脚本转发文件。
+
+``tests/build/test-test-ownership.sh`` 构建契约检查测试源码归属。主仓保留方便调用的
+``test-vdso``、``test-smp-time``、``test-page-cache-growth``、
+``test-user-return``、``test-syscall-io``、``test-kernel-host`` 与
+``test-kernel-ownership`` Make 目标，它们委托内核自己的 Make 入口，
+不在父仓复制内核测试清单。``test-legacy`` 同样先委托内核定向回归组，
+再运行主仓 Unix IPC 与用户态 syscall 头检查。
+
+来宾启动、SDK 编译和应用互操作仍由本仓编排；需要原生 ABI 探针时，直接消费
+``kernel/reliefnt/tools/tests/`` 内的源文件。窗口输入集成测试分别编译父仓的
+窗口客户端与内核仓的输入夹具对象，保留实际事件路由覆盖。
+
+
 运行证据
 ========
 

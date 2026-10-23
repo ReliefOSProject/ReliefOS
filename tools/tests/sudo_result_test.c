@@ -3,7 +3,7 @@
 #undef main
 #include "../../userland/apps/authd/authd_sudo.c"
 #include <assert.h>
-#include "host_tmp.h"
+#include "../../kernel/reliefnt/tools/tests/host_tmp.h"
 
 static int collected = -1;
 static int result_send(void *context, uint32_t type, const void *payload, uint32_t length, int fd)

@@ -45,7 +45,7 @@ def main():
     probe = work / "probe.elf"
     subprocess.run([*compiler_args, "-static", "-O2", "-Wall", "-Wextra",
                     *([f'-DPROBE_POWER_COMMAND="{args.power}"'] if args.power else []),
-                    "tools/tests/storage_upstream_guest.c", "tools/tests/tmpfs_mmap_test.c",
+                    "tools/tests/storage_upstream_guest.c", "kernel/reliefnt/tools/tests/tmpfs_mmap_test.c",
                     "-o", str(probe)], cwd=ROOT, check=True)
     image = work / "root.ext2"
     shutil.copy2(args.root, image)

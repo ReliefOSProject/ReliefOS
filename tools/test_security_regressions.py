@@ -14,15 +14,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-FORBIDDEN_KERNEL_RE = re.compile(
-    r"\b(?:(?:LEONOS|RELIEFOS)_GUI_IOCTL|(?:LEONOS|RELIEFOS)_AUTH_IOCTL|(?:LEONOS|RELIEFOS)_IOCTL_NET_|"
-    r"(?:LEONOS|RELIEFOS)_INPUTM_IOCTL|(?:LEONOS|RELIEFOS)_STARTUP_IOCTL|(?:LEONOS|RELIEFOS)_FS_IOCTL_|"
-    r"(?:LEONOS|RELIEFOS)_IOCTL_AUDIO_|(?:LEONOS|RELIEFOS)_IOCTL_DEVICE_LIST|(?:LEONOS|RELIEFOS)_IOCTL_DRIVER_|"
-    r"(?:LEONOS|RELIEFOS)_TEXT_IOCTL|(?:LEONOS|RELIEFOS)_IOCTL_LIST_DIR|(?:LEONOS|RELIEFOS)_KERNEL_DEBUG_IOCTL)"
-    r"[A-Z0-9_]*\b"
-)
-
-KERNEL_ROOTS = tuple("kernel/reliefnt/" + name for name in ("arch", "block", "drivers", "firmware", "fs", "kernel", "lib", "mm", "net", "sound"))
 PEERCRED_PATHS = (
     "userland/apps/windowd/main.c",
     "userland/apps/device-agent/main.c",
@@ -34,18 +25,6 @@ def read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
 
 
-def kernel_violations() -> list[str]:
-    violations: list[str] = []
-    for root in KERNEL_ROOTS:
-        for path in sorted((ROOT / root).rglob("*")):
-            if path.suffix not in {".c", ".h"}:
-                continue
-            text = path.read_text(encoding="utf-8")
-            for match in FORBIDDEN_KERNEL_RE.finditer(text):
-                line = text.count("\n", 0, match.start()) + 1
-                violations.append(f"{path.relative_to(ROOT)}:{line}: {match.group(0)}")
-    return violations
-
 
 def missing_peercred() -> list[str]:
     missing = []
@@ -56,14 +35,20 @@ def missing_peercred() -> list[str]:
     return missing
 
 
-def credential_regressions() -> list[str]:
-    # Linux kernel/sys.c and kernel/reboot.c use separate capabilities. The
-    # historical source-string assertion required incorrect real-UID gates.
-    result = subprocess.run([sys.executable, "tools/test_linux_capabilities.py"],
-                            cwd=ROOT, capture_output=True, text=True, timeout=60)
-    if result.returncode:
-        return ["production credential regression failed: " + (result.stdout + result.stderr)[-4000:]]
-    return []
+def kernel_report():
+    import json
+    result = subprocess.run([sys.executable, "kernel/reliefnt/tools/test_security_regressions.py", "--json"],
+                            cwd=ROOT, capture_output=True, text=True, timeout=90)
+    try:
+        report = json.loads(result.stdout)
+        fields = ("kernel_private_ioctl_violations", "credential_regression_failures")
+        if all(isinstance(report.get(name), list) for name in fields):
+            if result.returncode == 0 or any(report[name] for name in fields):
+                return report
+    except (json.JSONDecodeError, AttributeError):
+        pass
+    return {"kernel_private_ioctl_violations": [],
+            "credential_regression_failures": ["kernel suite failed: " + (result.stdout + result.stderr)[-4000:]]}
 
 
 def authorization_regressions() -> list[str]:
@@ -87,9 +72,10 @@ def main() -> int:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    violations = kernel_violations()
+    kernel = kernel_report()
+    violations = kernel["kernel_private_ioctl_violations"]
     peercred = missing_peercred()
-    gates = credential_regressions()
+    gates = kernel["credential_regression_failures"]
     from_peer = authorization_regressions()
     failures = violations + peercred + gates + from_peer
 

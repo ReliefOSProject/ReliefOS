@@ -20,7 +20,7 @@ from run_gcc_probe_qemu import qmp_quit
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_IMAGE = ROOT / "out/xorg-vmware-debug/images/reliefos.vmdk"
 OVMF = Path("/usr/share/edk2/x64/OVMF.4m.fd")
-PROBE_SOURCE = ROOT / "tools/tests/vdso_guest_test.c"
+PROBE_SOURCE = ROOT / "kernel/reliefnt/tools/tests/vdso_guest_test.c"
 SERVICE_PATH = "/etc/init.d/reliefos-vdso-guest"
 SERVICE_LINK = "/etc/runlevels/default/reliefos-vdso-guest"
 GUEST_TEST_DIR = "/usr/lib/reliefos/tests"

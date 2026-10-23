@@ -14,7 +14,7 @@
 #                  BRAND_STRICT=1 (final review, plan task 11).
 #
 # Old-name scan scope: Git-tracked files (git grep) and tracked filenames,
-# in the main repository and in the kernel submodule. Untracked user content,
+# in the main repository. ReliefNT owns its independent brand gate. Untracked user content,
 # build outputs and third-party submodules are out of scope by design; the
 # final review (plan task 11) covers untracked source with a separate rg pass.
 set -eu
@@ -175,14 +175,13 @@ userland/apps/shell/main.c
     else
         fail 'MOTD headers must use ReliefOS'
     fi
-    if grep -qx 'kernel_name=ReliefNT' "$root/kernel/reliefnt/configs/build-version" &&
-       grep -q 'LINUX_UTS_SYSNAME "ReliefNT"' \
-           "$root/kernel/reliefnt/include/reliefnt/uts.h" &&
-       grep -q 'info.kernel_name' "$root/userland/apps/osver/main.cpp"; then
-        ok 'system information surfaces the ReliefNT kernel name'
+
+    if grep -q 'info.kernel_name' "$root/userland/apps/osver/main.cpp"; then
+        ok 'version page renders the kernel-provided identity'
     else
-        fail 'kernel identity used by Fastfetch and the version page must be ReliefNT'
+        fail 'version page must render the kernel-provided identity'
     fi
+
 }
 
 check_current_docs() {
@@ -372,9 +371,6 @@ if [ -f "$allowlist" ]; then
         esac
     done < "$allowlist"
     audit_repo main "$root"
-    if [ -d "$root/kernel/reliefnt" ]; then
-        audit_repo kernel "$root/kernel/reliefnt"
-    fi
 else
     fail "missing $allowlist"
 fi

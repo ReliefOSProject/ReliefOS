@@ -2,8 +2,6 @@
 """Check that all boot environments use six ordinary VT sessions."""
 from pathlib import Path
 import unittest
-import subprocess
-import tempfile
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,15 +9,6 @@ ROOTFS = ROOT / "system/rootfs"
 
 
 class ConsoleBootPolicyTests(unittest.TestCase):
-    def test_console_cursor_and_background_output(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-vt-console-") as tmp:
-            binary = str(Path(tmp) / "console")
-            subprocess.run(["clang", "-std=c11", "-g", "-O1",
-                            "-ffunction-sections", "-fdata-sections", "-fsanitize=address,undefined",
-                            "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
-                            "-Wl,--gc-sections", "tools/tests/vt_console_test.c", "-o", binary],
-                           cwd=ROOT, check=True)
-            subprocess.run([binary], check=True, timeout=10)
 
     def test_init_respawns_a_session_on_each_virtual_terminal(self):
         config = (ROOTFS / "etc/inittab").read_text()
