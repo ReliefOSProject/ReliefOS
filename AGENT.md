@@ -247,7 +247,8 @@ make test-smoke
 主仓只持有应用、运行库、SDK、打包、安装器、镜像和完整系统集成测试；
 需要内核原生探针时消费子仓路径，不复制私有实现。内核宿主测试由子仓
 `make test-host` 选择；父仓委托目标不得维护另一份内核套件清单。
-两边的 `tools/test_test_ownership.py` 检查此边界。
+两边的 `tools/test_test_ownership.py` 检查此边界；主仓的 Shell 测试也不得直接
+断言内核私有源码和头文件的内容或存在性，这些检查由内核仓持有。
 
 额外规则：
 

@@ -10,8 +10,6 @@ for path in userland/apps/desktop userland/apps/windowd \
     userland/runtime/include/leonos/gui.h \
     userland/runtime/include/reliefos/mouse.h \
     userland/runtime/include/leonos/mouse.h \
-    kernel/reliefnt/drivers/video/framebuffer/desktop.c \
-    kernel/reliefnt/drivers/video/framebuffer/desktop_input.c \
     system/config/taskbar.cfg; do
     if test -e "$src/$path"; then
         echo "FAIL - removed implementation still exists: $path" >&2
@@ -28,11 +26,8 @@ for app in settings terminal run netctl servicemgr devmgr drvmgr sysconfdialog \
         exit 1
     fi
 done
-if grep -Eq 'APP_(DESKTOP|WINDOWD)_' "$src/Kconfig.components" || \
-   grep -Eq 'TASK_FLAG_WINDOW_SERVER|RELIEFOS_GID_(WINDOW_SERVER|SERVICE)' \
-       "$src/kernel/reliefnt/kernel/exec/userland.c" \
-       "$src/kernel/reliefnt/include/reliefnt/task/types.h"; then
-    echo 'FAIL - removed configuration or authority is still present' >&2
+if grep -Eq 'APP_(DESKTOP|WINDOWD)_' "$src/Kconfig.components"; then
+    echo 'FAIL - removed configuration is still present' >&2
     exit 1
 fi
 if grep -Eq 'wind[.]o|ui[.]o|ui_surface[.]o' "$src/userland/runtime/src/Kbuild"; then

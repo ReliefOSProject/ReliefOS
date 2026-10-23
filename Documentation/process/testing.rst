@@ -27,7 +27,11 @@ ReliefOS 持有应用、运行库、SDK、APK、安装器、镜像与完整系�
 ``Documentation/process/testing.rst``。混合套件按实现归属拆开，主仓不保留
 内核夹具副本或旧脚本转发文件。
 
-``tests/build/test-test-ownership.sh`` 构建契约检查测试源码归属。主仓保留方便调用的
+``tests/build/test-test-ownership.sh`` 构建契约检查测试源码归属，包括 Shell 测试
+直接引用内核私有源码和头文件的情况。旧内核桌面实现与可执行文件 GID 服务权限的
+残留检查由 ReliefNT 的 ``service_roles`` 套件持有；主仓的
+``tests/build/test-x11-only.sh`` 只检查本仓的应用、运行库与产品配置。
+主仓保留方便调用的
 ``test-vdso``、``test-smp-time``、``test-page-cache-growth``、
 ``test-user-return``、``test-syscall-io``、``test-kernel-host`` 与
 ``test-kernel-ownership`` Make 目标，它们委托内核自己的 Make 入口，
@@ -35,8 +39,8 @@ ReliefOS 持有应用、运行库、SDK、APK、安装器、镜像与完整系�
 再运行主仓 Unix IPC 与用户态 syscall 头检查。
 
 来宾启动、SDK 编译和应用互操作仍由本仓编排；需要原生 ABI 探针时，直接消费
-``kernel/reliefnt/tools/tests/`` 内的源文件。窗口输入集成测试分别编译父仓的
-窗口客户端与内核仓的输入夹具对象，保留实际事件路由覆盖。
+``kernel/reliefnt/tools/tests/`` 内的源文件；公开 UAPI 的消费和完整系统的
+构建集成检查仍属于主仓。
 
 
 运行证据

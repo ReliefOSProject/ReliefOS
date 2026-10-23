@@ -39,6 +39,20 @@ class TestOwnership(unittest.TestCase):
                         r"^kernel/reliefnt/(?:arch|block|drivers|firmware|fs|kernel|lib|mm|net|sound)/[^\n]*\.c$",
                         str(path.relative_to(ROOT)))
 
+    def test_os_shell_tests_do_not_inspect_private_kernel_sources(self):
+        violations = []
+        paths = set((ROOT / "tests").rglob("*.sh"))
+        paths.update((ROOT / "tools/tests").rglob("*.sh"))
+        paths.update((ROOT / "tools").glob("test*.sh"))
+        private_source = re.compile(
+            r"kernel/reliefnt/(?:arch|block|drivers|firmware|fs|kernel|lib|mm|net|sound|include/reliefnt)/"
+            r"[\w./+-]+\.(?:c|h|cpp|S|s|inc)\b")
+        for path in sorted(paths):
+            for line, text in enumerate(path.read_text().splitlines(), 1):
+                if not text.lstrip().startswith("#") and private_source.search(text):
+                    violations.append(f"{path.relative_to(ROOT)}:{line}")
+        self.assertEqual(violations, [], "private source assertions belong in ReliefNT")
+
 
 if __name__ == "__main__":
     unittest.main()
