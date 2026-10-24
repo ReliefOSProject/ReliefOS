@@ -12,12 +12,15 @@ from PIL import Image, ImageDraw
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from test_icewm_interactions_qemu import client_bounds
+
 from test_xorg_vm_qemu import (
     classify_greeter_text,
     lifecycle_events,
     require_event_order,
     require_vt_handshake,
     _bright_panel_bbox,
+    _session_st_visible,
 )
 
 
@@ -72,6 +75,38 @@ class EvidenceTests(unittest.TestCase):
         frame = Image.new("RGB", (1280, 800), "black")
         ImageDraw.Draw(frame).rectangle((0, 20, 605, 440), fill=(190, 198, 205))
         self.assertIsNone(_bright_panel_bbox(frame))
+
+    def test_default_st_is_visible_on_a_black_desktop(self):
+        frame = Image.new("RGB", (1280, 800), "black")
+        draw = ImageDraw.Draw(frame)
+        draw.rectangle((0, 0, 711, 481), fill=(192, 192, 192))
+        draw.rectangle((4, 4, 707, 21), fill=(0, 0, 128))
+        draw.rectangle((6, 26, 705, 477), fill="black")
+        draw.text((10, 30), "test@reliefos:~$", fill="white")
+        self.assertTrue(_session_st_visible(frame))
+
+    def test_black_background_and_console_text_are_not_a_session_window(self):
+        frame = Image.new("RGB", (1280, 800), "black")
+        self.assertFalse(_session_st_visible(frame))
+        ImageDraw.Draw(frame).text((0, 0), "ReliefOS tty1 login:", fill="white")
+        self.assertFalse(_session_st_visible(frame))
+
+    def test_default_st_bounds_follow_move_resize_and_maximize(self):
+        for bounds in ((6, 26, 706, 478), (126, 86, 826, 538),
+                       (126, 86, 906, 586), (0, 24, 1280, 774)):
+            with self.subTest(bounds=bounds):
+                left, top, right, bottom = bounds
+                frame = Image.new("RGB", (1280, 800), "black")
+                draw = ImageDraw.Draw(frame)
+                draw.rectangle((max(0, left - 6), max(0, top - 26),
+                                right + 5, bottom + 3), fill=(192, 192, 192))
+                draw.rectangle((left, top, right - 1, bottom - 1), fill="black")
+                draw.text((left + 4, top + 4), "test@reliefos:~$", fill="white")
+                # The native frame can join a thin black strip beside the title
+                # to the client. Geometry must exclude that frame fringe.
+                draw.line((left, max(1, top - 20), left, top), fill="black")
+                self.assertEqual(client_bounds(frame), bounds)
+        self.assertIsNone(client_bounds(Image.new("RGB", (1280, 800), "black")))
 
     def test_vt_evidence_requires_process_handshake(self):
         trace = "\n".join([
