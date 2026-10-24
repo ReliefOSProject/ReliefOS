@@ -93,9 +93,13 @@ fi
 
 # The refusal must not leave a half-written tree behind, and the winner must not
 # have been disturbed by the loser parsing the same makefiles.
-owner_objects=$(find "$same_o/reliefnt/obj/kernel" \( -name '*.c.o' -o -name '*.S.o' \) 2>/dev/null |
-        wc -l | tr -d ' ')
-listed=$(wc -l <"$same_o/reliefnt/obj/kernel/sources.list" 2>/dev/null || printf 'unreadable')
+archive="$same_o/reliefnt/built-in.a"
+llvm-ar t "$archive" > "$work/archive-members"
+listed=$(wc -l < "$work/archive-members")
+owner_objects=0
+while IFS= read -r member; do
+    [ ! -s "$member" ] || owner_objects=$((owner_objects + 1))
+done < "$work/archive-members"
 if [ "$owner_objects" = "$listed" ] && [ "$owner_objects" -gt 50 ]; then
     pass "the winning build has every manifest source as an object ($owner_objects)"
 else
@@ -142,11 +146,11 @@ for tree in "$other_a" "$other_b"; do
     else
         fail "$name has its own kernel image" 'missing or empty'
     fi
-    if grep -qF -- "$tree" "$tree/reliefnt/obj/kernel/sources.mk" 2>/dev/null; then
-        pass "$name's generated fragment points at $name"
+    if grep -qF -- "$tree" "$tree/reliefnt/arch/x86_64/.apic.o.cmd" 2>/dev/null; then
+        pass "$name's native command record points at $name"
     else
-        fail "$name's generated fragment points at $name" \
-            'the fragment references another tree: outputs were crossed'
+        fail "$name's native command record points at $name" \
+            'the native command references another tree: outputs were crossed'
     fi
 done
 

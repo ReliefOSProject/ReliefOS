@@ -68,7 +68,7 @@ def stage_probe(image: Path, out: Path, probe: Path, capture: bool, card: int,
                 'printf "[u6-standard] DONE failures=%s\\n" "${failures:-0}"; }\n')
             standard_script.write_text('#!/bin/sh\nexec /bin/sh /usr/lib/reliefos/tests/u6-standard-probe.sh "$@"\n')
         # debugfs edits the copied partition only; normal filesystem ownership,
-        # kernel, loader, init and OpenRC binaries remain the input image's bytes.
+        # kernel, init and OpenRC binaries remain the input image's bytes.
         batch=out/'debugfs.commands'
         ops=['mkdir /usr/lib/reliefos/tests',
              f'write "{probe}" /usr/lib/reliefos/tests/audio-guest',
@@ -312,7 +312,7 @@ def main() -> int:
     if not a.boot_only and a.controller!='none':
         try:metrics=analyze_wave(tone, None if legacy else 96000);waveform=True
         except (OSError,ValueError,wave.Error,EOFError) as exc:wave_error=str(exc) or type(exc).__name__
-    expected=ready if 'hda' in a.controller else (f'loaded {a.controller}.drv' in text if a.controller!='none' else not ready)
+    expected=ready if 'hda' in a.controller else (f'loaded {a.controller} abi=' in text if a.controller!='none' else not ready)
     shm_match=re.search(r'PASS native SysV SHM checks=(\d+); all owned segments removed',text)
     shm_checks=int(shm_match.group(1)) if shm_match else 0
     capture_verified=False;capture_metrics=None;capture_error=None

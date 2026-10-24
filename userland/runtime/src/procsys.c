@@ -3,11 +3,12 @@
 #define _POSIX_C_SOURCE 200809L
 #endif
 #include <reliefos/fs.h>
-#include <reliefos/gui.h>
 #include <reliefos/syscall.h>
 #include <reliefos/system.h>
 #include <errno.h>
 #include <pwd.h>
+#include <sched.h>
+#include <signal.h>
 #include <stdint.h>
 #include <string.h>
 #include <sys/time.h>
@@ -277,3 +278,30 @@ extern __typeof__(reliefos_perf_info) leonos_perf_info __attribute__((alias("rel
 extern __typeof__(reliefos_system_info) leonos_system_info __attribute__((alias("reliefos_system_info")));
 extern __typeof__(reliefos_task_snapshot) leonos_task_snapshot __attribute__((alias("reliefos_task_snapshot")));
 extern __typeof__(reliefos_time_info) leonos_time_info __attribute__((alias("reliefos_time_info")));
+
+unsigned long reliefos_uptime_ms(void)
+{
+    struct timespec ts;
+    if (clock_gettime(1, &ts) < 0) return 0;
+    return (unsigned long)((uint64_t)ts.tv_sec * 1000ULL +
+                           (uint64_t)ts.tv_nsec / 1000000ULL);
+}
+
+int reliefos_task_affinity_get(uint32_t pid, uint64_t *mask)
+{
+    return sched_getaffinity((pid_t)pid, sizeof(*mask), (cpu_set_t *)mask);
+}
+
+int reliefos_task_affinity_set(uint32_t pid, uint64_t mask)
+{
+    return sched_setaffinity((pid_t)pid, sizeof(mask), (const cpu_set_t *)&mask);
+}
+
+int reliefos_task_kill(uint32_t pid)
+{
+    return kill((pid_t)pid, SIGTERM);
+}
+extern __typeof__(reliefos_uptime_ms) leonos_uptime_ms __attribute__((alias("reliefos_uptime_ms")));
+extern __typeof__(reliefos_task_affinity_get) leonos_task_affinity_get __attribute__((alias("reliefos_task_affinity_get")));
+extern __typeof__(reliefos_task_affinity_set) leonos_task_affinity_set __attribute__((alias("reliefos_task_affinity_set")));
+extern __typeof__(reliefos_task_kill) leonos_task_kill __attribute__((alias("reliefos_task_kill")));

@@ -3,6 +3,18 @@
   "current_distributor": "reliefos-build",
   "apk_registration": "not-installed",
   "groups": {
+    "reliefos-grub": {
+      "destination": "reliefos",
+      "components": [],
+      "paths": ["usr/sbin/grub-install", "usr/sbin/grub-bios-setup", "usr/sbin/grub-probe", "usr/bin/grub-mkimage", "usr/lib/grub", "usr/share/licenses/grub", "usr/sbin/reliefos-boot-install", "usr/sbin/leonos-grub-installer", "usr/sbin/reliefos-grub-installer"],
+      "reason": "GNU GRUB 2.16 built from locked source for musl, its BIOS platform modules and GPL notices, and the shared ReliefOS boot installer CLI. Console tools have no desktop icons."
+    },
+    "reliefos-xdm-config": {
+      "destination": "reliefos",
+      "components": [],
+      "paths": ["etc/X11/xdm/xdm-config", "etc/X11/xdm/Xservers", "etc/X11/xdm/Xresources", "usr/lib/X11/xdm/Xsession", "usr/lib/X11/xdm/Xsetup_0"],
+      "reason": "Local XDM policy at the upstream default paths. The signed package depends on and replaces the overlapping configuration files of xdm, without modifying the upstream archive."
+    },
     "reliefos-nls": {
       "destination": "reliefos",
       "components": [],
@@ -11,9 +23,45 @@
     },
     "reliefos-apps": {
       "destination": "reliefos",
-      "components": ["imd", "windowd", "desktop", "installer", "login", "sessiond", "device-agent", "rcctl", "shell", "fileman", "taskmgr", "settings", "terminal", "run", "osver", "netctl", "servicemgr", "diskmgr", "devmgr", "drvmgr", "sysconfdialog", "apiapp", "sudod", "hello", "uidemo", "cjktest", "notepad", "calc", "paint", "minesweeper", "snake", "matrix", "memtest", "smptest", "abittest", "ipctest", "bugtest", "httpget", "rprfetch", "downloadmgr", "browser", "imageview", "wavplay", "mp3play", "oshlp", "helloworld", "guitest", "pleditor", "stardusthello", "stardustlayout", "stardustshowcase", "doomlauncher", "doom", "oschinpt", "stardustui", "portablegl", "glxgears", "leonmmcoset", "xiaobai"],
-      "paths": ["usr/lib/leonos", "usr/lib/reliefos", "usr/share/reliefos", "usr/share/fonts/reliefos", "etc/reliefos", "usr/sbin/leonos-rpr-apkcheck", "usr/sbin/leonos-rpr-ping", "usr/sbin/leonos-kernel-update", "usr/sbin/leonos-check-update", "usr/sbin/reliefos-rpr-apkcheck", "usr/sbin/reliefos-rpr-ping", "usr/sbin/reliefos-kernel-update", "usr/sbin/reliefos-check-update", "usr/lib/libportablegl.so.1"],
+      "components": ["installer", "login", "device-agent", "soundctl", "rcctl", "shell", "fileman", "taskmgr", "osver", "diskmgr", "driverinfo", "sudod", "reliefaskpass", "calc", "openrc-controller", "reliefapk", "reliefexcel", "reliefmail", "reliefword", "reliefppt", "paint", "minesweeper", "snake", "matrix", "memtest", "smptest", "abittest", "ipctest", "rprfetch", "imageview", "wavplay", "pleditor", "doomlauncher", "doom", "leonmmcoset", "xiaobai"],
+      "paths": ["usr/lib/leonos", "usr/lib/reliefos", "usr/share/reliefos", "usr/share/fonts/reliefos", "etc/reliefos", "etc/icewm", "usr/sbin/leonos-rpr-apkcheck", "usr/sbin/leonos-rpr-ping", "usr/sbin/leonos-kernel-update", "usr/sbin/leonos-check-update", "usr/sbin/reliefos-rpr-apkcheck", "usr/sbin/reliefos-rpr-ping", "usr/sbin/reliefos-kernel-update", "usr/sbin/reliefos-check-update"],
       "reason": "Native desktop, service, graphics and application interfaces. Embedded dependencies remain part of their actual consumers."
+    },
+    "reliefos-reliefplayer": {
+      "destination": "reliefos",
+      "components": ["reliefplayer"],
+      "paths": ["usr/bin/reliefplayer", "usr/share/applications/reliefos-reliefplayer.desktop"],
+      "reason": "ReliefPlayer audio executable, launcher, desktop entry and component artwork are installed and removed together. minimp3 remains embedded in its consumers."
+    },
+    "reliefos-reliefcapture": {
+      "destination": "reliefos",
+      "components": ["reliefcapture"],
+      "paths": ["usr/bin/reliefcapture", "usr/share/applications/reliefos-reliefcapture.desktop"],
+      "reason": "ReliefCapture screenshot and annotation executable, launcher, desktop entry and component artwork are installed and removed together."
+    },
+    "reliefos-reliefdiagram": {
+      "destination": "reliefos",
+      "components": ["reliefdiagram"],
+      "paths": ["usr/bin/reliefdiagram", "usr/share/applications/reliefos-reliefdiagram.desktop", "usr/share/mime/packages/reliefdiagram.xml"],
+      "reason": "ReliefDiagram editor, desktop entry, MIME declaration and component artwork are installed and removed together."
+    },
+    "reliefos-reliefmathpp": {
+      "destination": "reliefos",
+      "components": ["reliefmathpp"],
+      "paths": ["usr/bin/reliefmathpp", "usr/share/applications/reliefos-reliefmathpp.desktop", "usr/share/mime/packages/reliefmathpp.xml"],
+      "reason": "ReliefMath++ geometry application, desktop entry, MIME declaration and component artwork are installed and removed together."
+    },
+    "reliefos-relieftodo": {
+      "destination": "reliefos",
+      "components": ["relieftodo"],
+      "paths": ["usr/bin/relieftodo", "usr/share/applications/reliefos-relieftodo.desktop", "usr/share/mime/packages/relieftodo.xml"],
+      "reason": "ReliefTodo task manager, desktop launcher, MIME declaration and component artwork are installed and removed together."
+    },
+    "reliefos-reliefmath": {
+      "destination": "reliefos",
+      "components": ["reliefmath"],
+      "paths": ["usr/bin/reliefmath", "usr/share/applications/reliefos-reliefmath.desktop", "usr/share/mime/packages/reliefmath.xml", "usr/share/reliefmath", "usr/share/licenses/reliefmath"],
+      "reason": "ReliefMath GUI and isolated worker, their private math font and license texts, desktop launcher, MIME declaration and component icon are installed and removed together."
     },
     "reliefos-fastfetch": {
       "destination": "reliefos",
@@ -120,7 +168,7 @@
     "trust": {
       "destination": "alpine-after-validation",
       "components": [],
-      "paths": ["etc/ssl/certs", "etc/ssl/cert.pem", "etc/apk/keys", "etc/apk/ca.pem", "usr/share/licenses/alpine-keys"],
+      "paths": ["etc/ssl/certs", "etc/ssl/cert.pem", "etc/apk/keys", "etc/apk/ca.pem", "etc/apk/protected_paths.d/reliefos-ca-bundle.list", "usr/share/reliefos/certs", "usr/share/licenses/alpine-keys"],
       "alpine_candidates": ["ca-certificates", "alpine-keys"],
       "reason": "Transfer trust data via authenticated packages; validate certificate update triggers on ReliefOS."
     },

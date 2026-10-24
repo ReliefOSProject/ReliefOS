@@ -1,5 +1,5 @@
 #!/bin/sh
-# Contract tests for the ReliefNT kernel adapter (mk/kernel.mk, mk/headers.mk).
+# Contract tests for the ReliefNT kernel adapter (scripts/reliefos/Makefile.kernel, scripts/reliefos/Makefile.headers).
 #
 # The kernel products are built by the standalone checkout and published here;
 # this suite covers the adapter's failure and recovery surface: a missing
@@ -49,14 +49,32 @@ adapter_contract() {
         fail 'contract configuration is isolated under a temporary O' \
             "$(head -c 300 "$work/contract-defconfig.log")"
     fi
+    if make -s -j8 O="$work/contract-config" config-sync \
+            >"$work/contract-sync.log" 2>&1; then
+        pass 'contract configuration has a synchronized component graph'
+    else
+        fail 'contract configuration has a synchronized component graph' \
+            "$(head -c 300 "$work/contract-sync.log")"
+    fi
+
+    # Product previews use an initialized output, without generating any config.
+    for name in plan-new plan-old plan-priority plan-missing fetch-reliefnt-fetch fetch-ntclks-fetch; do
+        mkdir -p "$work/$name"
+        cp "$work/contract-config/.config" "$work/$name/.config"
+        mkdir -p "$work/$name/config"
+        cp "$work/contract-config/config/components.mk" "$work/$name/config/components.mk"
+    done
 
     if make -s -n O="$work/plan-new" \
-            RELIEFNT_DIR="$work/new-kernel" RELIEFNT_O="$work/new-out" kernel \
+            RELIEFNT_DIR="$work/new-kernel" RELIEFNT_O="$work/new-out" \
+            CC='ccache clang' CXX='sccache clang++' kernel \
             >"$work/plan-new.log" 2>&1 &&
-            grep -Fq -- "-C '$work/new-kernel' O='$work/new-out'" "$work/plan-new.log"; then
-        pass 'RELIEFNT_DIR and RELIEFNT_O control the delegated build'
+            grep -Fq -- "-C '$work/new-kernel' O='$work/new-out'" "$work/plan-new.log" &&
+            grep -Fq "CC='ccache clang'" "$work/plan-new.log" &&
+            grep -Fq "CXX='sccache clang++'" "$work/plan-new.log"; then
+        pass 'RELIEFNT_DIR, RELIEFNT_O and quoted tool commands reach the delegated build'
     else
-        fail 'RELIEFNT_DIR and RELIEFNT_O control the delegated build' \
+        fail 'RELIEFNT_DIR, RELIEFNT_O and quoted tool commands reach the delegated build' \
             "$(head -c 300 "$work/plan-new.log")"
     fi
 
@@ -209,55 +227,50 @@ fi
 pass 'the baseline kernel build succeeds'
 expected_manifest="$work/expected-products"
 actual_manifest="$work/actual-products"
-printf '%s\n' ac97.drv e1000.drv es1371.drv hda.drv kernel.debug kernel.sys \
-    kerneldebug.sys loader.elf mouse.drv serial.drv | LC_ALL=C sort > "$expected_manifest"
+printf '%s\n' kernel.debug kernel.sys kerneldebug.sys \
+    | LC_ALL=C sort > "$expected_manifest"
 awk '/^artifacts:$/ { artifacts=1; next } artifacts { print $2 }' \
     "$O/kernel-install/manifest.txt" | LC_ALL=C sort > "$actual_manifest"
 if cmp -s "$expected_manifest" "$actual_manifest"; then
-    pass 'kernel manifest contains the ten required product names'
+    pass 'kernel manifest contains the three required product names'
 else
-    fail 'kernel manifest contains the ten required product names' \
+    fail 'kernel manifest contains the three required product names' \
         "want: $(tr '\n' ' ' < "$expected_manifest")" \
         "have: $(tr '\n' ' ' < "$actual_manifest")"
 fi
 find "$O/generated" -type f -printf '%p %T@\n' | LC_ALL=C sort >"$work/published-before"
-loader_hash_before=$(sha256sum "$O/generated/boot/loader.elf" | cut -d' ' -f1)
-driver_hash_before=$(sha256sum "$O/generated/drivers/mouse.drv" | cut -d' ' -f1)
+kerneldebug_hash_before=$(sha256sum "$O/generated/system/kerneldebug.sys" | cut -d' ' -f1)
 
 advance_clock
-touch "$reliefnt/kernel/reliefnt/futex.c"
+touch "$reliefnt/kernel/ipc/futex.c"
 if build "$work/dirty.log" "$O"; then
     pass 'a touched checkout source is rebuilt'
 else
     fail 'a touched checkout source is rebuilt' 'make failed'
 fi
-if grep -qF -- "$reliefnt/kernel/reliefnt/futex.c" "$work/dirty.log" &&
+if grep -qE '^  CC +kernel/ipc/futex\.o$' "$work/dirty.log" &&
         grep -qE '^  (LD|IMAGE) ' "$work/dirty.log"; then
     pass 'the sub-make relinks and refreshes the affected products'
 else
     fail 'the sub-make relinks and refreshes the affected products' \
         "$(grep -E '^  (CC|LD|IMAGE) ' "$work/dirty.log" | head -3 | tr '\n' ' ')"
 fi
-if grep -qE 'loader\.elf|\.drv' "$work/dirty.log"; then
-    fail 'a kernel source touch leaves the loader and drivers alone' \
-        "$(grep -E 'loader\.elf|\.drv' "$work/dirty.log" | head -2 | tr '\n' ' ')"
+if grep -qE 'kerneldebug\.sys' "$work/dirty.log"; then
+    fail 'a kernel source touch leaves the debug module alone' \
+        "$(grep -E 'kerneldebug\.sys' "$work/dirty.log" | head -2 | tr '\n' ' ')"
 else
-    pass 'a kernel source touch leaves the loader and drivers alone'
+    pass 'a kernel source touch leaves the debug module alone'
 fi
-if [ "$loader_hash_before" = "$(sha256sum "$O/generated/boot/loader.elf" | cut -d' ' -f1)" ] &&
-        [ "$driver_hash_before" = "$(sha256sum "$O/generated/drivers/mouse.drv" | cut -d' ' -f1)" ]; then
+if [ "$kerneldebug_hash_before" = "$(sha256sum "$O/generated/system/kerneldebug.sys" | cut -d' ' -f1)" ]; then
     pass 'untouched products keep their bytes'
 else
-    fail 'untouched products keep their bytes' 'loader.elf or mouse.drv moved'
+    fail 'untouched products keep their bytes' 'kerneldebug.sys moved'
 fi
 # The publish path runs on every delegation; the published set must track what
 # the kernel checkout installed byte for byte.
 synced=yes
 for pair in system/kernel.sys:kernel.sys system/kernel.debug:kernel.debug \
-            system/kerneldebug.sys:kerneldebug.sys boot/loader.elf:loader.elf \
-            drivers/mouse.drv:mouse.drv drivers/serial.drv:serial.drv \
-            drivers/e1000.drv:e1000.drv drivers/ac97.drv:ac97.drv \
-            drivers/es1371.drv:es1371.drv; do
+            system/kerneldebug.sys:kerneldebug.sys; do
     rel=${pair%%:*}
     name=${pair#*:}
     cmp -s "$O/generated/$rel" "$O/kernel-install/$name" || synced=no
@@ -271,12 +284,12 @@ fi
 
 printf '\n=== (c) a deleted published product is restored ===\n'
 kernel_checksum=$(sha256sum "$O/generated/system/kernel.sys" | cut -d' ' -f1)
-rm -f "$O/generated/system/kernel.sys" "$O/generated/drivers/mouse.drv"
+rm -f "$O/generated/system/kernel.sys" "$O/generated/system/kerneldebug.sys"
 if build "$work/restore.log" "$O" &&
-        [ -s "$O/generated/system/kernel.sys" ] && [ -s "$O/generated/drivers/mouse.drv" ]; then
-    pass 'the deleted kernel.sys and mouse.drv are restored'
+        [ -s "$O/generated/system/kernel.sys" ] && [ -s "$O/generated/system/kerneldebug.sys" ]; then
+    pass 'the deleted kernel.sys and kerneldebug.sys are restored'
 else
-    fail 'the deleted kernel.sys and mouse.drv are restored' 'still missing'
+    fail 'the deleted kernel.sys and kerneldebug.sys are restored' 'still missing'
 fi
 if [ "$(sha256sum "$O/generated/system/kernel.sys" | cut -d' ' -f1)" = "$kernel_checksum" ]; then
     pass 'the restored kernel.sys is byte-identical'
@@ -310,7 +323,7 @@ printf '\n=== (e) a build failure in the checkout publishes no half-products ===
 # Fixture: a scratch copy of the checkout. The real checkout is never edited.
 fixture=$work/fixture
 cp -a "$reliefnt" "$fixture" || exit 1
-broken=$fixture/kernel/reliefnt/futex.c
+broken=$fixture/kernel/ipc/futex.c
 fail_out=$work/fail-out
 
 printf '\nthis is a deliberate syntax error in the fixture\n' >>"$broken"
@@ -326,15 +339,14 @@ else
         "$(tail -c 300 "$work/fail.log")"
 fi
 if [ ! -e "$fail_out/generated/system/kernel.sys" ] &&
-        [ ! -e "$fail_out/generated/boot/loader.elf" ] &&
-        [ ! -e "$fail_out/generated/drivers/mouse.drv" ]; then
+        [ ! -e "$fail_out/generated/system/kerneldebug.sys" ]; then
     pass 'the failed build publishes no half-products'
 else
     fail 'the failed build publishes no half-products' 'a product was published'
 fi
 
 # Recovery: fixing the source makes the same tree build and publish.
-cp "$reliefnt/kernel/reliefnt/futex.c" "$broken"
+cp "$reliefnt/kernel/ipc/futex.c" "$broken"
 if build "$work/recover.log" "$fail_out" RELIEFNT_DIR="$fixture" &&
         [ -s "$fail_out/generated/system/kernel.sys" ]; then
     pass 'the recovered fixture builds and publishes'
@@ -357,7 +369,7 @@ if build "$work/content.log" "$fail_out" RELIEFNT_DIR="$fixture"; then
 else
     fail 'a content change in the checkout re-publishes a new kernel.sys' 'make failed'
 fi
-cp "$reliefnt/kernel/reliefnt/futex.c" "$broken"
+cp "$reliefnt/kernel/ipc/futex.c" "$broken"
 if build "$work/restore-content.log" "$fail_out" RELIEFNT_DIR="$fixture" &&
         [ "$(sha256sum "$fail_out/generated/system/kernel.sys" | cut -d' ' -f1)" = \
           "$recovered_checksum" ]; then
@@ -368,7 +380,7 @@ fi
 
 # Failure after products exist: the published set must stay the old complete
 # set, not gain a half-published mix.
-loader_checksum=$(sha256sum "$fail_out/generated/boot/loader.elf" | cut -d' ' -f1)
+debug_checksum=$(sha256sum "$fail_out/generated/system/kerneldebug.sys" | cut -d' ' -f1)
 printf '\nthis is a deliberate syntax error in the fixture\n' >>"$broken"
 rm -f "$fail_out/generated/system/kernel.sys"
 if build "$work/fail2.log" "$fail_out" RELIEFNT_DIR="$fixture"; then
@@ -381,11 +393,11 @@ if [ ! -e "$fail_out/generated/system/kernel.sys" ]; then
 else
     fail 'a failed build does not restore a deleted product' 'kernel.sys reappeared'
 fi
-if [ "$(sha256sum "$fail_out/generated/boot/loader.elf" | cut -d' ' -f1)" = \
-      "$loader_checksum" ]; then
+if [ "$(sha256sum "$fail_out/generated/system/kerneldebug.sys" | cut -d' ' -f1)" = \
+      "$debug_checksum" ]; then
     pass 'surviving products keep their bytes across a failed build'
 else
-    fail 'surviving products keep their bytes across a failed build' 'loader.elf moved'
+    fail 'surviving products keep their bytes across a failed build' 'kerneldebug.sys moved'
 fi
 
 printf '\n%s: %d checks, %d failures\n' 'test-kernel-adapter' "$checks" "$failures"

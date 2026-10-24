@@ -1,0 +1,67 @@
+# Project-wide Kbuild environment; commands are provided by Linux Kbuild.
+RELIEFOS_SRC := $(srctree)
+RELIEFOS_OUTPUT := $(CURDIR)
+override O := .
+V ?= 0
+ARCH ?= x86_64
+PROFILE ?= release
+SOURCE_DATE_EPOCH ?= $(shell git -C $(srctree) show -s --format=%ct HEAD)
+TOOLCHAIN ?= $(srctree)/configs/toolchains/llvm-x86_64.mk
+# --- output layout ----------------------------------------------------------
+O_HOST      := $(O)/host
+O_GENERATED := $(O)/generated
+O_INCLUDE   := $(O)/include
+O_CONFIG    := $(O)/config
+O_SYSROOT   := $(O)/sysroot
+O_STAGE     := $(O)/stage
+O_PACKAGES  := $(O)/packages
+O_IMAGES    := $(O)/images
+O_LOGS      := $(O)/logs
+O_META      := $(O)/meta
+# Third-party build directories are separate from native source-relative
+# Kbuild objects under tools/ and userland/.
+O_THIRD_PARTY := $(O)/third-party
+# Staged root filesystem fragment for the upstream authentication libraries
+# (Linux-PAM, libxcrypt, ...). Same status as third-party: a layout extension,
+# because these packages install into their own DESTDIR rather than a flat
+# object tree.
+O_AUTH := $(O)/auth
+
+# Shared download cache: deliberately outside O because it is profile
+# independent and `distclean` must not throw it away.
+RELIEFOS_CACHE ?= $(if $(strip $(LEONOS_CACHE)),$(LEONOS_CACHE),$(RELIEFOS_SRC)/cache/downloads)
+
+# Written when an output tree is created and re-checked before anything is
+# deleted, so `clean` can never operate on a directory it does not own.
+RELIEFOS_O_MARKER := $(O)/.reliefos-out
+
+RELIEFOS_PASSIVE_GOALS := defconfig olddefconfig menuconfig migrate-config regen-component-kconfig tools fetch fetch-check reliefnt-fetch ntclks-fetch reliefnt-fetch-check ntclks-fetch-check headers_install
+RELIEFOS_INSPECT := $(or $(findstring n,$(firstword -$(MAKEFLAGS))),$(findstring q,$(firstword -$(MAKEFLAGS))))
+RELIEFOS_PASSIVE := $(if $(filter-out $(RELIEFOS_PASSIVE_GOALS),$(MAKECMDGOALS)),,1)
+RELIEFOS_O_MARKER := $(O)/.reliefos-out
+ifeq ($(V),1)
+Q :=
+quiet :=
+else
+Q := @
+quiet := quiet_
+endif
+SILENT := --silent
+HOSTCC ?= cc
+HOST_CFLAGS ?= -O2 -g
+HOST_LDFLAGS ?=
+RELIEFOS_STRICT_WARNINGS := -std=c11 -Wall -Wextra -Wpedantic -Werror -Wformat=2 -Wshadow -Wstrict-prototypes -Wmissing-prototypes
+RELIEFOS_HOST_INCLUDES := -I$(srctree) -I$(O_INCLUDE)
+RELIEFOS_SANITISE := -fsanitize=address,undefined -fno-omit-frame-pointer
+KBUILD_HOSTCFLAGS := $(RELIEFOS_STRICT_WARNINGS) $(RELIEFOS_HOST_INCLUDES) $(HOST_CFLAGS) -I$(srctree)/scripts/include
+KBUILD_HOSTLDFLAGS := $(HOST_LDFLAGS)
+export srctree objtree VPATH CONFIG_SHELL AWK
+
+# Product integration directories are real order-only dependencies, not parse-time mutations.
+$(O_HOST) $(RELIEFOS_HOST_BIN) $(O_META) $(O_INCLUDE) $(O_GENERATED) \
+$(O_CONFIG) $(O_SYSROOT) $(O_STAGE) $(O_PACKAGES) $(O_IMAGES) $(O_LOGS) \
+$(O_INCLUDE)/generated $(O_GENERATED)/system $(O_CONFIG)/generated:
+	$(Q)mkdir -p $@
+
+HOSTPKG_CONFIG ?= pkg-config
+export HOSTPKG_CONFIG

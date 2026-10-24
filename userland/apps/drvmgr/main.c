@@ -1,4 +1,3 @@
-#include <reliefos/auth.h>
 #include <reliefos/devmgr_service.h>
 #include <reliefos/gui.h>
 #include <libintl.h>
@@ -21,11 +20,9 @@
 static uint32_t pixels[DRVMGR_MAX_W * DRVMGR_MAX_H];
 static system_driver_info_t drivers[SYSTEM_DRIVER_MAX];
 static struct reliefos_ui_listview_state driver_list;
-static struct reliefos_user_info current_user;
 static uint32_t driver_count;
 static uint32_t view_w = DRVMGR_W;
 static uint32_t view_h = DRVMGR_H;
-static uint8_t can_manage;
 static char status_text[160] = "Ready";
 
 static void copy_text(char *dst, uint32_t cap, const char *src)
@@ -108,16 +105,6 @@ static void set_status_code(const char *prefix, int code)
     append_text(status_text, &pos, sizeof(status_text), ")");
 }
 
-static void refresh_user(void)
-{
-    current_user = (struct reliefos_user_info){0};
-    can_manage = 0;
-    if (reliefos_auth_current(&current_user) == 0 &&
-        current_user.role == RELIEFOS_AUTH_ROLE_ADMIN) {
-        can_manage = 1;
-    }
-}
-
 static uint32_t visible_rows(void)
 {
     uint32_t bottom = view_h > DRVMGR_STATUS_H + 12U ? view_h - DRVMGR_STATUS_H - 12U : view_h;
@@ -135,7 +122,6 @@ static void refresh_drivers(void)
 {
     uint32_t count = SYSTEM_DRIVER_MAX;
     int ret;
-    refresh_user();
     ret = system_driver_list(drivers, SYSTEM_DRIVER_MAX, &count);
     if (ret < 0) {
         driver_count = 0;
@@ -153,16 +139,7 @@ static void refresh_drivers(void)
         driver_list.selected = driver_count ? (int32_t)(driver_count - 1U) : -1;
     }
     copy_text(status_text, sizeof(status_text),
-              can_manage ? T("Administrator controls enabled")
-                         : T("Read-only: administrator required"));
-}
-
-static const system_driver_info_t *selected_driver(void)
-{
-    if (driver_list.selected < 0 || (uint32_t)driver_list.selected >= driver_count) {
-        return 0;
-    }
-    return &drivers[driver_list.selected];
+              T("Read-only: drivers are built into the kernel"));
 }
 
 static void draw_drvmgr(struct reliefos_ui_surface *ui)
@@ -179,14 +156,8 @@ static void draw_drvmgr(struct reliefos_ui_surface *ui)
     reliefos_ui_rect(ui, 0, 0, view_w, view_h, RELIEFOS_UI_GRAY);
     reliefos_ui_toolbar(ui, 8, 8, view_w > 16U ? view_w - 16U : view_w, 70U);
     reliefos_ui_toolbar_button(ui, 18, 16, 82, T("Refresh"), 0);
-    reliefos_ui_toolbar_button(ui, 108, 16, 72, T("Load"), 0);
-    reliefos_ui_toolbar_button(ui, 188, 16, 72, T("Unload"), 0);
-    reliefos_ui_toolbar_button(ui, 268, 16, 96, T("Force stop"), 0);
-    reliefos_ui_toolbar_button(ui, 372, 16, 98, T("Disable boot"), 0);
-    reliefos_ui_toolbar_button(ui, 478, 16, 94, T("Enable boot"), 0);
     reliefos_ui_text(ui, 18, 48,
-                   can_manage ? T("Modules run in Ring 0. Changes take effect immediately.")
-                              : T("You can inspect loaded modules, but cannot change them."),
+                   T("Drivers are built into the kernel image. This view is read-only."),
                    RELIEFOS_UI_DARK, RELIEFOS_UI_GRAY);
 
     reliefos_ui_scroll_view_frame(ui, 12, DRVMGR_LIST_Y - 4U,
@@ -233,27 +204,6 @@ static void present(struct reliefos_ui_surface *ui, uint32_t window_id)
     reliefos_gui_present_window(window_id, view_w, view_h, DRVMGR_MAX_W, pixels);
 }
 
-static void control_selected(uint32_t action)
-{
-    const system_driver_info_t *driver = selected_driver();
-    int ret;
-    if (!can_manage) {
-        copy_text(status_text, sizeof(status_text), T("Administrator permission required"));
-        return;
-    }
-    if (!driver) {
-        copy_text(status_text, sizeof(status_text), T("Select a driver first"));
-        return;
-    }
-    ret = system_driver_control(action, driver->file);
-    if (ret < 0) {
-        set_status_code(T("Driver operation failed"), ret);
-    } else {
-        copy_text(status_text, sizeof(status_text), T("Driver operation completed"));
-    }
-    refresh_drivers();
-}
-
 int main(void)
 {
     setlocale(LC_ALL, "");
@@ -264,7 +214,7 @@ int main(void)
     int window_id;
     puts("[drvmgr.elf] driver manager starting");
     window_id = reliefos_gui_create_app_window_ex(T("Driver Manager"),
-                                                T("Kernel driver modules"),
+                                                T("Built-in kernel drivers"),
                                                 DRVMGR_W, DRVMGR_H, 0);
     if (window_id <= 0) {
         printf("[drvmgr.elf] create window failed=%d\n", window_id);
@@ -285,16 +235,6 @@ int main(void)
             if (event.type == RELIEFOS_GUI_APP_EVENT_MOUSE_BUTTON && (event.buttons & 1U)) {
                 if (hit_rect(event.x, event.y, 18, 16, 82, RELIEFOS_UI_BUTTON_H)) {
                     refresh_drivers();
-                } else if (hit_rect(event.x, event.y, 108, 16, 72, RELIEFOS_UI_BUTTON_H)) {
-                    control_selected(SYSTEM_DRIVER_CONTROL_LOAD);
-                } else if (hit_rect(event.x, event.y, 188, 16, 72, RELIEFOS_UI_BUTTON_H)) {
-                    control_selected(SYSTEM_DRIVER_CONTROL_UNLOAD);
-                } else if (hit_rect(event.x, event.y, 268, 16, 96, RELIEFOS_UI_BUTTON_H)) {
-                    control_selected(SYSTEM_DRIVER_CONTROL_FORCE_UNLOAD);
-                } else if (hit_rect(event.x, event.y, 372, 16, 98, RELIEFOS_UI_BUTTON_H)) {
-                    control_selected(SYSTEM_DRIVER_CONTROL_DISABLE_BOOT);
-                } else if (hit_rect(event.x, event.y, 478, 16, 94, RELIEFOS_UI_BUTTON_H)) {
-                    control_selected(SYSTEM_DRIVER_CONTROL_ENABLE_BOOT);
                 } else if (event.x >= (int32_t)(view_w > 30U ? view_w - 30U : 690U) &&
                            event.y >= (int32_t)(DRVMGR_LIST_Y - 2U)) {
                     reliefos_ui_vscrollbar_handle_mouse(&driver_list.scroll,

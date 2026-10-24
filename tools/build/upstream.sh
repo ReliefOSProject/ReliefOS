@@ -3,6 +3,8 @@
 set -eu
 MAKEFLAGS=${MAKEFLAGS-}
 case ${MAKEFLAGS%% *} in *n*) exit 0 ;; esac
+. "$(CDPATH= cd -- "$(dirname "$0")" && pwd)/upstream-make-environment.sh"
+reliefos_upstream_make_environment
 [ "$#" = 12 ] || { echo 'usage: upstream.sh PACKAGE SRC DEPS LOCK CACHE WORK STAGE MUSL AUTH PAM CC TARGET' >&2; exit 2; }
 pkg=$1 src=$2 deps=$3 lock=$4 cache=$5 work=$6 stage=$7 musl=$8 auth=$9
 shift 9
@@ -26,6 +28,9 @@ source=$work/source/$directory
 if [ "$pkg" = alsa-lib ]; then
     patch -d "$source" -p1 < "$src/patches/alsa-lib/0001-reliefos-dmix-server.patch"
 fi
+if [ "$pkg" = coreutils ]; then
+    patch -d "$source" -p1 < "$src/patches/coreutils/0001-yes-batch-buffer.patch"
+fi
 resource=$("$cc" -print-resource-dir)
 CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -isystem $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib"
 case $pkg in libbsd|shadow) CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -idirafter $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib" ;; esac
@@ -35,7 +40,6 @@ CPPFLAGS="-I$auth/usr/include -I$pam/usr/include"
 LDFLAGS="-Wl,-z,relro,-z,now -L$auth/lib -L$auth/usr/lib -L$pam/lib -Wl,-rpath-link,$auth/lib -Wl,-rpath-link,$pam/lib"
 LIBS= PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR="$auth/lib/pkgconfig:$auth/usr/lib/pkgconfig:$pam/lib/pkgconfig" PKG_CONFIG_SYSROOT_DIR="$auth"
 export CC AR RANLIB STRIP BUILD_CC CFLAGS CPPFLAGS LDFLAGS LIBS PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PKG_CONFIG_SYSROOT_DIR
-MAKEFLAGS=${MAKEFLAGS%% -- *}; export MAKEFLAGS; unset MAKEOVERRIDES
 set -- --host="$target" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib
 case $pkg in
 libmd|libbsd) set -- "$@" --libdir=/lib ;;
@@ -88,9 +92,9 @@ fi
 case $pkg in
 libbsd) sed 's@GROUP(/lib/@GROUP(@' "$tmp/lib/libbsd.so" > "$tmp/lib/libbsd.so.new"; mv "$tmp/lib/libbsd.so.new" "$tmp/lib/libbsd.so"; rm "$tmp/lib/libbsd.la" ;;
 libmd) rm "$tmp/lib/libmd.la" ;;
-# Ship GNU dd only: BusyBox has no dd applet here and its dd lacks
-# status=progress, while the rest of coreutils must not shadow BusyBox applets.
-coreutils) find "$tmp" \( -type f -o -type l \) ! -path "$tmp/usr/bin/dd" -delete; find "$tmp" -mindepth 1 -type d -empty -delete ;;
+# Ship GNU dd and yes: dd provides status=progress, and yes has the larger
+# full_write fallback buffer. Other coreutils commands remain BusyBox-owned.
+coreutils) find "$tmp" \( -type f -o -type l \) ! -path "$tmp/usr/bin/dd" ! -path "$tmp/usr/bin/yes" -delete; find "$tmp" -mindepth 1 -type d -empty -delete ;;
 esac
 license=$(get license_in_source)
 mkdir -p "$tmp/usr/share/licenses/$pkg"

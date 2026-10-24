@@ -7,12 +7,13 @@
 #include <reliefos/blockdev.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 #include <linux/fs.h>
+#include <mntent.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <unistd.h>
 
 #define BLOCK_SECTOR_SIZE 512u
@@ -188,6 +189,10 @@ static const uint8_t block_guid_linux[16] = {
     0xaf, 0x3d, 0xc6, 0x0f, 0x83, 0x84, 0x72, 0x47,
     0x8e, 0x79, 0x3d, 0x69, 0xd8, 0x47, 0x7d, 0xe4,
 };
+static const uint8_t block_guid_bios_boot[16] = {
+    0x48, 0x61, 0x68, 0x21, 0x49, 0x64, 0x6f, 0x6e,
+    0x74, 0x4e, 0x65, 0x65, 0x64, 0x45, 0x46, 0x49,
+};
 
 static uint32_t block_crc32(const void *data, uint32_t length)
 {
@@ -255,6 +260,39 @@ static int block_zero(int fd, uint64_t offset, uint64_t length)
     return 0;
 }
 
+/** @brief Recognize supported whole-disk names, without accepting partition nodes. */
+static int block_disk_index(const char *path, uint32_t *out_index);
+
+/**
+ * @brief Refuse a mounted disk or partition before destructive raw I/O.
+ * Uses the current Linux mount namespace; no locks or retained allocations.
+ */
+static int block_check_unmounted(const char *path)
+{
+    FILE *stream = setmntent("/proc/self/mounts", "r");
+    if (!stream) return errno ? -errno : -BLOCK_EIO;
+    size_t length = strlen(path);
+    uint32_t ignored_index;
+    int whole_disk = block_disk_index(path, &ignored_index) == 0;
+    int result = 0;
+    struct mntent *entry;
+    while ((entry = getmntent(stream))) {
+        const char *source = entry->mnt_fsname;
+        if (!strcmp(source, path)) { result = -BLOCK_EBUSY; break; }
+        if (!whole_disk) continue;
+        if (strncmp(source, path, length)) continue;
+        const char *suffix = source + length;
+        if (!strncmp(path, "/dev/nvme", 9) && *suffix == 'p') ++suffix;
+        if (*suffix < '0' || *suffix > '9') continue;
+        while (*suffix >= '0' && *suffix <= '9') ++suffix;
+        if (!*suffix) { result = -BLOCK_EBUSY; break; }
+    }
+    if (!result && ferror(stream)) result = -BLOCK_EIO;
+    endmntent(stream);
+    return result;
+}
+
+/** @brief Open an owned descriptor with supported geometry and write prechecks. */
 static int block_open_info(const char *path, int writable, int *out_fd,
                            uint64_t *out_sectors, uint32_t *out_sector_size)
 {
@@ -263,7 +301,7 @@ static int block_open_info(const char *path, int writable, int *out_fd,
     int sector_size = BLOCK_SECTOR_SIZE;
     long ret;
     if (!path || !out_fd || !out_sectors || !out_sector_size) return -BLOCK_EINVAL;
-    fd = open(path, writable ? O_RDWR : O_RDONLY, 0);
+    fd = open(path, writable ? O_RDWR | O_EXCL : O_RDONLY, 0);
     if (fd < 0) return -errno;
     ret = ioctl(fd, BLKGETSIZE64, &bytes);
     if (ret < 0) {
@@ -277,9 +315,20 @@ static int block_open_info(const char *path, int writable, int *out_fd,
         (void)close(fd);
         return -error;
     }
-    if (sector_size != BLOCK_SECTOR_SIZE || !bytes || bytes % BLOCK_SECTOR_SIZE) {
+    if (sector_size != BLOCK_SECTOR_SIZE) {
+        (void)close(fd);
+        return -BLOCK_ENOTSUP;
+    }
+    if (!bytes || bytes % BLOCK_SECTOR_SIZE) {
         (void)close(fd);
         return -BLOCK_EINVAL;
+    }
+    if (writable) {
+        int readonly = 0;
+        if (ioctl(fd, BLKROGET, &readonly) < 0) ret = -errno;
+        else if (readonly) ret = -EROFS;
+        else ret = block_check_unmounted(path);
+        if (ret < 0) { (void)close(fd); return (int)ret; }
     }
     *out_fd = fd;
     *out_sectors = bytes / BLOCK_SECTOR_SIZE;
@@ -358,6 +407,7 @@ const char *reliefos_block_gpt_type_name(uint32_t type)
     case RELIEFOS_BLOCK_GPT_ESP: return "esp";
     case RELIEFOS_BLOCK_GPT_LINUX: return "linux";
     case RELIEFOS_BLOCK_GPT_BASIC_DATA: return "basic";
+    case RELIEFOS_BLOCK_GPT_BIOS_BOOT: return "bios-boot";
     default: return "other";
     }
 }
@@ -373,45 +423,96 @@ static uint32_t block_guid_type(const uint8_t guid[16])
     if (memcmp(guid, block_guid_esp, 16) == 0) return RELIEFOS_BLOCK_GPT_ESP;
     if (memcmp(guid, block_guid_linux, 16) == 0) return RELIEFOS_BLOCK_GPT_LINUX;
     if (memcmp(guid, block_guid_basic, 16) == 0) return RELIEFOS_BLOCK_GPT_BASIC_DATA;
+    if (memcmp(guid, block_guid_bios_boot, 16) == 0) return RELIEFOS_BLOCK_GPT_BIOS_BOOT;
     return 0;
 }
 
 static void block_set_guid(uint8_t guid[16], uint32_t type)
 {
     const uint8_t *source = type == RELIEFOS_BLOCK_GPT_ESP ? block_guid_esp :
-                            type == RELIEFOS_BLOCK_GPT_LINUX ? block_guid_linux : block_guid_basic;
+                            type == RELIEFOS_BLOCK_GPT_LINUX ? block_guid_linux :
+                            type == RELIEFOS_BLOCK_GPT_BIOS_BOOT ? block_guid_bios_boot : block_guid_basic;
     memcpy(guid, source, 16);
 }
 
-static void block_guid_make(uint8_t guid[16], uint64_t seed)
+/**
+ * @brief Generate a UUIDv4 in GPT wire byte order using the standard random device.
+ * Owns and closes its descriptor. Failure occurs before any GPT publication;
+ * geometry/time fallback seeds would reuse identities across fresh installs.
+ */
+static int block_guid_make(uint8_t guid[16])
 {
-    for (uint32_t i = 0; i < 16; ++i) {
-        seed ^= seed << 13;
-        seed ^= seed >> 7;
-        seed ^= seed << 17;
-        guid[i] = (uint8_t)(seed >> ((i & 7u) * 8u));
+    int fd = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
+    if (fd < 0) return -errno;
+    int result = 0;
+    for (size_t done = 0; done < 16;) {
+        ssize_t got = read(fd, guid + done, 16 - done);
+        if (got < 0 && errno == EINTR) continue;
+        if (got <= 0) { result = got < 0 ? -errno : -BLOCK_EIO; break; }
+        done += (size_t)got;
     }
-    guid[6] = (guid[6] & 0x0fu) | 0x40u;
+    if (close(fd) < 0 && !result) result = -errno;
+    if (result) return result;
+    /* GPT stores the first three UUID fields little-endian. */
+    guid[7] = (guid[7] & 0x0fu) | 0x40u;
     guid[8] = (guid[8] & 0x3fu) | 0x80u;
+    return 0;
 }
 
-static void block_name_set(uint16_t name[36], const char *text)
+/** @brief Encode valid UTF-8 as GPT UTF-16LE without truncating names or splitting surrogates. */
+static int block_name_set(uint16_t name[36], const char *text)
 {
-    uint32_t i = 0;
-    for (; i < 36u && text && text[i]; ++i)
-        name[i] = (uint8_t)text[i] >= 32u && (uint8_t)text[i] <= 126u ? (uint8_t)text[i] : '?';
-    for (; i < 36u; ++i) name[i] = 0;
+    uint16_t encoded[36] = {0};
+    uint32_t used = 0;
+    const uint8_t *p = (const uint8_t *)(text ? text : "");
+    while (*p) {
+        uint32_t code = *p++, continuation = 0, minimum = 0;
+        if (code >= 0xc2u && code <= 0xdfu) { code &= 0x1fu; continuation = 1; minimum = 0x80; }
+        else if (code >= 0xe0u && code <= 0xefu) { code &= 0x0fu; continuation = 2; minimum = 0x800; }
+        else if (code >= 0xf0u && code <= 0xf4u) { code &= 7u; continuation = 3; minimum = 0x10000; }
+        else if (code >= 0x80u) return -EILSEQ;
+        for (uint32_t i = 0; i < continuation; ++i) {
+            if ((*p & 0xc0u) != 0x80u) return -EILSEQ;
+            code = (code << 6) | (*p++ & 0x3fu);
+        }
+        if (code < minimum || code > 0x10ffffu || (code >= 0xd800u && code <= 0xdfffu)) return -EILSEQ;
+        uint32_t units = code >= 0x10000u ? 2u : 1u;
+        if (units > 36u - used) return -ENAMETOOLONG;
+        if (units == 2) {
+            code -= 0x10000u;
+            encoded[used++] = (uint16_t)(0xd800u | (code >> 10));
+            encoded[used++] = (uint16_t)(0xdc00u | (code & 0x3ffu));
+        } else encoded[used++] = (uint16_t)code;
+    }
+    memcpy(name, encoded, sizeof(encoded));
+    return 0;
 }
 
+/** @brief Decode GPT UTF-16LE to bounded UTF-8; malformed disk surrogates become U+FFFD. */
 static void block_name_get(char *text, uint32_t capacity, const uint16_t name[36])
 {
-    uint32_t i = 0;
+    uint16_t units[36];
+    uint32_t written = 0;
     if (!text || !capacity) return;
-    while (i < 36u && name[i] && i + 1u < capacity) {
-        text[i] = name[i] < 128u ? (char)name[i] : '?';
-        ++i;
+    memcpy(units, name, sizeof(units));
+    for (uint32_t i = 0; i < 36u && units[i]; ++i) {
+        uint32_t code = units[i];
+        if (code >= 0xd800u && code <= 0xdbffu) {
+            if (i + 1 < 36u && units[i + 1] >= 0xdc00u && units[i + 1] <= 0xdfffu) {
+                code = 0x10000u + ((code - 0xd800u) << 10) + (units[i + 1] - 0xdc00u); ++i;
+            } else code = 0xfffd;
+        } else if (code >= 0xdc00u && code <= 0xdfffu) code = 0xfffd;
+        uint32_t bytes = code < 0x80u ? 1u : code < 0x800u ? 2u : code < 0x10000u ? 3u : 4u;
+        if (bytes >= capacity - written) break;
+        if (bytes == 1) text[written++] = (char)code;
+        else {
+            text[written++] = (char)((bytes == 2 ? 0xc0u : bytes == 3 ? 0xe0u : 0xf0u) |
+                                      (code >> (6u * (bytes - 1u))));
+            for (uint32_t j = bytes - 1; j; --j)
+                text[written++] = (char)(0x80u | ((code >> (6u * (j - 1u))) & 0x3fu));
+        }
     }
-    text[i] = 0;
+    text[written] = 0;
 }
 
 static int block_gpt_header_valid(const struct block_gpt_header *header, uint64_t sectors)
@@ -682,7 +783,8 @@ int reliefos_block_gpt_initialize(const char *disk_path, int force)
     table.primary.partition_entries_lba = 2u;
     table.primary.partition_entry_count = GPT_ENTRY_MAX;
     table.primary.partition_entry_size = GPT_ENTRY_SIZE;
-    block_guid_make(table.primary.disk_guid, sectors ^ 0x4c34475054494e49ULL);
+    ret = block_guid_make(table.primary.disk_guid);
+    if (ret < 0) { block_gpt_free(&table); (void)close(fd); return ret; }
     table.backup = table.primary;
     table.backup.current_lba = sectors - 1u;
     table.backup.backup_lba = 1u;
@@ -856,12 +958,13 @@ static int block_create_entry(struct block_gpt_table *table, void *context)
                            (request->filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT2 ||
                             request->filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4) ?
                            RELIEFOS_BLOCK_GPT_LINUX : RELIEFOS_BLOCK_GPT_BASIC_DATA);
-            block_guid_make(table->entries[free_index].unique_guid,
-                            cursor ^ ((uint64_t)free_index << 32));
+            int result = block_guid_make(table->entries[free_index].unique_guid);
+            if (result) return result;
             table->entries[free_index].first_lba = cursor;
             table->entries[free_index].last_lba = end;
-            block_name_set(table->entries[free_index].name,
-                           request->name && request->name[0] ? request->name : "ReliefOS Data");
+            result = block_name_set(table->entries[free_index].name,
+                                    request->name && request->name[0] ? request->name : "ReliefOS Data");
+            if (result) return result;
             request->index = free_index;
             return 0;
         }
@@ -903,7 +1006,7 @@ static int block_set_type_entry(struct block_gpt_table *table, void *context)
 {
     struct block_index_request *request = context;
     if (request->index >= table->primary.partition_entry_count || block_guid_empty(table->entries[request->index].type_guid) ||
-        request->type < RELIEFOS_BLOCK_GPT_BASIC_DATA || request->type > RELIEFOS_BLOCK_GPT_LINUX) return -BLOCK_EINVAL;
+        request->type < RELIEFOS_BLOCK_GPT_BASIC_DATA || request->type > RELIEFOS_BLOCK_GPT_BIOS_BOOT) return -BLOCK_EINVAL;
     block_set_guid(table->entries[request->index].type_guid, request->type);
     return 0;
 }
@@ -911,8 +1014,7 @@ static int block_set_name_entry(struct block_gpt_table *table, void *context)
 {
     struct block_index_request *request = context;
     if (request->index >= table->primary.partition_entry_count || block_guid_empty(table->entries[request->index].type_guid)) return -BLOCK_ENOENT;
-    block_name_set(table->entries[request->index].name, request->name);
-    return 0;
+    return block_name_set(table->entries[request->index].name, request->name);
 }
 int reliefos_block_gpt_delete(const char *disk_path, uint32_t index)
 {
@@ -928,6 +1030,37 @@ int reliefos_block_gpt_set_name(const char *disk_path, uint32_t index, const cha
 {
     struct block_index_request request = {index, 0, name};
     return block_gpt_update(disk_path, block_set_name_entry, &request);
+}
+
+struct block_resize_request { uint32_t index; uint32_t size_mib; };
+static int block_resize_entry(struct block_gpt_table *table, void *context)
+{
+    struct block_resize_request *request = context;
+    struct block_gpt_entry *entry;
+    uint64_t sectors, new_last, next = table->primary.last_usable_lba + 1u;
+    if (request->index >= table->primary.partition_entry_count ||
+        block_guid_empty(table->entries[request->index].type_guid) ||
+        !request->size_mib) return -BLOCK_EINVAL;
+    entry = &table->entries[request->index];
+    sectors = (uint64_t)request->size_mib * 2048u;
+    if (sectors > UINT64_MAX - entry->first_lba) return -BLOCK_EINVAL;
+    new_last = entry->first_lba + sectors - 1u;
+    for (uint32_t i = 0; i < table->primary.partition_entry_count; ++i) {
+        const struct block_gpt_entry *other = &table->entries[i];
+        if (i != request->index && !block_guid_empty(other->type_guid) &&
+            other->first_lba > entry->first_lba && other->first_lba < next)
+            next = other->first_lba;
+    }
+    if (new_last >= next || new_last > table->primary.last_usable_lba)
+        return -BLOCK_ENOSPC;
+    entry->last_lba = new_last;
+    return 0;
+}
+
+int reliefos_block_gpt_resize(const char *disk_path, uint32_t index, uint32_t size_mib)
+{
+    struct block_resize_request request = {index, size_mib};
+    return block_gpt_update(disk_path, block_resize_entry, &request);
 }
 
 static void block_put32(uint8_t *bytes, uint32_t value)
@@ -1258,6 +1391,7 @@ extern __typeof__(reliefos_block_gpt_create) leonos_block_gpt_create __attribute
 extern __typeof__(reliefos_block_gpt_delete) leonos_block_gpt_delete __attribute__((alias("reliefos_block_gpt_delete")));
 extern __typeof__(reliefos_block_gpt_initialize) leonos_block_gpt_initialize __attribute__((alias("reliefos_block_gpt_initialize")));
 extern __typeof__(reliefos_block_gpt_set_name) leonos_block_gpt_set_name __attribute__((alias("reliefos_block_gpt_set_name")));
+extern __typeof__(reliefos_block_gpt_resize) leonos_block_gpt_resize __attribute__((alias("reliefos_block_gpt_resize")));
 extern __typeof__(reliefos_block_gpt_set_type) leonos_block_gpt_set_type __attribute__((alias("reliefos_block_gpt_set_type")));
 extern __typeof__(reliefos_block_gpt_type_name) leonos_block_gpt_type_name __attribute__((alias("reliefos_block_gpt_type_name")));
 extern __typeof__(reliefos_block_list_disks) leonos_block_list_disks __attribute__((alias("reliefos_block_list_disks")));

@@ -1,0 +1,10 @@
+RELIEFOS_RUNTIME_SRC_OBJECTS := admin.o ansi_curses.o api.o app_registry.o auth_accounts.o auth_password.o blockdev.o bootloader.o bootloader_publish.o bootloader_process.o devmand_client.o devmgr_service.o environment.o gpu.o gpu_sdk.o fb.o ini.o inputm.o launch.o libc.o license.o locale_conf.o net_service.o netsock.o ntp.o openrc.o pam_session.o png.o procsys.o sessiond_client.o sudo_client.o syscall.o tar.o text_encoding.o tls.o unix_ipc.o
+RELIEFOS_RUNTIME_SRC_C_OBJECTS := admin.o ansi_curses.o api.o app_registry.o auth_accounts.o auth_password.o blockdev.o bootloader.o bootloader_publish.o bootloader_process.o devmand_client.o devmgr_service.o environment.o gpu.o gpu_sdk.o fb.o ini.o inputm.o launch.o libc.o license.o locale_conf.o net_service.o netsock.o ntp.o openrc.o pam_session.o png.o procsys.o sessiond_client.o sudo_client.o tar.o text_encoding.o tls.o unix_ipc.o
+RELIEFOS_RUNTIME_SRC_ASM_OBJECTS := syscall.o
+ifneq ($(RELIEFOS_CAPTURE_RUNTIME_KBUILD),1)
+obj-y := $(RELIEFOS_RUNTIME_SRC_OBJECTS)
+ccflags-y += $(RUNTIME_FLAGS) $(RUNTIME_CFLAGS) -include $(AUTOCONF_H)
+asflags-y += --target=$(TRIPLE_USER) -fPIC -I$(HEADER_EXPORT_INCLUDE)
+$(addprefix $(obj)/,$(RELIEFOS_RUNTIME_SRC_C_OBJECTS)): $(AUTOCONF_H) $(GBK_TABLE) $(PNG_CONFIG) $(MUSL_STAMP) $(RUNTIME_HEADERS) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID)
+$(addprefix $(obj)/,$(RELIEFOS_RUNTIME_SRC_ASM_OBJECTS)): $(AUTOCONF_H) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID)
+endif

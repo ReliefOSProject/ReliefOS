@@ -55,7 +55,6 @@ version: 1.0
 | STOP 原因 | 含义 | 通常怎么查 |
 | KERNEL PANIC | 内核代码调用了 `panic()` 或 `bugcheck_panic()`。detail 行就是 panic 消息。 | 在源码或串口日志里搜索该消息。 |
 | Unhandled Page Fault | 内核态页面错误，或懒加载映射无法恢复的页面错误。 | 查看 `CR2`、`RIP` 和 `PF FLAGS`。 |
-| Window Server Page Fault | 桌面/窗口服务出错。ReliefOS 会停止，因为继续运行可能破坏 GUI 所有权。 | 检查窗口服务任务和出错地址。 |
 | Divide By Zero | CPU 向量 0，除零。 | 查看 `RIP` 附近的函数。 |
 | Debug Exception | CPU 向量 1，调试异常。 | 通常是错误的调试状态或意外 trap。 |
 | Non Maskable Interrupt | CPU 向量 2，不可屏蔽中断。 | 按硬件或模拟器层中断处理。 |
@@ -94,7 +93,7 @@ version: 1.0
 
 ## 用户程序页面错误
 
-普通 Ring-3 应用的 Page Fault 通常不会导致系统蓝屏。ReliefOS 会结束该应用，退出码为 `0x8000000e`，并在桌面弹出 `Application Page Fault` 报告。用户态页面错误主要在当前任务是窗口服务，或没有安全恢复路径时才会变成蓝屏。
+无法恢复的用户态页面错误会作为 Linux 信号交给应用，通常为 `SIGSEGV` 或 `SIGBUS`；默认信号处理会终止进程。没有安全恢复路径的内核态错误仍会停止系统，请通过串口诊断查看出错地址和指令指针。
 
 %%ENDDOC
 

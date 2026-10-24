@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefPPT
+Name[zh_CN]=ReliefPPT
+GenericName=Presentation Editor
+GenericName[zh_CN]=演示文稿
+Exec=/usr/bin/reliefppt %f
+TryExec=/usr/bin/reliefppt
+Icon=reliefos-reliefppt
+Terminal=false
+Categories=Office;Presentation;
+MimeType=application/x-reliefppt;
+StartupWMClass=reliefos-reliefppt

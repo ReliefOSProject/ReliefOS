@@ -32,9 +32,10 @@ stage() {
     printf '%s\n' "reliefos-xdm: $1" >> "$log"
 }
 
-for path in /usr/bin/xdm /etc/reliefos/xdm.conf /etc/reliefos/xdm-Xservers \
-    /etc/X11/xorg.conf /usr/lib/reliefos/xorg-tty-wrapper \
-    /usr/lib/reliefos/xdm-session; do
+for path in /usr/bin/xdm /etc/X11/xdm/xdm-config /etc/X11/xdm/Xservers \
+    /etc/X11/xdm/Xresources /usr/lib/X11/xdm/Xsetup_0 \
+    /etc/X11/xorg.conf /usr/bin/Xorg /usr/lib/reliefos/xorg-tty-wrapper \
+    /usr/lib/X11/xdm/Xsession; do
     if test ! -r "$path"; then
         stage "missing $path"
         stage 'tty1 restored to text login'
@@ -55,7 +56,8 @@ chmod 0600 "$sink"
 RELIEFOS_XORG_EVENT_FD=3
 export RELIEFOS_XORG_EVENT_FD
 exec 3>>"$sink"
-/usr/bin/xdm -nodaemon -config /etc/reliefos/xdm.conf
+# Use XDM's compiled-in /etc/X11/xdm/xdm-config, as a direct launch does.
+/usr/bin/xdm -nodaemon
 status=$?
 exec 3>&-
 

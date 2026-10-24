@@ -114,7 +114,7 @@ static void test_su(const char *self)
     char *login[] = {"/bin/su", "-l", "-c", shell_command, "su_target", NULL};
     command_uid = 0;
     command_password = NULL;
-    command("official-su-version", (char *[]){"/bin/su", "--version", NULL}, 0, "util-linux 2.41.6");
+    command("official-su-version", (char *[]){"/bin/su", "--version", NULL}, 0, "util-linux 2.42.4");
     command("su-root-target-groups", normal, 0, "[su-identity] uid=1001/1001/1001 gid=2001/2001/2001 extra=1");
     command_uid = 1000;
     command_password = "r\n";

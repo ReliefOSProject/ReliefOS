@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefWord
+Name[zh_CN]=ReliefWord
+GenericName=Word Processor
+GenericName[zh_CN]=文字处理器
+Exec=/usr/bin/reliefword %f
+TryExec=/usr/bin/reliefword
+Icon=reliefos-reliefword
+Terminal=false
+Categories=Office;WordProcessor;
+MimeType=application/x-reliefword;text/plain;text/html;
+StartupWMClass=reliefos-reliefword

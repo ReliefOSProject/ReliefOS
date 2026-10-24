@@ -31,6 +31,7 @@ awk -F / '$0 ~ /^\/(bin|sbin|usr\/bin|usr\/sbin)\/[^/]+$/ {print $NF}' \
     "$work/claimed" > "$work/commands"
 while IFS= read -r guest; do
     command=${guest##*/}
+    [ "$command" != bash ] || continue
     if grep -Fqx "$command" "$work/commands"; then continue; fi
     target="../../bin/busybox"
     case $guest in

@@ -9,6 +9,7 @@
 #include <reliefos/syscall.h>
 #include <reliefos/ui.h>
 #include <pty.h>
+#include <pwd.h>
 #include <errno.h>
 #include <stdio.h>
 #include <signal.h>
@@ -1574,12 +1575,13 @@ int main(int argc, char **argv, char **envp)
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     char *shell_argv[4];
-    char shell_prompt[] = "PS1=\\w \\$ ";
+    char shell_path[256];
+    char shell_environment[sizeof(shell_path) + sizeof("SHELL=")];
     char shell_term[] = "TERM=xterm";
     char shell_terminfo[] = "TERMINFO_DIRS=/usr/share/terminfo:/etc/terminfo:/lib/terminfo";
     char terminal_program[] = "TERM_PROGRAM=ReliefOS Terminal";
     char *terminal_envp[] = { shell_term, shell_terminfo, terminal_program, 0 };
-    char *shell_envp[] = { shell_prompt, shell_term, shell_terminfo, terminal_program, 0 };
+    char *shell_envp[] = { shell_environment, shell_term, shell_terminfo, terminal_program, 0 };
     char **command_env_owned = 0;
     char *const *command_argv;
     char *const *command_envp;
@@ -1597,8 +1599,22 @@ int main(int argc, char **argv, char **envp)
         command_argv = &argv[2];
         command_envp = 0;
     } else {
-        shell_argv[0] = "/bin/sh";
-        shell_argv[1] = 0;
+        struct passwd *account = getpwuid(getuid());
+        int path_length = snprintf(shell_path, sizeof(shell_path), "%s",
+                                   account && account->pw_shell && account->pw_shell[0] == '/'
+                                       ? account->pw_shell : "/bin/bash");
+        if (path_length < 0 || (size_t)path_length >= sizeof(shell_path)) {
+            printf("terminal: shell path is too long\n");
+            return 1;
+        }
+        shell_argv[0] = shell_path;
+        int length = snprintf(shell_environment, sizeof(shell_environment),
+                              "SHELL=%s", shell_argv[0]);
+        if (length < 0 || (size_t)length >= sizeof(shell_environment)) {
+            printf("terminal: shell path is too long\n");
+            return 1;
+        }
+        shell_argv[1] = "-l";
         shell_argv[2] = 0;
         shell_argv[3] = 0;
         command_path = shell_argv[0];

@@ -1,6 +1,5 @@
-/* Text-input service client. The public text_input_* / leonos_inputm_* entry
- * points are unchanged; transport moved from /dev/input-method ioctls to the
- * imd daemon over /run/reliefos/input-method.sock. */
+/* Standalone input-method service client. Window-system integration belongs
+ * to each frontend; this client only implements the input-method protocol. */
 #ifndef _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #endif
@@ -15,7 +14,6 @@
 #include <time.h>
 #include <unistd.h>
 
-#define INPUTM_PENDING_COMMIT_CAP 8U
 #define INPUTM_RESULT_QUEUE 32U
 #define INPUTM_KEY_QUEUE 32U
 #define INPUTM_FRAME_CAP 4096U
@@ -25,19 +23,6 @@
 #define INPUTM_CONNECT_ATTEMPT_MS 50u
 #define INPUTM_CONNECT_BACKOFF_MS 1000u
 
-struct inputm_pending_commit {
-    uint8_t used;
-    uint8_t keycode;
-    uint8_t pressed;
-    uint32_t window_id;
-    char text[RELIEFOS_INPUTM_TEXT_LEN];
-};
-
-static struct inputm_pending_commit inputm_pending_commits[INPUTM_PENDING_COMMIT_CAP];
-static char inputm_taken_text[RELIEFOS_INPUTM_TEXT_LEN];
-static uint8_t inputm_taken_keycode;
-static uint8_t inputm_taken_key_pressed;
-static uint32_t inputm_current_window_id;
 static int imd_fd = -1;
 static uint32_t imd_retry_after_ms;
 static struct reliefos_inputm_result inputm_results[INPUTM_RESULT_QUEUE];
@@ -53,19 +38,6 @@ static uint32_t inputm_now_ms(void)
     struct timespec ts;
     (void)clock_gettime(1, &ts);
     return (uint32_t)((uint64_t)ts.tv_sec * 1000u + (uint64_t)ts.tv_nsec / 1000000u);
-}
-
-static void inputm_copy_text(char *dst, uint32_t capacity, const char *src)
-{
-    uint32_t i = 0;
-    if (!dst || capacity == 0) {
-        return;
-    }
-    while (src && src[i] && i + 1U < capacity) {
-        dst[i] = src[i];
-        ++i;
-    }
-    dst[i] = 0;
 }
 
 static int inputm_copy_id(char *dst, uint32_t capacity, const char *id)
@@ -300,27 +272,6 @@ int text_input_set_context(const struct reliefos_inputm_context *context)
     return code;
 }
 
-void text_input_note_gui_window(uint32_t window_id)
-{
-    if (window_id) inputm_current_window_id = window_id;
-}
-
-int text_input_set_current_context(uint32_t flags, int32_t caret_x,
-                                   int32_t caret_y, uint32_t caret_w,
-                                   uint32_t caret_h)
-{
-    struct reliefos_inputm_context context = {0};
-    if (!inputm_current_window_id) return 0;
-    context.window_id = inputm_current_window_id;
-    context.flags = flags & (RELIEFOS_INPUTM_CONTEXT_FOCUSED |
-                             RELIEFOS_INPUTM_CONTEXT_SECURE);
-    context.caret_x = caret_x;
-    context.caret_y = caret_y;
-    context.caret_w = caret_w;
-    context.caret_h = caret_h;
-    return text_input_set_context(&context);
-}
-
 int text_input_get_state(uint32_t uid, struct reliefos_inputm_state *state)
 {
     struct reliefos_imd_get_state request = {.uid = uid};
@@ -340,87 +291,6 @@ int text_input_notify_config(uint32_t uid)
     return code;
 }
 
-int text_input_observe_gui_key(uint32_t window_id, uint8_t *keycode, uint8_t pressed)
-{
-    int ret;
-    if (!window_id || !keycode || *keycode == 0) return 0;
-    ret = text_input_submit_key(window_id, *keycode, pressed);
-    if (ret > 0) {
-        *keycode = 0;
-        return 1;
-    }
-    return ret;
-}
-
-static void inputm_queue_commit(const struct reliefos_inputm_result *result)
-{
-    for (uint32_t i = 0; i < INPUTM_PENDING_COMMIT_CAP; ++i) {
-        if (!inputm_pending_commits[i].used) {
-            inputm_pending_commits[i].used = 1;
-            inputm_pending_commits[i].window_id = result->window_id;
-            inputm_pending_commits[i].keycode = result->keycode;
-            inputm_pending_commits[i].pressed = result->pressed;
-            inputm_copy_text(inputm_pending_commits[i].text,
-                             sizeof(inputm_pending_commits[i].text), result->text);
-            return;
-        }
-    }
-    inputm_pending_commits[0].window_id = result->window_id;
-    inputm_pending_commits[0].keycode = result->keycode;
-    inputm_pending_commits[0].pressed = result->pressed;
-    inputm_copy_text(inputm_pending_commits[0].text,
-                     sizeof(inputm_pending_commits[0].text), result->text);
-    inputm_pending_commits[0].used = 1;
-}
-
-static void inputm_drain_commits(void)
-{
-    struct reliefos_inputm_result result = {0};
-    while (text_input_poll_result(&result) > 0) {
-        if ((result.type == RELIEFOS_INPUTM_RESULT_COMMIT && result.text[0]) ||
-            result.type == RELIEFOS_INPUTM_RESULT_PASSTHROUGH) {
-            inputm_queue_commit(&result);
-        }
-        result = (struct reliefos_inputm_result){0};
-    }
-}
-
-int text_input_poll_gui_commit(uint32_t window_id)
-{
-    if (!window_id) return 0;
-    inputm_drain_commits();
-    for (uint32_t i = 0; i < INPUTM_PENDING_COMMIT_CAP; ++i) {
-        if (inputm_pending_commits[i].used &&
-            inputm_pending_commits[i].window_id == window_id) {
-            inputm_copy_text(inputm_taken_text, sizeof(inputm_taken_text),
-                             inputm_pending_commits[i].text);
-            inputm_taken_keycode = inputm_pending_commits[i].keycode;
-            inputm_taken_key_pressed = inputm_pending_commits[i].pressed;
-            inputm_pending_commits[i] = (struct inputm_pending_commit){0};
-            return inputm_taken_text[0] || inputm_taken_keycode ? 1 : 0;
-        }
-    }
-    return 0;
-}
-
-int text_input_take_text(char *buffer, uint32_t capacity)
-{
-    if (!buffer || capacity == 0 || !inputm_taken_text[0]) return 0;
-    inputm_copy_text(buffer, capacity, inputm_taken_text);
-    inputm_taken_text[0] = 0;
-    return 1;
-}
-
-int text_input_take_key(uint8_t *keycode, uint8_t *pressed)
-{
-    if (!inputm_taken_keycode) return 0;
-    if (keycode) *keycode = inputm_taken_keycode;
-    if (pressed) *pressed = inputm_taken_key_pressed;
-    inputm_taken_keycode = 0;
-    inputm_taken_key_pressed = 0;
-    return 1;
-}
-
 int reliefos_inputm_register(const struct reliefos_inputm_provider *provider) { return text_input_register(provider); }
 int reliefos_inputm_unregister(void) { return text_input_unregister(); }
 int reliefos_inputm_provider_next(struct reliefos_inputm_key_event *event) { return text_input_provider_next(event); }
@@ -430,29 +300,17 @@ int reliefos_inputm_poll_result(struct reliefos_inputm_result *result) { return 
 int reliefos_inputm_set_active(uint32_t uid, const char *id) { return text_input_set_active(uid, id); }
 int reliefos_inputm_list(uint32_t uid, struct reliefos_inputm_provider *providers, uint32_t capacity, uint32_t *out_count) { return text_input_list(uid, providers, capacity, out_count); }
 int reliefos_inputm_set_context(const struct reliefos_inputm_context *context) { return text_input_set_context(context); }
-void reliefos_inputm_note_gui_window(uint32_t window_id) { text_input_note_gui_window(window_id); }
-int reliefos_inputm_set_current_context(uint32_t flags, int32_t caret_x, int32_t caret_y, uint32_t caret_w, uint32_t caret_h) { return text_input_set_current_context(flags, caret_x, caret_y, caret_w, caret_h); }
 int reliefos_inputm_get_state(uint32_t uid, struct reliefos_inputm_state *state) { return text_input_get_state(uid, state); }
 int reliefos_inputm_notify_config(uint32_t uid) { return text_input_notify_config(uid); }
-int reliefos_inputm_observe_gui_key(uint32_t window_id, uint8_t *keycode, uint8_t pressed) { return text_input_observe_gui_key(window_id, keycode, pressed); }
-int reliefos_inputm_poll_gui_commit(uint32_t window_id) { return text_input_poll_gui_commit(window_id); }
-int reliefos_inputm_take_text(char *buffer, uint32_t capacity) { return text_input_take_text(buffer, capacity); }
-int reliefos_inputm_take_key(uint8_t *keycode, uint8_t *pressed) { return text_input_take_key(keycode, pressed); }
 /* Published libleonos.so.2 aliases; keep these in the defining translation unit. */
 extern __typeof__(reliefos_inputm_get_state) leonos_inputm_get_state __attribute__((alias("reliefos_inputm_get_state")));
 extern __typeof__(reliefos_inputm_list) leonos_inputm_list __attribute__((alias("reliefos_inputm_list")));
-extern __typeof__(reliefos_inputm_note_gui_window) leonos_inputm_note_gui_window __attribute__((alias("reliefos_inputm_note_gui_window")));
 extern __typeof__(reliefos_inputm_notify_config) leonos_inputm_notify_config __attribute__((alias("reliefos_inputm_notify_config")));
-extern __typeof__(reliefos_inputm_observe_gui_key) leonos_inputm_observe_gui_key __attribute__((alias("reliefos_inputm_observe_gui_key")));
-extern __typeof__(reliefos_inputm_poll_gui_commit) leonos_inputm_poll_gui_commit __attribute__((alias("reliefos_inputm_poll_gui_commit")));
 extern __typeof__(reliefos_inputm_poll_result) leonos_inputm_poll_result __attribute__((alias("reliefos_inputm_poll_result")));
 extern __typeof__(reliefos_inputm_provider_next) leonos_inputm_provider_next __attribute__((alias("reliefos_inputm_provider_next")));
 extern __typeof__(reliefos_inputm_provider_result) leonos_inputm_provider_result __attribute__((alias("reliefos_inputm_provider_result")));
 extern __typeof__(reliefos_inputm_register) leonos_inputm_register __attribute__((alias("reliefos_inputm_register")));
 extern __typeof__(reliefos_inputm_set_active) leonos_inputm_set_active __attribute__((alias("reliefos_inputm_set_active")));
 extern __typeof__(reliefos_inputm_set_context) leonos_inputm_set_context __attribute__((alias("reliefos_inputm_set_context")));
-extern __typeof__(reliefos_inputm_set_current_context) leonos_inputm_set_current_context __attribute__((alias("reliefos_inputm_set_current_context")));
 extern __typeof__(reliefos_inputm_submit_key) leonos_inputm_submit_key __attribute__((alias("reliefos_inputm_submit_key")));
-extern __typeof__(reliefos_inputm_take_key) leonos_inputm_take_key __attribute__((alias("reliefos_inputm_take_key")));
-extern __typeof__(reliefos_inputm_take_text) leonos_inputm_take_text __attribute__((alias("reliefos_inputm_take_text")));
 extern __typeof__(reliefos_inputm_unregister) leonos_inputm_unregister __attribute__((alias("reliefos_inputm_unregister")));

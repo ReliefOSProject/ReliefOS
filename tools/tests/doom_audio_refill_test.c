@@ -5,9 +5,7 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #include "../../third_party/doomgeneric/doomgeneric/i_sound.c"
 #pragma GCC diagnostic pop
-#define main doom_port_main
-#include "../../userland/apps/doom/main.c"
-#undef main
+#include "../../userland/apps/doom/frontend_timing.c"
 
 struct refill_hardware {
     uint32_t free_frames;
@@ -38,11 +36,7 @@ static long refill_write(void *opaque, const void *pcm, uint32_t bytes)
 static struct refill_hardware *sleep_hardware;
 static unsigned int sleeps;
 unsigned long reliefos_uptime_ms(void) { return 1U; }
-int reliefos_gui_poll_app_event(struct reliefos_gui_app_event *event)
-{ (void)event; return 0; }
-int reliefos_gui_set_mouse_visible(uint32_t id, uint32_t visible)
-{ (void)id; (void)visible; return 0; }
-int reliefos_gui_destroy_app_window(uint32_t id) { (void)id; return 0; }
+void doom_pump_events(void) {}
 int sleep_ms(unsigned long ms)
 {
     assert(ms == 1U && sleep_hardware);

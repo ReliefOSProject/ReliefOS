@@ -4,10 +4,15 @@
 
 #include <stdlib.h>
 #include <errno.h>
+#include <stdio.h>
 #include <termios.h>
 #include <string.h>
+#include <libintl.h>
 
 #include "installer_tty.h"
+#include "model.h"
+
+#define T(s) gettext(s)
 
 static int tty_read_line(const char *prompt, char *buffer, uint32_t capacity)
 {
@@ -90,6 +95,60 @@ static int tty_line_is(const char *line, const char *expected)
     return line[i] == 0 && expected[i] == 0;
 }
 
+static int tty_install_xorg(struct installer_setup *setup)
+{
+    char input[16];
+    if (!setup) return 0;
+    for (;;) {
+        errno = 0;
+        if (!tty_read_line("Install Xorg desktop environment? [Y/n]: ",
+                           input, sizeof(input))) {
+            if (errno == EOVERFLOW) {
+                puts("Please answer yes or no.");
+                continue;
+            }
+            return 0;
+        }
+        if (!input[0] || tty_line_is(input, "y") || tty_line_is(input, "yes")) {
+            setup->skip_xorg = 0;
+            return 1;
+        }
+        if (tty_line_is(input, "n") || tty_line_is(input, "no")) {
+            setup->skip_xorg = 1;
+            return 1;
+        }
+        puts("Please answer yes or no.");
+    }
+}
+
+/** @brief Preserve the detected/default mode on Enter; accept explicit yes/no. */
+static int tty_select_loader(const char *name, uint8_t *skip)
+{
+    char input[16], prompt[160];
+    snprintf(prompt, sizeof(prompt), "%s %s: ", name, *skip ? "[y/N]" : "[Y/n]");
+    for (;;) {
+        errno = 0;
+        if (!tty_read_line(prompt, input, sizeof(input))) {
+            if (errno == EOVERFLOW) continue;
+            return 0;
+        }
+        if (!input[0]) return 1;
+        if (tty_line_is(input, "yes") || tty_line_is(input, "y")) { *skip = 0; return 1; }
+        if (tty_line_is(input, "no") || tty_line_is(input, "n")) { *skip = 1; return 1; }
+        puts(T("Please answer yes or no."));
+    }
+}
+
+/** @brief Present independent firmware choices before destructive confirmation. */
+static int tty_bootloaders(struct installer_setup *setup)
+{
+    if (!tty_select_loader(T("Install or update BIOS bootloader?"), &setup->skip_bios) ||
+        !tty_select_loader(T("Install or update UEFI bootloader?"), &setup->skip_uefi)) return 0;
+    if (setup->skip_bios && setup->skip_uefi)
+        puts(T("No bootloader selected. A new installation will need a separately configured bootloader."));
+    return 1;
+}
+
 static void tty_print_disks(const struct installer_tty_context *context)
 {
     char line[160];
@@ -131,21 +190,111 @@ static int tty_choose_disk(const struct installer_tty_context *context)
     }
 }
 
+static int tty_fs(const char *name)
+{
+    if (tty_line_is(name, "fat32") || tty_line_is(name, "fat"))
+        return RELIEFOS_BLOCK_FILESYSTEM_FAT32;
+    if (tty_line_is(name, "ext2")) return RELIEFOS_BLOCK_FILESYSTEM_EXT2;
+    if (tty_line_is(name, "ext4")) return RELIEFOS_BLOCK_FILESYSTEM_EXT4;
+    if (tty_line_is(name, "exfat")) return RELIEFOS_BLOCK_FILESYSTEM_EXFAT;
+    return RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
+}
+
+static void tty_print_partitions(const struct installer_tty_context *context)
+{
+    char line[256];
+    puts("\nPartitions:");
+    for (uint32_t i = 0; i < *context->partition_count; ++i) {
+        context->format_partition_line(line, sizeof(line), &context->partitions[i]);
+        printf("  [%u] %s\n", i, line);
+    }
+}
+
+static int tty_partition_menu(const struct installer_tty_context *context)
+{
+    char input[160], fs_name[16], partition_name[80], label[80];
+    unsigned long value;
+    char *end;
+    for (;;) {
+        tty_print_partitions(context);
+        puts("Commands: auto, init, create SIZE FS NAME, resize SIZE, rename NAME,");
+        puts("format FS LABEL, bios, esp, root, data, delete, refresh, done. FS raw creates an unformatted partition.");
+        if (!tty_read_line("partition> ", input, sizeof(input))) return 0;
+        if (tty_line_is(input, "done")) {
+            if (context->partition_plan_valid()) return 1;
+            puts("Select BIOS Boot, ESP and root partitions for dual boot, or use auto.");
+            continue;
+        }
+        if (tty_line_is(input, "auto")) {
+            if (context->partition_auto_layout() < 0) puts("Automatic layout failed.");
+        } else if (tty_line_is(input, "init")) {
+            if (context->partition_initialize() < 0) puts("GPT initialization failed.");
+        } else if (tty_line_is(input, "refresh")) {
+            context->refresh_partitions();
+        } else if (!strncmp(input, "create ", 7) &&
+                   sscanf(input + 7, "%lu %15s %79[^\n]", &value, fs_name, partition_name) == 3) {
+            int filesystem = tty_fs(fs_name);
+            if (value > 0xffffffffUL || (filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN && strcmp(fs_name, "raw")) ||
+                context->partition_create((uint32_t)filesystem, (uint32_t)value,
+                                          partition_name) < 0)
+                puts("Create failed.");
+        } else if (!strncmp(input, "resize ", 7) &&
+                   sscanf(input + 7, "%lu", &value) == 1) {
+            if (value > 0xffffffffUL || context->partition_resize((uint32_t)value) < 0)
+                puts("Resize failed.");
+        } else if (!strncmp(input, "rename ", 7)) {
+            if (context->partition_rename(input + 7) < 0) puts("Rename failed.");
+        } else if (!strncmp(input, "format ", 7) &&
+                   sscanf(input + 7, "%15s %79s", fs_name, label) == 2) {
+            int filesystem = tty_fs(fs_name);
+            if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN ||
+                context->partition_format((uint32_t)filesystem, label) < 0)
+                puts("Format failed.");
+        } else if (tty_line_is(input, "delete")) {
+            if (context->partition_delete() < 0) puts("Delete failed.");
+        } else if (tty_line_is(input, "esp") || tty_line_is(input, "root") ||
+                   tty_line_is(input, "data") || tty_line_is(input, "bios")) {
+            uint32_t type = tty_line_is(input, "esp") ? RELIEFOS_BLOCK_GPT_ESP :
+                            tty_line_is(input, "root") ? RELIEFOS_BLOCK_GPT_LINUX :
+                            tty_line_is(input, "bios") ? RELIEFOS_BLOCK_GPT_BIOS_BOOT :
+                            RELIEFOS_BLOCK_GPT_BASIC_DATA;
+            if (*context->selected_partition < 0 ||
+                (uint32_t)*context->selected_partition >= *context->partition_count ||
+                context->partition_set_type(type) < 0) {
+                puts("Select a partition number first.");
+            }
+        } else {
+            value = strtoul(input, &end, 10);
+            if (end != input && *end == 0 && value < *context->partition_count)
+                *context->selected_partition = (int32_t)value;
+            else puts("Unknown partition command.");
+        }
+        context->refresh_partitions();
+    }
+}
+
 int installer_tty_main(const struct installer_tty_context *context)
 {
     char input[32];
     if (!context || !context->setup || !context->disks || !context->disk_count ||
+        !context->partitions || !context->partition_count || !context->selected_partition ||
+        !context->root_partition || !context->esp_partition || !context->partition_auto ||
         !context->selected_disk || !context->install_mode ||
         !context->install_success || !context->page ||
-        !context->refresh_disks || !context->format_disk_line ||
-        !context->print_update_packages || !context->prepare_update ||
+        !context->refresh_disks || !context->format_disk_line || !context->refresh_partitions ||
+        !context->format_partition_line || !context->partition_plan_valid ||
+        !context->partition_auto_layout || !context->partition_initialize ||
+        !context->partition_create || !context->partition_resize ||
+        !context->partition_rename || !context->partition_set_type ||
+        !context->partition_delete || !context->partition_format ||
+        !context->prepare_update ||
         !context->perform_install || !context->perform_update) {
         return 1;
     }
 
     puts("ReliefOS installer (TTY)");
     puts("This installer uses the same disk formatter and payload as the graphical installer.");
-    puts("A fresh installation erases the selected disk.");
+    puts("Fresh install defaults to automatic partitioning; manual GPT editing is available.");
     for (;;) {
         if (!tty_read_line("Mode [install/update]: ", input, sizeof(input))) {
             return 1;
@@ -169,10 +318,10 @@ int installer_tty_main(const struct installer_tty_context *context)
 
     if (*context->install_mode == INSTALLER_TTY_MODE_UPDATE) {
         context->prepare_update();
-        if (*context->page != context->update_apps_page) {
+        if (*context->page == INSTALLER_PAGE_FINISH && !*context->install_success) {
             return 1;
         }
-        context->print_update_packages();
+        if (!tty_bootloaders(context->setup)) return 1;
         if (!tty_read_line("Type UPDATE to confirm an in-place update: ",
                            input, sizeof(input)) || !tty_line_is(input, "UPDATE")) {
             puts("Update not confirmed. Installation cancelled.");
@@ -180,11 +329,21 @@ int installer_tty_main(const struct installer_tty_context *context)
         }
         context->perform_update();
     } else {
+        context->refresh_partitions();
+        if (!tty_partition_menu(context)) {
+            puts("Partition setup cancelled.");
+            return 1;
+        }
         if (!tty_setup(context->setup)) {
             puts("Account setup cancelled or input exceeds the transport buffer.");
             return 1;
         }
-        if (!tty_read_line("Type INSTALL to confirm erasing this disk: ",
+        if (!tty_install_xorg(context->setup)) {
+            puts("Desktop selection cancelled.");
+            return 1;
+        }
+        if (!tty_bootloaders(context->setup)) return 1;
+        if (!tty_read_line("Type INSTALL to confirm the partition layout and installation: ",
                            input, sizeof(input)) || !tty_line_is(input, "INSTALL")) {
             puts("Installation not confirmed. Installation cancelled.");
             return 1;

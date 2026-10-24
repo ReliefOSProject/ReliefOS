@@ -1,7 +1,7 @@
 #!/bin/sh
 # Integration contract: real cross-build, ABI and incremental recovery; no target ELF execution.
 set -eu
-: "${PAM_TEST_SOURCE:?patched Linux-PAM 1.7.2 source required}"
+: "${PAM_TEST_SOURCE:?patched Linux-PAM 1.7.3 source required}"
 : "${PAM_TEST_SYSROOT:?musl sysroot required}"
 : "${PAM_TEST_DEPS:?libcrypt and Linux headers staging root required}"
 repo=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
@@ -23,7 +23,7 @@ run() {
         SYSROOT="$PAM_TEST_SYSROOT" DEPS="$work/deps" KERNEL_HEADERS="$work/deps/usr/include" CC="${CC:-clang}" "$@"
 }
 run -j4 install
-for utility in pam_conv1 bigcrypt hmacfile; do
+for utility in pam_conv1 hmacfile; do
     readelf -h "$work/build/bin/$utility" >/dev/null
 done
 for lib in pam pam_misc pamc; do

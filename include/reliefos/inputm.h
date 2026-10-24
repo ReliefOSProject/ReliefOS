@@ -20,11 +20,5 @@ int reliefos_inputm_list(uint32_t uid, struct reliefos_inputm_provider *provider
 int reliefos_inputm_set_context(const struct reliefos_inputm_context *context);
 int reliefos_inputm_get_state(uint32_t uid, struct reliefos_inputm_state *state);
 int reliefos_inputm_notify_config(uint32_t uid);
-int reliefos_inputm_observe_gui_key(uint32_t window_id, uint8_t *keycode, uint8_t pressed);
-int reliefos_inputm_take_text(char *buffer, uint32_t capacity);
-int reliefos_inputm_take_key(uint8_t *keycode, uint8_t *pressed);
-int reliefos_inputm_poll_gui_commit(uint32_t window_id);
-void reliefos_inputm_note_gui_window(uint32_t window_id);
-int reliefos_inputm_set_current_context(uint32_t flags, int32_t caret_x, int32_t caret_y, uint32_t caret_w, uint32_t caret_h);
 
 #endif

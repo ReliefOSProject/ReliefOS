@@ -51,11 +51,14 @@ start_child() {
     fi
     "$@" &
     child_pid=$!
-    start_tries=0
-    while test "$start_tries" -lt 64; do
-        # Waiting on a throwaway child forces the shell through its job reaping,
-        # so a child that died right after exec is seen as gone instead of as an
-        # unreaped zombie that kill -0 still accepts.
+    # Confirm the child survived its own exec before calling it started.  Each
+    # throwaway wait is a reap pass: without one a child that already exited
+    # still answers kill -0 as an unreaped zombie.  Two reap probes around a
+    # short settle span the window in which an exec failure or an immediate exit
+    # appears, so the session does not spin on a fixed pile of throwaway forks
+    # (each a full process spawn here) just to notice a child that died at exec.
+    start_probes=0
+    while test "$start_probes" -lt 2; do
         ( : ) & wait $! 2>/dev/null
         if ! kill -0 "$child_pid" 2>/dev/null; then
             wait "$child_pid" 2>/dev/null
@@ -63,47 +66,62 @@ start_child() {
             event "$start_name failed to start"
             return 1
         fi
-        start_tries=$((start_tries + 1))
+        start_probes=$((start_probes + 1))
+        # Fractional settle is a widely supported extension; skip it silently
+        # where only whole-second sleep exists rather than delay the session.
+        if test "$start_probes" -lt 2; then
+            sleep 0.05 2>/dev/null || :
+        fi
     done
     return 0
 }
 
 event 'PAM authentication accepted'
 
-twm_pid=
-xterm_pid=
+icewm_pid=
+st_pid=
 cleanup() {
-    for pid in $xterm_pid $twm_pid; do
+    for pid in $st_pid $icewm_pid; do
         kill "$pid" 2>/dev/null || :
     done
-    for pid in $xterm_pid $twm_pid; do
+    for pid in $st_pid $icewm_pid; do
         wait "$pid" 2>/dev/null || :
     done
 }
 trap cleanup EXIT HUP INT TERM
 
-# Retro pixel-art root background matching the TWM Light theme.  This is a
-# best-effort one-shot: on failure the X server keeps its default background.
-if test -x /usr/bin/xwallpaper; then
-    /usr/bin/xwallpaper --focus /etc/reliefos/wallpaper.png 2>/dev/null || :
+# Create the freedesktop.org XDG user directories before any session client
+# starts.  This is the same hook Xsession/xinitrc startup runs on other
+# distributions; GTK file libraries expect e.g. $HOME/Templates to exist.
+if test -x /usr/bin/xdg-user-dirs-update; then
+    /usr/bin/xdg-user-dirs-update || :
 fi
 
-start_child twm /usr/bin/twm -f /etc/reliefos/twmrc || exit 1
-twm_pid=$child_pid
-event "twm started for uid=$uid"
+# New homes receive /etc/skel; existing accounts need the same Dillo defaults.
+# The helper only creates missing standard user files and keeps personal edits.
+if test -x /usr/lib/reliefos/dillo-config-init; then
+    /usr/lib/reliefos/dillo-config-init || event 'Dillo defaults could not be initialized'
+fi
 
-start_child xterm /usr/bin/xterm -title ReliefOS -geometry 100x32+0+0 -bg '#f7f8fb' -fg '#22242e' -cr '#3b62a6' || exit 1
-xterm_pid=$child_pid
-event 'xterm started'
+# IceWM's native session supervisor starts icewmbg, which reads background
+# preferences from the selected theme and follows subsequent theme changes.
+start_child icewm /usr/bin/icewm-session || exit 1
+icewm_pid=$child_pid
+event "icewm started for uid=$uid"
 
-# The window manager owns the session lifetime; xterm is torn down with it.
-wait "$twm_pid"
+# Keep st's default palette and start the user's login shell.
+start_child st /usr/bin/st -T ReliefOS -g 100x32+0+0 -e "${SHELL:-/bin/sh}" -l || exit 1
+st_pid=$child_pid
+event 'st started'
+
+# The window manager owns the session lifetime; st is torn down with it.
+wait "$icewm_pid"
 status=$?
-twm_pid=
-if test -n "$xterm_pid"; then
-    kill "$xterm_pid" 2>/dev/null || :
+icewm_pid=
+if test -n "$st_pid"; then
+    kill "$st_pid" 2>/dev/null || :
 fi
-wait "$xterm_pid" 2>/dev/null || :
-xterm_pid=
+wait "$st_pid" 2>/dev/null || :
+st_pid=
 event 'xdm session ended'
 exit "$status"

@@ -11,15 +11,15 @@ from make_installer_iso import stage_installer_tree
 
 class PackagingPathsTests(unittest.TestCase):
     def test_media_payloads_are_excluded_from_packages(self):
-        self.assertTrue({"EFI", "grub", "reliefos", "leonos", "loader.elf", "install"} <= EXTERNAL)
+        self.assertTrue({"EFI", "grub", "reliefos", "leonos", "install"} <= EXTERNAL)
         script = (Path(__file__).parent / "build/apk-stage.sh").read_text()
-        self.assertEqual(script.count("for name in EFI grub reliefos leonos loader.elf install;"), 2)
+        self.assertEqual(script.count("for name in EFI grub reliefos leonos install;"), 2)
 
     def test_reference_iso_stages_canonical_and_rollback_payloads(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-iso-layout-") as directory:
             work = Path(directory)
             inputs = []
-            for name in ("efi.img", "BOOTX64.EFI", "loader.elf", "kernel.sys", "root.ext2", "font.pf2", "grub.cfg"):
+            for name in ("efi.img", "BOOTX64.EFI", "kernel.sys", "root.ext2", "font.pf2", "grub.cfg"):
                 path = work / name
                 path.write_bytes(name.encode())
                 inputs.append(path)
@@ -27,7 +27,6 @@ class PackagingPathsTests(unittest.TestCase):
             stage_installer_tree(stage, *inputs)
             for namespace in ("reliefos", "leonos"):
                 self.assertEqual((stage / namespace / "kernel.sys").read_bytes(), b"kernel.sys")
-                self.assertEqual((stage / namespace / "loader.elf").read_bytes(), b"loader.elf")
                 self.assertTrue((stage / (namespace + "-installer-iso.marker")).is_file())
 
     def test_api_accepts_canonical_and_legacy_paths_but_rejects_traversal(self):

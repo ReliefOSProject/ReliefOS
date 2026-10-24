@@ -6,7 +6,7 @@ import subprocess
 import time
 
 from PIL import ImageChops
-from test_installer_accounts_qemu import boot, next_page
+from test_installer_accounts_qemu import boot, next_page, previous_page
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -55,10 +55,11 @@ def main():
     with boot(output, disk, args.iso.resolve()) as (probe, serial, process):
         wait_page(probe, process, "Select Language")
         probe.frame("language")
-        for _ in range(4):
+        # The FLTK wizard no longer has the Motif-only Style step, so Mode is
+        # reached after three transitions from Language.
+        for _ in range(3):
             next_page(probe)
-        y = 64 if probe.height > 640 else 44
-        probe.click(350, y + 192)
+        probe.click(*probe.mode_option_point(update=True))
         next_page(probe)
         next_page(probe)
         wait_page(probe, process, "Confirm Update")
@@ -67,23 +68,26 @@ def main():
         assert "Type UPDATE" in page_text(probe, "update-confirm-page")
         probe.text("UPDATE")
         after = probe.frame("update-confirm-typed")
-        button = (probe.width - 206, probe.height - 44,
-                  probe.width - 122, probe.height - 20)
+        button = probe.footer_button_box()
         if ImageChops.difference(before.crop(button), after.crop(button)).getbbox() is None:
             failures.append("Typing UPDATE did not enable the update button")
-        for _ in range(2):
-            probe.click(probe.width - 258, probe.height - 33)
-            time.sleep(.8)
-        probe.click(350, y + 96)
-        next_page(probe)
-        next_page(probe)
+        # Leave the enabled Update confirmation unsubmitted, return to Mode,
+        # switch to a fresh install, and carry the same disk through that path.
+        previous_page(probe, 4)
+        previous_page(probe, 3)
+        probe.click(*probe.mode_option_point(update=False))
+        next_page(probe, 4)
+        probe.click(*probe.disk_selection_point())
+        next_page(probe, 5)
+        next_page(probe, 6)
         for index, value in enumerate(("alice", "password", "password", "rootpass", "rootpass")):
-            probe.click(350, y + 96 + index * 54)
+            probe.click(*probe.account_field_point(index))
             probe.text(value)
-        next_page(probe)
+        next_page(probe, 7)
+        probe.click(*probe.confirm_field_point())
         probe.text("INSTALL")
         probe.frame("fresh-confirm-typed")
-        next_page(probe)
+        next_page(probe, 8)
         try:
             wait_page(probe, process, "Installation Complete", timeout=2400)
         except AssertionError as error:

@@ -20,4 +20,41 @@ int reliefos_machine_identity(struct reliefos_machine_identity *identity);
 int reliefos_system_reboot(void);
 int reliefos_system_shutdown(void);
 
+#define RELIEFOS_TASK_NAME_LEN 32U
+#define RELIEFOS_TASK_MAX 64U
+
+#define RELIEFOS_TASK_SNAPSHOT_FLAG_ELEVATED_ADMIN 0x00000010U
+
+struct reliefos_task_info {
+    uint32_t pid;
+    uint32_t parent_pid;
+    uint32_t state;
+    uint32_t kind;
+    uint32_t flags;
+    uint32_t uid;
+    uint32_t role;
+    uint32_t session_id;
+    uint32_t memory_kib;
+    uint64_t cpu_ticks;
+    int32_t priority;
+    uint32_t pending_signals;
+    uint64_t wake_tick;
+    uint64_t entry;
+    uint64_t cr3;
+    uint64_t affinity_mask;
+    char name[RELIEFOS_TASK_NAME_LEN];
+    char username[32];
+};
+
+struct reliefos_task_snapshot {
+    uint32_t capacity;
+    uint32_t count;
+    uint64_t tick;
+    struct reliefos_task_info *tasks;
+};
+
+unsigned long reliefos_uptime_ms(void);
+int reliefos_task_snapshot(struct reliefos_task_info *tasks, uint32_t capacity, uint64_t *tick);
+int reliefos_task_kill(uint32_t pid);
+
 #endif

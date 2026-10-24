@@ -144,16 +144,11 @@ failed=0
 for pair in \
     'etc/leonos/leonos.conf etc/reliefos/leonos.conf' \
     'etc/leonos/display.conf etc/reliefos/display.conf' \
-    'etc/leonos/drivers.conf etc/reliefos/drivers.conf' \
-    'etc/leonos/taskbar.cfg etc/reliefos/taskbar.cfg' \
     'etc/leonos/network.conf etc/reliefos/network.conf' \
     'etc/leonos/locale.conf etc/reliefos/locale.conf' \
     'etc/leonos/environment.conf etc/reliefos/environment.conf' \
     'etc/leonos/fileassoc.cfg etc/reliefos/fileassoc.cfg' \
-    'etc/leonos/desktop-entries.conf etc/reliefos/desktop-entries.conf' \
     'etc/leonos/lesskey etc/reliefos/lesskey' \
-    'etc/leonos/desktop-profile etc/reliefos/desktop-profile' \
-    'etc/leonos/desktop-session etc/reliefos/desktop-session' \
     'etc/leonos/installer-runtime etc/reliefos/installer-runtime' \
     'etc/leonos/installed etc/reliefos/installed' \
     'var/lib/leonos/users.db var/lib/reliefos/users.db' \

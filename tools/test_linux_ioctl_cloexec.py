@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
-"""Regression for the generic ioctl(FIOCLEX/FIONCLEX) close-on-exec ABI.
+"""Validate the ReliefOS SDK ioctl probe and optional CPython guest integration.
 
-Host stage (always runs, no virtual machine):
-  * Linux UAPI header checks and dispatch-contract checks for the kernel
-    source that answers ioctl(FIOCLEX/FIONCLEX),
-  * the kernel descriptor-table unit test, built from the real
-    kernel/reliefnt/kernel/reliefnt/syscall.c with ASan/UBSan,
-  * the raw-syscall probe built with the ReliefOS musl SDK and executed on the
-    host Linux kernel, which is the reference implementation of the ABI.
-
-Guest stage (--guest): stage the same probe plus the unmodified static musl
-CPython 3.15 build into an installer root, build the diagnostic ISO and boot
-it under QEMU/KVM with serial console and syscall trace, then assert the guest
-probe report and the real ``python3 /bin/hello.py`` run.
+The kernel header, dispatch and descriptor-table fixtures live in ReliefNT.
+This suite compiles the shared native probe with the OS SDK, runs a Linux
+reference, and optionally builds/boots the full diagnostic image with CPython.
 """
 from __future__ import annotations
 
@@ -27,12 +18,8 @@ import tempfile
 import time
 from pathlib import Path
 
+
 ROOT = Path(__file__).resolve().parents[1]
-LINUX_V612 = {
-    # kernel/reliefnt/include/uapi/asm-generic/ioctls.h, Linux v6.12
-    "FIOCLEX": 0x5451,
-    "FIONCLEX": 0x5450,
-}
 FORMAT = "native x86-64 (i386/x32 deliberately out of scope)"
 
 
@@ -40,10 +27,6 @@ def read(relative: str) -> str:
     return (ROOT / relative).read_text(encoding="utf-8")
 
 
-def macro(text: str, name: str) -> int:
-    match = re.search(rf"^#define {re.escape(name)}\s+(0x[0-9a-fA-F]+|\d+)", text, re.M)
-    assert match, f"missing {name}"
-    return int(match.group(1), 0)
 
 
 def run(command: list[str], **kwargs) -> subprocess.CompletedProcess:
@@ -51,100 +34,11 @@ def run(command: list[str], **kwargs) -> subprocess.CompletedProcess:
 
 
 # --------------------------------------------------------------------------- #
-# Host stage 1: Linux UAPI headers and kernel dispatch contract.
+# OS diagnostic hooks for the optional full-image guest stage.
 # --------------------------------------------------------------------------- #
 
-def test_linux_headers() -> None:
-    tty = read("kernel/reliefnt/include/uapi/linux/tty.h")
-    fcntl = read("kernel/reliefnt/include/uapi/linux/fcntl.h")
-    assert macro(tty, "FIOCLEX") == LINUX_V612["FIOCLEX"], "FIOCLEX must match Linux v6.12"
-    assert macro(tty, "FIONCLEX") == LINUX_V612["FIONCLEX"], "FIONCLEX must match Linux v6.12"
-    assert macro(fcntl, "LINUX_FD_CLOEXEC") == 1
-    assert macro(fcntl, "LINUX_F_GETFD") == 1
-    assert macro(fcntl, "LINUX_F_SETFD") == 2
-    assert macro(fcntl, "LINUX_F_DUPFD_CLOEXEC") == 1030
-    assert macro(fcntl, "LINUX_O_CLOEXEC") == 0x80000
-    assert macro(fcntl, "LINUX_O_PATH") == 0x200000
-    for name, value in LINUX_V612.items():
-        print(f"  header {name}=0x{value:04x} matches Linux v6.12 {FORMAT}")
-
-
-def test_kernel_dispatch_contract() -> None:
-    syscall_c = read("kernel/reliefnt/kernel/reliefnt/syscall.c")
-    sched_h = read("kernel/reliefnt/kernel/reliefnt/include/reliefnt/sched.h")
-    # The generic requests must be resolved before any category/device routing.
-    dispatch = syscall_c.index("static int64_t syscall_dispatch_regs(uint64_t number")
-    generic = syscall_c.index("syscall_ioctl_descriptor_flags(sched_current_task(), a0")
-    owned = syscall_c.index("if (syscall_fs_owns(number))", dispatch)
-    assert dispatch < generic < owned, "FIOCLEX/FIONCLEX must precede device dispatch"
-    path_rule = syscall_c.index("syscall_ioctl_resolve_fd(sched_current_task(), a0)")
-    assert dispatch < path_rule < generic, "the O_PATH rule must run before generic ioctls"
-    # Unknown requests keep the Linux generic error instead of ENOSYS.
-    assert "return -RELIEFOS_ENOTTY;\n    }\n\n    return -RELIEFOS_ENOSYS;" in syscall_c
-    # The signalfd branch must no longer carry a private implementation: the
-    # generic handler answers FIOCLEX/FIONCLEX for it like for every other fd.
-    signalfd = syscall_c.rindex("if (file && file->kind == TASK_FILE_KIND_SIGNALFD)")
-    socket_dispatch = syscall_c.index("if (file && (file->flags & TASK_FILE_FLAG_SOCKET_UNIX))", signalfd)
-    signalfd_block = syscall_c[signalfd:socket_dispatch]
-    assert "FIOCLEX" not in signalfd_block and "FIONCLEX" not in signalfd_block
-    nonblock = syscall_c.index("return syscall_ioctl_nonblock(sched_current_task()", dispatch)
-    assert path_rule < nonblock < owned, "FIONBIO must use the shared generic VFS path"
-    # fcntl(F_GETFD/F_SETFD) shares one storage with ioctl(FIOCLEX/FIONCLEX).
-    assert "return task_fd_descriptor_flags(task, (int)a0);" in syscall_c
-    assert "task_fd_set_descriptor_flags(task, (int)a0, (uint32_t)a2)" in syscall_c
-    # The implicit stdio table must hold the flag, not answer success silently.
-    assert "cloexec_stdio_mask" in syscall_c
-    # O_PATH is FMODE_PATH, not an open flag, and must not collide with the
-    # internal EPOLL bit used by the same word.
-    assert macro(sched_h, "TASK_FILE_FLAG_EPOLL") == 0x00200000
-    assert macro(sched_h, "TASK_FILE_FLAG_PATH") != macro(sched_h, "TASK_FILE_FLAG_EPOLL")
-    assert "LINUX_O_PATH" in syscall_c and "TASK_FILE_FLAG_PATH" in syscall_c
-    # Diagnostic guest hooks used by the ISO produced by --guest. Since the
-    # stage-4 M5 migration the spawn authority is the desktop autospawn table
-    # (exact-token "autospawn=<name>" parsed from /proc/cmdline), not the
-    # kernel; the hook names must stay registered there.
-    autospawn = read("userland/apps/desktop/autospawn.c")
-    assert 'strncmp(token, "autospawn=", 10)' in autospawn, \
-        "autospawn must match exact cmdline tokens, not substrings"
-    for hook in ("ioctlcloexec", "python315"):
-        assert f'{{"{hook}",' in autospawn, f"missing diagnostic hook {hook}"
-    print("  kernel dispatch: generic FIOCLEX/FIONCLEX + O_PATH rule precede device dispatch")
-
-
 # --------------------------------------------------------------------------- #
-# Host stage 2: kernel descriptor-table unit test (real syscall.c).
-# --------------------------------------------------------------------------- #
-
-def test_kernel_descriptor_table(directory: Path) -> None:
-    binary = directory / "ioctl-cloexec-table"
-    sources = [
-        "tools/tests/ioctl_cloexec_table_test.c",
-        "kernel/reliefnt/kernel/reliefnt/sched/sched.c",
-        "kernel/reliefnt/kernel/reliefnt/wait.c",
-        "kernel/reliefnt/kernel/reliefnt/syscall_sysv_msg.c",
-        "kernel/reliefnt/kernel/reliefnt/syscall_sysv_sem.c",
-        "kernel/reliefnt/kernel/reliefnt/syscall_locks.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/core.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/pcm.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/device.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/alsa_control.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/mixer.c",
-        "kernel/reliefnt/kernel/reliefnt/audio/oss.c",
-    ]
-    run([
-        "clang", "-std=c11", "-g", "-O1", "-ffunction-sections", "-fdata-sections",
-        "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
-        "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include", "-Wl,--gc-sections",
-        *sources, "-o", str(binary),
-    ])
-    result = subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=60,
-                            stdout=subprocess.PIPE, text=True)
-    print("  " + result.stdout.strip())
-    run([str(binary), "--invalid-fd"], timeout=60)
-
-
-# --------------------------------------------------------------------------- #
-# Host stage 3: the raw-syscall probe on the host Linux reference kernel.
+# Build with the OS SDK and run on the host Linux reference kernel.
 # --------------------------------------------------------------------------- #
 
 def sdk_compiler(sdk: Path | None = None) -> Path:
@@ -157,7 +51,7 @@ def sdk_compiler(sdk: Path | None = None) -> Path:
 def build_probe(binary: Path, sdk: Path | None = None) -> Path:
     binary.parent.mkdir(parents=True, exist_ok=True)
     run([sdk_compiler(sdk), "-static", "-O2", "-pthread", "-Wall", "-Wextra",
-         "tools/tests/linux_ioctl_cloexec_test.c", "-o", str(binary)])
+         "kernel/reliefnt/tools/tests/linux_ioctl_cloexec_test.c", "-o", str(binary)])
     return binary
 
 
@@ -195,9 +89,8 @@ terminal_input console serial
 terminal_output gfxterm serial
 
 menuentry "ReliefOS ioctl CLOEXEC regression" {
-    multiboot2 /loader.elf root=/ log=serial mode=live syscall-trace=/opt/python/ autospawn=ioctlcloexec autospawn=python315
-    module2 /leonos/kernel.sys leonos-kernel
-    module2 /install/root.fat leonos-installer-root
+    multiboot2 /reliefos/kernel.sys root=/ log=serial mode=live syscall-trace=/opt/python/ autospawn=ioctlcloexec autospawn=python315
+    module2 /install/root.fat reliefos-installer-root
     boot
 }
 """
@@ -239,15 +132,11 @@ def stage_root(base: Path, probe: Path, image: Path) -> None:
     print(f"  staged {PROBE_GUEST_PATH} and the CPython 3.15 tree in {image}")
 
 
-def grub_efi_dir() -> str:
-    """Use the pinned GRUB modules like build.py; the host GRUB build boots a
-    different, unvalidated firmware image on this ISO layout."""
-    repo = ROOT / "boot/grub_modules_x86_64-efi"
-    if (repo / "modinfo.sh").is_file():
-        return "boot/grub_modules_x86_64-efi"
-    system = Path("/usr/lib/grub/x86_64-efi")
-    assert (system / "modinfo.sh").is_file(), "no GRUB x86_64-efi modules available"
-    return str(system)
+def grub_efi_dir(output=None) -> str:
+    """Consume the locked native platform output; never substitute host modules."""
+    modules = (output or ROOT / "out/x86_64/release") / "grub-efi/lib/grub/x86_64-efi"
+    assert (modules / "modinfo.sh").is_file(), f"build grub-efi first: {modules}"
+    return str(modules)
 
 
 def build_iso(root: Path, output: Path, config: Path, work: Path) -> Path:
@@ -257,7 +146,6 @@ def build_iso(root: Path, output: Path, config: Path, work: Path) -> Path:
                 return name
         raise AssertionError(f"missing build artifact (tried {names}); build kernel and userland targets separately")
 
-    loader = artifact("build/boot/loader.elf", "out/x86_64/release/generated/boot/loader.elf")
     kernel = artifact("build/system/kernel.sys", "out/x86_64/release/generated/system/kernel.sys")
     font = artifact("build/generated/grub/leonos-unicode.pf2", "out/x86_64/release/generated/grub/leonos-unicode.pf2")
     config.write_text(GRUB_TEMPLATE, encoding="ascii")
@@ -267,7 +155,7 @@ def build_iso(root: Path, output: Path, config: Path, work: Path) -> Path:
         "--grub-efi-dir", grub_efi_dir(),
         "--stage", str((work / "iso").relative_to(ROOT)),
         "--boot-image", str((work / "efiboot.img").relative_to(ROOT)),
-        "--loader", loader, "--kernel", kernel,
+        "--kernel", kernel,
         "--installer-root", str(root.relative_to(ROOT)),
         "--grub-font", font,
         "--work-dir", str(work.relative_to(ROOT)),
@@ -457,7 +345,7 @@ def write_evidence(host_output: str, host: dict, guest_text: str | None,
         "",
         f"[host] host Linux raw-syscall reference: checks={host['checks']} "
         f"failures={host['failures']} skips={host['skips']}",
-        "[host] kernel descriptor-table unit test (real syscall.c, ASan/UBSan): PASS",
+        "[host] kernel descriptor-table unit test: not run by this harness (kernel/reliefnt/tools/test_linux_ioctl_cloexec.py)",
         "",
         "--- host reference probe output ---",
         host_output.strip(),
@@ -480,8 +368,7 @@ def write_evidence(host_output: str, host: dict, guest_text: str | None,
         for index, line in enumerate(serial_lines):
             if any(marker in line for marker in (
                     "[ioctl-clex]", "Hello from Python", "Numbers:", "Sum:", "Fibonacci:",
-                    "name=python3.15 code=", "[desktop] autospawn ioctlcloexec",
-                    "[desktop] autospawn python315", "5451")):
+                    "name=python3.15 code=", "5451")):
                 lines.append(line.strip())
                 # Keep the syscall-trace result line that follows a FIOCLEX call.
                 if "5451" in line and index + 1 < len(serial_lines):
@@ -521,18 +408,14 @@ def main() -> int:
         parser.error("--terminal requires --guest")
 
     print(f"ioctl close-on-exec regression ({FORMAT})")
-    test_linux_headers()
-    test_kernel_dispatch_contract()
-    with tempfile.TemporaryDirectory(prefix="reliefos-ioctl-cloexec-") as directory:
-        test_kernel_descriptor_table(Path(directory))
-        probe = build_probe(ROOT / "build/ioctl-cloexec/linux-ioctl-cloexec.elf", args.sdk)
-        host_output = subprocess.run([str(probe)], cwd=ROOT, stdout=subprocess.PIPE,
-                                     stderr=subprocess.STDOUT, text=True,
-                                     timeout=120).stdout
-        host = parse_probe(host_output)
-        print(host_output.strip())
-        assert host["failures"] == 0, f"host Linux reference reported {host['failures']} failures"
-        print(f"  host Linux reference: {host['checks']} checks, 0 failures, {host['skips']} skips")
+    probe = build_probe(ROOT / "build/ioctl-cloexec/linux-ioctl-cloexec.elf", args.sdk)
+    host_output = subprocess.run([str(probe)], cwd=ROOT, stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT, text=True,
+                                 timeout=120).stdout
+    host = parse_probe(host_output)
+    print(host_output.strip())
+    assert host["failures"] == 0, f"host Linux reference reported {host['failures']} failures"
+    print(f"  host Linux reference: {host['checks']} checks, 0 failures, {host['skips']} skips")
     guest_text = None
     iso = None
     serial = None
@@ -541,7 +424,7 @@ def main() -> int:
     evidence = write_evidence(host_output, host, guest_text, iso, serial,
                               output=args.evidence, kernel=args.kernel)
     print(f"  evidence: {evidence.relative_to(ROOT)}")
-    print("PASS ioctl close-on-exec: host Linux reference and kernel unit test; "
+    print("PASS ioctl close-on-exec: host Linux reference; "
           + ("guest ISO verified" if args.guest else "guest ISO not requested"))
     return 0
 

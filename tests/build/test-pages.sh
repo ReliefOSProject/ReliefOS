@@ -18,17 +18,15 @@ bad()  { printf 'FAIL - %s\n' "$1"; fail=1; }
 build="$tmp/build_info.h"
 printf '#define RELIEFOS_KERNEL_VERSION "4.9.1"\n' > "$build"
 head -c 8192 /dev/zero > "$tmp/kernel.sys"
-head -c 4096 /dev/zero > "$tmp/loader.elf"
 head -c 123456 /dev/zero > "$tmp/reliefos-installer.iso"
 
 # The kernel side of the release metadata: an install manifest whose per-artifact
 # hashes match these exact bytes, and the kernel's build-version file.
 mkdir -p "$tmp/kernel-install"
 kernel_hash=$(sha256sum "$tmp/kernel.sys" | cut -d' ' -f1)
-loader_hash=$(sha256sum "$tmp/loader.elf" | cut -d' ' -f1)
 manifest="$tmp/kernel-install/manifest.txt"
-printf 'format_version: 1\narch: x86_64\nartifacts:\n  %s  kernel.sys\n  %s  loader.elf\n' \
-    "$kernel_hash" "$loader_hash" > "$manifest"
+printf 'format_version: 1\narch: x86_64\nartifacts:\n  %s  kernel.sys\n' \
+    "$kernel_hash" > "$manifest"
 version_src="$tmp/build-version"
 printf 'kernel_name=ReliefNT\nrelease_version=4.9.1\n' > "$version_src"
 
@@ -55,11 +53,11 @@ printf bb  > "$tmp/apps/reliefos-helloworld-4.9.1-r5.apk"
 
 # 1. Build the RPR subtree, then assemble the full Pages tree.
 sh "$src/tools/build/rpr-pages.sh" "$tmp/repository" "$tmp/apps" \
-    "$tmp/kernel.sys" "$tmp/loader.elf" "$manifest" "$version_src" \
+    "$tmp/kernel.sys" "$manifest" "$version_src" \
     "$tmp/fake-bin/apk" "$tmp/key" "$tmp/rpr-pages" \
     || { echo 'rpr-pages.sh failed' >&2; exit 1; }
 sh "$src/tools/build/site.sh" "$tmp/rpr-pages" "$tmp/reliefos-installer.iso" \
-    "$build" "$src/resources/pages/css/reliefos.css" "$tmp/pages" \
+    "$build" "$src/resources/pages/css/reliefos.css" "$tmp/pages" "$src/kernel/reliefnt/Documentation" \
     || { echo 'site.sh failed' >&2; exit 1; }
 
 # Public brand and download contract: visible page titles use the current
@@ -123,7 +121,7 @@ fi
 # 3. Every machine-interface file survived the move under /rpr/.
 for f in rpr/apk/packages.adb rpr/apk/repository.json rpr/apk/reliefos-rpr.rsa.pub rpr/apk/leonos-rpr.rsa.pub \
          rpr/apk/SHA256SUMS rpr/kernel/release.txt rpr/kernel/release.json \
-         rpr/kernel/kernel.sys rpr/kernel/loader.elf rpr/kernel/SHA256SUMS \
+         rpr/kernel/kernel.sys rpr/kernel/SHA256SUMS \
          rpr/manifest.json rpr/health.txt; do
     [ -f "$tmp/pages/$f" ] || bad "machine interface lost $f"
 done
@@ -134,19 +132,18 @@ grep -q '^version=4.9.1$' "$tmp/pages/rpr/kernel/release.txt" \
     && ok 'release.txt version matches build' \
     || bad 'release.txt version drifted from build'
 
-# 4b. The release.txt key set and the pairing hashes are the fixed machine
-#     contract (format_version=2: kernel and loader update as one unit).
+# 4b. The release.txt key set and the pairing hash are the fixed machine
+#     contract (format_version=3: kernel.sys is the single release unit).
 keys=$(sed 's/=.*//' "$tmp/pages/rpr/kernel/release.txt" | LC_ALL=C sort | tr '\n' ' ')
-expected_keys='format_version image_version kernel_file kernel_sha256 loader_file loader_sha256 version '
+expected_keys='format_version image_version kernel_file kernel_sha256 version '
 if [ "$keys" = "$expected_keys" ]; then
     ok 'release.txt key set unchanged'
 else
     bad "release.txt key set drifted: $keys"
 fi
 grep -q "^kernel_sha256=$kernel_hash\$" "$tmp/pages/rpr/kernel/release.txt" \
-    && grep -q "^loader_sha256=$loader_hash\$" "$tmp/pages/rpr/kernel/release.txt" \
-    && ok 'release.txt hashes match the published kernel manifest' \
-    || bad 'release.txt hashes drifted from the kernel manifest'
+    && ok 'release.txt hash matches the published kernel manifest' \
+    || bad 'release.txt hash drifted from the kernel manifest'
 
 # 5. No JavaScript anywhere and the ISO hash matches its SHA256SUMS.
 [ -z "$(find "$tmp/pages" -type f -name '*.js' 2>/dev/null)" ] \
@@ -155,77 +152,130 @@ grep -q "^kernel_sha256=$kernel_hash\$" "$tmp/pages/rpr/kernel/release.txt" \
     && ok 'installer ISO matches download/SHA256SUMS' \
     || bad 'installer ISO checksum mismatch'
 
-# 5b. Documentation: at least one rendered doc, index exists, raw Markdown does
-#     not leak, and no HTML/JS injection characters survive.
+# 5b. The indexed manual preserves its hierarchy without raw source or scripts.
 [ -f "$tmp/pages/docs/index.html" ] && ok 'docs index present' || bad 'docs index missing'
-docs_rendered=$(find "$tmp/pages/docs" -mindepth 2 -name index.html 2>/dev/null | wc -l)
-[ "$docs_rendered" -gt 0 ] && ok "docs rendered ($docs_rendered pages)" || bad 'no docs rendered'
-md_leak=$(find "$tmp/pages/docs" -type f -name '*.md' 2>/dev/null)
-[ -z "$md_leak" ] && ok 'no raw Markdown in published docs' || bad "Markdown leaked: $md_leak"
-if grep -qE '<script|javascript:' "$tmp/pages/docs/index.html"; then
-    bad 'script marker in docs index'
+for doc in admin-guide/installation applications/diskmgr kbuild/building process/releasing; do
+    [ -s "$tmp/pages/docs/reliefos/$doc.html" ] && ok "Sphinx page present: $doc" || bad "missing Sphinx page: $doc"
+done
+source_leak=$(find "$tmp/pages/docs" -type f \( -name '*.md' -o -name '*.rst' -o -name '*.rst.txt' -o -name '*.pickle' \) -print)
+[ -z "$source_leak" ] && ok 'no raw source or doctrees in published manual' || bad "source leaked: $source_leak"
+
+# The kernel manual comes from the kernel repository, not the system book.
+if [ -s "$tmp/pages/docs/reliefnt/core-api/modules.html" ] &&
+   grep -q 'ReliefNT 内核文档' "$tmp/pages/docs/reliefnt/index.html" &&
+   [ ! -e "$tmp/pages/docs/reliefos/core-api/modules.html" ]; then
+    ok 'system and kernel manuals remain separate'
 else
-    ok 'docs index has no script markers'
+    bad 'kernel manual is absent or mixed into the system book'
+fi
+grep -Fq 'href="../docs/reliefos/index.html"' "$tmp/pages/rpr/index.html" &&
+grep -Fq 'href="../../docs/reliefnt/index.html"' "$tmp/pages/rpr/kernel/index.html" &&
+    ok 'RPR links to both owning manuals' || bad 'RPR documentation links missing'
+
+# 5c. An unresolved RST cross-reference must fail without replacing a good manual.
+mkdir -p "$tmp/bad-docs"
+cp "$src/Documentation/conf.py" "$tmp/bad-docs/conf.py"
+# The production conf reads release data relative to its repository root.
+mkdir -p "$tmp/configs"
+cp "$src/configs/build-version" "$tmp/configs/build-version"
+cp -R "$src/Documentation/_templates" "$tmp/bad-docs/_templates"
+cat > "$tmp/bad-docs/index.rst" <<'RST'
+Broken reference
+================
+
+See :doc:`missing-page`.
+RST
+before_docs=$(sha256sum "$tmp/pages/docs/reliefos/index.html")
+if sh "$src/scripts/build-docs.sh" "$tmp/bad-docs" "$tmp/pages/docs/reliefos" >"$tmp/bad-docs.log" 2>&1; then
+    bad 'Sphinx accepted an unresolved document reference'
+elif grep -q 'missing-page' "$tmp/bad-docs.log" && [ "$before_docs" = "$(sha256sum "$tmp/pages/docs/reliefos/index.html")" ]; then
+    ok 'unresolved RST reference fails and preserves the published manual'
+else
+    cat "$tmp/bad-docs.log" >&2
+    bad 'documentation failure was unrelated or replaced the published tree'
 fi
 
-# Internal handoff/audit documents stay outside Pages; public references must
-# retain their repository paths without linking to unpublished HTML pages.
-brand_page="$tmp/pages/docs/branding-compatibility/index.html"
-for internal in superpowers/specs/2026-09-24-ntclks-separation-design.md \
-                superpowers/ntclks-separation/09-m1-authority-design-review.md \
-                superpowers/specs/2026-09-27-reliefos-reliefnt-rename-baseline.md \
-                superpowers/specs/2026-09-27-reliefos-reliefnt-rename-design.md \
-                superpowers/plans/2026-09-27-reliefos-reliefnt-rename.md \
-                superpowers/task11-verification.md; do
-    internal_name=${internal##*/}
-    internal_name=${internal_name%.md}
-    if [ ! -e "$tmp/pages/docs/$internal_name" ] \
-        && grep -Fq "<code>docs/$internal</code>" "$brand_page" \
-        && ! grep -Fq "href=\"../$internal_name/index.html" "$brand_page"; then
-        ok "internal reference stays readable without a Pages link: $internal"
+# A bad kernel manual must not publish even if the system manual built.
+before_site=$(sha256sum "$tmp/pages/index.html" "$tmp/pages/docs/reliefnt/index.html")
+if sh "$src/tools/build/site.sh" "$tmp/rpr-pages" "$tmp/reliefos-installer.iso" \
+    "$build" "$src/resources/pages/css/reliefos.css" "$tmp/pages" "$tmp/bad-docs" \
+    >"$tmp/bad-kernel-docs.log" 2>&1; then
+    bad 'site publication accepted a broken kernel manual'
+elif grep -q 'missing-page' "$tmp/bad-kernel-docs.log" &&
+     [ "$before_site" = "$(sha256sum "$tmp/pages/index.html" "$tmp/pages/docs/reliefnt/index.html")" ]; then
+    ok 'kernel documentation failure preserves the complete published site'
+else
+    bad 'kernel documentation failure was unrelated or replaced the site'
+fi
+
+# The production Make rule must notice deleted pages in either repository.
+# A query-only fixture exercises that rule without rebuilding product images.
+fixture="$tmp/make-fixture"
+mkdir -p "$fixture/os/Documentation" "$fixture/nt/Documentation" \
+    "$fixture/os/resources/pages/css" "$fixture/os/tools/build" \
+    "$fixture/os/scripts" "$fixture/os/configs" "$fixture/nt/configs" \
+    "$fixture/rpr" "$fixture/out/pages"
+for path in site.sh download-page.sh home-page.sh docs-page.sh site-common.sh; do
+    : > "$fixture/os/tools/build/$path"
+done
+for path in os/Documentation/index.rst os/Documentation/old.rst \
+    nt/Documentation/index.rst nt/Documentation/old.rst \
+    os/configs/build-version nt/configs/build-version os/scripts/build-docs.sh \
+    os/resources/pages/css/reliefos.css rpr/.complete rpr/manifest.json \
+    installer.iso build_info.h; do
+    : > "$fixture/$path"
+done
+cat > "$fixture/Makefile" <<EOF
+RELIEFOS_SRC := $fixture/os
+RELIEFNT_DIR := $fixture/nt
+O := $fixture/out
+RPR_PAGES := $fixture/rpr
+INSTALLER_ISO := $fixture/installer.iso
+BUILD_INFO_HEADER := $fixture/build_info.h
+include $src/scripts/reliefos/Makefile.site
+EOF
+for repo in os nt; do
+    : > "$fixture/$repo/Documentation/old.rst"
+    find "$fixture" -exec touch -t 200001010000 {} +
+    touch -t 200001020000 "$fixture/out/pages/.site-complete" "$fixture/out/pages/index.html"
+    if ! make --no-print-directory -f "$fixture/Makefile" -q "$fixture/out/pages/.site-complete"; then
+        bad "Pages dependency fixture was not initially current for $repo"
+    fi
+    rm "$fixture/$repo/Documentation/old.rst"
+    if make --no-print-directory -f "$fixture/Makefile" -q "$fixture/out/pages/.site-complete"; then
+        bad "deleted $repo documentation would remain published"
+    elif [ "$?" = 1 ]; then
+        ok "deleted $repo documentation triggers Pages rebuilding"
     else
-        bad "internal reference leaked or lost its repository path: $internal"
+        bad "Pages dependency query failed for $repo"
     fi
 done
 
-# 5c. md2html.awk escaping discipline: raw <tag>, javascript: link, and onX=
-#     attribute must not survive the converter as live HTML/JS.
-inj="$tmp/inj.md"
-cat > "$inj" <<'MD'
-# Test
-
-Literal tokens: <app> <pid> <sha256>.
-
-Inline code: `<script>alert(1)</script>`.
-
-Link [bad](javascript:alert(1)) and [ok](https://example.com).
-
-Event-like text: onerror=alert(1) as plain prose.
-
-Markdown HTML attempt: <img src=x onerror=alert(1)>
-MD
-awk -f "$src/tools/build/md2html.awk" "$inj" > "$tmp/inj.html"
-# No unescaped raw tags beyond the converter's own allowlist, and no live
-# javascript: URL in the href attribute.
-if grep -qE 'href="javascript:' "$tmp/inj.html"; then
-    bad 'javascript: URL survived href sanitization'
-else
-    ok 'javascript: href neutralized'
-fi
-if grep -qE '<(img|script)\b' "$tmp/inj.html"; then
-    bad 'raw HTML tag injection succeeded'
-else
-    ok 'raw HTML injection escaped'
-fi
-if ! grep -q '&lt;app&gt;' "$tmp/inj.html"; then
-    bad '<app> not escaped to &lt;app&gt;'
-else
-    ok 'angle-bracket tokens escaped'
-fi
+# Both repositories' clean targets own generated documentation, while unknown
+# files inside the output directory must survive. Pages belongs to the system.
+for repo in os nt; do
+    clean_source=$src
+    [ "$repo" = os ] || clean_source=$src/kernel/reliefnt
+    clean_output="$tmp/clean-$repo"
+    mkdir -p "$clean_output/Documentation/html"
+    : > "$clean_output/Documentation/html/index.html"
+    printf 'keep user notes\n' > "$clean_output/notes.txt"
+    printf 'reliefos-build-out version=1 root=%s\n' "$clean_source" > "$clean_output/.reliefos-out"
+    if [ "$repo" = os ]; then mkdir -p "$clean_output/pages"; fi
+    if O="$clean_output" SRC="$clean_source" KEEP_CONFIG=1 \
+       sh "$clean_source/scripts/clean.sh" >"$tmp/clean-$repo.log" 2>&1 &&
+       [ ! -e "$clean_output/Documentation" ] && [ ! -e "$clean_output/pages" ] &&
+       [ -s "$clean_output/notes.txt" ]; then
+        ok "$repo clean removes generated manuals and keeps unknown files"
+    else
+        cat "$tmp/clean-$repo.log" >&2
+        bad "$repo documentation cleanup failed"
+    fi
+done
 
 # 6. Negative: a broken link must fail verification.
 cp -R "$tmp/pages" "$tmp/broken"
-sed -i 's#href="download/index.html"#href="download/nope.html"#' "$tmp/broken/index.html"
+sed -i 's#href="download/index.html"#href="download/nope.html?release=4.9.1"#' "$tmp/broken/index.html"
 if sh "$src/tools/build/verify-pages.sh" "$tmp/broken" >/dev/null 2>&1; then
     bad 'verify-pages.sh accepted a broken link'
 else

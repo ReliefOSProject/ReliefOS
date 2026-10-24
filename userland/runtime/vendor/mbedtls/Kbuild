@@ -1,0 +1,98 @@
+RELIEFOS_MBEDTLS_OBJECTS := aes.o asn1parse.o asn1write.o base64.o bignum.o bignum_core.o bignum_mod.o bignum_mod_raw.o block_cipher.o cipher.o cipher_wrap.o constant_time.o ctr_drbg.o ecdh.o ecdsa.o ecp.o ecp_curves.o entropy.o entropy_poll.o error.o gcm.o md.o oid.o pem.o pk.o pk_ecc.o pk_wrap.o pkcs5.o pkparse.o pkwrite.o platform.o platform_util.o rsa.o rsa_alt_helpers.o sha1.o sha256.o sha512.o ssl_ciphersuites.o ssl_client.o ssl_msg.o ssl_tls.o ssl_tls12_client.o x509.o x509_crt.o
+RELIEFOS_MBEDTLS_C_OBJECTS := aes.o asn1parse.o asn1write.o base64.o bignum.o bignum_core.o bignum_mod.o bignum_mod_raw.o block_cipher.o cipher.o cipher_wrap.o constant_time.o ctr_drbg.o ecdh.o ecdsa.o ecp.o ecp_curves.o entropy.o entropy_poll.o error.o gcm.o md.o oid.o pem.o pk.o pk_ecc.o pk_wrap.o pkcs5.o pkparse.o pkwrite.o platform.o platform_util.o rsa.o rsa_alt_helpers.o sha1.o sha256.o sha512.o ssl_ciphersuites.o ssl_client.o ssl_msg.o ssl_tls.o ssl_tls12_client.o x509.o x509_crt.o
+RELIEFOS_MBEDTLS_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_RUNTIME_KBUILD),1)
+obj-y := $(RELIEFOS_MBEDTLS_OBJECTS)
+ccflags-y += $(RUNTIME_FLAGS) $(RUNTIME_CFLAGS) -include $(AUTOCONF_H)
+asflags-y += --target=$(TRIPLE_USER) -fPIC -I$(HEADER_EXPORT_INCLUDE)
+$(addprefix $(obj)/,$(RELIEFOS_MBEDTLS_C_OBJECTS)): $(AUTOCONF_H) $(GBK_TABLE) $(PNG_CONFIG) $(MUSL_STAMP) $(RUNTIME_HEADERS) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID)
+$(addprefix $(obj)/,$(RELIEFOS_MBEDTLS_ASM_OBJECTS)): $(AUTOCONF_H) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID)
+$(obj)/aes.o: $(srctree)/third_party/mbedtls/library/aes.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/asn1parse.o: $(srctree)/third_party/mbedtls/library/asn1parse.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/asn1write.o: $(srctree)/third_party/mbedtls/library/asn1write.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/base64.o: $(srctree)/third_party/mbedtls/library/base64.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/bignum.o: $(srctree)/third_party/mbedtls/library/bignum.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/bignum_core.o: $(srctree)/third_party/mbedtls/library/bignum_core.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/bignum_mod.o: $(srctree)/third_party/mbedtls/library/bignum_mod.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/bignum_mod_raw.o: $(srctree)/third_party/mbedtls/library/bignum_mod_raw.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/block_cipher.o: $(srctree)/third_party/mbedtls/library/block_cipher.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/cipher.o: $(srctree)/third_party/mbedtls/library/cipher.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/cipher_wrap.o: $(srctree)/third_party/mbedtls/library/cipher_wrap.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/constant_time.o: $(srctree)/third_party/mbedtls/library/constant_time.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ctr_drbg.o: $(srctree)/third_party/mbedtls/library/ctr_drbg.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ecdh.o: $(srctree)/third_party/mbedtls/library/ecdh.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ecdsa.o: $(srctree)/third_party/mbedtls/library/ecdsa.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ecp.o: $(srctree)/third_party/mbedtls/library/ecp.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ecp_curves.o: $(srctree)/third_party/mbedtls/library/ecp_curves.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/entropy.o: $(srctree)/third_party/mbedtls/library/entropy.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/entropy_poll.o: $(srctree)/third_party/mbedtls/library/entropy_poll.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/error.o: $(srctree)/third_party/mbedtls/library/error.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/gcm.o: $(srctree)/third_party/mbedtls/library/gcm.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/md.o: $(srctree)/third_party/mbedtls/library/md.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/oid.o: $(srctree)/third_party/mbedtls/library/oid.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pem.o: $(srctree)/third_party/mbedtls/library/pem.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pk.o: $(srctree)/third_party/mbedtls/library/pk.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pk_ecc.o: $(srctree)/third_party/mbedtls/library/pk_ecc.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pk_wrap.o: $(srctree)/third_party/mbedtls/library/pk_wrap.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pkcs5.o: $(srctree)/third_party/mbedtls/library/pkcs5.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pkparse.o: $(srctree)/third_party/mbedtls/library/pkparse.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pkwrite.o: $(srctree)/third_party/mbedtls/library/pkwrite.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/platform.o: $(srctree)/third_party/mbedtls/library/platform.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/platform_util.o: $(srctree)/third_party/mbedtls/library/platform_util.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/rsa.o: $(srctree)/third_party/mbedtls/library/rsa.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/rsa_alt_helpers.o: $(srctree)/third_party/mbedtls/library/rsa_alt_helpers.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/sha1.o: $(srctree)/third_party/mbedtls/library/sha1.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/sha256.o: $(srctree)/third_party/mbedtls/library/sha256.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/sha512.o: $(srctree)/third_party/mbedtls/library/sha512.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ssl_ciphersuites.o: $(srctree)/third_party/mbedtls/library/ssl_ciphersuites.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ssl_client.o: $(srctree)/third_party/mbedtls/library/ssl_client.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ssl_msg.o: $(srctree)/third_party/mbedtls/library/ssl_msg.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ssl_tls.o: $(srctree)/third_party/mbedtls/library/ssl_tls.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/ssl_tls12_client.o: $(srctree)/third_party/mbedtls/library/ssl_tls12_client.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/x509.o: $(srctree)/third_party/mbedtls/library/x509.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/x509_crt.o: $(srctree)/third_party/mbedtls/library/x509_crt.c FORCE
+	$(call if_changed_dep,cc_o_c)
+endif

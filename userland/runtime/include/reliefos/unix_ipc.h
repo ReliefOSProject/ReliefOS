@@ -11,7 +11,6 @@
  * sender handles short writes; SOCK_STREAM has no atomic frame boundary. */
 #define RELIEFOS_IPC_ATOMIC_FRAME_CAP 8192u
 
-#define RELIEFOS_IPC_SOCK_WINDOWD "/run/leonos/windowd.sock"
 #define RELIEFOS_IPC_SOCK_INPUT_METHOD "/run/leonos/input-method.sock"
 #define RELIEFOS_IPC_SOCK_SESSION "/run/leonos/session.sock"
 #define RELIEFOS_IPC_SOCK_DEVICE "/run/leonos/devman.sock"

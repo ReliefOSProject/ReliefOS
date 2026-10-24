@@ -15,4 +15,12 @@
 #define LEONOS_FB_CAP_MODE_SET RELIEFOS_FB_CAP_MODE_SET
 #define leonos_fb_capabilities reliefos_fb_capabilities
 #define leonos_fb_present reliefos_fb_present
+#define leonos_fb_blit reliefos_fb_blit
+#define leonos_fb_fill reliefos_fb_fill
+#define leonos_fb_info reliefos_fb_info
+#define leonos_fb_mode reliefos_fb_mode
+#define leonos_fb_pixel reliefos_fb_pixel
+#define leonos_fb_rect reliefos_fb_rect
+#define leonos_fb_set_mode reliefos_fb_set_mode
+#define leonos_fb_text reliefos_fb_text
 #endif /* LEONOS_FB_H */

@@ -1,4 +1,4 @@
-"""Regression tests for installer mouse initialization and window IPC."""
+"""Regressions for installer storage operations and independent Unix IPC."""
 from pathlib import Path
 import subprocess
 import tempfile
@@ -8,27 +8,56 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallerInputTests(unittest.TestCase):
+    def test_capacity_measurement_and_checked_limits(self):
+        """Measure actual trees without following links; reject bytes and inode overflow."""
+        with tempfile.TemporaryDirectory(prefix="installer-capacity-") as tmp:
+            executable = str(Path(tmp) / "capacity")
+            subprocess.run([
+                "cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g",
+                "-fsanitize=address,undefined", "-Wall", "-Wextra", "-Werror",
+                "tools/tests/installer_capacity_test.c",
+                "userland/apps/installer/installer_capacity.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable, tmp], cwd=ROOT, check=True, timeout=20)
+
+    def test_fresh_copy_sync_error_blocks_boot_publication(self):
+        """Batch only a fresh root; require its Linux filesystem barrier to pass."""
+        with tempfile.TemporaryDirectory(prefix="installer-sync-") as tmp:
+            executable = str(Path(tmp) / "copy-sync")
+            subprocess.run([
+                "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-idirafter", "userland/runtime/include", "-idirafter", "include",
+                "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
+                "tools/tests/installer_copy_sync_test.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable, tmp], cwd=ROOT, check=True, timeout=20)
+
+
+    def test_copy_progress_does_not_log_every_short_io_slice(self):
+        """Bound presentation overhead while preserving the next timed update."""
+        with tempfile.TemporaryDirectory(prefix="installer-progress-") as tmp:
+            executable = str(Path(tmp) / "progress")
+            subprocess.run([
+                "cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-idirafter", "userland/runtime/include", "-idirafter", "include",
+                "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
+                "tools/tests/installer_progress_test.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
+
     def test_update_to_fresh_mount_transition(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-installer-mount-") as tmp:
             executable = str(Path(tmp) / "mount-transition")
             subprocess.run([
                 "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections", "-Wl,--wrap=open",
                 "-idirafter", "include", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-                "tools/tests/installer_mount_transition_test.c", "-o", executable,
+                "tools/tests/installer_mount_transition_test.c", "userland/apps/installer/installer_partitions.c", "userland/apps/installer/installer_capacity.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
-    def test_keyboard_led_ioctl(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-keyboard-led-") as tmp:
-            executable = str(Path(tmp) / "led")
-            subprocess.run([
-                "clang", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
-                "tools/tests/evdev_led_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
     def test_disk_enumeration_preserves_posix_errors(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-block-errors-") as tmp:
@@ -41,28 +70,6 @@ class InstallerInputTests(unittest.TestCase):
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
-    def test_window_buffer_follows_presented_size(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-window-resize-") as tmp:
-            executable = str(Path(tmp) / "window-resize")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g", "-include", "string.h",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-idirafter", "userland/runtime/include", "-idirafter", "include", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
-                "tools/tests/window_resize_test.c", "userland/runtime/src/unix_ipc.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-    def test_window_creation_is_retried_before_present(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-windowd-") as tmp:
-            executable = str(Path(tmp) / "windowd-announce")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-idirafter", "userland/runtime/include", "-idirafter", "include", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
-                "tools/tests/windowd_announce_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
     def test_disconnected_ipc_clients_are_not_reported_as_would_block(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-ipc-disconnect-") as tmp:
             executable = str(Path(tmp) / "ipc-disconnect")
@@ -72,18 +79,6 @@ class InstallerInputTests(unittest.TestCase):
                 "-idirafter", "userland/runtime/include",
                 "tools/tests/unix_ipc_disconnect_test.c", "userland/runtime/src/unix_ipc.c",
                 "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-    def test_mouse_coordinates_survive_evdev_routing(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-pointer-") as tmp:
-            executable = str(Path(tmp) / "pointer")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
-                "-idirafter", "userland/runtime/include",
-                "tools/tests/pointer_routing_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
@@ -108,40 +103,6 @@ class InstallerInputTests(unittest.TestCase):
                 "-idirafter", "userland/runtime/include",
                 "tools/tests/unix_ipc_partial_send_test.c", "userland/runtime/src/unix_ipc.c",
                 "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-    def test_input_before_fetch_reply_preserves_descriptor(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-wind-") as tmp:
-            executable = str(Path(tmp) / "wind-reply")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-idirafter", "userland/runtime/include", "-idirafter", "include", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
-                "tools/tests/wind_reply_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-    def test_keyboard_irq_rejects_empty_and_auxiliary_output(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-keyboard-irq-") as tmp:
-            executable = str(Path(tmp) / "keyboard-irq")
-            subprocess.run([
-                "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                "-Ikernel/reliefnt/kernel/reliefnt/include",
-                "tools/tests/keyboard_irq_ready_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-    def test_mouse_parameters_reach_auxiliary_port(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-mouse-") as tmp:
-            executable = str(Path(tmp) / "mouse-init")
-            subprocess.run([
-                "cc", "-std=c11", "-Wall", "-Wextra", "-Werror", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
-                "tools/tests/mouse_init_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 

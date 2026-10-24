@@ -1,0 +1,8 @@
+RELIEFOS_APP_NAME := fileman
+RELIEFOS_APP_OBJECTS := actions.o archive.o boundary.o elevation.o filesystem.o main.o model.o operations.o search.o state.o util.o
+RELIEFOS_APP_C_OBJECTS := actions.o archive.o boundary.o elevation.o filesystem.o model.o operations.o state.o util.o
+RELIEFOS_APP_CXX_OBJECTS := main.o search.o
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+endif

@@ -49,4 +49,8 @@
 #define leonos_time_info reliefos_time_info
 #define leonos_time_ntp_sync reliefos_time_ntp_sync
 #define leonos_time_sync reliefos_time_sync
+#define leonos_task_info reliefos_task_info
+#define leonos_task_kill reliefos_task_kill
+#define leonos_task_snapshot reliefos_task_snapshot
+#define leonos_uptime_ms reliefos_uptime_ms
 #endif /* LEONOS_SYSTEM_H */

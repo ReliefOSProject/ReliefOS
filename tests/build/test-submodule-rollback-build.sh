@@ -1,19 +1,7 @@
 #!/bin/sh
-# Old-SHA rollback BUILD (plan stage 5: "旧 SHA 回退"). Complements
-# tests/build/test-submodule-contract.sh cases 3-4, which prove the release
-# guard's pairing rules but deliberately never build (their fixture clone has
-# no fetch cache). This test runs against the real worktree checkout:
-#
-#   1. detach the kernel submodule at an older published SHA (the documented
-#      daily-dev state) and build the complete product set declared by that pin
-#      into a fresh output directory. A pure kernel build must not require a
-#      UAPI whitelist newer than the pinned kernel provides;
-#   2. while rolled back, refuse release flows: `make rpr-pages` must fail
-#      with a message naming both the gitlink SHA and the rolled-back SHA;
-#   3. restore the original checkout on every exit path.
-#
-# usage: test-submodule-rollback-build.sh [OLD_SHA]   (default: 5cc9621,
-# the previous release pin). The worktree submodule is left as found.
+# Build an older published kernel in a scratch clone; never change the shared
+# submodule HEAD or overwrite local Kbuild work. Release mismatch checks use an
+# isolated parent gitlink fixture. usage: test-submodule-rollback-build.sh [SHA]
 set -u
 LC_ALL=C
 export LC_ALL
@@ -53,15 +41,12 @@ if [ -z "$gitlink" ]; then
 fi
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-rollback-build.XXXXXX") || exit 1
-restored=0
-cleanup() {
-    if [ "$restored" = 0 ]; then
-        git -C "$reliefnt" checkout -q --detach "$orig" 2>/dev/null
-        git -C "$reliefnt" submodule update --init --recursive >/dev/null 2>&1
-    fi
-    [ -n "${KEEP_WORK:-}" ] || rm -rf "$work"
-}
+original_status=$(git -C "$reliefnt" status --porcelain)
+original_checkout=$reliefnt
+cleanup() { [ -n "${KEEP_WORK:-}" ] || rm -rf "$work"; }
 trap cleanup EXIT INT TERM
+git clone -q --no-checkout "$reliefnt" "$work/rollback-kernel" || exit 1
+reliefnt=$work/rollback-kernel
 
 printf '=== (1) rollback build at %s (gitlink pins %s) ===\n' \
     "$(git -C "$reliefnt" rev-parse --short "$target")" \
@@ -86,70 +71,48 @@ else
     fail "locked kernel build dependencies are available at the rollback SHA" \
         "see $work/fetch.log" "$(tail -n 5 "$work/fetch.log")"
 fi
-if make -s -j"$(nproc)" O="$work/out" kernel >"$work/build.log" 2>&1; then
+if make -s -j"$(nproc)" O="$work/out" RELIEFNT_DIR="$reliefnt" kernel >"$work/build.log" 2>&1; then
     pass "make kernel builds at the rolled-back pin"
 else
     fail "make kernel builds at the rolled-back pin" \
         "see $work/build.log" "$(tail -n 5 "$work/build.log")"
 fi
 missing=
-for product in system/kernel.sys system/kernel.debug system/kerneldebug.sys \
-        boot/loader.elf; do
+for product in system/kernel.sys system/kernel.debug system/kerneldebug.sys; do
     [ -f "$work/out/generated/$product" ] || missing="$missing $product"
 done
-rollback_drivers=
-if [ -f "$reliefnt/mk/boot.mk" ]; then
-    rollback_drivers=$(sed -n 's/^DRIVER_NAMES[[:space:]]*:=\(.*\)$/\1/p' \
-        "$reliefnt/mk/boot.mk" | tr '\n' ' ')
-fi
-for driver in $rollback_drivers; do
-    product="drivers/$driver.drv"
-    [ -f "$work/out/generated/$product" ] || missing="$missing $product"
-done
-if [ -z "$rollback_drivers" ]; then
-    fail "the rollback pin declares a driver product set" \
-        "could not read DRIVER_NAMES from $reliefnt/mk/boot.mk"
-elif [ -z "$missing" ]; then
-    pass "all kernel products declared by the rollback pin are published"
+if [ -z "$missing" ]; then
+    pass "all published kernel products exist at the rolled-back pin"
 else
-    fail "all kernel products declared by the rollback pin are published" \
-        "missing:$missing" "drivers:$rollback_drivers"
+    fail "all published kernel products exist at the rolled-back pin" \
+        "missing:$missing"
 fi
-if printf '%s\n' "$rollback_drivers" | grep -qw hda; then
-    pass "the rollback pin publishes the HDA driver"
-else
-    printf 'note - rollback pin predates HDA; its declared product set is accepted without hda.drv\n'
+# The rolled-back pin may still install legacy loadable driver modules into the
+# sub-make install directory; the current adapter publishes only the three kernel
+# products and leaves those unpublished.
+if find "$work/out/kernel-install" -name '*.drv' 2>/dev/null | grep -q .; then
+    printf 'note - rolled-back pin installs legacy .drv modules; they stay unpublished\n'
 fi
 
-printf '\n=== (2) release flows refuse the rolled-back state (gitlink mismatch) ===\n'
-if make -s O="$work/out" rpr-pages >"$work/rpr.log" 2>&1; then
-    fail "make rpr-pages refuses a rolled-back checkout" 'make exited 0'
+printf '\n=== (2) release guard rejects a rollback mismatch in isolated metadata ===\n'
+parent=$work/guard-parent
+git init -q "$parent"
+mkdir -p "$parent/kernel"
+git clone -q "$reliefnt" "$parent/kernel/reliefnt"
+git -C "$parent" -c user.name=fixture -c user.email=fixture@example.invalid update-index --add --cacheinfo "160000,$gitlink,kernel/reliefnt"
+git -C "$parent" -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m 'fixture pin'
+if sh "$repo_root/tools/build/reliefnt-release-guard.sh" "$parent" "$parent/kernel/reliefnt" kernel/reliefnt >"$work/rpr.log" 2>&1; then
+    fail 'release guard refuses the rollback mismatch' 'guard exited0'
+elif grep -q "$gitlink" "$work/rpr.log" && grep -q "$target" "$work/rpr.log"; then
+    pass 'release guard refuses rollback and names both SHAs'
 else
-    pass "make rpr-pages refuses a rolled-back checkout"
+    fail 'release guard names both SHAs' "$(cat "$work/rpr.log")"
 fi
-if grep -q "$gitlink" "$work/rpr.log" && grep -q "$target" "$work/rpr.log"; then
-    pass "the refusal names both SHAs (gitlink and rollback HEAD)"
+printf '\n=== (3) original checkout was never changed ===\n'
+if [ "$(git -C "$original_checkout" rev-parse HEAD)" = "$orig" ] && [ "$(git -C "$original_checkout" status --porcelain)" = "$original_status" ]; then
+    pass 'original kernel HEAD and local edits preserved'
 else
-    fail "the refusal names both SHAs (gitlink and rollback HEAD)" \
-        "want: $gitlink and $target" "$(head -c 300 "$work/rpr.log")"
-fi
-
-printf '\n=== (3) restore the original checkout ===\n'
-if git -C "$reliefnt" checkout -q --detach "$orig" 2>"$work/restore.log"; then
-    restored=1
-    pass "the kernel checkout is back at the original SHA"
-else
-    fail "the kernel checkout is back at the original SHA" \
-        "$(cat "$work/restore.log")"
-fi
-git -C "$reliefnt" submodule update --init --recursive >>"$work/restore.log" 2>&1
-if [ -z "$(git -C "$reliefnt" status --porcelain)" ] &&
-        [ "$(git -C "$reliefnt" rev-parse HEAD)" = "$orig" ]; then
-    pass "the submodule is clean at the original SHA after restore"
-else
-    fail "the submodule is clean at the original SHA after restore" \
-        "$(git -C "$reliefnt" status --porcelain)" \
-        "HEAD=$(git -C "$reliefnt" rev-parse HEAD) want=$orig"
+    fail 'original kernel HEAD and local edits preserved'
 fi
 
 printf '\n'

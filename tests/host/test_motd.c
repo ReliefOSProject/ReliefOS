@@ -5,7 +5,6 @@
 #include <string.h>
 #include <wchar.h>
 #include "userland/apps/motd/format.h"
-#include "kernel/reliefnt/kernel/reliefnt/include/reliefnt/loadavg.h"
 
 static void check_width(const char *text, size_t limit)
 {
@@ -46,16 +45,6 @@ int main(void)
             free(text);
         }
     }
-    uint64_t loads[3] = {0};
-    for (int i = 0; i < 12; ++i) sched_load_update(loads, 1);
-    /* One minute at one runnable task: 1-exp(-1) ~= 0.632. */
-    assert(loads[0] > 41000 && loads[0] < 42000);
-    assert(loads[0] > loads[1] && loads[1] > loads[2]);
-    uint64_t before = loads[0];
-    for (int i = 0; i < 12; ++i) sched_load_update(loads, 0);
-    assert(loads[0] < before / 2);
-    for (int i = 0; i < 2000; ++i) sched_load_update(loads, 4);
-    assert(loads[0] > 4*65536-100 && loads[0] <= 4*65536);
-    puts("motd: multilingual wrapping, live-value rendering and load averages passed");
+    puts("motd: multilingual wrapping, live-value rendering passed");
     return 0;
 }

@@ -6,7 +6,6 @@ audio_out=${AUDIO_OUT:-"$repo/out/audio-hda"}
 require() { test -s "$1" || { echo "FAIL missing audio product: $1" >&2; exit 1; }; }
 require "$audio_out/system/lib/libreliefos-audio.so.1"
 require "$audio_out/userland/soundctl.elf"
-require "$audio_out/userland/settings.elf"
 readelf -d "$audio_out/system/lib/libreliefos-audio.so.1" | grep -F '[libreliefos-audio.so.1]'
 readelf -d "$audio_out/system/lib/libreliefos-audio.so.1" | grep -F '[libasound.so.2]'
 readelf -d "$audio_out/userland/soundctl.elf" | grep -F '[libreliefos-audio.so.1]'
@@ -42,7 +41,7 @@ done
 test ! -e "$audio_out/upstream/alsa-lib/root/usr/lib/libasound.la"
 for f in usr/lib/libasound.so.2 usr/lib/libopl3.so.1 usr/lib/libreliefos-audio.so.1 usr/bin/soundctl etc/asound.conf \
  usr/share/alsa/pcm/dmix.conf usr/share/alsa/pcm/dsnoop.conf usr/bin/aplay usr/bin/arecord \
- usr/bin/amixer usr/sbin/alsactl usr/bin/speaker-test usr/lib/reliefos/apps/settings/settings.elf \
+ usr/bin/amixer usr/sbin/alsactl usr/bin/speaker-test \
  etc/init.d/reliefos-audio etc/runlevels/default/reliefos-audio; do require "$audio_out/rootfs/raw/$f"; done
 test -x "$audio_out/rootfs/raw/etc/init.d/reliefos-audio"
 test -L "$audio_out/rootfs/raw/etc/runlevels/default/reliefos-audio"

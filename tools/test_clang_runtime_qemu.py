@@ -41,8 +41,8 @@ def layout():
     with tempfile.TemporaryDirectory(prefix="clang-layout-") as directory:
         executable = Path(directory) / "user_mmap_arena_test"
         run(["cc", "-std=c11", "-O1", "-Wall", "-Wextra",
-             "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
-             ROOT / "tools/tests/user_mmap_arena_test.c", "-o", executable])
+             "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/include",
+             ROOT / "kernel/reliefnt/tools/tests/user_mmap_arena_test.c", "-o", executable])
         run([executable])
 
 

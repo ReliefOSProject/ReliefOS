@@ -1,6 +1,6 @@
 #!/bin/sh
 # Exercise the actual leonos-kernel-update transaction in a private Linux
-# mount namespace. This proves the update script's manifest pairing, commit
+# mount namespace. This proves the update script's manifest contract, commit
 # swap and rollback semantics, not LeonOS kernel/VM execution and not the
 # TLS/RPR network path (rprfetch is mocked; the fetcher's HTTPS refusal and
 # the TLS stack's CA verification are covered by source review only).
@@ -22,19 +22,19 @@ fail() { printf 'fail - %s\n' "$1"; fails=$((fails + 1)); }
 old_kernel='OLD-CANONICAL-KERNEL-SYS-PAYLOAD'
 legacy_kernel='OLD-LEGACY-KERNEL-SYS-PAYLOAD'
 new_kernel='NEW-KERNEL-SYS-PAYLOAD'
-old_loader='OLD-LOADER-ELF-PAYLOAD'
-old_reliefos_loader='OLD-CANONICAL-LOADER-ELF-PAYLOAD'
-new_loader='NEW-LOADER-ELF-PAYLOAD'
 stale_middle='STALE-MIDDLELAYER-SYS-PAYLOAD'
 hash() { printf '%s' "$1" | sha256sum | awk '{print $1}'; }
 old_kernel_hash=$(hash "$old_kernel")
 new_kernel_hash=$(hash "$new_kernel")
-old_loader_hash=$(hash "$old_loader")
-new_loader_hash=$(hash "$new_loader")
 
-manifest() { # manifest FORMAT IMAGE RELEASE KERNEL_HASH LOADER_HASH
-    printf 'format_version=%s\nimage_version=%s\nversion=%s\nkernel_file=kernel.sys\nkernel_sha256=%s\nloader_file=loader.elf\nloader_sha256=%s\n' \
-        "$2" "$3" "$4" "$5" "$6" >"$1"
+manifest() { # manifest FORMAT IMAGE RELEASE KERNEL_HASH
+    printf 'format_version=%s\nimage_version=%s\nversion=%s\nkernel_file=kernel.sys\nkernel_sha256=%s\n' \
+        "$2" "$3" "$4" "$5" >"$1"
+}
+
+manifest_v2() { # old paired kernel+loader contract, must be refused
+    printf 'format_version=2\nimage_version=%s\nversion=%s\nkernel_file=kernel.sys\nkernel_sha256=%s\nloader_file=loader.elf\nloader_sha256=%s\n' \
+        "$2" "$3" "$4" "$5" >"$1"
 }
 
 setup_tree() { # setup_tree TREE SYNC_FAIL(0/1)
@@ -45,9 +45,7 @@ setup_tree() { # setup_tree TREE SYNC_FAIL(0/1)
         "$tree/serve" "$tree/usr/bin" "$tree/usr/sbin" "$tree/bin" "$tree/lib" \
         "$tree/lib64" "$tree/sbin"
     printf '%s' "$old_kernel" >"$tree/boot/reliefos/kernel.sys"
-    printf '%s' "$old_reliefos_loader" >"$tree/boot/reliefos/loader.elf"
     printf '%s' "$legacy_kernel" >"$tree/boot/leonos/kernel.sys"
-    printf '%s' "$old_loader" >"$tree/boot/loader.elf"
     printf '%s' "$stale_middle" >"$tree/boot/leonos/middlelayer.sys"
     printf 'menuentry "LeonOS 4 rollback" { module2 /leonos/kernel.sys leonos-kernel; }\n' >"$tree/boot/grub/grub.cfg"
     printf 'legacy-efi-payload\n' >"$tree/boot/EFI/BOOT/BOOTX64.EFI"
@@ -108,9 +106,7 @@ run_update() { # run_update TREE [args...] -> status in $status, log in $work/la
 
 assert_untouched() { # assert_untouched TREE LABEL
     if [ "$(cat "$1/boot/reliefos/kernel.sys")" = "$old_kernel" ] &&
-        [ "$(cat "$1/boot/reliefos/loader.elf")" = "$old_reliefos_loader" ] &&
         [ "$(cat "$1/boot/leonos/kernel.sys")" = "$legacy_kernel" ] &&
-        [ "$(cat "$1/boot/loader.elf")" = "$old_loader" ] &&
         [ "$(cat "$1/boot/leonos/middlelayer.sys")" = "$stale_middle" ] &&
         grep -q 'LeonOS 4 rollback' "$1/boot/grub/grub.cfg" &&
         [ "$(cat "$1/boot/EFI/BOOT/BOOTX64.EFI")" = 'legacy-efi-payload' ]; then
@@ -127,22 +123,19 @@ assert_untouched() { # assert_untouched TREE LABEL
 
 # --------------------------------------------------------------- scenarios
 
-# 1. success: newer release, matching hashes -> swap in the new pair
+# 1. success: newer release, matching hash -> swap in the new kernel
 tree=$work/tree-success
 setup_tree "$tree" 0
-manifest "$serve/release.txt" 2 1.0.1 1.0.1 "$new_kernel_hash" "$new_loader_hash"
+manifest "$serve/release.txt" 3 1.0.1 1.0.1 "$new_kernel_hash"
 printf '%s' "$new_kernel" >"$serve/kernel.sys"
-printf '%s' "$new_loader" >"$serve/loader.elf"
 run_update "$tree"
 if [ "$status" = 0 ] && [ "$(cat "$tree/boot/reliefos/kernel.sys")" = "$new_kernel" ] &&
-    [ "$(cat "$tree/boot/reliefos/loader.elf")" = "$new_loader" ] &&
-    [ "$(cat "$tree/boot/leonos/kernel.sys")" = "$legacy_kernel" ] &&
-    [ "$(cat "$tree/boot/loader.elf")" = "$old_loader" ]; then
-    pass "update success: newer release swaps canonical kernel.sys and loader.elf together"
+    [ "$(cat "$tree/boot/leonos/kernel.sys")" = "$legacy_kernel" ]; then
+    pass "update success: newer release swaps canonical kernel.sys"
 else
-    fail "update success: expected canonical payload pair replaced and legacy kernel retained (status=$status)"
+    fail "update success: expected canonical kernel replaced and legacy kernel retained (status=$status)"
 fi
-if grep -q 'Installed kernel and loader 1.0.1 (build 1.0.1)' "$work/last.log"; then
+if grep -q 'Installed kernel 1.0.1 (build 1.0.1)' "$work/last.log"; then
     pass "update success: reports the installed release"
 else
     fail "update success: missing install report"
@@ -161,7 +154,7 @@ fi
 # 2. local release already current -> no work, no changes
 tree=$work/tree-current
 setup_tree "$tree" 0
-manifest "$serve/release.txt" 2 1.0.0 1.0.0 "$new_kernel_hash" "$new_loader_hash"
+manifest "$serve/release.txt" 3 1.0.0 1.0.0 "$new_kernel_hash"
 run_update "$tree"
 if [ "$status" = 0 ] && grep -q 'Kernel image is current' "$work/last.log"; then
     pass "already current: exits 0 without touching the system"
@@ -173,9 +166,8 @@ assert_untouched "$tree" "already current"
 # 3. --check reports availability without modifying anything
 tree=$work/tree-check
 setup_tree "$tree" 0
-manifest "$serve/release.txt" 2 1.0.1 1.0.1 "$new_kernel_hash" "$new_loader_hash"
+manifest "$serve/release.txt" 3 1.0.1 1.0.1 "$new_kernel_hash"
 printf '%s' "$new_kernel" >"$serve/kernel.sys"
-printf '%s' "$new_loader" >"$serve/loader.elf"
 run_update "$tree" --check
 if [ "$status" = 0 ] && grep -q 'Kernel image update available' "$work/last.log"; then
     pass "--check: reports the available release without modifying the system"
@@ -187,9 +179,8 @@ assert_untouched "$tree" "--check"
 # 4. kernel checksum mismatch -> reject before the commit window
 tree=$work/tree-badkernel
 setup_tree "$tree" 0
-manifest "$serve/release.txt" 2 1.0.1 1.0.1 "$old_kernel_hash" "$new_loader_hash"
+manifest "$serve/release.txt" 3 1.0.1 1.0.1 "$old_kernel_hash"
 printf '%s' "$new_kernel" >"$serve/kernel.sys"
-printf '%s' "$new_loader" >"$serve/loader.elf"
 run_update "$tree"
 if [ "$status" = 1 ] && grep -q 'kernel.sys checksum mismatch' "$work/last.log"; then
     pass "checksum mismatch: kernel.sys with a wrong hash is rejected"
@@ -198,26 +189,24 @@ else
 fi
 assert_untouched "$tree" "kernel checksum mismatch"
 
-# 5. loader checksum mismatch -> reject before the commit window
-tree=$work/tree-badloader
+# 5. paired format 2 manifest -> refused instead of installing a half update
+tree=$work/tree-format2
 setup_tree "$tree" 0
-manifest "$serve/release.txt" 2 1.0.1 1.0.1 "$new_kernel_hash" "$old_loader_hash"
+manifest_v2 "$serve/release.txt" 1.0.1 1.0.1 "$new_kernel_hash" "$new_kernel_hash"
 printf '%s' "$new_kernel" >"$serve/kernel.sys"
-printf '%s' "$new_loader" >"$serve/loader.elf"
 run_update "$tree"
-if [ "$status" = 1 ] && grep -q 'loader.elf checksum mismatch' "$work/last.log"; then
-    pass "checksum mismatch: loader.elf with a wrong hash is rejected"
+if [ "$status" = 1 ] && grep -q 'Unsupported kernel release manifest' "$work/last.log"; then
+    pass "format 2 manifest: refused instead of installing a half update"
 else
-    fail "checksum mismatch: expected exit 1 and a loader mismatch (status=$status)"
+    fail "format 2 manifest: expected exit 1 and a refusal (status=$status)"
 fi
-assert_untouched "$tree" "loader checksum mismatch"
+assert_untouched "$tree" "format 2 manifest"
 
 # 6. format 1 manifest -> refused instead of installing a half update
 tree=$work/tree-format1
 setup_tree "$tree" 0
-manifest "$serve/release.txt" 1 1.0.1 1.0.1 "$new_kernel_hash" "$new_loader_hash"
+manifest "$serve/release.txt" 1 1.0.1 1.0.1 "$new_kernel_hash"
 printf '%s' "$new_kernel" >"$serve/kernel.sys"
-printf '%s' "$new_loader" >"$serve/loader.elf"
 run_update "$tree"
 if [ "$status" = 1 ] && grep -q 'Unsupported kernel release manifest' "$work/last.log"; then
     pass "format 1 manifest: refused instead of installing a half update"
@@ -229,9 +218,8 @@ assert_untouched "$tree" "format 1 manifest"
 # 7. image/release version disagreement -> rejected
 tree=$work/tree-disagree
 setup_tree "$tree" 0
-manifest "$serve/release.txt" 2 1.0.2 1.0.1 "$new_kernel_hash" "$new_loader_hash"
+manifest "$serve/release.txt" 3 1.0.2 1.0.1 "$new_kernel_hash"
 printf '%s' "$new_kernel" >"$serve/kernel.sys"
-printf '%s' "$new_loader" >"$serve/loader.elf"
 run_update "$tree"
 if [ "$status" = 1 ] && grep -q 'Remote image and release versions disagree' "$work/last.log"; then
     pass "version pairing: disagreeing image/release versions are rejected"
@@ -240,13 +228,12 @@ else
 fi
 assert_untouched "$tree" "version disagreement"
 
-# 8. failure inside the commit window -> canonical kernel and loader roll back;
+# 8. failure inside the commit window -> the canonical kernel rolls back;
 #    legacy kernel, GRUB rollback entry and EFI payload stay available.
 tree=$work/tree-rollback
 setup_tree "$tree" 1
-manifest "$serve/release.txt" 2 1.0.1 1.0.1 "$new_kernel_hash" "$new_loader_hash"
+manifest "$serve/release.txt" 3 1.0.1 1.0.1 "$new_kernel_hash"
 printf '%s' "$new_kernel" >"$serve/kernel.sys"
-printf '%s' "$new_loader" >"$serve/loader.elf"
 run_update "$tree"
 if [ "$status" != 0 ]; then
     pass "commit failure: update exits non-zero when the commit cannot complete"
@@ -260,18 +247,15 @@ assert_untouched "$tree" "commit failure rollback"
 tree=$work/tree-legacy-layout
 setup_tree "$tree" 0
 rm -rf "$tree/boot/reliefos"
-manifest "$serve/release.txt" 2 1.0.1 1.0.1 "$new_kernel_hash" "$new_loader_hash"
+manifest "$serve/release.txt" 3 1.0.1 1.0.1 "$new_kernel_hash"
 printf '%s' "$new_kernel" >"$serve/kernel.sys"
-printf '%s' "$new_loader" >"$serve/loader.elf"
 run_update "$tree"
 if [ "$status" = 0 ] && [ "$(cat "$tree/boot/reliefos/kernel.sys")" = "$new_kernel" ] &&
-    [ "$(cat "$tree/boot/reliefos/loader.elf")" = "$new_loader" ] &&
     [ "$(cat "$tree/boot/leonos/kernel.sys")" = "$legacy_kernel" ] &&
-    [ "$(cat "$tree/boot/loader.elf")" = "$old_loader" ] &&
     grep -q 'LeonOS 4 rollback' "$tree/boot/grub/grub.cfg"; then
-    pass "legacy layout migration: writes canonical payload and retains legacy GRUB entry and kernel"
+    pass "legacy layout migration: writes canonical kernel and retains legacy GRUB entry and kernel"
 else
-    fail "legacy layout migration: canonical payload missing or legacy rollback changed (status=$status)"
+    fail "legacy layout migration: canonical kernel missing or legacy rollback changed (status=$status)"
 fi
 
 printf '\n'

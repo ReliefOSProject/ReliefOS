@@ -1,0 +1,17 @@
+# Host programs and their source ownership; compiled by scripts/Makefile.host.
+hostprogs += host/bin/reliefos-emit host/bin/reliefos-version host/bin/reliefos-deps host/bin/reliefos-gbk host/bin/reliefos-musl-cc host/bin/reliefos-apk-own host/bin/reliefos-nls-extract host/bin/reliefos-components host/bin/reliefos-grub-font host/bin/reliefos-ext2-time host/bin/reliefos-dedup host/bin/reliefos-stage host/bin/reliefos-layout host/bin/reliefos-oschinpt-index
+host/bin/reliefos-emit-objs := tools/host/gen/reliefos-emit.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o
+host/bin/reliefos-version-objs := tools/host/version/reliefos-version.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o
+host/bin/reliefos-deps-objs := tools/host/manifest/reliefos-deps.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o tools/host/manifest/json.o
+host/bin/reliefos-gbk-objs := tools/host/assets/reliefos-gbk.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o
+host/bin/reliefos-musl-cc-objs := tools/host/sdk/reliefos-musl-cc.o
+host/bin/reliefos-apk-own-objs := tools/host/apk/reliefos-apk-own.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o tools/host/manifest/json.o
+host/bin/reliefos-nls-extract-objs := tools/host/nls/reliefos-nls-extract.o
+host/bin/reliefos-components-objs := tools/host/manifest/reliefos-components.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o
+host/bin/reliefos-grub-font-objs := tools/host/assets/reliefos-grub-font.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o
+host/bin/reliefos-ext2-time-objs := tools/host/images/reliefos-ext2-time.o
+host/bin/reliefos-dedup-objs := tools/host/manifest/reliefos-dedup.o
+host/bin/reliefos-stage-objs := tools/host/manifest/reliefos-stage.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o tools/host/manifest/json.o
+host/bin/reliefos-layout-objs := tools/host/manifest/reliefos-layout.o
+host/bin/reliefos-oschinpt-index-objs := tools/host/assets/reliefos-oschinpt-index.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o
+HOSTLDLIBS_host/bin/reliefos-ext2-time := -lext2fs -lcom_err

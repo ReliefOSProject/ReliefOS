@@ -1,0 +1,47 @@
+# GRUB is a third-party firmware loader, built by its native Makefiles.
+GRUB_SCRIPT := $(RELIEFOS_SRC)/tools/build/grub.sh
+GRUB_PATCHES := $(wildcard $(RELIEFOS_SRC)/patches/grub/*.patch)
+GRUB_RULES := $(RELIEFOS_SRC)/scripts/reliefos/Makefile.grub
+GRUB_HOST_ROOT := $(abspath $(O)/grub-host)
+GRUB_GUEST_ROOT := $(abspath $(UPSTREAM_ROOT)/grub/root)
+GRUB_BIOS_DIR ?= $(GRUB_HOST_ROOT)/lib/grub/i386-pc
+GRUB_MKIMAGE := $(GRUB_HOST_ROOT)/bin/grub-mkimage
+GRUB_MKSTANDALONE := $(GRUB_HOST_ROOT)/bin/grub-mkstandalone
+GRUB_BIOS_SETUP := $(GRUB_HOST_ROOT)/bin/grub-bios-setup
+GRUB_HOST_CC ?= $(HOSTCC)
+GRUB_PC_CC ?= gcc
+GRUB_HOST_TOOLS := $(addprefix $(GRUB_HOST_ROOT)/bin/,grub-mkimage grub-mkstandalone grub-bios-setup grub-probe)
+GRUB_HOST_RECORDED := $(addprefix $(GRUB_HOST_ROOT)/,$(shell cat '$(GRUB_HOST_ROOT)/.products' 2>/dev/null))
+GRUB_GUEST_RECORDED := $(addprefix $(GRUB_GUEST_ROOT)/,$(shell cat '$(GRUB_GUEST_ROOT)/.products' 2>/dev/null))
+GRUB_HOST_PRODUCTS := $(sort $(GRUB_HOST_ROOT)/.complete $(GRUB_HOST_ROOT)/.products $(GRUB_HOST_TOOLS) $(GRUB_HOST_RECORDED))
+grub_compiler_hash = $(shell tool_path=$$(command -v '$(firstword $(1))'); if test -n "$$tool_path"; then sha256sum "$$tool_path" | cut -d' ' -f1; fi)
+RELIEFOS_PARAMETERS_grub-host := lock=$(RELIEFOS_LOCK_DIGEST)|epoch=$(SOURCE_DATE_EPOCH)|host-cc=$(GRUB_HOST_CC)|host-id=$(shell $(GRUB_HOST_CC) --version 2>/dev/null | head -n1)|host-sha=$(call grub_compiler_hash,$(GRUB_HOST_CC))|pc-cc=$(GRUB_PC_CC)|pc-id=$(shell $(GRUB_PC_CC) --version 2>/dev/null | head -n1)|pc-sha=$(call grub_compiler_hash,$(GRUB_PC_CC))
+RELIEFOS_PARAMETERS_grub-guest := $(RELIEFOS_PARAMETERS_grub-host)|cc=$(TARGET_CC)|identity=$(shell $(TARGET_CC) --version 2>/dev/null | head -n1)|triple=$(TRIPLE_USER)
+$(if $(RELIEFOS_PASSIVE),,$(eval $(call KBUILD_PARAMETERS,grub-host)))
+$(if $(RELIEFOS_PASSIVE),,$(eval $(call KBUILD_PARAMETERS,grub-guest)))
+$(GRUB_HOST_PRODUCTS) &: $(GRUB_SCRIPT) $(GRUB_RULES) $(GRUB_PATCHES) $(RELIEFOS_UPSTREAM_MAKE_ENV) $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(O_META)/grub-host.parameters
+	$(Q)mkdir -p $(O_LOGS)
+	+$(Q)GRUB_HOST_CC='$(GRUB_HOST_CC)' GRUB_PC_CC='$(GRUB_PC_CC)' sh $(GRUB_SCRIPT) host '$(abspath $(RELIEFOS_DEPS_TOOL))' '$(RELIEFOS_LOCK)' '$(RELIEFOS_CACHE)' '$(abspath $(O_THIRD_PARTY))/grub-host' '$(GRUB_HOST_ROOT)' - '$(TARGET_CC)' '$(TRIPLE_USER)' >$(O_LOGS)/grub-host.log 2>&1 || { tail -n 35 $(O_LOGS)/grub-host.log >&2; exit 1; }
+GRUB_GUEST_PRODUCTS := $(addprefix $(GRUB_GUEST_ROOT)/usr/,sbin/grub-install sbin/grub-bios-setup sbin/grub-probe bin/grub-mkimage lib/grub/i386-pc/boot.img)
+GRUB_GUEST_PRODUCTS := $(sort $(GRUB_GUEST_PRODUCTS) $(GRUB_GUEST_ROOT)/.products $(GRUB_GUEST_RECORDED))
+$(GRUB_GUEST_ROOT)/.complete $(GRUB_GUEST_PRODUCTS) &: $(GRUB_SCRIPT) $(GRUB_RULES) $(GRUB_PATCHES) $(RELIEFOS_UPSTREAM_MAKE_ENV) $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(O_META)/grub-guest.parameters $(MUSL_STAMP) $(RELIEFOS_MUSL_ARTIFACTS) $(AUTH_STAMP) $(RELIEFOS_AUTH_ARTIFACTS)
+	$(Q)mkdir -p $(O_LOGS)
+	+$(Q)GRUB_HOST_CC='$(GRUB_HOST_CC)' GRUB_PC_CC='$(GRUB_PC_CC)' GRUB_UAPI='$(abspath $(AUTH_ROOT))/usr/include' sh $(GRUB_SCRIPT) guest '$(abspath $(RELIEFOS_DEPS_TOOL))' '$(RELIEFOS_LOCK)' '$(RELIEFOS_CACHE)' '$(abspath $(O_THIRD_PARTY))/grub-guest' '$(GRUB_GUEST_ROOT)' '$(abspath $(MUSL_SYSROOT))' '$(TARGET_CC)' '$(TRIPLE_USER)' >$(O_LOGS)/grub-guest.log 2>&1 || { tail -n 35 $(O_LOGS)/grub-guest.log >&2; exit 1; }
+.PHONY: grub-host upstream-grub
+grub-host: $(GRUB_HOST_ROOT)/.complete $(GRUB_HOST_TOOLS)
+upstream-grub: $(GRUB_GUEST_ROOT)/.complete $(GRUB_GUEST_PRODUCTS)
+
+# Build the EFI kernel/modules from the same locked upstream release. The old
+# prebuilt EFI kernel does not export cmdpath, which is required to retain the
+# actual boot device when other disks contain the same filenames.
+GRUB_EFI_ROOT := $(abspath $(O)/grub-efi)
+GRUB_EFI_STAMP := $(GRUB_EFI_ROOT)/.complete
+GRUB_EFI_RECORDED := $(addprefix $(GRUB_EFI_ROOT)/,$(shell cat '$(GRUB_EFI_ROOT)/.products' 2>/dev/null))
+GRUB_EFI_PRODUCTS := $(sort $(GRUB_EFI_STAMP) $(GRUB_EFI_ROOT)/.products $(GRUB_EFI_ROOT)/lib/grub/x86_64-efi/kernel.img $(GRUB_EFI_RECORDED))
+RELIEFOS_PARAMETERS_grub-efi := $(RELIEFOS_PARAMETERS_grub-host)
+$(if $(RELIEFOS_PASSIVE),,$(eval $(call KBUILD_PARAMETERS,grub-efi)))
+$(GRUB_EFI_PRODUCTS) &: $(GRUB_SCRIPT) $(GRUB_RULES) $(GRUB_PATCHES) $(RELIEFOS_UPSTREAM_MAKE_ENV) $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(O_META)/grub-efi.parameters
+	$(Q)mkdir -p $(O_LOGS)
+	+$(Q)GRUB_HOST_CC='$(GRUB_HOST_CC)' GRUB_PC_CC='$(GRUB_PC_CC)' sh $(GRUB_SCRIPT) efi '$(abspath $(RELIEFOS_DEPS_TOOL))' '$(RELIEFOS_LOCK)' '$(RELIEFOS_CACHE)' '$(abspath $(O_THIRD_PARTY))/grub-efi' '$(GRUB_EFI_ROOT)' - '$(TARGET_CC)' '$(TRIPLE_USER)' >$(O_LOGS)/grub-efi.log 2>&1 || { tail -n 35 $(O_LOGS)/grub-efi.log >&2; exit 1; }
+.PHONY: grub-efi
+grub-efi: $(GRUB_EFI_STAMP)

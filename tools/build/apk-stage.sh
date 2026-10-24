@@ -25,6 +25,13 @@ done
 [ -x "$own" ] || { echo "ownership tool is missing: $own" >&2; exit 1; }
 [ -d "$upstream/packages" ] || { echo "verified upstream package directory is missing: $upstream/packages" >&2; exit 1; }
 
+# Package triggers must execute chrooted inside the target root: they invoke
+# target-root tools by bare name or absolute path and write caches to
+# compiled-in absolute paths. fakeroot cannot chroot, so without user
+# namespaces the transaction would run trigger scripts against the host.
+unshare -Ur true >/dev/null 2>&1 ||
+    { echo 'APK staging requires user namespaces (unshare -Ur): package triggers must run chrooted inside the target root' >&2; exit 1; }
+
 # The desktop backend marker is a plain single-line value; never source it.
 # Unknown, empty, multi-line or missing markers abort before any staging work.
 backend_file=$raw/etc/reliefos/desktop-backend
@@ -38,7 +45,7 @@ while IFS= read -r marker_line || [ -n "$marker_line" ]; do
 done <"$backend_file"
 [ "$backend_lines" = 1 ] || { echo "desktop backend marker must be exactly one line: $backend_file" >&2; exit 1; }
 case $backend in
-    reliefos|xorg) ;;
+    reliefos|console|xorg) ;;
     *) echo "invalid desktop backend marker: $backend_file" >&2; exit 1 ;;
 esac
 
@@ -50,12 +57,14 @@ repository=$scratch/repository
 managed=$scratch/managed
 mkdir -p "$tree" "$repository" "$managed"
 : >"$scratch/upstream-requests"
+: >"$scratch/upstream-sonames"
 
 # Select upstream archives by their lock feature before any staging step can
 # see a filtered package: repository copy, raw overlay deletion, ownership
 # scan, the APK transaction and the index all consume this list. Selection is
 # driven by the dependency lock, never by archive or package names.
 : >"$scratch/kept-archives"
+: >"$scratch/console-excluded-archives"
 for archive in "$upstream"/packages/*.apk; do
     [ -f "$archive" ] || continue
     tar --ignore-zeros -xOf "$archive" .PKGINFO >"$scratch/upstream-pkginfo" 2>/dev/null ||
@@ -68,7 +77,16 @@ for archive in "$upstream"/packages/*.apk; do
     fi
     case $feature in
         base) ;;
-        xorg) [ "$backend" = xorg ] || continue ;;
+        xorg)
+            if [ "$backend" = xorg ]; then
+                :
+            elif [ "$backend" = console ]; then
+                printf '%s\n' "$archive" >>"$scratch/console-excluded-archives"
+                continue
+            else
+                continue
+            fi
+            ;;
         *) echo "invalid dependency feature for APK package: $upstream_name (lock: $lock): $feature" >&2; exit 1 ;;
     esac
     printf '%s\n' "$archive" >>"$scratch/kept-archives"
@@ -77,9 +95,49 @@ reliefos_log APK "selected $(wc -l <"$scratch/kept-archives") upstream archives 
 
 cp -a "$raw"/. "$tree"/
 
+# Console roots are made from an Xorg raw image so the live installer can
+# continue to use its graphical stack. Remove the payload files belonging to
+# excluded Xorg archives before ownership scanning, while retaining any
+# archive path that is also supplied by a selected base archive. Otherwise
+# omitted upstream files could be silently reclassified into local signed
+# packages and the generated APK database would still contain Xorg.
+if [ "$backend" = console ]; then
+    archive_tab=$(printf '\t')
+    : >"$scratch/kept-members"
+    : >"$scratch/excluded-members"
+    for list in kept-archives console-excluded-archives; do
+        if [ "$list" = kept-archives ]; then members=$scratch/kept-members
+        else members=$scratch/excluded-members
+        fi
+        while IFS= read -r archive; do
+            tar --ignore-zeros -tzf "$archive" >"$scratch/archive-members" 2>/dev/null || {
+                echo "invalid APK archive members: $archive" >&2
+                exit 1
+            }
+            while IFS= read -r path; do
+                case $path in ''|.*|*/) continue;; esac
+                case $path in
+                    /*|..|../*|*/../*|*/..|*"$archive_tab"*)
+                        echo "unsafe upstream APK path: $path" >&2
+                        exit 1
+                        ;;
+                esac
+                printf '%s\n' "$path" >>"$members"
+            done <"$scratch/archive-members"
+        done <"$scratch/$list"
+    done
+    LC_ALL=C sort -u "$scratch/kept-members" -o "$scratch/kept-members"
+    LC_ALL=C sort -u "$scratch/excluded-members" -o "$scratch/excluded-members"
+    LC_ALL=C comm -23 "$scratch/excluded-members" "$scratch/kept-members" >"$scratch/console-only-xorg-members"
+    while IFS= read -r path; do
+        [ -n "$path" ] || continue
+        rm -f "$tree/$path"
+    done <"$scratch/console-only-xorg-members"
+fi
+
 # Media-only payloads are copied back after the transaction and never claimed
 # by an installed package. Runtime state is always created by apk itself.
-for name in EFI grub reliefos leonos loader.elf install; do rm -rf "$tree/$name"; done
+for name in EFI grub reliefos leonos install; do rm -rf "$tree/$name"; done
 for name in lib/apk/db var/cache/apk usr/share/reliefos/apk/repository; do
     [ ! -L "$tree/$name" ] || { echo "invalid package-state symlink: $name" >&2; exit 1; }
     rm -rf "$tree/$name"
@@ -106,7 +164,8 @@ fi
 
 # Files from pinned official archives retain their upstream signatures and
 # package ownership. The verified APK archive member list is the authority for
-# their file paths; metadata members are not root payload.
+# their file paths; metadata members are not root payload. Only the five XDM
+# policy files are retained for the signed reliefos-xdm-config replacement.
 while IFS= read -r archive; do
     cp "$archive" "$repository/"
     tar --ignore-zeros -xOf "$archive" .PKGINFO >"$scratch/upstream-pkginfo" 2>/dev/null
@@ -114,10 +173,22 @@ while IFS= read -r archive; do
     upstream_version=$(sed -n 's/^pkgver = //p' "$scratch/upstream-pkginfo")
     [ -n "$upstream_name" ] && [ -n "$upstream_version" ] || { echo "invalid APK metadata: $archive" >&2; exit 1; }
     printf '%s=%s\n' "$upstream_name" "$upstream_version" >>"$scratch/upstream-requests"
+    sed -n 's/^provides = so:\([^= ]*\)=.*/\1/p' "$scratch/upstream-pkginfo" >>"$scratch/upstream-sonames"
     tar --ignore-zeros -tzf "$archive" >"$scratch/upstream-members" 2>/dev/null
     while IFS= read -r path; do
         case $path in ''|.*|*/) continue;; esac
         case $path in /*|*../*|../*|*"	"*) echo "unsafe upstream APK path: $path" >&2; exit 1;; esac
+        case $backend:$upstream_name:$path in
+            xorg:xdm:etc/X11/xdm/xdm-config|xorg:xdm:etc/X11/xdm/Xservers|\
+            xorg:xdm:etc/X11/xdm/Xresources|xorg:xdm:usr/lib/X11/xdm/Xsession|\
+            xorg:xdm:usr/lib/X11/xdm/Xsetup_0)
+                [ -f "$tree/$path" ] && [ ! -L "$tree/$path" ] || {
+                    echo "missing regular XDM policy file: $path" >&2
+                    exit 1
+                }
+                continue
+                ;;
+        esac
         rm -f "$tree/$path"
     done <"$scratch/upstream-members"
 done <"$scratch/kept-archives"
@@ -130,11 +201,13 @@ for applet in ar strings; do
     fi
 done
 # Only retire the BusyBox alias, never a real Bash executable or another link.
-if [ -L "$tree/bin/bash" ]; then
-    case $(readlink "$tree/bin/bash") in
-        busybox|./busybox|/bin/busybox|../bin/busybox) rm "$tree/bin/bash" ;;
-    esac
-fi
+for path in bin/bash sbin/bash usr/bin/bash usr/sbin/bash; do
+    if [ -L "$tree/$path" ]; then
+        case $(readlink "$tree/$path") in
+            busybox|./busybox|/bin/busybox|../bin/busybox|../../bin/busybox) rm "$tree/$path" ;;
+        esac
+    fi
+done
 
 # Preserve the exact dependency lock alongside the installed tools. The binary
 # digest records the actual verified bootstrap executable, not a second pin.
@@ -265,14 +338,7 @@ run_apk()
     if [ "$1" = mkpkg ]; then apk_log=$work/logs/$package.log
     else apk_log=$work/logs/install.log
     fi
-    if unshare -Ur true >/dev/null 2>&1; then set -- unshare -Ur "$apk" "$@"
-    elif command -v fakeroot >/dev/null 2>&1; then
-        if [ "$1" = mkpkg ]; then set -- fakeroot "$apk" "$@"
-        else set -- fakeroot "$apk" --usermode --force-no-chroot "$@"
-        fi
-    else echo 'APK packaging requires user namespaces or fakeroot' >&2; exit 1
-    fi
-    sh "$src/tools/build/run-logged.sh" --tag APK "$apk_log" "$@"
+    sh "$src/tools/build/run-logged.sh" --tag APK "$apk_log" unshare -Ur "$apk" "$@"
 }
 
 : >"$scratch/local-packages"
@@ -284,6 +350,9 @@ while IFS= read -r group; do
         while IFS="$(printf '\t')" read -r consumer soname; do
             [ "$consumer" = "$package" ] || continue
             provider=$(awk -F '\t' -v so="$soname" '$1 == so { print $2; exit }' "$scratch/providers")
+            if [ -z "$provider" ] && grep -Fxq "$soname" "$scratch/upstream-sonames"; then
+                provider=so:$soname
+            fi
             [ -n "$provider" ] || { echo "unresolved ELF dependency: $package: $soname" >&2; exit 1; }
             [ "$provider" = "$package" ] || dependencies="$dependencies $provider"
         done <"$scratch/needed"
@@ -299,13 +368,21 @@ while IFS= read -r group; do
         provides="$provides /bin/sh ifupdown-any"
     fi
     case $package in
+        reliefos-base) dependencies="$dependencies bash bash-completion bash-doc" ;;
         reliefos-musl-dev) dependencies="$dependencies reliefos-musl=$version"; provides="$provides musl-dev=$version libc-dev=$version" ;;
         reliefos-apk-tools) dependencies="$dependencies reliefos-busybox" ;;
         reliefos-trust) dependencies="$dependencies ca-certificates-bundle" ;;
         reliefos-fastfetch) dependencies="$dependencies !fastfetch" ;;
+        reliefos-xdm-config)
+            # The local server command uses the ReliefOS tty wrapper and Xorg
+            # configuration; its session requires IceWM and st. Native xdm can
+            # otherwise be installed without any local server or its drivers.
+            dependencies="$dependencies xdm reliefos-apps reliefos-base xorg-server xf86-input-evdev xf86-video-fbdev icewm st"
+            ;;
     esac
     replaces=
     case $package in reliefos-*) replaces="leonos-${package#reliefos-}";; esac
+    [ "$package" != reliefos-xdm-config ] || replaces="$replaces xdm"
     set -- mkpkg --files "$payload" --output "$repository/$package-$version.apk" \
         --info "name:$package" --info "version:$version" --info arch:x86_64 \
         --info "origin:$package" --info "description:ReliefOS build payload $package" \
@@ -334,9 +411,32 @@ set -- --root "$managed" --arch x86_64 --initdb --repositories-file /dev/null \
 while IFS= read -r group; do set -- "$@" "$(package_name "$group")"; done <"$scratch/groups"
 while IFS= read -r request; do set -- "$@" "$request"; done <"$scratch/upstream-requests"
 run_apk "$@"
+if [ "$backend" = xorg ]; then
+    icewm_url=$("$deps" --lock "$lock" --id alpine-icewm --print url)
+    tar --ignore-zeros -tzf "$repository/${icewm_url##*/}" >"$scratch/icewm-members" 2>/dev/null
+    icewm_themes=0
+    while IFS= read -r path; do
+        case $path in
+            usr/share/icewm/themes/*)
+                [ -e "$managed/$path" ] || [ -L "$managed/$path" ] || {
+                    echo "bundled IceWM theme resource is missing: $path" >&2
+                    exit 1
+                }
+                case $path in
+                    */default.theme) icewm_themes=$((icewm_themes + 1)) ;;
+                esac
+                ;;
+        esac
+    done <"$scratch/icewm-members"
+    [ "$icewm_themes" -gt 0 ] || {
+        echo 'the pinned IceWM package contains no bundled themes' >&2
+        exit 1
+    }
+    reliefos_log APK "included $icewm_themes bundled IceWM themes"
+fi
 mkdir -p "$managed/usr/share/reliefos/apk"
 cp -a "$repository" "$managed/usr/share/reliefos/apk/repository"
-for name in EFI grub reliefos leonos loader.elf install; do [ ! -e "$raw/$name" ] || cp -a "$raw/$name" "$managed/$name"; done
+for name in EFI grub reliefos leonos install; do [ ! -e "$raw/$name" ] || cp -a "$raw/$name" "$managed/$name"; done
 
 mkdir -p "$work/repository.new"
 rm -rf "$work/repository.new"

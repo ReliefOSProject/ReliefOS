@@ -51,8 +51,10 @@ with tempfile.TemporaryDirectory(prefix='reliefos-motd-qemu-') as directory:
                       .replace('bootlog=1', '').replace('mode=live', 'mode=live autospawn=ioctlcloexec'))
     iso = work / 'motd.iso'
     with (work / 'iso.log').open('w') as build_log:
-        run(['sh', src / 'tools/build/iso.sh', src, src / 'boot/grub_modules_x86_64-efi',
-             out / 'stage/esp', root, config, iso, '1790100000', 'LEONOSMOTD'],
+        run(['sh', src / 'tools/build/iso.sh', src, out / 'grub-efi/lib/grub/x86_64-efi',
+             out / 'stage/esp', root, config, iso, '1790100000', 'RELIEFOSMOTD',
+             out / 'grub-host/lib/grub/i386-pc', out / 'grub-host/bin/grub-mkimage'],
+            env=dict(os.environ, GRUB_MKSTANDALONE=str(out / 'grub-host/bin/grub-mkstandalone')),
             stdout=build_log, stderr=subprocess.STDOUT)
     args = ['qemu-system-x86_64', '-machine', 'q35', '-m', '2048', '-smp', '2',
             '-bios', str(firmware), '-display', 'none', '-serial', f'file:{log}',

@@ -37,9 +37,6 @@
 [submodule "third_party/ncurses"]
 	path = third_party/ncurses
 	url = https://github.com/ThomasDickey/ncurses-snapshots.git
-[submodule "third_party/kconfig-frontends"]
-	path = third_party/kconfig-frontends
-	url = https://github.com/movidius/kconfig-frontends.git
 [submodule "kernel/ntclks"]
 	path = kernel/reliefnt
 	url = https://github.com/ReliefOSProject/ReliefNT.git
