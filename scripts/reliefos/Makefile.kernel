@@ -3,7 +3,7 @@
 # Phase 3 of the kernel/userland separation: this repository no longer compiles
 # any kernel, driver or boot source. The standalone checkout named by
 # RELIEFNT_DIR owns those sources and builds kernel.sys, kernel.debug,
-# kerneldebug.sys (the device drivers are linked into kernel.sys);
+# kerneldebug.sys and ABI-bound built-in/loadable driver products;
 # this fragment drives that build and publishes the results to the legacy
 # locations the rest of the parent build (rootfs, images, rpr) consumes. The
 # parent consumes only the sub-build's `install` output and its exported headers
@@ -57,6 +57,26 @@ RELIEFNT_SUBBUILD_O := $(abspath $(RELIEFNT_O))
 RELIEFNT_DEST := $(O)/kernel-install
 RELIEFNT_SUBBUILD_DEST := $(abspath $(RELIEFNT_DEST))
 
+# Explicit defconfig resets both repositories, in that order. Ordinary builds
+# never request defconfig and let the child seed only a missing configuration.
+# In particular do not export the parent's KCONFIG_CONFIG/autoheader paths.
+RELIEFNT_CONFIG_ENV := env -u KCONFIG_CONFIG -u KCONFIG_AUTOCONFIG -u KCONFIG_AUTOHEADER -u KCONFIG_TRISTATE
+define RELIEFNT_CONFIGURE
+case "$${MAKEFLAGS%% *}" in *n*|*q*) exit 0 ;; esac; \
+exec $(RELIEFNT_CONFIG_ENV) \
+    $(MAKE) -C '$(RELIEFNT_DIR)' O='$(RELIEFNT_SUBBUILD_O)' ARCH='$(ARCH)' \
+    PROFILE='$(PROFILE)' SOURCE_DATE_EPOCH='$(SOURCE_DATE_EPOCH)' \
+    $(RELIEFNT_TOOL_PASSTHRU) $(RELIEFNT_VERSION_PASSTHRU) $(1)
+endef
+
+RELIEFNT_CONFIG_GOALS := kernel-menuconfig kernel-olddefconfig kernel-allmodconfig
+.PHONY: $(RELIEFNT_CONFIG_GOALS)
+$(RELIEFNT_CONFIG_GOALS): $(filter defconfig,$(MAKECMDGOALS))
+	+$(Q)$(call RELIEFNT_CONFIGURE,$(patsubst kernel-%,%,$@))
+ifneq ($(word 2,$(filter $(RELIEFNT_CONFIG_GOALS),$(MAKECMDGOALS))),)
+$(error select only one kernel configuration operation per make invocation)
+endif
+
 # Legacy product locations (kept stable for scripts/reliefos/Makefile.rootfs, scripts/reliefos/Makefile.images,
 # scripts/reliefos/Makefile.rpr and scripts/reliefos/Makefile.boot).
 RELIEFOS_KERNEL_SYS := $(O_GENERATED)/system/kernel.sys
@@ -69,7 +89,10 @@ RELIEFNT_PUBLISH_PAIRS := system/kernel.sys:kernel.sys system/kernel.debug:kerne
 	system/kerneldebug.sys:kerneldebug.sys
 
 RELIEFNT_PUBLISHED := $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_DEBUG) \
-	$(RELIEFNT_KERNELDEBUG_SYS)
+	$(RELIEFNT_KERNELDEBUG_SYS) $(RELIEFNT_DEST)/install.bundle.json
+
+# Explicit defconfig must finish before another child invocation claims its O.
+$(RELIEFNT_PUBLISHED) $(O)/kernel-export/manifest.txt: $(filter defconfig,$(MAKECMDGOALS))
 
 # An explicit command-line tool override is part of the caller's intent and is
 # passed to the sub-make as well (the checkout accepts the same CC/CXX/AR/
@@ -141,7 +164,7 @@ $(RELIEFNT_PUBLISHED) &: FORCE $(RELIEFOS_EMIT) $(RELIEFNT_KERNEL_HEADER_ORDER_O
 	        'checkout, e.g. RELIEFNT_DIR=/path/to/reliefnt or RELIEFNT_DIR=.' >&2; \
 	    exit 1; \
 	fi; \
-	exec $(MAKE) -C '$(RELIEFNT_DIR)' O='$(RELIEFNT_SUBBUILD_O)' ARCH='$(ARCH)' \
+	exec $(RELIEFNT_CONFIG_ENV) $(MAKE) -C '$(RELIEFNT_DIR)' O='$(RELIEFNT_SUBBUILD_O)' ARCH='$(ARCH)' \
 	    PROFILE='$(PROFILE)' SOURCE_DATE_EPOCH='$(or $(SOURCE_DATE_EPOCH),0)' \
 	    $(RELIEFNT_TOOL_PASSTHRU) $(RELIEFNT_VERSION_PASSTHRU) all install DESTDIR='$(RELIEFNT_SUBBUILD_DEST)'
 	$(Q)set -eu; \
@@ -178,7 +201,7 @@ reliefnt-fetch:
 	    echo 'Initialize it with `git submodule update --init --recursive`, or point RELIEFNT_DIR at an existing checkout' >&2; \
 	    exit 0; \
 	fi; \
-	exec $(MAKE) -C '$(RELIEFNT_DIR)' fetch
+	exec $(RELIEFNT_CONFIG_ENV) $(MAKE) -C '$(RELIEFNT_DIR)' fetch
 
 # --- fetch-check delegation -------------------------------------------------
 # `make fetch-check` also probes the kernel checkout's locked URLs.  Probes
@@ -199,7 +222,7 @@ reliefnt-fetch-check:
 	    echo 'Initialize it with `git submodule update --init --recursive`, or point RELIEFNT_DIR at an existing checkout' >&2; \
 	    exit 0; \
 	fi; \
-	exec $(MAKE) -C '$(RELIEFNT_DIR)' fetch-check
+	exec $(RELIEFNT_CONFIG_ENV) $(MAKE) -C '$(RELIEFNT_DIR)' fetch-check
 
 # --- the parent-owned version header -----------------------------------------
 # build_info.h is not a kernel product: the parent generates it for its own

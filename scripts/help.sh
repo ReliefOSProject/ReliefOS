@@ -14,8 +14,11 @@ ReliefOS build system (Linux Kbuild / Kconfig)
   make fetch-check     probe every locked URL without downloading anything;
                        name the packages whose address answers 404 or nothing
 
-  make defconfig       start $(O)/.config from configs/default.conf
+  make defconfig       reset OS and ReliefNT configurations to their defaults
   make olddefconfig    resolve new symbols non-interactively, keep user choices
+  make kernel-menuconfig     configure native kernel y/m/n selections
+  make kernel-olddefconfig   resolve new kernel options, preserving choices
+  make kernel-allmodconfig   build eligible kernel components as modules
   make menuconfig      edit the configuration of the selected output directory
   make migrate-config  explicitly rename old component symbols in O/.config
   make regen-component-kconfig  regenerate Kconfig.components from components.toml
@@ -50,6 +53,7 @@ ReliefOS build system (Linux Kbuild / Kconfig)
   make test-vdso       delegate vDSO ELF, timekeeper and mapping/auxv checks
   make test-kernel-host run standalone ReliefNT host regression suites
   make test-kernel-ownership check standalone ReliefNT test ownership
+  make test-kernel-update signed APK/RPR kernel-bundle transaction regressions
   make test            test-tools plus test-build
   make test-long       repeated -j1/-j8 comparisons and interrupt recovery
   make test-smoke      BIOS + UEFI QEMU checks for all three media (sequential)

@@ -1163,7 +1163,7 @@ static int install_boot_after_root_sync(const char *root,
     int result = sync_target_root(root);
     if (result) return result;
     fprintf(stderr, "[installer.elf] root filesystem synchronized before boot publication\n");
-    return reliefos_boot_install(boot);
+    return reliefos_boot_install_at_root(boot, root);
 }
 
 /** @brief Copy a newly formatted root, synchronize it, then publish selected loaders. */
@@ -1745,7 +1745,7 @@ void perform_update(void)
         return;
     }
 
-    ret = reliefos_boot_install(&boot);
+    ret = install_boot_after_root_sync(INSTALL_ROOT_MOUNT, &boot);
     if (ret < 0) { finish_install(ret, T("Boot update failed")); return; }
 
     show_progress(100, T("Update completed successfully"),

@@ -35,7 +35,7 @@ RELIEFOS_CACHE ?= $(if $(strip $(LEONOS_CACHE)),$(LEONOS_CACHE),$(RELIEFOS_SRC)/
 # deleted, so `clean` can never operate on a directory it does not own.
 RELIEFOS_O_MARKER := $(O)/.reliefos-out
 
-RELIEFOS_PASSIVE_GOALS := defconfig olddefconfig menuconfig migrate-config regen-component-kconfig tools fetch fetch-check reliefnt-fetch ntclks-fetch reliefnt-fetch-check ntclks-fetch-check headers_install
+RELIEFOS_PASSIVE_GOALS := defconfig olddefconfig menuconfig kernel-menuconfig kernel-olddefconfig kernel-allmodconfig migrate-config regen-component-kconfig tools fetch fetch-check reliefnt-fetch ntclks-fetch reliefnt-fetch-check ntclks-fetch-check headers_install
 RELIEFOS_INSPECT := $(or $(findstring n,$(firstword -$(MAKEFLAGS))),$(findstring q,$(firstword -$(MAKEFLAGS))))
 RELIEFOS_PASSIVE := $(if $(filter-out $(RELIEFOS_PASSIVE_GOALS),$(MAKECMDGOALS)),,1)
 RELIEFOS_O_MARKER := $(O)/.reliefos-out

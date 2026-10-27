@@ -141,6 +141,14 @@ $(BUSYBOX_ELF) $(BUSYBOX_LINKS) &: $(RELIEFOS_SRC)/tools/build/upstream-busybox.
 	+$(Q)case "$${MAKEFLAGS%% *}" in *n*) exit 0;; esac; UPSTREAM_CFLAGS='$(RELIEFOS_OPTIMIZATION_FLAGS)' UPSTREAM_LDFLAGS='$(RELIEFOS_LINK_POLICY_FLAGS)' sh $(RELIEFOS_SRC)/tools/build/upstream-busybox.sh $(RELIEFOS_SRC) $(abspath $(UPSTREAM_ROOT))/busybox $(abspath $(UPSTREAM_APP_DIR)) $(abspath $(MUSL_SYSROOT)) $(abspath $(AUTH_ROOT))/usr/include $(TARGET_CC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(UPSTREAM_EPOCH) >$(O_LOGS)/upstream-busybox.log 2>&1 || { tail -n 50 $(O_LOGS)/upstream-busybox.log >&2; exit 1; }
 .PHONY: upstream-busybox
 upstream-busybox: $(BUSYBOX_ELF) $(BUSYBOX_LINKS)
+INITRAMFS_BUSYBOX_DIR := $(UPSTREAM_APP_DIR)/initramfs
+INITRAMFS_BUSYBOX_ELF := $(INITRAMFS_BUSYBOX_DIR)/busybox.elf
+INITRAMFS_BUSYBOX_LINKS := $(INITRAMFS_BUSYBOX_DIR)/busybox.links
+$(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) &: $(RELIEFOS_SRC)/tools/build/upstream-busybox.sh $(RELIEFOS_UPSTREAM_MAKE_ENV) $(RELIEFOS_SRC)/tools/build/initramfs-busybox-check.sh $(RELIEFOS_SRC)/userland/busybox/leonos.config $(RELIEFOS_SRC)/userland/busybox/initramfs.config $(wildcard $(RELIEFOS_SRC)/patches/busybox/*.patch) $(O_META)/upstream-busybox.parameters $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(MUSL_STAMP) $(RELIEFOS_MUSL_ARTIFACTS) $(AUTH_STAMP) $(RELIEFOS_AUTH_ARTIFACTS)
+	$(Q)mkdir -p $(O_LOGS)
+	+$(Q)case "$${MAKEFLAGS%% *}" in *n*) exit 0;; esac; UPSTREAM_CFLAGS='$(RELIEFOS_OPTIMIZATION_FLAGS)' UPSTREAM_LDFLAGS='$(RELIEFOS_LINK_POLICY_FLAGS)' sh $(RELIEFOS_SRC)/tools/build/upstream-busybox.sh $(RELIEFOS_SRC) $(abspath $(UPSTREAM_ROOT))/busybox-initramfs $(abspath $(INITRAMFS_BUSYBOX_DIR)) $(abspath $(MUSL_SYSROOT)) $(abspath $(AUTH_ROOT))/usr/include $(TARGET_CC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(UPSTREAM_EPOCH) $(RELIEFOS_SRC)/userland/busybox/initramfs.config initramfs >$(O_LOGS)/upstream-initramfs-busybox.log 2>&1 || { tail -n 50 $(O_LOGS)/upstream-initramfs-busybox.log >&2; exit 1; }
+.PHONY: upstream-initramfs-busybox
+upstream-initramfs-busybox: $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS)
 reliefos-upstream: upstream-busybox
 upstream_app_pleditor_outputs := pleditor-generated/src/main.c pleditor-generated/src/pleditor.c pleditor-generated/src/syntax.c
 $(eval $(call RELIEFOS_UPSTREAM_APP,pleditor))

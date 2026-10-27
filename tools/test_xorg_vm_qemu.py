@@ -89,13 +89,15 @@ def _bright_panel_bbox(frame):
         colors = pixel[:3]
         return min(colors) >= 180 and max(colors) - min(colors) <= 20
 
+    # Upstream xlogin's fixed-size gray panel spans about one third of a full
+    # HD display; the X logo can remove another part from a neutral-color run.
     # A bright wallpaper band (the pale sky) is bright too, but it runs edge
     # to edge.  Only rows whose widest bright run keeps a margin on both
     # sides can belong to the centered panel.
     edge = width * 0.08
     row_hits = []
     for y in range(height):
-        if sum(bright(pixels[x, y]) for x in range(width)) < width * 0.40:
+        if sum(bright(pixels[x, y]) for x in range(width)) < width * 0.25:
             continue
         runs = []
         start = None
@@ -140,7 +142,7 @@ def _bright_panel_bbox(frame):
             else:
                 x_runs[-1].append(x)
         columns = max(x_runs, key=len, default=[])
-        if len(columns) < width * 0.40:
+        if len(columns) < width * 0.25:
             continue
         # xlogin's panel is centered with a margin on every side.  A running
         # st is also a bright rectangle, but it touches the display edge
@@ -235,16 +237,16 @@ def wait_serial_after(serial, needle, process, offset, timeout=30):
     raise AssertionError(f"Missing serial output after current action: {needle}")
 
 
-def greeter_login(probe, process):
+def greeter_login(probe, process, *, timeout=45):
     """Sign in at the XDM xlogin greeter: name first, then the password."""
-    wait_greeter_stage(probe, process, "login", "tty1-greeter")
+    wait_greeter_stage(probe, process, "login", "tty1-greeter", timeout=timeout)
     print("xorg-vm: greeter:", repr(greeter_ocr(probe.frame("tty1-greeter-detail"))[:400]), flush=True)
     # Re-focus after a VT acquire.  XDM may redraw before Xorg has delivered
     # the first post-acquire pointer/keyboard event to the input widget.
     probe.click(700, 310)
     probe.text("test")
     probe.key("ret")            # accept the name; xlogin swaps in the password
-    wait_greeter_stage(probe, process, "password", "tty1-greeter-password")
+    wait_greeter_stage(probe, process, "password", "tty1-greeter-password", timeout=timeout)
     # Return advances xlogin to its password entry. Keep that keyboard focus;
     # field positions differ between the white and packaged gray resources.
     probe.text("test")

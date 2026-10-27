@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: Apache-2.0
+# POSIX shell policy; module names/aliases originate in standard depmod indexes.
+module_config_load() {
+    module_root=${1%/}
+    module_directories='etc run usr/local/lib usr/lib lib'
+    module_release=${2-}
+    if [ -n "$module_release" ]; then
+        case $module_release in *[!A-Za-z0-9._+-]*|[!A-Za-z0-9]*|'' ) echo '[modules] invalid kernel release' >&2; return 1 ;; esac
+        module_directories="$module_directories lib/modules/$module_release"
+    fi
+    selected= seen='|'
+    for directory in $module_directories; do
+        for config in "$module_root/$directory/modules-load.d"/*.conf; do
+            [ -f "$config" ] || [ -L "$config" ] || continue
+            base=${config##*/}
+            case $base in *[!A-Za-z0-9_.-]*) echo "[modules] invalid configuration name: $base" >&2; return 1 ;; esac
+            case $seen in *"|$base|"*) continue ;; esac
+            seen=$seen$base'|'
+            selected=$selected$base' '
+        done
+    done
+    for base in $(printf '%s\n' $selected | LC_ALL=C sort); do
+        for directory in $module_directories; do
+            config=$module_root/$directory/modules-load.d/$base
+            [ -f "$config" ] || [ -L "$config" ] || continue
+            while read -r name rest; do
+                case $name in ''|'#'*|';'*) continue ;; *[!A-Za-z0-9_-]*)
+                    echo "[modules] invalid module in $config: $name" >&2; return 1 ;;
+                esac
+                case $rest in ''|'#'*|';'*) ;; *) echo "[modules] put module options in modprobe.d: $config" >&2; return 1 ;; esac
+                modprobe -b "$name" || { echo "[modules] failed to load configured module: $name" >&2; return 1; }
+            done <"$config"
+            break
+        done
+    done
+}
+
+module_coldplug() {
+    module_root=${1%/}
+    aliases=$module_root/lib/modules/$2/modules.alias
+    [ -r "$aliases" ] || { echo "[modules] missing native modules.alias for $2" >&2; return 1; }
+    for attribute in "$module_root"/sys/bus/*/devices/*/modalias; do
+        [ -r "$attribute" ] || continue
+        IFS= read -r identity <"$attribute" || continue
+        while read -r directive pattern name rest; do
+            [ "$directive" = alias ] || continue
+            case $name in ''|*[!A-Za-z0-9_-]*) echo '[modules] invalid generated alias target' >&2; return 1 ;; esac
+            case $identity in $pattern)
+                modprobe -b "$name" || { echo "[modules] device module failed: $name ($identity)" >&2; return 1; }
+                ;;
+            esac
+        done <"$aliases"
+    done
+}

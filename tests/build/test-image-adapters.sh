@@ -44,6 +44,7 @@ printf 'image adapters: reproducible ext2, modes and symlinks passed\n'
 # mocked. The resulting tree is inspected by the disk and ISO rules.
 mkdir -p "$w/fake-bin" "$w/modules"
 printf 'kernel-payload\n' > "$w/kernel.sys"
+grub_fixture_initramfs "$w/kernel.sys" "$w/initramfs.cpio"
 printf 'font-payload\n' > "$w/font.pf2"
 printf 'theme=metro\n' > "$w/display.conf"
 cat > "$w/fake-bin/grub-mkstandalone" <<EOF
@@ -58,8 +59,8 @@ printf 'efi-stub\\n' > "\$out"
 EOF
 chmod +x "$w/fake-bin/grub-mkstandalone"
 grub_fixture_bios "$w/bios-modules"
-PATH="$w/fake-bin:$PATH" sh "$src/tools/build/boot-stage.sh" \
-    "$src" "$w/modules" "$w/bios-modules" "$w/kernel.sys" "$w/font.pf2" \
+PATH="$w/fake-bin:$PATH" RELIEFOS_KERNEL_TOOLS="${RELIEFOS_KERNEL_TOOLS:-$src/out/kbuild-os-native/host/bin/reliefos-kernel-tools}" sh "$src/tools/build/boot-stage.sh" \
+    "$src" "$w/modules" "$w/bios-modules" "$w/kernel.sys" "$w/initramfs.cpio" "$w/font.pf2" \
     "$w/display.conf" "$w/esp" 1700000000
 failures=0
 require_file() {
@@ -70,6 +71,8 @@ require_text() {
 }
 require_file "$w/esp/reliefos/kernel.sys" 'ESP stages the canonical ReliefOS kernel path'
 require_file "$w/esp/leonos/kernel.sys" 'ESP keeps a legacy kernel payload for rollback'
+require_file "$w/esp/reliefos/initramfs.cpio" 'ESP stages the paired early userspace'
+cmp "$w/initramfs.cpio" "$w/esp/leonos/initramfs.cpio"
 if [ -f "$w/esp/reliefos/kernel.sys" ] && [ -f "$w/esp/leonos/kernel.sys" ] &&
     cmp -s "$w/esp/reliefos/kernel.sys" "$w/esp/leonos/kernel.sys"; then
     printf 'ok - canonical and legacy ESP kernels are matched payloads\n'
@@ -84,9 +87,11 @@ else
     printf 'FAIL - ESP stages no retired loader.elf payload\n'
     failures=$((failures + 1))
 fi
-for file in boot/grub/grub.cfg boot/grub/installer.cfg boot/grub/live.cfg; do
+for file in boot/grub/installer.cfg boot/grub/live.cfg; do
     require_text "$src/$file" 'multiboot2 /reliefos/kernel.sys' "$file boots kernel.sys directly"
 done
+require_text "$src/boot/grub/grub.cfg" 'multiboot2 $reliefos_kernel' 'installed GRUB boots the selected checked version'
+require_file "$w/esp/grub/kernel-slots.cfg" 'ESP includes the stable kernel slot selector'
 require_text "$src/boot/grub/grub.cfg" 'multiboot2 /leonos/kernel.sys' 'installed GRUB config retains the legacy boot entry'
 for file in boot/grub/installer.cfg boot/grub/live.cfg; do
     require_text "$src/$file" 'module2 /install/root.fat reliefos-installer-root' "$file keeps the installer root module"
@@ -115,51 +120,11 @@ require_text "$src/userland/apps/installer/install_ops.h" 'TARGET_BOOT "/reliefo
 require_text "$src/userland/apps/installer/install_ops.h" 'TARGET_BOOT "/leonos/kernel.sys"' 'installer recognizes a legacy ESP kernel path'
 if [ "$failures" -ne 0 ]; then exit 1; fi
 
-# Exercise installer publication order. A failed GRUB resource copy must leave
-# the old configuration, its rollback kernel, and any stale loader.elf the old
-# menu may still reference available for the next boot; the stale loader is
-# retired only after the new grub.cfg is published.
-${HOSTCC:-cc} -std=gnu11 -D_GNU_SOURCE -O1 -Wno-address-of-packed-member \
-    -I"$src/userland/runtime/include" "$src/userland/apps/bootinstall/main.c" \
-    "$src/userland/runtime/src/bootloader.c" "$src/userland/runtime/src/bootloader_publish.c" \
-    "$src/userland/runtime/src/bootloader_process.c" "$src/userland/runtime/src/blockdev.c" \
-    -o "$w/boot-install"
-require_text "$src/userland/storage/leonos-grub-installer" 'exec /usr/sbin/reliefos-boot-install' 'legacy command forwards to shared publisher'
-require_text "$src/userland/storage/leonos-grub-installer" '--bios=no --uefi=yes --update' 'legacy command preserves UEFI-only update semantics'
-mkdir -p "$w/install-source" "$w/rollback-esp/grub" "$w/rollback-esp/leonos" \
-    "$w/rollback-esp/reliefos" "$w/rollback-esp/EFI/BOOT"
-cp -a "$w/esp/." "$w/install-source/"
-printf 'old-grub-config\n' > "$w/rollback-esp/grub/grub.cfg"
-printf 'old-stale-loader\n' > "$w/rollback-esp/loader.elf"
-printf 'old-stale-loader\n' > "$w/rollback-esp/reliefos/loader.elf"
-printf 'old-rollback-kernel\n' > "$w/rollback-esp/leonos/kernel.sys"
-chmod 555 "$w/rollback-esp/grub"
-if "$w/boot-install" --source "$w/install-source" --boot-directory "$w/rollback-esp" \
-    --bios=no --uefi=yes --update >"$w/grub-installer-fail.log" 2>&1; then
-    echo 'FAIL - interrupted installer publication unexpectedly succeeded'
-    exit 1
-fi
-chmod 755 "$w/rollback-esp/grub"
-if [ "$(cat "$w/rollback-esp/grub/grub.cfg")" = 'old-grub-config' ] &&
-    [ "$(cat "$w/rollback-esp/loader.elf")" = 'old-stale-loader' ] &&
-    [ "$(cat "$w/rollback-esp/reliefos/loader.elf")" = 'old-stale-loader' ] &&
-    [ "$(cat "$w/rollback-esp/leonos/kernel.sys")" = 'old-rollback-kernel' ]; then
-    printf 'ok - interrupted publication keeps old GRUB config, rollback kernel and stale loader intact\n'
-else
-    printf 'FAIL - interrupted publication damaged the old GRUB rollback entry\n'
-    exit 1
-fi
-"$w/boot-install" --source "$w/install-source" --boot-directory "$w/rollback-esp" \
-    --bios=no --uefi=yes --update >"$w/grub-installer-success.log"
-if cmp -s "$w/install-source/reliefos/kernel.sys" "$w/rollback-esp/reliefos/kernel.sys" &&
-    [ "$(cat "$w/rollback-esp/leonos/kernel.sys")" = 'old-rollback-kernel' ] &&
-    [ "$(cat "$w/rollback-esp/grub/grub.cfg")" = "$(cat "$w/install-source/grub/grub.cfg")" ] &&
-    [ ! -e "$w/rollback-esp/loader.elf" ] &&
-    [ ! -e "$w/rollback-esp/reliefos/loader.elf" ] &&
-    [ ! -e "$w/rollback-esp/leonos/loader.elf" ]; then
-    printf 'ok - successful publication writes the kernel then GRUB config and retires loader.elf\n'
-else
-    printf 'FAIL - successful publication did not publish the kernel/config or retire loader.elf\n'
-    exit 1
-fi
-printf 'image adapters: ReliefOS ESP, ISO, GPT and legacy rollback contracts passed\n'
+# The runtime publisher now validates the complete versioned kernel/modules/
+# initramfs bundle. Its dedicated native suite covers interrupted publication,
+# legacy rollback, loader selection and exact durable slot ordering, using the
+# actual production sources and GRUB. Keep those assertions in one maintained
+# owner rather than compiling an obsolete subset of the runtime here.
+GRUB_HOST_ROOT="${GRUB_HOST_ROOT:-$src/out/kbuild-os-native/grub-host}" \
+    python3 "$src/tools/test_bootloader_install.py"
+printf 'image adapters: ReliefOS ESP, ISO, GPT and checked publication contracts passed\n'

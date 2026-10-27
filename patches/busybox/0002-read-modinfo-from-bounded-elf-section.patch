@@ -1,0 +1,129 @@
+--- a/modutils/modinfo.c
++++ b/modutils/modinfo.c
+@@ -18,6 +18,7 @@
+ #include <fnmatch.h>
+ #include <sys/utsname.h> /* uname() */
+ #include "libbb.h"
++#include <elf.h>
+ #include "modutils.h"
+ 
+ static const char *const shortcuts[] ALIGN_PTR = {
+@@ -58,12 +59,66 @@
+ 	printf("%s%c", data, (option_mask32 & OPT_0) ? '\0' : '\n');
+ }
+ 
++/* Locate NUL-delimited metadata using ELF section bounds, not adjacent file
++ * bytes. Both native-endian ELF classes are supported; memcpy avoids assuming
++ * file alignment. Invalid/truncated sections never reach the string walker. */
++static char *modinfo_area(char *image, size_t *length)
++{
++	uint64_t table, names_offset, names_size, offset, bytes;
++	uint32_t names_index, count, size, index, name, type;
++	unsigned char *ident = (unsigned char *)image;
++	if (*length < EI_NIDENT || memcmp(image, ELFMAG, SELFMAG)
++	 || ident[EI_DATA] != (BB_BIG_ENDIAN ? ELFDATA2MSB : ELFDATA2LSB))
++		return NULL;
++	if (ident[EI_CLASS] == ELFCLASS64) {
++		Elf64_Ehdr h;
++		if (*length < sizeof(h)) return NULL;
++		memcpy(&h, image, sizeof(h));
++		table = h.e_shoff; count = h.e_shnum; size = h.e_shentsize; names_index = h.e_shstrndx;
++		if (h.e_type != ET_REL || size != sizeof(Elf64_Shdr)) return NULL;
++	} else if (ident[EI_CLASS] == ELFCLASS32) {
++		Elf32_Ehdr h;
++		if (*length < sizeof(h)) return NULL;
++		memcpy(&h, image, sizeof(h));
++		table = h.e_shoff; count = h.e_shnum; size = h.e_shentsize; names_index = h.e_shstrndx;
++		if (h.e_type != ET_REL || size != sizeof(Elf32_Shdr)) return NULL;
++	} else return NULL;
++	if (!count || names_index >= count || table > *length || count > (*length - table) / size)
++		return NULL;
++	names_offset = names_size = 0;
++	/* First obtain the bounded section-name table, then find the exact area. */
++	for (index = 0; index <= count; index++) {
++		uint32_t slot = index ? index - 1 : names_index;
++		if (ident[EI_CLASS] == ELFCLASS64) {
++			Elf64_Shdr h;
++			memcpy(&h, image + table + (uint64_t)slot * size, sizeof(h));
++			name = h.sh_name; type = h.sh_type; offset = h.sh_offset; bytes = h.sh_size;
++		} else {
++			Elf32_Shdr h;
++			memcpy(&h, image + table + (uint64_t)slot * size, sizeof(h));
++			name = h.sh_name; type = h.sh_type; offset = h.sh_offset; bytes = h.sh_size;
++		}
++		if (!index) {
++			if (type != SHT_STRTAB || offset > *length || bytes > *length - offset) return NULL;
++			names_offset = offset; names_size = bytes;
++			continue;
++		}
++		if (name <= names_size && names_size - name >= sizeof(".modinfo")
++		 && memcmp(image + names_offset + name, ".modinfo", sizeof(".modinfo")) == 0) {
++			if (type != SHT_PROGBITS || offset > *length || bytes > *length - offset) return NULL;
++			*length = bytes;
++			return image + offset;
++		}
++	}
++	return NULL;
++}
++
+ static void modinfo(const char *path, const char *version,
+ 			const char *field)
+ {
+ 	size_t len;
+ 	int j;
+-	char *ptr, *the_module;
++	char *ptr, *the_module, *contents;
+ 	char *allocated;
+ 	int tags = option_mask32;
+ 
+@@ -82,6 +137,14 @@
+ 		}
+ 	}
+ 
++	contents = the_module;
++	the_module = modinfo_area(contents, &len);
++	if (!the_module) {
++		bb_error_msg("invalid module metadata: %s", path);
++		free(contents);
++		goto ret;
++	}
++
+ 	for (j = 1; (1<<j) & (OPT_TAGS|OPT_F); j++) {
+ 		const char *pattern;
+ 
+@@ -99,25 +162,16 @@
+ 		}
+ 
+ 		ptr = the_module;
+-		while (1) {
+-			char *after_pattern;
+-
+-			ptr = memchr(ptr, *pattern, len - (ptr - (char*)the_module));
+-			if (ptr == NULL) /* no occurrence left, done */
+-				break;
+-			after_pattern = is_prefixed_with(ptr, pattern);
+-			if (after_pattern && *after_pattern == '=') {
+-				/* field prefixes are 0x80 or 0x00 */
+-				if ((ptr[-1] & 0x7F) == 0x00) {
+-					ptr = after_pattern + 1;
+-					display(ptr, pattern);
+-					ptr += strlen(ptr);
+-				}
+-			}
+-			++ptr;
+-		}
+-	}
+-	free(the_module);
++		while (ptr < the_module + len) {
++			char *end = memchr(ptr, '\0', len - (ptr - the_module));
++			size_t key = strlen(pattern);
++			if (!end) break;
++			if ((size_t)(end - ptr) > key && !memcmp(ptr, pattern, key) && ptr[key] == '=')
++				display(ptr + key + 1, pattern);
++			ptr = end + 1;
++		}
++	}
++	free(contents);
+  ret:
+ 	free(allocated);
+ }

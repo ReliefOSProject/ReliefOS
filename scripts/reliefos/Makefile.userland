@@ -56,7 +56,7 @@ USERLAND_APP_FLAGS_pleditor := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_F
 
 USERLAND_DOOM_EXCLUDE := doomgeneric_allegro.c doomgeneric_emscripten.c doomgeneric_linuxvt.c doomgeneric_sdl.c doomgeneric_soso.c doomgeneric_sosox.c doomgeneric_win.c doomgeneric_xlib.c i_allegromusic.c i_allegrosound.c i_sdlsound.c i_sdlmusic.c i_cdmus.c mus2mid.c
 
-USERLAND_KBUILD_APPS := $(sort $(USERLAND_APPS) pleditor gptinit motd bootinstall)
+USERLAND_KBUILD_APPS := $(sort $(USERLAND_APPS) pleditor gptinit motd bootinstall kernelbundle)
 define RELIEFOS_APP_KBUILD_CAPTURE
 RELIEFOS_APP_OBJECTS :=
 RELIEFOS_APP_C_OBJECTS :=
@@ -99,14 +99,28 @@ USERLAND_DEPS_pleditor := $(addprefix $(UPSTREAM_APP_DIR)/pleditor-generated/src
 $(eval $(call RELIEFOS_APP,pleditor,pleditor,$(USERLAND_DIR)/pleditor.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
 
 $(eval $(call RELIEFOS_APP,gptinit,gptinit,$(O)/userland-installer/gptinit.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
-$(eval $(call RELIEFOS_APP,bootinstall,bootinstall,$(USERLAND_DIR)/bootinstall.elf,$(AUTOCONF_H),$(RUNTIME_SO)))
+# Recovery must remain runnable when an interrupted APK transaction removed
+# shared libraries. Compile its source through the same directory Kbuild and
+# link only referenced archive members with the ordinary musl static startup.
+define RELIEFOS_STATIC_RUNTIME_APP
+userland/apps/$(1): $(AUTOCONF_H) $(MUSL_STAMP) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID) $(RELIEFOS_AR_ID)
+quiet_cmd_reliefos_static_app_$(1) = LD      $$@
+      cmd_reliefos_static_app_$(1) = $$(TARGET_LD) $$(RELIEFOS_LINK_POLICY_FLAGS) -static --gc-sections -z max-page-size=0x1000 -o $$@.tmp $$(MUSL_SYSROOT)/lib/crt1.o $$(MUSL_SYSROOT)/lib/crti.o $$(USERLAND_OBJECTS_$(1)) --start-group $$(RUNTIME_ARCHIVE) $$(MUSL_SYSROOT)/lib/libc.a $$(RUNTIME_BUILTINS) --end-group $$(MUSL_SYSROOT)/lib/crtn.o && mv $$@.tmp $$@
+$(2): $(O)/userland/apps/$(1)/built-in.a $(RUNTIME_ARCHIVE) $(MUSL_SYSROOT)/lib/crt1.o $(MUSL_SYSROOT)/lib/crti.o $(MUSL_SYSROOT)/lib/crtn.o $(MUSL_SYSROOT)/lib/libc.a $(RELIEFOS_LD_ID) FORCE
+	$$(call if_changed,reliefos_static_app_$(1))
+targets += $(2)
+.PHONY: app-$(1)
+app-$(1): $(2)
+endef
+$(eval $(call RELIEFOS_STATIC_RUNTIME_APP,kernelbundle,$(RELIEFOS_KERNEL_RECOVERY)))
+$(eval $(call RELIEFOS_STATIC_RUNTIME_APP,bootinstall,$(USERLAND_DIR)/bootinstall.elf))
 
 # Only manifest-owned disabled ELF outputs may be removed; arbitrary files in
 # this directory and old build/ images are outside this rule's ownership.
 .PHONY: userland userland-prune installer-userland
 userland-prune:
 	$(Q)$(foreach app,$(RELIEFOS_DISABLED_APPS),rm -f $(USERLAND_DIR)/$(app).elf;) :
-userland: userland-prune $(addprefix $(USERLAND_DIR)/,$(addsuffix .elf,$(RELIEFOS_COMPONENT_APPS))) $(USERLAND_DIR)/bootinstall.elf
+userland: userland-prune $(addprefix $(USERLAND_DIR)/,$(addsuffix .elf,$(RELIEFOS_COMPONENT_APPS))) $(USERLAND_DIR)/bootinstall.elf $(RELIEFOS_KERNEL_RECOVERY)
 installer-userland: $(O)/userland-installer/gptinit.elf
 
 # PAM helper: ordinary musl/POSIX process, without a desktop component entry.

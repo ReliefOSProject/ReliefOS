@@ -36,6 +36,7 @@ include/uapi/linux/kd.h
 include/uapi/linux/limits.h
 include/uapi/linux/membarrier.h
 include/uapi/linux/mman.h
+include/uapi/linux/module.h
 include/uapi/linux/mount.h
 include/uapi/linux/msg.h
 include/uapi/linux/openat2.h

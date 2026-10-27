@@ -6,9 +6,11 @@ import fcntl
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import time
+import uuid
 
 from test_installer_accounts_qemu import (Probe, install_gui, install_tty,
                                         USER_PASSWORD, ROOT_PASSWORD, login_tty, installer_log)
@@ -34,10 +36,12 @@ def copy_disk(source, target):
     return target
 
 
-def boot_evidence(text, firmware):
+def boot_evidence(text, firmware, release=None, *, cpus=None):
     """Require this firmware's kernel completion and actual PID 1 handoff."""
     expected = "UEFI" if firmware == "uefi" else "legacy"
-    return all(marker in text for marker in (
+    online = cpus is None or re.search(
+        r"\[reliefnt\] boot complete:[^\r\n]*\bonline_cpus=" + str(cpus) + "/" + str(cpus) + r"(?:\s|$)", text)
+    return bool(online) and (release is None or "version=" + release + " " in text) and all(marker in text for marker in (
         f"[boot] firmware={expected}", "[reliefnt] boot complete:",
         "[reliefnt] PID 1 path="))
 
@@ -59,37 +63,15 @@ def wait_for(serial, process, predicate, description, timeout):
 
 @contextmanager
 def working_disk(disk, backend, *, size=3 * 1024**3, existing=False):
-    """Use a private file or RAM file, saving real raw bytes after the VM exits.
-
-    Guest block commands and flushes still execute normally. RAM-backed test
-    media avoids host SSD flush latency; it does not model power-loss survival.
-    All installed-system boots subsequently use the saved ordinary raw file.
-    """
+    """Use only a private ordinary file; guest cache flushes reach its backend."""
+    if backend != "file":
+        raise ValueError("Installation evidence requires an ordinary private disk file")
     if disk.exists() != existing:
         raise FileExistsError(f"Unexpected private disk state: {disk}")
-    if backend == "file":
-        if not existing:
-            with disk.open("xb") as stream:
-                stream.truncate(size)
-        yield disk
-        return
-    if backend != "memory" or not hasattr(os, "memfd_create"):
-        raise ValueError("Memory-backed tests need Linux memfd_create; choose --disk-backend=file")
-    descriptor = os.memfd_create(f"reliefos-{disk.stem}", os.MFD_CLOEXEC)
-    transient = Path(f"/proc/{os.getpid()}/fd/{descriptor}")
-    try:
-        if existing:
-            subprocess.run(["cp", "--sparse=always", disk, transient], check=True)
-        else:
-            os.ftruncate(descriptor, size)
-        try:
-            yield transient
-        finally:
-            subprocess.run(["cp", "--sparse=always", transient, disk], check=True)
-            with disk.open("r+b") as saved:
-                os.fsync(saved.fileno())
-    finally:
-        os.close(descriptor)
+    if not existing:
+        with disk.open("xb") as stream:
+            stream.truncate(size)
+    yield disk
 
 
 @contextmanager
@@ -99,16 +81,15 @@ def boot(output, firmware, *, disk=None, iso=None, timeout=180,
     """Own one 4-GiB VM and its QMP socket, retaining fresh logs/screenshots."""
     output.mkdir(parents=True, exist_ok=False)
     serial = output / "serial.log"
-    qmp = output.parent / "q.sock"
-    qmp.unlink(missing_ok=True)
-    if len(os.fsencode(qmp)) >= 104:
-        raise ValueError("Choose a short --out path for the UNIX socket")
+    qmp = Path(os.environ.get("RELIEFOS_QMP_DIR", ROOT.parent)).resolve() / (".reliefos-ko-install-" + uuid.uuid4().hex[:12] + ".sock")
+    if qmp.exists() or len(os.fsencode(qmp)) >= 104:
+        raise ValueError("Choose an available short RELIEFOS_QMP_DIR on the project filesystem")
     command = [os.environ.get("QEMU", "qemu-system-x86_64"), "-machine", "q35",
                "-accel", os.environ.get("DUAL_BOOT_ACCEL", "kvm"),
                "-cpu", os.environ.get("DUAL_BOOT_CPU", "host"),
                "-m", "4096", "-smp", "2", "-display", "none",
                "-serial", f"file:{serial}", "-qmp", f"unix:{qmp},server=on,wait=off",
-               "-device", "VGA,xres=1280,yres=800", "-device", "qemu-xhci",
+               "-device", "VGA,xres=1280,yres=800", "-device", "piix3-usb-uhci",
                "-device", "usb-tablet", "-netdev", "user,id=net0",
                "-device", "e1000,netdev=net0", "-no-reboot", "-no-shutdown"]
     if firmware == "uefi":
@@ -144,6 +125,24 @@ def boot(output, firmware, *, disk=None, iso=None, timeout=180,
             probe = Probe(qmp, output)
             probe.disk = disk
             yield probe, serial, process
+        except Exception:
+            if probe and process.poll() is None:
+                try:
+                    diagnostic = {"cpus": probe.command("human-monitor-command", {"command-line": "info cpus"}),
+                                  "samples": []}
+                    for _ in range(2):
+                        diagnostic["samples"].append([
+                            {"cpu": cpu,
+                             "registers": probe.command("human-monitor-command", {"command-line": "info registers", "cpu-index": cpu}),
+                             "stack": probe.command("human-monitor-command", {"command-line": "x/32gx $rsp", "cpu-index": cpu})}
+                            for cpu in range(2)])
+                        time.sleep(1)
+                    (output / "failure-cpu-state.json").write_text(json.dumps(diagnostic, indent=2) + "\n")
+                    probe.key("ctrl-alt-f2")
+                    probe.frame("failure-tty2")
+                except Exception as error:
+                    (output / "failure-diagnostic-error.txt").write_text(str(error) + "\n")
+            raise
         finally:
             try:
                 if probe:
@@ -208,7 +207,7 @@ def boot_matrix(args, output):
                 with boot(output / name, firmware,
                           disk=copy_disk(disk, output / f"{name}.raw") if medium == "disk" else None,
                           iso=args.images / f"reliefos-{medium}.iso" if medium != "disk" else None) as (probe, serial, process):
-                    wait_for(serial, process, lambda text: boot_evidence(text, firmware),
+                    wait_for(serial, process, lambda text: boot_evidence(text, firmware, args.expected_release, cpus=2),
                              f"{name} kernel/PID1", args.timeout)
                     if medium == "installer":
                         wait_for(serial, process, lambda text: "path=/usr/lib/reliefos/apps/installer/installer.elf" in text,
@@ -330,10 +329,11 @@ def install_matrix(args, output):
                        iso=args.images / "reliefos-installer.iso") as session):
                 try:
                     if frontend == "gui":
-                        install_gui(*session, chinese=True)
+                        install_gui(*session, chinese=True, install_timeout=args.install_timeout)
                     else:
                         install_tty(*session, skip_xorg=True,
-                                    install_bios=bios, install_uefi=uefi)
+                                    install_bios=bios, install_uefi=uefi,
+                                    install_timeout=args.install_timeout)
                 except Exception:
                     try:
                         installer_log(session[0], session[1])
@@ -353,7 +353,7 @@ def install_matrix(args, output):
                 boot_disk = copy_disk(disk, output / f"{name}-{target}.raw")
                 with boot(output / f"{name}-{target}", target, disk=boot_disk) as (probe, serial, process):
                     if expected:
-                        wait_for(serial, process, lambda text: boot_evidence(text, target),
+                        wait_for(serial, process, lambda text: boot_evidence(text, target, args.expected_release, cpus=2),
                                  f"installed {name}/{target}", args.timeout)
                         if frontend == "gui":
                             wait_for(serial, process, lambda text: "VT graphics vt=1 enabled=1" in text,
@@ -394,6 +394,11 @@ def self_test():
     assert not boot_evidence(complete, "uefi")
     assert not boot_evidence(complete.replace("[reliefnt] boot complete:", ""), "bios")
     assert not boot_evidence("GNU GRUB 2.12\n", "bios")
+    assert not boot_evidence(complete, "bios", "wrong-release")
+    assert boot_evidence(complete + "version=matching-release root=/\n", "bios", "matching-release")
+    assert not boot_evidence(complete, "bios", cpus=2)
+    assert not boot_evidence(complete.replace("boot complete:", "boot complete: online_cpus=1/2"), "bios", cpus=2)
+    assert boot_evidence(complete.replace("boot complete:", "boot complete: online_cpus=2/2"), "bios", cpus=2)
     from test_installer_accounts_qemu import wait_install
     from unittest.mock import patch
     import tempfile
@@ -426,7 +431,7 @@ def self_test():
                     assert success, (text, tty)
     import tempfile
     with tempfile.TemporaryDirectory() as directory:
-        for backend in ("file", "memory"):
+        for backend in ("file",):
             disk = Path(directory) / f"{backend}.raw"
             with working_disk(disk, backend, size=4 * 1024**2) as transient:
                 with transient.open("r+b") as stream:
@@ -458,7 +463,7 @@ def self_test():
             raise AssertionError("Missing completion fixture unexpectedly passed")
     with tempfile.TemporaryDirectory() as directory:
         output = Path(directory)
-        for backend in ("file", "memory"):
+        for backend in ("file",):
             disk = output / f"old-layout-{backend}.raw"
             case = output / backend
             case.mkdir()
@@ -476,6 +481,7 @@ def main():
     """Serialize this task's VM ownership and save per-run artifact identities."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--images", type=Path, default=ROOT / "out/dualboot-build/images")
+    parser.add_argument("--kernel-manifest", type=Path, help="require this install.bundle.json kernel release on every positive boot")
     parser.add_argument("--out", type=Path, default=ROOT / "out/dbq")
     parser.add_argument("--matrix", choices=("boot", "install", "regression", "all"), default="all")
     parser.add_argument("--console-disk", type=Path, help="Existing accepted console install for regression-only runs")
@@ -485,11 +491,20 @@ def main():
     parser.add_argument("--media", default="disk,live,installer")
     parser.add_argument("--timeout", type=int, default=180)
     parser.add_argument("--negative-timeout", type=int, default=20)
-    parser.add_argument("--disk-backend", choices=("memory", "file"), default="memory",
+    parser.add_argument("--disk-backend", choices=("file",), default="file",
                         help="Private installation backing; all installed boots use saved raw files")
+    parser.add_argument("--install-timeout", type=int, default=2400,
+                        help="Finite copy/flush budget in seconds; boot deadlines remain separate")
     parser.add_argument("--install-cases", default="bios-both,uefi-both,bios-only,uefi-only,none")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
+    if args.install_timeout <= 0:
+        parser.error("--install-timeout must be positive")
+    args.expected_release = None
+    if args.kernel_manifest:
+        args.expected_release = json.loads(args.kernel_manifest.read_text())["release"]
+        if not re.fullmatch(r"[A-Za-z0-9._+-]{1,31}", args.expected_release):
+            parser.error("invalid expected kernel release")
     if args.timeout < 1 or args.negative_timeout < 1:
         parser.error("timeouts must be positive")
     if args.self_test:
@@ -513,13 +528,17 @@ def main():
             args.images / "reliefos-installer.iso"] if path.is_file()}
         (output / "sources.json").write_text(json.dumps(hashes, indent=2) + "\n")
         (output / "settings.json").write_text(json.dumps({"installation_disk_backend": args.disk_backend,
-                                                          "guest_memory_mib": 4096}, indent=2) + "\n")
+                                                          "guest_memory_mib": 4096,
+                                                          "expected_release": args.expected_release}, indent=2) + "\n")
         results = boot_matrix(args, output) if args.matrix in ("boot", "all") else []
         if args.matrix in ("install", "all") and all(result["passed"] for result in results):
             results += install_matrix(args, output)
         if args.matrix in ("regression", "all") and all(result["passed"] for result in results):
             from test_dual_boot_regressions import regression_matrix
             results += regression_matrix(args, output)
+        after = {name: digest(args.images / name) for name in hashes}
+        (output / "sources-after.json").write_text(json.dumps(after, indent=2) + "\n")
+        assert after == hashes, "A source installation/boot medium changed during acceptance"
         if not all(result["passed"] for result in results):
             raise SystemExit(1)
 

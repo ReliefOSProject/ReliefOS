@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <fcntl.h>
@@ -50,7 +51,7 @@ static int device_stat(const char *path, struct stat *out)
             if (strcmp(path, name)) continue;
             memset(out, 0, sizeof(*out));
             out->st_mode = S_IFBLK | 0600;
-            out->st_rdev = !disk && part == 2 ? target_device : makedev(244 + disk, part);
+            out->st_rdev = !disk && (part == 2 || part == 3) ? target_device : makedev(244 + disk, part);
             return 1;
         }
     }
@@ -194,7 +195,9 @@ int main(int argc, char **argv)
         if (!strcmp(scenario, "missing-root")) options.root_partuuid = "34567890-1234-4abc-90ab-112233445566";
         if (!strcmp(scenario, "explicit-root")) options.root_partuuid = "12345678-1234-4ABC-90AB-112233445566";
     }
-    int result = reliefos_boot_install(&options);
+    const char *root = getenv("RELIEFOS_TEST_FINAL_ROOT");
+    assert(root && *root);
+    int result = reliefos_boot_install_at_root(&options, root);
     if (result) { fprintf(stderr, "boot install failed: %d\n", result); return 1; }
     uint32_t modes;
     assert(reliefos_boot_probe(options.disk_path, options.boot_dir, &modes) == 0);

@@ -77,6 +77,13 @@ endif
 # Compare absolute paths: `O=.` and `O=<src>` are the same refusal. O has already
 # been restricted to a safe character set above, so quoting here cannot be escaped.
 reliefos_O_absolute := $(shell realpath -m -- '$(O)' 2>/dev/null || printf '%s' '$(O)')
+# Resolve child overrides before the native Kbuild instance changes into O.
+reliefos_kernel_path_keys := RELIEFNT_DIR NTCLKS_DIR RELIEFNT_O NTCLKS_O
+reliefos_kernel_path_unsafe := $(foreach key,$(reliefos_kernel_path_keys),$(call strip_allowed,$($(key)),$(RELIEFOS_ALLOWED_CHARS)))
+ifneq ($(strip $(reliefos_kernel_path_unsafe)),)
+$(error kernel checkout/output paths accept only A-Z a-z 0-9 . _ / -)
+endif
+reliefos_kernel_path_args := $(foreach key,$(reliefos_kernel_path_keys),$(if $(strip $($(key))),$(key)='$(abspath $($(key)))'))
 ifeq ($(reliefos_O_absolute),/)
 $(error refusing / as the output directory)
 endif
@@ -233,7 +240,7 @@ endif
 
 # Inspection never creates O. Configuration-independent goals may inspect an
 # existing host-only tree without creating a .config as a side effect.
-reliefos_config_free_goals := tools fetch fetch-check reliefnt-fetch ntclks-fetch reliefnt-fetch-check ntclks-fetch-check headers_install defconfig olddefconfig menuconfig migrate-config regen-component-kconfig
+reliefos_config_free_goals := tools fetch fetch-check reliefnt-fetch ntclks-fetch reliefnt-fetch-check ntclks-fetch-check headers_install defconfig olddefconfig menuconfig kernel-menuconfig kernel-olddefconfig kernel-allmodconfig migrate-config regen-component-kconfig
 ifneq ($(strip $(reliefos_lock_skip)),)
 ifneq ($(strip $(reliefos_goals)),)
 ifeq ($(wildcard $(reliefos_O_absolute)),)
@@ -287,7 +294,7 @@ __kbuild:
 	    SOURCE_DATE_EPOCH='$(SOURCE_DATE_EPOCH)' TOOLCHAIN='$(TOOLCHAIN)' \
 	    $(MAKE) --no-print-directory -rR -C '$(reliefos_O_absolute)' \
 	    -f '$(RELIEFOS_SRC)/scripts/Makefile.port' -f '$(RELIEFOS_SRC)/scripts/Makefile.build' \
-	    obj=. KBUILD_BUILTIN=1 HOSTCC='$(reliefos_native_hostcc)' $(reliefos_kbuild_goals)
+	    obj=. KBUILD_BUILTIN=1 HOSTCC='$(reliefos_native_hostcc)' $(reliefos_kernel_path_args) $(reliefos_kbuild_goals)
 
 # The source Makefile itself is never an implicit product.
 $(firstword $(MAKEFILE_LIST)): ;

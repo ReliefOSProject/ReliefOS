@@ -21,7 +21,10 @@ tar -xf "$archive" -C "$work/source" --no-same-owner
 source=$work/source/$directory
 # Upstream generates extra_deps.lst in the build tree. A source-tree copy would
 # shadow that rule through VPATH and leave the build-tree input missing.
-patch -d "$source" -p1 < "$repo/patches/grub/0001-explicit-root-for-raw-image-setup.patch"
+for adaptation in "$repo"/patches/grub/*.patch; do
+    [ -f "$adaptation" ] || continue
+    patch -d "$source" -p1 < "$adaptation"
+done
 tmp=$(mktemp -d "$stage.new.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 if [ "$mode" != guest ]; then

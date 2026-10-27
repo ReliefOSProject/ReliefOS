@@ -68,53 +68,6 @@ int reliefos_fstat_legacy(int fd, struct reliefos_stat *st)
 
 
 
-/* Keep one descriptor per process so per-frame drawing does not repeatedly
- * allocate and release a device fd.  The kernel still accepts the legacy
- * control descriptor for old statically linked applications. */
-int reliefos_list_dir(const char *path, struct reliefos_dir_entry *entries,
-                    uint32_t capacity, uint32_t *out_count)
-{
-    uint32_t count = 0;
-    int fd;
-    if (out_count) {
-        *out_count = 0;
-    }
-    if (!path || (capacity && !entries)) {
-        return -1;
-    }
-    if (capacity > RELIEFOS_FS_MAX_ENTRIES) {
-        capacity = RELIEFOS_FS_MAX_ENTRIES;
-    }
-    fd = open(path, RELIEFOS_O_RDONLY, 0);
-    if (fd < 0) {
-        return fd;
-    }
-    while (count < capacity) {
-        /* Directory reads already return one fixed-size entry per syscall. */
-        long got = syscall3(SYS_read, fd, (long)&entries[count],
-                            sizeof(entries[count]));
-        if (got < 0) {
-            (void)close(fd);
-            return (int)got;
-        }
-        if (got == 0) {
-            break;
-        }
-        if (got != (long)sizeof(entries[count])) {
-            (void)close(fd);
-            return -1;
-        }
-        ++count;
-    }
-    if (close(fd) < 0) {
-        return -1;
-    }
-    if (out_count) {
-        *out_count = count;
-    }
-    return 0;
-}
-
 static uint32_t mode_to_legacy_permissions(uint32_t mode)
 {
     return ((mode & 4u) >> 2) | (mode & 2u) | ((mode & 1u) << 2);
@@ -1736,21 +1689,6 @@ int reliefos_kernel_debug_clear(void)
     return reliefos_kernel_debug_write("");
 }
 
-int reliefos_readdir(int fd, struct reliefos_dir_entry *entry)
-{
-    long got;
-    if (!entry) {
-        return -1;
-    }
-    got = read(fd, entry, sizeof(*entry));
-    if (got < 0) {
-        return (int)got;
-    }
-    if (got == 0) {
-        return 0;
-    }
-    return got == (long)sizeof(*entry) ? 1 : -1;
-}
 /* Published libleonos.so.2 aliases; keep these in the defining translation unit. */
 extern __typeof__(reliefos_fs_acl_get) leonos_fs_acl_get __attribute__((alias("reliefos_fs_acl_get")));
 extern __typeof__(reliefos_fs_acl_repair) leonos_fs_acl_repair __attribute__((alias("reliefos_fs_acl_repair")));
@@ -1765,8 +1703,6 @@ extern __typeof__(reliefos_kernel_debug_arm_next_boot) leonos_kernel_debug_arm_n
 extern __typeof__(reliefos_kernel_debug_clear) leonos_kernel_debug_clear __attribute__((alias("reliefos_kernel_debug_clear")));
 extern __typeof__(reliefos_kernel_debug_get_state) leonos_kernel_debug_get_state __attribute__((alias("reliefos_kernel_debug_get_state")));
 extern __typeof__(reliefos_kernel_debug_set_enabled) leonos_kernel_debug_set_enabled __attribute__((alias("reliefos_kernel_debug_set_enabled")));
-extern __typeof__(reliefos_list_dir) leonos_list_dir __attribute__((alias("reliefos_list_dir")));
-extern __typeof__(reliefos_readdir) leonos_readdir __attribute__((alias("reliefos_readdir")));
 extern __typeof__(reliefos_stat_legacy) leonos_stat_legacy __attribute__((alias("reliefos_stat_legacy")));
 extern __typeof__(reliefos_system_reboot) leonos_system_reboot __attribute__((alias("reliefos_system_reboot")));
 extern __typeof__(reliefos_system_shutdown) leonos_system_shutdown __attribute__((alias("reliefos_system_shutdown")));

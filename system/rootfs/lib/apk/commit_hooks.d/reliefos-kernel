@@ -1,0 +1,12 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# Standard apk(8) commit hooks run under APK's write lock in the managed root.
+set -eu
+# Offline image assembly runs APK in a Linux-hosted chroot, before any ESP is
+# attached. The image builder creates and verifies its initial boot slots.
+[ "$(uname -s)" = ReliefNT ] || exit 0
+case ${1-} in
+    pre-commit) exec /usr/libexec/reliefos/kernel-bundle --retain-installed / ;;
+    post-commit) exec /usr/libexec/reliefos/kernel-bundle --restore-all / ;;
+    *) echo 'reliefos-kernel: unsupported APK commit hook phase' >&2; exit 2 ;;
+esac

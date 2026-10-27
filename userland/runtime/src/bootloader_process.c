@@ -19,7 +19,7 @@ int boot_install_bios(const struct reliefos_boot_install_options *options)
     if (n < 0 || (size_t)n >= sizeof(boot_directory)) return -ENAMETOOLONG;
     char *const argv[] = {BOOT_GRUB_INSTALL, "--target=i386-pc", directory,
         boot_directory, "--recheck", "--force-file-id", "--fonts=", "--themes=", "--locales=",
-        "--modules=part_gpt fat normal multiboot2 cmp search search_fs_file configfile serial terminal all_video font gfxterm gfxmenu",
+        "--modules=part_gpt fat normal multiboot2 cmp search search_fs_file configfile serial terminal all_video font gfxterm gfxmenu hashsum gcry_sha256 crypto loadenv regexp test",
         "--", (char *)options->disk_path, NULL};
     char *const environment[] = {"PATH=/usr/sbin:/usr/bin:/sbin:/bin", "LC_ALL=C",
                                 "HOME=/root", NULL};

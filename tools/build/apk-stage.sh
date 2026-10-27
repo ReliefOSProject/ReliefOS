@@ -371,6 +371,7 @@ while IFS= read -r group; do
         reliefos-base) dependencies="$dependencies bash bash-completion bash-doc" ;;
         reliefos-musl-dev) dependencies="$dependencies reliefos-musl=$version"; provides="$provides musl-dev=$version libc-dev=$version" ;;
         reliefos-apk-tools) dependencies="$dependencies reliefos-busybox" ;;
+        reliefos-kernel) dependencies="$dependencies reliefos-grub=$version" ;;
         reliefos-trust) dependencies="$dependencies ca-certificates-bundle" ;;
         reliefos-fastfetch) dependencies="$dependencies !fastfetch" ;;
         reliefos-xdm-config)
@@ -394,6 +395,10 @@ while IFS= read -r group; do
         set -- "$@" --script "post-install:$src/userland/storage/busybox-binutils-links" \
             --script "post-upgrade:$src/userland/storage/busybox-binutils-links" \
             --script "trigger:$src/userland/storage/busybox-binutils-links" --trigger /usr/bin
+    fi
+    if [ "$package" = reliefos-kernel ]; then
+        set -- "$@" --script "post-install:$src/userland/storage/kernel-package-activate" \
+            --script "post-upgrade:$src/userland/storage/kernel-package-activate"
     fi
     run_apk "$@"
     printf '%s\n' "$repository/$package-$version.apk" >>"$scratch/local-packages"

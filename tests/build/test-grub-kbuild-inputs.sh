@@ -68,6 +68,7 @@ prepare_output() {
         "$target_out/generated/config" "$target_out/host/bin" "$target_out/meta"
     printf 'fixture config\n' > "$target_out/.config"
     printf 'fixture kernel\n' > "$target_out/generated/system/kernel.sys"
+    grub_fixture_initramfs "$target_out/generated/system/kernel.sys" "$target_out/generated/system/initramfs.cpio"
     printf 'fixture font\n' > "$target_out/generated/grub/leonos-unicode.pf2"
     printf 'theme=metro\nwallpaper.mode=fill\n' > "$target_out/generated/config/display.conf"
     printf '#!/bin/sh\nexit 0\n' > "$target_out/host/bin/reliefos-emit"
@@ -89,6 +90,9 @@ run_esp() {
             O_IMAGES="$target_out/images" RELIEFOS_HOST_BIN="$target_out/host/bin" \
             RELIEFOS_CONFIG_FILE="$target_out/.config" \
             RELIEFOS_EMIT="$target_out/host/bin/reliefos-emit" \
+            RELIEFOS_KERNEL_TOOLS="${RELIEFOS_KERNEL_TOOLS:-$src/out/kbuild-os-native/host/bin/reliefos-kernel-tools}" \
+            RELIEFOS_INITRAMFS="$target_out/generated/system/initramfs.cpio" \
+            RELIEFOS_INITRAMFS_MANIFEST="$target_out/generated/system/initramfs.cpio.json" \
             GRUB_FONT="$target_out/generated/grub/leonos-unicode.pf2" \
             GRUB_BIOS_DIR="$work/bios-modules" GRUB_MKSTANDALONE=grub-mkstandalone \
             GRUB_EFI_DIR="$module_dir" SOURCE_DATE_EPOCH=1700000000 esp

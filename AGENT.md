@@ -31,7 +31,8 @@ Ring 3，内核和可加载驱动运行在 Ring 0。当前 Xorg profile 的主�
 ```text
 BIOS 或 UEFI / GRUB
   -> kernel/reliefnt 子仓产物 kernel.sys（Ring 0，自带 Multiboot2 头，GRUB 直接引导）
-  -> userland init.elf
+  -> initramfs /init，加载根设备/文件系统模块后 switch_root
+  -> /sbin/init / OpenRC
   -> Xorg / XDM
   -> IceWM / 普通桌面应用（纯控制台安装不启动 Xorg）
 ```
@@ -68,8 +69,12 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
   `-errno`。已实现接口才可视为可用，未知 syscall 返回 `-ENOSYS`。
 - 内核负责用户指针与长度验证、页表/进程资源、硬件和最终授权。
 - 内核内部能力按职责落在内核子仓的 `kernel/`、`lib/`、`mm/`、`net/`、
-  `fs/`、`block/`、`sound/` 和 `drivers/` 等目录（均相对于 `kernel/reliefnt/`），全部编译进
-  kernel.sys；不存在跨模块 callback 表或第二个启动镜像。用户态与内核之间只有
+  `fs/`、`block/`、`sound/` 和 `drivers/` 等目录（均相对于 `kernel/reliefnt/`）。
+  defconfig 默认将生产组件全部内置；支持独立生命周期的部件可经 tristate
+  编译为针对同一 ReliefNT ABI 的 ELF `.ko`，不加载 Linux 原版二进制模块。
+  调度、内存和 VFS 等必要核心仍内置。模块注册、回调、IRQ/DMA、OFD/VMA
+  必须保留实现 owner，排空真实用户后才能释放代码；不恢复旧私有 `.drv` 协议。
+  用户态与内核之间只有
   syscall/ioctl ABI；图形会话通过 Xorg 的 X11 协议通信。职责归属与旧数据格式的兼容策略见
   `Documentation/userspace-api/abi.rst`。
 - X11 应用连接 Xorg，由 IceWM 管理窗口。不得恢复已移除的自研窗口服务器、

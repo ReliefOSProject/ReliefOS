@@ -52,6 +52,7 @@ done
 tree "$out/upstream/grub/root/usr/lib/grub" usr/lib/grub grub
 tree "$out/upstream/grub/root/usr/share/licenses/grub" usr/share/licenses/grub grub
 file "$out/userland/bootinstall.elf" usr/sbin/reliefos-boot-install 0755 reliefos-boot-tools
+file "$out/userland/initramfs/kernel-bundle.elf" usr/libexec/reliefos/kernel-bundle 0755 reliefos-boot-tools
 for spec in auth pam; do
     for directory in lib usr etc sbin bin; do
         input=$out/$spec/root/$directory
@@ -120,6 +121,9 @@ for package in musl mimalloc; do tree "$out/sysroot/musl/share/licenses/$package
 printf '/lib:/usr/local/lib:/usr/lib:/usr/lib/reliefos:/usr/lib/leonos\n' > "$work/data/ld.path"
 file "$work/data/ld.path" etc/ld-musl-x86_64.path 0644 musl
 file "$out/generated/system/kerneldebug.sys" usr/lib/reliefos/kerneldebug.sys 0755
+[ -f "$out/stage/kernel-payload/kernel-payload.json" ] || { echo 'rootfs-stage: matching kernel payload is missing' >&2; exit 1; }
+tree "$out/stage/kernel-payload/lib/modules" lib/modules reliefos-kernel
+tree "$out/stage/kernel-payload/usr/lib/reliefos/kernel" usr/lib/reliefos/kernel reliefos-kernel
 file "$out/userland/motd.elf" usr/lib/reliefos/motd-status 0755 reliefos-base
 # awk reads TSV without collapsing empty label/extension fields. No data is
 # interpreted as a command; only validated component IDs are used in paths.

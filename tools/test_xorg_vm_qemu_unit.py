@@ -38,6 +38,22 @@ class GreeterStageTests(unittest.TestCase):
 
 
 class EvidenceTests(unittest.TestCase):
+    def test_upstream_default_gray_xdm_on_full_hd_display_is_detected(self):
+        frame = Image.new("RGB", (1920, 1080), "black")
+        draw = ImageDraw.Draw(frame)
+        draw.rectangle((643, 279, 1282, 529), fill=(191, 191, 191))
+        draw.rectangle((1158, 304, 1271, 503), fill="white")
+        draw.line((1158, 304, 1271, 503), fill="black", width=30)
+        draw.line((1271, 304, 1158, 503), fill="black", width=30)
+        draw.rectangle((771, 383, 1101, 409), outline="black")
+        rectangle = _bright_panel_bbox(frame)
+        self.assertIsNotNone(rectangle)
+        left, top, right, bottom = rectangle
+        self.assertLessEqual(left, 713)
+        self.assertLessEqual(top, 363)
+        self.assertGreaterEqual(right, 1102)
+        self.assertGreaterEqual(bottom, 447)
+
     def test_session_st_is_not_an_xlogin_panel(self):
         frame = Image.new("RGB", (1280, 800), "black")
         ImageDraw.Draw(frame).rectangle((0, 20, 605, 440), fill="white")

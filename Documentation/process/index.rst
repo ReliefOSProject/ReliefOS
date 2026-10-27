@@ -13,3 +13,4 @@
    releasing
    assets
    security
+   kernel-modules-plan

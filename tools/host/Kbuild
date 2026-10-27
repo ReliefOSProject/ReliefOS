@@ -14,4 +14,14 @@ host/bin/reliefos-dedup-objs := tools/host/manifest/reliefos-dedup.o
 host/bin/reliefos-stage-objs := tools/host/manifest/reliefos-stage.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o tools/host/manifest/json.o
 host/bin/reliefos-layout-objs := tools/host/manifest/reliefos-layout.o
 host/bin/reliefos-oschinpt-index-objs := tools/host/assets/reliefos-oschinpt-index.o tools/host/common/buffer.o tools/host/common/io.o tools/host/common/process.o
+hostprogs += host/bin/reliefos-kernel-tools
+host/bin/reliefos-kernel-tools-objs := tools/host/modules/main.o tools/host/modules/bundle.o tools/host/modules/stage_io.o tools/host/modules/stage_json.o tools/host/modules/stage_inventory.o tools/host/modules/modules_stage.o tools/host/manifest/json.o tools/host/common/buffer.o
+host/bin/reliefos-kernel-tools-objs += tools/host/modules/initramfs_stage.o tools/host/modules/newc.o
+host/bin/reliefos-kernel-tools-objs += tools/host/modules/payload_stage.o
+host/bin/reliefos-kernel-tools-objs += tools/host/modules/stage_check.o
+host/bin/reliefos-kernel-tools-objs += tools/host/modules/slots.o userland/runtime/shared/boot_slots.o
+host/bin/reliefos-kernel-tools-objs += tools/host/modules/release_info.o
+# The target runtime uses its own src/boot_slots.o alias; HOSTCC's shared/ path
+# stays distinct and is built by the original Makefile.host source rule.
+HOSTCFLAGS_userland/runtime/shared/boot_slots.o += -I$(srctree)/userland/runtime/include
 HOSTLDLIBS_host/bin/reliefos-ext2-time := -lext2fs -lcom_err

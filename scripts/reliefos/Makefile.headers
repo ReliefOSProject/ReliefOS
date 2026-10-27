@@ -48,7 +48,7 @@ $(HEADER_EXPORT_MANIFEST): FORCE $(RELIEFOS_EMIT)
 	        'checkout, e.g. RELIEFNT_DIR=/path/to/reliefnt or RELIEFNT_DIR=.' >&2; \
 	    exit 1; \
 	fi; \
-	exec $(MAKE) -C '$(RELIEFNT_DIR)' O='$(RELIEFNT_SUBBUILD_O)' ARCH='$(ARCH)' \
+	exec $(RELIEFNT_CONFIG_ENV) $(MAKE) -C '$(RELIEFNT_DIR)' O='$(RELIEFNT_SUBBUILD_O)' ARCH='$(ARCH)' \
 	    PROFILE='$(PROFILE)' SOURCE_DATE_EPOCH='$(SOURCE_DATE_EPOCH)' \
 	    headers_install HEADER_EXPORT_LIST='$(HEADER_EXPORT_LIST)'
 	$(Q)set -eu; \

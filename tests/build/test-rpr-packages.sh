@@ -2,6 +2,9 @@
 set -eu
 
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+: "${RELIEFOS_KERNEL_TOOLS:=$src/out/kbuild-os-native/host/bin/reliefos-kernel-tools}"
+RELIEFOS_KERNEL_RECOVERY=${RELIEFOS_TEST_RECOVERY:-$src/out/kbuild-os-native/userland/initramfs/kernel-bundle.elf}
+export RELIEFOS_KERNEL_TOOLS RELIEFOS_KERNEL_RECOVERY
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 
@@ -30,14 +33,20 @@ set -eu
 output=
 metadata=
 files=
+destination=
 while [ "$#" -gt 0 ]; do
     case $1 in
         --output) output=$2; shift 2 ;;
         --files) files=$2; shift 2 ;;
         --info) metadata="$metadata\n$2"; shift 2 ;;
+        --destination) destination=$2; shift 2 ;;
         *) shift ;;
     esac
 done
+if [ -n "$destination" ]; then
+    cp -a "$RELIEFOS_RPR_TEST_PAYLOAD/lib" "$RELIEFOS_RPR_TEST_PAYLOAD/usr" "$destination/"
+    exit 0
+fi
 [ -n "$output" ]
 : > "$output"
 printf '%b\n' "$metadata" > "$output.metadata"
@@ -70,19 +79,18 @@ test "$(cat "$tmp/repository/.complete")" = 4.7.1
 # this protects every package source, including future RPR applications.
 mkdir -p "$tmp/pages-repository" "$tmp/pages-apps"
 printf package > "$tmp/pages-repository/reliefos-base-1-r0.apk"
+printf kernel-package-fixture > "$tmp/pages-repository/reliefos-kernel-1-r0.apk"
 printf package > "$tmp/pages-apps/reliefos-broken.apk"
 printf reliefos-broken.apk > "$tmp/pages-apps/packages.list"
-printf kernel > "$tmp/kernel.sys"
-kernel_hash=$(sha256sum "$tmp/kernel.sys" | cut -d' ' -f1)
-mkdir -p "$tmp/pages-kernel"
-printf 'format_version: 1\narch: x86_64\nartifacts:\n  %s  kernel.sys\n' \
-    "$kernel_hash" > "$tmp/pages-kernel/manifest.txt"
+python3 "$src/tools/tests/make_kernel_bundle_fixture.py" "$tmp/pages-kernel" "$tmp/kernel.sys"
+RELIEFOS_RPR_TEST_PAYLOAD=$tmp/pages-kernel
+export RELIEFOS_RPR_TEST_PAYLOAD
 printf 'kernel_name=ntclks\nrelease_version=4.7.1\n' > "$tmp/pages-version"
 openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 \
     -out "$tmp/pages-key" 2>/dev/null
 chmod 600 "$tmp/pages-key"
 if sh "$src/tools/build/rpr-pages.sh" "$tmp/pages-repository" "$tmp/pages-apps" \
-    "$tmp/kernel.sys" "$tmp/pages-kernel/manifest.txt" \
+    "$tmp/kernel.sys" "$tmp/pages-kernel" \
     "$tmp/pages-version" "$tmp/fake-bin/apk" "$tmp/pages-key" "$tmp/pages-output" \
     2>"$tmp/pages-error"; then
     echo 'versionless RPR package was accepted' >&2
@@ -96,7 +104,7 @@ test ! -e "$tmp/pages-output"
 rm "$tmp/pages-apps/reliefos-broken.apk" "$tmp/pages-apps/packages.list"
 printf 'app package\n' > "$tmp/pages-apps/reliefos-doom-1-r0.apk"
 sh "$src/tools/build/rpr-pages.sh" "$tmp/pages-repository" "$tmp/pages-apps" \
-    "$tmp/kernel.sys" "$tmp/pages-kernel/manifest.txt" \
+    "$tmp/kernel.sys" "$tmp/pages-kernel" \
     "$tmp/pages-version" "$tmp/fake-bin/apk" "$tmp/pages-key" "$tmp/pages-output"
 cmp "$tmp/pages-output/apk/leonos-rpr.rsa.pub" "$tmp/pages-output/apk/reliefos-rpr.rsa.pub"
 grep -F '"public_key":"reliefos-rpr.rsa.pub"' "$tmp/pages-output/apk/repository.json"

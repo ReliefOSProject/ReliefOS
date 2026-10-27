@@ -12,6 +12,7 @@ include $(srctree)/scripts/reliefos/Makefile.third-party
 include $(srctree)/scripts/reliefos/Makefile.pam
 include $(srctree)/scripts/reliefos/Makefile.runtime
 include $(srctree)/scripts/reliefos/Makefile.upstream
+include $(srctree)/scripts/reliefos/Makefile.modules
 include $(srctree)/scripts/reliefos/Makefile.grub
 include $(srctree)/scripts/reliefos/Makefile.components.audio
 include $(srctree)/scripts/reliefos/Makefile.userland

@@ -27,12 +27,30 @@ fi
 temporary=/tmp/reliefos-apk-update.$$
 (umask 077; /bin/busybox mkdir "$temporary")
 restore_world=0
+retention_started=0
+activation_deferred=0
+kernel_bundle=${RELIEFOS_KERNEL_BUNDLE_HELPER:-/usr/libexec/reliefos/kernel-bundle}
+activation_marker=$target/run/reliefos-kernel-activation.defer
 cleanup() {
+    status=$?
+    trap - EXIT HUP INT TERM
+    set +e
+    # APK may have removed old version-owned files even on a failed commit.
+    # A killed transaction is additionally recovered by the static early tool.
+    if [ "$retention_started" -eq 1 ]; then
+        "$kernel_bundle" --restore-all "$target" || status=1
+    fi
     if [ "$restore_world" -eq 1 ]; then
-        /bin/busybox cp "$temporary/world-before" "$target/etc/apk/world.restore.$$"
-        /bin/busybox mv "$target/etc/apk/world.restore.$$" "$target/etc/apk/world"
+        if /bin/busybox cp "$temporary/world-before" "$target/etc/apk/world.restore.$$" &&
+           /bin/busybox mv "$target/etc/apk/world.restore.$$" "$target/etc/apk/world"; then :
+        else status=1
+        fi
+    fi
+    if [ "$activation_deferred" -eq 1 ]; then
+        /bin/busybox rm -f "$activation_marker" || status=1
     fi
     /bin/busybox rm -rf "$temporary"
+    exit "$status"
 }
 trap cleanup EXIT HUP INT TERM
 ( /bin/busybox mkdir "$temporary/seen" )
@@ -118,6 +136,21 @@ configuration=$preflight_configuration
 # The migrator never overwrites an existing canonical file and verifies bytes,
 # mode and ownership before publishing; a failure prevents the transaction.
 /bin/sh /usr/lib/reliefos/reliefos-migrate "$target"
+# The caller is the offline installer, which publishes its selected BIOS/UEFI
+# resources only after this entire signed package transaction and root sync.
+# Retain old modules first, then defer the kernel package's activation script
+# within this invocation. Normal system APK operations have no defer marker.
+case "$kernel_bundle" in /*) ;; *) echo 'kernel bundle helper must be absolute' >&2; exit 1 ;; esac
+[ -x "$kernel_bundle" ] || { echo 'Missing native kernel retention helper.' >&2; exit 1; }
+"$kernel_bundle" --retain-installed "$target"
+retention_started=1
+[ ! -L "$target/run" ] && { [ ! -e "$target/run" ] || [ -d "$target/run" ]; } || exit 1
+/bin/busybox mkdir -p "$target/run"
+[ ! -e "$activation_marker" ] && [ ! -L "$activation_marker" ] || {
+    echo 'An offline kernel activation is already pending.' >&2; exit 1;
+}
+(umask 077; set -C; printf '%s\n' 'ReliefOS offline installer boot publication pending' > "$activation_marker")
+activation_deferred=1
 broken_packages 1 > "$temporary/broken-before"
 world=$target/etc/apk/world
 /bin/busybox cp "$world" "$temporary/world-before"

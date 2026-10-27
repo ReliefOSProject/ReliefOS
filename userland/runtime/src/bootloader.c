@@ -1,5 +1,6 @@
 /* Shared standard GRUB installation policy; frontends own their UI and disks. */
 #include "bootloader_internal.h"
+#include "kernel_bundle_internal.h"
 #include <reliefos/blockdev.h>
 #include <ctype.h>
 #include <errno.h>
@@ -60,7 +61,8 @@ static int bios_payload(const struct reliefos_boot_install_options *options)
 {
     const char *const required[] = {"boot.img", "diskboot.img", "kernel.img",
         "lzma_decompress.img", "moddep.lst", "modinfo.sh", "command.lst", "fs.lst",
-        "biosdisk.mod", "part_gpt.mod", "fat.mod", "normal.mod", "multiboot2.mod", "cmp.mod"};
+        "biosdisk.mod", "part_gpt.mod", "fat.mod", "normal.mod", "multiboot2.mod", "cmp.mod",
+        "hashsum.mod", "gcry_sha256.mod", "crypto.mod", "loadenv.mod", "regexp.mod", "test.mod"};
     for (unsigned i = 0; i < sizeof(required) / sizeof(required[0]); ++i) {
         char relative[256];
         snprintf(relative, sizeof(relative), "grub/i386-pc/%s", required[i]);
@@ -113,7 +115,7 @@ int reliefos_boot_validate_payload(const struct reliefos_boot_install_options *o
     int root = boot_open_directory(options->source);
     if (root < 0) return root;
     close(root);
-    const char *const common[] = {"reliefos/kernel.sys", "leonos/kernel.sys", "grub/grub.cfg",
+    const char *const common[] = {"grub/grub.cfg", "grub/kernel-slots.cfg",
         "grub/fonts/leonos-unicode.pf2", "grub/theme/theme.txt"};
     for (unsigned i = 0; i < sizeof(common) / sizeof(common[0]); ++i) {
         int result = payload_file(options, common[i]);
@@ -122,6 +124,13 @@ int reliefos_boot_validate_payload(const struct reliefos_boot_install_options *o
     int result = options->install_uefi ? payload_file(options, "EFI/BOOT/BOOTX64.EFI") : 0;
     if (!result && options->install_bios) result = bios_payload(options);
     if (!result) result = boot_walk_payload(options, -1, 0);
+    if (!result) {
+        root = boot_open_directory(options->source);
+        if (root < 0) return root;
+        struct reliefos_kernel_slot identity;
+        result = kernel_bundle_select(root, &identity, NULL);
+        close(root);
+    }
     return result;
 }
 
@@ -250,6 +259,57 @@ static int target_root_uuid(const struct reliefos_boot_install_options *options,
     return found ? 0 : -ENOENT;
 }
 
+/** @brief Bind a checked final root to the exact complete kernel carried by media.
+ * @param options Borrowed validated media/disk settings.
+ * @param path Absolute final root, opened without symlink components.
+ * @param identity Optional complete media identity output on success.
+ * @return Zero for matching checksums, module membership and selected disk root;
+ * negative errno otherwise. No filesystem or firmware writes are performed.
+ */
+static int checked_root(const struct reliefos_boot_install_options *options, const char *path,
+                         struct reliefos_kernel_slot *identity)
+{
+    if (!options_valid(options) || !path) return -EINVAL;
+    int media = boot_open_directory(options->source);
+    if (media < 0) return media;
+    struct reliefos_kernel_slot expected;
+    int result = kernel_bundle_select(media, &expected, NULL);
+    close(media);
+    if (result) return result;
+    struct kernel_bundle_checked bundle = {.root = -1};
+    result = kernel_bundle_check_open(&bundle, path, expected.release);
+    expected.generation = 1;
+    if (!result && !reliefos_kernel_slot_equal(&expected, &bundle.identity)) result = -EINVAL;
+    if (!result && options->disk_path) {
+        struct stat root;
+        char wanted[37];
+        result = fstat(bundle.root, &root) ? -errno : target_root_uuid(options, wanted);
+        struct reliefos_block_partition parts[RELIEFOS_BLOCK_MAX_PARTITIONS];
+        uint32_t count = 0;
+        if (!result) result = reliefos_block_list_partitions(options->disk_path, parts,
+            RELIEFOS_BLOCK_MAX_PARTITIONS, &count);
+        if (!result && count > RELIEFOS_BLOCK_MAX_PARTITIONS) result = -EOVERFLOW;
+        int belongs = 0;
+        for (uint32_t i = 0; !result && i < count; ++i) {
+            if (parts[i].gpt_type != RELIEFOS_BLOCK_GPT_LINUX) continue;
+            char uuid[37]; struct stat partition;
+            result = reliefos_block_partition_uuid(options->disk_path, parts[i].index, uuid);
+            if (result || strcmp(wanted, uuid)) continue;
+            if (stat(parts[i].path, &partition)) { result = -errno; break; }
+            if (S_ISBLK(partition.st_mode) && partition.st_rdev == root.st_dev) belongs = 1;
+        }
+        if (!result && !belongs) result = -EXDEV;
+    }
+    if (!result && identity) *identity = expected;
+    kernel_bundle_check_close(&bundle);
+    return result;
+}
+
+int reliefos_boot_validate_root(const struct reliefos_boot_install_options *options, const char *root)
+{
+    return checked_root(options, root, NULL);
+}
+
 /** @brief Decode the versioned mode record, checking actual loader files too. */
 int reliefos_boot_probe(const char *disk_path, const char *boot_dir, uint32_t *modes)
 {
@@ -355,10 +415,12 @@ int reliefos_boot_validate_target(const struct reliefos_boot_install_options *op
  * serializes installs. Errors can leave completed file or raw-disk stages in
  * place; they never report a failed GRUB invocation as a successful install.
  */
-int reliefos_boot_install(const struct reliefos_boot_install_options *options)
+int reliefos_boot_install_at_root(const struct reliefos_boot_install_options *options, const char *installed_root)
 {
     int result = reliefos_boot_validate_payload(options);
     if (!result) result = reliefos_boot_validate_target(options);
+    struct reliefos_kernel_slot identity;
+    if (!result) result = checked_root(options, installed_root, &identity);
     if (result) return result;
     uint32_t modes = 0;
     if (options->preserve_rollback) {
@@ -367,7 +429,8 @@ int reliefos_boot_install(const struct reliefos_boot_install_options *options)
     }
     int root = boot_open_directory(options->boot_dir);
     if (root < 0) return root;
-    result = boot_walk_payload(options, root, 1);
+    result = reliefos_kernel_bundle_publish(installed_root, options->boot_dir, identity.release);
+    if (!result) result = boot_walk_payload(options, root, 1);
     if (!result && options->install_bios) {
         fprintf(stderr, "[boot-install] installing BIOS loader on %s\n", options->disk_path);
         result = boot_install_bios(options);
@@ -392,4 +455,9 @@ int reliefos_boot_install(const struct reliefos_boot_install_options *options)
     if (!result) result = boot_retire_legacy(root);
     close(root);
     return result;
+}
+
+int reliefos_boot_install(const struct reliefos_boot_install_options *options)
+{
+    return reliefos_boot_install_at_root(options, "/");
 }

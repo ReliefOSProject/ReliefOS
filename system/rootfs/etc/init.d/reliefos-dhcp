@@ -10,7 +10,7 @@ respawn_max=3
 respawn_period=60
 output_log=/var/log/udhcpc.log
 error_log=/var/log/udhcpc.log
-depend() { need reliefos-runtime; provide net; }
+depend() { need reliefos-runtime reliefos-modules; provide net; }
 
 start_pre() {
     rm -f /run/reliefos/dhcp-lease || return 1

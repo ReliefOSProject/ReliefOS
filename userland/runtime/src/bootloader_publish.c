@@ -73,7 +73,7 @@ int boot_open_directory(const char *path)
 }
 
 /** @brief Return the held safe parent and bounded leaf for a relative destination. */
-static int open_parent(int root, const char *relative, int create, char leaf[256])
+int boot_open_parent(int root, const char *relative, int create, char leaf[256])
 {
     if (!relative_valid(relative)) return -EINVAL;
     char path[BOOT_PATH_MAX];
@@ -93,9 +93,14 @@ static int open_parent(int root, const char *relative, int create, char leaf[256
 int boot_open_file(int root, const char *relative)
 {
     char leaf[256];
-    int parent = open_parent(root, relative, 0, leaf);
+    int parent = boot_open_parent(root, relative, 0, leaf);
     if (parent < 0) return parent;
-    int fd = openat(parent, leaf, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+    struct stat before;
+    if (fstatat(parent, leaf, &before, AT_SYMLINK_NOFOLLOW) < 0) {
+        int error = -errno; close(parent); return error;
+    }
+    if (!S_ISREG(before.st_mode)) { close(parent); return -EINVAL; }
+    int fd = openat(parent, leaf, O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC);
     int error = errno;
     close(parent);
     if (fd < 0) return -error;
@@ -112,7 +117,7 @@ static int check_destination(int root, const char *relative, int directory,
                               const struct stat *source)
 {
     char leaf[256];
-    int parent = open_parent(root, relative, 0, leaf);
+    int parent = boot_open_parent(root, relative, 0, leaf);
     if (parent == -ENOENT) return 0;
     if (parent < 0) return parent;
     struct stat target;
@@ -161,7 +166,7 @@ static int publish(const struct reliefos_boot_install_options *options, int root
                     const char *relative, int source, const char *data, size_t length)
 {
     char leaf[256], temporary[64];
-    int parent = open_parent(root, relative, 1, leaf);
+    int parent = boot_open_parent(root, relative, 1, leaf);
     if (parent < 0) return parent;
     struct stat existing;
     if (!fstatat(parent, leaf, &existing, AT_SYMLINK_NOFOLLOW) && !S_ISREG(existing.st_mode)) {
@@ -213,7 +218,7 @@ int boot_publish_file(const struct reliefos_boot_install_options *options, int r
 {
     if (only_missing) {
         char leaf[256];
-        int parent = open_parent(root, relative, 0, leaf);
+        int parent = boot_open_parent(root, relative, 0, leaf);
         if (parent >= 0) {
             struct stat st;
             int found = fstatat(parent, leaf, &st, AT_SYMLINK_NOFOLLOW);
@@ -243,13 +248,19 @@ int boot_publish_record(const struct reliefos_boot_install_options *options, int
     return publish(options, root, relative, -1, data, length);
 }
 
+int boot_publish_descriptor(const struct reliefos_boot_install_options *options, int root,
+                            const char *relative, int source)
+{
+    return publish(options, root, relative, source, NULL, 0);
+}
+
 /** @brief Retire old loader files without following their names outside the boot tree. */
 int boot_retire_legacy(int root)
 {
     const char *const files[] = {"loader.elf", "reliefos/loader.elf", "leonos/loader.elf"};
     for (unsigned i = 0; i < 3; ++i) {
         char leaf[256];
-        int parent = open_parent(root, files[i], 0, leaf);
+        int parent = boot_open_parent(root, files[i], 0, leaf);
         if (parent == -ENOENT) continue;
         if (parent < 0) return parent;
         int result = unlinkat(parent, leaf, 0) < 0 && errno != ENOENT ? -errno : 0;
@@ -267,6 +278,12 @@ static int walk(const struct reliefos_boot_install_options *options, int root,
     if (depth > 16) return -ELOOP;
     if (!strcmp(relative, "reliefos/config/bootloaders.conf") ||
         !strcmp(relative, "reliefos/config/root.cfg")) return 0;
+    /* The checked publisher alone owns kernel activation and immutable version
+     * files. Copying a media's A/B state would erase the installed generation. */
+    if (!strcmp(relative, "reliefos/state") || !strcmp(relative, "reliefos/versions") ||
+        !strcmp(relative, "reliefos/kernel.sys") || !strcmp(relative, "reliefos/initramfs.cpio") ||
+        !strcmp(relative, "reliefos/boot.json") || !strcmp(relative, "leonos/kernel.sys") ||
+        !strcmp(relative, "leonos/initramfs.cpio")) return 0;
     if (!strcmp(relative, "grub/i386-pc") && !options->install_bios) return 0;
     char path[BOOT_PATH_MAX];
     int result = boot_join(path, options->source, relative);

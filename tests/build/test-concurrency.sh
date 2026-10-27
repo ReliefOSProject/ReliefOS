@@ -146,7 +146,29 @@ for tree in "$other_a" "$other_b"; do
     else
         fail "$name has its own kernel image" 'missing or empty'
     fi
-    if grep -qF -- "$tree" "$tree/reliefnt/arch/x86_64/.apic.o.cmd" 2>/dev/null; then
+    # Follow the native archive rather than assuming a kernel source layout.
+    # Every object must belong to this O, and its recorded command must use
+    # this O's generated headers. A moved source cannot make this a false fail.
+    llvm-ar t "$tree/reliefnt/built-in.a" > "$work/$name-members"
+    records_ok=1
+    source_records=0
+    while IFS= read -r member; do
+        case $member in "$tree/reliefnt/"*) ;; *) records_ok=0; break ;; esac
+        record="${member%/*}/.${member##*/}.cmd"
+        if [ ! -s "$member" ] || [ ! -s "$record" ]; then
+            records_ok=0
+            break
+        fi
+        # A composite has a link record; only compilation records use headers.
+        if grep -q '^source_' "$record"; then
+            source_records=$((source_records + 1))
+            if ! grep -qF -- "$tree/reliefnt/include" "$record"; then
+                records_ok=0
+                break
+            fi
+        fi
+    done < "$work/$name-members"
+    if [ "$records_ok" -eq 1 ] && [ "$source_records" -gt 50 ]; then
         pass "$name's native command record points at $name"
     else
         fail "$name's native command record points at $name" \

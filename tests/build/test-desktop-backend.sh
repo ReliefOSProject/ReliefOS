@@ -54,6 +54,15 @@ legacy_brand=leon
 legacy_brand=${legacy_brand}os
 printf '%s\n' fixture > "$work/out/system/lib/lib${legacy_brand}.so.2"
 printf '%s\n' fixture > "$work/out/generated/system/kerneldebug.sys"
+# This layout-only fixture represents the separately verified kernel bundle.
+# Real identity/checksum and dependency validation belongs to test-kernel-payload.
+mkdir -p "$work/out/stage/kernel-payload/lib/modules/desktop-fixture" \
+    "$work/out/stage/kernel-payload/usr/lib/reliefos/kernel/desktop-fixture"
+printf '{"schema":1,"release":"desktop-fixture"}\n' > "$work/out/stage/kernel-payload/kernel-payload.json"
+printf 'CONFIG_MODULES=y\n' > "$work/out/stage/kernel-payload/lib/modules/desktop-fixture/config"
+printf 'kernel fixture\n' > "$work/out/stage/kernel-payload/usr/lib/reliefos/kernel/desktop-fixture/kernel.sys"
+mkdir -p "$work/out/userland/initramfs"
+printf 'kernel bundle tool fixture\n' > "$work/out/userland/initramfs/kernel-bundle.elf"
 printf '%s\n' fixture > "$work/out/userland/motd.elf"
 printf '%s\n' fixture > "$work/out/userland/bootinstall.elf"
 for command in sbin/grub-install sbin/grub-bios-setup sbin/grub-probe bin/grub-mkimage; do

@@ -34,6 +34,24 @@ HTML 文档另需 Sphinx，见 :doc:`../process/documentation`。Sphinx 仅服�
 内核缓存独立。普通构建缺缓存应报错，不暗中下载。第三方保留自己的上游构建系统。
 源码与公开头从各自所有者导出，不从历史 build 目录补齐。
 
+配置内核
+========
+
+``make defconfig`` 有序重置 ReliefOS 与 ReliefNT 的默认配置。内核输出默认
+在 ``O/reliefnt``；``RELIEFNT_O=`` 可指定另一输出目录，相对路径从调用
+顶层 make 的目录解析。默认将生产部件内置；普通构建及 OS 的
+``olddefconfig`` 不重置已有内核选择。
+
+用以下目标编辑同一内核输出的配置::
+
+    make kernel-menuconfig
+    make kernel-olddefconfig
+    make kernel-allmodconfig
+
+前者打开 ReliefNT 原生菜单，第二个保留已有选择并解析新增选项，第三个将
+支持独立模块的部件选为 ``m``。内核与 OS 分别持有配置，应用、镜像和
+QEMU 选项继续在 OS 菜单中配置。仅已完成运行时边界的部件才提供 ``m``。
+
 增量与排错
 ==========
 

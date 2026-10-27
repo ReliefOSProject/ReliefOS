@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import json
 from pathlib import Path
 import re
 import shutil
@@ -18,22 +19,51 @@ def require(value: bool, text: str) -> None:
     print(f"PASS {text}", flush=True)
 
 
-def archive_objects(source: Path, directory: Path = Path()) -> list[str]:
-    """Read explicit local obj-y ownership in native archive traversal order."""
-    entries: list[str] = []
-    text = (source / directory / "Kbuild").read_text().replace("\\\n", " ")
-    for line in text.splitlines():
-        match = re.match(r"^obj-y\s*([:+]?=)\s*(.*?)\s*(?:#.*)?$", line)
-        if match:
-            if match[1] in ("=", ":="):
-                entries = []
-            entries.extend(match[2].split())
+def archive_objects(source: Path, configuration: dict[str, str], directory: Path = Path()) -> list[str]:
+    """Read enabled local builtin/composite objects in native traversal order."""
+    lists: dict[str, list[str]] = {}
+
+    def read_list(path: Path) -> None:
+        for line in path.read_text().replace("\\\n", " ").splitlines():
+            child = re.fullmatch(r"include \$\(src\)/([A-Za-z0-9_-]+)/Kbuild", line)
+            if child:
+                read_list(path.parent / child[1] / "Kbuild")
+                continue
+            line = re.sub(r"\$\((CONFIG_[A-Z0-9_]+)\)",
+                          lambda match: configuration.get(match[1], "n"), line)
+            match = re.match(r"^([A-Za-z0-9_.-]+)\s*([:+]?=)\s*(.*?)\s*(?:#.*)?$", line)
+            if not match:
+                continue
+            key, operation, value = match.groups()
+            prefix = re.fullmatch(r"\$\(addprefix ([A-Za-z0-9_-]+/),\$\(([A-Za-z0-9_.-]+)\)\)", value)
+            entries = ([prefix[1] + item for item in lists[prefix[2]]]
+                       if prefix else value.split())
+            if operation in ("=", ":="):
+                lists[key] = []
+            lists.setdefault(key, []).extend(entries)
+
+    read_list(source / directory / "Kbuild")
     result: list[str] = []
-    for entry in entries:
-        if entry.endswith("/") and "/" not in entry[:-1]:
-            result.extend(archive_objects(source, directory / entry))
-        elif entry.endswith(".o") and "/" not in entry:
+
+    def append_object(entry: str) -> None:
+        # Native builtin archives flatten composite members; the same list
+        # becomes a relocatable composite when selected as a module.
+        members = lists.get(entry[:-2] + "-y", lists.get(entry[:-2] + "-objs"))
+        if members is not None:
+            for member in members:
+                append_object(member)
+        else:
+            # Generated sources such as vdso_blob.S also belong to the local
+            # explicit list; the kernel's ownership audit checks their rules.
+            if not entry.endswith(".o") or any(part in ("", ".", "..") for part in entry.split("/")):
+                raise AssertionError(f"invalid native member: {directory}/{entry}")
             result.append((directory / entry).as_posix())
+
+    for entry in lists.get("obj-y", []):
+        if entry.endswith("/") and "/" not in entry[:-1]:
+            result.extend(archive_objects(source, configuration, directory / entry))
+        elif entry.endswith(".o") and "/" not in entry:
+            append_object(entry)
         else:
             raise AssertionError(f"non-local Kbuild member: {directory}/{entry}")
     return result
@@ -118,11 +148,21 @@ def main() -> None:
         require(len(baseline) > 200, "production kernel and runtime first-party objects built")
         members = subprocess.check_output(["llvm-ar", "t", str(kernel / "built-in.a")], text=True).splitlines()
         members = [str(Path(path).resolve().relative_to(kernel)) for path in members]
-        expected = archive_objects(source)
+        configuration = dict(line.split("=", 1) for line in (kernel / ".config").read_text().splitlines()
+                             if line.startswith("CONFIG_") and "=" in line)
+        expected = archive_objects(source, configuration)
         require(members == expected, "archive contains exactly the intended source objects in order")
         output_before = (out / "generated/system/kernel.sys").read_bytes()
         build()
-        require(baseline == objects(), "no-op leaves all native object mtimes unchanged")
+        noop = objects()
+        if baseline != noop:
+            report = {"added": [str(p) for p in noop.keys() - baseline.keys()],
+                      "removed": [str(p) for p in baseline.keys() - noop.keys()],
+                      "changed": {str(p): {"before": [str(baseline[p][0]), baseline[p][1]],
+                                           "after": [str(noop[p][0]), noop[p][1]]}
+                                  for p in baseline.keys() & noop.keys() if baseline[p] != noop[p]}}
+            (logs / "noop-difference.json").write_text(json.dumps(report, indent=2))
+        require(baseline == noop, "no-op leaves all native object mtimes unchanged")
 
         file = source / "kernel/ipc/futex.c"
         file.touch()
@@ -144,13 +184,19 @@ def main() -> None:
 
         before = current
         public = source / "include/uapi/reliefos/fs_abi.h"
-        public.write_text(public.read_text() + "\n/* isolated Kbuild UAPI dependency probe */\n")
+        public_before = public.read_bytes()
+        public.write_bytes(public_before + b"\n/* isolated Kbuild UAPI dependency probe */\n")
         build()
         current = objects()
         require(bool(changed(runtime_only(before), runtime_only(current))),
                 "exported UAPI content change rebuilds runtime consumers")
         require((out / "kernel-export/include/reliefos/fs_abi.h").read_bytes() == public.read_bytes(),
                 "parent header publication has the changed UAPI bytes")
+        public.write_bytes(public_before)
+        build()
+        current = objects()
+        require(output_before == (out / "generated/system/kernel.sys").read_bytes(),
+                "restoring UAPI source restores its exact native ABI and kernel bytes")
 
         before = current
         build("KERNEL_CFLAGS=-DRELIEFNT_KBUILD_FLAG_PROBE=1")
@@ -172,13 +218,25 @@ def main() -> None:
 
         before = objects()
         archive_time = (kernel / "built-in.a").stat().st_mtime_ns
-        wrapper.write_text(wrapper.read_text() + "# in-place tool identity change\n")
+        wrapper_before = wrapper.read_bytes()
+        release_before = (kernel / "include/config/kernel.release").read_bytes()
+        abi_consumers = {obj for obj in before if "include/generated/module_abi.h" in
+                         obj.with_name(f".{obj.name}.cmd").read_text()}
+        wrapper.write_bytes(wrapper_before + b"# in-place tool identity change\n")
         build()
         require((kernel / "built-in.a").stat().st_mtime_ns != archive_time,
                 "archiver replacement at the same path rebuilds the archive immediately")
-        require(before == objects(), "archiver replacement recompiles no C or assembly")
+        current = objects()
+        require(release_before != (kernel / "include/config/kernel.release").read_bytes(),
+                "changed archiver bytes invalidate the conservative native module ABI")
+        require(changed(before, current) <= abi_consumers and runtime_only(before) == runtime_only(current),
+                "archiver replacement recompiles only actual ABI-header consumers")
         build()
-        require(before == objects(), "tool identity invalidation settles to no-op")
+        require(current == objects(), "tool identity invalidation settles to no-op")
+        wrapper.write_bytes(wrapper_before)
+        build()
+        require(output_before == (out / "generated/system/kernel.sys").read_bytes(),
+                "restoring identical tool bytes restores the original native ABI and kernel")
 
         before = objects()
         victim = next(obj for obj, (file, _) in before.items() if file == source / "kernel/ipc/futex.c")

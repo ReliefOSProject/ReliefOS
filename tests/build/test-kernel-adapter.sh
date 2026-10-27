@@ -93,8 +93,8 @@ adapter_contract() {
             NTCLKS_DIR="$work/old-kernel" NTCLKS_O="$work/old-out" kernel \
             >"$work/plan-priority.log" 2>&1 &&
             grep -Fq -- "-C '$work/new-kernel' O='$work/new-out'" "$work/plan-priority.log" &&
-            ! grep -Fq -- "$work/old-kernel" "$work/plan-priority.log" &&
-            ! grep -Fq -- "$work/old-out" "$work/plan-priority.log"; then
+            ! grep -Fq -- "-C '$work/old-kernel'" "$work/plan-priority.log" &&
+            ! grep -Fq -- " O='$work/old-out'" "$work/plan-priority.log"; then
         pass 'new adapter variables take priority when both spellings are set'
     else
         fail 'new adapter variables take priority when both spellings are set' \

@@ -10,6 +10,7 @@
    installation
    desktop
    packages
+   kernel-modules
    openrc-controller
    accounts
    console

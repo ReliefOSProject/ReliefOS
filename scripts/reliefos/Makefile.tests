@@ -62,6 +62,9 @@ define RELIEFOS_RUN_CONTRACT_TESTS
 	       GRUB_EFI_DIR='$(GRUB_EFI_DIR)' \
 	       RELIEFOS_EMIT='$(RELIEFOS_EMIT)' \
 	       LEONOS_EMIT='$(RELIEFOS_EMIT)' \
+	       RELIEFOS_TEST_BUSYBOX='$(abspath $(INITRAMFS_BUSYBOX_ELF))' \
+	       RELIEFOS_KERNEL_TOOLS='$(abspath $(RELIEFOS_KERNEL_TOOLS))' \
+	       RELIEFOS_TEST_RECOVERY='$(abspath $(RELIEFOS_KERNEL_RECOVERY))' \
 	       sh $$contract_test >$$report 2>&1; then status=0; else status=1; fi; \
 	    cat $$report; \
 	    if grep -q 'FAIL - ' $$report; then status=1; fi; \
@@ -76,7 +79,7 @@ endef
 leonos-test-tools-plain: reliefos-test-tools-plain
 leonos-test-tools-sanitised: reliefos-test-tools-sanitised
 
-test-build: test-tools $(RELIEFOS_HOST_TOOLS)
+test-build: test-tools $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY)
 	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_BUILD_TESTS))
 	@$(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_xorg_qemu.py --source-only
 
@@ -93,6 +96,12 @@ test-audio:
 
 test: test-tools test-build
 
+.PHONY: test-directory-api
+test-directory-api:
+	$(Q)python3 $(RELIEFOS_SRC)/tools/test_directory_api.py
+
+test: test-directory-api
+
 # Kernel implementation tests are owned and selected by ReliefNT. The parent
 # preserves convenient Make goals and delegates; it owns no kernel suite list.
 RELIEFOS_KERNEL_TEST_GOALS := test-vdso test-smp-time test-page-cache-growth \
@@ -100,7 +109,7 @@ RELIEFOS_KERNEL_TEST_GOALS := test-vdso test-smp-time test-page-cache-growth \
 .PHONY: $(RELIEFOS_KERNEL_TEST_GOALS)
 $(RELIEFOS_KERNEL_TEST_GOALS):
 	$(Q)mkdir -p $(O)/tmp/kernel-tests
-	+$(Q)$(MAKE) -C '$(RELIEFNT_DIR)' O='$(abspath $(O))/kernel-tests/$@' \
+	+$(Q)$(RELIEFNT_CONFIG_ENV) $(MAKE) -C '$(RELIEFNT_DIR)' O='$(abspath $(O))/kernel-tests/$@' \
 	 TMPDIR='$(or $(TMPDIR),$(abspath $(O))/tmp/kernel-tests)' \
 	 RELIEFNT_TEST_PYTHON='$(or $(RELIEFOS_TEST_PYTHON),python3)' \
 	 $(patsubst test-kernel-%,test-%,$@)
@@ -136,3 +145,12 @@ test-reliefapk:
 .PHONY: test-reliefapk-apk
 test-reliefapk-apk: $(UPSTREAM_APK)
 	$(Q)TMPDIR='$(abspath $(O))/tmp' python3 $(RELIEFOS_SRC)/tools/tests/test_reliefapk_apk.py --apk $(abspath $(UPSTREAM_APK))
+
+.PHONY: test-kernel-update
+test-kernel-update: $(RELIEFOS_KERNEL_TOOLS) $(RELIEFOS_KERNEL_RECOVERY) $(USERLAND_DIR)/bootinstall.elf $(INITRAMFS_BUSYBOX_ELF) $(UPSTREAM_APK)
+	$(Q)mkdir -p '$(abspath $(O))/tmp'
+	$(Q)TMPDIR='$(abspath $(O))/tmp' RELIEFOS_KERNEL_TOOLS='$(abspath $(RELIEFOS_KERNEL_TOOLS))' \
+	 RELIEFOS_TEST_RECOVERY='$(abspath $(RELIEFOS_KERNEL_RECOVERY))' \
+	 RELIEFOS_TEST_BOOTINSTALL='$(abspath $(USERLAND_DIR))/bootinstall.elf' \
+	 RELIEFOS_TEST_BUSYBOX='$(abspath $(INITRAMFS_BUSYBOX_ELF))' RELIEFOS_TEST_APK='$(abspath $(UPSTREAM_APK))' \
+	 python3 $(RELIEFOS_SRC)/tools/test_kernel_update.py

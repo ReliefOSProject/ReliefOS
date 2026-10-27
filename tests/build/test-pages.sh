@@ -9,6 +9,9 @@
 set -eu
 
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+: "${RELIEFOS_KERNEL_TOOLS:=$src/out/kbuild-os-native/host/bin/reliefos-kernel-tools}"
+RELIEFOS_KERNEL_RECOVERY=${RELIEFOS_TEST_RECOVERY:-$src/out/kbuild-os-native/userland/initramfs/kernel-bundle.elf}
+export RELIEFOS_KERNEL_TOOLS RELIEFOS_KERNEL_RECOVERY
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 fail=0
@@ -17,16 +20,13 @@ bad()  { printf 'FAIL - %s\n' "$1"; fail=1; }
 
 build="$tmp/build_info.h"
 printf '#define RELIEFOS_KERNEL_VERSION "4.9.1"\n' > "$build"
-head -c 8192 /dev/zero > "$tmp/kernel.sys"
 head -c 123456 /dev/zero > "$tmp/reliefos-installer.iso"
 
-# The kernel side of the release metadata: an install manifest whose per-artifact
-# hashes match these exact bytes, and the kernel's build-version file.
-mkdir -p "$tmp/kernel-install"
+# The complete kernel/module/initramfs fixture uses the actual native producers
+# and runtime verifier. APK encoding/signatures have their own real integration
+# test; this Pages fixture deliberately checks layout with a recording encoder.
+python3 "$src/tools/tests/make_kernel_bundle_fixture.py" "$tmp/kernel-payload" "$tmp/kernel.sys"
 kernel_hash=$(sha256sum "$tmp/kernel.sys" | cut -d' ' -f1)
-manifest="$tmp/kernel-install/manifest.txt"
-printf 'format_version: 1\narch: x86_64\nartifacts:\n  %s  kernel.sys\n' \
-    "$kernel_hash" > "$manifest"
 version_src="$tmp/build-version"
 printf 'kernel_name=ReliefNT\nrelease_version=4.9.1\n' > "$version_src"
 
@@ -35,12 +35,21 @@ mkdir -p "$tmp/fake-bin"
 cat > "$tmp/fake-bin/apk" <<'EOF'
 #!/bin/sh
 set -eu
+case " $* " in
+    *' extract '*)
+        while [ "$1" != --destination ]; do shift; done
+        destination=$2
+        cp -a "$RELIEFOS_RPR_TEST_PAYLOAD/lib" "$RELIEFOS_RPR_TEST_PAYLOAD/usr" "$destination/"
+        exit 0 ;;
+esac
 [ "$1" = mkndx ] || exit 0
 out=
 while [ "$#" -gt 0 ]; do [ "$1" = --output ] && out=$2; shift; done
 [ -n "$out" ] && : > "$out"
 EOF
 chmod 755 "$tmp/fake-bin/apk"
+RELIEFOS_RPR_TEST_PAYLOAD=$tmp/kernel-payload
+export RELIEFOS_RPR_TEST_PAYLOAD
 
 # Real 0600 signing key so the pub-key export path is exercised.
 openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out "$tmp/key" 2>/dev/null
@@ -49,11 +58,12 @@ chmod 600 "$tmp/key"
 # Two package sources so the generated list has >1 row.
 mkdir -p "$tmp/repository" "$tmp/apps"
 printf aaa > "$tmp/repository/reliefos-musl-4.9.1-r5.apk"
+printf kernel-package-fixture > "$tmp/repository/reliefos-kernel-4.9.1-r5.apk"
 printf bb  > "$tmp/apps/reliefos-helloworld-4.9.1-r5.apk"
 
 # 1. Build the RPR subtree, then assemble the full Pages tree.
 sh "$src/tools/build/rpr-pages.sh" "$tmp/repository" "$tmp/apps" \
-    "$tmp/kernel.sys" "$manifest" "$version_src" \
+    "$tmp/kernel.sys" "$tmp/kernel-payload" "$version_src" \
     "$tmp/fake-bin/apk" "$tmp/key" "$tmp/rpr-pages" \
     || { echo 'rpr-pages.sh failed' >&2; exit 1; }
 sh "$src/tools/build/site.sh" "$tmp/rpr-pages" "$tmp/reliefos-installer.iso" \
@@ -121,7 +131,7 @@ fi
 # 3. Every machine-interface file survived the move under /rpr/.
 for f in rpr/apk/packages.adb rpr/apk/repository.json rpr/apk/reliefos-rpr.rsa.pub rpr/apk/leonos-rpr.rsa.pub \
          rpr/apk/SHA256SUMS rpr/kernel/release.txt rpr/kernel/release.json \
-         rpr/kernel/kernel.sys rpr/kernel/SHA256SUMS \
+         rpr/kernel/kernel.sys rpr/kernel/initramfs.cpio rpr/kernel/bundle.json rpr/kernel/SHA256SUMS \
          rpr/manifest.json rpr/health.txt; do
     [ -f "$tmp/pages/$f" ] || bad "machine interface lost $f"
 done
@@ -132,12 +142,12 @@ grep -q '^version=4.9.1$' "$tmp/pages/rpr/kernel/release.txt" \
     && ok 'release.txt version matches build' \
     || bad 'release.txt version drifted from build'
 
-# 4b. The release.txt key set and the pairing hash are the fixed machine
-#     contract (format_version=3: kernel.sys is the single release unit).
+# 4b. Protocol 4 couples the verified module inventory and initramfs to the
+#     exact signed package/index cohort. Legacy kernel-only clients refuse it.
 keys=$(sed 's/=.*//' "$tmp/pages/rpr/kernel/release.txt" | LC_ALL=C sort | tr '\n' ' ')
-expected_keys='format_version image_version kernel_file kernel_sha256 version '
+expected_keys='bundle_manifest_sha256 format_version image_version initramfs_sha256 kernel_release kernel_sha256 module_abi module_directory package package_file package_sha256 package_version repository_sha256 version '
 if [ "$keys" = "$expected_keys" ]; then
-    ok 'release.txt key set unchanged'
+    ok 'release.txt uses the complete protocol 4 key set'
 else
     bad "release.txt key set drifted: $keys"
 fi
@@ -299,6 +309,18 @@ if sh "$src/tools/build/verify-pages.sh" "$tmp/noindex" >/dev/null 2>&1; then
 else
     ok 'verify-pages.sh rejects a missing packages.adb'
 fi
+
+# The deployment checker binds all kernel/update artifacts to the same release.
+for member in kernel/initramfs.cpio kernel/bundle.json apk/packages.adb kernel/release.json; do
+    broken="$tmp/cohort-${member##*/}"
+    cp -R "$tmp/pages" "$broken"
+    printf 'cohort corruption\n' >> "$broken/rpr/$member"
+    if sh "$src/tools/build/verify-pages.sh" "$broken" >/dev/null 2>&1; then
+        bad "verify-pages.sh accepted corrupt $member"
+    else
+        ok "verify-pages.sh rejects corrupt $member"
+    fi
+done
 
 [ "$fail" = 0 ] || exit 1
 printf 'Pages assembly and verification contract passed\n'

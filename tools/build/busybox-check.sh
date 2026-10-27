@@ -26,11 +26,20 @@ for name in find xargs dd mount umount fdisk sfdisk blkid lsblk fsck runuser \
     fi
 done
 for name in sh ash false ping ping6 df free top dmesg hexdump killall nc netstat \
-    traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod \
+    traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod depmod modinfo switch_root \
     unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch chroot setuidgid; do
     awk -F / -v name="$name" '$NF==name {found=1} END {exit !found}' "$links" || {
         echo "BusyBox applet is missing: $name" >&2
         exit 1
+    }
+done
+if grep -Eq '^CONFIG_(MODPROBE_SMALL|FEATURE_2_4_MODULES)=y$' "$config"; then
+    echo 'BusyBox requires the full Linux module dependency/configuration mechanism' >&2
+    exit 1
+fi
+for symbol in FEATURE_MODUTILS_ALIAS FEATURE_MODUTILS_SYMBOLS FEATURE_MODPROBE_BLACKLIST FEATURE_CMDLINE_MODULE_OPTIONS; do
+    grep -Fqx "CONFIG_$symbol=y" "$config" || {
+        echo "BusyBox module support is missing: CONFIG_$symbol" >&2; exit 1;
     }
 done
 for path in /bin/sh /bin/ash /bin/false; do

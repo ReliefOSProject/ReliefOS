@@ -14,29 +14,13 @@
 # into the output (plan §25).
 set -eu
 [ "$#" = 8 ] || exit 2
-repository=$1 apps=$2 kernel=$3 manifest=$4 version_src=$5 apk=$6 key=$7 output=$8
+repository=$1 apps=$2 kernel=$3 payload=$4 version_src=$5 apk=$6 key=$7 output=$8
+: "${RELIEFOS_KERNEL_TOOLS:?set the native Kbuild kernel tool}"
+: "${RELIEFOS_KERNEL_RECOVERY:?set the static Kbuild bundle verifier}"
 [ ! -L "$key" ] && [ -f "$key" ] && [ "$(stat -c %a "$key")" = 600 ] || { echo 'private signing key must be a regular 0600 file' >&2; exit 1; }
 version=$(sed -n 's/^release_version=//p' "$version_src" | head -n1)
 printf '%s\n' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo 'invalid release version' >&2; exit 1; }
 image=$version
-
-# The pairing hash is read from the kernel install manifest, which records
-# what the kernel checkout actually built and installed; it is then checked
-# against the bytes this script is about to publish, so advertising a hash
-# that is not the shipped file's would break the update contract.
-manifest_hash() {
-    hash=$(awk -v name="$1" 'NF == 2 && $2 == name { print $1; exit }' "$manifest")
-    printf '%s\n' "$hash" | grep -Eq '^[0-9a-f]{64}$' || {
-        echo "kernel manifest has no sha256 for $1" >&2
-        exit 1
-    }
-    printf '%s\n' "$hash"
-}
-kernel_hash=$(manifest_hash kernel.sys)
-[ "$kernel_hash" = "$(sha256sum "$kernel" | cut -d' ' -f1)" ] || {
-    echo 'kernel.sys does not match the kernel manifest' >&2
-    exit 1
-}
 
 # Generators share escaping, page chrome and size formatting from one file so
 # the RPR and download/home pages stay visually identical and no logic is
@@ -50,7 +34,7 @@ work=$(CDPATH= cd -- "$work" && pwd -P)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 mkdir -p "$work/site/apk" "$work/site/kernel" "$work/site/packages" "$work/site/css"
 
-# --- machine interface: compatible paths, canonical package identities -----
+# --- signed package repository, including one complete current kernel ------
 openssl pkey -in "$key" -pubout -out "$work/site/apk/reliefos-rpr.rsa.pub" 2>/dev/null
 cp "$work/site/apk/reliefos-rpr.rsa.pub" "$work/site/apk/leonos-rpr.rsa.pub"
 chmod 644 "$work/site/apk/reliefos-rpr.rsa.pub" "$work/site/apk/leonos-rpr.rsa.pub"
@@ -69,6 +53,36 @@ for source in "$repository"/reliefos-*.apk "$apps"/reliefos-*.apk; do
     cp "$source" "$work/site/apk/$name"
 done
 "$apk" mkndx --keys-dir "$work/site/apk" --sign-key "$key" --output "$work/site/apk/packages.adb" "$work/site/apk"/*.apk
+kernel_package=
+for file in "$work/site/apk"/reliefos-kernel-[0-9]*.apk; do
+    [ -f "$file" ] || continue
+    [ -z "$kernel_package" ] || { echo 'RPR must contain exactly one current kernel package' >&2; exit 1; }
+    kernel_package=$file
+done
+[ -n "$kernel_package" ] || { echo 'RPR is missing its complete signed kernel package' >&2; exit 1; }
+"$RELIEFOS_KERNEL_TOOLS" release-info "$payload" "$kernel" "$kernel_package" \
+    "$work/site/apk/packages.adb" "$image" "$RELIEFOS_KERNEL_RECOVERY" > "$work/site/kernel/release.txt"
+release_field() { sed -n "s/^$1=//p" "$work/site/kernel/release.txt"; }
+kernel_release=$(release_field kernel_release)
+module_abi=$(release_field module_abi)
+kernel_hash=$(release_field kernel_sha256)
+initramfs_hash=$(release_field initramfs_sha256)
+package_version=$(release_field package_version)
+package_file=$(release_field package_file)
+package_hash=$(release_field package_sha256)
+repository_hash=$(release_field repository_sha256)
+bundle_hash=$(release_field bundle_manifest_sha256)
+# Bind the description to the actual signed APK, not just to a separately valid
+# build directory. extract never executes package scripts or edits an APK DB.
+mkdir "$work/kernel-check"
+"$apk" --keys-dir "$work/site/apk" extract --no-chown --destination "$work/kernel-check" "$kernel_package"
+cmp -s "$payload/kernel-payload.json" "$work/kernel-check/usr/lib/reliefos/kernel/$kernel_release/bundle.json" || {
+    echo 'RPR signed kernel package and described payload disagree' >&2; exit 1;
+}
+"$RELIEFOS_KERNEL_RECOVERY" --inspect "$work/kernel-check" "$kernel_release" > "$work/kernel-actual"
+printf 'kernel_release=%s\nmodule_abi=%s\nkernel_sha256=%s\ninitramfs_sha256=%s\n' \
+    "$kernel_release" "$module_abi" "$kernel_hash" "$initramfs_hash" > "$work/kernel-expected"
+cmp -s "$work/kernel-expected" "$work/kernel-actual" || { echo 'RPR APK boot identity mismatch' >&2; exit 1; }
 (cd "$work/site/apk" && sha256sum ./*.apk leonos-rpr.rsa.pub reliefos-rpr.rsa.pub packages.adb | sed 's|  ./|  |' | LC_ALL=C sort -k2 > SHA256SUMS)
 {
     printf '{"architecture":"x86_64","index":"packages.adb","public_key":"reliefos-rpr.rsa.pub","legacy_public_key":"leonos-rpr.rsa.pub","schema":1,"packages":['
@@ -77,15 +91,13 @@ done
     printf ']}\n'
 } > "$work/site/apk/repository.json"
 cp "$kernel" "$work/site/kernel/kernel.sys"
-cat > "$work/site/kernel/release.txt" <<RELEASE
-format_version=3
-image_version=$image
-version=$version
-kernel_file=kernel.sys
-kernel_sha256=$kernel_hash
-RELEASE
-printf '%s  kernel.sys\n' "$kernel_hash" > "$work/site/kernel/SHA256SUMS"
-printf '{"architecture":"x86_64","image_version":"%s","files":{"kernel.sys":{"sha256":"%s"}},"schema":1,"version":"%s"}\n' "$image" "$kernel_hash" "$version" > "$work/site/kernel/release.json"
+cp "$payload/usr/lib/reliefos/kernel/$kernel_release/initramfs.cpio" "$work/site/kernel/initramfs.cpio"
+cp "$payload/kernel-payload.json" "$work/site/kernel/bundle.json"
+printf '%s  kernel.sys\n%s  initramfs.cpio\n%s  bundle.json\n' \
+    "$kernel_hash" "$initramfs_hash" "$bundle_hash" > "$work/site/kernel/SHA256SUMS"
+printf '{"architecture":"x86_64","schema":4,"image_version":"%s","version":"%s","kernel_release":"%s","module_abi":"%s","module_directory":"lib/modules/%s","files":{"kernel.sys":{"sha256":"%s"},"initramfs.cpio":{"sha256":"%s"},"bundle.json":{"sha256":"%s"}},"package":{"name":"reliefos-kernel","version":"%s","file":"%s","sha256":"%s"},"repository_sha256":"%s"}\n' \
+    "$image" "$version" "$kernel_release" "$module_abi" "$kernel_release" "$kernel_hash" "$initramfs_hash" "$bundle_hash" \
+    "$package_version" "$package_file" "$package_hash" "$repository_hash" > "$work/site/kernel/release.json"
 printf '{"apk":"/apk/packages.adb","kernel":"/kernel/release.txt","schema":1,"version":"%s"}\n' "$version" > "$work/site/manifest.json"
 printf 'leonos-rpr-ok\n' > "$work/site/health.txt"
 printf '%s\n' "$version" > "$work/site/.complete"
@@ -116,7 +128,7 @@ list is generated by the ReliefOS build system from the real repository contents
 </section>
 <section>
 <h2>Kernel</h2>
-<p>Latest <code>kernel.sys</code> release, with SHA-256 checksums.</p>
+<p>Matching kernel, initramfs and module inventory, delivered by a signed APK package.</p>
 <p><a href="kernel/index.html">Kernel information</a></p>
 </section>
 <section>
@@ -240,11 +252,17 @@ done
 <section>
 <h2>Kernel files</h2>
 <dl class="meta">
+<dt>Kernel release</dt><dd>$(printf '%s' "$kernel_release" | site_html_escape)</dd>
+<dt>Module ABI</dt><dd class="hash">$(printf '%s' "$module_abi" | site_html_escape)</dd>
 <dt>kernel.sys</dt><dd class="hash">$(printf '%s' "$kernel_hash" | site_html_escape)</dd>
+<dt>initramfs.cpio</dt><dd class="hash">$(printf '%s' "$initramfs_hash" | site_html_escape)</dd>
 <div class="clear"></div>
 </dl>
 <p>
-<a class="button" href="kernel.sys">Download kernel.sys</a>
+<a class="button" href="../apk/$package_file">Download signed kernel package</a>
+<a href="kernel.sys">kernel.sys</a>
+<a href="initramfs.cpio">initramfs.cpio</a>
+<a href="bundle.json">Module and file inventory</a>
 <a href="../../docs/reliefnt/index.html">ReliefNT kernel documentation</a>
 </p>
 </section>

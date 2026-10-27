@@ -179,17 +179,29 @@ def wait_motif_sidebar(probe, process, frame_name, timeout=60):
     return wait_installer_sidebar(probe, process, frame_name, timeout)
 
 
+def installer_root_extent(text):
+    """Locate the classified reserved filesystem carrier, excluding newc bytes."""
+    matches = re.findall(r"\[boot\] module=[0-9]+ name=(?:reliefos|leonos)-installer-root start=(0x[0-9a-fA-F]+) bytes=([0-9]+)", text)
+    if len(matches) != 1:
+        raise AssertionError("Missing or ambiguous installer filesystem boot module")
+    start, size = int(matches[0][0], 16), int(matches[0][1])
+    if not start or size < 512 or size % 512 or start + size > 1 << 64:
+        raise AssertionError("Invalid installer filesystem boot module extent")
+    return start, size
+
+
 def installer_log(probe, serial):
-    """Read the actual redirected guest stderr after the finish page appears."""
-    match = re.search(r"installer root ready ramdisk=(0x[0-9a-f]+).*bytes=(\d+)",
-                      serial.read_text(errors="replace"))
-    if not match:
-        raise AssertionError("Missing installer RAM disk location in serial log")
-    memory = probe.output / "installer-root.ext2"
+    """Read a diagnostic snapshot of the write-through reserved RAM filesystem.
+
+    Success admission separately reads the live guest log through its rescue
+    TTY; a possibly incomplete cached snapshot never proves installation.
+    """
+    start, size = installer_root_extent(serial.read_text(errors="replace"))
+    memory = probe.output / "installer-root.ext4"
     log_path = probe.output / "installer.log"
     probe.command("stop")
     try:
-        probe.command("pmemsave", {"val": int(match[1], 16), "size": int(match[2]),
+        probe.command("pmemsave", {"val": start, "size": size,
                                   "filename": str(memory)})
     finally:
         probe.command("cont")
@@ -257,9 +269,11 @@ def installer_finish_log(probe, serial, process):
     raise AssertionError("Installer rescue terminal did not return its real log")
 
 
-def wait_install(probe, serial, process, *, tty=False):
+def wait_install(probe, serial, process, *, tty=False, timeout=2400):
     """Require the real completion marker and finish UI; cached RAM logs are diagnostic."""
-    deadline = time.monotonic() + 2400
+    if timeout <= 0:
+        raise ValueError("installation timeout must be positive")
+    deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         log = serial.read_text(errors="replace")
         if any("[installer.elf]" in line and " ret=-" in line for line in log.splitlines()):
@@ -312,7 +326,7 @@ def xorg_checkbox_checked(indicator):
                       for index, channel in enumerate(color)) > 40) >= 3
 
 
-def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False):
+def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False, install_timeout=2400):
     """Complete the real GUI, optionally selecting Chinese before account setup."""
     probe.enable_installer_geometry()
     wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
@@ -373,11 +387,11 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False):
     probe.click(confirm_x, confirm_y)
     probe.frame("confirmation-ready")
     next_page(probe, 8)
-    wait_install(probe, serial, process)
+    wait_install(probe, serial, process, timeout=install_timeout)
 
 
 def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
-                install_bios=True, install_uefi=True, select_entry=True):
+                install_bios=True, install_uefi=True, select_entry=True, install_timeout=2400):
     """Answer the real TTY installer, including both independent loader choices."""
     if select_entry:
         from test_vt_qemu import ocr
@@ -411,7 +425,7 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
         wait_log(serial, prompt, process, timeout=120)
         probe.text(answer)
         probe.key("ret")
-    wait_install(probe, serial, process, tty=True)
+    wait_install(probe, serial, process, tty=True, timeout=install_timeout)
 
 
 def login_tty(probe, serial, process, root, *, skip_xorg=False):

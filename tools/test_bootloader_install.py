@@ -1,18 +1,20 @@
 """Host publication and refusal tests for the shared installer API."""
 from pathlib import Path
+import contextlib
 import os
 import hashlib
 import shlex
 import shutil
 import subprocess
 import tempfile
+import test_kernel_modules_stage as fixtures
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
     """Build production sources with sanitizers and check private target bytes."""
-    with tempfile.TemporaryDirectory(prefix="boot-install-") as temporary:
+    with tempfile.TemporaryDirectory(prefix="boot-install-") as temporary, contextlib.ExitStack() as cleanup:
         work = Path(temporary)
         executable = work / "install"
         grub = Path(os.environ.get("GRUB_HOST_ROOT", ROOT / "out/dualboot-build/grub-host")).resolve()
@@ -49,9 +51,16 @@ exec "$grub/bin/grub-bios-setup" -s --root-device=hd0,gpt2 \
             helpers[name] = helper
         sources = [ROOT / "userland/runtime/src" / f"bootloader{suffix}.c"
                    for suffix in ("", "_publish", "_process")]
+        sources.extend(ROOT / "userland/runtime/src" / (name + ".c") for name in
+                       ("kernel_bundle_io", "kernel_bundle_check", "kernel_bundle_slots", "kernel_bundle_publish", "kernel_bundle_sync"))
+        sources.extend((ROOT / "userland/runtime/shared/boot_slots.c",
+                        ROOT / "third_party/mbedtls/library/sha256.c",
+                        ROOT / "third_party/mbedtls/library/platform_util.c"))
+        (work / "qa_mbedtls.h").write_text("#define MBEDTLS_SHA256_C\n")
         subprocess.run([
             "cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g",
             "-fsanitize=address,undefined", "-Wall", "-Wextra", "-Werror",
+            '-DMBEDTLS_CONFIG_FILE="qa_mbedtls.h"', "-I", work, "-Ithird_party/mbedtls/include",
             f'-DBOOT_GRUB_INSTALL="{adapter}"',
             *[f'-DBOOT_{name.upper().replace("-", "_")}="{path}"' for name, path in helpers.items()],
             "-Wl,--wrap=stat,--wrap=lstat,--wrap=open,--wrap=ioctl,--wrap=fsync,--wrap=write,--wrap=setmntent",
@@ -60,8 +69,20 @@ exec "$grub/bin/grub-bios-setup" -s --root-device=hd0,gpt2 \
             "-Iuserland/runtime/include", "tests/host/test_bootloader_install.c",
             *sources, "-o", executable,
         ], cwd=ROOT, check=True)
+        fixture = fixtures.ModulesStage("test_real_metadata_dependency_closure_and_stale_output")
+        fixture.setUp()
+        cleanup.callback(fixture.doCleanups)
+        fixture.stage()
+        archive = work / "initramfs.cpio"
+        subprocess.run([fixtures.KERNEL_TOOLS, "initramfs-stage", ROOT, fixture.output,
+                        fixtures.BUSYBOX, fixtures.BUSYBOX.with_name("busybox.links"), archive, "0", fixtures.RECOVERY], check=True)
+        final_root = work / "final-root"
+        subprocess.run([fixtures.KERNEL_TOOLS, "kernel-payload", fixture.install, fixture.output,
+                        archive, final_root], check=True)
         source = work / "source"
-        for relative in ("reliefos/kernel.sys", "leonos/kernel.sys", "grub/grub.cfg",
+        source.mkdir()
+        subprocess.run([fixtures.KERNEL_TOOLS, "boot-payload", fixture.install / "kernel.sys", archive, source], check=True)
+        for relative in ("grub/grub.cfg", "grub/kernel-slots.cfg",
                          "grub/fonts/leonos-unicode.pf2", "grub/theme/theme.txt", "EFI/BOOT/BOOTX64.EFI"):
             file = source / relative
             file.parent.mkdir(parents=True, exist_ok=True)
@@ -71,18 +92,25 @@ exec "$grub/bin/grub-bios-setup" -s --root-device=hd0,gpt2 \
                 file.write_bytes(b"MZ" + b"\0" * 62)
             else:
                 file.write_text("new payload\n")
-        env = dict(os.environ, UBSAN_OPTIONS="halt_on_error=1", PATH="/nonexistent")
+        env = dict(os.environ, UBSAN_OPTIONS="halt_on_error=1", PATH="/nonexistent", RELIEFOS_TEST_FINAL_ROOT=str(final_root))
         for uefi in (0, 1):
             target = work / f"target-{uefi}"
             target.mkdir()
             subprocess.run([executable, source, target, "0", str(uefi), "0"], check=True, env=env)
-            assert (target / "reliefos/kernel.sys").read_bytes() == (source / "reliefos/kernel.sys").read_bytes()
+            version = target / "reliefos/versions" / fixtures.RELEASE / hashlib.sha256(archive.read_bytes()).hexdigest()
+            assert (version / "kernel.sys").read_bytes() == (source / "reliefos/kernel.sys").read_bytes()
+            assert (version / "initramfs.cpio").read_bytes() == archive.read_bytes()
+            assert not (target / "reliefos/kernel.sys").exists()
+            state = target / "reliefos/state"
+            before_slots = {path.name: path.read_bytes() for path in state.glob("kernel-*")}
             assert (target / "grub/grub.cfg").read_text() == "new payload\n"
             assert (target / "EFI/BOOT/BOOTX64.EFI").exists() == bool(uefi)
             assert not (target / "grub/i386-pc").exists()
+            (target / "leonos").mkdir(exist_ok=True)
             (target / "leonos/kernel.sys").write_text("preserved rollback")
             subprocess.run([executable, source, target, "0", "0", "1"], check=True, env=env)
             assert (target / "leonos/kernel.sys").read_text() == "preserved rollback"
+            assert before_slots == {path.name: path.read_bytes() for path in state.glob("kernel-*")}
             assert (f"uefi={uefi}\n") in (target / "reliefos/config/bootloaders.conf").read_text()
         target = work / "unsafe"
         target.mkdir()
@@ -98,6 +126,15 @@ exec "$grub/bin/grub-bios-setup" -s --root-device=hd0,gpt2 \
         assert subprocess.run([executable, source, missing_target, "0", "1", "0"], env=env).returncode
         assert list(missing_target.iterdir()) == []
         assert subprocess.run([executable, source, missing_target, "1", "0", "0"], env=env).returncode
+        (source / "EFI/BOOT/BOOTX64.EFI").write_bytes(b"MZ" + b"\0" * 62)
+        # A good media kernel is insufficient: a missing or corrupt root module
+        # must reject the whole transaction before even creating ESP state.
+        module = final_root / "lib/modules" / fixtures.RELEASE / "kernel/helper.ko"
+        original_module = module.read_bytes()
+        module.write_bytes(original_module + b"corrupt")
+        assert subprocess.run([executable, source, missing_target, "0", "1", "0"], env=env).returncode
+        assert list(missing_target.iterdir()) == []
+        module.write_bytes(original_module)
         # The metadata adapter maps Linux device nodes to owned files. Successful
         # BIOS writes are made by real locked GNU grub-bios-setup; guest tests
         # separately exercise the full upstream grub-install executable.

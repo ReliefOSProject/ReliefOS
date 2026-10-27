@@ -14,6 +14,8 @@ set -eu
 [ "$#" = 1 ] || exit 2
 site=$1
 [ -d "$site" ] || { echo "not a Pages tree: $site" >&2; exit 1; }
+verify_work=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-pages-check.XXXXXX")
+trap 'rm -rf "$verify_work"' EXIT HUP INT TERM
 
 # Every failing check appends to a list so a single run surfaces as much as
 # possible; a non-empty list at the end is the failure signal.
@@ -28,7 +30,7 @@ for f in index.html download/index.html download/reliefos-installer.iso download
          rpr/manifest.json rpr/health.txt \
          rpr/css/reliefos.css \
          rpr/apk/packages.adb rpr/apk/repository.json rpr/apk/reliefos-rpr.rsa.pub rpr/apk/leonos-rpr.rsa.pub rpr/apk/SHA256SUMS \
-         rpr/kernel/kernel.sys \
+         rpr/kernel/kernel.sys rpr/kernel/initramfs.cpio rpr/kernel/bundle.json \
          rpr/kernel/release.txt rpr/kernel/release.json rpr/kernel/SHA256SUMS; do
     [ -e "$site/$f" ] || report "missing $f"
 done
@@ -70,10 +72,57 @@ if [ -f "$site/rpr/apk/repository.json" ]; then
     awk -F '"' '
         $0 ~ /"packages"/ { inlist=1 }
         inlist { for (i=1;i<=NF;i++) if ($i ~ /^reliefos-.*\.apk$/) print $i }
-    ' "$site/rpr/apk/repository.json" | while IFS= read -r pkg; do
+    ' "$site/rpr/apk/repository.json" > "$verify_work/packages"
+    while IFS= read -r pkg; do
         [ -n "$pkg" ] || continue
         [ -f "$site/rpr/apk/$pkg" ] || report "repository.json references missing APK $pkg"
-    done
+    done < "$verify_work/packages"
+fi
+
+# Check the exact published cohort, not only the existence of protocol files.
+for directory in apk kernel; do
+    (cd "$site/rpr/$directory" && sha256sum -c SHA256SUMS >/dev/null 2>&1) \
+        || report "rpr/$directory checksums do not match the published files"
+done
+release=$site/rpr/kernel/release.txt
+if [ -f "$release" ]; then
+    field() { sed -n "s/^$1=//p" "$release"; }
+    if ! awk -F= '
+        BEGIN { split("format_version image_version version kernel_release module_abi kernel_sha256 initramfs_sha256 package package_version package_file package_sha256 repository_sha256 bundle_manifest_sha256 module_directory", keys, " "); for (i in keys) allowed[keys[i]]=1 }
+        NF!=2 || !allowed[$1] || seen[$1]++ || $2=="" { exit 1 }
+        END { if (NR!=14) exit 1 }
+    ' "$release" || [ "$(field format_version)" != 4 ]; then
+        report 'invalid RPR format 4 release metadata'
+    else
+        image=$(field image_version)
+        version=$(field version)
+        kernel_release=$(field kernel_release)
+        abi=$(field module_abi)
+        kernel_hash=$(field kernel_sha256)
+        initramfs_hash=$(field initramfs_sha256)
+        bundle_hash=$(field bundle_manifest_sha256)
+        package_version=$(field package_version)
+        package_file=$(field package_file)
+        package_hash=$(field package_sha256)
+        index_hash=$(field repository_sha256)
+        if [ "$image" != "$version" ] || [ "$(field package)" != reliefos-kernel ] ||
+           [ "$package_file" != "reliefos-kernel-$package_version.apk" ] ||
+           [ "$(field module_directory)" != "lib/modules/$kernel_release" ]; then
+            report 'RPR release/package/module identities disagree'
+        fi
+        case $package_file in ''|*[!A-Za-z0-9._+-]*) report 'unsafe RPR kernel package filename'; package_file=invalid ;; esac
+        for record in "$kernel_hash kernel/kernel.sys" "$initramfs_hash kernel/initramfs.cpio" \
+                      "$bundle_hash kernel/bundle.json" "$package_hash apk/$package_file" "$index_hash apk/packages.adb"; do
+            digest=${record%% *}
+            member=${record#* }
+            actual=$(sha256sum "$site/rpr/$member" 2>/dev/null) || actual=missing
+            [ "${actual%% *}" = "$digest" ] || report "RPR metadata checksum mismatch: $member"
+        done
+        printf '{"architecture":"x86_64","schema":4,"image_version":"%s","version":"%s","kernel_release":"%s","module_abi":"%s","module_directory":"lib/modules/%s","files":{"kernel.sys":{"sha256":"%s"},"initramfs.cpio":{"sha256":"%s"},"bundle.json":{"sha256":"%s"}},"package":{"name":"reliefos-kernel","version":"%s","file":"%s","sha256":"%s"},"repository_sha256":"%s"}\n' \
+            "$image" "$version" "$kernel_release" "$abi" "$kernel_release" "$kernel_hash" "$initramfs_hash" "$bundle_hash" \
+            "$package_version" "$package_file" "$package_hash" "$index_hash" > "$verify_work/release.json"
+        cmp -s "$verify_work/release.json" "$site/rpr/kernel/release.json" || report 'RPR release.json and release.txt disagree'
+    fi
 fi
 if [ -f "$site/rpr/apk/SHA256SUMS" ]; then
     for apk in "$site"/rpr/apk/reliefos-*.apk; do
@@ -93,8 +142,8 @@ fi
 # --- HTML links resolve to something inside the tree ------------------------
 # All href values except external http(s) URLs must exist relative to the
 # containing HTML file. This guards against a broken base path (plan §25).
-linkfails=$(mktemp "${TMPDIR:-/tmp}/reliefos-links.XXXXXX")
-trap 'rm -f "$linkfails"' EXIT HUP INT TERM
+linkfails=$verify_work/links
+: > "$linkfails"
 for page in $(find "$site" -name '*.html' -print); do
     dir=$(dirname "$page")
     grep -oE 'href="[^"#]+"' "$page" 2>/dev/null \

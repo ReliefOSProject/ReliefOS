@@ -50,11 +50,12 @@ sh "$src/tools/build/busybox-links.sh" "$work/empty-plan" "$work/empty-links" > 
 # generated .config, because a suppressed link still leaves `busybox NAME`
 # callable when the applet is compiled in.
 for name in sh ash false ping ping6 df free top dmesg hexdump killall nc netstat \
-    traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod \
+    traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod depmod modinfo switch_root \
     unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch chroot setuidgid; do
     printf '/bin/%s\n' "$name"
 done > "$work/check-links"
-: > "$work/check-config"
+printf '%s\n' 'CONFIG_FEATURE_MODUTILS_ALIAS=y' 'CONFIG_FEATURE_MODUTILS_SYMBOLS=y' \
+    'CONFIG_FEATURE_MODPROBE_BLACKLIST=y' 'CONFIG_FEATURE_CMDLINE_MODULE_OPTIONS=y' > "$work/check-config"
 sh "$src/tools/build/busybox-check.sh" "$work/check-config" "$work/check-links" > "$work/check-out"
 grep -q 'ownership contract: PASS' "$work/check-out"
 for spec in CONFIG_DD=y CONFIG_CLEAR=y CONFIG_START_STOP_DAEMON=y; do
@@ -63,6 +64,11 @@ for spec in CONFIG_DD=y CONFIG_CLEAR=y CONFIG_START_STOP_DAEMON=y; do
         echo "busybox-check accepted enabled external applet: $spec" >&2; exit 1
     fi
 done
+cat "$work/check-config" > "$work/check-small-config"
+printf '%s\n' CONFIG_MODPROBE_SMALL=y >> "$work/check-small-config"
+if sh "$src/tools/build/busybox-check.sh" "$work/check-small-config" "$work/check-links" > "$work/check-rejected" 2>&1; then
+    echo 'busybox-check accepted modprobe without the standard dependency/config mechanism' >&2; exit 1
+fi
 grep -v '^/bin/sh$' "$work/check-links" > "$work/check-no-sh"
 if sh "$src/tools/build/busybox-check.sh" "$work/check-config" "$work/check-no-sh" > "$work/check-rejected" 2>&1; then
     echo 'busybox-check accepted a profile without /bin/sh' >&2; exit 1
