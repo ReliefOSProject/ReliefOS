@@ -13,6 +13,8 @@ import shutil
 import subprocess
 import time
 
+from PIL import Image, ImageChops, ImageDraw
+
 from test_installer_accounts_qemu import Probe
 from test_installer_window_qemu import wait_log
 from test_vt_qemu import ocr, wait_text
@@ -272,18 +274,45 @@ def wait_greeter_stage(probe, process, expected, name, timeout=45):
     raise AssertionError(f"XDM greeter did not reach {expected!r}; observed {observed!r}")
 
 
-def _session_st_visible(frame):
-    """Return True once the session st has mapped its window.
+def session_st_bounds(frame):
+    """Find st's default black client surface enclosed by the WM frame.
 
-    The pale wallpaper alone already passes any brightness floor on the bare
-    root window the moment xdm kills the greeter, long before icewm/st have
-    mapped.  The st started by xdm-session fills its window with #f7f8fb
-    and the wallpaper palette contains no pixel of that exact color, so only
-    a mapped terminal can put it on screen -- the readiness signal needed
-    before typing the marker command.
+    Ignore the edge-connected desktop/console background and small glyphs,
+    icons or shadows. This also finds a moved, resized or maximized terminal
+    without counting the black root window when st is minimized.
     """
-    colors = frame.getcolors(1 << 20) or []
-    return sum(count for count, rgb in colors if rgb == (247, 248, 251)) >= 20000
+    channels = [channel.point(lambda value: 255 if value == 0 else 0)
+                for channel in frame.convert("RGB").split()]
+    mask = ImageChops.multiply(ImageChops.multiply(*channels[:2]), channels[2])
+    width, height = frame.size
+    for y in range(16, height, 32):
+        for x in range(16, width, 32):
+            if not mask.getpixel((x, y)):
+                continue
+            before = mask.copy()
+            ImageDraw.floodfill(mask, (x, y), 0)
+            component = ImageChops.subtract(before, mask)
+            bounds = component.getbbox()
+            if (bounds and 0 < bounds[1] < bounds[3] < height and
+                    bounds[2] - bounds[0] >= 200 and
+                    bounds[3] - bounds[1] >= 100 and
+                    component.histogram()[255] >= 20000):
+                # A thin black frame edge can join the surface beside the
+                # title. Keep rows/columns dominated by the client itself.
+                surface = component.crop(bounds)
+                columns = surface.resize((surface.width, 1), Image.Resampling.BOX)
+                rows = surface.resize((1, surface.height), Image.Resampling.BOX)
+                xs = columns.point(lambda value: 255 if value >= 128 else 0).getbbox()
+                ys = rows.point(lambda value: 255 if value >= 128 else 0).getbbox()
+                if xs and ys:
+                    return (bounds[0] + xs[0], bounds[1] + ys[1],
+                            bounds[0] + xs[2], bounds[1] + ys[3])
+    return None
+
+
+def _session_st_visible(frame):
+    """Require a bounded terminal surface rather than a bare black desktop."""
+    return session_st_bounds(frame) is not None
 
 
 def wait_session(probe, process, name, timeout=45):

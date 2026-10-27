@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exercise shipped IceWM with real pointer/key input on a private QEMU disk.
 
-Requires the Xorg test image's test/test account and pale st window. This checks
+Requires the Xorg test image's test/test account and default st window. This checks
 completed interactions and release handling; screenshot timing is not an FPS
 measurement. Use --kernel to test an incremental kernel without rebuilding Xorg.
 """
@@ -11,20 +11,16 @@ from pathlib import Path
 import subprocess
 import time
 
-from PIL import ImageChops
-
 from run_gcc_probe_qemu import qmp_quit
 from test_installer_accounts_qemu import Probe
 from test_vdso_qemu import file_sha256, gpt_partitions, install_private_kernel
-from test_xorg_vm_qemu import boot, greeter_login, st_marker, wait_session
+from test_xorg_vm_qemu import boot, greeter_login, session_st_bounds, st_marker, wait_session
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def client_bounds(frame):
-    masks = [frame.getchannel(channel).point(lambda v, t=target: 255 if v == t else 0)
-             for channel, target in zip("RGB", (247, 248, 251))]
-    return ImageChops.multiply(ImageChops.multiply(*masks[:2]), masks[2]).getbbox()
+    return session_st_bounds(frame)
 
 
 def wait_bounds(probe, process, name, predicate, timeout=3):
