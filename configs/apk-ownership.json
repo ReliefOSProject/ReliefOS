@@ -39,6 +39,12 @@
       "paths": ["usr/bin/reliefplayer", "usr/share/applications/reliefos-reliefplayer.desktop"],
       "reason": "ReliefPlayer audio executable, launcher, desktop entry and component artwork are installed and removed together. minimp3 remains embedded in its consumers."
     },
+    "reliefos-network-controller": {
+      "destination": "reliefos",
+      "components": ["network-controller"],
+      "paths": ["usr/bin/network-controller", "usr/share/applications/reliefos-network-controller.desktop"],
+      "reason": "Network Controller GUI, restricted worker, launcher, desktop entry and artwork are installed and removed together. Shared network boot and resolver tools remain independent of the optional GUI."
+    },
     "reliefos-reliefcapture": {
       "destination": "reliefos",
       "components": ["reliefcapture"],

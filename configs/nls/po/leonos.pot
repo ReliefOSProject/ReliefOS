@@ -15065,3 +15065,399 @@ msgstr ""
 #: userland/apps/openrc-controller/window.cpp
 msgid "No crashed services were reported."
 msgstr ""
+
+#: userland/apps/network-controller
+msgid "ARP table"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Address mode"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Administrator permission is required to manage network settings."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Apply Ethernet configuration"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Applying the network failed. Saved settings remain on disk. Check the output and restore or correct the configuration."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Auto refresh"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Automatic (DHCP)"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Broadcast"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Cancel the running operation and close? Configuration changes already saved remain on disk."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Cancellation requested; waiting for the running command."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Cannot export the diagnostic output."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Cannot send the network operation."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Cannot start the network worker."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Clear output"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Cloudflare (1.1.1.1)"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Connected"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Copy output"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Custom servers"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "DHCP lease"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "DHCP log"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "DNS lookup"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "DNS policy"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "DNS resolver"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "DNS server (optional)"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "DNS servers"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Default gateway"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Diagnostics"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Disable Ethernet"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Discard unsaved edits and reload the network profile?"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Discard unsaved network settings and close?"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Enable Ethernet"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Enter a usable static IPv4 address and prefix."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Enter a valid host, IPv4 DNS server and TCP port (1–65535)."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Enter an IPv4 address and a prefix from 0 to 32."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Enter one to three IPv4 DNS servers."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Export network diagnostics"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "From DHCP"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Gateway (optional)"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Host or IPv4"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Host range"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "IPv4 address"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "IPv4 subnet calculator"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Invalid IPv4 address."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Invalid IPv4 gateway."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Invalid IPv4 prefix."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Invalid network profile."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Live interface data. Configuration is managed by OpenRC; diagnostics report actual results."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "MAC address"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "MTU"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Malformed interface response.\n"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Network Controller\nIPv4 Ethernet configuration and network diagnostics for ReliefOS.\nC++ / FLTK"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Network adapters"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Network authentication"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Network information"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Network response is too large."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Network worker disconnected. Reopen the application to authenticate."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Only custom DNS accepts server addresses."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Operation failed. See Output for details."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Output exported."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Packets / errors"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Persistent configuration is available for eth0. Loopback and other interfaces are shown for inspection."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Ping"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Prefix length"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Prefix length (0–32)"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Read configuration"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Receive rate"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Received total"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Refresh interfaces"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Reload configuration"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Restore and apply"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Restore previous configuration"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Restore previous…"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Restore the previous profile and apply it? The current network connection may be interrupted."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Routing table"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Save and apply"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Save and apply this Ethernet configuration?"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Save network configuration"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Save only"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Select an adapter to inspect its live state. Configure eth0 with DHCP, static IPv4 or disabled mode. Save and apply uses the existing OpenRC network service.\n\nStatic mode requires custom or Cloudflare DNS. Use spaces between custom DNS addresses. Saving detects external changes and keeps the previous configuration.\n\nDiagnostics use real network operations. TCP success confirms a connection, not TLS or application health. Wi-Fi, IPv6, VPN and changing the kernel's fixed MTU are not supported."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Send rate"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Sent total"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Settings: /etc/reliefos/network.conf\nSaving keeps a backup and detects external changes. Applying may briefly disconnect the network. Static mode requires explicit DNS."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Static IPv4"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Static mode requires custom or Cloudflare DNS."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Subnet mask"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "TCP connections"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "TCP port"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "TCP port test"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Test TCP port"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "The current network connection may be interrupted."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "The gateway must be a different usable address in the same subnet."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Too many queued operations."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Unsaved configuration changes"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Up to three IPv4 addresses separated by spaces."
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Up, carrier not reported"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Usable addresses"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Usage and limitations"
+msgstr ""
+
+#: userland/apps/network-controller
+msgid "Wait for the current operation or cancel it."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp
+msgid "Adapter counters are not exported by this kernel. Address, gateway, DNS and connection diagnostics remain available."
+msgstr ""

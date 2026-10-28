@@ -128,6 +128,39 @@ int reliefos_net_set_dns_policy(uint32_t mode, uint32_t custom_dns_ip,
 {
     if (!result || mode > RELIEFOS_NET_DNS_MODE_CUSTOM) { errno = EINVAL; return -1; }
     if (geteuid()) { errno = EPERM; return -1; }
+    /* A versioned profile owns resolver policy. Refuse an older competing
+     * writer before touching its file: reporting success while the publisher
+     * uses the managed profile would leave kernel and libc DNS inconsistent. */
+    int profile_fd = open("/etc/reliefos/network.conf", O_RDONLY | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK);
+    if (profile_fd >= 0) {
+        struct stat profile_stat;
+        if (fstat(profile_fd, &profile_stat) || !S_ISREG(profile_stat.st_mode) ||
+            profile_stat.st_uid || (profile_stat.st_mode & 022) ||
+            profile_stat.st_size < 0 || profile_stat.st_size > 16384) {
+            close(profile_fd); errno = EINVAL; return -1;
+        }
+        FILE *profile = fdopen(profile_fd, "r");
+        if (!profile) { close(profile_fd); return -1; }
+        char line[256];
+        int managed = 0;
+        while (fgets(line, sizeof(line), profile))
+            if (!strncmp(line, "version=", 8)) { managed = 1; break; }
+        int failed = ferror(profile);
+        fclose(profile);
+        if (managed) { errno = EBUSY; return -1; }
+        if (failed) { errno = EIO; return -1; }
+    } else if (errno != ENOENT) {
+        return -1;
+    }
+    /* Fresh images need not contain an empty legacy policy directory. */
+    if (mkdir("/etc/udhcpc", 0755) < 0 && errno != EEXIST) return -1;
+    int policy_dir = open("/etc/udhcpc", O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+    if (policy_dir < 0) return -1;
+    struct stat policy_directory;
+    int unsafe_dir = fstat(policy_dir, &policy_directory) ||
+        policy_directory.st_uid || (policy_directory.st_mode & 022);
+    close(policy_dir);
+    if (unsafe_dir) { errno = EPERM; return -1; }
     char temporary[] = "/etc/udhcpc/.dns.XXXXXX";
     int fd = mkstemp(temporary);
     if (fd < 0) return -1;

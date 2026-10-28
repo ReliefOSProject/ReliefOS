@@ -533,6 +533,13 @@ def draw_icon(name: str) -> list[list[tuple[int, int, int, int]]]:
         icon_bugtest(c)
     elif name == "netctl":
         icon_netctl(c)
+    elif name == "network-controller":
+        icon_netctl(c)
+        fill(c, 9, 8, 6, 6, WHITE)
+        rect(c, 9, 8, 6, 6, DARK)
+        line(c, 10, 11, 13, 11, GREEN)
+        line(c, 11, 10, 13, 12, GREEN)
+        line(c, 11, 12, 13, 10, GREEN)
     elif name in {"sessiond", "device-agent"}:
         icon_servicemgr(c)
     elif name == "servicemgr":

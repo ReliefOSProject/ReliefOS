@@ -11,6 +11,7 @@
    vga-text
    desktop
    packages
+   network-controller
    kernel-modules
    openrc-controller
    accounts

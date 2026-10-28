@@ -16855,3 +16855,399 @@ msgstr "sudo：当前用户密码"
 #: userland/apps/openrc-controller/window.cpp
 msgid "No crashed services were reported."
 msgstr "未检测到崩溃的服务。"
+
+#: userland/apps/network-controller
+msgid "ARP table"
+msgstr "ARP 表"
+
+#: userland/apps/network-controller
+msgid "Address mode"
+msgstr "地址模式"
+
+#: userland/apps/network-controller
+msgid "Administrator permission is required to manage network settings."
+msgstr "管理网络设置需要管理员权限。"
+
+#: userland/apps/network-controller
+msgid "Apply Ethernet configuration"
+msgstr "应用以太网配置"
+
+#: userland/apps/network-controller
+msgid "Applying the network failed. Saved settings remain on disk. Check the output and restore or correct the configuration."
+msgstr "应用网络配置失败。设置已保存在磁盘上，请查看输出并恢复或修正配置。"
+
+#: userland/apps/network-controller
+msgid "Auto refresh"
+msgstr "自动刷新"
+
+#: userland/apps/network-controller
+msgid "Automatic (DHCP)"
+msgstr "自动获取（DHCP）"
+
+#: userland/apps/network-controller
+msgid "Broadcast"
+msgstr "广播地址"
+
+#: userland/apps/network-controller
+msgid "Cancel the running operation and close? Configuration changes already saved remain on disk."
+msgstr "取消正在运行的操作并关闭？已经保存的配置会保留在磁盘上。"
+
+#: userland/apps/network-controller
+msgid "Cancellation requested; waiting for the running command."
+msgstr "已请求取消，正在等待命令结束。"
+
+#: userland/apps/network-controller
+msgid "Cannot export the diagnostic output."
+msgstr "无法导出诊断输出。"
+
+#: userland/apps/network-controller
+msgid "Cannot send the network operation."
+msgstr "无法发送网络操作。"
+
+#: userland/apps/network-controller
+msgid "Cannot start the network worker."
+msgstr "无法启动网络工作进程。"
+
+#: userland/apps/network-controller
+msgid "Clear output"
+msgstr "清空输出"
+
+#: userland/apps/network-controller
+msgid "Cloudflare (1.1.1.1)"
+msgstr "Cloudflare（1.1.1.1）"
+
+#: userland/apps/network-controller
+msgid "Connected"
+msgstr "已连接"
+
+#: userland/apps/network-controller
+msgid "Copy output"
+msgstr "复制输出"
+
+#: userland/apps/network-controller
+msgid "Custom servers"
+msgstr "自定义服务器"
+
+#: userland/apps/network-controller
+msgid "DHCP lease"
+msgstr "DHCP 租约"
+
+#: userland/apps/network-controller
+msgid "DHCP log"
+msgstr "DHCP 日志"
+
+#: userland/apps/network-controller
+msgid "DNS lookup"
+msgstr "DNS 查询"
+
+#: userland/apps/network-controller
+msgid "DNS policy"
+msgstr "DNS 策略"
+
+#: userland/apps/network-controller
+msgid "DNS resolver"
+msgstr "DNS 解析器"
+
+#: userland/apps/network-controller
+msgid "DNS server (optional)"
+msgstr "DNS 服务器（可选）"
+
+#: userland/apps/network-controller
+msgid "DNS servers"
+msgstr "DNS 服务器"
+
+#: userland/apps/network-controller
+msgid "Default gateway"
+msgstr "默认网关"
+
+#: userland/apps/network-controller
+msgid "Diagnostics"
+msgstr "诊断工具"
+
+#: userland/apps/network-controller
+msgid "Disable Ethernet"
+msgstr "禁用以太网"
+
+#: userland/apps/network-controller
+msgid "Discard unsaved edits and reload the network profile?"
+msgstr "放弃未保存的编辑并重新读取网络配置？"
+
+#: userland/apps/network-controller
+msgid "Discard unsaved network settings and close?"
+msgstr "放弃未保存的网络设置并关闭？"
+
+#: userland/apps/network-controller
+msgid "Enable Ethernet"
+msgstr "启用以太网"
+
+#: userland/apps/network-controller
+msgid "Enter a usable static IPv4 address and prefix."
+msgstr "请输入可用的静态 IPv4 地址和前缀长度。"
+
+#: userland/apps/network-controller
+msgid "Enter a valid host, IPv4 DNS server and TCP port (1–65535)."
+msgstr "请输入有效的主机、IPv4 DNS 服务器和 TCP 端口（1–65535）。"
+
+#: userland/apps/network-controller
+msgid "Enter an IPv4 address and a prefix from 0 to 32."
+msgstr "请输入 IPv4 地址及 0 至 32 的前缀长度。"
+
+#: userland/apps/network-controller
+msgid "Enter one to three IPv4 DNS servers."
+msgstr "请输入一至三个 IPv4 DNS 服务器地址。"
+
+#: userland/apps/network-controller
+msgid "Export network diagnostics"
+msgstr "导出网络诊断"
+
+#: userland/apps/network-controller
+msgid "From DHCP"
+msgstr "通过 DHCP 获取"
+
+#: userland/apps/network-controller
+msgid "Gateway (optional)"
+msgstr "网关（可选）"
+
+#: userland/apps/network-controller
+msgid "Host or IPv4"
+msgstr "主机或 IPv4 地址"
+
+#: userland/apps/network-controller
+msgid "Host range"
+msgstr "主机范围"
+
+#: userland/apps/network-controller
+msgid "IPv4 address"
+msgstr "IPv4 地址"
+
+#: userland/apps/network-controller
+msgid "IPv4 subnet calculator"
+msgstr "IPv4 子网计算器"
+
+#: userland/apps/network-controller
+msgid "Invalid IPv4 address."
+msgstr "IPv4 地址无效。"
+
+#: userland/apps/network-controller
+msgid "Invalid IPv4 gateway."
+msgstr "IPv4 网关无效。"
+
+#: userland/apps/network-controller
+msgid "Invalid IPv4 prefix."
+msgstr "IPv4 前缀长度无效。"
+
+#: userland/apps/network-controller
+msgid "Invalid network profile."
+msgstr "网络配置无效。"
+
+#: userland/apps/network-controller
+msgid "Live interface data. Configuration is managed by OpenRC; diagnostics report actual results."
+msgstr "显示网卡的实时数据。配置由 OpenRC 管理，诊断工具展示实际结果。"
+
+#: userland/apps/network-controller
+msgid "MAC address"
+msgstr "MAC 地址"
+
+#: userland/apps/network-controller
+msgid "MTU"
+msgstr "MTU"
+
+#: userland/apps/network-controller
+msgid "Malformed interface response.\n"
+msgstr "网卡响应格式错误。\n"
+
+#: userland/apps/network-controller
+msgid "Network Controller\nIPv4 Ethernet configuration and network diagnostics for ReliefOS.\nC++ / FLTK"
+msgstr "Network Controller（网络控制器）\nReliefOS IPv4 以太网配置与网络诊断工具。\nC++ / FLTK"
+
+#: userland/apps/network-controller
+msgid "Network adapters"
+msgstr "网络接口"
+
+#: userland/apps/network-controller
+msgid "Network authentication"
+msgstr "网络身份认证"
+
+#: userland/apps/network-controller
+msgid "Network information"
+msgstr "网络信息"
+
+#: userland/apps/network-controller
+msgid "Network response is too large."
+msgstr "网络响应过大。"
+
+#: userland/apps/network-controller
+msgid "Network worker disconnected. Reopen the application to authenticate."
+msgstr "网络工作进程已断开，请重新打开程序进行认证。"
+
+#: userland/apps/network-controller
+msgid "Only custom DNS accepts server addresses."
+msgstr "只有自定义 DNS 模式需要填写服务器地址。"
+
+#: userland/apps/network-controller
+msgid "Operation failed. See Output for details."
+msgstr "操作失败，请查看“输出”中的详细信息。"
+
+#: userland/apps/network-controller
+msgid "Output exported."
+msgstr "输出已导出。"
+
+#: userland/apps/network-controller
+msgid "Packets / errors"
+msgstr "数据包 / 错误"
+
+#: userland/apps/network-controller
+msgid "Persistent configuration is available for eth0. Loopback and other interfaces are shown for inspection."
+msgstr "持久化配置适用于 eth0。回环及其他接口可用于查看状态。"
+
+#: userland/apps/network-controller
+msgid "Ping"
+msgstr "Ping"
+
+#: userland/apps/network-controller
+msgid "Prefix length"
+msgstr "前缀长度"
+
+#: userland/apps/network-controller
+msgid "Prefix length (0–32)"
+msgstr "前缀长度（0–32）"
+
+#: userland/apps/network-controller
+msgid "Read configuration"
+msgstr "读取配置"
+
+#: userland/apps/network-controller
+msgid "Receive rate"
+msgstr "接收速率"
+
+#: userland/apps/network-controller
+msgid "Received total"
+msgstr "累计接收"
+
+#: userland/apps/network-controller
+msgid "Refresh interfaces"
+msgstr "刷新网卡"
+
+#: userland/apps/network-controller
+msgid "Reload configuration"
+msgstr "重新读取配置"
+
+#: userland/apps/network-controller
+msgid "Restore and apply"
+msgstr "恢复并应用"
+
+#: userland/apps/network-controller
+msgid "Restore previous configuration"
+msgstr "恢复上次配置"
+
+#: userland/apps/network-controller
+msgid "Restore previous…"
+msgstr "恢复上次配置…"
+
+#: userland/apps/network-controller
+msgid "Restore the previous profile and apply it? The current network connection may be interrupted."
+msgstr "恢复上次配置并应用？当前网络连接可能中断。"
+
+#: userland/apps/network-controller
+msgid "Routing table"
+msgstr "路由表"
+
+#: userland/apps/network-controller
+msgid "Save and apply"
+msgstr "保存并应用"
+
+#: userland/apps/network-controller
+msgid "Save and apply this Ethernet configuration?"
+msgstr "保存并应用此以太网配置？"
+
+#: userland/apps/network-controller
+msgid "Save network configuration"
+msgstr "保存网络配置"
+
+#: userland/apps/network-controller
+msgid "Save only"
+msgstr "仅保存"
+
+#: userland/apps/network-controller
+msgid "Select an adapter to inspect its live state. Configure eth0 with DHCP, static IPv4 or disabled mode. Save and apply uses the existing OpenRC network service.\n\nStatic mode requires custom or Cloudflare DNS. Use spaces between custom DNS addresses. Saving detects external changes and keeps the previous configuration.\n\nDiagnostics use real network operations. TCP success confirms a connection, not TLS or application health. Wi-Fi, IPv6, VPN and changing the kernel's fixed MTU are not supported."
+msgstr "选择网卡查看实时状态。eth0 支持 DHCP、静态 IPv4 或禁用模式。“保存并应用”通过现有 OpenRC 网络服务执行。\n\n静态模式需要指定自定义或 Cloudflare DNS，多个 DNS 地址使用空格分隔。保存会检测外部修改并保留上次配置。\n\n诊断执行真实网络操作。TCP 成功仅表示连接建立，不代表 TLS 或应用正常。不支持 Wi-Fi、IPv6、VPN 或修改内核固定的 MTU。"
+
+#: userland/apps/network-controller
+msgid "Send rate"
+msgstr "发送速率"
+
+#: userland/apps/network-controller
+msgid "Sent total"
+msgstr "累计发送"
+
+#: userland/apps/network-controller
+msgid "Settings: /etc/reliefos/network.conf\nSaving keeps a backup and detects external changes. Applying may briefly disconnect the network. Static mode requires explicit DNS."
+msgstr "配置文件：/etc/reliefos/network.conf\n保存会备份并检测外部修改，应用可能短暂中断网络。静态模式需要指定 DNS。"
+
+#: userland/apps/network-controller
+msgid "Static IPv4"
+msgstr "静态 IPv4"
+
+#: userland/apps/network-controller
+msgid "Static mode requires custom or Cloudflare DNS."
+msgstr "静态模式需要自定义或 Cloudflare DNS。"
+
+#: userland/apps/network-controller
+msgid "Subnet mask"
+msgstr "子网掩码"
+
+#: userland/apps/network-controller
+msgid "TCP connections"
+msgstr "TCP 连接"
+
+#: userland/apps/network-controller
+msgid "TCP port"
+msgstr "TCP 端口"
+
+#: userland/apps/network-controller
+msgid "TCP port test"
+msgstr "TCP 端口测试"
+
+#: userland/apps/network-controller
+msgid "Test TCP port"
+msgstr "测试 TCP 端口"
+
+#: userland/apps/network-controller
+msgid "The current network connection may be interrupted."
+msgstr "当前网络连接可能中断。"
+
+#: userland/apps/network-controller
+msgid "The gateway must be a different usable address in the same subnet."
+msgstr "网关必须是同一子网内另一个可用地址。"
+
+#: userland/apps/network-controller
+msgid "Too many queued operations."
+msgstr "排队操作过多。"
+
+#: userland/apps/network-controller
+msgid "Unsaved configuration changes"
+msgstr "网络配置尚未保存"
+
+#: userland/apps/network-controller
+msgid "Up to three IPv4 addresses separated by spaces."
+msgstr "最多输入三个 IPv4 地址，以空格分隔。"
+
+#: userland/apps/network-controller
+msgid "Up, carrier not reported"
+msgstr "已启用，未报告链路状态"
+
+#: userland/apps/network-controller
+msgid "Usable addresses"
+msgstr "可用地址数"
+
+#: userland/apps/network-controller
+msgid "Usage and limitations"
+msgstr "使用方法与限制"
+
+#: userland/apps/network-controller
+msgid "Wait for the current operation or cancel it."
+msgstr "请等待当前操作结束，或先取消该操作。"
+
+#: userland/apps/network-controller/window.cpp
+msgid "Adapter counters are not exported by this kernel. Address, gateway, DNS and connection diagnostics remain available."
+msgstr "当前内核尚未导出网卡流量计数。地址、网关、DNS 与连接诊断仍可正常使用。"

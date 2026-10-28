@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=Network Controller
+Name[zh_CN]=网络控制器
+GenericName=Network Manager
+GenericName[zh_CN]=网络管理器
+Comment=Configure Ethernet, DHCP, static IPv4 and DNS and diagnose network connections
+Comment[zh_CN]=配置以太网、DHCP、静态 IPv4 和 DNS，诊断网络连接
+Exec=/usr/bin/network-controller
+TryExec=/usr/bin/network-controller
+Icon=reliefos-network-controller
+Terminal=false
+Categories=Settings;X-NetworkSettings;
+StartupWMClass=reliefos-network-controller

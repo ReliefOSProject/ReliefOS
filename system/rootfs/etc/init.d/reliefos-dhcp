@@ -1,10 +1,10 @@
 #!/sbin/openrc-run
-description="BusyBox DHCP client"
+description="Ethernet configuration and BusyBox DHCP client"
 supervisor=supervise-daemon
 retry=TERM/1/KILL/1
 input_file=/dev/null
 command=/sbin/udhcpc
-command_args="-f -R -i eth0 -s /usr/share/udhcpc/default.script -t 3 -T 1 -A 30"
+command_args="-f -R -i eth0 -p /run/reliefos/udhcpc.pid -s /usr/share/udhcpc/default.script -t 3 -T 1 -A 30"
 respawn_delay=5
 respawn_max=3
 respawn_period=60
@@ -13,6 +13,33 @@ error_log=/var/log/udhcpc.log
 depend() { need reliefos-runtime reliefos-modules; provide net; }
 
 start_pre() {
-    rm -f /run/reliefos/dhcp-lease || return 1
-    /sbin/ifconfig eth0 up
+    /usr/lib/reliefos/network-profile prepare
+}
+
+start() {
+    local mode
+    mode=$(/usr/lib/reliefos/network-profile mode) || return 1
+    if [ "$mode" = dhcp ]; then
+        default_start || return $?
+    else
+        ebegin "Applying $mode Ethernet configuration"
+        eend 0
+    fi
+    service_set_value network_profile_mode "$mode"
+}
+
+stop() {
+    local mode
+    mode=$(service_get_value network_profile_mode)
+    # A service started before profile support used the DHCP supervisor.
+    if [ -z "$mode" ] || [ "$mode" = dhcp ]; then
+        default_stop || return $?
+        # Finish the DHCP client and its deconfiguration hook before a
+        # static address is installed, even if the supervisor exits early.
+        /usr/lib/reliefos/network-profile stop-dhcp || return $?
+    fi
+}
+
+stop_post() {
+    /usr/lib/reliefos/network-profile release
 }

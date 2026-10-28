@@ -336,3 +336,6 @@ main	compatibility	Documentation/process/assets.rst	历史来源渲染器文件�
 main	history	Documentation/releases/5.1.2.rst	已发布 5.1.2 正文的独立 RST 归档，外部标签链接保持历史原值
 main	compatibility	tests/build/test-x11-only.sh	负向检查退休的旧窗口头与协议服务不存在，不提供兼容实现。
 main	compatibility	userland/runtime/src/fb.c	既有 fbdev ELF 别名移出已删除的窗口传输，指向同一个独立设备实现。
+main	compatibility	userland/apps/network-controller/worker.cpp	迁移前读取已发布的 udhcpc DNS 数据文件，不执行其中内容
+main	compatibility	system/rootfs/usr/lib/reliefos/network-profile	保留已发布的 udhcpc DNS 数据文件与旧 DNS-only 配置兼容
+main	compatibility	tests/build/test-network-profile.sh	在私有 chroot 验证已发布的 udhcpc DNS 配置兼容

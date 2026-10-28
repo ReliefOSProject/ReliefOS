@@ -65,6 +65,7 @@ define RELIEFOS_RUN_CONTRACT_TESTS
 	       RELIEFOS_TEST_BUSYBOX='$(abspath $(INITRAMFS_BUSYBOX_ELF))' \
 	       RELIEFOS_KERNEL_TOOLS='$(abspath $(RELIEFOS_KERNEL_TOOLS))' \
 	       RELIEFOS_TEST_RECOVERY='$(abspath $(RELIEFOS_KERNEL_RECOVERY))' \
+	       RELIEFOS_TEST_HEADERS='$(abspath $(HEADER_EXPORT_INCLUDE))' \
 	       sh $$contract_test >$$report 2>&1; then status=0; else status=1; fi; \
 	    cat $$report; \
 	    if grep -q 'FAIL - ' $$report; then status=1; fi; \
@@ -79,7 +80,7 @@ endef
 leonos-test-tools-plain: reliefos-test-tools-plain
 leonos-test-tools-sanitised: reliefos-test-tools-sanitised
 
-test-build: test-tools $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY)
+test-build: test-tools $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY) $(HEADER_EXPORT_MANIFEST)
 	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_BUILD_TESTS))
 	@$(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_xorg_qemu.py --source-only
 
@@ -134,6 +135,10 @@ $(eval $(call RELIEFOS_NATIVE_HOST_TESTS,sanitised,$(O_HOST)/tests-sanitised,$(R
 
 .PHONY: test-reliefapk
 .PHONY: test-openrc-controller
+.PHONY: test-network-controller
+test-network-controller: $(HEADER_EXPORT_MANIFEST)
+	$(Q)TMPDIR='$(abspath $(O))/tmp' RELIEFOS_TEST_HEADERS='$(abspath $(HEADER_EXPORT_INCLUDE))' sh $(RELIEFOS_SRC)/tests/build/test-network-controller.sh
+
 test-openrc-controller:
 	$(Q)TMPDIR='$(abspath $(O))/tmp' sh $(RELIEFOS_SRC)/tests/build/test-openrc-controller.sh
 
