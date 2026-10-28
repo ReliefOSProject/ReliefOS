@@ -8,6 +8,7 @@
    :maxdepth: 2
 
    installation
+   vga-text
    desktop
    packages
    kernel-modules
