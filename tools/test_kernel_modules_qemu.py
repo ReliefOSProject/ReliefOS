@@ -22,7 +22,7 @@ import uuid
 from test_installer_accounts_qemu import Probe
 from test_installer_window_qemu import wait_log
 from test_vt_qemu import wait_text, ocr
-from test_xorg_vm_qemu import collect, greeter_login, wait_greeter_stage, wait_session
+from test_xorg_vm_qemu import collect, greeter_login, wait_greeter_stage, wait_session, session_st_bounds
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -76,22 +76,49 @@ def session_terminal_focused(frame):
     return sum(b > r + 40 and b > g + 40 for r, g, b in samples) > len(samples) * .8
 
 
+def session_terminal_inactive(frame):
+    """Recognize the fixture's gray inactive title, excluding blank frames."""
+    if frame.width < 640 or frame.height < 480:
+        return False
+    samples = [frame.getpixel((x, y))[:3]
+               for y in (8, 14, 20) for x in range(120, 600, 4)]
+    return sum(64 <= r <= 190 and max(r, g, b) - min(r, g, b) <= 8
+               for r, g, b in samples) > len(samples) * .8
+
+
 def focus_session_terminal(probe, process, timeout=45):
-    """Retry a harmless focus click until the restored WM visibly accepts it."""
+    """Require an inactive-to-active transition instead of accepting a saved title.
+
+    First select the other mapped window with Alt-Tab. Only after the terminal
+    is visibly inactive may a click and its resulting active title confirm
+    resumption. A static saved blue title, or a blank framebuffer, cannot pass.
+    No commands are typed while probing this reversible focus transition.
+    """
     deadline = time.monotonic() + timeout
+    inactive_seen = False
     while time.monotonic() < deadline:
         if process.poll() is not None:
             raise RuntimeError("QEMU exited while focusing the graphical terminal")
-        probe.click(300, 200)
-        if session_terminal_focused(probe.frame("session-terminal-focus")):
-            return
+        if not inactive_seen:
+            probe.key("alt-tab")
+            inactive_seen = session_terminal_inactive(probe.frame("session-other-focus"))
+        else:
+            probe.click(300, 200)
+            if session_terminal_focused(probe.frame("session-terminal-focus")):
+                return
         time.sleep(.5)
-    raise AssertionError("the restored session did not focus its terminal")
+    raise AssertionError("the restored session did not confirm a fresh terminal focus transition")
 
 
 def graphical_marker_visible(text, marker):
     """Accept a fresh shell output line, never the command echo containing it."""
     return any(line.strip() == marker for line in text.splitlines())
+
+
+def graphical_terminal_text(frame):
+    """Read the terminal client alone so adjacent windows cannot merge lines."""
+    bounds = session_st_bounds(frame)
+    return ocr(frame.crop(bounds)) if bounds else ""
 
 
 def wait_graphical_marker(probe, process, marker, timeout=30):
@@ -101,7 +128,7 @@ def wait_graphical_marker(probe, process, marker, timeout=30):
     while time.monotonic() < deadline:
         if process.poll() is not None:
             raise RuntimeError("QEMU exited during graphical input confirmation")
-        last = ocr(probe.frame("graphical-command-output"))
+        last = graphical_terminal_text(probe.frame("graphical-command-output"))
         if graphical_marker_visible(last, marker):
             return
         time.sleep(.5)
@@ -199,8 +226,13 @@ def main():
     if args.firmware == "uefi":
         command += ["-bios", os.environ.get("QEMU_FIRMWARE", "/usr/share/edk2/x64/OVMF.4m.fd")]
     if args.transport == "nvme":
+        if args.firmware == "bios":
+            # SeaBIOS cannot boot its NVMe driver with the controller BAR
+            # above 4 GiB. Keep firmware MMIO in its supported address range;
+            # this changes the VM firmware layout, not the guest driver.
+            command += ["-fw_cfg", "name=opt/org.seabios/pci64,string=0"]
         command += ["-drive", f"file={image},format=raw,if=none,id=osdisk,snapshot=on",
-                    "-device", "nvme,drive=osdisk,serial=reliefos-module-test"]
+                    "-device", "nvme,drive=osdisk,serial=reliefos-module-test,bootindex=1"]
     else:
         command += ["-drive", f"file={image},format=raw,if=ide,snapshot=on"]
     result = {"passed": False, "image": str(image), "image_sha256": before,
@@ -294,8 +326,13 @@ def main():
         # kernel DEBUG trace is used as an acquisition acknowledgement.
         focus_session_terminal(probe, process)
         nonce = uuid.uuid4().hex[:8]
-        marker = "KOREADY" + nonce
+        marker = "KOREADY"
         receipt = "/home/test/kr" + nonce
+        # The visible acknowledgement is absent before this command. Its
+        # unique file independently proves UID/PTY after the return switch;
+        # do not require OCR to distinguish tiny hexadecimal font glyphs.
+        if graphical_marker_visible(graphical_terminal_text(probe.frame("before-graphical-command")), marker):
+            raise AssertionError("graphical acknowledgement already exists before fresh input")
         # The normal user's home is the return channel. Do not assume that a
         # desktop account can open the machine's serial device for writing.
         # Keep this shorter than the known 100-column st plus its prompt so
@@ -322,11 +359,13 @@ def main():
                       "busybox ifconfig; busybox route -n")
         with local_payload_server() as (port, expected):
             # The full profile ships GNU wget; BusyBox's WGET applet is disabled.
-            # Bound both the request and the process, and retain diagnostics.
-            body = f"timeout 20 wget --no-proxy -T 10 -t 1 -O /tmp/module-network.bin http://10.0.2.2:{port}/module-probe && sha256sum /tmp/module-network.bin"
+            # Use volatile /run so this network oracle does not also time a
+            # slow PIO root disk. Real-root writes were checked above. Keep
+            # the complete payload, its digest and both request/process bounds.
+            body = f"timeout 20 wget --no-proxy -T 10 -t 1 -O /run/module-network.bin http://10.0.2.2:{port}/module-probe && sha256sum /run/module-network.bin"
             network = capture_guest(probe, serial, process, output, "LOCAL-TCP", body, timeout=60)
             (output / "network.txt").write_text(network + "\n")
-            if not re.search(r"(?m)^" + expected + r"  /tmp/module-network\.bin$", network):
+            if not re.search(r"(?m)^" + expected + r"  /run/module-network\.bin$", network):
                 raise AssertionError("normal OpenRC network did not transfer the complete local payload")
         print("Local TCP SHA256", flush=True)
         if args.benchmark:

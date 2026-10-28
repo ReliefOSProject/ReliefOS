@@ -8,6 +8,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallerInputTests(unittest.TestCase):
+    def test_fresh_copy_metadata_and_failure_safety(self):
+        """Exercise real copy metadata and publication on an owned host tree."""
+        with tempfile.TemporaryDirectory(prefix="installer-fresh-copy-") as tmp:
+            executable = str(Path(tmp) / "fresh-copy")
+            subprocess.run([
+                "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-idirafter", "userland/runtime/include", "-idirafter", "include",
+                "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
+                "tools/tests/installer_fresh_copy_test.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable, tmp], cwd=ROOT, check=True, timeout=20)
+
     def test_capacity_measurement_and_checked_limits(self):
         """Measure actual trees without following links; reject bytes and inode overflow."""
         with tempfile.TemporaryDirectory(prefix="installer-capacity-") as tmp:

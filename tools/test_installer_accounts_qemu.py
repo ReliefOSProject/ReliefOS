@@ -8,6 +8,7 @@ import subprocess
 import re
 import json
 import time
+import uuid
 
 from test_installer_window_qemu import Probe as WindowProbe, wait_log
 from qmp_terminal_smoke import text_keys
@@ -248,11 +249,13 @@ def assert_desktop_profile(image, skip_xorg):
 
 
 def installer_finish_log(probe, serial, process):
-    """Read current redirected output through the real installer rescue terminal."""
+    """Read a bounded live log suffix and this request's status via the rescue TTY."""
     start = serial.stat().st_size
+    token = "INSTALLER_LOG_READ_DONE_" + uuid.uuid4().hex
     probe.key("ctrl-alt-f2")
     time.sleep(1)
-    probe.text("cat /var/log/installer-session.log > /dev/ttyS0; echo INSTALLER_LOG_READ_DONE > /dev/ttyS0")
+    probe.text("tail -c 16384 /var/log/installer-session.log > /dev/ttyS0; "
+               f"echo {token}:$? > /dev/ttyS0")
     probe.key("ret")
     deadline = time.monotonic() + 60
     while time.monotonic() < deadline:
@@ -260,7 +263,9 @@ def installer_finish_log(probe, serial, process):
         with serial.open("r", errors="replace") as stream:
             stream.seek(start)
             text = stream.read()
-        if "INSTALLER_LOG_READ_DONE" in text:
+        result = re.search(re.escape(token) + r":([0-9]+)(?:\r?\n|$)", text)
+        if result:
+            assert result.group(1) == "0", "Installer log read failed: " + result.group(1)
             probe.key("ctrl-alt-f1")
             time.sleep(1)
             (probe.output / "installer-finish.log").write_text(text)

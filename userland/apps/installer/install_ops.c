@@ -67,6 +67,7 @@ static uint32_t tty_last_progress = 0xffffffffu;
 static char tty_last_status[128];
 static uint8_t copy_buf[COPY_BUF_SIZE];
 static uint8_t copy_defer_sync;
+static uint8_t copy_fresh_root;
 static char installer_root_uuid[37], installer_esp_uuid[37];
 
 static unsigned long boot_last_present;
@@ -961,8 +962,9 @@ static int copy_file_path(const char *src, const char *dst)
     int n = snprintf(temporary, sizeof(temporary), "%.*s.reliefos-copy-XXXXXX",
                      (int)(slash - dst + 1), dst);
     if (n < 0 || (size_t)n >= sizeof(temporary)) { error = ENAMETOOLONG; goto done; }
-    /* A failed copy must leave the previous file (and any hard-link aliases)
-     * intact. mkstemp also refuses to follow an attacker-supplied temp link. */
+    /* Publish only a complete file. In particular, native open may create an
+     * inode before a later fd-allocation failure, so never create the final
+     * filename directly. Existing files and hard-link aliases stay intact. */
     out_fd = mkstemp(temporary);
     if (out_fd < 0) {
         error = errno;
@@ -997,7 +999,13 @@ static int copy_file_path(const char *src, const char *dst)
         (void)sched_yield();
     }
     if (got < 0) { error = errno; goto done; }
-    if (fchown(out_fd, source.st_uid, source.st_gid) < 0 ||
+    /* The newly created inode may already have the required ownership.
+     * Avoid journaling an unchanged owner; always apply the final mode after
+     * a possible chown, which can clear the source set-ID bits. */
+    struct stat destination;
+    if (fstat(out_fd, &destination) < 0 ||
+        ((destination.st_uid != source.st_uid || destination.st_gid != source.st_gid) &&
+         fchown(out_fd, source.st_uid, source.st_gid) < 0) ||
         fchmod(out_fd, source.st_mode & 07777) < 0 ||
         (!copy_defer_sync && fsync(out_fd) < 0)) {
         error = errno;
@@ -1130,9 +1138,21 @@ static int copy_dir_recursive(const char *src, const char *dst)
         }
     }
     struct stat directory_mode;
-    if (stat(src, &directory_mode) < 0 ||
-        chown(dst, directory_mode.st_uid, directory_mode.st_gid) < 0 ||
-        chmod(dst, directory_mode.st_mode & 07777) < 0) {
+    if (stat(src, &directory_mode) < 0) { ret = -errno; goto out; }
+    int set_owner = 1, set_mode = 1;
+    if (copy_fresh_root) {
+        struct stat destination;
+        if (lstat(dst, &destination) < 0) { ret = -errno; goto out; }
+        if (!S_ISDIR(destination.st_mode)) { ret = -ENOTDIR; goto out; }
+        set_owner = destination.st_uid != directory_mode.st_uid ||
+                    destination.st_gid != directory_mode.st_gid;
+        /* An ownership change can clear set-ID bits even if the old mode
+         * matched. Restore the requested mode after every actual chown. */
+        set_mode = set_owner ||
+                   (destination.st_mode & 07777) != (directory_mode.st_mode & 07777);
+    }
+    if ((set_owner && chown(dst, directory_mode.st_uid, directory_mode.st_gid) < 0) ||
+        (set_mode && chmod(dst, directory_mode.st_mode & 07777) < 0)) {
         ret = -errno;
     } else {
         ret = 0;
@@ -1140,6 +1160,18 @@ static int copy_dir_recursive(const char *src, const char *dst)
 out:
     free(entries);
     return ret;
+}
+/** @brief Scope batching to one exclusively owned newly formatted root copy. */
+static int copy_root_payload(const char *source, const char *target, int fresh)
+{
+    uint8_t saved_defer = copy_defer_sync;
+    uint8_t saved_fresh = copy_fresh_root;
+    copy_defer_sync = fresh != 0;
+    copy_fresh_root = fresh != 0;
+    int result = copy_dir_recursive(source, target);
+    copy_fresh_root = saved_fresh;
+    copy_defer_sync = saved_defer;
+    return result;
 }
 /**
  * @brief Complete the Linux filesystem durability barrier on an owned root fd.
@@ -1171,13 +1203,12 @@ static int copy_payload_ordered(void)
 {
     const char *root = fresh_root_payload();
     /* This target was freshly formatted: no previous installation is being
-     * replaced. Keep per-file write/close/rename checks, but avoid one whole
-     * journal commit per tiny file. The checked syncfs barrier below remains
+     * replaced. Skip only already-correct directory metadata; all files keep
+     * private temporary names and atomic replacement. All I/O/metadata/close
+     * errors remain checked. Batch file sync only here; syncfs below remains
      * mandatory before either bootloader is published. */
-    uint8_t saved_defer = copy_defer_sync;
-    copy_defer_sync = install_mode == INSTALLER_MODE_FRESH;
-    int ret = copy_dir_recursive(root, INSTALL_ROOT_MOUNT);
-    copy_defer_sync = saved_defer;
+    int ret = copy_root_payload(root, INSTALL_ROOT_MOUNT,
+                                install_mode == INSTALLER_MODE_FRESH);
     if (!ret) ret = installer_write_fstab();
     if (!ret && installer_setup_write(&setup, INSTALL_ROOT_MOUNT) < 0) {
         ret = -errno;

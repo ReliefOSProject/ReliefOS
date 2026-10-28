@@ -21,6 +21,7 @@ from test_xorg_vm_qemu import (
     require_vt_handshake,
     _bright_panel_bbox,
     _session_st_visible,
+    wait_session,
 )
 
 
@@ -41,6 +42,25 @@ class GreeterStageTests(unittest.TestCase):
 
 
 class EvidenceTests(unittest.TestCase):
+    def test_a_fileman_list_cannot_hide_an_existing_terminal(self):
+        class Process:
+            def poll(self): return None
+        class Display:
+            def __init__(self, image): self.image = image
+            def frame(self, name): return self.image
+        frame = Image.new("RGB", (1920, 1080), "black")
+        draw = ImageDraw.Draw(frame)
+        draw.rectangle((0, 0, 714, 482), fill=(192, 192, 192))
+        draw.rectangle((6, 26, 710, 478), fill="black")
+        draw.rectangle((935, 165, 1669, 579), fill="white")
+        self.assertIsNotNone(_bright_panel_bbox(frame))
+        wait_session(Display(frame), Process(), "desktop", timeout=.05)
+        greeter = Image.new("RGB", (1920, 1080), "black")
+        draw = ImageDraw.Draw(greeter)
+        draw.rectangle((643, 279, 1282, 529), fill=(191, 191, 191))
+        draw.rectangle((1158, 304, 1271, 503), fill="black")
+        with self.assertRaises(AssertionError):
+            wait_session(Display(greeter), Process(), "greeter", timeout=.05)
     def test_upstream_default_gray_xdm_on_full_hd_display_is_detected(self):
         frame = Image.new("RGB", (1920, 1080), "black")
         draw = ImageDraw.Draw(frame)

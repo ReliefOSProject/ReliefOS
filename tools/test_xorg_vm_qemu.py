@@ -321,8 +321,9 @@ def wait_session(probe, process, name, timeout=45):
     while time.monotonic() < deadline:
         assert process.poll() is None, "QEMU exited while waiting for the session"
         frame = probe.frame(name)
-        if (_bright_panel_bbox(frame) is None and
-                _session_st_visible(frame)):
+        # A centered light panel can be Fileman's list. The bounded black st
+        # client is the session evidence; a greeter/logo alone cannot supply it.
+        if _session_st_visible(frame):
             return
         time.sleep(.5)
     raise AssertionError(f"IceWM/st session never became visible on {name}")
