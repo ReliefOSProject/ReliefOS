@@ -13,6 +13,7 @@
    packages
    network-controller
    kernel-modules
+   usb
    openrc-controller
    accounts
    console
