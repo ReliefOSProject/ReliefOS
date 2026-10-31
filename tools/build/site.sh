@@ -14,15 +14,16 @@
 #     build      build_info.h (for the release version)
 #     css        resources/pages/css/reliefos.css
 #     output     $(O)/pages       the assembled site root
+#     kernel_docs  selected ReliefNT checkout's Documentation/ directory
 #
 # Runs the download and home page generators from its own directory so it uses
 # the matching scripts regardless of the working directory.
 set -eu
-[ "$#" = 5 ] || exit 2
-rpr_pages=$1 iso=$2 build=$3 css=$4 output=$5
+[ "$#" = 6 ] || exit 2
+rpr_pages=$1 iso=$2 build=$3 css=$4 output=$5 kernel_docs=$6
 here=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 root=$(CDPATH= cd -- "$here/../.." && pwd)
-docs_src=$root/docs
+docs_src=$root/Documentation
 [ -d "$rpr_pages" ] && [ -f "$rpr_pages/manifest.json" ] || { echo "missing RPR tree at $rpr_pages" >&2; exit 1; }
 [ -s "$iso" ] || { echo "missing installer ISO $iso" >&2; exit 1; }
 [ -f "$css" ] || { echo "missing shared stylesheet $css" >&2; exit 1; }
@@ -48,11 +49,9 @@ cp "$iso" "$work/pages/download/${iso##*/}"
 #    and the home page into the assembled root.
 sh "$here/download-page.sh" "$work/pages/download/${iso##*/}" "$build" "$work/pages"
 sh "$here/home-page.sh" "$build" "$work/pages"
-# 5. Render the Documentation section from the repository docs/ tree: every
-#    Markdown file becomes a static, JavaScript-free HTML page with the shared
-#    chrome. The docs are build inputs, so the section is generated from the
-#    real tree and cannot drift from it.
-sh "$here/docs-page.sh" "$docs_src" "$work/pages/docs"
+# 5. Build the indexed RST manuals with Sphinx, preserving their directories.
+#    This remains static HTML without JavaScript; process records are not shipped.
+sh "$here/docs-page.sh" "$docs_src" "$kernel_docs" "$work/pages/docs"
 : > "$work/pages/.nojekyll"
 # Single completion stamp naming this atomic assembly. Make treats the whole
 # Pages tree as one output keyed on this file, so a partially generated tree is

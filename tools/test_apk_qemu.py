@@ -25,7 +25,7 @@ def prepare(package_cache=None, guest_proxy=None, testing_only=False):
          "-isystem", sysroot / "include", "-static", "-O2", "-Wall", "-Wextra",
          *(["-DAPK_TESTING_ONLY"] if testing_only else []),
          sysroot / "lib/crt1.o", sysroot / "lib/crti.o", ROOT / "tools/tests/apk_guest_probe.c",
-         ROOT / "tools/tests/linux_map_stack_test.c",
+         ROOT / "kernel/reliefnt/tools/tests/linux_map_stack_test.c",
          sysroot / "lib/libc.a", sysroot / "lib/crtn.o", "-o", WORK / "probe.elf"])
     run(["clang", "--target=x86_64-linux-musl", "-fuse-ld=lld", "-nostdlib", "-nostdinc",
          "-isystem", sysroot / "include", "-O2", "-Wall", "-Wextra",

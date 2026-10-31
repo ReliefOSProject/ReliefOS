@@ -1,6 +1,12 @@
 {
   "repository": "https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.24/main/x86_64",
   "packages": [
+    {"name": "bash", "version": "5.3.9-r1", "sha256": "4ad962f26fb3c68365171233fe61e3c51bbee1cab35e8dc661198233daeab0dd", "recipe_commit": "1522c3193610902d8493f9790a2755c11f21f26d", "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/bash-5.3.9-r1.apk"},
+    {"name": "bash-completion", "version": "2.17.0-r1", "sha256": "9db205ae09360013128162b0f94cf121c24a8887c46330e0422fc31b8c854d6c", "recipe_commit": "5fc8418c6904b56de1ce06118049cfa7f000281e", "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/bash-completion-2.17.0-r1.apk"},
+    {"name": "bash-doc", "version": "5.3.9-r1", "sha256": "519c0a4d7b13e044862bfab9a5cdb8ebf634d6d59483b3af40c09779a3771bb9", "recipe_commit": "1522c3193610902d8493f9790a2755c11f21f26d", "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/bash-doc-5.3.9-r1.apk"},
+    {"name": "readline", "version": "8.3.3-r1", "sha256": "766911ecb986a6c5cf0841a6b556cd1e9dbbf22b3559726de32416486cd15c81", "recipe_commit": "a854c03acdac188901fb012f7acbee70a36e8041", "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/readline-8.3.3-r1.apk"},
+    {"name": "libncursesw", "version": "6.6_p20260516-r0", "sha256": "cf8caa8a88bc4ce9d9e395567fefaf9ef7fbd55c50ae6155b35c1b58f3755023", "recipe_commit": "2cee8a7328d061418336ad327b512d96bcd7bc5e", "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/libncursesw-6.6_p20260516-r0.apk"},
+    {"name": "ncurses-terminfo-base", "version": "6.6_p20260516-r0", "sha256": "ce83be6d0bd10584a53c3a5868cc1595ce5f0f8e0b621f8f7f70b6144e521fc9", "recipe_commit": "2cee8a7328d061418336ad327b512d96bcd7bc5e", "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/ncurses-terminfo-base-6.6_p20260516-r0.apk"},
     {"name": "openrc", "version": "0.63.2-r0", "sha256": "cda5779b160ddbdf1d1b9cc9514b7b72f0a18453792ff7c0a6eb6e28d5bc2225", "recipe_commit": "30c61338b7a04d3c94509eabba5210b7bf81151a"},
     {"name": "openrc-user", "version": "0.63.2-r0", "sha256": "c350ab9e3de14d5eb33e609bca2f1c4c4d45c9cf3d1ee7a152800e76c26e3863", "recipe_commit": "30c61338b7a04d3c94509eabba5210b7bf81151a"},
     {"name": "libcap2", "version": "2.78-r0", "sha256": "42886a7b4bcde26347c712925c8dc7db202b6029ef9b8c7ee81577ab7bdd8fad", "recipe_commit": "0c35848136c4c16a1b1672cb812efa88fffef1c2"},

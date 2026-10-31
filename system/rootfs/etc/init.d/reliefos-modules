@@ -1,0 +1,12 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: Apache-2.0
+description="ReliefNT native kernel modules"
+depend() {
+    need reliefos-runtime
+    before reliefos-device reliefos-audio reliefos-dhcp
+}
+start() {
+    ebegin "Loading configured kernel modules and enumerated devices"
+    /usr/lib/reliefos/modules-load
+    eend $?
+}

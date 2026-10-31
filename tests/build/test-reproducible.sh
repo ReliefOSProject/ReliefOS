@@ -64,7 +64,7 @@ pass 'both output trees build from scratch'
 # what the next rebuild recompiles. The kernel side is compared through the
 # sub-build tree (reliefnt/) and the products the adapter publishes.
 for product in include/generated/autoconf.h \
-        include/generated/build_info.h reliefnt/obj/kernel/sources.list \
+        include/generated/build_info.h reliefnt/built-in.a \
         reliefnt/generated/system/kernel.unstripped generated/system/kernel.sys \
         generated/system/kernel.debug; do
     checks=$((checks + 1))

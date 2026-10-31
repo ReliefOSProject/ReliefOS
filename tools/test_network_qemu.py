@@ -193,7 +193,7 @@ def main():
         probe = work / "network.elf"
         subprocess.run([str(compiler), "-static", "-O2", "-Wall", "-D_GNU_SOURCE", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
                         "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                        "-idirafter", "userland/runtime/include", "tools/tests/network_guest_test.c",
+                        "-idirafter", "userland/runtime/include", "kernel/reliefnt/tools/tests/network_guest_test.c",
                         "userland/runtime/src/ntp.c", "userland/runtime/src/netsock.c", "userland/runtime/src/unix_ipc.c",
                         "-Lbuild/musl/lib", "-Wl,--start-group", "-l:libleonos.a",
                         "-Wl,--end-group", "-o", str(probe)], check=True)
@@ -207,7 +207,6 @@ def main():
         shutil.copy2(ROOT / "build/live/root.ext2", image)
         subprocess.run(["debugfs", "-w", "-R", "mkdir /usr/lib/reliefos/tests", str(image)], check=True, capture_output=True)
         for source, destination in ((probe, "/usr/lib/reliefos/tests/linux-inventory.elf"),
-                (ROOT / "build/drivers/e1000.drv", "/usr/lib/reliefos/drivers/e1000.drv"),
                 (ROOT / "build/userland/busybox.elf", "/bin/busybox"),
                 (ROOT / "build/system/lib/libleonos.so.2", "/usr/lib/leonos/libleonos.so.2"),
                 (ROOT / "build/userland/netctl.elf", "/usr/lib/reliefos/apps/netctl/netctl.elf"),

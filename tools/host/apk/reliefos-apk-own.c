@@ -159,6 +159,27 @@ static int load_rules(struct state *state, const char *policy_path, json_value *
             add_string_rules(state, stems, name, "", ".so") != 0 ||
             add_string_rules(state, stems, name, "", ".a") != 0 ||
             add_string_rules(state, stems, name, "", ".la") != 0) return -1;
+        /* Install/uninstall each namespaced application icon with its owning
+         * component. Never claim an entire shared hicolor directory. */
+        {
+            const json_value *components = json_member(group, "components");
+            static const unsigned sizes[] = {16, 32, 48, 64, 128, 256};
+            size_t component, size;
+            for (component = 0; component < json_child_count(components); component++) {
+                const char *id = json_text(json_child(components, component));
+                size_t capacity;
+                char *path;
+                if (id == NULL) return fail("component must be a string");
+                capacity = strlen(id) + 96u;
+                path = malloc(capacity);
+                if (path == NULL) return fail("out of memory");
+                for (size = 0; size < sizeof(sizes)/sizeof(sizes[0]); size++) {
+                    (void)snprintf(path, capacity, "usr/share/icons/hicolor/%ux%u/apps/reliefos-%s.png", sizes[size], sizes[size], id);
+                    if (add_rule(state, path, name) != 0) { free(path); return -1; }
+                }
+                free(path);
+            }
+        }
     }
     {
         static const struct { const char *group; const char *path; } tool_paths[] = {

@@ -1,0 +1,8 @@
+RELIEFOS_APP_NAME := reliefmath
+RELIEFOS_APP_OBJECTS := catalog.o dialogs.o document.o editor_core.o editor_view.o export.o file_io.o files.o history.o jobs.o library.o main.o model.o preview.o process.o protocol.o recovery.o render_types.o snippet.o ui_layout.o window.o
+RELIEFOS_APP_C_OBJECTS :=
+RELIEFOS_APP_CXX_OBJECTS := catalog.o dialogs.o document.o editor_core.o editor_view.o export.o file_io.o files.o history.o jobs.o library.o main.o model.o preview.o process.o protocol.o recovery.o render_types.o snippet.o ui_layout.o window.o
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+endif

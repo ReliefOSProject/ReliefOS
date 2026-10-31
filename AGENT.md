@@ -23,39 +23,42 @@
 
 ## 2. 项目定位与运行时架构
 
-ReliefOS 是面向 x86_64、UEFI 启动的操作系统项目。正常系统使用 FAT32 ESP
-和 ext2 根文件系统，应用运行在 Ring 3，内核和可加载驱动运行在 Ring 0。主要启动
+ReliefOS 是面向 x86_64、支持 Legacy BIOS 与 UEFI 启动的操作系统项目。默认磁盘使用
+GPT，包含未格式化的 BIOS Boot 分区、FAT32 ESP 和 ext4 根文件系统；应用运行在
+Ring 3，内核和可加载驱动运行在 Ring 0。当前 Xorg profile 的主要启动
 与服务链如下：
 
 ```text
-UEFI/GRUB
-  -> boot/ loader.elf
-  -> kernel/reliefnt 子仓产物 kernel.sys（Ring 0）
-  -> userland init.elf
-  -> desktop.elf（窗口服务器）
-  -> 登录 / OOBE / 服务 / 普通桌面应用
+BIOS 或 UEFI / GRUB
+  -> kernel/reliefnt 子仓产物 kernel.sys（Ring 0，自带 Multiboot2 头，GRUB 直接引导）
+  -> initramfs /init，加载根设备/文件系统模块后 switch_root
+  -> /sbin/init / OpenRC
+  -> Xorg / XDM
+  -> IceWM / 普通桌面应用（纯控制台安装不启动 Xorg）
 ```
 
-安装器 ISO 是另一条启动路径：顶层 ISO 只包含启动所需的 loader、内核和
+安装器 ISO 是另一条启动路径：顶层 ISO 只包含启动所需的内核和
 installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
-启动载荷）和 `/install/root`（ext2 运行时根载荷）。不要把“安装器运行时
-镜像内容”和“安装后系统内容”混为一谈。
+启动载荷）、`/install/root`（Xorg 运行时根载荷）和 `/install/root-console`
+（纯控制台载荷）。不要把“安装器运行时镜像内容”和“安装后系统内容”混为一谈。
+新安装默认同时安装 BIOS / UEFI loader，可分别取消；旧系统更新不重分区。
+具体布局、引导身份和已验证边界见 `Documentation/admin-guide/installation.rst` 及其中的双启动说明。
 
 ### 根目录职责
 
 | 路径 | 职责 |
 | --- | --- |
-| `boot/` | GRUB 配置与 EFI 模块；loader 源码在内核子仓 `boot/loader/`。 |
-| `kernel/reliefnt/` | ReliefNT 子仓（gitlink，URL 为 github.com/ReliefOSProject/ReliefNT）：内核核心（调度、内存、ELF 进程、syscall、GUI IPC、网络、驱动管理、权限判定与 `lib/` 内部工具）、`drivers/`、`boot/loader/`、`include/uapi` 与内核侧 `include/reliefnt/`。首次使用执行 `git submodule update --init --recursive`，并在子仓内 `make fetch`（其缓存不入库）。 |
-| `userland/runtime/` | ReliefOS libc、syscall 包装、UI/字体、网络/HTTP/TLS、PTY 等公共实现。 |
-| `userland/apps/` | Ring-3 系统与桌面应用；`desktop/` 是窗口服务器，其他应用为它的客户端。 |
-| `userland/{busybox,stardustui}/` | 第三方软件的 ReliefOS 端口、适配层与构建输入。 |
+| `boot/` | GRUB 配置与 BIOS 模块清单；两平台模块由锁定源码构建。 |
+| `kernel/reliefnt/` | ReliefNT 子仓（gitlink，URL 为 github.com/ReliefOSProject/ReliefNT）：内核核心（调度、内存、ELF 进程、syscall、网络、驱动管理、权限判定与 `lib/` 内部工具）、`drivers/`、`include/uapi` 与内核侧 `include/reliefnt/`。首次使用执行 `git submodule update --init --recursive`，并在子仓内 `make fetch`（其缓存不入库）。 |
+| `userland/runtime/` | ReliefOS libc、syscall 包装、字体、网络/HTTP/TLS、PTY 等公共实现。 |
+| `userland/apps/` | Ring-3 系统与桌面应用；当前图形应用使用 FLTK/X11；未迁移的旧图形应用源码保留但不构建、不打包。 |
+| `userland/busybox/` 等第三方端口目录 | 第三方软件的 ReliefOS 适配层与构建输入。 |
 | `include/reliefos/` | 公共 C ABI 头文件；旧 `include/leonos/` 转发头保持兼容。 |
 | `system/` | 被 staging 的系统配置、字体、壁纸、证书、图标、应用资源和默认内容。 |
 | `configs/` | 动态组件清单、可提交 build profile 与默认配置。 |
 | `tools/` | 构建、Kconfig 同步、镜像、安装器、SDK、资源生成和验证脚本。 |
-| `mk/`、`tools/host/`、`tools/build/` | Make 依赖规则、C 工具及上游适配器。 |
-| `docs/` | 架构、ABI、构建、文件系统、驱动、安全等项目文档。 |
+| `Kbuild`、`scripts/reliefos/`、`tools/host/`、`tools/build/` | 原生 Kbuild、产品集成、C 工具及上游适配器。 |
+| `Documentation/` | 架构、ABI、构建、文件系统、驱动、安全等项目文档。 |
 | `third_party/` | 通过 Git submodule 引入的上游源码；见 `.gitmodules`。 |
 | `build/` | 可再生产物与 staging 输出；不可作为手写源码的唯一来源。 |
 
@@ -65,17 +68,20 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
   `syscall`；参数使用 `rax/rdi/rsi/rdx/r10/r8/r9`，负返回值为
   `-errno`。已实现接口才可视为可用，未知 syscall 返回 `-ENOSYS`。
 - 内核负责用户指针与长度验证、页表/进程资源、硬件和最终授权。
-- 内核内部能力按职责直接落在内核子仓的 `kernel/reliefnt/kernel/reliefnt/`（含 `lib/` 工具）和
-  `kernel/reliefnt/drivers/bootstrap/storage/`（文件系统与 `LEONACL.SYS` 权限元数据），全部编译进
-  kernel.sys；不存在跨模块 callback 表或第二个启动镜像。用户态与内核之间只有
-  syscall/ioctl ABI 和 GUI IPC。职责归属与旧数据格式的兼容策略见
-  `docs/KERNEL_USERSPACE_BOUNDARIES.md`。
-- GUI 客户端与 `desktop.elf` 通过 GUI IPC/ioctl 通信，而不是共享窗口服务器
-  的私有像素内存。应用提交自己的缓冲内容；不要把窗口服务器内部 buffer
-  当作公共 ABI。
-- 来宾运行路径使用 Unix 根目录格式，例如 `/usr/lib/reliefos/apps/desktop/desktop.elf`；
-  仓库源码路径（`system/`、`kernel/reliefnt/drivers/`、`docs/`）是构建输入，不等于来宾路径。
-  现行 rootfs 契约见 `docs/ROOTFS_LAYOUT_AND_MIGRATION.md`。
+- 内核内部能力按职责落在内核子仓的 `kernel/`、`lib/`、`mm/`、`net/`、
+  `fs/`、`block/`、`sound/` 和 `drivers/` 等目录（均相对于 `kernel/reliefnt/`）。
+  defconfig 默认将生产组件全部内置；支持独立生命周期的部件可经 tristate
+  编译为针对同一 ReliefNT ABI 的 ELF `.ko`，不加载 Linux 原版二进制模块。
+  调度、内存和 VFS 等必要核心仍内置。模块注册、回调、IRQ/DMA、OFD/VMA
+  必须保留实现 owner，排空真实用户后才能释放代码；不恢复旧私有 `.drv` 协议。
+  用户态与内核之间只有
+  syscall/ioctl ABI；图形会话通过 Xorg 的 X11 协议通信。职责归属与旧数据格式的兼容策略见
+  `Documentation/userspace-api/abi.rst`。
+- X11 应用连接 Xorg，由 IceWM 管理窗口。不得恢复已移除的自研窗口服务器、
+  私有窗口 IPC、UI 传输兼容层或按可执行文件 GID 授予服务身份的旧逻辑。
+- 来宾运行路径使用 Unix 根目录格式，例如 `/usr/lib/reliefos/apps/fileman/fileman.elf`；
+  仓库源码路径（`system/`、`kernel/reliefnt/drivers/`、`Documentation/`）是构建输入，不等于来宾路径。
+  现行 rootfs 契约见 `Documentation/userspace-api/filesystem.rst`。
   相对路径依赖任务当前目录；路径统一使用 Unix 根目录语义。
 
 ## 3. 公共 ABI、库和 SDK 的联动规则
@@ -84,13 +90,13 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 都要逐项检查以下闭环，不能只修改一处：
 
 1. `include/reliefos/*.h`：公共定义、常量、结构布局、权限语义和返回值。
-2. `kernel/reliefnt/kernel/reliefnt/`（内核子仓）：编号、用户范围检查、权限检查、实现和错误路径。
+2. `kernel/reliefnt/kernel/`（内核子仓）：编号、用户范围检查、权限检查、实现和错误路径。
 3. `userland/runtime/include/` 与 `userland/runtime/src/`：声明、包装和实现。
-4. 使用该 API 的系统应用、窗口服务器及相关测试程序。
+4. 使用该 API 的系统应用、Xorg 适配及相关测试程序。
 5. `configs/header-export.list` 白名单与 `headers_install` 导出：SDK/用户态只消费
    导出结果，由 `tools/test_header_export.py` 校验；不维护手工 ABI 镜像副本。
 6. `packages/reliefos-musl-sdk.tar.gz` 装配规则与归属/许可证文本。
-7. `docs/ABI.md`、`docs/SYSCALLS.md` 或对应专题文档。
+7. `Documentation/userspace-api/abi.rst` 或对应专题文档。
 
 公开结构应采用定宽类型，校验用户提供的指针、容量、长度、枚举值和版本。
 不要在 ABI 中泄漏内核指针、窗口服务器私有地址或未经界定的可变对象。扩展
@@ -114,33 +120,26 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 
 UI 修改必须横向检查，而不是只改一个应用。典型关联范围包括：
 
-- `userland/apps/desktop/`：窗口管理、桌面、任务栏、开始菜单、状态栏、
-  覆盖层、主题广播、图标和壁纸。
-- `userland/runtime/src/ui*.c` 及公开 UI 头文件：控件、布局、绘制、文字输入、
-  文件选择、窗口协议、主题状态与字体。
+- `system/xorg/`：XDM、IceWM 会话、窗口管理配置、菜单、键位与主题。
+- `userland/apps/fltk_*.h` 及应用的 FLTK 前端：控件、布局、UTF-8、字体与图标。
 - 所有受影响内置应用：窗口尺寸、焦点、键鼠、文本编辑、主题变化事件、
   图标/快捷方式和高 DPI/分辨率边界。
 - `system/` 中的字体、壁纸、BMP/PNG/图标等 staging 资产，以及
-  `tools/prepare_ui_font.py`、`tools/make_app_icons.py` 等生成步骤。
+  `tools/make_app_icons.py` 等生成步骤。
 - 登录、OOBE、Installer 与早期 framebuffer：它们可能使用不同的启动阶段和
   配置读取时机，不能仅以登录后桌面正常就宣布完成。
 
 ### 主题与个性化
 
-- 用户个性化数据属于 `/home/<name>/appearance.conf`；Metro 与 Win95
-  的基础色配置相互独立，不能相互覆盖。
-- `/etc/reliefos/display.conf` 是尚无用户会话时的启动/默认外观，用于早期
-  framebuffer、bugcheck、登录、OOBE 和安装器等场景。它不能替代每用户配置。
-- 修改个性化设置后应立即经 Desktop 发布状态并让已打开应用收到主题变化；
-  不要只写文件、等下次启动才生效。
-- 现有壁纸 BMP 处理有安全上限：最大 1280 x 720，仅接受受支持的未压缩
-  24-bit/32-bit BMP。任何格式、尺寸或缩放策略扩展都需检查解码器、内存占用、
-  绘制与错误显示。
-- TTF/字体加载、壁纸加载、目录扫描和图标读取不得长期阻塞 Desktop 主循环。
-  需要分段、异步或有界处理时，保持 UI 可响应并保留明确的失败状态。
+- IceWM 的用户主题与会话设置位于 `~/.icewm/`，系统默认值来自 `system/xorg/`。
+- FLTK 控件统一使用默认 `gtk+` scheme；优先改善排版，不另造控件主题。
+- 登录、安装器和早期 framebuffer 的显示路径分别验证。不要把登录后 X11 正常
+  当作所有阶段的证明；字体、图标和文件读取不得长期阻塞应用事件循环。
 
 ### 输入、窗口与可访问性
 
+- 功能性应用的内容区不放程序名称的大标题或介绍横幅。程序名放在窗口标题栏，
+  内容区优先展示原生工具栏、数据和工作画布；空状态提示保持普通字号。
 - 新输入、键盘快捷键、鼠标模式或终端行为要同时验证：事件消费顺序、焦点、
   修饰键释放、文本提交、预编辑文本、应用快捷键与窗口服务器全局快捷键。
 - 密码或其他安全输入字段必须明确禁止第三方输入法；不得为了“兼容”把敏感
@@ -179,10 +178,13 @@ UI 修改必须横向检查，而不是只改一个应用。典型关联范围�
 
 ## 6. 构建系统和动态 Menuconfig
 
-根 `Makefile` 是唯一受支持的生产入口。GNU Make 负责依赖图、增量判断及 jobserver；
-`mk/*.mk` 声明规则，`tools/host/` 的 C 程序只转换数据，`tools/build/` 的短 Shell 脚本
-适配上游 configure/Make 和镜像格式工具。不得另建调度器、调用旧 Python 引擎，或让生产链
-执行 Python、Meson、Ninja。生产链只编译 C 与汇编，不要求 Rust 工具链。
+根 `Makefile` 是受支持的生产入口。自研 C、C++、汇编和宿主工具使用固定的 Linux 6.12
+Kbuild；原版引擎、Kconfig 和许可证由 `scripts/kbuild-source.json` 逐文件记录，不直接修改。
+项目扩展放在单独的 `scripts/Makefile.*` 与目录 `Kbuild`，沿用 `.cmd`、fixdep 和 jobserver。
+`scripts/reliefos/` 集成第三方、SDK、镜像、运行和测试；`tools/host/` 的 C 程序转换数据，
+`tools/build/` 适配上游 configure/Make 与镜像格式工具。第三方维持其原有构建边界。
+不得增加平行的自研编译链、调用旧 Python 构建引擎，或让生产链执行 Python、Meson、Ninja。Sphinx 仅用于独立文档与 Pages 目标。
+不要求 Rust 工具链。
 
 ```sh
 make help
@@ -204,16 +206,21 @@ make test-smoke
 
 - 默认 O 为 `out/<arch>/<profile>`，支持 `ARCH=x86_64`、`PROFILE=release|debug`。
   修改输出目录用 O，修改目标工具用显式 CC/CXX/LD/AR；HOSTCC 独立。
-- `O/config/.config` 是当前配置，Kconfig、Kconfig.components 与 configs/components.toml
-  是受跟踪输入。组件 BUILD、IMAGE、ENTRY、SDK、API 选择不得混用；required 组件不可关闭。
+- `O/.config` 是当前配置，Kconfig、Kconfig.components 与 configs/components.toml
+  是受跟踪输入。组件 BUILD、IMAGE、ENTRY 的作用不得混用；required 组件不可关闭。
+  SDK/API 字段仅保留为兼容元数据，不是可选构建控制；SDK 内容由实际产品清单定义。
   修改组件元数据时保持 Kconfig.components 同步，运行组件 fixture。
-- 生成的 C 配置和版本头写入 O。生产构建不得改写源码目录、递增版本计数，或使用
+- 原版 Kconfig 生成 `O/include/config/auto.conf` 与 `O/include/generated/autoconf.h`；
+  许可证别名由独立 policy header 提供，不改写原版配置头。生成的配置和版本头写入 O。生产构建不得改写源码目录、递增版本计数，或使用
   当前时钟/随机 UUID 破坏可重现性；SOURCE_DATE_EPOCH 默认来自提交时间。
 - 下载只能出现在显式 fetch；生产消费已校验缓存，不允许隐式联网。依赖锁是唯一下载身份来源。
-- 新源文件、删除源文件、编译/链接参数变化、多输出成员缺失必须正确触发重建。
+- 源码成员显式登记在相应 Kbuild 中；增加/删除文件时同步对象清单。源码、头文件、
+  编译/链接参数和对象清单变化、多输出成员缺失必须正确触发重建。
   对目录 stage 使用完整成员清单，临时树完成并校验后再发布，不能以 stamp 代替存在性检查。
+- 内核每个生产代码目录由本地 `Kbuild` 管理对象和直接子目录；根目录不维护全局
+  源码清单。模块边界、私有共享状态与迁移追溯见 `kernel/reliefnt/Documentation/core-api/modules.rst`。
 - 同一 O 的真实构建互斥，不手工伪造 RELIEFOS_BUILD_OWNER。不同 O 可并行。
-  `-n/-q` 不重建被包含的配置，避免干扰持锁构建；首次准确预览前先 defconfig。
+  `-n/-q` 不重建被包含的配置，避免干扰持锁构建；首次预览应用和产品前先 defconfig、config-sync。
 - `all` 包括 kernel、userland、runtime、sdk、apk-repo、image-vmdk、iso、installer；
   `release` 再加本地 rpr-pages。run/run-debug/run-iso/run-installer 只负责运行对应产物。
 - SDK 必须用随包 C 编译器驱动实际编译/链接，覆盖路径含空格的重定位和静态/动态程序。
@@ -223,7 +230,7 @@ make test-smoke
 - clean/distclean 仅清有所有权标记的 O，拒绝 symlink/源码根/不明目录，保留下载缓存。
   不删除用户旧 build/、buildsystem/cache/、buildsystem/deps/、ISO 或 VMDK。
 - Python 仅允许现存非生产 OS 测试、维护工具及上游参考代码。详见
-  `docs/build/legacy-removal.md`；不以保留的参考实现冒充新链验收。
+  `Documentation/kbuild/building.rst`；不以保留的参考实现冒充新链验收。
 
 ## 7. 验证要求
 
@@ -240,6 +247,14 @@ make test-smoke
 | 网络/TLS | 相关构建 + VM 真实网络请求 | DNS、TCP、握手、验证与 UI 状态可区分。 |
 | 安全修复 | 定向回归检查 + 合适的运行证明 | 触发条件被阻断，未用降级掩盖。 |
 
+测试源码按被测实现归属：内核、驱动、文件系统、内存、调度和 Linux UAPI 的
+脚本、原生探针与夹具放在 ReliefNT 的 `tools/`、`tools/tests/`、`tests/host/`。
+主仓只持有应用、运行库、SDK、打包、安装器、镜像和完整系统集成测试；
+需要内核原生探针时消费子仓路径，不复制私有实现。内核宿主测试由子仓
+`make test-host` 选择；父仓委托目标不得维护另一份内核套件清单。
+两边的 `tools/test_test_ownership.py` 检查此边界；主仓的 Shell 测试也不得直接
+断言内核私有源码和头文件的内容或存在性，这些检查由内核仓持有。
+
 额外规则：
 
 - 每次源码修改完成后运行 `git diff --check`。
@@ -250,12 +265,13 @@ make test-smoke
   `/home/xiaobai/Projects/Projects/.reliefos-qmp-<id>.sock`；不要使用 `/tmp` 或 tmpfs。
 - 遇到概率性失败，记录平台、镜像、网络、操作步骤和关键日志，重复定向验证；
   不要以单次成功或失败就宣布根因。
-- 新增安全审计报告时，使用简体中文，归档为 `docs/security/YYYY-MM-DD.md`，
-  明确静态覆盖范围和未做的 PoC/QEMU 验证，不能虚构修复版本或利用结论。
+- 新增安全审计记录时，使用简体中文，原始输出临时放在 `out/security/`；
+  经确认的长期约束写入 `Documentation/process/security.rst`。明确静态覆盖范围
+  和未做的 PoC/QEMU 验证，不能虚构修复版本或利用结论。
 
 ## 8. 代码注释规范
 
-`kernel/reliefnt/kernel/reliefnt/`（内核子仓）中的每个函数定义和公共函数声明必须紧贴
+`kernel/reliefnt/kernel/`（内核子仓）中的每个函数定义和公共函数声明必须紧贴
 Doxygen 风格块注释。C 与汇编预处理源统一使用 `/** ... */`，格式如下：
 
 ```c
@@ -282,9 +298,9 @@ int subsystem_handle(const struct request *request, struct result *out_result);
 ## 9. 文档、日志和交付质量
 
 - 新功能、公开 API、构建开关、镜像布局或第三方移植发生变化时，更新相关
-  `docs/`、SDK 说明、示例和归属/许可证文本。文档只能描述
+  `Documentation/`、SDK 说明、示例和归属/许可证文本。文档只能描述
   已确认存在的接口；计划中的接口必须明确标为计划。
-- 日志应使用稳定前缀（例如 `[reliefnt]`，兼容期 `[ntclks]`、`[desktop.elf]`、`[tls]`），包含足够的
+- 日志应使用稳定前缀（例如 `[reliefnt]`，兼容期 `[ntclks]`、`[tls]`），包含足够的
   阶段、返回码和状态来定位问题，但不能泄露令牌、密码、Cookie、私钥或请求体。
 - 对用户的最终交付应优先给出结果，然后列出：修改了什么、关键路径、构建/
   打包/运行验证分别是否完成、已知限制和下一步。默认使用简体中文。
@@ -325,3 +341,19 @@ int subsystem_handle(const struct request *request, struct result *out_result);
 不要以删除 fallback、增加 sleep、关闭校验、无限增大超时、吞掉错误或硬编码
 成功状态来“修复”问题。应找到真实边界、状态机、权限、I/O 或构建/staging
 断点，并保留可观察的诊断。
+
+## 12. 版本发布的长期规则
+
+- 发布前必须阅读并遵循 [发布规范](Documentation/process/releasing.rst)。Release 更新范围是
+  `(上一版本号提交, 本次版本号提交]`，不是发布日期之间或任意最近 tag 之间。
+  例如 5.1.0 从“改为 5.0.0”的提交之后统计到“改为 5.1.0”的提交。
+- ReliefOS 只写主仓自身变更，排除 ReliefNT 实现和纯 gitlink 更新；ReliefNT
+  只写内核仓变更。两份说明的章节格式相同，正文独立；合并去重，不能把已撤销
+  的功能或计划当作交付，不列“更新版本号到 x.x.x”等无用更新。
+- 说明必须包括：更新内容、是否破坏性更新、更新与迁移注意事项、开发者提示；
+  归档到 `Documentation/releases/<版本>.rst`。
+- 先推送内核版本提交，再更新父仓 gitlink 并推送；标签与 GitHub Release
+  必须固定到各自精确版本提交。使用 `gh` 和审阅过的正文文件发布，回读核对。
+- `/etc/os-release` 的 `VERSION_ID` 与主仓发布版本一致；保留品牌显示规则。
+  二进制仅在明确要求时从本版本重建并附校验和，不上传旧产物。预发布标记
+  prerelease；不自动重写标签或 Release，不自动合并开发分支。

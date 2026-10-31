@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefDiagram
+GenericName=Mind Map and Diagram Editor
+GenericName[zh_CN]=思维导图与逻辑图编辑器
+Comment=Design mind maps, flowcharts and logic diagrams
+Comment[zh_CN]=设计思维导图、流程图和逻辑关系图，编辑图形并导出图片
+Exec=/usr/bin/reliefdiagram %f
+TryExec=/usr/bin/reliefdiagram
+Icon=reliefos-reliefdiagram
+Terminal=false
+Categories=Office;Graphics;2DGraphics;
+MimeType=application/x-reliefdiagram;
+StartupWMClass=reliefos-reliefdiagram

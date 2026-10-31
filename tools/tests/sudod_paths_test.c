@@ -2,7 +2,7 @@
 #include "../../userland/apps/sudod/main.c"
 #undef main
 #include <assert.h>
-#include "host_tmp.h"
+#include "../../kernel/reliefnt/tools/tests/host_tmp.h"
 
 int main(void)
 {

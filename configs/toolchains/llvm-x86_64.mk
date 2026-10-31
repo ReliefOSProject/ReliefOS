@@ -1,6 +1,6 @@
 # ReliefOS x86_64 target toolchain description.
 #
-# Reviewed data, not logic: mk/toolchain.mk interprets it and `make doctor`
+# Reviewed data, not logic: scripts/reliefos/Makefile.toolchain interprets it and `make doctor`
 # verifies it. Switching toolchains means pointing TOOLCHAIN= at another file in
 # this directory, never at an undeclared environment variable.
 
@@ -19,7 +19,6 @@ TOOLCHAIN_LD := ld.lld
 TOOLCHAIN_OBJCOPY := llvm-objcopy
 TOOLCHAIN_STRIP := llvm-strip
 
-# Checked by `make doctor`. The whole tree builds from C and assembly; no
-# additional language toolchain is required.
+# Checked by `make doctor`: target C, C++, assembly and LLVM binary tools.
 TOOLCHAIN_REQUIRED := $(TOOLCHAIN_CC) $(TOOLCHAIN_CXX) $(TOOLCHAIN_AR) \
 	$(TOOLCHAIN_LD) $(TOOLCHAIN_OBJCOPY) $(TOOLCHAIN_STRIP) $(TOOLCHAIN_RANLIB)

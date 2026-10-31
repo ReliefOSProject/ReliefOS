@@ -13,7 +13,7 @@
 struct component {
   char id[96], symbol[96], kind[96];
   char label[1024], category[1024], extensions[1024];
-  int stage, entry, sdk, api, open_with;
+  int stage, entry, sdk, api, open_with, image_supported;
   char deps[32][96];
   size_t ndeps;
   char api_deps[32][96];
@@ -95,7 +95,8 @@ static void field(struct component *c) {
       "id",         "symbol",    "kind",         "default",
       "required",   "stage",     "entry",        "sdk",
       "api",        "label",     "category",     "depends",
-      "extensions", "open_with", "api_requires", "api_stage_path"};
+      "extensions", "open_with", "api_requires", "api_stage_path",
+      "image_supported"};
   char key[96], value[1024];
   size_t k;
   token(key, sizeof key, 0);
@@ -140,7 +141,7 @@ static void field(struct component *c) {
       space();
     }
     expect(']');
-  } else if ((k >= 3 && k <= 8) || k == 13) {
+  } else if ((k >= 3 && k <= 8) || k == 13 || k == 16) {
     int b = boolean();
     if (k == 3)
       c->def = b;
@@ -156,6 +157,8 @@ static void field(struct component *c) {
       c->api = b;
     if (k == 13)
       c->open_with = b;
+    if (k == 16)
+      c->image_supported = b;
   } else {
     token(value, sizeof value, 1);
     if (strchr(value, '\t'))
@@ -209,6 +212,7 @@ static void parse(const char *data) {
       if (count == LIMIT)
         fail("too many components");
       c = &components[count++];
+      c->image_supported = 1;
     } else {
       if (!c)
         fail("field outside component");
@@ -223,6 +227,10 @@ static void parse(const char *data) {
         strcmp(c->kind, "package-app") && strcmp(c->kind, "tool") &&
         strcmp(c->kind, "library"))
       fail("unknown kind");
+    if (c->stage && !c->image_supported)
+      fail("image membership is unsupported for this component");
+    if (c->entry && !strcmp(c->kind, "library"))
+      fail("application entry is unsupported for this component");
     for (size_t j = 0; j < i; j++)
       if (!strcmp(c->id, components[j].id) ||
           !strcmp(c->symbol, components[j].symbol))
@@ -274,11 +282,15 @@ static void config(const char *path) {
     fail("cannot open config");
   while (getline(&line, &capacity, f) >= 0) {
     for (size_t i = 0; i < count; i++) {
-      const char *suffixes[] = {"BUILD", "IMAGE", "ENTRY", "SDK", "API"};
+      /* SDK/API metadata stays manifest-owned: no production action consumes
+       * per-component configuration switches for those fields. */
+      const char *suffixes[] = {"BUILD", "IMAGE", "ENTRY"};
       int *flags[] = {&components[i].enabled, &components[i].stage,
-                      &components[i].entry, &components[i].sdk,
-                      &components[i].api};
-      for (size_t flag = 0; flag < 5; ++flag) {
+                      &components[i].entry};
+      for (size_t flag = 0; flag < sizeof suffixes / sizeof suffixes[0]; ++flag) {
+        if ((flag == 1 && !components[i].image_supported) ||
+            (flag == 2 && !strcmp(components[i].kind, "library")))
+          continue;
         char key[160];
         int n = snprintf(key, sizeof key, "CONFIG_RELIEFOS_COMPONENT_%s_%s",
                          components[i].symbol, suffixes[flag]);
@@ -315,8 +327,8 @@ static void config(const char *path) {
       visit_api(i, 1);
   for (size_t i = 0; i < count; i++) {
     struct component *c = &components[i];
-    c->stage = c->enabled && c->stage;
-    c->entry = c->stage && c->entry;
+    c->stage = c->enabled && c->image_supported && c->stage;
+    c->entry = c->stage && strcmp(c->kind, "library") != 0 && c->entry;
     c->sdk = c->enabled && c->sdk;
     c->api = c->enabled && c->api;
   }

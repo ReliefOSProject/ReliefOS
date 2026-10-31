@@ -14,7 +14,14 @@ valid_ipv4() (
 )
 mode=1
 custom=0.0.0.0
-if test -r /etc/udhcpc/leonos-dns; then read -r mode custom < /etc/udhcpc/leonos-dns; fi
+if test -e /etc/reliefos/network.conf || test -L /etc/reliefos/network.conf; then
+    settings=$(/usr/lib/reliefos/network-profile dns)
+    read -r mode custom <<EOF
+$settings
+EOF
+elif test -r /etc/udhcpc/leonos-dns; then
+    read -r mode custom < /etc/udhcpc/leonos-dns
+fi
 case "$mode" in
     1) servers=$(cat /run/reliefos/dhcp-dns 2>/dev/null || :) ;;
     0) servers=1.1.1.1 ;;

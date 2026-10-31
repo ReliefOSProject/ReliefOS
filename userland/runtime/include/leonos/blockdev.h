@@ -28,6 +28,7 @@
 #define leonos_block_gpt_delete reliefos_block_gpt_delete
 #define leonos_block_gpt_initialize reliefos_block_gpt_initialize
 #define leonos_block_gpt_set_name reliefos_block_gpt_set_name
+#define leonos_block_gpt_resize reliefos_block_gpt_resize
 #define leonos_block_gpt_set_type reliefos_block_gpt_set_type
 #define leonos_block_gpt_type reliefos_block_gpt_type
 #define leonos_block_gpt_type_name reliefos_block_gpt_type_name

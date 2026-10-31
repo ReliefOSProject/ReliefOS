@@ -20,6 +20,16 @@ class ImageAccounts(unittest.TestCase):
         crypt = ctypes.CDLL(ctypes.util.find_library("crypt"))
         crypt.crypt.argtypes = [ctypes.c_char_p, ctypes.c_char_p]
         crypt.crypt.restype = ctypes.c_char_p
+        base_video = [line.split(":") for line in
+                      (ROOT / "system/rootfs/etc/group").read_text().splitlines()
+                      if line.startswith("video:")]
+        test_video = [line.split(":") for line in
+                      (ROOT / "system/test-accounts/group").read_text().splitlines()
+                      if line.startswith("video:")]
+        self.assertEqual(base_video, [["video", "x", "44", ""]])
+        self.assertEqual(test_video, [["video", "x", "44", "test"]])
+        self.assertIn("video:!::\n", (ROOT / "system/rootfs/etc/gshadow").read_text())
+        self.assertIn("video:!::test\n", (ROOT / "system/test-accounts/gshadow").read_text())
         with tempfile.TemporaryDirectory(prefix="reliefos-image-accounts-") as temporary:
             work = Path(temporary)
             source = work / "source"
@@ -46,6 +56,8 @@ class ImageAccounts(unittest.TestCase):
                         self.assertNotEqual(crypt.crypt(b"incorrect", shadow[user].encode()), shadow[user].encode())
                     self.assertIn("wheel:x:10:test\n", (stage / "etc/group").read_text())
                     self.assertIn("wheel:!::test\n", (stage / "etc/gshadow").read_text())
+                    self.assertIn("video:x:44:test\n", (stage / "etc/group").read_text())
+                    self.assertIn("video:!::test\n", (stage / "etc/gshadow").read_text())
                     self.assertIn("%wheel ALL=(ALL:ALL) ALL", (stage / "etc/sudoers").read_text().splitlines())
                     self.assertTrue((stage / "etc/reliefos/installed").is_file())
                     self.assertEqual((stage / "etc/shadow").stat().st_mode & 0o777, 0o600)

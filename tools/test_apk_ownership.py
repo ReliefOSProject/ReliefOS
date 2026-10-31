@@ -60,6 +60,25 @@ class OwnershipTests(unittest.TestCase):
                 with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                     load_policy(path, ROOT / "configs/components.toml")
 
+    def test_coreutils_dispatcher_links_helper_and_manual_share_one_package(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "root"
+            for folder in ("usr/bin", "bin", "usr/libexec/coreutils", "usr/share/man/man1"):
+                (root / folder).mkdir(parents=True, exist_ok=True)
+            (root / "usr/bin/coreutils").write_bytes(b"GNU dispatcher fixture")
+            for name in ("cat", "cp", "chroot", "false", "[", "stdbuf"):
+                (root / "usr/bin" / name).symlink_to("coreutils")
+            (root / "bin/cat").symlink_to("../usr/bin/cat")
+            (root / "usr/libexec/coreutils/libstdbuf.so").write_bytes(b"preload fixture")
+            (root / "usr/share/man/man1/cp.1").write_bytes(b"GNU manual fixture")
+            entries = {item["path"]: item for item in inventory(root, self.rules)}
+            for path in ("usr/bin/coreutils", "usr/bin/cat", "usr/bin/cp", "usr/bin/chroot",
+                         "usr/bin/false", "usr/bin/[", "usr/bin/stdbuf", "bin/cat",
+                         "usr/libexec/coreutils/libstdbuf.so", "usr/share/man/man1/cp.1"):
+                with self.subTest(path=path):
+                    self.assertEqual(entries["/" + path]["group"], "coreutils")
+                    self.assertNotEqual(entries["/" + path]["classification"], "fallback-needs-review")
+
     def test_policy_is_not_a_fake_database(self):
         self.assertEqual(self.policy["apk_registration"], "not-installed")
         self.assertEqual(self.policy["groups"]["reliefos-fastfetch"]["future_apk_conflicts"], ["fastfetch"])

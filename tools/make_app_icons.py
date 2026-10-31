@@ -3,11 +3,15 @@ from __future__ import annotations
 
 import argparse
 import struct
+import zlib
 from pathlib import Path
 
 
 SIZE = 16
 BMP_SIZE = 32
+ICON_APPS = tuple(line.strip() for line in
+                  (Path(__file__).resolve().parents[1] / 'configs/app-icons.list').read_text().splitlines()
+                  if line.strip() and not line.startswith('#'))
 FONT3 = {
     "A": ["111", "101", "111", "101", "101"],
     "C": ["111", "100", "100", "100", "111"],
@@ -381,9 +385,116 @@ def icon_installer(c: list[list[tuple[int, int, int, int]]]) -> None:
     line(c, 11, 6, 8, 9, BLUE)
 
 
+def icon_extra(c, name):
+    """Additional artwork for ReliefOS-authored graphical applications."""
+    if name == "sysconfdialog":
+        fill(c, 2, 3, 12, 10, WHITE); rect(c, 2, 3, 12, 10, DARK)
+        for y, x in ((6, 5), (10, 10)):
+            fill(c, 4, y, 8, 1, MID); fill(c, x, y-1, 2, 3, BLUE)
+    elif name == "apiapp":
+        line(c, 4, 4, 11, 11, DARK); line(c, 11, 4, 4, 11, DARK)
+        for x, y, color in ((2,2,BLUE), (9,2,GREEN), (2,9,ORANGE), (9,9,PURPLE)):
+            fill(c, x, y, 5, 5, color); rect(c, x, y, 5, 5, DARK)
+    elif name == "mp3play":
+        fill(c, 6, 3, 2, 9, ORANGE); fill(c, 11, 2, 2, 9, ORANGE)
+        line(c, 6, 3, 12, 2, ORANGE); fill(c, 3, 10, 4, 3, ORANGE); fill(c, 8, 9, 4, 3, ORANGE)
+    elif name in {"helloworld", "guitest"}:
+        icon_hello(c) if name == "helloworld" else icon_uidemo(c)
+        if name == "helloworld": fill(c, 2, 1, 4, 2, YELLOW)
+        else: line(c, 8, 11, 10, 13, GREEN); line(c, 10, 13, 14, 8, GREEN)
+    elif name == "leonmmcoset":
+        color = rgba(229,109,158)
+        fill(c, 2, 3, 5, 5, color); fill(c, 9, 3, 5, 5, color)
+        fill(c, 3, 6, 10, 4, color)
+        for y in range(10, 14): fill(c, y-6, y, 28-2*y, 1, color)
+    elif name == "xiaobai":
+        fill(c, 3, 5, 10, 8, WHITE); rect(c, 3, 5, 10, 8, MID)
+        for x in (3, 10): fill(c, x, 2, 3, 4, LIGHT); put(c, x+1, 3, rgba(229,109,158))
+        put(c, 5, 8, BLUE); put(c, 10, 8, BLUE); put(c, 7, 11, DARK); put(c, 8, 11, DARK)
+    elif name == "reliefapk":
+        fill(c, 2, 5, 12, 9, ORANGE); rect(c, 2, 5, 12, 9, DARK)
+        fill(c, 4, 2, 8, 4, YELLOW); rect(c, 4, 2, 8, 4, DARK)
+        fill(c, 7, 6, 2, 5, WHITE)
+        line(c, 5, 9, 8, 12, WHITE); line(c, 8, 12, 11, 9, WHITE)
+    elif name == "reliefppt":
+        fill(c, 1, 1, 14, 10, WHITE); rect(c, 1, 1, 14, 10, ORANGE)
+        fill(c, 2, 2, 12, 2, ORANGE)
+        fill(c, 3, 6, 4, 1, MID); fill(c, 3, 8, 5, 1, MID)
+        fill(c, 10, 5, 3, 5, ORANGE); fill(c, 9, 7, 1, 3, ORANGE)
+        line(c, 8, 11, 8, 14, DARK); line(c, 5, 15, 8, 12, DARK); line(c, 11, 15, 8, 12, DARK)
+    elif name == "relieftodo":
+        draw_document(c, GREEN)
+        for y in (4, 8, 12):
+            rect(c, 4, y, 3, 3, GREEN)
+            fill(c, 9, y+1, 3, 1, MID)
+        line(c, 4, 5, 5, 6, GREEN); line(c, 5, 6, 7, 3, GREEN)
+    elif name == "reliefplayer":
+        fill(c, 1, 1, 14, 14, WHITE); rect(c, 1, 1, 14, 14, BLUE)
+        for x, height in ((3, 3), (5, 6), (7, 4)):
+            fill(c, x, 12-height, 1, height, BLUE)
+        for x in range(5):
+            fill(c, 9+x, 4+x//2, 1, 7-x, GREEN)
+    elif name == "reliefcapture":
+        fill(c, 1, 2, 13, 10, WHITE); rect(c, 1, 2, 13, 10, DARK)
+        fill(c, 2, 3, 11, 2, BLUE)
+        put(c, 4, 4, WHITE); put(c, 6, 4, WHITE); put(c, 8, 4, WHITE)
+        fill(c, 3, 6, 9, 5, rgba(190, 226, 242))
+        put(c, 10, 7, YELLOW); put(c, 11, 7, YELLOW)
+        line(c, 3, 10, 6, 7, GREEN); line(c, 6, 7, 8, 9, GREEN)
+        line(c, 8, 9, 10, 7, GREEN); line(c, 10, 7, 12, 10, GREEN)
+        line(c, 3, 11, 12, 11, BLUE)
+        line(c, 6, 13, 10, 10, DARK); line(c, 6, 13, 12, 15, DARK)
+        fill(c, 10, 8, 3, 3, ORANGE); put(c, 11, 9, WHITE)
+        fill(c, 12, 11, 3, 3, ORANGE); put(c, 13, 12, WHITE)
+        put(c, 6, 13, ORANGE)
+    elif name == "reliefdiagram":
+        line(c, 5, 8, 11, 3, BLUE); line(c, 5, 8, 11, 8, BLUE); line(c, 5, 8, 11, 13, BLUE)
+        fill(c, 1, 6, 5, 5, BLUE); rect(c, 1, 6, 5, 5, DARK)
+        for y, shade in ((1, GREEN), (6, PURPLE), (11, ORANGE)):
+            fill(c, 10, y, 5, 4, shade); rect(c, 10, y, 5, 4, DARK)
+    elif name == "reliefmathpp":
+        fill(c, 1, 1, 14, 14, WHITE); rect(c, 1, 1, 14, 14, BLUE)
+        line(c, 3, 12, 13, 12, MID); line(c, 4, 3, 4, 13, MID)
+        for x, y, u, v in ((3,10,5,7), (5,7,7,11), (7,11,10,4), (10,4,13,7)):
+            line(c, x, y, u, v, PURPLE)
+        line(c, 9, 3, 13, 3, GREEN); line(c, 11, 1, 11, 5, GREEN)
+    elif name == "reliefmath":
+        draw_document(c, PURPLE)
+        fill(c, 6, 5, 3, 1, BLUE)
+        line(c, 5, 10, 6, 12, PURPLE)
+        line(c, 6, 12, 8, 7, PURPLE)
+        line(c, 8, 7, 12, 7, PURPLE)
+        fill(c, 10, 4, 2, 1, ORANGE)
+    elif name == "reliefword":
+        draw_document(c, BLUE)
+        fill(c, 4, 4, 8, 2, BLUE)
+        line(c, 5, 7, 6, 11, BLUE); line(c, 6, 11, 8, 8, BLUE)
+        line(c, 8, 8, 10, 11, BLUE); line(c, 10, 11, 11, 7, BLUE)
+    elif name == "reliefexcel":
+        fill(c, 2, 1, 12, 14, WHITE); rect(c, 2, 1, 12, 14, GREEN)
+        fill(c, 3, 2, 10, 3, GREEN)
+        for x in (6,10): fill(c, x, 5, 1, 9, MID)
+        for y in (8,11): fill(c, 3, y, 10, 1, MID)
+        fill(c, 7, 6, 3, 2, rgba(183,224,194))
+    elif name == "doomlauncher":
+        fill(c, 3, 2, 10, 9, LIGHT); rect(c, 3, 2, 10, 9, DARK)
+        fill(c, 2, 4, 12, 5, LIGHT); fill(c, 4, 5, 3, 3, RED); fill(c, 9, 5, 3, 3, RED)
+        fill(c, 5, 11, 6, 3, DARK)
+        for x in (5,7,9): fill(c, x, 11, 1, 2, WHITE)
+        fill(c, 9, 9, 6, 6, ORANGE)
+        for y in range(3): fill(c, 11, 10+y, 3-y, 1, WHITE)
+    else:
+        return False
+    return True
+
+
 def draw_icon(name: str) -> list[list[tuple[int, int, int, int]]]:
+    if name not in ICON_APPS:
+        raise ValueError(f'No ReliefOS graphical application artwork for {name}')
     c = blank()
-    if name == "fileman":
+    if icon_extra(c, name):
+        pass
+    elif name == "fileman":
         icon_fileman(c)
     elif name == "terminal":
         icon_terminal(c)
@@ -422,10 +533,24 @@ def draw_icon(name: str) -> list[list[tuple[int, int, int, int]]]:
         icon_bugtest(c)
     elif name == "netctl":
         icon_netctl(c)
+    elif name == "network-controller":
+        icon_netctl(c)
+        fill(c, 9, 8, 6, 6, WHITE)
+        rect(c, 9, 8, 6, 6, DARK)
+        line(c, 10, 11, 13, 11, GREEN)
+        line(c, 11, 10, 13, 12, GREEN)
+        line(c, 11, 12, 13, 10, GREEN)
     elif name in {"sessiond", "device-agent"}:
         icon_servicemgr(c)
     elif name == "servicemgr":
         icon_servicemgr(c)
+    elif name == "openrc-controller":
+        icon_servicemgr(c)
+        fill(c, 9, 8, 6, 6, WHITE)
+        rect(c, 9, 8, 6, 6, DARK)
+        line(c, 11, 10, 13, 11, GREEN)
+        line(c, 13, 11, 11, 12, GREEN)
+        line(c, 11, 12, 11, 10, GREEN)
     elif name == "httpget":
         icon_httpget(c)
     elif name == "downloadmgr":
@@ -475,16 +600,37 @@ def write_bmp(path: Path, pixels: list[list[tuple[int, int, int, int]]]) -> None
     path.write_bytes(header + dib + data)
 
 
+def write_png(path: Path, pixels: list[list[tuple[int, int, int, int]]], size: int) -> None:
+    """RGBA PNG with integral pixel-art scaling and no external build libraries."""
+    def chunk(kind, body):
+        return struct.pack('>I', len(body)) + kind + body + struct.pack('>I', zlib.crc32(kind + body))
+    raw = bytearray()
+    for y in range(size):
+        raw.append(0)
+        for x in range(size): raw.extend(pixels[y * SIZE // size][x * SIZE // size])
+    header = struct.pack('>IIBBBBB', size, size, 8, 6, 0, 0, 0)
+    path.write_bytes(b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', header) +
+                     chunk(b'IDAT', zlib.compress(raw, 9)) + chunk(b'IEND', b''))
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Generate ReliefOS BMP app icons")
+    parser = argparse.ArgumentParser(description="Generate ReliefOS classic app artwork and freedesktop PNG icons")
     parser.add_argument("--out-dir", required=True)
-    parser.add_argument("--apps", nargs="+", required=True)
+    parser.add_argument("--apps", nargs="+", choices=ICON_APPS)
+    parser.add_argument("--theme-dir", help="hicolor output directory (optional)")
     args = parser.parse_args()
 
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    for name in args.apps:
-        write_bmp(out_dir / f"{name}.bmp", draw_icon(name))
+    apps = args.apps or ICON_APPS
+    for name in apps:
+        pixels = draw_icon(name)
+        write_bmp(out_dir / f"{name}.bmp", pixels)
+        if args.theme_dir:
+            for size in (16,32,48,64,128,256):
+                directory = Path(args.theme_dir) / f'{size}x{size}' / 'apps'
+                directory.mkdir(parents=True, exist_ok=True)
+                write_png(directory / f'reliefos-{name}.png', pixels, size)
     return 0
 
 

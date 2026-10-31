@@ -9,8 +9,8 @@
 
 static int valid_service(const char *name)
 {
-    static const char *const allowed[] = {"reliefos-desktop", "reliefos-imd", "reliefos-windowd",
-        "reliefos-session", "reliefos-device", "reliefos-dhcp", "reliefos-ntp"};
+    static const char *const allowed[] = {"reliefos-audio", "reliefos-device",
+        "reliefos-dhcp", "reliefos-ntp"};
     for (unsigned i = 0; i < sizeof(allowed) / sizeof(allowed[0]); ++i)
         if (!strcmp(name, allowed[i])) return 1;
     return 0;

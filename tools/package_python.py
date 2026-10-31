@@ -68,7 +68,7 @@ def package(archive: Path, out: Path, musl: Path) -> None:
         notices = tree / "usr/share/licenses/python"
         shutil.copytree(extracted / "python/licenses", notices)
         shutil.copy2(extracted / "python/PYTHON.json", notices / "PYTHON.json")
-        shutil.copy2(ROOT / "userland/python/README.md", notices / "README.md")
+        shutil.copy2(ROOT / "userland/python/README.rst", notices / "README.rst")
         hashes = {p.relative_to(tree).as_posix(): digest(p)
                   for p in sorted((tree / "opt/python").rglob("*")) if p.is_file()}
         launcher = tree / PYTHON_LAUNCHER

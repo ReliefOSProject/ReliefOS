@@ -42,48 +42,6 @@
                     "ignoreFailures": true
                 }
             ]
-        },
-        {
-            "name": "ReliefOS: Debug UEFI loader (Windows + WSL)",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${config:leonos.wslProjectRoot}/out/x86_64/release/reliefnt/generated/boot/loader.elf",
-            "cwd": "${config:leonos.wslProjectRoot}",
-            "MIMode": "gdb",
-            "miDebuggerServerAddress": "127.0.0.1:1234",
-            "pipeTransport": {
-                "pipeProgram": "wsl.exe",
-                "pipeArgs": [
-                    "-e"
-                ],
-                "debuggerPath": "/usr/bin/gdb",
-                "pipeCwd": "${workspaceFolder}",
-                "quoteArgs": true
-            },
-            "sourceFileMap": {
-                "${config:leonos.wslProjectRoot}": "${workspaceFolder}"
-            },
-            "targetArchitecture": "x86_64",
-            "stopAtEntry": false,
-            "preLaunchTask": "ReliefOS: Start QEMU for GDB",
-            "postDebugTask": "ReliefOS: Stop QEMU for GDB",
-            "setupCommands": [
-                {
-                    "description": "Disable GDB pagination",
-                    "text": "set pagination off",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Allow pending breakpoints",
-                    "text": "set breakpoint pending on",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Show the next instruction",
-                    "text": "set disassemble-next-line on",
-                    "ignoreFailures": true
-                }
-            ]
         }
     ]
 }

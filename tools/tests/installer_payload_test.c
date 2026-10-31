@@ -5,13 +5,24 @@
 #undef MNT_EXPIRE
 #undef UMOUNT_NOFOLLOW
 #define lstat fixture_lstat
-#define main installer_application_main
-#include "../../userland/apps/installer/main.c"
-#undef main
+#define fopen fixture_fopen
+#include "../../userland/apps/installer/install_ops.c"
 #undef lstat
+#undef fopen
 
 /* Map guest stat requests into a real, private host filesystem fixture. */
 static const char *fixture_root;
+FILE *fixture_fopen(const char *path, const char *mode)
+{
+    char translated[4096];
+    int size = snprintf(translated, sizeof(translated), "%s%s", fixture_root, path);
+    if (size < 0 || (size_t)size >= sizeof(translated)) { errno = ENAMETOOLONG; return NULL; }
+    int fd = open(translated, O_RDONLY);
+    if (fd < 0) return NULL;
+    FILE *stream = fdopen(fd, mode);
+    if (!stream) { int error = errno; close(fd); errno = error; }
+    return stream;
+}
 int fixture_lstat(const char *path, struct stat *out)
 {
     char translated[4096];
@@ -38,7 +49,16 @@ int main(int argc, char **argv)
 {
     if (argc != 2 && argc != 3) return 2;
     fixture_root = argv[1];
-    int result = argc == 3 ? check_update_target_required() : check_update_payload_required();
+    int result;
+    if (argc == 3 && !strcmp(argv[2], "fresh-xorg")) {
+        setup.skip_xorg = 0;
+        result = check_install_payload_required();
+    } else if (argc == 3 && !strcmp(argv[2], "fresh-console")) {
+        setup.skip_xorg = 1;
+        result = check_install_payload_required();
+    } else if (argc == 3 && !strcmp(argv[2], "update")) {
+        result = check_update_payload_required();
+    } else result = argc == 3 ? check_update_target_required() : check_update_payload_required();
     printf("payload-check=%d\n", result);
     return result == 0 ? 0 : 1;
 }

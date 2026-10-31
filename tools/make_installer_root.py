@@ -12,7 +12,7 @@ from pathlib import Path
 from make_ext2_root import write_ext2_root
 
 ROOT = Path(__file__).resolve().parents[1]
-ADVANCED_INSTALL_GUIDE = ROOT / "docs/ADVANCED_INSTALL.txt"
+ADVANCED_INSTALL_GUIDE = ROOT / "Documentation/admin-guide/installation.rst"
 sys.path.insert(0, str(ROOT / "tools"))
 from reliefos_layout import (  # noqa: E402
     BIN,
@@ -22,7 +22,6 @@ from reliefos_layout import (  # noqa: E402
     ETC_SSL_CERTS,
     HOME,
     RELIEFOS_APPS,
-    RELIEFOS_LIB,
     LIB,
     LICENSES,
     ROOT_SYMLINKS,
@@ -104,17 +103,8 @@ def share_identical_payload_files(stage: Path) -> None:
             os.link(previous, path)
 
 
-def stage_policy_libraries(policy_runtime: Path, stage: Path) -> None:
-    """Stage separately linked canonical and legacy SONAME objects."""
-    copy_file(policy_runtime.with_name("libreliefos.so.2"),
-              stage / RELIEFOS_LIB / "libreliefos.so.2")
-    copy_file(policy_runtime, stage / "usr/lib/leonos/libleonos.so.2")
-
-
-def stage_runtime_payload(esp_tree: Path, stage: Path, policy_runtime: Path,
-                          userland_dir: Path, gptinit: Path,
-                          generated_icons_dir: Path,
-                          policy_apps: tuple[str, ...]) -> None:
+def stage_runtime_payload(esp_tree: Path, stage: Path,
+                          userland_dir: Path, gptinit: Path) -> None:
     """Build the writable ext2 live installer root."""
     # Root filesystems and libc: the musl interpreter and runtime libraries
     # are real files under /lib, matching the ELF PT_INTERP contract.
@@ -127,10 +117,20 @@ def stage_runtime_payload(esp_tree: Path, stage: Path, policy_runtime: Path,
     copy_tree(esp_tree / ETC, stage / ETC)
     layout_directories(stage)
     (stage / ETC_RELIEFOS / "installer-runtime").write_text("installer\n")
-    # Installer-only programs and policy overrides.
-    for app in ("imd", "windowd", "desktop", "installer"):
-        copy_file(userland_dir / f"{app}.elf",
-                  stage / RELIEFOS_APPS / app / f"{app}.elf")
+    # Installer-only programs on top of the ordinary X11 root.
+    copy_file(userland_dir / "installer.elf",
+              stage / RELIEFOS_APPS / "installer" / "installer.elf")
+    copy_file(ROOT / "userland/apps/installer/installer.desktop",
+              stage / "usr/share/applications/reliefos-installer.desktop")
+    copy_file(ROOT / "resources/build-art/app-icons/installer.bmp",
+              stage / "usr/lib/reliefos/apps/installer/installer.bmp")
+    for size in (16, 32, 48, 64, 128, 256):
+        icon = Path(f"hicolor/{size}x{size}/apps/reliefos-installer.png")
+        copy_file(ROOT / "resources/build-art/app-icons" / icon,
+                  stage / "usr/share/icons" / icon)
+    session = stage / "usr/lib/reliefos/installer-session"
+    copy_file(ROOT / "system/xorg/installer-session", session)
+    session.chmod(0o755)
     copy_file(userland_dir / "busybox.elf", stage / BIN / "busybox")
     copy_file(gptinit, stage / RELIEFOS_APPS / "gptinit" / "gptinit.elf")
     (stage / RELIEFOS_APPS / "gptinit" / "manifest.ini").write_text(
@@ -139,14 +139,8 @@ def stage_runtime_payload(esp_tree: Path, stage: Path, policy_runtime: Path,
         "hidden=1\ncommands=gptinit\n",
         encoding="ascii",
     )
-    copy_file(esp_tree / RELIEFOS_APPS / "dynlinkerror" / "dynlinkerror.elf",
-              stage / RELIEFOS_APPS / "dynlinkerror" / "dynlinkerror.elf")
-    for app in policy_apps:
-        copy_file(generated_icons_dir / f"{app}.bmp",
-                  stage / RELIEFOS_APPS / app / f"{app}.bmp")
-    stage_policy_libraries(policy_runtime, stage)
-    copy_file(ADVANCED_INSTALL_GUIDE, stage / "root/ADVANCED_INSTALL.txt")
-    for app in ("imd", "windowd", "desktop", "installer", "gptinit"):
+    copy_file(ADVANCED_INSTALL_GUIDE, stage / "root/installation.rst")
+    for app in ("installer", "gptinit"):
         link, target = command_symlink(app, f"{RELIEFOS_APPS}/{app}/{app}.elf")
         path = stage / link
         if path.is_symlink():
@@ -162,21 +156,19 @@ def stage_installed_payloads(esp_tree: Path, destination: Path) -> None:
     """Split normal staging into ext2 root and the minimal FAT32 boot payload.
 
     The installed root keeps real /bin, /sbin and /lib directories; there is
-    deliberately no /lib64.  The ESP gets only GRUB, the loader and the
-    /reliefos boot files and the /leonos rollback payload.
+    deliberately no /lib64.  The ESP gets only GRUB, the /reliefos boot
+    files and the /leonos rollback payload.
     """
     root = destination / "install/root"
     esp = destination / "install/esp"
     copy_tree(esp_tree, root)
     shutil.rmtree(root / "EFI", ignore_errors=True)
     shutil.rmtree(root / "grub", ignore_errors=True)
-    remove_file(root / "loader.elf")
     shutil.rmtree(root / "reliefos", ignore_errors=True)
     shutil.rmtree(root / "leonos", ignore_errors=True)
 
     copy_file(esp_tree / "EFI/BOOT/BOOTX64.EFI", esp / "EFI/BOOT/BOOTX64.EFI")
     copy_tree(esp_tree / "grub", esp / "grub")
-    copy_file(esp_tree / "loader.elf", esp / "loader.elf")
     copy_tree(esp_tree / "reliefos", esp / "reliefos")
     copy_tree(esp_tree / "leonos", esp / "leonos")
 
@@ -186,31 +178,20 @@ def main() -> int:
     parser.add_argument("--out", default="build/install/root.fat")
     parser.add_argument("--stage", default="build/install/root")
     parser.add_argument("--esp-tree", default="build/esp")
-    parser.add_argument("--installed-policy-dir", default="build/userland-installer-policy")
-    parser.add_argument("--policy-apps", nargs="*", default=("desktop", "settings"))
     parser.add_argument("--userland-dir", default="build/userland")
     parser.add_argument("--gptinit", default="build/userland-installer/gptinit.elf")
-    parser.add_argument("--policy-runtime", default="build/userland-installer-policy/libleonos.so.2")
-    parser.add_argument("--generated-icons-dir", default="build/generated/app-icons")
     parser.add_argument("--size-mib", type=int, default=64)
     args = parser.parse_args()
 
     out = ROOT / args.out
     stage = ROOT / args.stage
     esp_tree = ROOT / args.esp_tree
-    installed_policy_dir = ROOT / args.installed_policy_dir
     userland_dir = ROOT / args.userland_dir
     gptinit = ROOT / args.gptinit
-    generated_icons_dir = ROOT / args.generated_icons_dir
-    policy_runtime = ROOT / args.policy_runtime
 
     if not esp_tree.exists():
         raise FileNotFoundError(f"missing normal ESP payload: {esp_tree}")
-    if not installed_policy_dir.exists():
-        raise FileNotFoundError(f"missing installed policy directory: {installed_policy_dir}")
-    if (not userland_dir.exists() or not generated_icons_dir.exists() or
-            not policy_runtime.is_file() or
-            not policy_runtime.with_name("libreliefos.so.2").is_file() or not gptinit.is_file()):
+    if not userland_dir.exists() or not gptinit.is_file():
         raise FileNotFoundError("missing installer build inputs")
 
     if stage.exists():
@@ -219,20 +200,11 @@ def main() -> int:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.unlink(missing_ok=True)
 
-    stage_runtime_payload(esp_tree, stage, policy_runtime, userland_dir,
-                          gptinit, generated_icons_dir,
-                          tuple(args.policy_apps))
+    stage_runtime_payload(esp_tree, stage, userland_dir, gptinit)
 
     # Installed-system root payload: the same root namespace without the
     # live-installer-only gptinit package.
     stage_installed_payloads(esp_tree, stage)
-    for app in args.policy_apps:
-        if app not in {"desktop", "settings"}:
-            raise ValueError(f"unsupported installer policy app: {app}")
-        name = f"{app}.elf"
-        copy_file(installed_policy_dir / name,
-                  stage / "install/root" / RELIEFOS_APPS / app / name)
-    stage_policy_libraries(policy_runtime, stage / "install/root")
     remove_file(stage / "install/root/etc/license.conf")
     remove_file(stage / "install/root/etc/install.id")
     (stage / "install/root" / VAR_LIB_RELIEFOS).mkdir(parents=True, exist_ok=True)

@@ -33,7 +33,7 @@ class BootPayloadTests(unittest.TestCase):
             source = Path(temporary) / "source"
             destination = Path(temporary) / "ESP with spaces"
             destination.mkdir()
-            files = ("EFI/BOOT/BOOTX64.EFI", "loader.elf", "leonos/kernel.sys",
+            files = ("EFI/BOOT/BOOTX64.EFI", "reliefos/kernel.sys", "leonos/kernel.sys",
                      "grub/grub.cfg", "grub/fonts/font.pf2")
             for name in files:
                 p = source / name
@@ -42,16 +42,18 @@ class BootPayloadTests(unittest.TestCase):
             def copy(src, dest=destination):
                 return subprocess.run(["/bin/sh", str(SCRIPT), "--source", str(src), str(dest)],
                                       capture_output=True, text=True, timeout=10)
+            (destination / "loader.elf").write_text("preserve until inputs validated")
+            self.assertNotEqual(copy(source / "missing").returncode, 0)
+            self.assertNotEqual(copy(source, destination / "missing").returncode, 0)
+            (source / "leonos/kernel.sys").unlink()
+            self.assertNotEqual(copy(source).returncode, 0)
+            self.assertEqual((destination / "loader.elf").read_text(), "preserve until inputs validated")
+            (source / "leonos/kernel.sys").write_text("leonos/kernel.sys")
             result = copy(source)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             for name in files:
                 self.assertEqual((destination / name).read_text(), name)
-            self.assertNotEqual(copy(source / "missing").returncode, 0)
-            self.assertNotEqual(copy(source, destination / "missing").returncode, 0)
-            (source / "leonos/kernel.sys").unlink()
-            (destination / "loader.elf").write_text("preserve until inputs validated")
-            self.assertNotEqual(copy(source).returncode, 0)
-            self.assertEqual((destination / "loader.elf").read_text(), "preserve until inputs validated")
+            self.assertFalse((destination / "loader.elf").exists())
             no_args = subprocess.run(["/bin/sh", str(SCRIPT)], capture_output=True, timeout=10)
             self.assertNotEqual(no_args.returncode, 0)
 

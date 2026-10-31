@@ -121,53 +121,7 @@ def main():
                     probe.text("/tmp/vt-probe")
                     probe.key("ret")
                     wait_log(serial, "VT-PROBE-PASS", process, timeout=30)
-                if not TEXT_ONLY:
-                    import re
-                    probe.text("test ! -e /run/reliefos/session-user && echo VT-GUI-PENDING >/dev/ttyS0")
-                    probe.key("ret")
-                    wait_log(serial, "VT-GUI-PENDING", process, timeout=20)
-                    match = re.search(r"exec pid=(\d+) path=/usr/lib/reliefos/apps/desktop/desktop.elf", serial.read_text())
-                    assert match, "Desktop PID not recorded"
-                    probe.text(f"kill -STOP {match[1]}")
-                    probe.key("ret")
-                    probe.text(f"sleep 8 && kill -CONT {match[1]} &")
-                    probe.key("ret")
-                    # Both switches happen while the compositor is stopped.
-                    # The pause also outlasts the former IPC short-write
-                    # timeout. Repaint and keyboard input must both recover.
-                    probe.key("ctrl-alt-f1")
-                    probe.key("ctrl-alt-f2")
-                    probe.key("ctrl-alt-f1")
-                    wait_graphical(probe, process, "tty1-after-paused-switch")
-                    wait_text(probe, process, "tty1-after-paused-switch-login", "root")
-                    probe.text("root")
-                    probe.frame("tty1-password-entered")
-                    probe.key("ret")
-                    time.sleep(2)
-                    probe.frame("tty1-authentication-pending")
-                    probe.key("ctrl-alt-f2")
-                    # The PAM owner stays alive until logout. Successful GUI
-                    # authentication publishes this root-owned session marker.
-                    probe.text("while test ! -f /run/reliefos/session-user; do sleep 1; done; echo VT-GUI-LOGIN-OK >/dev/ttyS0")
-                    probe.key("ret")
-                    try:
-                        wait_log(serial, "VT-GUI-LOGIN-OK", process, timeout=30)
-                    except AssertionError:
-                        probe.key("ctrl-c")
-                        probe.text("cat /var/log/desktop.log >/dev/ttyS0; echo VT-LOG-END >/dev/ttyS0")
-                        probe.key("ret")
-                        wait_log(serial, "VT-LOG-END", process, timeout=20)
-                        probe.key("ctrl-alt-f1")
-                        raise
-                    probe.key("ctrl-alt-f1")
-                    wait_graphical(probe, process, "tty1-signed-in")
-                    probe.key("ctrl-alt-f2")
-                    probe.text(f"kill {match[1]}")
-                    probe.key("ret")
-                    time.sleep(2)
-                    probe.frame("tty2-after-kill")
-                    probe.key("ctrl-alt-f1")
-                    wait_text(probe, process, "tty1-after-desktop-exit", "login:")
+
                     probe.key("ctrl-alt-f2")
                 before = serial.read_text().count("path=/bin/login ")
                 probe.text("exit")

@@ -51,7 +51,6 @@ class LocaleSeedTests(unittest.TestCase):
             (staging / "grub").mkdir()
             for name, value in (
                 ("EFI/BOOT/BOOTX64.EFI", b"efi"),
-                ("loader.elf", b"loader"),
                 ("grub/grub.cfg", b"menu"),
                 ("reliefos/kernel.sys", b"kernel"),
                 ("leonos/kernel.sys", b"kernel"),

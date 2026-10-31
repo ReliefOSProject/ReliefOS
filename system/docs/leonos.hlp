@@ -55,7 +55,6 @@ ReliefOS shows a blue bugcheck screen when the kernel cannot safely continue. Th
 | STOP reason | Meaning | Usual next step |
 | KERNEL PANIC | Kernel code called `panic()` or `bugcheck_panic()`. The detail line is the panic message. | Search the message in the source tree or serial log. |
 | Unhandled Page Fault | A kernel-mode page fault, or a page fault that could not be recovered by lazy mapping. | Check `CR2`, `RIP`, and `PF FLAGS`. |
-| Window Server Page Fault | The desktop/window server faulted. ReliefOS stops because continuing could corrupt GUI ownership. | Check the window server task and the faulting address. |
 | Divide By Zero | CPU vector 0. Code divided by zero. | Inspect the function at `RIP`. |
 | Debug Exception | CPU vector 1. Debug trap. | Usually a bad debug state or unexpected trap. |
 | Non Maskable Interrupt | CPU vector 2. NMI. | Treat as hardware or emulator-level interruption. |
@@ -94,7 +93,7 @@ When `VECTOR` is `14`, the blue screen shows `PF FLAGS`.
 
 ## User application faults
 
-Most ordinary Ring-3 application page faults do not blue-screen the system. ReliefOS terminates the application, uses exit code `0x8000000e`, and posts an `Application Page Fault` report on the desktop. A user-mode page fault becomes a blue screen mainly when the current task is the window server or when no safe recovery path exists.
+Unrecoverable user-mode page faults are delivered to the application as Linux signals, normally `SIGSEGV` or `SIGBUS`. The default signal action terminates the process. Kernel-mode faults without a safe recovery path still stop the system; inspect the serial diagnostics for the fault address and instruction pointer.
 
 %%ENDDOC
 

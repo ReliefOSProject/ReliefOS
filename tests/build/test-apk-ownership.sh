@@ -9,12 +9,23 @@ python3 - "$src/configs/apk-ownership.json" <<'PY'
 import json, sys
 policy = json.load(open(sys.argv[1], encoding="utf-8"))
 groups = policy["groups"]
-required = {"reliefos-nls", "reliefos-apps", "reliefos-fastfetch",
+required = {"reliefos-nls", "reliefos-apps", "reliefos-fastfetch", "reliefos-xdm-config", "reliefos-reliefmath",
             "reliefos-mimalloc", "reliefos-musl-dev", "reliefos-apk-tools", "reliefos-base"}
 missing = sorted(required - groups.keys())
 legacy = sorted(name for name in groups if name.startswith("leonos-"))
 if missing or legacy or policy.get("current_distributor") != "reliefos-build":
     raise SystemExit(f"APK ownership identity is not migrated: missing={missing}, legacy={legacy}, distributor={policy.get('current_distributor')}")
+for app in ("reliefexcel", "reliefword", "reliefppt"):
+    if app not in groups["reliefos-apps"]["components"]:
+        raise SystemExit(f"{app} is missing from reliefos-apps ownership")
+math_group = groups.get("reliefos-reliefmath", {})
+if "reliefmath" not in math_group.get("components", []):
+    raise SystemExit("reliefmath is missing from component-specific ownership")
+for path in ("usr/bin/reliefmath", "usr/share/reliefmath",
+             "usr/share/licenses/reliefmath", "usr/share/mime/packages/reliefmath.xml",
+             "usr/share/applications/reliefos-reliefmath.desktop"):
+    if path not in math_group.get("paths", []):
+        raise SystemExit(f"ReliefMath ownership does not cover {path}")
 PY
 
 cc -std=c11 -Wall -Wextra -Wpedantic -Werror -Wformat=2 -Wshadow \
@@ -30,6 +41,11 @@ ln -s tool "$tmp/root/usr/bin/tool-link"
 printf app >"$tmp/root/usr/lib/reliefos/apps/demo/demo.elf"
 printf legacy-library >"$tmp/root/usr/lib/leonos/libleonos.so.2"
 printf library >"$tmp/root/usr/lib/reliefos/libreliefos.so.2"
+for size in 16 32 48 64 128 256; do
+    mkdir -p "$tmp/root/usr/share/icons/hicolor/${size}x${size}/apps"
+    printf png > "$tmp/root/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-demo.png"
+done
+printf png > "$tmp/root/usr/share/icons/hicolor/48x48/apps/folder.png"
 cat >"$tmp/policy.json" <<'EOF'
 {"version":1,"current_distributor":"reliefos-build","apk_registration":"not-installed","groups":{
  "reliefos-tools":{"destination":"reliefos","components":[],"paths":["usr/bin/tool"]},
@@ -57,6 +73,8 @@ _, rules = apk_ownership.load_policy(root / "policy.json", root / "components.to
 rows = {row[3]: row for row in (line.split("\t") for line in (root / "list").read_text().splitlines())}
 failures = []
 for path, owner in (("usr/lib/reliefos/apps/demo/demo.elf", "reliefos-demo"),
+                    *((f"usr/share/icons/hicolor/{size}x{size}/apps/reliefos-demo.png", "reliefos-demo") for size in (16,32,48,64,128,256)),
+                    ("usr/share/icons/hicolor/48x48/apps/folder.png", "reliefos-base"),
                     ("usr/lib/reliefos/libreliefos.so.2", "reliefos-apps"),
                     ("usr/lib/leonos/libleonos.so.2", "reliefos-apps")):
     for implementation, actual in (("C", rows[path][0]),
@@ -68,6 +86,55 @@ if installed["current_distributor"] != "reliefos-apk":
     failures.append(f"installed distributor: {installed['current_distributor']}, expected reliefos-apk")
 if failures:
     raise SystemExit("\n".join(failures))
+PY
+
+# ReliefMath's second ELF and all of its private data must travel under the
+# same application owner; the shared SimSun font remains with the base apps.
+mkdir -p "$tmp/mathroot/usr/lib/reliefos/apps/reliefmath" \
+    "$tmp/mathroot/usr/share/reliefmath" "$tmp/mathroot/usr/share/licenses/reliefmath" \
+    "$tmp/mathroot/usr/share/mime/packages" "$tmp/mathroot/usr/share/applications" \
+    "$tmp/mathroot/usr/share/fonts/reliefos" "$tmp/mathroot/usr/bin"
+printf 'GUI\n' > "$tmp/mathroot/usr/lib/reliefos/apps/reliefmath/reliefmath.elf"
+printf 'worker\n' > "$tmp/mathroot/usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf"
+printf 'window icon\n' > "$tmp/mathroot/usr/lib/reliefos/apps/reliefmath/reliefmath.bmp"
+printf 'math font\n' > "$tmp/mathroot/usr/share/reliefmath/STIXTwoMath-Regular.otf"
+printf 'font license\n' > "$tmp/mathroot/usr/share/licenses/reliefmath/STIX-OFL.txt"
+printf 'license summary\n' > "$tmp/mathroot/usr/share/licenses/reliefmath/README.md"
+printf 'mime\n' > "$tmp/mathroot/usr/share/mime/packages/reliefmath.xml"
+printf 'desktop\n' > "$tmp/mathroot/usr/share/applications/reliefos-reliefmath.desktop"
+printf 'shared font\n' > "$tmp/mathroot/usr/share/fonts/reliefos/simsun.ttc"
+ln -s ../lib/reliefos/apps/reliefmath/reliefmath.elf "$tmp/mathroot/usr/bin/reliefmath"
+for size in 16 32 48 64 128 256; do
+    mkdir -p "$tmp/mathroot/usr/share/icons/hicolor/${size}x${size}/apps"
+    printf 'png\n' > "$tmp/mathroot/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-reliefmath.png"
+done
+"$tmp/reliefos-apk-own" --policy "$src/configs/apk-ownership.json" \
+    --root "$tmp/mathroot" --output "$tmp/math-list"
+PYTHONDONTWRITEBYTECODE=1 python3 - "$src" "$tmp" <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(sys.argv[1]) / "tools"))
+import apk_ownership
+root = Path(sys.argv[2])
+_, rules = apk_ownership.load_policy(Path(sys.argv[1]) / "configs/apk-ownership.json", Path(sys.argv[1]) / "configs/components.toml")
+rows = {row[3]: row[0] for row in (line.split("\t") for line in (root / "math-list").read_text().splitlines())}
+required = [
+    "usr/lib/reliefos/apps/reliefmath/reliefmath.elf",
+    "usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf",
+    "usr/lib/reliefos/apps/reliefmath/reliefmath.bmp",
+    "usr/bin/reliefmath",
+    "usr/share/reliefmath/STIXTwoMath-Regular.otf",
+    "usr/share/licenses/reliefmath/README.md",
+    "usr/share/licenses/reliefmath/STIX-OFL.txt",
+    "usr/share/mime/packages/reliefmath.xml",
+    "usr/share/applications/reliefos-reliefmath.desktop",
+    *(f"usr/share/icons/hicolor/{size}x{size}/apps/reliefos-reliefmath.png" for size in (16, 32, 48, 64, 128, 256)),
+]
+for path in required:
+    if rows.get(path) != "reliefos-reliefmath" or apk_ownership.classify(path, rules)[0] != "reliefos-reliefmath":
+        raise SystemExit(f"ReliefMath payload has inconsistent ownership: {path} -> {rows.get(path)}")
+if rows.get("usr/share/fonts/reliefos/simsun.ttc") != "reliefos-apps":
+    raise SystemExit("shared SimSun font must remain in shared app-font ownership")
 PY
 awk -F '\t' '$1=="reliefos-demo" && $2=="file" && $3=="0644" && $4=="usr/lib/reliefos/apps/demo/demo.elf" && $5=="-" { ok=1 } END { exit !ok }' "$tmp/list"
 awk -F '\t' '$1=="reliefos-apps" && $2=="file" && $4=="usr/lib/reliefos/libreliefos.so.2" && $5=="-" { ok=1 } END { exit !ok }' "$tmp/list"
@@ -95,4 +162,22 @@ printf '\177ELFfixture' > "$tmp/root/usr/bin/non-executable-data"
 test "$(wc -l < "$tmp/elf")" = 1
 grep -q 'non-executable-data' "$tmp/elf"
 grep -q '"apk_registration":"installed-by-upstream-apk"' "$tmp/installed.json"
+# XDM policy overlaps exactly five upstream paths. All other XDM files retain
+# upstream ownership when the package stage strips the verified archive list.
+for path in etc/X11/xdm/xdm-config etc/X11/xdm/Xservers etc/X11/xdm/Xresources \
+    usr/lib/X11/xdm/Xsession usr/lib/X11/xdm/Xsetup_0 usr/lib/X11/xdm/chooser; do
+    mkdir -p "$tmp/root/${path%/*}"
+    printf 'XDM fixture\n' > "$tmp/root/$path"
+done
+"$tmp/reliefos-apk-own" --policy "$src/configs/apk-ownership.json" --root "$tmp/root" --output "$tmp/xdm-list"
+PYTHONDONTWRITEBYTECODE=1 python3 - "$src" "$tmp" <<'PY'
+import sys
+from pathlib import Path
+root = Path(sys.argv[2])
+rows = {row[3]: row[0] for row in (line.split("\t") for line in (root / "xdm-list").read_text().splitlines())}
+expected = {"etc/X11/xdm/xdm-config", "etc/X11/xdm/Xservers", "etc/X11/xdm/Xresources",
+            "usr/lib/X11/xdm/Xsession", "usr/lib/X11/xdm/Xsetup_0"}
+assert {path for path, owner in rows.items() if owner == "reliefos-xdm-config"} == expected
+assert rows["usr/lib/X11/xdm/chooser"] != "reliefos-xdm-config"
+PY
 printf 'apk ownership: component groups, legacy libraries, installed identity, policy conflicts, symlinks and ELF inventory passed\n'

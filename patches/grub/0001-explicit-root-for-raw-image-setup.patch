@@ -1,0 +1,71 @@
+Subject: [PATCH] grub-setup: accept an explicit root on a destination image
+
+GRUB 2.12 derives the root from the directory hosting core.img even when
+filesystem probing is disabled. That makes rootless image composition depend
+on access to the host mount's block device. Permit an explicit GRUB root on
+the destination disk, only with --skip-fs-probe. Keep automatic detection for
+all existing callers, including grub-install; do not change the embedding,
+Reed-Solomon or boot-sector logic. No host block device is opened by the
+explicit image path.
+
+ReliefOS integration patch, not an upstream GRUB release change.
+License: GPL-3.0-or-later (same as the modified GRUB sources).
+
+--- a/include/grub/util/install.h
++++ b/include/grub/util/install.h
+@@ -204 +204,2 @@
+-		      int add_rs_codes, int warn_short_mbr_gap);
++		      int add_rs_codes, int warn_short_mbr_gap,
++                      const char *root_device);
+@@ -210 +211,2 @@
+-		       int add_rs_codes, int warn_short_mbr_gap);
++		       int add_rs_codes, int warn_short_mbr_gap,
++                      const char *root_device);
+--- a/util/setup.c
++++ b/util/setup.c
+@@ -258 +258 @@
+-       int warn_small)
++       int warn_small, const char *root_device)
+@@ -313,0 +314,16 @@
++  /* Explicit image roots avoid deriving a raw image's root from the host
++     filesystem. The caller must opt out of host filesystem probing. All
++     embedding and boot-sector construction below remains unchanged. */
++  if (root_device)
++    {
++      if (fs_probe)
++        grub_util_error ("explicit root requires --skip-fs-probe");
++      root = xstrdup (root_device);
++      root_dev = grub_device_open (root);
++      if (!root_dev)
++        grub_util_error ("%s", grub_errmsg);
++      if (root_dev->disk->id != dest_dev->disk->id ||
++          root_dev->disk->dev->id != dest_dev->disk->dev->id)
++        grub_util_error ("explicit root is not on the destination disk");
++    }
++  else
+--- a/util/grub-setup.c
++++ b/util/grub-setup.c
+@@ -85,0 +86,2 @@
++  {"root-device", 'r', N_("DEVICE"), 0,
++   N_("explicit GRUB root on the destination image (requires --skip-fs-probe)"), 0},
+@@ -132,0 +135 @@
++  char *root_device;
+@@ -178,0 +182,5 @@
++        break;
++
++      case 'r':
++        free (arguments->root_device);
++        arguments->root_device = xstrdup (arg);
+@@ -318 +326 @@
+-		   arguments.add_rs_codes, 0);
++		   arguments.add_rs_codes, 0, arguments.root_device);
+@@ -327,0 +336 @@
++  free (arguments.root_device);
+--- a/util/grub-install.c
++++ b/util/grub-install.c
+@@ -1775 +1775 @@
+-				  !grub_install_is_short_mbrgap_supported ());
++				  !grub_install_is_short_mbrgap_supported (), NULL);
+@@ -1806 +1806 @@
+-				   0 /* unused */, 0 /* unused */ );
++				   0 /* unused */, 0 /* unused */, NULL );

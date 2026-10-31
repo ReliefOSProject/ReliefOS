@@ -13,6 +13,14 @@ new_lib="$sdk/lib/libreliefos.so.2"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 
+# Keep the historical goldens unchanged. The explicitly removed window stack
+# is a breaking API removal: these families must be absent, including aliases.
+retired='^((leonos|reliefos)_(ui_|gui_|mouse_|display_|appearance_|inputm_(note_gui_window|observe_gui_key|poll_gui_commit|take_text|take_key|set_current_context))|text_input_(note_gui_window|observe_gui_key|poll_gui_commit|take_text|take_key|set_current_context)|ui_)'
+awk -v retired="$retired" '$1 !~ retired' \
+    "$root/tests/fixtures/brand-abi/old-sdk-exports.tsv" > "$work/old.expected"
+awk -v retired="$retired" '$1 !~ retired' \
+    "$root/tests/fixtures/brand-abi/old-shared-symbols.tsv" > "$work/shared.expected"
+
 test -x "$driver"
 mkdir -p "$work/legacy-headers/leonos"
 cp "$root/tests/fixtures/brand-abi/old-sdk/include/leonos/api.h" \
@@ -46,28 +54,32 @@ readelf -d "$new_lib" | grep -q 'Library soname: \[libreliefos.so.2\]'
 
 nm -D --defined-only --format=posix "$compat_lib" |
     awk '$1 ~ /^leonos_/ {print $1 "\t" $2}' | LC_ALL=C sort > "$work/old.actual"
-cmp "$root/tests/fixtures/brand-abi/old-sdk-exports.tsv" "$work/old.actual"
+cmp "$work/old.expected" "$work/old.actual"
 nm -D --defined-only --format=posix "$compat_lib" |
     awk '{print $1 "\t" $2}' | LC_ALL=C sort > "$work/compat.all"
+awk -v retired="$retired" '$1 ~ retired {print; failed=1} END {exit failed}' \
+    "$work/compat.all"
+nm -D --defined-only --format=posix "$new_lib" |
+    awk -v retired="$retired" '$1 ~ retired {print; failed=1} END {exit failed}'
 tab=$(printf '\t')
 join -t "$tab" -1 1 -2 1 \
-    "$root/tests/fixtures/brand-abi/old-shared-symbols.tsv" "$work/compat.all" \
+    "$work/shared.expected" "$work/compat.all" \
     > "$work/shared.joined"
 awk -F '\t' '$2 != $3 {print $1}' "$work/shared.joined" > "$work/shared.type-mismatch"
 test ! -s "$work/shared.type-mismatch"
 join -t "$tab" -v1 -1 1 -2 1 \
-    "$root/tests/fixtures/brand-abi/old-shared-symbols.tsv" "$work/compat.all" \
+    "$work/shared.expected" "$work/compat.all" \
     > "$work/shared.missing"
 test ! -s "$work/shared.missing"
 
 nm -D --defined-only --format=posix "$new_lib" |
     awk '$1 ~ /^reliefos_/ {print $1 "\t" $2}' | LC_ALL=C sort > "$work/new.actual"
 awk -F '\t' '{sub(/^leonos_/, "reliefos_", $1); print $1 "\t" $2}' \
-    "$root/tests/fixtures/brand-abi/old-sdk-exports.tsv" > "$work/new.expected"
+    "$work/old.expected" > "$work/new.expected"
 while IFS="$(printf '\t')" read -r symbol type; do
     awk -F '\t' -v symbol="$symbol" -v type="$type" \
         '$1 == symbol && $2 == type { found = 1 } END { exit !found }' \
         "$work/new.actual"
 done < "$work/new.expected"
 
-echo 'ok - old and ReliefOS SDK ELFs retain separate SONAMEs and exported ABI symbols'
+echo 'ok - supported SDK ABIs retain their SONAMEs and removed graphics exports are absent'

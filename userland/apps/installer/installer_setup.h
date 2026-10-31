@@ -9,8 +9,17 @@ struct installer_setup {
     char password_confirm[RELIEFOS_AUTH_PASSWORD_LEN];
     char root_password[RELIEFOS_AUTH_PASSWORD_LEN];
     char root_password_confirm[RELIEFOS_AUTH_PASSWORD_LEN];
+    uint8_t skip_xorg;
+    uint8_t skip_bios;
+    uint8_t skip_uefi;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int installer_setup_valid(const struct installer_setup *setup);
 int installer_setup_write(const struct installer_setup *setup, const char *target);
+#ifdef __cplusplus
+}
+#endif
 #endif

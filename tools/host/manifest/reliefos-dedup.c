@@ -46,12 +46,22 @@ static int same_bytes(const char *a, const char *b)
 static int examine(const char *path, const struct stat *st, int type,
                    struct FTW *walk)
 {
+    static const char *const embedded_roots[] = {
+        "install/root/",
+        "install/root-console/",
+    };
     (void)walk;
     if (type == FTW_NS || type == FTW_DNR) return -1;
     if (type != FTW_F || !S_ISREG(st->st_mode)) return 0;
     const char *relative = path + root_length;
     if (*relative == '/') relative++;
-    if (!strncmp(relative, "install/root/", 13)) relative += 13;
+    for (size_t i = 0; i < sizeof embedded_roots / sizeof embedded_roots[0]; i++) {
+        size_t length = strlen(embedded_roots[i]);
+        if (!strncmp(relative, embedded_roots[i], length)) {
+            relative += length;
+            break;
+        }
+    }
     if (strncmp(relative, "usr/", 4) && strncmp(relative, "bin/", 4) &&
         strncmp(relative, "sbin/", 5) && strncmp(relative, "opt/", 4)) return 0;
     FILE *input = fopen(path, "rb");

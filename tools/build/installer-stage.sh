@@ -1,22 +1,23 @@
 #!/bin/sh
-# Build both installer policy roots through the same signed APK transaction as
-# the ordinary system, then embed the installed root and minimal ESP payload.
+# Build the installed and runtime installer roots through the same signed APK
+# transaction as the ordinary system, then embed the installed root and the
+# minimal ESP payload.  The runtime root is the plain X11 root plus the
+# installer programs and the installer-runtime marker; its live session is
+# selected by console-session and started by system/xorg/installer-session.
 set -eu
 . "$(CDPATH= cd -- "$(dirname "$0")/../../scripts" && pwd)/logging.sh"
 [ "$#" = 6 ] || { echo 'usage: installer-stage SRC O RAW_ROOT ESP OUTPUT EPOCH' >&2; exit 2; }
 src=$1 out=$2 raw=$3 esp=$4 output=$5 epoch=$6
 : "${APK_TOOL:?}" "${APK_UPSTREAM:?}" "${APK_OWN_TOOL:?}" "${APK_KEY:?}" "${APK_VERSION:?}"
+for path in usr/sbin/reliefos-boot-install usr/sbin/grub-install \
+    usr/sbin/grub-bios-setup usr/sbin/grub-probe usr/bin/grub-mkimage \
+    usr/lib/grub/i386-pc/boot.img; do
+    [ -s "$raw/$path" ] || { echo "installer root is missing required boot tool/data: $path" >&2; exit 1; }
+done
 mkdir -p "$(dirname "$output")"
 work=$(mktemp -d "$output.new.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 cp -a "$raw" "$work/installed-raw"
-for app in desktop settings; do
-    mkdir -p "$work/installed-raw/usr/lib/reliefos/apps/$app"
-    cp "$out/userland-installer-policy/$app.elf" "$work/installed-raw/usr/lib/reliefos/apps/$app/$app.elf"
-done
-mkdir -p "$work/installed-raw/usr/lib/reliefos"
-cp "$out/installer/lib/libreliefos.so.2" "$work/installed-raw/usr/lib/reliefos/libreliefos.so.2"
-cp "$out/installer/lib/libleonos.so.2" "$work/installed-raw/usr/lib/leonos/libleonos.so.2"
 rm -f "$work/installed-raw/etc/license.conf" "$work/installed-raw/etc/install.id"
 package_root() {
     reliefos_log APK "$3"
@@ -25,30 +26,35 @@ package_root() {
         "${APK_LOCK:-$src/configs/dependencies.lock.json}" \
         "$src/configs/apk-ownership.json" "$APK_OWN_TOOL" "$APK_KEY" "$APK_VERSION"
 }
-restore_native_desktop_policy() {
-    runtime_root=$1
-    mkdir -p "$runtime_root/etc/reliefos" "$runtime_root/etc/runlevels/default"
-    printf 'reliefos\n' > "$runtime_root/etc/reliefos/desktop-backend"
-    for service in reliefos-windowd reliefos-session; do
-        rm -f "$runtime_root/etc/runlevels/default/$service"
-        ln -s "../../init.d/$service" "$runtime_root/etc/runlevels/default/$service"
-    done
-    rm -f "$runtime_root/etc/reliefos/xdm.conf" "$runtime_root/etc/reliefos/xdm-Xservers" \
-        "$runtime_root/etc/X11/xorg.conf" "$runtime_root/etc/pam.d/xdm" \
-        "$runtime_root/etc/reliefos/xdm-session" "$runtime_root/etc/reliefos/twmrc" \
-        "$runtime_root/usr/lib/reliefos/reliefos-xdm" "$runtime_root/usr/lib/reliefos/xdm-session" \
-        "$runtime_root/usr/lib/reliefos/xorg-tty-wrapper"
-}
 package_root "$work/installed-raw" "$work/installed" "$out/packages/apk-installed"
+cp -a "$work/installed-raw" "$work/console-raw"
+sh "$src/tools/build/installer-console-profile.sh" "$work/console-raw"
+package_root "$work/console-raw" "$work/console-installed" "$out/packages/apk-console"
+for root in "$work/installed" "$work/console-installed"; do
+    for path in usr/sbin/reliefos-boot-install usr/sbin/grub-install \
+        usr/sbin/grub-bios-setup usr/sbin/grub-probe usr/bin/grub-mkimage \
+        usr/lib/grub/i386-pc/boot.img; do
+        [ -s "$root/$path" ] || { echo "signed target is missing required boot tool/data: $path" >&2; exit 1; }
+    done
+done
 cp -a "$raw" "$work/runtime-raw"
-restore_native_desktop_policy "$work/runtime-raw"
 mkdir -p "$work/runtime-raw/usr/lib/reliefos/apps/installer"
 cp "$out/userland/installer.elf" "$work/runtime-raw/usr/lib/reliefos/apps/installer/installer.elf"
 chmod 755 "$work/runtime-raw/usr/lib/reliefos/apps/installer/installer.elf"
 ln -s ../lib/reliefos/apps/installer/installer.elf "$work/runtime-raw/usr/bin/installer"
+mkdir -p "$work/runtime-raw/usr/share/applications"
+cp "$src/userland/apps/installer/installer.desktop" \
+   "$work/runtime-raw/usr/share/applications/reliefos-installer.desktop"
+cp "$src/resources/build-art/app-icons/installer.bmp" \
+   "$work/runtime-raw/usr/lib/reliefos/apps/installer/installer.bmp"
+for size in 16 32 48 64 128 256; do
+    icons=usr/share/icons/hicolor/${size}x${size}/apps
+    mkdir -p "$work/runtime-raw/$icons"
+    cp "$src/resources/build-art/app-icons/hicolor/${size}x${size}/apps/reliefos-installer.png" "$work/runtime-raw/$icons/"
+done
 mkdir -p "$work/runtime-raw/usr/lib/reliefos"
-cp "$out/installer/lib/libreliefos.so.2" "$work/runtime-raw/usr/lib/reliefos/libreliefos.so.2"
-cp "$out/installer/lib/libleonos.so.2" "$work/runtime-raw/usr/lib/leonos/libleonos.so.2"
+cp "$src/system/xorg/installer-session" "$work/runtime-raw/usr/lib/reliefos/installer-session"
+chmod 755 "$work/runtime-raw/usr/lib/reliefos/installer-session"
 mkdir -p "$work/runtime-raw/usr/lib/reliefos/apps/gptinit" "$work/runtime-raw/root" "$work/runtime-raw/etc/reliefos"
 cp "$out/userland-installer/gptinit.elf" "$work/runtime-raw/usr/lib/reliefos/apps/gptinit/gptinit.elf"
 cat > "$work/runtime-raw/usr/lib/reliefos/apps/gptinit/manifest.ini" <<'MANIFEST'
@@ -65,7 +71,7 @@ commands=gptinit
 MANIFEST
 ln -s ../lib/reliefos/apps/gptinit/gptinit.elf "$work/runtime-raw/usr/bin/gptinit"
 printf 'installer\n' > "$work/runtime-raw/etc/reliefos/installer-runtime"
-cp "$src/docs/ADVANCED_INSTALL.txt" "$work/runtime-raw/root/ADVANCED_INSTALL.txt"
+cp "$src/Documentation/admin-guide/installation.rst" "$work/runtime-raw/root/installation.rst"
 package_root "$work/runtime-raw" "$work/runtime" "$out/packages/apk-installer-runtime"
 [ -x "$work/runtime/usr/lib/reliefos/apps/installer/installer.elf" ] || {
     echo 'installer runtime package is missing installer.elf' >&2
@@ -74,6 +80,7 @@ package_root "$work/runtime-raw" "$work/runtime" "$out/packages/apk-installer-ru
 mkdir -p "$work/runtime/install"
 reliefos_log STAGE 'installer payload and ESP'
 mv "$work/installed" "$work/runtime/install/root"
+mv "$work/console-installed" "$work/runtime/install/root-console"
 cp -a "$esp" "$work/runtime/install/esp"
 "${INSTALLER_DEDUP_TOOL:-$out/host/bin/reliefos-dedup}" "$work/runtime"
 find "$work/runtime" -exec touch -h -d "@$epoch" {} +

@@ -4,16 +4,6 @@
 set -eu
 [ "$#" = 9 ] || { echo 'usage: rootfs-stage SRC O CONFIG METADATA STAGE_TOOL LAYOUT_TOOL DEST MANIFEST EPOCH' >&2; exit 2; }
 src=$1 out=$2 config=$3 metadata=$4 stage_tool=$5 layout_tool=$6 dest=$7 manifest=$8 epoch=$9
-reliefos_enabled=$(grep -Fxc 'CONFIG_DESKTOP_BACKEND_RELIEFOS=y' "$config" || true)
-xorg_enabled=$(grep -Fxc 'CONFIG_DESKTOP_BACKEND_XORG=y' "$config" || true)
-case "$reliefos_enabled:$xorg_enabled" in
-    1:0) desktop_backend=reliefos ;;
-    0:1) desktop_backend=xorg ;;
-    *)
-        echo 'rootfs-stage: exactly one desktop backend must be enabled' >&2
-        exit 2
-        ;;
-esac
 mkdir -p "$(dirname "$dest")"
 work=$(mktemp -d "$dest.new.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -27,50 +17,79 @@ file() { record f "$1" "/$2" "${3:-0644}" "${4:-reliefos-base}" "${5:-unique}" "
 tree() { record t "$1" "/$2" 0755 "$3" "${4:-unique}"; }
 link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
-# Independent upstream installations never share a destination during builds.
-for package in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3; do
+# Every enabled upstream root is passed by the build graph. The default keeps
+# standalone callers compatible with the complete product package set.
+rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ncurses'}
+for package in $rootfs_upstream_packages; do
+    case $package in
+        ''|*[!A-Za-z0-9._-]*)
+            echo "rootfs-stage: invalid upstream package id: $package" >&2
+            exit 2
+            ;;
+    esac
+    if [ "$package" = ncurses ]; then
+        if enabled "$package"; then
+            # Only runtime data and commands belong in the root (development static
+            # archives/headers are exported by SDK rules instead).
+            for directory in bin share; do
+                input=$out/upstream/$package/root/usr/$directory
+                if [ -d "$input" ]; then tree "$input" "usr/$directory" "$package"; fi
+            done
+            tree "$out/upstream/ncurses/root/usr/share/terminfo" etc/terminfo ncurses
+        fi
+        continue
+    fi
     for directory in bin sbin lib usr etc; do
         input=$out/upstream/$package/root/$directory
         if [ -d "$input" ]; then tree "$input" "$directory" "$package"; fi
     done
 done
+# GRUB is built from the locked GNU source for the guest musl ABI. Publish only
+# the install/probe/image commands and their platform data, not host binaries.
+for command in sbin/grub-install sbin/grub-bios-setup sbin/grub-probe bin/grub-mkimage; do
+    file "$out/upstream/grub/root/usr/$command" "usr/$command" 0755 grub
+done
+tree "$out/upstream/grub/root/usr/lib/grub" usr/lib/grub grub
+tree "$out/upstream/grub/root/usr/share/licenses/grub" usr/share/licenses/grub grub
+file "$out/userland/bootinstall.elf" usr/sbin/reliefos-boot-install 0755 reliefos-boot-tools
+file "$out/userland/initramfs/kernel-bundle.elf" usr/libexec/reliefos/kernel-bundle 0755 reliefos-boot-tools
 for spec in auth pam; do
     for directory in lib usr etc sbin bin; do
         input=$out/$spec/root/$directory
         if [ -d "$input" ]; then tree "$input" "$directory" "$spec"; fi
     done
 done
-for package in ncurses; do
-    if enabled "$package"; then
-        # Only runtime data and commands belong in the root (development static
-        # archives/headers are exported by SDK rules instead).
-        for directory in bin share; do
-            input=$out/upstream/$package/root/usr/$directory
-            if [ -d "$input" ]; then tree "$input" "usr/$directory" "$package"; fi
-        done
-        tree "$out/upstream/ncurses/root/usr/share/terminfo" etc/terminfo ncurses
-    fi
-done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
-printf '%s\n' "$desktop_backend" > "$work/data/desktop-backend"
+# Match the private files created for existing accounts on their first login.
+record d - /etc/skel/.dillo 0700 product-policy override
+for name in dillorc style.css; do
+    file "$src/system/rootfs/etc/skel/.dillo/$name" "etc/skel/.dillo/$name" 0600 product-policy override
+done
+# The source lives in the product rootfs tree, but ReliefMath owns its package
+# and must only contribute it when the application component is selected.
+record x - /usr/share/mime/packages/reliefmath.xml 0000 product-policy override
+record x - /usr/share/mime/packages/reliefmathpp.xml 0000 product-policy override
+record x - /usr/share/mime/packages/relieftodo.xml 0000 product-policy override
+record x - /usr/share/mime/packages/reliefdiagram.xml 0000 product-policy override
+# Image roots default to Xorg. Installer staging also derives a console target
+# profile; the live media keeps Xorg and selects its own installer session.
+printf '%s\n' xorg > "$work/data/desktop-backend"
 file "$work/data/desktop-backend" etc/reliefos/desktop-backend 0644 product-policy override
-if [ "$desktop_backend" = xorg ]; then
-    for service in reliefos-windowd reliefos-session; do
-        record x - "/etc/runlevels/default/$service" 0000 product-policy override
-    done
-    file "$src/system/xorg/xorg.conf" etc/X11/xorg.conf 0644 product-policy override
-    file "$src/system/xorg/reliefos-xdm" usr/lib/reliefos/reliefos-xdm 0755 reliefos-apps override
-    file "$src/system/xorg/xorg-tty-wrapper" usr/lib/reliefos/xorg-tty-wrapper 0755 reliefos-apps override
-    file "$src/system/xorg/xdm.conf" etc/reliefos/xdm.conf 0644 product-policy override
-    file "$src/system/xorg/xdm-Xservers" etc/reliefos/xdm-Xservers 0644 product-policy override
-    file "$src/system/xorg/xdm-session" etc/reliefos/xdm-session 0755 reliefos-apps override
-    file "$src/system/xorg/xdm-session" usr/lib/reliefos/xdm-session 0755 reliefos-apps override
-    file "$src/system/xorg/xdm-setup" usr/lib/reliefos/xdm-setup 0755 reliefos-apps override
-    file "$src/system/xorg/twmrc" etc/reliefos/twmrc 0644 product-policy override
-    file "$src/system/xorg/wallpaper.png" etc/reliefos/wallpaper.png 0644 product-policy override
-    file "$src/system/xorg/pam-xdm" etc/pam.d/xdm 0644 product-policy override
-fi
+file "$src/system/xorg/xorg.conf" etc/X11/xorg.conf 0644 product-policy override
+file "$src/system/xorg/reliefos-xdm" usr/lib/reliefos/reliefos-xdm 0755 reliefos-apps override
+file "$src/system/xorg/xorg-tty-wrapper" usr/lib/reliefos/xorg-tty-wrapper 0755 reliefos-apps override
+# XDM reads its compiled-in config and native script locations. The APK stage
+# assigns these overlapping upstream files to reliefos-xdm-config.
+file "$src/system/xorg/xdm.conf" etc/X11/xdm/xdm-config 0644 product-policy override
+file "$src/system/xorg/xdm-Xservers" etc/X11/xdm/Xservers 0644 product-policy override
+file "$src/system/xorg/xdm-Xresources" etc/X11/xdm/Xresources 0644 product-policy override
+file "$src/system/xorg/xdm-session" usr/lib/X11/xdm/Xsession 0755 product-policy override
+file "$src/system/xorg/xdm-setup" usr/lib/X11/xdm/Xsetup_0 0755 product-policy override
+# IceWM reads these system defaults through its standard /etc/icewm path.
+tree "$src/system/xorg/icewm" etc/reliefos/icewm product-policy override
+link etc/icewm reliefos/icewm reliefos-apps
+file "$src/system/xorg/pam-xdm" etc/pam.d/xdm 0644 product-policy override
 legacy=$src/system/rootfs/var/lib/leonos/users.db
 if [ -e "$legacy" ] || [ -L "$legacy" ]; then
     [ ! -L "$legacy" ] && [ "$(od -An -tx1 "$legacy" | tr -d ' \n')" = 3253554100000000 ] || { echo 'populated legacy account seed requires recovery' >&2; exit 1; }
@@ -102,37 +121,70 @@ for package in musl mimalloc; do tree "$out/sysroot/musl/share/licenses/$package
 printf '/lib:/usr/local/lib:/usr/lib:/usr/lib/reliefos:/usr/lib/leonos\n' > "$work/data/ld.path"
 file "$work/data/ld.path" etc/ld-musl-x86_64.path 0644 musl
 file "$out/generated/system/kerneldebug.sys" usr/lib/reliefos/kerneldebug.sys 0755
-for driver in "$out/generated/drivers"/*.drv; do file "$driver" "usr/lib/reliefos/drivers/${driver##*/}" 0755; done
+[ -f "$out/stage/kernel-payload/kernel-payload.json" ] || { echo 'rootfs-stage: matching kernel payload is missing' >&2; exit 1; }
+tree "$out/stage/kernel-payload/lib/modules" lib/modules reliefos-kernel
+tree "$out/stage/kernel-payload/usr/lib/reliefos/kernel" usr/lib/reliefos/kernel reliefos-kernel
 file "$out/userland/motd.elf" usr/lib/reliefos/motd-status 0755 reliefos-base
-file "$out/userland/dynlinkerror.elf" usr/lib/reliefos/apps/dynlinkerror/dynlinkerror.elf 0755 reliefos-apps
 # awk reads TSV without collapsing empty label/extension fields. No data is
 # interpreted as a command; only validated component IDs are used in paths.
 awk -F '\t' -v dir="$work/manifests" -v src="$src" '
+BEGIN {
+  catalog=src "/configs/app-icons.list";
+  while ((getline app < catalog)>0) if(app!~/^#/ && app!="") artwork[app]=1;
+  close(catalog);
+}
 $4==1 && ($2 ~ /-app$/ || $1 ~ /^(busybox|sl)$/) {
   terminal=0; ini=src "/userland/apps/" $1 "/" $1 ".app.ini";
   while ((getline line < ini)>0) {split(line,a,"="); if(a[1]=="terminal" && a[2]~/^(1|true|yes)$/) terminal=1} close(ini);
   ini=src "/userland/" $1 "/" $1 ".app.ini";
   while ((getline line < ini)>0) {split(line,a,"="); if(a[1]=="terminal" && a[2]~/^(1|true|yes)$/) terminal=1} close(ini);
   f=dir "/" $1 ".ini";
-  printf "[app]\nid=%s\nname=%s\nversion=system\ncategory=%s\nexec=%s.elf\nicon=%s\nentry=%d\nterminal=%d\nsystem=%d\nhidden=0\nopen_with=%d\nextensions=%s\ncommands=%s\n", $1,$8,$9,$1,($5?$1 ".bmp":""),$5,terminal,($2=="system-app"),$11,$10,$1 > f; close(f);
+  printf "[app]\nid=%s\nname=%s\nversion=system\ncategory=%s\nexec=%s.elf\nicon=%s\nentry=%d\nterminal=%d\nsystem=%d\nhidden=0\nopen_with=%d\nextensions=%s\ncommands=%s\n", $1,$8,$9,$1,($5 && artwork[$1]?$1 ".bmp":""),$5,terminal,($2=="system-app"),$11,$10,$1 > f; close(f);
 }' "$metadata"
 awk -F '\t' '$4==1 && $2 ~ /-app$/ {print $1, $5}' "$metadata" > "$work/apps"
 while read -r app entry; do
+    # Artwork is limited to self-authored graphical applications. The
+    # upstream hicolor-icon-theme package supplies index.theme unchanged.
+    if grep -qx "$app" "$src/configs/app-icons.list"; then
+        for size in 16 32 48 64 128 256; do
+            icon=${size}x${size}/apps/reliefos-$app.png
+            file "$src/resources/build-art/app-icons/hicolor/$icon" "usr/share/icons/hicolor/$icon" 0644 "$app"
+        done
+        # Hidden graphical entries (installer/easter eggs) need window icons.
+        file "$src/resources/build-art/app-icons/$app.bmp" "usr/lib/reliefos/apps/$app/$app.bmp" 0644 "$app"
+    fi
     case $app in sudo|su) continue ;; esac
-    # M1 service role gids (kernel LEONOS_GID_*, images.sh re-chown, /etc/group
-    # leonos-window-server/leonos-service): authority rides on the image gid.
     gid=0
-    case $app in desktop) gid=60001 ;; windowd|imd) gid=60002 ;; esac
     file "$out/userland/$app.elf" "usr/lib/reliefos/apps/$app/$app.elf" 0755 "$app" unique "$gid"
     file "$work/manifests/$app.ini" "usr/lib/reliefos/apps/$app/manifest.ini" 0644 "$app"
     if [ "$entry" = 1 ]; then
-        file "$src/resources/build-art/app-icons/$app.bmp" "usr/lib/reliefos/apps/$app/$app.bmp" 0644 "$app"
         for ini in "$src/userland/apps/$app/$app.app.ini" "$src/userland/$app/$app.app.ini"; do
             if [ -f "$ini" ]; then file "$ini" "usr/lib/reliefos/apps/$app/$app.app.ini" 0644 "$app"; break; fi
         done
     fi
+    # Desktop entries are staged for every app that ships one, including
+    # hidden (entry=0) easter eggs, so the X11 menu can offer them.
+    for desktop in "$src/userland/apps/$app/$app.desktop" "$src/userland/$app/$app.desktop"; do
+        if [ -f "$desktop" ]; then file "$desktop" "usr/share/applications/reliefos-$app.desktop" 0644 "$app"; break; fi
+    done
     link "usr/bin/$app" "../lib/reliefos/apps/$app/$app.elf" "$app"
 done < "$work/apps"
+if enabled reliefmath; then
+    # The GUI component owns its worker, private math font, license notices and
+    # MIME declaration as one component-selected rootfs product.
+    file "$out/userland/reliefmath-render.elf" usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf 0755 reliefmath
+    file "$src/system/rootfs/usr/share/mime/packages/reliefmath.xml" usr/share/mime/packages/reliefmath.xml 0644 reliefmath override
+    sh "$src/tools/build/reliefmath-resources-stage.sh" "$src" "$plan"
+fi
+if enabled reliefmathpp; then
+    file "$src/system/rootfs/usr/share/mime/packages/reliefmathpp.xml" usr/share/mime/packages/reliefmathpp.xml 0644 reliefmathpp override
+fi
+if enabled relieftodo; then
+    file "$src/system/rootfs/usr/share/mime/packages/relieftodo.xml" usr/share/mime/packages/relieftodo.xml 0644 relieftodo override
+fi
+if enabled reliefdiagram; then
+    file "$src/system/rootfs/usr/share/mime/packages/reliefdiagram.xml" usr/share/mime/packages/reliefdiagram.xml 0644 reliefdiagram override
+fi
 # Doom's image payload is deliberately opt-in with the app image switch.  Keep
 # the WAD beside the executable so the guest launcher can use its configured
 # default path, and carry the Freedoom notice into the same rootfs manifest.
@@ -157,7 +209,6 @@ for spec in 'sqlite sqlite.so.3'; do
     set -- $spec
     if enabled "$1"; then file "$out/userland/$2" "usr/lib/$2" 0755 "$1"; fi
 done
-if enabled portablegl || enabled glxgears; then file "$out/system/lib/libportablegl.so.1" usr/lib/libportablegl.so.1 0755 portablegl; fi
 if enabled fastfetch; then
     file "$src/userland/fastfetch/config.jsonc" etc/fastfetch/config.jsonc 0644 fastfetch
     file "$src/userland/fastfetch/leonos-ascii.txt" usr/share/fastfetch/leonos-ascii.txt 0644 fastfetch
@@ -177,10 +228,8 @@ file "$config" etc/reliefos/leonos.conf
 for source in "$src/system/config"/*; do
     [ "${source##*/}" = display.conf ] || file "$source" "etc/reliefos/${source##*/}" 0644 product-policy override
 done
-awk 'BEGIN{theme="metro";mode="fill"} /^CONFIG_VMDK_DEFAULT_THEME_WIN95=y$/{theme="win95"} /^CONFIG_VMDK_WALLPAPER_STRETCH=y$/{mode="stretch"} /^CONFIG_VMDK_WALLPAPER_CENTER=y$/{mode="center"} END{print "theme="theme;print "wallpaper.mode="mode}' "$config" > "$work/data/display.conf"
+awk 'BEGIN{theme="metro"} /^CONFIG_VMDK_DEFAULT_THEME_WIN95=y$/{theme="win95"} END{print "theme="theme}' "$config" > "$work/data/display.conf"
 file "$work/data/display.conf" etc/reliefos/display.conf
-awk -F '\t' 'BEGIN{print "# Generated from component selection."} $4==1 && $5==0 && $2 ~ /-app$/ {print "hide=/usr/lib/reliefos/apps/"$1"/"$1".elf"}' "$metadata" > "$work/data/desktop-entries.conf"
-file "$work/data/desktop-entries.conf" etc/reliefos/desktop-entries.conf
 locale_name=$(awk -F= 'BEGIN{lang="zh_CN.UTF-8"} /^CONFIG_VMDK_DEFAULT_LANG=/{gsub(/"/,"",$2);lang=$2} END{print lang}' "$config")
 case $locale_name in *[!A-Za-z0-9._@-]*|'') echo 'rootfs-stage: invalid locale name' >&2; exit 2;; esac
 printf 'LANG=%s\nMUSL_LOCPATH=/usr/share/musl/locales\n' "$locale_name" > "$work/data/locale.conf"
@@ -199,25 +248,17 @@ for loc in $(cat "$src/configs/nls/LINGUAS"); do
     done
 done
 file "$src/logo.png" usr/share/reliefos/resources/logo.png
-file "$src/system/resources/mouse.bmp" usr/share/reliefos/resources/mouse.bmp
-file "$src/system/resources/wallpaper-metro.bmp" usr/share/reliefos/resources/wallpaper-metro.bmp
 file "$src/system/certs/cacert.pem" etc/ssl/certs/ca-certificates.crt
-file "$src/docs/APK_PREPARATION.md" usr/share/doc/reliefos/APK_PREPARATION.md
+file "$src/system/certs/cacert.pem" usr/share/reliefos/certs/ca-certificates.crt 0644 trust
+file "$src/Documentation/admin-guide/packages.rst" usr/share/doc/reliefos/packages.rst
 file "$src/configs/apk-ownership.json" usr/share/reliefos/apk-ownership.json
-file "$src/third_party/portablegl/LICENSE" usr/share/doc/reliefos/PORTABLEGL-LICENSE
-for name in leonos-metro.ttf leonos-win95.ttf; do file "$out/generated/fonts/$name" "usr/share/fonts/reliefos/$name"; done
 for name in simsun.ttc system.psf; do file "$src/system/fonts/$name" "usr/share/fonts/reliefos/$name"; done
 file "$src/system/fonts/times.ttf" usr/share/fonts/reliefos/times-new-roman.ttf
-for source in "$src/resources/build-art/window-buttons"/*.bmp "$src/resources/build-art/minesweeper"/*.bmp; do file "$source" "usr/share/reliefos/resources/${source##*/}"; done
+for source in "$src/resources/build-art/minesweeper"/*.bmp; do file "$source" "usr/share/reliefos/resources/${source##*/}"; done
 file "$src/test/test.mp3" test/test.mp3
 for app in leonmmcoset xiaobai; do
     if enabled "$app"; then file "$src/userland/apps/$app/$app.png" "usr/lib/reliefos/apps/$app/$app.png" 0644 "$app"; fi
 done
-if enabled stardusthello || enabled stardustlayout || enabled stardustshowcase; then
-    for name in md3-light.theme.json md3-dark.theme.json green_light.theme.json green_dark.theme.json; do
-        file "$src/third_party/stardustui/docs/zh-cn/example/$name" "etc/stardustui/theme/$name" 0644 stardustui
-    done
-fi
 # Compatibility links are explicit overrides of upstream aliases.
 link usr/bin/su ../../bin/su authentication override
 for command in fdisk sfdisk runuser fsck blkid mkfs.ext4 fsck.ext4 mkfs.ext2 fsck.ext2 mkfs.fat fsck.fat mkfs.exfat fsck.exfat leonos-grub-installer; do link "sbin/$command" "../usr/sbin/$command" storage override; done

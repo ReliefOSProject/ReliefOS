@@ -1,0 +1,17 @@
+RELIEFOS_APP_NAME := pleditor
+RELIEFOS_APP_OBJECTS := main.o platform.o pleditor.o syntax.o
+RELIEFOS_APP_C_OBJECTS := main.o platform.o pleditor.o syntax.o
+RELIEFOS_APP_CXX_OBJECTS :=
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+
+$(obj)/main.o: $(objtree)/userland/pleditor-generated/src/main.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/platform.o: $(srctree)/userland/apps/pleditor/platform_reliefos.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/pleditor.o: $(objtree)/userland/pleditor-generated/src/pleditor.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/syntax.o: $(objtree)/userland/pleditor-generated/src/syntax.c FORCE
+	$(call if_changed_dep,cc_o_c)
+endif

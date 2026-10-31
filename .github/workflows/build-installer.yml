@@ -96,6 +96,21 @@ jobs:
             ncurses-bin \
             exfatprogs
 
+      # APK staging executes package triggers chrooted inside the target root
+      # via `unshare -Ur`. Ubuntu 24.04 restricts unprivileged user namespaces
+      # by default (AppArmor), so lift the restriction and assert the capability
+      # here instead of failing deep inside the build.
+      - name: Enable unprivileged user namespaces
+        run: |
+          set -euo pipefail
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+          if [ -e /proc/sys/kernel/unprivileged_userns_clone ]; then
+            sudo sysctl -w kernel.unprivileged_userns_clone=1
+          fi
+          unshare -Ur true
+
       - name: Verify toolchain
         run: |
           set -euo pipefail
@@ -132,10 +147,9 @@ jobs:
           : "${KCONFIG_LICENSE_SERVER_URL:=http://127.0.0.1:30301}"
           : "${KCONFIG_LICENSE_DEBUG_LOG:=true}"
 
-          config_path=out/x86_64/release/config/.config
-          # Always start from the checked-in defconfig.  This also runs the
-          # component/Kconfig synchronizer, so removed symbols cannot leak
-          # into a fresh CI checkout from a stale workspace configuration.
+          config_path=out/x86_64/release/.config
+          # Start from native Kconfig and the checked-in product seed, so
+          # removed symbols cannot leak from a stale workspace configuration.
           make fetch
           # kernel/reliefnt submodule cache (unifont); its cache/ is untracked
           make -C kernel/reliefnt fetch
@@ -247,7 +261,7 @@ jobs:
             out/x86_64/release/images/reliefos.vmdk
             out/x86_64/release/images/reliefos-live.iso
             out/x86_64/release/images/reliefos-installer.iso
-            out/x86_64/release/config/.config
+            out/x86_64/release/.config
             build-summary.md                       # 包含摘要文档
           if-no-files-found: error
           compression-level: 0

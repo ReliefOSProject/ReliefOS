@@ -2,23 +2,13 @@
 """Check that all boot environments use six ordinary VT sessions."""
 from pathlib import Path
 import unittest
-import subprocess
-import tempfile
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 ROOTFS = ROOT / "system/rootfs"
 
 
 class ConsoleBootPolicyTests(unittest.TestCase):
-    def test_console_cursor_and_background_output(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-vt-console-") as tmp:
-            binary = str(Path(tmp) / "console")
-            subprocess.run(["clang", "-std=c11", "-g", "-O1",
-                            "-ffunction-sections", "-fdata-sections", "-fsanitize=address,undefined",
-                            "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ikernel/reliefnt/kernel/reliefnt/include",
-                            "-Wl,--gc-sections", "tools/tests/vt_console_test.c", "-o", binary],
-                           cwd=ROOT, check=True)
-            subprocess.run([binary], check=True, timeout=10)
 
     def test_init_respawns_a_session_on_each_virtual_terminal(self):
         config = (ROOTFS / "etc/inittab").read_text()
@@ -31,11 +21,13 @@ class ConsoleBootPolicyTests(unittest.TestCase):
 
     def test_console_session_restores_login_after_graphical_exit(self):
         script = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
-        self.assertIn("login.elf --graphical-session", script)
+        self.assertIn("/usr/lib/reliefos/installer-session", script)
+        self.assertIn("/usr/lib/reliefos/reliefos-xdm", script)
         self.assertIn("/run/reliefos/graphical-session-started", script)
         self.assertIn("login.elf --installer-shell", script)
         self.assertIn("exec /sbin/getty -n -l", script)
-        self.assertLess(script.index("login.elf --graphical-session"),
+        self.assertNotIn("login.elf --graphical-session", script)
+        self.assertLess(script.index("reliefos-xdm"),
                         script.index("exec /sbin/getty"))
         self.assertNotIn("LEONOS_BOOT_MODE", script)
         self.assertNotIn("RELIEFOS_BOOT_MODE", script)
@@ -44,11 +36,66 @@ class ConsoleBootPolicyTests(unittest.TestCase):
     def test_xorg_session_is_selected_by_raw_marker(self):
         script = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
         self.assertIn("/etc/reliefos/desktop-backend", script)
-        self.assertIn("reliefos-xdm", (ROOT / "system/xorg/reliefos-xdm").read_text())
-        self.assertIn("xdm -nodaemon -config", (ROOT / "system/xorg/reliefos-xdm").read_text())
+        launcher = (ROOT / "system/xorg/reliefos-xdm").read_text()
+        self.assertIn("reliefos-xdm", launcher)
+        self.assertIn("/usr/bin/xdm -nodaemon", launcher)
+        self.assertNotIn("/usr/bin/xdm -nodaemon -config", launcher)
         self.assertNotIn("source ", script)
         self.assertNotIn(". /etc/reliefos/desktop-backend", script)
         self.assertNotIn("-novtswitch", (ROOT / "system/xorg/xdm-Xservers").read_text())
+
+    def test_xdm_source_config_selects_the_standard_x11_paths(self):
+        config = (ROOT / "system/xorg/xdm.conf").read_text()
+        for path in (
+            "/etc/X11/xdm/Xservers",
+            "/etc/X11/xdm/Xresources",
+            "/usr/lib/X11/xdm/Xsession",
+            "/usr/lib/X11/xdm/Xsetup_0",
+        ):
+            self.assertIn(path, config)
+        for legacy_path in (
+            "/etc/reliefos/xdm-Xservers",
+            "/etc/reliefos/xdm-Xresources",
+            "/usr/lib/reliefos/xdm-session",
+            "/usr/lib/reliefos/xdm-setup",
+        ):
+            self.assertNotIn(legacy_path, config)
+
+    def test_xdm_greeter_keeps_reliefos_identity_and_gray_blue_branding(self):
+        resources = (ROOT / "system/xorg/xdm-Xresources").read_text()
+        self.assertIn("xlogin*greeting: Login into ReliefOS", resources)
+        self.assertIn("/usr/lib/X11/xdm/pixmaps/xorg.xpm", resources)
+        self.assertIn("/usr/lib/X11/xdm/pixmaps/xorg-bw.xpm", resources)
+
+        def resource_color(name):
+            match = re.search(
+                rf"(?im)^\s*xlogin\*{re.escape(name)}:\s*(#[0-9a-f]{{6}}|[a-z][a-z0-9]*)\s*$",
+                resources,
+            )
+            self.assertIsNotNone(match, f"missing XDM color resource {name}")
+            value = match.group(1).lower()
+            if value.startswith("#"):
+                return tuple(int(value[index:index + 2], 16) for index in (1, 3, 5))
+            named = {"grey": (190, 190, 190), "gray": (190, 190, 190),
+                     "blue3": (0, 0, 205), "blue": (0, 0, 255)}
+            self.assertIn(value, named, f"unrecognized X11 color {value}")
+            return named[value]
+
+        background = resource_color("background")
+        self.assertGreaterEqual(min(background), 160)
+        self.assertLessEqual(max(background) - min(background), 20)
+
+        red, green, blue = resource_color("greetColor")
+        self.assertGreater(blue, red * 1.5, "greeter text should be blue")
+        self.assertGreater(blue, green * 1.15, "greeter text should be blue")
+
+    def test_installer_root_keeps_the_xorg_backend_marker(self):
+        rootfs_stage = (ROOT / "tools/build/rootfs-stage.sh").read_text()
+        installer_root = (ROOT / "tools/make_installer_root.py").read_text()
+        self.assertIn("printf '%s\\n' xorg > \"$work/data/desktop-backend\"",
+                      rootfs_stage)
+        self.assertIn("etc/reliefos/desktop-backend", rootfs_stage)
+        self.assertIn("copy_tree(esp_tree / ETC, stage / ETC)", installer_root)
 
     def test_xorg_server_is_attached_to_tty1_before_vt_initialization(self):
         servers = (ROOT / "system/xorg/xdm-Xservers").read_text()
@@ -57,6 +104,17 @@ class ConsoleBootPolicyTests(unittest.TestCase):
         self.assertIn("exec <\"$tty\" >\"$tty\" 2>&1", wrapper)
         self.assertIn("exec /usr/bin/Xorg \"$@\"", wrapper)
         self.assertNotIn("setsid", wrapper)
+
+    def test_installer_media_session_starts_the_installer_without_a_greeter(self):
+        session = (ROOT / "system/xorg/installer-session").read_text()
+        self.assertIn("installer.elf --graphical", session)
+        self.assertIn("/usr/lib/reliefos/xorg-tty-wrapper", session)
+        self.assertIn("/usr/bin/icewm-session", session)
+        self.assertNotIn("xwallpaper", session)
+        self.assertIn("desktop-backend=xorg", session)
+        self.assertNotIn("reliefos-xdm", session)
+        self.assertNotIn("PAM", session)
+        self.assertNotIn("password", session.lower())
 
     def test_invalid_backend_marker_never_falls_back_to_native_desktop(self):
         script = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
@@ -67,10 +125,12 @@ class ConsoleBootPolicyTests(unittest.TestCase):
     def test_xorg_evidence_events_are_safe_and_orderable(self):
         launcher = (ROOT / "system/xorg/reliefos-xdm").read_text()
         session = (ROOT / "system/xorg/xdm-session").read_text()
+        self.assertIn("/usr/bin/icewm-session", session)
+        self.assertNotIn("xwallpaper", session)
         console = (ROOTFS / "usr/lib/reliefos/console-session").read_text()
         for event in ("desktop-backend=xorg", "xdm started on vt1"):
             self.assertIn(event, launcher)
-        for event in ("PAM authentication accepted", "twm started for uid=", "xterm started", "xdm session ended"):
+        for event in ("PAM authentication accepted", "icewm started for uid=", "st started", "xdm session ended"):
             self.assertIn(event, session)
         self.assertIn("/var/log/xdm.log", launcher)
         self.assertIn("state_dir=/run/reliefos/xdm", launcher)
@@ -83,11 +143,12 @@ class ConsoleBootPolicyTests(unittest.TestCase):
         self.assertIn("tty1 restored to text login", console)
         self.assertNotIn("password", launcher.lower() + session.lower())
 
-    def test_graphical_and_installer_sessions_claim_a_controlling_terminal(self):
+    def test_installer_and_text_sessions_claim_a_controlling_terminal(self):
         source = (ROOT / "userland/apps/login/main.c").read_text()
-        for item in ("setsid()", "TIOCSCTTY", "tcsetpgrp", "VT_ACTIVATE",
-                     "KDSETMODE", "KD_GRAPHICS", "KD_TEXT"):
+        for item in ("setsid()", "TIOCSCTTY", "tcsetpgrp"):
             self.assertIn(item, source)
+        self.assertNotIn("--graphical-session", source)
+        self.assertNotIn("--graphical-login", source)
 
     def test_runlevels_do_not_start_the_desktop_as_a_service(self):
         runlevels = ROOTFS / "etc/runlevels"
@@ -96,7 +157,7 @@ class ConsoleBootPolicyTests(unittest.TestCase):
             self.assertFalse((runlevels / name / "reliefos-desktop").exists())
         self.assertFalse((runlevels / "tty").exists())
         self.assertFalse((runlevels / "installer-tty").exists())
-        self.assertTrue((ROOTFS / "etc/reliefos/desktop-session").exists())
+        self.assertFalse((ROOTFS / "etc/reliefos/desktop-session").exists())
         self.assertIn("installer-runtime", (ROOTFS / "usr/lib/reliefos/rc-default").read_text())
 
     def test_grub_uses_only_installer_session_selection(self):

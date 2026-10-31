@@ -29,9 +29,9 @@ def main():
         subprocess.run([*compiler, "-shared", "-fPIC", "-O2", "-D" + definition,
                         str(module), "-o", str(binary)], check=True)
         files += ["--file", str(binary), destination]
-    binary = output / "secure-loader.elf"
+    binary = output / "secure-exec-probe.elf"
     subprocess.run([*compiler, "-O2", "-DSECURE_LOADER_TEST",
-                    str(ROOT / "tools/tests/setid_runtime_probe.c"),
+                    str(ROOT / "kernel/reliefnt/tools/tests/setid_runtime_probe.c"),
                     "-L" + str(output / "trusted"), "-lreliefos-security-probe", "-o", str(binary)], check=True)
     subprocess.run(["python3", "tools/test_linux_reference.py", "--probe-binary", str(binary),
                     "--case", "secure_loader", "--log", str(output / "linux-6.12.log"),

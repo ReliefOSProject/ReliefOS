@@ -11,8 +11,8 @@ set -u
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd -P)
 cd "$repo_root" || exit 1
 
-deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:?set by mk/tests.mk}}
-lock=${RELIEFOS_LOCK:-${LEONOS_LOCK:?set by mk/tests.mk}}
+deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:?set by scripts/reliefos/Makefile.tests}}
+lock=${RELIEFOS_LOCK:-${LEONOS_LOCK:?set by scripts/reliefos/Makefile.tests}}
 fetch=./tools/build/fetch.sh
 
 failures=0
@@ -154,8 +154,8 @@ else
 fi
 
 # Every product the rest of the build links against has to be a real file *and*
-# has to be declared to Make. `make -q` cannot prove this: the signature rules
-# hang off FORCE, so a dry run always considers them stale. An undeclared path is
+# has to be declared to Make. Native parameter checks use FORCE, so `make -q`
+# cannot prove that a file has a producer. An undeclared path is
 # the one thing Make reports unambiguously, so that is what gets asserted here.
 declared() {
     LC_ALL=C make -n "$1" 2>&1 | grep -q 'No rule to make target'
@@ -218,11 +218,11 @@ else
     failures=$((failures + 1))
 fi
 
-# The signature carries the lock file digest, so an edit is noticed even when
-# its mtime is kept. Build the signature target itself, without rebuilding the
-# sysroot: inspection mode deliberately does not write candidate signatures.
+# The native parameter record carries the lock digest, so an edit is noticed
+# even when its mtime is kept. Build that target without rebuilding the sysroot;
+# inspection mode must leave the output tree unchanged.
 meta=$test_out/meta
-sig=$meta/musl-sysroot.sig
+sig=$meta/musl-sysroot.parameters
 cp "$sig" "$work/signature-baseline" || exit 1
 cp -p "$lock" "$work/lock-backup.json" || exit 1
 refresh_signature() {

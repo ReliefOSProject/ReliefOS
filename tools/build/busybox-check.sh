@@ -11,24 +11,41 @@ END {exit bad}' "$links"
 for name in find xargs dd mount umount fdisk sfdisk blkid lsblk fsck runuser \
     su login passwd sulogin chpasswd adduser addgroup deluser delgroup \
     cryptpw mkpasswd chattr lsattr tune2fs mke2fs mkfs.ext2 mkdosfs mkfs.vfat nologin \
-    clear reset resize less wget xxd start-stop-daemon; do
+    clear reset resize less wget xxd start-stop-daemon bash; do
+    # The applet must not even be compiled in: a suppressed link still leaves
+    # `busybox NAME` callable. Alias names like mkfs.ext2 are covered through
+    # their primary symbol (MKE2FS).
+    symbol=$(printf '%s' "$name" | tr 'a-z.-' 'A-Z__')
+    if grep -Eq "^CONFIG_${symbol}=[ym]" "$config"; then
+        echo "BusyBox enables externally provided applet: $name (CONFIG_$symbol)" >&2
+        exit 1
+    fi
     if awk -F / -v name="$name" '$NF==name {found=1} END {exit !found}' "$links"; then
         echo "BusyBox owns externally provided applet: $name" >&2
         exit 1
     fi
 done
 for name in sh ash false ping ping6 df free top dmesg hexdump killall nc netstat \
-    traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod \
-    unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch; do
+    traceroute traceroute6 crond crontab mdev insmod lsmod modprobe rmmod depmod modinfo switch_root \
+    unzip bunzip2 xz unxz cpio bzip2 bc dc tree timeout watch chroot setuidgid; do
     awk -F / -v name="$name" '$NF==name {found=1} END {exit !found}' "$links" || {
         echo "BusyBox applet is missing: $name" >&2
         exit 1
     }
 done
+if grep -Eq '^CONFIG_(MODPROBE_SMALL|FEATURE_2_4_MODULES)=y$' "$config"; then
+    echo 'BusyBox requires the full Linux module dependency/configuration mechanism' >&2
+    exit 1
+fi
+for symbol in FEATURE_MODUTILS_ALIAS FEATURE_MODUTILS_SYMBOLS FEATURE_MODPROBE_BLACKLIST FEATURE_CMDLINE_MODULE_OPTIONS; do
+    grep -Fqx "CONFIG_$symbol=y" "$config" || {
+        echo "BusyBox module support is missing: CONFIG_$symbol" >&2; exit 1;
+    }
+done
 for path in /bin/sh /bin/ash /bin/false; do
     grep -Fqx "$path" "$links" || { echo "BusyBox shell link is missing: $path" >&2; exit 1; }
 done
-if grep -Eq '^CONFIG_(HUSH|ASH_JOB_CONTROL|HUSH_JOB|SSL_CLIENT|TLS|FEATURE_WGET_HTTPS|FEATURE_SH_STANDALONE|FEATURE_SH_NOFORK|FEATURE_PREFER_APPLETS)=y$' "$config"; then
+if grep -Eq '^CONFIG_(BASH_IS_ASH|BASH_IS_HUSH|HUSH|ASH_JOB_CONTROL|HUSH_JOB|SSL_CLIENT|TLS|FEATURE_WGET_HTTPS|FEATURE_SH_STANDALONE|FEATURE_SH_NOFORK|FEATURE_PREFER_APPLETS)=y$' "$config"; then
     echo 'BusyBox enabled an incompatible shell or TLS feature' >&2
     exit 1
 fi

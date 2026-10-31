@@ -1,0 +1,32 @@
+#!/bin/sh
+# Seed standard Dillo user files, without replacing any personal configuration.
+set -eu
+umask 077
+[ "$#" -le 2 ] || { echo 'usage: dillo-config-init [USER_HOME [DEFAULTS]]' >&2; exit 2; }
+user_directory=${1:-${HOME:-}}
+defaults=${2:-/etc/skel/.dillo}
+case $user_directory in
+    /*) ;;
+    *) echo 'dillo-config-init: an absolute user home is required' >&2; exit 1 ;;
+esac
+configuration=$user_directory/.dillo
+# A linked configuration directory is an explicit user choice.
+[ ! -L "$configuration" ] || exit 0
+for name in dillorc style.css; do
+    [ -f "$defaults/$name" ] && [ -r "$defaults/$name" ] || {
+        echo "dillo-config-init: missing default $name" >&2
+        exit 1
+    }
+done
+mkdir -p "$configuration"
+for name in dillorc style.css; do
+    target=$configuration/$name
+    if [ -e "$target" ] || [ -L "$target" ]; then
+        continue
+    fi
+    # Noclobber also refuses an existing file created after the check above.
+    (set -C; cat "$defaults/$name" > "$target") || {
+        echo "dillo-config-init: could not initialize $name" >&2
+        exit 1
+    }
+done

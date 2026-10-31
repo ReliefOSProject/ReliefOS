@@ -22,9 +22,8 @@ do not collide with third-party Linux software:
     /var/lib/reliefos             persistent mutable state
     /var/cache/reliefos           cache data
     /run/reliefos                 volatile per-boot IPC and session state
-    /usr/lib/reliefos             private libraries, drivers and loader payload
+    /usr/lib/reliefos             private libraries and interpreter payload
     /usr/lib/reliefos/apps        application packages (manifest + executable)
-    /usr/lib/reliefos/drivers     ReliefOS Ring-0 driver modules
     /usr/lib/reliefos/tests       diagnostic guest probes
     /usr/share/reliefos           desktop resources that are not icon-theme data
     /usr/share/fonts/reliefos     ReliefOS UI fonts
@@ -70,7 +69,6 @@ RUN_RELIEFOS = "run/reliefos"
 
 RELIEFOS_LIB = "usr/lib/reliefos"
 RELIEFOS_APPS = "usr/lib/reliefos/apps"
-RELIEFOS_DRIVERS = "usr/lib/reliefos/drivers"
 RELIEFOS_TESTS = "usr/lib/reliefos/tests"
 RELIEFOS_SHARE = "usr/share/reliefos"
 RELIEFOS_RESOURCES = "usr/share/reliefos/resources"
@@ -140,7 +138,6 @@ P_VAR_CACHE_RELIEFOS = "/var/cache/reliefos"
 P_RUN_RELIEFOS = "/run/reliefos"
 P_RELIEFOS_LIB = "/usr/lib/reliefos"
 P_RELIEFOS_APPS = "/usr/lib/reliefos/apps"
-P_RELIEFOS_DRIVERS = "/usr/lib/reliefos/drivers"
 P_RELIEFOS_TESTS = "/usr/lib/reliefos/tests"
 P_RELIEFOS_SHARE = "/usr/share/reliefos"
 P_RELIEFOS_RESOURCES = "/usr/share/reliefos/resources"
@@ -158,15 +155,12 @@ P_LIBRELIEFOS = "/usr/lib/reliefos/libreliefos.so.2"
 # Configuration files.
 P_RELIEFOS_CONF = P_ETC_RELIEFOS + "/leonos.conf"
 P_DISPLAY_CONF = P_ETC_RELIEFOS + "/display.conf"
-P_DRIVERS_CONF = P_ETC_RELIEFOS + "/drivers.conf"
-P_TASKBAR_CFG = P_ETC_RELIEFOS + "/taskbar.cfg"
 P_NETWORK_CONF = P_ETC_RELIEFOS + "/network.conf"
 P_NETWORK_BAK = P_ETC_RELIEFOS + "/network.conf.bak"
 P_NETWORK_TMP = P_ETC_RELIEFOS + "/network.conf.tmp"
 P_LOCALE_CONF = P_ETC_RELIEFOS + "/locale.conf"
 P_ENVIRONMENT_CONF = P_ETC_RELIEFOS + "/environment.conf"
 P_FILEASSOC_CFG = P_ETC_RELIEFOS + "/fileassoc.cfg"
-P_DESKTOP_ENTRIES_CONF = P_ETC_RELIEFOS + "/desktop-entries.conf"
 P_LESSKEY = P_ETC_RELIEFOS + "/lesskey"
 
 # Persistent state and volatile runtime state.
@@ -186,10 +180,9 @@ P_BOOT_KERNELDEBUG_MARKER = "/boot/reliefos/state/kerneldebug.next"
 P_BOOT_DISPLAY_CONF = "/boot/reliefos/config/display.conf"
 P_KERNELDEBUG_MODULE = P_RELIEFOS_LIB + "/kerneldebug.sys"
 
-# ESP-internal (EFI FAT) paths.  GRUB and loader.elf use these before any
-# root filesystem exists.  The loader is at the ESP root so GRUB's
-# ``search --file /loader.elf`` convention is preserved.
-ESP_LOADER = "/loader.elf"
+# ESP-internal (EFI FAT) paths.  GRUB and the kernel read these before any
+# root filesystem exists.  kernel.sys carries the Multiboot2 header GRUB
+# searches for (``search --file /reliefos/kernel.sys``).
 ESP_KERNEL = "/reliefos/kernel.sys"
 ESP_KERNEL_LEGACY = "/leonos/kernel.sys"
 ESP_KERNELDEBUG_MARKER = "/reliefos/state/kerneldebug.next"

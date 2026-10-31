@@ -20,6 +20,8 @@ set -eu
 # A '+' recipe preserves Make's jobserver, but also runs during make -n.
 . "$(CDPATH= cd -- "$(dirname "$0")/../../scripts" && pwd)/logging.sh"
 case ${MAKEFLAGS%% *} in *n*) exit 0 ;; esac
+. "$(CDPATH= cd -- "$(dirname "$0")" && pwd)/upstream-make-environment.sh"
+reliefos_upstream_make_environment
 
 die() {
     printf '%s\n' "auth-upstream: $*" >&2

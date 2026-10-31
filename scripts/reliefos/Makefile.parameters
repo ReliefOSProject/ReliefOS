@@ -1,0 +1,8 @@
+# Command inputs for upstream/product adapters, tracked by native .cmd files.
+define KBUILD_PARAMETERS
+quiet_cmd_parameters_$(1) = GEN     $$@
+cmd_parameters_$(1) = mkdir -p $$(dir $$@); printf '%s\n' '$$(call escsq,$$(strip $$(RELIEFOS_PARAMETERS_$(1))))' > $$@
+$(O_META)/$(1).parameters: FORCE
+	$$(call if_changed,parameters_$(1))
+targets += $(O_META)/$(1).parameters
+endef

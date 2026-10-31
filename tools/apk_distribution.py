@@ -28,7 +28,7 @@ LICENSE_URLS = (
     "https://gitlab.alpinelinux.org/alpine/apk-tools/-/raw/v3.0.8/LICENSE",
 )
 REPOSITORY = "usr/share/reliefos/apk/repository"
-EXTERNAL = {"EFI", "grub", "reliefos", "leonos", "loader.elf", "install"}
+EXTERNAL = {"EFI", "grub", "reliefos", "leonos", "install"}
 _USER_NAMESPACE_AVAILABLE = None
 
 
@@ -48,17 +48,19 @@ def _user_namespace_available():
     return _USER_NAMESPACE_AVAILABLE
 
 
-def _run_apk(apk, arguments, *, usermode=False):
+def _run_apk(apk, arguments, *, install=False):
     """Run apk with root-like metadata support on restricted CI runners."""
     if _user_namespace_available():
         run(["unshare", "-Ur", apk, *arguments])
         return
+    if install:
+        # Install transactions execute package triggers chrooted inside the
+        # target root; fakeroot cannot chroot, so user namespaces are required.
+        raise RuntimeError(
+            "apk install requires unshare user namespaces: package triggers must run chrooted inside the target root")
     if shutil.which("fakeroot") is None:
         raise RuntimeError("apk packaging requires unshare user namespaces or fakeroot")
-    command = ["fakeroot", apk]
-    if usermode:
-        command += ["--usermode", "--force-no-chroot"]
-    run(command + list(arguments))
+    run(["fakeroot", apk, *arguments])
 
 
 def digest(path):
@@ -312,9 +314,12 @@ def build_distribution(source, output, work, apk, key):
                 link.unlink()
         # Retire the old ash-as-bash alias when repackaging an existing root.
         # GNU Bash from Alpine must own /bin/bash, including its script semantics.
-        bash = tree / "bin/bash"
-        if bash.is_symlink() and bash.resolve() == (tree / "bin/busybox").resolve():
-            bash.unlink()
+        for relative in ("bin/bash", "sbin/bash", "usr/bin/bash", "usr/sbin/bash"):
+            bash = tree / relative
+            if bash.is_symlink() and os.readlink(bash) in {
+                "busybox", "./busybox", "/bin/busybox", "../bin/busybox", "../../bin/busybox"
+            }:
+                bash.unlink()
         notices = tree / "usr/share/licenses/apk-tools"
         notices.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(apk.parent / "LICENSE", notices / "LICENSE")
@@ -416,6 +421,7 @@ def build_distribution(source, output, work, apk, key):
             raise ValueError("BusyBox is missing required init/network applets")
         provides["reliefos-busybox"].add("ifupdown-any")
         dependencies = defaultdict(set)
+        dependencies["reliefos-base"].update(("bash", "bash-completion", "bash-doc"))
         dependencies["reliefos-apk-tools"].add("reliefos-busybox")
         if "ca-certificates-bundle" in groups:
             dependencies["reliefos-trust"].add("ca-certificates-bundle")
@@ -491,7 +497,7 @@ def build_distribution(source, output, work, apk, key):
         shutil.copyfile(public, managed / "etc/apk/keys" / legacy_public_name)
         _run_apk(apk, ["--root", managed, "--arch", "x86_64", "--initdb",
                        "--repositories-file", "/dev/null", "--repository", repository / "packages.adb",
-                       "add", *sorted(groups), *[entry["name"] + "=" + entry["version"] for entry in upstream_manifest["packages"]]], usermode=True)
+                       "add", *sorted(groups), *[entry["name"] + "=" + entry["version"] for entry in upstream_manifest["packages"]]], install=True)
         apply_root_symlinks(managed)
         shutil.copytree(repository, managed / REPOSITORY)
         for name in EXTERNAL - {"install"}:
@@ -526,6 +532,8 @@ def repackage_tree(stage, work):
 
     def fingerprint(root):
         digestor = hashlib.sha256()
+        digestor.update(Path(__file__).read_bytes())
+        digestor.update((ROOT / "configs/openrc-packages.json").read_bytes())
         for path in sorted(root.rglob("*")):
             relative = path.relative_to(root).as_posix().encode()
             digestor.update(relative + b"\0")

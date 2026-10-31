@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include "../../userland/runtime/src/blockdev.c"
+_Static_assert(BLKROGET == 0x125e, "Linux BLKROGET uses the historical _IO encoding");
 
 static int fail_open, fail_ioctl, fail_seek, fail_io;
 int open(const char *path, int flags, ...)
@@ -21,6 +22,7 @@ int ioctl(int fd, unsigned long request, ...)
     va_start(args, request);
     if (request == BLKGETSIZE64) *va_arg(args, uint64_t *) = 2ULL * 1024 * 1024 * 1024;
     else if (request == BLKSSZGET) *va_arg(args, int *) = 512;
+    else if (request == BLKROGET) *va_arg(args, int *) = 0;
     else assert(request == BLKRRPART);
     va_end(args);
     return 0;

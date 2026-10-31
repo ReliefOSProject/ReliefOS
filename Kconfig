@@ -1,79 +1,44 @@
-menu "ReliefOS"
+mainmenu "ReliefOS System Configuration"
 
-menu "Build"
+comment "Kernel configuration is owned by ReliefNT"
+comment "Build policy: PROFILE=debug|release; V=1"
 
-source "Kconfig.components"
-
-menu "Desktop"
-
-choice
-    prompt "Desktop backend"
-    default DESKTOP_BACKEND_RELIEFOS
-
-config DESKTOP_BACKEND_RELIEFOS
-    bool "ReliefOS Desktop + desktopd"
-    help
-      Use the existing ReliefOS graphical stack. The user-visible desktopd
-      name maps to windowd, desktop.elf and sessiond; no separate desktopd
-      daemon is built.
-
-config DESKTOP_BACKEND_XORG
-    bool "Xorg + twm + xdm"
-    help
-      Use Alpine's Xorg server, twm window manager and xdm display manager
-      for a minimal X11 login session. ReliefOS native GUI applications are
-      not X11 clients in this mode.
-
-endchoice
-
-endmenu
+menu "System images"
 
 config VMDK_DEFAULT_LANG
     string "Default system locale"
     default "zh_CN.UTF-8"
     help
-      Locale name written into /etc/reliefos/locale.conf of standalone images.
-      Use a real locale name: C.UTF-8 leaves gettext inert.
-
-config VMDK_REQUIRE_LICENSE
-    bool "Standalone VMDK requires license activation"
-    default y
-
-config INSTALLER_INSTALLED_REQUIRE_LICENSE
-    bool "Installed system from installer ISO requires license activation"
-    default y
-
-config RPR_BASE_URL
-    string "ReliefOS remote package repository URL"
-    default "https://reliefosproject.github.io/ReliefOS/rpr"
-    help
-      HTTPS base URL of the RPR directory inside the GitHub Pages site. The
-      client appends /apk for signed APK metadata and /kernel for kernel and
-      middle-layer releases. The Pages tree publishes the RPR machine interface
-      under /rpr/, so the default ends in /rpr.
+      Locale written into /etc/reliefos/locale.conf of system images.
+      Use an installed locale; C.UTF-8 does not enable gettext translations.
 
 config IMAGE_SIZE_MIB
-    int "Standalone VMDK image size in MiB (FAT32 ESP plus ext2 root)"
+    int "Minimum standalone disk size in MiB (GPT, BIOS Boot, ESP and ext4)"
     range 384 4096
     default 1024
+    help
+      Minimum size requested by the BIOS/UEFI disk-image builder. The builder
+      may increase it to fit the root filesystem and partition overhead.
 
 config INSTALLER_ROOT_SIZE_MIB
-    int "Installer runtime root size in MiB"
+    int "Minimum installer runtime root size in MiB"
     range 32 4096
     default 400
     help
-      The installer root is passed by GRUB as one complete Multiboot module.
-      Its size therefore consumes guest RAM before the kernel starts, and the
-      kernel can only manage physical pages above the 768 MiB user window. A
-      400 MiB root therefore requires a guest with at least 2 GiB RAM; use a
-      smaller root or increase the VM memory rather than expecting a 1 GiB
-      guest to load it.
+      GRUB loads the complete installer root as a Multiboot module. It consumes
+      guest RAM before userspace starts; the image builder may enlarge it to
+      fit the runtime. Use sufficient guest RAM (normally at least 2 GiB).
 
-menu "Image defaults"
+menu "Boot console colors"
+
+comment "XDM and IceWM use their own settings and themes"
 
 choice
-    prompt "Standalone VMDK default theme"
+    prompt "Boot console color palette"
     default VMDK_DEFAULT_THEME_METRO
+    help
+      Controls the early kernel console and panic display color palette.
+      This does not change the XDM login screen or the IceWM desktop theme.
 
 config VMDK_DEFAULT_THEME_METRO
     bool "Metro"
@@ -83,188 +48,94 @@ config VMDK_DEFAULT_THEME_WIN95
 
 endchoice
 
-choice
-    prompt "Standalone VMDK wallpaper display mode"
-    default VMDK_WALLPAPER_FILL
 
-config VMDK_WALLPAPER_FILL
-    bool "Fill"
-
-config VMDK_WALLPAPER_STRETCH
-    bool "Stretch"
-
-config VMDK_WALLPAPER_CENTER
-    bool "Center"
-
-endchoice
 
 endmenu
+endmenu
 
-menu "Compiler and diagnostics"
+menu "Activation policy"
 
-choice
-    prompt "Build preset"
-    default BUILD_PRESET_DEVELOP
-
-config BUILD_PRESET_DEBUG
-    bool "Debug"
-
-config BUILD_PRESET_DEVELOP
-    bool "Develop"
-
-config BUILD_PRESET_RELEASE
-    bool "Release"
-
-endchoice
-
-config BUILD_USE_ADVANCED_OVERRIDES
-    bool "Override build preset defaults"
-    default n
+config VMDK_REQUIRE_LICENSE
+    bool "Require activation in standalone images"
+    default y
     help
-      When disabled, Debug/Develop/Release owns optimization, symbols,
-      diagnostics, and stripping. Enable this only when those values should
-      be edited independently.
+      Compile the standalone userspace activation policy. This is separate
+      from the policy compiled for systems deployed by the installer.
 
-config BUILD_OPTIMIZATION_LEVEL
-    int "C/C++ optimization level"
-    range 0 3
-    depends on BUILD_USE_ADVANCED_OVERRIDES
-    default 0 if BUILD_PRESET_DEBUG
-    default 2 if BUILD_PRESET_DEVELOP
-    default 3 if BUILD_PRESET_RELEASE
-
-config BUILD_DEBUG_SYMBOLS
-    bool "Emit debug symbols"
-    depends on BUILD_USE_ADVANCED_OVERRIDES
-    default y if BUILD_PRESET_DEBUG || BUILD_PRESET_DEVELOP
-    default n if BUILD_PRESET_RELEASE
-
-config BUILD_ENABLE_LTO
-    bool "Enable link-time optimization"
-    depends on BUILD_USE_ADVANCED_OVERRIDES
-    default n
-
-config BUILD_STRIP_BINARIES
-    bool "Strip user binaries"
-    depends on BUILD_USE_ADVANCED_OVERRIDES
-    default y if BUILD_PRESET_RELEASE
-    default n if BUILD_PRESET_DEBUG || BUILD_PRESET_DEVELOP
-
-config BUILD_DEVELOPER_DIAGNOSTICS
-    bool "Enable developer diagnostics"
-    depends on BUILD_USE_ADVANCED_OVERRIDES
-    default y if BUILD_PRESET_DEBUG
-    default n if BUILD_PRESET_DEVELOP || BUILD_PRESET_RELEASE
-
-config BUILD_VERBOSE_LOG
-    bool "Enable detailed build logs by default"
-    default n
-
-endmenu
-
-menu "Boot"
-
-config LOADER_VERIFY_SHA256
-    bool "Verify the kernel SHA-256 hash in loader"
-    default n
+config INSTALLER_INSTALLED_REQUIRE_LICENSE
+    bool "Require activation in installer-deployed systems"
+    default y
     help
-      When enabled, the EFI/Multiboot loader hashes kernel.sys before
-      executing it and stops on a mismatch unless the user explicitly
-      confirms a bypass. Leave disabled to skip this
-      optional integrity check and its boot-time cost.
+      Compile the activation policy used by the installed-system payload.
+      This does not select the standalone-image policy above.
+
+config LICENSE_SERVER_URL
+    string "Activation service URL"
+    default "http://127.0.0.1:30301"
+
+config LICENSE_DEBUG_LOG
+    bool "Activation diagnostic logging"
+    default y
 
 endmenu
 
+menu "Package repository"
+
+config RPR_BASE_URL
+    string "ReliefOS remote package repository URL"
+    default "https://reliefosproject.github.io/ReliefOS/rpr"
+    help
+      Base URL of the RPR subtree. Clients append /apk for signed package
+      metadata and /kernel for kernel releases. It is not the documentation
+      URL or the complete Pages site root.
+
 endmenu
 
-menu "QEMU Run"
+source "Kconfig.components"
+
+menu "QEMU run targets"
 
 config QEMU_MEMORY_MB
-    int "QEMU memory size in MiB"
+    int "Guest memory in MiB"
     range 128 65536
     default 4096
+    help
+      Default for run, run-iso and run-installer; MEMORY overrides it.
+      Small values may be insufficient for the selected boot media.
 
 config QEMU_SMP_CPUS
-    int "QEMU virtual CPU count"
+    int "Virtual CPU count"
     range 1 64
     default 4
+    help
+      Default for run targets. CPUS overrides it; this does not configure
+      or limit the number of CPUs supported by the kernel.
 
 config QEMU_DISPLAY_WIDTH
-    int "QEMU VGA display width"
+    int "VGA display width"
     range 640 7680
     default 1920
 
 config QEMU_DISPLAY_HEIGHT
-    int "QEMU VGA display height"
+    int "VGA display height"
     range 480 4320
     default 1080
 
 config QEMU_ENABLE_KVM
-    bool "Enable KVM acceleration for QEMU run targets"
+    bool "Use KVM acceleration"
     default y
+    help
+      Requires usable KVM on the host. QEMU_KVM=0 selects software emulation.
 
 config QEMU_NET_DEVICE
-    string "QEMU network device model"
+    string "Network device model (empty disables networking)"
     default "e1000"
-    help
-      Leave empty to disable QEMU user networking for run targets.
 
 config QEMU_OVMF_PATH
-    string "QEMU OVMF firmware path"
+    string "Preferred OVMF firmware path for UEFI"
     default "/usr/share/ovmf/OVMF.fd"
-
-endmenu
-
-menu "Validation"
-
-config TEST_LICENSE_SERVER
-    bool "Include license server checks in test-all"
-    default y
-
-config TEST_LOS2W
-    bool "Include los2w self-tests in test-all"
-    default y
-
-config TEST_QMP_TERMINAL
-    bool "Include terminal QMP smoke test in test-all"
-    default y
-
-config TEST_QMP_STARDUST
-    bool "Include StardustUI QMP smoke test in test-all"
-    default y
-
-config TEST_COMPONENT_CONFIG
-    bool "Include dynamic component configuration self-tests in test-all"
-    default y
-
-endmenu
-
-menu "SDK and release"
-
-config SDK_INCLUDE_COMPONENT_METADATA
-    bool "Include component manifest metadata in developer SDK"
-    default y
-
-config RELEASE_WRITE_CHECKSUMS
-    bool "Write SHA-256 checksums for release artifacts"
-    default y
-
-config RELEASE_INCLUDE_THIRD_PARTY_NOTICES
-    bool "Include third-party notices in release artifacts"
-    default y
-
-endmenu
-
-menu "System Configuration"
-
-config LICENSE_SERVER_URL
-    string "License platform URL"
-    default "http://127.0.0.1:30301"
-
-config LICENSE_DEBUG_LOG
-    bool "Enable license and OOBE activation debug logs"
-    default y
-
-endmenu
+    help
+      An existing file takes priority over automatic OVMF discovery.
+      QEMU_BOOT=bios uses SeaBIOS and does not use this firmware path.
 
 endmenu
