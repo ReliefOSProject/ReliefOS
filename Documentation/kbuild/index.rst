@@ -10,5 +10,6 @@
    building
    configuration
    products
+   smp-measurement
    sdk
    third-party

@@ -119,16 +119,20 @@ def gpt_partitions(raw: Path) -> list[dict[str, int | str]]:
     with raw.open("rb") as disk:
         disk.seek(PAGE_SIZE)
         header = disk.read(92)
-        if header[:8] != b"EFI PART":
+        if len(header) != 92 or header[:8] != b"EFI PART":
             raise ValueError("input disk has no primary GPT header")
         entries_lba = struct.unpack_from("<Q", header, 72)[0]
         entry_count, entry_size = struct.unpack_from("<II", header, 80)
         if entry_count > 4096 or entry_size < 128 or entry_size > 4096:
             raise ValueError("input disk has invalid GPT entry dimensions")
+        if entries_lba * PAGE_SIZE + entry_count * entry_size > raw.stat().st_size:
+            raise ValueError("input disk has truncated GPT entries")
         for index in range(entry_count):
             disk.seek(entries_lba * PAGE_SIZE + index * entry_size)
             entry = disk.read(entry_size)
-            if len(entry) != entry_size or not any(entry):
+            if len(entry) != entry_size:
+                raise ValueError("input disk has truncated GPT entry")
+            if not any(entry):
                 continue
             first, last = struct.unpack_from("<QQ", entry, 32)
             name = entry[56:128].decode("utf-16le", errors="replace").rstrip("\0")
@@ -155,6 +159,8 @@ def private_raw_image(image: Path, output: Path) -> tuple[Path, dict[str, int | 
 def extract_root(raw: Path, layout: dict[str, int | str], output: Path) -> Path:
     root_image = output / "guest-root.ext4"
     first, last = int(layout["root_first"]), int(layout["root_last"])
+    if first < 0 or last < first or (last + 1) * PAGE_SIZE > raw.stat().st_size:
+        raise ValueError("invalid root partition extent")
     remaining = (last - first + 1) * PAGE_SIZE
     with raw.open("rb") as disk, root_image.open("wb") as root:
         disk.seek(first * PAGE_SIZE)
