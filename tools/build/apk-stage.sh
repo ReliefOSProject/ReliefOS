@@ -371,6 +371,8 @@ while IFS= read -r group; do
         reliefos-base) dependencies="$dependencies bash bash-completion bash-doc" ;;
         reliefos-musl-dev) dependencies="$dependencies reliefos-musl=$version"; provides="$provides musl-dev=$version libc-dev=$version" ;;
         reliefos-apk-tools) dependencies="$dependencies reliefos-busybox" ;;
+        reliefos-busybox) dependencies="$dependencies reliefos-coreutils" ;;
+        reliefos-coreutils) dependencies="$dependencies !coreutils !coreutils-single" ;;
         reliefos-kernel) dependencies="$dependencies reliefos-grub=$version" ;;
         reliefos-trust) dependencies="$dependencies ca-certificates-bundle" ;;
         reliefos-fastfetch) dependencies="$dependencies !fastfetch" ;;
@@ -384,6 +386,10 @@ while IFS= read -r group; do
     replaces=
     case $package in reliefos-*) replaces="leonos-${package#reliefos-}";; esac
     [ "$package" != reliefos-xdm-config ] || replaces="$replaces xdm"
+    # Old images recorded the transferred command paths as BusyBox files.
+    # APK must hand those paths to GNU in the same transaction that upgrades
+    # BusyBox; an overwrite/force flag would conceal a packaging conflict.
+    [ "$package" != reliefos-coreutils ] || replaces="$replaces reliefos-busybox leonos-busybox"
     set -- mkpkg --files "$payload" --output "$repository/$package-$version.apk" \
         --info "name:$package" --info "version:$version" --info arch:x86_64 \
         --info "origin:$package" --info "description:ReliefOS build payload $package" \

@@ -11,6 +11,7 @@
    vga-text
    desktop
    packages
+   coreutils
    network-controller
    kernel-modules
    usb
