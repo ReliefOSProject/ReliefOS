@@ -6,7 +6,10 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 from collections import defaultdict
 from pathlib import Path
 

@@ -1,5 +1,7 @@
 #!/bin/sh
 set -eu
+# Fixture modes are part of the inventory contract, independent of the caller.
+umask 022
 
 src=${1:-$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)}
 tmp=$(mktemp -d)

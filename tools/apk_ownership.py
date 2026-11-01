@@ -10,7 +10,10 @@ from pathlib import Path, PurePosixPath
 import posixpath
 import re
 import stat
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 import reliefos_layout as layout
 from storage_tools import FORMATTER_COMMANDS, UTIL_LINUX_COMMANDS, UTIL_LINUX_LIBRARIES
@@ -105,9 +108,11 @@ def inventory(root: Path, rules):
                     if candidate_basis == "path-rule":
                         group, basis = candidate, "guest-symlink-target"
             elif stat.S_ISREG(info.st_mode):
+                digest = hashlib.sha256()
                 with path.open("rb") as stream:
-                    digest = hashlib.file_digest(stream, "sha256").hexdigest()
-                entry.update(type="file", size=info.st_size, sha256=digest)
+                    for chunk in iter(lambda: stream.read(256 * 1024), b""):
+                        digest.update(chunk)
+                entry.update(type="file", size=info.st_size, sha256=digest.hexdigest())
             else:
                 raise ValueError(f"unexpected staging special file: {name}")
             entry.update(group=group, classification=basis)

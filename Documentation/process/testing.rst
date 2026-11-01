@@ -18,6 +18,17 @@ test 为宿主/构建契约，test-long 包括长流程与恢复，test-legacy �
 test-build 包含 Pages 文档回归，宿主需要 Sphinx；普通内核和用户态编译不因此依赖它。
 按风险选择定向检查；通过已有失败之前的步骤不能称为全套通过。
 
+APK 归属测试和组件 Kconfig 维护脚本支持 Python 3.10+；3.10 另需 TOML 解析包
+``tomli``（Debian/Ubuntu 的 ``python3-tomli``），3.11+ 使用标准库
+``tomllib``。APK 夹具在测试子进程中固定 ``umask 022``，避免继承宿主
+私有权限掩码后与预期文件模式冲突。
+宿主文件写入失败测试使用子进程的文件大小限制，验证短写后报错、原文件
+保留与临时文件清理；不依赖 root 是否能绕过目录权限。
+
+``make test-audio`` 仍需要真实 ALSA 和 OPL3 构建依赖；
+``tools/test_audio_userland.py`` 的日志写入 ``out/audio-hda/qa/logs/``。
+音频产品检查需要已有内核包、rootfs 和 SDK，缺少产物必须报错。
+
 仓库边界
 ========
 
