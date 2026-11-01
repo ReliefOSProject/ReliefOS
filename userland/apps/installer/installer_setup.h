@@ -1,6 +1,7 @@
 #ifndef RELIEFOS_INSTALLER_SETUP_H
 #define RELIEFOS_INSTALLER_SETUP_H
 #include <reliefos/auth_user.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 struct installer_setup {
@@ -12,6 +13,8 @@ struct installer_setup {
     uint8_t skip_xorg;
     uint8_t skip_bios;
     uint8_t skip_uefi;
+    bool swap_enabled;
+    uint64_t swap_size_mib;
 };
 
 #ifdef __cplusplus

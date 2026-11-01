@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 /** @brief Accept the canonical installed-product alphabet and reject traversal.
@@ -214,6 +215,59 @@ int reliefos_kernel_bundle_describe(const char *root, const char *release, struc
     struct kernel_bundle_checked bundle = {.root = -1};
     int result = kernel_bundle_check_open(&bundle, root, release);
     if (!result) *identity = bundle.identity;
+    kernel_bundle_check_close(&bundle);
+    return result;
+}
+
+/** @brief Validate the target bundle, then parse the exact checksum-bound config.
+ * @param root Absolute target payload. @param release Expected bundle release.
+ * @param enabled Changed only after one valid CONFIG_SWAP declaration is found.
+ * @return Zero, or negative errno for incomplete, corrupted or ambiguous input.
+ */
+int reliefos_kernel_bundle_swap_supported(const char *root,const char *release,int *enabled)
+{
+    if (!enabled) return -EINVAL;
+    struct kernel_bundle_checked bundle={.root=-1};
+    int result=kernel_bundle_check_open(&bundle,root,release), fd=-1;
+    unsigned char *bytes=NULL;
+    if (result) goto out;
+    char path[128];
+    int n=snprintf(path,sizeof(path),"%sconfig",bundle.modules);
+    if (n<0 || (size_t)n>=sizeof(path)) {result=-EOVERFLOW;goto out;}
+    struct kernel_bundle_product *product=find_product(&bundle,path);
+    if (!product) {result=-EINVAL;goto out;}
+    fd=boot_open_file(bundle.root,path);
+    if (fd<0) {result=fd;fd=-1;goto out;}
+    struct stat st;
+    if (fstat(fd,&st)<0) {result=-errno;goto out;}
+    if (st.st_size<=0 || st.st_size>1024*1024) {result=-EINVAL;goto out;}
+    size_t length=(size_t)st.st_size,used=0;
+    bytes=malloc(length);
+    if (!bytes) {result=-ENOMEM;goto out;}
+    while (used<length) {
+        ssize_t count=read(fd,bytes+used,length-used);
+        if (count<0 && errno==EINTR) continue;
+        if (count<=0) {result=count<0 ? -errno : -EIO;goto out;}
+        used+=(size_t)count;
+    }
+    char digest[65];
+    result=kernel_bundle_hash_bytes(bytes,length,digest);
+    if (result || strcmp(digest,product->hash)) {if (!result) result=-EIO;goto out;}
+    if (memchr(bytes,0,length) || bytes[length-1]!='\n') {result=-EINVAL;goto out;}
+    int found=0,value=0;
+    for (size_t start=0;start<length;) {
+        unsigned char *end=memchr(bytes+start,'\n',length-start);
+        size_t size=(size_t)(end-(bytes+start));
+        if (size==13 && !memcmp(bytes+start,"CONFIG_SWAP=y",13)) {++found;value=1;}
+        else if (size==24 && !memcmp(bytes+start,"# CONFIG_SWAP is not set",24)) {++found;value=0;}
+        else if (size>=12 && !memcmp(bytes+start,"CONFIG_SWAP=",12)) {result=-EINVAL;goto out;}
+        start+=size+1;
+    }
+    if (found!=1) {result=-EINVAL;goto out;}
+    *enabled=value;
+out:
+    free(bytes);
+    if (fd>=0) close(fd);
     kernel_bundle_check_close(&bundle);
     return result;
 }

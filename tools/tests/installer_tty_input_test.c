@@ -96,6 +96,14 @@ int main(void)
     }
     feed("invalid\nYeS\nnO\n");
     assert(tty_bootloaders(&setup) == 1 && !setup.skip_bios && setup.skip_uefi);
+    feed("\n");setup.swap_enabled=false;
+    assert(installer_tty_select_swap(&setup)==1 && !setup.swap_enabled);
+    feed("yes\n2049\n");
+    assert(installer_tty_select_swap(&setup)==1 && setup.swap_enabled && setup.swap_size_mib==2049);
+    feed("yes\n0\n18446744073709551616\n512\n");
+    assert(installer_tty_select_swap(&setup)==1 && setup.swap_enabled && setup.swap_size_mib==512);
+    feed("no\n");
+    assert(installer_tty_select_swap(&setup)==1 && !setup.swap_enabled);
     puts("installer input: line handling, Xorg/BIOS/UEFI choices and terminal restoration PASS");
     return 0;
 }

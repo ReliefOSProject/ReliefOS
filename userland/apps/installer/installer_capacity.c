@@ -2,8 +2,81 @@
 #include <dirent.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+
+/** @brief Recommend one MiB-rounded RAM size within the documented defaults.
+ * @param ram_kib Detected RAM in KiB. @return Recommended whole MiB, 512..2048.
+ */
+uint64_t installer_swap_recommend_mib(uint64_t ram_kib)
+{
+    uint64_t mib=ram_kib/1024+(ram_kib%1024!=0);
+    return mib<512 ? 512 : mib>2048 ? 2048 : mib;
+}
+
+/** @brief Compute the shared default from the running machine's reported RAM.
+ * @return Recommended whole MiB, falling back to 512 when reporting is unavailable.
+ */
+uint64_t installer_swap_recommend_system(void)
+{
+    FILE *file=fopen("/proc/meminfo","r");
+    if (!file) return 512;
+    char line[128];uint64_t recommendation=512;
+    while (fgets(line,sizeof(line),file)) {
+        if (strncmp(line,"MemTotal:",9)) continue;
+        const char *start=line+9;
+        while (*start==' ' || *start=='\t') ++start;
+        if (*start<'0' || *start>'9') break;
+        errno=0;char *end;
+        unsigned long long kib=strtoull(start,&end,10);
+        while (*end==' ' || *end=='\t') ++end;
+        if (!errno && (!strcmp(end,"kB\n") || !strcmp(end,"kB")))
+            recommendation=installer_swap_recommend_mib((uint64_t)kib);
+        break;
+    }
+    fclose(file);return recommendation;
+}
+
+/** @brief Accept positive whole MiB representable by the v1 last-page field.
+ * @param mib Proposed whole MiB. @return Nonzero exactly when representable.
+ */
+int installer_swap_size_valid(uint64_t mib)
+{
+    return mib && mib<=((uint64_t)UINT32_MAX+1u)/256u;
+}
+
+/** @brief Parse a decimal MiB field and publish only a complete valid value.
+ * @param text NUL-terminated decimal text. @param mib Writable output changed
+ * only on success. @return Zero, negative EINVAL or negative EOVERFLOW.
+ */
+int installer_swap_parse_mib(const char *text,uint64_t *mib)
+{
+    if (!text || !*text || !mib) return -EINVAL;
+    uint64_t value=0;
+    for (const char *p=text;*p;++p) {
+        if (*p<'0' || *p>'9') return -EINVAL;
+        unsigned digit=(unsigned)(*p-'0');
+        if (value>(UINT64_MAX-digit)/10u) return -EOVERFLOW;
+        value=value*10u+digit;
+    }
+    if (!installer_swap_size_valid(value)) return -EINVAL;
+    *mib=value;return 0;
+}
+
+/** @brief Add the selected allocated file without partially updating need.
+ * @param need Mutable capacity snapshot. @param mib Selected whole MiB.
+ * @return Zero or negative validation/arithmetic errno, leaving need unchanged.
+ */
+int installer_capacity_add_swap(struct installer_capacity *need,uint64_t mib)
+{
+    if (!need || !installer_swap_size_valid(mib)) return -EINVAL;
+    uint64_t bytes=mib*1024u*1024u;
+    if (need->root_bytes>UINT64_MAX-bytes || need->root_inodes==UINT64_MAX)
+        return -EOVERFLOW;
+    need->root_bytes+=bytes; ++need->root_inodes;
+    return 0;
+}
 
 /** @brief Accumulate with checked arithmetic and a filesystem allocation unit. */
 static int account(uint64_t *total, uint64_t size, uint64_t unit)

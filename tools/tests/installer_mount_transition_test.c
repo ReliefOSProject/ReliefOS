@@ -66,9 +66,9 @@ int fake_posix_spawnp(pid_t *pid, const char *file,
     (void)attr;
     (void)envp;
     ++spawn_calls;
-    snprintf(spawn_file, sizeof(spawn_file), "%s", file ? file : "");
+    snprintf(spawn_file, sizeof(spawn_file), "%s", file);
     spawn_argc = 0;
-    for (int i = 0; argv && argv[i] && spawn_argc < 16; ++i) {
+    for (int i = 0; argv[i] && spawn_argc < 16; ++i) {
         snprintf(spawn_args[spawn_argc], sizeof(spawn_args[0]), "%s", argv[i]);
         ++spawn_argc;
     }
@@ -242,6 +242,12 @@ int main(void)
     assert(installer_mount_targets("/dev/sda", 1) < 0);
     assert(format_calls == previous_formats && mutations == 2);
     capacity_bytes = 0; capacity_inodes = 10000000;
+    assert(installer_mount_targets("/dev/sda", 1) == -ENOSPC);
+    assert(format_calls == previous_formats && mutations == 2);
+    capacity_inodes = 0;setup.swap_enabled = true;setup.swap_size_mib = 4096;
+    assert(installer_mount_targets("/dev/sda", 1) == -ENOSPC);
+    assert(format_calls == previous_formats && mutations == 2);
+    installer_partition_auto = 0;setup.swap_size_mib = 512;
     assert(installer_mount_targets("/dev/sda", 1) == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
     puts("PASS installer mount transition, raw BIOS role and capacity refusal before formatting");

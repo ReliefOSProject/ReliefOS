@@ -54,6 +54,10 @@ struct installer_tty_context {
 extern "C" {
 #endif
 int installer_tty_main(const struct installer_tty_context *context);
+/** @brief Read the optional fresh-install swap choice and checked MiB size.
+ * @param setup Mutable shared wizard settings. @return One on success, zero on EOF.
+ */
+int installer_tty_select_swap(struct installer_setup *setup);
 #ifdef __cplusplus
 }
 #endif

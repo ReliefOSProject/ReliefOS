@@ -129,7 +129,7 @@ def main():
     metadata = {'mode': args.mode, 'platform': 'QEMU/KVM q35 SVGA II, 2 CPUs, 4 GiB',
                 'kernel_sha256': digest(kernel), 'symbols_sha256': digest(symbols),
                 'source_image': str(source), 'source_sha256': source_hash,
-                'injection': 'GDB writes mov (%rax),%rax at console_display_tick in guest RAM; RAX=0xffff800000000000',
+                'injection': 'GDB writes mov (%rax),%rax at console_display_tick; target chosen from a non-present current PML4 entry',
                 'held_display_locks': args.hold_display_locks, 'vmware_verified': False}
     process = probe = None
     try:
@@ -169,14 +169,32 @@ def main():
         gdb_commands = ['set pagination off', 'set confirm off', f'target remote {gdb}',
                         'hbreak console_display_tick', 'continue',
                         'printf "FAULT-INJECTION RIP=%#lx CS=%#lx RSP=%#lx\\n", $rip, $cs, $rsp',
-                        'x/8bx $rip', 'delete breakpoints']
+                        'x/8bx $rip', 'delete breakpoints',
+                        # Prove a canonical kernel address absent from the
+                        # current page table while the guest is stopped. A
+                        # non-present PML4 entry excludes every lower mapping.
+                        'python',
+                        'import gdb',
+                        'root = int(gdb.parse_and_eval("$cr3")) & 0x000ffffffffff000',
+                        'base = 0xffff800000000000',
+                        'target = None',
+                        'for slot in range(256, 511):',
+                        '    entry = bytes(gdb.selected_inferior().read_memory(base + root + slot * 8, 8))',
+                        '    if (int.from_bytes(entry, "little") & 1) == 0:',
+                        '        target = 0xffff000000000000 | (slot << 39)',
+                        '        break',
+                        'if target is None:',
+                        '    raise gdb.GdbError("no non-present kernel PML4 entry")',
+                        'gdb.execute("set $fault_target = (unsigned long long)0x%x" % target)',
+                        'print("FAULT-TARGET=0x%016X PML4E=not-present" % target)',
+                        'end']
         if args.hold_display_locks:
             gdb_commands += ['set {unsigned int} &console_log_owner = 0xfffffffe',
                              'set {unsigned int} &device_lock = 1']
         gdb_commands += ['set {unsigned char} (unsigned long)&console_display_tick = 0x48',
                          'set {unsigned char} ((unsigned long)&console_display_tick+1) = 0x8b',
                          'set {unsigned char} ((unsigned long)&console_display_tick+2) = 0x00',
-                         'set $rax = 0xffff800000000000',
+                         'set $rax = $fault_target',
                          'hbreak console_panic_begin', 'continue',
                          f'monitor screendump {output}/frozen-display.ppm',
                          'delete breakpoints', 'detach', 'quit', '']
@@ -185,6 +203,11 @@ def main():
         with (output/'gdb.log').open('w') as log:
             run(['gdb', '-q', '-nx', '--batch', symbols, '-x', script],
                 stdout=log, stderr=subprocess.STDOUT, timeout=30)
+        selection = re.search(r'FAULT-TARGET=0x([0-9A-F]{16}) PML4E=not-present',
+                              (output/'gdb.log').read_text(errors='replace'))
+        if not selection: raise AssertionError('GDB did not prove a non-present PML4 entry')
+        target = int(selection[1], 16)
+        metadata['fault_address'] = f'0x{target:016X}'
         wait_log(serial, 'RESTART REQUIRED', process, 30)
         first = probe.frame('panic')
         first.save(output/'panic.png')
@@ -195,7 +218,7 @@ def main():
         final_log = serial.read_text(errors='replace')
         report = final_log[final_log.index('!!! KERNEL PANIC'):]
         (output/'panic-report.txt').write_text(report)
-        for needle in ('Unhandled Page Fault', 'CR2=0xFFFF800000000000', 'RAX=', 'RIP=',
+        for needle in ('Unhandled Page Fault', f'CR2=0x{target:016X}', 'RAX=', 'RIP=',
                        'PF: P=0 W=0 U=0', 'other CPUs stopped=1/1',
                        'Display: tty'+('2 (current text console)' if args.mode=='tty' else '1 (GUI -> panic text overlay)')):
             if needle not in report: raise AssertionError('missing diagnostic: '+needle)

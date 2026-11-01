@@ -10,6 +10,7 @@
 #include <libintl.h>
 
 #include "installer_tty.h"
+#include "installer_capacity.h"
 #include "model.h"
 
 #define T(s) gettext(s)
@@ -118,6 +119,42 @@ static int tty_install_xorg(struct installer_setup *setup)
             return 1;
         }
         puts("Please answer yes or no.");
+    }
+}
+
+/** @brief Read a default-off swap choice and an explicitly validated MiB size.
+ * @param setup Mutable shared wizard settings. @return One on success or zero
+ * for EOF, input error, or a null setup; invalid entries are prompted again.
+ */
+int installer_tty_select_swap(struct installer_setup *setup)
+{
+    if (!setup) return 0;
+    char input[32],prompt[128];
+    for (;;) {
+        errno=0;
+        if (!tty_read_line(T("Create a swapfile? [y/N]: "),input,sizeof(input))) {
+            if (errno==EOVERFLOW) continue;
+            return 0;
+        }
+        if (!input[0] || tty_line_is(input,"n") || tty_line_is(input,"no")) {
+            setup->swap_enabled=false;return 1;
+        }
+        if (tty_line_is(input,"y") || tty_line_is(input,"yes")) break;
+        puts(T("Please answer yes or no."));
+    }
+    uint64_t suggested=setup->swap_size_mib ? setup->swap_size_mib : installer_swap_recommend_system();
+    snprintf(prompt,sizeof(prompt),T("Swap size in MiB [%llu]: "),(unsigned long long)suggested);
+    for (;;) {
+        errno=0;
+        if (!tty_read_line(prompt,input,sizeof(input))) {
+            if (errno==EOVERFLOW) {puts(T("Enter a valid swap size in MiB."));continue;}
+            return 0;
+        }
+        uint64_t value=suggested;
+        if (!input[0] || !installer_swap_parse_mib(input,&value)) {
+            setup->swap_size_mib=value;setup->swap_enabled=true;return 1;
+        }
+        puts(T("Enter a valid swap size in MiB."));
     }
 }
 
@@ -342,6 +379,7 @@ int installer_tty_main(const struct installer_tty_context *context)
             puts("Desktop selection cancelled.");
             return 1;
         }
+        if (!installer_tty_select_swap(context->setup)) return 1;
         if (!tty_bootloaders(context->setup)) return 1;
         if (!tty_read_line("Type INSTALL to confirm the partition layout and installation: ",
                            input, sizeof(input)) || !tty_line_is(input, "INSTALL")) {

@@ -36,6 +36,7 @@ extern "C" {
 #include "../fltk_support.h"
 #include "../locale_settings.h"
 #include "install_ops.h"
+#include "installer_capacity.h"
 #include "installer_tty.h"
 #include "model.h"
 
@@ -72,6 +73,9 @@ static Fl_Hold_Browser *disk_browser;
 static Fl_Hold_Browser *partition_browser;
 static Fl_Input *confirm_input;
 static Fl_Check_Button *xorg_checkbox;
+static Fl_Input *swap_size_input;
+static char swap_size_text[32];
+static int swap_size_initialized, swap_size_invalid;
 static Fl_Box *bootloader_hint;
 static Fl_Input *account_inputs[5];
 static Fl_Box *account_hint;
@@ -249,7 +253,8 @@ static int primary_disabled(void)
     if (page == INSTALLER_PAGE_PARTITIONS)
         return !installer_partition_plan_valid();
     if (page == INSTALLER_PAGE_CONFIRM)
-        return confirm_input_overflow || !confirmation_ok();
+        return confirm_input_overflow || !confirmation_ok() ||
+               (install_mode==INSTALLER_MODE_FRESH && setup.swap_enabled && swap_size_invalid);
     return 0;
 }
 
@@ -942,6 +947,28 @@ static void xorg_install_changed(Fl_Widget *widget, void *)
     setup.skip_xorg = static_cast<Fl_Check_Button *>(widget)->value() ? 0 : 1;
 }
 
+/** @brief Retain a checked editable MiB value across page rebuilds. */
+static void swap_size_changed(Fl_Widget *widget,void *)
+{
+    const char *value=static_cast<Fl_Input *>(widget)->value();
+    swap_size_invalid=!reliefos_fltk::copy_input(swap_size_text,sizeof(swap_size_text),value);
+    uint64_t size=0;
+    if (!swap_size_invalid) swap_size_invalid=installer_swap_parse_mib(swap_size_text,&size)!=0;
+    if (!swap_size_invalid) setup.swap_size_mib=size;
+    update_footer();
+}
+
+/** @brief Change only the fresh-install swap choice. */
+static void swap_install_changed(Fl_Widget *widget,void *)
+{
+    setup.swap_enabled=static_cast<Fl_Check_Button *>(widget)->value()!=0;
+    if (swap_size_input) {
+        if (setup.swap_enabled) swap_size_input->activate();
+        else swap_size_input->deactivate();
+    }
+    update_footer();
+}
+
 /** @brief Apply one firmware choice and explain the effect of skipping both. */
 static void bootloader_install_changed(Fl_Widget *widget, void *data)
 {
@@ -989,11 +1016,27 @@ static void build_confirm_page(void)
     confirm_input->callback(confirm_changed);
     reliefos_fltk::style(confirm_input);
     if (install_mode != INSTALLER_MODE_UPDATE) {
-        xorg_checkbox = new Fl_Check_Button(CONTENT_X, 318, 560, 32,
+        xorg_checkbox = new Fl_Check_Button(CONTENT_X, 318, 375, 32,
                                              T("Install Xorg desktop environment"));
         xorg_checkbox->value(setup.skip_xorg ? 0 : 1);
         xorg_checkbox->callback(xorg_install_changed);
         reliefos_fltk::style(xorg_checkbox);
+        if (!swap_size_initialized) {
+            if (!setup.swap_size_mib) setup.swap_size_mib=installer_swap_recommend_system();
+            snprintf(swap_size_text,sizeof(swap_size_text),"%llu",(unsigned long long)setup.swap_size_mib);
+            swap_size_initialized=1;
+        }
+        Fl_Check_Button *swap=new Fl_Check_Button(CONTENT_X+390,318,220,32,T("Swapfile (MiB)"));
+        swap->value(setup.swap_enabled ? 1 : 0);
+        swap->callback(swap_install_changed);
+        reliefos_fltk::style(swap);
+        swap_size_input=new Fl_Input(CONTENT_X+615,318,130,32);
+        swap_size_input->value(swap_size_text);
+        swap_size_input->maximum_size(20);
+        swap_size_input->when(FL_WHEN_CHANGED);
+        swap_size_input->callback(swap_size_changed);
+        if (!setup.swap_enabled) swap_size_input->deactivate();
+        reliefos_fltk::style(swap_size_input);
     }
     Fl_Check_Button *bios = new Fl_Check_Button(CONTENT_X, 366, CONTENT_W, 32,
                                                 T("Install or update BIOS bootloader"));
@@ -1066,6 +1109,7 @@ static void clear_page_widgets(void)
     partition_browser = NULL;
     confirm_input = NULL;
     xorg_checkbox = NULL;
+    swap_size_input = NULL;
     bootloader_hint = NULL;
     account_hint = NULL;
     status_box = NULL;

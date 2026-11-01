@@ -17251,3 +17251,40 @@ msgstr "请等待当前操作结束，或先取消该操作。"
 #: userland/apps/network-controller/window.cpp
 msgid "Adapter counters are not exported by this kernel. Address, gateway, DNS and connection diagnostics remain available."
 msgstr "当前内核尚未导出网卡流量计数。地址、网关、DNS 与连接诊断仍可正常使用。"
+
+#: userland/apps/installer
+msgid "Swapfile (MiB)"
+msgstr "交换文件 (MiB)"
+
+#: userland/apps/installer
+msgid "Create a swapfile? [y/N]: "
+msgstr "创建交换文件？[y/N]："
+
+#: userland/apps/installer
+#, c-format
+msgid "Swap size in MiB [%llu]: "
+msgstr "交换文件大小（MiB）[%llu]："
+
+#: userland/apps/installer
+msgid "Enter a valid swap size in MiB."
+msgstr "请输入有效的交换文件大小（MiB）。"
+
+#: userland/apps/installer
+msgid "Creating swapfile"
+msgstr "正在创建交换文件"
+
+#: userland/apps/installer
+msgid "Writing allocated space"
+msgstr "正在写入分配的空间"
+
+#: userland/apps/installer
+msgid "Invalid swap size"
+msgstr "交换文件大小无效"
+
+#: userland/apps/installer
+msgid "Selected system does not support swap"
+msgstr "所选系统不支持交换空间"
+
+#: userland/apps/installer
+msgid "Swap requires an AHCI disk"
+msgstr "交换文件需要 AHCI 磁盘"

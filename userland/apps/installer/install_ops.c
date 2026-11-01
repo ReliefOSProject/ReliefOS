@@ -16,6 +16,7 @@
 #include "installer_setup.h"
 #include "installer_partitions.h"
 #include "installer_capacity.h"
+#include "installer_swap.h"
 #include "../../auth/standard_accounts.h"
 #include "installer_copy.h"
 #include "install_ops.h"
@@ -534,34 +535,6 @@ static int installer_format_ext4(const char *path)
     return 0;
 }
 
-/* Commit fstab only after the root payload is copied; failure aborts install. */
-static int installer_write_fstab(void)
-{
-    char text[320], temporary[] = INSTALL_ROOT_MOUNT "/etc/.fstab.XXXXXX";
-    if (!installer_root_uuid[0] || !installer_esp_uuid[0]) return -EINVAL;
-    int length = snprintf(text, sizeof(text),
-        "# <source> <mountpoint> <type> <options> <dump> <pass>\n"
-        "/dev/disk/by-partuuid/%s / ext4 defaults 0 1\n"
-        "/dev/disk/by-partuuid/%s /boot vfat defaults 0 2\n",
-        installer_root_uuid, installer_esp_uuid);
-    if (length < 0 || (size_t)length >= sizeof(text)) return -EOVERFLOW;
-    int fd = mkstemp(temporary), ret = 0;
-    if (fd < 0) return -errno;
-    for (int done = 0; done < length;) {
-        ssize_t count = write(fd, text + done, (size_t)(length - done));
-        if (count < 0 && errno == EINTR) continue;
-        if (count <= 0) { ret = count < 0 ? -errno : -EIO; break; }
-        done += (int)count;
-    }
-    if (!ret && fchown(fd, 0, 0) < 0) ret = -errno;
-    if (!ret && fchmod(fd, 0644) < 0) ret = -errno;
-    if (!ret && fsync(fd) < 0) ret = -errno;
-    if (close(fd) < 0 && !ret) ret = -errno;
-    if (!ret && rename(temporary, INSTALL_ROOT_MOUNT "/etc/fstab") < 0) ret = -errno;
-    if (ret < 0) (void)unlink(temporary);
-    return ret;
-}
-
 static int installer_target_partitions(const char *disk_path, int fresh,
                                        char *esp_path, uint32_t esp_cap,
                                        char *root_path, uint32_t root_cap,
@@ -575,6 +548,7 @@ static int installer_target_partitions(const char *disk_path, int fresh,
     if (fresh) {
         ret = installer_capacity_measure(fresh_root_payload(), INSTALL_ESP_PAYLOAD,
                                         !setup.skip_bios, !setup.skip_uefi, &capacity);
+        if (!ret && setup.swap_enabled) ret = installer_capacity_add_swap(&capacity,setup.swap_size_mib);
         if (ret) return ret;
     }
     *root_filesystem = RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
@@ -1198,6 +1172,18 @@ static int install_boot_after_root_sync(const char *root,
     return reliefos_boot_install_at_root(boot, root);
 }
 
+/** @brief Keep the existing worker responsive while allocating the swapfile.
+ * @param done Bytes written. @param total Nonzero requested byte count.
+ * @param context Borrowed last-presentation timestamp.
+ */
+static void installer_swap_progress(uint64_t done,uint64_t total,void *context)
+{
+    unsigned long *last=context,now=reliefos_uptime_ms();
+    if (now-*last<COPY_PRESENT_INTERVAL_MS && done<total) return;
+    *last=now;
+    show_progress(95+(uint32_t)(done*3u/total),T("Creating swapfile"),T("Writing allocated space"));
+}
+
 /** @brief Copy a newly formatted root, synchronize it, then publish selected loaders. */
 static int copy_payload_ordered(void)
 {
@@ -1209,10 +1195,15 @@ static int copy_payload_ordered(void)
      * mandatory before either bootloader is published. */
     int ret = copy_root_payload(root, INSTALL_ROOT_MOUNT,
                                 install_mode == INSTALLER_MODE_FRESH);
-    if (!ret) ret = installer_write_fstab();
     if (!ret && installer_setup_write(&setup, INSTALL_ROOT_MOUNT) < 0) {
         ret = -errno;
         set_status(T("Account setup failed"), strerror(errno));
+    }
+    if (!ret) {
+        unsigned long last=0;
+        ret=installer_swap_prepare(INSTALL_ROOT_MOUNT,installer_root_uuid,installer_esp_uuid,
+                                   setup.swap_enabled ? setup.swap_size_mib : 0,
+                                   installer_swap_progress,&last);
     }
     if (ret < 0) {
         printf("[installer.elf] root payload copy failed src=%s dst=%s ret=%d\n",
@@ -1662,6 +1653,16 @@ void perform_install(void)
     if (ret < 0) {
         finish_install(ret, T("Payload check failed"));
         return;
+    }
+
+    if (setup.swap_enabled) {
+        if (!installer_swap_size_valid(setup.swap_size_mib)) {
+            finish_install(-EINVAL,T("Invalid swap size"));return;
+        }
+        ret=installer_swap_bundle_supported(fresh_root_payload());
+        if (ret) {finish_install(ret,T("Selected system does not support swap"));return;}
+        ret=installer_swap_storage_supported(disks[selected_disk].path);
+        if (ret) {finish_install(ret,T("Swap requires an AHCI disk"));return;}
     }
 
     struct reliefos_boot_install_options boot = installer_boot_options(0);

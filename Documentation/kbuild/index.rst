@@ -11,5 +11,6 @@
    configuration
    products
    smp-measurement
+   memory-testing
    sdk
    third-party

@@ -58,6 +58,13 @@ int reliefos_kernel_bundle_validate(const char *root, const char *release);
  * @return Zero or negative errno; performs no publication or package mutation.
  */
 int reliefos_kernel_bundle_describe(const char *root, const char *release, struct reliefos_kernel_slot *identity);
+/** @brief Read CONFIG_SWAP from a fully validated, checksum-bound target bundle.
+ * @param root Absolute payload root. @param release Expected canonical release.
+ * @param enabled Caller-owned output, changed only after validation succeeds.
+ * @return Zero for an unambiguous enabled/disabled value, or negative errno on
+ * incomplete, altered, oversized or ambiguous package/configuration data.
+ */
+int reliefos_kernel_bundle_swap_supported(const char *root,const char *release,int *enabled);
 /** @brief Save a verified independent copy before APK can remove old owned files.
  * @param root Absolute installed root, nullable values are rejected.
  * @param release Expected installed kernel release, not a pathname.

@@ -331,7 +331,8 @@ def xorg_checkbox_checked(indicator):
                       for index, channel in enumerate(color)) > 40) >= 3
 
 
-def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False, install_timeout=2400):
+def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False, install_timeout=2400,
+                swap_mib=None):
     """Complete the real GUI, optionally selecting Chinese before account setup."""
     probe.enable_installer_geometry()
     wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
@@ -386,6 +387,26 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False, insta
         assert xorg_checkbox_checked(enabled_xorg), "Xorg checkbox did not return to enabled state"
         assert enabled_xorg.tobytes() == default_xorg.tobytes(), "Xorg indicator did not return to its initial state"
 
+    # The optional swap checkbox is default-off. Coordinates share the same
+    # content origin as xorg_indicator_point; keep a real frame for review.
+    swap_x, swap_y = probe.content_left + 398, probe.sidebar_top + 334
+    probe.move(probe.width - 10, 10)
+    frame = probe.frame("confirmation-swap-default")
+    indicator = frame.crop((swap_x - 9, swap_y - 9, swap_x + 10, swap_y + 10))
+    assert not xorg_checkbox_checked(indicator), "Swap option is not unchecked by default"
+    if swap_mib is not None:
+        if not isinstance(swap_mib, int) or not 1 <= swap_mib <= 16777216:
+            raise ValueError("swap_mib must be a valid positive MiB count")
+        probe.click(swap_x, swap_y)
+        probe.click(probe.content_left + 680, swap_y)
+        probe.key("home")
+        probe.key("shift-end")
+        probe.text(str(swap_mib))
+        probe.move(probe.width - 10, 10)
+        frame = probe.frame("confirmation-swap-enabled")
+        indicator = frame.crop((swap_x - 9, swap_y - 9, swap_x + 10, swap_y + 10))
+        assert xorg_checkbox_checked(indicator), "Swap option did not become checked"
+
     # Returning from Accounts rebuilds Confirm and clears its validation field.
     probe.click(confirm_x, confirm_y)
     probe.text("INSTALL")
@@ -396,7 +417,8 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False, insta
 
 
 def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
-                install_bios=True, install_uefi=True, select_entry=True, install_timeout=2400):
+                install_bios=True, install_uefi=True, select_entry=True, install_timeout=2400,
+                swap_mib=None):
     """Answer the real TTY installer, including both independent loader choices."""
     if select_entry:
         from test_vt_qemu import ocr
@@ -416,16 +438,22 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
         # to serial for exact, bounded assertions without OCR transcription.
         probe.text("installer 2>/var/log/installer-session.log | tee /dev/ttyS0")
         probe.key("ret")
-    answers = (("Mode [install/update]: ", "install"),
+    if swap_mib is not None and (not isinstance(swap_mib, int) or not 1 <= swap_mib <= 16777216):
+        raise ValueError("swap_mib must be a valid positive MiB count")
+    answers = [("Mode [install/update]: ", "install"),
                ("Select disk number (r to refresh, q to quit): ", "0"),
                ("partition> ", "auto"), ("partition> ", "done"),
                ("Username: ", "alice"), ("Password: ", USER_PASSWORD),
                ("Confirm password: ", USER_PASSWORD), ("root password: ", ROOT_PASSWORD),
                ("Confirm root password: ", ROOT_PASSWORD),
                ("Install Xorg desktop environment? [Y/n]: ", "n" if skip_xorg else ""),
+               ("Create a swapfile? [y/N]: ", "y" if swap_mib is not None else "")]
+    if swap_mib is not None:
+        answers.append(("Swap size in MiB [", str(swap_mib)))
+    answers += [
                ("Install or update BIOS bootloader? [Y/n]: ", "" if install_bios else "n"),
                ("Install or update UEFI bootloader? [Y/n]: ", "" if install_uefi else "n"),
-               ("Type INSTALL to confirm the partition layout and installation: ", "INSTALL"))
+               ("Type INSTALL to confirm the partition layout and installation: ", "INSTALL")]
     for prompt, answer in answers:
         wait_log(serial, prompt, process, timeout=120)
         probe.text(answer)
@@ -546,10 +574,13 @@ def main():
     parser.add_argument("--installer", choices=("gui", "tty"), default="gui")
     parser.add_argument("--without-xorg", action="store_true",
                         help="Skip the optional Xorg desktop during a fresh install")
+    parser.add_argument("--swap-mib", type=int, help="Enable a swapfile with this explicit MiB size")
     parser.add_argument("--login-only", action="store_true", help="Boot this test's existing scratch disk without reinstalling")
     parser.add_argument("--desktop", action="store_true", help="Also log into the installed desktop and capture Terminal identity")
     parser.add_argument("--desktop-only", action="store_true", help="Only boot the existing test disk into the desktop")
     args = parser.parse_args()
+    if args.swap_mib is not None and not 1 <= args.swap_mib <= 16777216:
+        parser.error("--swap-mib must be between 1 and 16777216")
     if args.without_xorg and (args.desktop or args.desktop_only):
         parser.error("--desktop and --desktop-only require Xorg")
     output = args.output.resolve()
@@ -566,9 +597,9 @@ def main():
         with disk.open("xb") as file: file.truncate(8 * 1024**3)
         with boot(output / "install", disk, args.iso.resolve()) as session:
             if args.installer == "gui":
-                install_gui(*session, skip_xorg=args.without_xorg)
+                install_gui(*session, skip_xorg=args.without_xorg, swap_mib=args.swap_mib)
             else:
-                install_tty(*session, skip_xorg=args.without_xorg)
+                install_tty(*session, skip_xorg=args.without_xorg, swap_mib=args.swap_mib)
     with boot(output / "root", disk) as session:
         login_tty(*session, True, skip_xorg=args.without_xorg)
     with boot(output / "user", disk) as session:

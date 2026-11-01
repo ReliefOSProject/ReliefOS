@@ -119,7 +119,7 @@ class InstallerSetupTests(unittest.TestCase):
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 "-Wl,--wrap=read,--wrap=write,--wrap=tcgetattr,--wrap=tcsetattr",
                 "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-                "tools/tests/installer_tty_input_test.c", "-o", str(executable),
+                "tools/tests/installer_tty_input_test.c", "userland/apps/installer/installer_capacity.c", "-o", str(executable),
             ], cwd=ROOT, check=True)
             subprocess.run([str(executable)], check=True, timeout=10)
 

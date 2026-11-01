@@ -98,9 +98,8 @@ def boot(output, firmware, *, disk=None, iso=None, timeout=180,
             raise FileNotFoundError(f"UEFI firmware unavailable: {image}")
         command += ["-bios", str(image)]
     if nvme and low_nvme_mmio:
-        # Existing kernel direct map is bounded to16GiB. This documented OVMF
-        # platform setting places64-bit BARs in its32-bit aperture; high BAR
-        # support is a separate kernel capability, never silently claimed here.
+        # This OVMF option deliberately places 64-bit BARs in its 32-bit
+        # aperture. It is a separate topology, not evidence for other BARs.
         command += ["-fw_cfg", "name=opt/ovmf/X-PciMmio64Mb,string=0"]
     if disk:
         command += ["-drive", f"file={disk},if=none,id=disk0,format=raw"]
@@ -323,17 +322,18 @@ def install_matrix(args, output):
         record = {"case": name, "passed": False}
         disk = output / f"{name}.raw"
         try:
-            with (working_disk(disk, args.disk_backend) as transient,
+            with (working_disk(disk, args.disk_backend, size=args.disk_gib * 1024**3) as transient,
                   boot(output / f"{name}-install", firmware,
                        disk=prepare_install_disk(transient, name, output),
                        iso=args.images / "reliefos-installer.iso") as session):
                 try:
                     if frontend == "gui":
-                        install_gui(*session, chinese=True, install_timeout=args.install_timeout)
+                        install_gui(*session, chinese=True, install_timeout=args.install_timeout,
+                                    swap_mib=args.swap_mib)
                     else:
                         install_tty(*session, skip_xorg=True,
                                     install_bios=bios, install_uefi=uefi,
-                                    install_timeout=args.install_timeout)
+                                    install_timeout=args.install_timeout, swap_mib=args.swap_mib)
                 except Exception:
                     try:
                         installer_log(session[0], session[1])
@@ -495,9 +495,13 @@ def main():
                         help="Private installation backing; all installed boots use saved raw files")
     parser.add_argument("--install-timeout", type=int, default=2400,
                         help="Finite copy/flush budget in seconds; boot deadlines remain separate")
+    parser.add_argument("--swap-mib", type=int, help="Enable an explicit MiB swapfile in each fresh install")
+    parser.add_argument("--disk-gib", type=int, default=3, help="Private install disk size in GiB")
     parser.add_argument("--install-cases", default="bios-both,uefi-both,bios-only,uefi-only,none")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
+    if args.disk_gib < 1 or (args.swap_mib is not None and not 1 <= args.swap_mib <= 16777216):
+        parser.error("disk size must be positive and swap MiB must be between 1 and 16777216")
     if args.install_timeout <= 0:
         parser.error("--install-timeout must be positive")
     args.expected_release = None
@@ -528,6 +532,8 @@ def main():
             args.images / "reliefos-installer.iso"] if path.is_file()}
         (output / "sources.json").write_text(json.dumps(hashes, indent=2) + "\n")
         (output / "settings.json").write_text(json.dumps({"installation_disk_backend": args.disk_backend,
+                                                          "installation_disk_gib": args.disk_gib,
+                                                          "swap_mib": args.swap_mib,
                                                           "guest_memory_mib": 4096,
                                                           "expected_release": args.expected_release}, indent=2) + "\n")
         results = boot_matrix(args, output) if args.matrix in ("boot", "all") else []
