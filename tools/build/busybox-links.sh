@@ -1,5 +1,5 @@
 #!/bin/sh
-# Emit BusyBox plan records only for commands not already owned by the plan.
+# Route BusyBox's historical paths to GNU providers and keep other applets.
 set -eu
 [ "$#" = 2 ] || { echo 'usage: busybox-links.sh PLAN LINKS' >&2; exit 2; }
 plan=$1 links=$2
@@ -20,19 +20,35 @@ while IFS="$(printf '\t')" read -r kind source guest mode owner policy gid; do
             find "$source" \( -type f -o -type l \) -print > "$work/tree"
             while IFS= read -r path; do
                 relative=${path#"$source"/}
-                printf '%s/%s\n' "${guest%/}" "$relative"
+                printf '%s/%s\t%s\n' "${guest%/}" "$relative" "$owner"
             done < "$work/tree"
             ;;
-        f|l) printf '%s\n' "$guest" ;;
+        f|l) printf '%s\t%s\n' "$guest" "$owner" ;;
     esac
-done < "$plan" > "$work/claimed"
+done < "$plan" > "$work/claimed-owners"
+cut -f1 "$work/claimed-owners" > "$work/claimed"
 
 awk -F / '$0 ~ /^\/(bin|sbin|usr\/bin|usr\/sbin)\/[^/]+$/ {print $NF}' \
     "$work/claimed" > "$work/commands"
 while IFS= read -r guest; do
     command=${guest##*/}
     [ "$command" != bash ] || continue
-    if grep -Fqx "$command" "$work/commands"; then continue; fi
+    if grep -Fqx "$command" "$work/commands"; then
+        # GNU commands live in /usr/bin. Keep callers of the old non-usr-merge
+        # /bin and /usr/sbin paths on that same provider, without duplicating
+        # a destination already explicitly present in the selected plan.
+        if ! grep -Fqx "$guest" "$work/claimed" &&
+            awk -F '\t' -v path="/usr/bin/$command" \
+                '$1==path && $2=="coreutils" {found=1} END {exit !found}' "$work/claimed-owners"; then
+            case $guest in
+                /bin/*|/sbin/*) target=../usr/bin/$command ;;
+                /usr/sbin/*) target=../bin/$command ;;
+                *) continue ;;
+            esac
+            printf 'l\t%s\t%s\t0777\tcoreutils\tunique\t0\n' "$target" "$guest"
+        fi
+        continue
+    fi
     target="../../bin/busybox"
     case $guest in
         /bin/*) target=busybox ;;

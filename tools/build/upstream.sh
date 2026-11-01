@@ -59,7 +59,15 @@ e2fsprogs) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS
  set -- "$@" --sbindir=/usr/sbin --with-root-prefix=/usr --disable-libuuid --disable-libblkid --disable-elf-shlibs --disable-fsck --disable-uuidd --disable-nls --disable-fuse2fs --without-libarchive --with-udev-rules-dir=no --with-systemd-unit-dir=no --with-crond-dir=no ;;
 dosfstools) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS; set -- "$@" --sbindir=/usr/sbin --enable-compat-symlinks ;;
 exfatprogs) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS; set -- "$@" --sbindir=/usr/sbin --disable-shared --enable-static ;;
-coreutils) set -- "$@" --disable-nls --disable-acl --disable-xattr --without-gmp --without-libsigsegv --disable-dependency-tracking ;;
+coreutils)
+    # The optional dispatched CRC backend pulls compiler-rt's precompiled
+    # cpu_model constructor into every single-binary invocation. Its host ISA
+    # is outside -mno-avx's control (some toolchains build it with AVX2), while
+    # ReliefNT currently saves x87/SSE state. Use upstream's portable CRC path.
+    gl_cv_crc_pclmul=no; export gl_cv_crc_pclmul
+    set -- "$@" --disable-nls --disable-acl --disable-xattr --disable-dependency-tracking \
+    --enable-single-binary=symlinks \
+    --enable-install-program=arch,hostname,kill,uptime --with-selinux ;;
 alsa-lib) set -- "$@" --enable-shared --disable-static --disable-python ;;
 alsa-utils) set -- "$@" --disable-alsatest --enable-alsa-topology --disable-alsamixer --disable-bat \
  --disable-alsaconf --disable-alsaloop --disable-nhlt --disable-nls \
@@ -92,9 +100,11 @@ fi
 case $pkg in
 libbsd) sed 's@GROUP(/lib/@GROUP(@' "$tmp/lib/libbsd.so" > "$tmp/lib/libbsd.so.new"; mv "$tmp/lib/libbsd.so.new" "$tmp/lib/libbsd.so"; rm "$tmp/lib/libbsd.la" ;;
 libmd) rm "$tmp/lib/libmd.la" ;;
-# Ship GNU dd and yes: dd provides status=progress, and yes has the larger
-# full_write fallback buffer. Other coreutils commands remain BusyBox-owned.
-coreutils) find "$tmp" \( -type f -o -type l \) ! -path "$tmp/usr/bin/dd" ! -path "$tmp/usr/bin/yes" -delete; find "$tmp" -mindepth 1 -type d -empty -delete ;;
+coreutils)
+    sh "$source/build-aux/gen-lists-of-programs.sh" --list-progs > "$work/upstream-programs"
+    sh "$src/tools/build/coreutils-check.sh" "$tmp" \
+        "$src/userland/coreutils/programs.list" "$work/upstream-programs"
+    ;;
 esac
 license=$(get license_in_source)
 mkdir -p "$tmp/usr/share/licenses/$pkg"

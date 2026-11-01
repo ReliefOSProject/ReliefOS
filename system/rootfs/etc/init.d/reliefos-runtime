@@ -13,6 +13,8 @@ start() {
     checkpath --directory --mode 1777 /tmp /var/tmp || return 1
     # Hostname load moved out of the kernel (A16). The rootfs default is
     # "reliefos"; a missing or rejected hostname file must not fail the service.
-    test -f /etc/hostname && hostname -F /etc/hostname
+    # GNU hostname accepts a NAME operand, not BusyBox's -F extension.
+    # Keep this existing file parser explicit while PATH resolves GNU tools.
+    test -f /etc/hostname && /bin/busybox hostname -F /etc/hostname
     test -r /proc/self/status && test -d /sys && test -c /dev/console
 }

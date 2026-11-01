@@ -9,12 +9,16 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 
+def evidence_path(suite):
+    directory = ROOT / "out/audio-hda/qa/logs"
+    directory.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    return directory / f"{suite}-{stamp}.log"
+
 def controls():
     qa = ROOT / "out/audio-hda/qa"
     qa.mkdir(parents=True, exist_ok=True)
-    audit = ROOT / ".superpowers/sdd/2026-09-30-intel-hda-audio"
-    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    log = audit / f"task-14-controls-{stamp}.log"
+    log = evidence_path("controls")
     with tempfile.TemporaryDirectory(prefix="controls-", dir=qa) as work, log.open("x") as output:
         common = ["cc", "-std=c11", "-D_POSIX_C_SOURCE=200809L", "-Wall", "-Wextra", "-Werror",
                   "-g", "-fsanitize=address,undefined", "-fno-omit-frame-pointer",
@@ -69,9 +73,7 @@ def settings():
     '''Exercise ALSA state restore/store semantics through the OpenRC script.'''
     qa = ROOT / "out/audio-hda/qa"
     qa.mkdir(parents=True, exist_ok=True)
-    audit = ROOT / ".superpowers/sdd/2026-09-30-intel-hda-audio"
-    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    log = audit / f"task-15-settings-{stamp}.log"
+    log = evidence_path("settings")
     service = ROOT / "system/rootfs/etc/init.d/reliefos-audio"
     failed = False
     with tempfile.TemporaryDirectory(prefix="settings-", dir=qa) as work, log.open("x") as output:
@@ -148,9 +150,7 @@ def doom_suite(kind):
     """Run the host-only deterministic Doom transport or mixer contract."""
     qa = ROOT / "out/audio-hda/qa"
     qa.mkdir(parents=True, exist_ok=True)
-    audit = ROOT / ".superpowers/sdd/2026-09-30-intel-hda-audio"
-    stamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    log = audit / f"task-16-doom-{kind}-{stamp}.log"
+    log = evidence_path(f"doom-{kind}")
     test = ROOT / "tools/tests" / ("doom_music_test.c" if kind == "music" else f"doom_audio_{kind}_test.c")
     source = ROOT / "userland/apps/doom" / ("music.c" if kind == "music" else
         "audio_output.c" if kind == "refill" else f"audio_{kind}.c")

@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <time.h>
@@ -190,24 +191,66 @@ static void test_write_failure_keeps_original_file(void)
     char path[256];
     size_t size = 0;
     char *text;
+    pid_t child;
 
     TEST_ASSERT(test_temp_dir(root, sizeof(root)) != NULL);
     TEST_ASSERT_EQ(0, test_join(path, sizeof(path), root, "victim"));
     TEST_ASSERT_EQ(0, write_file_if_changed(path, "keep me\n", 8, 0644));
 
-    /* A read-only directory rejects the temporary file, so the rename can
-     * never have been attempted: the original must survive untouched. */
-    TEST_ASSERT_EQ(0, chmod(root, 0500));
-    errno = 0;
-    TEST_ASSERT_EQ(-1, write_file_if_changed(path, "overwrite\n", 10, 0644));
-    TEST_ASSERT(errno != 0);
-    TEST_ASSERT_EQ(0, chmod(root, 0700));
+    /* Force a partial temporary-file write followed by EFBIG, including for
+     * root with DAC override. Isolate the resource limit and signal in a child. */
+    child = fork();
+    TEST_ASSERT(child >= 0);
+    if (child == 0) {
+        struct rlimit limit;
+        int result;
+
+        if (getrlimit(RLIMIT_FSIZE, &limit) != 0 ||
+            signal(SIGXFSZ, SIG_IGN) == SIG_ERR) {
+            _exit(2);
+        }
+        limit.rlim_cur = 1;
+        if (setrlimit(RLIMIT_FSIZE, &limit) != 0) {
+            _exit(3);
+        }
+        errno = 0;
+        result = write_file_if_changed(path, "overwrite\n", 10, 0644);
+        _exit(result == -1 && errno == EFBIG ? 0 : 4);
+    }
+    if (child > 0) {
+        int status = 0;
+        pid_t waited;
+
+        do {
+            waited = waitpid(child, &status, 0);
+        } while (waited < 0 && errno == EINTR);
+        TEST_ASSERT_EQ(child, waited);
+        TEST_ASSERT(WIFEXITED(status));
+        TEST_ASSERT_EQ(0, WEXITSTATUS(status));
+    }
 
     text = test_read_all(path, &size);
     TEST_ASSERT(text != NULL);
     if (text != NULL) {
         TEST_ASSERT_STR_EQ("keep me\n", text);
         free(text);
+    }
+    {
+        DIR *directory = opendir(root);
+        struct dirent *entry;
+        unsigned leftovers = 0;
+
+        TEST_ASSERT(directory != NULL);
+        if (directory != NULL) {
+            while ((entry = readdir(directory)) != NULL) {
+                if (strcmp(entry->d_name, "victim") != 0 &&
+                    strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+                    leftovers++;
+                }
+            }
+            closedir(directory);
+        }
+        TEST_ASSERT_EQ(0, leftovers);
     }
     test_remove_tree(root);
 }
