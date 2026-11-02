@@ -23,7 +23,10 @@ def client_bounds(frame):
     return session_st_bounds(frame)
 
 
-def wait_bounds(probe, process, name, predicate, timeout=3):
+def wait_bounds(probe, process, name, predicate, timeout=12):
+    # Full-resolution connected-component detection can take over two seconds
+    # per 1920x1080 frame. Allow two matching observations after repaint;
+    # this includes host image analysis and is not a guest latency measurement.
     started = time.monotonic()
     last = None
     stable = 0
@@ -111,7 +114,7 @@ def main():
                 raise RuntimeError("QEMU failed to start")
             time.sleep(.1)
         probe = Probe(qmp, output)
-        greeter_login(probe, process)
+        greeter_login(probe, process, timeout=120)
         wait_session(probe, process, "session", timeout=90)
         st_marker(probe, serial, process, "ICEWM-INTERACTIONS-BEGIN")
         bounds = client_bounds(probe.frame("initial"))

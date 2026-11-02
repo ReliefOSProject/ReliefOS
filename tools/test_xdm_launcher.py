@@ -300,6 +300,43 @@ class XdmLauncherTests(unittest.TestCase):
         self.assertIn("st started", log)
         self.assertIn("xdm session ended", log)
 
+    def test_desktop_priority_is_inherited_then_reset_for_terminal(self):
+        write_stub(self.sandbox / "bin/busybox",
+                   'test "$1" = renice || exit 2\n'
+                   'printf \'%s\\n\' "$*" >> /run/priority.calls\n')
+        self.install_session_stubs()
+        self.install_xdm(0)
+        result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        calls = (self.sandbox / "run/priority.calls").read_text().splitlines()
+        self.assertEqual(len(calls), 2)
+        self.assertRegex(calls[0], r"^renice -10 -p [1-9][0-9]*$")
+        self.assertRegex(calls[1], r"^renice 0 -p [1-9][0-9]*$")
+        self.assertIn("icewm started for uid=1000", self.log())
+        self.assertIn("st started", self.log())
+
+    def test_menu_terminal_resets_inherited_desktop_priority(self):
+        write_stub(self.sandbox / "bin/busybox",
+                   'test "$1" = renice || exit 2\n'
+                   'printf \'%s\\n\' "$*" >> /run/priority.calls\n')
+        shutil.copy2(XORG / "icewm/terminal.sh",
+                     self.sandbox / "etc/reliefos/icewm/terminal.sh")
+        self.install_session_stubs(st='printf \'%s\\n\' "$@" > /run/st.argv\n')
+        result = self.run_guest("exec /bin/sh /etc/reliefos/icewm/terminal.sh")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertRegex((self.sandbox / "run/priority.calls").read_text(),
+                         r"^renice 0 -p [1-9][0-9]*\n$")
+        self.assertIn("-l", (self.sandbox / "run/st.argv").read_text().splitlines())
+
+    def test_priority_permission_failure_keeps_the_desktop_available(self):
+        write_stub(self.sandbox / "bin/busybox", 'exit 1\n')
+        self.install_session_stubs()
+        self.install_xdm(0)
+        result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("st started", self.log())
+        self.assertIn("xdm exit status=0", self.log())
+
     def test_xsession_does_not_force_the_wallpaper(self):
         self.install_session_stubs()
         self.install_wallpaper_probe()

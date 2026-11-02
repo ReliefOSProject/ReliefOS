@@ -109,6 +109,13 @@ start_child icewm /usr/bin/icewm-session || exit 1
 icewm_pid=$child_pid
 event "icewm started for uid=$uid"
 
+# IceWM keeps the display service priority inherited from XDM.  Shells and
+# their build jobs use the normal nice value, including for a root login.
+if test -x /bin/busybox; then
+    /bin/busybox renice 0 -p "$$" >/dev/null 2>&1 ||
+        event 'terminal scheduling priority unchanged'
+fi
+
 # Keep st's default palette and start the user's login shell.
 start_child st /usr/bin/st -T ReliefOS -g 100x32+0+0 -e "${SHELL:-/bin/sh}" -l || exit 1
 st_pid=$child_pid

@@ -56,6 +56,13 @@ chmod 0600 "$sink"
 RELIEFOS_XORG_EVENT_FD=3
 export RELIEFOS_XORG_EVENT_FD
 exec 3>>"$sink"
+# Xorg and the window manager need timely CPU service while ordinary jobs
+# compile in parallel.  Keep SCHED_OTHER and use an inherited nice value;
+# Xsession and the menu terminal restore normal priority before starting shells.
+if test -x /bin/busybox; then
+    /bin/busybox renice -10 -p "$$" >/dev/null 2>&1 ||
+        stage 'desktop scheduling priority unchanged'
+fi
 # Use XDM's compiled-in /etc/X11/xdm/xdm-config, as a direct launch does.
 /usr/bin/xdm -nodaemon
 status=$?
