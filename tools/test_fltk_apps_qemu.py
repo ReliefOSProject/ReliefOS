@@ -138,6 +138,9 @@ def target_compile_probe(output: Path, sysroot: Path, cxx: str, ld: str,
     probe_build = OUT if build_dir is None else build_dir
     x11_root = X11_ROOT if build_dir is None else build_dir / "upstream/x11-development"
     managed_root = MANAGED_ROOT if build_dir is None else build_dir / "rootfs/managed"
+    x11_library = managed_root / "usr/lib/libX11.so.6"
+    if not x11_library.is_file():
+        x11_library = x11_root / "usr/lib/libX11.so.6"
     resource_dir = Path(subprocess.check_output(
         [cxx, "-print-resource-dir"], cwd=ROOT, text=True).strip())
     source = ROOT / "tools/tests/fltk_ui_probe.cpp"
@@ -151,6 +154,7 @@ def target_compile_probe(output: Path, sysroot: Path, cxx: str, ld: str,
         "-isystem", resource_dir / "include", "-isystem", x11_root / "usr/include",
         "-I", ROOT / "userland/apps", "-I", ROOT / "include",
         "-I", probe_build / "include", "-I", probe_build / "sdk/reliefos-musl-sdk/include",
+        "-I", probe_build / "kernel-export/include",
         "-D_POSIX_C_SOURCE=200809L", "-D_GNU_SOURCE", "-std=c++17",
         "-fno-exceptions", "-fno-rtti", "-Wall", "-Wextra",
         "-include", probe_build / "include/generated/autoconf.h", "-c", source,
@@ -164,7 +168,7 @@ def target_compile_probe(output: Path, sysroot: Path, cxx: str, ld: str,
         "-L", sysroot / "lib", "-l:libmimalloc.so.3", "--start-group",
         x11_root / "usr/lib/libfltk.so", x11_root / "usr/lib/libstdc++.so.6",
         x11_root / "usr/lib/libgcc_s.so.1",
-        managed_root / "usr/lib/libX11.so.6", "-lc", "--end-group",
+        x11_library, "-lc", "--end-group",
         sysroot / "lib/crtn.o",
     ]
     command_log.write_text(json.dumps({"compile": [str(x) for x in compile_command],

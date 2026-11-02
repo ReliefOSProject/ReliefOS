@@ -9202,6 +9202,14 @@ msgstr ""
 msgid "Refresh (F5)"
 msgstr ""
 
+#: userland/apps/fileman/main.cpp
+msgid "Automatic refresh unavailable; press F5"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp
+msgid "Automatic refresh unavailable; refresh manually (F5)"
+msgstr ""
+
 #: userland/apps/reliefmail/tools.cpp:114
 msgid "Refresh folders"
 msgstr ""

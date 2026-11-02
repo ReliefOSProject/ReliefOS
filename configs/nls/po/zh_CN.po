@@ -9322,6 +9322,14 @@ msgstr "刷新"
 msgid "Refresh (F5)"
 msgstr "刷新（F5）"
 
+#: userland/apps/fileman/main.cpp
+msgid "Automatic refresh unavailable; press F5"
+msgstr "自动刷新不可用，请按 F5 刷新"
+
+#: userland/apps/fileman/main.cpp
+msgid "Automatic refresh unavailable; refresh manually (F5)"
+msgstr "自动刷新不可用，请手动刷新（F5）"
+
 #: userland/apps/reliefmail/tools.cpp:114
 msgid "Refresh folders"
 msgstr "刷新文件夹"

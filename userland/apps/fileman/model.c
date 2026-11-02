@@ -795,6 +795,13 @@ static int tree_node_index_for_path(const char *path)
     return -1;
 }
 
+static int tree_visible_directory(const struct reliefos_dir_entry *entry)
+{
+    return entry->type == RELIEFOS_FS_TYPE_DIR &&
+           !text_eq(entry->name, ".") && !text_eq(entry->name, "..") &&
+           (fileman_show_hidden || !fileman_entry_is_hidden(entry));
+}
+
 static int tree_dir_has_children(const char *path)
 {
     struct reliefos_dir_entry entry;
@@ -812,8 +819,7 @@ static int tree_dir_has_children(const char *path)
         if (ret <= 0) {
             break;
         }
-        if (entry.type == RELIEFOS_FS_TYPE_DIR &&
-            (fileman_show_hidden || !fileman_entry_is_hidden(&entry))) {
+        if (tree_visible_directory(&entry)) {
             close(fd);
             return 1;
         }
@@ -830,6 +836,7 @@ static void tree_add_node(const char *path, const char *label, uint32_t id,
         return;
     }
     node = &fileman_tree_nodes[fileman_tree_node_count++];
+    *node = (struct fileman_tree_node){0};
     node->used = 1;
     node->id = id;
     node->parent_id = parent_id;
@@ -884,12 +891,7 @@ static void tree_load_children(uint32_t node_index)
         if (ret <= 0) {
             break;
         }
-        if (entry.type != RELIEFOS_FS_TYPE_DIR) {
-            continue;
-        }
-        if (!fileman_show_hidden && fileman_entry_is_hidden(&entry)) {
-            continue;
-        }
+        if (!tree_visible_directory(&entry)) continue;
         build_path_join(child_path, sizeof(child_path), node->path, entry.name);
         tree_add_node(child_path, entry.name, fileman_tree_next_id++, node->id);
     }
@@ -908,6 +910,83 @@ static void tree_load_children(uint32_t node_index)
             --slot;
         }
         fileman_tree_nodes[slot] = child;
+    }
+}
+
+/* Reconcile only an expanded current node. Retain the ids and loaded state of
+ * surviving children and their descendants; other branches are not scanned. */
+void fileman_tree_refresh_current(void)
+{
+    int parent_index = tree_node_index_for_path(current_path);
+    if (parent_index < 0 || !fileman_tree_nodes[parent_index].expanded) return;
+
+    char children[FILEMAN_TREE_MAX_NODES][RELIEFOS_FS_NAME_LEN];
+    uint32_t child_count = 0;
+    int fd = open(current_path, RELIEFOS_O_RDONLY, 0);
+    if (fd < 0) return;
+    int ret = 0;
+    while (child_count < FILEMAN_TREE_MAX_NODES) {
+        struct reliefos_dir_entry entry;
+        ret = reliefos_readdir(fd, &entry);
+        if (ret <= 0) break;
+        if (!tree_visible_directory(&entry)) continue;
+        copy_text(children[child_count++], RELIEFOS_FS_NAME_LEN, entry.name);
+    }
+    close(fd);
+    if (ret < 0) return;
+
+    const uint32_t parent_id = fileman_tree_nodes[parent_index].id;
+    uint8_t removed[FILEMAN_TREE_MAX_NODES] = {0};
+    /* If enumeration hit the tree limit, unseen children might still exist. */
+    if (child_count < FILEMAN_TREE_MAX_NODES) {
+        for (uint32_t i = 0; i < fileman_tree_node_count; ++i) {
+            if (!fileman_tree_nodes[i].used || fileman_tree_nodes[i].parent_id != parent_id) continue;
+            uint32_t j = 0;
+            while (j < child_count && !text_eq(fileman_tree_nodes[i].label, children[j])) ++j;
+            if (j == child_count) removed[i] = 1;
+        }
+        int changed;
+        do {
+            changed = 0;
+            for (uint32_t i = 0; i < fileman_tree_node_count; ++i) {
+                if (!fileman_tree_nodes[i].used || removed[i]) continue;
+                for (uint32_t j = 0; j < fileman_tree_node_count; ++j) {
+                    if (removed[j] && fileman_tree_nodes[i].parent_id == fileman_tree_nodes[j].id) {
+                        removed[i] = 1;
+                        changed = 1;
+                        break;
+                    }
+                }
+            }
+        } while (changed);
+        uint32_t kept = 0;
+        for (uint32_t i = 0; i < fileman_tree_node_count; ++i)
+            if (!removed[i]) fileman_tree_nodes[kept++] = fileman_tree_nodes[i];
+        fileman_tree_node_count = kept;
+    }
+
+    parent_index = tree_node_index_for_id(parent_id);
+    if (parent_index < 0) return;
+    fileman_tree_nodes[parent_index].has_children = child_count != 0;
+    fileman_tree_nodes[parent_index].loaded = 1;
+    for (uint32_t i = 0; i < child_count; ++i) {
+        char path[RELIEFOS_FS_PATH_LEN];
+        if (fileman_join_path(path, sizeof(path), current_path, children[i]) < 0) continue;
+        if (tree_node_index_for_path(path) >= 0) continue;
+        if (fileman_tree_node_count >= FILEMAN_TREE_MAX_NODES) break;
+        tree_add_node(path, children[i], fileman_tree_next_id++, parent_id);
+    }
+    /* Siblings need not be contiguous because their descendants retain ids. */
+    for (uint32_t i = 0; i < fileman_tree_node_count; ++i) {
+        if (fileman_tree_nodes[i].parent_id != parent_id) continue;
+        for (uint32_t j = i + 1; j < fileman_tree_node_count; ++j) {
+            if (fileman_tree_nodes[j].parent_id == parent_id &&
+                tree_compare_nodes(&fileman_tree_nodes[i], &fileman_tree_nodes[j]) > 0) {
+                struct fileman_tree_node swap = fileman_tree_nodes[i];
+                fileman_tree_nodes[i] = fileman_tree_nodes[j];
+                fileman_tree_nodes[j] = swap;
+            }
+        }
     }
 }
 
@@ -1152,6 +1231,9 @@ int navigate_to_path(const char *path)
     }
     copy_text(current_path, sizeof(current_path), target);
     getcwd(current_path, sizeof(current_path));
+    /* Install the new watch before scanning so changes during enumeration are
+     * queued for a second pass rather than missed. */
+    fileman_watch_navigate(current_path);
     ret = reload_dir();
     if (ret == 0) {
         fileman_tree_sync_navigation(old_path, current_path);

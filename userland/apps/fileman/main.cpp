@@ -1,5 +1,7 @@
 #include "fileman.h"
 #include "search.h"
+#include "selection.h"
+#include "watch.h"
 
 extern "C" {
 #include <reliefos/launch_result.h>
@@ -66,13 +68,108 @@ unsigned toolbar_action_count;
 struct fileman_tree_item tree_items[FILEMAN_TREE_MAX_NODES];
 uint32_t tree_count;
 int updating;
+struct fileman_watch directory_watch = {-1, -1};
+unsigned watch_pending;
+unsigned ui_activity_depth;
+bool watch_timer;
+bool watch_registered;
 
 void refresh_ui();
+void refresh_files();
+void update_status();
 void perform_action(uint32_t action);
 void show_context_menu();
 void menu_action(Fl_Widget *, void *data);
 void show_search();
 void layout_main();
+void watch_timeout(void *);
+
+void schedule_watch_refresh()
+{
+    if (!watch_pending || watch_timer || ui_activity_depth) return;
+    watch_timer = true;
+    Fl::add_timeout(0.1, watch_timeout);
+}
+
+/* Dialogs and menus run nested event loops. Do not replace the selection while
+ * the enclosing action still depends on it, even after the dialog closes. */
+class UiActivity {
+public:
+    UiActivity() { ++ui_activity_depth; }
+    ~UiActivity() { if (!--ui_activity_depth) schedule_watch_refresh(); }
+};
+
+void stop_directory_watch()
+{
+    if (watch_registered) {
+        Fl::remove_fd(directory_watch.fd);
+        watch_registered = false;
+    }
+    fileman_watch_close(&directory_watch);
+}
+
+void set_directory_watch(const char *path)
+{
+    if (watch_timer) {
+        Fl::remove_timeout(watch_timeout);
+        watch_timer = false;
+    }
+    watch_pending = 0;
+    if (directory_watch.fd < 0) return;
+    int result = fileman_watch_set(&directory_watch, path);
+    if (result < 0) {
+        fprintf(stderr, "[fileman.elf] automatic refresh unavailable for %s (%d)\n", path, -result);
+        if (result == -EIO) stop_directory_watch();
+    }
+}
+
+void watch_ready(int, void *)
+{
+    unsigned events = fileman_watch_drain(&directory_watch);
+    if (events & FILEMAN_WATCH_ERROR) {
+        stop_directory_watch();
+        events |= FILEMAN_WATCH_CHANGED;
+    }
+    watch_pending |= events;
+    schedule_watch_refresh();
+}
+
+void retry_directory_watch()
+{
+    if (directory_watch.fd < 0) {
+        int result = fileman_watch_open(&directory_watch);
+        if (result < 0) {
+            fprintf(stderr, "[fileman.elf] automatic refresh unavailable (%d)\n", -result);
+            return;
+        }
+        Fl::add_fd(directory_watch.fd, FL_READ, watch_ready, NULL);
+        watch_registered = true;
+    }
+    set_directory_watch(current_path);
+}
+
+void watch_timeout(void *)
+{
+    watch_timer = false;
+    if (!watch_pending || ui_activity_depth) return;
+    if (fileman_operation_active || Fl::modal() || Fl::grab()) {
+        /* Menu grabs may outlive their callbacks; wait for the grab to end. */
+        watch_timer = true;
+        Fl::add_timeout(0.2, watch_timeout);
+        return;
+    }
+    unsigned events = watch_pending;
+    watch_pending = 0;
+    if ((events & FILEMAN_WATCH_OVERFLOW) && !(events & FILEMAN_WATCH_LOST))
+        set_directory_watch(current_path);
+    struct fileman_selection selection;
+    fileman_selection_capture(&selection, entries, entry_count, file_list.selected, selected_mask);
+    if (reload_dir() == 0) fileman_tree_refresh_current();
+    fileman_selection_restore(&selection, entries, entry_count, &file_list.selected, &selected_mask);
+    /* Keep the current input text, cursor, widget focus and browser scroll. */
+    refresh_files();
+    update_status();
+}
 
 int action_enabled(uint32_t action)
 {
@@ -669,6 +766,7 @@ void search_start(Fl_Widget *, void *data)
 
 void show_search()
 {
+    UiActivity activity;
     SearchState state{};
     state.window = new Fl_Double_Window(main_window->x() + 40, main_window->y() + 45,
                                          900, 560, T("Search Files"));
@@ -758,7 +856,10 @@ void add_menu_action(const char *group, const char *label, uint32_t action, int 
 
 void action_menu_callback(Fl_Widget *, void *data)
 {
+    UiActivity activity;
     uint32_t action = (uint32_t)(uintptr_t)data;
+    if (action == FILEMAN_ACTION_REFRESH && directory_watch.wd < 0)
+        retry_directory_watch();
     if (action == ACTION_ABOUT) {
         (void)confirm_dialog(T("File Manager"),
             T("Browse files, manage folders and launch X11 applications."), 1);
@@ -786,7 +887,11 @@ void update_status()
     bool directory_status = !strncmp(status_text, directory_prefix, prefix_length) &&
                             status_text[prefix_length] >= '0' &&
                             status_text[prefix_length] <= '9';
-    status_output->value(directory_status ? T("Ready") : status_text);
+    const bool monitoring = directory_watch.fd >= 0 && directory_watch.wd >= 0;
+    status_output->value(directory_status ?
+        (monitoring ? T("Ready") : T("Automatic refresh unavailable; press F5")) : status_text);
+    if (refresh_button) refresh_button->tooltip(monitoring ? T("Refresh (F5)") :
+        T("Automatic refresh unavailable; refresh manually (F5)"));
     for (unsigned i = 0; i < toolbar_action_count; ++i) {
         if (action_enabled(toolbar_actions[i].action)) toolbar_actions[i].button->activate();
         else toolbar_actions[i].button->deactivate();
@@ -835,6 +940,7 @@ void refresh_tree()
     if (!folders) return;
     tree_count = build_tree_items(tree_items, FILEMAN_TREE_MAX_NODES);
     updating = 1;
+    int top = folders->topline();
     folders->clear();
     folders->format_char(0);
     for (uint32_t i = 0; i < tree_count; ++i) {
@@ -849,6 +955,8 @@ void refresh_tree()
         if (text_eq(current_path, tree_path_for_id(tree_items[i].id)))
             folders->value((int)i + 1);
     }
+    if (top > 0 && tree_count)
+        folders->topline((uint32_t)top <= tree_count ? top : (int)tree_count);
     updating = 0;
 }
 
@@ -885,7 +993,8 @@ void refresh_files()
     } else if (selected_entry_valid()) {
         files->value(file_list.selected + 1);
     }
-    if (top > 0 && (uint32_t)top <= entry_count) files->topline(top);
+    if (top > 0 && entry_count)
+        files->topline((uint32_t)top <= entry_count ? top : (int)entry_count);
     updating = 0;
     refresh_tree();
 }
@@ -1009,6 +1118,7 @@ public:
             return 1;
         }
         if (event == FL_PUSH && Fl::event_button() == FL_RIGHT_MOUSE) {
+            UiActivity activity;
             sync_selection();
             if (context_menu) {
                 show_context_menu();
@@ -1045,7 +1155,10 @@ void button_action(Fl_Widget *, void *data)
 
 void menu_action(Fl_Widget *, void *data)
 {
+    UiActivity activity;
     uint32_t action = (uint32_t)(uintptr_t)data;
+    if (action == FILEMAN_ACTION_REFRESH && directory_watch.wd < 0)
+        retry_directory_watch();
     if (action == ACTION_ABOUT) {
         (void)confirm_dialog(T("File Manager"),
             T("Browse files, manage folders and launch X11 applications."), 1);
@@ -1226,6 +1339,11 @@ void build_ui(int argc, char **argv)
 
 } // namespace
 
+extern "C" void fileman_watch_navigate(const char *path)
+{
+    set_directory_watch(path);
+}
+
 extern "C" int fileman_input_dialog(const char *title, const char *prompt,
                                       char *value, uint32_t capacity)
 {
@@ -1264,6 +1382,9 @@ extern "C" void fileman_refresh_view(void)
 int main(int argc, char **argv)
 {
     reliefos_fltk::init("fileman");
+    int watch_result = fileman_watch_open(&directory_watch);
+    if (watch_result < 0)
+        fprintf(stderr, "[fileman.elf] automatic refresh unavailable (%d)\n", -watch_result);
     refresh_home_path();
     fileman_settings_load();
     fileman_tree_reset();
@@ -1273,10 +1394,17 @@ int main(int argc, char **argv)
     if (navigate_to_path(initial) < 0) (void)navigate_to_path("/");
     (void)fileman_tree_toggle(1);
     build_ui(argc, argv);
+    if (directory_watch.fd >= 0) {
+        Fl::add_fd(directory_watch.fd, FL_READ, watch_ready, NULL);
+        watch_registered = true;
+    }
     refresh_ui();
     main_window->show(argc, argv);
     Fl::add_timeout(1.0, reap_children);
     puts("[fileman.elf] FLTK file manager ready");
     fflush(stdout);
-    return Fl::run();
+    int result = Fl::run();
+    if (watch_timer) Fl::remove_timeout(watch_timeout);
+    stop_directory_watch();
+    return result;
 }
