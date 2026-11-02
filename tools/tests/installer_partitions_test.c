@@ -101,28 +101,43 @@ int main(int argc, char **argv)
     scenario = argv[2];
     struct reliefos_block_disk_info disk;
     struct installer_partition_plan plan;
+    uint32_t modes = RELIEFOS_BOOT_BIOS | RELIEFOS_BOOT_UEFI;
+    if (!strcmp(scenario, "bios-only")) modes = RELIEFOS_BOOT_BIOS;
+    if (!strcmp(scenario, "uefi-only")) modes = RELIEFOS_BOOT_UEFI;
+    if (!strcmp(scenario, "external")) modes = 0;
     assert(reliefos_block_get_info("/dev/sda", &disk) == 0);
     if (!strcmp(argv[2], "small")) {
-        assert(installer_partition_plan_default(&disk, &plan) == -ENOSPC);
+        assert(installer_partition_plan_default(&disk, modes, &plan) == -ENOSPC);
         return 0;
     }
-    assert(installer_partition_plan_default(&disk, &plan) == 0);
+    assert(installer_partition_plan_default(&disk, modes, &plan) == 0);
     mounted = 1;
     mount_source = "/dev/sda12";
     assert(block_check_unmounted("/dev/sda1") == 0);
     assert(block_check_unmounted("/dev/sda") == -EBUSY);
     mounted = 0;
     mount_source = "/dev/sda1";
-    assert(plan.bios.index == 0 && plan.bios.first_lba == 2048 && plan.bios.sector_count == 2048);
-    assert(plan.esp.index == 1 && plan.esp.first_lba == 4096 && plan.esp.sector_count == 262144);
-    assert(plan.root.index == 2 && plan.root.first_lba == 266240);
+    assert(plan.boot_modes == modes);
+    if (modes & RELIEFOS_BOOT_BIOS) {
+        assert(plan.bios.index == 0 && plan.bios.first_lba == 2048 && plan.bios.sector_count == 2048);
+        assert(plan.esp.index == 1 && plan.esp.first_lba == 4096);
+        assert(plan.root.index == 2 && plan.root.first_lba == 266240);
+    } else {
+        assert(!plan.bios.sector_count && !plan.bios.first_lba);
+        assert(plan.esp.index == 0 && plan.esp.first_lba == 2048);
+        assert(plan.root.index == 1 && plan.root.first_lba == 264192);
+    }
+    assert(plan.esp.sector_count == 262144);
     assert(plan.root.first_lba + plan.root.sector_count <= disk.sector_count - 33);
     struct reliefos_block_disk_info bad = disk;
     bad.sector_size = 4096;
-    assert(installer_partition_plan_default(&bad, &plan) == -ENOTSUP);
+    assert(installer_partition_plan_default(&bad, modes, &plan) == -ENOTSUP);
     bad = disk; bad.sector_count = UINT64_MAX;
-    assert(installer_partition_plan_default(&bad, &plan) == -EOVERFLOW);
-    assert(installer_partition_plan_default(&disk, &plan) == 0);
+    assert(installer_partition_plan_default(&bad, modes, &plan) == -EOVERFLOW);
+    assert(installer_partition_plan_default(&disk, 4, &plan) == -EINVAL);
+    struct installer_partition_plan zero = {0};
+    assert(!memcmp(&plan, &zero, sizeof(plan)));
+    assert(installer_partition_plan_default(&disk, modes, &plan) == 0);
     if (!strcmp(argv[2], "manual")) {
         assert(reliefos_block_gpt_initialize("/dev/sda", 1) == 0);
         uint32_t index;
@@ -150,6 +165,8 @@ int main(int argc, char **argv)
     else if (!strcmp(argv[2], "mounted")) mounted = 1;
     else if (!strcmp(argv[2], "4kn")) logical_sector = 4096;
     else if (!strcmp(argv[2], "badplan")) ++plan.root.first_lba;
+    else if (!strcmp(argv[2], "bad-modes")) plan.boot_modes = 4;
+    else if (!strcmp(argv[2], "stale-modes")) plan.boot_modes = RELIEFOS_BOOT_UEFI;
     int result = installer_partition_apply_default("/dev/sda", &plan);
     if (!strcmp(scenario, "clear-write-fail") || !strcmp(scenario, "clear-sync-fail")) {
         assert(result == -EIO && clearing);
@@ -157,15 +174,22 @@ int main(int argc, char **argv)
     else if (entropy_failure) assert(result == -EIO);
     else if (mounted) assert(result == -EBUSY);
     else if (logical_sector != 512) assert(result == -ENOTSUP);
-    else if (!strcmp(argv[2], "badplan")) assert(result == -EINVAL);
+    else if (!strcmp(argv[2], "badplan") || !strcmp(argv[2], "bad-modes") ||
+             !strcmp(argv[2], "stale-modes")) assert(result == -EINVAL);
     else {
         assert(result == 0);
         struct reliefos_block_partition parts[128];
         uint32_t count;
-        assert(reliefos_block_list_partitions("/dev/sda", parts, 128, &count) == 0 && count == 3);
-        assert(parts[0].gpt_type == RELIEFOS_BLOCK_GPT_BIOS_BOOT);
-        assert(parts[0].filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN);
-        assert(!strcmp(reliefos_block_gpt_type_name(parts[0].gpt_type), "bios-boot"));
+        assert(reliefos_block_list_partitions("/dev/sda", parts, 128, &count) == 0);
+        assert(count == ((modes & RELIEFOS_BOOT_BIOS) ? 3 : 2));
+        assert(clearing == !!(modes & RELIEFOS_BOOT_BIOS));
+        if (modes & RELIEFOS_BOOT_BIOS) {
+            assert(parts[0].gpt_type == RELIEFOS_BLOCK_GPT_BIOS_BOOT);
+            assert(parts[0].filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN);
+            assert(!strcmp(reliefos_block_gpt_type_name(parts[0].gpt_type), "bios-boot"));
+        }
+        assert(parts[count - 2].gpt_type == RELIEFOS_BLOCK_GPT_ESP);
+        assert(parts[count - 1].gpt_type == RELIEFOS_BLOCK_GPT_LINUX);
         char path[64], uuid[37];
         assert(reliefos_block_partition_path("/dev/nvme0n1", 2, path, sizeof(path)) == 0);
         assert(!strcmp(path, "/dev/nvme0n1p3"));

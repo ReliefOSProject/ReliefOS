@@ -62,6 +62,8 @@ def main():
         probe.click(*probe.mode_option_point(update=True))
         next_page(probe)
         next_page(probe)
+        wait_page(probe, process, "Choose bootloaders")
+        next_page(probe)
         wait_page(probe, process, "Confirm Update")
         before = probe.frame("update-confirm-empty")
         # The confirmation field must be focused on entry without a click.
@@ -73,6 +75,7 @@ def main():
             failures.append("Typing UPDATE did not enable the update button")
         # Leave the enabled Update confirmation unsubmitted, return to Mode,
         # switch to a fresh install, and carry the same disk through that path.
+        previous_page(probe, 5)
         previous_page(probe, 4)
         previous_page(probe, 3)
         probe.click(*probe.mode_option_point(update=False))
@@ -80,14 +83,15 @@ def main():
         probe.click(*probe.disk_selection_point())
         next_page(probe, 5)
         next_page(probe, 6)
+        next_page(probe, 7)
         for index, value in enumerate(("alice", "password", "password", "rootpass", "rootpass")):
             probe.click(*probe.account_field_point(index))
             probe.text(value)
-        next_page(probe, 7)
+        next_page(probe, 8)
         probe.click(*probe.confirm_field_point())
         probe.text("INSTALL")
         probe.frame("fresh-confirm-typed")
-        next_page(probe, 8)
+        next_page(probe, 9)
         try:
             wait_page(probe, process, "Installation Complete", timeout=2400)
         except AssertionError as error:

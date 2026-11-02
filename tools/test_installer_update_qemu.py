@@ -73,6 +73,8 @@ def main():
         probe.click(*probe.mode_option_point(update=True))
         next_page(probe)
         next_page(probe)
+        wait_page(probe, process, "Choose bootloaders")
+        next_page(probe)
         wait_page(probe, process, "Confirm Update")
         probe.click(*probe.confirm_field_point())
         probe.text("UPDATE")

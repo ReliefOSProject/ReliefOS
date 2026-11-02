@@ -176,7 +176,7 @@ static int tty_select_loader(const char *name, uint8_t *skip)
     }
 }
 
-/** @brief Present independent firmware choices before destructive confirmation. */
+/** @brief Present independent firmware choices before partition planning. */
 static int tty_bootloaders(struct installer_setup *setup)
 {
     if (!tty_select_loader(T("Install or update BIOS bootloader?"), &setup->skip_bios) ||
@@ -259,7 +259,9 @@ static int tty_partition_menu(const struct installer_tty_context *context)
         if (!tty_read_line("partition> ", input, sizeof(input))) return 0;
         if (tty_line_is(input, "done")) {
             if (context->partition_plan_valid()) return 1;
-            puts("Select BIOS Boot, ESP and root partitions for dual boot, or use auto.");
+            puts(context->setup->skip_bios
+                ? T("Select ESP and root partitions, or use auto.")
+                : T("Select an unformatted BIOS Boot partition, ESP and root partitions, or use auto."));
             continue;
         }
         if (tty_line_is(input, "auto")) {
@@ -366,6 +368,7 @@ int installer_tty_main(const struct installer_tty_context *context)
         }
         context->perform_update();
     } else {
+        if (!tty_bootloaders(context->setup)) return 1;
         context->refresh_partitions();
         if (!tty_partition_menu(context)) {
             puts("Partition setup cancelled.");
@@ -380,7 +383,6 @@ int installer_tty_main(const struct installer_tty_context *context)
             return 1;
         }
         if (!installer_tty_select_swap(context->setup)) return 1;
-        if (!tty_bootloaders(context->setup)) return 1;
         if (!tty_read_line("Type INSTALL to confirm the partition layout and installation: ",
                            input, sizeof(input)) || !tty_line_is(input, "INSTALL")) {
             puts("Installation not confirmed. Installation cancelled.");

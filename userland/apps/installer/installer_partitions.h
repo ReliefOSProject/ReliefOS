@@ -1,6 +1,7 @@
 #ifndef RELIEFOS_INSTALLER_PARTITIONS_H
 #define RELIEFOS_INSTALLER_PARTITIONS_H
 #include <reliefos/blockdev.h>
+#include <reliefos/bootloader.h>
 
 /** @brief A zero-based GPT slot and its 512-byte logical sector range. */
 struct installer_partition_extent {
@@ -8,8 +9,9 @@ struct installer_partition_extent {
     uint64_t first_lba, sector_count;
 };
 
-/** @brief Validated default geometry, with an unformatted BIOS Boot extent. */
+/** @brief Firmware-specific geometry; the BIOS extent is zero when omitted. */
 struct installer_partition_plan {
+    uint32_t boot_modes;
     struct installer_partition_extent bios, esp, root;
 };
 
@@ -18,6 +20,7 @@ extern "C" {
 #endif
 /** @brief Calculate geometry without I/O; zero output on a negative errno result. */
 int installer_partition_plan_default(const struct reliefos_block_disk_info *disk,
+                                     uint32_t boot_modes,
                                      struct installer_partition_plan *out);
 /** @brief Revalidate geometry and replace the selected unmounted disk's GPT. */
 int installer_partition_apply_default(const char *disk_path,

@@ -22,11 +22,14 @@ def run_case(size):
     with patch.object(helper,'wait_log',wait),patch.object(helper,'wait_install') as finish:
         helper.install_tty(probe,None,None,select_entry=False,swap_mib=size)
         finish.assert_called_once()
-    assert prompts[9]=='Install Xorg desktop environment? [Y/n]: '
-    assert prompts[10]=='Create a swapfile? [y/N]: '
-    assert probe.answers[10]==('y' if size is not None else '')
+    assert prompts[2:4]==['Install or update BIOS bootloader? [Y/n]: ',
+                          'Install or update UEFI bootloader? [Y/n]: ']
+    assert prompts[4]=='partition> '
+    assert prompts[11]=='Install Xorg desktop environment? [Y/n]: '
+    assert prompts[12]=='Create a swapfile? [y/N]: '
+    assert probe.answers[12]==('y' if size is not None else '')
     if size is not None:
-        assert prompts[11]=='Swap size in MiB [' and probe.answers[11]==str(size)
+        assert prompts[13]=='Swap size in MiB [' and probe.answers[13]==str(size)
     else:assert not any(p.startswith('Swap size in MiB [') for p in prompts)
     assert prompts[-1]=='Type INSTALL to confirm the partition layout and installation: '
     print('PASS TTY helper swap_mib='+str(size))

@@ -101,7 +101,7 @@ def main():
                       timeout=40)
             print('PASS installer session exit/recovery to the rescue shell', flush=True)
             return
-        for _ in range(6): next_page(probe)
+        for _ in range(7): next_page(probe)
         wait_text(probe, process, 'installer-accounts', 'Standard user name')
         if args.install:
             # The accounts page initially focuses the username. Keep field

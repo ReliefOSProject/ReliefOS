@@ -15,19 +15,26 @@
  * MiB remains unused, matching the shared block API's MiB sizing contract.
  */
 int installer_partition_plan_default(const struct reliefos_block_disk_info *disk,
+                                     uint32_t boot_modes,
                                      struct installer_partition_plan *out)
 {
     if (!out) return -EINVAL;
     memset(out, 0, sizeof(*out));
     if (!disk) return -EINVAL;
+    if (boot_modes & ~(RELIEFOS_BOOT_BIOS | RELIEFOS_BOOT_UEFI)) return -EINVAL;
     if (disk->sector_size != 512) return -ENOTSUP;
     if (disk->sector_count > INT64_MAX / 512u) return -EOVERFLOW;
     if (disk->sector_count < 655360) return -ENOSPC;
-    uint64_t root_sectors = (disk->sector_count - 33u - 266240u) & ~2047ULL;
+    const int bios = !!(boot_modes & RELIEFOS_BOOT_BIOS);
+    const uint64_t esp_start = bios ? 4096u : 2048u;
+    const uint64_t root_start = esp_start + 262144u;
+    uint64_t root_sectors = (disk->sector_count - 33u - root_start) & ~2047ULL;
     if (root_sectors / 2048u > UINT32_MAX) return -EOVERFLOW;
-    out->bios = (struct installer_partition_extent){0, 2048, 2048};
-    out->esp = (struct installer_partition_extent){1, 4096, 262144};
-    out->root = (struct installer_partition_extent){2, 266240, root_sectors};
+    out->boot_modes = boot_modes;
+    if (bios) out->bios = (struct installer_partition_extent){0, 2048, 2048};
+    /* BIOS GRUB also reads the common FAT32 kernel/config payload. */
+    out->esp = (struct installer_partition_extent){bios ? 1u : 0u, esp_start, 262144};
+    out->root = (struct installer_partition_extent){bios ? 2u : 1u, root_start, root_sectors};
     return 0;
 }
 
@@ -74,20 +81,20 @@ int installer_partition_apply_default(const char *disk_path,
     struct reliefos_block_disk_info disk;
     struct installer_partition_plan expected;
     int result = reliefos_block_get_info(disk_path, &disk);
-    if (!result) result = installer_partition_plan_default(&disk, &expected);
+    if (!result) result = installer_partition_plan_default(&disk, plan->boot_modes, &expected);
     if (result < 0) return result;
     if (!same_extent(&plan->bios, &expected.bios) ||
         !same_extent(&plan->esp, &expected.esp) ||
         !same_extent(&plan->root, &expected.root)) return -EINVAL;
     result = reliefos_block_gpt_initialize(disk_path, 1);
-    if (!result) result = clear_default_bios(disk_path, &plan->bios);
+    if (!result && plan->bios.sector_count) result = clear_default_bios(disk_path, &plan->bios);
     const struct installer_partition_extent *extents[] = {&plan->bios, &plan->esp, &plan->root};
     const uint32_t filesystems[] = {RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN,
         RELIEFOS_BLOCK_FILESYSTEM_FAT32, RELIEFOS_BLOCK_FILESYSTEM_EXT4};
     const uint32_t types[] = {RELIEFOS_BLOCK_GPT_BIOS_BOOT, RELIEFOS_BLOCK_GPT_ESP,
         RELIEFOS_BLOCK_GPT_LINUX};
     const char *names[] = {"RELIEFOS_BIOS", "RELIEFOS_ESP", "RELIEFOS_ROOT"};
-    for (unsigned i = 0; !result && i < 3; ++i) {
+    for (unsigned i = plan->bios.sector_count ? 0 : 1; !result && i < 3; ++i) {
         uint32_t index;
         result = reliefos_block_gpt_create(disk_path, filesystems[i],
             (uint32_t)(extents[i]->sector_count / 2048u), names[i], &index);

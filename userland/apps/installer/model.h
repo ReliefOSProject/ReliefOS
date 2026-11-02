@@ -10,6 +10,7 @@ enum installer_page {
     INSTALLER_PAGE_WELCOME,
     INSTALLER_PAGE_MODE,
     INSTALLER_PAGE_DISK,
+    INSTALLER_PAGE_BOOTLOADERS,
     INSTALLER_PAGE_PARTITIONS,
     INSTALLER_PAGE_ACCOUNTS,
     INSTALLER_PAGE_CONFIRM,
@@ -35,13 +36,12 @@ enum installer_action {
 extern "C" {
 #endif
 
-/* Forward transition; the disk page branches by setup mode (update goes
- * straight to the confirm page, fresh installs collect accounts first). */
+/* Both modes select firmware after the disk. Fresh installs then configure
+ * partitions/accounts; updates keep their partition layout and confirm. */
 enum installer_page installer_model_next(enum installer_page page,
                                          enum installer_mode mode);
 
-/* Backward transition; the confirm page returns to the page that opened it
- * (the disk page in update mode, accounts in fresh mode). */
+/* Backward transition; update confirmation returns to firmware selection. */
 enum installer_page installer_model_prev(enum installer_page page,
                                          enum installer_mode mode);
 

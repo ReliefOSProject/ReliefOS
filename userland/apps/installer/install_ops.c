@@ -286,6 +286,7 @@ void refresh_partitions(void)
         (uint32_t)selected_disk >= disk_count ||
         !text_eq(partition_disk_path, disks[selected_disk].path);
     if (disk_changed) {
+        installer_partition_auto = 1;
         selected_partition = -1;
         installer_root_partition = -1;
         installer_esp_partition = -1;
@@ -344,19 +345,33 @@ void format_partition_line(char *buf, uint32_t cap,
              ((int32_t)partition->index == installer_esp_partition ? "  [ESP]" : ""));
 }
 
+uint32_t installer_boot_modes(void)
+{
+    return (setup.skip_bios ? 0u : RELIEFOS_BOOT_BIOS) |
+           (setup.skip_uefi ? 0u : RELIEFOS_BOOT_UEFI);
+}
+
 int installer_partition_plan_valid(void)
 {
-    int root_seen = 0, esp_seen = 0;
+    int root_seen = 0, esp_seen = 0, bios_seen = 0;
     if (installer_partition_auto) {
         struct installer_partition_plan plan;
         return selected_disk >= 0 && (uint32_t)selected_disk < disk_count &&
-            !installer_partition_plan_default(&disks[selected_disk], &plan);
+            !installer_partition_plan_default(&disks[selected_disk], installer_boot_modes(), &plan);
     }
     if (selected_disk < 0 || (uint32_t)selected_disk >= disk_count ||
+        disks[selected_disk].sector_count < 34u ||
         installer_root_partition < 0 || installer_esp_partition < 0 ||
         installer_root_partition == installer_esp_partition)
         return 0;
     for (uint32_t i = 0; i < partition_count; ++i) {
+        if (partitions[i].gpt_type == RELIEFOS_BLOCK_GPT_BIOS_BOOT &&
+            partitions[i].filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN &&
+            partitions[i].sector_count >= 2048u &&
+            partitions[i].first_lba >= 34u &&
+            partitions[i].first_lba < disks[selected_disk].sector_count - 33u &&
+            partitions[i].sector_count <= disks[selected_disk].sector_count - 33u - partitions[i].first_lba)
+            bios_seen = 1;
         if ((int32_t)partitions[i].index == installer_root_partition)
             root_seen = partitions[i].gpt_type == RELIEFOS_BLOCK_GPT_LINUX &&
                         partitions[i].sector_count >= 128ULL * 2048ULL;
@@ -364,9 +379,9 @@ int installer_partition_plan_valid(void)
             esp_seen = partitions[i].gpt_type == RELIEFOS_BLOCK_GPT_ESP &&
                        partitions[i].sector_count >= 128ULL * 2048ULL;
     }
-    /* Firmware choices are made on confirmation; its preflight checks BIOS
-     * space before any formatting. UEFI-only manual layouts can reach it. */
-    return root_seen && esp_seen;
+    /* Rechecked after navigating back to firmware selection. No disk writes
+     * here: adding BIOS to an existing two-part layout needs explicit changes. */
+    return root_seen && esp_seen && (setup.skip_bios || bios_seen);
 }
 
 static int installer_partition_disk(void)
@@ -400,7 +415,7 @@ int installer_partition_auto_layout(void)
     struct installer_partition_plan plan;
     int ret = installer_partition_disk();
     if (!ret) ret = reliefos_block_get_info(disks[selected_disk].path, &info);
-    if (!ret) ret = installer_partition_plan_default(&info, &plan);
+    if (!ret) ret = installer_partition_plan_default(&info, installer_boot_modes(), &plan);
     if (!ret) ret = installer_partition_apply_default(disks[selected_disk].path, &plan);
     if (!ret) {
         refresh_partitions();
@@ -556,7 +571,7 @@ static int installer_target_partitions(const char *disk_path, int fresh,
         struct reliefos_block_disk_info info;
         struct installer_partition_plan plan;
         ret = reliefos_block_get_info(disk_path, &info);
-        if (!ret) ret = installer_partition_plan_default(&info, &plan);
+        if (!ret) ret = installer_partition_plan_default(&info, installer_boot_modes(), &plan);
         if (!ret) ret = installer_capacity_check(&capacity, plan.root.sector_count, plan.esp.sector_count);
         if (!ret) ret = installer_partition_apply_default(disk_path, &plan);
         if (ret < 0) return ret;
@@ -1623,9 +1638,8 @@ void prepare_update_target(void)
     }
     set_status(T("Update installed ReliefOS packages"),
                T("Alpine packages and local configuration are preserved."));
-    page = PAGE_CONFIRM;
+    page = PAGE_BOOTLOADERS;
     reset_confirm();
-    refresh_ui();
     refresh_ui();
 }
 

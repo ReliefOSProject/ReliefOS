@@ -19,7 +19,7 @@ SIDEBAR_ACTIVE = (0xFF, 0xFF, 0xFF)
 SIDEBAR_ROW_TOP = 100
 SIDEBAR_ROW_PITCH = 34
 SIDEBAR_ROW_HEIGHT = 30
-SIDEBAR_PAGE_COUNT = 10
+SIDEBAR_PAGE_COUNT = 11
 
 
 class InstallerProbe:
@@ -201,7 +201,11 @@ class InstallerProbe:
         if index != 0:
             raise ValueError("Only the first visible partition row is supported")
         self._require_installer_geometry()
-        return self.content_left + 100, self.sidebar_top + 108
+        return self.content_left + 100, self.sidebar_top + 140
+
+    def bootloader_indicator_point(self, bios=True):
+        self._require_installer_geometry()
+        return self.content_left + 8, self.sidebar_top + (154 if bios else 198)
 
     def account_field_point(self, index):
         if not 0 <= index < 5:

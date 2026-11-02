@@ -37,6 +37,7 @@ extern "C" {
 #include "../locale_settings.h"
 #include "install_ops.h"
 #include "installer_capacity.h"
+#include "installer_partitions.h"
 #include "installer_tty.h"
 #include "model.h"
 
@@ -77,6 +78,7 @@ static Fl_Input *swap_size_input;
 static char swap_size_text[32];
 static int swap_size_initialized, swap_size_invalid;
 static Fl_Box *bootloader_hint;
+static Fl_Box *partition_hint;
 static Fl_Input *account_inputs[5];
 static Fl_Box *account_hint;
 static Fl_Box *status_box;
@@ -217,6 +219,7 @@ static const char *page_label(enum installer_page target)
     case INSTALLER_PAGE_WELCOME: return T("Welcome");
     case INSTALLER_PAGE_MODE: return T("Mode");
     case INSTALLER_PAGE_DISK: return T("Disk");
+    case INSTALLER_PAGE_BOOTLOADERS: return T("Bootloaders");
     case INSTALLER_PAGE_PARTITIONS: return T("Partitions");
     case INSTALLER_PAGE_ACCOUNTS: return T("Accounts");
     case INSTALLER_PAGE_CONFIRM: return T("Confirm");
@@ -592,7 +595,25 @@ static void build_disk_page(void)
 static void refresh_partition_list(void)
 {
     if (!partition_browser) return;
-    char line[256];
+    char line[640];
+    if (partition_hint) {
+        struct installer_partition_plan plan;
+        if (installer_partition_auto && selected_disk >= 0 &&
+            (uint32_t)selected_disk < disk_count &&
+            !installer_partition_plan_default(&disks[selected_disk], installer_boot_modes(), &plan)) {
+            snprintf(line, sizeof(line), setup.skip_bios
+                ? T("Automatic plan: ESP 128 MiB FAT32; root %llu MiB ext4.\nThe list shows current partitions. The plan is applied only after confirmation.")
+                : T("Automatic plan: BIOS Boot 1 MiB; ESP 128 MiB FAT32; root %llu MiB ext4.\nThe list shows current partitions. The plan is applied only after confirmation."),
+                (unsigned long long)(plan.root.sector_count / 2048u));
+            partition_hint->copy_label(line);
+        } else {
+            partition_hint->copy_label(installer_partition_auto
+                ? T("The automatic layout does not fit this disk. Select another disk or configure partitions manually.")
+                : setup.skip_bios
+                    ? T("Manual layout: assign a FAT32 ESP and an ext4 root. BIOS Boot is not required for the selected bootloaders.")
+                    : T("Manual layout: assign BIOS Boot, ESP and root roles. BIOS Boot stays unformatted."));
+        }
+    }
     partition_browser->clear();
     for (uint32_t i = 0; i < partition_count; ++i) {
         format_partition_line(line, sizeof(line), &partitions[i]);
@@ -687,7 +708,9 @@ static const char *partition_prompt_text(enum partition_prompt_action action)
 {
     switch (action) {
     case PARTITION_PROMPT_AUTO:
-        return T("Type AUTO to erase the disk and create BIOS Boot, ESP and root partitions:");
+        return setup.skip_bios
+            ? T("Type AUTO to erase the disk and create ESP and root partitions:")
+            : T("Type AUTO to erase the disk and create BIOS Boot, ESP and root partitions:");
     case PARTITION_PROMPT_INITIALIZE:
         return T("Type INITIALIZE to replace the partition table:");
     case PARTITION_PROMPT_CREATE:
@@ -813,11 +836,8 @@ static void build_partition_page(void)
     };
 
     make_heading(T("Configure partitions"), 16);
-    make_label(installer_partition_auto
-                   ? T("Automatic layout creates 1 MiB BIOS Boot, 128 MiB FAT32 ESP and ext4 root.")
-                   : T("Manual layout: assign BIOS Boot, ESP and root roles. BIOS Boot stays unformatted."),
-               CONTENT_X, 52, CONTENT_W, 38, 14, 1);
-    partition_browser = new Fl_Hold_Browser(CONTENT_X, 96, CONTENT_W, 280);
+    partition_hint = make_label("", CONTENT_X, 52, CONTENT_W, 68, 14, 1);
+    partition_browser = new Fl_Hold_Browser(CONTENT_X, 128, CONTENT_W, 248);
     partition_browser->callback(select_partition);
     partition_browser->textsize(13);
     partition_browser->selection_color(COLOR_SIDEBAR);
@@ -970,17 +990,48 @@ static void swap_install_changed(Fl_Widget *widget,void *)
 }
 
 /** @brief Apply one firmware choice and explain the effect of skipping both. */
+static const char *bootloader_description(void)
+{
+    if (install_mode == INSTALLER_MODE_UPDATE)
+        return T("Existing partitions are preserved. BIOS requires an unformatted BIOS Boot partition. Skipped existing bootloaders are preserved.");
+    if (setup.skip_bios && setup.skip_uefi)
+        return T("No bootloader selected. A new installation will need a separately configured bootloader.");
+    return setup.skip_bios
+        ? T("Automatic partitioning creates a FAT32 ESP and an ext4 root. No BIOS Boot partition is needed.")
+        : T("Automatic partitioning creates an unformatted BIOS Boot partition, a FAT32 ESP and an ext4 root. BIOS also uses the FAT32 partition for boot files.");
+}
+
 static void bootloader_install_changed(Fl_Widget *widget, void *data)
 {
     uint8_t skip = static_cast<Fl_Check_Button *>(widget)->value() ? 0 : 1;
     if ((uintptr_t)data == 1) setup.skip_bios = skip;
     else setup.skip_uefi = skip;
     if (bootloader_hint) {
-        bootloader_hint->copy_label(setup.skip_bios && setup.skip_uefi
-            ? T("No bootloader selected. A new installation will need a separately configured bootloader.")
-            : T("BIOS requires an unformatted BIOS Boot partition. Skipped existing bootloaders are preserved."));
+        bootloader_hint->copy_label(bootloader_description());
         bootloader_hint->redraw();
     }
+}
+
+static void build_bootloader_page(void)
+{
+    make_heading(T("Choose bootloaders"), 16);
+    make_label(T("Select the firmware used to start this disk. You can select both BIOS and UEFI."),
+               CONTENT_X, 62, CONTENT_W, 54, 15, 1);
+    Fl_Check_Button *bios = new Fl_Check_Button(CONTENT_X, 138, CONTENT_W, 32,
+                                                T("Install or update BIOS bootloader"));
+    bios->value(setup.skip_bios ? 0 : 1);
+    bios->callback(bootloader_install_changed, (void *)(uintptr_t)1);
+    reliefos_fltk::style(bios);
+    Fl_Check_Button *uefi = new Fl_Check_Button(CONTENT_X, 182, CONTENT_W, 32,
+                                                T("Install or update UEFI bootloader"));
+    uefi->value(setup.skip_uefi ? 0 : 1);
+    uefi->callback(bootloader_install_changed, (void *)(uintptr_t)2);
+    reliefos_fltk::style(uefi);
+    bootloader_hint = make_label(bootloader_description(),
+                                 CONTENT_X, 244, CONTENT_W, 100, 14, 1);
+    if (install_mode == INSTALLER_MODE_UPDATE)
+        make_label(T("The initial selection matches the bootloaders found on this disk."),
+                   CONTENT_X, 362, CONTENT_W, 54, 14, 1);
 }
 
 static void build_confirm_page(void)
@@ -1038,20 +1089,11 @@ static void build_confirm_page(void)
         if (!setup.swap_enabled) swap_size_input->deactivate();
         reliefos_fltk::style(swap_size_input);
     }
-    Fl_Check_Button *bios = new Fl_Check_Button(CONTENT_X, 366, CONTENT_W, 32,
-                                                T("Install or update BIOS bootloader"));
-    bios->value(setup.skip_bios ? 0 : 1);
-    bios->callback(bootloader_install_changed, (void *)(uintptr_t)1);
-    reliefos_fltk::style(bios);
-    Fl_Check_Button *uefi = new Fl_Check_Button(CONTENT_X, 406, CONTENT_W, 32,
-                                                T("Install or update UEFI bootloader"));
-    uefi->value(setup.skip_uefi ? 0 : 1);
-    uefi->callback(bootloader_install_changed, (void *)(uintptr_t)2);
-    reliefos_fltk::style(uefi);
-    bootloader_hint = make_label(setup.skip_bios && setup.skip_uefi
-        ? T("No bootloader selected. A new installation will need a separately configured bootloader.")
-        : T("BIOS requires an unformatted BIOS Boot partition. Skipped existing bootloaders are preserved."),
-        CONTENT_X, 454, CONTENT_W, 70, 13, 1);
+    snprintf(line, sizeof(line), "%s BIOS: %s    UEFI: %s", T("Bootloaders:"),
+             setup.skip_bios ? T("Skip") : T("Install"),
+             setup.skip_uefi ? T("Skip") : T("Install"));
+    make_label(line, CONTENT_X, 366, CONTENT_W, 36, 14, 1);
+    make_label(bootloader_description(), CONTENT_X, 414, CONTENT_W, 100, 13, 1);
 }
 
 static void build_progress_page(void)
@@ -1111,6 +1153,7 @@ static void clear_page_widgets(void)
     xorg_checkbox = NULL;
     swap_size_input = NULL;
     bootloader_hint = NULL;
+    partition_hint = NULL;
     account_hint = NULL;
     status_box = NULL;
     detail_box = NULL;
@@ -1132,6 +1175,7 @@ static void show_page(void)
     case INSTALLER_PAGE_WELCOME: build_welcome_page(); break;
     case INSTALLER_PAGE_MODE: build_mode_page(); break;
     case INSTALLER_PAGE_DISK: build_disk_page(); break;
+    case INSTALLER_PAGE_BOOTLOADERS: build_bootloader_page(); break;
     case INSTALLER_PAGE_PARTITIONS: build_partition_page(); break;
     case INSTALLER_PAGE_ACCOUNTS: build_accounts_page(); break;
     case INSTALLER_PAGE_CONFIRM: build_confirm_page(); break;

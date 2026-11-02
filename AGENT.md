@@ -42,6 +42,8 @@ installer root；真正安装到磁盘的系统分为 `/install/esp`（FAT32
 启动载荷）、`/install/root`（Xorg 运行时根载荷）和 `/install/root-console`
 （纯控制台载荷）。不要把“安装器运行时镜像内容”和“安装后系统内容”混为一谈。
 新安装默认同时安装 BIOS / UEFI loader，可分别取消；旧系统更新不重分区。
+安装器在分区之前选择引导方式；自动布局只在选择 BIOS 时创建 BIOS Boot，
+所有引导组合均保留存放内核与 GRUB 资源的 FAT32 ESP。返回修改选项不得自动擦盘。
 具体布局、引导身份和已验证边界见 `Documentation/admin-guide/installation.rst` 及其中的双启动说明。
 
 ### 根目录职责

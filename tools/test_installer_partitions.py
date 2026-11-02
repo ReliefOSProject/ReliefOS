@@ -23,7 +23,9 @@ def main():
             "tools/tests/installer_partitions_test.c",
             "userland/apps/installer/installer_partitions.c", "-o", executable,
         ], cwd=ROOT, check=True)
-        for case in ("small", "readonly", "mounted", "4kn", "badplan", "no-entropy", "normal", "manual", "old-fat", "clear-write-fail", "clear-sync-fail"):
+        successful = ("normal", "bios-only", "uefi-only", "external", "manual", "old-fat")
+        for case in ("small", "readonly", "mounted", "4kn", "badplan", "bad-modes", "stale-modes",
+                     "no-entropy", *successful, "clear-write-fail", "clear-sync-fail"):
             image = work / f"{case}.raw"
             with image.open("wb") as stream:
                 stream.truncate((192 if case == "small" else 384) * 1024**2)
@@ -46,7 +48,7 @@ def main():
                 table = json.loads(subprocess.check_output(["sfdisk", "--json", image]))["partitiontable"]
                 assert table.get("partitions", []) == []
                 continue
-            if case not in ("normal", "manual", "old-fat"):
+            if case not in successful:
                 assert before == hashlib.file_digest(image.open("rb"), "sha256").hexdigest(), case
                 continue
             if case == "old-fat":
@@ -64,14 +66,15 @@ def main():
                 assert parts[3]["type"].upper() == "0FC63DAF-8483-4772-8E79-3D69D8477DE4"
                 subprocess.run(["sfdisk", "--verify", image], check=True)
                 continue
-            assert table["label"] == "gpt" and len(parts) == 3
-            assert [(p["start"], p["size"]) for p in parts[:2]] == [(2048, 2048), (4096, 262144)]
-            assert parts[2]["start"] == 266240
-            assert [p["type"].upper() for p in parts] == [
-                "21686148-6449-6E6F-744E-656564454649",
-                "C12A7328-F81F-11D2-BA4B-00A0C93EC93B",
-                "0FC63DAF-8483-4772-8E79-3D69D8477DE4"]
-            assert len({p["uuid"] for p in parts}) == 3
+            bios = case not in ("uefi-only", "external")
+            assert table["label"] == "gpt" and len(parts) == (3 if bios else 2)
+            assert [(p["start"], p["size"]) for p in parts[:-1]] == (
+                [(2048, 2048), (4096, 262144)] if bios else [(2048, 262144)])
+            assert parts[-1]["start"] == (266240 if bios else 264192)
+            expected_types = (["21686148-6449-6E6F-744E-656564454649"] if bios else []) + [
+                "C12A7328-F81F-11D2-BA4B-00A0C93EC93B", "0FC63DAF-8483-4772-8E79-3D69D8477DE4"]
+            assert [p["type"].upper() for p in parts] == expected_types
+            assert len({p["uuid"] for p in parts}) == len(parts)
             assert uuid.UUID(table["id"]).version == 4
             assert all(uuid.UUID(p["uuid"]).version == 4 for p in parts)
             subprocess.run(["sfdisk", "--verify", image], check=True)
@@ -82,7 +85,7 @@ def main():
             other = json.loads(subprocess.check_output(["sfdisk", "--json", second]))["partitiontable"]
             assert table["id"] != other["id"], "same-size installations reused a disk GUID"
             assert not ({p["uuid"] for p in parts} & {p["uuid"] for p in other["partitions"]}), "partition GUIDs reused across disks"
-        print("PASS installer GPT: real primary/backup tables, BIOS/ESP/root geometry, UUIDs, NVMe paths and unchanged refusal cases")
+        print("PASS installer GPT: all firmware choices, real primary/backup tables, geometry, UUIDs, NVMe paths and unchanged refusal cases")
 
 
 if __name__ == "__main__":

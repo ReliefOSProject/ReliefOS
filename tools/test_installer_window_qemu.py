@@ -181,8 +181,9 @@ def main():
         parser.error("installed requires an existing --disk")
     out = args.output / args.case
     out.mkdir(parents=True, exist_ok=True)
-    serial, qmp = out / "serial.log", out / "qmp.sock"
-    qmp.unlink(missing_ok=True)
+    import uuid
+    serial = out / "serial.log"
+    qmp = ROOT.parent / f".reliefos-inst-win-{uuid.uuid4().hex[:12]}.sock"
     iso = ROOT / "build/images" / ("reliefos-live.iso" if args.case == "desktop" else "reliefos-installer.iso")
     if args.iso:
         iso = args.iso.resolve()
@@ -224,6 +225,20 @@ def main():
                 wait_log(serial, "Select disk number", process, 10)
                 probe.text("0")
                 probe.key("ret")
+                for prompt, answer in (
+                    ("Install or update BIOS bootloader?", ""),
+                    ("Install or update UEFI bootloader?", ""),
+                    ("partition> ", "done"),
+                    ("Username: ", "alice"), ("Password: ", "password"),
+                    ("Confirm password: ", "password"),
+                    ("root password: ", "rootpass"),
+                    ("Confirm root password: ", "rootpass"),
+                    ("Install Xorg desktop environment?", ""),
+                    ("Create a swapfile? [y/N]: ", ""),
+                ):
+                    wait_log(serial, prompt, process, 30)
+                    probe.text(answer)
+                    probe.key("ret")
                 wait_log(serial, "Type INSTALL", process, 10)
                 probe.text("INSTALL" if args.install else "no")
                 probe.key("ret")

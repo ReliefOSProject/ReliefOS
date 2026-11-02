@@ -126,27 +126,27 @@ def installer_power(probe, serial, process):
     wait_log(serial, "name=installer.elf", process)
     time.sleep(8)
     assert probe.visible_page(probe.frame("installer-language")) == 0
-    for expected in (1, 2, 3, 4, 5):
+    for expected in (1, 2, 3, 4, 5, 6):
         probe.click(*probe.footer_point())
         time.sleep(0.8)
         assert probe.visible_page(probe.frame(f"installer-page-{expected}")) == expected
     probe.click(*probe.partition_selection_point())
     probe.click(*probe.footer_point())
     time.sleep(0.8)
-    assert probe.visible_page(probe.frame("installer-accounts")) == 6
+    assert probe.visible_page(probe.frame("installer-accounts")) == 7
     for index, value in enumerate(("alice", "password", "password", "rootpass", "rootpass")):
         probe.click(*probe.account_field_point(index))
         probe.text(value)
     probe.click(*probe.footer_point())
     time.sleep(0.8)
-    assert probe.visible_page(probe.frame("installer-confirm")) == 7
+    assert probe.visible_page(probe.frame("installer-confirm")) == 8
     probe.click(*probe.confirm_field_point())
     probe.text("INSTALL")
     time.sleep(1)
     probe.frame("installer-confirm-typed")
     probe.click(*probe.footer_point())
     time.sleep(2)
-    assert probe.visible_page(probe.frame("installer-copying")) == 8, "Install did not start"
+    assert probe.visible_page(probe.frame("installer-copying")) == 9, "Install did not start"
     print("GUI installation started on disposable disk", flush=True)
     return complete_installer_power(probe, serial, process)
 
@@ -154,7 +154,7 @@ def installer_power(probe, serial, process):
 def complete_installer_power(probe, serial, process):
     wait_log(serial, "[installer.elf] installation completed successfully", process, 1800)
     time.sleep(2)
-    assert probe.visible_page(probe.frame("installer-complete")) == 9
+    assert probe.visible_page(probe.frame("installer-complete")) == 10
     probe.command("eject", {"device": "installcd", "force": True})
     probe.events.clear()
     probe.click(*probe.footer_point())
