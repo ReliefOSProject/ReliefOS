@@ -45,6 +45,29 @@ GNU 与 BusyBox 的选项集合不完全相同。例如 GNU ``hostname`` 接受�
 不支持 BusyBox 的 ``-F``。系统初始化对现有主机名文件的读取显式使用
 ``/bin/busybox hostname -F /etc/hostname``；自定义脚本也应选择正确的实现。
 
+终端颜色
+========
+
+交互式 Bash 通过 ``/etc/bash/colors.sh`` 为 ``ls``、``dir``、``vdir``
+设置 ``--color=auto`` 别名，文件类型和扩展名颜色使用 GNU ``dircolors``
+的默认数据库。配置由系统 bashrc 加载，新账户和已有账户均在重新打开
+终端后生效；当前终端也可执行 ``. /etc/bash/colors.sh``。
+
+自动模式只在命令输出到终端时着色，管道和文件重定向保持纯文本。
+非交互脚本不加载这些别名；``command ls`` 或 ``/usr/bin/ls`` 可以直接
+调用外部命令，``ls --color=never`` 可关闭本次输出的颜色。
+
+已有的 ``LS_COLORS``、``LESS``、同名别名和函数不会被覆盖。
+未设置 ``LESS`` 时使用 ``-R``，允许分页器显示 ANSI 颜色。
+启动 shell 前设置 ``TERM=dumb``、不设置终端类型或设置非空 ``NO_COLOR``
+会跳过默认颜色配置。GNU 9.12 的帮助包含超链接控制序列，当前 st 不支持该扩展；
+可用 ``TERM=dumb ls --help | less`` 查看纯文本帮助，其他命令的颜色不受影响。
+
+``fdisk``、``sfdisk`` 保持 util-linux 原有的自动颜色及
+``terminal-colors.d`` 用户配置。本镜像中的 ``grep``、``diff``、``tree``、
+``dmesg`` 和 ``cal`` 为 BusyBox 实现，没有实际着色功能；不为其添加
+无效选项，也不强制为纯文本工具插入转义序列。
+
 功能边界
 ========
 

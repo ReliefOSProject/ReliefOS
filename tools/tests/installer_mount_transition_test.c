@@ -39,7 +39,8 @@ int __wrap_open(const char *path, int flags, ...)
 }
 
 static int root_mounted, esp_mounted, busy_root, busy_esp, mutations;
-static int manual_layout, manual_bad_role, format_calls, type_calls;
+static int manual_layout, manual_bad_role, format_calls, type_calls, gpt_index;
+static char formatted_esp[64];
 static uint64_t capacity_bytes, capacity_inodes;
 int fake_capacity_measure(const char *root, const char *boot, int bios, int uefi,
                           struct installer_capacity *out)
@@ -119,17 +120,19 @@ int reliefos_block_get_info(const char *path, struct reliefos_block_disk_info *o
 int reliefos_block_gpt_initialize(const char *path, int force)
 {
     ++mutations;
+    gpt_index = 0;
     /* GPT rereads and filesystem formatting require all target mounts gone. */
     return root_mounted || esp_mounted ? -EBUSY : 0;
 }
 int reliefos_block_gpt_create(const char *path, uint32_t fs, uint32_t size,
                             const char *name, uint32_t *index)
-{ *index = fs == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN ? 0 : fs == RELIEFOS_BLOCK_FILESYSTEM_FAT32 ? 1 : 2; return 0; }
+{ *index = gpt_index++; return 0; }
 int reliefos_block_gpt_set_type(const char *path, uint32_t index, uint32_t type) { ++type_calls; return 0; }
 int reliefos_block_partition_path(const char *path, uint32_t index, char *out, uint32_t cap)
 { snprintf(out, cap, "%sp%u", path, index + 1); return 0; }
 int reliefos_block_format(const char *path, uint32_t fs, const char *label)
-{ assert(!root_mounted && !esp_mounted); ++format_calls; return 0; }
+{ assert(!root_mounted && !esp_mounted); ++format_calls;
+  snprintf(formatted_esp, sizeof(formatted_esp), "%s", path); return 0; }
 int reliefos_block_partition_uuid(const char *path, uint32_t index, char uuid[37])
 { strcpy(uuid, "00000000-0000-0000-0000-000000000001"); return 0; }
 int reliefos_block_list_partitions(const char *path, struct reliefos_block_partition *parts,
@@ -250,6 +253,44 @@ int main(void)
     installer_partition_auto = 0;setup.swap_size_mib = 512;
     assert(installer_mount_targets("/dev/sda", 1) == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
+    setup.swap_enabled = false;
+    installer_partition_auto = 1;
+    for (unsigned modes = 0; modes < 4; ++modes) {
+        setup.skip_bios = !(modes & RELIEFOS_BOOT_BIOS);
+        setup.skip_uefi = !(modes & RELIEFOS_BOOT_UEFI);
+        assert(installer_boot_modes() == modes);
+        assert(installer_mount_targets("/dev/sda", 1) == 0);
+        assert(!strcmp(formatted_esp, (modes & RELIEFOS_BOOT_BIOS) ? "/dev/sdap2" : "/dev/sdap1"));
+        assert(!strcmp(spawn_args[spawn_argc - 1], (modes & RELIEFOS_BOOT_BIOS) ? "/dev/sdap3" : "/dev/sdap2"));
+    }
+    /* Navigating back to firmware selection changes validation, never GPT or
+     * formatting. A two-part UEFI layout cannot silently become BIOS-ready. */
+    int saved_mutations = mutations, saved_formats = format_calls;
+    reliefos_block_get_info("/dev/sda", &disks[0]);
+    manual_layout = 1;
+    reliefos_block_list_partitions("/dev/sda", partitions, RELIEFOS_BLOCK_MAX_PARTITIONS, &partition_count);
+    partitions[0].first_lba = 2048;
+    installer_partition_auto = 0;
+    installer_root_partition = 8; installer_esp_partition = 3;
+    setup.skip_bios = 0;
+    assert(installer_partition_plan_valid());
+    partitions[0].gpt_type = RELIEFOS_BLOCK_GPT_BASIC_DATA;
+    assert(!installer_partition_plan_valid());
+    setup.skip_bios = 1;
+    assert(installer_partition_plan_valid());
+    setup.skip_bios = 0;
+    partitions[0].gpt_type = RELIEFOS_BLOCK_GPT_BIOS_BOOT;
+    partitions[0].filesystem = RELIEFOS_BLOCK_FILESYSTEM_FAT32;
+    assert(!installer_partition_plan_valid());
+    partitions[0].filesystem = RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
+    partitions[0].sector_count = 1024;
+    assert(!installer_partition_plan_valid());
+    partitions[0].sector_count = 2048;
+    partitions[0].first_lba = disks[0].sector_count - 1024;
+    assert(!installer_partition_plan_valid());
+    partitions[0].first_lba = 2048;
+    assert(installer_partition_plan_valid());
+    assert(mutations == saved_mutations && format_calls == saved_formats);
     puts("PASS installer mount transition, raw BIOS role and capacity refusal before formatting");
     return 0;
 }

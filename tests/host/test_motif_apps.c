@@ -597,9 +597,13 @@ int main(void)
         assert(installer_model_next(INSTALLER_PAGE_MODE, INSTALLER_MODE_FRESH) ==
                INSTALLER_PAGE_DISK);
         assert(installer_model_next(INSTALLER_PAGE_DISK, INSTALLER_MODE_UPDATE) ==
-               INSTALLER_PAGE_CONFIRM);
+               INSTALLER_PAGE_BOOTLOADERS);
         assert(installer_model_next(INSTALLER_PAGE_DISK, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_BOOTLOADERS);
+        assert(installer_model_next(INSTALLER_PAGE_BOOTLOADERS, INSTALLER_MODE_FRESH) ==
                INSTALLER_PAGE_PARTITIONS);
+        assert(installer_model_next(INSTALLER_PAGE_BOOTLOADERS, INSTALLER_MODE_UPDATE) ==
+               INSTALLER_PAGE_CONFIRM);
         assert(installer_model_next(INSTALLER_PAGE_PARTITIONS, INSTALLER_MODE_FRESH) ==
                INSTALLER_PAGE_ACCOUNTS);
         assert(installer_model_next(INSTALLER_PAGE_ACCOUNTS, INSTALLER_MODE_FRESH) ==
@@ -609,12 +613,16 @@ int main(void)
         assert(installer_model_next(INSTALLER_PAGE_PROGRESS, INSTALLER_MODE_FRESH) ==
                INSTALLER_PAGE_PROGRESS);
         assert(installer_model_prev(INSTALLER_PAGE_CONFIRM, INSTALLER_MODE_UPDATE) ==
-               INSTALLER_PAGE_DISK);
+               INSTALLER_PAGE_BOOTLOADERS);
         assert(installer_model_prev(INSTALLER_PAGE_CONFIRM, INSTALLER_MODE_FRESH) ==
                INSTALLER_PAGE_ACCOUNTS);
         assert(installer_model_prev(INSTALLER_PAGE_ACCOUNTS, INSTALLER_MODE_FRESH) ==
                INSTALLER_PAGE_PARTITIONS);
         assert(installer_model_prev(INSTALLER_PAGE_PARTITIONS, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_BOOTLOADERS);
+        assert(installer_model_prev(INSTALLER_PAGE_BOOTLOADERS, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_DISK);
+        assert(installer_model_prev(INSTALLER_PAGE_BOOTLOADERS, INSTALLER_MODE_UPDATE) ==
                INSTALLER_PAGE_DISK);
         assert(installer_model_prev(INSTALLER_PAGE_WELCOME, INSTALLER_MODE_FRESH) ==
                INSTALLER_PAGE_THANKS);
@@ -648,10 +656,19 @@ int main(void)
         assert(steps[0] == INSTALLER_PAGE_LANGUAGE);
         assert(steps[1] == INSTALLER_PAGE_THANKS);
         assert(steps[2] == INSTALLER_PAGE_WELCOME);
+        assert(steps[4] == INSTALLER_PAGE_DISK);
+        assert(steps[5] == INSTALLER_PAGE_BOOTLOADERS);
+        assert(steps[6] == INSTALLER_PAGE_PARTITIONS);
         assert(steps[count - 1] == INSTALLER_PAGE_FINISH);
         count = installer_model_steps(INSTALLER_MODE_UPDATE, steps, INSTALLER_PAGE_COUNT);
         assert(count == INSTALLER_PAGE_COUNT - 2);
-        for (int i = 0; i < count; ++i) assert(steps[i] != INSTALLER_PAGE_ACCOUNTS);
+        assert(steps[4] == INSTALLER_PAGE_DISK);
+        assert(steps[5] == INSTALLER_PAGE_BOOTLOADERS);
+        assert(steps[6] == INSTALLER_PAGE_CONFIRM);
+        for (int i = 0; i < count; ++i) {
+            assert(steps[i] != INSTALLER_PAGE_ACCOUNTS);
+            assert(steps[i] != INSTALLER_PAGE_PARTITIONS);
+        }
         count = installer_model_steps(INSTALLER_MODE_FRESH, steps, 2);
         assert(count == INSTALLER_PAGE_COUNT && steps[1] == INSTALLER_PAGE_THANKS);
 

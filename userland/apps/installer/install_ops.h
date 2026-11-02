@@ -18,6 +18,7 @@ extern "C" {
 /* The operations code drives the wizard state under the historical page and
  * mode names; the frontends use the model enums directly. */
 #define PAGE_CONFIRM INSTALLER_PAGE_CONFIRM
+#define PAGE_BOOTLOADERS INSTALLER_PAGE_BOOTLOADERS
 #define PAGE_PROGRESS INSTALLER_PAGE_PROGRESS
 #define PAGE_FINISH INSTALLER_PAGE_FINISH
 #define INSTALL_MODE_FRESH INSTALLER_MODE_FRESH
@@ -103,6 +104,7 @@ void refresh_partitions(void);
 void format_partition_line(char *buf, uint32_t cap,
                            const struct reliefos_block_partition *partition);
 int installer_partition_plan_valid(void);
+uint32_t installer_boot_modes(void);
 int installer_partition_initialize(void);
 int installer_partition_auto_layout(void);
 int installer_partition_create(uint32_t filesystem, uint32_t size_mib,

@@ -73,11 +73,15 @@ class Probe(WindowProbe):
 
 
 @contextmanager
-def boot(output, disk, iso=None, *, smp=2):
+def boot(output, disk, iso=None, *, smp=2, firmware="uefi"):
     output.mkdir(parents=True, exist_ok=True)
-    serial, qmp = output / "serial.log", output / "qmp.sock"
+    serial = output / "serial.log"
+    qmp = ROOT.parent / f".reliefos-inst-{uuid.uuid4().hex[:12]}.sock"
+    if firmware not in ("bios", "uefi"):
+        raise ValueError(f"Unknown firmware: {firmware}")
     command = ["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-machine", "q35",
-               "-m", "4096", "-smp", str(smp), "-bios", "/usr/share/edk2/x64/OVMF.4m.fd",
+               "-m", "4096", "-smp", str(smp),
+               *(["-bios", "/usr/share/edk2/x64/OVMF.4m.fd"] if firmware == "uefi" else []),
                "-display", "none", "-serial", f"file:{serial}",
                "-vga", "vmware", "-device", "qemu-xhci", "-device", "usb-tablet",
                "-netdev", "user,id=net0", "-device", "e1000,netdev=net0",
@@ -287,7 +291,7 @@ def wait_install(probe, serial, process, *, tty=False, timeout=2400):
             raise RuntimeError("QEMU exited during installation")
         completed = "[installer.elf] installation completed successfully" in log
         frame = probe.frame("tty-install-progress" if tty else "progress")
-        finished = "Reboot now?" in log if tty else probe.visible_page(frame) == 9
+        finished = "Reboot now?" in log if tty else probe.visible_page(frame) == 10
         if finished and not tty:
             current = installer_finish_log(probe, serial, process)
             assert "[installer.elf] installation completed successfully" in current, current[-10000:]
@@ -331,7 +335,8 @@ def xorg_checkbox_checked(indicator):
                       for index, channel in enumerate(color)) > 40) >= 3
 
 
-def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False, install_timeout=2400,
+def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False,
+                install_bios=True, install_uefi=True, install_timeout=2400,
                 swap_mib=None):
     """Complete the real GUI, optionally selecting Chinese before account setup."""
     probe.enable_installer_geometry()
@@ -352,13 +357,21 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False, insta
     if chinese:
         probe.click(probe.content_left + 30, probe.sidebar_top + 191)
         probe.frame("language-chinese")
-    for expected_page in range(1, 7):
+    for expected_page in range(1, 8):
         next_page(probe, expected_page)
+        if expected_page == 5:
+            if not install_bios:
+                probe.click(*probe.bootloader_indicator_point(bios=True))
+            if not install_uefi:
+                probe.click(*probe.bootloader_indicator_point(bios=False))
+            probe.frame("bootloaders")
+        if expected_page == 6:
+            probe.frame("partitions-planned")
     for index, text in enumerate(("alice", USER_PASSWORD, USER_PASSWORD, ROOT_PASSWORD, ROOT_PASSWORD)):
         probe.click(*probe.account_field_point(index))
         probe.text(text)
     probe.frame("accounts")
-    next_page(probe, 7)
+    next_page(probe, 8)
     probe.frame("confirmation")
 
     # Exercise the Xorg choice across a real page rebuild. The screenshot of
@@ -373,9 +386,9 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False, insta
     probe.click(confirm_x, confirm_y)
     changed_xorg = xorg_checkbox_crop(probe, "confirmation-xorg-toggled")
     assert not xorg_checkbox_checked(changed_xorg), "Xorg checkbox did not clear when clicked"
-    previous_page(probe, 6)
+    previous_page(probe, 7)
     probe.frame("accounts-xorg-back")
-    next_page(probe, 7)
+    next_page(probe, 8)
     probe.click(confirm_x, confirm_y)
     retained_xorg = xorg_checkbox_crop(probe, "confirmation-xorg-retained")
     assert not xorg_checkbox_checked(retained_xorg), "Xorg choice was lost when returning to Confirm"
@@ -412,7 +425,7 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False, insta
     probe.text("INSTALL")
     probe.click(confirm_x, confirm_y)
     probe.frame("confirmation-ready")
-    next_page(probe, 8)
+    next_page(probe, 9)
     wait_install(probe, serial, process, timeout=install_timeout)
 
 
@@ -442,6 +455,8 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
         raise ValueError("swap_mib must be a valid positive MiB count")
     answers = [("Mode [install/update]: ", "install"),
                ("Select disk number (r to refresh, q to quit): ", "0"),
+               ("Install or update BIOS bootloader? [Y/n]: ", "" if install_bios else "n"),
+               ("Install or update UEFI bootloader? [Y/n]: ", "" if install_uefi else "n"),
                ("partition> ", "auto"), ("partition> ", "done"),
                ("Username: ", "alice"), ("Password: ", USER_PASSWORD),
                ("Confirm password: ", USER_PASSWORD), ("root password: ", ROOT_PASSWORD),
@@ -451,8 +466,6 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
     if swap_mib is not None:
         answers.append(("Swap size in MiB [", str(swap_mib)))
     answers += [
-               ("Install or update BIOS bootloader? [Y/n]: ", "" if install_bios else "n"),
-               ("Install or update UEFI bootloader? [Y/n]: ", "" if install_uefi else "n"),
                ("Type INSTALL to confirm the partition layout and installation: ", "INSTALL")]
     for prompt, answer in answers:
         wait_log(serial, prompt, process, timeout=120)

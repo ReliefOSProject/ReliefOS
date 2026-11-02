@@ -80,6 +80,8 @@ enum installer_page installer_model_next(enum installer_page page,
     case INSTALLER_PAGE_MODE:
         return INSTALLER_PAGE_DISK;
     case INSTALLER_PAGE_DISK:
+        return INSTALLER_PAGE_BOOTLOADERS;
+    case INSTALLER_PAGE_BOOTLOADERS:
         return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_CONFIRM
                                              : INSTALLER_PAGE_PARTITIONS;
     case INSTALLER_PAGE_PARTITIONS:
@@ -106,9 +108,11 @@ enum installer_page installer_model_prev(enum installer_page page,
     case INSTALLER_PAGE_DISK:
         return INSTALLER_PAGE_MODE;
     case INSTALLER_PAGE_PARTITIONS:
+        return INSTALLER_PAGE_BOOTLOADERS;
+    case INSTALLER_PAGE_BOOTLOADERS:
         return INSTALLER_PAGE_DISK;
     case INSTALLER_PAGE_CONFIRM:
-        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_DISK
+        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_BOOTLOADERS
                                              : INSTALLER_PAGE_ACCOUNTS;
     case INSTALLER_PAGE_ACCOUNTS:
         return INSTALLER_PAGE_PARTITIONS;
