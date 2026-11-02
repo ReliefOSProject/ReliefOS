@@ -17,6 +17,16 @@ set -eu
 repository=$1 apps=$2 kernel=$3 payload=$4 version_src=$5 apk=$6 key=$7 output=$8
 : "${RELIEFOS_KERNEL_TOOLS:?set the native Kbuild kernel tool}"
 : "${RELIEFOS_KERNEL_RECOVERY:?set the static Kbuild bundle verifier}"
+# Kbuild passes paths relative to its output directory; the runtime verifier
+# requires a canonical absolute staging root. Refuse a symlinked final
+# component before resolving references to a parent directory.
+case "$payload" in
+    /*) ;;
+    ?*)
+        [ ! -L "$payload" ] || { echo 'symlinked RPR kernel payload root' >&2; exit 1; }
+        payload=$(CDPATH= cd -- "$payload" && pwd -P)
+        ;;
+esac
 [ ! -L "$key" ] && [ -f "$key" ] && [ "$(stat -c %a "$key")" = 600 ] || { echo 'private signing key must be a regular 0600 file' >&2; exit 1; }
 version=$(sed -n 's/^release_version=//p' "$version_src" | head -n1)
 printf '%s\n' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo 'invalid release version' >&2; exit 1; }
