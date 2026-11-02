@@ -110,6 +110,30 @@ cmp "$tmp/pages-output/apk/leonos-rpr.rsa.pub" "$tmp/pages-output/apk/reliefos-r
 grep -F '"public_key":"reliefos-rpr.rsa.pub"' "$tmp/pages-output/apk/repository.json"
 grep -F '"legacy_public_key":"leonos-rpr.rsa.pub"' "$tmp/pages-output/apk/repository.json"
 test -f "$tmp/pages-output/apk/reliefos-base-1-r0.apk"
+
+# Kbuild invokes the producer from its output directory with relative inputs.
+# Exercise the real runtime verifier with that calling convention as well.
+(
+    cd "$tmp"
+    sh "$src/tools/build/rpr-pages.sh" pages-repository pages-apps \
+        kernel.sys pages-kernel pages-version "$tmp/fake-bin/apk" \
+        "$tmp/pages-key" relative-pages-output
+)
+cmp "$tmp/pages-output/kernel/release.txt" "$tmp/relative-pages-output/kernel/release.txt"
+
+# Resolving relative paths must preserve the producer's symlink-root refusal.
+ln -s pages-kernel "$tmp/pages-kernel-link"
+if (
+    cd "$tmp"
+    sh "$src/tools/build/rpr-pages.sh" pages-repository pages-apps \
+        kernel.sys pages-kernel-link pages-version "$tmp/fake-bin/apk" \
+        "$tmp/pages-key" symlink-pages-output
+) > "$tmp/symlink-error" 2>&1; then
+    echo 'symlinked RPR kernel payload root was accepted' >&2
+    exit 1
+fi
+test ! -e "$tmp/symlink-pages-output"
+
 printf 'CONFIG_RPR_BASE_URL="https://reliefosproject.github.io/ReliefOS/rpr"\n' > "$tmp/rpr.conf"
 sh "$src/tools/build/rpr-config.sh" "$tmp/rpr.conf" > "$tmp/rpr.env"
 grep -Fx 'RPR_PUBLIC_KEY=reliefos-rpr.rsa.pub' "$tmp/rpr.env"

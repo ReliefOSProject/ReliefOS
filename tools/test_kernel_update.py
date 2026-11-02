@@ -327,13 +327,19 @@ class KernelUpdate(unittest.TestCase):
         self.assertFalse((directory / "published").exists())
         # A matching signed archive must still publish through the same code.
         prefix = self.payloads["new"] / "usr/lib/reliefos/kernel" / self.releases["new"]
-        result = subprocess.run(["sh", ROOT / "tools/build/rpr-pages.sh", repository, apps, prefix / "kernel.sys",
-            self.payloads["new"], version, APK, self.key, directory / "published"], text=True, capture_output=True,
-            env={**os.environ, "RELIEFOS_KERNEL_TOOLS": str(fixtures.KERNEL_TOOLS), "RELIEFOS_KERNEL_RECOVERY": str(fixtures.RECOVERY)})
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        metadata = json.loads((directory / "published/kernel/release.json").read_bytes())
-        self.assertEqual(metadata["schema"], 4)
-        self.assertEqual(metadata["kernel_release"], self.releases["new"])
+        working = directory / "relative build"
+        working.mkdir()
+        for payload in (self.payloads["new"], Path(os.path.relpath(self.payloads["new"], working))):
+            with self.subTest(payload=str(payload)):
+                result = subprocess.run(["sh", ROOT / "tools/build/rpr-pages.sh", repository, apps,
+                    prefix / "kernel.sys", payload, version, APK, self.key, directory / "published"],
+                    cwd=working, text=True, capture_output=True,
+                    env={**os.environ, "RELIEFOS_KERNEL_TOOLS": str(fixtures.KERNEL_TOOLS),
+                         "RELIEFOS_KERNEL_RECOVERY": str(fixtures.RECOVERY)})
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                metadata = json.loads((directory / "published/kernel/release.json").read_bytes())
+                self.assertEqual(metadata["schema"], 4)
+                self.assertEqual(metadata["kernel_release"], self.releases["new"])
 
 
 if __name__ == "__main__":
