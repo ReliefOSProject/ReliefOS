@@ -23,7 +23,8 @@ elif test -r /etc/udhcpc/leonos-dns; then
     read -r mode custom < /etc/udhcpc/leonos-dns
 fi
 case "$mode" in
-    1) servers=$(cat /run/reliefos/dhcp-dns 2>/dev/null || :) ;;
+    1) servers="$(cat /run/reliefos/ra-dns 2>/dev/null || :)
+$(cat /run/reliefos/dhcp-dns 2>/dev/null || :)" ;;
     0) servers=1.1.1.1 ;;
     2) servers=$custom ;;
     *) exit 1 ;;
@@ -31,10 +32,21 @@ esac
 umask 022
 tmp=$(mktemp /etc/.resolv.conf.XXXXXX)
 trap 'rm -f "$tmp"' EXIT HUP INT TERM
-printf '# Managed by ReliefOS udhcpc resolver hook\noptions timeout:2 attempts:2\n' > "$tmp"
+printf '# Managed by ReliefOS network resolver hook\noptions timeout:2 attempts:2\n' > "$tmp"
+seen=' '
+count=0
 for server in $servers; do
-    valid_ipv4 "$server" || exit 1
+    case "$server" in
+        *:*) /usr/lib/reliefos/apps/rdnssd/rdnssd.elf --validate-server "$server" || exit 1 ;;
+        *) valid_ipv4 "$server" || exit 1 ;;
+    esac
+    case "$seen" in *" $server "*) continue ;; esac
+    seen="$seen$server "
+    # musl consumes at most three nameservers. Keep additional advertised
+    # entries in their source cache so expiry can expose the next server.
+    test "$count" -lt 3 || continue
     printf 'nameserver %s\n' "$server" >> "$tmp"
+    count=$((count + 1))
 done
 chmod 0644 "$tmp"
 mv -f "$tmp" /etc/resolv.conf

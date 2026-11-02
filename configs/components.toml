@@ -31,6 +31,19 @@ sdk = false
 api = false
 
 [[components]]
+id = "rdnssd"
+symbol = "APP_RDNSSD"
+label = "IPv6 router-advertisement DNS service"
+category = "Core services"
+kind = "system-app"
+default = true
+required = true
+stage = true
+entry = false
+sdk = false
+api = false
+
+[[components]]
 id = "installer"
 symbol = "APP_INSTALLER"
 label = "Installer"

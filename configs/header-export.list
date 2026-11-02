@@ -28,7 +28,10 @@ include/uapi/linux/fcntl.h
 include/uapi/linux/fs.h
 include/uapi/linux/futex.h
 include/uapi/linux/if.h
+include/uapi/linux/if_addr.h
+include/uapi/linux/if_link.h
 include/uapi/linux/if_packet.h
+include/uapi/linux/in6.h
 include/uapi/linux/input.h
 include/uapi/linux/ioctl.h
 include/uapi/linux/ipc.h
@@ -51,6 +54,9 @@ include/uapi/linux/sem.h
 include/uapi/linux/signalfd.h
 include/uapi/linux/signal.h
 include/uapi/linux/socket.h
+include/uapi/linux/ipv6_route.h
+include/uapi/linux/netlink.h
+include/uapi/linux/rtnetlink.h
 include/uapi/linux/soundcard.h
 include/uapi/linux/patchkey.h
 include/uapi/sound/asound.h

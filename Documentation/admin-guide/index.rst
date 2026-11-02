@@ -13,6 +13,7 @@
    packages
    coreutils
    network-controller
+   ipv6
    kernel-modules
    usb
    openrc-controller

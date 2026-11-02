@@ -1,0 +1,21 @@
+#!/sbin/openrc-run
+description="IPv6 router-advertisement DNS client"
+supervisor=supervise-daemon
+command=/usr/lib/reliefos/apps/rdnssd/rdnssd.elf
+command_args=eth0
+input_file=/dev/null
+output_log=/var/log/rdnssd.log
+error_log=/var/log/rdnssd.log
+retry=TERM/5/KILL/1
+respawn_delay=10
+respawn_max=3
+respawn_period=120
+depend() { need reliefos-runtime reliefos-modules; after reliefos-dhcp; }
+start_pre() {
+    checkpath --directory --mode 0755 /run/reliefos
+    test "$(/usr/lib/reliefos/network-profile mode)" != disabled
+}
+stop_post() {
+    rm -f /run/reliefos/ra-dns
+    /usr/lib/reliefos/publish-resolver
+}
