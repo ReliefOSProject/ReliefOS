@@ -5,16 +5,17 @@ USB U 盘与键盘鼠标
 控制器与设备
 ============
 
-默认内核内置 xHCI、EHCI 和 UHCI。xHCI 支持直接连接根端口的 USB 3.x
+默认内核内置 xHCI、EHCI 和 UHCI。xHCI 支持根端口或 Hub 后的 USB 3.x
 SuperSpeed BOT/SCSI 存储，以及 USB 2.0/1.x BOT 存储、boot HID 键盘和相对
 鼠标。EHCI 支持 USB 2.0 高速 BOT/SCSI 存储；低速/全速键鼠可由 UHCI
 companion 提供。VMware 中可选择“USB Controller / USB Compatibility / USB
 3.x”使用 xHCI，或选择 USB 2.0 使用 EHCI；两种路径的验证结果分别记录。
 USB 的 Linux 块设备与 evdev 接口由内核提供，不需要修改 BusyBox。
 
-xHCI 的验收范围是直接连接的根端口设备；xHCI 下的 USB hub 路由、UAS、
-stream、等时音视频及非 boot HID 不受支持。USB4、Type-C/PD 和物理电气
-认证也不在支持范围内。EHCI 原有的 hub 支持不因此改变。SuperSpeedPlus
+xHCI 支持 USB2／USB3 Hub、多级路由和下游设备热插拔；USB2 的 multi-TT
+Hub 使用默认 single-TT 模式。拔掉 Hub 时，下游设备一起断开，旧打开不会
+转向重新插入的设备。UAS、stream、等时音视频及非 boot HID 不受支持。
+USB4、Type-C/PD 和物理电气认证也不在支持范围内。SuperSpeedPlus
 可按已验证的控制器协议能力识别速率，但日志中的 ``bps`` 是控制器声明的
 链路速率，不是实测吞吐量；10/20 Gb/s 物理链路尚未验证。
 
@@ -109,6 +110,22 @@ EHCI/UHCI companion 回归。各行是否运行和通过以其 ``results.json`` 
 验证未完成，不能据此声称存储、输入和缓存同步全部成功；以往 VMware USB2
 失败仍按原结果记录。物理 USB 直通和实体硬件尚未验证。QEMU 的
 ``-vga vmware`` 也不代表真实 VMware 验证。
+
+``tools/test_xhci_hub_qemu.py`` 另行验证两级全速 Hub 后的 U 盘、USB 键盘
+登录和相对鼠标、单独 U 盘拔插、整棵 Hub 树移除／重建，以及可选
+``--modules`` 的挂载阻止卸载和卸载后重新枚举。使用 console backend 的测试
+副本，避免 XDM 在 TTY 键盘验证期间切换焦点。该脚本同样消费匹配镜像的
+``--manifest``、内核仓原生 ``--probe``，并要求新建 ``--output``：
+
+.. code-block:: sh
+
+   python3 tools/test_xhci_hub_qemu.py --image /path/to/reliefos.raw \
+     --manifest /path/to/install.bundle.json --probe /path/to/usb-input-probe \
+     --output /path/to/new-hub-evidence --controller qemu-xhci
+
+QEMU 的 ``usb-hub`` 只支持全速，不能用它证明高速 Hub 的 TT 或 USB3 Hub
+物理链路。内核支持边界和硬件协议验证归属 ReliefNT 文档；Hub 的 VMware
+验证未完成，物理 USB 直通和实体 Hub 也尚未验证。
 
 VMware 的 USB 兼容性和可移动设备操作见
 `Workstation Pro 官方手册

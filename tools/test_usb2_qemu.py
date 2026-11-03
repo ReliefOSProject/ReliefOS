@@ -380,7 +380,7 @@ done
 
 
 @contextmanager
-def payload_server(probe, release, modular, nonce, module='ehci'):
+def payload_server(probe, release, modular, nonce, module='ehci', *, script_factory=guest_script):
     """Serve exact nonce URLs and hold the guest until replug evidence is read."""
     contents = {'/p': probe}
     gate = threading.Event()
@@ -408,7 +408,7 @@ def payload_server(probe, release, modular, nonce, module='ehci'):
 
     server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
     base = f'http://10.0.2.2:{server.server_port}/{nonce}'
-    contents['/u'] = guest_script(base, hashlib.sha256(probe).hexdigest(), release, modular, nonce, module)
+    contents['/u'] = script_factory(base, hashlib.sha256(probe).hexdigest(), release, modular, nonce, module)
     worker = threading.Thread(target=server.serve_forever, daemon=True)
     worker.start()
     try:
