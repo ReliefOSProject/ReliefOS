@@ -38,7 +38,7 @@ const char *fileman_x11_default_app(const char *path)
     if (!path) return NULL;
     const char *base = strrchr(path, '/');
     const char *extension = strrchr(base ? base + 1 : path, '.');
-    if (extension && (!strcasecmp(extension, ".elf") || !strcasecmp(extension, ".lnk")))
+    if (extension && (!strcasecmp(extension, ".elf") || !strcasecmp(extension, ".desktop")))
         return NULL;
     if (extension && (!strcasecmp(extension, ".html") || !strcasecmp(extension, ".htm")))
         return "/usr/bin/dillo";

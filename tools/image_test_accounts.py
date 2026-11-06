@@ -26,12 +26,6 @@ def seed_test_accounts(root: Path) -> None:
         home.mkdir(parents=True, exist_ok=True)
         shutil.copytree(root / "etc/skel", home, symlinks=True, dirs_exist_ok=True)
         home.chmod(0o700)
-        for directory in ("desktop", "documents", "downloads"):
-            path = home / directory
-            if path.is_symlink():
-                raise ValueError(f"test home directory is a symlink: {path}")
-            path.mkdir(exist_ok=True)
-            path.chmod(0o700)
     # The existing session launcher requires this marker to enforce PAM login.
     settings = root / "etc/reliefos"
     for name, text in (("test-image", PROFILE), ("installed", "test-image=1\n")):

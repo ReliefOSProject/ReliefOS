@@ -105,25 +105,14 @@ version: 1.0
 %%BODY
 # File permissions
 
-ReliefOS uses a Windows-style permission model for files and directories. The current v1 permission bits are stored in ACL metadata and checked by kernel file operations.
+Files and directories use POSIX owner, group and read/write/execute mode bits.
 
-## Permission bits
-
-| Bit | Meaning |
-| R / Read | Read a file, list a directory, or view basic metadata. |
-| W / Write | Create files, write existing files, or modify directory contents. |
-| X / Execute | Run an `.elf` file or traverse a directory while resolving a path. |
-| Delete | Remove or rename the object. |
-| Manage | Change permissions, repair ACL metadata, or take ownership when allowed. |
-
-## Important rules
-
-- Administrators can manage system-wide objects and repair broken ACL metadata.
-- Normal users are expected to control their own `/home/<name>` files.
-- Opening a shortcut checks permission on both the `.lnk` file and its target.
-- Missing ACL metadata falls back to system default rules.
-
-%%ENDDOC
+- Read opens file contents or lists directory names.
+- Write changes file contents. Creating, removing and renaming entries requires write and search permission on the parent directory.
+- Execute runs a program; on directories it permits searching and path traversal.
+- Use file properties, chmod and chown to inspect and change modes and ownership when authorized.
+- Application shortcuts use standard .desktop entries; file and folder shortcuts use symbolic links. Programs run with the current user's permissions.
+- A symbolic link resolves to its target; target and parent directory permissions govern access.
 
 %%DOC help.format
 path: Developers/Help file format

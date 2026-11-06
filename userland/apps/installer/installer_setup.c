@@ -123,17 +123,15 @@ out:;
 
 static int prepare_home(const char *target, const struct reliefos_user_info *user)
 {
-    const char *const directories[] = {"", "/desktop", "/documents", "/downloads"};
     char path[512];
-    for (unsigned i = 0; i < 4; ++i) {
-        int n = snprintf(path, sizeof(path), "%s%s%s", target, user->home, directories[i]);
-        if (n < 0 || (size_t)n >= sizeof(path)) { errno = ENAMETOOLONG; return -1; }
-        if (mkdir(path, 0700) < 0 && errno != EEXIST) return -1;
-        struct stat st;
-        if (lstat(path, &st) < 0) return -1;
-        if (!S_ISDIR(st.st_mode)) { errno = ENOTDIR; return -1; }
-        if (chown(path, user->uid, user->uid) < 0 || chmod(path, 0700) < 0) return -1;
-    }
+    int n=snprintf(path,sizeof(path),"%s%s",target,user->home);
+    if (n<0 || (size_t)n>=sizeof(path)) { errno=ENAMETOOLONG; return -1; }
+    if (mkdir(path,0700)<0 && errno!=EEXIST) return -1;
+    struct stat st;
+    if (lstat(path,&st)<0) return -1;
+    if (!S_ISDIR(st.st_mode)) { errno=ENOTDIR; return -1; }
+    if (chown(path,user->uid,user->uid)<0 || chmod(path,0700)<0) return -1;
+    /* XDG special directories are initialized in the authenticated session. */
     /* Xorg uses the packaged application menu. Home initialization must not
      * depend on applications from the retired private Desktop. */
     const char *const shell_configs[] = {".bash_profile", ".bashrc", ".inputrc"};

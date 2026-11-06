@@ -101,7 +101,7 @@ static void fileman_settings_path(char *path, uint32_t capacity)
         return;
     }
     path[0] = 0;
-    if (reliefos_auth_current(&user) == 0 && user.uid && user.home[0]) {
+    if (reliefos_auth_current(&user) == 0 && user.home[0]) {
         build_path_join(path, capacity, user.home, ".fileman.conf");
         return;
     }
@@ -352,7 +352,7 @@ int refresh_home_path(void)
 {
     struct reliefos_user_info user;
     home_path[0] = 0;
-    if (reliefos_auth_current(&user) == 0 && user.uid && user.home[0]) {
+    if (reliefos_auth_current(&user) == 0 && user.home[0]) {
         copy_text(home_path, sizeof(home_path), user.home);
         return 1;
     }
@@ -436,8 +436,8 @@ const char *entry_type_name(const struct reliefos_dir_entry *entry)
     if (ends_with(entry->name, ".elf")) {
         return "ELF ";
     }
-    if (ends_with(entry->name, ".lnk")) {
-        return "LNK ";
+    if (entry->type == RELIEFOS_FS_TYPE_SYMLINK || ends_with(entry->name, ".desktop")) {
+        return "LINK";
     }
     return "FILE";
 }
@@ -504,7 +504,7 @@ void build_file_menu_items(struct fileman_context_menu_item *items, uint32_t cou
     items[2] = (struct fileman_context_menu_item){T("Default Program..."), FILEMAN_ACTION_DEFAULT_PROGRAM,
                                                      has_file ? 0 : FILEMAN_MENU_DISABLED};
     items[3] = (struct fileman_context_menu_item){T("Create Shortcut"), FILEMAN_ACTION_CREATE_SHORTCUT,
-                                                     has_file ? 0 : FILEMAN_MENU_DISABLED};
+                                                     has_mutable ? 0 : FILEMAN_MENU_DISABLED};
     items[4] = (struct fileman_context_menu_item){T("Details"), FILEMAN_ACTION_DETAILS,
                                                      has_item ? 0 : FILEMAN_MENU_DISABLED};
     items[5] = (struct fileman_context_menu_item){"", 0, FILEMAN_MENU_SEPARATOR};

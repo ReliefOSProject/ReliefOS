@@ -1,4 +1,5 @@
 #include "fileman.h"
+#include <reliefos/xdg.h>
 #include "archive.h"
 #include <errno.h>
 #include <reliefos/launch_result.h>
@@ -126,8 +127,8 @@ void create_shortcut_for_selected(void)
     const char *created_name;
     int to_desktop;
     int ret;
-    if (!selected_entry_is_file()) {
-        set_status(T("Select a file"));
+    if (!selected_entry_is_mutable()) {
+        set_status(T("Select an item"));
         return;
     }
     build_child_path(target_path, sizeof(target_path), entries[file_list.selected].name);
@@ -136,14 +137,11 @@ void create_shortcut_for_selected(void)
         T("Place shortcut on Desktop? No creates it here."),
         1);
     if (to_desktop) {
-        if (!home_path[0]) {
-            refresh_home_path();
-        }
-        if (!home_path[0]) {
+        int directory_error=reliefos_xdg_user_dir("DESKTOP",dest_dir,sizeof(dest_dir));
+        if (directory_error<0) {
             set_status(T("Desktop folder unavailable"));
             return;
         }
-        build_path_join(dest_dir, sizeof(dest_dir), home_path, "desktop");
     } else {
         copy_text(dest_dir, sizeof(dest_dir), current_path);
     }

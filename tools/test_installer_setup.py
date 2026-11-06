@@ -22,7 +22,7 @@ class InstallerSetupTests(unittest.TestCase):
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
                 "-idirafter", "userland/runtime/include",
-                "tools/tests/installer_xorg_home_test.c", "userland/runtime/src/launch.c",
+                "tools/tests/installer_xorg_home_test.c",
                 "-o", str(executable),
             ], cwd=ROOT, check=True)
             (root / "home").mkdir()
@@ -40,13 +40,13 @@ class InstallerSetupTests(unittest.TestCase):
             result = subprocess.run([executable, root], capture_output=True, text=True, timeout=10)
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             home = root / "home/test"
-            for directory in (home, home / "desktop", home / "documents", home / "downloads"):
+            for directory in (home,):
                 self.assertTrue(directory.is_dir())
                 self.assertEqual(directory.stat().st_mode & 0o777, 0o700)
                 self.assertEqual(directory.stat().st_uid, os.getuid())
             for name in (".bash_profile", ".bashrc", ".inputrc"):
                 self.assertEqual((home / name).read_text(), "# shell defaults\n")
-            self.assertEqual(list((home / "desktop").iterdir()), [])
+            self.assertFalse(any((home / name).exists() for name in ("desktop", "documents", "downloads")))
 
     def test_console_home_does_not_create_desktop_shortcuts(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-console-home-") as temporary:
@@ -64,7 +64,7 @@ class InstallerSetupTests(unittest.TestCase):
             for name in (".bash_profile", ".bashrc", ".inputrc"):
                 (root / "etc/skel" / name).write_text("# shell defaults\n")
             subprocess.run([str(executable), root], check=True, timeout=10)
-            self.assertEqual(list((root / "home/test/desktop").iterdir()), [])
+            self.assertFalse((root / "home/test/desktop").exists())
             self.assertEqual((root / "home/test/.bashrc").read_text(), "# shell defaults\n")
 
     def test_hyfetch_defaults(self):

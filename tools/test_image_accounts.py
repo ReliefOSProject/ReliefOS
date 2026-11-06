@@ -67,9 +67,9 @@ class ImageAccounts(unittest.TestCase):
                         stream.truncate(32 << 20)
                     populate_ext2(stage, image, 8192)
                     for path, uid, gid, mode in (("/home/test", 1000, 1000, "0700"),
-                                                 ("/home/test/desktop/Terminal.lnk", 1000, 1000, "0644"),
+                                                 ("/home/test/.bashrc", 1000, 1000, "0644"),
                                                  ("/root", 0, 0, "0700"),
-                                                 ("/etc/skel/desktop/Terminal.lnk", 0, 0, "0644"),
+                                                 ("/etc/skel/.bashrc", 0, 0, "0644"),
                                                  ("/etc/shadow", 0, 0, "0600"),
                                                  ("/etc/sudoers", 0, 0, "0440")):
                         info = subprocess.check_output(["debugfs", "-R", f"stat {path}", str(image)],

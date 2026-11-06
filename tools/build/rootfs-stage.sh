@@ -96,9 +96,7 @@ if [ -e "$legacy" ] || [ -L "$legacy" ]; then
     record x - /var/lib/leonos/users.db 0000 product-policy override
 fi
 "$layout_tool" >> "$plan"
-for directory in desktop documents downloads; do
-    record d - "/etc/skel/$directory" 0700 product-policy override
-done
+# XDG special directories are created by xdg-user-dirs-update in the user session.
 for spec in 'etc/sudoers.d 0750' 'var/lib/sudo 0700' 'run/sudo 0711' 'run/sudo/ts 0700'; do
     set -- $spec; record d - "/$1" "$2" product-policy override
 done

@@ -41,9 +41,14 @@ int reliefos_launch_get_extension_association(const char *extension, char *progr
                                             uint32_t capacity);
 void reliefos_launch_default_shortcut_name(const char *target_path, char *buffer,
                                          uint32_t capacity);
+/* Application shortcuts are standard .desktop files; other paths use POSIX
+ * symbolic links. Never overwrite an existing destination. */
 int reliefos_launch_create_shortcut(const char *shortcut_path, const char *target_path);
 int reliefos_launch_create_shortcut_in_dir(const char *dir_path, const char *target_path,
                                          char *out_path, uint32_t out_capacity);
+/* Launch a Desktop Entry through the packaged GLib gio implementation. Field
+ * codes, quoting, localization, Path and Terminal are handled by upstream. */
+int reliefos_launch_desktop_file(char *const arguments[]);
 /* Starts an executable in a child process. execve() intentionally replaces
  * the current process image, so graphical launchers must use this helper. */
 int reliefos_spawn_argv(const char *path, char *const argv[]);

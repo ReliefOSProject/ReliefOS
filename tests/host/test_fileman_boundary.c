@@ -46,6 +46,8 @@ int main(void)
     assert(!strcmp(fileman_x11_default_app("/tmp/test.txt"), "/usr/bin/nedit"));
     assert(!strcmp(fileman_x11_default_app("/tmp/.hidden"), "/usr/bin/nedit"));
     assert(!fileman_x11_default_app("/tmp/program.elf"));
+    assert(!fileman_x11_default_app("/tmp/Example.desktop"));
+    assert(!fileman_x11_default_app("/tmp/EXAMPLE.DESKTOP"));
     assert(fileman_path_contains("/home/test", "/home/test/dir"));
     assert(fileman_path_contains("/", "/tmp"));
     assert(!fileman_path_contains("/home/test", "/home/testing"));

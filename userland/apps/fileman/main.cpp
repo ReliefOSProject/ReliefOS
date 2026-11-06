@@ -33,6 +33,7 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -180,8 +181,9 @@ int action_enabled(uint32_t action)
         return selected_entry_valid();
     case FILEMAN_ACTION_OPEN_WITH:
     case FILEMAN_ACTION_DEFAULT_PROGRAM:
-    case FILEMAN_ACTION_CREATE_SHORTCUT:
         return selected_entry_is_file();
+    case FILEMAN_ACTION_CREATE_SHORTCUT:
+        return selected_entry_is_mutable();
     case FILEMAN_ACTION_RENAME:
         return selected_entry_is_mutable() && fileman_selected_count() <= 1;
     case FILEMAN_ACTION_COPY:
@@ -264,29 +266,16 @@ int spawn_app(const char *program, const char *path)
     return (int)child;
 }
 
-int launch_path(const char *path, unsigned depth)
+int launch_path(const char *path)
 {
-    if (depth > 8) return RELIEFOS_LAUNCH_ERR_SHORTCUT_LOOP;
     struct stat st;
     if (stat(path, &st) < 0) return -errno;
     if (S_ISDIR(st.st_mode)) return navigate_to_path(path);
     if (!S_ISREG(st.st_mode)) return -EINVAL;
-    if (ends_with(path, ".lnk")) {
-        FILE *file = fopen(path, "r");
-        if (!file) return -errno;
-        char line[512], target[RELIEFOS_FS_PATH_LEN] = {0};
-        while (fgets(line, sizeof(line), file)) {
-            if (strncmp(line, "target=", 7)) continue;
-            line[strcspn(line, "\r\n")] = 0;
-            if (strlen(line + 7) >= sizeof(target)) {
-                fclose(file);
-                return -ENAMETOOLONG;
-            }
-            copy_text(target, sizeof(target), line + 7);
-            break;
-        }
-        fclose(file);
-        return target[0] ? launch_path(target, depth + 1) : RELIEFOS_LAUNCH_ERR_INVALID_SHORTCUT;
+    size_t path_length=strlen(path);
+    if (path_length>=8 && !strcasecmp(path+path_length-8,".desktop")) {
+        char *arguments[] = {const_cast<char *>(path), nullptr};
+        return reliefos_launch_desktop_file(arguments);
     }
     const char *program = fileman_x11_default_app(path);
     if (!program) {
@@ -982,7 +971,7 @@ void refresh_files()
         const char *kind = entries[i].type == RELIEFOS_FS_TYPE_DIR ? T("Folder") :
             fileman_entry_is_device(i) ? T("Device") :
             ends_with(entries[i].name, ".elf") ? T("Application") :
-            ends_with(entries[i].name, ".lnk") ? T("Shortcut") : T("File");
+            (entries[i].type == RELIEFOS_FS_TYPE_SYMLINK || ends_with(entries[i].name, ".desktop")) ? T("Shortcut") : T("File");
         char line[sizeof(display_name) + 128];
         snprintf(line, sizeof(line), "%s\t%s", display_name, kind);
         files->add(line);
@@ -1358,7 +1347,7 @@ extern "C" int fileman_confirm_dialog(const char *title, const char *message,
 
 extern "C" int fileman_launch_path(const char *path)
 {
-    return launch_path(path, 0);
+    return launch_path(path);
 }
 
 extern "C" void show_open_with_for_path(const char *path, uint8_t set_default_only)
