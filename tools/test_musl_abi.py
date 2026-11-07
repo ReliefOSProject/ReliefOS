@@ -3,21 +3,36 @@
 
 import argparse
 from pathlib import Path
+import sys
 import subprocess
 import tempfile
 
-from generate_linux_syscalls import syscall_entries
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "kernel/reliefnt/tools"))
+from generate_linux_syscalls import syscall_entries
 
 
 def run(args):
     subprocess.run([str(arg) for arg in args], check=True, timeout=60)
 
 
+def default_prefix() -> Path:
+    """Find a complete configured O; --prefix selects any explicit sysroot."""
+    complete = [
+        p for pattern in ("*/sysroot/musl", "*/*/sysroot/musl")
+        for p in (ROOT / "out").glob(pattern)
+        if (p / "include/fcntl.h").is_file() and (p / "lib/libc.so").is_file()
+    ]
+    if complete:
+        return max(complete, key=lambda p: p.stat().st_mtime)
+    return ROOT / "out/x86_64/release/sysroot/musl"
+
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--prefix", type=Path, default=ROOT / "build/musl/sysroot")
+    parser.add_argument("--prefix", type=Path, default=default_prefix())
     args = parser.parse_args()
     prefix = args.prefix.resolve()
     resource = subprocess.check_output(["clang", "-print-resource-dir"], text=True).strip()

@@ -11,6 +11,7 @@
 #include <locale.h>
 #include <reliefos/layout.h>
 #include <reliefos/launch.h>
+#include <reliefos/xdg.h>
 #include <reliefos/stdio.h>
 #include <reliefos/syscall.h>
 #include <reliefos/ui.h>
@@ -121,15 +122,7 @@ static void append_u32(char *dst, uint32_t *pos, uint32_t capacity,
 
 static void download_path_for_user(char *dst, uint32_t capacity)
 {
-    struct reliefos_user_info user;
-    uint32_t pos = 0;
-    dst[0] = 0;
-    if (reliefos_auth_current(&user) == 0 && user.home[0]) {
-        append_text(dst, &pos, capacity, user.home);
-        append_text(dst, &pos, capacity, "/downloads");
-        return;
-    }
-    copy_text(dst, capacity, "/tmp");
+    if (reliefos_xdg_user_dir("DOWNLOAD",dst,capacity)<0) copy_text(dst,capacity,"/tmp");
 }
 
 static void build_download_path(char *dst, uint32_t capacity)

@@ -1,0 +1,117 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# Policy only: native module, mount and exec operations use the Linux ABI.
+PATH=/bin:/sbin:/usr/bin:/usr/sbin
+export PATH
+umask 022
+
+# Running this file on a build host must never mount or modify anything.
+if [ "$$" != 1 ] || [ "$(uname -s)" != ReliefNT ]; then
+    echo 'ReliefOS early init: refusing to run outside ReliefNT PID 1' >&2
+    exit 77
+fi
+
+fail() {
+    echo "[initramfs] ERROR: $*" >&2
+    echo '[initramfs] Entering the early recovery shell; exit retries /init.' >&2
+    while :; do
+        /bin/sh -i </dev/console >/dev/console 2>&1
+        exec /init
+    done
+}
+
+. /etc/initramfs-functions || fail 'missing boot policy functions'
+for provider in dev proc sys; do
+    mkdir -p "/$provider" || fail "create /$provider"
+    if ! mountpoint -q "/$provider"; then
+        case $provider in dev) filesystem=devfs ;; proc) filesystem=proc ;; sys) filesystem=sysfs ;; esac
+        mount -t "$filesystem" "$filesystem" "/$provider" || fail "mount $filesystem"
+    fi
+done
+expected=$(cat /etc/kernel-release) || fail 'missing kernel release'
+[ "$(uname -r)" = "$expected" ] || fail 'kernel/initramfs ABI mismatch'
+cmdline=$(cat /proc/cmdline) || fail 'read kernel command line'
+parse_cmdline "$cmdline" || fail 'use root=PARTUUID=..., root=UUID=..., root=LABEL=... or root=/dev/... and an absolute init='
+
+while IFS= read -r module || [ -n "$module" ]; do
+    case $module in ''|'#'*) continue ;; *[!A-Za-z0-9_-]*) fail 'invalid boot module list' ;; esac
+    modprobe "$module" || fail "load boot module $module"
+done </etc/modules-load.d/reliefos-boot.conf
+
+resolve_device() {
+    case $1 in
+        /dev/*) resolved=$1 ;;
+        PARTUUID=*) resolved=$(partuuid_device "$1") || return 1 ;;
+        UUID=*|LABEL=*)
+            key=${1%%=*}; value=${1#*=}; resolved=
+            for candidate in /dev/sd* /dev/nvme* /dev/ram* /dev/sr*; do
+                [ -b "$candidate" ] || continue
+                identity=$(blkid "$candidate") || continue
+                case " $identity " in *" $key=\"$value\" "*)
+                    [ -z "$resolved" ] || return 1
+                    resolved=$candidate ;;
+                esac
+            done
+            ;;
+        *) return 1 ;;
+    esac
+    [ -n "$resolved" ] && [ -b "$resolved" ]
+}
+resolve_device "$root" || fail "root block device missing or ambiguous: $root"
+root_device=$resolved
+if [ -z "$rootfstype" ]; then
+    identity=$(blkid "$root_device") || fail "probe $root_device"
+    case " $identity " in
+        *' TYPE="ext4" '*|*' TYPE="ext3" '*) rootfstype=ext4 ;;
+        *' TYPE="ext2" '*) rootfstype=ext2 ;;
+        *' TYPE="vfat" '*) rootfstype=vfat ;;
+        *' TYPE="exfat" '*) rootfstype=exfat ;;
+        *) fail "unknown root filesystem: $root_device; specify rootfstype=" ;;
+    esac
+fi
+mkdir -p /newroot || fail 'create real-root mountpoint'
+options=$root_access
+[ -z "$rootflags" ] || options=$rootflags,$root_access
+mount -t "$rootfstype" -o "$options" "$root_device" /newroot || fail "mount $root_device ($rootfstype)"
+# Recover an interrupted APK removal before relying on any final-root library,
+# normal module database or service. The static tool is part of this initramfs.
+case $mode in installer|live) ;;
+    *) /sbin/kernel-bundle --recover-running /newroot || fail 'recover retained kernel package after interrupted update' ;;
+esac
+[ -x "/newroot$final_init" ] || fail "new init is missing or not executable: $final_init"
+
+# A physical-root fstab supplies its own ESP identity. Live/installer roots
+# must never attach an unrelated physical disk's ESP as their boot state.
+case $mode in installer|live) ;;
+    *)
+        esp_source= esp_type= esp_options=
+        if [ -r /newroot/etc/fstab ]; then
+            while read -r source point type flags rest; do
+                case $source in ''|'#'*) continue ;; esac
+                [ "$point" = /boot ] || continue
+                [ -z "$esp_source" ] || fail 'multiple /boot entries in fstab'
+                esp_source=$source; esp_type=$type; esp_options=$flags
+            done </newroot/etc/fstab
+        fi
+        if [ -n "$esp_source" ]; then
+            resolve_device "$esp_source" || fail "ESP device missing or ambiguous: $esp_source"
+            mkdir -p /newroot/boot || fail 'create ESP mountpoint'
+            mount -t "$esp_type" -o "$esp_options" "$resolved" /newroot/boot || fail 'mount boot ESP from fstab'
+        fi
+        ;;
+esac
+
+# /run is volatile on every boot. A fresh tmpfs covers stale disk state without
+# following disk symlinks or deleting persistent files outside this directory.
+mkdir -p /run || fail 'create early runtime directory'
+if ! mountpoint -q /run; then
+    mount -t tmpfs -o mode=0755,nosuid,nodev tmpfs /run || fail 'mount volatile /run'
+fi
+mkdir -p /run/lock || fail 'create runtime lock directory'
+for provider in dev proc sys run; do
+    mkdir -p "/newroot/$provider" || fail "create real-root /$provider"
+    mount --move "/$provider" "/newroot/$provider" || fail "move /$provider"
+done
+echo "[initramfs] root=$root_device filesystem=$rootfstype init=$final_init"
+exec switch_root -c /dev/console /newroot "$final_init"
+fail 'switch_root returned'

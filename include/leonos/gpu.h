@@ -40,5 +40,4 @@
 #define leonos_gpu_info reliefos_gpu_info
 #define leonos_gpu_render reliefos_gpu_render
 #define leonos_gpu_vertex reliefos_gpu_vertex
-#define leonos_gui_present_window reliefos_gui_present_window
 #endif /* LEONOS_GPU_H */

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-relieftodo">
+    <comment>ReliefTodo task list</comment>
+    <comment xml:lang="zh_CN">ReliefTodo 任务清单</comment>
+    <glob pattern="*.rtodo"/>
+    <magic priority="60"><match type="string" offset="0" value="RTDO"/></magic>
+  </mime-type>
+</mime-info>

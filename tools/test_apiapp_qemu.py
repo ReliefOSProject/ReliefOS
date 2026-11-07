@@ -94,7 +94,7 @@ def main():
         compiler = ROOT / "build/musl-gcc/root/opt/dyne/gcc-musl/bin/x86_64-linux-musl-gcc"
         pipe_probe = work / "pipe-stat-test"
         subprocess.run([str(compiler), "-static", "-O2", "-Wall", "-Wextra",
-                        str(ROOT / "tools/tests/pipe_stat_type_test.c"), "-o", str(pipe_probe)], check=True)
+                        str(ROOT / "kernel/reliefnt/tools/tests/pipe_stat_type_test.c"), "-o", str(pipe_probe)], check=True)
         subprocess.run([str(pipe_probe)], check=True, timeout=10)
         inject(image, pipe_probe, "/bin/pipe-stat-test", "0100755")
         locale = work / "locale.conf"

@@ -59,8 +59,8 @@ def main():
     temporary.mkdir()
     stage = output / "stage"
     subprocess.run(["cp", "--reflink=auto", "-a", str(ROOT / "build/esp"), str(stage)], check=True)
-    for source, destination in (("build/system/kernel.sys", "leonos/kernel.sys"),
-                                ("build/boot/loader.elf", "loader.elf")):
+    for source, destination in (("build/system/kernel.sys", "reliefos/kernel.sys"),
+                                ("build/system/kernel.sys", "leonos/kernel.sys")):
         shutil.copy2(ROOT / source, stage / destination)
     auth = ROOT / "build/auth-upstream"
     overlay_auth_tree(auth / "root/lib", stage / "lib", stage)
@@ -98,7 +98,7 @@ insmod all_video
 set gfxpayload=keep
 menuentry "ReliefOS PAM runtime probe" {
     set root=(hd0,gpt1)
-    multiboot2 /loader.elf root=/ log=serial autospawn=gcc
+    multiboot2 /reliefos/kernel.sys root=/ log=serial autospawn=gcc
     boot
 }
 ''')
@@ -109,8 +109,8 @@ menuentry "ReliefOS PAM runtime probe" {
     artifacts += sorted((stage / "lib").glob("libmd.so*"))
     artifacts += [stage / "sbin" / helper.name for helper in sorted((auth / "root/sbin").iterdir())
                   if helper.is_file()]
-    artifacts += [tests / "gcc-probe.elf", stage / "leonos/kernel.sys",
-                  stage / "loader.elf", stage / "lib/ld-musl-x86_64.so.1"]
+    artifacts += [tests / "gcc-probe.elf", stage / "reliefos/kernel.sys",
+                  stage / "leonos/kernel.sys", stage / "lib/ld-musl-x86_64.so.1"]
     artifacts += [stage / "usr/lib/leonos/libleonos.so.2",
                   stage / "usr/lib/reliefos/apps/authd/authd.elf"]
     artifacts += extra_files

@@ -1,7 +1,18 @@
 #ifndef LEONOS_AUTH_H
 #define LEONOS_AUTH_H
 
-#include <leonos/auth_user.h>
+#include <reliefos/auth_user.h>
+
+/* Historical regression fixture only: the retired authd protocol keeps its
+ * pre-rename type and constant spellings, aliased here to the canonical UAPI
+ * names so the fixture and its tests share one published layout. */
+#define LEONOS_AUTH_HOME_LEN RELIEFOS_AUTH_HOME_LEN
+#define LEONOS_AUTH_PASSWORD_LEN RELIEFOS_AUTH_PASSWORD_LEN
+#define LEONOS_AUTH_PASSWORD_MAX_CHARS RELIEFOS_AUTH_PASSWORD_MAX_CHARS
+#define LEONOS_AUTH_PASSWORD_MIN_CHARS RELIEFOS_AUTH_PASSWORD_MIN_CHARS
+#define LEONOS_AUTH_USERNAME_LEN RELIEFOS_AUTH_USERNAME_LEN
+#define leonos_user_info reliefos_user_info
+#define leonos_auth_record reliefos_auth_record
 
 #define LEONOS_AUTH_ROLE_NONE 0U
 #define LEONOS_AUTH_ROLE_USER 1U

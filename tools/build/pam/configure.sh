@@ -1,5 +1,5 @@
 #!/bin/sh
-# Fixed ReliefOS feature policy, derived from Linux-PAM 1.7.2 meson.build defaults.
+# Fixed ReliefOS feature policy, derived from Linux-PAM 1.7.3 meson.build defaults.
 # Capability checks compile/link only; cross executables are never run.
 set -eu
 if [ "${1:-}" = --help ]; then
@@ -13,11 +13,11 @@ tmp=$(mktemp -d "$(dirname "$output")/.configure.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 : "${CC:?}" "${CPPFLAGS:=}" "${CFLAGS:=}" "${LDFLAGS:=}"
 cat > "$tmp/config.h" <<'HEADER'
-/* Linux-PAM 1.7.2 ReliefOS policy; capabilities below are cross-link probes. */
+/* Linux-PAM 1.7.3 ReliefOS policy; capabilities below are cross-link probes. */
 #pragma once
 #define _GNU_SOURCE 1
 #define PACKAGE "Linux-PAM"
-#define PAM_VERSION "1.7.2"
+#define PAM_VERSION "1.7.3"
 #define UNUSED __attribute__((__unused__))
 #define PAM_NO_HEADER_FUNCTIONS 1
 #define SYSCONFDIR "/etc"

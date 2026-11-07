@@ -1,0 +1,28 @@
+# Audio is opt-in for applications; the base runtime has no libasound dependency.
+AUDIO_ALSA_ROOT := $(UPSTREAM_ROOT)/alsa-lib/root
+AUDIO_OPL_ROOT := $(UPSTREAM_ROOT)/nuked-opl3/root
+AUDIO_SDK_PRODUCTS := $(upstream_alsa-lib_products) $(upstream_nuked-opl3_products)
+
+AUDIO_CONTROL_SO := $(RUNTIME_DIR)/libreliefos-audio.so.1
+AUDIO_FLAGS := $(RUNTIME_FLAGS) -nostdinc -isystem $(if $(RELIEFOS_PASSIVE),deferred,$(shell $(TARGET_CC) -print-resource-dir 2>/dev/null))/include -D_POSIX_C_SOURCE=200809L -I$(AUDIO_ALSA_ROOT)/usr/include
+RELIEFOS_CAPTURE_AUDIO_KBUILD := 1
+include $(RELIEFOS_SRC)/userland/audio/Kbuild
+RELIEFOS_CAPTURE_AUDIO_KBUILD :=
+AUDIO_OBJECTS := $(addprefix $(O)/userland/audio/,$(RELIEFOS_AUDIO_OBJECTS))
+obj-y += userland/audio/
+export AUDIO_FLAGS
+
+userland/audio: $(MUSL_STAMP) $(HEADER_EXPORT_MANIFEST) $(upstream_alsa-lib_products) $(RELIEFOS_CC_ID) $(RELIEFOS_AR_ID)
+
+quiet_cmd_reliefos_audio_shared = LD      $@
+      cmd_reliefos_audio_shared = $(TARGET_LD) $(RELIEFOS_LINK_POLICY_FLAGS) -shared --no-undefined --hash-style=both -z max-page-size=0x1000 -soname libreliefos-audio.so.1 -o $@.tmp $(AUDIO_OBJECTS) $(AUDIO_ALSA_ROOT)/usr/lib/libasound.so.2 -L$(MUSL_SYSROOT)/lib -lc $(RUNTIME_BUILTINS); mv $@.tmp $@
+$(AUDIO_CONTROL_SO): $(O)/userland/audio/built-in.a $(AUDIO_ALSA_ROOT)/usr/lib/libasound.so.2 $(MUSL_SYSROOT)/lib/libc.so $(RUNTIME_BUILTINS) $(RELIEFOS_LD_ID) FORCE
+	$(call if_changed,reliefos_audio_shared)
+targets += $(AUDIO_CONTROL_SO)
+
+AUDIO_SDK_PRODUCTS += $(AUDIO_CONTROL_SO)
+USERLAND_EXTRA_soundctl = -I$(AUDIO_ALSA_ROOT)/usr/include
+USERLAND_LIBS_soundctl = $(AUDIO_CONTROL_SO) $(AUDIO_ALSA_ROOT)/usr/lib/libasound.so.2 $(RUNTIME_BUILTINS)
+USERLAND_DEPS_soundctl = $(upstream_alsa-lib_products)
+USERLAND_LIBS_settings = $(AUDIO_CONTROL_SO) $(AUDIO_ALSA_ROOT)/usr/lib/libasound.so.2 $(RUNTIME_BUILTINS)
+USERLAND_DEPS_settings = $(upstream_alsa-lib_products)

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Disk Manager
+Name[zh_CN]=磁盘管理器
+Comment=Manage GPT partitions, filesystems and mounts
+Comment[zh_CN]=管理 GPT 分区、文件系统和挂载
+Exec=/usr/bin/diskmgr
+TryExec=/usr/bin/diskmgr
+Icon=reliefos-diskmgr
+Terminal=false
+Categories=System;Filesystem;
+StartupWMClass=reliefos-diskmgr

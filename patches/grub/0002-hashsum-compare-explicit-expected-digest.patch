@@ -1,0 +1,70 @@
+From: ReliefOS contributors
+Subject: [PATCH] hashsum: compare a single file with an explicit expected digest
+
+SPDX-License-Identifier: GPL-3.0-or-later
+
+Keep the upstream hash implementation and existing command modes. Add a
+single-file comparison mode so the checked boot selector can independently
+compare kernel and initramfs bytes with its slot metadata, even if a checksum
+list loses one of its records. Reject mixed modes and malformed digests before
+opening a file. This patch applies to the locked GRUB 2.16 in every platform.
+
+--- a/grub-core/commands/hashsum.c
++++ b/grub-core/commands/hashsum.c
+@@ -36,6 +36,8 @@
+    ARG_TYPE_STRING},
+   {"keep-going", 'k', 0, N_("Don't stop after first error."), 0, 0},
+   {"uncompress", 'u', 0, N_("Uncompress file before checksumming."), 0, 0},
++  {"expected", -1, 0, N_("Compare one file with this hexadecimal digest."),
++   N_("HASH"), ARG_TYPE_STRING},
+   {0, 0, 0, 0, 0, 0}
+ };
+ 
+@@ -215,6 +217,7 @@
+   int keep = state[3].set;
+   int uncompress = state[4].set;
+   unsigned unread = 0;
++  grub_uint8_t expected[GRUB_CRYPTO_MAX_MDLEN];
+ 
+   for (i = 0; i < ARRAY_SIZE (aliases); i++)
+     if (grub_strcmp (ctxt->extcmd->cmd->name, aliases[i].name) == 0)
+@@ -231,6 +234,25 @@
+ 
+   if (hash->mdlen > GRUB_CRYPTO_MAX_MDLEN)
+     return grub_error (GRUB_ERR_BUG, "mdlen is too long");
++
++  /* Compare trusted scalar metadata directly, independently of a hash list's
++     membership. Keep this mode bounded to one exact, uncompressed file. */
++  if (state[5].set)
++    {
++      if (argc != 1 || state[1].set || state[2].set || keep || uncompress)
++        return grub_error (GRUB_ERR_BAD_ARGUMENT,
++                           "--expected requires one file without other modes");
++      if (grub_strlen (state[5].arg) != 2 * hash->mdlen)
++        return grub_error (GRUB_ERR_BAD_ARGUMENT, "invalid expected hash length");
++      for (i = 0; i < hash->mdlen; i++)
++        {
++          int high = hextoval (state[5].arg[2 * i]);
++          int low = hextoval (state[5].arg[2 * i + 1]);
++          if (high < 0 || low < 0)
++            return grub_error (GRUB_ERR_BAD_ARGUMENT, "invalid expected hash");
++          expected[i] = (high << 4) | low;
++        }
++    }
+ 
+   if (state[2].set)
+     prefix = state[2].arg;
+@@ -272,6 +294,13 @@
+ 	  unread++;
+ 	  continue;
+ 	}
++      if (state[5].set)
++        {
++          if (grub_memcmp (result, expected, hash->mdlen))
++            return grub_error (GRUB_ERR_TEST_FAILURE, "checksum mismatch for %s",
++                               args[i]);
++          return GRUB_ERR_NONE;
++        }
+       for (j = 0; j < hash->mdlen; j++)
+ 	grub_printf ("%02x", ((grub_uint8_t *) result)[j]);
+       grub_printf ("  %s\n", args[i]);

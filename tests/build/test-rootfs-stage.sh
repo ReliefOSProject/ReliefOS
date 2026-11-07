@@ -42,11 +42,11 @@ mkdir "$work/deleted-root"
 # explicit value reaches the manifest (M1 service role marks depend on it).
 grep -q '"uid":0,"gid":0' "$work/deleted.json"
 printf 'payload\n' > "$work/gid-input"
-printf 'f\t%s\t/usr/lib/reliefos/apps/desktop/desktop.elf\t0755\tservice\tunique\t60001\n' "$work/gid-input" > "$work/gid-plan"
+printf 'f\t%s\t/usr/share/fixture/data\t0755\tservice\tunique\t1234\n' "$work/gid-input" > "$work/gid-plan"
 mkdir "$work/gid-root"
 "$work/stage" "$work/gid-plan" "$work/gid-root" "$work/gid.json"
-grep -q '"path":"/usr/lib/reliefos/apps/desktop/desktop.elf","mode":"0755","uid":0,"gid":60001' "$work/gid.json"
-[ "$(stat -c %a "$work/gid-root/usr/lib/reliefos/apps/desktop/desktop.elf")" = 755 ]
+grep -q '"path":"/usr/share/fixture/data","mode":"0755","uid":0,"gid":1234' "$work/gid.json"
+[ "$(stat -c %a "$work/gid-root/usr/share/fixture/data")" = 755 ]
 # An absent, empty or non-decimal gid column is refused before staging.
 for bad in '' 'bogus' '-1' '99999999999'; do
     printf 'f\t%s\t/bad\t0644\tservice\tunique\t%s\n' "$work/gid-input" "$bad" > "$work/bad-gid"

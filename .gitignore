@@ -1,5 +1,5 @@
 # Make output trees (default out/<arch>/<profile>, custom O=out/<name>).
-# Keep these anchored: docs/build/, tests/build/ and tools/build/ are source.
+# Keep these anchored: Documentation/, tests/build/ and tools/build/ are source.
 /out/
 # Shared verified downloads, intentionally retained by make distclean.
 /cache/

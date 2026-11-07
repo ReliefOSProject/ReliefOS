@@ -4,18 +4,23 @@
 set -u
 
 cat <<'HELP'
-ReliefOS build system (GNU Make + C host tools)
+ReliefOS build system (Linux Kbuild / Kconfig)
 
   make                 same as `make help`; never downloads or builds
   make help            this message
   make doctor          check host tools, target toolchain and third-party bits
-  make fetch           the only network stage: fetch and verify locked sources,
+  make fetch           the only download stage: fetch and verify locked sources,
                        parent and kernel checkout alike
+  make fetch-check     probe every locked URL without downloading anything;
+                       name the packages whose address answers 404 or nothing
 
-  make defconfig       start $(O)/config/.config from configs/default.conf
+  make defconfig       reset OS and ReliefNT configurations to their defaults
   make olddefconfig    resolve new symbols non-interactively, keep user choices
+  make kernel-menuconfig     configure native kernel y/m/n selections
+  make kernel-olddefconfig   resolve new kernel options, preserving choices
+  make kernel-allmodconfig   build eligible kernel components as modules
   make menuconfig      edit the configuration of the selected output directory
-  make migrate-config  explicitly rename old component symbols in O/config/.config
+  make migrate-config  explicitly rename old component symbols in O/.config
   make regen-component-kconfig  regenerate Kconfig.components from components.toml
 
   make tools           build this project's C host tools (HOSTCC only)
@@ -27,14 +32,15 @@ ReliefOS build system (GNU Make + C host tools)
   make sdk             alias of musl-sdk (built from build output)
   make rootfs          staged root filesystem
   make apk-repo        signed local package repository
-  make image-vmdk      bootable disk image
-  make iso             live ISO
-  make installer       installer ISO
-  make rpr-pages       local signed APK/kernel Pages tree (does not publish)
+  make htmldocs        strict Sphinx manual in O/Documentation/html
+  make image-vmdk      BIOS + UEFI GPT disk image
+  make iso             BIOS + UEFI live ISO
+  make installer       BIOS + UEFI installer ISO
+  make rpr-pages       local signed APK/kernel subtree (does not publish)
   make pages           full GitHub Pages tree: home, download/, rpr/, docs/ (does not publish)
   make site            alias of pages
   make download-page   alias of pages (single atomic output)
-  make docs-page       alias of pages (documentation rendered from docs/)
+  make docs-page       alias of pages (separate Documentation/ manuals from both repositories)
   make release         all plus pages
   make all             kernel userland runtime sdk apk-repo image-vmdk iso installer
 
@@ -44,10 +50,14 @@ ReliefOS build system (GNU Make + C host tools)
 
   make test-tools      C host tool tests, plain and under ASan/UBSan
   make test-build      shell contract tests for the build surface
+  make test-vdso       delegate vDSO ELF, timekeeper and mapping/auxv checks
+  make test-kernel-host run standalone ReliefNT host regression suites
+  make test-kernel-ownership check standalone ReliefNT test ownership
+  make test-kernel-update signed APK/RPR kernel-bundle transaction regressions
   make test            test-tools plus test-build
   make test-long       repeated -j1/-j8 comparisons and interrupt recovery
-  make test-smoke      QEMU boot tests (long; explicit)
-  make test-legacy     pre-existing regression tests, some need Python
+  make test-smoke      BIOS + UEFI QEMU checks for all three media (sequential)
+  make test-legacy     kernel legacy group plus OS userspace regressions
 
   make clean           remove built products in $(O), keep configuration
   make distclean       also remove configuration in $(O); keeps the download cache
@@ -58,6 +68,8 @@ Variables
   PROFILE=debug|release  compile policy; anything else is an error
   O=PATH               output directory, default out/<arch>/<profile>
   V=1                  echo the real command, its working directory and overrides
+  QEMU_BOOT=uefi|bios   run firmware, default uefi
+  QEMU_FIRMWARE=FILE   OVMF firmware for uefi; unused for bios
   CPUS=n               override Kconfig guest CPU count
   MEMORY=4G            guest memory for the run targets
   TOOLCHAIN=FILE       toolchain description, default configs/toolchains/llvm-x86_64.mk

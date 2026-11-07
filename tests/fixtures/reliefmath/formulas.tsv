@@ -1,0 +1,131 @@
+greek.alpha	\alpha
+greek.beta	\beta
+greek.gamma	\gamma
+greek.delta	\delta
+greek.epsilon	\epsilon
+greek.zeta	\zeta
+greek.eta	\eta
+greek.theta	\theta
+greek.iota	\iota
+greek.kappa	\kappa
+greek.lambda	\lambda
+greek.mu	\mu
+greek.nu	\nu
+greek.xi	\xi
+greek.omicron	ο
+greek.pi	\pi
+greek.rho	\rho
+greek.sigma	\sigma
+greek.tau	\tau
+greek.upsilon	\upsilon
+greek.phi	\phi
+greek.chi	\chi
+greek.psi	\psi
+greek.omega	\omega
+greek.capital-gamma	\Gamma
+greek.capital-delta	\Delta
+greek.capital-theta	\Theta
+greek.capital-lambda	\Lambda
+greek.capital-xi	\Xi
+greek.capital-pi	\Pi
+greek.capital-sigma	\Sigma
+greek.capital-upsilon	\Upsilon
+greek.capital-phi	\Phi
+greek.capital-psi	\Psi
+greek.capital-omega	\Omega
+greek.varepsilon	\varepsilon
+greek.vartheta	\vartheta
+greek.varpi	\varpi
+greek.varrho	\varrho
+greek.varsigma	\varsigma
+greek.varphi	\varphi
+operator.plus	+
+operator.minus	-
+relation.equals	=
+operator.plus-minus	\pm
+operator.minus-plus	\mp
+operator.times	\times
+operator.dot	\cdot
+operator.divide	\div
+operator.star	\star
+relation.less	<
+relation.greater	>
+relation.less-equal	\le
+relation.greater-equal	\ge
+relation.not-equal	\ne
+relation.approx	\approx
+relation.equivalent	\equiv
+relation.similar	\sim
+relation.proportional	\propto
+relation.much-less	\ll
+relation.much-greater	\gg
+relation.perpendicular	\perp
+relation.parallel	\parallel
+arrow.to	\to
+arrow.left	\leftarrow
+arrow.right	\rightarrow
+arrow.left-right	\leftrightarrow
+arrow.right-double	\Rightarrow
+arrow.left-double	\Leftarrow
+arrow.mapsto	\mapsto
+set.member	\in
+set.not-member	\notin
+set.subset	\subset
+set.subset-equal	\subseteq
+set.union	\cup
+set.intersection	\cap
+set.empty	\emptyset
+set.forall	\forall
+set.exists	\exists
+symbol.infinity	\infty
+bracket.parentheses	\left( x \right)
+bracket.square	\left[ x \right]
+bracket.curly	\left\{ x \right\}
+bracket.angle	\left\langle x \right\rangle
+bracket.floor	\left\lfloor x \right\rfloor
+bracket.ceiling	\left\lceil x \right\rceil
+spacing.thin	\,
+spacing.medium	\:
+spacing.thick	\;
+spacing.quad	\quad
+spacing.double-quad	\qquad
+spacing.negative	\!
+structure.fraction	\frac{a}{b}
+structure.display-fraction	\displaystyle\frac{a}{b}
+structure.root	\sqrt{x}
+structure.indexed-root	\sqrt[n]{x}
+structure.superscript	a^{b}
+structure.subscript	a_{i}
+structure.auto-parentheses	\left( x \right)
+structure.auto-square-brackets	\left[ x \right]
+structure.auto-curly-brackets	\left\{ x \right\}
+structure.auto-absolute	\left| x \right|
+structure.sum	\sum_{i=1}^{n} x
+structure.product	\prod_{i=1}^{n} x
+structure.integral	\int_{a}^{b} f(x) \, dx
+structure.double-integral	\iint_{a}^{b} f(x,y) \, dx \, dy
+structure.triple-integral	\iiint_{a}^{b} f(x,y,z) \, dx \, dy \, dz
+structure.closed-integral	\oint_C f(x) \, dx
+structure.limit	\lim_{x \to 0} f(x)
+function.sin	\sin{x}
+function.cos	\cos{x}
+function.tan	\tan{x}
+function.log	\log{x}
+function.ln	\ln{x}
+function.exp	\exp{x}
+function.min	\min{x}
+function.max	\max{x}
+structure.matrix	\begin{matrix}a & b \\ c & d\end{matrix}
+structure.parenthesized-matrix	\begin{pmatrix}a & b \\ c & d\end{pmatrix}
+structure.bracketed-matrix	\begin{bmatrix}a & b \\ c & d\end{bmatrix}
+structure.cases	\begin{cases}a & b \\ c & d\end{cases}
+structure.aligned	\begin{aligned}a &= b \\ c &= d\end{aligned}
+structure.vector	\vec{x}
+structure.hat	\hat{x}
+structure.overline	\overline{x}
+structure.absolute-value	\left| x \right|
+structure.norm	\left\| x \right\|
+structure.text	\text{a}
+structure.roman	\mathrm{a}
+structure.bold	\mathbf{a}
+structure.italic	\mathit{a}

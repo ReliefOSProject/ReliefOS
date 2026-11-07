@@ -13,6 +13,60 @@ CRYPTO = [f"third_party/mbedtls/library/{name}.c" for name in
 
 
 class InstallerSetupTests(unittest.TestCase):
+    def test_xorg_home_succeeds_without_retired_apps(self):
+        with tempfile.TemporaryDirectory(prefix="reliefos-xorg-home-") as temporary:
+            root = Path(temporary)
+            executable = root / "xorg-home"
+            subprocess.run([
+                "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
+                "-idirafter", "userland/runtime/include",
+                "tools/tests/installer_xorg_home_test.c",
+                "-o", str(executable),
+            ], cwd=ROOT, check=True)
+            (root / "home").mkdir()
+            (root / "etc/skel").mkdir(parents=True)
+            for name in (".bash_profile", ".bashrc", ".inputrc"):
+                (root / "etc/skel" / name).write_text("# shell defaults\n")
+            # The X11 payload supplies st and the ported apps, but no longer
+            # contains the private Desktop's terminal/settings/run programs.
+            for program in ("usr/bin/st", "usr/lib/reliefos/apps/fileman/fileman.elf",
+                            "usr/lib/reliefos/apps/taskmgr/taskmgr.elf"):
+                path = root / program
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("X11 application fixture\n")
+                path.chmod(0o755)
+            result = subprocess.run([executable, root], capture_output=True, text=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            home = root / "home/test"
+            for directory in (home,):
+                self.assertTrue(directory.is_dir())
+                self.assertEqual(directory.stat().st_mode & 0o777, 0o700)
+                self.assertEqual(directory.stat().st_uid, os.getuid())
+            for name in (".bash_profile", ".bashrc", ".inputrc"):
+                self.assertEqual((home / name).read_text(), "# shell defaults\n")
+            self.assertFalse(any((home / name).exists() for name in ("desktop", "documents", "downloads")))
+
+    def test_console_home_does_not_create_desktop_shortcuts(self):
+        with tempfile.TemporaryDirectory(prefix="reliefos-console-home-") as temporary:
+            root = Path(temporary)
+            executable = root / "console-home"
+            subprocess.run([
+                "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
+                "-idirafter", "userland/runtime/include",
+                "tools/tests/installer_console_home_test.c", "-o", str(executable),
+            ], cwd=ROOT, check=True)
+            (root / "home").mkdir()
+            (root / "etc/skel").mkdir(parents=True)
+            for name in (".bash_profile", ".bashrc", ".inputrc"):
+                (root / "etc/skel" / name).write_text("# shell defaults\n")
+            subprocess.run([str(executable), root], check=True, timeout=10)
+            self.assertFalse((root / "home/test/desktop").exists())
+            self.assertEqual((root / "home/test/.bashrc").read_text(), "# shell defaults\n")
+
     def test_hyfetch_defaults(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-hyfetch-home-") as temporary:
             work = Path(temporary)
@@ -65,7 +119,7 @@ class InstallerSetupTests(unittest.TestCase):
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
                 "-Wl,--wrap=read,--wrap=write,--wrap=tcgetattr,--wrap=tcsetattr",
                 "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-                "tools/tests/installer_tty_input_test.c", "-o", str(executable),
+                "tools/tests/installer_tty_input_test.c", "userland/apps/installer/installer_capacity.c", "-o", str(executable),
             ], cwd=ROOT, check=True)
             subprocess.run([str(executable)], check=True, timeout=10)
 

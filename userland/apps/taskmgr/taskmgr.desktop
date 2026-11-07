@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Task manager
+Name[zh_CN]=任务管理器
+Exec=/usr/bin/taskmgr
+TryExec=/usr/bin/taskmgr
+Icon=reliefos-taskmgr
+Terminal=false
+Categories=System;
+StartupWMClass=reliefos-taskmgr

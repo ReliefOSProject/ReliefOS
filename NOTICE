@@ -58,7 +58,7 @@ Runtime, libraries, and applications
 * Dyne musl 2.2.0 native toolchain: GCC 15.1.0 and GNU binutils 2.44
   (GPL-3.0-or-later), musl (MIT), and the upstream bundled static libraries.
   GCC runtime libraries use the GCC Runtime Library Exception where applicable.
-  See userland/musl-gcc/README.md, COPYING3 and COPYING.RUNTIME; installed
+  See userland/musl-gcc/README.rst, COPYING3 and COPYING.RUNTIME; installed
   provenance and upstream file hashes are in /share/licenses/musl-gcc/.
   Source/build recipes: https://github.com/dyne/musl/tree/2.2.0.
 * less: GPL-3.0-or-later OR BSD-2-Clause. Installed from the signed Alpine APK;
@@ -90,10 +90,6 @@ Data, dictionaries, and visual resources
   are subject to the applicable Microsoft license terms. They are not covered
   by the root LICENSE; verify redistribution rights before publishing
   an image containing them.
-* Metro desktop wallpaper: NASA Image and Video Library asset PIA18033.
-  Source and credit are recorded in
-  system/resources/wallpaper-metro.source.txt. Use is subject to NASA media
-  usage guidance and applicable trademark restrictions.
 * Mozilla CA root certificates distributed as the curl CA Extract:
   system/certs/cacert.pem. The file contains Mozilla certificate data and its
   source, conversion, date, and checksum comments. See
@@ -108,3 +104,13 @@ license. Preserve copyright notices, license texts, disclaimers, and required
 attribution in the source tree and in the installed image. Do not describe the
 entire distribution as Apache-2.0 unless the statement is explicitly limited
 to ReliefOS-owned code and all third-party terms remain visible.
+
+Linux Kbuild and Kconfig build tools
+----------------------------------
+The build/configuration files listed in scripts/kbuild-source.json come from
+Linux 6.12 (https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.12.tar.xz).
+Their original SPDX identifiers and copyright notices are preserved. They are
+covered by their own GPL-2.0 terms, with texts in LICENSES/preferred/GPL-2.0
+and LICENSES/kbuild/COPYING. Project compiler-policy adapters are separate
+files. These build-tool terms do not relabel the ReliefOS-owned application
+or operating-system source.

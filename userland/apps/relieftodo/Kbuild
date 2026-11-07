@@ -1,0 +1,8 @@
+RELIEFOS_APP_NAME := relieftodo
+RELIEFOS_APP_OBJECTS := actions.o document.o file_io.o main.o model.o window.o
+RELIEFOS_APP_C_OBJECTS :=
+RELIEFOS_APP_CXX_OBJECTS := actions.o document.o file_io.o main.o model.o window.o
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+endif

@@ -5,6 +5,7 @@
 #include <reliefos/fs.h>
 #include <reliefos/ini.h>
 #include <reliefos/launch.h>
+#include <reliefos/xdg.h>
 #include <reliefos/startup.h>
 #include <reliefos/syscall.h>
 #include <reliefos/tar.h>
@@ -879,7 +880,6 @@ int reliefos_api_install_with_progress(const char *api_path, const char *dest_di
                                      void *context)
 {
     struct reliefos_api_info info;
-    struct reliefos_user_info user;
     struct reliefos_stat exe_stat;
     char install_root[RELIEFOS_API_PATH_MAX];
     char exe_path[RELIEFOS_API_PATH_MAX];
@@ -918,21 +918,11 @@ int reliefos_api_install_with_progress(const char *api_path, const char *dest_di
         return 0;
     }
     if (create_shortcut && info.main_exe[0]) {
-        if (reliefos_auth_current(&user) == 0 && user.uid && user.home[0]) {
-            char desktop_dir[RELIEFOS_FS_PATH_LEN];
-            uint32_t hlen = (uint32_t)strlen(user.home);
-            if (hlen + 8U < sizeof(desktop_dir)) {
-                memcpy(desktop_dir, user.home, hlen);
-                memcpy(desktop_dir + hlen, "/desktop", 9U);
-                api_ensure_dir(desktop_dir);
-                if (reliefos_launch_create_shortcut_in_dir(
-                        desktop_dir, exe_path,
-                        shortcut_name,
-                        sizeof(shortcut_name)) < 0) {
-                    return 0;
-                }
-            }
-        }
+        char desktop_dir[RELIEFOS_FS_PATH_LEN];
+        if (reliefos_xdg_user_dir("DESKTOP",desktop_dir,sizeof(desktop_dir))<0 ||
+            !api_ensure_dir(desktop_dir) ||
+            reliefos_launch_create_shortcut_in_dir(desktop_dir,exe_path,
+                shortcut_name,sizeof(shortcut_name))<0) return 0;
     }
     return 1;
 }

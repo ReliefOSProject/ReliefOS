@@ -7,12 +7,38 @@
 static int fault = ENOSYS;
 static unsigned dialogs;
 static unsigned resource_calls;
+static gid_t effective_groups[32];
+static size_t effective_group_count;
 
-/* Unprivileged user namespaces forbid setgroups; credentials are not under test. */
+/* Capture initgroups' real musl group selection where user namespaces deny setgroups. */
 int setgroups(size_t count, const gid_t *groups)
-{ (void)count; (void)groups; return 0; }
-int initgroups(const char *user, gid_t group)
-{ assert(!strcmp(user, "root") && group == 0); return 0; }
+{
+    assert(count <= sizeof(effective_groups) / sizeof(effective_groups[0]));
+    memcpy(effective_groups, groups, count * sizeof(*groups));
+    effective_group_count = count;
+    return 0;
+}
+
+int getgroups(int size, gid_t *groups)
+{
+    if (size < 0 || (size && (size_t)size < effective_group_count)) {
+        errno = EINVAL;
+        return -1;
+    }
+    if (size) memcpy(groups, effective_groups, effective_group_count * sizeof(*groups));
+    return (int)effective_group_count;
+}
+
+/* The user namespace denies the kernel setgroups syscall. Preserve musl's
+ * actual /etc/group resolution while capturing the resulting group vector. */
+int initgroups(const char *user, gid_t primary)
+{
+    gid_t groups[32];
+    int count = (int)(sizeof(groups) / sizeof(groups[0]));
+    int result = getgrouplist(user, primary, groups, &count);
+    if (result < 0) return -1;
+    return setgroups((size_t)result, groups);
+}
 
 /* Reproduce the current kernel's missing resources at the real DSO boundary. */
 int getrlimit(int resource, struct rlimit *limit)
@@ -26,12 +52,14 @@ int getrlimit(int resource, struct rlimit *limit)
     return syscall(SYS_prlimit64, 0, resource, NULL, limit);
 }
 
-int reliefos_ui_show_password_dialog(const char *title, const char *label, char *value, uint32_t size)
-{ (void)title; (void)label; (void)value; (void)size; ++dialogs; return 0; }
-int reliefos_ui_show_input_dialog(const char *title, const char *label, char *value, uint32_t size)
-{ (void)title; (void)label; (void)value; (void)size; ++dialogs; return 0; }
-int reliefos_ui_show_message_box(const char *title, const char *message, const char *button)
-{ (void)title; (void)message; (void)button; ++dialogs; return 1; }
+int misc_conv(int count, const struct pam_message **messages,
+              struct pam_response **responses, void *context)
+{
+    (void)count; (void)messages; (void)context;
+    *responses = NULL;
+    ++dialogs;
+    return PAM_CONV_ERR;
+}
 
 static void write_file(const char *path, const char *text)
 {
@@ -71,6 +99,39 @@ static void run_case(const char *label, const char *secret, const char *limits, 
     assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 }
 
+static void run_video_group_case(void)
+{
+    pid_t child = fork();
+    assert(child >= 0);
+    if (!child) {
+        fault = ENOSYS;
+        resource_calls = 0;
+        effective_group_count = 0;
+        write_file("/etc/security/limits.conf", "");
+        struct reliefos_user_info user;
+        char password[] = "AbC123!";
+        int result = reliefos_pam_login("test", password, &user);
+        assert(result == 0 && user.uid == 1000 && password[0] == 0);
+        gid_t groups[32];
+        int count = getgroups((int)(sizeof(groups) / sizeof(groups[0])), groups);
+        assert(count >= 2);
+        int has_personal = 0, has_video = 0;
+        for (int i = 0; i < count; ++i) {
+            if (groups[i] == 1000) has_personal = 1;
+            if (groups[i] == 44) has_video = 1;
+        }
+        assert(has_personal && has_video);
+        assert(reliefos_auth_logout() == 0);
+        assert(reliefos_pam_session_wait() == 0);
+        _exit(0);
+    }
+    int status;
+    assert(waitpid(child, &status, 0) == child);
+    if (!WIFEXITED(status) || WEXITSTATUS(status))
+        fprintf(stderr, "case video group wait status=%d\n", status);
+    assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
+}
+
 int main(void)
 {
     struct conversation context = {0};
@@ -85,14 +146,15 @@ int main(void)
     assert(mkdir("/etc/pam.d", 0755) == 0);
     assert(mkdir("/etc/security", 0755) == 0);
     assert(mkdir("/run/reliefos", 0755) == 0);
-    write_file("/etc/passwd", "root:x:0:0:root:/root:/bin/sh\n");
-    write_file("/etc/group", "root:x:0:\n");
+    write_file("/etc/passwd", "root:x:0:0:root:/root:/bin/sh\n"
+               "test:x:1000:1000:Test user:/home/test:/bin/sh\n");
     char salt[CRYPT_GENSALT_OUTPUT_SIZE], text[512];
     struct crypt_data data = {0};
     assert(crypt_gensalt_rn("$y$", 0, NULL, 0, salt, sizeof(salt)));
     char *hash = crypt_rn("AbC123!", salt, &data, sizeof(data));
     assert(hash && *hash == '$');
-    snprintf(text, sizeof(text), "root:%s:20000:0:99999:7:::\n", hash);
+    snprintf(text, sizeof(text), "root:%s:20000:0:99999:7:::\ntest:%s:20000:0:99999:7:::\n",
+             hash, hash);
     write_file("/etc/shadow", text);
     write_file("/etc/pam.d/reliefos-gui",
                "auth required pam_unix.so\naccount required pam_unix.so\n"
@@ -102,6 +164,7 @@ int main(void)
     run_case("supported nofile enforced", "AbC123!", "root soft nofile 64\n", 0, ENOSYS);
     run_case("unsupported cpu denied", "AbC123!", "root hard cpu 1\n", EACCES, ENOSYS);
     run_case("unexpected resource failure", "AbC123!", "", EIO, EIO);
+    run_video_group_case();
     puts("[pam-login-case] PASS");
     return 0;
 }

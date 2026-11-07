@@ -1,0 +1,19 @@
+#!/bin/sh
+# Check only the optional file installed by ReliefOS; preserve other swap policy.
+[ "$#" -eq 2 ] && [ -r "$1" ] && [ -r "$2" ] || exit 2
+awk '
+  $1 == "/swapfile" && $3 == "swap" {
+    count = split($4, options, ","); automatic = 1
+    for (i = 1; i <= count; ++i) if (options[i] == "noauto") automatic = 0
+    if (automatic) found = 1
+  }
+  END { exit found ? 0 : 1 }
+' "$1"
+configured=$?
+[ "$configured" -eq 1 ] && exit 0
+[ "$configured" -eq 0 ] || exit 2
+if awk 'NR > 1 && $1 == "/swapfile" { found = 1 } END { exit found ? 0 : 1 }' "$2"; then
+    exit 0
+fi
+echo "[reliefos] configured /swapfile is not active" >&2
+exit 1

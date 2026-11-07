@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefTodo
+Name[zh_CN]=ReliefTodo
+GenericName=Task Manager
+GenericName[zh_CN]=待办事项管理器
+Comment=Organize tasks, projects, priorities and due dates
+Comment[zh_CN]=管理任务、项目、优先级与截止日期
+Exec=/usr/bin/relieftodo %f
+TryExec=/usr/bin/relieftodo
+Icon=reliefos-relieftodo
+Terminal=false
+Categories=Office;Utility;
+MimeType=application/x-relieftodo;
+StartupWMClass=reliefos-relieftodo

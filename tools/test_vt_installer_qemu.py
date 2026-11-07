@@ -44,7 +44,7 @@ def main():
             wait_text(probe, process, 'installer-shell', 'built-in shell', timeout=100)
         else:
             wait_text(probe, process, 'installer-language', 'English', timeout=100)
-            probe.click(320, 164 if probe.height > 640 else 144)
+            probe.click(*probe.language_option_point())
             wait_text(probe, process, 'installer-english', 'Select Language')
         for number in range(2, 7):
             probe.key(f'ctrl-alt-f{number}')
@@ -89,7 +89,7 @@ def main():
             probe.key('ctrl-alt-f2')
             wait_text(probe, process, 'exit-recovery-shell', 'built-in shell')
             match = re.search(
-                r'exec pid=(\d+) path=/usr/lib/reliefos/apps/desktop/desktop.elf',
+                r'exec pid=(\d+) path=/usr/bin/Xorg',
                 serial.read_text())
             assert match, 'graphical session pid not recorded'
             probe.text(f'kill {match[1]}')
@@ -101,7 +101,7 @@ def main():
                       timeout=40)
             print('PASS installer session exit/recovery to the rescue shell', flush=True)
             return
-        for _ in range(6): next_page(probe)
+        for _ in range(7): next_page(probe)
         wait_text(probe, process, 'installer-accounts', 'Standard user name')
         if args.install:
             # The accounts page initially focuses the username. Keep field

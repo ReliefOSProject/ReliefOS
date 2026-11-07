@@ -2,6 +2,8 @@
 set -eu
 MAKEFLAGS=${MAKEFLAGS-}
 case ${MAKEFLAGS%% *} in *n*) exit 0 ;; esac
+. "$(CDPATH= cd -- "$(dirname "$0")" && pwd)/upstream-make-environment.sh"
+reliefos_upstream_make_environment
 [ "$#" = 9 ] || { echo 'usage: upstream-terminal.sh PACKAGE SRC DEPS LOCK WORK STAGE MUSL CC TARGET' >&2; exit 2; }
 pkg=$1 src=$2 deps=$3 lock=$4 work=$5 stage=$6 musl=$7
 shift 7
@@ -21,7 +23,6 @@ resource=$("$cc" -print-resource-dir)
 CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -isystem $musl/include -isystem $resource/include -L$musl/lib"
 AR=llvm-ar RANLIB=llvm-ranlib CFLAGS='-O2 -fno-stack-protector -mno-avx -mno-avx2' CPPFLAGS= LDFLAGS=-static LIBS=
 export CC AR RANLIB CFLAGS CPPFLAGS LDFLAGS LIBS
-MAKEFLAGS=${MAKEFLAGS%% -- *}; export MAKEFLAGS; unset MAKEOVERRIDES
 tmp=$(mktemp -d "$stage.new.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT
 case $pkg in

@@ -77,15 +77,6 @@ index 8e0deb0..ad1b48a 100644
  
          /* no longer need cleartext */
          cp = Goodcrypt_md5(pass_new, (const char *) result);
-@@ -475,7 +466,7 @@ PAMH_ARG_DECL(char * create_password_hash,
- 		char tmppass[9];
- 		char *hashed;
- 
--		crypt_make_salt(salt, 2);
-+		if (crypt_make_salt(salt, 2) < 0) return NULL;
- 		if (off(UNIX_BIGCRYPT, ctrl) && strlen(password) > 8) {
- 			strncpy(tmppass, password, sizeof(tmppass)-1);
- 			tmppass[sizeof(tmppass)-1] = '\0';
 @@ -493,12 +484,13 @@ PAMH_ARG_DECL(char * create_password_hash,
  	 * guaranteed to have crypt_gensalt_rn().
  	 */

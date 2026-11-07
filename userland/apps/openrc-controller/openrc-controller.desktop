@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=OpenRC Controller
+Name[zh_CN]=OpenRC 控制器
+GenericName=Service Manager
+GenericName[zh_CN]=服务与运行级别管理器
+Comment=Manage OpenRC services, runlevels, configuration and diagnostics
+Comment[zh_CN]=管理 OpenRC 服务、运行级别、配置与诊断
+Exec=/usr/bin/openrc-controller
+TryExec=/usr/bin/openrc-controller
+Icon=reliefos-openrc-controller
+Terminal=false
+Categories=System;Monitor;
+StartupWMClass=reliefos-openrc-controller

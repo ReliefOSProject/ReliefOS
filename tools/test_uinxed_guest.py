@@ -90,7 +90,7 @@ def main():
             'return result != 0;\n}\n', encoding="ascii")
         compiler = ROOT / "build/musl/sdk/bin/reliefos-musl-cc"
         for input_file, output in ((probe, work / "probe.elf"),
-                (ROOT / "tools/tests/pselect_runtime_probe.c", work / "pselect-probe")):
+                (ROOT / "kernel/reliefnt/tools/tests/pselect_runtime_probe.c", work / "pselect-probe")):
             subprocess.run([str(compiler), "-static", "-O2", str(input_file), "-o", str(output)], check=True)
         with tempfile.TemporaryDirectory(prefix="stage-", dir=work) as temporary:
             stage = Path(temporary) / "root"

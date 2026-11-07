@@ -1,0 +1,10 @@
+/* FLTK 1.3 draws each run with one font, without per-glyph CJK fallback.
+ * A user-origin important rule also covers pages that name Latin-only fonts.
+ * Keep page sizes, weights, colours and layout; only select a Unicode face.
+ * Dillo reads this file from ~/.dillo/style.css, not /etc/dillo/style.css.
+ */
+* { font-family: serif !important; }
+pre, code, kbd, samp, tt,
+pre *, code *, kbd *, samp *, tt * {
+    font-family: monospace !important;
+}

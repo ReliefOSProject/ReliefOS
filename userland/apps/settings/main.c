@@ -13,7 +13,6 @@
 #include <reliefos/environment.h>
 #include <reliefos/text_input.h>
 #include <reliefos/launch.h>
-#include <reliefos/license.h>
 #include <reliefos/psf_font.h>
 #include <reliefos/startup.h>
 #include <reliefos/stdio.h>
@@ -26,7 +25,7 @@
 #define SETTINGS_DROPDOWN_ROW_H 28
 #define SETTINGS_MODE_COUNT 5
 #define SETTINGS_SCALE_COUNT 3
-#define SETTINGS_TAB_COUNT 8
+#define SETTINGS_TAB_COUNT 7
 #define SETTINGS_USER_ROWS 7
 #define SETTINGS_ASSOC_ROWS 6
 #define SETTINGS_SERVICE_ROWS 5
@@ -53,9 +52,8 @@ enum {
     PAGE_USERS = 2,
     PAGE_ASSOC = 3,
     PAGE_SERVICES = 4,
-    PAGE_ACTIVATION = 5,
-    PAGE_INPUT_METHODS = 6,
-    PAGE_SOUND = 7,
+    PAGE_INPUT_METHODS = 5,
+    PAGE_SOUND = 6,
 };
 
 enum {
@@ -462,37 +460,6 @@ static uint32_t settings_assoc_row_candidates(uint32_t row,
         }
     }
     return count;
-}
-
-static const char *license_status_label(uint32_t status)
-{
-    switch (status) {
-    case RELIEFOS_LICENSE_STATUS_OK:
-        return T("Activated");
-    case RELIEFOS_LICENSE_STATUS_MISSING:
-        return T("Not activated");
-    case RELIEFOS_LICENSE_STATUS_INVALID:
-        return T("Invalid activation");
-    case RELIEFOS_LICENSE_STATUS_NETWORK:
-        return T("Network failure");
-    case RELIEFOS_LICENSE_STATUS_CLOCK:
-        return T("Clock failure");
-    case RELIEFOS_LICENSE_STATUS_DENIED:
-        return T("Activation denied");
-    default:
-        return T("Unknown");
-    }
-}
-
-static const char *license_mode_label(const char *mode)
-{
-    if (text_eq(mode, "online")) {
-        return T("Online");
-    }
-    if (text_eq(mode, "offline")) {
-        return T("Offline");
-    }
-    return T("None");
 }
 
 static const char *value_or_dash(const char *value)
@@ -1571,46 +1538,6 @@ static void draw_services_page(struct reliefos_ui_surface *ui)
                          : RELIEFOS_UI_BUTTON_DISABLED);
 }
 
-static void draw_activation_page(struct reliefos_ui_surface *ui)
-{
-    struct reliefos_license_info info;
-    const char *status;
-    uint32_t required;
-    uint32_t ok;
-    required = (uint32_t)reliefos_license_required();
-    if (!required) {
-        info = (struct reliefos_license_info){0};
-        copy_text(info.detail, sizeof(info.detail), T("License validation is disabled for this build."));
-        status = T("Not required");
-        ok = 1;
-    } else if (reliefos_license_status(&info) < 0) {
-        info = (struct reliefos_license_info){0};
-        info.status = RELIEFOS_LICENSE_STATUS_INVALID;
-        copy_text(info.detail, sizeof(info.detail), "license status unavailable");
-        status = license_status_label(info.status);
-        ok = 0;
-    } else {
-        status = license_status_label(info.status);
-        ok = info.status == RELIEFOS_LICENSE_STATUS_OK;
-    }
-    reliefos_ui_text(ui, 34, 64, T("Activation"), RELIEFOS_UI_BLACK, RELIEFOS_UI_WHITE);
-    reliefos_ui_panel(ui, 34, 94, SETTINGS_W - 68, 52,
-                    ok ? RELIEFOS_UI_WHITE : RELIEFOS_UI_LIGHT);
-    reliefos_ui_text(ui, 50, 110, T("Computer"),
-                   RELIEFOS_UI_BLACK, ok ? RELIEFOS_UI_WHITE : RELIEFOS_UI_LIGHT);
-    reliefos_ui_text_clipped(ui, 176, 110, SETTINGS_W - 226,
-                           status,
-                           ok ? RELIEFOS_UI_BLACK : RELIEFOS_UI_DARK,
-                           ok ? RELIEFOS_UI_WHITE : RELIEFOS_UI_LIGHT);
-    draw_field(ui, 170, T("Activation mode"),
-               !required ? T("Not required") :
-               ok ? license_mode_label(info.mode) : "-");
-    draw_field(ui, 202, T("Machine ID"), info.install_id);
-    draw_field(ui, 234, T("Email hash"), info.email_hash);
-    draw_field(ui, 266, T("Detail"), info.detail);
-    draw_field(ui, 298, T("License file"), RELIEFOS_PATH_LICENSE);
-}
-
 static void draw_settings(struct reliefos_ui_surface *ui)
 {
     struct reliefos_ui_tab_item tabs[] = {
@@ -1619,7 +1546,6 @@ static void draw_settings(struct reliefos_ui_surface *ui)
         {T("Users"), PAGE_USERS, 0},
         {T("File Types"), PAGE_ASSOC, 0},
         {T("Services"), PAGE_SERVICES, 0},
-        {T("Activation"), PAGE_ACTIVATION, 0},
         {T("Input Method"), PAGE_INPUT_METHODS, 0},
         {T("Sound"), PAGE_SOUND, 0},
     };
@@ -1642,8 +1568,6 @@ static void draw_settings(struct reliefos_ui_surface *ui)
         draw_input_methods_page(ui);
     } else if (active_page == PAGE_SOUND) {
         settings_sound_draw(ui, &sound_model);
-    } else {
-        draw_activation_page(ui);
     }
     reliefos_ui_statusbar(ui, SETTINGS_H - 28, 28, status_text);
 }
@@ -2201,7 +2125,6 @@ static void handle_click(int32_t x, int32_t y)
         {T("Users"), PAGE_USERS, 0},
         {T("File Types"), PAGE_ASSOC, 0},
         {T("Services"), PAGE_SERVICES, 0},
-        {T("Activation"), PAGE_ACTIVATION, 0},
         {T("Input Method"), PAGE_INPUT_METHODS, 0},
         {T("Sound"), PAGE_SOUND, 0},
     };

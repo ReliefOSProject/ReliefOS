@@ -1,6 +1,6 @@
 # Tsinghua mirror of the fixed Alpine stable branch.
 # Retain the tag aliases for existing world entries using @alpine.
-# See /usr/share/doc/reliefos/APK_PREPARATION.md before installing packages.
+# See /usr/share/doc/reliefos/packages.rst before installing packages.
 https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.24/main
 https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.24/community
 @alpine https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.24/main

@@ -1,5 +1,5 @@
 #include <reliefos/fs.h>
-#include <reliefos/gui.h>
+#include <reliefos/system.h>
 #include <reliefos/net.h>
 #include <reliefos/stdio.h>
 #include <reliefos/system.h>

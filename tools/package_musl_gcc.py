@@ -77,7 +77,7 @@ def package(archive: Path, out: Path) -> None:
                         "-o", str(launcher)], check=True)
         notices = tree / "usr/share/licenses/musl-gcc"
         notices.mkdir(parents=True)
-        for name in ("README.md", "COPYING3", "COPYING.RUNTIME"):
+        for name in ("README.rst", "COPYING3", "COPYING.RUNTIME"):
             shutil.copy2(ROOT / "userland/musl-gcc" / name, notices / name)
         shutil.copy2(ROOT / "third_party/musl/COPYRIGHT", notices / "musl-COPYRIGHT")
         examples = tree / "usr/share/examples/musl-gcc"

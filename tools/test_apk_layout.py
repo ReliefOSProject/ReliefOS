@@ -55,7 +55,6 @@ class ApkSeedTests(unittest.TestCase):
             "RUN_RELIEFOS": "RELIEFOS_LAYOUT_RUN_RELIEFOS",
             "RELIEFOS_LIB": "RELIEFOS_LAYOUT_RELIEFOS_LIB",
             "RELIEFOS_APPS": "RELIEFOS_LAYOUT_RELIEFOS_APPS",
-            "RELIEFOS_DRIVERS": "RELIEFOS_LAYOUT_RELIEFOS_DRIVERS",
             "RELIEFOS_TESTS": "RELIEFOS_LAYOUT_RELIEFOS_TESTS",
             "RELIEFOS_SHARE": "RELIEFOS_LAYOUT_RELIEFOS_SHARE",
             "RELIEFOS_RESOURCES": "RELIEFOS_LAYOUT_RELIEFOS_RESOURCES",
@@ -67,7 +66,6 @@ class ApkSeedTests(unittest.TestCase):
             "P_RUN_RELIEFOS": "RELIEFOS_LAYOUT_RUN_RELIEFOS",
             "P_RELIEFOS_LIB": "RELIEFOS_LAYOUT_RELIEFOS_LIB",
             "P_RELIEFOS_APPS": "RELIEFOS_LAYOUT_RELIEFOS_APPS",
-            "P_RELIEFOS_DRIVERS": "RELIEFOS_LAYOUT_RELIEFOS_DRIVERS",
             "P_RELIEFOS_TESTS": "RELIEFOS_LAYOUT_RELIEFOS_TESTS",
             "P_RELIEFOS_SHARE": "RELIEFOS_LAYOUT_RELIEFOS_SHARE",
             "P_RELIEFOS_RESOURCES": "RELIEFOS_LAYOUT_RELIEFOS_RESOURCES",
@@ -189,13 +187,13 @@ def check_images():
             assert hashlib.sha256(debugfs(image, f"cat /{prefix}sbin/apk")).hexdigest() == (
                 "5118a57ae7c07e13268a754f78aa9c7d39a0bed708bb11c101d78e2a884cee5d")
             assert debugfs(image, f"cat /{prefix}usr/share/reliefos/apk/repository/packages.adb")
-            for name in ("usr/lib/reliefos/apps/desktop/desktop.elf", "usr/lib/reliefos/libreliefos.so.2", "usr/lib/leonos/libleonos.so.2",
+            for name in ("usr/lib/reliefos/apps/login/login.elf", "usr/lib/reliefos/libreliefos.so.2", "usr/lib/leonos/libleonos.so.2",
                          "sbin/apk", "usr/bin/vim", "usr/bin/sudo", "lib/ld-musl-x86_64.so.1"):
                 entry = package_files["/" + name]
                 assert hashlib.sha256(debugfs(image, f"cat /{prefix}{name}")).hexdigest() == entry["sha256"], (image, prefix, name)
                 stat(image, prefix + name, "regular", int(entry["mode"], 8))
-            assert debugfs(image, f"cat /{prefix}usr/share/doc/reliefos/APK_PREPARATION.md") == (
-                ROOT / "docs/APK_PREPARATION.md").read_bytes()
+            assert debugfs(image, f"cat /{prefix}usr/share/doc/reliefos/packages.rst") == (
+                ROOT / "Documentation/admin-guide/packages.rst").read_bytes()
             print(f"PASS {image.relative_to(ROOT)} {prefix or '/'}: real APK database, executable, repository, modes and trust")
 
 

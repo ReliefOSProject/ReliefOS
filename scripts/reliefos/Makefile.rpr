@@ -1,0 +1,31 @@
+RPR_APPS := $(O)/rpr-apps/repository
+RPR_APP_PACKAGES := $(RPR_APPS)/.complete $(RPR_APPS)/packages.list
+# Only applications with a supported frontend are published.
+RPR_INPUTS := $(RELIEFOS_SRC)/third_party/doomgeneric/freedoom1.wad $(RELIEFOS_SRC)/third_party/doomgeneric/LICENSE $(RELIEFOS_SRC)/third_party/doomgeneric/FREEDOOM-COPYING.txt
+$(RPR_APP_PACKAGES) &: $(addprefix $(USERLAND_DIR)/,doom.elf doomlauncher.elf) $(BUILD_INFO_HEADER) $(RPR_INPUTS) $(APK_MANIFEST) $(RELIEFOS_SRC)/tools/build/rpr-apps.sh
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/rpr-apps.sh $(RELIEFOS_SRC) $(O) $(BUILD_INFO_HEADER) $(UPSTREAM_APK) '$(APK_SIGNING_KEY)' $(RPR_APPS) $(SOURCE_DATE_EPOCH)
+RPR_PAGES := $(O)/rpr-pages
+# --- release guard (design §8: 开发构建可 dirty，发布构建必须拒绝) -----------
+# Release artifacts (rpr-pages and `make release`) must come from a clean
+# kernel/reliefnt submodule exactly at the gitlink committed in HEAD. The plain
+# `all`/`kernel` targets are deliberately NOT gated. The check runs first as a
+# prerequisite of the phony `rpr-pages`/`release` aliases (serial make fails
+# fast, before anything is built) and again as the first line of the producing
+# recipe, so -j and direct goal invocations cannot publish from a bad tree.
+RELIEFNT_RELEASE_GUARD_CMD = sh $(RELIEFOS_SRC)/tools/build/reliefnt-release-guard.sh '$(RELIEFOS_SRC)' '$(RELIEFNT_DIR)' 'kernel/reliefnt'
+.PHONY: reliefnt-release-guard ntclks-release-guard
+ntclks-release-guard: reliefnt-release-guard
+reliefnt-release-guard:
+	$(Q)$(RELIEFNT_RELEASE_GUARD_CMD)
+# Protocol 4 binds the complete runtime-validated kernel package to the exact
+# signed APK/index cohort; a kernel.sys-only publication cannot enable modules.
+$(RPR_PAGES)/.complete $(RPR_PAGES)/manifest.json &: $(RPR_APP_PACKAGES) $(APK_MANIFEST) $(APK_REPOSITORY)/packages.adb $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_PAYLOAD_MANIFEST) $(RELIEFOS_KERNEL_TOOLS) $(RELIEFOS_KERNEL_RECOVERY) $(RELIEFOS_SRC)/tools/build/rpr-pages.sh
+	$(Q)$(RELIEFNT_RELEASE_GUARD_CMD)
+	$(Q)SOURCE_DATE_EPOCH=$(SOURCE_DATE_EPOCH) RELIEFOS_KERNEL_TOOLS='$(abspath $(RELIEFOS_KERNEL_TOOLS))' RELIEFOS_KERNEL_RECOVERY='$(abspath $(RELIEFOS_KERNEL_RECOVERY))' sh $(RELIEFOS_SRC)/tools/build/rpr-pages.sh $(APK_REPOSITORY) $(RPR_APPS) $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_PAYLOAD) $(RELIEFNT_DIR)/configs/build-version $(UPSTREAM_APK) '$(APK_SIGNING_KEY)' $(RPR_PAGES)
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/stage-inventory.sh write $(RPR_PAGES) $(O_META)/rpr-pages.files
+$(O_META)/rpr-pages-present.parameters: FORCE
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/stage-inventory.sh check $(RPR_PAGES) $(O_META)/rpr-pages.files $@
+$(RPR_PAGES)/.complete $(RPR_PAGES)/manifest.json: $(O_META)/rpr-pages-present.parameters $(RELIEFOS_SRC)/tools/build/stage-inventory.sh
+.PHONY: rpr-apps rpr-pages
+rpr-apps: $(RPR_APP_PACKAGES)
+rpr-pages: reliefnt-release-guard $(RPR_PAGES)/.complete $(RPR_PAGES)/manifest.json

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefCapture
+GenericName=Screenshot and Annotation
+GenericName[zh_CN]=截图与标注
+Comment=Capture, annotate and save screenshots
+Comment[zh_CN]=截取屏幕、窗口或区域，添加标注并保存 PNG
+Exec=/usr/bin/reliefcapture
+TryExec=/usr/bin/reliefcapture
+Icon=reliefos-reliefcapture
+Terminal=false
+Categories=Graphics;
+StartupWMClass=reliefos-reliefcapture

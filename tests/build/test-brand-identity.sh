@@ -9,12 +9,12 @@
 #   old_names    - every remaining old-name hit must be listed in
 #                  tests/build/brand-allowlist.tsv with a valid category.
 #                  Any unlisted hit is a FAIL. Categories are defined in
-#                  docs/branding-compatibility.md section 3; the transitional
+#                  Documentation/userspace-api/abi.rst; the transitional
 #                  'migration' category is reported but only rejected when
 #                  BRAND_STRICT=1 (final review, plan task 11).
 #
 # Old-name scan scope: Git-tracked files (git grep) and tracked filenames,
-# in the main repository and in the kernel submodule. Untracked user content,
+# in the main repository. ReliefNT owns its independent brand gate. Untracked user content,
 # build outputs and third-party submodules are out of scope by design; the
 # final review (plan task 11) covers untracked source with a separate rg pass.
 set -eu
@@ -23,7 +23,9 @@ allowlist="$root/tests/build/brand-allowlist.tsv"
 strict=${BRAND_STRICT:-0}
 fails=0
 
-work=$(mktemp -d)
+tmp_root=${TMPDIR:-$root/out/tmp}
+mkdir -p "$tmp_root"
+work=$(mktemp -d "$tmp_root/reliefos-brand-identity.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 
 ok() { printf 'ok - %s\n' "$1"; }
@@ -52,10 +54,11 @@ check_appearance() {
     else
         fail 'os-release PRETTY_NAME must be exactly PRETTY_NAME="ReliefOS"'
     fi
-    if grep -qx 'VERSION_ID=4' "$root/system/rootfs/etc/os-release"; then
-        ok 'os-release VERSION_ID keeps numeric semantics'
+    release_version=$(sed -n 's/^release_version=//p' "$root/configs/build-version")
+    if grep -Fxq "VERSION_ID=$release_version" "$root/system/rootfs/etc/os-release"; then
+        ok 'os-release VERSION_ID matches the release version'
     else
-        fail 'os-release VERSION_ID must stay VERSION_ID=4'
+        fail 'os-release VERSION_ID must match configs/build-version'
     fi
     if grep -q 'menuentry "ReliefOS"' "$root/boot/grub/grub.cfg"; then
         ok 'GRUB menu entry uses ReliefOS'
@@ -78,17 +81,13 @@ system/docs/zh_CN/leonos.hlp
 configs/components.toml
 configs/nls/po/leonos.pot
 configs/nls/po/zh_CN.po
-userland/apps/installer/main.c
+userland/apps/installer/main.cpp
 userland/apps/installer/installer_tty.c
 userland/apps/login/main.c
-userland/apps/desktop/desktop.h
-userland/apps/desktop/start_menu.c
-userland/apps/desktop/render.c
-userland/apps/desktop/screen.c
-userland/apps/osver/main.c
+userland/apps/osver/main.cpp
 userland/apps/settings/main.c
 userland/apps/run/main.c
-userland/apps/fileman/main.c
+userland/apps/fileman/main.cpp
 userland/apps/browser/main.c
 userland/apps/browser/input.c
 userland/apps/browser/navigation.c
@@ -99,8 +98,15 @@ userland/apps/hello/main.c
 userland/apps/cjktest/main.c
 userland/apps/oschinpt/main.c
 userland/apps/uidemo/main.c
-userland/apps/paint/main.c
-userland/apps/minesweeper/main.c
+userland/apps/minesweeper/main.cpp
+userland/apps/calc/main.cpp
+userland/apps/taskmgr/main.cpp
+userland/apps/leonmmcoset/main.cpp
+userland/apps/xiaobai/main.cpp
+userland/apps/paint/main.cpp
+userland/apps/imageview/main.cpp
+userland/apps/doomlauncher/main.cpp
+userland/apps/doom/main.cpp
 userland/apps/oshlp/main.c
 userland/apps/notepad/main.c
 userland/apps/terminal/main.c
@@ -165,37 +171,34 @@ userland/apps/shell/main.c
     else
         fail 'MOTD headers must use ReliefOS'
     fi
-    if grep -qx 'kernel_name=ReliefNT' "$root/kernel/reliefnt/configs/build-version" &&
-       grep -q 'LINUX_UTS_SYSNAME "ReliefNT"' \
-           "$root/kernel/reliefnt/kernel/reliefnt/include/reliefnt/uts.h" &&
-       grep -q 'info.kernel_name' "$root/userland/apps/osver/main.c"; then
-        ok 'system information surfaces the ReliefNT kernel name'
+
+    if grep -q 'info.kernel_name' "$root/userland/apps/osver/main.cpp"; then
+        ok 'version page renders the kernel-provided identity'
     else
-        fail 'kernel identity used by Fastfetch and the version page must be ReliefNT'
+        fail 'version page must render the kernel-provided identity'
     fi
+
 }
 
 check_current_docs() {
-    if grep -qx '# ReliefOS 高级安装教程' "$root/docs/ADVANCED_INSTALL.md" &&
-       grep -q '^ReliefOS Installer ISO - Advanced Installation Quick Guide$' \
-           "$root/docs/ADVANCED_INSTALL.txt" &&
-       grep -q 'Install ReliefOS (TTY mode)' "$root/docs/ADVANCED_INSTALL.txt"; then
-        ok 'current installer guides use ReliefOS'
+    if grep -qx '安装 ReliefOS' "$root/Documentation/admin-guide/installation.rst" &&
+       grep -q 'Install ReliefOS (console session)' "$root/Documentation/admin-guide/installation.rst"; then
+        ok 'current installer guide uses ReliefOS'
     else
-        fail 'current installer guides must use ReliefOS'
+        fail 'current installer guide must use ReliefOS'
     fi
-    if grep -q 'kernel/reliefnt/drivers/' "$root/docs/DRIVERS.md" &&
-       ! grep -q 'kernel/ntclks/drivers/' "$root/docs/DRIVERS.md"; then
+    if grep -q 'kernel/reliefnt/drivers/' "$root/Documentation/userspace-api/graphics.rst" &&
+       ! grep -q 'kernel/ntclks/drivers/' "$root/Documentation/userspace-api/graphics.rst"; then
         ok 'driver guide uses the ReliefNT submodule path'
     else
         fail 'driver guide must use kernel/reliefnt/drivers/'
     fi
-    if grep -q 'about:reliefos' "$root/docs/BROWSER.md"; then
+    if grep -q 'about:reliefos' "$root/Documentation/applications/system-tools.rst"; then
         ok 'browser guide documents the ReliefOS home URI'
     else
         fail 'browser guide must document about:reliefos'
     fi
-    if grep -q 'About ReliefOS' "$root/docs/KERNEL_DEBUG.md"; then
+    if grep -q 'About ReliefOS' "$root/Documentation/admin-guide/console.rst"; then
         ok 'kernel debugger guide uses the ReliefOS product name'
     else
         fail 'kernel debugger guide must use About ReliefOS'
@@ -209,9 +212,8 @@ check_paths() {
     else
         fail 'host version generator must use the ReliefNT identity'
     fi
-    if grep -Fq '/etc/reliefos/locale.conf' "$root/Kconfig" &&
-       grep -Fq '/etc/reliefos/locale.conf' "$root/kernel/reliefnt/Kconfig"; then
-        ok 'both configuration menus describe the canonical locale path'
+    if grep -Fq '/etc/reliefos/locale.conf' "$root/Kconfig"; then
+        ok 'product configuration describes the canonical locale path'
     else
         fail 'configuration menus must describe /etc/reliefos/locale.conf'
     fi
@@ -223,8 +225,9 @@ check_paths() {
     else
         fail 'APK input method registration must use canonical application paths'
     fi
-    if grep -Fq '$images/reliefos.vmdk' "$root/scripts/test-smoke.sh" &&
-       grep -Fq '$images/reliefos-$variant.iso' "$root/scripts/test-smoke.sh"; then
+    if grep -Fq 'tools/test_dual_boot_qemu.py' "$root/scripts/test-smoke.sh" &&
+       grep -Fq 'images / "reliefos.vmdk"' "$root/tools/test_dual_boot_qemu.py" &&
+       grep -Fq 'f"reliefos-{medium}.iso"' "$root/tools/test_dual_boot_qemu.py"; then
         ok 'VM smoke test consumes the canonical release artifact names'
     else
         fail 'VM smoke test must consume canonical release artifact names'
@@ -270,10 +273,10 @@ check_headers_libs() {
     else
         ok 'host installer tools use canonical ReliefOS layout constants'
     fi
-    if grep -rq 'libreliefos\.so\.2' "$root/mk" "$root/tools/build" 2>/dev/null; then
+    if grep -rq 'libreliefos\.so\.2' "$root/scripts/reliefos" "$root/tools/build" 2>/dev/null; then
         ok 'build graph produces libreliefos.so.2'
     else
-        fail 'mk/ and tools/build/ must produce libreliefos.so.2'
+        fail 'Kbuild integration and tools/build/ must produce libreliefos.so.2'
     fi
     if grep -q '^include/uapi/reliefos/' "$root/configs/header-export.list"; then
         ok 'header export lists include/uapi/reliefos/'
@@ -284,22 +287,22 @@ check_headers_libs() {
 
 # Layer 4: build product names.
 check_artifacts() {
-    if grep -q 'reliefos\.vmdk' "$root/mk/images.mk" 2>/dev/null; then
+    if grep -q 'reliefos\.vmdk' "$root/scripts/reliefos/Makefile.images" 2>/dev/null; then
         ok 'images.mk produces reliefos.vmdk'
     else
-        fail 'mk/images.mk must produce reliefos.vmdk'
+        fail 'scripts/reliefos/Makefile.images must produce reliefos.vmdk'
     fi
-    if grep -q 'reliefos-live\.iso' "$root/mk/images.mk" 2>/dev/null; then
+    if grep -q 'reliefos-live\.iso' "$root/scripts/reliefos/Makefile.images" 2>/dev/null; then
         ok 'images.mk produces reliefos-live.iso'
     else
-        fail 'mk/images.mk must produce reliefos-live.iso'
+        fail 'scripts/reliefos/Makefile.images must produce reliefos-live.iso'
     fi
-    if grep -q 'reliefos-installer\.iso' "$root/mk/images.mk" 2>/dev/null; then
+    if grep -q 'reliefos-installer\.iso' "$root/scripts/reliefos/Makefile.images" 2>/dev/null; then
         ok 'images.mk produces reliefos-installer.iso'
     else
-        fail 'mk/images.mk must produce reliefos-installer.iso'
+        fail 'scripts/reliefos/Makefile.images must produce reliefos-installer.iso'
     fi
-    if grep -rq 'reliefos-musl-sdk' "$root/mk" "$root/tools/build" 2>/dev/null; then
+    if grep -rq 'reliefos-musl-sdk' "$root/scripts/reliefos" "$root/tools/build" 2>/dev/null; then
         ok 'SDK archive is named reliefos-musl-sdk'
     else
         fail 'SDK archive must be named reliefos-musl-sdk'
@@ -323,6 +326,9 @@ audit_repo() {
     git -C "$hit_dir" ls-files | grep -Ei 'leonos|ntclks' >> "$hits" || true
     sort -u "$hits" | while IFS= read -r hit_path; do
         [ -n "$hit_path" ] || continue
+        # ls-files still includes unstaged deletions; they are no longer part
+        # of the source tree being verified. Audit remaining symlinks too.
+        [ -e "$hit_dir/$hit_path" ] || [ -L "$hit_dir/$hit_path" ] || continue
         if ! hit_allowed "$hit_scope" "$hit_path"; then
             printf 'FAIL - non-allowlisted old name in %s:%s (rename it or add a categorised entry to brand-allowlist.tsv)\n' \
                 "$hit_scope" "$hit_path"
@@ -361,9 +367,6 @@ if [ -f "$allowlist" ]; then
         esac
     done < "$allowlist"
     audit_repo main "$root"
-    if [ -d "$root/kernel/reliefnt" ]; then
-        audit_repo kernel "$root/kernel/reliefnt"
-    fi
 else
     fail "missing $allowlist"
 fi

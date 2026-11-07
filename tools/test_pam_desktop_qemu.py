@@ -28,7 +28,7 @@ def prepare_probe(disk, output, core=False):
     source = "core_limit_runtime_probe.c" if core else "flock_nonblock_runtime_probe.c"
     binary = output / name
     subprocess.run([*recipe["compiler"], "-static", "-O2",
-                    "-pthread", str(ROOT / "tools/tests" / source), "-o", str(binary)], check=True)
+                    "-pthread", str(ROOT / "kernel/reliefnt/tools/tests" / source), "-o", str(binary)], check=True)
     subprocess.run([str(binary)], check=True, timeout=10)
     filesystem = output / "root-check.ext2"
     start = root_partition(disk, filesystem)

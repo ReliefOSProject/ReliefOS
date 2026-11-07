@@ -22,7 +22,7 @@ int main(void)
     FILE *file = fopen(path, "r");
     assert(file);
     struct group *group;
-    unsigned wheel = 0, personal = 0;
+    unsigned wheel = 0, video = 0, personal = 0;
     while ((group = fgetgrent(file))) {
         if (!strcmp(group->gr_name, "wheel")) {
             ++wheel;
@@ -33,22 +33,35 @@ int main(void)
             ++personal;
             assert(group->gr_gid == 1000);
         }
+        if (!strcmp(group->gr_name, "video")) {
+            ++video;
+            assert(group->gr_gid == 44 && group->gr_mem[0]);
+            assert(!strcmp(group->gr_mem[0], "alice") && !group->gr_mem[1]);
+        }
     }
-    assert(wheel == 1 && personal == 1);
+    assert(wheel == 1 && video == 1 && personal == 1);
     fclose(file);
 
     snprintf(path, sizeof(path), "%s/etc/gshadow", target);
     file = fopen(path, "r");
     assert(file);
     struct sgrp *shadow;
-    wheel = 0;
-    while ((shadow = fgetsgent(file))) if (!strcmp(shadow->sg_namp, "wheel")) {
+    wheel = video = 0;
+    while ((shadow = fgetsgent(file))) {
+      if (!strcmp(shadow->sg_namp, "wheel")) {
         ++wheel;
         assert(!strcmp(shadow->sg_passwd, "!"));
         assert(!shadow->sg_adm[0] && shadow->sg_mem[0]);
         assert(!strcmp(shadow->sg_mem[0], "alice") && !shadow->sg_mem[1]);
+      }
+      if (!strcmp(shadow->sg_namp, "video")) {
+        ++video;
+        assert(!strcmp(shadow->sg_passwd, "!"));
+        assert(!shadow->sg_adm[0] && shadow->sg_mem[0]);
+        assert(!strcmp(shadow->sg_mem[0], "alice") && !shadow->sg_mem[1]);
+      }
     }
-    assert(wheel == 1);
+    assert(wheel == 1 && video == 1);
     fclose(file);
     struct stat st;
     assert(stat(path, &st) == 0 && st.st_uid == 0 && (st.st_mode & 0777) == 0600);
@@ -65,8 +78,11 @@ int main(void)
     assert(users == 1);
     fclose(file);
     assert(!reliefos_account_name_valid("alice,bob", 32));
+    assert(!reliefos_account_name_valid("video", 32));
     errno = 0;
     assert(reliefos_account_seed(target, "wheel", "password", "password") == -1 && errno == EINVAL);
-    puts("installer wheel: PASS membership, gshadow, nonroot identity and reserved names");
+    errno = 0;
+    assert(reliefos_account_seed(target, "video", "password", "password") == -1 && errno == EINVAL);
+    puts("installer groups: PASS video/wheel membership, gshadow, nonroot identity and reserved names");
     return 0;
 }

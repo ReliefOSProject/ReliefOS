@@ -22,11 +22,7 @@ for name in root home/test; do
     mkdir -p "$work/$name"
     cp -a "$work/etc/skel/." "$work/$name/"
     chmod 700 "$work/$name"
-    for directory in desktop documents downloads; do
-        [ ! -L "$work/$name/$directory" ] || exit 1
-        mkdir -p "$work/$name/$directory"
-        chmod 700 "$work/$name/$directory"
-    done
+    # xdg-user-dirs-update initializes special directories at first login.
 done
 printf 'leonos-standalone-test-v1\n' > "$work/etc/reliefos/test-image"
 printf 'test-image=1\n' > "$work/etc/reliefos/installed"

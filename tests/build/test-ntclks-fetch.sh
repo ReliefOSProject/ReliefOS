@@ -20,7 +20,7 @@ export LC_ALL
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd -P)
 cd "$repo_root" || exit 1
 
-deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:?set by mk/tests.mk}}
+deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:?set by scripts/reliefos/Makefile.tests}}
 lock=${RELIEFOS_LOCK:-${LEONOS_LOCK:-configs/dependencies.lock.json}}
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-fetch-delegate.XXXXXX") || exit 1

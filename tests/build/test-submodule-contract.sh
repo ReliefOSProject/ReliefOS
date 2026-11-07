@@ -13,7 +13,7 @@
 #      older published kernel SHA passes the release guard. Since 3430c76 the
 #      pinned pair (HEAD / HEAD~1) are two complete kernel snapshots, so cases
 #      3-4 exercise a real dual-SHA pin. The matching rollback-BUILD (kernel
-#      product set from an older pin, in the real worktree) lives in
+#      product set from an older pin, in an isolated clone) lives in
 #      tests/build/test-submodule-rollback-build.sh; this contract test never
 #      builds (its fixture clone has no fetch cache). Boot-time kernel update
 #      rollback is covered by the §5.8 guest tests instead.
@@ -32,8 +32,8 @@ failures=0
 checks=0
 
 cleanup() {
-    # Always leave the real submodule clean.
-    rm -f "$repo_root/kernel/reliefnt/P5_CONTRACT_DIRTY_PROBE"
+    # Remove only the probe this run created; preserve pre-existing edits.
+    [ "${probe_created:-0}" = 0 ] || rm -f "$probe"
     [ -n "${KEEP_WORK:-}" ] || rm -rf "$work"
 }
 trap cleanup EXIT INT TERM
@@ -63,8 +63,11 @@ else
 fi
 
 printf '\n=== (2) a dirty submodule builds (dev) but refuses release ===\n'
-probe=$repo_root/kernel/reliefnt/P5_CONTRACT_DIRTY_PROBE
+before_status=$(git -C "$reliefnt" status --porcelain)
+probe=$reliefnt/P5_CONTRACT_DIRTY_PROBE
+[ ! -e "$probe" ] || { echo 'probe already exists; refusing to overwrite' >&2; exit 1; }
 : >"$probe"
+probe_created=1
 if [ -n "$(git -C "$reliefnt" status --porcelain)" ]; then
     pass "the probe file dirties the submodule"
 else
@@ -88,10 +91,11 @@ else
         "$(head -c 200 "$work/dirty-rpr.log")"
 fi
 rm -f "$probe"
-if [ -z "$(git -C "$reliefnt" status --porcelain)" ]; then
-    pass "the submodule is clean again after restore"
+probe_created=0
+if [ "$before_status" = "$(git -C "$reliefnt" status --porcelain)" ]; then
+    pass "the submodule status matches the pre-test state"
 else
-    fail "the submodule is clean again after restore" \
+    fail "the submodule status matches the pre-test state" \
         "$(git -C "$reliefnt" status --porcelain)"
 fi
 
@@ -119,19 +123,29 @@ if ! git -C "$clone" diff --cached --quiet; then
     git -C "$clone" -c user.name=fixture -c user.email=fixture@example.invalid \
         commit -q -m 'fixture: record kernel gitlink' || exit 1
 fi
-# The fixture must exercise the tree under test, including changes not yet
-# committed: sync the guard and its wiring into the fixture (same idea as the
-# source copies in test-kernel-adapter.sh fixtures). The adapter's parse guard
-# in mk/kernel.mk is part of that wiring: it must not shadow the release
-# guard's dual-SHA refusal for an initialized checkout at another published
-# SHA.
-cp "$repo_root/tools/build/reliefnt-release-guard.sh" "$clone/tools/build/" || exit 1
-cp "$repo_root/mk/rpr.mk" "$clone/mk/rpr.mk" || exit 1
-cp "$repo_root/mk/kernel.mk" "$clone/mk/kernel.mk" || exit 1
-cp "$repo_root/mk/headers.mk" "$clone/mk/headers.mk" || exit 1
-mkdir -p "$clone/mk/components"
-cp "$repo_root/mk/components/audio.mk" "$clone/mk/components/audio.mk" || exit 1
-cp "$repo_root/Makefile" "$clone/Makefile" || exit 1
+# Overlay the current source snapshot, including uncommitted Kbuild files and
+# deletions. A clone of HEAD alone would test the retired build system instead.
+python3 - "$repo_root" "$clone" <<'PYOVERLAY'
+from pathlib import Path
+import os, shutil, subprocess, sys
+source, destination = map(Path, sys.argv[1:])
+paths = subprocess.check_output(["git", "-C", str(source), "ls-files", "--cached", "--others", "--exclude-standard", "-z"]).split(b"\0")
+for raw in set(paths):
+    if not raw:
+        continue
+    relative = Path(os.fsdecode(raw))
+    current, target = source / relative, destination / relative
+    if current.is_dir():  # gitlinks; dependencies are initialized separately
+        continue
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if current.is_symlink():
+        target.unlink(missing_ok=True)
+        target.symlink_to(os.readlink(current))
+    elif current.is_file():
+        shutil.copy2(current, target)
+    elif target.is_file() or target.is_symlink():
+        target.unlink()
+PYOVERLAY
 if [ -z "${other:-}" ]; then
     printf 'skip - gitlink mismatch case: the kernel repository has no older\n'
     printf '       published SHA to check out under the fixture gitlink\n'
@@ -143,12 +157,10 @@ elif git clone -q --no-checkout "$repo_root/kernel/reliefnt" \
     # git >= 2.38 blocks the file transport for submodules by default.
     cp "$repo_root/.gitmodules" "$clone/.gitmodules"
     git -C "$clone" config submodule.third_party/zlib.url "$repo_root/third_party/zlib"
-    git -C "$clone" config submodule.third_party/kconfig-frontends.url \
-        "$repo_root/third_party/kconfig-frontends"
     git -c protocol.file.allow=always -C "$clone" submodule update -q --init \
-        third_party/zlib third_party/kconfig-frontends \
+        third_party/zlib \
         2>"$work/fixture-submodules.log"
-    if make -s -C "$clone" O="$work/clone-out" rpr-pages \
+    if make -s -j1 -C "$clone" O="$work/clone-out" rpr-pages \
             >"$work/mismatch.log" 2>&1; then
         fail "make rpr-pages refuses a gitlink mismatch" 'make exited 0'
     else
@@ -183,8 +195,8 @@ if [ -n "${other:-}" ] && { [ -d "$clone/kernel/reliefnt/.git" ] || [ -f "$clone
             "$(head -c 300 "$work/rollback.log")"
     fi
     printf 'note - the full old-SHA rollback BUILD runs in\n'
-    printf '       tests/build/test-submodule-rollback-build.sh against the real\n'
-    printf '       worktree (this fixture clone has no fetch cache to build\n'
+    printf '       tests/build/test-submodule-rollback-build.sh in its isolated\n'
+    printf '       build fixture (this clone has no fetch cache to build\n'
     printf '       with). The guard/rollback pinning path is covered by the\n'
     printf '       check above.\n'
 else

@@ -4,6 +4,7 @@ description="ReliefOS runtime directories"
 depend() { before "*"; }
 start() {
     /usr/lib/reliefos/reliefos-migrate / || return 1
+    /bin/sh /usr/lib/reliefos/migrate-shell || return 1
     checkpath --directory --mode 0755 /run/reliefos /var/lib/reliefos /var/cache/reliefos /etc/reliefos /usr/lib/reliefos /run/lock /var/log || return 1
     if [ ! -e /run/leonos ]; then
         ln -s /run/reliefos /run/leonos || return 1
@@ -12,6 +13,8 @@ start() {
     checkpath --directory --mode 1777 /tmp /var/tmp || return 1
     # Hostname load moved out of the kernel (A16). The rootfs default is
     # "reliefos"; a missing or rejected hostname file must not fail the service.
-    test -f /etc/hostname && hostname -F /etc/hostname
+    # GNU hostname accepts a NAME operand, not BusyBox's -F extension.
+    # Keep this existing file parser explicit while PATH resolves GNU tools.
+    test -f /etc/hostname && /bin/busybox hostname -F /etc/hostname
     test -r /proc/self/status && test -d /sys && test -c /dev/console
 }

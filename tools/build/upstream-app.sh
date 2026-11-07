@@ -3,6 +3,8 @@
 set -eu
 MAKEFLAGS=${MAKEFLAGS-}
 case ${MAKEFLAGS%% *} in *n*) exit 0 ;; esac
+. "$(CDPATH= cd -- "$(dirname "$0")" && pwd)/upstream-make-environment.sh"
+reliefos_upstream_make_environment
 [ "$#" = 12 ] || { echo 'usage: upstream-app.sh PACKAGE SRC WORK OUTPUT MUSL RUNTIME ARCHIVE INCLUDE AUTOCONF CC LD AR' >&2; exit 2; }
 pkg=$1 src=$2 work=$3 output=$4 musl=$5 runtime=$6 archive=$7 includes=$8 autoconf=$9
 shift 9
@@ -29,7 +31,6 @@ case $pkg in
 pleditor)
  source=$src/third_party/pl_editor
  cp -R "$source/src" "$work/generated/src"
- flags="$flags -I$work/generated/src"
  awk '
  /#include <stdlib.h>/ {print; print "#include <stdint.h>"; next}
  /    size_t buffer_size = \(size_t\)\(state->screen_rows \+ 2\) \*/ {
@@ -46,9 +47,10 @@ pleditor)
  {print}
  END {if (changed != 1) exit 1}
  ' "$source/src/pleditor.c" > "$work/generated/src/pleditor.c"
- for name in main pleditor syntax; do compile -include "$autoconf" -fPIE -c "$work/generated/src/$name.c" -o "$work/objects/$name.o"; done
- compile -include "$autoconf" -fPIE -c "$src/userland/apps/pleditor/platform_reliefos.c" -o "$work/objects/platform.o"
- executable "$work"/objects/*.o
+ rm -rf "$output/pleditor-generated"
+ mkdir -p "$output/pleditor-generated/src"
+ cp "$work/generated/src/main.c" "$work/generated/src/pleditor.c" \
+    "$work/generated/src/syntax.c" "$output/pleditor-generated/src/"
  ;;
 sl)
  compile -D_DEFAULT_SOURCE -fPIE -c "$source/sl.c" -o "$work/objects/sl.o"
@@ -59,10 +61,8 @@ sqlite)
  (cd "$work/generated" && make sqlite3.c sqlite3.h)
  flags="$flags -DSQLITE_OS_OTHER=1 -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION=1 -DSQLITE_OMIT_WAL=1 -DSQLITE_DEFAULT_MEMSTATUS=0 -DSQLITE_MAX_MMAP_SIZE=0"
  compile -c "$work/generated/sqlite3.c" -o "$work/objects/sqlite3.o"
- compile -c "$port/leonos_sqlite_vfs.c" -o "$work/objects/vfs.o"
- shared sqlite.so.3 "$work"/objects/*.o
- staticlib libsqlite3.a "$work"/objects/*.o
- cp "$work/generated/sqlite3.h" "$output/sqlite3.h"
+ cp "$work/objects/sqlite3.o" "$output/sqlite3.o"
+ cp "$work/generated/sqlite3.c" "$work/generated/sqlite3.h" "$output/"
  ;;
 *) echo "unsupported upstream app: $pkg" >&2; exit 2 ;;
 esac

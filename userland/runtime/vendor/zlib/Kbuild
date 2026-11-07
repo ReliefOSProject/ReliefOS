@@ -1,0 +1,34 @@
+RELIEFOS_ZLIB_OBJECTS := adler32.o compress.o crc32.o deflate.o infback.o inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o
+RELIEFOS_ZLIB_C_OBJECTS := adler32.o compress.o crc32.o deflate.o infback.o inffast.o inflate.o inftrees.o trees.o uncompr.o zutil.o
+RELIEFOS_ZLIB_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_RUNTIME_KBUILD),1)
+obj-y := $(RELIEFOS_ZLIB_OBJECTS)
+ccflags-y += $(RUNTIME_FLAGS) $(RUNTIME_CFLAGS) -include $(AUTOCONF_H)
+asflags-y += --target=$(TRIPLE_USER) -fPIC -I$(HEADER_EXPORT_INCLUDE)
+$(addprefix $(obj)/,$(RELIEFOS_ZLIB_C_OBJECTS)): $(AUTOCONF_H) $(GBK_TABLE) $(PNG_CONFIG) $(MUSL_STAMP) $(RUNTIME_HEADERS) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID)
+$(addprefix $(obj)/,$(RELIEFOS_ZLIB_ASM_OBJECTS)): $(AUTOCONF_H) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID)
+
+ccflags-y += -DZ_SOLO -include stddef.h
+$(obj)/adler32.o: $(srctree)/third_party/zlib/adler32.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/compress.o: $(srctree)/third_party/zlib/compress.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/crc32.o: $(srctree)/third_party/zlib/crc32.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/deflate.o: $(srctree)/third_party/zlib/deflate.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/infback.o: $(srctree)/third_party/zlib/infback.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/inffast.o: $(srctree)/third_party/zlib/inffast.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/inflate.o: $(srctree)/third_party/zlib/inflate.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/inftrees.o: $(srctree)/third_party/zlib/inftrees.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/trees.o: $(srctree)/third_party/zlib/trees.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/uncompr.o: $(srctree)/third_party/zlib/uncompr.c FORCE
+	$(call if_changed_dep,cc_o_c)
+$(obj)/zutil.o: $(srctree)/third_party/zlib/zutil.c FORCE
+	$(call if_changed_dep,cc_o_c)
+endif

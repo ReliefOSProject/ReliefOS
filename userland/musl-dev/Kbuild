@@ -1,0 +1,7 @@
+RELIEFOS_MUSL_DEV_OBJECTS := stack_chk_fail_local.o
+RELIEFOS_MUSL_DEV_C_OBJECTS := $(RELIEFOS_MUSL_DEV_OBJECTS)
+ifneq ($(RELIEFOS_CAPTURE_MUSL_DEV_KBUILD),1)
+obj-y := $(RELIEFOS_MUSL_DEV_OBJECTS)
+ccflags-y += --target=$(TRIPLE_USER) -O2 -fPIC -fno-stack-protector -nostdinc
+$(addprefix $(obj)/,$(RELIEFOS_MUSL_DEV_C_OBJECTS)): $(RELIEFOS_CC_ID)
+endif

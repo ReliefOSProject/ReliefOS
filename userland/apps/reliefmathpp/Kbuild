@@ -1,0 +1,11 @@
+RELIEFOS_APP_NAME := reliefmathpp
+RELIEFOS_APP_OBJECTS := analysis.o canvas.o dialogs.o document.o expression.o files.o main.o mesh.o model.o scene.o window.o shared_relieftodo_file_io.o
+RELIEFOS_APP_C_OBJECTS :=
+RELIEFOS_APP_CXX_OBJECTS := analysis.o canvas.o dialogs.o document.o expression.o files.o main.o mesh.o model.o scene.o window.o shared_relieftodo_file_io.o
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+# Shared first-party source, compiled separately for this app context.
+$(obj)/shared_relieftodo_file_io.o: $(srctree)/userland/apps/relieftodo/file_io.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+endif

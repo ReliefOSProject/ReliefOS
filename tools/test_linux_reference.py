@@ -22,7 +22,7 @@ def main():
     parser.add_argument("--proxy", help="override the proxy from the environment (optional)")
     parser.add_argument("--timeout", type=float, default=120)
     parser.add_argument("--jobs", type=int, default=8)
-    parser.add_argument("--probe-source", type=Path, default=ROOT / "tools/tests/musl_guest_test.c")
+    parser.add_argument("--probe-source", type=Path, default=ROOT / "kernel/reliefnt/tools/tests/musl_guest_test.c")
     parser.add_argument("--probe-binary", type=Path)
     parser.add_argument("--file", nargs=2, action="append", default=[], metavar=("SOURCE", "GUEST_PATH"))
     parser.add_argument("--case", help="Run only the named probe case")
@@ -63,7 +63,7 @@ def main():
             stdout=log, stderr=subprocess.STDOUT)
     compiler = sdk / "bin/reliefos-musl-cc"
     run([compiler, "-static", "-O2", *([f'-DREFERENCE_CASE="{args.case}"'] if args.case else []),
-         ROOT / "tools/tests/linux_reference_init.c", "-o", output / "reference-init"])
+         ROOT / "kernel/reliefnt/tools/tests/linux_reference_init.c", "-o", output / "reference-init"])
     if args.probe_binary:
         shutil.copy2(args.probe_binary.resolve(), output / "probe")
     else:

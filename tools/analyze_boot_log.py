@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Analyze ReliefOS loader, kernel, and dynamic-loader boot logs.
+"""Analyze ReliefOS kernel and dynamic-loader boot logs.
 
 Examples:
     python tools/analyze_boot_log.py serial.log
@@ -68,22 +68,6 @@ class Rule:
 
 DIRECT_RULES = (
     Rule(
-        "LOADER-INTEGRITY", "致命", "引导加载器",
-        r"^\[loader\] Boot stopped by integrity policy\.",
-        "引导加载器因完整性策略停止启动",
-        "loader 检测到 kernel 的 SHA-256 与其内置值不一致，且用户拒绝继续。",
-        "重新构建 loader 与 kernel，或检查 ESP/ISO 中是否混入了不同构建的组件。",
-        "kernel/reliefnt/boot/loader/main.c:1028",
-    ),
-    Rule(
-        "LOADER-FILE", "致命", "引导加载器",
-        r"^\[loader\].*(?:kernel\.sys load failed|module load failed|no readable EFI FAT volume|unable to open EFI filesystem)",
-        "引导加载器无法读取核心启动组件",
-        "loader 无法从 EFI 文件系统或 GRUB 模块获得 kernel.sys。",
-        "检查 ESP 中的 boot/、reliefos/kernel.sys（旧盘为 leonos/kernel.sys），以及 ext2 根分区和 EFI/FAT32 挂载状态。",
-        "kernel/reliefnt/boot/loader/main.c:1114",
-    ),
-    Rule(
         "STORAGE-ROOT", "错误", "存储",
         r"^\[(?:reliefnt|ntclks)\] no block-backed root filesystem available for userland$",
         "用户态没有可用的根文件系统",
@@ -95,7 +79,7 @@ DIRECT_RULES = (
         "USERLAND-LOAD", "错误", "用户态启动",
         r"^\[(?:reliefnt|ntclks)\] failed to load (?:init\.elf|desktop\.elf).*",
         "关键用户态程序未能加载",
-        "init.elf 或 desktop.elf 在创建任务时失败，桌面启动无法完成。",
+        "PID 1 或 Xorg 在创建任务时失败，桌面启动无法完成。",
         "先查看前后是否有 ELF 验证、动态解释器或文件查找错误；再检查镜像中对应程序是否完整。",
         "kernel/reliefnt/kernel/exec/userland.c:654",
     ),
@@ -161,7 +145,7 @@ DIRECT_RULES = (
         "ACPI 关机路径不可用",
         "固件没有提供完成 ACPI S5 关机所需的表或寄存器，关机可能只能停止 CPU。",
         "检查虚拟机 ACPI 选项、固件类型和硬件平台；在 VMware 中验证 ACPI 电源管理已启用。",
-        "kernel/reliefnt/arch/x86_64/power.c:532",
+        "kernel/reliefnt/arch/x86_64/platform/power.c:532",
     ),
 )
 
@@ -217,7 +201,7 @@ def _bugcheck_findings(lines: list[str], radius: int) -> list[Finding]:
             tuple(item + 1 for item in indexes), _context(lines, indexes, radius),
             "内核进入不可恢复的停止状态；同一段日志通常包含陷阱向量、任务名、RIP、CR2 和栈指针。",
             "优先检查本条之前最近的 exception、page fault、ELF 或驱动错误；使用 RIP 和任务名定位对应模块。",
-            "kernel/reliefnt/kernel/reliefnt/lib/bugcheck.c:422",
+            "kernel/reliefnt/lib/bugcheck.c:422",
         ))
         index = cursor
     return findings
@@ -241,7 +225,7 @@ def _exception_findings(lines: list[str], radius: int) -> list[Finding]:
             _context(lines, (index,), radius),
             f"CPU 在 RIP={match.group('rip')} 触发向量 {vector}，错误码为 {match.group('error')}。",
             "依据 RIP、当前 pid/task 和异常模式检查近期映射、重定位、用户指针或特权级转换；页错误还需检查 CR2 与标志位。",
-            "kernel/reliefnt/arch/x86_64/idt.c:156",
+            "kernel/reliefnt/arch/x86_64/interrupt/idt.c:156",
         ))
     return findings
 
@@ -268,8 +252,8 @@ def _task_exit_findings(lines: list[str], radius: int) -> list[Finding]:
             "TASK-EXIT-127", "错误", "用户态启动", f"任务 {name} 因启动失败退出 (127)",
             tuple(location + 1 for location in locations), _context(lines, locations, radius),
             explanation,
-            "查看该任务之前的 ELF 头部、解释器、ABI、段映射或动态库错误；init.elf 和 desktop.elf 失败会阻断系统桌面。",
-            "kernel/reliefnt/kernel/reliefnt/sched/sched.c:498",
+            "查看该任务之前的 ELF 头部、解释器、ABI、段映射或动态库错误；PID 1 和 Xorg 失败会阻断系统桌面。",
+            "kernel/reliefnt/kernel/sched/core.c",
         ))
     return findings
 
@@ -349,7 +333,7 @@ def _print_text(analysis: LogAnalysis) -> None:
 
 def _self_test() -> int:
     """Exercise correlations for the ELF and CPU-fault failures seen in practice."""
-    sample = """[ntclks] boot complete: version=4.4.0 root=/ fs=ext2 desktop=desktop.elf
+    sample = """[ntclks] boot complete: version=4.4.0 root=/ fs=ext4 session=xorg
 [ntclks] ELF main header validation failed
 [ntclks] failed to map executable init.elf
 [ntclks] scheduler task exited pid=1 name=init.elf code=127

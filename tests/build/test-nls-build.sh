@@ -23,7 +23,7 @@ if cmp -s "$w/a.mo" "$w/c.mo"; then
 fi
 
 # The recipe must carry the flags; a bare msgfmt would be host-endian.
-grep -q -- '--endianness=little' "$src/mk/nls.mk"
+grep -q -- '--endianness=little' "$src/scripts/reliefos/Makefile.nls"
 
 # Every msgid in the catalog is used by a live source site.
 awk '/^msgid "/{s++} /^msgstr[0 ]/{g++} END{exit !(s>1000 && g==s)}' \

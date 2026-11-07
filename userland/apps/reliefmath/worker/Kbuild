@@ -1,0 +1,14 @@
+RELIEFOS_WORKER_OBJECTS := model.o protocol.o render_types.o boxes.o font.o main.o output.o parser.o renderer.o scene.o
+RELIEFOS_WORKER_CXX_OBJECTS := $(RELIEFOS_WORKER_OBJECTS)
+ifneq ($(RELIEFOS_CAPTURE_WORKER_KBUILD),1)
+obj-y := $(RELIEFOS_WORKER_OBJECTS)
+cxxflags-y += $(RELIEFMATH_WORKER_FLAGS) -include $(AUTOCONF_H)
+$(addprefix $(obj)/,$(RELIEFOS_WORKER_CXX_OBJECTS)): $(AUTOCONF_H) $(MUSL_STAMP) $(HEADER_EXPORT_MANIFEST) $(RELIEFMATH_DEV_PRODUCTS) $(RELIEFOS_CXX_ID)
+include $(srctree)/scripts/Makefile.cxx
+$(obj)/model.o: $(srctree)/userland/apps/reliefmath/model.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/protocol.o: $(srctree)/userland/apps/reliefmath/protocol.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/render_types.o: $(srctree)/userland/apps/reliefmath/render_types.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+endif

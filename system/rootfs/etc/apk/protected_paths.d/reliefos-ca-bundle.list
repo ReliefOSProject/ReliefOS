@@ -1,0 +1,4 @@
+# apk 3 applies replacement protection to directories, not individual files.
+# This is the generated trust output. Keep private CA sources in
+# /usr/local/share/ca-certificates, or use an account-specific CA file elsewhere.
+-etc/ssl/certs

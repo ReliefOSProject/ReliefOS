@@ -1,0 +1,13 @@
+--- a/src/yes.c
++++ b/src/yes.c
+@@ -224,6 +224,7 @@ main (int argc, char **argv)
+-  /* Improve performance by using a buffer size greater than BUFSIZ / 2.  */
+-  if (bufalloc <= BUFSIZ / 2)
++  /* Give the portable full_write fallback a larger buffer than musl's small
++     BUFSIZ.  The splice fast path below remains available and takes priority.  */
++  if (bufalloc < 64 * 1024)
+     {
+-      bufalloc = BUFSIZ;
++      bufalloc = 64 * 1024;
+       reuse_operand_strings = false;
+     }

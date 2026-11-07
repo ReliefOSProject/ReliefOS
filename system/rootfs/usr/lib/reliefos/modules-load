@@ -1,0 +1,14 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+set -eu
+if [ "$(uname -s)" != ReliefNT ] || [ "$(id -u)" != 0 ]; then
+    echo 'ReliefOS module loader: refusing host or unprivileged module operations' >&2
+    exit 77
+fi
+# Linux omits this inventory when CONFIG_MODULES=n. Builtin-only older kernels
+# also need no coldplug modprobe calls when booting an upgraded root filesystem.
+[ -r /proc/modules ] || exit 0
+. /usr/lib/reliefos/module-policy
+release=$(uname -r)
+module_config_load / "$release"
+module_coldplug / "$release"

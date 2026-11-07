@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: Apache-2.0
+# Pure command-line parsing shared with the host policy regression.
+partuuid_device() {
+    case $1 in PARTUUID=*) partuuid_identity=${1#PARTUUID=} ;; *) return 1 ;; esac
+    case $partuuid_identity in ''|*[!0-9A-Fa-f-]*) return 1 ;; esac
+    partuuid_identity=$(printf '%s' "$partuuid_identity" | tr 'A-F' 'a-f') || return 1
+    printf '/dev/disk/by-partuuid/%s\n' "$partuuid_identity"
+}
+
+parse_cmdline() {
+    root= rootfstype= rootflags= mode= final_init=/sbin/init root_access=rw
+    set -f
+    for argument in $1; do
+        case $argument in
+            root=*) root=${argument#root=} ;;
+            rootfstype=*) rootfstype=${argument#rootfstype=} ;;
+            rootflags=*) rootflags=${argument#rootflags=} ;;
+            init=*) final_init=${argument#init=} ;;
+            mode=*) mode=${argument#mode=} ;;
+            ro|rw) root_access=$argument ;;
+        esac
+    done
+    set +f
+    case $final_init in /*) ;; *) return 1 ;; esac
+    case $mode in installer|live) root=/dev/ram0 ;; esac
+    case $root in '"'*'"') root=${root#\"}; root=${root%\"} ;; esac
+    case $root in /dev/*|PARTUUID=*|UUID=*|LABEL=*) ;;
+        *) return 1 ;;
+    esac
+    case $root in *'"'*|*' '*|*'\'*|*'..'*) return 1 ;; esac
+    return 0
+}

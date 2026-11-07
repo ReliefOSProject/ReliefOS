@@ -1,0 +1,41 @@
+# Installed kernel metadata owns module discovery, names and early phases.
+RELIEFOS_MODULES_STAGE := $(O_STAGE)/kernel-modules
+RELIEFOS_MODULES_MANIFEST := $(RELIEFOS_MODULES_STAGE)/modules-stage.json
+RELIEFOS_INITRAMFS := $(O_GENERATED)/system/initramfs.cpio
+RELIEFOS_INITRAMFS_MANIFEST := $(RELIEFOS_INITRAMFS).json
+RELIEFOS_KERNEL_RECOVERY := $(O)/userland/initramfs/kernel-bundle.elf
+RELIEFOS_KERNEL_PAYLOAD := $(O_STAGE)/kernel-payload
+RELIEFOS_KERNEL_PAYLOAD_MANIFEST := $(RELIEFOS_KERNEL_PAYLOAD)/kernel-payload.json
+RELIEFOS_MODULE_TOOLS := $(RELIEFOS_KERNEL_TOOLS)
+# Images support all three currently offered virtual disk transports. Disabling
+# one explicitly rejects this portable profile instead of silently forcing y.
+RELIEFOS_BOOT_FEATURES ?= SATA_AHCI PATA_IDE BLK_DEV_NVME EXT4_FS FAT_FS ISO9660_FS
+$(RELIEFOS_MODULES_MANIFEST): $(RELIEFNT_DEST)/install.bundle.json $(INITRAMFS_BUSYBOX_ELF) $(RELIEFOS_MODULE_TOOLS)
+	$(Q)$(RELIEFOS_KERNEL_TOOLS) modules-stage $(abspath $(RELIEFNT_DEST)) \
+	    $(abspath $(INITRAMFS_BUSYBOX_ELF)) $(abspath $(RELIEFOS_MODULES_STAGE)) $(RELIEFOS_BOOT_FEATURES)
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/stage-inventory.sh write $(RELIEFOS_MODULES_STAGE) $(O_META)/kernel-modules.files
+$(RELIEFOS_INITRAMFS) $(RELIEFOS_INITRAMFS_MANIFEST) &: $(RELIEFOS_MODULES_MANIFEST) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) \
+    $(RELIEFOS_KERNEL_TOOLS) $(RELIEFOS_KERNEL_RECOVERY) \
+    $(RELIEFOS_SRC)/system/initramfs/init $(RELIEFOS_SRC)/system/initramfs/functions
+	$(Q)$(RELIEFOS_KERNEL_TOOLS) initramfs-stage $(RELIEFOS_SRC) $(abspath $(RELIEFOS_MODULES_STAGE)) \
+        $(abspath $(INITRAMFS_BUSYBOX_ELF)) $(abspath $(INITRAMFS_BUSYBOX_LINKS)) $(abspath $(RELIEFOS_INITRAMFS)) $(SOURCE_DATE_EPOCH) $(abspath $(RELIEFOS_KERNEL_RECOVERY))
+$(RELIEFOS_KERNEL_PAYLOAD_MANIFEST): $(RELIEFOS_MODULES_MANIFEST) $(RELIEFOS_INITRAMFS) $(RELIEFOS_INITRAMFS_MANIFEST) \
+    $(RELIEFNT_DEST)/install.bundle.json $(RELIEFOS_KERNEL_TOOLS)
+	$(Q)$(RELIEFOS_KERNEL_TOOLS) kernel-payload $(abspath $(RELIEFNT_DEST)) \
+	    $(abspath $(RELIEFOS_MODULES_STAGE)) $(abspath $(RELIEFOS_INITRAMFS)) $(abspath $(RELIEFOS_KERNEL_PAYLOAD))
+
+define RELIEFOS_KERNEL_STAGE_PRESENCE
+$(O_META)/$(1)-present.parameters: FORCE $(RELIEFOS_KERNEL_TOOLS)
+	$$(Q)$$(RELIEFOS_KERNEL_TOOLS) check-stage $$(abspath $(2)) $(3) $$(abspath $$@)
+$(2)/$(3): $(O_META)/$(1)-present.parameters
+endef
+$(eval $(call RELIEFOS_KERNEL_STAGE_PRESENCE,kernel-modules,$(RELIEFOS_MODULES_STAGE),modules-stage.json))
+$(eval $(call RELIEFOS_KERNEL_STAGE_PRESENCE,kernel-payload,$(RELIEFOS_KERNEL_PAYLOAD),kernel-payload.json))
+.PHONY: initramfs kernel-modules test-kernel-modules-stage test-initramfs-stage
+initramfs: $(RELIEFOS_INITRAMFS) $(RELIEFOS_INITRAMFS_MANIFEST)
+kernel-modules: $(RELIEFOS_KERNEL_PAYLOAD_MANIFEST)
+test-kernel-modules-stage test-initramfs-stage: $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_TOOLS) $(RELIEFOS_KERNEL_RECOVERY)
+	$(Q)RELIEFOS_TEST_BUSYBOX='$(abspath $(INITRAMFS_BUSYBOX_ELF))' \
+	    RELIEFOS_KERNEL_TOOLS='$(abspath $(RELIEFOS_KERNEL_TOOLS))' \
+	    RELIEFOS_TEST_RECOVERY='$(abspath $(RELIEFOS_KERNEL_RECOVERY))' \
+	    sh $(RELIEFOS_SRC)/tests/build/$@.sh

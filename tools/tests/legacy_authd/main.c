@@ -7,7 +7,6 @@
 #include <leonos/auth_db.h>
 #include <leonos/authd.h>
 #include <leonos/fs.h>
-#include <leonos/launch.h>
 #include <leonos/stdio.h>
 #include <leonos/syscall.h>
 #include <leonos/unix_ipc.h>
@@ -157,44 +156,9 @@ static int authd_ensure_dir(const char *path)
 
 static int authd_prepare_user_home(const struct leonos_user_info *user)
 {
-    static const char *const subdirs[] = {"desktop", "documents", "downloads"};
-    char path[LEONOS_FS_PATH_LEN];
-    char desktop_dir[LEONOS_FS_PATH_LEN];
-    uint32_t home_len;
-    if (!user || !user->home[0]) {
-        return -1;
-    }
-    if (authd_ensure_dir("/home") < 0 || authd_ensure_dir(user->home) < 0) {
-        return -1;
-    }
-    if (chown(user->home, user->uid, user->uid) < 0 || chmod(user->home, 0700) < 0) return -1;
-    home_len = (uint32_t)strlen(user->home);
-    if (home_len + 16U >= sizeof(path)) {
-        return -1;
-    }
-    for (uint32_t i = 0; i < sizeof(subdirs) / sizeof(subdirs[0]); ++i) {
-        memcpy(path, user->home, home_len);
-        path[home_len] = '/';
-        authd_copy(path + home_len + 1U, sizeof(path) - home_len - 1U, subdirs[i]);
-        if (authd_ensure_dir(path) < 0) {
-            return -1;
-        }
-        if (chown(path, user->uid, user->uid) < 0 || chmod(path, 0700) < 0) return -1;
-    }
-    memcpy(desktop_dir, user->home, home_len);
-    memcpy(desktop_dir + home_len, "/desktop", 9U);
-    static const char *const targets[] = {
-        LEONOS_LAYOUT_LEONOS_APPS "/fileman/fileman.elf",
-        LEONOS_LAYOUT_LEONOS_APPS "/terminal/terminal.elf",
-        LEONOS_LAYOUT_LEONOS_APPS "/settings/settings.elf",
-        LEONOS_LAYOUT_LEONOS_APPS "/run/run.elf",
-        LEONOS_LAYOUT_LEONOS_APPS "/taskmgr/taskmgr.elf",
-    };
-    for (uint32_t i = 0; i < sizeof(targets) / sizeof(targets[0]); ++i) {
-        if (leonos_launch_create_shortcut_in_dir(desktop_dir, targets[i], path, sizeof(path)) < 0 ||
-            chown(path, user->uid, user->uid) < 0 || chmod(path, 0600) < 0) return -1;
-    }
-    return 0;
+    if (!user || !user->home[0]) return -1;
+    if (authd_ensure_dir("/home")<0 || authd_ensure_dir(user->home)<0) return -1;
+    return chown(user->home,user->uid,user->uid)<0 || chmod(user->home,0700)<0 ? -1 : 0;
 }
 
 static void authd_send_ack(int slot, int32_t code)

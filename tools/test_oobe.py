@@ -1,4 +1,4 @@
-"""Host regressions for the OOBE-to-desktop service handoff."""
+"""Host regressions for account and boot-state handling."""
 from pathlib import Path
 import subprocess
 import tempfile
@@ -39,28 +39,6 @@ class OobeTests(unittest.TestCase):
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
-    def test_taskbar_does_not_wait_for_network_service(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-oobe-network-") as tmp:
-            executable = str(Path(tmp) / "network")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-                "tools/tests/oobe_network_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
-    def test_slow_startup_service_does_not_block_desktop(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-oobe-startup-") as tmp:
-            executable = str(Path(tmp) / "startup")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-                "tools/tests/oobe_startup_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
-
     def test_reboot_discards_session_but_keeps_accounts(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-auth-boot-") as tmp:
             executable = str(Path(tmp) / "auth-boot")
@@ -73,17 +51,6 @@ class OobeTests(unittest.TestCase):
             for scenario in ("stale", "missing", "denied", "database-formats"):
                 with self.subTest(scenario=scenario):
                     subprocess.run([executable, scenario], cwd=ROOT, check=True, timeout=10)
-
-    def test_closed_window_fetch_finishes_without_timeout(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-oobe-window-") as tmp:
-            executable = str(Path(tmp) / "window")
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-                "tools/tests/oobe_window_test.c", "-o", executable,
-            ], cwd=ROOT, check=True)
-            subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 
     def test_input_method_requests_after_login(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-oobe-") as tmp:

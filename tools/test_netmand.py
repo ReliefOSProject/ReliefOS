@@ -18,10 +18,3 @@ with tempfile.TemporaryDirectory(prefix="reliefos-netmand-") as temporary:
                     "tools/tests/netmand_client_test.c", "userland/runtime/src/unix_ipc.c",
                     "-o", str(binary)], cwd=ROOT, check=True)
     subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=20)
-    compiler = ROOT / "build/musl-gcc/root/opt/dyne/gcc-musl/bin/x86_64-linux-musl-gcc"
-    binary = work / "netctl-test"
-    subprocess.run([str(compiler), "-static", "-O1", "-g", "-D_GNU_SOURCE", "-DRELIEFOS_USE_MUSL",
-                    "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections", "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
-                    "-idirafter", "userland/runtime/include", "tools/tests/netctl_dhcp_test.c", "-o", str(binary)],
-                   cwd=ROOT, check=True)
-    subprocess.run([str(binary)], cwd=ROOT, check=True, timeout=20)

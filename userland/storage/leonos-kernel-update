@@ -1,217 +1,182 @@
 #!/bin/sh
-set -u
+# SPDX-License-Identifier: Apache-2.0
+# Freeze a signed APK cohort, validate its complete kernel bundle, then let APK
+# and the shared native publisher own installation, retention and activation.
+set -eu
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
-export PATH
-
-usage() { printf '%s\n' 'Usage: reliefos-kernel-update [-f|--force|--check]' >&2; }
+LC_ALL=C
+export PATH LC_ALL
+usage() { echo 'Usage: reliefos-kernel-update [-f|--force|--check]' >&2; }
+die() { printf 'reliefos-kernel-update: %s\n' "$1" >&2; exit 1; }
 check_only=0
 force=0
-case "${1-}" in
+case ${1-} in
     '') ;;
     --check) check_only=1 ;;
     -f|--force) force=1 ;;
     *) usage; exit 2 ;;
 esac
 [ "$#" -le 1 ] || { usage; exit 2; }
-if [ "$check_only" -eq 0 ] && [ "$(id -u)" -ne 0 ]; then
-    printf '%s\n' 'reliefos-kernel-update: root privileges are required' >&2
-    exit 1
-fi
-
+[ "$check_only" = 1 ] || [ "$(id -u)" = 0 ] || die 'root privileges are required'
 config=/etc/reliefos/rpr.conf
-[ -r "$config" ] || { printf 'Missing RPR configuration: %s\n' "$config" >&2; exit 1; }
+[ -r "$config" ] || die 'Missing RPR configuration'
 rpr_url=$(sed -n 's/^RPR_BASE_URL=//p' "$config")
-case "$rpr_url" in https://*) ;; *) printf '%s\n' 'Invalid RPR URL: HTTPS is required' >&2; exit 1;; esac
-
-manifest=$(mktemp /tmp/reliefos-kernel-release.XXXXXX) || exit 1
-esp=/boot
-boot=$esp/reliefos
-legacy_boot=$esp/leonos
-kernel_tmp=
-loader_tmp=
-kernel_backup=
-loader_backup=
+case $rpr_url in
+    https://*) ;;
+    *) die 'Invalid RPR URL: HTTPS is required' ;;
+esac
+case $rpr_url in *[[:space:]]*|*\?*|*\#*) die 'Invalid RPR URL' ;; esac
+rpr_url=${rpr_url%/}
+helper=/usr/libexec/reliefos/kernel-bundle
+temporary=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-kernel-update.XXXXXX") || exit 1
 lock_dir=
 legacy_lock_dir=
-boot_dir_created=0
-had_kernel=0
-had_loader=0
-commit_started=0
-commit_done=0
 cleanup() {
     status=$?
     trap - EXIT HUP INT TERM
-    if [ "$commit_started" -eq 1 ] && [ "$commit_done" -eq 0 ]; then
-        # The kernel and its loader are one release unit: the handoff layout
-        # they agree on is compiled into both, so a rolled-back kernel has to
-        # come back with the loader that was on disk before the swap.
-        if [ -n "$kernel_backup" ] && [ -f "$kernel_backup" ]; then
-            rm -f -- "$boot/kernel.sys"
-            mv -- "$kernel_backup" "$boot/kernel.sys" || true
-        elif [ "$had_kernel" -eq 0 ]; then
-            rm -f -- "$boot/kernel.sys"
-        fi
-        if [ -n "$loader_backup" ] && [ -f "$loader_backup" ]; then
-            rm -f -- "$boot/loader.elf"
-            mv -- "$loader_backup" "$boot/loader.elf" || true
-        elif [ "$had_loader" -eq 0 ]; then
-            rm -f -- "$boot/loader.elf"
-        fi
-        sync || true
-    fi
-    rm -f -- "$manifest"
-    [ -z "$kernel_tmp" ] || rm -f -- "$kernel_tmp" "$kernel_tmp.part"
-    [ -z "$loader_tmp" ] || rm -f -- "$loader_tmp" "$loader_tmp.part"
-    if [ "$commit_done" -eq 1 ]; then
-        [ -z "$kernel_backup" ] || rm -f -- "$kernel_backup"
-        [ -z "$loader_backup" ] || rm -f -- "$loader_backup"
-    fi
+    rm -rf -- "$temporary"
     [ -z "$lock_dir" ] || rmdir -- "$lock_dir" 2>/dev/null || true
     [ -z "$legacy_lock_dir" ] || rmdir -- "$legacy_lock_dir" 2>/dev/null || true
-    if [ "$boot_dir_created" -eq 1 ]; then
-        rmdir -- "$boot" 2>/dev/null || true
-    fi
     exit "$status"
 }
 trap cleanup EXIT
 trap 'exit 130' HUP INT TERM
-rprfetch "$rpr_url/kernel/release.txt" "$manifest" || exit 1
-
-field() {
-    key=$1
-    value=$(sed -n "s/^${key}=//p" "$manifest")
-    [ -n "$value" ] || return 1
-    case "$value" in
-        *'
-'*) return 1 ;;
-    esac
-    printf '%s' "$value"
+manifest=$temporary/release.txt
+rprfetch "$rpr_url/kernel/release.txt" "$manifest"
+[ "$(wc -c < "$manifest")" -le 4096 ] || die 'Oversized kernel release manifest'
+# Never source metadata. Refuse NUL, CR, spaces and all executable syntax before
+# parsing the exact bounded key set; every field is a single scalar.
+tr -d '[:alnum:]_.+=/\n-' < "$manifest" > "$temporary/invalid"
+[ ! -s "$temporary/invalid" ] || die 'Invalid kernel release manifest bytes'
+field() { sed -n "s/^$1=//p" "$manifest"; }
+format=$(field format_version)
+[ "$format" = 4 ] || die "Unsupported kernel release manifest: $format; a complete format 4 package is required"
+awk -F= '
+    BEGIN { split("format_version image_version version kernel_release module_abi kernel_sha256 initramfs_sha256 package package_version package_file package_sha256 repository_sha256 bundle_manifest_sha256 module_directory", keys, " "); for (i in keys) allowed[keys[i]]=1 }
+    NF != 2 || !allowed[$1] || seen[$1]++ || $2 == "" { exit 1 }
+    END { if (NR != 14) exit 1 }
+' "$manifest" || die 'Invalid or duplicate kernel release fields'
+remote_image=$(field image_version)
+remote_version=$(field version)
+release=$(field kernel_release)
+abi=$(field module_abi)
+kernel_hash=$(field kernel_sha256)
+initramfs_hash=$(field initramfs_sha256)
+package_version=$(field package_version)
+package_file=$(field package_file)
+package_hash=$(field package_sha256)
+index_hash=$(field repository_sha256)
+bundle_hash=$(field bundle_manifest_sha256)
+printf '%s\n' "$remote_image" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || die 'Invalid remote image version'
+[ "${#remote_image}" -le 31 ] && [ "$remote_image" = "$remote_version" ] || die 'Remote image and release versions disagree'
+case $release in ''|.|..|*[!A-Za-z0-9._+-]*) die 'Invalid kernel release identity' ;; esac
+[ "${#release}" -le 31 ] || die 'Invalid kernel release length'
+for digest in "$abi" "$kernel_hash" "$initramfs_hash" "$package_hash" "$index_hash" "$bundle_hash"; do
+    case $digest in ''|*[!0-9a-f]*) die 'Invalid kernel release checksum' ;; esac
+    [ "${#digest}" = 64 ] || die 'Invalid kernel release checksum length'
+done
+case $package_version in [0-9]*) ;; *) die 'Invalid package version' ;; esac
+case $package_version in *[!A-Za-z0-9._+-]*) die 'Invalid package version' ;; esac
+[ "$(field package)" = reliefos-kernel ] &&
+[ "$package_file" = "reliefos-kernel-$package_version.apk" ] &&
+[ "$(field module_directory)" = "lib/modules/$release" ] || die 'Invalid package or module directory pairing'
+hash_matches() {
+    actual=$(sha256sum "$1") || return 1
+    [ "${actual%% *}" = "$2" ]
 }
-format=$(field format_version) || { printf '%s\n' 'Invalid kernel release manifest' >&2; exit 1; }
-remote_image=$(field image_version) || remote_image=
-remote_release=$(field version) || { printf '%s\n' 'Kernel release has no version' >&2; exit 1; }
-kernel_file=$(field kernel_file) || exit 1
-kernel_hash=$(field kernel_sha256) || exit 1
-loader_file=$(field loader_file) || exit 1
-loader_hash=$(field loader_sha256) || exit 1
-[ "$format" = 2 ] || {
-    printf 'Unsupported kernel release manifest: %s (format 1 advertised a middle-layer payload)\n' "$format" >&2
-    exit 1;
+# The immutable signed index is the only repository seen by the solver. A
+# concurrent publication changing either remote file fails before root mutation.
+mkdir "$temporary/download" "$temporary/verified" "$temporary/extracted"
+rprfetch "$rpr_url/apk/packages.adb" "$temporary/download/packages.adb"
+hash_matches "$temporary/download/packages.adb" "$index_hash" || die 'Repository checksum mismatch'
+apk --keys-dir /etc/apk/keys verify "$temporary/download/packages.adb"
+printf 'ndx %s/download/packages.adb\n' "$temporary" > "$temporary/repositories"
+mkdir -p "$temporary/solver/etc/apk" "$temporary/solver/lib/apk/db"
+printf 'x86_64\n' > "$temporary/solver/etc/apk/arch"
+: > "$temporary/solver/etc/apk/world"
+solver() {
+    apk --root "$temporary/solver" --arch x86_64 --keys-dir /etc/apk/keys \
+        --repositories-file "$temporary/repositories" --no-network "$@"
 }
-printf '%s\n' "$remote_release" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || {
-    printf 'Invalid remote release version: %s\n' "$remote_release" >&2; exit 1;
+solver query --from repositories --match name --all-matches --fields package reliefos-kernel \
+    > "$temporary/candidates" 2> "$temporary/query.errors" || {
+    cat "$temporary/query.errors" >&2; die 'Cannot query the signed kernel candidate';
 }
-release_image=$remote_release
-[ -n "$remote_image" ] || remote_image=$release_image
-case "$remote_image" in *[!0-9.]*|''|.*|*.) printf 'Invalid remote image version: %s\n' "$remote_image" >&2; exit 1;; esac
-[ "$release_image" = "$remote_image" ] || {
-    printf '%s\n' 'Remote image and release versions disagree' >&2
-    exit 1
-}
-case "$kernel_file" in kernel.sys) ;; *) printf '%s\n' 'Invalid kernel release filename' >&2; exit 1;; esac
-case "$loader_file" in loader.elf) ;; *) printf '%s\n' 'Invalid loader release filename' >&2; exit 1;; esac
-case "$kernel_hash" in *[!0-9a-f]*|'') printf '%s\n' 'Invalid kernel.sys checksum' >&2; exit 1;; esac
-case "$loader_hash" in *[!0-9a-f]*|'') printf '%s\n' 'Invalid loader.elf checksum' >&2; exit 1;; esac
-[ "${#kernel_hash}" -eq 64 ] && [ "${#loader_hash}" -eq 64 ] || {
-    printf '%s\n' 'Invalid kernel release checksum length' >&2
-    exit 1
-}
-
-local_release=$(uname -r) || exit 1
-local_image=${local_release%%-*}
-version_is_newer() {
-    awk -v local_version="$1" -v remote_version="$2" 'BEGIN {
-        nl=split(local_version, l, /\./); nr=split(remote_version, r, /\./)
-        if (nl != 3 || nr != 3) exit 2
-        for (i=1; i<=3; i++) {
-            if (l[i] !~ /^[0-9]+$/ || r[i] !~ /^[0-9]+$/) exit 2
-            if ((r[i]+0) > (l[i]+0)) exit 0
-            if ((r[i]+0) < (l[i]+0)) exit 1
-        }
-        exit 1
-    }'
-}
-version_is_newer "$local_image" "$remote_image"
-comparison=$?
-[ "$comparison" -ne 2 ] || { printf 'Invalid local image version: %s\n' "$local_image" >&2; exit 1; }
-if [ "$force" -eq 0 ] && [ "$comparison" -ne 0 ]; then
-    printf 'Kernel image is current: local=%s remote=%s (releases %s / %s)\n' \
-        "$local_image" "$remote_image" "$local_release" "$remote_release"
+cat "$temporary/query.errors" >&2
+[ ! -s "$temporary/query.errors" ] || die 'Cannot resolve the signed kernel candidate'
+awk -v expected="Package: reliefos-kernel-$package_version" '
+    /^$/ { next } $0 != expected || count++ { exit 1 } END { if (count != 1) exit 1 }
+' "$temporary/candidates" || die 'Signed repository and advertised kernel package disagree'
+local_package=$(apk --repositories-file /dev/null --no-network list --installed --manifest reliefos-kernel)
+local_version=$(printf '%s\n' "$local_package" | awk 'NF==2 && $1=="reliefos-kernel" { print $2 }')
+[ -n "$local_version" ] || die 'No managed kernel package; use the installer to migrate this system'
+comparison=$(apk version --test "$local_version" "$package_version")
+case $comparison in '<'|'='|'>') ;; *) die 'Cannot compare installed package versions' ;; esac
+if [ "$force" = 0 ] && [ "$comparison" != '<' ]; then
+    printf 'Kernel image is current: installed package=%s remote=%s (kernel %s)\n' "$local_version" "$package_version" "$release"
     exit 0
 fi
-if [ "$force" -eq 1 ]; then
-    printf 'Forcing kernel image update: local=%s remote=%s (remote build %s)\n' \
-        "$local_image" "$remote_image" "$remote_release"
+printf 'Kernel image update available: installed package=%s remote=%s (kernel %s)\n' "$local_version" "$package_version" "$release"
+[ "$check_only" = 0 ] || exit 0
+# Boot resources are migrated by the installer, before any APK removes old
+# files. Routine updates never replace firmware loaders or the stable selector.
+[ -x "$helper" ] && [ ! -L "$helper" ] || die 'Missing native kernel bundle verifier'
+[ -f /usr/lib/reliefos/kernel/current-release ] && [ ! -L /usr/lib/reliefos/kernel/current-release ] &&
+[ -s /boot/grub/kernel-slots.cfg ] && [ ! -L /boot/grub/kernel-slots.cfg ] ||
+    die 'Install the matched GRUB resources with the installer before updating this system'
+[ ! -L /boot ] && [ ! -L /boot/reliefos ] || die 'Unsafe boot directory'
+if mkdir /run/reliefos-kernel-update.lock 2>/dev/null; then lock_dir=/run/reliefos-kernel-update.lock
+else die 'Another kernel update is already running'; fi
+if mkdir /run/leonos-kernel-update.lock 2>/dev/null; then legacy_lock_dir=/run/leonos-kernel-update.lock
+else die 'Another kernel update is already running'; fi
+# Ask APK to solve an empty private database so every dependency comes from the
+# frozen signed cohort. Query metadata first: fetch --url also requires local
+# archives to exist when the index is local. Some query failures return zero,
+# so also require a nonempty typed result without error diagnostics.
+solver query --from repositories --recursive --fields package "reliefos-kernel=$package_version" \
+    > "$temporary/solution" 2> "$temporary/solver.errors" || {
+    cat "$temporary/solver.errors" >&2; die 'Cannot solve signed kernel dependencies';
+}
+cat "$temporary/solver.errors" >&2
+[ ! -s "$temporary/solver.errors" ] || die 'Cannot resolve complete signed kernel dependencies'
+awk '
+    /^$/ { next }
+    !/^Package: reliefos-[A-Za-z0-9._+-]+-[0-9][A-Za-z0-9._+-]*$/ { exit 1 }
+    { name=substr($0,10); if (seen[name]++) exit 1; print name ".apk"; count++ }
+    END { if (!count) exit 1 }
+' "$temporary/solution" > "$temporary/packages" || die 'Invalid signed dependency solution'
+while IFS= read -r name || [ -n "$name" ]; do
+    [ ! -e "$temporary/download/$name" ] || die 'Duplicate signed dependency'
+    rprfetch "$rpr_url/apk/$name" "$temporary/download/$name"
+done < "$temporary/packages"
+[ -f "$temporary/download/$package_file" ] || die 'Kernel package absent from solved dependency cohort'
+hash_matches "$temporary/download/$package_file" "$package_hash" || die 'Kernel package checksum mismatch'
+# A distinct empty output directory prevents APK fetch's existing-size shortcut
+# from substituting for signed-index archive integrity validation.
+solver fetch --recursive --output "$temporary/verified" "reliefos-kernel=$package_version"
+while IFS= read -r name || [ -n "$name" ]; do
+    [ -f "$temporary/verified/$name" ] || die 'A signed dependency was not completely verified by APK'
+    apk --keys-dir /etc/apk/keys verify "$temporary/verified/$name"
+done < "$temporary/packages"
+[ -f "$temporary/verified/$package_file" ] || die 'Kernel archive was not verified by APK'
+hash_matches "$temporary/verified/$package_file" "$package_hash" || die 'Verified kernel package checksum mismatch'
+apk --keys-dir /etc/apk/keys extract --no-chown --destination "$temporary/extracted" "$temporary/verified/$package_file"
+"$helper" --inspect "$temporary/extracted" "$release" > "$temporary/actual"
+printf 'kernel_release=%s\nmodule_abi=%s\nkernel_sha256=%s\ninitramfs_sha256=%s\n' \
+    "$release" "$abi" "$kernel_hash" "$initramfs_hash" > "$temporary/expected"
+cmp -s "$temporary/expected" "$temporary/actual" || die 'Signed bundle and advertised boot identity disagree'
+hash_matches "$temporary/extracted/usr/lib/reliefos/kernel/$release/bundle.json" "$bundle_hash" || die 'Signed bundle inventory checksum mismatch'
+printf '%s\n' "$release" > "$temporary/expected-release"
+cmp -s "$temporary/expected-release" "$temporary/extracted/usr/lib/reliefos/kernel/current-release" || die 'Signed current-release pointer mismatch'
+cp "$temporary/download/packages.adb" "$temporary/verified/packages.adb"
+printf 'ndx %s/verified/packages.adb\n' "$temporary" > "$temporary/repositories.verified"
+# Plain world requests stay plain. No add of a local APK (checksum pin), exact
+# world version, raw kernel rename, trust bypass or firmware rewrite occurs.
+if [ "$force" = 1 ] && [ "$comparison" = '=' ]; then
+    apk --repositories-file "$temporary/repositories.verified" --no-network fix --reinstall reliefos-kernel
 else
-    printf 'Kernel image update available: local=%s remote=%s (remote build %s)\n' \
-        "$local_image" "$remote_image" "$remote_release"
+    apk --repositories-file "$temporary/repositories.verified" --no-network upgrade reliefos-kernel
 fi
-[ "$check_only" -eq 0 ] || exit 0
-
-if [ -L "$boot" ] || { [ -e "$boot" ] && [ ! -d "$boot" ]; }; then
-    printf 'Unsafe canonical boot directory: %s\n' "$boot" >&2
-    exit 1
-fi
-if { [ ! -f "$boot/kernel.sys" ] || [ ! -f "$boot/loader.elf" ]; } &&
-    { [ ! -d "$legacy_boot" ] || [ ! -f "$legacy_boot/kernel.sys" ]; }; then
-    printf 'Boot payload is unavailable under %s and %s\n' "$boot" "$legacy_boot" >&2
-    exit 1
-fi
-if [ ! -f "$boot/loader.elf" ] && [ ! -f "$esp/loader.elf" ]; then
-    printf 'Boot loader is unavailable under %s\n' "$esp" >&2
-    exit 1
-fi
-if [ ! -d "$boot" ]; then
-    mkdir -- "$boot" || { printf 'Cannot create canonical boot directory: %s\n' "$boot" >&2; exit 1; }
-    boot_dir_created=1
-fi
-lock_dir=/run/reliefos-kernel-update.lock
-mkdir -- "$lock_dir" 2>/dev/null || {
-    printf '%s\n' 'Another kernel update is already running' >&2
-    lock_dir=
-    exit 1
-}
-legacy_lock_dir=/run/leonos-kernel-update.lock
-mkdir -- "$legacy_lock_dir" 2>/dev/null || {
-    printf '%s\n' 'Another kernel update is already running' >&2
-    rmdir -- "$lock_dir" 2>/dev/null || true
-    lock_dir=
-    legacy_lock_dir=
-    exit 1
-}
-# Each download lands on the filesystem that owns the file it replaces, so the
-# commit step renames within one filesystem instead of copying across devices.
-kernel_tmp=$(mktemp "$boot/.kernel.sys.rpr.XXXXXX") || exit 1
-loader_tmp=$(mktemp "$boot/.loader.elf.rpr.XXXXXX") || exit 1
-rprfetch "$rpr_url/kernel/$kernel_file" "$kernel_tmp" || exit 1
-rprfetch "$rpr_url/kernel/$loader_file" "$loader_tmp" || exit 1
-actual_kernel=$(sha256sum "$kernel_tmp" | awk '{print $1}')
-actual_loader=$(sha256sum "$loader_tmp" | awk '{print $1}')
-[ "$actual_kernel" = "$kernel_hash" ] || { printf '%s\n' 'kernel.sys checksum mismatch' >&2; exit 1; }
-[ "$actual_loader" = "$loader_hash" ] || { printf '%s\n' 'loader.elf checksum mismatch' >&2; exit 1; }
-chmod 0644 "$kernel_tmp" "$loader_tmp" || exit 1
-
-kernel_backup="$boot/.kernel.sys.rpr-backup.$$"
-loader_backup="$boot/.loader.elf.rpr-backup.$$"
-[ ! -e "$kernel_backup" ] && [ ! -e "$loader_backup" ] || {
-    printf '%s\n' 'Kernel update backup path already exists' >&2
-    exit 1
-}
-commit_started=1
-if [ -e "$boot/kernel.sys" ]; then
-    mv -- "$boot/kernel.sys" "$kernel_backup" || exit 1
-    had_kernel=1
-fi
-if [ -e "$boot/loader.elf" ]; then
-    mv -- "$boot/loader.elf" "$loader_backup" || exit 1
-    had_loader=1
-fi
-mv -- "$kernel_tmp" "$boot/kernel.sys" || exit 1
-mv -- "$loader_tmp" "$boot/loader.elf" || exit 1
-kernel_tmp=
-loader_tmp=
-sync || exit 1
-commit_done=1
-printf 'Installed kernel and loader %s (build %s); reboot to activate.\n' \
-    "$remote_image" "$remote_release"
-exit 0
+"$helper" --inspect / "$release" > "$temporary/installed"
+cmp -s "$temporary/expected" "$temporary/installed" || die 'Installed kernel bundle does not match the verified update'
+printf 'Installed kernel %s (package %s); reboot to activate.\n' "$release" "$package_version"

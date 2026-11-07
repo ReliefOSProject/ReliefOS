@@ -1,9 +1,5 @@
 #!/bin/sh
-# Paint the ReliefOS pixel-art backdrop behind the greeter (best effort).
-# xdm runs this as root while the display is open but before the login box
-# maps, so the greeter appears over the same wallpaper as the TWM session.
-# On failure the X server keeps its default root background.
-if test -x /usr/bin/xwallpaper && test -r /etc/reliefos/wallpaper.png; then
-    /usr/bin/xwallpaper --focus /etc/reliefos/wallpaper.png 2>/dev/null || :
-fi
+# Standard XDM setup hook, installed as /usr/lib/X11/xdm/Xsetup_0.
+# Keep the X server background unless the administrator configures this hook.
+# The greeter's colors, fonts and logo are defined by /etc/X11/xdm/Xresources.
 exit 0

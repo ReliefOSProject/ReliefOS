@@ -14,6 +14,8 @@ set -eu
 
 . "$(CDPATH= cd -- "$(dirname "$0")/../../scripts" && pwd)/logging.sh"
 case ${MAKEFLAGS%% *} in *n*) exit 0 ;; esac
+. "$(CDPATH= cd -- "$(dirname "$0")" && pwd)/upstream-make-environment.sh"
+reliefos_upstream_make_environment
 
 die() {
     printf '%s\n' "musl-sysroot: $*" >&2
@@ -24,7 +26,7 @@ usage() {
     cat >&2 <<'USAGE'
 usage: musl-sysroot.sh --src ROOT --deps PATH --lock PATH --work DIR --sysroot DIR
                        --cc EXE --ar EXE --ranlib EXE --ld EXE
-                       --target TRIPLE --cflags FLAGS [--log FILE] [--print-only]
+                       --target TRIPLE --stack-object FILE --cflags FLAGS [--log FILE] [--print-only]
 USAGE
     exit 2
 }
@@ -39,6 +41,7 @@ ar=""
 ranlib=""
 ld=""
 target=""
+stack_object=""
 cflags=""
 log=""
 print_only=0
@@ -55,6 +58,7 @@ while [ "$#" -gt 0 ]; do
         --ranlib) ranlib=$2; shift 2 ;;
         --ld) ld=$2; shift 2 ;;
         --target) target=$2; shift 2 ;;
+        --stack-object) stack_object=$2; shift 2 ;;
         --cflags) cflags=$2; shift 2 ;;
         --log) log=$2; shift 2 ;;
         --print-only) print_only=1; shift ;;
@@ -63,7 +67,7 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
-for required in src deps lock work sysroot cc ar ranlib ld target cflags; do
+for required in src deps lock work sysroot cc ar ranlib ld target stack_object cflags; do
     eval "value=\${$required}"
     [ -n "$value" ] || { printf 'musl-sysroot: --%s is required\n' "$required" >&2; exit 2; }
 done
@@ -188,10 +192,8 @@ run_logged make --no-print-directory -C "$build" install CC="$CC" AR="$AR" RANLI
 # musl builds without stack protection; anything compiled with it still needs
 # __stack_chk_fail_local, so the device supplies it the way the old build did.
 mkdir -p "$sysroot/lib"
-"$cc" --target="$target" -O2 -fPIC -fno-stack-protector -nostdinc \
-    -c "$src/userland/musl-dev/stack_chk_fail_local.c" \
-    -o "$build/stack_chk_fail_local.o"
-"$ar" rcs "$sysroot/lib/libssp_nonshared.a" "$build/stack_chk_fail_local.o"
+[ -f "$stack_object" ] || die "missing Kbuild stack-protector helper: $stack_object"
+"$ar" rcs "$sysroot/lib/libssp_nonshared.a" "$stack_object"
 
 mimalloc_obj="$build/mimalloc.o"
 resource=$("$cc" -print-resource-dir)

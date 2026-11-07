@@ -28,13 +28,23 @@ printf 'toolchain\t%s\n\n' "${TOOLCHAIN:-unset}"
 group 'host tools (required by make itself and the C helpers)'
 for tool in sh grep sed awk find sort cmp mv ln mkdir rm printf date tr head \
             cut expr uname nproc xz tar patch curl flock make readelf stat od \
-            gzip sha256sum timeout perl autoconf automake libtoolize gperf bison flex pkg-config msgfmt; do
+            gzip sha256sum timeout perl autoconf automake libtoolize gperf bison flex pkg-config msgfmt makeinfo; do
     check_tool "$tool"
 done
 reliefos_log HOSTCC "${HOSTCC:-cc}"
 if ! command -v "${HOSTCC:-cc}" >/dev/null 2>&1; then
     missing "HOSTCC=${HOSTCC:-cc}"
 fi
+
+group 'GRUB BIOS freestanding compiler'
+check_tool "${GRUB_PC_CC:-gcc}"
+grub_probe=$(mktemp -d)
+if printf 'void _start(void) { for (;;) {} }\n' | "${GRUB_PC_CC:-gcc}" -m32 -ffreestanding -fno-pie -fno-stack-protector -x c -c -o "$grub_probe/probe.o" - >"$grub_probe/log" 2>&1; then
+    present 'GRUB i386 code generation' "${GRUB_PC_CC:-gcc} -m32"
+else
+    missing 'GRUB BIOS requires a compiler supporting freestanding -m32'
+fi
+rm -rf "$grub_probe"
 
 group ''
 group 'target toolchain (validated by actually compiling)'
@@ -98,7 +108,7 @@ fi
 
 group ''
 group 'image and run tools (needed by the image and run phases)'
-for tool in mke2fs e2fsck mkfs.fat mformat mcopy xorriso qemu-img qemu-system-x86_64 grub-mkstandalone grub-mkfont sfdisk fakeroot openssl zip; do
+for tool in mke2fs e2fsck mkfs.fat mformat mcopy xorriso qemu-img qemu-system-x86_64 grub-mkfont sfdisk fakeroot openssl zip; do
     check_tool "$tool"
 done
 image_probe=$(mktemp -d)
@@ -110,9 +120,8 @@ else
 fi
 rm -rf "$image_probe"
 
-# ReliefOS boots through UEFI, so a QEMU without firmware cannot be tested at
-# all. Reporting this as satisfied is how a run target ends up looking green
-# while the guest never starts.
+# OVMF is required for the default UEFI run and complete dual-firmware tests.
+# BIOS run targets use SeaBIOS and do not depend on this firmware file.
 firmware_found=''
 for candidate in "${SRC:-.}/buildsystem/firmware/OVMF.fd" \
                  "${SRC:-.}/build/firmware/OVMF.fd" \
@@ -131,10 +140,10 @@ fi
 
 group ''
 group 'third-party build inputs'
-if [ -f third_party/kconfig-frontends/configure.ac ]; then
-    reliefos_log OK 'kconfig-frontends submodule present'
+if [ -f scripts/kconfig/conf.c ] && [ -f scripts/Makefile.build ]; then
+    reliefos_log OK 'vendored Linux Kbuild / Kconfig source present'
 else
-    missing 'third_party/kconfig-frontends (git submodule update --init --recursive)'
+    missing 'scripts/Makefile.build or scripts/kconfig/conf.c'
 fi
 if [ -f third_party/zlib/contrib/puff/puff.c ]; then
     reliefos_log OK 'zlib reference inflate (contrib/puff) present'

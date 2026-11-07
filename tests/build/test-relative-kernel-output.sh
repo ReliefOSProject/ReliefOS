@@ -26,9 +26,8 @@ for kernel_o in default override; do
         fi
     fi
 
-    test -f "$repo_root/$reliefnt_o/kernel-export/include/leonos/audio_abi.h"
     test -f "$repo_root/$reliefnt_o/kernel-export/include/reliefos/audio_abi.h"
-    test -f "$work/kernel-export/include/leonos/audio_abi.h"
+    test -f "$work/kernel-export/include/reliefos/audio_abi.h"
 done
 
 printf 'ok   - relative output paths publish ReliefOS UAPI headers\n'

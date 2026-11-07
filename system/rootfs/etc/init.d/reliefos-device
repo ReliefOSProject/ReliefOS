@@ -9,4 +9,4 @@ respawn_max=3
 respawn_period=60
 output_log=/var/log/device-agent.log
 error_log=/var/log/device-agent.log
-depend() { need reliefos-runtime; }
+depend() { need reliefos-runtime reliefos-modules; }

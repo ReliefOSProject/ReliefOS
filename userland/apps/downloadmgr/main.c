@@ -1,4 +1,5 @@
 #include <reliefos/auth.h>
+#include <reliefos/xdg.h>
 #include <reliefos/fs.h>
 #include <reliefos/gui.h>
 #include <reliefos/http.h>
@@ -164,15 +165,7 @@ static void sanitize_filename(char *dst, uint32_t cap, const char *src)
 
 static void build_download_dir(char *dst, uint32_t cap)
 {
-    struct reliefos_user_info user;
-    if (reliefos_auth_current(&user) == 0 && user.home[0]) {
-        uint32_t pos = 0;
-        dst[0] = 0;
-        append_text(dst, &pos, cap, user.home);
-        append_text(dst, &pos, cap, "/downloads");
-        return;
-    }
-    copy_text(dst, cap, "/tmp");
+    if (reliefos_xdg_user_dir("DOWNLOAD",dst,cap)<0) copy_text(dst,cap,"/tmp");
 }
 
 static void build_child_path(char *dst, uint32_t cap, const char *dir,

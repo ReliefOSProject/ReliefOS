@@ -93,9 +93,13 @@ fi
 
 # The refusal must not leave a half-written tree behind, and the winner must not
 # have been disturbed by the loser parsing the same makefiles.
-owner_objects=$(find "$same_o/reliefnt/obj/kernel" \( -name '*.c.o' -o -name '*.S.o' \) 2>/dev/null |
-        wc -l | tr -d ' ')
-listed=$(wc -l <"$same_o/reliefnt/obj/kernel/sources.list" 2>/dev/null || printf 'unreadable')
+archive="$same_o/reliefnt/built-in.a"
+llvm-ar t "$archive" > "$work/archive-members"
+listed=$(wc -l < "$work/archive-members")
+owner_objects=0
+while IFS= read -r member; do
+    [ ! -s "$member" ] || owner_objects=$((owner_objects + 1))
+done < "$work/archive-members"
 if [ "$owner_objects" = "$listed" ] && [ "$owner_objects" -gt 50 ]; then
     pass "the winning build has every manifest source as an object ($owner_objects)"
 else
@@ -142,11 +146,33 @@ for tree in "$other_a" "$other_b"; do
     else
         fail "$name has its own kernel image" 'missing or empty'
     fi
-    if grep -qF -- "$tree" "$tree/reliefnt/obj/kernel/sources.mk" 2>/dev/null; then
-        pass "$name's generated fragment points at $name"
+    # Follow the native archive rather than assuming a kernel source layout.
+    # Every object must belong to this O, and its recorded command must use
+    # this O's generated headers. A moved source cannot make this a false fail.
+    llvm-ar t "$tree/reliefnt/built-in.a" > "$work/$name-members"
+    records_ok=1
+    source_records=0
+    while IFS= read -r member; do
+        case $member in "$tree/reliefnt/"*) ;; *) records_ok=0; break ;; esac
+        record="${member%/*}/.${member##*/}.cmd"
+        if [ ! -s "$member" ] || [ ! -s "$record" ]; then
+            records_ok=0
+            break
+        fi
+        # A composite has a link record; only compilation records use headers.
+        if grep -q '^source_' "$record"; then
+            source_records=$((source_records + 1))
+            if ! grep -qF -- "$tree/reliefnt/include" "$record"; then
+                records_ok=0
+                break
+            fi
+        fi
+    done < "$work/$name-members"
+    if [ "$records_ok" -eq 1 ] && [ "$source_records" -gt 50 ]; then
+        pass "$name's native command record points at $name"
     else
-        fail "$name's generated fragment points at $name" \
-            'the fragment references another tree: outputs were crossed'
+        fail "$name's native command record points at $name" \
+            'the native command references another tree: outputs were crossed'
     fi
 done
 

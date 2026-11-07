@@ -35,7 +35,7 @@ class OpenRCShutdownTests(unittest.TestCase):
         self.assertIn("test -d /run/leonos || return 1", runtime_script)
 
     def test_reliefos_services_have_one_canonical_runlevel_entry(self) -> None:
-        services = ("device", "dhcp", "imd", "ntp", "session", "windowd")
+        services = ("device", "dhcp", "ntp")
         for service in services:
             canonical = "reliefos-" + service
             legacy = "leonos-" + service

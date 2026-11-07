@@ -60,9 +60,6 @@ SDK_LICENSES: dict[str, tuple[str, ...]] = {
     "libpng.a": ("THIRD_PARTY/LIBPNG-LICENSE",),
     "sqlite.a": ("THIRD_PARTY/SQLITE-LICENSE",),
     "sqlite.so.3": ("THIRD_PARTY/SQLITE-LICENSE",),
-    "libstardustui.a": ("THIRD_PARTY/STARDUSTUI-LICENSE",),
-    "libportablegl.a": ("THIRD_PARTY/PORTABLEGL-LICENSE",),
-    "libportablegl.so.1": ("THIRD_PARTY/PORTABLEGL-LICENSE",),
 }
 
 
@@ -313,26 +310,27 @@ def check_sdk(source: Path) -> list[Finding]:
 
 
 def read_acknowledgement_source(root: Path) -> str:
-    source = root / "userland/apps/installer/main.c"
+    source = root / "userland/apps/installer/main.cpp"
     if not source.is_file():
         return ""
     text = source.read_text(encoding="utf-8", errors="replace")
-    start = text.find("static const char acknowledgements_en[]")
-    end = text.find("static int text_eq", start if start >= 0 else 0)
-    return text[start:end if end >= 0 else None] if start >= 0 else ""
+    arrays = re.findall(
+        r'static\s+const\s+char\s+acknowledgements_(?:en|zh)\[\]\s*=\s*'
+        r'(?:"(?:[^"\\]|\\.)*"\s*)+;', text, re.DOTALL)
+    return "\n".join(arrays)
 
 
 def check_excluded_credits(root: Path, excluded: Sequence[str]) -> list[Finding]:
     text = read_acknowledgement_source(root)
     if not text:
         return [result("excluded-credit", "fail", "error", "installer acknowledgements", "source text",
-                        "missing", "userland/apps/installer/main.c", "installer acknowledgement text was not found")]
+                        "missing", "userland/apps/installer/main.cpp", "installer acknowledgement text was not found")]
     findings = []
     for term in excluded:
         present = re.search(re.escape(term), text, re.IGNORECASE) is not None
         findings.append(result("excluded-credit", "fail" if present else "pass",
                                "error" if present else "info", term, "absent from installer acknowledgement page",
-                               "present" if present else "absent", "userland/apps/installer/main.c",
+                               "present" if present else "absent", "userland/apps/installer/main.cpp",
                                "excluded project appears in installer acknowledgements" if present else
                                "excluded project is absent from installer acknowledgements"))
     return findings
@@ -367,7 +365,8 @@ def self_test() -> int:
         (root / "third_party/demo").mkdir(parents=True)
         (root / "third_party/demo/LICENSE").write_text("MIT\n", encoding="utf-8")
         (root / "userland/apps/installer").mkdir(parents=True)
-        (root / "userland/apps/installer/main.c").write_text('static const char acknowledgements_en[] = "ok";\nstatic int text_eq(void);', encoding="utf-8")
+        (root / "userland/apps/installer/main.cpp").write_text('static const char acknowledgements_en[] = "ok";\nstatic int text_eq(void);', encoding="utf-8")
+        assert check_excluded_credits(root, ("TinyLlama",))[0].status == "pass"
         assert check_submodules(root)[0].status == "pass"
         esp_program = root / "build/esp/usr/bin"
         esp_program.mkdir(parents=True)
@@ -384,7 +383,7 @@ def self_test() -> int:
         (sdk / "THIRD_PARTY").mkdir()
         (sdk / "THIRD_PARTY/ZLIB-LICENSE").write_text("zlib\n", encoding="utf-8")
         assert any(f.component == "libz.a" and f.status == "pass" for f in check_sdk(sdk))
-        (root / "userland/apps/installer/main.c").write_text(
+        (root / "userland/apps/installer/main.cpp").write_text(
             'static const char acknowledgements_en[] = "TinyLlama";\nstatic int text_eq(void);',
             encoding="utf-8")
         assert check_excluded_credits(root, ("TinyLlama",))[0].status == "fail"

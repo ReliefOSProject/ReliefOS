@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: GPL-2.0
+# Compiler-policy adapter for ReliefOS/ReliefNT, which are not Linux kernels.
+# The upstream compilation/dependency engine stays unmodified. Linux's forced
+# compiler_types.h is not an input to either project's freestanding/POSIX ABI.
+# Recursive Kbuild calls retain this adapter before loading the upstream rules.
+override build := -f $(srctree)/scripts/Makefile.port -f $(srctree)/scripts/Makefile.build obj
+
+override c_flags = -Wp,-MMD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE) \
+                  $(_c_flags) $(modkern_cflags) $(basename_flags) $(modname_flags)
+
+# Fail product/custom actions at the first failing command.
+.SHELLFLAGS := -ec
+
+# Product directory edges make the AR identity before recursively entering
+# these target build contexts. Include its digest in the saved native command,
+# but do not add a built-in.a prerequisite here: this adapter is included ahead
+# of Makefile.build, so that rule would become the native default target and
+# would leak a product-output dependency into host-only builds.
+ifneq ($(wildcard $(RELIEFOS_AR_ID)),)
+RELIEFOS_NATIVE_AR_ID = $(shell sha256sum '$(RELIEFOS_AR_ID)' 2>/dev/null | cut -d' ' -f1)
+override AR = env RELIEFOS_AR_ID=$(RELIEFOS_NATIVE_AR_ID) $(TARGET_AR)
+endif
+
+# Upstream normally creates object directories while parsing. Inspection must
+# leave even a partially built output tree unchanged.
+ifneq ($(or $(findstring n,$(firstword -$(MAKEFLAGS))),$(findstring q,$(firstword -$(MAKEFLAGS)))),)
+override obj-dirs :=
+endif
+
+ifeq ($(V),1)
+quiet :=
+Q :=
+else
+quiet := quiet_
+Q := @
+endif
+export quiet Q

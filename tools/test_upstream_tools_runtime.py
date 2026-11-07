@@ -39,7 +39,7 @@ class UpstreamRuntimeTests(unittest.TestCase):
     def test_fdisk_version_uses_target_libraries(self):
         result = self.fdisk("--version")
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout.strip(), "fdisk from util-linux 2.41.6")
+        self.assertEqual(result.stdout.strip(), "fdisk from util-linux 2.42.4")
 
     def test_fdisk_can_write_and_read_a_gpt_on_a_disposable_file(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-fdisk-runtime-") as temporary:

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefMath++
+GenericName=Geometry and Function Plotter
+GenericName[zh_CN]=几何与函数绘图工具
+Comment=Explore 2D and 3D geometry, functions and numerical calculations
+Comment[zh_CN]=绘制二维和三维几何、函数曲线与曲面，并进行数值计算
+Exec=/usr/bin/reliefmathpp %f
+TryExec=/usr/bin/reliefmathpp
+Icon=reliefos-reliefmathpp
+Terminal=false
+Categories=Office;Math;
+MimeType=application/x-reliefmathpp;
+StartupWMClass=reliefos-reliefmathpp

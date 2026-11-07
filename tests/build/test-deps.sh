@@ -15,7 +15,7 @@ export LC_ALL
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd -P)
 cd "$repo_root" || exit 1
 
-deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:?set by mk/tests.mk}}
+deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:?set by scripts/reliefos/Makefile.tests}}
 lock=${RELIEFOS_LOCK:-${LEONOS_LOCK:-configs/dependencies.lock.json}}
 
 failures=0
@@ -106,10 +106,10 @@ fi
 expect_output_is 'a submodule reports its pinned commit' 9fa28ece75d8a2191de7c5bb53bed224c5947417 \
     "$deps" --lock "$lock" --id musl --print commit
 expect_output_is 'a tarball reports its digest' \
-    ac15ffb8430502fbaccdec66c5a82ee0eab0b0f36220df56710feadfeb13d0a0 \
+    fc0f1eb6b6766470326f2c014693809190e67dba84274a6fbae9d4912d066706 \
     "$deps" --lock "$lock" --id libmd --print sha256
 expect_output_is 'a tarball reports its download url' \
-    https://libbsd.freedesktop.org/releases/libmd-1.2.0.tar.xz \
+    https://libbsd.freedesktop.org/releases/libmd-1.3.0.tar.xz \
     "$deps" --lock "$lock" --id libmd --print url
 expect_failure 'an unknown id fails rather than printing nothing' \
     "$deps" --lock "$lock" --id does-not-exist --print commit
@@ -128,7 +128,7 @@ else
     printf 'ok   - submodules are excluded from the fetch list\n'
 fi
 checks=$((checks + 1))
-if printf '%s\n' "$fetch_list" | grep -q 'libmd-1.2.0.tar.xz'; then
+if printf '%s\n' "$fetch_list" | grep -q 'libmd-1.3.0.tar.xz'; then
     printf 'ok   - downloaded tarballs appear in the fetch list\n'
 else
     printf 'FAIL - downloaded tarballs must appear in the fetch list\n'
@@ -154,10 +154,12 @@ D='0000000000000000000000000000000000000000000000000000000000000000'
 
 expect_output_is 'xorg entry reports feature' xorg \
     "$deps" --lock "$lock" --id alpine-xdm --print feature
-expect_output_is 'xterm entry reports pinned version' 410-r0 \
-    "$deps" --lock "$lock" --id alpine-xterm --print version
-expect_output_is 'xterm entry reports feature' xorg \
-    "$deps" --lock "$lock" --id alpine-xterm --print feature
+expect_output_is 'st entry reports pinned version' 0.9.3-r0 \
+    "$deps" --lock "$lock" --id alpine-st --print version
+expect_output_is 'st entry reports feature' xorg \
+    "$deps" --lock "$lock" --id alpine-st --print feature
+expect_output_is 'st font dependency is pinned' 2.1.5-r2 \
+    "$deps" --lock "$lock" --id alpine-font-liberation --print version
 expect_output_is 'unmarked entry defaults to base' base \
     "$deps" --lock "$lock" --id alpine-openrc --print feature
 expect_failure 'invalid feature is rejected' \

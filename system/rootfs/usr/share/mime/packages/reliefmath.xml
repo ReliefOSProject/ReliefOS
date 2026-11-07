@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-reliefmath">
+    <comment>ReliefMath document</comment>
+    <comment xml:lang="zh_CN">ReliefMath 文档</comment>
+    <glob pattern="*.rmath"/>
+  </mime-type>
+</mime-info>

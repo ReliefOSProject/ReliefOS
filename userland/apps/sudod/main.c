@@ -7,7 +7,6 @@
 #include <fcntl.h>
 #include <reliefos/sudo.h>
 #include <reliefos/auth.h>
-#include <reliefos/ui.h>
 #include <libintl.h>
 #define T(s) gettext(s)
 #include <locale.h>
@@ -282,28 +281,12 @@ static int sudod_finish(int32_t status)
 
 static int askpass(const char *prompt)
 {
-    char password[RELIEFOS_AUTH_PASSWORD_LEN] = {0};
     if (!prompt || !strcmp(prompt, "Password:") || !strcmp(prompt, "Password: "))
         prompt = T("Password:");
-    int result = reliefos_ui_show_password_dialog(
-        T("Authentication"), prompt, password, sizeof(password));
-    fprintf(stderr, "[askpass] dialog result=%d\n", result);
-    if (result == 1) {
-        size_t size = strlen(password);
-        password[size++] = '\n';
-        size_t sent = 0;
-        while (sent < size) {
-            ssize_t n = write(STDOUT_FILENO, password + sent, size - sent);
-            if (n < 0 && errno == EINTR) continue;
-            if (n <= 0) {
-                fprintf(stderr, "[askpass] response write failed errno=%d\n", errno);
-                result = 0; break;
-            }
-            sent += (size_t)n;
-        }
-    }
-    explicit_bzero(password, sizeof(password));
-    return result == 1 ? 0 : 1;
+    execl("/usr/lib/reliefos/apps/reliefaskpass/reliefaskpass.elf",
+          "reliefaskpass", prompt, (char *)0);
+    perror("Start authentication prompt");
+    return 1;
 }
 
 int main(int argc, char **argv)

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefPlayer
+GenericName=Audio Player
+GenericName[zh_CN]=音频播放器
+Comment=Play local MP3 and WAV audio
+Comment[zh_CN]=播放本地 MP3 和 WAV 音频，支持暂停、定位和音量控制
+Exec=/usr/bin/reliefplayer %f
+TryExec=/usr/bin/reliefplayer
+Icon=reliefos-reliefplayer
+Terminal=false
+Categories=AudioVideo;Audio;Player;
+MimeType=audio/mpeg;audio/x-wav;audio/wav;audio/vnd.wave;
+StartupWMClass=reliefos-reliefplayer

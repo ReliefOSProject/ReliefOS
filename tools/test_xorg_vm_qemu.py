@@ -2,7 +2,7 @@
 """Boot the Xorg image on the VMware SVGA device and verify the tty1 session.
 
 The scenario is the acceptance walk-through from the desktop task: tty1 runs the
-XDM/Xorg/TWM graphical session, tty2-tty6 stay text logins that accept typed
+XDM/Xorg/IceWM graphical session, tty2-tty6 stay text logins that accept typed
 input, Ctrl+Alt+Fn switches the display both ways, and the guest's XDM lifecycle
 record is captured as the evidence log that tools/test_xorg_qemu.py validates.
 """
@@ -12,6 +12,8 @@ import re
 import shutil
 import subprocess
 import time
+
+from PIL import Image, ImageChops, ImageDraw
 
 from test_installer_accounts_qemu import Probe
 from test_installer_window_qemu import wait_log
@@ -57,7 +59,12 @@ def login(probe, process, name, user, password, prompt_needle):
     wait_text(probe, process, f"{name}-password", "Password:")
     probe.text(password)
     probe.key("ret")
-    wait_text(probe, process, f"{name}-shell", "built-in shell")
+    # Login now selects Bash where available. Check the account prompt and
+    # execute a fresh command rather than require BusyBox's startup banner.
+    wait_text(probe, process, f"{name}-shell", f"{user}@")
+    marker = f"XORG-LOGIN-{time.monotonic_ns():x}"
+    serial_run(probe, probe.output / "serial.log", process,
+               f"echo {marker} >/dev/ttyS0", marker)
 
 
 GREETER_NEEDLE = "unsecure"   # xlogin's banner; gone once a session runs
@@ -76,20 +83,23 @@ def classify_greeter_text(text):
 
 
 def _bright_panel_bbox(frame):
-    """Find xlogin's large white panel, ignoring bright terminal glyphs."""
+    """Find xlogin's neutral white/gray panel, ignoring terminal glyphs."""
     width, height = frame.size
     pixels = frame.load()
 
     def bright(pixel):
-        return min(pixel[:3]) >= 220
+        colors = pixel[:3]
+        return min(colors) >= 180 and max(colors) - min(colors) <= 20
 
+    # Upstream xlogin's fixed-size gray panel spans about one third of a full
+    # HD display; the X logo can remove another part from a neutral-color run.
     # A bright wallpaper band (the pale sky) is bright too, but it runs edge
     # to edge.  Only rows whose widest bright run keeps a margin on both
     # sides can belong to the centered panel.
     edge = width * 0.08
     row_hits = []
     for y in range(height):
-        if sum(bright(pixels[x, y]) for x in range(width)) < width * 0.40:
+        if sum(bright(pixels[x, y]) for x in range(width)) < width * 0.25:
             continue
         runs = []
         start = None
@@ -110,7 +120,10 @@ def _bright_panel_bbox(frame):
     # Text and the separator split individual rows.  Group rows into bands
     # tolerating short gaps, then aggregate each band so a single row cannot
     # select only half of the white surface.  The panel is the largest band.
-    gap = max(4, height // 100)
+    # A short text label can hide several full rows when the centered panel
+    # is only just wide enough to pass the screen-relative row threshold.
+    # On 1280x800 captures, allow the ten-row jump around xlogin's label.
+    gap = max(10, height // 100)
     bands = [[row_hits[0]]]
     for y in row_hits[1:]:
         if y - bands[-1][-1] <= gap:
@@ -131,10 +144,10 @@ def _bright_panel_bbox(frame):
             else:
                 x_runs[-1].append(x)
         columns = max(x_runs, key=len, default=[])
-        if len(columns) < width * 0.40:
+        if len(columns) < width * 0.25:
             continue
         # xlogin's panel is centered with a margin on every side.  A running
-        # xterm is also a bright rectangle, but it touches the display edge
+        # st is also a bright rectangle, but it touches the display edge
         # and must not keep the session probe in the greeter state.
         if (columns[0] < width * 0.10 or columns[-1] >= width * 0.90 or
                 band[0] < height * 0.10 or band[-1] >= height * 0.90):
@@ -169,8 +182,8 @@ def lifecycle_events(log):
     """Extract only the authenticated non-root session lifecycle events."""
     patterns = (
         ("PAM authentication accepted", re.compile(r"PAM authentication accepted\b")),
-        ("twm started for uid", re.compile(r"twm started for uid=(?!0\b)[1-9][0-9]*\b")),
-        ("xterm started", re.compile(r"xterm started\b")),
+        ("icewm started for uid", re.compile(r"icewm started for uid=(?!0\b)[1-9][0-9]*\b")),
+        ("st started", re.compile(r"st started\b")),
         ("xdm session ended", re.compile(r"xdm session ended\b")),
         ("tty1 restored to text login", re.compile(r"tty1 restored to text login\b")),
     )
@@ -185,8 +198,8 @@ def lifecycle_events(log):
 def require_event_order(log):
     """Require the authenticated XDM lifecycle to be recorded in order."""
     expected = [
-        "PAM authentication accepted", "twm started for uid",
-        "xterm started", "xdm session ended", "tty1 restored to text login",
+        "PAM authentication accepted", "icewm started for uid",
+        "st started", "xdm session ended", "tty1 restored to text login",
     ]
     actual = lifecycle_events(log)
     if actual != expected:
@@ -226,20 +239,18 @@ def wait_serial_after(serial, needle, process, offset, timeout=30):
     raise AssertionError(f"Missing serial output after current action: {needle}")
 
 
-def greeter_login(probe, process):
+def greeter_login(probe, process, *, timeout=45):
     """Sign in at the XDM xlogin greeter: name first, then the password."""
-    wait_greeter_stage(probe, process, "login", "tty1-greeter")
+    wait_greeter_stage(probe, process, "login", "tty1-greeter", timeout=timeout)
     print("xorg-vm: greeter:", repr(greeter_ocr(probe.frame("tty1-greeter-detail"))[:400]), flush=True)
     # Re-focus after a VT acquire.  XDM may redraw before Xorg has delivered
     # the first post-acquire pointer/keyboard event to the input widget.
     probe.click(700, 310)
     probe.text("test")
     probe.key("ret")            # accept the name; xlogin swaps in the password
-    wait_greeter_stage(probe, process, "password", "tty1-greeter-password")
-    # xlogin keeps the password field at the same y coordinate as the login
-    # field; clicking below the field leaves the keyboard focus on the root
-    # window and submits an empty password, returning to the greeter.
-    probe.click(700, 310)
+    wait_greeter_stage(probe, process, "password", "tty1-greeter-password", timeout=timeout)
+    # Return advances xlogin to its password entry. Keep that keyboard focus;
+    # field positions differ between the white and packaged gray resources.
     probe.text("test")
     probe.key("ret")            # submit
 
@@ -263,39 +274,67 @@ def wait_greeter_stage(probe, process, expected, name, timeout=45):
     raise AssertionError(f"XDM greeter did not reach {expected!r}; observed {observed!r}")
 
 
-def _session_xterm_visible(frame):
-    """Return True once the session xterm has mapped its window.
+def session_st_bounds(frame):
+    """Find st's default black client surface enclosed by the WM frame.
 
-    The pale wallpaper alone already passes any brightness floor on the bare
-    root window the moment xdm kills the greeter, long before twm/xterm have
-    mapped.  The xterm started by xdm-session fills its window with #f7f8fb
-    and the wallpaper palette contains no pixel of that exact color, so only
-    a mapped terminal can put it on screen -- the readiness signal needed
-    before typing the marker command.
+    Ignore the edge-connected desktop/console background and small glyphs,
+    icons or shadows. This also finds a moved, resized or maximized terminal
+    without counting the black root window when st is minimized.
     """
-    colors = frame.getcolors(1 << 20) or []
-    return sum(count for count, rgb in colors if rgb == (247, 248, 251)) >= 20000
+    channels = [channel.point(lambda value: 255 if value == 0 else 0)
+                for channel in frame.convert("RGB").split()]
+    mask = ImageChops.multiply(ImageChops.multiply(*channels[:2]), channels[2])
+    width, height = frame.size
+    for y in range(16, height, 32):
+        for x in range(16, width, 32):
+            if not mask.getpixel((x, y)):
+                continue
+            before = mask.copy()
+            ImageDraw.floodfill(mask, (x, y), 0)
+            component = ImageChops.subtract(before, mask)
+            bounds = component.getbbox()
+            if (bounds and 0 < bounds[1] < bounds[3] < height and
+                    bounds[2] - bounds[0] >= 200 and
+                    bounds[3] - bounds[1] >= 100 and
+                    component.histogram()[255] >= 20000):
+                # A thin black frame edge can join the surface beside the
+                # title. Keep rows/columns dominated by the client itself.
+                surface = component.crop(bounds)
+                columns = surface.resize((surface.width, 1), Image.Resampling.BOX)
+                rows = surface.resize((1, surface.height), Image.Resampling.BOX)
+                xs = columns.point(lambda value: 255 if value >= 128 else 0).getbbox()
+                ys = rows.point(lambda value: 255 if value >= 128 else 0).getbbox()
+                if xs and ys:
+                    return (bounds[0] + xs[0], bounds[1] + ys[1],
+                            bounds[0] + xs[2], bounds[1] + ys[3])
+    return None
+
+
+def _session_st_visible(frame):
+    """Require a bounded terminal surface rather than a bare black desktop."""
+    return session_st_bounds(frame) is not None
 
 
 def wait_session(probe, process, name, timeout=45):
-    """Require a mapped session window before sending an xterm probe."""
+    """Require a mapped session window before sending an st probe."""
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         assert process.poll() is None, "QEMU exited while waiting for the session"
         frame = probe.frame(name)
-        if (_bright_panel_bbox(frame) is None and
-                _session_xterm_visible(frame)):
+        # A centered light panel can be Fileman's list. The bounded black st
+        # client is the session evidence; a greeter/logo alone cannot supply it.
+        if _session_st_visible(frame):
             return
         time.sleep(.5)
-    raise AssertionError(f"TWM/xterm session never became visible on {name}")
+    raise AssertionError(f"IceWM/st session never became visible on {name}")
 
 
-def xterm_marker(probe, serial, process, marker, command=None):
-    """Prove that input reached the xterm shell by observing its serial marker."""
+def st_marker(probe, serial, process, marker, command=None):
+    """Prove that input reached the st shell by observing its serial marker."""
     command = command or f"echo {marker} >/dev/ttyS0"
     offset = len(serial.read_text(errors="replace")) if serial.exists() else 0
-    # TWM keeps the keyboard focus with the pointer, and the greeter login
-    # clicks leave the pointer outside the session xterm that xdm-session
+    # IceWM keeps the keyboard focus with the pointer, and the greeter login
+    # clicks leave the pointer outside the session st that xdm-session
     # places at +0+0.  Click the terminal first, the same way greeter_login
     # focuses the login field before typing.
     probe.click(300, 200)
@@ -329,7 +368,7 @@ def frame_distance(first, second):
                for y in range(90) for x in range(160)) / (160 * 90 * 255)
 
 
-def collect(probe, serial, process, tag, path=None, command=None):
+def collect(probe, serial, process, tag, path=None, command=None, timeout=20):
     """Run a guest command and read its output between serial markers."""
     if (path is None) == (command is None):
         raise ValueError("exactly one of path or command is required")
@@ -346,7 +385,7 @@ def collect(probe, serial, process, tag, path=None, command=None):
     # are stable on the guest's busybox shell.
     probe.text(f"echo '{begin}' >/dev/ttyS0; {body} >/dev/ttyS0; echo '{end}' >/dev/ttyS0")
     probe.key("ret")
-    wait_serial_after(serial, end, process, 0, timeout=20)
+    wait_serial_after(serial, end, process, 0, timeout=timeout)
     text = serial.read_text(errors="replace")
     start = text.rfind(begin)
     finish = text.find(end, start + len(begin))
@@ -408,7 +447,7 @@ def main() -> int:
         try:
             greeter_login(probe, process)
             wait_session(probe, process, "tty1-session-live")
-            xterm_marker(probe, serial, process, "XORG-XTERM-READY")
+            st_marker(probe, serial, process, "XORG-ST-READY")
             session_ready = True
         except AssertionError as error:
             fail(f"tty1 session did not replace the greeter: {error}")
@@ -453,10 +492,10 @@ def main() -> int:
 
             # Type a sentinel on the active text VT without submitting it.
             # After the return, neither OCR nor the measurable framebuffer
-            # distance may show that text in the xterm surface.
+            # distance may show that text in the st surface.
             switch_vt(probe, serial, process, 1)
             wait_session(probe, process, "tty1-before-isolation")
-            xterm_marker(probe, serial, process, "XORG-RESTORED")
+            st_marker(probe, serial, process, "XORG-RESTORED")
             baseline = probe.frame("tty1-isolation-baseline")
             switch_vt(probe, serial, process, 2)
             sentinel = "TTY2-ONLY-INPUT-9F3A"
@@ -476,40 +515,49 @@ def main() -> int:
             serial_run(probe, serial, process,
                        "echo TTY2-AFTER-ISOLATION >/dev/ttyS0", "TTY2-AFTER-ISOLATION")
 
-            # Capture the real process table, then terminate TWM through the
-            # xterm shell.  This exercises XDM's session-ended and tty1 getty
+            # Capture the real process table, then terminate IceWM through the
+            # st shell.  This exercises XDM's session-ended and tty1 getty
             # handoff paths instead of leaving the session alive at teardown.
             processes = collect(probe, serial, process, "SESSION-PROCS", command="ps")
-            twm = re.search(r"(?im)^\s*(\d+)\s+.*\btwm(?:\s|$)", processes)
+            icewm = re.search(r"(?im)^\s*(\d+)\s+.*\bicewm(?:\s|$)", processes)
             if re.search(r"(?im)(?:getty|login\.elf).*tty1\b", processes):
                 fail(f"text getty/login still owns tty1 during the graphical session: {processes!r}")
-            if not twm:
-                fail(f"session process table has no TWM pid: {processes!r}")
+            if not icewm:
+                fail(f"session process table has no IceWM pid: {processes!r}")
             else:
-                twm_pid = twm.group(1)
+                icewm_pid = icewm.group(1)
                 switch_vt(probe, serial, process, 1)
                 wait_session(probe, process, "tty1-before-exit")
-                xterm_marker(probe, serial, process, "XORG-EXIT-REQUEST",
-                             f"echo XORG-EXIT-REQUEST >/dev/ttyS0; kill {twm_pid}")
+                st_marker(probe, serial, process, "XORG-EXIT-REQUEST",
+                             f"echo XORG-EXIT-REQUEST >/dev/ttyS0; kill {icewm_pid}")
                 # XDM may immediately present a fresh greeter after the user
                 # session ends.  First collect that end event, then terminate
                 # the display manager itself to exercise tty1's text fallback.
                 switch_vt(probe, serial, process, 2)
                 session_log = collect(probe, serial, process,
-                                      "XDM-AFTER-SESSION", path="/var/log/xdm.log")
+                                      "XDM-AFTER-SESSION", path="/home/test/.xsession-errors")
                 if "xdm session ended" not in session_log:
-                    fail("XDM log has no session-ended event after TWM termination")
-                xdm_ps = collect(probe, serial, process, "XDM-PROCS", command="ps")
-                xdm_pid_match = re.search(r"(?im)^\s*(\d+)\s+.*\bxdm\b", xdm_ps)
-                if xdm_pid_match:
+                    fail("user session log has no session-ended event after IceWM termination")
+                # The root launcher merges its session-event sink only after
+                # XDM exits. Check that final log below, and stop the actual
+                # manager identified by its configured pid file: a process-name
+                # search can accidentally select the reliefos-xdm wrapper.
+                xdm_pid_output = collect(probe, serial, process, "XDM-PID", path="/run/xdm.pid")
+                # Kernel diagnostics share the serial stream, so only a
+                # standalone decimal line can be the pid file's contents.
+                xdm_pids = re.findall(r"(?m)^([1-9][0-9]*)\s*$", xdm_pid_output)
+                if len(xdm_pids) == 1:
+                    xdm_pid = xdm_pids[0]
                     serial_run(probe, serial, process,
-                               f"echo TTY2-XDM-STOP >/dev/ttyS0; kill {xdm_pid_match.group(1)}",
+                               f"echo TTY2-XDM-STOP >/dev/ttyS0; kill {xdm_pid}",
                                "TTY2-XDM-STOP")
                 else:
-                    fail(f"XDM process missing after session end: {xdm_ps!r}")
+                    fail(f"XDM pid file invalid after session end: {xdm_pid_output!r}")
                 try:
-                    switch_vt(probe, serial, process, 1)
-                    wait_text(probe, process, "tty1-restored-login", "login:", timeout=60)
+                    # Xorg has exited, so tty1 is now a text VT. Do not require
+                    # the graphics=1 handshake used for a live Xorg switch.
+                    probe.key("ctrl-alt-f1")
+                    wait_text(probe, process, "tty1-restored-login", "reliefos login:", timeout=60)
                 except AssertionError as error:
                     fail(f"tty1 did not restore a text login after XDM exit: {error}")
 

@@ -55,7 +55,6 @@ ReliefOS shows a blue bugcheck screen when the kernel cannot safely continue. Th
 | STOP reason | Meaning | Usual next step |
 | KERNEL PANIC | Kernel code called `panic()` or `bugcheck_panic()`. The detail line is the panic message. | Search the message in the source tree or serial log. |
 | Unhandled Page Fault | A kernel-mode page fault, or a page fault that could not be recovered by lazy mapping. | Check `CR2`, `RIP`, and `PF FLAGS`. |
-| Window Server Page Fault | The desktop/window server faulted. ReliefOS stops because continuing could corrupt GUI ownership. | Check the window server task and the faulting address. |
 | Divide By Zero | CPU vector 0. Code divided by zero. | Inspect the function at `RIP`. |
 | Debug Exception | CPU vector 1. Debug trap. | Usually a bad debug state or unexpected trap. |
 | Non Maskable Interrupt | CPU vector 2. NMI. | Treat as hardware or emulator-level interruption. |
@@ -94,7 +93,7 @@ When `VECTOR` is `14`, the blue screen shows `PF FLAGS`.
 
 ## User application faults
 
-Most ordinary Ring-3 application page faults do not blue-screen the system. ReliefOS terminates the application, uses exit code `0x8000000e`, and posts an `Application Page Fault` report on the desktop. A user-mode page fault becomes a blue screen mainly when the current task is the window server or when no safe recovery path exists.
+Unrecoverable user-mode page faults are delivered to the application as Linux signals, normally `SIGSEGV` or `SIGBUS`. The default signal action terminates the process. Kernel-mode faults without a safe recovery path still stop the system; inspect the serial diagnostics for the fault address and instruction pointer.
 
 %%ENDDOC
 
@@ -106,25 +105,14 @@ version: 1.0
 %%BODY
 # File permissions
 
-ReliefOS uses a Windows-style permission model for files and directories. The current v1 permission bits are stored in ACL metadata and checked by kernel file operations.
+Files and directories use POSIX owner, group and read/write/execute mode bits.
 
-## Permission bits
-
-| Bit | Meaning |
-| R / Read | Read a file, list a directory, or view basic metadata. |
-| W / Write | Create files, write existing files, or modify directory contents. |
-| X / Execute | Run an `.elf` file or traverse a directory while resolving a path. |
-| Delete | Remove or rename the object. |
-| Manage | Change permissions, repair ACL metadata, or take ownership when allowed. |
-
-## Important rules
-
-- Administrators can manage system-wide objects and repair broken ACL metadata.
-- Normal users are expected to control their own `/home/<name>` files.
-- Opening a shortcut checks permission on both the `.lnk` file and its target.
-- Missing ACL metadata falls back to system default rules.
-
-%%ENDDOC
+- Read opens file contents or lists directory names.
+- Write changes file contents. Creating, removing and renaming entries requires write and search permission on the parent directory.
+- Execute runs a program; on directories it permits searching and path traversal.
+- Use file properties, chmod and chown to inspect and change modes and ownership when authorized.
+- Application shortcuts use standard .desktop entries; file and folder shortcuts use symbolic links. Programs run with the current user's permissions.
+- A symbolic link resolves to its target; target and parent directory permissions govern access.
 
 %%DOC help.format
 path: Developers/Help file format

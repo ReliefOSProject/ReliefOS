@@ -1,0 +1,15 @@
+#!/sbin/openrc-run
+description="Check the installed optional swapfile"
+
+depend() {
+    need swap
+    after localmount
+}
+
+start() {
+    ebegin "Checking optional swapfile activation"
+    /usr/lib/reliefos/check-swapfile /etc/fstab /proc/swaps
+    result=$?
+    eend "$result"
+    return "$result"
+}

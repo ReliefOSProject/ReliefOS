@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefExcel
+Name[zh_CN]=ReliefExcel
+GenericName=Spreadsheet
+Exec=/usr/bin/reliefexcel %f
+TryExec=/usr/bin/reliefexcel
+Icon=reliefos-reliefexcel
+Terminal=false
+Categories=Office;Spreadsheet;
+MimeType=application/x-reliefexcel;text/csv;
+StartupWMClass=reliefos-reliefexcel

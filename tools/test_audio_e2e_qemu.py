@@ -129,7 +129,7 @@ def main() -> int:
     parser.add_argument("--load-seconds", type=int, default=60,
                         help="CPU/I/O load duration during the Doom run")
     parser.add_argument("--standard-probe", type=Path,
-                        default=ROOT / "docs/superpowers/audio-validation/u6-standard-probe-20261003.sh")
+                        default=ROOT / "tools/tests/audio_standard_probe.sh")
     parser.add_argument("--probe", type=Path,
                         default=ROOT / "out/audio-hda-u6/qa/audio-guest-timer-accepted")
     args = parser.parse_args()

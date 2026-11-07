@@ -1,0 +1,6 @@
+macro-newcommand	\newcommand{\foo}{x}
+macro-def	\def\foo{x}
+external-package	\usepackage{amsmath}
+external-input	\input{secret.tex}
+unknown-environment	\begin{tikzpicture}x\end{tikzpicture}
+unknown-command	\unknown{x}

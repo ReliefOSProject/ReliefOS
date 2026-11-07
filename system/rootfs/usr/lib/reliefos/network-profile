@@ -1,0 +1,172 @@
+#!/bin/sh
+# Strict data reader shared by OpenRC and the sole resolver publisher.
+# Never source this profile or execute configuration text.
+set -eu
+fail() { echo "network-profile: $*" >&2; exit 1; }
+valid_ip() (
+    case "$1" in ''|*[!0-9.]*|.*|*.|*..*) exit 1 ;; esac
+    IFS=.; set -- $1
+    test "$#" -eq 4 || exit 1
+    for octet do
+        case "$octet" in 0[0-9]*) exit 1 ;; esac
+        test "${#octet}" -le 3 && test "$octet" -le 255 || exit 1
+    done
+)
+ip_number() (
+    IFS=.; set -- $1
+    printf '%s\n' "$((($1 << 24) | ($2 << 16) | ($3 << 8) | $4))"
+)
+print_ip() { printf '%s.%s.%s.%s\n' "$((($1 >> 24) & 255))" "$((($1 >> 16) & 255))" "$((($1 >> 8) & 255))" "$(($1 & 255))"; }
+clear_lease() {
+    /sbin/route del default dev eth0 2>/dev/null || :
+    /sbin/ifconfig eth0 0.0.0.0
+    rm -f /run/reliefos/dhcp-lease /run/reliefos/dhcp-dns
+}
+stop_dhcp() {
+    client=/run/reliefos/udhcpc.pid
+    if test ! -e "$client" && test ! -L "$client"; then return 0; fi
+    test -f "$client" && test ! -L "$client" || fail 'unsafe DHCP PID file'
+    test "$(stat -c %u "$client")" = 0 || fail 'DHCP PID file must belong to root'
+    permissions=$(stat -c %a "$client")
+    test "$((0$permissions & 022))" -eq 0 || fail 'unsafe DHCP PID file permissions'
+    read -r pid extra < "$client"
+    case "$pid" in ''|*[!0-9]*) fail 'invalid DHCP PID' ;; esac
+    test -z "$extra" && test "${#pid}" -le 10 && test "$pid" -gt 1 && test "$pid" -le 2147483647 || fail 'invalid DHCP PID'
+    if test ! -d "/proc/$pid"; then rm -f "$client"; return 0; fi
+    # Match the recorded service client, including BusyBox multicall argv.
+    # Refuse an unrelated process if the recorded PID has been reused.
+    command=$(tr '\000' '\n' < "/proc/$pid/cmdline")
+    newline='
+'
+    case "$command" in
+        /sbin/udhcpc"$newline"*|udhcpc"$newline"*|/bin/busybox"$newline"udhcpc"$newline"*) ;;
+        *) fail 'PID no longer identifies the DHCP client' ;;
+    esac
+    /sbin/start-stop-daemon --stop --retry TERM/10/KILL/2 --pidfile "$client" || return $?
+    rm -f "$client"
+}
+case "${1:-}" in
+    stop-dhcp) stop_dhcp; exit ;;
+    release) clear_lease; /usr/lib/reliefos/publish-resolver; exit ;;
+    mode|dns|prepare|check) ;;
+    *) fail 'expected mode, dns, prepare, check, release or stop-dhcp' ;;
+esac
+mode=dhcp address=0.0.0.0 prefix=24 gateway=0.0.0.0 dns_mode=automatic dns_servers= dns_custom=
+profile=/etc/reliefos/network.conf
+if test -e "$profile" || test -L "$profile"; then
+    test -f "$profile" && test ! -L "$profile" || fail 'profile is not a regular file'
+    test "$(stat -c %u "$profile")" = 0 || fail 'profile must belong to root'
+    permissions=$(stat -c %a "$profile")
+    test "$((0$permissions & 022))" -eq 0 || fail 'profile is writable by another user'
+    size=$(stat -c %s "$profile")
+    test "$size" -le 16384 || fail 'profile is too large'
+    # POSIX shells can discard NUL bytes while reading. Reject them before
+    # parsing so this validator has the same byte contract as the GUI worker.
+    clean_size=$(tr -d '\000' < "$profile" | wc -c)
+    test "$clean_size" -eq "$size" || fail 'NUL byte in profile'
+    seen=' '
+    while IFS= read -r line || test -n "$line"; do
+        case "$line" in ''|\#*) continue ;; *=*) ;; *) fail 'invalid field' ;; esac
+        key=${line%%=*}; value=${line#*=}
+        case "$seen" in *" $key "*) fail 'duplicate field' ;; esac
+        seen="$seen$key "
+        case "$key" in
+            version) test "$value" = 1 || fail 'unsupported version' ;;
+            mode) mode=$value ;;
+            address) address=$value ;;
+            prefix) prefix=$value ;;
+            gateway) gateway=$value ;;
+            dns_mode) dns_mode=$value ;;
+            dns_servers) dns_servers=$value ;;
+            dns_custom) dns_custom=$value ;;
+            *) fail 'unknown field' ;;
+        esac
+    done < "$profile"
+    case "$seen" in
+        *' version '*)
+            case "$seen" in *' dns_custom '*) fail 'legacy field in versioned profile' ;; esac
+            for key in version mode address prefix gateway dns_mode dns_servers; do
+                case "$seen" in *" $key "*) ;; *) fail 'incomplete profile' ;; esac
+            done
+            ;;
+        *)
+            # The previously shipped network.conf contained DNS preferences
+            # only. Preserve it and the published udhcpc policy until Save
+            # creates a complete versioned profile; do not silently rewrite it.
+            for key in $seen; do
+                case "$key" in dns_mode|dns_custom) ;; *) fail 'incomplete profile' ;; esac
+            done
+            case "$seen" in *' dns_mode '*) ;; *) fail 'missing DNS policy' ;; esac
+            case "$dns_mode" in
+                dhcp|automatic) dns_mode=automatic; test -z "$dns_custom" || fail 'unexpected custom server' ;;
+                custom) dns_servers=$dns_custom ;;
+                cloudflare) test -z "$dns_custom" || fail 'unexpected custom server' ;;
+                *) fail 'invalid legacy DNS mode' ;;
+            esac
+            if test -r /etc/udhcpc/leonos-dns; then
+                read -r previous_mode previous_servers < /etc/udhcpc/leonos-dns
+                case "$previous_mode" in
+                    0) dns_mode=cloudflare; dns_servers= ;;
+                    1) dns_mode=automatic; dns_servers= ;;
+                    2) dns_mode=custom; dns_servers=$previous_servers ;;
+                    *) fail 'invalid published DNS mode' ;;
+                esac
+            fi
+            ;;
+    esac
+fi
+case "$mode" in dhcp|static|disabled) ;; *) fail 'invalid mode' ;; esac
+case "$dns_mode" in automatic|custom|cloudflare) ;; *) fail 'invalid DNS mode' ;; esac
+valid_ip "$address" && valid_ip "$gateway" || fail 'invalid IPv4 address'
+case "$prefix" in ''|*[!0-9]*) fail 'invalid prefix' ;; esac
+while test "$prefix" != 0 && test "${prefix#0}" != "$prefix"; do prefix=${prefix#0}; done
+test "${#prefix}" -le 2 && test "$prefix" -le 32 || fail 'invalid prefix'
+mask=0
+test "$prefix" -eq 0 || mask=$(((4294967295 << (32 - prefix)) & 4294967295))
+ip=$(ip_number "$address"); gw=$(ip_number "$gateway")
+if test "$mode" = static; then
+    test "$ip" -gt 0 && test "$ip" -lt 3758096384 && test "$((ip >> 24))" -ne 127 || fail 'unusable static address'
+    network=$((ip & mask)); broadcast=$((network | (4294967295 ^ mask)))
+    if test "$prefix" -lt 31; then
+        test "$ip" -ne "$network" && test "$ip" -ne "$broadcast" || fail 'network or broadcast address'
+    fi
+    if test "$gw" -ne 0; then
+        test "$gw" -lt 3758096384 && test "$gw" -ne "$ip" && test "$((gw & mask))" -eq "$network" || fail 'gateway outside subnet'
+        if test "$prefix" -lt 31; then
+            test "$gw" -ne "$network" && test "$gw" -ne "$broadcast" || fail 'unusable gateway'
+        fi
+    fi
+    test "$dns_mode" != automatic || fail 'static mode needs explicit DNS'
+fi
+if test "$dns_mode" = custom; then
+    case "$dns_servers" in ''|*[!0-9.\ ]*|\ *|*\ |*'  '*) fail 'invalid DNS servers' ;; esac
+    count=0
+    for server in $dns_servers; do
+        valid_ip "$server" || fail 'invalid DNS server'
+        n=$(ip_number "$server")
+        test "$n" -gt 0 && test "$n" -lt 3758096384 || fail 'unusable DNS server'
+        count=$((count + 1)); test "$count" -le 3 || fail 'too many DNS servers'
+    done
+else
+    test -z "$dns_servers" || fail 'unexpected DNS servers'
+fi
+case "$1" in
+    check) exit 0 ;;
+    mode) printf '%s\n' "$mode" ;;
+    dns)
+        case "$dns_mode" in automatic) printf '1 0.0.0.0\n' ;; cloudflare) printf '0 0.0.0.0\n' ;; custom) printf '2 %s\n' "$dns_servers" ;; esac
+        ;;
+    prepare)
+        mkdir -p /run/reliefos
+        clear_lease
+        case "$mode" in
+            dhcp) /sbin/ifconfig eth0 up ;;
+            static)
+                /sbin/ifconfig eth0 "$address" netmask "$(print_ip "$mask")" up
+                test "$gw" -eq 0 || /sbin/route add default gw "$gateway" dev eth0
+                ;;
+            disabled) /sbin/ifconfig eth0 down ;;
+        esac
+        /usr/lib/reliefos/publish-resolver
+        ;;
+esac

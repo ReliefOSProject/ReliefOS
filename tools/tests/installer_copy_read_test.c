@@ -16,10 +16,12 @@ ssize_t __wrap_read(int fd, void *buffer, size_t size)
     return __real_read(fd, buffer, size);
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
-    FILE *file = tmpfile();
+    assert(argc == 2);
+    FILE *file = fopen(argv[1], "w+b");
     assert(file);
+    assert(!unlink(argv[1]));
     unsigned char data[50003], got[32768];
     for (unsigned i = 0; i < sizeof(data); ++i) data[i] = (unsigned char)(i * 17);
     assert(fwrite(data, 1, sizeof(data), file) == sizeof(data) && !fflush(file));

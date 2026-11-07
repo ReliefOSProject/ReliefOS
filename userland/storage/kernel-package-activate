@@ -1,0 +1,16 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# APK counts a failed package script as a failed transaction. Keep activation
+# here rather than relying on post-commit hooks, whose status APK ignores.
+set -eu
+if [ "$(uname -s)" != ReliefNT ]; then
+    echo 'Kernel activation deferred to checked image/installer boot publication.'
+    exit 0
+fi
+marker=/run/reliefos-kernel-activation.defer
+if [ -f "$marker" ] && [ ! -L "$marker" ] &&
+   [ "$(cat "$marker")" = 'ReliefOS offline installer boot publication pending' ]; then
+    echo 'Kernel activation deferred to the offline installer root sync and selected bootloader transaction.'
+    exit 0
+fi
+exec /usr/libexec/reliefos/kernel-bundle --publish-installed / /boot

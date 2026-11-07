@@ -35,7 +35,7 @@ def qmp_quit(sock_path: Path, process: subprocess.Popen) -> None:
             process.wait(timeout=5)
         except subprocess.TimeoutExpired:
             process.kill()
-            process.wait()
+            process.wait(timeout=5)
 
 
 def main() -> int:

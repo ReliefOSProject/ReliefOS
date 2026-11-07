@@ -56,7 +56,7 @@ class StorageRuntimeTests(unittest.TestCase):
         for command in ("mount", "umount"):
             result = self.tool(UTIL, f"bin/{command}", "--version")
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("util-linux 2.41.6", result.stdout)
+            self.assertIn("util-linux 2.42.4", result.stdout)
         listing = self.tool(UTIL, "bin/mount")
         self.assertEqual(listing.returncode, 0, listing.stderr)
         self.assertIn(" on /", listing.stdout)

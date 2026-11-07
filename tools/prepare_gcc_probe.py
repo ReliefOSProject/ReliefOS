@@ -26,8 +26,6 @@ def main():
     for namespace in ("reliefos", "leonos"):
         (stage / namespace).mkdir(exist_ok=True)
         shutil.copy2(ROOT / "build/system/kernel.sys", stage / namespace / "kernel.sys")
-        shutil.copy2(ROOT / "build/boot/loader.elf", stage / namespace / "loader.elf")
-    shutil.copy2(ROOT / "build/boot/loader.elf", stage / "loader.elf")
     from package_musl_gcc import COMMANDS
     for name in ("opt/dyne", "usr/share/licenses/musl-gcc", "usr/share/examples/musl-gcc"):
         shutil.copytree(args.toolchain / name, stage / name, symlinks=True)
@@ -48,7 +46,7 @@ insmod all_video
 set gfxpayload=keep
 menuentry "ReliefOS GCC ABI probe" {
     set root=(hd0,gpt1)
-    multiboot2 /loader.elf root=/ log=serial autospawn=gcc syscall-trace=/opt/dyne/
+    multiboot2 /reliefos/kernel.sys root=/ log=serial autospawn=gcc syscall-trace=/opt/dyne/
     boot
 }
 """, encoding="ascii")

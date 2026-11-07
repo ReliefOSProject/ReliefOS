@@ -1,4 +1,4 @@
-# Linux-PAM 1.7.2, ReliefOS musl feature policy. Source is a patched, read-only tree.
+# Linux-PAM 1.7.3, ReliefOS musl feature policy. Source is a patched, read-only tree.
 # Parent owns download, patch application, output lock and staging publication.
 .DEFAULT_GOAL := all
 .DELETE_ON_ERROR:
@@ -20,7 +20,7 @@ $(foreach required,SRC BUILD SYSROOT DEPS,$(if $(strip $($(required))),,$(error 
 RESOURCE := $(shell $(CC) -print-resource-dir)
 CROSS = --target=$(TARGET) --sysroot=$(SYSROOT) --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none
 INCLUDES = -nostdinc -isystem $(SYSROOT)/include -isystem $(RESOURCE)/include -idirafter $(KERNEL_HEADERS) -I$(BUILD)/include -I$(SRC)/libpam/include -I$(SRC)/libpam_internal/include -I$(SRC)/libpamc/include -I$(SRC)/libpam_misc/include
-COMPILE = $(CC) $(filter-out -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none,$(CROSS)) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -fPIC -ffile-prefix-map=$(SRC)=Linux-PAM-1.7.2 -ffile-prefix-map=$(BUILD)=pam-build
+COMPILE = $(CC) $(filter-out -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none,$(CROSS)) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) -fPIC -ffile-prefix-map=$(SRC)=Linux-PAM-1.7.3 -ffile-prefix-map=$(BUILD)=pam-build
 LINK = $(CC) $(CROSS) $(CFLAGS) $(LDFLAGS) -Wl,-z,relro,-z,now,--no-undefined -L$(BUILD)/lib -L$(DEPS)/lib -Wl,-rpath-link,$(DEPS)/lib
 CONFIG := $(BUILD)/include/config.h
 SIGNATURE := $(BUILD)/arguments
@@ -106,8 +106,7 @@ install: all
 	@sh $(PORT)install.sh '$(SRC)' '$(BUILD)' '$(DESTDIR)'
 -include $(shell test ! -d '$(BUILD)/obj' || find '$(BUILD)/obj' -name '*.o.d')
 
-# Upstream also builds these non-installed diagnostic/legacy conversion tools.
-$(eval $(call helper,bigcrypt,unix,bigcrypt bigcrypt_main,-lcrypt))
+# Upstream also builds this non-installed diagnostic tool.
 $(eval $(call helper,hmacfile,timestamp,hmacfile hmacsha1 sha1,))
 BISON ?= bison
 FLEX ?= flex
@@ -128,7 +127,7 @@ $(BUILD)/bin/pam_conv1: $(BUILD)/obj/generated/pam_conv_l.o $(BUILD)/obj/generat
 	@mkdir -p $(@D)
 	$(LINK) -pie $^ -o $@.tmp
 	@mv $@.tmp $@
-all: $(BUILD)/bin/pam_conv1 $(BUILD)/bin/bigcrypt $(BUILD)/bin/hmacfile
+all: $(BUILD)/bin/pam_conv1 $(BUILD)/bin/hmacfile
 
 # Keep UAPI behind musl while selecting libxcrypt's extended API declaration.
 # Passing the same directory to both -I and -idirafter makes Clang demote -I.

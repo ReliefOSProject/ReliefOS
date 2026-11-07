@@ -1,0 +1,53 @@
+#!/bin/sh
+set -eu
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+export PATH
+umask 077
+
+if [ ! -x /bin/bash ] || [ -L /bin/bash ]; then
+    echo 'migrate-shell: the official /bin/bash executable is missing' >&2
+    exit 1
+fi
+
+marker=/var/lib/reliefos/bash-default-v1
+[ ! -e "$marker" ] || exit 0
+
+for path in /sbin/bash /usr/bin/bash /usr/sbin/bash; do
+    if [ -L "$path" ]; then
+        case $(readlink "$path") in
+            busybox|./busybox|/bin/busybox|../bin/busybox|../../bin/busybox) rm "$path" ;;
+        esac
+    fi
+done
+
+default_shell=$(useradd -D | sed -n 's/^SHELL=//p')
+case $default_shell in
+    /bin/sh|/bin/ash|/usr/bin/sh|/usr/bin/ash|/usr/bin/bash) useradd -D -s /bin/bash ;;
+esac
+
+awk -F: 'NF == 7 && ($3 == 0 || ($3 >= 1000 && $3 <= 60000)) &&
+    $6 ~ /^\// && ($7 == "" || $7 ~ /^\/(usr\/)?bin\/(ba|a)?sh$/) {
+        print $1 ":" $6 ":" $7
+    }' /etc/passwd |
+while IFS=: read -r name home shell; do
+    case $name in ''|-*) exit 1 ;; esac
+    case $shell in
+        /bin/bash) ;;
+        *) usermod -s /bin/bash -- "$name" ;;
+    esac
+    [ -d "$home" ] || continue
+    /bin/busybox setuidgid "$name" /bin/sh -ec '
+        cd "$1"
+        umask 077
+        set -C
+        for config in .bash_profile .bashrc .inputrc; do
+            if [ -e "$config" ] || [ -L "$config" ]; then continue; fi
+            if [ "$config" = .bash_profile ] &&
+               { [ -e .bash_login ] || [ -L .bash_login ]; }; then continue; fi
+            cat "/etc/skel/$config" > "$config"
+        done
+    ' sh "$home"
+done
+
+mkdir -p /var/lib/reliefos
+printf '%s\n' bash > "$marker"

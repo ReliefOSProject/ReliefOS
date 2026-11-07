@@ -1,0 +1,13 @@
+RELIEFOS_APP_NAME := reliefmail
+RELIEFOS_APP_OBJECTS := compose_state.o compose_window.o dialogs.o editor.o html.o imap.o main.o mime.o model.o profile_io.o reader.o reader_render.o smtp.o sqlite_core.o store.o tasks.o tools.o transport.o ui_adapters.o ui_widgets.o vault.o window.o window_accounts.o window_actions.o window_query.o window_reader.o window_vault.o worker.o shared_reliefword_layout.o shared_reliefword_model.o
+RELIEFOS_APP_C_OBJECTS := sqlite_core.o
+RELIEFOS_APP_CXX_OBJECTS := compose_state.o compose_window.o dialogs.o editor.o html.o imap.o main.o mime.o model.o profile_io.o reader.o reader_render.o smtp.o store.o tasks.o tools.o transport.o ui_adapters.o ui_widgets.o vault.o window.o window_accounts.o window_actions.o window_query.o window_reader.o window_vault.o worker.o shared_reliefword_layout.o shared_reliefword_model.o
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+# Shared first-party source, compiled separately for this app context.
+$(obj)/shared_reliefword_layout.o: $(srctree)/userland/apps/reliefword/layout.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/shared_reliefword_model.o: $(srctree)/userland/apps/reliefword/model.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+endif

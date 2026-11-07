@@ -10,4 +10,4 @@ with tempfile.TemporaryDirectory(prefix="installer-copy-", dir=ROOT / "build") a
     subprocess.run(["cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
                     "-fsanitize=address,undefined", "-Wl,--wrap=read",
                     "tools/tests/installer_copy_read_test.c", "-o", binary], cwd=ROOT, check=True)
-    subprocess.run([binary], check=True, timeout=10)
+    subprocess.run([binary, Path(directory) / "input.bin"], check=True, timeout=10)

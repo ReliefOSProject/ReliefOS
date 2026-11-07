@@ -26,7 +26,7 @@ def main():
     work.mkdir(parents=True, exist_ok=True)
     executable = work / "probe"
     subprocess.run([str(ROOT / "build/musl/sdk/bin/reliefos-musl-cc"), "-static", "-O2",
-                    "-pthread", str(ROOT / "tools/tests" / (
+                    "-pthread", str(ROOT / "kernel/reliefnt/tools/tests" / (
                         "eevdf_runtime_probe.c" if args.scheduler else "execution_lock_runtime_probe.c")),
                     "-o", str(executable)], check=True)
     if not args.scheduler:

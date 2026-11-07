@@ -1,0 +1,18 @@
+# ReliefOS application Kbuild flags.  Each app directory owns its object list
+# and therefore its compile context, including objects sourced from shared or
+# vendor directories.
+
+obj-y += $(RELIEFOS_APP_OBJECTS)
+
+ccflags-y += $(if $(USERLAND_APP_FLAGS_$(RELIEFOS_APP_NAME)),$(USERLAND_APP_FLAGS_$(RELIEFOS_APP_NAME)),$(USERLAND_FLAGS) $(USERLAND_CFLAGS)) \
+	$(USERLAND_EXTRA_$(RELIEFOS_APP_NAME)) -include $(AUTOCONF_H)
+cxxflags-y += $(USERLAND_CXX_FLAGS) $(USERLAND_EXTRA_$(RELIEFOS_APP_NAME)) \
+	$(USERLAND_CXX_EXTRA_$(RELIEFOS_APP_NAME)) -include $(AUTOCONF_H)
+asflags-y += --target=$(TRIPLE_USER) -fPIC -I$(HEADER_EXPORT_INCLUDE)
+
+$(addprefix $(obj)/,$(RELIEFOS_APP_C_OBJECTS) $(RELIEFOS_APP_ASM_OBJECTS)): $(RELIEFOS_CC_ID)
+$(addprefix $(obj)/,$(RELIEFOS_APP_CXX_OBJECTS)): $(RELIEFOS_CXX_ID)
+
+ifneq ($(strip $(RELIEFOS_APP_CXX_OBJECTS)),)
+include $(srctree)/scripts/Makefile.cxx
+endif

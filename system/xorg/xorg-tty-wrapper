@@ -15,4 +15,7 @@ if test ! -r "$tty" || test ! -w "$tty"; then
 fi
 
 exec <"$tty" >"$tty" 2>&1
+if test ! -c /dev/dri/card0 && test -c /dev/fb0; then
+    /usr/sbin/fbset -fb /dev/fb0 -depth 32 || :
+fi
 exec /usr/bin/Xorg "$@"

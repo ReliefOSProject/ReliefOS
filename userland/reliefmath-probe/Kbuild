@@ -1,0 +1,10 @@
+RELIEFOS_RELIEFMATH_PROBE_OBJECTS := reliefmath_backend_probe.o
+RELIEFOS_RELIEFMATH_PROBE_CXX_OBJECTS := $(RELIEFOS_RELIEFMATH_PROBE_OBJECTS)
+ifneq ($(RELIEFOS_CAPTURE_RELIEFMATH_PROBE_KBUILD),1)
+obj-y := $(RELIEFOS_RELIEFMATH_PROBE_OBJECTS)
+cxxflags-y += $(RELIEFMATH_WORKER_FLAGS) -include $(AUTOCONF_H)
+$(addprefix $(obj)/,$(RELIEFOS_RELIEFMATH_PROBE_CXX_OBJECTS)): $(AUTOCONF_H) $(MUSL_STAMP) $(HEADER_EXPORT_MANIFEST) $(RELIEFMATH_DEV_PRODUCTS) $(RELIEFOS_CXX_ID)
+$(obj)/reliefmath_backend_probe.o: $(srctree)/tools/tests/reliefmath_backend_probe.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+include $(srctree)/scripts/Makefile.cxx
+endif

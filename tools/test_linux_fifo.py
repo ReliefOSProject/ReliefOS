@@ -36,7 +36,7 @@ def main():
     work.mkdir(parents=True, exist_ok=True)
     binary = work / "fifo-abi"
     run(ROOT / "build/musl/sdk/bin/reliefos-musl-cc", "-static", "-O2", "-Wall", "-Wextra", "-Werror",
-        ROOT / "tools/tests/fifo_abi_test.c", "-o", binary)
+        ROOT / "kernel/reliefnt/tools/tests/fifo_abi_test.c", "-o", binary)
     host = run(binary, capture_output=True, text=True, timeout=15)
     (work / "host.log").write_text(host.stdout + host.stderr)
     print(host.stdout, end="")
@@ -85,7 +85,7 @@ def main():
                 f'command_args="-n -dddd -p 10.0.2.2:{ntp.getsockname()[1]}"\n')
         report = tree / "usr/bin/openrc-probe-report"
         report.write_text("#!/bin/sh\nsleep 20\necho '[openrc-probe] service logs'\n"
-            "for f in /var/log/imd.log /var/log/windowd.log /var/log/desktop.log /var/log/sessiond.log /var/log/device-agent.log /var/log/udhcpc.log /var/log/ntpd.log; do echo \"$f\"; cat \"$f\"; done\n"
+            "for f in /var/log/device-agent.log /var/log/udhcpc.log /var/log/ntpd.log; do echo \"$f\"; cat \"$f\"; done\n"
             "cat /run/reliefos/dhcp-lease /run/reliefos/ntp-state /etc/resolv.conf\n/bin/busybox nslookup pool.ntp.org\n/bin/rc-status -a\necho '[openrc-probe] report end'\n")
         report.chmod(0o755)
         inittab = tree / "etc/inittab"
@@ -93,7 +93,7 @@ def main():
         grub = tree / "grub/grub.cfg"
         text = grub.read_text()
         text = text.replace("set timeout=5", "set timeout=0", 1)
-        text = text.replace("multiboot2 /loader.elf root=/", "multiboot2 /loader.elf init=/usr/bin/fifo-abi syscall-trace=/usr/bin/fifo-abi root=/", 1)
+        text = text.replace("multiboot2 /reliefos/kernel.sys root=/", "multiboot2 /reliefos/kernel.sys init=/usr/bin/fifo-abi syscall-trace=/usr/bin/fifo-abi root=/", 1)
         grub.write_text(text)
         with (work / "image.log").open("w") as log:
             run(sys.executable, "tools/make_image.py", "--esp-tree", tree,

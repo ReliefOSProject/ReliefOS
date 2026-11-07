@@ -7,20 +7,18 @@ work=${TMPDIR:-/tmp}/reliefos-desktop-backend.$$
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 mkdir -p "$work"
 
-grep -q '^config DESKTOP_BACKEND_RELIEFOS$' Kconfig
-grep -q '^config DESKTOP_BACKEND_XORG$' Kconfig
-grep -q '^CONFIG_DESKTOP_BACKEND_RELIEFOS=y$' configs/default.conf
-! grep -q '^CONFIG_DESKTOP_BACKEND_XORG=y$' configs/default.conf
+# The FLTK X11 frontend is the only desktop frontend; the backend choice is
+# gone from the configuration.
+if grep -q 'DESKTOP_BACKEND' Kconfig configs/default.conf; then
+    echo 'desktop backend choice is still configurable' >&2
+    exit 1
+fi
 
 make -s O="$work/default" defconfig
-grep -q '^CONFIG_DESKTOP_BACKEND_RELIEFOS=y$' "$work/default/config/.config"
-! grep -q '^CONFIG_DESKTOP_BACKEND_XORG=y$' "$work/default/config/.config"
-
-mkdir -p "$work/xorg/config"
-printf '%s\n' 'CONFIG_DESKTOP_BACKEND_XORG=y' > "$work/xorg/config/.config"
-make -s O="$work/xorg" olddefconfig
-grep -q '^CONFIG_DESKTOP_BACKEND_XORG=y$' "$work/xorg/config/.config"
-! grep -q '^CONFIG_DESKTOP_BACKEND_RELIEFOS=y$' "$work/xorg/config/.config"
+if grep -q 'DESKTOP_BACKEND' "$work/default/.config"; then
+    echo 'defconfig still emits desktop backend symbols' >&2
+    exit 1
+fi
 
 hostcc=${HOSTCC:-cc}
 mkdir -p "$work/src/system" "$work/out"
@@ -28,7 +26,7 @@ cp -a system/rootfs "$work/src/system/rootfs"
 for name in certs config docs fonts resources test-accounts xorg; do
     ln -s "$repo_root/system/$name" "$work/src/system/$name"
 done
-for name in configs docs resources test third_party tools userland; do
+for name in configs Documentation resources test third_party tools userland; do
     ln -s "$repo_root/$name" "$work/src/$name"
 done
 cp logo.png "$work/src/logo.png"
@@ -41,7 +39,7 @@ mkdir -p "$work/out/upstream/sudo/root/usr/bin" \
     "$work/out/sysroot/musl/share/licenses/musl" \
     "$work/out/sysroot/musl/share/licenses/mimalloc" \
     "$work/out/system/lib" "$work/out/generated/system" \
-    "$work/out/generated/drivers" "$work/out/generated/fonts" \
+    "$work/out/generated/fonts" \
     "$work/out/userland"
 printf '%s\n' fixture > "$work/out/upstream/sudo/root/usr/bin/sudo"
 printf '%s\n' fixture > "$work/out/upstream/shadow/root/usr/bin/passwd"
@@ -56,72 +54,216 @@ legacy_brand=leon
 legacy_brand=${legacy_brand}os
 printf '%s\n' fixture > "$work/out/system/lib/lib${legacy_brand}.so.2"
 printf '%s\n' fixture > "$work/out/generated/system/kerneldebug.sys"
-printf '%s\n' fixture > "$work/out/generated/drivers/fixture.drv"
-printf '%s\n' fixture > "$work/out/generated/fonts/${legacy_brand}-metro.ttf"
-printf '%s\n' fixture > "$work/out/generated/fonts/${legacy_brand}-win95.ttf"
+# This layout-only fixture represents the separately verified kernel bundle.
+# Real identity/checksum and dependency validation belongs to test-kernel-payload.
+mkdir -p "$work/out/stage/kernel-payload/lib/modules/desktop-fixture" \
+    "$work/out/stage/kernel-payload/usr/lib/reliefos/kernel/desktop-fixture"
+printf '{"schema":1,"release":"desktop-fixture"}\n' > "$work/out/stage/kernel-payload/kernel-payload.json"
+printf 'CONFIG_MODULES=y\n' > "$work/out/stage/kernel-payload/lib/modules/desktop-fixture/config"
+printf 'kernel fixture\n' > "$work/out/stage/kernel-payload/usr/lib/reliefos/kernel/desktop-fixture/kernel.sys"
+mkdir -p "$work/out/userland/initramfs"
+printf 'kernel bundle tool fixture\n' > "$work/out/userland/initramfs/kernel-bundle.elf"
 printf '%s\n' fixture > "$work/out/userland/motd.elf"
-printf '%s\n' fixture > "$work/out/userland/dynlinkerror.elf"
+printf '%s\n' fixture > "$work/out/userland/bootinstall.elf"
+for command in sbin/grub-install sbin/grub-bios-setup sbin/grub-probe bin/grub-mkimage; do
+    mkdir -p "$work/out/upstream/grub/root/usr/${command%/*}"
+    printf '%s\n' fixture > "$work/out/upstream/grub/root/usr/$command"
+done
+mkdir -p "$work/out/upstream/grub/root/usr/lib/grub/i386-pc" \
+    "$work/out/upstream/grub/root/usr/share/licenses/grub"
+printf '%s\n' fixture > "$work/out/upstream/grub/root/usr/lib/grub/i386-pc/boot.img"
+printf '%s\n' fixture > "$work/out/upstream/grub/root/usr/share/licenses/grub/COPYING"
 for locale in $(cat configs/nls/LINGUAS); do
     mkdir -p "$work/out/generated/nls/$locale/LC_MESSAGES"
     printf '%s\n' fixture > "$work/out/generated/nls/$locale/LC_MESSAGES/${legacy_brand}.mo"
 done
-printf '%s\n' 'component metadata fixture' > "$work/metadata"
+printf 'busybox\ttool\t1\t1\t0\t0\t0\tBusyBox\tTools\t\t0\n' > "$work/metadata"
+for app in fileman installer leonmmcoset reliefword reliefppt soundctl sudo fastfetch; do
+    entry=0
+    case $app in fileman|fastfetch) entry=1 ;; esac
+    printf '%s\tsystem-app\t1\t1\t%s\t0\t0\t%s\tSystem applications\t\t0\n' "$app" "$entry" "$app" >> "$work/metadata"
+    printf 'app fixture\n' > "$work/out/userland/$app.elf"
+done
+printf 'reliefmath\tprogram-app\t1\t1\t1\t0\t0\tReliefMath\tOffice applications\t.rmath\t1\n' >> "$work/metadata"
+printf 'math GUI fixture\n' > "$work/out/userland/reliefmath.elf"
+printf 'math worker fixture\n' > "$work/out/userland/reliefmath-render.elf"
+printf 'reliefmathpp\tprogram-app\t1\t1\t1\t0\t0\tReliefMath++\tOffice applications\t.rmathpp\t1\n' >> "$work/metadata"
+printf 'geometry GUI fixture\n' > "$work/out/userland/reliefmathpp.elf"
+printf 'audio fixture\n' > "$work/out/system/lib/libreliefos-audio.so.1"
+printf 'calc\tprogram-app\t0\t0\t1\t0\t0\tCalculator\tOffice applications\t\t0\n' >> "$work/metadata"
+printf 'ncurses\tlibrary\t1\t1\t0\t1\t0\tncurses\tLibraries\t\t0\n' >> "$work/metadata"
+mkdir -p "$work/out/upstream/ncurses/root/usr/bin" \
+    "$work/out/upstream/ncurses/root/usr/share/terminfo" \
+    "$work/out/upstream/ncurses/root/usr/include" \
+    "$work/out/upstream/fixture-provider/root/usr/bin" \
+    "$work/out/upstream/fixture-provider/root/usr/sbin" \
+    "$work/out/upstream/inactive/root/usr/bin"
+printf 'ncurses clear\n' > "$work/out/upstream/ncurses/root/usr/bin/clear"
+ln -s clear "$work/out/upstream/ncurses/root/usr/bin/reset"
+printf 'terminal data\n' > "$work/out/upstream/ncurses/root/usr/share/terminfo/fixture"
+printf 'development header\n' > "$work/out/upstream/ncurses/root/usr/include/curses.h"
+printf 'selected provider\n' > "$work/out/upstream/fixture-provider/root/usr/bin/hexdump"
+printf 'external ping provider\n' > "$work/out/upstream/fixture-provider/root/usr/bin/ping"
+printf 'storage provider\n' > "$work/out/upstream/fixture-provider/root/usr/sbin/mkfs.ext4"
+printf 'inactive provider\n' > "$work/out/upstream/inactive/root/usr/bin/tree"
+printf 'BusyBox fixture\n' > "$work/out/userland/busybox.elf"
+printf '%s\n' /bin/sh /bin/ash /bin/false /bin/ping /bin/ping6 /bin/hexdump \
+    /usr/bin/clear /usr/bin/reset /sbin/mkfs.ext4 /bin/passwd /usr/bin/tree > "$work/out/userland/busybox.links"
 
-"$hostcc" -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
+$hostcc -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
     "$repo_root/tools/host/manifest/reliefos-stage.c" \
     "$repo_root/tools/host/common/io.c" "$repo_root/tools/host/common/buffer.c" \
     "$repo_root/tools/host/manifest/json.c" -o "$work/stage"
-"$hostcc" -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
+$hostcc -std=c11 -Wall -Wextra -Werror -Wpedantic -I"$repo_root" \
     "$repo_root/tools/host/manifest/reliefos-layout.c" -o "$work/layout"
 
-run_rootfs_stage() {
-    backend=$1
-    config=$work/$backend.config
-    dest=$work/$backend-root
-    manifest=$work/$backend-manifest.json
-    cat > "$config" <<CONFIG
-CONFIG_DESKTOP_BACKEND_RELIEFOS=$(test "$backend" = reliefos && printf y || printf n)
-CONFIG_DESKTOP_BACKEND_XORG=$(test "$backend" = xorg && printf y || printf n)
+cat > "$work/rootfs.config" <<CONFIG
 CONFIG_RPR_BASE_URL="https://example.invalid/rpr"
 CONFIG_VMDK_DEFAULT_LANG="zh_CN.UTF-8"
 CONFIG
-    sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
-        "$config" "$work/metadata" "$work/stage" "$work/layout" \
-        "$dest" "$manifest" 1700000000
-    printf '%s\n' "$dest"
-}
+ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux ncurses fixture-provider' \
+sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
+    "$work/rootfs.config" "$work/metadata" "$work/stage" "$work/layout" \
+    "$work/root" "$work/manifest.json" 1700000000
+xorg_root=$work/root
 
-reliefos_root=$(run_rootfs_stage reliefos)
-xorg_root=$(run_rootfs_stage xorg)
-grep -qx reliefos "$reliefos_root/etc/reliefos/desktop-backend"
+# Only self-authored graphical apps receive artwork, including hidden entries.
+for app in fileman installer leonmmcoset reliefword reliefppt reliefmath reliefmathpp; do
+    for size in 16 32 48 64 128 256; do
+        icon=usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png
+        cmp "$repo_root/resources/build-art/app-icons/hicolor/${size}x${size}/apps/reliefos-$app.png" "$xorg_root/$icon"
+    done
+done
+for app in soundctl sudo fastfetch; do
+    test ! -e "$xorg_root/usr/lib/reliefos/apps/$app/$app.bmp"
+    for size in 16 32 48 64 128 256; do
+        test ! -e "$xorg_root/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png"
+    done
+done
+grep -qx 'icon=' "$xorg_root/usr/lib/reliefos/apps/fastfetch/manifest.ini"
+test ! -e "$xorg_root/usr/share/icons/hicolor/48x48/apps/reliefos-calc.png"
+test -f "$xorg_root/usr/lib/reliefos/apps/installer/installer.bmp"
+test -f "$xorg_root/usr/lib/reliefos/apps/leonmmcoset/leonmmcoset.bmp"
+cmp "$work/out/userland/reliefmath.elf" "$xorg_root/usr/lib/reliefos/apps/reliefmath/reliefmath.elf"
+cmp "$work/out/userland/reliefmath-render.elf" "$xorg_root/usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf"
+test "$(readlink "$xorg_root/usr/bin/reliefmath")" = ../lib/reliefos/apps/reliefmath/reliefmath.elf
+grep -qx 'open_with=1' "$xorg_root/usr/lib/reliefos/apps/reliefmath/manifest.ini"
+grep -qx 'extensions=.rmath' "$xorg_root/usr/lib/reliefos/apps/reliefmath/manifest.ini"
+grep -qx 'category=Office applications' "$xorg_root/usr/lib/reliefos/apps/reliefmath/manifest.ini"
+test "$(stat -c %a "$xorg_root/usr/share/reliefmath/STIXTwoMath-Regular.otf")" = 444
+test "$(stat -c %a "$xorg_root/usr/share/licenses/reliefmath/STIX-OFL.txt")" = 444
+test -f "$xorg_root/usr/share/licenses/reliefmath/README.md"
+test -f "$xorg_root/usr/share/mime/packages/reliefmath.xml"
+cmp "$work/out/userland/reliefmathpp.elf" "$xorg_root/usr/lib/reliefos/apps/reliefmathpp/reliefmathpp.elf"
+test -f "$xorg_root/usr/share/mime/packages/reliefmathpp.xml"
+grep -qx 'extensions=.rmathpp' "$xorg_root/usr/lib/reliefos/apps/reliefmathpp/manifest.ini"
+awk -F '\t' '$1!="reliefmathpp"' "$work/metadata" > "$work/metadata-no-mathpp"
+sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
+    "$work/rootfs.config" "$work/metadata-no-mathpp" "$work/stage" "$work/layout" \
+    "$work/root-no-mathpp" "$work/no-mathpp-manifest.json" 1700000000
+for path in usr/lib/reliefos/apps/reliefmathpp usr/bin/reliefmathpp usr/share/applications/reliefos-reliefmathpp.desktop usr/share/mime/packages/reliefmathpp.xml; do
+    test ! -e "$work/root-no-mathpp/$path"
+done
+
+# Removing the selected app from component metadata excludes every private
+# product while leaving the shared system CJK font in the composed root.
+awk -F '\t' '$1!="reliefmath"' "$work/metadata" > "$work/metadata-no-reliefmath"
+ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux ncurses fixture-provider' \
+sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
+    "$work/rootfs.config" "$work/metadata-no-reliefmath" "$work/stage" "$work/layout" \
+    "$work/root-no-reliefmath" "$work/no-reliefmath-manifest.json" 1700000000
+for path in \
+    usr/lib/reliefos/apps/reliefmath \
+    usr/bin/reliefmath \
+    usr/share/applications/reliefos-reliefmath.desktop \
+    usr/share/reliefmath \
+    usr/share/licenses/reliefmath \
+    usr/share/mime/packages/reliefmath.xml; do
+    test ! -e "$work/root-no-reliefmath/$path"
+done
+for size in 16 32 48 64 128 256; do
+    test ! -e "$work/root-no-reliefmath/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-reliefmath.png"
+done
+test -f "$work/root-no-reliefmath/usr/share/fonts/reliefos/simsun.ttc"
+
 grep -qx xorg "$xorg_root/etc/reliefos/desktop-backend"
-test -L "$reliefos_root/etc/runlevels/default/reliefos-windowd"
-test -L "$reliefos_root/etc/runlevels/default/reliefos-session"
 test ! -e "$xorg_root/etc/runlevels/default/reliefos-windowd"
 test ! -e "$xorg_root/etc/runlevels/default/reliefos-session"
 test -f "$xorg_root/etc/X11/xorg.conf"
-test -f "$xorg_root/etc/reliefos/xdm.conf"
-test -f "$xorg_root/etc/reliefos/xdm-Xservers"
-test -f "$xorg_root/etc/reliefos/xdm-session"
-test -x "$xorg_root/usr/lib/reliefos/reliefos-xdm"
-test -x "$xorg_root/usr/lib/reliefos/xorg-tty-wrapper"
-test -x "$xorg_root/usr/lib/reliefos/xdm-session"
-test -f "$xorg_root/etc/pam.d/xdm"
-test ! -e "$reliefos_root/etc/X11/xorg.conf"
-test ! -e "$reliefos_root/etc/reliefos/xdm.conf"
-
-cat > "$work/invalid.config" <<'CONFIG'
-CONFIG_DESKTOP_BACKEND_RELIEFOS=n
-CONFIG_DESKTOP_BACKEND_XORG=n
-CONFIG_RPR_BASE_URL="https://example.invalid/rpr"
-CONFIG_VMDK_DEFAULT_LANG="zh_CN.UTF-8"
-CONFIG
-if sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
-    "$work/invalid.config" "$work/metadata" "$work/stage" "$work/layout" \
-    "$work/invalid-root" "$work/invalid-manifest.json" 1700000000 \
-    >/dev/null 2>&1; then
-    echo 'rootfs-stage accepted an invalid desktop backend' >&2
+# Mouse0 must consume the kernel's authoritative absolute position.
+# xf86-input-evdev drops the absolute axes of a mixed rel/abs mouse
+# ("ignoring absolute axes") and rebuilds the cursor from the relative deltas,
+# which permanently drifts away from the kernel position whenever a motion
+# event is lost (the VMware mouse offset bug).  IgnoreRelativeAxes "true" is
+# not enough: the scrollwheel probe branch re-enables EVDEV_RELATIVE_EVENTS and
+# the relative path wins.  The trinary value IgnoreAbsoluteAxes "false" means
+# "unignore": both axis classes initialize and the absolute position wins every
+# sync frame.
+mouse0=$(awk '/Identifier "Mouse0"/,/^EndSection/' "$xorg_root/etc/X11/xorg.conf")
+if ! printf '%s\n' "$mouse0" | grep -q 'Option "IgnoreAbsoluteAxes" "false"'; then
+    echo 'Mouse0 must unignore the absolute axes (IgnoreAbsoluteAxes "false")' >&2
+    echo 'FAIL - xorg.conf mouse absolute position contract' >&2
     exit 1
 fi
+test -f "$xorg_root/etc/X11/xdm/xdm-config"
+test -f "$xorg_root/etc/X11/xdm/Xservers"
+test -f "$xorg_root/etc/X11/xdm/Xresources"
+test -x "$xorg_root/usr/lib/X11/xdm/Xsession"
+test -x "$xorg_root/usr/lib/X11/xdm/Xsetup_0"
+test -x "$xorg_root/usr/lib/reliefos/dillo-config-init"
+cmp "$repo_root/system/rootfs/etc/fonts/conf.d/09-reliefos-dillo-cjk.conf" "$xorg_root/etc/fonts/conf.d/09-reliefos-dillo-cjk.conf"
+test "$(stat -c %a "$xorg_root/etc/skel/.dillo")" = 700
+for name in dillorc style.css; do
+    cmp "$repo_root/system/rootfs/etc/skel/.dillo/$name" "$xorg_root/etc/skel/.dillo/$name"
+    test "$(stat -c %a "$xorg_root/etc/skel/.dillo/$name")" = 600
+done
+test ! -e "$xorg_root/etc/reliefos/wallpaper.png"
+test -x "$xorg_root/usr/lib/reliefos/reliefos-xdm"
+test -x "$xorg_root/usr/lib/reliefos/xorg-tty-wrapper"
+for path in etc/reliefos/xdm.conf etc/reliefos/xdm-Xservers \
+    etc/reliefos/xdm-Xresources etc/reliefos/xdm-session \
+    etc/reliefos/xdm-setup usr/lib/reliefos/xdm-session \
+    usr/lib/reliefos/xdm-setup; do
+    test ! -e "$xorg_root/$path"
+done
+test -f "$xorg_root/etc/pam.d/xdm"
+# IceWM is the only window manager: its configuration is staged and no old
+# window manager file may survive in the product root.
+test -f "$xorg_root/etc/reliefos/icewm/preferences"
+test -f "$xorg_root/etc/reliefos/icewm/menu"
+test -f "$xorg_root/etc/reliefos/icewm/keys"
+test -f "$xorg_root/etc/reliefos/icewm/themes/light/default.theme"
+test ! -e "$xorg_root/etc/reliefos/twmrc"
+test ! -e "$xorg_root/usr/bin/twm"
+test ! -e "$xorg_root/usr/bin/twm.real"
+test -f "$xorg_root/bin/busybox"
+test -L "$xorg_root/bin/sh"
+test -L "$xorg_root/bin/ash"
+test -L "$xorg_root/bin/false"
+test -L "$xorg_root/bin/ping6"
+test "$(readlink "$xorg_root/bin/ping6")" = busybox
+# Commands claimed by a staged upstream root keep their provider and never
+# grow a BusyBox link, even under a different directory.
+cmp "$work/out/upstream/fixture-provider/root/usr/bin/hexdump" "$xorg_root/usr/bin/hexdump"
+cmp "$work/out/upstream/fixture-provider/root/usr/bin/ping" "$xorg_root/usr/bin/ping"
+cmp "$work/out/upstream/fixture-provider/root/usr/sbin/mkfs.ext4" "$xorg_root/usr/sbin/mkfs.ext4"
+test ! -e "$xorg_root/bin/hexdump"
+test ! -e "$xorg_root/bin/ping"
+# /sbin/mkfs.ext4 stays the storage compatibility alias to the upstream
+# provider; BusyBox must not claim the command.
+test -L "$xorg_root/sbin/mkfs.ext4"
+test "$(readlink "$xorg_root/sbin/mkfs.ext4")" = ../usr/sbin/mkfs.ext4
+cmp "$work/out/upstream/ncurses/root/usr/bin/clear" "$xorg_root/usr/bin/clear"
+test -L "$xorg_root/usr/bin/reset"
+test "$(readlink "$xorg_root/usr/bin/reset")" = clear
+test -f "$xorg_root/usr/share/terminfo/fixture"
+test -f "$xorg_root/etc/terminfo/fixture"
+test ! -e "$xorg_root/usr/include/curses.h"
+cmp "$work/out/upstream/shadow/root/usr/bin/passwd" "$xorg_root/usr/bin/passwd"
+test ! -e "$xorg_root/bin/passwd"
+# Roots outside ROOTFS_UPSTREAM_PACKAGES never reach the rootfs: the command
+# stays a generated BusyBox link instead of the inactive provider file.
+test -L "$xorg_root/usr/bin/tree"
+test "$(readlink "$xorg_root/usr/bin/tree")" = ../../bin/busybox
 
-printf '%s\n' 'ok - desktop backend Kconfig and rootfs policy'
+printf '%s\n' 'ok - X11 session policy and upstream staging'

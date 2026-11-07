@@ -41,7 +41,7 @@ libdir=/lib
 
 Name: $lib
 Description: Linux-PAM $lib library
-Version: 1.7.2
+Version: 1.7.3
 Libs: -L\${libdir} -l$lib
 Cflags: -I\${includedir}
 PC

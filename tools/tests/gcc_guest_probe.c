@@ -16,7 +16,7 @@
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
-#include "vfork_linux_edges.c"
+#include "../../kernel/reliefnt/tools/tests/vfork_linux_edges.c"
 
 #if defined(__x86_64__) && !defined(SYS_vfork)
 #define SYS_vfork 58

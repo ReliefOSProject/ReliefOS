@@ -21,6 +21,7 @@ enum reliefos_block_gpt_type {
     RELIEFOS_BLOCK_GPT_BASIC_DATA = 1,
     RELIEFOS_BLOCK_GPT_ESP = 2,
     RELIEFOS_BLOCK_GPT_LINUX = 3,
+    RELIEFOS_BLOCK_GPT_BIOS_BOOT = 4,
 };
 
 struct reliefos_block_disk_info {
@@ -57,6 +58,7 @@ int reliefos_block_gpt_create(const char *disk_path, uint32_t filesystem,
 int reliefos_block_gpt_delete(const char *disk_path, uint32_t index);
 int reliefos_block_gpt_set_type(const char *disk_path, uint32_t index, uint32_t type);
 int reliefos_block_gpt_set_name(const char *disk_path, uint32_t index, const char *name);
+int reliefos_block_gpt_resize(const char *disk_path, uint32_t index, uint32_t size_mib);
 int reliefos_block_format(const char *partition_path, uint32_t filesystem,
                         const char *label);
 int reliefos_block_probe_filesystem(const char *partition_path, uint32_t *out_filesystem);

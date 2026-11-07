@@ -18,9 +18,7 @@
 
 #define RELIEFOS_ASSOC_CONFIG_PATH RELIEFOS_PATH_FILEASSOC_CFG
 #define RELIEFOS_ASSOC_CONFIG_MAX 1024U
-#define RELIEFOS_SHORTCUT_MAX_BYTES 384U
-#define RELIEFOS_SHORTCUT_MAX_DEPTH 8U
-#define RELIEFOS_TERMINAL_APP_PATH RELIEFOS_LAYOUT_RELIEFOS_APPS "/terminal/terminal.elf"
+#define RELIEFOS_TERMINAL_APP_PATH "/usr/bin/st"
 
 static int launch_fail(int code)
 {
@@ -148,11 +146,6 @@ static int ends_with_ignore_case(const char *text, const char *suffix)
     return text_eq_ignore_case(text + text_n - suffix_n, suffix);
 }
 
-static int is_system_desktop_path(const char *path)
-{
-    return text_eq_ignore_case(path, RELIEFOS_LAYOUT_RELIEFOS_APPS "/desktop/desktop.elf");
-}
-
 static const char *path_basename(const char *path)
 {
     const char *base = path;
@@ -205,7 +198,7 @@ static int launch_in_terminal(char *argv[])
         terminal = terminal_path;
     }
     terminal_argv[0] = (char *)terminal;
-    terminal_argv[1] = "--run";
+    terminal_argv[1] = "-e";
     while (argv[argc]) {
         if (argc >= RELIEFOS_LAUNCH_MAX_ARGS) {
             return launch_fail(RELIEFOS_LAUNCH_ERR_TOO_MANY_ARGS);
@@ -266,124 +259,6 @@ static void build_cat_command(char *dst, uint32_t capacity, const char *path)
     append_text(dst, &pos, capacity, "cat \"");
     append_text(dst, &pos, capacity, path);
     append_char(dst, &pos, capacity, '"');
-}
-
-static void append_shortcut_base(char *dst, uint32_t *pos, uint32_t capacity,
-                                 const char *target_path)
-{
-    const char *base = path_basename(target_path);
-    uint32_t base_len = text_len(base);
-    if (!base || !base[0]) {
-        base = "Shortcut";
-        base_len = text_len(base);
-    } else if (ends_with_ignore_case(base, ".elf")) {
-        base_len -= 4U;
-    }
-    if (!base_len) {
-        base = "Shortcut";
-        base_len = text_len(base);
-    }
-    for (uint32_t i = 0; i < base_len; ++i) {
-        append_char(dst, pos, capacity, base[i]);
-    }
-}
-
-void reliefos_launch_default_shortcut_name(const char *target_path, char *buffer,
-                                         uint32_t capacity)
-{
-    uint32_t pos = 0;
-    if (!buffer || capacity == 0) {
-        return;
-    }
-    buffer[0] = 0;
-    append_shortcut_base(buffer, &pos, capacity, target_path);
-    if (!ends_with_ignore_case(buffer, ".lnk")) {
-        append_text(buffer, &pos, capacity, ".lnk");
-    }
-}
-
-static void build_numbered_shortcut_name(char *dst, uint32_t capacity,
-                                         const char *target_path, uint32_t number)
-{
-    uint32_t pos = 0;
-    if (!dst || capacity == 0) {
-        return;
-    }
-    dst[0] = 0;
-    append_shortcut_base(dst, &pos, capacity, target_path);
-    append_char(dst, &pos, capacity, ' ');
-    if (number >= 10) {
-        append_char(dst, &pos, capacity, (char)('0' + (number / 10) % 10));
-    }
-    append_char(dst, &pos, capacity, (char)('0' + number % 10));
-    append_text(dst, &pos, capacity, ".lnk");
-}
-
-int reliefos_launch_create_shortcut(const char *shortcut_path, const char *target_path)
-{
-    struct reliefos_stat st;
-    char body[RELIEFOS_SHORTCUT_MAX_BYTES];
-    uint32_t pos = 0;
-    int fd;
-    long wrote;
-    if (!shortcut_path || !shortcut_path[0] || !target_path || !target_path[0]) {
-        return launch_fail(RELIEFOS_LAUNCH_ERR_EMPTY);
-    }
-    if (!ends_with_ignore_case(shortcut_path, ".lnk")) {
-        return launch_fail(RELIEFOS_LAUNCH_ERR_INVALID_SHORTCUT);
-    }
-    if (reliefos_stat_legacy(target_path, &st) < 0) {
-        return launch_fail(RELIEFOS_LAUNCH_ERR_NOT_FOUND);
-    }
-    if (reliefos_stat_legacy(shortcut_path, &st) == 0) {
-        return launch_fail(RELIEFOS_LAUNCH_ERR_EXISTS);
-    }
-    body[0] = 0;
-    append_text(body, &pos, sizeof(body), "# ReliefOS shortcut\n");
-    append_text(body, &pos, sizeof(body), "target=");
-    append_text(body, &pos, sizeof(body), target_path);
-    append_char(body, &pos, sizeof(body), '\n');
-    fd = open(shortcut_path, RELIEFOS_O_WRONLY | RELIEFOS_O_CREAT | RELIEFOS_O_TRUNC, 0666);
-    if (fd < 0) {
-        return fd;
-    }
-    wrote = write(fd, body, pos);
-    close(fd);
-    if (wrote < 0) {
-        return (int)wrote;
-    }
-    return (uint32_t)wrote == pos ? 0 : -1;
-}
-
-int reliefos_launch_create_shortcut_in_dir(const char *dir_path, const char *target_path,
-                                         char *out_path, uint32_t out_capacity)
-{
-    struct reliefos_stat st;
-    char name[RELIEFOS_FS_NAME_LEN];
-    char path[RELIEFOS_FS_PATH_LEN];
-    int ret;
-    if (!dir_path || !dir_path[0] || !target_path || !target_path[0]) {
-        return launch_fail(RELIEFOS_LAUNCH_ERR_EMPTY);
-    }
-    if (reliefos_stat_legacy(dir_path, &st) < 0 || st.type != RELIEFOS_FS_TYPE_DIR) {
-        return launch_fail(RELIEFOS_LAUNCH_ERR_NOT_FOUND);
-    }
-    reliefos_launch_default_shortcut_name(target_path, name, sizeof(name));
-    for (uint32_t i = 0; i < 100; ++i) {
-        if (i > 0) {
-            build_numbered_shortcut_name(name, sizeof(name), target_path, i + 1);
-        }
-        build_child_path(path, sizeof(path), dir_path, name);
-        if (reliefos_stat_legacy(path, &st) == 0) {
-            continue;
-        }
-        ret = reliefos_launch_create_shortcut(path, target_path);
-        if (ret == 0 && out_path && out_capacity) {
-            copy_text(out_path, out_capacity, path);
-        }
-        return ret;
-    }
-    return launch_fail(RELIEFOS_LAUNCH_ERR_EXISTS);
 }
 
 static const struct reliefos_launch_assoc_app *find_assoc_app(const char *program_path)
@@ -740,97 +615,6 @@ const char *reliefos_launch_resolve_default_app_for_path(const char *path)
                ? program : 0;
 }
 
-static int shortcut_line_starts_with(const char *line, uint32_t len, const char *prefix)
-{
-    uint32_t i = 0;
-    while (prefix && prefix[i]) {
-        if (i >= len || line[i] != prefix[i]) {
-            return 0;
-        }
-        ++i;
-    }
-    return i > 0;
-}
-
-static int parse_shortcut_target(const char *buffer, uint32_t len,
-                                 char *target, uint32_t capacity)
-{
-    uint32_t pos = 0;
-    if (!target || capacity == 0) {
-        return launch_fail(RELIEFOS_LAUNCH_ERR_INVALID_SHORTCUT);
-    }
-    target[0] = 0;
-    while (pos < len) {
-        uint32_t start = pos;
-        uint32_t line_len;
-        uint32_t text_start;
-        uint32_t text_end;
-        uint32_t out = 0;
-        while (pos < len && buffer[pos] != '\n' && buffer[pos] != '\r') {
-            ++pos;
-        }
-        line_len = pos - start;
-        while (pos < len && (buffer[pos] == '\n' || buffer[pos] == '\r')) {
-            ++pos;
-        }
-        text_start = start;
-        text_end = start + line_len;
-        while (text_start < text_end && is_space_char(buffer[text_start])) {
-            ++text_start;
-        }
-        while (text_end > text_start && is_space_char(buffer[text_end - 1])) {
-            --text_end;
-        }
-        if (text_start >= text_end || buffer[text_start] == '#') {
-            continue;
-        }
-        if (shortcut_line_starts_with(buffer + text_start, text_end - text_start, "target=")) {
-            text_start += 7;
-        }
-        while (text_start < text_end && out + 1 < capacity) {
-            target[out++] = buffer[text_start++];
-        }
-        target[out] = 0;
-        return target[0] ? 0 : RELIEFOS_LAUNCH_ERR_INVALID_SHORTCUT;
-    }
-    return launch_fail(RELIEFOS_LAUNCH_ERR_INVALID_SHORTCUT);
-}
-
-static int read_shortcut_target(const char *shortcut_path, char *target, uint32_t capacity)
-{
-    char buffer[RELIEFOS_SHORTCUT_MAX_BYTES];
-    uint32_t len = 0;
-    int fd;
-    int ret;
-    struct reliefos_stat st;
-    if (!shortcut_path || !target || capacity == 0) {
-        return launch_fail(RELIEFOS_LAUNCH_ERR_EMPTY);
-    }
-    target[0] = 0;
-    fd = open(shortcut_path, RELIEFOS_O_RDONLY, 0);
-    if (fd < 0) {
-        return fd;
-    }
-    while (len + 1 < sizeof(buffer)) {
-        long got = read(fd, buffer + len, sizeof(buffer) - len - 1);
-        if (got < 0) {
-            close(fd);
-            return (int)got;
-        }
-        if (got == 0) {
-            break;
-        }
-        len += (uint32_t)got;
-    }
-    close(fd);
-    buffer[len] = 0;
-    ret = parse_shortcut_target(buffer, len, target, capacity);
-    if (ret < 0) {
-        return ret;
-    }
-    return reliefos_stat_legacy(target, &st) < 0 ? RELIEFOS_LAUNCH_ERR_NOT_FOUND : 0;
-}
-
 int reliefos_launch_file_with_app(const char *target_path, const char *program_path)
 {
     const char *resolved_program;
@@ -931,7 +715,7 @@ int reliefos_cmdline_split(char *line, char *argv[], uint32_t max_args)
     return (int)argc;
 }
 
-static int reliefos_launch_argv_depth(char *argv[], uint32_t depth)
+int reliefos_launch_argv(char *argv[])
 {
     struct reliefos_stat st;
     char extension[16];
@@ -944,35 +728,12 @@ static int reliefos_launch_argv_depth(char *argv[], uint32_t depth)
     path = argv[0];
     path = (char *)reliefos_launch_builtin_path(path);
     argv[0] = path;
-    if (ends_with_ignore_case(path, ".lnk")) {
-        char target[RELIEFOS_FS_PATH_LEN];
-        char *target_argv[RELIEFOS_LAUNCH_MAX_ARGS];
-        uint32_t i = 1;
-        int ret;
-        if (depth >= RELIEFOS_SHORTCUT_MAX_DEPTH) {
-            return launch_fail(RELIEFOS_LAUNCH_ERR_SHORTCUT_LOOP);
-        }
-        ret = read_shortcut_target(path, target, sizeof(target));
-        if (ret < 0) {
-            return ret;
-        }
-        target_argv[0] = target;
-        while (i + 1 < RELIEFOS_LAUNCH_MAX_ARGS && argv[i]) {
-            target_argv[i] = argv[i];
-            ++i;
-        }
-        target_argv[i] = 0;
-        return reliefos_launch_argv_depth(target_argv, depth + 1);
-    }
+    if (ends_with_ignore_case(path, ".desktop")) return reliefos_launch_desktop_file(argv);
     if (ends_with_ignore_case(path, ".elf")) {
         if (app_requires_terminal(path)) {
             return launch_in_terminal(argv);
         }
-        int ret = reliefos_spawn_argv(path, argv);
-        if (ret == -RELIEFOS_EEXIST && is_system_desktop_path(path)) {
-            return launch_fail(RELIEFOS_LAUNCH_ERR_ALREADY_RUNNING);
-        }
-        return ret;
+        return reliefos_spawn_argv(path, argv);
     }
     if (reliefos_stat_legacy(path, &st) < 0) {
         return launch_fail(RELIEFOS_LAUNCH_ERR_NOT_FOUND);
@@ -1001,11 +762,6 @@ static int reliefos_launch_argv_depth(char *argv[], uint32_t depth)
         }
     }
     return launch_fail(RELIEFOS_LAUNCH_ERR_NO_ASSOCIATION);
-}
-
-int reliefos_launch_argv(char *argv[])
-{
-    return reliefos_launch_argv_depth(argv, 0);
 }
 
 int reliefos_launch_command_line(char *line, char *argv[], uint32_t max_args)
@@ -1083,9 +839,6 @@ extern __typeof__(reliefos_launch_argv) leonos_launch_argv __attribute__((alias(
 extern __typeof__(reliefos_launch_assoc_apps) leonos_launch_assoc_apps __attribute__((alias("reliefos_launch_assoc_apps")));
 extern __typeof__(reliefos_launch_builtin_path) leonos_launch_builtin_path __attribute__((alias("reliefos_launch_builtin_path")));
 extern __typeof__(reliefos_launch_command_line) leonos_launch_command_line __attribute__((alias("reliefos_launch_command_line")));
-extern __typeof__(reliefos_launch_create_shortcut) leonos_launch_create_shortcut __attribute__((alias("reliefos_launch_create_shortcut")));
-extern __typeof__(reliefos_launch_create_shortcut_in_dir) leonos_launch_create_shortcut_in_dir __attribute__((alias("reliefos_launch_create_shortcut_in_dir")));
-extern __typeof__(reliefos_launch_default_shortcut_name) leonos_launch_default_shortcut_name __attribute__((alias("reliefos_launch_default_shortcut_name")));
 extern __typeof__(reliefos_launch_errno) leonos_launch_errno __attribute__((alias("reliefos_launch_errno")));
 extern __typeof__(reliefos_launch_error_kind) leonos_launch_error_kind __attribute__((alias("reliefos_launch_error_kind")));
 extern __typeof__(reliefos_launch_error_text) leonos_launch_error_text __attribute__((alias("reliefos_launch_error_text")));

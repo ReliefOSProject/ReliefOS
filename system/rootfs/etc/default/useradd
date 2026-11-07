@@ -1,0 +1,4 @@
+SHELL=/bin/bash
+HOME=/home
+SKEL=/etc/skel
+CREATE_MAIL_SPOOL=no

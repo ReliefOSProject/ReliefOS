@@ -6,11 +6,11 @@
     "C_Cpp.default.cStandard": "gnu11",
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.intelliSenseMode": "linux-clang-x64",
-    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/vscode/compile_commands.json",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/out/vscode/compile_commands.json",
     "C_Cpp.default.browse.limitSymbolsToIncludedHeaders": true,
     "C_Cpp.intelliSenseEngine": "default",
     "C_Cpp.intelliSenseCacheSize": 2048,
-    "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/build/vscode/intellisense",
+    "C_Cpp.intelliSenseCachePath": "${workspaceFolder}/out/vscode/intellisense",
     "C_Cpp.errorSquiggles": "enabled",
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
     "C_Cpp.codeAnalysis.runAutomatically": true,
@@ -38,8 +38,8 @@
     "C_Cpp.intelliSenseMemoryLimit": 4096,
     "C_Cpp.suggestSnippets": true,
     "files.watcherExclude": {
-        "**/build/vscode/objects/**": true,
-        "**/build/vscode/intellisense/**": true
+        "**/out/vscode/objects/**": true,
+        "**/out/vscode/intellisense/**": true
     },
     "files.associations": {
         "*.inc": "c",
