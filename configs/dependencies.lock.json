@@ -2396,13 +2396,13 @@
       "id": "apk-tools-license",
       "kind": "binary",
       "version": "3.0.9",
-      "url": "https://gitlab.alpinelinux.org/alpine/apk-tools/-/raw/v3.0.9/LICENSE",
+      "url": "https://raw.githubusercontent.com/alpinelinux/apk-tools/f1c6067603a1e349a9f4babb816f9cf391be83bc/LICENSE",
       "sha256": "b3c87315aae4c9f276c37168f2655dd8bd990544d7a0bbfb929664155c7ab257",
       "directory": "apk-tools-license",
       "script": "tools/build/rootfs-stage.sh",
       "target": "rootfs-raw",
       "license": "resources/licenses/apk-tools-LICENSE",
-      "note": "Unmodified upstream apk-tools license text"
+      "note": "Unmodified upstream GPL-2.0-only license text, identical in apk-tools 3.0.9; pinned to the license revision in the official GitHub mirror to avoid GitLab anti-bot responses on CI runners"
     },
     {
       "id": "apk-tools-static",
