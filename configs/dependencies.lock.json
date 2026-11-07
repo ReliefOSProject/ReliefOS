@@ -2712,7 +2712,7 @@
       "id": "unifont",
       "kind": "binary",
       "version": "18.0.01",
-      "url": "https://unifoundry.com/pub/unifont/unifont-18.0.01/font-builds/unifont_all-18.0.01.hex.gz",
+      "url": "https://ftp.gnu.org/gnu/unifont/unifont-18.0.01/unifont_all-18.0.01.hex.gz",
       "sha256": "14c96e497466a82e46cf20032ce510e186bdc8658c9158e2290f452cda9bc498",
       "directory": "unifont_all-18.0.01.hex.gz",
       "script": "scripts/reliefos/Makefile.resources",
