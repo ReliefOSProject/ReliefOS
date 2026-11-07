@@ -53,32 +53,6 @@ endchoice
 endmenu
 endmenu
 
-menu "Activation policy"
-
-config VMDK_REQUIRE_LICENSE
-    bool "Require activation in standalone images"
-    default y
-    help
-      Compile the standalone userspace activation policy. This is separate
-      from the policy compiled for systems deployed by the installer.
-
-config INSTALLER_INSTALLED_REQUIRE_LICENSE
-    bool "Require activation in installer-deployed systems"
-    default y
-    help
-      Compile the activation policy used by the installed-system payload.
-      This does not select the standalone-image policy above.
-
-config LICENSE_SERVER_URL
-    string "Activation service URL"
-    default "http://127.0.0.1:30301"
-
-config LICENSE_DEBUG_LOG
-    bool "Activation diagnostic logging"
-    default y
-
-endmenu
-
 menu "Package repository"
 
 config RPR_BASE_URL

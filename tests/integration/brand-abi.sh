@@ -14,8 +14,9 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 
 # Keep the historical goldens unchanged. The explicitly removed window stack
-# is a breaking API removal: these families must be absent, including aliases.
-retired='^((leonos|reliefos)_(ui_|gui_|mouse_|display_|appearance_|inputm_(note_gui_window|observe_gui_key|poll_gui_commit|take_text|take_key|set_current_context))|text_input_(note_gui_window|observe_gui_key|poll_gui_commit|take_text|take_key|set_current_context)|ui_)'
+# and product activation are breaking API removals: these families must be
+# absent, including aliases.
+retired='^((leonos|reliefos)_(license_|ui_|gui_|mouse_|display_|appearance_|inputm_(note_gui_window|observe_gui_key|poll_gui_commit|take_text|take_key|set_current_context))|text_input_(note_gui_window|observe_gui_key|poll_gui_commit|take_text|take_key|set_current_context)|ui_)'
 awk -v retired="$retired" '$1 !~ retired' \
     "$root/tests/fixtures/brand-abi/old-sdk-exports.tsv" > "$work/old.expected"
 awk -v retired="$retired" '$1 !~ retired' \

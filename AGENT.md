@@ -213,7 +213,7 @@ make test-smoke
   SDK/API 字段仅保留为兼容元数据，不是可选构建控制；SDK 内容由实际产品清单定义。
   修改组件元数据时保持 Kconfig.components 同步，运行组件 fixture。
 - 原版 Kconfig 生成 `O/include/config/auto.conf` 与 `O/include/generated/autoconf.h`；
-  许可证别名由独立 policy header 提供，不改写原版配置头。生成的配置和版本头写入 O。生产构建不得改写源码目录、递增版本计数，或使用
+  不改写原版配置头。生成的配置和版本头写入 O。生产构建不得改写源码目录、递增版本计数，或使用
   当前时钟/随机 UUID 破坏可重现性；SOURCE_DATE_EPOCH 默认来自提交时间。
 - 下载只能出现在显式 fetch；生产消费已校验缓存，不允许隐式联网。依赖锁是唯一下载身份来源。
 - 源码成员显式登记在相应 Kbuild 中；增加/删除文件时同步对象清单。源码、头文件、

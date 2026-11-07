@@ -48,6 +48,6 @@ image-iso: iso
 # `release` is gated by the ReliefNT release guard (scripts/reliefos/Makefile.rpr): release builds
 # must come from a clean kernel/reliefnt submodule at the committed gitlink.
 release: reliefnt-release-guard all pages
-config-sync: $(AUTOCONF_H) $(AUTOCONF_INSTALLER_H) $(RELIEFOS_COMPONENT_MK)
+config-sync: $(AUTOCONF_H) $(RELIEFOS_COMPONENT_MK)
 build-info: $(BUILD_INFO_HEADER)
 test-all: test test-long test-legacy test-smoke

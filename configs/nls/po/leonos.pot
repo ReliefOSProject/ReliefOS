@@ -558,22 +558,6 @@ msgstr ""
 msgid "Acre"
 msgstr ""
 
-#: userland/apps/settings/main.c:471
-msgid "Activated"
-msgstr ""
-
-#: userland/apps/settings/main.c:1596
-msgid "Activation"
-msgstr ""
-
-#: userland/apps/settings/main.c:481
-msgid "Activation denied"
-msgstr ""
-
-#: userland/apps/settings/main.c:1605
-msgid "Activation mode"
-msgstr ""
-
 #: userland/apps/devmgr/main.c:114
 msgid "Active"
 msgstr ""
@@ -2214,10 +2198,6 @@ msgstr ""
 msgid "Clipboard is empty"
 msgstr ""
 
-#: userland/apps/settings/main.c:479
-msgid "Clock failure"
-msgstr ""
-
 #: userland/apps/apiapp/main.c:794
 msgid "Close"
 msgstr ""
@@ -2320,10 +2300,6 @@ msgstr ""
 
 #: userland/apps/fileman/actions.c:373
 msgid "Compression canceled"
-msgstr ""
-
-#: userland/apps/settings/main.c:1599
-msgid "Computer"
 msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:442
@@ -4124,10 +4100,6 @@ msgstr ""
 
 #: userland/apps/reliefmail/dialogs.cpp:137
 msgid "Email address"
-msgstr ""
-
-#: userland/apps/settings/main.c:1609
-msgid "Email hash"
 msgstr ""
 
 #: configs/nls/messages.c:92
@@ -6126,10 +6098,6 @@ msgstr ""
 msgid "Invalid accent geometry"
 msgstr ""
 
-#: userland/apps/settings/main.c:475
-msgid "Invalid activation"
-msgstr ""
-
 #: configs/nls/messages.c:346
 msgid "Invalid box placement"
 msgstr ""
@@ -6630,14 +6598,6 @@ msgstr ""
 msgid "License Website"
 msgstr ""
 
-#: userland/apps/settings/main.c:1611
-msgid "License file"
-msgstr ""
-
-#: userland/apps/settings/main.c:1583
-msgid "License validation is disabled for this build."
-msgstr ""
-
 #: userland/apps/reliefppt/window.cpp:210
 msgid "Light theme"
 msgstr ""
@@ -6780,10 +6740,6 @@ msgstr ""
 
 #: userland/apps/mp3play/main.c:347
 msgid "MP3 audio (*.mp3)"
-msgstr ""
-
-#: userland/apps/settings/main.c:1608
-msgid "Machine ID"
 msgstr ""
 
 #: userland/apps/reliefmail/window.cpp:203
@@ -7406,10 +7362,6 @@ msgstr ""
 msgid "Network failed"
 msgstr ""
 
-#: userland/apps/settings/main.c:477
-msgid "Network failure"
-msgstr ""
-
 #: userland/apps/reliefapk/dialogs.cpp:296
 msgid "Network timeout (seconds):"
 msgstr ""
@@ -7754,10 +7706,6 @@ msgstr ""
 msgid "Normal fraction"
 msgstr ""
 
-#: userland/apps/settings/main.c:473
-msgid "Not activated"
-msgstr ""
-
 #: userland/apps/guitest/main.c:70
 msgid "Not allowed"
 msgstr ""
@@ -7834,10 +7782,6 @@ msgstr ""
 msgid "Not mounted"
 msgstr ""
 
-#: userland/apps/settings/main.c:1584
-msgid "Not required"
-msgstr ""
-
 #: userland/apps/reliefcapture/window.cpp:191
 msgid "Not saved"
 msgstr ""
@@ -7906,10 +7850,6 @@ msgstr ""
 msgid "Office supplies"
 msgstr ""
 
-#: userland/apps/settings/main.c:493
-msgid "Offline"
-msgstr ""
-
 #: userland/apps/reliefapk/dialogs.cpp:295
 msgid "Offline: use installed packages and cached indexes only"
 msgstr ""
@@ -7948,10 +7888,6 @@ msgstr ""
 
 #: userland/apps/reliefmath/dialogs.cpp:952
 msgid "One match replaced."
-msgstr ""
-
-#: userland/apps/settings/main.c:490
-msgid "Online"
 msgstr ""
 
 #: userland/apps/reliefmail/window_actions.cpp:640

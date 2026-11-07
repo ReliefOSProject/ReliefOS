@@ -70,7 +70,6 @@ for size in 16 32 48 64 128 256; do
     mkdir -p "$w/raw/usr/share/icons/hicolor/${size}x${size}/apps"
     printf 'math icon\n' > "$w/raw/usr/share/icons/hicolor/${size}x${size}/apps/reliefos-reliefmath.png"
 done
-printf 'license\n' > "$w/raw/etc/license.conf"
 ln -s ../../init.d/reliefos-audio "$w/raw/etc/runlevels/default/reliefos-audio"
 printf 'gptinit\n' > "$w/out/userland-installer/gptinit.elf"
 printf 'installer\n' > "$w/out/userland/installer.elf"
@@ -213,7 +212,6 @@ done
 [ -f "$w/stage/install/root-console/usr/share/reliefos/other-app-data" ]
 [ -d "$w/stage/install/root-console/usr/lib/reliefos/apps/soundctl" ]
 [ -f "$w/stage/install/root-console/usr/lib/reliefos/libreliefos.so.2" ]
-[ -f "$w/stage/etc/license.conf" ]
 inode() { stat -c '%d:%i' "$1"; }
 library=$w/stage/usr/lib/reliefos/libreliefos.so.2
 installed_library=$w/stage/install/root/usr/lib/reliefos/libreliefos.so.2
@@ -247,7 +245,6 @@ cmp "$w/raw/usr/lib/leonos/libleonos.so.2" "$w/stage/install/root/usr/lib/leonos
 cmp "$w/raw/usr/lib/reliefos/apps/soundctl/soundctl.elf" \
     "$w/stage/install/root/usr/lib/reliefos/apps/soundctl/soundctl.elf"
 [ ! -e "$w/stage/install/root/$program" ]
-[ ! -e "$w/stage/install/root/etc/license.conf" ]
 [ -f "$w/stage/install/esp/reliefos/kernel.sys" ]
 [ -f "$w/stage/install/esp/leonos/kernel.sys" ]
 [ -f "$w/stage/install/esp/grub/grub.cfg" ]

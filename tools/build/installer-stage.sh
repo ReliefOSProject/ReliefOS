@@ -18,7 +18,6 @@ mkdir -p "$(dirname "$output")"
 work=$(mktemp -d "$output.new.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 cp -a "$raw" "$work/installed-raw"
-rm -f "$work/installed-raw/etc/license.conf" "$work/installed-raw/etc/install.id"
 package_root() {
     reliefos_log APK "$3"
     SOURCE_DATE_EPOCH=$epoch APK_MUSL_SYSROOT=$out/sysroot/musl sh "$src/tools/build/apk-stage.sh" "$src" "$1" "$2" "$3" \

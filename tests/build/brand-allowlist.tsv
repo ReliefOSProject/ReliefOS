@@ -40,7 +40,6 @@ main	compatibility	include/leonos/lat15_vga16.psf	旧 include/leonos/lat15_vga16
 main	compatibility	include/leonos/lat15_vga16_psf.inc	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/launch_result.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/layout.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-main	compatibility	include/leonos/license.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/net.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/net_service.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/openrc.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
@@ -289,8 +288,8 @@ main	compatibility	userland/runtime/src/gpu.c	旧 GPU API 包装/导出 alias，
 main	compatibility	userland/runtime/src/ini.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
 main	compatibility	userland/runtime/src/inputm.c	旧 inputm 公开入口真实 ELF alias
 main	compatibility	userland/runtime/src/launch.c	旧 leonos_* 已发布 ELF alias 符号，转发到当前 reliefos_* 实现
+main	compatibility	tools/test_activation_removal.py	退役产品激活的负向验收；旧接口名和头路径仅用于禁止恢复的匹配条件，不提供兼容实现。
 main	compatibility	userland/runtime/src/libc.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/runtime/src/license.c	旧许可证 local/offline/machine-id 哈希域字符串持久协议兼容，其他命中为旧导出 alias
 main	compatibility	userland/runtime/src/locale_conf.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
 main	compatibility	userland/runtime/src/netsock.c	已发布 DNS 配置文件名 leonos-dns 与旧公开网络 API alias
 main	compatibility	userland/runtime/src/ntp.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。

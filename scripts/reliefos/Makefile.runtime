@@ -37,7 +37,7 @@ RUNTIME_FLAGS := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_FLAGS) -std=c11
 	-I$(O_INCLUDE) -I$(RELIEFOS_SRC)/include -I$(RELIEFOS_SRC)/third_party/mbedtls/include \
 	-I$(RELIEFOS_SRC)/third_party/zlib -I$(RELIEFOS_SRC)/third_party/libpng \
 	-I$(O_INCLUDE)/libpng -DMBEDTLS_CONFIG_FILE='"reliefos_mbedtls_config.h"' \
-	-include $(RELIEFOS_SRC)/userland/runtime/include/build_policy.h \
+	-include $(O_INCLUDE)/generated/autoconf.h \
 	-ffile-prefix-map=$(RELIEFOS_SRC)=. -ffile-prefix-map=$(RELIEFOS_OUTPUT)=out
 RUNTIME_CFLAGS ?=
 RUNTIME_AUTH_LIBS := $(PAM_LIB) $(PAM_MISC_LIB) $(AUTH_ROOT)/lib/libcrypt.so.2

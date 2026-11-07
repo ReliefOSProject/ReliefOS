@@ -256,7 +256,7 @@ static int run_file_mmap_tests(void)
         close(fd);
         return fail("file-mmap", -1);
     }
-    if (!has_substring(map, "CONFIG_LICENSE_SERVER_URL=")) {
+    if (!has_substring(map, "CONFIG_IMAGE_SIZE_MIB=")) {
         munmap(map, 8192);
         close(fd);
         return fail("file-mmap-prefix", -1);

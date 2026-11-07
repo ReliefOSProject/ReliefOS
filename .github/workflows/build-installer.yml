@@ -12,21 +12,6 @@ on:
         required: false
         default: "400"
         type: string
-      installed_system_requires_license:
-        description: Require activation after the installer deploys the system
-        required: false
-        default: false
-        type: boolean
-      license_server_url:
-        description: HTTP(S) license server URL baked into the installer
-        required: false
-        default: http://127.0.0.1:30301
-        type: string
-      license_debug_log:
-        description: Include license and OOBE activation debug logs
-        required: false
-        default: true
-        type: boolean
       # ---------- 新增输入 ----------
       upload_artifacts:
         description: Upload build artifacts (VMDK, ISO, etc.)
@@ -136,16 +121,10 @@ jobs:
       - name: Prepare build configuration
         env:
           KCONFIG_INSTALLER_ROOT_SIZE_MIB: ${{ inputs.installer_root_size_mib }}
-          KCONFIG_INSTALLER_INSTALLED_REQUIRE_LICENSE: ${{ inputs.installed_system_requires_license }}
-          KCONFIG_LICENSE_SERVER_URL: ${{ inputs.license_server_url }}
-          KCONFIG_LICENSE_DEBUG_LOG: ${{ inputs.license_debug_log }}
         run: |
           set -euo pipefail
 
           : "${KCONFIG_INSTALLER_ROOT_SIZE_MIB:=400}"
-          : "${KCONFIG_INSTALLER_INSTALLED_REQUIRE_LICENSE:=false}"
-          : "${KCONFIG_LICENSE_SERVER_URL:=http://127.0.0.1:30301}"
-          : "${KCONFIG_LICENSE_DEBUG_LOG:=true}"
 
           config_path=out/x86_64/release/.config
           # Start from native Kconfig and the checked-in product seed, so
@@ -162,34 +141,12 @@ jobs:
             printf '%s=%s\n' "$key" "$value" >> "$config_path"
           }
 
-          set_bool() {
-            local key=$1
-            local value=$2
-            case "$value" in
-              true) set_config "$key" y ;;
-              false) set_config "$key" n ;;
-              *) echo "invalid boolean for $key: $value" >&2; exit 1 ;;
-            esac
-          }
-
           if ! [[ "$KCONFIG_INSTALLER_ROOT_SIZE_MIB" =~ ^[0-9]+$ ]] || \
              (( KCONFIG_INSTALLER_ROOT_SIZE_MIB < 32 || KCONFIG_INSTALLER_ROOT_SIZE_MIB > 4096 )); then
             echo "installer_root_size_mib must be an integer from 32 to 4096" >&2
             exit 1
           fi
-          case "$KCONFIG_LICENSE_SERVER_URL" in
-            http://*|https://*) ;;
-            *) echo "license_server_url must start with http:// or https://" >&2; exit 1 ;;
-          esac
-          if [[ "$KCONFIG_LICENSE_SERVER_URL" =~ [[:space:]\"\\\\] ]]; then
-            echo "license_server_url must not contain whitespace, quotes, or backslashes" >&2
-            exit 1
-          fi
-
           set_config CONFIG_INSTALLER_ROOT_SIZE_MIB "$KCONFIG_INSTALLER_ROOT_SIZE_MIB"
-          set_bool CONFIG_INSTALLER_INSTALLED_REQUIRE_LICENSE "$KCONFIG_INSTALLER_INSTALLED_REQUIRE_LICENSE"
-          set_config CONFIG_LICENSE_SERVER_URL "\"$KCONFIG_LICENSE_SERVER_URL\""
-          set_bool CONFIG_LICENSE_DEBUG_LOG "$KCONFIG_LICENSE_DEBUG_LOG"
 
       - name: Verify dynamic component configuration
         run: |
@@ -232,9 +189,6 @@ jobs:
 
           ## Input Parameters
           - installer_root_size_mib: ${{ inputs.installer_root_size_mib }}
-          - installed_system_requires_license: ${{ inputs.installed_system_requires_license }}
-          - license_server_url: ${{ inputs.license_server_url }}
-          - license_debug_log: ${{ inputs.license_debug_log }}
           - upload_artifacts: ${{ inputs.upload_artifacts }}
 
           ## Generated Artifacts

@@ -587,22 +587,6 @@ msgstr "公共资源与开源项目致谢。"
 msgid "Acre"
 msgstr "英亩"
 
-#: userland/apps/settings/main.c:471
-msgid "Activated"
-msgstr "已激活"
-
-#: userland/apps/settings/main.c:1596
-msgid "Activation"
-msgstr "激活"
-
-#: userland/apps/settings/main.c:481
-msgid "Activation denied"
-msgstr "激活被拒绝"
-
-#: userland/apps/settings/main.c:1605
-msgid "Activation mode"
-msgstr "激活方式"
-
 #: userland/apps/devmgr/main.c:114
 msgid "Active"
 msgstr "活动"
@@ -2252,10 +2236,6 @@ msgstr "剪贴板"
 msgid "Clipboard is empty"
 msgstr "剪贴板为空"
 
-#: userland/apps/settings/main.c:479
-msgid "Clock failure"
-msgstr "时钟失败"
-
 #: userland/apps/apiapp/main.c:794
 msgid "Close"
 msgstr "关闭"
@@ -2359,10 +2339,6 @@ msgstr "正在压缩为tar..."
 #: userland/apps/fileman/actions.c:373
 msgid "Compression canceled"
 msgstr "已取消压缩"
-
-#: userland/apps/settings/main.c:1599
-msgid "Computer"
-msgstr "此计算机"
 
 #: userland/apps/reliefexcel/window.cpp:442
 msgid "Condition:"
@@ -4173,10 +4149,6 @@ msgstr "椭圆"
 #: userland/apps/reliefmail/dialogs.cpp:137
 msgid "Email address"
 msgstr "邮箱地址"
-
-#: userland/apps/settings/main.c:1609
-msgid "Email hash"
-msgstr "邮箱哈希"
 
 #: configs/nls/messages.c:92
 msgid "Empty set"
@@ -6207,10 +6179,6 @@ msgstr "文本中含有无效的 UTF-8"
 msgid "Invalid accent geometry"
 msgstr "重音符号几何尺寸无效"
 
-#: userland/apps/settings/main.c:475
-msgid "Invalid activation"
-msgstr "激活无效"
-
 #: configs/nls/messages.c:346
 msgid "Invalid box placement"
 msgstr "排版框位置无效"
@@ -6716,14 +6684,6 @@ msgstr "许可证"
 msgid "License Website"
 msgstr "许可证网站"
 
-#: userland/apps/settings/main.c:1611
-msgid "License file"
-msgstr "许可证文件"
-
-#: userland/apps/settings/main.c:1583
-msgid "License validation is disabled for this build."
-msgstr "此构建已关闭许可证验证。"
-
 #: userland/apps/reliefppt/window.cpp:210
 msgid "Light theme"
 msgstr "浅色"
@@ -6868,10 +6828,6 @@ msgstr "MAC:"
 #: userland/apps/mp3play/main.c:347
 msgid "MP3 audio (*.mp3)"
 msgstr "MP3 音频 (*.mp3)"
-
-#: userland/apps/settings/main.c:1608
-msgid "Machine ID"
-msgstr "机器码"
 
 #: userland/apps/reliefmail/window.cpp:203
 msgid "Mail navigation"
@@ -7498,10 +7454,6 @@ msgstr "网络配置已刷新"
 msgid "Network failed"
 msgstr "网络失败"
 
-#: userland/apps/settings/main.c:477
-msgid "Network failure"
-msgstr "网络失败"
-
 #: userland/apps/reliefapk/dialogs.cpp:296
 msgid "Network timeout (seconds):"
 msgstr "网络超时（秒）："
@@ -7850,10 +7802,6 @@ msgstr "普通"
 msgid "Normal fraction"
 msgstr "普通分式"
 
-#: userland/apps/settings/main.c:473
-msgid "Not activated"
-msgstr "未激活"
-
 #: userland/apps/guitest/main.c:70
 msgid "Not allowed"
 msgstr "禁止"
@@ -7930,10 +7878,6 @@ msgstr "不等于"
 msgid "Not mounted"
 msgstr "未挂载"
 
-#: userland/apps/settings/main.c:1584
-msgid "Not required"
-msgstr "不需要验证"
-
 #: userland/apps/reliefcapture/window.cpp:191
 msgid "Not saved"
 msgstr "未保存"
@@ -8003,10 +7947,6 @@ msgstr "八进制（OCT）"
 msgid "Office supplies"
 msgstr "办公用品"
 
-#: userland/apps/settings/main.c:493
-msgid "Offline"
-msgstr "离线"
-
 #: userland/apps/reliefapk/dialogs.cpp:295
 msgid "Offline: use installed packages and cached indexes only"
 msgstr "离线：仅使用已安装的软件包和缓存的索引"
@@ -8046,10 +7986,6 @@ msgstr "按需启动"
 #: userland/apps/reliefmath/dialogs.cpp:952
 msgid "One match replaced."
 msgstr "已替换一处。"
-
-#: userland/apps/settings/main.c:490
-msgid "Online"
-msgstr "在线"
 
 #: userland/apps/reliefmail/window_actions.cpp:640
 msgid "Only a ready operation can be cancelled."

@@ -205,8 +205,6 @@ def main() -> int:
     # Installed-system root payload: the same root namespace without the
     # live-installer-only gptinit package.
     stage_installed_payloads(esp_tree, stage)
-    remove_file(stage / "install/root/etc/license.conf")
-    remove_file(stage / "install/root/etc/install.id")
     (stage / "install/root" / VAR_LIB_RELIEFOS).mkdir(parents=True, exist_ok=True)
     layout_directories(stage)
     layout_directories(stage / "install/root")
