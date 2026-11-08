@@ -63,7 +63,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 plan=$temporary/root
-/bin/busybox mkdir -p "$plan/etc/apk" "$plan/lib/apk/db" "$plan/var/cache/apk" "$temporary/repository" "$temporary/seen"
+/bin/busybox mkdir -p "$plan/etc/apk" "$plan/lib/apk/db" "$plan/var/cache/apk" "$temporary/repository"
 /bin/busybox cp "$target/lib/apk/db/installed" "$plan/lib/apk/db/installed"
 /bin/busybox cp "$target/lib/apk/db/installed" "$temporary/installed-before"
 /bin/busybox cp -p "$target/etc/apk/world" "$temporary/world-before"
@@ -73,70 +73,44 @@ if [ -f "$target/etc/apk/arch" ]; then
     /bin/busybox cp "$target/etc/apk/arch" "$plan/etc/apk/arch"
 fi
 
-# Reuse cached signed indexes for world-selected repository tags, without
-# copying package archives into memory or writing the installed cache.
-copy_index_cache() {
-    cache_source=$1
-    if [ -L "$cache_source" ]; then
-        link=$(/bin/busybox readlink "$cache_source")
-        case "$link" in
-            /*) cache_source=$target$link ;;
-            *) cache_source=${cache_source%/*}/$link ;;
-        esac
-    fi
-    [ -d "$cache_source" ] || return 0
-    cache_source=$(CDPATH= cd -- "$cache_source" && pwd -P)
-    case "$cache_source" in "$target"/*) ;; *) die 'package cache escapes the installed root' ;; esac
-    for index in "$cache_source"/*; do
-        case "${index##*/}" in *.adb|APKINDEX.*.tar.gz) ;; *) continue ;; esac
-        [ -f "$index" ] && [ ! -L "$index" ] || continue
-        /bin/busybox cp "$index" "$plan/var/cache/apk/"
-    done
-}
-copy_index_cache "$target/var/cache/apk"
-copy_index_cache "$target/etc/apk/cache"
-
-# Only repositories explicitly selected by world tags participate. Absolute
-# local URLs are interpreted in the installed root's namespace.
-required_tags=' '
+# APK requires each world tag to have an available repository even when its
+# packages are already installed. Register those tags against the same signed
+# offline media for this transaction only. Installed packages still satisfy
+# world/dependency constraints; new archives can only come from the media.
+# Do not depend on online repositories or their possibly absent/stale caches,
+# and never strip tags from the installed world or rewrite repository settings.
+: > "$temporary/tags"
 while IFS= read -r dependency || [ -n "$dependency" ]; do
     case "$dependency" in
-        *@*) tag=${dependency#*@}; tag=${tag%%[\<\>\=\~]*}; required_tags="$required_tags$tag " ;;
+        *@*)
+            tag=${dependency#*@}; tag=${tag%%[\<\>\=\~]*}
+            case "$tag" in ''|*[!a-zA-Z0-9_.+-]*) die 'invalid repository tag in installed world' ;; esac
+            printf '%s\n' "$tag" >> "$temporary/tags"
+            ;;
     esac
 done < "$plan/etc/apk/world"
-configuration=$temporary/repositories
-printf 'ndx %s/packages.adb\n' "$repository" > "$configuration"
-append_repositories() {
-    [ -f "$1" ] || return 0
-    while IFS= read -r line || [ -n "$line" ]; do
-        read -r first second third rest <<EOF
-$line
-EOF
-        case "$first" in
-            set) printf '%s\n' "$line" >> "$configuration"; continue ;;
-            @*) kind=; tag=$first; url=$second; components="$third $rest" ;;
-            v2|v3|ndx) kind=$first; tag=$second; url=$third; components=$rest ;;
-            *) continue ;;
-        esac
-        case "$tag" in @*) ;; *) continue ;; esac
-        case "$required_tags" in *" ${tag#@} "*) ;; *) continue ;; esac
-        case "$url" in
-            /*) url=$target$url ;;
-            file:///*) url=$target${url#file://} ;;
-        esac
-        printf '%s %s %s %s\n' "$kind" "$tag" "$url" "$components" >> "$configuration"
-    done < "$1"
+/bin/busybox sort -u "$temporary/tags" > "$temporary/required-tags"
+write_repositories() {
+    source_repository=$1
+    tag_repositories=$2
+    printf 'ndx %s/packages.adb\n' "$source_repository"
+    number=0
+    while IFS= read -r tag; do
+        number=$((number + 1))
+        tagged_repository=$tag_repositories/$number
+        /bin/busybox mkdir -p "$tagged_repository"
+        /bin/busybox cp "$source_repository/packages.adb" "$tagged_repository/packages.adb"
+        for archive in "$source_repository"/*.apk; do
+            [ -f "$archive" ] || continue
+            /bin/busybox ln -s "$archive" "$tagged_repository/${archive##*/}"
+        done
+        # Distinct index URLs keep APK's default/tagged repository masks
+        # separate, preserving the installed origin tag of retained extras.
+        printf 'ndx @%s %s/packages.adb\n' "$tag" "$tagged_repository"
+    done < "$temporary/required-tags"
 }
-append_repositories "$target/etc/apk/repositories"
-for directory in "$target/etc/apk/repositories.d" "$target/lib/apk/repositories.d"; do
-    for snippet in "$directory"/*.list; do
-        [ -f "$snippet" ] || continue
-        name=${snippet##*/}
-        [ ! -e "$temporary/seen/$name" ] || continue
-        : > "$temporary/seen/$name"
-        append_repositories "$snippet"
-    done
-done
+configuration=$temporary/repositories
+write_repositories "$repository" "$temporary/tagged-media" > "$configuration"
 
 broken_packages() {
     /bin/busybox awk -v exclude_system="$2" '
@@ -209,8 +183,7 @@ apk --root "$plan" --keys-dir "$target/etc/apk/keys" \
 apk --root "$plan" --keys-dir "$target/etc/apk/keys" --no-network \
     verify "$temporary/repository/"*.apk
 /bin/busybox cp "$repository/packages.adb" "$temporary/repository/packages.adb"
-/bin/busybox awk -v repo_index="$temporary/repository/packages.adb" \
-    'NR == 1 { print "ndx " repo_index; next } { print }' "$configuration" > "$temporary/verified.repositories"
+write_repositories "$temporary/repository" "$temporary/tagged-verified" > "$temporary/verified.repositories"
 configuration=$temporary/verified.repositories
 echo 'Calculating the offline package transaction'
 if [ -n "$repair_packages" ]; then
