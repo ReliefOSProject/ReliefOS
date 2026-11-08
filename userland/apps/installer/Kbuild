@@ -1,8 +1,10 @@
 RELIEFOS_APP_NAME := installer
-RELIEFOS_APP_OBJECTS := install_ops.o installer_capacity.o installer_partitions.o installer_setup.o installer_swap.o installer_swap_bundle.o installer_swap_config.o installer_swap_prepare.o installer_swap_storage.o installer_tty.o main.o model.o
-RELIEFOS_APP_C_OBJECTS := install_ops.o installer_capacity.o installer_partitions.o installer_setup.o installer_swap.o installer_swap_bundle.o installer_swap_config.o installer_swap_prepare.o installer_swap_storage.o installer_tty.o model.o
-RELIEFOS_APP_CXX_OBJECTS := main.o
+RELIEFOS_APP_OBJECTS := install_ops.o installer_capacity.o installer_partitions.o installer_setup.o installer_swap.o installer_swap_bundle.o installer_swap_config.o installer_swap_prepare.o installer_swap_storage.o installer_tty.o installer_update_engine.o installer_update_target.o installer_update_model.o installer_update_journal.o main.o model.o shared_reliefapk_process.o
+RELIEFOS_APP_C_OBJECTS := install_ops.o installer_capacity.o installer_partitions.o installer_setup.o installer_swap.o installer_swap_bundle.o installer_swap_config.o installer_swap_prepare.o installer_swap_storage.o installer_tty.o installer_update_engine.o installer_update_target.o installer_update_model.o installer_update_journal.o model.o
+RELIEFOS_APP_CXX_OBJECTS := main.o shared_reliefapk_process.o
 RELIEFOS_APP_ASM_OBJECTS :=
 ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
 include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+$(obj)/shared_reliefapk_process.o: $(srctree)/userland/apps/reliefapk/process.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
 endif

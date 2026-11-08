@@ -9,6 +9,7 @@
 #include "../../userland/apps/installer/install_ops.c"
 #undef lstat
 #undef fopen
+#include "../../userland/apps/installer/installer_update.h"
 
 /* Map guest stat requests into a real, private host filesystem fixture. */
 static const char *fixture_root;
@@ -57,8 +58,21 @@ int main(int argc, char **argv)
         setup.skip_xorg = 1;
         result = check_install_payload_required();
     } else if (argc == 3 && !strcmp(argv[2], "update")) {
-        result = check_update_payload_required();
-    } else result = argc == 3 ? check_update_target_required() : check_update_payload_required();
+        struct installer_update_info target = {0}, media = {0};
+        char root[4096], payload[4096];
+        snprintf(root, sizeof(root), "%s/target", fixture_root);
+        result = installer_update_read_system(root, &target);
+        if (!result) {
+            snprintf(payload, sizeof(payload), "%s/install/%s", fixture_root,
+                     !strcmp(target.profile, "console") ? "root-console" : "root");
+            result = installer_update_read_media(payload, target.profile, &media);
+        }
+    } else if (argc == 3) {
+        struct installer_update_info target = {0};
+        char root[4096];
+        snprintf(root, sizeof(root), "%s/target", fixture_root);
+        result = installer_update_read_system(root, &target);
+    } else result = check_install_payload_required();
     printf("payload-check=%d\n", result);
     return result == 0 ? 0 : 1;
 }

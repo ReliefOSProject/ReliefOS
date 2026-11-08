@@ -5,7 +5,6 @@ from pathlib import Path
 import subprocess
 import time
 
-from PIL import ImageChops
 from test_installer_accounts_qemu import boot, next_page, previous_page
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +15,12 @@ def page_text(probe, name):
     if frame.width < 640 or frame.height < 480:
         return ""
     crop = probe.output / "content.png"
-    frame.crop((240, 50, min(frame.width, 1250), 320)).resize((2020, 540)).save(crop)
+    if probe._detect_installer_sidebar(frame) is None:
+        return ""
+    content = frame.crop((max(0, probe.content_left - 8), probe.sidebar_top + 8,
+                          min(frame.width, probe.content_left + 790),
+                          min(frame.height, probe.sidebar_top + 600)))
+    content.resize((content.width * 2, content.height * 2)).save(crop)
     return subprocess.check_output(["tesseract", str(crop), "stdout", "--psm", "6"],
                                    stderr=subprocess.DEVNULL, text=True)
 
@@ -40,7 +44,7 @@ def wait_page(probe, process, text, timeout=90):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--disk", type=Path, required=True)
-    parser.add_argument("--iso", type=Path, default=ROOT / "build/images/reliefos-installer.iso")
+    parser.add_argument("--iso", type=Path, default=ROOT / "out/x86_64/release/images/reliefos-installer.iso")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     output = args.output.resolve()
@@ -62,20 +66,10 @@ def main():
         probe.click(*probe.mode_option_point(update=True))
         next_page(probe)
         next_page(probe)
-        wait_page(probe, process, "Choose bootloaders")
-        next_page(probe)
-        wait_page(probe, process, "Confirm Update")
-        before = probe.frame("update-confirm-empty")
-        # The confirmation field must be focused on entry without a click.
-        assert "Type UPDATE" in page_text(probe, "update-confirm-page")
-        probe.text("UPDATE")
-        after = probe.frame("update-confirm-typed")
-        button = probe.footer_button_box()
-        if ImageChops.difference(before.crop(button), after.crop(button)).getbbox() is None:
-            failures.append("Typing UPDATE did not enable the update button")
-        # Leave the enabled Update confirmation unsubmitted, return to Mode,
-        # switch to a fresh install, and carry the same disk through that path.
-        previous_page(probe, 5)
+        wait_page(probe, process, "Review system update", timeout=600)
+        probe.frame("update-review")
+        # Leave the inspected update unsubmitted, return to Mode, and carry
+        # the same disk through fresh installation with independent defaults.
         previous_page(probe, 4)
         previous_page(probe, 3)
         probe.click(*probe.mode_option_point(update=False))
@@ -98,7 +92,7 @@ def main():
             failures.append(str(error))
         if failures:
             raise AssertionError("; ".join(failures))
-        print(f"PASS UPDATE input and update-to-fresh installation; {serial}", flush=True)
+        print(f"PASS inspected update-to-fresh installation; {serial}", flush=True)
 
 
 if __name__ == "__main__":

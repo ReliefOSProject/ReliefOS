@@ -194,35 +194,29 @@ static void assert_format_args(void)
 
 int main(void)
 {
-    assert(installer_mount_targets("/dev/sda", 0) == 0);
-    assert(root_mounted && esp_mounted);
-    assert(spawn_calls == 0);   /* an update never formats */
-    assert(installer_mount_targets("/dev/sda", 1) == 0);
+    assert(installer_mount_targets("/dev/sda") == 0);
     assert(root_mounted && esp_mounted && mutations == 1);
     assert_format_args();
-    assert(installer_mount_targets("/dev/sda", 0) == 0);
-    assert(spawn_calls == 1);   /* returning to update does not re-format */
-    assert(installer_mount_targets("/dev/sda", 0) == 0);
     busy_esp = 1;
-    assert(installer_mount_targets("/dev/sda", 1) == -EBUSY);
+    assert(installer_mount_targets("/dev/sda") == -EBUSY);
     assert(root_mounted && esp_mounted && mutations == 1);
     busy_esp = 0;
     busy_root = 1;
-    assert(installer_mount_targets("/dev/sda", 1) == -EBUSY);
+    assert(installer_mount_targets("/dev/sda") == -EBUSY);
     assert(root_mounted && !esp_mounted && mutations == 1);
     busy_root = 0;
-    assert(installer_mount_targets("/dev/sda", 1) == 0);
+    assert(installer_mount_targets("/dev/sda") == 0);
     assert(root_mounted && esp_mounted && mutations == 2);
     manual_layout = 1;
     installer_partition_auto = 0;
     installer_root_partition = 8;
     installer_esp_partition = 3;
-    assert(installer_mount_targets("/dev/sda", 1) == 0);
+    assert(installer_mount_targets("/dev/sda") == 0);
     assert(!strcmp(spawn_args[spawn_argc - 1], "/dev/sda9"));
     assert(mutations == 2); /* A manual install never replaces the GPT. */
     manual_bad_role = 1;
     int unchanged_formats = format_calls;
-    assert(installer_mount_targets("/dev/sda", 1) == -EINVAL);
+    assert(installer_mount_targets("/dev/sda") == -EINVAL);
     assert(format_calls == unchanged_formats && mutations == 2);
     selected_partition = 0;
     partition_count = 1;
@@ -238,20 +232,20 @@ int main(void)
     assert(type_calls == previous_types);
     manual_bad_role = 0;
     capacity_bytes = 256ULL * 1024 * 1024;
-    assert(installer_mount_targets("/dev/sda", 1) == -ENOSPC);
+    assert(installer_mount_targets("/dev/sda") == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
     installer_partition_auto = 1;
     capacity_bytes = UINT64_MAX;
-    assert(installer_mount_targets("/dev/sda", 1) < 0);
+    assert(installer_mount_targets("/dev/sda") < 0);
     assert(format_calls == previous_formats && mutations == 2);
     capacity_bytes = 0; capacity_inodes = 10000000;
-    assert(installer_mount_targets("/dev/sda", 1) == -ENOSPC);
+    assert(installer_mount_targets("/dev/sda") == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
     capacity_inodes = 0;setup.swap_enabled = true;setup.swap_size_mib = 4096;
-    assert(installer_mount_targets("/dev/sda", 1) == -ENOSPC);
+    assert(installer_mount_targets("/dev/sda") == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
     installer_partition_auto = 0;setup.swap_size_mib = 512;
-    assert(installer_mount_targets("/dev/sda", 1) == -ENOSPC);
+    assert(installer_mount_targets("/dev/sda") == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
     setup.swap_enabled = false;
     installer_partition_auto = 1;
@@ -259,7 +253,7 @@ int main(void)
         setup.skip_bios = !(modes & RELIEFOS_BOOT_BIOS);
         setup.skip_uefi = !(modes & RELIEFOS_BOOT_UEFI);
         assert(installer_boot_modes() == modes);
-        assert(installer_mount_targets("/dev/sda", 1) == 0);
+        assert(installer_mount_targets("/dev/sda") == 0);
         assert(!strcmp(formatted_esp, (modes & RELIEFOS_BOOT_BIOS) ? "/dev/sdap2" : "/dev/sdap1"));
         assert(!strcmp(spawn_args[spawn_argc - 1], (modes & RELIEFOS_BOOT_BIOS) ? "/dev/sdap3" : "/dev/sdap2"));
     }

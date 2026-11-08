@@ -77,7 +77,7 @@ cp "$work/runner/target/etc/apk/keys/$legacy_key" "$work/old-signing-key.pub"
 awk '/^P:/{p=$0} /^V:/{if(p=="P:external-fixture")print}' "$work/runner/target/lib/apk/db/installed" > "$work/external-before"
 # Install the new command path while keeping old command aliases in the target.
 mkdir -p "$work/runner/usr/lib/reliefos" "$work/runner/usr/lib/leonos"
-cp "$src/userland/storage/leonos-apk-update" "$work/runner/usr/lib/reliefos/reliefos-apk-update"
+cp "$src/userland/storage/reliefos-apk-update" "$work/runner/usr/lib/reliefos/reliefos-apk-update"
 ln -sfn reliefos-apk-update "$work/runner/usr/lib/reliefos/leonos-apk-update"
 ln -sfn ../reliefos/reliefos-apk-update "$work/runner/usr/lib/leonos/leonos-apk-update"
 # pivot_root, rather than chroot, lets APK create its script sandbox on Linux.

@@ -28,6 +28,7 @@ enum installer_action {
     INSTALLER_ACTION_NEXT = 0,
     INSTALLER_ACTION_INSTALL,
     INSTALLER_ACTION_UPDATE,
+    INSTALLER_ACTION_RETRY,
     INSTALLER_ACTION_RESTART,
     INSTALLER_ACTION_CLOSE,
 };
@@ -36,12 +37,12 @@ enum installer_action {
 extern "C" {
 #endif
 
-/* Both modes select firmware after the disk. Fresh installs then configure
- * partitions/accounts; updates keep their partition layout and confirm. */
+/* Fresh installs configure firmware, partitions and accounts. Updates inspect
+ * the selected system and show firmware choices inside their review page. */
 enum installer_page installer_model_next(enum installer_page page,
                                          enum installer_mode mode);
 
-/* Backward transition; update confirmation returns to firmware selection. */
+/* Backward transition; update review returns to target selection. */
 enum installer_page installer_model_prev(enum installer_page page,
                                          enum installer_mode mode);
 

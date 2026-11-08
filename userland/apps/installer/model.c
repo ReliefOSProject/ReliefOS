@@ -80,7 +80,8 @@ enum installer_page installer_model_next(enum installer_page page,
     case INSTALLER_PAGE_MODE:
         return INSTALLER_PAGE_DISK;
     case INSTALLER_PAGE_DISK:
-        return INSTALLER_PAGE_BOOTLOADERS;
+        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_CONFIRM
+                                             : INSTALLER_PAGE_BOOTLOADERS;
     case INSTALLER_PAGE_BOOTLOADERS:
         return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_CONFIRM
                                              : INSTALLER_PAGE_PARTITIONS;
@@ -112,7 +113,7 @@ enum installer_page installer_model_prev(enum installer_page page,
     case INSTALLER_PAGE_BOOTLOADERS:
         return INSTALLER_PAGE_DISK;
     case INSTALLER_PAGE_CONFIRM:
-        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_BOOTLOADERS
+        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_DISK
                                              : INSTALLER_PAGE_ACCOUNTS;
     case INSTALLER_PAGE_ACCOUNTS:
         return INSTALLER_PAGE_PARTITIONS;
@@ -144,6 +145,7 @@ enum installer_action installer_model_action(enum installer_page page,
                                              : INSTALLER_ACTION_INSTALL;
     }
     if (page == INSTALLER_PAGE_FINISH) {
+        if (!install_success && mode == INSTALLER_MODE_UPDATE) return INSTALLER_ACTION_RETRY;
         return install_success ? INSTALLER_ACTION_RESTART : INSTALLER_ACTION_CLOSE;
     }
     return INSTALLER_ACTION_NEXT;
@@ -151,7 +153,7 @@ enum installer_action installer_model_action(enum installer_page page,
 
 const char *installer_model_confirm_word(enum installer_mode mode)
 {
-    return mode == INSTALLER_MODE_UPDATE ? "UPDATE" : "INSTALL";
+    return mode == INSTALLER_MODE_UPDATE ? "" : "INSTALL";
 }
 
 int installer_model_steps(enum installer_mode mode, enum installer_page *out,
@@ -160,7 +162,8 @@ int installer_model_steps(enum installer_mode mode, enum installer_page *out,
     int count = 0;
     enum installer_page page;
     for (page = INSTALLER_PAGE_LANGUAGE; page < INSTALLER_PAGE_COUNT; ++page) {
-        if ((page == INSTALLER_PAGE_ACCOUNTS || page == INSTALLER_PAGE_PARTITIONS) &&
+        if ((page == INSTALLER_PAGE_ACCOUNTS || page == INSTALLER_PAGE_PARTITIONS ||
+             page == INSTALLER_PAGE_BOOTLOADERS) &&
             mode == INSTALLER_MODE_UPDATE)
             continue;
         if (count < cap)

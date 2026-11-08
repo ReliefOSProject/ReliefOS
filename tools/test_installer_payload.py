@@ -16,12 +16,19 @@ class InstallerPayloadTests(unittest.TestCase):
         cls.work = tempfile.TemporaryDirectory(
             prefix="reliefos-installer-payload-", dir=os.environ["TMPDIR"])
         cls.executable = Path(cls.work.name) / "payload-check"
+        model = Path(cls.work.name) / "update-model.o"
+        subprocess.run([
+            "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
+            "-ffunction-sections", "-fdata-sections", "-c",
+            "userland/apps/installer/installer_update_model.c", "-o", model,
+        ], cwd=ROOT, check=True)
         subprocess.run([
             "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
             "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
             "-idirafter", "include", "-Ikernel/reliefnt/include",
             "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-            "tools/tests/installer_payload_test.c", "-o", str(cls.executable),
+            "tools/tests/installer_payload_test.c", model,
+            "-o", str(cls.executable),
         ], cwd=ROOT, check=True)
 
     @classmethod
@@ -38,6 +45,7 @@ class InstallerPayloadTests(unittest.TestCase):
             "usr/share/doc/reliefos",
             "usr/share/fonts/reliefos", "usr/share/reliefos/resources",
             "usr/share/licenses", "etc/ssl/certs",
+            "bin", "sbin", "usr/bin", "boot",
         ):
             (self.root / "install/root" / name).mkdir(parents=True, exist_ok=True)
         for name in (
@@ -58,11 +66,12 @@ class InstallerPayloadTests(unittest.TestCase):
 
     def target_fixture(self, namespace):
         root = self.root / "target"
-        for name in ("bin", "sbin", "lib", "usr/bin", "usr/sbin", "usr/lib",
+        for name in ("bin", "sbin", "lib/apk/db", "usr/bin", "usr/sbin", "usr/lib", "usr/share", "etc/apk",
                      f"etc/{namespace}", f"var/lib/{namespace}",
                      f"usr/lib/{namespace}/apps", "boot/EFI"):
             (root / name).mkdir(parents=True, exist_ok=True)
         library = "libreliefos.so.2" if namespace == "reliefos" else "libleonos.so.2"
+        (root / "etc/os-release").write_text("ID=" + namespace + "\nVERSION_ID=5.3.0\n")
         for name in (f"usr/lib/{namespace}/{library}", f"boot/{namespace}/kernel.sys"):
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -84,6 +93,7 @@ class InstallerPayloadTests(unittest.TestCase):
             file.parent.mkdir(parents=True, exist_ok=True)
             file.write_text("signed package fixture\n")
         (root / "etc/reliefos/desktop-backend").write_text("console\n" if console else "xorg\n")
+        (root / "etc/os-release").write_text("ID=reliefos\nVERSION_ID=5.3.1\n")
         return root
 
     def validate_profile(self, mode):

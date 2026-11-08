@@ -333,7 +333,7 @@ def build_distribution(source, output, work, apk, key):
         updater = tree / "usr/lib/reliefos/reliefos-apk-update"
         updater.parent.mkdir(parents=True, exist_ok=True)
         updater.unlink(missing_ok=True)
-        shutil.copyfile(ROOT / "userland/storage/leonos-apk-update", updater)
+        shutil.copyfile(ROOT / "userland/storage/reliefos-apk-update", updater)
         updater.chmod(0o755)
         (tree / "usr/lib/reliefos/leonos-apk-update").symlink_to("reliefos-apk-update")
         (tree / "usr/lib/leonos").mkdir(parents=True, exist_ok=True)

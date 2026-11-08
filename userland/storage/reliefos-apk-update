@@ -1,0 +1,265 @@
+#!/bin/sh
+# Signed offline package transactions for the installer. Inspection uses a
+# private database and accepts a read-only installed root.
+set -eu
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+LC_ALL=C
+export PATH LC_ALL
+umask 077
+
+die() { printf 'update: %s\n' "$*" >&2; exit 1; }
+mode=apply
+expected_index=
+case "$#:${1:-}" in
+    2:*) target=$1; repository=$2 ;;
+    3:--check|3:--apply|4:--apply)
+        mode=${1#--}; target=$2; repository=$3; expected_index=${4:-} ;;
+    *) echo 'usage: reliefos-apk-update [--check|--apply] TARGET_ROOT SIGNED_REPOSITORY [INDEX_SHA256]' >&2; exit 2 ;;
+esac
+case "$target:$repository" in /*:/*) ;; *) die 'absolute target and repository paths are required' ;; esac
+[ ! -L "$target" ] && [ ! -L "$repository" ] || die 'target and repository must be real directories'
+target=$(CDPATH= cd -- "$target" && pwd -P)
+repository=$(CDPATH= cd -- "$repository" && pwd -P)
+[ "$target" != / ] || die 'boot the installation media to update an offline system'
+for file in "$target/etc/apk/world" "$target/lib/apk/db/installed" "$repository/packages.adb"; do
+    [ -s "$file" ] && [ ! -L "$file" ] || die "missing or unsafe package metadata: $file"
+done
+[ -d "$target/etc/apk/keys" ] && [ ! -L "$target/etc/apk/keys" ] || die 'installed package trust keys are missing'
+index_sha=$(/bin/busybox sha256sum "$repository/packages.adb")
+index_sha=${index_sha%% *}
+[ -z "$expected_index" ] || [ "$index_sha" = "$expected_index" ] || die 'installation media changed after inspection; check the update again'
+
+temporary=$(/bin/busybox mktemp -d /tmp/reliefos-update.XXXXXX)
+world_changed=0
+retention_started=0
+activation_deferred=0
+kernel_bundle=${RELIEFOS_KERNEL_BUNDLE_HELPER:-/usr/libexec/reliefos/kernel-bundle}
+activation_marker=$target/run/reliefos-kernel-activation.defer
+cleanup() {
+    result=$?
+    trap - EXIT HUP INT TERM
+    set +e
+    if [ "$retention_started" -eq 1 ]; then
+        "$kernel_bundle" --restore-all "$target" || result=1
+    fi
+    # Only roll world back when APK did not modify its database. A partially
+    # committed database must keep APK's actual world for a consistent retry.
+    if [ "$result" -ne 0 ] && [ "$world_changed" -eq 1 ] &&
+       /bin/busybox cmp -s "$temporary/installed-before" "$target/lib/apk/db/installed"; then
+        if /bin/busybox cp -p "$temporary/world-before" "$target/etc/apk/world.restore.$$" &&
+           /bin/busybox mv "$target/etc/apk/world.restore.$$" "$target/etc/apk/world"; then :
+        else result=1
+        fi
+    fi
+    if [ "$activation_deferred" -eq 1 ]; then
+        /bin/busybox rm -f "$activation_marker" || result=1
+    fi
+    /bin/busybox rm -rf "$temporary"
+    exit "$result"
+}
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+plan=$temporary/root
+/bin/busybox mkdir -p "$plan/etc/apk" "$plan/lib/apk/db" "$plan/var/cache/apk" "$temporary/repository" "$temporary/seen"
+/bin/busybox cp "$target/lib/apk/db/installed" "$plan/lib/apk/db/installed"
+/bin/busybox cp "$target/lib/apk/db/installed" "$temporary/installed-before"
+/bin/busybox cp -p "$target/etc/apk/world" "$temporary/world-before"
+/bin/busybox sed 's/^leonos-/reliefos-/' "$temporary/world-before" > "$plan/etc/apk/world"
+if [ -f "$target/etc/apk/arch" ]; then
+    [ ! -L "$target/etc/apk/arch" ] || die 'unsafe installed architecture file'
+    /bin/busybox cp "$target/etc/apk/arch" "$plan/etc/apk/arch"
+fi
+
+# Reuse cached signed indexes for world-selected repository tags, without
+# copying package archives into memory or writing the installed cache.
+copy_index_cache() {
+    cache_source=$1
+    if [ -L "$cache_source" ]; then
+        link=$(/bin/busybox readlink "$cache_source")
+        case "$link" in
+            /*) cache_source=$target$link ;;
+            *) cache_source=${cache_source%/*}/$link ;;
+        esac
+    fi
+    [ -d "$cache_source" ] || return 0
+    cache_source=$(CDPATH= cd -- "$cache_source" && pwd -P)
+    case "$cache_source" in "$target"/*) ;; *) die 'package cache escapes the installed root' ;; esac
+    for index in "$cache_source"/*; do
+        case "${index##*/}" in *.adb|APKINDEX.*.tar.gz) ;; *) continue ;; esac
+        [ -f "$index" ] && [ ! -L "$index" ] || continue
+        /bin/busybox cp "$index" "$plan/var/cache/apk/"
+    done
+}
+copy_index_cache "$target/var/cache/apk"
+copy_index_cache "$target/etc/apk/cache"
+
+# Only repositories explicitly selected by world tags participate. Absolute
+# local URLs are interpreted in the installed root's namespace.
+required_tags=' '
+while IFS= read -r dependency || [ -n "$dependency" ]; do
+    case "$dependency" in
+        *@*) tag=${dependency#*@}; tag=${tag%%[\<\>\=\~]*}; required_tags="$required_tags$tag " ;;
+    esac
+done < "$plan/etc/apk/world"
+configuration=$temporary/repositories
+printf 'ndx %s/packages.adb\n' "$repository" > "$configuration"
+append_repositories() {
+    [ -f "$1" ] || return 0
+    while IFS= read -r line || [ -n "$line" ]; do
+        read -r first second third rest <<EOF
+$line
+EOF
+        case "$first" in
+            set) printf '%s\n' "$line" >> "$configuration"; continue ;;
+            @*) kind=; tag=$first; url=$second; components="$third $rest" ;;
+            v2|v3|ndx) kind=$first; tag=$second; url=$third; components=$rest ;;
+            *) continue ;;
+        esac
+        case "$tag" in @*) ;; *) continue ;; esac
+        case "$required_tags" in *" ${tag#@} "*) ;; *) continue ;; esac
+        case "$url" in
+            /*) url=$target$url ;;
+            file:///*) url=$target${url#file://} ;;
+        esac
+        printf '%s %s %s %s\n' "$kind" "$tag" "$url" "$components" >> "$configuration"
+    done < "$1"
+}
+append_repositories "$target/etc/apk/repositories"
+for directory in "$target/etc/apk/repositories.d" "$target/lib/apk/repositories.d"; do
+    for snippet in "$directory"/*.list; do
+        [ -f "$snippet" ] || continue
+        name=${snippet##*/}
+        [ ! -e "$temporary/seen/$name" ] || continue
+        : > "$temporary/seen/$name"
+        append_repositories "$snippet"
+    done
+done
+
+broken_packages() {
+    /bin/busybox awk -v exclude_system="$2" '
+        function emit() {
+            if (flags ~ /[fs]/ && (!exclude_system || name !~ /^(leonos|reliefos)-/))
+                print name "\t" version "\t" checksum "\t" flags
+            name = version = checksum = flags = ""
+        }
+        /^P:/ { name = substr($0, 3) }
+        /^V:/ { version = substr($0, 3) }
+        /^C:/ { checksum = substr($0, 3) }
+        /^f:/ { flags = substr($0, 3) }
+        /^$/ { emit() }
+        END { emit() }
+    ' "$1/lib/apk/db/installed" | /bin/busybox sort
+}
+
+# Preserve APK's exact exit status while streaming its output through tee.
+# The status file is written before the pipeline closes, including on errors.
+run_transaction() {
+    run_root=$1
+    run_log=$2
+    operation=$3
+    shift 3
+    exclude_system=1
+    [ "$#" -eq 0 ] || exclude_system=0
+    broken_packages "$run_root" "$exclude_system" > "$temporary/broken-before"
+    (
+        set +e
+        if [ "$operation" = fix ]; then
+            apk --root "$run_root" --keys-dir "$target/etc/apk/keys" \
+                --repositories-file "$configuration" --no-network "$@" fix --reinstall --upgrade $repair_packages
+        else
+            apk --root "$run_root" --keys-dir "$target/etc/apk/keys" \
+                --repositories-file "$configuration" --no-network "$@" upgrade $packages
+        fi
+        printf '%s\n' "$?" > "$temporary/apk-status"
+    ) 2>&1 | /bin/busybox tee "$run_log"
+    status=$(/bin/busybox cat "$temporary/apk-status")
+    [ "$status" -ne 0 ] || return 0
+    broken_packages "$run_root" 0 > "$temporary/broken-after"
+    count=$(/bin/busybox awk 'END { print NR }' "$temporary/broken-before")
+    if [ "$count" -gt 0 ] && [ "$count" -lt 125 ] && [ "$status" -eq "$count" ] &&
+       /bin/busybox cmp -s "$temporary/broken-before" "$temporary/broken-after" &&
+       ! /bin/busybox grep -q '^ERROR:' "$run_log" &&
+       /bin/busybox tail -n 1 "$run_log" |
+           /bin/busybox grep -Eq "^$status errors?; .+ in [0-9]+ packages$"; then
+        echo 'WARNING: pre-existing external package errors remain:' >&2
+        /bin/busybox cut -f 1 "$temporary/broken-before" >&2
+        return 0
+    fi
+    return "$status"
+}
+
+echo 'Checking signed repository and package archives'
+packages=$(apk --root "$plan" --keys-dir "$target/etc/apk/keys" \
+    --repositories-file "$configuration" --no-network search --quiet 'reliefos-*')
+[ -n "$packages" ] || die 'the signed repository has no ReliefOS packages'
+for name in $packages; do
+    case "$name" in reliefos-*) ;; *) die 'invalid system package name' ;; esac
+    case "$name" in *[!a-zA-Z0-9+_.-]*) die 'invalid system package name' ;; esac
+done
+repair_packages=$(broken_packages "$plan" 0 | /bin/busybox awk -F '\t' '$1 ~ /^reliefos-/ { print $1 }')
+for name in $repair_packages; do
+    case "$name" in *[!a-zA-Z0-9+_.-]*) die 'invalid repair package name' ;; esac
+done
+apk --root "$plan" --keys-dir "$target/etc/apk/keys" \
+    --repositories-file "$configuration" --no-network fetch --recursive \
+    --output "$temporary/repository" $packages $repair_packages
+apk --root "$plan" --keys-dir "$target/etc/apk/keys" --no-network \
+    verify "$temporary/repository/"*.apk
+/bin/busybox cp "$repository/packages.adb" "$temporary/repository/packages.adb"
+/bin/busybox awk -v repo_index="$temporary/repository/packages.adb" \
+    'NR == 1 { print "ndx " repo_index; next } { print }' "$configuration" > "$temporary/verified.repositories"
+configuration=$temporary/verified.repositories
+echo 'Calculating the offline package transaction'
+if [ -n "$repair_packages" ]; then
+    run_transaction "$plan" "$temporary/repair-plan.log" fix --simulate
+fi
+run_transaction "$plan" "$temporary/plan.log" upgrade --simulate
+printf 'RELIEFOS_UPDATE_INDEX_SHA256=%s\n' "$index_sha"
+[ "$mode" != check ] || exit 0
+
+echo 'Preserving installed kernel modules and local configuration'
+case "$kernel_bundle" in /*) ;; *) die 'kernel retention helper must have an absolute path' ;; esac
+[ -x "$kernel_bundle" ] || die 'native kernel retention helper is missing'
+/bin/sh /usr/lib/reliefos/reliefos-migrate "$target"
+"$kernel_bundle" --retain-installed "$target"
+retention_started=1
+[ ! -L "$target/run" ] && { [ ! -e "$target/run" ] || [ -d "$target/run" ]; } || die 'unsafe target run directory'
+/bin/busybox mkdir -p "$target/run"
+[ ! -e "$activation_marker" ] && [ ! -L "$activation_marker" ] || die 'kernel activation is already pending'
+(set -C; printf '%s\n' 'ReliefOS installer package transaction' > "$activation_marker")
+activation_deferred=1
+
+# A concurrent administrator edit must be inspected again before committing.
+/bin/busybox cmp -s "$temporary/world-before" "$target/etc/apk/world" || die 'installed package selection changed during preflight'
+/bin/busybox cmp -s "$temporary/installed-before" "$target/lib/apk/db/installed" || die 'installed package database changed during preflight'
+/bin/busybox cp -p "$temporary/world-before" "$target/etc/apk/world.reliefos-update.$$"
+/bin/busybox cat "$plan/etc/apk/world" > "$target/etc/apk/world.reliefos-update.$$"
+/bin/busybox mv "$target/etc/apk/world.reliefos-update.$$" "$target/etc/apk/world"
+world_changed=1
+echo 'Applying the signed package transaction'
+if [ -n "$repair_packages" ]; then
+    run_transaction "$target" "$temporary/repair.log" fix
+fi
+run_transaction "$target" "$temporary/transaction.log" upgrade
+/bin/busybox chroot "$target" /bin/sh /usr/lib/reliefos/migrate-shell
+
+echo 'Publishing the verified offline repository'
+for relative in usr usr/share usr/share/reliefos usr/share/reliefos/apk usr/share/reliefos/apk/repository; do
+    path=$target/$relative
+    [ ! -L "$path" ] && { [ ! -e "$path" ] || [ -d "$path" ]; } || die "unsafe repository directory: $path"
+    [ -d "$path" ] || /bin/busybox mkdir -m 0755 "$path"
+done
+destination=$target/usr/share/reliefos/apk/repository
+for package in "$temporary/repository"/*.apk; do
+    name=${package##*/}
+    /bin/busybox cp "$package" "$destination/$name.new"
+    /bin/busybox chmod 0644 "$destination/$name.new"
+    /bin/busybox mv "$destination/$name.new" "$destination/$name"
+done
+/bin/busybox cp "$temporary/repository/packages.adb" "$destination/packages.adb.new"
+/bin/busybox chmod 0644 "$destination/packages.adb.new"
+/bin/busybox mv "$destination/packages.adb.new" "$destination/packages.adb"
+/bin/busybox sync

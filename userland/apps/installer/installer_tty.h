@@ -45,9 +45,7 @@ struct installer_tty_context {
     int (*partition_set_type)(uint32_t type);
     int (*partition_delete)(void);
     int (*partition_format)(uint32_t filesystem, const char *label);
-    void (*prepare_update)(void);
     void (*perform_install)(void);
-    void (*perform_update)(void);
 };
 
 #ifdef __cplusplus

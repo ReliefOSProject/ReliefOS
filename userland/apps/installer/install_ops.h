@@ -1,4 +1,4 @@
-/* Installer install/update operations shared by the FLTK and TTY frontends. */
+/* Fresh installation operations and wizard state shared by both frontends. */
 #ifndef RELIEFOS_INSTALLER_OPS_H
 #define RELIEFOS_INSTALLER_OPS_H
 
@@ -116,9 +116,7 @@ int installer_partition_delete(void);
 int installer_partition_format(uint32_t filesystem, const char *label);
 
 /* Long-running operations; they drive `page` to PROGRESS then FINISH. */
-void prepare_update_target(void);
 void perform_install(void);
-void perform_update(void);
 
 #ifdef __cplusplus
 }

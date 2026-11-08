@@ -10,6 +10,7 @@
 #include <libintl.h>
 
 #include "installer_tty.h"
+#include "installer_update.h"
 #include "installer_capacity.h"
 #include "model.h"
 
@@ -312,6 +313,12 @@ static int tty_partition_menu(const struct installer_tty_context *context)
     }
 }
 
+static void tty_update_progress(void *context, unsigned progress, const char *message)
+{
+    (void)context;
+    printf("[%3u%%] %s\n", progress, T(message));
+}
+
 int installer_tty_main(const struct installer_tty_context *context)
 {
     char input[32];
@@ -326,8 +333,7 @@ int installer_tty_main(const struct installer_tty_context *context)
         !context->partition_create || !context->partition_resize ||
         !context->partition_rename || !context->partition_set_type ||
         !context->partition_delete || !context->partition_format ||
-        !context->prepare_update ||
-        !context->perform_install || !context->perform_update) {
+        !context->perform_install) {
         return 1;
     }
 
@@ -356,17 +362,35 @@ int installer_tty_main(const struct installer_tty_context *context)
     }
 
     if (*context->install_mode == INSTALLER_TTY_MODE_UPDATE) {
-        context->prepare_update();
-        if (*context->page == INSTALLER_PAGE_FINISH && !*context->install_success) {
+        struct installer_update_info inspected, result;
+        const char *disk = context->disks[*context->selected_disk].path;
+        int error = installer_update_check(disk, &inspected, tty_update_progress, NULL);
+        if (error) {
+            fprintf(stderr, "%s: %s\n", T(inspected.failure), strerror(-error));
             return 1;
         }
+        printf("\n%s: %s -> %s\n%s: %s\n%s: %s\n%s: %s\n",
+               T("System version"), inspected.installed_version, inspected.media_version,
+               T("Target disk"), inspected.disk, T("System partition"), inspected.root_device,
+               T("Boot partition"), inspected.esp_device);
+        printf("%s: %llu MiB / %llu MiB\n", T("Free / required space"),
+               (unsigned long long)(inspected.free_bytes / (1024u * 1024u)),
+               (unsigned long long)((inspected.required_bytes + 1024u * 1024u - 1) / (1024u * 1024u)));
+        puts(T("Accounts, personal files, installed software and local configuration are preserved."));
+        context->setup->skip_bios = !(inspected.boot_modes & 1u);
+        context->setup->skip_uefi = !(inspected.boot_modes & 2u);
         if (!tty_bootloaders(context->setup)) return 1;
-        if (!tty_read_line("Type UPDATE to confirm an in-place update: ",
-                           input, sizeof(input)) || !tty_line_is(input, "UPDATE")) {
+        if (!tty_read_line(T("Proceed with system update? [y/N]: "), input, sizeof(input)) ||
+            (!tty_line_is(input, "y") && !tty_line_is(input, "Y") && !tty_line_is(input, "yes"))) {
             puts("Update not confirmed. Installation cancelled.");
             return 1;
         }
-        context->perform_update();
+        error = installer_update_apply(&inspected,
+            (context->setup->skip_bios ? 0u : 1u) | (context->setup->skip_uefi ? 0u : 2u),
+            &result, tty_update_progress, NULL);
+        *context->install_success = error == 0;
+        *context->page = INSTALLER_PAGE_FINISH;
+        if (error) fprintf(stderr, "%s: %s\n", T(result.failure), strerror(-error));
     } else {
         if (!tty_bootloaders(context->setup)) return 1;
         context->refresh_partitions();

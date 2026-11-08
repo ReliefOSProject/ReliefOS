@@ -807,10 +807,6 @@ msgstr "阿尔法"
 msgid "Alpine packages and local configuration are preserved."
 msgstr "保留 Alpine 软件包及本地配置。"
 
-#: userland/apps/installer/main.cpp:1027
-msgid "Alpine packages and local configuration are retained. Boot files are updated after the package transaction succeeds."
-msgstr "保留 Alpine 软件包和本地配置，软件包事务成功后再更新启动文件。"
-
 #: userland/apps/reliefexcel/window.cpp:525
 msgid "Amount"
 msgstr "金额"
@@ -2387,10 +2383,6 @@ msgstr "确认 SMTP 发送"
 #: userland/apps/reliefmail/window_actions.cpp:490
 msgid "Confirm Trash clear"
 msgstr "确认清空废纸篓"
-
-#: userland/apps/installer/main.cpp:1015
-msgid "Confirm Update"
-msgstr "确认更新"
 
 #: userland/apps/reliefmail/window_reader.cpp:170
 msgid "Confirm action"
@@ -6078,10 +6070,6 @@ msgstr "安装介质不完整"
 #: userland/apps/reliefapk/window.cpp:268
 msgid "Installed"
 msgstr "已安装"
-
-#: userland/apps/installer/main.cpp:1017
-msgid "Installed ReliefOS packages will be upgraded."
-msgstr "将升级已安装的 ReliefOS 软件包。"
 
 #: userland/apps/reliefapk/window.cpp:688
 msgid "Installed size"
@@ -12734,10 +12722,6 @@ msgstr "输入 INITIALIZE 以替换分区表："
 msgid "Type INSTALL to enable the Install button."
 msgstr "输入 INSTALL 以启用安装按钮。"
 
-#: userland/apps/installer/main.cpp:1033
-msgid "Type UPDATE to enable the Update button."
-msgstr "输入 UPDATE 以启用更新按钮。"
-
 #: userland/apps/reliefmail/window_actions.cpp:491
 msgid "Type the account-bound Trash phrase."
 msgstr "输入与此账户绑定的废纸篓确认短语。"
@@ -15554,9 +15538,6 @@ msgstr "工作进程错误"
 #~ msgid "System information (logo unavailable)"
 #~ msgstr "系统版本信息（Logo 不可用）"
 
-#~ msgid "System version"
-#~ msgstr "系统版本"
-
 #~ msgid "Tar extract failed"
 #~ msgstr "Tar解压失败"
 
@@ -16822,10 +16803,6 @@ msgstr "引导器："
 msgid "Choose bootloaders"
 msgstr "选择引导方式"
 
-#: userland/apps/installer/main.cpp:969
-msgid "Existing partitions are preserved. BIOS requires an unformatted BIOS Boot partition. Skipped existing bootloaders are preserved."
-msgstr "保留现有分区。BIOS 引导需要未格式化的 BIOS Boot 分区。未选中的现有引导器会保留。"
-
 #: userland/apps/installer/main.cpp:608
 msgid "Manual layout: assign a FAT32 ESP and an ext4 root. BIOS Boot is not required for the selected bootloaders."
 msgstr "手动布局：指定 FAT32 ESP 和 ext4 根分区。当前引导选择不需要 BIOS Boot 分区。"
@@ -16849,10 +16826,6 @@ msgstr "跳过"
 #: userland/apps/installer/main.cpp:606
 msgid "The automatic layout does not fit this disk. Select another disk or configure partitions manually."
 msgstr "此磁盘无法容纳自动方案。请选择其他磁盘或手动配置分区。"
-
-#: userland/apps/installer/main.cpp:1006
-msgid "The initial selection matches the bootloaders found on this disk."
-msgstr "默认选择与此磁盘上检测到的引导器一致。"
 
 #: userland/apps/installer/main.cpp:707
 msgid "Type AUTO to erase the disk and create ESP and root partitions:"
@@ -17290,3 +17263,171 @@ msgstr "所选系统不支持交换空间"
 #: userland/apps/installer
 msgid "Swap requires an AHCI disk"
 msgstr "交换文件需要 AHCI 磁盘"
+
+#: userland/apps/installer
+msgid "Checking update target"
+msgstr "正在检查更新目标"
+
+#: userland/apps/installer
+msgid "Administrator privileges are required"
+msgstr "需要管理员权限"
+
+#: userland/apps/installer
+msgid "Identifying the installed system"
+msgstr "正在识别已安装的系统"
+
+#: userland/apps/installer
+msgid "Checking installation media and free space"
+msgstr "正在检查安装介质与可用空间"
+
+#: userland/apps/installer
+msgid "Installation media is older than the installed system"
+msgstr "安装介质的版本早于已安装系统"
+
+#: userland/apps/installer
+msgid "Target or media changed. Check the update again."
+msgstr "目标系统或安装介质已变化，请重新检查更新。"
+
+#: userland/apps/installer
+msgid "Checking bootloader compatibility"
+msgstr "正在检查引导器兼容性"
+
+#: userland/apps/installer
+msgid "Verifying signed packages and dependencies"
+msgstr "正在校验软件包签名与依赖"
+
+#: userland/apps/installer
+msgid "Update checks completed"
+msgstr "更新检查完成"
+
+#: userland/apps/installer
+msgid "Preparing the installed system for update"
+msgstr "正在准备更新已安装的系统"
+
+#: userland/apps/installer
+msgid "Recovering the previous update attempt"
+msgstr "正在恢复上一次未完成的更新"
+
+#: userland/apps/installer
+msgid "Applying signed system packages"
+msgstr "正在更新已签名的系统软件包"
+
+#: userland/apps/installer
+msgid "Synchronizing the updated root filesystem"
+msgstr "正在同步更新后的根文件系统"
+
+#: userland/apps/installer
+msgid "Resuming bootloader publication"
+msgstr "正在继续提交引导文件"
+
+#: userland/apps/installer
+msgid "Publishing kernel and bootloader files"
+msgstr "正在提交内核与引导文件"
+
+#: userland/apps/installer
+msgid "Finishing the system update"
+msgstr "正在完成系统更新"
+
+#: userland/apps/installer
+msgid "System update completed successfully"
+msgstr "系统更新成功"
+
+#: userland/apps/installer
+msgid "Writing the update log"
+msgstr "正在写入更新日志"
+
+#: userland/apps/installer
+msgid "Update worker failed"
+msgstr "后台更新进程执行失败"
+
+#: userland/apps/installer
+msgid "Check Again"
+msgstr "重新检查"
+
+#: userland/apps/installer
+msgid "Check Update"
+msgstr "检查更新"
+
+#: userland/apps/installer
+msgid "Ready to update"
+msgstr "可以开始更新"
+
+#: userland/apps/installer
+msgid "Review the detected system and start the update."
+msgstr "请核对识别到的系统信息，然后开始更新。"
+
+#: userland/apps/installer
+msgid "Cannot start the update worker"
+msgstr "无法启动后台更新进程"
+
+#: userland/apps/installer
+msgid "Preparing the system update"
+msgstr "正在准备系统更新"
+
+#: userland/apps/installer
+msgid "Checking the selected system"
+msgstr "正在检查所选系统"
+
+#: userland/apps/installer
+msgid "Review system update"
+msgstr "确认系统更新"
+
+#: userland/apps/installer
+msgid "Media version"
+msgstr "安装介质版本"
+
+#: userland/apps/installer
+msgid "Target disk"
+msgstr "目标磁盘"
+
+#: userland/apps/installer
+msgid "Boot partition"
+msgstr "引导分区"
+
+#: userland/apps/installer
+msgid "Desktop environment"
+msgstr "桌面环境"
+
+#: userland/apps/installer
+msgid "Console"
+msgstr "控制台"
+
+#: userland/apps/installer
+msgid "Free / required space"
+msgstr "可用／所需空间"
+
+#: userland/apps/installer
+msgid "Update bootloader software"
+msgstr "更新引导器程序"
+
+#: userland/apps/installer
+msgid "Accounts, personal files, installed software and local configuration are preserved."
+msgstr "保留账户、个人文件、已安装软件和本地配置。"
+
+#: userland/apps/installer
+msgid "A previous update is incomplete. This attempt will verify the system and recover the pending update stages."
+msgstr "上一次更新尚未完成。本次将重新校验系统，并恢复待完成的更新步骤。"
+
+#: userland/apps/installer
+msgid "Signed packages are checked before changes. Boot files are published after the package transaction succeeds."
+msgstr "写入前校验软件包签名，软件包事务成功后再提交引导文件。"
+
+#: userland/apps/installer
+msgid "Update details"
+msgstr "更新详情"
+
+#: userland/apps/installer
+msgid "Checking system update"
+msgstr "正在检查系统更新"
+
+#: userland/apps/installer
+msgid "Review the details, then check the update again to retry."
+msgstr "请查看详细日志，然后重新检查更新以重试。"
+
+#: userland/apps/installer
+msgid "System version"
+msgstr "系统版本"
+
+#: userland/apps/installer
+msgid "Proceed with system update? [y/N]: "
+msgstr "确认更新系统？[y/N] "

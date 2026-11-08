@@ -26,7 +26,7 @@ $(APK_MANAGED_ROOT)/.apk-complete $(APK_REPOSITORY)/packages.adb $(APK_MANIFEST)
 	$(APK_RAW_STAMP) $(APK_STAGE_SCRIPT) $(APK_STAGE_INPUTS) $(RELIEFOS_APK_OWN) $(UPSTREAM_APK) \
 	$(UPSTREAM_APK_ROOT)/.complete $(RELIEFOS_SRC)/configs/apk-ownership.json \
 	$(RELIEFOS_SRC)/resources/licenses/apk-tools-LICENSE $(MUSL_STAMP) \
-	$(RELIEFOS_SRC)/userland/storage/leonos-apk-update \
+	$(RELIEFOS_SRC)/userland/storage/reliefos-apk-update \
 	$(RELIEFOS_SRC)/userland/storage/busybox-binutils-links \
 	$(RELIEFOS_SRC)/system/rootfs/etc/apk/protected_paths.d/leonos.list \
 	$(RELIEFOS_SRC)/system/rootfs/etc/apk/protected_paths.d/reliefos.list \

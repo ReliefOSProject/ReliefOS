@@ -305,7 +305,8 @@ main	compatibility	userland/runtime/src/text_encoding.c	所有当前命中均为
 main	compatibility	userland/runtime/src/tls.c	旧 leonos_* 已发布 ELF alias 符号，转发到当前 reliefos_* 实现
 main	compatibility	userland/runtime/src/unix_ipc.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
 main	compatibility	userland/sqlite/leonos_sqlite_vfs.c	仅文件名与 .zName="leonos" 为已注册 SQLite VFS 标识；私有 C 类型/函数已迁 reliefos。
-main	compatibility	userland/storage/leonos-apk-update	旧脚本名入口与旧 world/package prefix 显式迁到新包，不能清零升级识别
+main	compatibility	userland/storage/reliefos-apk-update	旧 world/package prefix 显式迁到新包，不能清零升级识别
+main	compatibility	userland/apps/installer/installer_update_model.c	只读识别旧系统 ID、配置命名空间与包名前缀，保留已安装系统的升级入口
 main	compatibility	third_party/doomgeneric/README.leonos.md	保留既有端口说明文件名；当前标题正文已 ReliefOS
 main	compatibility	third_party/doomgeneric/doomgeneric/r_data.c	LEONOS_DOOM 是现有第三方端口编译开关；当前说明已 ReliefOS
 main	compatibility	third_party/doomgeneric/doomgeneric/w_file_stdc.c	LEONOS_DOOM 与旧公开 leonos/fs.h 保留第三方端口源兼容；当前说明已 ReliefOS
