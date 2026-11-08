@@ -1,0 +1,14 @@
+diff --git a/src/thread/pthread_mutexattr_setprotocol.c b/src/thread/pthread_mutexattr_setprotocol.c
+--- a/src/thread/pthread_mutexattr_setprotocol.c
++++ b/src/thread/pthread_mutexattr_setprotocol.c
+@@ -15,6 +15,10 @@ int pthread_mutexattr_setprotocol(pthread_mutexattr_t *a, int protocol)
+ 		if (r < 0) {
+ 			volatile int lk = 0;
+ 			r = -__syscall(SYS_futex, &lk, FUTEX_LOCK_PI, 0, 0);
++			/* A kernel without PI futexes cannot implement this POSIX
++			 * protocol. Report the attribute capability, not a raw
++			 * missing-syscall error, so callers can use PRIO_NONE. */
++			if (r == ENOSYS) r = ENOTSUP;
+ 			a_store(&check_pi_result, r);
+ 		}
+ 		if (r) return r;

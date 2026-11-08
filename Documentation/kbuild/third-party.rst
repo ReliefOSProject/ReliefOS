@@ -22,6 +22,11 @@ musl、BusyBox、SQLite、FLTK、Xorg/Mesa、GRUB、认证库等保留各自原�
 移植边界。目标程序与开发 SDK 的 staging 不可混用。上游 README、许可证、
 COPYING、归属和字体许可是来源资料，保留原文，不属于待清理的过程报告。
 
+musl 的互斥锁属性探测补丁将内核缺少 PI futex 的 ``ENOSYS`` 转换为
+POSIX 的 ``ENOTSUP``，以便 PulseAudio 等调用者回退到普通互斥锁。
+该补丁不伪装成已实现优先级继承，也不改变其他 futex 错误。补丁及摘要由
+依赖锁管理；已有镜像需要重新构建 musl 和系统包才会取得此修正。
+
 移植与打包
 ==========
 

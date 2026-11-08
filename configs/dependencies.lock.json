@@ -2616,6 +2616,10 @@
         {
           "path": "patches/musl/0001-enforce-password-file-lock.patch",
           "sha256": "e336ed20b2d338dbbf88588dff043e8ce349d0d0044277d31be229d600bb93ad"
+        },
+        {
+          "path": "patches/musl/0002-report-unsupported-pi-mutex-protocol.patch",
+          "sha256": "6454c5786fe36c513e5dbc69eb221cfdde840f90e49e00139da4c3e55cece039"
         }
       ]
     },
