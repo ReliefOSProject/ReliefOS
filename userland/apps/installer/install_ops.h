@@ -32,6 +32,7 @@ extern "C" {
 #define INSTALL_ESP_PAYLOAD "/install/esp"
 #define INSTALL_ROOT_MOUNT "/target"
 #define INSTALL_ESP_MOUNT "/target/boot"
+#define INSTALL_ESP_VOLUME "/target/efi"
 
 /* Target-root path contract.  The installer payload uses the same relative
  * paths as the guest root, so each payload path is INSTALL_ROOT_PAYLOAD plus
@@ -105,6 +106,7 @@ void format_partition_line(char *buf, uint32_t cap,
                            const struct reliefos_block_partition *partition);
 int installer_partition_plan_valid(void);
 uint32_t installer_boot_modes(void);
+int installer_boot_entry_path(char *path, uint32_t capacity);
 int installer_partition_initialize(void);
 int installer_partition_auto_layout(void);
 int installer_partition_create(uint32_t filesystem, uint32_t size_mib,

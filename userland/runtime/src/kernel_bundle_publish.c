@@ -248,6 +248,27 @@ int reliefos_kernel_bundle_publish(const char *root_path, const char *boot, cons
     struct stat source_status, target_status;
     if (fstat(root, &target_status) || fstat(bundle.root, &source_status)) { result = -errno; goto out; }
     if (source_status.st_dev == target_status.st_dev && source_status.st_ino == target_status.st_ino) { result = -EINVAL; goto out; }
+    static const char instance_header[] = "ReliefOS instance v1\n";
+    char marker[sizeof(instance_header) - 1 + 36 + 1], uuid[37] = {0}, alias[128];
+    result = kernel_bundle_read_fixed(root, "reliefos-instance.id", marker, sizeof(marker));
+    if (!result) {
+        if (memcmp(marker, instance_header, sizeof(instance_header) - 1) || marker[sizeof(marker) - 1] != '\n') {
+            result = -EINVAL; goto out;
+        }
+        memcpy(uuid, marker + sizeof(instance_header) - 1, 36);
+        for (unsigned i = 0; i < 36; ++i) {
+            if (i == 8 || i == 13 || i == 18 || i == 23) {
+                if (uuid[i] != '-') { result = -EINVAL; goto out; }
+            } else if ((uuid[i] < '0' || uuid[i] > '9') && (uuid[i] < 'a' || uuid[i] > 'f')) {
+                result = -EINVAL; goto out;
+            }
+        }
+        snprintf(alias, sizeof(alias), "/dev/disk/by-partuuid/%s", uuid);
+        struct stat device;
+        if (stat(alias, &device) < 0) { result = -errno; goto out; }
+        if (!S_ISBLK(device.st_mode) || device.st_rdev != source_status.st_dev) { result = -EXDEV; goto out; }
+    } else if (result == -ENOENT) result = 0;
+    else goto out;
     stage = "synchronize installed root products";
     result = kernel_bundle_sync_root(&bundle);
     if (result) goto out;

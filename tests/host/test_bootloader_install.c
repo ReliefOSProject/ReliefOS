@@ -203,6 +203,22 @@ int main(int argc, char **argv)
     assert(reliefos_boot_probe(options.disk_path, options.boot_dir, &modes) == 0);
     unsigned selected = (options.install_bios ? 1u : 0u) | (options.install_uefi ? 2u : 0u);
     assert((modes & selected) == selected);
+    if (virtual_image && (modes & RELIEFOS_BOOT_BIOS)) {
+        char core[1024], saved[1024];
+        snprintf(core, sizeof(core), "%s/grub/i386-pc/core.img", options.boot_dir);
+        snprintf(saved, sizeof(saved), "%s/grub/i386-pc/legacy-core.img", options.boot_dir);
+        assert(!rename(core, saved));
+        assert(!reliefos_boot_probe(options.disk_path, options.boot_dir, &modes));
+        int raw = __real_open(virtual_image, O_RDWR);
+        assert(raw >= 0);
+        unsigned char sector[512], invalid[8] = {0};
+        assert(pread(raw, sector, sizeof(sector), 0) == sizeof(sector));
+        assert(pwrite(raw, invalid, sizeof(invalid), 0x5c) == sizeof(invalid));
+        assert(reliefos_boot_probe(options.disk_path, options.boot_dir, &modes) < 0 && !modes);
+        assert(pwrite(raw, sector + 0x5c, 8, 0x5c) == 8);
+        assert(!close(raw));
+        assert(!rename(saved, core));
+    }
     assert(callbacks > 0);
     puts("PASS shared boot publication API");
     return 0;

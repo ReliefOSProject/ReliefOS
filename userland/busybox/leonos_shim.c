@@ -106,7 +106,7 @@ const char *reliefos_shell_command_path(const char *name)
         strcmp(name, "fsck.fat32") == 0 || strcmp(name, "fsck.vfat") == 0 ||
         strcmp(name, "fsck.ext2") == 0 || strcmp(name, "fsck.exfat") == 0 ||
         strcmp(name, "blkid") == 0 || strcmp(name, "lsblk") == 0 ||
-        strcmp(name, "leonos-grub-installer") == 0 || strcmp(name, "sync") == 0)
+        strcmp(name, "sync") == 0)
         return "/bin/busybox";
     if (reliefos_app_registry_resolve(name, resolved, sizeof(resolved)) == 0)
         return resolved;

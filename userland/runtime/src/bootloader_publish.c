@@ -323,8 +323,22 @@ static int walk(const struct reliefos_boot_install_options *options, int root,
 int boot_walk_payload(const struct reliefos_boot_install_options *options, int root, int publish_files)
 {
     const char *const trees[] = {"reliefos", "leonos", "grub", "EFI"};
+    int preserve_efi = 0;
+    if (publish_files && options->install_uefi) {
+        int marker = boot_open_file(root, "reliefos-instance.id");
+        if (marker >= 0) close(marker);
+        else if (marker != -ENOENT) return marker;
+        else {
+            int existing = boot_open_file(root, "EFI/BOOT/BOOTX64.EFI");
+            if (existing >= 0) {
+                close(existing);
+                preserve_efi = 1;
+                fprintf(stderr, "[boot-install] preserving unverified legacy EFI executable and sibling configuration\n");
+            } else if (existing != -ENOENT) return existing;
+        }
+    }
     for (unsigned i = 0; i < 4; ++i) {
-        if (i == 3 && !options->install_uefi) continue;
+        if (i == 3 && (!options->install_uefi || preserve_efi)) continue;
         int result = walk(options, root, trees[i], 0, publish_files);
         if (result) return result;
     }

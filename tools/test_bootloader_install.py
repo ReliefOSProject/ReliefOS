@@ -50,7 +50,7 @@ exec "$grub/bin/grub-bios-setup" -s --root-device=hd0,gpt2 \
             helper.chmod(0o755)
             helpers[name] = helper
         sources = [ROOT / "userland/runtime/src" / f"bootloader{suffix}.c"
-                   for suffix in ("", "_publish", "_process")]
+                   for suffix in ("", "_publish", "_process", "_uefi")]
         sources.extend(ROOT / "userland/runtime/src" / (name + ".c") for name in
                        ("kernel_bundle_io", "kernel_bundle_check", "kernel_bundle_slots", "kernel_bundle_publish", "kernel_bundle_sync"))
         sources.extend((ROOT / "userland/runtime/shared/boot_slots.c",
@@ -82,7 +82,7 @@ exec "$grub/bin/grub-bios-setup" -s --root-device=hd0,gpt2 \
         source = work / "source"
         source.mkdir()
         subprocess.run([fixtures.KERNEL_TOOLS, "boot-payload", fixture.install / "kernel.sys", archive, source], check=True)
-        for relative in ("grub/grub.cfg", "grub/kernel-slots.cfg",
+        for relative in ("grub/grub.cfg", "grub/kernel-slots.cfg", "grub/other-systems.cfg",
                          "grub/fonts/leonos-unicode.pf2", "grub/theme/theme.txt", "EFI/BOOT/BOOTX64.EFI"):
             file = source / relative
             file.parent.mkdir(parents=True, exist_ok=True)

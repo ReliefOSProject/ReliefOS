@@ -9,6 +9,7 @@
  * signed index and installed database, so a stale confirmation cannot retarget. */
 struct installer_update_info {
     char disk[64], root_device[64], esp_device[64];
+    char boot_file[128];
     char root_uuid[37], esp_uuid[37];
     char installed_version[64], media_version[64], profile[16];
     char installed_kernel[96], media_kernel[96];
@@ -43,6 +44,9 @@ int installer_update_write_checkpoint(const char *root, const struct installer_u
 typedef void (*installer_update_observer)(void *context, unsigned progress, const char *message);
 int installer_update_check(const char *disk, struct installer_update_info *info,
                            installer_update_observer observer, void *context);
+int installer_update_check_target(const char *disk, const char *root_uuid, const char *esp_uuid,
+                                 struct installer_update_info *info,
+                                 installer_update_observer observer, void *context);
 int installer_update_apply(const struct installer_update_info *expected, unsigned boot_modes,
                            struct installer_update_info *result,
                            installer_update_observer observer, void *context);

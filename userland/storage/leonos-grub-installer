@@ -1,17 +1,5 @@
 #!/bin/sh
-# Compatibility spelling for the shared UEFI-only boot publisher.
+# Compatibility name; all validation/publication uses the native installer.
+# The old ESP-only copy interface cannot identify a root safely.
 set -eu
-PATH=/usr/sbin:/usr/bin:/sbin:/bin
-export PATH
-source=/install/esp
-if [ "${1-}" = --source ]; then
-    [ "$#" -ge 3 ] || { printf '%s\n' 'Usage: reliefos-grub-installer [--source DIR] ESP-MOUNTPOINT' >&2; exit 2; }
-    source=$2
-    shift 2
-fi
-[ "$#" -eq 1 ] && [ -d "$1" ] || {
-    printf '%s\n' 'Usage: reliefos-grub-installer [--source DIR] ESP-MOUNTPOINT' >&2
-    exit 2
-}
-exec /usr/sbin/reliefos-boot-install --source "$source" --boot-directory "$1" \
-    --bios=no --uefi=yes --update
+exec /usr/sbin/reliefos-boot-install --bios=no --uefi=yes --update "$@"

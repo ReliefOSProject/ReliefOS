@@ -1,4 +1,5 @@
 #include "decoder.h"
+#include "media.h"
 #include "../relieftodo/storage.h"
 #include <errno.h>
 #include <fcntl.h>
@@ -41,6 +42,7 @@ struct Frame {
 };
 } // namespace
 struct Decoder::Impl {
+  MediaAudio media;
   int fd = -1;
   Info info;
   uint64_t size = 0, data = 0, position = 0;
@@ -66,13 +68,13 @@ const char *error_text(Error error) {
   case Error::Cancelled:
     return "Cancelled";
   case Error::Io:
-    return "Could not read the audio file";
+    return "Could not read the media file";
   case Error::Invalid:
-    return "Invalid or truncated audio file";
+    return "Invalid or truncated media file";
   case Error::Unsupported:
-    return "Unsupported audio format";
+    return "Unsupported media format or codec";
   case Error::TooLarge:
-    return "Audio file exceeds the supported limit";
+    return "Media exceeds the supported size or resolution";
   case Error::Memory:
     return "Not enough memory";
   case Error::Device:
@@ -80,11 +82,11 @@ const char *error_text(Error error) {
   case Error::Busy:
     return "Audio device is busy";
   case Error::Playback:
-    return "Audio playback failed";
+    return "Media playback failed";
   case Error::Worker:
-    return "Audio process stopped unexpectedly";
+    return "Playback process stopped unexpectedly";
   }
-  return "Audio playback failed";
+  return "Media playback failed";
 }
 bool Decoder::Impl::wav(Error &error, Progress progress, void *opaque) {
   uint64_t end = uint64_t(le32(input + 4)) + 8, at = 12;
@@ -294,8 +296,12 @@ bool Decoder::open(const char *path, Error &error, Progress progress,
     return false;
   }
   bool wav = !memcmp(p_->input, "RIFF", 4) && !memcmp(p_->input + 8, "WAVE", 4);
-  if (!(wav ? p_->wav(error, progress, opaque)
-            : p_->scan(error, progress, opaque))) {
+  const char *extension = strrchr(path, '.');
+  bool mp4 = !memcmp(p_->input + 4, "ftyp", 4) ||
+             (extension && !strcasecmp(extension, ".mp4"));
+  if (!(mp4 ? p_->media.open(path, p_->info, error, progress, opaque)
+            : wav ? p_->wav(error, progress, opaque)
+                  : p_->scan(error, progress, opaque))) {
     close();
     return false;
   }
@@ -306,7 +312,9 @@ const Info &Decoder::info() const {
   static const Info empty;
   return p_ ? p_->info : empty;
 }
-uint64_t Decoder::position() const { return p_ ? p_->position : 0; }
+uint64_t Decoder::position() const {
+  return !p_ ? 0 : p_->info.kind == Kind::Mp4 ? p_->media.position() : p_->position;
+}
 int Decoder::Impl::frame(Error &error) {
   if (next >= index.size())
     return 0;
@@ -347,6 +355,8 @@ bool Decoder::seek(uint64_t target, Error &error) {
   }
   if (target > p_->info.frames)
     target = p_->info.frames;
+  if (p_->info.kind == Kind::Mp4)
+    return p_->media.seek(target, error);
   p_->pcm_at = p_->pcm_count = p_->failures = 0;
   if (p_->info.kind == Kind::Wav) {
     p_->position = target;
@@ -382,6 +392,8 @@ int Decoder::read(int16_t *stereo, unsigned frames, Error &error) {
     error = Error::Invalid;
     return -1;
   }
+  if (p_->info.kind == Kind::Mp4)
+    return p_->media.read(stereo, frames > 4096 ? 4096 : frames, error);
   if (!frames || p_->position >= p_->info.frames)
     return 0;
   if (frames > 4096)

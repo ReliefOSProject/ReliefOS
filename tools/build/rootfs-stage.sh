@@ -19,8 +19,21 @@ link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
 # Every enabled upstream root is passed by the build graph. The default keeps
 # standalone callers compatible with the complete product package set.
-rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ncurses'}
+rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg ncurses'}
 for package in $rootfs_upstream_packages; do
+    if [ "$package" = ffmpeg ]; then
+        if enabled reliefplayer; then
+            for library in "$out/upstream/ffmpeg/root/usr/lib/"*.so.*; do
+                if [ -L "$library" ]; then
+                    link "usr/lib/${library##*/}" "$(readlink "$library")" reliefos-media-codecs
+                else
+                    file "$library" "usr/lib/${library##*/}" 0755 reliefos-media-codecs
+                fi
+            done
+            tree "$out/upstream/ffmpeg/root/usr/share/licenses/ffmpeg" usr/share/licenses/ffmpeg reliefos-media-codecs
+        fi
+        continue
+    fi
     case $package in
         ''|*[!A-Za-z0-9._-]*)
             echo "rootfs-stage: invalid upstream package id: $package" >&2

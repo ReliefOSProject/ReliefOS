@@ -1,7 +1,7 @@
 # Include after third-party.mk, pam.mk and runtime.mk. Each package owns an isolated root.
 UPSTREAM_ROOT := $(O)/upstream
 UPSTREAM_SCRIPT := $(RELIEFOS_SRC)/tools/build/upstream.sh
-UPSTREAM_PACKAGES := libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3
+UPSTREAM_PACKAGES := libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg
 upstream_libmd_outputs := lib/libmd.so.0 usr/include/md5.h
 upstream_libbsd_outputs := lib/libbsd.so.0 usr/include/bsd/stdlib.h
 upstream_util-linux_outputs := usr/lib/libuuid.a usr/lib/libblkid.a bin/su usr/sbin/fdisk bin/mount bin/lsblk
@@ -18,6 +18,8 @@ upstream_alsa-lib_outputs := usr/lib/libasound.so.2 usr/lib/libasound.a usr/incl
 upstream_alsa-utils_outputs := usr/bin/aplay usr/bin/arecord usr/bin/amixer usr/sbin/alsactl usr/bin/speaker-test
 upstream_nuked-opl3_outputs := usr/lib/libopl3.so.1 usr/include/opl3.h
 upstream_nuked-opl3_script := $(RELIEFOS_SRC)/tools/build/opl3.sh
+upstream_ffmpeg_outputs := usr/lib/libavformat-reliefplayer.so.62 usr/lib/libavcodec-reliefplayer.so.62 usr/lib/libavutil-reliefplayer.so.60 usr/lib/libswresample-reliefplayer.so.6 usr/lib/libswscale-reliefplayer.so.9 usr/include/libavformat/avformat.h usr/include/libavcodec/avcodec.h usr/include/libavutil/avutil.h usr/include/libswresample/swresample.h usr/include/libswscale/swscale.h
+upstream_ffmpeg_script := $(RELIEFOS_SRC)/tools/build/ffmpeg.sh
 $(foreach package,$(UPSTREAM_PACKAGES) ncurses,$(eval upstream_$(package)_primary := $(upstream_$(package)_outputs)))
 upstream_libbsd_deps := libmd
 upstream_shadow_deps := libmd libbsd

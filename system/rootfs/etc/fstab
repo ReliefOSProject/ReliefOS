@@ -1,4 +1,5 @@
 # Live and installer roots are supplied by the boot storage layer.
 # Disk-image creation and fresh installation replace this file with the actual
-# GPT by-partuuid sources for / (ext4) and /boot (vfat).
+# GPT by-partuuid sources for / and the ESP. Fresh installs mount the ESP at
+# /efi and bind their UUID-named instance to /boot; standalone images use /boot.
 # <source> <mountpoint> <type> <options> <dump> <pass>

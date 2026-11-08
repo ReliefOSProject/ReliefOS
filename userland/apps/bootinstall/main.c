@@ -9,6 +9,7 @@ static void usage(void)
     puts("Usage: reliefos-boot-install --source DIR --boot-directory DIR [--disk DEVICE]");
     puts("       [--bios=yes|no] [--uefi=yes|no] [--check] [--update]");
     puts("       [--root-partuuid UUID] (default: the selected disk's unique GPT Linux root)");
+    puts("       [--esp-directory DIR] (physical ESP for a per-instance --boot-directory)");
     puts("       reliefos-boot-install --kernel-release RELEASE --root-directory DIR --boot-directory DIR [--check]");
     puts("Kernel publication validates the complete installed package and retains the previous boot slot.");
     puts("BIOS requires a whole disk with a GPT BIOS Boot partition. Both modes default to yes.");
@@ -32,6 +33,7 @@ int main(int argc, char **argv)
         .source = "/install/esp", .install_bios = 1, .install_uefi = 1,
     };
     int check = 0;
+    const char *esp_directory = NULL;
     int firmware_options = 0;
     const char *kernel_release = NULL, *root_directory = "/";
     for (int i = 1; i < argc; ++i) {
@@ -46,13 +48,15 @@ int main(int argc, char **argv)
             if (mode_value(argv[i] + 7, &options.install_uefi)) { usage(); return 2; }
         } else if ((!strcmp(argv[i], "--source") || !strcmp(argv[i], "--boot-directory") ||
                     !strcmp(argv[i], "--disk") || !strcmp(argv[i], "--root-partuuid") ||
-                    !strcmp(argv[i], "--kernel-release") || !strcmp(argv[i], "--root-directory")) && i + 1 < argc) {
+                    !strcmp(argv[i], "--kernel-release") || !strcmp(argv[i], "--root-directory") ||
+                    !strcmp(argv[i], "--esp-directory")) && i + 1 < argc) {
             const char *option = argv[i++];
             if (!strcmp(option, "--source")) { options.source = argv[i]; firmware_options = 1; }
             else if (!strcmp(option, "--disk")) { options.disk_path = argv[i]; firmware_options = 1; }
             else if (!strcmp(option, "--root-partuuid")) { options.root_partuuid = argv[i]; firmware_options = 1; }
             else if (!strcmp(option, "--kernel-release")) kernel_release = argv[i];
             else if (!strcmp(option, "--root-directory")) root_directory = argv[i];
+            else if (!strcmp(option, "--esp-directory")) { esp_directory = argv[i]; firmware_options = 1; }
             else options.boot_dir = argv[i];
         } else { usage(); return 2; }
     }
@@ -67,10 +71,13 @@ int main(int argc, char **argv)
         puts(check ? "Kernel package checks passed." : "Matched kernel boot version published; reboot to activate.");
         return 0;
     }
-    if (!options.boot_dir || (options.install_bios && !options.disk_path)) { usage(); return 2; }
-    int result = check ? reliefos_boot_validate_payload(&options) : reliefos_boot_install_at_root(&options, root_directory);
+    if (!options.boot_dir || !options.disk_path) { usage(); return 2; }
+    int result = check ? reliefos_boot_validate_payload(&options) : esp_directory
+        ? reliefos_boot_install_instance_at_root(&options, root_directory, esp_directory)
+        : reliefos_boot_install_at_root(&options, root_directory);
     if (check && !result) result = reliefos_boot_validate_target(&options);
     if (check && !result) result = reliefos_boot_validate_root(&options, root_directory);
+    if (check && !result && esp_directory) result = reliefos_boot_validate_instance(&options, esp_directory);
     if (result) {
         fprintf(stderr, "reliefos-boot-install: %s (%d); incomplete stages are not a complete rollback\n",
                 strerror(-result), result);

@@ -14,18 +14,19 @@ work=$(mktemp -d "$output.work.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 cp -a "$esp" "$work/tree"
 mkdir -p "$work/tree/install" "$work/tree/boot/grub" "$work/efi/EFI/BOOT"
+case $volume in RELIEFOSLIVE|RELIEFOSINST) ;; *) echo 'unsupported ISO identity' >&2; exit 2 ;; esac
+marker=reliefos-$volume.marker
+sed "s/@RELIEFOS_ISO_MARKER@/$marker/g" "$src/boot/grub/installer_embedded.cfg" > "$work/embedded.cfg"
 "${GRUB_MKSTANDALONE:-grub-mkstandalone}" -d "$modules" -O x86_64-efi -o "$work/efi/EFI/BOOT/BOOTX64.EFI" \
- --modules='part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file configfile echo serial terminal video video_bochs video_cirrus efi_gop all_video font gfxterm gfxmenu' \
- "boot/grub/grub.cfg=$src/boot/grub/installer_embedded.cfg"
+ --modules='part_gpt part_msdos ext2 chain ntfs linux gzio reboot search_fs_uuid search_label fat iso9660 multiboot2 normal cmp search search_fs_file configfile echo serial terminal video video_bochs video_cirrus efi_gop all_video font gfxterm gfxmenu' \
+ "boot/grub/grub.cfg=$work/embedded.cfg"
 "$mkimage" -O i386-pc-eltorito -d "$bios" -p /grub \
-    -c "$src/boot/grub/installer_embedded.cfg" -o "$work/tree/boot/grub/bios.img" \
+    -c "$work/embedded.cfg" -o "$work/tree/boot/grub/bios.img" \
     $(cat "$src/boot/grub/bios-modules.list")
 cp "$work/efi/EFI/BOOT/BOOTX64.EFI" "$work/tree/EFI/BOOT/BOOTX64.EFI"
 cp "$root" "$work/tree/install/root.fat"
 cp "$config" "$work/tree/grub/grub.cfg"
-printf 'ReliefOS installer ISO volume\n' > "$work/tree/reliefos-installer-iso.marker"
-# Old embedded GRUB releases still locate the installer media by this marker.
-printf 'ReliefOS installer ISO volume\n' > "$work/tree/leonos-installer-iso.marker"
+printf 'ReliefOS %s volume\n' "$volume" > "$work/tree/$marker"
 find "$work/efi" "$work/tree" -exec touch -h -d "@$epoch" {} +
 size=$(( ($(stat -c %s "$work/efi/EFI/BOOT/BOOTX64.EFI") + 1048575) / 1048576 + 8 ))
 [ "$size" -ge 16 ] || size=16

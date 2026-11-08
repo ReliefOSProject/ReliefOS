@@ -28,10 +28,12 @@ printf 'leonos-standalone-test-v1\n' > "$work/etc/reliefos/test-image"
 printf 'test-image=1\n' > "$work/etc/reliefos/installed"
 printf 'LANG=%s\nMUSL_LOCPATH=/usr/share/musl/locales\n' "$language" > "$work/etc/reliefos/locale.conf"
 if [ "$mode" = disk ]; then
-    cat > "$work/etc/fstab" <<'FSTAB'
+    root_uuid=$(sh "$src/tools/build/image-identity.sh" root)
+    esp_uuid=$(sh "$src/tools/build/image-identity.sh" esp)
+    cat > "$work/etc/fstab" <<FSTAB
 # Stable GPT partition identities owned by tools/build/disk.sh.
-/dev/disk/by-partuuid/5c13543b-732c-4f81-8652-621124484420 / ext4 defaults 0 1
-/dev/disk/by-partuuid/41a3ee19-ba85-47a0-9705-a5c128374021 /boot vfat defaults 0 2
+/dev/disk/by-partuuid/$root_uuid / ext4 defaults 0 1
+/dev/disk/by-partuuid/$esp_uuid /boot vfat defaults 0 2
 FSTAB
 fi
 if [ -d "$output.previous" ] && [ ! -e "$output" ]; then mv "$output.previous" "$output"; fi

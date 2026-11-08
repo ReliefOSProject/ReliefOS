@@ -2,7 +2,7 @@
 ReliefPlayer
 ============
 
-ReliefPlayer 是独立的 FLTK 本地音频播放器，位于“网络和多媒体”应用分组，
+ReliefPlayer 是独立的 FLTK 本地音视频播放器，位于“网络和多媒体”应用分组，
 不属于 ReliefOffice。使用系统中文字体和 FLTK 默认 gtk+ 控件。
 
 .. code-block:: sh
@@ -10,12 +10,14 @@ ReliefPlayer 是独立的 FLTK 本地音频播放器，位于“网络和多媒�
     reliefplayer
     reliefplayer /home/test/music.mp3
     reliefplayer /home/test/recording.wav
+    reliefplayer /home/test/movie.mp4
 
-点击“打开音频”选择文件，打开后自动播放。支持播放/暂停、停止、拖动进度、
+点击“打开媒体”选择文件，打开后自动播放。支持播放/暂停、停止、拖动进度、
 前后跳转 10 秒、软件音量和静音。窗口显示文件名、格式、采样率、声道、位深、
-已播放时间和总时长。文件管理器中的 MP3、WAV 默认使用本程序打开。
+已播放时间和总时长。MP4 视频在窗口中保持比例显示，支持常见的直角旋转元数据。
+文件管理器中的 MP3、WAV、MP4 默认使用本程序打开。
 
-- Ctrl+O：打开音频。
+- Ctrl+O：打开媒体。
 - 空格：播放或暂停。
 - 左右方向键：前后跳转 10 秒。
 - Home：回到开头。
@@ -31,15 +33,31 @@ MP3 使用仓库已有 minimp3，支持单/双声道 MPEG Layer III，包括可�
 首次打开扫描帧索引以确定总时长，定位时预解码恢复状态。时间按音频帧统计，
 不裁切编码器延迟和尾部 padding。会跳过 ID3 和 APEv2 标签边界，
 不读取封面或展示标签信息。
-APEv2 边界布局参考 `FFmpeg 的官方实现 <https://www.ffmpeg.org/doxygen/4.2/apetag_8c_source.html>`_，
-不引入 FFmpeg 作为运行时依赖。
+APEv2 边界布局参考 `FFmpeg 的官方实现 <https://www.ffmpeg.org/doxygen/4.2/apetag_8c_source.html>`_。
 
 WAV 支持 RIFF 中的单/双声道 PCM 8、16、24、32 位和 IEEE float32；
 支持容器位深与有效位深相同的对应 WAVE_FORMAT_EXTENSIBLE 子格式。
 采样率范围 8–192 kHz，不支持其他 WAV 压缩编码、RF64 或多声道源文件。
 最多打开 2 GiB 的文件；MP3 索引最多 100 万帧。
 
+MP4 使用锁定的官方 FFmpeg 8.1.3 LGPL 精简共享库，支持 H.264、MPEG-4 Part 2、
+HEVC 视频及 AAC、MP3 音轨；音频最多 8 声道，转换为 48 kHz 立体声。
+无音轨的视频使用单调时钟播放，不需要打开音频设备。含音轨的视频按音频设备
+已经播放的帧同步画面，定位会刷新解码器并丢弃关键帧到目标位置之间的预解码数据。
+不支持的编码、损坏文件和解码失败会报告错误。
+
+视频使用软件解码，源画面最多 4096 × 2160，显示快照最多 1280 × 720 像素
+（竖屏时可交换边长）。不含硬件加速、HDR 色调映射、字幕或多音轨选择；
+高分辨率视频的流畅程度取决于虚拟机性能。
+
+``make fetch`` 下载锁定源码，``upstream-ffmpeg`` 离线构建五个解码共享库。
+播放器启用时，运行库及 LGPL 许可证随 ``reliefos-media-codecs`` APK 一起进入镜像；
+开发头文件留在独立构建目录。库名及 SONAME 带有 ``-reliefplayer`` 后缀，
+可以与 Alpine 的完整 FFmpeg/VLC 依赖共存。FFmpeg 不构建命令行程序、网络协议或外部编码器。
+
 解码、文件读取和音频写入由独立子进程执行，GUI 通过非阻塞管道控制。
+视频通过有界共享内存发布 RGB 快照，GUI 保存自己的画面副本；双方只尝试获取
+复制锁，不等待对方，也不在锁内读文件或解码。
 采样率和设备不同时使用线性插值；设备输出为 S16_LE，使用前置立体声，
 额外硬件声道置零。非阻塞短写、设备回压和排空均保留未完成数据；
 播放失败不会把进度伪装为完成。设备连续 5 秒既无写入也无播放进展时报告错误。

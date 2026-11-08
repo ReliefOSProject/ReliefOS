@@ -39,6 +39,7 @@ int main(void)
     assert(!strcmp(fileman_x11_default_app("/tmp/plan.rdiagram"), "/usr/bin/reliefdiagram"));
     assert(!strcmp(fileman_x11_default_app("/tmp/PLAN.RDIAGRAM"), "/usr/bin/reliefdiagram"));
     assert(!strcmp(fileman_x11_default_app("/tmp/music.mp3"), "/usr/bin/reliefplayer"));
+    assert(!strcmp(fileman_x11_default_app("/tmp/video.MP4"), "/usr/bin/reliefplayer"));
     assert(!strcmp(fileman_x11_default_app("/tmp/MUSIC.WAV"), "/usr/bin/reliefplayer"));
     assert(!strcmp(fileman_x11_app_for_path("/tmp/equation.rmath", "/usr/bin/custom-math"),
                    "/usr/bin/custom-math"));

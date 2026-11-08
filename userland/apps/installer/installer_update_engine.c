@@ -264,7 +264,8 @@ static int recover_pending(struct update_run *run, struct installer_update_targe
 }
 
 static int execute(const char *disk, const struct installer_update_info *expected, unsigned modes,
-                    struct installer_update_info *out, installer_update_observer observer, void *context)
+                    struct installer_update_info *out, installer_update_observer observer, void *context,
+                    const char *root_uuid, const char *esp_uuid)
 {
     struct installer_update_target target;
     struct installer_update_checkpoint checkpoint = {0};
@@ -283,7 +284,8 @@ static int execute(const char *disk, const struct installer_update_info *expecte
         return -out->error_number;
     }
     report(&run, 2, N_("Identifying the installed system"));
-    int result = installer_update_target_open(&target, disk, expected ? expected->root_uuid : NULL);
+    int result = installer_update_target_open(&target, disk, expected ? expected->root_uuid : root_uuid,
+                                              expected ? expected->esp_uuid : esp_uuid);
     if (result) goto done;
     if (reliefos_account_legacy_check(target.root) < 0) { result = -errno; goto done; }
     const char *media = !strcmp(target.info.profile, "console") ? "/install/root-console" : "/install/root";
@@ -313,7 +315,8 @@ static int execute(const char *disk, const struct installer_update_info *expecte
         .progress = boot_progress, .progress_context = &run,
     };
     report(&run, 16, N_("Checking bootloader compatibility"));
-    result = reliefos_boot_validate_payload(&boot);
+    result = target.namespaced ? reliefos_boot_validate_instance(&boot, target.esp) : 0;
+    if (!result) result = reliefos_boot_validate_payload(&boot);
     if (!result) result = reliefos_boot_validate_target(&boot);
     if (result) goto done;
     report(&run, 22, N_("Verifying signed packages and dependencies"));
@@ -349,7 +352,9 @@ static int execute(const char *disk, const struct installer_update_info *expecte
     }
     report(&run, 86, resume_boot ? N_("Resuming bootloader publication") : N_("Publishing kernel and bootloader files"));
     result = save_checkpoint(&target, &checkpoint, "boot");
-    if (!result) result = reliefos_boot_install_at_root(&boot, target.root);
+    if (!result) result = target.namespaced
+        ? reliefos_boot_install_instance_at_root(&boot, target.root, target.esp)
+        : reliefos_boot_install_at_root(&boot, target.root);
     if (result) { (void)save_checkpoint(&target, &checkpoint, "boot-failed"); goto done; }
     result = sync_root(target.root);
     if (!result) result = save_checkpoint(&target, &checkpoint, "done");
@@ -379,7 +384,16 @@ int installer_update_check(const char *disk, struct installer_update_info *info,
         if (info) { memset(info, 0, sizeof(*info)); info->error_number = EINVAL; }
         return -EINVAL;
     }
-    return execute(disk, NULL, 0, info, observer, context);
+    return execute(disk, NULL, 0, info, observer, context, NULL, NULL);
+}
+
+int installer_update_check_target(const char *disk, const char *root_uuid, const char *esp_uuid,
+                                 struct installer_update_info *info,
+                                 installer_update_observer observer, void *context)
+{
+    if (!disk || !info || (root_uuid && *root_uuid && strlen(root_uuid) != 36) ||
+        (esp_uuid && *esp_uuid && strlen(esp_uuid) != 36)) return -EINVAL;
+    return execute(disk, NULL, 0, info, observer, context, root_uuid, esp_uuid);
 }
 
 int installer_update_apply(const struct installer_update_info *expected, unsigned modes,
@@ -392,7 +406,7 @@ int installer_update_apply(const struct installer_update_info *expected, unsigne
         if (result) { memset(result, 0, sizeof(*result)); result->error_number = EINVAL; }
         return -EINVAL;
     }
-    return execute(expected->disk, expected, modes, result, observer, context);
+    return execute(expected->disk, expected, modes, result, observer, context, NULL, NULL);
 }
 
 static void worker_progress(void *context, unsigned progress, const char *message)
@@ -406,6 +420,7 @@ static void worker_info(const struct installer_update_info *info)
 {
 #define FIELD(name) printf("info\t%s\t%s\n", #name, info->name)
     FIELD(disk); FIELD(root_device); FIELD(esp_device); FIELD(root_uuid); FIELD(esp_uuid);
+    FIELD(boot_file);
     FIELD(installed_version); FIELD(media_version); FIELD(profile); FIELD(installed_kernel);
     FIELD(media_kernel); FIELD(index_sha256); FIELD(database_sha256); FIELD(world_sha256); FIELD(pending);
 #undef FIELD
@@ -420,6 +435,8 @@ int installer_update_worker(int argc, char **argv)
     setenv("PATH", "/usr/sbin:/usr/bin:/sbin:/bin", 1);
     if (argc == 4 && !strcmp(argv[2], "check")) {
         result = installer_update_check(argv[3], &info, worker_progress, NULL);
+    } else if (argc == 6 && !strcmp(argv[2], "check")) {
+        result = installer_update_check_target(argv[3], argv[4], argv[5], &info, worker_progress, NULL);
     } else if (argc == 10 && !strcmp(argv[2], "apply")) {
         struct installer_update_info expected = {0};
         if (strlen(argv[3]) >= sizeof(expected.disk) || strlen(argv[4]) != 36 || strlen(argv[5]) != 36 ||

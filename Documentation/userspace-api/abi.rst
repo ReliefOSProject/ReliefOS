@@ -62,3 +62,15 @@ X11 应用通过 Xorg 通信。未知或旧兼容路径不能当作新的公开�
 历史 ABI 快照保持不变；集成验证要求已移除的图形接口不存在，并继续检查
 其他接口的布局、符号类型和 SONAME。进程/时钟与 fbdev 辅助声明分别位于
 ``<reliefos/system.h>`` 和 ``<reliefos/fb.h>``，应用必须重新构建。
+
+独立安装实例的引导接口
+======================
+
+``<reliefos/bootloader.h>`` 保持原有 ``reliefos_boot_install_options`` 布局及旧接口，
+新增 ``reliefos_boot_prepare_instance`` 创建带所有权标记的根 PARTUUID 命名目录，
+``reliefos_boot_validate_instance`` 只读核对该目录和物理 ESP 的实际 inode，
+``reliefos_boot_install_instance_at_root`` 发布实例内核、菜单及独立 EFI 文件。
+新接口显式传入物理 ESP；``boot_dir`` 可为实例目录的 bind 挂载点。
+目录遍历拒绝 symlink，未知目录内容不能被认作本安装器所有。
+低层内核包发布还会核对实例标记中的 PARTUUID 与实际根设备，防止跨实例更新。
+原有直接挂载 ESP 到 ``/boot`` 的系统继续使用旧接口，不改变其现有文件布局。

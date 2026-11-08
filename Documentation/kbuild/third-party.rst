@@ -27,6 +27,13 @@ POSIX 的 ``ENOTSUP``，以便 PulseAudio 等调用者回退到普通互斥锁�
 该补丁不伪装成已实现优先级继承，也不改变其他 futex 错误。补丁及摘要由
 依赖锁管理；已有镜像需要重新构建 musl 和系统包才会取得此修正。
 
+ReliefPlayer 的 MP4 解码使用官方 FFmpeg 8.1.3 源码，以 LGPL 配置构建
+``avformat``、``avcodec``、``avutil``、``swresample`` 和 ``swscale``。
+源码 tag、commit、归档摘要和许可证由依赖锁固定；构建使用独立的 ``-reliefplayer``
+库名和 SONAME，避免与用户安装的完整 FFmpeg 运行库发生文件及提供者冲突。
+只将选中的播放器所需运行库与 LGPL 原文装入 ``reliefos-media-codecs`` 包，
+不向镜像发布 FFmpeg 命令行程序或开发头文件。
+
 移植与打包
 ==========
 

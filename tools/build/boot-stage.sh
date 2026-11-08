@@ -16,8 +16,9 @@ trap 'rm -rf "$work"' EXIT HUP INT TERM
 mkdir -p "$work/EFI/BOOT" "$work/grub/fonts" "$work/grub/theme" \
     "$work/reliefos/config" "$work/leonos/config" "$work/grub/i386-pc"
 "${GRUB_MKSTANDALONE:-grub-mkstandalone}" -d "$modules" -O x86_64-efi -o "$work/EFI/BOOT/BOOTX64.EFI" \
- --modules='part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file regexp configfile echo serial terminal video video_bochs video_cirrus efi_gop all_video font gfxterm gfxmenu hashsum gcry_sha256 crypto loadenv test' \
+ --modules='part_gpt part_msdos ext2 chain ntfs linux gzio reboot search_fs_uuid search_label fat iso9660 multiboot2 normal cmp search search_fs_file regexp configfile echo serial terminal video video_bochs video_cirrus efi_gop all_video font gfxterm gfxmenu hashsum gcry_sha256 crypto loadenv test' \
  "boot/grub/grub.cfg=$src/boot/grub/embedded.cfg"
+printf 'set prefix=($root)/grub\nconfigfile $prefix/grub.cfg\n' > "$work/EFI/BOOT/grub.cfg"
 : "${RELIEFOS_KERNEL_TOOLS:?set RELIEFOS_KERNEL_TOOLS to the native Kbuild host tool}"
 "$RELIEFOS_KERNEL_TOOLS" boot-payload "$kernel" "$initramfs" "$work"
 cp "$font" "$work/grub/fonts/leonos-unicode.pf2"
@@ -25,6 +26,7 @@ cp "$display" "$work/reliefos/config/display.conf"
 cp "$display" "$work/leonos/config/display.conf"
 cp "$src/boot/grub/grub.cfg" "$work/grub/grub.cfg"
 cp "$src/boot/grub/kernel-slots.cfg" "$work/grub/kernel-slots.cfg"
+cp "$src/boot/grub/other-systems.cfg" "$work/grub/other-systems.cfg"
 cp "$src/boot/grub/theme/theme.txt" "$work/grub/theme/theme.txt"
 cp -a "$bios/." "$work/grub/i386-pc/"
 find "$work" -exec touch -h -d "@$epoch" {} +

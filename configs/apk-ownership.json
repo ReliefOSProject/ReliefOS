@@ -37,7 +37,13 @@
       "destination": "reliefos",
       "components": ["reliefplayer"],
       "paths": ["usr/bin/reliefplayer", "usr/share/applications/reliefos-reliefplayer.desktop"],
-      "reason": "ReliefPlayer audio executable, launcher, desktop entry and component artwork are installed and removed together. minimp3 remains embedded in its consumers."
+      "reason": "ReliefPlayer audio/video executable, launcher, desktop entry and component artwork are installed and removed together. minimp3 remains embedded in its consumers."
+    },
+    "reliefos-media-codecs": {
+      "destination": "reliefos",
+      "components": [],
+      "paths": ["usr/lib/libavformat-reliefplayer.so", "usr/lib/libavcodec-reliefplayer.so", "usr/lib/libavutil-reliefplayer.so", "usr/lib/libswresample-reliefplayer.so", "usr/lib/libswscale-reliefplayer.so", "usr/share/licenses/ffmpeg"],
+      "reason": "Pinned LGPL FFmpeg libraries for local MP4 decoding in ReliefPlayer; headers and development files stay outside the runtime image."
     },
     "reliefos-network-controller": {
       "destination": "reliefos",

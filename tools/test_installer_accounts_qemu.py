@@ -431,7 +431,7 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False,
 
 def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
                 install_bios=True, install_uefi=True, select_entry=True, install_timeout=2400,
-                swap_mib=None):
+                swap_mib=None, partition_commands=None):
     """Answer the real TTY installer, including both independent loader choices."""
     if select_entry:
         from test_vt_qemu import ocr
@@ -457,7 +457,7 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
                ("Select disk number (r to refresh, q to quit): ", "0"),
                ("Install or update BIOS bootloader? [Y/n]: ", "" if install_bios else "n"),
                ("Install or update UEFI bootloader? [Y/n]: ", "" if install_uefi else "n"),
-               ("partition> ", "auto"), ("partition> ", "done"),
+               *[("partition> ", command) for command in (partition_commands or ("auto", "done"))],
                ("Username: ", "alice"), ("Password: ", USER_PASSWORD),
                ("Confirm password: ", USER_PASSWORD), ("root password: ", ROOT_PASSWORD),
                ("Confirm root password: ", ROOT_PASSWORD),

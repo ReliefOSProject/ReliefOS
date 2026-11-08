@@ -47,7 +47,10 @@ USERLAND_DEPS_osver += $(BUILD_INFO_HEADER)
 USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric -I$(AUDIO_OPL_ROOT)/usr/include
 USERLAND_LIBS_doom += $(AUDIO_OPL_ROOT)/usr/lib/libopl3.so.1 $(RUNTIME_BUILTINS)
 USERLAND_DEPS_doom += $(upstream_nuked-opl3_products)
-USERLAND_EXTRA_reliefplayer := -I$(RELIEFOS_SRC)/third_party/minimp3
+MEDIA_CODEC_ROOT := $(UPSTREAM_ROOT)/ffmpeg/root
+USERLAND_EXTRA_reliefplayer := -I$(RELIEFOS_SRC)/third_party/minimp3 -isystem $(MEDIA_CODEC_ROOT)/usr/include
+USERLAND_LIBS_reliefplayer += $(addprefix $(MEDIA_CODEC_ROOT)/usr/lib/,libavformat-reliefplayer.so.62 libavcodec-reliefplayer.so.62 libswresample-reliefplayer.so.6 libswscale-reliefplayer.so.9 libavutil-reliefplayer.so.60)
+USERLAND_DEPS_reliefplayer += $(upstream_ffmpeg_products)
 
 # The historical port-script compiler flags for pleditor are intentionally
 # retained. Only the transform/copy stage stays in the adapter; Kbuild compiles

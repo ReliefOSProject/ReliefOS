@@ -19,6 +19,9 @@ class PlayerWindow : public Fl_Double_Window {
   Session session_;
   char path_[4096]{};
   bool closing_ = false;
+  bool video_layout_ = false;
+  uint32_t video_serial_ = 0;
+  Fl_Widget *video_;
   Fl_Button *open_, *help_, *play_, *stop_, *back_, *forward_;
   Fl_Box *panel_, *title_, *detail_, *elapsed_, *duration_, *status_;
   Fl_Check_Button *mute_;

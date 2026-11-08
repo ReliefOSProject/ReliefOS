@@ -17431,3 +17431,123 @@ msgstr "系统版本"
 #: userland/apps/installer
 msgid "Proceed with system update? [y/N]: "
 msgstr "确认更新系统？[y/N] "
+
+#: configs/nls/messages.c:688
+msgid "Could not read the media file"
+msgstr "无法读取媒体文件"
+
+#: configs/nls/messages.c:689
+msgid "Invalid or truncated media file"
+msgstr "媒体文件无效或不完整"
+
+#: configs/nls/messages.c:691
+msgid "Media exceeds the supported size or resolution"
+msgstr "媒体大小或分辨率超出支持范围"
+
+#: userland/apps/reliefplayer/window.cpp:181
+msgid "Media files (*.{mp3,MP3,wav,WAV,mp4,MP4})"
+msgstr "媒体文件 (*.{mp3,MP3,wav,WAV,mp4,MP4})"
+
+#: userland/apps/reliefplayer/window.cpp:55
+msgid "Media playback failed"
+msgstr "媒体播放失败"
+
+#: userland/apps/reliefplayer/window.cpp:272
+msgid "No audio track"
+msgstr "无音轨"
+
+#: userland/apps/reliefplayer/window.cpp:85
+msgid "No media file selected"
+msgstr "尚未选择媒体文件"
+
+#: userland/apps/reliefplayer/window.cpp:43
+msgid "Open an MP3, WAV or MP4 file to begin"
+msgstr "打开 MP3、WAV 或 MP4 文件开始播放"
+
+#: userland/apps/reliefplayer/window.cpp:181
+msgid "Open media"
+msgstr "打开媒体"
+
+#: userland/apps/reliefplayer/window.cpp:81
+msgid "Open media..."
+msgstr "打开媒体…"
+
+#: configs/nls/messages.c:696
+msgid "Playback process stopped unexpectedly"
+msgstr "播放进程意外退出"
+
+#: userland/apps/reliefplayer/window.cpp:45
+msgid "Reading media information..."
+msgstr "正在读取媒体信息……"
+
+#: userland/apps/reliefplayer/window.cpp:330
+msgid "ReliefPlayer\nMP3 / WAV audio and MP4 video player\n\nCtrl+O: open media\nSpace: play or pause\nLeft / Right: seek 10 seconds\nHome: return to the beginning\n\nVolume changes affect this player only.\nSupports PCM WAV 8/16/24/32-bit and float32, mono or stereo.\nMP4: H.264, MPEG-4 or HEVC video; AAC or MP3 audio.\nLocal files only; no network streams or media library."
+msgstr "ReliefPlayer\nMP3 / WAV 音频与 MP4 视频播放器\n\nCtrl+O：打开媒体\n空格：播放或暂停\n左右方向键：前后跳转 10 秒\nHome：回到开头\n\n音量只影响本程序。\n支持单/双声道 PCM WAV 8/16/24/32 位和 float32。\nMP4：H.264、MPEG-4 或 HEVC 视频；AAC 或 MP3 音轨。\n仅播放本地文件，不含网络串流或媒体库。"
+
+#: userland/apps/reliefplayer/window.cpp:221
+msgid "Stopping playback..."
+msgstr "正在停止播放……"
+
+#: configs/nls/messages.c:690
+msgid "Unsupported media format or codec"
+msgstr "不支持的媒体格式或编码"
+
+#: userland/apps/installer/installer_tty.c:435
+msgid "Automatic installation erases the selected disk."
+msgstr "自动安装会擦除所选磁盘。"
+
+#: userland/apps/installer/main.cpp:691
+msgid "Automatically identify a single ReliefOS installation"
+msgstr "自动识别唯一的 ReliefOS 安装"
+
+#: userland/apps/installer/main.cpp:449
+msgid "Cannot identify the selected partitions"
+msgstr "无法识别所选分区"
+
+#: userland/apps/installer/main.cpp:765
+msgid "EFI system partition"
+msgstr "EFI 系统分区"
+
+#: userland/apps/installer/installer_tty.c:381
+msgid "ESP partition number (blank: use fstab): "
+msgstr "ESP 分区编号（留空：使用 fstab）："
+
+#: userland/apps/installer/main.cpp:1067
+msgid "Format selected ESP (erase all EFI boot files on it)"
+msgstr "格式化所选 ESP（擦除其中所有 EFI 引导文件）"
+
+#: userland/apps/installer/installer_tty.c:437
+msgid "Only the selected root is formatted; existing ESP files are preserved."
+msgstr "仅格式化所选根分区；保留现有 ESP 文件。"
+
+#: userland/apps/installer/main.cpp:1285
+msgid "Only the selected root will be formatted. Existing ESP files and other partitions are preserved."
+msgstr "仅格式化所选根分区。保留现有 ESP 文件和其他分区。"
+
+#: userland/apps/installer/installer_tty.c:382
+msgid "ReliefOS root partition number (blank: auto): "
+msgstr "ReliefOS 根分区编号（留空：自动识别）："
+
+#: userland/apps/installer/main.cpp:763
+msgid "ReliefOS system partition"
+msgstr "ReliefOS 系统分区"
+
+#: userland/apps/installer/installer_tty.c:436
+msgid "The selected root and ESP will be formatted."
+msgstr "将格式化所选根分区和 ESP。"
+
+#: userland/apps/installer/main.cpp:1284
+msgid "The selected root and ESP will be formatted. All EFI boot files on that ESP will be erased."
+msgstr "将格式化所选根分区和 ESP，擦除该 ESP 上的所有 EFI 引导文件。"
+
+#: userland/apps/installer/main.cpp:1063
+msgid "The selected root is formatted. An existing FAT32 ESP is preserved by default."
+msgstr "将格式化所选根分区。默认保留现有 FAT32 ESP。"
+
+#: userland/apps/installer/main.cpp:1378
+msgid "UEFI boot file (add it in firmware if no automatic entry appears):"
+msgstr "UEFI 引导文件（若未自动出现入口，请在固件中添加）："
+
+#: userland/apps/installer/main.cpp:692
+msgid "Use the selected installation's fstab"
+msgstr "使用所选安装的 fstab"

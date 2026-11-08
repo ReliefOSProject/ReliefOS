@@ -17,6 +17,12 @@ Clang 必须包含 x86_64 compiler-rt builtins。典型 Debian/Ubuntu 依赖为:
 HTML 文档另需 Sphinx，见 :doc:`../process/documentation`。Sphinx 仅服务文档；
 内核和用户态生产编译不因此改用 Python、Meson 或 Ninja。
 
+``make test-build`` 中的播放器宿主检查另需 ``ffmpeg``、``libavformat-dev``、
+``libavcodec-dev``、``libavutil-dev``、``libswresample-dev`` 和 ``libswscale-dev``。
+这些是宿主检查依赖；生产播放器使用锁定源码构建的 musl 库。
+可通过 ``PLAYER_TARGET_BUILD=/绝对路径/out/x86_64/release sh tests/build/test-reliefplayer-mp4.sh``
+在 Linux 宿主上同时运行实际精简库和 musl 版本的解码/控制检查；这不等于来宾播放验证。
+
 构建顺序
 ========
 

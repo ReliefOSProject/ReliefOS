@@ -22,6 +22,7 @@ extern "C" {
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Choice.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Input.H>
@@ -77,6 +78,8 @@ static Fl_Return_Button *primary_button;
 static Fl_Button *cancel_button;
 static Fl_Hold_Browser *disk_browser;
 static Fl_Hold_Browser *partition_browser;
+static Fl_Choice *update_root_choice, *update_esp_choice;
+static Fl_Check_Button *format_esp_checkbox;
 static Fl_Input *confirm_input;
 static Fl_Check_Button *xorg_checkbox;
 static Fl_Input *swap_size_input;
@@ -436,7 +439,16 @@ static void start_update_job(int applying)
         return;
     }
     executable[bytes] = 0;
-    const char *check[] = {executable, "--update-worker", "check", disks[selected_disk].path, NULL};
+    char root_uuid[37] = {0}, esp_uuid[37] = {0};
+    if (!applying) {
+        int error = 0;
+        if (installer_root_partition >= 0)
+            error = reliefos_block_partition_uuid(disks[selected_disk].path, installer_root_partition, root_uuid);
+        if (!error && installer_esp_partition >= 0)
+            error = reliefos_block_partition_uuid(disks[selected_disk].path, installer_esp_partition, esp_uuid);
+        if (error) { set_error_status(T("Cannot identify the selected partitions"), error); return; }
+    }
+    const char *check[] = {executable, "--update-worker", "check", disks[selected_disk].path, root_uuid, esp_uuid, NULL};
     const char *apply[] = {executable, "--update-worker", "apply", update_info.disk,
         update_info.root_uuid, update_info.esp_uuid, update_info.index_sha256, update_info.database_sha256,
         update_info.world_sha256, modes, NULL};
@@ -662,10 +674,46 @@ static void build_mode_page(void)
                CONTENT_X, 278, CONTENT_W, 42, 15, 1);
 }
 
+static void update_partition_selected(Fl_Widget *widget, void *)
+{
+    auto *choice = static_cast<Fl_Choice *>(widget);
+    int index = choice->mvalue() ? int((intptr_t)choice->mvalue()->user_data()) - 1 : -1;
+    if (widget == update_root_choice) installer_root_partition = index;
+    else installer_esp_partition = index;
+    update_checked = 0;
+}
+
+static void refresh_update_partitions(void)
+{
+    if (!update_root_choice || !update_esp_choice) return;
+    refresh_partitions();
+    update_root_choice->clear(); update_esp_choice->clear();
+    update_root_choice->add(T("Automatically identify a single ReliefOS installation"));
+    update_esp_choice->add(T("Use the selected installation's fstab"));
+    update_root_choice->value(0); update_esp_choice->value(0);
+    for (uint32_t i = 0; i < partition_count; ++i) {
+        char line[256]; format_partition_line(line, sizeof(line), &partitions[i]);
+        Fl_Choice *choice = partitions[i].gpt_type == RELIEFOS_BLOCK_GPT_ESP ? update_esp_choice :
+            partitions[i].gpt_type == RELIEFOS_BLOCK_GPT_LINUX ? update_root_choice : nullptr;
+        if (!choice) continue;
+        char escaped[sizeof(line) * 2]; size_t used = 0;
+        for (const char *p = line; *p; ++p) {
+            if (*p == '/' || *p == '\\' || *p == '&') escaped[used++] = '\\';
+            escaped[used++] = *p;
+        }
+        escaped[used] = 0;
+        choice->add(escaped, 0, nullptr, (void *)(intptr_t)(partitions[i].index + 1));
+        int selected = choice == update_root_choice ? installer_root_partition : installer_esp_partition;
+        if (selected == (int)partitions[i].index) choice->value(choice->size() - 2);
+    }
+}
+
 static void select_disk(Fl_Widget *, void *)
 {
     if (disk_browser && disk_browser->value() > 0)
         selected_disk = disk_browser->value() - 1;
+    setup.format_esp = 0;
+    refresh_update_partitions();
     update_footer();
 }
 
@@ -680,6 +728,7 @@ static void refresh_disk_list(void)
     }
     if (selected_disk >= 0 && (uint32_t)selected_disk < disk_count)
         disk_browser->value(selected_disk + 1);
+    refresh_update_partitions();
     update_footer();
     refresh_status_widgets();
 }
@@ -704,11 +753,21 @@ static void build_disk_page(void)
                CONTENT_X, 62, 600, 32, 15, 1);
     make_button(T("Refresh"), CONTENT_X + 650, 22, 130, 34, refresh_pressed, NULL);
     make_label(T("Available disks"), CONTENT_X, 102, CONTENT_W, 26, 14, 0);
-    disk_browser = new Fl_Hold_Browser(CONTENT_X, 132, CONTENT_W, 330);
+    disk_browser = new Fl_Hold_Browser(CONTENT_X, 132, CONTENT_W,
+                                     install_mode == INSTALLER_MODE_UPDATE ? 190 : 330);
     disk_browser->callback(select_disk);
     disk_browser->textsize(14);
     disk_browser->selection_color(COLOR_SIDEBAR);
     reliefos_fltk::style(disk_browser);
+    if (install_mode == INSTALLER_MODE_UPDATE) {
+        make_label(T("ReliefOS system partition"), CONTENT_X, 330, CONTENT_W, 24, 14, 0);
+        update_root_choice = new Fl_Choice(CONTENT_X, 356, CONTENT_W, 32);
+        make_label(T("EFI system partition"), CONTENT_X, 396, CONTENT_W, 24, 14, 0);
+        update_esp_choice = new Fl_Choice(CONTENT_X, 422, CONTENT_W, 32);
+        update_root_choice->callback(update_partition_selected);
+        update_esp_choice->callback(update_partition_selected);
+        reliefos_fltk::style(update_root_choice); reliefos_fltk::style(update_esp_choice);
+    }
     status_box = make_label(status_text, CONTENT_X, 478, CONTENT_W, 34, 14, 1);
     detail_box = make_label(detail_text, CONTENT_X, 516, CONTENT_W, 48, 14, 1);
     refresh_disk_list();
@@ -717,6 +776,7 @@ static void build_disk_page(void)
 static void refresh_partition_list(void)
 {
     if (!partition_browser) return;
+    if (format_esp_checkbox) format_esp_checkbox->value(setup.format_esp);
     char line[640];
     if (partition_hint) {
         struct installer_partition_plan plan;
@@ -944,6 +1004,12 @@ static void partition_role_pressed(Fl_Widget *, void *data)
     partition_result(ret, T("Partition role updated."));
 }
 
+static void format_esp_changed(Fl_Widget *widget, void *)
+{
+    setup.format_esp = static_cast<Fl_Check_Button *>(widget)->value() != 0;
+    update_footer();
+}
+
 static void build_partition_page(void)
 {
     static const char *const labels[] = {
@@ -992,10 +1058,18 @@ static void build_partition_page(void)
     detail_box = make_label(detail_text, CONTENT_X, 512, CONTENT_W, 38, 13, 1);
     make_label(T("Create: size in MiB, filesystem, name. Resize only changes the trailing edge."),
                CONTENT_X, 552, CONTENT_W, 26, 12, 1);
-    make_label((installer_partition_auto || installer_partition_table_replaced)
+    make_label(installer_partition_auto
                    ? T("Final confirmation formats a FAT32 ESP and ext4 root on the selected disk.")
-                   : T("Final confirmation formats only the selected ESP and root; other partitions are preserved."),
+                   : T("The selected root is formatted. An existing FAT32 ESP is preserved by default."),
                CONTENT_X, 578, CONTENT_W, 32, 12, 1);
+    if (!installer_partition_auto) {
+        auto *format = new Fl_Check_Button(CONTENT_X, 613, CONTENT_W, 28,
+            T("Format selected ESP (erase all EFI boot files on it)"));
+        format->value(setup.format_esp);
+        format_esp_checkbox = format;
+        format->callback(format_esp_changed);
+        reliefos_fltk::style(format);
+    }
     refresh_partition_list();
 }
 
@@ -1204,9 +1278,11 @@ static void build_confirm_page(void)
         line[0] = 0;
     snprintf(target, sizeof(target), "%s %s", T("Target:"), line);
     make_label(target, CONTENT_X, 98, CONTENT_W, 34, 14, 1);
-    make_label((installer_partition_auto || installer_partition_table_replaced)
+    make_label(installer_partition_auto
                        ? T("The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root.")
-                       : T("Only the selected ESP and root partitions will be formatted; other partitions are preserved."),
+                       : setup.format_esp
+                           ? T("The selected root and ESP will be formatted. All EFI boot files on that ESP will be erased.")
+                           : T("Only the selected root will be formatted. Existing ESP files and other partitions are preserved."),
                CONTENT_X, 142, CONTENT_W, 64, 14, 1);
     make_label(T("Type INSTALL to enable the Install button."),
                CONTENT_X, 224, CONTENT_W, 30, 14, 1);
@@ -1293,11 +1369,22 @@ static void build_finish_page(void)
                    CONTENT_X, 62, CONTENT_W, 32, 15, 1);
         make_label(T("Remove the installation media, then restart."),
                    CONTENT_X, 108, CONTENT_W, 32, 15, 1);
+        if (!setup.skip_uefi) {
+            char entry[128];
+            int error = install_mode == INSTALLER_MODE_UPDATE
+                ? (snprintf(entry, sizeof(entry), "%s", update_info.boot_file), 0)
+                : installer_boot_entry_path(entry, sizeof(entry));
+            if (!error) {
+                make_label(T("UEFI boot file (add it in firmware if no automatic entry appears):"),
+                           CONTENT_X, 148, CONTENT_W, 28, 13, 1);
+                make_label(entry, CONTENT_X, 180, CONTENT_W, 28, 13, 1);
+            }
+        }
         if (reboot_error) {
-            make_label(T("Restart failed"), CONTENT_X, 154,
+            make_label(T("Restart failed"), CONTENT_X, 212,
                        CONTENT_W, 28, 14, 1);
             snprintf(message, sizeof(message), "%s", strerror(reboot_error));
-            make_label(message, CONTENT_X, 184, CONTENT_W, 36, 14, 1);
+            make_label(message, CONTENT_X, 242, CONTENT_W, 36, 14, 1);
         }
     } else {
         make_heading(install_mode == INSTALLER_MODE_UPDATE
@@ -1309,12 +1396,14 @@ static void build_finish_page(void)
         make_label(status_text, CONTENT_X, 108, CONTENT_W, 42, 14, 1);
         make_label(detail_text, CONTENT_X, 154, CONTENT_W, 60, 14, 1);
     }
-    if (install_mode == INSTALLER_MODE_UPDATE) build_update_log(236, 264);
+    if (install_mode == INSTALLER_MODE_UPDATE) build_update_log(reboot_error ? 290 : 236, reboot_error ? 210 : 264);
 }
 
 static void clear_page_widgets(void)
 {
     disk_browser = NULL;
+    update_root_choice = update_esp_choice = NULL;
+    format_esp_checkbox = NULL;
     partition_browser = NULL;
     confirm_input = NULL;
     xorg_checkbox = NULL;
@@ -1502,6 +1591,7 @@ int main(int argc, char **argv)
         tty_context.partition_delete = installer_partition_delete;
         tty_context.partition_format = installer_partition_format;
         tty_context.perform_install = perform_install;
+        tty_context.boot_entry_path = installer_boot_entry_path;
         return installer_tty_main(&tty_context);
     }
     puts("[installer.elf] starting installer wizard");

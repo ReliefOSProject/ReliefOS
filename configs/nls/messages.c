@@ -685,15 +685,15 @@ static const char *const relieftodo_static_labels[] = {
 /* ReliefPlayer labels returned by the decoder error table. */
 static const char *const reliefplayer_static_labels[] = {
     N_("ReliefPlayer"),
-    N_("Could not read the audio file"),
-    N_("Invalid or truncated audio file"),
-    N_("Unsupported audio format"),
-    N_("Audio file exceeds the supported limit"),
+    N_("Could not read the media file"),
+    N_("Invalid or truncated media file"),
+    N_("Unsupported media format or codec"),
+    N_("Media exceeds the supported size or resolution"),
     N_("Not enough memory"),
     N_("Audio device is unavailable"),
     N_("Audio device is busy"),
-    N_("Audio playback failed"),
-    N_("Audio process stopped unexpectedly"),
+    N_("Media playback failed"),
+    N_("Playback process stopped unexpectedly"),
 };
 
 /* ReliefCapture worker errors and application name. */

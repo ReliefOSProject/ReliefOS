@@ -30,6 +30,7 @@
 #include <string.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -70,6 +71,12 @@ static uint8_t copy_buf[COPY_BUF_SIZE];
 static uint8_t copy_defer_sync;
 static uint8_t copy_fresh_root;
 static char installer_root_uuid[37], installer_esp_uuid[37];
+int installer_boot_entry_path(char *path, uint32_t capacity)
+{
+    if (!path || !capacity || !installer_root_uuid[0]) return -EINVAL;
+    int n = snprintf(path, capacity, "/EFI/ReliefOS/%s/grubx64.efi", installer_root_uuid);
+    return n < 0 || (uint32_t)n >= capacity ? -ENAMETOOLONG : 0;
+}
 
 static unsigned long boot_last_present;
 
@@ -291,6 +298,7 @@ void refresh_partitions(void)
         installer_root_partition = -1;
         installer_esp_partition = -1;
         installer_partition_table_replaced = 0;
+        setup.format_esp = 0;
         partition_disk_path[0] = 0;
         if (selected_disk >= 0 && (uint32_t)selected_disk < disk_count)
             copy_text(partition_disk_path, sizeof(partition_disk_path),
@@ -377,7 +385,8 @@ int installer_partition_plan_valid(void)
                         partitions[i].sector_count >= 128ULL * 2048ULL;
         if ((int32_t)partitions[i].index == installer_esp_partition)
             esp_seen = partitions[i].gpt_type == RELIEFOS_BLOCK_GPT_ESP &&
-                       partitions[i].sector_count >= 128ULL * 2048ULL;
+                       (setup.format_esp || partitions[i].filesystem == RELIEFOS_BLOCK_FILESYSTEM_FAT32) &&
+                       partitions[i].sector_count >= 2048u;
     }
     /* Rechecked after navigating back to firmware selection. No disk writes
      * here: adding BIOS to an existing two-part layout needs explicit changes. */
@@ -421,6 +430,7 @@ int installer_partition_auto_layout(void)
         refresh_partitions();
         installer_partition_auto = 0;
         installer_partition_table_replaced = 1;
+        setup.format_esp = 1;
         installer_root_partition = (int32_t)plan.root.index;
         installer_esp_partition = (int32_t)plan.esp.index;
     }
@@ -479,6 +489,7 @@ int installer_partition_set_type(uint32_t type)
                                                 partition->index, type);
     if (!ret) {
         if (type == RELIEFOS_BLOCK_GPT_ESP) {
+            if (installer_esp_partition != index) setup.format_esp = 0;
             installer_esp_partition = index;
             if (installer_root_partition == index) installer_root_partition = -1;
         } else if (type == RELIEFOS_BLOCK_GPT_LINUX) {
@@ -600,14 +611,16 @@ static int installer_fresh_partitions(const char *disk_path,
     if (esp == UINT32_MAX || root == UINT32_MAX || esp == root) return -ENOENT;
     if (parts[esp].gpt_type != RELIEFOS_BLOCK_GPT_ESP ||
         parts[root].gpt_type != RELIEFOS_BLOCK_GPT_LINUX) return -EINVAL;
-    if (parts[esp].sector_count < 128ULL * 2048ULL ||
+    if (parts[esp].sector_count < 2048u ||
         parts[root].sector_count < 128ULL * 2048ULL) return -ENOSPC;
     ret = installer_capacity_check(&capacity, parts[root].sector_count, parts[esp].sector_count);
     if (ret) return ret;
     copy_text(esp_path, esp_cap, parts[esp].path);
     copy_text(root_path, root_cap, parts[root].path);
-    ret = reliefos_block_format(esp_path, RELIEFOS_BLOCK_FILESYSTEM_FAT32, "RELIEFOS");
-    if (ret < 0) return ret;
+    if (setup.format_esp) {
+        ret = reliefos_block_format(esp_path, RELIEFOS_BLOCK_FILESYSTEM_FAT32, "RELIEFOS");
+        if (ret < 0) return ret;
+    } else if (parts[esp].filesystem != RELIEFOS_BLOCK_FILESYSTEM_FAT32) return -EINVAL;
     *root_filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT4;
     ret = installer_format_ext4(root_path);
     if (!ret) ret = reliefos_block_partition_uuid(disk_path, parts[root].index,
@@ -641,7 +654,7 @@ static int installer_mount_targets(const char *disk_path)
     }
     /* Release mounts from a previous installation attempt before rewriting
      * the GPT or formatting either selected filesystem. */
-    const char *targets[] = {INSTALL_ESP_MOUNT, INSTALL_ROOT_MOUNT};
+    const char *targets[] = {INSTALL_ESP_MOUNT, INSTALL_ESP_VOLUME, INSTALL_ROOT_MOUNT};
     for (uint32_t i = 0; i < sizeof(targets) / sizeof(targets[0]); ++i) {
         if (umount2(targets[i], 0) < 0 && errno != ENOENT && errno != EINVAL) {
             ret = -errno;
@@ -670,19 +683,45 @@ static int installer_mount_targets(const char *disk_path)
         printf("[installer.elf] mount root failed path=%s errno=%d\n", root_path, errno);
         return -errno;
     }
-    if (mkdir(INSTALL_ESP_MOUNT, 0755) < 0 && errno != EEXIST) {
+    if ((mkdir(INSTALL_ESP_MOUNT, 0755) < 0 && errno != EEXIST) ||
+        (mkdir(INSTALL_ESP_VOLUME, 0755) < 0 && errno != EEXIST)) {
         ret = -errno;
         printf("[installer.elf] mount esp mkdir failed path=%s errno=%d\n",
                INSTALL_ESP_MOUNT, errno);
         (void)umount2(INSTALL_ROOT_MOUNT, 0);
         return ret;
     }
-    if (mount(esp_path, INSTALL_ESP_MOUNT, "fat32", 0, NULL) < 0) {
+    if (mount(esp_path, INSTALL_ESP_VOLUME, "vfat", 0, NULL) < 0) {
         ret = -errno;
         printf("[installer.elf] mount esp failed path=%s errno=%d\n", esp_path, errno);
         (void)umount2(INSTALL_ROOT_MOUNT, 0);
         return ret;
     }
+    char instance[512];
+    ret = reliefos_boot_prepare_instance(INSTALL_ESP_VOLUME, installer_root_uuid, instance, sizeof(instance));
+    if (!ret && mount(instance, INSTALL_ESP_MOUNT, NULL, MS_BIND, NULL) < 0) ret = -errno;
+    if (ret) {
+        (void)umount2(INSTALL_ESP_VOLUME, 0);
+        (void)umount2(INSTALL_ROOT_MOUNT, 0);
+        return ret;
+    }
+    struct installer_capacity needed = {0};
+    struct statvfs available;
+    ret = installer_capacity_measure(fresh_root_payload(), INSTALL_ESP_PAYLOAD,
+                                    !setup.skip_bios, !setup.skip_uefi, &needed);
+    if (!ret && statvfs(INSTALL_ESP_MOUNT, &available) < 0) ret = -errno;
+    if (!ret) {
+        uint64_t extra = 8u * 1024u * 1024u;
+        if (!setup.skip_uefi) {
+            struct stat loader;
+            if (stat(INSTALL_ESP_PAYLOAD "/EFI/BOOT/BOOTX64.EFI", &loader) < 0) ret = -errno;
+            else extra += (uint64_t)loader.st_size * 3u;
+        }
+        uint64_t unit = available.f_frsize ? available.f_frsize : available.f_bsize;
+        if (!ret && (!unit || (uint64_t)available.f_bavail > UINT64_MAX / unit)) ret = -EOVERFLOW;
+        if (!ret && (uint64_t)available.f_bavail * unit < needed.boot_bytes + extra) ret = -ENOSPC;
+    }
+    if (ret) return ret;
     return 0;
 }
 
@@ -1139,7 +1178,7 @@ static int install_boot_after_root_sync(const char *root,
     int result = sync_target_root(root);
     if (result) return result;
     fprintf(stderr, "[installer.elf] root filesystem synchronized before boot publication\n");
-    return reliefos_boot_install_at_root(boot, root);
+    return reliefos_boot_install_instance_at_root(boot, root, INSTALL_ESP_VOLUME);
 }
 
 /** @brief Keep the existing worker responsive while allocating the swapfile.

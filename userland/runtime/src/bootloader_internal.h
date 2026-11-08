@@ -51,4 +51,8 @@ int boot_publish_descriptor(const struct reliefos_boot_install_options *options,
 int boot_retire_legacy(int rootfd);
 /** @brief Run fixed-path upstream grub-install, pumping the caller's optional UI callback. */
 int boot_install_bios(const struct reliefos_boot_install_options *options);
+/** @brief Publish an instance EFI entry, preserving an unrelated fallback loader. */
+int boot_install_uefi(const struct reliefos_boot_install_options *options, const char *esp);
+/** @brief Check physical ESP, namespace inode and ownership marker without mutation. */
+int boot_validate_instance(const struct reliefos_boot_install_options *options, const char *esp);
 #endif

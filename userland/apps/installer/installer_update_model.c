@@ -230,6 +230,7 @@ int installer_update_decode(struct installer_update_info *info, unsigned *progre
 #define FIELD(name) {#name, info->name, sizeof(info->name)}
     struct field fields[] = {
         FIELD(disk), FIELD(root_device), FIELD(esp_device), FIELD(root_uuid), FIELD(esp_uuid),
+        FIELD(boot_file),
         FIELD(installed_version), FIELD(media_version), FIELD(profile), FIELD(installed_kernel),
         FIELD(media_kernel), FIELD(index_sha256), FIELD(database_sha256), FIELD(world_sha256), FIELD(pending),
     };
