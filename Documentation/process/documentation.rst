@@ -9,6 +9,7 @@
 按读者任务组织 admin-guide、applications、kbuild、userspace-api、process，
 每个目录提供 index.rst 和显式 toctree。保持段落可读，一页解决一个主题。
 标题使用等号上下线，章用等号、节用横线、子节用波浪线；代码用字面块或 code-block。
+标题装饰线按显示宽度计算，汉字通常占两列；混排标题的上下线均须覆盖整行标题。
 交叉引用使用 doc/ref 角色，避免绝对宿主路径、陈旧构建编号和失效截图链接。
 
 先写目的、前提与可操作步骤，再写接口约束、错误和限制。不把计划、聊天交接、
@@ -34,3 +35,17 @@ ReliefNT 的内核手册只在 ReliefNT 仓库维护；主仓手册记录用户�
 构建启用 nitpicky 和 warnings-as-errors；缺失交叉引用、未收入目录、错误语法
 均须修复，不能通过关闭警告或排除现行页面让检查变绿。
 文档生成所需 Python/Sphinx 仅属于文档工具，不进入目标系统编译链。
+
+完整文档检查无需编译内核或应用，但须初始化所选 ReliefNT 子模块::
+
+    git submodule update --init kernel/reliefnt
+    python3 tools/test_documentation.py
+
+此检查通过两仓的 ``make htmldocs`` 入口和实际 Pages 文档入口构建全部页面，
+核对每个 RST 页面、站内链接、HTML 锚点和资源，拒绝依赖网站根路径的链接、
+JavaScript 及源文档泄漏。只检查现有文档入口可传 ``--site 路径``。
+外部网站链接不在此离线检查范围内。
+
+``Check documentation`` 工作流在推送和 PR 时独立检查文档，覆盖 Sphinx 5.3、
+Pages 当前使用的 7.2.6 和 9.x。Pages 发布工作流也会先运行文档检查，再构建
+系统镜像；两处均保留严格警告检查，不以关闭警告绕过失败。

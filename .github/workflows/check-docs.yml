@@ -1,0 +1,53 @@
+name: Check documentation
+
+on:
+  push:
+    paths: &documentation_paths
+      - 'Documentation/**'
+      - 'kernel/reliefnt'
+      - 'Makefile'
+      - 'configs/build-version'
+      - 'scripts/build-docs.sh'
+      - 'scripts/reliefos/Makefile.site'
+      - 'tools/build/docs-page.sh'
+      - 'tools/test_documentation.py'
+      - '.github/workflows/check-docs.yml'
+      - '.github/workflows/build-pages.yml'
+  pull_request:
+    paths: *documentation_paths
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reliefos-docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  documentation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        sphinx: ['5.3.*', '7.2.6', '9.*']
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Checkout kernel documentation
+        run: git submodule update --init kernel/reliefnt
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install documentation dependencies
+        run: python -m pip install -r Documentation/requirements.txt 'Sphinx==${{ matrix.sphinx }}'
+
+      - name: Check both manuals and the documentation portal
+        run: python tools/test_documentation.py
