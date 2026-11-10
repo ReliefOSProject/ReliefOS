@@ -19,7 +19,7 @@ link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
 # Every enabled upstream root is passed by the build graph. The default keeps
 # standalone callers compatible with the complete product package set.
-rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg ncurses'}
+rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg'}
 for package in $rootfs_upstream_packages; do
     if [ "$package" = ffmpeg ]; then
         if enabled reliefplayer; then
@@ -40,18 +40,6 @@ for package in $rootfs_upstream_packages; do
             exit 2
             ;;
     esac
-    if [ "$package" = ncurses ]; then
-        if enabled "$package"; then
-            # Only runtime data and commands belong in the root (development static
-            # archives/headers are exported by SDK rules instead).
-            for directory in bin share; do
-                input=$out/upstream/$package/root/usr/$directory
-                if [ -d "$input" ]; then tree "$input" "usr/$directory" "$package"; fi
-            done
-            tree "$out/upstream/ncurses/root/usr/share/terminfo" etc/terminfo ncurses
-        fi
-        continue
-    fi
     for directory in bin sbin lib usr etc; do
         input=$out/upstream/$package/root/$directory
         if [ -d "$input" ]; then tree "$input" "$directory" "$package"; fi
@@ -144,7 +132,7 @@ BEGIN {
   while ((getline app < catalog)>0) if(app!~/^#/ && app!="") artwork[app]=1;
   close(catalog);
 }
-$4==1 && ($2 ~ /-app$/ || $1 ~ /^(busybox|sl)$/) {
+$4==1 && ($2 ~ /-app$/ || $1 == "busybox") {
   terminal=0; ini=src "/userland/apps/" $1 "/" $1 ".app.ini";
   while ((getline line < ini)>0) {split(line,a,"="); if(a[1]=="terminal" && a[2]~/^(1|true|yes)$/) terminal=1} close(ini);
   ini=src "/userland/" $1 "/" $1 ".app.ini";
@@ -203,29 +191,23 @@ if enabled doom; then
     file "$src/third_party/doomgeneric/freedoom1.wad" usr/lib/reliefos/apps/doom/freedoom1.wad 0644 doom
     file "$src/third_party/doomgeneric/FREEDOOM-COPYING.txt" usr/share/doc/reliefos/FREEDOOM-COPYING.txt 0644 doom
 fi
-# Tool executables keep their native locations; registry entries use a local
-# symlink so the registry's relative exec contract remains the same as apps.
-for app in busybox sl; do
+# BusyBox retains its system registry entry; upstream commands use native paths.
+for app in busybox; do
     if enabled "$app"; then
         file "$work/manifests/$app.ini" "usr/lib/reliefos/apps/$app/manifest.ini" 0644 "$app"
-        target=/usr/bin/$app
-        [ "$app" != busybox ] || target=/bin/busybox
-        link "usr/lib/reliefos/apps/$app/$app.elf" "$target" "$app"
+        link "usr/lib/reliefos/apps/$app/$app.elf" /bin/busybox "$app"
     fi
 done
-for app in fastfetch sl; do
+for app in fastfetch; do
     if enabled "$app"; then file "$out/userland/$app.elf" "usr/bin/$app" 0755 "$app" override; fi
 done
-for spec in 'sqlite sqlite.so.3'; do
-    set -- $spec
-    if enabled "$1"; then file "$out/userland/$2" "usr/lib/$2" 0755 "$1"; fi
-done
 if enabled fastfetch; then
+    file "$src/userland/fastfetch/LICENSE" usr/share/licenses/fastfetch/LICENSE 0644 fastfetch
     file "$src/userland/fastfetch/config.jsonc" etc/fastfetch/config.jsonc 0644 fastfetch
     file "$src/userland/fastfetch/leonos-ascii.txt" usr/share/fastfetch/leonos-ascii.txt 0644 fastfetch
     file "$src/userland/fastfetch/hyfetch.json" etc/skel/.config/hyfetch.json 0644 fastfetch
 fi
-for spec in 'busybox third_party/busybox/LICENSE' 'sl third_party/sl/LICENSE' 'pleditor third_party/pl_editor/LICENSE'; do
+for spec in 'busybox third_party/busybox/LICENSE' 'pleditor third_party/pl_editor/LICENSE'; do
     set -- $spec
     if enabled "$1"; then file "$src/$2" "usr/share/licenses/$1/${2##*/}" 0644 "$1" override; fi
 done
@@ -263,6 +245,18 @@ file "$src/system/certs/cacert.pem" etc/ssl/certs/ca-certificates.crt
 file "$src/system/certs/cacert.pem" usr/share/reliefos/certs/ca-certificates.crt 0644 trust
 file "$src/Documentation/admin-guide/packages.rst" usr/share/doc/reliefos/packages.rst
 file "$src/configs/apk-ownership.json" usr/share/reliefos/apk-ownership.json
+: > "$work/data/apk-components"
+for component in sl ncurses sqlite; do
+    if enabled "$component"; then
+        printf '%s\n' "$component" >> "$work/data/apk-components"
+        file "$src/resources/licenses/$component-LICENSE" "usr/share/licenses/$component/LICENSE"
+    fi
+done
+file "$work/data/apk-components" etc/reliefos/apk-components
+for library in zlib libpng mbedtls3; do
+    file "$src/resources/licenses/$library-LICENSE" "usr/share/licenses/reliefos-runtime-dependencies/$library-LICENSE"
+done
+
 for name in simsun.ttc system.psf; do file "$src/system/fonts/$name" "usr/share/fonts/reliefos/$name"; done
 file "$src/system/fonts/times.ttf" usr/share/fonts/reliefos/times-new-roman.ttf
 for source in "$src/resources/build-art/minesweeper"/*.bmp; do file "$source" "usr/share/reliefos/resources/${source##*/}"; done

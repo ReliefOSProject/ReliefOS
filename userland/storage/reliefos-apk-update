@@ -67,7 +67,52 @@ plan=$temporary/root
 /bin/busybox cp "$target/lib/apk/db/installed" "$plan/lib/apk/db/installed"
 /bin/busybox cp "$target/lib/apk/db/installed" "$temporary/installed-before"
 /bin/busybox cp -p "$target/etc/apk/world" "$temporary/world-before"
-/bin/busybox sed 's/^leonos-/reliefos-/' "$temporary/world-before" > "$plan/etc/apk/world"
+# Retired local commands are selected directly from their official packages.
+# Local generation/version constraints cannot describe upstream versions. Keep
+# existing upstream requests (including their tags/pins) and all unrelated
+# world entries, using an inherited tag only when adding a missing request.
+# Editing the private plan lets APK remove the old owners in the same signed
+# transaction that installs their replacements; --check never edits the target.
+: > "$temporary/upstream-packages"
+/bin/busybox awk -v upstream_packages="$temporary/upstream-packages" '
+    function canonical(request) {
+        sub(/^leonos-/, "reliefos-", request)
+        return request
+    }
+    function package_name(request) {
+        sub(/[@<>=~].*$/, "", request)
+        return request
+    }
+    function emit(request) {
+        if (!seen[request]++) print request
+    }
+    function upstream(name, tag) {
+        if (!(name in present)) emit(name tag)
+        print name >> upstream_packages
+    }
+    NR == FNR { present[package_name(canonical($0))] = 1; next }
+    {
+        request = canonical($0)
+        name = package_name(request)
+        if (name !~ /^reliefos-(sl|ncurses|sqlite)$/) { emit(request); next }
+        tag = ""
+        if (index(request, "@")) {
+            tag = request
+            sub(/^[^@]*@/, "", tag)
+            sub(/[<>=~].*$/, "", tag)
+            tag = "@" tag
+        }
+        if (name == "reliefos-sl") upstream("sl", tag)
+        if (name == "reliefos-ncurses") {
+            upstream("ncurses", tag)
+            upstream("ncurses-terminfo", tag)
+        }
+        if (name == "reliefos-sqlite") {
+            upstream("sqlite", tag)
+            upstream("sqlite-libs", tag)
+        }
+    }
+' "$temporary/world-before" "$temporary/world-before" > "$plan/etc/apk/world"
 if [ -f "$target/etc/apk/arch" ]; then
     [ ! -L "$target/etc/apk/arch" ] || die 'unsafe installed architecture file'
     /bin/busybox cp "$target/etc/apk/arch" "$plan/etc/apk/arch"
@@ -173,13 +218,17 @@ for name in $packages; do
     case "$name" in reliefos-*) ;; *) die 'invalid system package name' ;; esac
     case "$name" in *[!a-zA-Z0-9+_.-]*) die 'invalid system package name' ;; esac
 done
-repair_packages=$(broken_packages "$plan" 0 | /bin/busybox awk -F '\t' '$1 ~ /^reliefos-/ { print $1 }')
+repair_packages=$(broken_packages "$plan" 0 | /bin/busybox awk -F '\t' \
+    '$1 ~ /^reliefos-/ && $1 !~ /^reliefos-(sl|ncurses|sqlite)$/ { print $1 }')
 for name in $repair_packages; do
     case "$name" in *[!a-zA-Z0-9+_.-]*) die 'invalid repair package name' ;; esac
 done
+# Replacement commands are world selections, no longer dependencies of local
+# wrappers. Include them in the verified archive set before the solver runs.
+upstream_packages=$(/bin/busybox sort -u "$temporary/upstream-packages")
 apk --root "$plan" --keys-dir "$target/etc/apk/keys" \
     --repositories-file "$configuration" --no-network fetch --recursive \
-    --output "$temporary/repository" $packages $repair_packages
+    --output "$temporary/repository" $packages $repair_packages $upstream_packages
 apk --root "$plan" --keys-dir "$target/etc/apk/keys" --no-network \
     verify "$temporary/repository/"*.apk
 /bin/busybox cp "$repository/packages.adb" "$temporary/repository/packages.adb"
@@ -235,4 +284,15 @@ done
 /bin/busybox cp "$temporary/repository/packages.adb" "$destination/packages.adb.new"
 /bin/busybox chmod 0644 "$destination/packages.adb.new"
 /bin/busybox mv "$destination/packages.adb.new" "$destination/packages.adb"
+# Old offline archives must not keep the removed wrappers installable. Limit
+# cleanup to these retired package names; retain unrelated administrator files.
+for component in sl ncurses sqlite; do
+    for prefix in reliefos leonos; do
+        for archive in "$destination/$prefix-$component-"[0-9]*.apk; do
+            [ -e "$archive" ] || [ -L "$archive" ] || continue
+            [ -f "$archive" ] && [ ! -L "$archive" ] || die "unsafe retired package archive: $archive"
+            /bin/busybox rm "$archive"
+        done
+    done
+done
 /bin/busybox sync

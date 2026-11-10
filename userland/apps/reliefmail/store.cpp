@@ -1023,7 +1023,7 @@ bool Store::open(const ProfilePaths &paths, StoreOpenMode mode, Text &error) {
     database_ = db;
     sqlite3_busy_timeout(db, 150);
     sqlite3_db_config(db, SQLITE_DBCONFIG_DEFENSIVE, 1, nullptr);
-    if (!exec_sql(db, "PRAGMA journal_mode=DELETE;PRAGMA synchronous=FULL;PRAGMA foreign_keys=ON;"
+    if (!exec_sql(db, "PRAGMA journal_mode=DELETE;PRAGMA synchronous=FULL;PRAGMA foreign_keys=ON;PRAGMA mmap_size=0;"
             "PRAGMA trusted_schema=OFF;PRAGMA secure_delete=ON;", error,
             "cannot configure durable profile database") || !initialize_schema(db, data_fd_, error)) {
         close();
@@ -4737,7 +4737,7 @@ bool Store::restore_profile_impl(const char *source_path, SecretBytes backup_mas
         database_ = db;
         sqlite3_busy_timeout(db, 150);
         sqlite3_db_config(db, SQLITE_DBCONFIG_DEFENSIVE, 1, nullptr);
-        if (!exec_sql(db, "PRAGMA journal_mode=DELETE;PRAGMA synchronous=FULL;PRAGMA foreign_keys=ON;"
+        if (!exec_sql(db, "PRAGMA journal_mode=DELETE;PRAGMA synchronous=FULL;PRAGMA foreign_keys=ON;PRAGMA mmap_size=0;"
                 "PRAGMA trusted_schema=OFF;PRAGMA secure_delete=ON;", error,
                 "cannot configure restored profile database") || !initialize_schema(db, data_fd_, error)) {
             sqlite3_close(db);

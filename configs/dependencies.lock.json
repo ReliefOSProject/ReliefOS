@@ -1211,7 +1211,7 @@
       "directory": "libpng-1.6.59-r0",
       "script": "tools/build/upstream-apk.sh",
       "target": "apk-root",
-      "feature": "xorg",
+      "feature": "base",
       "note": "Alpine v3.24 main x86_64 APKINDEX license = Libpng; embedded APK signature is verified by apk-tools",
       "license_in_source": ".PKGINFO"
     },
@@ -2387,7 +2387,7 @@
       "directory": "zlib-1.4-r0",
       "script": "tools/build/upstream-apk.sh",
       "target": "apk-root",
-      "feature": "xorg",
+      "feature": "base",
       "note": "Alpine v3.24 main x86_64 APKINDEX license = Zlib; embedded APK signature is verified by apk-tools",
       "license_in_source": ".PKGINFO"
     },
@@ -2522,15 +2522,6 @@
       "target": "auth-upstream"
     },
     {
-      "id": "libpng",
-      "kind": "submodule",
-      "commit": "3061454d980de7d53608f594194cfac722721d2a",
-      "directory": "third_party/libpng",
-      "script": "build.py:archive:libpng",
-      "target": "musl-runtime",
-      "license": "third_party/libpng/LICENSE"
-    },
-    {
       "id": "libxcrypt",
       "kind": "tarball",
       "version": "4.5.2",
@@ -2598,15 +2589,6 @@
       "target": "musl-ltp"
     },
     {
-      "id": "mbedtls",
-      "kind": "submodule",
-      "commit": "068ff080b369adfac81509f9b57b2afabaf82dc5",
-      "directory": "third_party/mbedtls",
-      "script": "build.py:kernel",
-      "target": "kernel",
-      "license": "third_party/mbedtls/LICENSE"
-    },
-    {
       "id": "mimalloc",
       "kind": "submodule",
       "commit": "34fbd7e7cd4627424490afe19b20f8066bfc537d",
@@ -2647,15 +2629,6 @@
       "license_in_source": "LICENSE"
     },
     {
-      "id": "ncurses",
-      "kind": "submodule",
-      "commit": "0096bd402c4a9c8f39bd7ed266e1b8920327e4d8",
-      "directory": "third_party/ncurses",
-      "script": "tools/build/upstream-terminal.sh",
-      "target": "terminal-packages",
-      "license": "third_party/ncurses/COPYING"
-    },
-    {
       "id": "pl_editor",
       "kind": "submodule",
       "commit": "22fae7a1bc2362486d8bf845f0daf6ec7060a3a1",
@@ -2684,24 +2657,6 @@
       "checksum_source": "https://api.github.com/repos/shadow-maint/shadow/releases/tags/4.20.3",
       "script": "tools/build/upstream.sh",
       "target": "auth-upstream"
-    },
-    {
-      "id": "sl",
-      "kind": "submodule",
-      "commit": "923e7d7ebc5c1f009755bdeb789ac25658ccce03",
-      "directory": "third_party/sl",
-      "script": "tools/build/upstream-app.sh",
-      "target": "sl",
-      "license": "third_party/sl/LICENSE"
-    },
-    {
-      "id": "sqlite",
-      "kind": "submodule",
-      "commit": "f3d536d37825302e31ed0eddd811c689f38f85a3",
-      "directory": "third_party/sqlite",
-      "script": "tools/build/upstream-app.sh",
-      "target": "sqlite",
-      "license": "third_party/sqlite/LICENSE.md"
     },
     {
       "id": "stardustui",
@@ -2746,15 +2701,6 @@
       "checksum_source": "https://www.kernel.org/pub/linux/utils/util-linux/v2.42/sha256sums.asc",
       "script": "tools/build/upstream.sh",
       "target": "auth-upstream"
-    },
-    {
-      "id": "zlib",
-      "kind": "submodule",
-      "commit": "da607da739fa6047df13e66a2af6b8bec7c2a498",
-      "directory": "third_party/zlib",
-      "script": "build.py:archive:zlib",
-      "target": "musl-runtime",
-      "license": "third_party/zlib/LICENSE"
     },
     {
       "id": "alsa-lib",
@@ -2830,6 +2776,212 @@
       "license_in_source": "COPYING",
       "checksum_source": "https://raw.githubusercontent.com/buildroot/buildroot/master/boot/grub2/grub2.hash",
       "note": "Official GRUB 2.16 release; signature fingerprint DFB62CC1A987E6C76EBF8143916EC0708CDFDDFD; BIOS and EFI modules and tools are built from the same locked source."
+    },
+    {
+      "id": "alpine-mbedtls3",
+      "kind": "apk",
+      "version": "3.6.7-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/mbedtls3-3.6.7-r0.apk",
+      "sha256": "d4ac9dec9efd61bb7cc72929eaf944279439068b0b07c7d2167bfab98dce9273",
+      "directory": "mbedtls3-3.6.7-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "base",
+      "note": "Alpine v3.24 community x86_64; official APK signature verified before use; license = Apache-2.0 OR GPL-2.0-or-later.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-ncurses",
+      "kind": "apk",
+      "version": "6.6_p20260516-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/ncurses-6.6_p20260516-r0.apk",
+      "sha256": "a36d43d2bacbfaab10fe76221f62704066d8bbb5800d7d3a9c2a562e723fad8a",
+      "directory": "ncurses-6.6_p20260516-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "component:ncurses",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = X11.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-ncurses-terminfo",
+      "kind": "apk",
+      "version": "6.6_p20260516-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/ncurses-terminfo-6.6_p20260516-r0.apk",
+      "sha256": "cd84fa2666e59ea2e224cb936db96006a40d9bd850d938c0d9f2c034eaae6425",
+      "directory": "ncurses-terminfo-6.6_p20260516-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "component:ncurses",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = X11.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-sl",
+      "kind": "apk",
+      "version": "5.02-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/sl-5.02-r1.apk",
+      "sha256": "aa3ceb845953904ab61459f0f97416903c56a80b428f8bc320d879b9e58c1a57",
+      "directory": "sl-5.02-r1",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "component:sl",
+      "note": "Alpine v3.24 community x86_64; official APK signature verified before use; license = MIT.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-sqlite",
+      "kind": "apk",
+      "version": "3.53.4-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/sqlite-3.53.4-r0.apk",
+      "sha256": "c51f4aae4fdbbec678639cdaa7af6758eef331dbf7299e2777fa7020b41ff194",
+      "directory": "sqlite-3.53.4-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "component:sqlite",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = blessing.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-sqlite-libs",
+      "kind": "apk",
+      "version": "3.53.4-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/sqlite-libs-3.53.4-r0.apk",
+      "sha256": "a8a216e53d22faa3f04d2e3650c1991af66f8d0b42fadff5afcdb9afb60b19e5",
+      "directory": "sqlite-libs-3.53.4-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "component:sqlite",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = blessing.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "runtime-dev-libpng-dev",
+      "kind": "apk",
+      "version": "1.6.59-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/libpng-dev-1.6.59-r0.apk",
+      "sha256": "71731d72ac2bd884401d6322639d4da73de606759c0af19fe1f783f55d9f3688",
+      "directory": "libpng-dev-1.6.59-r0",
+      "script": "tools/build/runtime-development.sh",
+      "target": "runtime-development",
+      "feature": "base",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = Libpng.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "runtime-dev-libpng-static",
+      "kind": "apk",
+      "version": "1.6.59-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/libpng-static-1.6.59-r0.apk",
+      "sha256": "2ebc64ebe210aa006839f0af0e93ea6f01200ecb57da53eb06e46865fedcc2ac",
+      "directory": "libpng-static-1.6.59-r0",
+      "script": "tools/build/runtime-development.sh",
+      "target": "runtime-development",
+      "feature": "base",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = Libpng.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "runtime-dev-mbedtls3-dev",
+      "kind": "apk",
+      "version": "3.6.7-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/mbedtls3-dev-3.6.7-r0.apk",
+      "sha256": "510a08d0bf913391469ac8dc1a7f0fa8a27c046f38593cad045c663a7c1b5e0d",
+      "directory": "mbedtls3-dev-3.6.7-r0",
+      "script": "tools/build/runtime-development.sh",
+      "target": "runtime-development",
+      "feature": "base",
+      "note": "Alpine v3.24 community x86_64; official APK signature verified before use; license = Apache-2.0 OR GPL-2.0-or-later.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "runtime-dev-mbedtls3-static",
+      "kind": "apk",
+      "version": "3.6.7-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/mbedtls3-static-3.6.7-r0.apk",
+      "sha256": "83a6707af57599f8085b45f845defad73a5de3dfea46d06874b0f65b90234dc4",
+      "directory": "mbedtls3-static-3.6.7-r0",
+      "script": "tools/build/runtime-development.sh",
+      "target": "runtime-development",
+      "feature": "base",
+      "note": "Alpine v3.24 community x86_64; official APK signature verified before use; license = Apache-2.0 OR GPL-2.0-or-later.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "runtime-dev-sqlite-dev",
+      "kind": "apk",
+      "version": "3.53.4-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/sqlite-dev-3.53.4-r0.apk",
+      "sha256": "c30a6155ebd456f37524242c2a60690e516666fa487fba6630280e7ecdf9442f",
+      "directory": "sqlite-dev-3.53.4-r0",
+      "script": "tools/build/runtime-development.sh",
+      "target": "runtime-development",
+      "feature": "base",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = blessing.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "runtime-dev-sqlite-static",
+      "kind": "apk",
+      "version": "3.53.4-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/sqlite-static-3.53.4-r0.apk",
+      "sha256": "83d2dabbda8e65d76d6c8d7486996891a1fde7e8053289d58aeb5f7d917b63ae",
+      "directory": "sqlite-static-3.53.4-r0",
+      "script": "tools/build/runtime-development.sh",
+      "target": "runtime-development",
+      "feature": "base",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = blessing.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "runtime-dev-zlib-dev",
+      "kind": "apk",
+      "version": "1.4-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/zlib-dev-1.4-r0.apk",
+      "sha256": "889ed6014fc9acb815a7755732d4099bd84b1176b4845853bb050361d8b876b2",
+      "directory": "zlib-dev-1.4-r0",
+      "script": "tools/build/runtime-development.sh",
+      "target": "runtime-development",
+      "feature": "base",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = Zlib.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "runtime-dev-zlib-static",
+      "kind": "apk",
+      "version": "1.4-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/zlib-static-1.4-r0.apk",
+      "sha256": "3e02130f63e764b969f14ae62fe1f50b58436f709895c9d9fa2b7496c98a03b5",
+      "directory": "zlib-static-1.4-r0",
+      "script": "tools/build/runtime-development.sh",
+      "target": "runtime-development",
+      "feature": "base",
+      "note": "Alpine v3.24 main x86_64; official APK signature verified before use; license = Zlib.",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "host-test-mbedtls3",
+      "kind": "tarball",
+      "version": "3.6.7",
+      "url": "https://github.com/Mbed-TLS/mbedtls/releases/download/mbedtls-3.6.7/mbedtls-3.6.7.tar.bz2",
+      "sha256": "a7e8bcbec0e6f761b4af24f25677626b35f762f68eef79c08677a363212d11f6",
+      "directory": "mbedtls-3.6.7",
+      "script": "tools/build/host-runtime-development.sh",
+      "target": "host-runtime-development",
+      "license_in_source": "LICENSE",
+      "note": "Host-only native libraries for ASan/UBSan source tests; never used in target runtime, SDK, APKs or release images."
+    },
+    {
+      "id": "host-test-sqlite3",
+      "kind": "tarball",
+      "version": "3.53.4",
+      "url": "https://sqlite.org/2026/sqlite-autoconf-3530400.tar.gz",
+      "sha256": "0e9483900e92cd5de8fd48d16bf9200145a61f7fd5be542a5ac81d8a9516eb9c",
+      "directory": "sqlite-autoconf-3530400",
+      "script": "tools/build/host-runtime-development.sh",
+      "target": "host-runtime-development",
+      "license_in_source": "README.txt",
+      "note": "Host-only native libraries for ASan/UBSan source tests; never used in target runtime, SDK, APKs or release images."
     }
   ]
 }

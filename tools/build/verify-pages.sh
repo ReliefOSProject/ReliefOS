@@ -71,7 +71,7 @@ fi
 if [ -f "$site/rpr/apk/repository.json" ]; then
     awk -F '"' '
         $0 ~ /"packages"/ { inlist=1 }
-        inlist { for (i=1;i<=NF;i++) if ($i ~ /^reliefos-.*\.apk$/) print $i }
+        inlist { for (i=1;i<=NF;i++) if ($i ~ /^[A-Za-z0-9][A-Za-z0-9+_.-]*-[0-9][A-Za-z0-9._+-]*\.apk$/) print $i }
     ' "$site/rpr/apk/repository.json" > "$verify_work/packages"
     while IFS= read -r pkg; do
         [ -n "$pkg" ] || continue

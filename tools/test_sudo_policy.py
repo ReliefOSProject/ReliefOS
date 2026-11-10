@@ -12,6 +12,7 @@ Two suites run under ASan/UBSan:
 from __future__ import annotations
 
 import subprocess
+from runtime_test_dependencies import crypto_flags
 import sys
 import tempfile
 from pathlib import Path
@@ -42,8 +43,7 @@ SUITES = (
                        "userland/apps/authd/authd_sudo.c",
                        "userland/apps/authd/accounts.c",
                        "userland/runtime/src/auth_password.c",
-                       *[f"third_party/mbedtls/library/{name}.c" for name in
-                         ("md", "pkcs5", "sha1", "sha256", "sha512", "platform_util", "aes")]]),
+                       *crypto_flags()]),
 )
 
 
@@ -52,10 +52,6 @@ def main() -> int:
         for name, sources in SUITES:
             executable = str(Path(tmp) / name)
             extra = ["-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections"]
-            extra += (["-Ithird_party/mbedtls/include",
-                      "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                      '-DMBEDTLS_CONFIG_FILE="reliefos_mbedtls_config.h"']
-                     if name == "sudo-security" else [])
             if name == "sudo-client":
                 extra += ["-Wl,--wrap=reliefos_ipc_connect,--wrap=reliefos_ipc_peer_credentials"]
             subprocess.run(["cc", *COMMON_FLAGS, *extra, *sources, "-o", executable],

@@ -27,6 +27,13 @@ def load_policy(policy_path: Path, components_path: Path):
         raise ValueError("unsupported ownership policy or invented APK registration")
     components = tomllib.loads(components_path.read_text())["components"]
     expected = {item["id"] for item in components}
+    upstream = policy.get("upstream_components", {})
+    if not isinstance(upstream, dict) or not set(upstream) <= expected or any(
+            not isinstance(packages, list) or not packages or
+            any(not isinstance(package, str) or
+                not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9+_.-]*", package) for package in packages)
+            for packages in upstream.values()):
+        raise ValueError("invalid upstream component packages")
     owners, rules = {}, {}
 
     def claim(path, group):
@@ -54,8 +61,8 @@ def load_policy(policy_path: Path, components_path: Path):
         for stem in entry.get("library_stems", []):
             for suffix in (".so", ".a", ".la"):
                 claim(stem + suffix, group)
-    if set(owners) != expected:
-        raise ValueError(f"component policy mismatch: {sorted(set(owners) ^ expected)}")
+    if set(owners) & set(upstream) or set(owners) | set(upstream) != expected:
+        raise ValueError(f"component policy mismatch: {sorted((set(owners) | set(upstream)) ^ expected)}")
     for path in (*UTIL_LINUX_COMMANDS, *UTIL_LINUX_LIBRARIES):
         claim(path, "storage-util-linux")
     for path in FORMATTER_COMMANDS:

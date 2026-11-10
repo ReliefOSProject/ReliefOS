@@ -98,7 +98,7 @@ int main(int argc, char **argv)
         fprintf(stderr, "reliefos-musl-cc: RELIEFOS_SDK_ABI must be reliefos or leonos\n");
         return 2;
     }
-    char **args = calloc((size_t)argc + 48, sizeof(*args));
+    char **args = calloc((size_t)argc + 64, sizeof(*args));
     if (!args) { perror("SDK driver"); return 126; }
     size_t n = 0;
     args[n++] = (char *)compiler;
@@ -149,11 +149,17 @@ int main(int argc, char **argv)
         if (static_link) {
             args[n++] = paths[5]; args[n++] = "-Wl,--start-group";
             args[n++] = leonos_abi ? "-lleonos" : "-lreliefos";
+            args[n++] = "-lpng"; args[n++] = "-lz";
+            args[n++] = "-lmbedtls"; args[n++] = "-lmbedx509";
+            args[n++] = "-lmbedcrypto"; args[n++] = "-lcrypt";
             args[n++] = "-lc"; args[n++] = "-Wl,--end-group";
         } else {
             args[n++] = "-l:libmimalloc.so.3";
             args[n++] = leonos_abi ? "-l:libleonos.so.2" : "-l:libreliefos.so.2";
-            args[n++] = "-lc";
+            args[n++] = "-Wl,-rpath-link"; args[n++] = paths[6];
+            args[n++] = "-lpng"; args[n++] = "-lz";
+            args[n++] = "-lmbedtls"; args[n++] = "-lmbedx509";
+            args[n++] = "-lmbedcrypto"; args[n++] = "-lc";
         }
         args[n++] = "-l:libclang_rt.builtins.a";
         if (!shared) args[n++] = paths[4];

@@ -53,6 +53,7 @@ main	compatibility	include/leonos/tar.h	逐文件确认含 canonical reliefos/re
 main	compatibility	include/leonos/text.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/text_input.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/reliefos/layout.h	frozen task 6 guest layout values
+main	compatibility	Documentation/kbuild/third-party.rst	说明 libleonos.so.2 旧 SONAME 的独立依赖与兼容边界
 main	compatibility	scripts/reliefos/Makefile.apk	沿用用户已存在签名私钥路径、旧工具脚本源文件及兼容 APK protected_paths 文件名
 main	compatibility	scripts/reliefos/Makefile.host	LEONOS_* 旧输入变量回退，RELIEFOS_* 优先
 main	compatibility	scripts/reliefos/Makefile.kernel	NTCLKS_DIR/O 输入兼容及 ntclks-fetch 目标别名；旧外部 URL 说明
@@ -122,6 +123,7 @@ main	compatibility	tests/fixtures/brand-abi/old_api.c	compiles a legacy SDK cons
 main	compatibility	tests/integration/brand-abi.sh	compiles and checks both SDK ABIs
 main	compatibility	tests/integration/pam-product.sh	PAM 模块历史符号导出检查
 main	compatibility	tests/integration/test-apk-upgrade.sh	真实旧包数据库、world、签名和配置升级的回归输入
+main	compatibility	tests/integration/test-runtime-apk-upgrade.sh	旧命令包装包及旧前缀、版本和仓库 tag 的清除回归输入；新系统不保留这些包
 main	compatibility	tests/integration/test-kernel-update.sh	真实旧系统引导菜单、旧 ESP /leonos 及旧更新命令入口的升级回滚测试
 main	compatibility	tests/integration/test-motd-qemu.py	仅隔离诊断 ISO 已有 LEONOSMOTD volume ID；未改磁盘协议标签。
 main	compatibility	tests/integration/test-official-tools.sh	断言旧非官方包/目录不得存在于新产品
@@ -146,7 +148,7 @@ main	compatibility	tools/build/rootfs-stage.sh	旧数据库拒绝策略、双 SO
 main	compatibility	tools/build/rpr-apps.sh	APK metadata 显式 replaces:leonos-* 升级旧包
 main	compatibility	tools/build/rpr-pages.sh	旧 RSA key 下载名、health marker 与旧世界包替换说明供已安装客户端
 main	compatibility	tools/build/standalone-root.sh	PROFILE 字节值 leonos-standalone-test-v1 明确冻结，目录已 canonical
-main	compatibility	tools/build/upstream-app.sh	构建仍保留的 leonos_sqlite_vfs.c 源文件路径
+main	compatibility	tools/build/upstream-app.sh	构建脚本保留旧 /usr/lib/leonos 动态库搜索路径
 main	compatibility	tools/build/upstream-busybox.sh	读取保留的 leonos.config 并过滤旧 CONFIG_LEONOS_* 端口选项
 main	compatibility	tools/build/verify-pages.sh	验证已发布旧 RPR 公钥文件名同时存在
 main	compatibility	tools/build_api.py	冻结 leonos-api 格式字段；显式双接受旧应用安装路径
@@ -273,7 +275,7 @@ main	compatibility	userland/runtime/include/leonos/syscall.h	逐文件确认含 
 main	compatibility	userland/runtime/include/leonos/text_input.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/tls.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	userland/runtime/include/leonos/unix_ipc.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-main	compatibility	userland/runtime/include/leonos_mbedtls_config.h	旧 mbedTLS 配置头转发 canonical 并给旧 time 宏别名
+main	compatibility	userland/runtime/include/leonos_mbedtls_config.h	旧 mbedTLS 配置 include 路径转发官方匹配配置；不再使用私有 ALT 结构
 main	compatibility	userland/runtime/include/ncurses.h	canonical guard/库说明已为 RELIEFOS/libreliefos；仅 leonos_curses_window 旧公开类型宏别名。
 main	compatibility	userland/runtime/include/reliefos/unix_ipc.h	frozen task 6 guest socket paths
 main	compatibility	userland/runtime/src/admin.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
@@ -304,7 +306,6 @@ main	compatibility	userland/runtime/src/tar.c	所有当前命中均为已发布�
 main	compatibility	userland/runtime/src/text_encoding.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
 main	compatibility	userland/runtime/src/tls.c	旧 leonos_* 已发布 ELF alias 符号，转发到当前 reliefos_* 实现
 main	compatibility	userland/runtime/src/unix_ipc.c	所有当前命中均为已发布旧 ELF 导出 alias 或说明，别名指向同一 canonical 实现。
-main	compatibility	userland/sqlite/leonos_sqlite_vfs.c	仅文件名与 .zName="leonos" 为已注册 SQLite VFS 标识；私有 C 类型/函数已迁 reliefos。
 main	compatibility	userland/storage/reliefos-apk-update	旧 world/package prefix 显式迁到新包，不能清零升级识别
 main	compatibility	userland/apps/installer/installer_update_model.c	只读识别旧系统 ID、配置命名空间与包名前缀，保留已安装系统的升级入口
 main	compatibility	third_party/doomgeneric/README.leonos.md	保留既有端口说明文件名；当前标题正文已 ReliefOS

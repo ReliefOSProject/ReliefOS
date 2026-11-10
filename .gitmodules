@@ -1,30 +1,15 @@
 [submodule "third_party/litehtml"]
 	path = third_party/litehtml
 	url = https://github.com/litehtml/litehtml.git
-[submodule "third_party/mbedtls"]
-	path = third_party/mbedtls
-	url = https://github.com/Mbed-TLS/mbedtls.git
 [submodule "third_party/busybox"]
 	path = third_party/busybox
 	url = https://github.com/mirror/busybox.git
 [submodule "third_party/pl_editor"]
 	path = third_party/pl_editor
 	url = https://github.com/Leonmmcoset/pl_editor.git
-[submodule "third_party/zlib"]
-	path = third_party/zlib
-	url = https://github.com/madler/zlib.git
-[submodule "third_party/libpng"]
-	path = third_party/libpng
-	url = https://github.com/pnggroup/libpng.git
 [submodule "third_party/stardustui"]
 	path = third_party/stardustui
 	url = https://github.com/xingji-studio/StardustUI.git
-[submodule "third_party/sqlite"]
-	path = third_party/sqlite
-	url = https://github.com/sqlite/sqlite.git
-[submodule "third_party/sl"]
-	path = third_party/sl
-	url = https://github.com/mtoyoda/sl.git
 [submodule "third_party/portablegl"]
 	path = third_party/portablegl
 	url = https://github.com/rswinkle/PortableGL.git
@@ -34,9 +19,6 @@
 [submodule "third_party/mimalloc"]
 	path = third_party/mimalloc
 	url = https://github.com/microsoft/mimalloc.git
-[submodule "third_party/ncurses"]
-	path = third_party/ncurses
-	url = https://github.com/ThomasDickey/ncurses-snapshots.git
 [submodule "kernel/ntclks"]
 	path = kernel/reliefnt
 	url = https://github.com/ReliefOSProject/ReliefNT.git

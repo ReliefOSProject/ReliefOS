@@ -3,6 +3,8 @@
 # The core harness is POSIX shell and C: the acceptance rule for this migration
 # may not depend on the interpreter it is auditing (plan section 2).
 
+export RELIEFOS_TEST_DEP_ROOT := $(abspath $(HOST_RUNTIME_DEVELOPMENT_ROOT))
+
 RELIEFOS_TEST_TMP := $(if $(TMPDIR),$(TMPDIR),/tmp)/reliefos-tests-$(shell id -u)
 
 # C unit tests for the shared host primitives and the JSON reader.
@@ -80,7 +82,7 @@ endef
 leonos-test-tools-plain: reliefos-test-tools-plain
 leonos-test-tools-sanitised: reliefos-test-tools-sanitised
 
-test-build: test-tools $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY) $(HEADER_EXPORT_MANIFEST)
+test-build: $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS) test-tools $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY) $(HEADER_EXPORT_MANIFEST)
 	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_BUILD_TESTS))
 	@$(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_xorg_qemu.py --source-only
 

@@ -7,7 +7,7 @@ RUNTIME_COMPAT_SO := $(RUNTIME_DIR)/libleonos.so.2
 RUNTIME_ARCHIVE := $(O)/musl/lib/libreliefos.a
 RUNTIME_COMPAT_ARCHIVE := $(O)/musl/lib/libleonos.a
 GBK_TABLE := $(O_INCLUDE)/generated/reliefos_gbk_table.h
-PNG_CONFIG := $(O_INCLUDE)/libpng/pnglibconf.h
+PNG_CONFIG := $(RUNTIME_DEVELOPMENT_ROOT)/usr/include/pnglibconf.h
 
 # Make's built-in actions and the C++ extension need these values in each
 # recursive directory build. These are the same tools selected by the outer
@@ -24,9 +24,6 @@ export RELIEFOS_CC_ID RELIEFOS_CXX_ID RELIEFOS_LD_ID RELIEFOS_AR_ID
 RELIEFOS_CAPTURE_RUNTIME_KBUILD := 1
 include $(RELIEFOS_SRC)/userland/runtime/src/Kbuild
 include $(RELIEFOS_SRC)/userland/auth/Kbuild
-include $(RELIEFOS_SRC)/userland/runtime/vendor/libpng/Kbuild
-include $(RELIEFOS_SRC)/userland/runtime/vendor/mbedtls/Kbuild
-include $(RELIEFOS_SRC)/userland/runtime/vendor/zlib/Kbuild
 RELIEFOS_CAPTURE_RUNTIME_KBUILD :=
 
 RUNTIME_FLAGS := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_FLAGS) -std=c11 \
@@ -34,23 +31,16 @@ RUNTIME_FLAGS := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_FLAGS) -std=c11
 	-Wall -Wextra -DRELIEFOS_USE_MUSL -D_GNU_SOURCE -mno-avx -mno-avx2 \
 	-I$(HEADER_EXPORT_INCLUDE) -I$(PAM_ROOT)/usr/include -I$(AUTH_ROOT)/usr/include -I$(MUSL_SYSROOT)/include \
 	-I$(RELIEFOS_SRC)/userland/runtime/include \
-	-I$(O_INCLUDE) -I$(RELIEFOS_SRC)/include -I$(RELIEFOS_SRC)/third_party/mbedtls/include \
-	-I$(RELIEFOS_SRC)/third_party/zlib -I$(RELIEFOS_SRC)/third_party/libpng \
-	-I$(O_INCLUDE)/libpng -DMBEDTLS_CONFIG_FILE='"reliefos_mbedtls_config.h"' \
+	-I$(O_INCLUDE) -I$(RELIEFOS_SRC)/include -isystem $(RUNTIME_DEVELOPMENT_ROOT)/usr/include \
 	-include $(O_INCLUDE)/generated/autoconf.h \
 	-ffile-prefix-map=$(RELIEFOS_SRC)=. -ffile-prefix-map=$(RELIEFOS_OUTPUT)=out
 RUNTIME_CFLAGS ?=
 RUNTIME_AUTH_LIBS := $(PAM_LIB) $(PAM_MISC_LIB) $(AUTH_ROOT)/lib/libcrypt.so.2
-RUNTIME_HEADERS := $(PAM_HEADER) $(AUTH_ROOT)/usr/include/crypt.h
+RUNTIME_HEADERS := $(PAM_HEADER) $(AUTH_ROOT)/usr/include/crypt.h $(RUNTIME_DEVELOPMENT_PRODUCTS)
 RUNTIME_BUILTINS := $(if $(RELIEFOS_PASSIVE),,$(shell $(TARGET_CC) --target=$(TRIPLE_USER) --rtlib=compiler-rt -print-libgcc-file-name 2>/dev/null))
 
-# Link member order matches the previous sorted source list: third-party
-# runtime inputs first, then auth and the main runtime (whose syscall.S stays
-# last in that directory list). Each source still gets its own Kbuild context.
+# Only first-party code is embedded; official library ABIs remain separate.
 RUNTIME_OBJECTS := \
-	$(addprefix $(O)/userland/runtime/vendor/libpng/,$(RELIEFOS_LIBPNG_OBJECTS)) \
-	$(addprefix $(O)/userland/runtime/vendor/mbedtls/,$(RELIEFOS_MBEDTLS_OBJECTS)) \
-	$(addprefix $(O)/userland/runtime/vendor/zlib/,$(RELIEFOS_ZLIB_OBJECTS)) \
 	$(addprefix $(O)/userland/auth/,$(RELIEFOS_AUTH_OBJECTS)) \
 	$(addprefix $(O)/userland/runtime/src/,$(RELIEFOS_RUNTIME_SRC_OBJECTS))
 
@@ -60,12 +50,9 @@ export GBK_TABLE PNG_CONFIG MUSL_STAMP RUNTIME_BUILTINS
 # Directory recursion must be enabled at the root for product targets to use
 # each child built-in.a as the freshness edge for their direct object links.
 need-builtin := 1
-obj-y += userland/runtime/src/ userland/auth/ \
-	userland/runtime/vendor/libpng/ userland/runtime/vendor/mbedtls/ \
-	userland/runtime/vendor/zlib/ userland/musl-dev/
+obj-y += userland/runtime/src/ userland/auth/ userland/musl-dev/
 
-userland/runtime/src userland/auth userland/runtime/vendor/libpng \
-userland/runtime/vendor/mbedtls userland/runtime/vendor/zlib: \
+userland/runtime/src userland/auth: \
 	$(AUTOCONF_H) $(GBK_TABLE) $(PNG_CONFIG) $(MUSL_STAMP) $(RUNTIME_HEADERS) \
 	$(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID) $(RELIEFOS_AR_ID)
 
@@ -73,19 +60,15 @@ $(GBK_TABLE): $(RELIEFOS_GBK_TOOL) $(RELIEFOS_SRC)/third_party/litehtml/src/enco
 	$(Q)mkdir -p $(dir $@)
 	$(Q)$(RELIEFOS_GBK_TOOL) $(RELIEFOS_SRC)/third_party/litehtml/src/encodings.cpp $@
 
-$(PNG_CONFIG): $(RELIEFOS_SRC)/third_party/libpng/scripts/pnglibconf.h.prebuilt $(RELIEFOS_SRC)/tools/build/png-config.sh $(RELIEFOS_EMIT)
-	$(Q)mkdir -p $(dir $@)
-	$(Q)sh $(RELIEFOS_SRC)/tools/build/png-config.sh $< $@ $(RELIEFOS_EMIT)
-
 quiet_cmd_reliefos_runtime_shared = LD      $@
-      cmd_reliefos_runtime_shared = test -f '$(RUNTIME_BUILTINS)' || { echo 'missing compiler-rt builtins; select a complete Clang toolchain' >&2; exit 1; }; $(TARGET_LD) -shared --no-undefined --hash-style=both -soname $(notdir $@) -o $@.tmp $(RUNTIME_OBJECTS) -L$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 $(RUNTIME_AUTH_LIBS) -lc $(RUNTIME_BUILTINS); mv $@.tmp $@
-$(RUNTIME_SO) $(RUNTIME_COMPAT_SO): $(O)/userland/runtime/src/built-in.a $(O)/userland/auth/built-in.a $(O)/userland/runtime/vendor/libpng/built-in.a $(O)/userland/runtime/vendor/mbedtls/built-in.a $(O)/userland/runtime/vendor/zlib/built-in.a $(RUNTIME_AUTH_LIBS) $(MUSL_SYSROOT)/lib/libc.so $(MUSL_SYSROOT)/lib/libmimalloc.so.3 $(RUNTIME_BUILTINS) $(RELIEFOS_LD_ID) FORCE
+      cmd_reliefos_runtime_shared = test -f '$(RUNTIME_BUILTINS)' || { echo 'missing compiler-rt builtins; select a complete Clang toolchain' >&2; exit 1; }; $(TARGET_LD) -shared --no-undefined --hash-style=both -soname $(notdir $@) -o $@.tmp $(RUNTIME_OBJECTS) -L$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 $(RUNTIME_AUTH_LIBS) $(RUNTIME_DEP_SHARED) -lc $(RUNTIME_BUILTINS); mv $@.tmp $@
+$(RUNTIME_SO) $(RUNTIME_COMPAT_SO): $(O)/userland/runtime/src/built-in.a $(O)/userland/auth/built-in.a $(RUNTIME_AUTH_LIBS) $(RUNTIME_DEP_SHARED) $(MUSL_SYSROOT)/lib/libc.so $(MUSL_SYSROOT)/lib/libmimalloc.so.3 $(RUNTIME_BUILTINS) $(RELIEFOS_LD_ID) FORCE
 	$(call if_changed,reliefos_runtime_shared)
 targets += $(RUNTIME_SO) $(RUNTIME_COMPAT_SO)
 
 quiet_cmd_reliefos_runtime_archive = AR      $@
       cmd_reliefos_runtime_archive = rm -f $@.tmp; $(TARGET_AR) rcsD $@.tmp $(RUNTIME_OBJECTS); mv $@.tmp $@
-$(RUNTIME_ARCHIVE) $(RUNTIME_COMPAT_ARCHIVE): $(O)/userland/runtime/src/built-in.a $(O)/userland/auth/built-in.a $(O)/userland/runtime/vendor/libpng/built-in.a $(O)/userland/runtime/vendor/mbedtls/built-in.a $(O)/userland/runtime/vendor/zlib/built-in.a $(RELIEFOS_AR_ID) FORCE
+$(RUNTIME_ARCHIVE) $(RUNTIME_COMPAT_ARCHIVE): $(O)/userland/runtime/src/built-in.a $(O)/userland/auth/built-in.a $(RELIEFOS_AR_ID) FORCE
 	$(call if_changed,reliefos_runtime_archive)
 targets += $(RUNTIME_ARCHIVE) $(RUNTIME_COMPAT_ARCHIVE)
 

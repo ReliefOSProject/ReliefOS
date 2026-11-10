@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Verify swap capability from complete checksum-bound target bundles."""
+from runtime_test_dependencies import crypto_flags
 import argparse
 import hashlib
 import os
@@ -46,21 +47,20 @@ def main():
     args=parser.parse_args()
     if args.output:args.output.mkdir(parents=True,exist_ok=False)
     else:args.output=Path(tempfile.mkdtemp(prefix="installer-bundle-swap-",dir=os.environ.get("TMPDIR")))
-    args.output=args.output.resolve();(args.output/"qa_mbedtls.h").write_text("#define MBEDTLS_SHA256_C\n")
+    args.output=args.output.resolve()
     cc=shutil.which("clang")
     if not cc:raise RuntimeError("clang is required")
     binary=str(args.output/"bundle")
     sources=["tools/tests/installer_bundle_swap_test.c","userland/runtime/src/kernel_bundle_check.c",
              "userland/runtime/src/kernel_bundle_io.c","userland/runtime/src/bootloader_publish.c",
-             "userland/runtime/shared/boot_slots.c","third_party/mbedtls/library/sha256.c",
-             "third_party/mbedtls/library/platform_util.c"]
+             "userland/runtime/shared/boot_slots.c"]
     if (ROOT/"userland/apps/installer/installer_swap_bundle.c").exists():
         sources.append("userland/apps/installer/installer_swap_bundle.c")
     command=[cc,"-std=c11","-D_GNU_SOURCE","-O1","-g","-Wall","-Wextra","-Werror",
              "-fsanitize=address,undefined","-fno-sanitize-recover=all","-fno-pie","-no-pie",
-             "-ffunction-sections","-fdata-sections","-Wl,--gc-sections",'-DMBEDTLS_CONFIG_FILE="qa_mbedtls.h"',
-             "-I",str(args.output),"-Iuserland/runtime/include","-Ithird_party/mbedtls/include",
-             *sources,"-o",binary]
+             "-ffunction-sections","-fdata-sections","-Wl,--gc-sections",
+             "-I",str(args.output),"-Iuserland/runtime/include",
+             *sources,*crypto_flags(),"-o",binary]
     result=run(command)
     if result:return result
     failures=0

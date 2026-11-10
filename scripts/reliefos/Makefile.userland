@@ -41,8 +41,8 @@ $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_DEPS_$(app) += $(X11_DEVELOP
 
 USERLAND_LIBS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
 USERLAND_DEPS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
-USERLAND_EXTRA_reliefmail := -I$(UPSTREAM_APP_DIR)
-USERLAND_DEPS_reliefmail += $(SQLITE_HEADER) $(SQLITE_AMALGAMATION)
+USERLAND_LIBS_reliefmail += $(RUNTIME_DEP_LIBDIR)/libsqlite3.so
+USERLAND_DEPS_reliefmail += $(RUNTIME_DEVELOPMENT_PRODUCTS)
 USERLAND_DEPS_osver += $(BUILD_INFO_HEADER)
 USERLAND_EXTRA_doom := -DRELIEFOS_DOOM -DLEONOS_DOOM -DFEATURE_SOUND -I$(RELIEFOS_SRC)/third_party/doomgeneric/doomgeneric -I$(AUDIO_OPL_ROOT)/usr/include
 USERLAND_LIBS_doom += $(AUDIO_OPL_ROOT)/usr/lib/libopl3.so.1 $(RUNTIME_BUILTINS)
@@ -84,8 +84,8 @@ USERLAND_CRT_$(1) := $(USERLAND_CRT)
 RELIEFOS_APP_BUILTIN_$(1) := $(O)/userland/apps/$(1)/built-in.a
 userland/apps/$(1): $(AUTOCONF_H) $(MUSL_STAMP) $(PNG_CONFIG) $(HEADER_EXPORT_MANIFEST) $$(USERLAND_DEPS_$(1)) $$(if $$(USERLAND_C_OBJECTS_$(1)),$$(RELIEFOS_CC_ID)) $$(if $$(USERLAND_CXX_OBJECTS_$(1)),$$(RELIEFOS_CXX_ID)) $$(RELIEFOS_AR_ID)
 quiet_cmd_reliefos_app_link_$(1) = LD      $$@
-      cmd_reliefos_app_link_$(1) = $$(TARGET_LD) $$(USERLAND_LINK_FLAGS) $$(USERLAND_LDFLAGS) -o $$@.tmp $$(MUSL_SYSROOT)/lib/Scrt1.o $$(MUSL_SYSROOT)/lib/crti.o $$(USERLAND_OBJECTS_$(1)) -L$$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 --start-group $(5) $$(USERLAND_LIBS_$(1)) -lc --end-group $$(MUSL_SYSROOT)/lib/crtn.o; mv $$@.tmp $$@
-$(3): $$(RELIEFOS_APP_BUILTIN_$(1)) $(5) $$(USERLAND_LIBS_$(1)) $$(USERLAND_DEPS_$(1)) $$(USERLAND_CRT) $$(MUSL_SYSROOT)/lib/libc.so $$(MUSL_SYSROOT)/lib/libmimalloc.so.3 $$(RELIEFOS_LD_ID) FORCE
+      cmd_reliefos_app_link_$(1) = $$(TARGET_LD) $$(USERLAND_LINK_FLAGS) $$(USERLAND_LDFLAGS) -o $$@.tmp $$(MUSL_SYSROOT)/lib/Scrt1.o $$(MUSL_SYSROOT)/lib/crti.o $$(USERLAND_OBJECTS_$(1)) -L$$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 --start-group $(5) $$(USERLAND_LIBS_$(1)) $$(RUNTIME_DEP_SHARED) -lc --end-group $$(MUSL_SYSROOT)/lib/crtn.o; mv $$@.tmp $$@
+$(3): $$(RELIEFOS_APP_BUILTIN_$(1)) $$(RUNTIME_DEP_SHARED) $(5) $$(USERLAND_LIBS_$(1)) $$(USERLAND_DEPS_$(1)) $$(USERLAND_CRT) $$(MUSL_SYSROOT)/lib/libc.so $$(MUSL_SYSROOT)/lib/libmimalloc.so.3 $$(RELIEFOS_LD_ID) FORCE
 	$$(call if_changed,reliefos_app_link_$(1))
 targets += $(3)
 .PHONY: app-$(1)
@@ -108,8 +108,8 @@ $(eval $(call RELIEFOS_APP,gptinit,gptinit,$(O)/userland-installer/gptinit.elf,$
 define RELIEFOS_STATIC_RUNTIME_APP
 userland/apps/$(1): $(AUTOCONF_H) $(MUSL_STAMP) $(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID) $(RELIEFOS_AR_ID)
 quiet_cmd_reliefos_static_app_$(1) = LD      $$@
-      cmd_reliefos_static_app_$(1) = $$(TARGET_LD) $$(RELIEFOS_LINK_POLICY_FLAGS) -static --gc-sections -z max-page-size=0x1000 -o $$@.tmp $$(MUSL_SYSROOT)/lib/crt1.o $$(MUSL_SYSROOT)/lib/crti.o $$(USERLAND_OBJECTS_$(1)) --start-group $$(RUNTIME_ARCHIVE) $$(MUSL_SYSROOT)/lib/libc.a $$(RUNTIME_BUILTINS) --end-group $$(MUSL_SYSROOT)/lib/crtn.o && mv $$@.tmp $$@
-$(2): $(O)/userland/apps/$(1)/built-in.a $(RUNTIME_ARCHIVE) $(MUSL_SYSROOT)/lib/crt1.o $(MUSL_SYSROOT)/lib/crti.o $(MUSL_SYSROOT)/lib/crtn.o $(MUSL_SYSROOT)/lib/libc.a $(RELIEFOS_LD_ID) FORCE
+      cmd_reliefos_static_app_$(1) = $$(TARGET_LD) $$(RELIEFOS_LINK_POLICY_FLAGS) -static --gc-sections -z max-page-size=0x1000 -o $$@.tmp $$(MUSL_SYSROOT)/lib/crt1.o $$(MUSL_SYSROOT)/lib/crti.o $$(USERLAND_OBJECTS_$(1)) --start-group $$(RUNTIME_ARCHIVE) $$(RUNTIME_DEP_STATIC) $$(MUSL_SYSROOT)/lib/libc.a $$(RUNTIME_BUILTINS) --end-group $$(MUSL_SYSROOT)/lib/crtn.o && mv $$@.tmp $$@
+$(2): $(O)/userland/apps/$(1)/built-in.a $(RUNTIME_ARCHIVE) $(RUNTIME_DEP_STATIC) $(MUSL_SYSROOT)/lib/crt1.o $(MUSL_SYSROOT)/lib/crti.o $(MUSL_SYSROOT)/lib/crtn.o $(MUSL_SYSROOT)/lib/libc.a $(RELIEFOS_LD_ID) FORCE
 	$$(call if_changed,reliefos_static_app_$(1))
 targets += $(2)
 .PHONY: app-$(1)

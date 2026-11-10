@@ -1,6 +1,7 @@
 #!/bin/sh
 set -eu
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+. "$src/tests/lib/runtime-dependencies.sh"
 tmp="$src/out/tmp"
 export TMPDIR="$tmp"
 mkdir -p "$tmp"
@@ -30,7 +31,7 @@ run_protocol() {
     set -- -std=c++17 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -Werror \
         -fno-exceptions -fno-rtti -nostdinc++ -fsanitize=address,undefined \
         -fno-sanitize-recover=all -g -I"$src/userland/apps/reliefmail" \
-        -I/usr/include/mbedtls3 \
+        -I"$runtime_deps/usr/include" \
         "$src/tests/host/test_reliefmail_protocol.cpp" \
         "$src/userland/apps/reliefmail/model.cpp" \
         "$src/userland/apps/reliefmail/mime.cpp" \
@@ -43,8 +44,7 @@ run_protocol() {
             "$src/userland/apps/reliefmail/imap.cpp" \
             "$src/userland/apps/reliefmail/smtp.cpp"
     fi
-    "${HOSTCXX:-c++}" "$@" -L/usr/lib/mbedtls3 \
-        -Wl,-rpath,/usr/lib/mbedtls3 -lmbedtls -lmbedx509 -lmbedcrypto \
+    "${HOSTCXX:-c++}" "$@" "$runtime_deps/usr/lib/libmbedtls.a" "$runtime_deps/usr/lib/libmbedx509.a" "$runtime_deps/usr/lib/libmbedcrypto.a" -pthread \
         -o "$work/reliefmail-protocol"
 
     build_worker
@@ -77,44 +77,33 @@ run_protocol() {
     "${PYTHON:-python3}" "$fixture" --verify-audit "$audit_file"
 }
 
-build_sqlite_core() {
-    if [ -f "$work/sqlite_core.o" ]; then return; fi
-    generated="$src/out/xorg-vmware-debug/upstream/app-sqlite/generated"
-    ${HOSTCC:-cc} -std=c11 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -Werror \
-        -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION=1 -DSQLITE_OMIT_WAL=1 \
-        -DSQLITE_MAX_MMAP_SIZE=0 -DSQLITE_DEFAULT_MEMSTATUS=0 -I"$generated" -c \
-        "$src/userland/apps/reliefmail/sqlite_core.c" -o "$work/sqlite_core.o"
-}
-
 build_store() {
-    build_sqlite_core
     "${HOSTCXX:-c++}" -std=c++17 -D_POSIX_C_SOURCE=200809L -DRELIEFMAIL_TESTING \
         -Wall -Wextra -Werror -fno-exceptions -fno-rtti -nostdinc++ \
         -fsanitize=address,undefined -fno-sanitize-recover=all -g \
-        -I"$src/userland/apps/reliefmail" -I"$src/out/xorg-vmware-debug/upstream/app-sqlite/generated" \
-        -I/usr/include/mbedtls3 "$src/tests/host/test_reliefmail_store.cpp" \
+        -I"$src/userland/apps/reliefmail" \
+        -I"$runtime_deps/usr/include" "$src/tests/host/test_reliefmail_store.cpp" \
         "$src/userland/apps/reliefmail/store.cpp" "$src/userland/apps/reliefmail/model.cpp" \
         "$src/userland/apps/reliefmail/mime.cpp" "$src/userland/apps/reliefmail/html.cpp" \
         "$src/userland/apps/reliefmail/profile_io.cpp" "$src/userland/apps/reliefmail/vault.cpp" \
-        "$work/sqlite_core.o" -L/usr/lib/mbedtls3 -Wl,-rpath,/usr/lib/mbedtls3 -lmbedcrypto \
+        "$runtime_deps/usr/lib/libsqlite3.a" "$runtime_deps/usr/lib/libmbedcrypto.a" -pthread \
         -o "$work/reliefmail-store"
 }
 
 build_worker() {
-    build_sqlite_core
     "${HOSTCXX:-c++}" -std=c++17 -D_POSIX_C_SOURCE=200809L -DRELIEFMAIL_TESTING \
         -Wall -Wextra -Werror -fno-exceptions -fno-rtti -nostdinc++ \
         -fsanitize=address,undefined -fno-sanitize-recover=all -g \
-        -I"$src/userland/apps/reliefmail" -I"$src/out/xorg-vmware-debug/upstream/app-sqlite/generated" \
-        -I/usr/include/mbedtls3 "$src/tests/host/test_reliefmail_worker.cpp" \
+        -I"$src/userland/apps/reliefmail" \
+        -I"$runtime_deps/usr/include" "$src/tests/host/test_reliefmail_worker.cpp" \
         "$src/userland/apps/reliefmail/worker.cpp" "$src/userland/apps/reliefmail/tasks.cpp" \
         "$src/userland/apps/reliefmail/store.cpp" "$src/userland/apps/reliefmail/model.cpp" \
         "$src/userland/apps/reliefmail/mime.cpp" "$src/userland/apps/reliefmail/html.cpp" \
         "$src/userland/apps/reliefmail/reader_render.cpp" \
         "$src/userland/apps/reliefmail/imap.cpp" "$src/userland/apps/reliefmail/smtp.cpp" \
         "$src/userland/apps/reliefmail/transport.cpp" "$src/userland/apps/reliefmail/profile_io.cpp" \
-        "$src/userland/apps/reliefmail/vault.cpp" "$work/sqlite_core.o" \
-        -L/usr/lib/mbedtls3 -Wl,-rpath,/usr/lib/mbedtls3 -lmbedtls -lmbedx509 -lmbedcrypto -lpng16 -lz \
+        "$src/userland/apps/reliefmail/vault.cpp" "$runtime_deps/usr/lib/libsqlite3.a" \
+        "$runtime_deps/usr/lib/libmbedtls.a" "$runtime_deps/usr/lib/libmbedx509.a" "$runtime_deps/usr/lib/libmbedcrypto.a" -pthread -lpng16 -lz \
         -o "$work/reliefmail-worker"
 }
 
@@ -158,14 +147,14 @@ if [ "${1:-all}" = task6-adapters ]; then
     "${HOSTCXX:-c++}" -std=c++17 -D_POSIX_C_SOURCE=200809L -Wall -Wextra -Werror \
         -fno-exceptions -fno-rtti -nostdinc++ -fsanitize=address,undefined \
         -fno-sanitize-recover=all -g -I"$src/userland/apps/reliefmail" \
-        -I/usr/include/mbedtls3 \
+        -I"$runtime_deps/usr/include" \
         "$src/tests/host/test_reliefmail_task6_adapters.cpp" \
         "$src/userland/apps/reliefmail/ui_adapters.cpp" \
         "$src/userland/apps/reliefmail/model.cpp" \
         "$src/userland/apps/reliefmail/vault.cpp" \
         "$src/userland/apps/reliefmail/profile_io.cpp" \
         "$src/userland/apps/reliefmail/html.cpp" \
-        -L/usr/lib/mbedtls3 -Wl,-rpath,/usr/lib/mbedtls3 -lmbedcrypto \
+        "$runtime_deps/usr/lib/libmbedcrypto.a" -pthread \
         -o "$work/reliefmail-task6-adapters"
     ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 "$work/reliefmail-task6-adapters"
     printf 'ReliefMail Task6 adapter suite passed\n'
@@ -231,11 +220,11 @@ if [ "${1:-all}" = vault-task5 ]; then
     "${HOSTCXX:-c++}" -std=c++17 -D_POSIX_C_SOURCE=200809L -DRELIEFMAIL_TESTING \
         -Wall -Wextra -Werror -fno-exceptions -fno-rtti -nostdinc++ \
         -fsanitize=address,undefined -fno-sanitize-recover=all -g \
-        -I"$src/userland/apps/reliefmail" -I/usr/include/mbedtls3 \
+        -I"$src/userland/apps/reliefmail" -I"$runtime_deps/usr/include" \
         "$src/tests/host/test_reliefmail_vault.cpp" \
         "$src/userland/apps/reliefmail/vault.cpp" \
         "$src/userland/apps/reliefmail/profile_io.cpp" \
-        -L/usr/lib/mbedtls3 -Wl,-rpath,/usr/lib/mbedtls3 -lmbedcrypto \
+        "$runtime_deps/usr/lib/libmbedcrypto.a" -pthread \
         -o "$work/reliefmail-vault"
     ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 \
         "$work/reliefmail-vault" --task5-password-change
@@ -281,11 +270,11 @@ printf 'ReliefMail store suite passed\n'
 ${HOSTCXX:-c++} -std=c++17 -D_POSIX_C_SOURCE=200809L -DRELIEFMAIL_TESTING \
     -Wall -Wextra -Werror -fno-exceptions -fno-rtti -nostdinc++ \
     -fsanitize=address,undefined -fno-sanitize-recover=all -g \
-    -I"$src/userland/apps/reliefmail" -I/usr/include/mbedtls3 \
+    -I"$src/userland/apps/reliefmail" -I"$runtime_deps/usr/include" \
     "$src/tests/host/test_reliefmail_vault.cpp" \
     "$src/userland/apps/reliefmail/vault.cpp" \
     "$src/userland/apps/reliefmail/profile_io.cpp" \
-    -L/usr/lib/mbedtls3 -Wl,-rpath,/usr/lib/mbedtls3 -lmbedcrypto \
+    "$runtime_deps/usr/lib/libmbedcrypto.a" -pthread \
     -o "$work/reliefmail-vault"
 ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 "$work/reliefmail-vault"
 printf 'ReliefMail vault suite passed\n'

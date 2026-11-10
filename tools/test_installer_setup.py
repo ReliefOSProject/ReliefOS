@@ -8,8 +8,8 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-CRYPTO = [f"third_party/mbedtls/library/{name}.c" for name in
-          ("md", "pkcs5", "sha1", "sha256", "sha512", "platform_util", "aes")]
+from runtime_test_dependencies import crypto_flags
+CRYPTO = crypto_flags()
 
 
 class InstallerSetupTests(unittest.TestCase):
@@ -145,8 +145,7 @@ class InstallerSetupTests(unittest.TestCase):
                 "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
                 "-fsanitize=address,undefined", "-fno-omit-frame-pointer",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                '-DMBEDTLS_CONFIG_FILE="reliefos_mbedtls_config.h"',
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-Ithird_party/mbedtls/include",
+                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
                 "-idirafter", "userland/runtime/include", "tools/tests/installer_accounts_test.c",
                 "-Itools/tests/legacy_authd/include",
                 "tools/tests/legacy_authd/accounts.c", "userland/runtime/src/auth_password.c",

@@ -187,13 +187,7 @@ static int load_rules(struct state *state, const char *policy_path, json_value *
             {"reliefos-fastfetch", "etc/fastfetch"}, {"reliefos-fastfetch", "usr/share/fastfetch/leonos-ascii.txt"},
             {"reliefos-fastfetch", "etc/skel/.config/hyfetch.json"},
             {"reliefos-apps", "usr/share/licenses/pleditor"},
-            {"busybox", "bin/busybox"}, {"busybox", "bin/sh"}, {"busybox", "usr/share/licenses/busybox"},
-            {"ncurses", "usr/share/terminfo"}, {"ncurses", "etc/terminfo"},
-            {"ncurses", "usr/share/licenses/ncurses"}, {"sl", "usr/bin/sl"}, {"sl", "usr/share/licenses/sl"}
-        };
-        static const char *const ncurses_commands[] = {
-            "clear", "infocmp", "infotocap", "captoinfo", "reset", "tabs", "tic",
-            "toe", "tput", "tset", "ncursesw6-config"
+            {"busybox", "bin/busybox"}, {"busybox", "bin/sh"}, {"busybox", "usr/share/licenses/busybox"}
         };
         static const char *const util_commands[] = {
             "usr/sbin/fdisk", "usr/sbin/sfdisk", "usr/sbin/runuser", "usr/sbin/fsck",
@@ -210,12 +204,6 @@ static int load_rules(struct state *state, const char *policy_path, json_value *
         size_t item;
         for (item = 0; item < sizeof(tool_paths) / sizeof(tool_paths[0]); item++)
             if (add_rule(state, tool_paths[item].path, tool_paths[item].group) != 0) return -1;
-        for (item = 0; item < sizeof(ncurses_commands) / sizeof(ncurses_commands[0]); item++) {
-            char *path = join2("usr/bin", ncurses_commands[item]);
-            int result = path == NULL ? -1 : add_rule(state, path, "ncurses");
-            free(path);
-            if (result != 0) return -1;
-        }
         for (item = 0; item < sizeof(util_commands) / sizeof(util_commands[0]); item++)
             if (add_rule(state, util_commands[item], "storage-util-linux") != 0) return -1;
         for (item = 0; item < sizeof(util_libraries) / sizeof(util_libraries[0]); item++)

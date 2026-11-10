@@ -6,6 +6,7 @@ RELIEFOS_SRC=$(CDPATH= cd -- "$SCRIPT_DIR/../.." && pwd)
 THIRD_PARTY=$RELIEFOS_SRC/scripts/reliefos/Makefile.third-party
 PAM_MAKEFILE=$RELIEFOS_SRC/scripts/reliefos/Makefile.pam
 UPSTREAM_MAKEFILE=$RELIEFOS_SRC/scripts/reliefos/Makefile.upstream
+APK_DEPS_MAKEFILE=$RELIEFOS_SRC/scripts/reliefos/Makefile.apk-dependencies
 UPSTREAM_MAKE_ENV=$RELIEFOS_SRC/tools/build/upstream-make-environment.sh
 TMP_PARENT=${TMPDIR:-/tmp}
 mkdir -p "$TMP_PARENT"
@@ -40,7 +41,7 @@ check_normal_edge "$THIRD_PARTY" '$(MUSL_STAMP)' musl-sysroot
 check_normal_edge "$THIRD_PARTY" '$(AUTH_STAMP)' auth-upstream
 check_normal_edge "$PAM_MAKEFILE" '$(PAM_STAMP)' pam-stage
 check_normal_edge "$UPSTREAM_MAKEFILE" 'upstream_$(1)_script' upstream-package
-check_normal_edge "$UPSTREAM_MAKEFILE" '$(UPSTREAM_TERMINAL_SCRIPT)' upstream-terminal
+check_normal_edge "$APK_DEPS_MAKEFILE" '$(RELIEFOS_SRC)/tools/build/host-runtime-development.sh' host-runtime-development
 check_normal_edge "$UPSTREAM_MAKEFILE" 'upstream_app_$(1)_inputs' upstream-app
 check_normal_edge "$UPSTREAM_MAKEFILE" '$(BUSYBOX_ELF)' upstream-busybox
 

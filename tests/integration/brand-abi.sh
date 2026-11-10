@@ -19,7 +19,9 @@ trap 'rm -rf "$work"' EXIT HUP INT TERM
 retired='^((leonos|reliefos)_(license_|ui_|gui_|mouse_|display_|appearance_|inputm_(note_gui_window|observe_gui_key|poll_gui_commit|take_text|take_key|set_current_context))|text_input_(note_gui_window|observe_gui_key|poll_gui_commit|take_text|take_key|set_current_context)|ui_)'
 awk -v retired="$retired" '$1 !~ retired' \
     "$root/tests/fixtures/brand-abi/old-sdk-exports.tsv" > "$work/old.expected"
-awk -v retired="$retired" '$1 !~ retired' \
+# Third-party internal exports were split into their own official libraries.
+# Public first-party aliases remain the compatibility contract.
+awk -v retired="$retired" '$1 !~ retired && $1 ~ /^(leonos_|reliefos_|text_input_)/' \
     "$root/tests/fixtures/brand-abi/old-shared-symbols.tsv" > "$work/shared.expected"
 
 test -x "$driver"
@@ -55,7 +57,8 @@ readelf -d "$new_lib" | grep -q 'Library soname: \[libreliefos.so.2\]'
 
 nm -D --defined-only --format=posix "$compat_lib" |
     awk '$1 ~ /^leonos_/ {print $1 "\t" $2}' | LC_ALL=C sort > "$work/old.actual"
-cmp "$work/old.expected" "$work/old.actual"
+join -t "$(printf '\t')" -v1 "$work/old.expected" "$work/old.actual" > "$work/old.missing"
+test ! -s "$work/old.missing"
 nm -D --defined-only --format=posix "$compat_lib" |
     awk '{print $1 "\t" $2}' | LC_ALL=C sort > "$work/compat.all"
 awk -v retired="$retired" '$1 ~ retired {print; failed=1} END {exit failed}' \

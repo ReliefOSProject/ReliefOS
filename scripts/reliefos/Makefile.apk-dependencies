@@ -1,0 +1,44 @@
+# Binary runtime dependencies are staged before compiling their consumers.
+UPSTREAM_ROOT := $(O)/upstream
+UPSTREAM_APK_ROOT := $(UPSTREAM_ROOT)/apk
+UPSTREAM_APK := $(UPSTREAM_APK_ROOT)/apk.static
+$(UPSTREAM_APK) $(UPSTREAM_APK_ROOT)/.complete &: $(RELIEFOS_SRC)/tools/build/upstream-apk.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(wildcard $(RELIEFOS_SRC)/system/rootfs/etc/apk/keys/*)
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/upstream-apk.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK_ROOT))
+.PHONY: upstream-apk
+upstream-apk: $(UPSTREAM_APK) $(UPSTREAM_APK_ROOT)/.complete
+
+
+RUNTIME_DEVELOPMENT_ROOT := $(UPSTREAM_ROOT)/runtime-development
+RUNTIME_DEP_LIBDIR := $(RUNTIME_DEVELOPMENT_ROOT)/usr/lib
+RUNTIME_DEP_SHARED := $(addprefix $(RUNTIME_DEP_LIBDIR)/,libpng.so libz.so libmbedtls.so libmbedx509.so libmbedcrypto.so)
+RUNTIME_DEP_STATIC := $(addprefix $(RUNTIME_DEP_LIBDIR)/,libpng.a libz.a libmbedtls.a libmbedx509.a libmbedcrypto.a)
+RUNTIME_DEVELOPMENT_PRODUCTS := $(addprefix $(RUNTIME_DEVELOPMENT_ROOT)/usr/include/,zlib.h zconf.h png.h pngconf.h pnglibconf.h sqlite3.h mbedtls/ssl.h mbedtls/mbedtls_config.h) $(RUNTIME_DEP_SHARED) $(RUNTIME_DEP_STATIC) $(RUNTIME_DEP_LIBDIR)/libsqlite3.so $(RUNTIME_DEP_LIBDIR)/libsqlite3.a
+$(RUNTIME_DEVELOPMENT_ROOT)/.complete $(RUNTIME_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/runtime-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK) $(addprefix $(RELIEFOS_SRC)/resources/licenses/,zlib-LICENSE libpng-LICENSE sqlite-LICENSE mbedtls3-LICENSE)
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/runtime-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(RUNTIME_DEVELOPMENT_ROOT))
+	$(Q)touch $(RUNTIME_DEVELOPMENT_PRODUCTS)
+$(O_META)/runtime-development-present.parameters: FORCE $(RELIEFOS_SRC)/tools/build/upstream-verify.sh
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/upstream-verify.sh $(RUNTIME_DEVELOPMENT_ROOT) $(RUNTIME_DEVELOPMENT_ROOT).files $@
+$(RUNTIME_DEVELOPMENT_ROOT)/.complete $(RUNTIME_DEVELOPMENT_PRODUCTS): $(O_META)/runtime-development-present.parameters
+.PHONY: runtime-development
+runtime-development: $(RUNTIME_DEVELOPMENT_ROOT)/.complete $(RUNTIME_DEVELOPMENT_PRODUCTS)
+reliefos-upstream: upstream-apk
+export RUNTIME_DEVELOPMENT_ROOT RUNTIME_DEP_SHARED RUNTIME_DEP_STATIC
+
+# Retain public build goal names while their payload comes from verified APKs.
+.PHONY: upstream-ncurses upstream-app-sl upstream-app-sqlite
+upstream-ncurses upstream-app-sl: upstream-apk
+upstream-app-sqlite: upstream-apk runtime-development
+
+# Source-based sanitizer tests need host-libc libraries. Musl APK archives must
+# never be linked into glibc tests (SQLite's libc internals differ).
+HOST_RUNTIME_DEVELOPMENT_ROOT := $(O_HOST)/runtime-development
+HOST_RUNTIME_DEVELOPMENT_PRODUCTS := $(addprefix $(HOST_RUNTIME_DEVELOPMENT_ROOT)/usr/lib/,libmbedtls.a libmbedx509.a libmbedcrypto.a libsqlite3.a)
+RELIEFOS_PARAMETERS_host-runtime-development := cc=$(HOSTCC)
+$(if $(RELIEFOS_PASSIVE),,$(eval $(call KBUILD_PARAMETERS,host-runtime-development)))
+$(HOST_RUNTIME_DEVELOPMENT_ROOT)/.complete $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS) &: $(O_META)/host-runtime-development.parameters $(RELIEFOS_SRC)/tools/build/host-runtime-development.sh $(RELIEFOS_UPSTREAM_MAKE_ENV) $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(RUNTIME_DEVELOPMENT_PRODUCTS)
+	+$(Q)sh $(RELIEFOS_SRC)/tools/build/host-runtime-development.sh $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(RUNTIME_DEVELOPMENT_ROOT)) $(abspath $(O_HOST))/runtime-development-work $(abspath $(HOST_RUNTIME_DEVELOPMENT_ROOT)) '$(HOSTCC)'
+$(O_META)/host-runtime-development-present.parameters: FORCE $(RELIEFOS_SRC)/tools/build/upstream-verify.sh
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/upstream-verify.sh $(HOST_RUNTIME_DEVELOPMENT_ROOT) $(HOST_RUNTIME_DEVELOPMENT_ROOT).files $@
+$(HOST_RUNTIME_DEVELOPMENT_ROOT)/.complete $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS): $(O_META)/host-runtime-development-present.parameters
+.PHONY: host-runtime-development
+host-runtime-development: $(HOST_RUNTIME_DEVELOPMENT_ROOT)/.complete $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS)

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Run the actual runtime bundle validator against native production payloads."""
+from runtime_test_dependencies import crypto_flags
 import hashlib
 import json
 import os
@@ -107,7 +108,6 @@ class KernelBundle(unittest.TestCase):
         cls.build = tempfile.TemporaryDirectory(prefix="reliefos-runtime-kernel-bundle-")
         cls.addClassCleanup(cls.build.cleanup)
         work = Path(cls.build.name)
-        (work / "qa_mbedtls.h").write_text("#define MBEDTLS_SHA256_C\n")
         cls.binary = work / "bundle"
         sources = [ROOT / "userland/runtime/src" / (name + ".c") for name in
                    ("kernel_bundle_io", "kernel_bundle_check", "kernel_bundle_slots", "kernel_bundle_publish", "kernel_bundle_sync", "kernel_bundle_retain", "bootloader_publish")]
@@ -115,11 +115,10 @@ class KernelBundle(unittest.TestCase):
         subprocess.run(["cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
                         "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
                         "-Wl,--wrap=write,--wrap=pwrite,--wrap=fsync,--wrap=renameat",
-                        '-DMBEDTLS_CONFIG_FILE="qa_mbedtls.h"', "-I", str(work), "-I", str(ROOT),
-                        "-I", str(ROOT / "userland/runtime/include"), "-I", str(ROOT / "third_party/mbedtls/include"),
+                        "-I", str(work), "-I", str(ROOT),
+                        "-I", str(ROOT / "userland/runtime/include"),
                         str(ROOT / "tests/host/test_kernel_bundle.c"), *map(str, sources),
-                        str(ROOT / "third_party/mbedtls/library/sha256.c"),
-                        str(ROOT / "third_party/mbedtls/library/platform_util.c"), "-o", str(cls.binary)], check=True)
+                        *crypto_flags(), "-o", str(cls.binary)], check=True)
 
     def setUp(self):
         fixture = fixtures.ModulesStage("test_real_metadata_dependency_closure_and_stale_output")

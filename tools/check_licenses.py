@@ -27,17 +27,11 @@ DEFAULT_EXCLUDED_CREDITS = ("llama2.c", "TinyLlama", "karpathy")
 # The first existing candidate is accepted.
 SUBMODULE_LICENSES: dict[str, tuple[str, ...]] = {
     "litehtml": ("LICENSE",),
-    "mbedtls": ("LICENSE",),
     "musl": ("COPYRIGHT",),
     "mimalloc": ("LICENSE",),
     "busybox": ("LICENSE",),
-    "ncurses": ("COPYING",),
     "pl_editor": ("LICENSE", "COPYING"),
-    "zlib": ("LICENSE",),
-    "libpng": ("LICENSE",),
     "stardustui": ("LICENSE",),
-    "sl": ("LICENSE",),
-    "sqlite": ("LICENSE.md", "LICENSE", "COPYING"),
     "portablegl": ("LICENSE",),
 }
 
@@ -55,11 +49,13 @@ IMAGE_LICENSES: dict[str, tuple[str, ...]] = {
 SDK_LICENSES: dict[str, tuple[str, ...]] = {
     "libncursesw.a": ("THIRD_PARTY/NCURSES-COPYING",),
     "libtinfow.a": ("THIRD_PARTY/NCURSES-COPYING",),
-    "libc.a": ("THIRD_PARTY/MUSL-COPYING",),
-    "libz.a": ("THIRD_PARTY/ZLIB-LICENSE",),
-    "libpng.a": ("THIRD_PARTY/LIBPNG-LICENSE",),
-    "sqlite.a": ("THIRD_PARTY/SQLITE-LICENSE",),
-    "sqlite.so.3": ("THIRD_PARTY/SQLITE-LICENSE",),
+    "libc.a": ("share/licenses/musl/COPYRIGHT", "THIRD_PARTY/MUSL-COPYING"),
+    "libz.a": ("share/licenses/zlib/LICENSE", "THIRD_PARTY/ZLIB-LICENSE"),
+    "libpng.a": ("share/licenses/libpng/LICENSE", "THIRD_PARTY/LIBPNG-LICENSE"),
+    "libsqlite3.a": ("share/licenses/sqlite/LICENSE",),
+    "libmbedcrypto.a": ("share/licenses/mbedtls3/LICENSE",),
+    "libmbedtls.a": ("share/licenses/mbedtls3/LICENSE",),
+    "libmbedx509.a": ("share/licenses/mbedtls3/LICENSE",),
 }
 
 
@@ -202,6 +198,20 @@ def check_submodules(root: Path) -> list[Finding]:
     return findings
 
 
+def check_binary_notices(root: Path) -> list[Finding]:
+    findings = []
+    for name in ("sl", "ncurses", "zlib", "libpng", "sqlite", "mbedtls3"):
+        relative = f"resources/licenses/{name}-LICENSE"
+        path = root / relative
+        present = path.is_file() and path.stat().st_size > 0
+        findings.append(result("binary-license", "pass" if present else "fail",
+                               "info" if present else "error", name, relative,
+                               relative if present else "missing", str(path),
+                               "binary dependency license is present" if present else
+                               "binary dependency license is missing"))
+    return findings
+
+
 def image_base(source: Path) -> Path:
     if source.is_dir():
         for relative in ("install/root", "root/install/root", "install/esp", "root/install/esp"):
@@ -249,10 +259,10 @@ def check_image(source: Path, category: str = "image-license") -> list[Finding]:
                                    "packaged program license is present" if found else
                                    "program is present but its license file is missing"))
         if artifact.has_prefix("usr/share/terminfo"):
-            notice = "usr/share/licenses/ncurses/COPYING"
-            found = artifact.find((notice,))
+            notices = ("usr/share/licenses/ncurses/LICENSE", "usr/share/licenses/ncurses/COPYING")
+            found = artifact.find(notices)
             findings.append(result(category, "pass" if found else "fail",
-                                   "info" if found else "error", "ncurses", notice,
+                                   "info" if found else "error", "ncurses", " or ".join(notices),
                                    found or "missing", str(source), "ncurses runtime license"))
         api_notices = {"oschinpt": ("LICENSE", "ATTRIBUTION.txt")}
         for api, notices in api_notices.items():
@@ -414,7 +424,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     sdk = args.sdk
     installer = locate_default(root, args.installer, ("build/install", "build/installer-iso"))
     excluded = tuple(args.excluded) if args.excluded else DEFAULT_EXCLUDED_CREDITS
-    findings = check_submodules(root)
+    findings = check_submodules(root) + check_binary_notices(root)
     findings += check_image(image)
     if sdk:
         findings += check_sdk(sdk if sdk.is_absolute() else root / sdk)

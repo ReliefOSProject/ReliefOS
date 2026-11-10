@@ -32,6 +32,9 @@ printf '%s\t%s\t%s\n' "$lock" "$id" "$field" >> "$FAKE_DEPS_LOG"
 case $field:$id in
     feature:alpine-openrc|feature:alpine-xorg-fonts) printf 'base\n' ;;
     feature:alpine-xorg-server|feature:alpine-xterm|feature:alpine-icewm|feature:alpine-mesa-dri-gallium) printf 'xorg\n' ;;
+    feature:alpine-sl) printf 'component:sl\n' ;;
+    feature:alpine-ncurses) printf 'component:ncurses\n' ;;
+    feature:alpine-sqlite-libs) printf 'component:sqlite\n' ;;
     feature:alpine-broken-feature) printf 'weird\n' ;;
     url:alpine-icewm) printf 'https://fixture.invalid/apk/icewm-0.1.apk\n' ;;
     feature:*) echo "no dependency named \"$id\"" >&2; exit 1 ;;
@@ -272,6 +275,21 @@ expect_no_grep "$s/own.log" 'usr/lib/xorg/modules/raw-overlay-probe'
 expect_no_grep "$s/own.log" 'etc/fixture-openrc.conf'
 expect_no_grep "$s/own.log" 'usr/bin/xorg-server'
 expect_grep "$s/apk.log" 'add reliefos-base icewm=0.1 mesa-dri-gallium=0.1 openrc=0.1 xorg-fonts=0.1 xorg-server=0.1 xterm=0.1'
+
+# Optional binary packages follow IMAGE selection in both backends.
+build_archive "$w/upstream/packages" sl 0.1 usr/bin/sl
+build_archive "$w/upstream/packages" ncurses 0.1 usr/bin/tput
+build_archive "$w/upstream/packages" sqlite-libs 0.1 usr/lib/libsqlite3.so.0
+printf 'sl\nsqlite\n' > "$w/raw/etc/reliefos/apk-components"
+stage components
+expect_present "$w/components/repository/sl-0.1.apk"
+expect_present "$w/components/repository/sqlite-libs-0.1.apk"
+expect_absent "$w/components/repository/ncurses-0.1.apk"
+expect_no_grep "$w/components/own.log" 'usr/bin/sl'
+: > "$w/raw/etc/reliefos/apk-components"
+stage no-components
+for package in sl ncurses sqlite-libs; do expect_absent "$w/no-components/repository/$package-0.1.apk"; done
+rm "$w/upstream/packages/sl-0.1.apk" "$w/upstream/packages/ncurses-0.1.apk" "$w/upstream/packages/sqlite-libs-0.1.apk"
 
 # --- marker failures stop staging before any scan or transaction ---
 for marker in '' 'bogus' 'reliefos extra' "reliefos${newline}xorg${newline}" 'xorg '; do

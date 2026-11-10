@@ -1,7 +1,6 @@
-/* Transitional compatibility forwarder (ReliefOS / ReliefNT rename).
- * Canonical runtime configuration: <reliefos_mbedtls_config.h>. */
+/* Compatibility include: use the configuration shipped with mbedtls3-dev.
+ * Custom ALT settings are incompatible with the precompiled library ABI. */
 #ifndef LEONOS_MBEDTLS_CONFIG_H
 #define LEONOS_MBEDTLS_CONFIG_H
-#include <reliefos_mbedtls_config.h>
-#define leonos_mbedtls_time reliefos_mbedtls_time
-#endif /* LEONOS_MBEDTLS_CONFIG_H */
+#include <mbedtls/mbedtls_config.h>
+#endif

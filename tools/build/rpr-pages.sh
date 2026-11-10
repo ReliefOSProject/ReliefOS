@@ -48,21 +48,29 @@ mkdir -p "$work/site/apk" "$work/site/kernel" "$work/site/packages" "$work/site/
 openssl pkey -in "$key" -pubout -out "$work/site/apk/reliefos-rpr.rsa.pub" 2>/dev/null
 cp "$work/site/apk/reliefos-rpr.rsa.pub" "$work/site/apk/leonos-rpr.rsa.pub"
 chmod 644 "$work/site/apk/reliefos-rpr.rsa.pub" "$work/site/apk/leonos-rpr.rsa.pub"
-for source in "$repository"/reliefos-*.apk "$apps"/reliefos-*.apk; do
+# Indexing verifies the original signatures too: trust both the local signing
+# key and the pinned Alpine keys, without re-signing upstream packages.
+mkdir "$work/keys"
+source_root=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+cp "$source_root"/system/rootfs/etc/apk/keys/*.pub "$work/keys/"
+cp "$work/site/apk/reliefos-rpr.rsa.pub" "$work/keys/"
+# Include the complete verified dependency closure; official APK bytes and
+# signatures are preserved when publishing the local RPR tree.
+for source in "$repository"/*.apk "$apps"/reliefos-*.apk; do
     [ -f "$source" ] || { echo "missing RPR package $source" >&2; exit 1; }
     name=${source##*/}
     case $name in *[!a-zA-Z0-9._+-]*) echo 'unsafe RPR filename' >&2; exit 1 ;; esac
     # apk resolves a package from its metadata as name-version.apk. A
     # versionless archive indexes successfully but every normal client then
     # requests a URL that does not exist.
-    printf '%s\n' "$name" | grep -Eq '^reliefos-.+-[0-9][A-Za-z0-9._+-]*\.apk$' || {
+    printf '%s\n' "$name" | grep -Eq '^[A-Za-z0-9][A-Za-z0-9+_.-]*-[0-9][A-Za-z0-9._+-]*\.apk$' || {
         echo "RPR package filename is missing its version: $name" >&2
         exit 1
     }
     [ ! -e "$work/site/apk/$name" ] || { echo "duplicate RPR package $name" >&2; exit 1; }
     cp "$source" "$work/site/apk/$name"
 done
-"$apk" mkndx --keys-dir "$work/site/apk" --sign-key "$key" --output "$work/site/apk/packages.adb" "$work/site/apk"/*.apk
+"$apk" mkndx --keys-dir "$work/keys" --sign-key "$key" --output "$work/site/apk/packages.adb" "$work/site/apk"/*.apk
 kernel_package=
 for file in "$work/site/apk"/reliefos-kernel-[0-9]*.apk; do
     [ -f "$file" ] || continue
@@ -202,11 +210,12 @@ HTML
 <caption>APK packages published in this release</caption>
 <tr><th>Package</th><th>Version</th><th>Architecture</th><th>Size</th></tr>
 HTML
-    for file in "$work/site/apk"/reliefos-*.apk; do
+    for file in "$work/site/apk"/*.apk; do
         [ -f "$file" ] || continue
         fname=${file##*/}
-        base=${fname%.apk}                 # reliefos-<name>-<version>-r<epoch>
-        stem=${base%%-[0-9]*}              # reliefos-<name>: up to the first -<digit>
+        base=${fname%.apk}                 # <name>-<version>-r<epoch>
+        without_revision=${base%-*}
+        stem=${without_revision%-*}        # names may contain digits: libatk-1.0
         ver=${base#"$stem"-}               # <version>-r<epoch>
         size=$(stat -c %s "$file")
         esc_name=$(printf '%s' "$stem" | site_html_escape)
@@ -224,11 +233,12 @@ HTML
 # Per-package information pages: data is parsed from the validated APK filename
 # plus real file size and the recorded SHA256SUMS hash, so it can never drift
 # from what is actually published (plan §17, §21).
-for file in "$work/site/apk"/reliefos-*.apk; do
+for file in "$work/site/apk"/*.apk; do
     [ -f "$file" ] || continue
     fname=${file##*/}
     base=${fname%.apk}
-    stem=${base%%-[0-9]*}
+    without_revision=${base%-*}
+    stem=${without_revision%-*}
     ver=${base#"$stem"-}
     size=$(stat -c %s "$file")
     hash=$(site_hash_for "$work/site/apk/SHA256SUMS" "$fname")
