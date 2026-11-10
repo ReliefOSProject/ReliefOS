@@ -591,8 +591,8 @@ int main(void)
         int count;
 
         assert(installer_model_next(INSTALLER_PAGE_LANGUAGE, INSTALLER_MODE_FRESH) ==
-               INSTALLER_PAGE_THANKS);
-        assert(installer_model_next(INSTALLER_PAGE_THANKS, INSTALLER_MODE_FRESH) ==
+               INSTALLER_PAGE_LICENSE);
+        assert(installer_model_next(INSTALLER_PAGE_LICENSE, INSTALLER_MODE_FRESH) ==
                INSTALLER_PAGE_WELCOME);
         assert(installer_model_next(INSTALLER_PAGE_MODE, INSTALLER_MODE_FRESH) ==
                INSTALLER_PAGE_DISK);
@@ -625,7 +625,7 @@ int main(void)
         assert(installer_model_prev(INSTALLER_PAGE_BOOTLOADERS, INSTALLER_MODE_UPDATE) ==
                INSTALLER_PAGE_DISK);
         assert(installer_model_prev(INSTALLER_PAGE_WELCOME, INSTALLER_MODE_FRESH) ==
-               INSTALLER_PAGE_THANKS);
+               INSTALLER_PAGE_LICENSE);
         assert(installer_model_prev(INSTALLER_PAGE_FINISH, INSTALLER_MODE_UPDATE) ==
                INSTALLER_PAGE_DISK);
         assert(installer_model_prev(INSTALLER_PAGE_LANGUAGE, INSTALLER_MODE_FRESH) ==
@@ -656,7 +656,7 @@ int main(void)
         count = installer_model_steps(INSTALLER_MODE_FRESH, steps, INSTALLER_PAGE_COUNT);
         assert(count == INSTALLER_PAGE_COUNT);
         assert(steps[0] == INSTALLER_PAGE_LANGUAGE);
-        assert(steps[1] == INSTALLER_PAGE_THANKS);
+        assert(steps[1] == INSTALLER_PAGE_LICENSE);
         assert(steps[2] == INSTALLER_PAGE_WELCOME);
         assert(steps[4] == INSTALLER_PAGE_DISK);
         assert(steps[5] == INSTALLER_PAGE_BOOTLOADERS);
@@ -673,7 +673,7 @@ int main(void)
             assert(steps[i] != INSTALLER_PAGE_BOOTLOADERS);
         }
         count = installer_model_steps(INSTALLER_MODE_FRESH, steps, 2);
-        assert(count == INSTALLER_PAGE_COUNT && steps[1] == INSTALLER_PAGE_THANKS);
+        assert(count == INSTALLER_PAGE_COUNT && steps[1] == INSTALLER_PAGE_LICENSE);
 
         installer_model_format_disk_line(buf, sizeof(buf), 0, "vda", 2048 * 1024, 512);
         assert(strcmp(buf, "Disk 0  vda  1 GiB") == 0);

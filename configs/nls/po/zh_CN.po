@@ -579,10 +579,6 @@ msgstr "账户创建失败"
 msgid "Accounts"
 msgstr "账户"
 
-#: userland/apps/installer/main.cpp:477
-msgid "Acknowledgements for public resources and open-source projects."
-msgstr "公共资源与开源项目致谢。"
-
 #: userland/apps/calc/units.cpp:22
 msgid "Acre"
 msgstr "英亩"
@@ -6665,6 +6661,7 @@ msgid "Library"
 msgstr "公式库"
 
 #: userland/apps/reliefapk/window.cpp:684
+#: userland/apps/installer/main.cpp
 msgid "License"
 msgstr "许可证"
 
@@ -11953,14 +11950,6 @@ msgstr "文本宽度溢出"
 #: userland/apps/reliefmath/window.cpp:107
 msgid "Text..."
 msgstr "文本…"
-
-#: userland/apps/installer/main.cpp:476
-msgid "Thank You"
-msgstr "感谢"
-
-#: userland/apps/installer/main.cpp:214
-msgid "Thanks"
-msgstr "感谢"
 
 #: userland/apps/oshlp/main.c:1208
 msgid "The .hlp file could not be read."

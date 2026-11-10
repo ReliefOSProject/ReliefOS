@@ -26,11 +26,9 @@ extern "C" {
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Input.H>
-#include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Progress.H>
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Round_Button.H>
-#include <FL/Fl_Scroll.H>
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Window.H>
@@ -108,91 +106,8 @@ static size_t update_stdout_offset, update_stderr_offset;
 static int update_job, update_checked, update_protocol_error;
 static char update_message[256];
 
-static const char acknowledgements_en[] =
-    "Acknowledgements\n"
-    "\n"
-    "ReliefOS gratefully acknowledges the creators, contributors, and maintainers "
-    "of the public resources and open-source projects used by this release.\n"
-    "\n"
-    "Runtime, Toolchain, and Applications\n"
-    "- GNU GRUB 2 - GPL-3.0-or-later\n"
-    "- Mbed TLS 3.6.7 - Apache License 2.0\n"
-    "- musl 1.2.6 - MIT\n"
-    "- mimalloc 3.5.1 - MIT\n"
-    "- zlib 1.4 (signed Alpine APK) - zlib License\n"
-    "- libpng 1.6.59 (signed Alpine APK) - libpng License\n"
-    "- SQLite 3.53.4 - public-domain dedication and blessing\n"
-    "- BusyBox 1.36.1 - GPL-2.0-only\n"
-    "- less (Alpine APK) - GPL-3.0-or-later OR BSD-2-Clause\n"
-    "- Vim (Alpine APK) - Vim License\n"
-    "- Fastfetch 2.68.1 - MIT\n"
-    "- sl - permissive upstream license\n"
-    "- Leonmmcoset/pl_editor (modified PL Editor fork) - MIT\n"
-    "- file and libmagic - BSD-2-Clause\n"
-    "- StardustUI - MIT\n"
-    "- DoomGeneric - GPL-2.0-only\n"
-    "- Freedoom - BSD-3-Clause\n"
-    "- rime-pinyin-simp dictionary - Apache License 2.0\n"
-    "- minimp3 - CC0-1.0\n"
-    "\n"
-    "Fonts and Visual Resources\n"
-    "- Noto Sans Mono - SIL Open Font License 1.1\n"
-    "- Droid Sans Fallback - Apache License 2.0\n"
-    "- Noto Sans CJK - SIL Open Font License 1.1\n"
-    "- Microsoft fonts used by the distribution - subject to the applicable "
-    "Microsoft license terms\n"
-    "- NASA Image and Video Library, PIA18033 - used in accordance with NASA "
-    "Media Usage Guidelines\n"
-    "\n"
-    "Recorded Browser Source Dependencies\n"
-    "- litehtml - BSD-3-Clause\n"
-    "- Gumbo HTML Parser - Apache License 2.0\n"
-    "\n"
-    "These browser sources are retained for future compatibility work and are "
-    "not linked into the current browser runtime.\n"
-    "Complete license texts and attribution notices are preserved with the "
-    "corresponding source, SDK, and/or installed program package.\n";
-
-static const char acknowledgements_zh[] =
-    "感谢\n"
-    "\n"
-    "ReliefOS 诚挚感谢本发行版所使用的公共资源与开源项目的创作者、贡献者和维护者。\n"
-    "\n"
-    "运行时、开发工具链与应用程序\n"
-    "- GNU GRUB 2 - GPL-3.0-or-later\n"
-    "- Mbed TLS 3.6.7 - Apache License 2.0\n"
-    "- musl 1.2.6 - MIT\n"
-    "- mimalloc 3.5.1 - MIT\n"
-    "- zlib 1.4（签名 Alpine APK）- zlib License\n"
-    "- libpng 1.6.59（签名 Alpine APK）- libpng License\n"
-    "- SQLite 3.53.4 - 公共领域声明与许可祝福文本\n"
-    "- BusyBox 1.36.1 - GPL-2.0-only\n"
-    "- less (Alpine APK) - GPL-3.0-or-later OR BSD-2-Clause\n"
-    "- Vim (Alpine APK) - Vim License\n"
-    "- Fastfetch 2.68.1 - MIT\n"
-    "- sl - 上游宽松许可\n"
-    "- Leonmmcoset/pl_editor（PL Editor 修改版）- MIT\n"
-    "- file 与 libmagic - BSD-2-Clause\n"
-    "- StardustUI - MIT\n"
-    "- DoomGeneric - GPL-2.0-only\n"
-    "- Freedoom - BSD-3-Clause\n"
-    "- rime-pinyin-simp 中文词库 - Apache License 2.0\n"
-    "- minimp3 - CC0-1.0\n"
-    "\n"
-    "字体与视觉资源\n"
-    "- Noto Sans Mono - SIL Open Font License 1.1\n"
-    "- Droid Sans Fallback - Apache License 2.0\n"
-    "- Noto Sans CJK - SIL Open Font License 1.1\n"
-    "- 发行版使用的 Microsoft 字体 - 受相应 Microsoft 许可条款约束\n"
-    "- NASA Image and Video Library，PIA18033 - 遵循 NASA 媒体使用指南\n"
-    "\n"
-    "已记录的浏览器源码依赖\n"
-    "- litehtml - BSD-3-Clause\n"
-    "- Gumbo HTML Parser - Apache License 2.0\n"
-    "\n"
-    "这些浏览器源码为后续兼容性工作保留，当前浏览器运行时尚未链接它们。\n"
-    "完整许可证文本与归属声明保留在相应源代码、开发套件和/或已安装程序包中。\n";
-
+/* Embedded verbatim from the repository LICENSE by apache_license.S. */
+extern "C" const char installer_license_text[];
 
 static Fl_Box *make_label(const char *text, int x, int y, int w, int h,
                           int size, int wrap)
@@ -230,7 +145,7 @@ static const char *page_label(enum installer_page target)
 {
     switch (target) {
     case INSTALLER_PAGE_LANGUAGE: return T("Language");
-    case INSTALLER_PAGE_THANKS: return T("Thanks");
+    case INSTALLER_PAGE_LICENSE: return T("License");
     case INSTALLER_PAGE_WELCOME: return T("Welcome");
     case INSTALLER_PAGE_MODE: return T("Mode");
     case INSTALLER_PAGE_DISK: return T("Disk");
@@ -610,22 +525,17 @@ static void build_language_page(void)
                CONTENT_X, 238, CONTENT_W, 32, 15, 1);
 }
 
-static void build_thanks_page(void)
+static void build_license_page(void)
 {
-    make_heading(T("Thank You"), 20);
-    make_label(T("Acknowledgements for public resources and open-source projects."),
-               CONTENT_X, 58, CONTENT_W, 32, 15, 1);
-    Fl_Scroll *scroll = new Fl_Scroll(CONTENT_X, 98, CONTENT_W, 500);
-    scroll->box(FL_DOWN_BOX);
-    scroll->begin();
-    Fl_Multiline_Output *text =
-        new Fl_Multiline_Output(CONTENT_X, 98, CONTENT_W - 18, 900);
-    text->value(language_selection() == 1 ? acknowledgements_zh
-                                          : acknowledgements_en);
+    make_heading("Apache License 2.0", 20);
+    static Fl_Text_Buffer license_buffer;
+    if (!license_buffer.length()) license_buffer.text(installer_license_text);
+    Fl_Text_Display *text = new Fl_Text_Display(CONTENT_X, 62, CONTENT_W, 536);
+    text->buffer(license_buffer);
+    text->textfont(FL_COURIER);
     text->textsize(13);
-    text->wrap(1);
+    text->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
     reliefos_fltk::style(text);
-    scroll->end();
 }
 
 static void build_welcome_page(void)
@@ -1428,7 +1338,7 @@ static void show_page(void)
     content_group->begin();
     switch ((enum installer_page)page) {
     case INSTALLER_PAGE_LANGUAGE: build_language_page(); break;
-    case INSTALLER_PAGE_THANKS: build_thanks_page(); break;
+    case INSTALLER_PAGE_LICENSE: build_license_page(); break;
     case INSTALLER_PAGE_WELCOME: build_welcome_page(); break;
     case INSTALLER_PAGE_MODE: build_mode_page(); break;
     case INSTALLER_PAGE_DISK: build_disk_page(); break;

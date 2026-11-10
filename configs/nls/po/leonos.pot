@@ -550,10 +550,6 @@ msgstr ""
 msgid "Accounts"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:477
-msgid "Acknowledgements for public resources and open-source projects."
-msgstr ""
-
 #: userland/apps/calc/units.cpp:22
 msgid "Acre"
 msgstr ""
@@ -6579,6 +6575,7 @@ msgid "Library"
 msgstr ""
 
 #: userland/apps/reliefapk/window.cpp:684
+#: userland/apps/installer/main.cpp
 msgid "License"
 msgstr ""
 
@@ -11800,14 +11797,6 @@ msgstr ""
 
 #: userland/apps/reliefmath/window.cpp:107
 msgid "Text..."
-msgstr ""
-
-#: userland/apps/installer/main.cpp:476
-msgid "Thank You"
-msgstr ""
-
-#: userland/apps/installer/main.cpp:214
-msgid "Thanks"
 msgstr ""
 
 #: userland/apps/oshlp/main.c:1208
