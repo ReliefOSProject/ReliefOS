@@ -11,7 +11,7 @@
 
 int installer_setup_valid(const struct installer_setup *setup)
 {
-    if (!setup || setup->skip_xorg > 1 || setup->skip_bios > 1 || setup->skip_uefi > 1) return 0;
+    if (!setup || setup->skip_xorg > 1 || setup->skip_bios > 1 || setup->skip_uefi > 1 || setup->format_esp > 1) return 0;
     if (!reliefos_account_name_valid(setup->username, sizeof(setup->username)) ||
         !strcmp(setup->username, "root") || !strcmp(setup->username, "nobody") ||
         !strcmp(setup->username, "wheel")) return 0;

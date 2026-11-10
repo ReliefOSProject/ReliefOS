@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 
 extern "C" {
 #include <reliefos/blockdev.h>
@@ -21,14 +22,15 @@ extern "C" {
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Check_Button.H>
+#include <FL/Fl_Choice.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Input.H>
-#include <FL/Fl_Multiline_Output.H>
 #include <FL/Fl_Progress.H>
 #include <FL/Fl_Return_Button.H>
 #include <FL/Fl_Round_Button.H>
-#include <FL/Fl_Scroll.H>
+#include <FL/Fl_Text_Buffer.H>
+#include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Window.H>
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
@@ -39,6 +41,8 @@ extern "C" {
 #include "installer_capacity.h"
 #include "installer_partitions.h"
 #include "installer_tty.h"
+#include "installer_update.h"
+#include "../reliefapk/process.h"
 #include "model.h"
 
 enum partition_prompt_action {
@@ -72,6 +76,8 @@ static Fl_Return_Button *primary_button;
 static Fl_Button *cancel_button;
 static Fl_Hold_Browser *disk_browser;
 static Fl_Hold_Browser *partition_browser;
+static Fl_Choice *update_root_choice, *update_esp_choice;
+static Fl_Check_Button *format_esp_checkbox;
 static Fl_Input *confirm_input;
 static Fl_Check_Button *xorg_checkbox;
 static Fl_Input *swap_size_input;
@@ -92,92 +98,16 @@ static int back_pending;
 static int render_pending;
 static int account_input_overflow[5];
 static int confirm_input_overflow;
+static ra::Process update_process;
+static struct installer_update_info update_info;
+static Fl_Text_Buffer *update_log_buffer;
+static Fl_Text_Display *update_log_display;
+static size_t update_stdout_offset, update_stderr_offset;
+static int update_job, update_checked, update_protocol_error;
+static char update_message[256];
 
-static const char acknowledgements_en[] =
-    "Acknowledgements\n"
-    "\n"
-    "ReliefOS gratefully acknowledges the creators, contributors, and maintainers "
-    "of the public resources and open-source projects used by this release.\n"
-    "\n"
-    "Runtime, Toolchain, and Applications\n"
-    "- GNU GRUB 2 - GPL-3.0-or-later\n"
-    "- Mbed TLS 3.6.7 - Apache License 2.0\n"
-    "- musl 1.2.6 - MIT\n"
-    "- mimalloc 3.5.1 - MIT\n"
-    "- zlib 1.3.2, the bundled compression library - zlib License\n"
-    "- libpng 1.6.58, the bundled PNG decoder library - libpng License\n"
-    "- SQLite 3.46.1 - public-domain dedication and blessing\n"
-    "- BusyBox 1.36.1 - GPL-2.0-only\n"
-    "- less (Alpine APK) - GPL-3.0-or-later OR BSD-2-Clause\n"
-    "- Vim (Alpine APK) - Vim License\n"
-    "- Fastfetch 2.68.1 - MIT\n"
-    "- sl - permissive upstream license\n"
-    "- Leonmmcoset/pl_editor (modified PL Editor fork) - MIT\n"
-    "- file and libmagic - BSD-2-Clause\n"
-    "- StardustUI - MIT\n"
-    "- DoomGeneric - GPL-2.0-only\n"
-    "- Freedoom - BSD-3-Clause\n"
-    "- rime-pinyin-simp dictionary - Apache License 2.0\n"
-    "- minimp3 - CC0-1.0\n"
-    "\n"
-    "Fonts and Visual Resources\n"
-    "- Noto Sans Mono - SIL Open Font License 1.1\n"
-    "- Droid Sans Fallback - Apache License 2.0\n"
-    "- Noto Sans CJK - SIL Open Font License 1.1\n"
-    "- Microsoft fonts used by the distribution - subject to the applicable "
-    "Microsoft license terms\n"
-    "- NASA Image and Video Library, PIA18033 - used in accordance with NASA "
-    "Media Usage Guidelines\n"
-    "\n"
-    "Recorded Browser Source Dependencies\n"
-    "- litehtml - BSD-3-Clause\n"
-    "- Gumbo HTML Parser - Apache License 2.0\n"
-    "\n"
-    "These browser sources are retained for future compatibility work and are "
-    "not linked into the current browser runtime.\n"
-    "Complete license texts and attribution notices are preserved with the "
-    "corresponding source, SDK, and/or installed program package.\n";
-
-static const char acknowledgements_zh[] =
-    "感谢\n"
-    "\n"
-    "ReliefOS 诚挚感谢本发行版所使用的公共资源与开源项目的创作者、贡献者和维护者。\n"
-    "\n"
-    "运行时、开发工具链与应用程序\n"
-    "- GNU GRUB 2 - GPL-3.0-or-later\n"
-    "- Mbed TLS 3.6.7 - Apache License 2.0\n"
-    "- musl 1.2.6 - MIT\n"
-    "- mimalloc 3.5.1 - MIT\n"
-    "- zlib 1.3.2（内置压缩库）- zlib License\n"
-    "- libpng 1.6.58（内置 PNG 解码库）- libpng License\n"
-    "- SQLite 3.46.1 - 公共领域声明与许可祝福文本\n"
-    "- BusyBox 1.36.1 - GPL-2.0-only\n"
-    "- less (Alpine APK) - GPL-3.0-or-later OR BSD-2-Clause\n"
-    "- Vim (Alpine APK) - Vim License\n"
-    "- Fastfetch 2.68.1 - MIT\n"
-    "- sl - 上游宽松许可\n"
-    "- Leonmmcoset/pl_editor（PL Editor 修改版）- MIT\n"
-    "- file 与 libmagic - BSD-2-Clause\n"
-    "- StardustUI - MIT\n"
-    "- DoomGeneric - GPL-2.0-only\n"
-    "- Freedoom - BSD-3-Clause\n"
-    "- rime-pinyin-simp 中文词库 - Apache License 2.0\n"
-    "- minimp3 - CC0-1.0\n"
-    "\n"
-    "字体与视觉资源\n"
-    "- Noto Sans Mono - SIL Open Font License 1.1\n"
-    "- Droid Sans Fallback - Apache License 2.0\n"
-    "- Noto Sans CJK - SIL Open Font License 1.1\n"
-    "- 发行版使用的 Microsoft 字体 - 受相应 Microsoft 许可条款约束\n"
-    "- NASA Image and Video Library，PIA18033 - 遵循 NASA 媒体使用指南\n"
-    "\n"
-    "已记录的浏览器源码依赖\n"
-    "- litehtml - BSD-3-Clause\n"
-    "- Gumbo HTML Parser - Apache License 2.0\n"
-    "\n"
-    "这些浏览器源码为后续兼容性工作保留，当前浏览器运行时尚未链接它们。\n"
-    "完整许可证文本与归属声明保留在相应源代码、开发套件和/或已安装程序包中。\n";
-
+/* Embedded verbatim from the repository LICENSE by apache_license.S. */
+extern "C" const char installer_license_text[];
 
 static Fl_Box *make_label(const char *text, int x, int y, int w, int h,
                           int size, int wrap)
@@ -215,7 +145,7 @@ static const char *page_label(enum installer_page target)
 {
     switch (target) {
     case INSTALLER_PAGE_LANGUAGE: return T("Language");
-    case INSTALLER_PAGE_THANKS: return T("Thanks");
+    case INSTALLER_PAGE_LICENSE: return T("License");
     case INSTALLER_PAGE_WELCOME: return T("Welcome");
     case INSTALLER_PAGE_MODE: return T("Mode");
     case INSTALLER_PAGE_DISK: return T("Disk");
@@ -236,9 +166,12 @@ static const char *primary_label(void)
                                    install_success)) {
     case INSTALLER_ACTION_INSTALL: return T("Install");
     case INSTALLER_ACTION_UPDATE: return T("Update");
+    case INSTALLER_ACTION_RETRY: return T("Check Again");
     case INSTALLER_ACTION_RESTART: return T("Restart");
     case INSTALLER_ACTION_CLOSE: return T("Close");
-    case INSTALLER_ACTION_NEXT: return T("Next");
+    case INSTALLER_ACTION_NEXT:
+        return page == INSTALLER_PAGE_DISK && install_mode == INSTALLER_MODE_UPDATE
+            ? T("Check Update") : T("Next");
     }
     return T("Next");
 }
@@ -255,6 +188,8 @@ static int primary_disabled(void)
         return selected_disk < 0 || (uint32_t)selected_disk >= disk_count;
     if (page == INSTALLER_PAGE_PARTITIONS)
         return !installer_partition_plan_valid();
+    if (page == INSTALLER_PAGE_CONFIRM && install_mode == INSTALLER_MODE_UPDATE)
+        return !update_checked;
     if (page == INSTALLER_PAGE_CONFIRM)
         return confirm_input_overflow || !confirmation_ok() ||
                (install_mode==INSTALLER_MODE_FRESH && setup.swap_enabled && swap_size_invalid);
@@ -326,6 +261,130 @@ static void schedule_render(void)
     Fl::add_timeout(0.0, render_deferred);
 }
 
+static void update_pump(void *)
+{
+    update_process.step(16384);
+    const char *output = update_process.output();
+    size_t length = update_process.output_size();
+    while (update_stdout_offset < length) {
+        const char *line = output + update_stdout_offset;
+        const char *end = static_cast<const char *>(memchr(line, '\n', length - update_stdout_offset));
+        if (!end) break;
+        size_t bytes = static_cast<size_t>(end - line);
+        char text[512];
+        if (bytes < sizeof(text)) {
+            memcpy(text, line, bytes);
+            text[bytes] = 0;
+            unsigned value = progress_value;
+            int result = installer_update_decode(&update_info, &value, update_message, sizeof(update_message), text);
+            if (result < 0) update_protocol_error = 1;
+            if (result == 2 || result == 3) {
+                progress_value = value;
+                copy_text(progress_text, sizeof(progress_text), T(update_message));
+                copy_text(status_text, sizeof(status_text), T(update_message));
+            }
+        }
+        update_stdout_offset += bytes + 1;
+    }
+    size_t errors = update_process.errors_size();
+    if (errors > update_stderr_offset) {
+        const char *logs = update_process.errors();
+        fwrite(logs + update_stderr_offset, 1, errors - update_stderr_offset, stderr);
+        update_stderr_offset = errors;
+        if (update_log_buffer) {
+            size_t start = errors > 65536 ? errors - 65536 : 0;
+            while (start < errors && (static_cast<unsigned char>(logs[start]) & 0xc0) == 0x80) ++start;
+            update_log_buffer->text(logs + start);
+            if (update_log_display) {
+                update_log_display->insert_position(update_log_buffer->length());
+                update_log_display->show_insert_position();
+            }
+        }
+    }
+    refresh_status_widgets();
+    if (update_process.running()) { Fl::repeat_timeout(0.08, update_pump); return; }
+    int checking = update_job == 1;
+    update_job = 0;
+    ui_busy = 0;
+    install_running = 0;
+    if (update_process.exit_code() == 0 && !update_protocol_error && !update_info.error_number) {
+        if (checking) {
+            update_checked = 1;
+            setup.skip_bios = !(update_info.boot_modes & 1u);
+            setup.skip_uefi = !(update_info.boot_modes & 2u);
+            page = INSTALLER_PAGE_CONFIRM;
+            set_status(T("Ready to update"), T("Review the detected system and start the update."));
+        } else {
+            page = INSTALLER_PAGE_FINISH;
+            install_success = 1;
+            progress_value = 100;
+            set_status(T("System update completed successfully"), T("Remove the installation media, then restart."));
+            fprintf(stderr, "[installer.elf] update completed successfully\n");
+        }
+    } else {
+        page = INSTALLER_PAGE_FINISH;
+        install_success = 0;
+        int error = update_info.error_number ? update_info.error_number
+            : update_process.exec_error() ? update_process.exec_error() : EIO;
+        char detail[128];
+        snprintf(detail, sizeof(detail), "%s (%d)", strerror(error), error);
+        set_status(update_info.failure[0] ? T(update_info.failure) : T("Update worker failed"), detail);
+    }
+    show_page();
+}
+
+static void start_update_job(int applying)
+{
+    if (update_job || selected_disk < 0 || static_cast<uint32_t>(selected_disk) >= disk_count) return;
+    if (applying && !update_checked) return;
+    if (!applying) memset(&update_info, 0, sizeof(update_info));
+    update_checked = 0;
+    update_protocol_error = 0;
+    update_stdout_offset = update_stderr_offset = 0;
+    if (!update_log_buffer) update_log_buffer = new Fl_Text_Buffer();
+    update_log_buffer->text("");
+    char executable[PATH_MAX], modes[2] = {
+        static_cast<char>('0' + (setup.skip_bios ? 0 : 1) + (setup.skip_uefi ? 0 : 2)), 0};
+    ssize_t bytes = readlink("/proc/self/exe", executable, sizeof(executable) - 1);
+    if (bytes < 0 || static_cast<size_t>(bytes) >= sizeof(executable) - 1) {
+        page = INSTALLER_PAGE_FINISH;
+        install_success = 0;
+        set_status(T("Cannot start the update worker"), strerror(bytes < 0 ? errno : ENAMETOOLONG));
+        show_page();
+        return;
+    }
+    executable[bytes] = 0;
+    char root_uuid[37] = {0}, esp_uuid[37] = {0};
+    if (!applying) {
+        int error = 0;
+        if (installer_root_partition >= 0)
+            error = reliefos_block_partition_uuid(disks[selected_disk].path, installer_root_partition, root_uuid);
+        if (!error && installer_esp_partition >= 0)
+            error = reliefos_block_partition_uuid(disks[selected_disk].path, installer_esp_partition, esp_uuid);
+        if (error) { set_error_status(T("Cannot identify the selected partitions"), error); return; }
+    }
+    const char *check[] = {executable, "--update-worker", "check", disks[selected_disk].path, root_uuid, esp_uuid, NULL};
+    const char *apply[] = {executable, "--update-worker", "apply", update_info.disk,
+        update_info.root_uuid, update_info.esp_uuid, update_info.index_sha256, update_info.database_sha256,
+        update_info.world_sha256, modes, NULL};
+    if (!update_process.start(applying ? apply : check, false, ra::AuthMode::Sudo, false)) {
+        page = INSTALLER_PAGE_FINISH;
+        install_success = 0;
+        set_status(T("Cannot start the update worker"), strerror(update_process.exec_error() ? update_process.exec_error() : EIO));
+        show_page();
+        return;
+    }
+    update_job = applying ? 2 : 1;
+    ui_busy = 1;
+    install_running = 1;
+    install_success = 0;
+    page = INSTALLER_PAGE_PROGRESS;
+    progress_value = 0;
+    copy_text(progress_text, sizeof(progress_text), applying ? T("Preparing the system update") : T("Checking the selected system"));
+    show_page();
+    Fl::add_timeout(0.0, update_pump);
+}
+
 static void close_now(void)
 {
     exit(0);
@@ -384,13 +443,10 @@ static void go_primary_now(void *)
         show_page();
         return;
     case INSTALLER_ACTION_UPDATE:
-        ui_busy = 1;
-        page = INSTALLER_PAGE_PROGRESS;
-        show_page();
-        Fl::flush();
-        perform_update();
-        ui_busy = 0;
-        show_page();
+        start_update_job(1);
+        return;
+    case INSTALLER_ACTION_RETRY:
+        start_update_job(0);
         return;
     case INSTALLER_ACTION_RESTART:
         fprintf(stderr, "[installer.elf] restart requested from completion page\n");
@@ -409,14 +465,7 @@ static void go_primary_now(void *)
     }
 
     if (page == INSTALLER_PAGE_DISK && install_mode == INSTALLER_MODE_UPDATE) {
-        ui_busy = 1;
-        confirm_input_overflow = 0;
-        page = INSTALLER_PAGE_PROGRESS;
-        show_page();
-        Fl::flush();
-        prepare_update_target();
-        ui_busy = 0;
-        show_page();
+        start_update_job(0);
         return;
     }
     page = (uint8_t)installer_model_next((enum installer_page)page,
@@ -476,22 +525,17 @@ static void build_language_page(void)
                CONTENT_X, 238, CONTENT_W, 32, 15, 1);
 }
 
-static void build_thanks_page(void)
+static void build_license_page(void)
 {
-    make_heading(T("Thank You"), 20);
-    make_label(T("Acknowledgements for public resources and open-source projects."),
-               CONTENT_X, 58, CONTENT_W, 32, 15, 1);
-    Fl_Scroll *scroll = new Fl_Scroll(CONTENT_X, 98, CONTENT_W, 500);
-    scroll->box(FL_DOWN_BOX);
-    scroll->begin();
-    Fl_Multiline_Output *text =
-        new Fl_Multiline_Output(CONTENT_X, 98, CONTENT_W - 18, 900);
-    text->value(language_selection() == 1 ? acknowledgements_zh
-                                          : acknowledgements_en);
+    make_heading("Apache License 2.0", 20);
+    static Fl_Text_Buffer license_buffer;
+    if (!license_buffer.length()) license_buffer.text(installer_license_text);
+    Fl_Text_Display *text = new Fl_Text_Display(CONTENT_X, 62, CONTENT_W, 536);
+    text->buffer(license_buffer);
+    text->textfont(FL_COURIER);
     text->textsize(13);
-    text->wrap(1);
+    text->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
     reliefos_fltk::style(text);
-    scroll->end();
 }
 
 static void build_welcome_page(void)
@@ -540,10 +584,46 @@ static void build_mode_page(void)
                CONTENT_X, 278, CONTENT_W, 42, 15, 1);
 }
 
+static void update_partition_selected(Fl_Widget *widget, void *)
+{
+    auto *choice = static_cast<Fl_Choice *>(widget);
+    int index = choice->mvalue() ? int((intptr_t)choice->mvalue()->user_data()) - 1 : -1;
+    if (widget == update_root_choice) installer_root_partition = index;
+    else installer_esp_partition = index;
+    update_checked = 0;
+}
+
+static void refresh_update_partitions(void)
+{
+    if (!update_root_choice || !update_esp_choice) return;
+    refresh_partitions();
+    update_root_choice->clear(); update_esp_choice->clear();
+    update_root_choice->add(T("Automatically identify a single ReliefOS installation"));
+    update_esp_choice->add(T("Use the selected installation's fstab"));
+    update_root_choice->value(0); update_esp_choice->value(0);
+    for (uint32_t i = 0; i < partition_count; ++i) {
+        char line[256]; format_partition_line(line, sizeof(line), &partitions[i]);
+        Fl_Choice *choice = partitions[i].gpt_type == RELIEFOS_BLOCK_GPT_ESP ? update_esp_choice :
+            partitions[i].gpt_type == RELIEFOS_BLOCK_GPT_LINUX ? update_root_choice : nullptr;
+        if (!choice) continue;
+        char escaped[sizeof(line) * 2]; size_t used = 0;
+        for (const char *p = line; *p; ++p) {
+            if (*p == '/' || *p == '\\' || *p == '&') escaped[used++] = '\\';
+            escaped[used++] = *p;
+        }
+        escaped[used] = 0;
+        choice->add(escaped, 0, nullptr, (void *)(intptr_t)(partitions[i].index + 1));
+        int selected = choice == update_root_choice ? installer_root_partition : installer_esp_partition;
+        if (selected == (int)partitions[i].index) choice->value(choice->size() - 2);
+    }
+}
+
 static void select_disk(Fl_Widget *, void *)
 {
     if (disk_browser && disk_browser->value() > 0)
         selected_disk = disk_browser->value() - 1;
+    setup.format_esp = 0;
+    refresh_update_partitions();
     update_footer();
 }
 
@@ -558,6 +638,7 @@ static void refresh_disk_list(void)
     }
     if (selected_disk >= 0 && (uint32_t)selected_disk < disk_count)
         disk_browser->value(selected_disk + 1);
+    refresh_update_partitions();
     update_footer();
     refresh_status_widgets();
 }
@@ -582,11 +663,21 @@ static void build_disk_page(void)
                CONTENT_X, 62, 600, 32, 15, 1);
     make_button(T("Refresh"), CONTENT_X + 650, 22, 130, 34, refresh_pressed, NULL);
     make_label(T("Available disks"), CONTENT_X, 102, CONTENT_W, 26, 14, 0);
-    disk_browser = new Fl_Hold_Browser(CONTENT_X, 132, CONTENT_W, 330);
+    disk_browser = new Fl_Hold_Browser(CONTENT_X, 132, CONTENT_W,
+                                     install_mode == INSTALLER_MODE_UPDATE ? 190 : 330);
     disk_browser->callback(select_disk);
     disk_browser->textsize(14);
     disk_browser->selection_color(COLOR_SIDEBAR);
     reliefos_fltk::style(disk_browser);
+    if (install_mode == INSTALLER_MODE_UPDATE) {
+        make_label(T("ReliefOS system partition"), CONTENT_X, 330, CONTENT_W, 24, 14, 0);
+        update_root_choice = new Fl_Choice(CONTENT_X, 356, CONTENT_W, 32);
+        make_label(T("EFI system partition"), CONTENT_X, 396, CONTENT_W, 24, 14, 0);
+        update_esp_choice = new Fl_Choice(CONTENT_X, 422, CONTENT_W, 32);
+        update_root_choice->callback(update_partition_selected);
+        update_esp_choice->callback(update_partition_selected);
+        reliefos_fltk::style(update_root_choice); reliefos_fltk::style(update_esp_choice);
+    }
     status_box = make_label(status_text, CONTENT_X, 478, CONTENT_W, 34, 14, 1);
     detail_box = make_label(detail_text, CONTENT_X, 516, CONTENT_W, 48, 14, 1);
     refresh_disk_list();
@@ -595,6 +686,7 @@ static void build_disk_page(void)
 static void refresh_partition_list(void)
 {
     if (!partition_browser) return;
+    if (format_esp_checkbox) format_esp_checkbox->value(setup.format_esp);
     char line[640];
     if (partition_hint) {
         struct installer_partition_plan plan;
@@ -822,6 +914,12 @@ static void partition_role_pressed(Fl_Widget *, void *data)
     partition_result(ret, T("Partition role updated."));
 }
 
+static void format_esp_changed(Fl_Widget *widget, void *)
+{
+    setup.format_esp = static_cast<Fl_Check_Button *>(widget)->value() != 0;
+    update_footer();
+}
+
 static void build_partition_page(void)
 {
     static const char *const labels[] = {
@@ -870,10 +968,18 @@ static void build_partition_page(void)
     detail_box = make_label(detail_text, CONTENT_X, 512, CONTENT_W, 38, 13, 1);
     make_label(T("Create: size in MiB, filesystem, name. Resize only changes the trailing edge."),
                CONTENT_X, 552, CONTENT_W, 26, 12, 1);
-    make_label((installer_partition_auto || installer_partition_table_replaced)
+    make_label(installer_partition_auto
                    ? T("Final confirmation formats a FAT32 ESP and ext4 root on the selected disk.")
-                   : T("Final confirmation formats only the selected ESP and root; other partitions are preserved."),
+                   : T("The selected root is formatted. An existing FAT32 ESP is preserved by default."),
                CONTENT_X, 578, CONTENT_W, 32, 12, 1);
+    if (!installer_partition_auto) {
+        auto *format = new Fl_Check_Button(CONTENT_X, 613, CONTENT_W, 28,
+            T("Format selected ESP (erase all EFI boot files on it)"));
+        format->value(setup.format_esp);
+        format_esp_checkbox = format;
+        format->callback(format_esp_changed);
+        reliefos_fltk::style(format);
+    }
     refresh_partition_list();
 }
 
@@ -992,8 +1098,6 @@ static void swap_install_changed(Fl_Widget *widget,void *)
 /** @brief Apply one firmware choice and explain the effect of skipping both. */
 static const char *bootloader_description(void)
 {
-    if (install_mode == INSTALLER_MODE_UPDATE)
-        return T("Existing partitions are preserved. BIOS requires an unformatted BIOS Boot partition. Skipped existing bootloaders are preserved.");
     if (setup.skip_bios && setup.skip_uefi)
         return T("No bootloader selected. A new installation will need a separately configured bootloader.");
     return setup.skip_bios
@@ -1029,20 +1133,54 @@ static void build_bootloader_page(void)
     reliefos_fltk::style(uefi);
     bootloader_hint = make_label(bootloader_description(),
                                  CONTENT_X, 244, CONTENT_W, 100, 14, 1);
-    if (install_mode == INSTALLER_MODE_UPDATE)
-        make_label(T("The initial selection matches the bootloaders found on this disk."),
-                   CONTENT_X, 362, CONTENT_W, 54, 14, 1);
 }
 
 static void build_confirm_page(void)
 {
+    if (install_mode == INSTALLER_MODE_UPDATE) {
+        char text[256];
+        make_heading(T("Review system update"), 16);
+        make_label(T("Installed version"), CONTENT_X, 66, 200, 26, 14, 0);
+        make_label(update_info.installed_version, CONTENT_X + 215, 66, 220, 26, 14, 0);
+        make_label(T("Media version"), CONTENT_X + 445, 66, 170, 26, 14, 0);
+        make_label(update_info.media_version, CONTENT_X + 620, 66, 160, 26, 14, 0);
+        make_label(T("Target disk"), CONTENT_X, 112, 200, 26, 14, 0);
+        make_label(update_info.disk, CONTENT_X + 215, 112, 560, 26, 14, 0);
+        make_label(T("System partition"), CONTENT_X, 150, 200, 26, 14, 0);
+        make_label(update_info.root_device, CONTENT_X + 215, 150, 560, 26, 14, 0);
+        make_label(T("Boot partition"), CONTENT_X, 188, 200, 26, 14, 0);
+        make_label(update_info.esp_device, CONTENT_X + 215, 188, 560, 26, 14, 0);
+        make_label(T("Desktop environment"), CONTENT_X, 226, 200, 26, 14, 0);
+        make_label(!strcmp(update_info.profile, "console") ? T("Console") : "Xorg / IceWM",
+                   CONTENT_X + 215, 226, 560, 26, 14, 0);
+        make_label(T("Free / required space"), CONTENT_X, 264, 200, 26, 14, 0);
+        snprintf(text, sizeof(text), "%llu MiB / %llu MiB",
+                 (unsigned long long)(update_info.free_bytes / (1024u * 1024u)),
+                 (unsigned long long)((update_info.required_bytes + 1024u * 1024u - 1) / (1024u * 1024u)));
+        make_label(text, CONTENT_X + 215, 264, 560, 26, 14, 0);
+        make_label(T("Update bootloader software"), CONTENT_X, 310, CONTENT_W, 26, 14, 0);
+        Fl_Check_Button *bios = new Fl_Check_Button(CONTENT_X, 346, 175, 30, "BIOS");
+        bios->value(!setup.skip_bios);
+        bios->callback(bootloader_install_changed, (void *)(uintptr_t)1);
+        reliefos_fltk::style(bios);
+        Fl_Check_Button *uefi = new Fl_Check_Button(CONTENT_X + 190, 346, 175, 30, "UEFI");
+        uefi->value(!setup.skip_uefi);
+        uefi->callback(bootloader_install_changed, (void *)(uintptr_t)2);
+        reliefos_fltk::style(uefi);
+        make_label(T("Accounts, personal files, installed software and local configuration are preserved."),
+                   CONTENT_X, 398, CONTENT_W, 46, 14, 1);
+        if (update_info.pending[0])
+            make_label(T("A previous update is incomplete. This attempt will verify the system and recover the pending update stages."),
+                       CONTENT_X, 464, CONTENT_W, 60, 14, 1);
+        else
+            make_label(T("Signed packages are checked before changes. Boot files are published after the package transaction succeeds."),
+                       CONTENT_X, 464, CONTENT_W, 60, 14, 1);
+        return;
+    }
     char line[160];
     char target[192];
-    make_heading(install_mode == INSTALLER_MODE_UPDATE
-                     ? T("Confirm Update") : T("Confirm Installation"), 16);
-    make_label(install_mode == INSTALLER_MODE_UPDATE
-                   ? T("Installed ReliefOS packages will be upgraded.")
-                   : T("This operation is destructive."),
+    make_heading(T("Confirm Installation"), 16);
+    make_label(T("This operation is destructive."),
                CONTENT_X, 54, CONTENT_W, 32, 15, 1);
     if (selected_disk >= 0 && (uint32_t)selected_disk < disk_count)
         format_disk_line(line, sizeof(line), &disks[selected_disk]);
@@ -1050,15 +1188,13 @@ static void build_confirm_page(void)
         line[0] = 0;
     snprintf(target, sizeof(target), "%s %s", T("Target:"), line);
     make_label(target, CONTENT_X, 98, CONTENT_W, 34, 14, 1);
-    make_label(install_mode == INSTALLER_MODE_UPDATE
-                   ? T("Alpine packages and local configuration are retained. Boot files are updated after the package transaction succeeds.")
-                   : (installer_partition_auto || installer_partition_table_replaced)
+    make_label(installer_partition_auto
                        ? T("The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root.")
-                       : T("Only the selected ESP and root partitions will be formatted; other partitions are preserved."),
+                       : setup.format_esp
+                           ? T("The selected root and ESP will be formatted. All EFI boot files on that ESP will be erased.")
+                           : T("Only the selected root will be formatted. Existing ESP files and other partitions are preserved."),
                CONTENT_X, 142, CONTENT_W, 64, 14, 1);
-    make_label(install_mode == INSTALLER_MODE_UPDATE
-                   ? T("Type UPDATE to enable the Update button.")
-                   : T("Type INSTALL to enable the Install button."),
+    make_label(T("Type INSTALL to enable the Install button."),
                CONTENT_X, 224, CONTENT_W, 30, 14, 1);
     confirm_input = new Fl_Input(CONTENT_X, 260, 330, 36);
     confirm_input->value(confirm_text);
@@ -1066,29 +1202,27 @@ static void build_confirm_page(void)
     confirm_input->when(FL_WHEN_CHANGED | FL_WHEN_ENTER_KEY_ALWAYS);
     confirm_input->callback(confirm_changed);
     reliefos_fltk::style(confirm_input);
-    if (install_mode != INSTALLER_MODE_UPDATE) {
-        xorg_checkbox = new Fl_Check_Button(CONTENT_X, 318, 375, 32,
-                                             T("Install Xorg desktop environment"));
-        xorg_checkbox->value(setup.skip_xorg ? 0 : 1);
-        xorg_checkbox->callback(xorg_install_changed);
-        reliefos_fltk::style(xorg_checkbox);
-        if (!swap_size_initialized) {
-            if (!setup.swap_size_mib) setup.swap_size_mib=installer_swap_recommend_system();
-            snprintf(swap_size_text,sizeof(swap_size_text),"%llu",(unsigned long long)setup.swap_size_mib);
-            swap_size_initialized=1;
-        }
-        Fl_Check_Button *swap=new Fl_Check_Button(CONTENT_X+390,318,220,32,T("Swapfile (MiB)"));
-        swap->value(setup.swap_enabled ? 1 : 0);
-        swap->callback(swap_install_changed);
-        reliefos_fltk::style(swap);
-        swap_size_input=new Fl_Input(CONTENT_X+615,318,130,32);
-        swap_size_input->value(swap_size_text);
-        swap_size_input->maximum_size(20);
-        swap_size_input->when(FL_WHEN_CHANGED);
-        swap_size_input->callback(swap_size_changed);
-        if (!setup.swap_enabled) swap_size_input->deactivate();
-        reliefos_fltk::style(swap_size_input);
+    xorg_checkbox = new Fl_Check_Button(CONTENT_X, 318, 375, 32,
+                                         T("Install Xorg desktop environment"));
+    xorg_checkbox->value(setup.skip_xorg ? 0 : 1);
+    xorg_checkbox->callback(xorg_install_changed);
+    reliefos_fltk::style(xorg_checkbox);
+    if (!swap_size_initialized) {
+        if (!setup.swap_size_mib) setup.swap_size_mib=installer_swap_recommend_system();
+        snprintf(swap_size_text,sizeof(swap_size_text),"%llu",(unsigned long long)setup.swap_size_mib);
+        swap_size_initialized=1;
     }
+    Fl_Check_Button *swap=new Fl_Check_Button(CONTENT_X+390,318,220,32,T("Swapfile (MiB)"));
+    swap->value(setup.swap_enabled ? 1 : 0);
+    swap->callback(swap_install_changed);
+    reliefos_fltk::style(swap);
+    swap_size_input=new Fl_Input(CONTENT_X+615,318,130,32);
+    swap_size_input->value(swap_size_text);
+    swap_size_input->maximum_size(20);
+    swap_size_input->when(FL_WHEN_CHANGED);
+    swap_size_input->callback(swap_size_changed);
+    if (!setup.swap_enabled) swap_size_input->deactivate();
+    reliefos_fltk::style(swap_size_input);
     snprintf(line, sizeof(line), "%s BIOS: %s    UEFI: %s", T("Bootloaders:"),
              setup.skip_bios ? T("Skip") : T("Install"),
              setup.skip_uefi ? T("Skip") : T("Install"));
@@ -1096,9 +1230,24 @@ static void build_confirm_page(void)
     make_label(bootloader_description(), CONTENT_X, 414, CONTENT_W, 100, 13, 1);
 }
 
+static void build_update_log(int y, int height)
+{
+    make_label(T("Update details"), CONTENT_X, y, CONTENT_W, 26, 14, 0);
+    if (!update_log_buffer) update_log_buffer = new Fl_Text_Buffer();
+    update_log_display = new Fl_Text_Display(CONTENT_X, y + 32, CONTENT_W, height);
+    update_log_display->buffer(update_log_buffer);
+    update_log_display->textfont(FL_HELVETICA);
+    update_log_display->textsize(13);
+    update_log_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+    reliefos_fltk::style(update_log_display);
+    update_log_display->insert_position(update_log_buffer->length());
+    update_log_display->show_insert_position();
+    make_label("/var/log/installer-update.log", CONTENT_X, y + height + 40, CONTENT_W, 22, 12, 0);
+}
+
 static void build_progress_page(void)
 {
-    make_heading(mode_progress_title(), 20);
+    make_heading(update_job == 1 ? T("Checking system update") : mode_progress_title(), 20);
     make_label(T("Do not turn off this machine."), CONTENT_X, 62,
                CONTENT_W, 30, 15, 1);
     progress_text_box = make_label(progress_text, CONTENT_X, 112,
@@ -1115,6 +1264,7 @@ static void build_progress_page(void)
     snprintf(percent, sizeof(percent), "%u%%", (unsigned)value);
     progress_percent_box = make_label(percent, CONTENT_X + CONTENT_W - 98,
                                       162, 72, 30, 14, 0);
+    if (install_mode == INSTALLER_MODE_UPDATE) build_update_log(222, 290);
 }
 
 static void build_finish_page(void)
@@ -1129,25 +1279,41 @@ static void build_finish_page(void)
                    CONTENT_X, 62, CONTENT_W, 32, 15, 1);
         make_label(T("Remove the installation media, then restart."),
                    CONTENT_X, 108, CONTENT_W, 32, 15, 1);
+        if (!setup.skip_uefi) {
+            char entry[128];
+            int error = install_mode == INSTALLER_MODE_UPDATE
+                ? (snprintf(entry, sizeof(entry), "%s", update_info.boot_file), 0)
+                : installer_boot_entry_path(entry, sizeof(entry));
+            if (!error) {
+                make_label(T("UEFI boot file (add it in firmware if no automatic entry appears):"),
+                           CONTENT_X, 148, CONTENT_W, 28, 13, 1);
+                make_label(entry, CONTENT_X, 180, CONTENT_W, 28, 13, 1);
+            }
+        }
         if (reboot_error) {
-            make_label(T("Restart failed"), CONTENT_X, 154,
+            make_label(T("Restart failed"), CONTENT_X, 212,
                        CONTENT_W, 28, 14, 1);
             snprintf(message, sizeof(message), "%s", strerror(reboot_error));
-            make_label(message, CONTENT_X, 184, CONTENT_W, 36, 14, 1);
+            make_label(message, CONTENT_X, 242, CONTENT_W, 36, 14, 1);
         }
     } else {
         make_heading(install_mode == INSTALLER_MODE_UPDATE
                          ? T("Update Failed") : T("Installation Failed"), 20);
-        make_label(T("No writes will continue after this error."),
+        make_label(install_mode == INSTALLER_MODE_UPDATE
+                       ? T("Review the details, then check the update again to retry.")
+                       : T("No writes will continue after this error."),
                    CONTENT_X, 62, CONTENT_W, 32, 15, 1);
         make_label(status_text, CONTENT_X, 108, CONTENT_W, 42, 14, 1);
         make_label(detail_text, CONTENT_X, 154, CONTENT_W, 60, 14, 1);
     }
+    if (install_mode == INSTALLER_MODE_UPDATE) build_update_log(reboot_error ? 290 : 236, reboot_error ? 210 : 264);
 }
 
 static void clear_page_widgets(void)
 {
     disk_browser = NULL;
+    update_root_choice = update_esp_choice = NULL;
+    format_esp_checkbox = NULL;
     partition_browser = NULL;
     confirm_input = NULL;
     xorg_checkbox = NULL;
@@ -1160,6 +1326,7 @@ static void clear_page_widgets(void)
     progress_text_box = NULL;
     progress_percent_box = NULL;
     progress_bar = NULL;
+    update_log_display = NULL;
     for (int i = 0; i < 5; ++i) account_inputs[i] = NULL;
 }
 
@@ -1171,7 +1338,7 @@ static void show_page(void)
     content_group->begin();
     switch ((enum installer_page)page) {
     case INSTALLER_PAGE_LANGUAGE: build_language_page(); break;
-    case INSTALLER_PAGE_THANKS: build_thanks_page(); break;
+    case INSTALLER_PAGE_LICENSE: build_license_page(); break;
     case INSTALLER_PAGE_WELCOME: build_welcome_page(); break;
     case INSTALLER_PAGE_MODE: build_mode_page(); break;
     case INSTALLER_PAGE_DISK: build_disk_page(); break;
@@ -1289,6 +1456,10 @@ static int run_graphical(void)
 
 int main(int argc, char **argv)
 {
+    if (argc >= 2 && !strcmp(argv[1], "--update-worker")) {
+        setvbuf(stdout, NULL, _IOLBF, 0);
+        return installer_update_worker(argc, argv);
+    }
     struct installer_tty_context tty_context;
     int graphical = argc == 2 && strcmp(argv[1], "--graphical") == 0;
 
@@ -1329,9 +1500,8 @@ int main(int argc, char **argv)
         tty_context.partition_set_type = installer_partition_set_type;
         tty_context.partition_delete = installer_partition_delete;
         tty_context.partition_format = installer_partition_format;
-        tty_context.prepare_update = prepare_update_target;
         tty_context.perform_install = perform_install;
-        tty_context.perform_update = perform_update;
+        tty_context.boot_entry_path = installer_boot_entry_path;
         return installer_tty_main(&tty_context);
     }
     puts("[installer.elf] starting installer wizard");

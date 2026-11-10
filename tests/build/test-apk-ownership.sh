@@ -17,6 +17,11 @@ missing = sorted(required - groups.keys())
 legacy = sorted(name for name in groups if name.startswith("leonos-"))
 if missing or legacy or policy.get("current_distributor") != "reliefos-build":
     raise SystemExit(f"APK ownership identity is not migrated: missing={missing}, legacy={legacy}, distributor={policy.get('current_distributor')}")
+if {"sl", "ncurses", "sqlite"} & groups.keys():
+    raise SystemExit("official terminal/SQLite packages must not create local APK ownership groups")
+if policy.get("upstream_components") != {"sl": ["sl"], "ncurses": ["ncurses", "ncurses-terminfo"],
+                                         "sqlite": ["sqlite", "sqlite-libs"]}:
+    raise SystemExit("terminal/SQLite components must identify their real upstream packages")
 for app in ("reliefexcel", "reliefword", "reliefppt"):
     if app not in groups["reliefos-apps"]["components"]:
         raise SystemExit(f"{app} is missing from reliefos-apps ownership")

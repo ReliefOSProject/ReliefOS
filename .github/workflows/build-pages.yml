@@ -69,6 +69,9 @@ jobs:
           git -C third_party/musl rev-parse --verify HEAD
           git submodule status --recursive
 
+      - name: Check both documentation manuals
+        run: python3 tools/test_documentation.py
+
       - name: Import APK signing key
         id: signing_key
         env:

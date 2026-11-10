@@ -20,6 +20,14 @@ config IMAGE_SIZE_MIB
       Minimum size requested by the BIOS/UEFI disk-image builder. The builder
       may increase it to fit the root filesystem and partition overhead.
 
+config DISK_INSTANCE_ID
+    string "Standalone disk image instance identity"
+    default "reliefos"
+    help
+      Use a distinct identity for disk images that will be connected together.
+      It deterministically derives GPT disk and partition UUIDs. An exact
+      byte-for-byte clone retains its identities, just as on other systems.
+
 config INSTALLER_ROOT_SIZE_MIB
     int "Minimum installer runtime root size in MiB"
     range 32 4096

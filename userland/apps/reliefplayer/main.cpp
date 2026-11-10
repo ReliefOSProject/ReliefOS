@@ -17,7 +17,7 @@ void ready(void *p) {
   auto &start = *static_cast<Startup *>(p);
   start.window->redraw();
   Fl::flush();
-  puts("[reliefplayer.elf] FLTK audio player ready");
+  puts("[reliefplayer.elf] FLTK media player ready");
   fflush(stdout);
   if (start.path)
     start.window->open_path(start.path);
@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
   bool literal = false;
   for (int n = 1; n < argc; ++n) {
     if (!literal && !strcmp(argv[n], "--help")) {
-      puts("Usage: reliefplayer [--] [audio.mp3|audio.wav]\nNative FLTK audio "
+      puts("Usage: reliefplayer [--] [audio.mp3|audio.wav|video.mp4]\nNative FLTK media "
            "player.");
       return 0;
     }

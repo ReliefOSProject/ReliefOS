@@ -16,11 +16,13 @@ enum class Error : uint32_t {
   Playback,
   Worker
 };
-enum class Kind : uint32_t { Wav, Mp3 };
+enum class Kind : uint32_t { Wav, Mp3, Mp4 };
 struct Info {
   Kind kind = Kind::Wav;
   uint32_t rate = 0, channels = 0, bits = 0;
   uint64_t frames = 0;
+  uint32_t width = 0, height = 0;
+  bool has_audio = true;
 };
 using Progress = bool (*)(void *, uint64_t, uint64_t);
 const char *error_text(Error error);

@@ -1,6 +1,7 @@
 #include "worker.h"
 #include "../relieftodo/storage.h"
 #include "pcm.h"
+#include "media.h"
 #include "protocol.h"
 #include <errno.h>
 #include <fcntl.h>
@@ -319,7 +320,8 @@ public:
   }
 };
 } // namespace
-int worker(const char *path, int commands, int statuses, unsigned volume) {
+int worker(const char *path, int commands, int statuses, unsigned volume,
+           VideoShared *video) {
   signal(SIGPIPE, SIG_IGN);
   Control control;
   control.fd = commands;
@@ -339,10 +341,23 @@ int worker(const char *path, int commands, int statuses, unsigned volume) {
     report.send(true);
     return 1;
   }
+  VideoDecoder picture;
+  bool has_video = decoder.info().kind == Kind::Mp4;
+  if (has_video && (!video || !picture.open(path, error, loading, &progress))) {
+    if (control.quit)
+      return 0;
+    report.status.state = State::Failed;
+    report.status.error = video ? error : Error::Memory;
+    report.send(true);
+    return 1;
+  }
   report.status.info = decoder.info();
   report.status.progress = 100;
   Audio audio;
   uint64_t target = 0;
+  uint64_t clock_base = 0, clock_started = 0;
+  bool silent_running = false;
+  bool has_audio = decoder.info().has_audio;
   State state = State::Stopped;
   unsigned recoveries = 0;
   while (!control.quit) {
@@ -356,8 +371,23 @@ int worker(const char *path, int commands, int statuses, unsigned volume) {
                                                         : control.target;
       else if (audio.active())
         target = audio.position();
+      else if (silent_running) {
+        target = clock_base + monotonic_ms() - clock_started;
+        if (target > decoder.info().frames)
+          target = decoder.info().frames;
+      }
+      uint64_t preview_ms = target * 1000 / decoder.info().rate;
+      if (target == decoder.info().frames && preview_ms)
+        --preview_ms;
+      bool seek_failed =
+          has_video && control.seeking && !picture.seek(preview_ms, error);
       audio.close();
-      if (target == decoder.info().frames && !control.play_requested) {
+      silent_running = false;
+      if (seek_failed) {
+        report.status.error = error;
+        state = State::Failed;
+        control.playing = false;
+      } else if (target == decoder.info().frames && !control.play_requested) {
         state = State::Ended;
         control.playing = false;
       } else
@@ -365,16 +395,29 @@ int worker(const char *path, int commands, int statuses, unsigned volume) {
       control.reset = control.seeking = false;
       control.play_requested = false;
     }
-    if (control.playing && !audio.active()) {
-      if (target >= decoder.info().frames)
+    if (control.playing && !audio.active() && !silent_running) {
+      if (target >= decoder.info().frames) {
         target = 0;
+        if (has_video && !picture.seek(0, error)) {
+          report.status.error = error;
+          state = State::Failed;
+          control.playing = false;
+        }
+      }
       errno = 0;
-      if (!audio.open(decoder, target, error)) {
+      if (!control.playing) {
+        // Seeking/replay errors remain visible until the user retries.
+      } else if (has_audio && !audio.open(decoder, target, error)) {
         report.status.error = error;
         report.status.system_error = errno;
         state = State::Failed;
         control.playing = false;
       } else {
+        if (!has_audio) {
+          silent_running = true;
+          clock_base = target;
+          clock_started = monotonic_ms();
+        }
         state = State::Playing;
         report.status.error = Error::Ok;
         report.status.system_error = 0;
@@ -412,6 +455,25 @@ int worker(const char *path, int commands, int statuses, unsigned volume) {
           report.status.system_error = saved;
         }
       }
+    }
+    if (control.playing && silent_running) {
+      target = clock_base + monotonic_ms() - clock_started;
+      if (target >= decoder.info().frames) {
+        target = decoder.info().frames;
+        silent_running = false;
+        control.playing = false;
+        state = State::Ended;
+      }
+    }
+    if (has_video && state != State::Failed &&
+        !picture.pump(target * 1000 / decoder.info().rate, video, error)) {
+      if (control.quit)
+        break;
+      audio.close();
+      silent_running = false;
+      control.playing = false;
+      state = State::Failed;
+      report.status.error = error;
     }
     bool changed = report.status.state != state;
     report.status.state = state;

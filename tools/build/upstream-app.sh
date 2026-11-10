@@ -52,17 +52,5 @@ pleditor)
  cp "$work/generated/src/main.c" "$work/generated/src/pleditor.c" \
     "$work/generated/src/syntax.c" "$output/pleditor-generated/src/"
  ;;
-sl)
- compile -D_DEFAULT_SOURCE -fPIE -c "$source/sl.c" -o "$work/objects/sl.o"
- executable "$work/objects/sl.o"
- ;;
-sqlite)
- sed "s@TOP = ../sqlite@TOP = $source@" "$source/Makefile.linux-gcc" > "$work/generated/Makefile"
- (cd "$work/generated" && make sqlite3.c sqlite3.h)
- flags="$flags -DSQLITE_OS_OTHER=1 -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION=1 -DSQLITE_OMIT_WAL=1 -DSQLITE_DEFAULT_MEMSTATUS=0 -DSQLITE_MAX_MMAP_SIZE=0"
- compile -c "$work/generated/sqlite3.c" -o "$work/objects/sqlite3.o"
- cp "$work/objects/sqlite3.o" "$output/sqlite3.o"
- cp "$work/generated/sqlite3.c" "$work/generated/sqlite3.h" "$output/"
- ;;
 *) echo "unsupported upstream app: $pkg" >&2; exit 2 ;;
 esac

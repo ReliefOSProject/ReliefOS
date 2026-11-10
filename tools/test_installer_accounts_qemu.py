@@ -431,7 +431,7 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False,
 
 def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
                 install_bios=True, install_uefi=True, select_entry=True, install_timeout=2400,
-                swap_mib=None):
+                swap_mib=None, partition_commands=None):
     """Answer the real TTY installer, including both independent loader choices."""
     if select_entry:
         from test_vt_qemu import ocr
@@ -457,7 +457,7 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
                ("Select disk number (r to refresh, q to quit): ", "0"),
                ("Install or update BIOS bootloader? [Y/n]: ", "" if install_bios else "n"),
                ("Install or update UEFI bootloader? [Y/n]: ", "" if install_uefi else "n"),
-               ("partition> ", "auto"), ("partition> ", "done"),
+               *[("partition> ", command) for command in (partition_commands or ("auto", "done"))],
                ("Username: ", "alice"), ("Password: ", USER_PASSWORD),
                ("Confirm password: ", USER_PASSWORD), ("root password: ", ROOT_PASSWORD),
                ("Confirm root password: ", ROOT_PASSWORD),
@@ -477,7 +477,7 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
 def login_tty(probe, serial, process, root, *, skip_xorg=False):
     # Console-profile installs expose tty1 directly. Xorg-profile installs
     # keep a text getty on tty2, even while a graphical greeter owns tty1.
-    from test_vt_qemu import wait_text
+    from test_vt_qemu import wait_text, ocr
     username = "root" if root else "alice"
     if skip_xorg:
         wait_text(probe, process, "console-tty1-login", "login:", timeout=90)
@@ -485,6 +485,18 @@ def login_tty(probe, serial, process, root, *, skip_xorg=False):
         # Xorg takes tty1 after init completes. Switch only after that handoff
         # so its startup cannot steal the test's text login back from tty2.
         wait_log(serial, "VT graphics vt=1 enabled=1", process, timeout=120)
+        deadline = time.monotonic() + 120
+        while time.monotonic() < deadline:
+            assert process.poll() is None, "QEMU exited before XDM was ready"
+            frame = probe.frame("xdm-ready")
+            # The large X logo dominates whole-screen text segmentation.
+            greeter = frame.crop((max(0, frame.width // 2 - 320), frame.height // 4,
+                                  min(frame.width, frame.width // 2 + 180), frame.height * 3 // 4))
+            if "Login into ReliefOS" in ocr(greeter):
+                break
+            time.sleep(.5)
+        else:
+            raise AssertionError("XDM login fields did not become ready")
         probe.key("ctrl-alt-f2")
         wait_text(probe, process, "tty-login", "login:", timeout=90)
     probe.text(username)
@@ -552,6 +564,35 @@ def login_tty(probe, serial, process, root, *, skip_xorg=False):
     probe.frame(("console-tty1" if skip_xorg else "tty2") + ("-root-session" if root else "-user-session"))
 
 
+def shutdown_after_login(probe, process, *, root):
+    """Stop services cleanly so the next boot does not inherit Xorg's live lock."""
+    from test_vt_qemu import wait_text
+    if not root:
+        probe.text("exit")
+        probe.key("ret")
+        wait_text(probe, process, "shutdown-login", "login:")
+        probe.text("root")
+        probe.key("ret")
+        wait_text(probe, process, "shutdown-password", "Password:")
+        probe.text(ROOT_PASSWORD)
+        probe.key("ret")
+        probe.text("echo SHUTDOWN_AUTHENTICATED")
+        probe.key("ret")
+        wait_text(probe, process, "shutdown-root", "SHUTDOWN_AUTHENTICATED")
+    probe.text("/sbin/poweroff")
+    probe.key("ret")
+    deadline = time.monotonic() + 60
+    while time.monotonic() < deadline:
+        status = process.poll()
+        if status is not None:
+            assert status == 0, f"QEMU exited with status {status} during shutdown"
+            return
+        if probe.command("query-status")["status"] == "shutdown":
+            return
+        time.sleep(.2)
+    raise AssertionError("The installed system did not finish its normal shutdown")
+
+
 def login_desktop(probe, serial, process):
     wait_log(serial, "path=/usr/lib/reliefos/apps/login/login.elf", process)
     time.sleep(5)
@@ -582,7 +623,7 @@ def login_desktop(probe, serial, process):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--iso", type=Path, default=ROOT / "build/images/reliefos-installer.iso")
+    parser.add_argument("--iso", type=Path, default=ROOT / "out/x86_64/release/images/reliefos-installer.iso")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--installer", choices=("gui", "tty"), default="gui")
     parser.add_argument("--without-xorg", action="store_true",
@@ -615,8 +656,10 @@ def main():
                 install_tty(*session, skip_xorg=args.without_xorg, swap_mib=args.swap_mib)
     with boot(output / "root", disk) as session:
         login_tty(*session, True, skip_xorg=args.without_xorg)
+        shutdown_after_login(session[0], session[2], root=True)
     with boot(output / "user", disk) as session:
         login_tty(*session, False, skip_xorg=args.without_xorg)
+        shutdown_after_login(session[0], session[2], root=False)
     if args.desktop:
         with boot(output / "desktop", disk) as session:
             login_desktop(*session)

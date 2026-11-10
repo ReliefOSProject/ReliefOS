@@ -550,10 +550,6 @@ msgstr ""
 msgid "Accounts"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:477
-msgid "Acknowledgements for public resources and open-source projects."
-msgstr ""
-
 #: userland/apps/calc/units.cpp:22
 msgid "Acre"
 msgstr ""
@@ -776,10 +772,6 @@ msgstr ""
 
 #: userland/apps/installer/install_ops.c:1618
 msgid "Alpine packages and local configuration are preserved."
-msgstr ""
-
-#: userland/apps/installer/main.cpp:1027
-msgid "Alpine packages and local configuration are retained. Boot files are updated after the package transaction succeeds."
 msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:525
@@ -2348,10 +2340,6 @@ msgstr ""
 
 #: userland/apps/reliefmail/window_actions.cpp:490
 msgid "Confirm Trash clear"
-msgstr ""
-
-#: userland/apps/installer/main.cpp:1015
-msgid "Confirm Update"
 msgstr ""
 
 #: userland/apps/reliefmail/window_reader.cpp:170
@@ -5998,10 +5986,6 @@ msgstr ""
 msgid "Installed"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1017
-msgid "Installed ReliefOS packages will be upgraded."
-msgstr ""
-
 #: userland/apps/reliefapk/window.cpp:688
 msgid "Installed size"
 msgstr ""
@@ -6591,6 +6575,7 @@ msgid "Library"
 msgstr ""
 
 #: userland/apps/reliefapk/window.cpp:684
+#: userland/apps/installer/main.cpp
 msgid "License"
 msgstr ""
 
@@ -11814,14 +11799,6 @@ msgstr ""
 msgid "Text..."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:476
-msgid "Thank You"
-msgstr ""
-
-#: userland/apps/installer/main.cpp:214
-msgid "Thanks"
-msgstr ""
-
 #: userland/apps/oshlp/main.c:1208
 msgid "The .hlp file could not be read."
 msgstr ""
@@ -12572,10 +12549,6 @@ msgstr ""
 
 #: userland/apps/installer/main.cpp:1034
 msgid "Type INSTALL to enable the Install button."
-msgstr ""
-
-#: userland/apps/installer/main.cpp:1033
-msgid "Type UPDATE to enable the Update button."
 msgstr ""
 
 #: userland/apps/reliefmail/window_actions.cpp:491
@@ -15030,10 +15003,6 @@ msgstr ""
 msgid "Choose bootloaders"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:969
-msgid "Existing partitions are preserved. BIOS requires an unformatted BIOS Boot partition. Skipped existing bootloaders are preserved."
-msgstr ""
-
 #: userland/apps/installer/main.cpp:608
 msgid "Manual layout: assign a FAT32 ESP and an ext4 root. BIOS Boot is not required for the selected bootloaders."
 msgstr ""
@@ -15056,10 +15025,6 @@ msgstr ""
 
 #: userland/apps/installer/main.cpp:606
 msgid "The automatic layout does not fit this disk. Select another disk or configure partitions manually."
-msgstr ""
-
-#: userland/apps/installer/main.cpp:1006
-msgid "The initial selection matches the bootloaders found on this disk."
 msgstr ""
 
 #: userland/apps/installer/main.cpp:707
@@ -15460,4 +15425,292 @@ msgstr ""
 
 #: userland/apps/network-controller/window.cpp
 msgid "Adapter counters are not exported by this kernel. Address, gateway, DNS and connection diagnostics remain available."
+msgstr ""
+
+#: userland/apps/installer
+msgid "Checking update target"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Administrator privileges are required"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Identifying the installed system"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Checking installation media and free space"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Installation media is older than the installed system"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Target or media changed. Check the update again."
+msgstr ""
+
+#: userland/apps/installer
+msgid "Checking bootloader compatibility"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Verifying signed packages and dependencies"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Update checks completed"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Preparing the installed system for update"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Recovering the previous update attempt"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Applying signed system packages"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Synchronizing the updated root filesystem"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Resuming bootloader publication"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Publishing kernel and bootloader files"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Finishing the system update"
+msgstr ""
+
+#: userland/apps/installer
+msgid "System update completed successfully"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Writing the update log"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Update worker failed"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Check Again"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Check Update"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Ready to update"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Review the detected system and start the update."
+msgstr ""
+
+#: userland/apps/installer
+msgid "Cannot start the update worker"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Preparing the system update"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Checking the selected system"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Review system update"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Media version"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Target disk"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Boot partition"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Desktop environment"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Console"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Free / required space"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Update bootloader software"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Accounts, personal files, installed software and local configuration are preserved."
+msgstr ""
+
+#: userland/apps/installer
+msgid "A previous update is incomplete. This attempt will verify the system and recover the pending update stages."
+msgstr ""
+
+#: userland/apps/installer
+msgid "Signed packages are checked before changes. Boot files are published after the package transaction succeeds."
+msgstr ""
+
+#: userland/apps/installer
+msgid "Update details"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Checking system update"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Review the details, then check the update again to retry."
+msgstr ""
+
+#: userland/apps/installer
+msgid "System version"
+msgstr ""
+
+#: userland/apps/installer
+msgid "Proceed with system update? [y/N]: "
+msgstr ""
+
+#: configs/nls/messages.c:688
+msgid "Could not read the media file"
+msgstr ""
+
+#: configs/nls/messages.c:689
+msgid "Invalid or truncated media file"
+msgstr ""
+
+#: configs/nls/messages.c:691
+msgid "Media exceeds the supported size or resolution"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:181
+msgid "Media files (*.{mp3,MP3,wav,WAV,mp4,MP4})"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:55
+msgid "Media playback failed"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:272
+msgid "No audio track"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:85
+msgid "No media file selected"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:43
+msgid "Open an MP3, WAV or MP4 file to begin"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:181
+msgid "Open media"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:81
+msgid "Open media..."
+msgstr ""
+
+#: configs/nls/messages.c:696
+msgid "Playback process stopped unexpectedly"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:45
+msgid "Reading media information..."
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:330
+msgid "ReliefPlayer\nMP3 / WAV audio and MP4 video player\n\nCtrl+O: open media\nSpace: play or pause\nLeft / Right: seek 10 seconds\nHome: return to the beginning\n\nVolume changes affect this player only.\nSupports PCM WAV 8/16/24/32-bit and float32, mono or stereo.\nMP4: H.264, MPEG-4 or HEVC video; AAC or MP3 audio.\nLocal files only; no network streams or media library."
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:221
+msgid "Stopping playback..."
+msgstr ""
+
+#: configs/nls/messages.c:690
+msgid "Unsupported media format or codec"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:435
+msgid "Automatic installation erases the selected disk."
+msgstr ""
+
+#: userland/apps/installer/main.cpp:691
+msgid "Automatically identify a single ReliefOS installation"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:449
+msgid "Cannot identify the selected partitions"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:765
+msgid "EFI system partition"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:381
+msgid "ESP partition number (blank: use fstab): "
+msgstr ""
+
+#: userland/apps/installer/main.cpp:1067
+msgid "Format selected ESP (erase all EFI boot files on it)"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:437
+msgid "Only the selected root is formatted; existing ESP files are preserved."
+msgstr ""
+
+#: userland/apps/installer/main.cpp:1285
+msgid "Only the selected root will be formatted. Existing ESP files and other partitions are preserved."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:382
+msgid "ReliefOS root partition number (blank: auto): "
+msgstr ""
+
+#: userland/apps/installer/main.cpp:763
+msgid "ReliefOS system partition"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:436
+msgid "The selected root and ESP will be formatted."
+msgstr ""
+
+#: userland/apps/installer/main.cpp:1284
+msgid "The selected root and ESP will be formatted. All EFI boot files on that ESP will be erased."
+msgstr ""
+
+#: userland/apps/installer/main.cpp:1063
+msgid "The selected root is formatted. An existing FAT32 ESP is preserved by default."
+msgstr ""
+
+#: userland/apps/installer/main.cpp:1378
+msgid "UEFI boot file (add it in firmware if no automatic entry appears):"
+msgstr ""
+
+#: userland/apps/installer/main.cpp:692
+msgid "Use the selected installation's fstab"
 msgstr ""

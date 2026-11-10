@@ -23,6 +23,23 @@
 同名外部命令使用 GNU 入口，旧路径由 APK 管理并转发；详情与验收方法见
 :doc:`coreutils`。
 
+基础依赖
+========
+
+sl、ncurses、zlib、libpng、SQLite、mbedTLS 3 由签名 Alpine APK 提供。
+系统直接请求官方命令、终端工具/数据和 SQLite 命令/运行库，不再生成本地包装包。
+文件所有权可通过
+``apk info --who-owns /usr/bin/sl``、``/usr/bin/tput``、``/usr/lib/libsqlite3.so.0`` 查询。
+离线更新器在预检时将旧包装包的 world 请求转换为官方包，保留其他包和配置；
+正式事务自动卸载旧包，完成后清除离线缓存中的旧包装包归档。
+新的自有包使用第 4 代版本前缀，保证从第 2、3 代包按正常版本顺序升级。
+旧的 ``sqlite.so.3`` ABI 已移除。
+依赖旧自定义 SQLite VFS 或厂商内部符号的外部程序需要重新编译。
+
+RPR 本地发布树继续包含完整的签名索引、原始上游 APK 和自有包，构建
+``rpr-pages`` 不等于部署到线上。运行库因新增 ELF NEEDED 而得到真实 APK
+依赖，不能只复制新的 ``libreliefos.so.2`` 而遗漏配套库。
+
 内核与模块更新
 ==============
 

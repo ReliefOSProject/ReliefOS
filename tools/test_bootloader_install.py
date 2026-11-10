@@ -1,5 +1,6 @@
 """Host publication and refusal tests for the shared installer API."""
 from pathlib import Path
+from runtime_test_dependencies import crypto_flags
 import contextlib
 import os
 import hashlib
@@ -50,24 +51,21 @@ exec "$grub/bin/grub-bios-setup" -s --root-device=hd0,gpt2 \
             helper.chmod(0o755)
             helpers[name] = helper
         sources = [ROOT / "userland/runtime/src" / f"bootloader{suffix}.c"
-                   for suffix in ("", "_publish", "_process")]
+                   for suffix in ("", "_publish", "_process", "_uefi")]
         sources.extend(ROOT / "userland/runtime/src" / (name + ".c") for name in
                        ("kernel_bundle_io", "kernel_bundle_check", "kernel_bundle_slots", "kernel_bundle_publish", "kernel_bundle_sync"))
-        sources.extend((ROOT / "userland/runtime/shared/boot_slots.c",
-                        ROOT / "third_party/mbedtls/library/sha256.c",
-                        ROOT / "third_party/mbedtls/library/platform_util.c"))
-        (work / "qa_mbedtls.h").write_text("#define MBEDTLS_SHA256_C\n")
+        sources.append(ROOT / "userland/runtime/shared/boot_slots.c")
         subprocess.run([
             "cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g",
             "-fsanitize=address,undefined", "-Wall", "-Wextra", "-Werror",
-            '-DMBEDTLS_CONFIG_FILE="qa_mbedtls.h"', "-I", work, "-Ithird_party/mbedtls/include",
+            "-I", work,
             f'-DBOOT_GRUB_INSTALL="{adapter}"',
             *[f'-DBOOT_{name.upper().replace("-", "_")}="{path}"' for name, path in helpers.items()],
             "-Wl,--wrap=stat,--wrap=lstat,--wrap=open,--wrap=ioctl,--wrap=fsync,--wrap=write,--wrap=setmntent",
             "-Wl,--wrap=reliefos_block_get_info,--wrap=reliefos_block_list_partitions",
             "-Wl,--wrap=reliefos_block_partition_uuid",
             "-Iuserland/runtime/include", "tests/host/test_bootloader_install.c",
-            *sources, "-o", executable,
+            *sources, *crypto_flags(), "-o", executable,
         ], cwd=ROOT, check=True)
         fixture = fixtures.ModulesStage("test_real_metadata_dependency_closure_and_stale_output")
         fixture.setUp()
@@ -82,7 +80,7 @@ exec "$grub/bin/grub-bios-setup" -s --root-device=hd0,gpt2 \
         source = work / "source"
         source.mkdir()
         subprocess.run([fixtures.KERNEL_TOOLS, "boot-payload", fixture.install / "kernel.sys", archive, source], check=True)
-        for relative in ("grub/grub.cfg", "grub/kernel-slots.cfg",
+        for relative in ("grub/grub.cfg", "grub/kernel-slots.cfg", "grub/other-systems.cfg",
                          "grub/fonts/leonos-unicode.pf2", "grub/theme/theme.txt", "EFI/BOOT/BOOTX64.EFI"):
             file = source / relative
             file.parent.mkdir(parents=True, exist_ok=True)

@@ -1,4 +1,4 @@
-/* Installer install/update operations shared by the FLTK and TTY frontends. */
+/* Fresh installation operations and wizard state shared by both frontends. */
 #ifndef RELIEFOS_INSTALLER_OPS_H
 #define RELIEFOS_INSTALLER_OPS_H
 
@@ -32,6 +32,7 @@ extern "C" {
 #define INSTALL_ESP_PAYLOAD "/install/esp"
 #define INSTALL_ROOT_MOUNT "/target"
 #define INSTALL_ESP_MOUNT "/target/boot"
+#define INSTALL_ESP_VOLUME "/target/efi"
 
 /* Target-root path contract.  The installer payload uses the same relative
  * paths as the guest root, so each payload path is INSTALL_ROOT_PAYLOAD plus
@@ -105,6 +106,7 @@ void format_partition_line(char *buf, uint32_t cap,
                            const struct reliefos_block_partition *partition);
 int installer_partition_plan_valid(void);
 uint32_t installer_boot_modes(void);
+int installer_boot_entry_path(char *path, uint32_t capacity);
 int installer_partition_initialize(void);
 int installer_partition_auto_layout(void);
 int installer_partition_create(uint32_t filesystem, uint32_t size_mib,
@@ -116,9 +118,7 @@ int installer_partition_delete(void);
 int installer_partition_format(uint32_t filesystem, const char *label);
 
 /* Long-running operations; they drive `page` to PROGRESS then FINISH. */
-void prepare_update_target(void);
 void perform_install(void);
-void perform_update(void);
 
 #ifdef __cplusplus
 }

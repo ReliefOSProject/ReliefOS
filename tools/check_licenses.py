@@ -22,22 +22,14 @@ from pathlib import Path
 from typing import Iterable, Sequence
 
 
-DEFAULT_EXCLUDED_CREDITS = ("llama2.c", "TinyLlama", "karpathy")
-
 # The first existing candidate is accepted.
 SUBMODULE_LICENSES: dict[str, tuple[str, ...]] = {
     "litehtml": ("LICENSE",),
-    "mbedtls": ("LICENSE",),
     "musl": ("COPYRIGHT",),
     "mimalloc": ("LICENSE",),
     "busybox": ("LICENSE",),
-    "ncurses": ("COPYING",),
     "pl_editor": ("LICENSE", "COPYING"),
-    "zlib": ("LICENSE",),
-    "libpng": ("LICENSE",),
     "stardustui": ("LICENSE",),
-    "sl": ("LICENSE",),
-    "sqlite": ("LICENSE.md", "LICENSE", "COPYING"),
     "portablegl": ("LICENSE",),
 }
 
@@ -55,11 +47,13 @@ IMAGE_LICENSES: dict[str, tuple[str, ...]] = {
 SDK_LICENSES: dict[str, tuple[str, ...]] = {
     "libncursesw.a": ("THIRD_PARTY/NCURSES-COPYING",),
     "libtinfow.a": ("THIRD_PARTY/NCURSES-COPYING",),
-    "libc.a": ("THIRD_PARTY/MUSL-COPYING",),
-    "libz.a": ("THIRD_PARTY/ZLIB-LICENSE",),
-    "libpng.a": ("THIRD_PARTY/LIBPNG-LICENSE",),
-    "sqlite.a": ("THIRD_PARTY/SQLITE-LICENSE",),
-    "sqlite.so.3": ("THIRD_PARTY/SQLITE-LICENSE",),
+    "libc.a": ("share/licenses/musl/COPYRIGHT", "THIRD_PARTY/MUSL-COPYING"),
+    "libz.a": ("share/licenses/zlib/LICENSE", "THIRD_PARTY/ZLIB-LICENSE"),
+    "libpng.a": ("share/licenses/libpng/LICENSE", "THIRD_PARTY/LIBPNG-LICENSE"),
+    "libsqlite3.a": ("share/licenses/sqlite/LICENSE",),
+    "libmbedcrypto.a": ("share/licenses/mbedtls3/LICENSE",),
+    "libmbedtls.a": ("share/licenses/mbedtls3/LICENSE",),
+    "libmbedx509.a": ("share/licenses/mbedtls3/LICENSE",),
 }
 
 
@@ -202,6 +196,20 @@ def check_submodules(root: Path) -> list[Finding]:
     return findings
 
 
+def check_binary_notices(root: Path) -> list[Finding]:
+    findings = []
+    for name in ("sl", "ncurses", "zlib", "libpng", "sqlite", "mbedtls3"):
+        relative = f"resources/licenses/{name}-LICENSE"
+        path = root / relative
+        present = path.is_file() and path.stat().st_size > 0
+        findings.append(result("binary-license", "pass" if present else "fail",
+                               "info" if present else "error", name, relative,
+                               relative if present else "missing", str(path),
+                               "binary dependency license is present" if present else
+                               "binary dependency license is missing"))
+    return findings
+
+
 def image_base(source: Path) -> Path:
     if source.is_dir():
         for relative in ("install/root", "root/install/root", "install/esp", "root/install/esp"):
@@ -249,10 +257,10 @@ def check_image(source: Path, category: str = "image-license") -> list[Finding]:
                                    "packaged program license is present" if found else
                                    "program is present but its license file is missing"))
         if artifact.has_prefix("usr/share/terminfo"):
-            notice = "usr/share/licenses/ncurses/COPYING"
-            found = artifact.find((notice,))
+            notices = ("usr/share/licenses/ncurses/LICENSE", "usr/share/licenses/ncurses/COPYING")
+            found = artifact.find(notices)
             findings.append(result(category, "pass" if found else "fail",
-                                   "info" if found else "error", "ncurses", notice,
+                                   "info" if found else "error", "ncurses", " or ".join(notices),
                                    found or "missing", str(source), "ncurses runtime license"))
         api_notices = {"oschinpt": ("LICENSE", "ATTRIBUTION.txt")}
         for api, notices in api_notices.items():
@@ -309,33 +317,6 @@ def check_sdk(source: Path) -> list[Finding]:
         artifact.close()
 
 
-def read_acknowledgement_source(root: Path) -> str:
-    source = root / "userland/apps/installer/main.cpp"
-    if not source.is_file():
-        return ""
-    text = source.read_text(encoding="utf-8", errors="replace")
-    arrays = re.findall(
-        r'static\s+const\s+char\s+acknowledgements_(?:en|zh)\[\]\s*=\s*'
-        r'(?:"(?:[^"\\]|\\.)*"\s*)+;', text, re.DOTALL)
-    return "\n".join(arrays)
-
-
-def check_excluded_credits(root: Path, excluded: Sequence[str]) -> list[Finding]:
-    text = read_acknowledgement_source(root)
-    if not text:
-        return [result("excluded-credit", "fail", "error", "installer acknowledgements", "source text",
-                        "missing", "userland/apps/installer/main.cpp", "installer acknowledgement text was not found")]
-    findings = []
-    for term in excluded:
-        present = re.search(re.escape(term), text, re.IGNORECASE) is not None
-        findings.append(result("excluded-credit", "fail" if present else "pass",
-                               "error" if present else "info", term, "absent from installer acknowledgement page",
-                               "present" if present else "absent", "userland/apps/installer/main.cpp",
-                               "excluded project appears in installer acknowledgements" if present else
-                               "excluded project is absent from installer acknowledgements"))
-    return findings
-
-
 def locate_default(root: Path, explicit: Path | None, names: Sequence[str]) -> Path:
     if explicit:
         return explicit if explicit.is_absolute() else root / explicit
@@ -364,9 +345,6 @@ def self_test() -> int:
         (root / ".gitmodules").write_text('[submodule "third_party/demo"]\n\tpath = third_party/demo\n\turl = https://example.invalid/demo\n', encoding="utf-8")
         (root / "third_party/demo").mkdir(parents=True)
         (root / "third_party/demo/LICENSE").write_text("MIT\n", encoding="utf-8")
-        (root / "userland/apps/installer").mkdir(parents=True)
-        (root / "userland/apps/installer/main.cpp").write_text('static const char acknowledgements_en[] = "ok";\nstatic int text_eq(void);', encoding="utf-8")
-        assert check_excluded_credits(root, ("TinyLlama",))[0].status == "pass"
         assert check_submodules(root)[0].status == "pass"
         esp_program = root / "build/esp/usr/bin"
         esp_program.mkdir(parents=True)
@@ -383,10 +361,6 @@ def self_test() -> int:
         (sdk / "THIRD_PARTY").mkdir()
         (sdk / "THIRD_PARTY/ZLIB-LICENSE").write_text("zlib\n", encoding="utf-8")
         assert any(f.component == "libz.a" and f.status == "pass" for f in check_sdk(sdk))
-        (root / "userland/apps/installer/main.cpp").write_text(
-            'static const char acknowledgements_en[] = "TinyLlama";\nstatic int text_eq(void);',
-            encoding="utf-8")
-        assert check_excluded_credits(root, ("TinyLlama",))[0].status == "fail"
         (root / "third_party/demo/LICENSE").unlink()
         assert check_submodules(root)[0].status == "fail"
         print("self-test: passed")
@@ -399,8 +373,6 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--image", type=Path, help="ESP staging directory or ZIP")
     parser.add_argument("--sdk", type=Path, help="SDK directory or ZIP")
     parser.add_argument("--installer", type=Path, help="installer staging directory or ZIP")
-    parser.add_argument("--excluded-credit", action="append", dest="excluded", default=None,
-                        help="project name forbidden in installer acknowledgements (repeatable)")
     parser.add_argument("--json", type=Path, dest="json_path", help="write machine-readable report")
     parser.add_argument("--strict", action="store_true", help="also fail when warnings are present")
     parser.add_argument("--self-test", action="store_true", help="run built-in tests")
@@ -413,15 +385,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     # is only license-checked when an artifact is given explicitly.
     sdk = args.sdk
     installer = locate_default(root, args.installer, ("build/install", "build/installer-iso"))
-    excluded = tuple(args.excluded) if args.excluded else DEFAULT_EXCLUDED_CREDITS
-    findings = check_submodules(root)
+    findings = check_submodules(root) + check_binary_notices(root)
     findings += check_image(image)
     if sdk:
         findings += check_sdk(sdk if sdk.is_absolute() else root / sdk)
-    # Installer ESP is an image staging tree; acknowledgement source is always
-    # checked independently so docs containing the same names cannot confuse it.
     findings += check_image(installer, "installer-license")
-    findings += check_excluded_credits(root, excluded)
     return report(findings, args.json_path, args.strict)
 
 

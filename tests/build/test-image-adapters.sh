@@ -92,7 +92,8 @@ for file in boot/grub/installer.cfg boot/grub/live.cfg; do
 done
 require_text "$src/boot/grub/grub.cfg" 'multiboot2 $reliefos_kernel' 'installed GRUB boots the selected checked version'
 require_file "$w/esp/grub/kernel-slots.cfg" 'ESP includes the stable kernel slot selector'
-require_text "$src/boot/grub/grub.cfg" 'multiboot2 /leonos/kernel.sys' 'installed GRUB config retains the legacy boot entry'
+require_text "$src/boot/grub/grub.cfg" 'Previous complete kernel' 'installed GRUB retains an actual complete previous kernel'
+require_file "$w/esp/grub/other-systems.cfg" 'ESP includes multi-system discovery'
 for file in boot/grub/installer.cfg boot/grub/live.cfg; do
     require_text "$src/$file" 'module2 /install/root.fat reliefos-installer-root' "$file keeps the installer root module"
 done
@@ -104,18 +105,18 @@ for file in boot/grub/grub.cfg boot/grub/installer.cfg boot/grub/live.cfg boot/g
         printf 'ok - %s does not reference the retired loader\n' "$file"
     fi
 done
-require_text "$src/boot/grub/installer_embedded.cfg" 'reliefos-installer-iso.marker' 'embedded GRUB discovers the new ISO marker'
-require_text "$src/boot/grub/installer_embedded.cfg" 'leonos-installer-iso.marker' 'embedded GRUB still discovers old ISO media'
-require_text "$src/tools/build/iso.sh" 'reliefos-installer-iso.marker' 'ISO staging writes the new installer marker'
-require_text "$src/tools/build/iso.sh" 'leonos-installer-iso.marker' 'ISO staging keeps the legacy marker for old loaders'
+require_text "$src/boot/grub/installer_embedded.cfg" '"$cmdpath"' 'embedded GRUB binds to its own boot medium first'
+require_text "$src/boot/grub/installer_embedded.cfg" '@RELIEFOS_ISO_MARKER@' 'ISO marker is specialized per medium'
+require_text "$src/tools/build/iso.sh" 'marker=reliefos-$volume.marker' 'Live and installer use distinct fallback markers'
+require_text "$src/tools/build/iso.sh" 's/@RELIEFOS_ISO_MARKER@/$marker/g' 'ISO stage publishes its matching embedded identity'
 require_text "$src/scripts/reliefos/Makefile.images" '$(O_IMAGES)/reliefos.vmdk' 'image target uses the ReliefOS VMDK name'
 require_text "$src/scripts/reliefos/Makefile.images" '$(O_IMAGES)/reliefos-live.iso' 'image target uses the ReliefOS live ISO name'
 require_text "$src/scripts/reliefos/Makefile.images" '$(O_IMAGES)/reliefos-installer.iso' 'image target uses the ReliefOS installer ISO name'
 require_text "$src/tools/build/disk.sh" 'name=RELIEFOS_ESP' 'GPT ESP partition has the canonical name'
 require_text "$src/tools/build/disk.sh" 'name=RELIEFOS_ROOT' 'GPT root partition has the canonical name'
 require_text "$src/tools/build/disk.sh" '-n RELIEFOS' 'FAT label fits the eight-character limit'
-require_text "$src/tools/build/disk.sh" '41A3EE19-BA85-47A0-9705-A5C128374021' 'published ESP UUID is unchanged'
-require_text "$src/tools/build/disk.sh" '5C13543B-732C-4F81-8652-621124484420' 'published root UUID is unchanged'
+require_text "$src/tools/build/disk.sh" 'esp_uuid=$(sh "$src/tools/build/image-identity.sh" esp)' 'ESP UUID comes from the configured instance identity'
+require_text "$src/tools/build/disk.sh" 'root_uuid=$(sh "$src/tools/build/image-identity.sh" root)' 'root UUID comes from the same instance identity'
 require_text "$src/userland/apps/installer/install_ops.h" 'TARGET_BOOT "/reliefos/kernel.sys"' 'installer detects the canonical ESP kernel path'
 require_text "$src/userland/apps/installer/install_ops.h" 'TARGET_BOOT "/leonos/kernel.sys"' 'installer recognizes a legacy ESP kernel path'
 if [ "$failures" -ne 0 ]; then exit 1; fi

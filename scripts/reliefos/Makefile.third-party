@@ -171,7 +171,7 @@ RELIEFOS_AUTH_CFLAGS := -O2 -mno-avx -mno-avx2
 RELIEFOS_AUTH_ARTIFACTS := \
 	$(AUTH_ROOT)/usr/include/crypt.h \
 	$(AUTH_ROOT)/usr/include/linux/openat2.h \
-	$(AUTH_ROOT)/lib/libcrypt.so.2 \
+	$(AUTH_ROOT)/lib/libcrypt.so.2 $(AUTH_ROOT)/lib/libcrypt.a \
 	$(AUTH_ROOT)/share/licenses/libxcrypt/LICENSE \
 	$(AUTH_ROOT)/share/licenses/linux-headers/LICENSE
 

@@ -39,9 +39,24 @@ int reliefos_boot_validate_root(const struct reliefos_boot_install_options *opti
  * Existing boot slots and versioned payloads are never copied from the media.
  */
 int reliefos_boot_install_at_root(const struct reliefos_boot_install_options *options, const char *root);
+/** @brief Install into a per-instance boot tree and publish its EFI files on esp.
+ * @param options Original ABI options; boot_dir names the instance directory.
+ * @param root Final installed root. @param esp Physical mounted ESP root.
+ * @return Zero after publication, negative errno on failure. Other EFI loaders
+ * and existing fallback executables are preserved; no implicit firmware writes.
+ */
+int reliefos_boot_install_instance_at_root(const struct reliefos_boot_install_options *options,
+                                         const char *root, const char *esp);
+/** @brief Create/open a UUID-named instance below a held physical ESP, rejecting links.
+ * @param esp Absolute physical ESP. @param uuid Canonical root PARTUUID.
+ * @param path Output absolute directory. @param capacity Output size.
+ * @return Zero or negative errno; existing unrelated directories survive.
+ */
+int reliefos_boot_prepare_instance(const char *esp, const char *uuid, char *path, unsigned capacity);
+/** @brief Check physical ESP and per-instance ownership without creating files. */
+int reliefos_boot_validate_instance(const struct reliefos_boot_install_options *options, const char *esp);
 /** @brief Install using this system's final root (/); return negative errno on failure.
- * The original structure and symbol ABI remain unchanged. Offline installers
- * use reliefos_boot_install_at_root to name their mounted destination root.
+ * Offline installers use reliefos_boot_install_at_root for their destination.
  */
 int reliefos_boot_install(const struct reliefos_boot_install_options *options);
 /** @brief Read installed mode bits; legacy media without a record can identify UEFI only. */

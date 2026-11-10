@@ -115,7 +115,7 @@ int reliefos_boot_validate_payload(const struct reliefos_boot_install_options *o
     int root = boot_open_directory(options->source);
     if (root < 0) return root;
     close(root);
-    const char *const common[] = {"grub/grub.cfg", "grub/kernel-slots.cfg",
+    const char *const common[] = {"grub/grub.cfg", "grub/kernel-slots.cfg", "grub/other-systems.cfg",
         "grub/fonts/leonos-unicode.pf2", "grub/theme/theme.txt"};
     for (unsigned i = 0; i < sizeof(common) / sizeof(common[0]); ++i) {
         int result = payload_file(options, common[i]);
@@ -310,7 +310,45 @@ int reliefos_boot_validate_root(const struct reliefos_boot_install_options *opti
     return checked_root(options, root, NULL);
 }
 
-/** @brief Decode the versioned mode record, checking actual loader files too. */
+/** @brief Recognize an embedded GRUB core when an older image lacks its ESP copy.
+ * The stage-one LBA and diskboot blocklist must remain inside a GPT BIOS Boot
+ * extent. A mode record or arbitrary nonzero MBR alone is insufficient.
+ */
+static int embedded_bios_core(const char *path, int fd, const unsigned char mbr[512])
+{
+    struct reliefos_block_disk_info info;
+    int result = reliefos_block_get_info(path, &info);
+    if (result) return result;
+    if (info.sector_size != 512) return -ENOTSUP;
+    uint64_t lba = 0;
+    /* GRUB_BOOT_MACHINE_KERNEL_SECTOR in the standard i386-pc boot protocol. */
+    for (unsigned i = 0; i < 8; ++i) lba |= (uint64_t)mbr[0x5c + i] << (8 * i);
+    if (!lba || lba >= info.sector_count || lba > INT64_MAX / 512) return -EINVAL;
+    struct reliefos_block_partition parts[RELIEFOS_BLOCK_MAX_PARTITIONS];
+    uint32_t count = 0;
+    result = reliefos_block_list_partitions(path, parts, RELIEFOS_BLOCK_MAX_PARTITIONS, &count);
+    if (result) return result;
+    if (count > RELIEFOS_BLOCK_MAX_PARTITIONS) return -EOVERFLOW;
+    for (uint32_t i = 0; i < count; ++i) {
+        if (parts[i].gpt_type != RELIEFOS_BLOCK_GPT_BIOS_BOOT ||
+            parts[i].first_lba > info.sector_count ||
+            parts[i].sector_count > info.sector_count - parts[i].first_lba) continue;
+        uint64_t end = parts[i].first_lba + parts[i].sector_count;
+        if (lba < parts[i].first_lba || lba >= end) continue;
+        unsigned char core[512];
+        ssize_t got;
+        do { got = pread(fd, core, sizeof(core), (off_t)(lba * 512)); } while (got < 0 && errno == EINTR);
+        if (got != sizeof(core)) return got < 0 ? -errno : -EIO;
+        uint64_t next = 0;
+        for (unsigned j = 0; j < 8; ++j) next |= (uint64_t)core[500 + j] << (8 * j);
+        unsigned sectors = core[508] | (unsigned)core[509] << 8;
+        unsigned segment = core[510] | (unsigned)core[511] << 8;
+        return next > lba && next < end && sectors && sectors <= end - next && segment == 0x820 ? 0 : -EINVAL;
+    }
+    return -ENOENT;
+}
+
+/** @brief Decode installed modes, including legacy raw-only BIOS cores. */
 int reliefos_boot_probe(const char *disk_path, const char *boot_dir, uint32_t *modes)
 {
     if (!modes) return -EINVAL;
@@ -346,7 +384,11 @@ int reliefos_boot_probe(const char *disk_path, const char *boot_dir, uint32_t *m
         }
         if (!result && !found) result = -EINVAL;
         if (!result && (*modes & RELIEFOS_BOOT_UEFI)) result = installed_file(root, "EFI/BOOT/BOOTX64.EFI");
-        if (!result && (*modes & RELIEFOS_BOOT_BIOS)) result = installed_file(root, "grub/i386-pc/core.img");
+        int embedded_only = 0;
+        if (!result && (*modes & RELIEFOS_BOOT_BIOS)) {
+            result = installed_file(root, "grub/i386-pc/core.img");
+            if (result == -ENOENT && disk_path) { embedded_only = 1; result = 0; }
+        }
         if (!result && (*modes & RELIEFOS_BOOT_BIOS) && disk_path) {
             int disk = open(disk_path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
             if (disk < 0) result = -errno;
@@ -359,6 +401,7 @@ int reliefos_boot_probe(const char *disk_path, const char *boot_dir, uint32_t *m
                     unsigned code = 0;
                     for (unsigned i = 0; i < 440; ++i) code |= sector[i];
                     if (!code || sector[510] != 0x55 || sector[511] != 0xaa) result = -EINVAL;
+                    else if (embedded_only) result = embedded_bios_core(disk_path, disk, sector);
                 }
                 close(disk);
             }
@@ -400,10 +443,23 @@ int reliefos_boot_validate_target(const struct reliefos_boot_install_options *op
     uint32_t previous;
     if (!result) result = reliefos_boot_probe(options->disk_path, options->boot_dir, &previous);
     if (!result) result = boot_walk_payload(options, root, 0);
-    if (!result && options->disk_path) {
+    if (!result) {
         int file = boot_open_file(root, "reliefos/config/root.cfg");
         if (file >= 0) close(file);
         else if (file != -ENOENT) result = file;
+        else if (options->install_uefi) {
+            int existing = boot_open_file(root, "EFI/BOOT/BOOTX64.EFI");
+            if (existing >= 0) {
+                close(existing);
+                char uuid[37], expected[96], marker[96];
+                result = root_uuid_text(options->root_partuuid, uuid);
+                int length = result ? 0 : snprintf(expected, sizeof(expected), "ReliefOS instance v1\n%s\n", uuid);
+                if (!result) result = kernel_bundle_read_fixed(root, "reliefos-instance.id", marker, (size_t)length);
+                if (!result && memcmp(marker, expected, (size_t)length)) result = -EXDEV;
+                if (result == -ENOENT) result = -EEXIST;
+            }
+            else if (existing != -ENOENT) result = existing;
+        }
     }
     close(root);
     return result;
@@ -415,7 +471,8 @@ int reliefos_boot_validate_target(const struct reliefos_boot_install_options *op
  * serializes installs. Errors can leave completed file or raw-disk stages in
  * place; they never report a failed GRUB invocation as a successful install.
  */
-int reliefos_boot_install_at_root(const struct reliefos_boot_install_options *options, const char *installed_root)
+static int install_at_root(const struct reliefos_boot_install_options *options,
+                           const char *installed_root, const char *esp)
 {
     int result = reliefos_boot_validate_payload(options);
     if (!result) result = reliefos_boot_validate_target(options);
@@ -429,12 +486,33 @@ int reliefos_boot_install_at_root(const struct reliefos_boot_install_options *op
     }
     int root = boot_open_directory(options->boot_dir);
     if (root < 0) return root;
-    result = reliefos_kernel_bundle_publish(installed_root, options->boot_dir, identity.release);
+    if (esp && !options->preserve_rollback) {
+        const char *slots[] = {"reliefos/state/kernel-A.env", "reliefos/state/kernel-A.sha256",
+                               "reliefos/state/kernel-B.env", "reliefos/state/kernel-B.sha256"};
+        for (unsigned i = 0; i < 4 && !result; ++i) {
+            char leaf[256]; int state = boot_open_parent(root, slots[i], 0, leaf);
+            if (state == -ENOENT) continue;
+            if (state < 0) { result = state; break; }
+            if (unlinkat(state, leaf, 0) < 0 && errno != ENOENT) result = -errno;
+            if (!result && fsync(state) < 0) result = -errno;
+            close(state);
+        }
+    }
+    if (!result) result = reliefos_kernel_bundle_publish(installed_root, options->boot_dir, identity.release);
     if (!result) result = boot_walk_payload(options, root, 1);
     if (!result && options->install_bios) {
         fprintf(stderr, "[boot-install] installing BIOS loader on %s\n", options->disk_path);
-        result = boot_install_bios(options);
+        struct reliefos_boot_install_options bios_options = *options;
+        char physical_boot[BOOT_PATH_MAX];
+        if (esp) {
+            int n = snprintf(physical_boot, sizeof(physical_boot), "%s/reliefos/instances/%s", esp, options->root_partuuid);
+            if (n < 0 || n >= (int)sizeof(physical_boot)) result = -ENAMETOOLONG;
+            else bios_options.boot_dir = physical_boot;
+        }
+        if (!result) result = boot_install_bios(&bios_options);
     }
+    if (!result && options->install_uefi && esp)
+        result = boot_install_uefi(options, esp);
     if (!result && fsync(root) < 0) result = -errno;
     if (!result && options->disk_path) {
         char uuid[37], config[96];
@@ -455,6 +533,20 @@ int reliefos_boot_install_at_root(const struct reliefos_boot_install_options *op
     if (!result) result = boot_retire_legacy(root);
     close(root);
     return result;
+}
+
+int reliefos_boot_install_at_root(const struct reliefos_boot_install_options *options, const char *root)
+{
+    return install_at_root(options, root, NULL);
+}
+
+int reliefos_boot_install_instance_at_root(const struct reliefos_boot_install_options *options,
+                                         const char *root, const char *esp)
+{
+    if (!esp || esp[0] != '/' || !options || !options->root_partuuid) return -EINVAL;
+    int result = boot_validate_instance(options, esp);
+    if (result) return result;
+    return install_at_root(options, root, esp);
 }
 
 int reliefos_boot_install(const struct reliefos_boot_install_options *options)

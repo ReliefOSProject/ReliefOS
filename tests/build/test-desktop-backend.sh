@@ -89,6 +89,17 @@ printf 'math GUI fixture\n' > "$work/out/userland/reliefmath.elf"
 printf 'math worker fixture\n' > "$work/out/userland/reliefmath-render.elf"
 printf 'reliefmathpp\tprogram-app\t1\t1\t1\t0\t0\tReliefMath++\tOffice applications\t.rmathpp\t1\n' >> "$work/metadata"
 printf 'geometry GUI fixture\n' > "$work/out/userland/reliefmathpp.elf"
+printf 'reliefplayer\tprogram-app\t1\t1\t1\t0\t0\tReliefPlayer\tNetwork and multimedia\t.mp3,.wav,.mp4\t1\n' >> "$work/metadata"
+printf 'media player fixture\n' > "$work/out/userland/reliefplayer.elf"
+mkdir -p "$work/out/upstream/ffmpeg/root/usr/lib" \
+    "$work/out/upstream/ffmpeg/root/usr/include/libavcodec" \
+    "$work/out/upstream/ffmpeg/root/usr/share/licenses/ffmpeg"
+for lib in avformat avcodec avutil swresample swscale; do
+    printf 'codec fixture\n' > "$work/out/upstream/ffmpeg/root/usr/lib/lib$lib-reliefplayer.so.62.1.0"
+    ln -s "lib$lib-reliefplayer.so.62.1.0" "$work/out/upstream/ffmpeg/root/usr/lib/lib$lib-reliefplayer.so.62"
+done
+printf 'development header\n' > "$work/out/upstream/ffmpeg/root/usr/include/libavcodec/avcodec.h"
+printf 'LGPL fixture\n' > "$work/out/upstream/ffmpeg/root/usr/share/licenses/ffmpeg/COPYING.LGPLv2.1"
 printf 'audio fixture\n' > "$work/out/system/lib/libreliefos-audio.so.1"
 printf 'calc\tprogram-app\t0\t0\t1\t0\t0\tCalculator\tOffice applications\t\t0\n' >> "$work/metadata"
 printf 'ncurses\tlibrary\t1\t1\t0\t1\t0\tncurses\tLibraries\t\t0\n' >> "$work/metadata"
@@ -121,11 +132,26 @@ cat > "$work/rootfs.config" <<CONFIG
 CONFIG_RPR_BASE_URL="https://example.invalid/rpr"
 CONFIG_VMDK_DEFAULT_LANG="zh_CN.UTF-8"
 CONFIG
-ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux ncurses fixture-provider' \
+ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux fixture-provider ffmpeg' \
 sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
     "$work/rootfs.config" "$work/metadata" "$work/stage" "$work/layout" \
     "$work/root" "$work/manifest.json" 1700000000
 xorg_root=$work/root
+for lib in avformat avcodec avutil swresample swscale; do
+    test -f "$xorg_root/usr/lib/lib$lib-reliefplayer.so.62"
+    test -L "$xorg_root/usr/lib/lib$lib-reliefplayer.so.62"
+done
+test -f "$xorg_root/usr/share/licenses/ffmpeg/COPYING.LGPLv2.1"
+test ! -e "$xorg_root/usr/include/libavcodec"
+grep -qx 'extensions=.mp3,.wav,.mp4' "$xorg_root/usr/lib/reliefos/apps/reliefplayer/manifest.ini"
+awk -F '\t' '$1!="reliefplayer"' "$work/metadata" > "$work/metadata-no-player"
+ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux fixture-provider ffmpeg' \
+sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
+    "$work/rootfs.config" "$work/metadata-no-player" "$work/stage" "$work/layout" \
+    "$work/root-no-player" "$work/no-player-manifest.json" 1700000000
+test ! -e "$work/root-no-player/usr/bin/reliefplayer"
+test ! -e "$work/root-no-player/usr/lib/libavformat-reliefplayer.so.62"
+test ! -e "$work/root-no-player/usr/share/licenses/ffmpeg"
 
 # Only self-authored graphical apps receive artwork, including hidden entries.
 for app in fileman installer leonmmcoset reliefword reliefppt reliefmath reliefmathpp; do
@@ -168,7 +194,7 @@ done
 # Removing the selected app from component metadata excludes every private
 # product while leaving the shared system CJK font in the composed root.
 awk -F '\t' '$1!="reliefmath"' "$work/metadata" > "$work/metadata-no-reliefmath"
-ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux ncurses fixture-provider' \
+ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux fixture-provider' \
 sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
     "$work/rootfs.config" "$work/metadata-no-reliefmath" "$work/stage" "$work/layout" \
     "$work/root-no-reliefmath" "$work/no-reliefmath-manifest.json" 1700000000
@@ -253,11 +279,13 @@ test ! -e "$xorg_root/bin/ping"
 # provider; BusyBox must not claim the command.
 test -L "$xorg_root/sbin/mkfs.ext4"
 test "$(readlink "$xorg_root/sbin/mkfs.ext4")" = ../usr/sbin/mkfs.ext4
-cmp "$work/out/upstream/ncurses/root/usr/bin/clear" "$xorg_root/usr/bin/clear"
-test -L "$xorg_root/usr/bin/reset"
-test "$(readlink "$xorg_root/usr/bin/reset")" = clear
-test -f "$xorg_root/usr/share/terminfo/fixture"
-test -f "$xorg_root/etc/terminfo/fixture"
+# ncurses payloads are installed later from signed APKs, never overlaid.
+grep -Fx ncurses "$xorg_root/etc/reliefos/apk-components"
+test ! -e "$xorg_root/usr/share/doc/reliefos/apk-transitions"
+test ! -e "$xorg_root/usr/lib/reliefos/apps/sl"
+test -f "$xorg_root/usr/share/licenses/ncurses/LICENSE"
+test ! -e "$xorg_root/usr/share/terminfo/fixture"
+test ! -e "$xorg_root/etc/terminfo/fixture"
 test ! -e "$xorg_root/usr/include/curses.h"
 cmp "$work/out/upstream/shadow/root/usr/bin/passwd" "$xorg_root/usr/bin/passwd"
 test ! -e "$xorg_root/bin/passwd"

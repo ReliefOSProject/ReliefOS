@@ -162,6 +162,10 @@ expect_output_is 'st font dependency is pinned' 2.1.5-r2 \
     "$deps" --lock "$lock" --id alpine-font-liberation --print version
 expect_output_is 'unmarked entry defaults to base' base \
     "$deps" --lock "$lock" --id alpine-openrc --print feature
+expect_output_is 'optional APK keeps component feature' component:sl \
+    "$deps" --lock "$lock" --id alpine-sl --print feature
+expect_output_is 'runtime PNG is available in both backends' base \
+    "$deps" --lock "$lock" --id alpine-libpng --print feature
 expect_failure 'invalid feature is rejected' \
     "$deps" --lock "$(entry_lock '{"id":"a","kind":"apk","version":"1","url":"https://x/a.apk","sha256":"'$D'","directory":"a-1","license_in_source":".PKGINFO","feature":"desktop"}')" --check
 
@@ -228,12 +232,12 @@ check 'a complete entry passes with --root' "$deps" --lock "$work/clean.json" --
 # --- patch queries ------------------------------------------------------------
 expect_output_is 'musl reports the digest of the patch it must apply' \
     'e336ed20b2d338dbbf88588dff043e8ce349d0d0044277d31be229d600bb93ad' \
-    sh -c "$deps --lock $lock --id musl --list-patches | cut -f1"
+    sh -c "$deps --lock $lock --id musl --list-patches | head -n1 | cut -f1"
 expect_output_is 'and the path of that patch' \
     'patches/musl/0001-enforce-password-file-lock.patch' \
-    sh -c "$deps --lock $lock --id musl --list-patches | cut -f2"
+    sh -c "$deps --lock $lock --id musl --list-patches | head -n1 | cut -f2"
 expect_output_is 'a dependency without patches prints nothing' '' \
-    "$deps" --lock "$lock" --id zlib --list-patches
+    "$deps" --lock "$lock" --id alpine-zlib --list-patches
 expect_failure '--list-patches without --id is rejected' \
     "$deps" --lock "$lock" --list-patches
 expect_failure '--print without --id is rejected' \

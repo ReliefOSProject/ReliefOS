@@ -84,19 +84,19 @@ esac
 # must never attach an unrelated physical disk's ESP as their boot state.
 case $mode in installer|live) ;;
     *)
-        esp_source= esp_type= esp_options=
-        if [ -r /newroot/etc/fstab ]; then
-            while read -r source point type flags rest; do
-                case $source in ''|'#'*) continue ;; esac
-                [ "$point" = /boot ] || continue
-                [ -z "$esp_source" ] || fail 'multiple /boot entries in fstab'
-                esp_source=$source; esp_type=$type; esp_options=$flags
-            done </newroot/etc/fstab
-        fi
+        selected_instance=
+        case $root in PARTUUID=*) selected_instance=$(printf '%s' "${root#PARTUUID=}" | tr 'A-F' 'a-f') ;; esac
+        parse_boot_fstab /newroot/etc/fstab "$selected_instance" || fail 'invalid ESP or boot instance policy in fstab'
         if [ -n "$esp_source" ]; then
             resolve_device "$esp_source" || fail "ESP device missing or ambiguous: $esp_source"
-            mkdir -p /newroot/boot || fail 'create ESP mountpoint'
-            mount -t "$esp_type" -o "$esp_options" "$resolved" /newroot/boot || fail 'mount boot ESP from fstab'
+            mkdir -p "/newroot$esp_point" /newroot/boot || fail 'create ESP mountpoint'
+            mount -t "$esp_type" -o "$esp_options" "$resolved" "/newroot$esp_point" || fail 'mount boot ESP from fstab'
+            if [ "$esp_point" = /efi ]; then
+                [ -n "$boot_bind" ] || fail 'missing per-installation boot bind mount'
+                mount -o bind "/newroot$boot_bind" /newroot/boot || fail 'bind selected installation boot directory'
+            elif [ -n "$boot_bind" ]; then
+                fail 'boot bind requires a physical /efi mount'
+            fi
         fi
         ;;
 esac

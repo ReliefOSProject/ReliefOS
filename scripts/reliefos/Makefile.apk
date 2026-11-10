@@ -8,10 +8,10 @@ APK_REPOSITORY := $(APK_WORK)/repository
 APK_MANIFEST := $(APK_WORK)/manifest.json
 APK_OWNERSHIP := $(APK_WORK)/ownership.tsv
 APK_SIGNING_KEY ?= $(HOME)/.local/share/leonos/apk-signing/key.pem
-# Generation 2 supersedes the generation-1 BusyBox/binutils ownership regression,
-# including targets partially updated by those media. Published releases must use
-# an increasing SOURCE_DATE_EPOCH (or an explicit increasing version prefix).
-APK_BUILD_VERSION ?= 2.$(SOURCE_DATE_EPOCH)-r0
+# Generation 4 removes the terminal/SQLite wrapper packages entirely.
+# This sorts after generation 3 even for development builds at the same commit.
+# Published releases must still use an increasing SOURCE_DATE_EPOCH.
+APK_BUILD_VERSION ?= 4.$(SOURCE_DATE_EPOCH)-r0
 APK_STAGE_SCRIPT := $(RELIEFOS_SRC)/tools/build/apk-stage.sh
 APK_STAGE_INPUTS := $(RELIEFOS_SRC)/tools/build/apk-layout.sh $(RELIEFOS_LAYOUT_TOOL) $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL)
 BUILD_LOG_INPUTS := $(RELIEFOS_SHELL_LOG) $(RELIEFOS_SRC)/tools/build/run-logged.sh $(RELIEFOS_SRC)/tools/build/format-log.awk
@@ -26,7 +26,7 @@ $(APK_MANAGED_ROOT)/.apk-complete $(APK_REPOSITORY)/packages.adb $(APK_MANIFEST)
 	$(APK_RAW_STAMP) $(APK_STAGE_SCRIPT) $(APK_STAGE_INPUTS) $(RELIEFOS_APK_OWN) $(UPSTREAM_APK) \
 	$(UPSTREAM_APK_ROOT)/.complete $(RELIEFOS_SRC)/configs/apk-ownership.json \
 	$(RELIEFOS_SRC)/resources/licenses/apk-tools-LICENSE $(MUSL_STAMP) \
-	$(RELIEFOS_SRC)/userland/storage/leonos-apk-update \
+	$(RELIEFOS_SRC)/userland/storage/reliefos-apk-update \
 	$(RELIEFOS_SRC)/userland/storage/busybox-binutils-links \
 	$(RELIEFOS_SRC)/system/rootfs/etc/apk/protected_paths.d/leonos.list \
 	$(RELIEFOS_SRC)/system/rootfs/etc/apk/protected_paths.d/reliefos.list \

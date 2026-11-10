@@ -77,6 +77,14 @@ for archive in "$upstream"/packages/*.apk; do
     fi
     case $feature in
         base) ;;
+        component:sl|component:ncurses|component:sqlite)
+            [ -f "$raw/etc/reliefos/apk-components" ] && [ ! -L "$raw/etc/reliefos/apk-components" ] || {
+                echo 'missing APK component selection' >&2; exit 1;
+            }
+            if ! grep -Fxq "${feature#component:}" "$raw/etc/reliefos/apk-components"; then
+                continue
+            fi
+            ;;
         xorg)
             if [ "$backend" = xorg ]; then
                 :
@@ -225,7 +233,7 @@ cp "$apk" "$tree/sbin/apk"
 chmod 755 "$tree/sbin/apk"
 mkdir -p "$tree/usr/share/licenses/apk-tools"
 cp "$src/resources/licenses/apk-tools-LICENSE" "$tree/usr/share/licenses/apk-tools/LICENSE"
-cp "$src/userland/storage/leonos-apk-update" "$tree/usr/lib/reliefos/reliefos-apk-update"
+cp "$src/userland/storage/reliefos-apk-update" "$tree/usr/lib/reliefos/reliefos-apk-update"
 chmod 755 "$tree/usr/lib/reliefos/reliefos-apk-update"
 ln -sfn reliefos-apk-update "$tree/usr/lib/reliefos/leonos-apk-update"
 mkdir -p "$tree/usr/lib/leonos"

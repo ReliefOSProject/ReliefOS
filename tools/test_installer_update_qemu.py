@@ -6,8 +6,9 @@ import subprocess
 import re
 import json
 import time
+import hashlib
 
-from test_installer_accounts_qemu import boot, next_page, wait_log
+from test_installer_accounts_qemu import boot, next_page, wait_log, installer_finish_log
 from test_installer_mode_switch_qemu import wait_page
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +28,16 @@ def installed_state(disk, directory):
                                         stderr=subprocess.DEVNULL, text=True)
         assert value, f"Missing {path}"
         result[name] = value
+    result["checkpoint"] = subprocess.check_output([
+        "debugfs", "-R", "cat /var/lib/reliefos/installer-update/state", str(image)],
+        stderr=subprocess.DEVNULL, text=True)
+    result["preserved"] = {}
+    for path in ("/etc/passwd", "/etc/shadow", "/etc/group", "/etc/gshadow", "/etc/fstab",
+                 "/etc/hostname", "/home/alice/installer-user-check", "/root/installer-root-check"):
+        content = subprocess.check_output(["debugfs", "-R", f"cat {path}", str(image)],
+                                          stderr=subprocess.DEVNULL)
+        if content:
+            result["preserved"][path] = hashlib.sha256(content).hexdigest()
     image.unlink()
     return result
 
@@ -56,9 +67,9 @@ def main():
     if disk.exists():
         parser.error("output scratch.raw already exists; use a new output directory")
     subprocess.run(["cp", "--reflink=auto", "--sparse=always", args.disk.resolve(), disk], check=True)
-    before = installed_state(disk, output) if args.preserve_package else None
-    if before:
-        versions = package_versions(before["installed"])
+    before = installed_state(disk, output)
+    versions = package_versions(before["installed"])
+    if args.preserve_package:
         assert all(name in versions for name in args.preserve_package), "Fixture lacks required packages"
     with boot(output / "update", disk, args.iso.resolve()) as (probe, serial, process):
         wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
@@ -72,41 +83,33 @@ def main():
             next_page(probe)
         probe.click(*probe.mode_option_point(update=True))
         next_page(probe)
-        next_page(probe)
-        wait_page(probe, process, "Choose bootloaders")
-        next_page(probe)
-        wait_page(probe, process, "Confirm Update")
-        probe.click(*probe.confirm_field_point())
-        probe.text("UPDATE")
-        probe.frame("confirmation")
-        next_page(probe)
         try:
+            next_page(probe)
+            wait_page(probe, process, "Review system update", args.timeout)
+            probe.frame("confirmation")
+            next_page(probe)
             wait_page(probe, process, "was updated on the selected disk", args.timeout)
             probe.frame("updated")
         finally:
-            log = serial.read_text(errors="replace")
-            match = re.search(r"installer root ready ramdisk=(0x[0-9a-f]+).*bytes=(\d+)", log)
-            if match:
-                memory = output / "installer-root.ext2"
-                probe.command("stop")
-                probe.command("pmemsave", {"val": int(match[1], 16), "size": int(match[2]),
-                                          "filename": str(memory)})
-                subprocess.run(["debugfs", "-R", f"dump /var/log/installer-session.log {output / 'installer.log'}",
-                                str(memory)], check=True)
+            (output / "installer.log").write_text(installer_finish_log(probe, serial, process))
         log = (output / "installer.log").read_text()
-        assert "APK update wait_status=0" in log and "update completed successfully" in log
-    if before:
-        after = installed_state(disk, output)
-        updated = package_versions(after["installed"])
-        expected_world = re.sub(r"(?m)^leonos-", "reliefos-", before["world"])
-        # apk serializes world in lexical order after renaming dependencies.
-        assert sorted(expected_world.splitlines()) == sorted(after["world"].splitlines()), \
-            "Update changed world dependencies beyond the package rename"
+        assert "update completed successfully" in log
+    after = installed_state(disk, output)
+    assert "\nphase=done\n" in after["checkpoint"], "The native update transaction did not finish"
+    for path, digest in before["preserved"].items():
+        assert after["preserved"].get(path) == digest, f"Update changed preserved file {path}"
+    print("PASS preserved accounts, filesystem configuration and existing test user files")
+    updated = package_versions(after["installed"])
+    expected_world = re.sub(r"(?m)^leonos-", "reliefos-", before["world"])
+    # apk serializes world in lexical order after renaming dependencies.
+    assert sorted(expected_world.splitlines()) == sorted(after["world"].splitlines()), \
+        "Update changed world dependencies beyond the package rename"
+    assert any(name.startswith(("leonos-", "reliefos-")) and
+               updated.get(re.sub(r"^leonos-", "reliefos-", name)) not in (None, version)
+               for name, version in versions.items()), "No ReliefOS package was upgraded"
+    if args.preserve_package:
         for name in args.preserve_package:
             assert versions[name] == updated.get(name), f"Update changed {name}"
-        assert any(name.startswith(("leonos-", "reliefos-")) and
-                   updated.get(re.sub(r"^leonos-", "reliefos-", name)) not in (None, version)
-                   for name, version in versions.items()), "No ReliefOS package was upgraded"
         print("PASS preserved world and packages: " + ", ".join(args.preserve_package))
     print(f"PASS GUI update: confirmation, package transaction and completion; {serial}")
 

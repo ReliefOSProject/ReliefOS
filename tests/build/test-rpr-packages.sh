@@ -34,8 +34,12 @@ output=
 metadata=
 files=
 destination=
+keys=
+indexing=0
 while [ "$#" -gt 0 ]; do
     case $1 in
+        mkndx) indexing=1; shift ;;
+        --keys-dir) keys=$2; shift 2 ;;
         --output) output=$2; shift 2 ;;
         --files) files=$2; shift 2 ;;
         --info) metadata="$metadata\n$2"; shift 2 ;;
@@ -43,6 +47,10 @@ while [ "$#" -gt 0 ]; do
         *) shift ;;
     esac
 done
+if [ "$indexing" = 1 ]; then
+    test -s "$keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub"
+    test -s "$keys/reliefos-rpr.rsa.pub"
+fi
 if [ -n "$destination" ]; then
     cp -a "$RELIEFOS_RPR_TEST_PAYLOAD/lib" "$RELIEFOS_RPR_TEST_PAYLOAD/usr" "$destination/"
     exit 0
@@ -103,6 +111,8 @@ test ! -e "$tmp/pages-output"
 # canonical filename points at the same key during the package transition.
 rm "$tmp/pages-apps/reliefos-broken.apk" "$tmp/pages-apps/packages.list"
 printf 'app package\n' > "$tmp/pages-apps/reliefos-doom-1-r0.apk"
+printf 'upstream package\n' > "$tmp/pages-repository/mbedtls3-3.6.7-r0.apk"
+printf 'numbered package name\n' > "$tmp/pages-repository/libatk-1.0-2.60.3-r0.apk"
 sh "$src/tools/build/rpr-pages.sh" "$tmp/pages-repository" "$tmp/pages-apps" \
     "$tmp/kernel.sys" "$tmp/pages-kernel" \
     "$tmp/pages-version" "$tmp/fake-bin/apk" "$tmp/pages-key" "$tmp/pages-output"
@@ -110,6 +120,11 @@ cmp "$tmp/pages-output/apk/leonos-rpr.rsa.pub" "$tmp/pages-output/apk/reliefos-r
 grep -F '"public_key":"reliefos-rpr.rsa.pub"' "$tmp/pages-output/apk/repository.json"
 grep -F '"legacy_public_key":"leonos-rpr.rsa.pub"' "$tmp/pages-output/apk/repository.json"
 test -f "$tmp/pages-output/apk/reliefos-base-1-r0.apk"
+cmp "$tmp/pages-repository/mbedtls3-3.6.7-r0.apk" "$tmp/pages-output/apk/mbedtls3-3.6.7-r0.apk"
+grep -F 'href="mbedtls3.html"' "$tmp/pages-output/packages/index.html"
+grep -F '../apk/mbedtls3-3.6.7-r0.apk' "$tmp/pages-output/packages/mbedtls3.html"
+grep -F 'href="libatk-1.0.html"' "$tmp/pages-output/packages/index.html"
+grep -F '<dt>Version</dt><dd>2.60.3-r0</dd>' "$tmp/pages-output/packages/libatk-1.0.html"
 
 # Kbuild invokes the producer from its output directory with relative inputs.
 # Exercise the real runtime verifier with that calling convention as well.

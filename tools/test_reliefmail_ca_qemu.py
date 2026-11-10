@@ -65,8 +65,7 @@ def build_probes(output):
             command[-3], command[-1] = str(source), str(output / (name + '.o'))
             command[1:1] = ['-I' + str(ROOT / 'userland/apps/reliefmail'),
                              '-I' + str(ROOT / 'userland/runtime/include'),
-                             '-I' + str(ROOT / 'third_party/mbedtls/include'),
-                             '-DMBEDTLS_CONFIG_FILE="reliefos_mbedtls_config.h"']
+                             '-I' + str(OUT / 'upstream/runtime-development/usr/include')]
             run(command, log)
             objects.append(str(output / (name + '.o')))
         command = list(template['link'])
@@ -74,6 +73,8 @@ def build_probes(output):
         command[index:index + 1] = objects
         command[command.index(str(probe))] = str(output / 'tls-probe.elf')
         command.insert(command.index('-lc'), str(OUT / 'system/lib/libreliefos.so.2'))
+        for library in ('mbedtls', 'mbedx509', 'mbedcrypto'):
+            command.insert(command.index('-lc'), str(OUT / 'upstream/runtime-development/usr/lib' / ('lib' + library + '.so')))
         run(command, log)
     return probe
 

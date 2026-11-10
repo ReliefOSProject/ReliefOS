@@ -2,6 +2,11 @@
   "version": 1,
   "current_distributor": "reliefos-build",
   "apk_registration": "not-installed",
+  "upstream_components": {
+    "sl": ["sl"],
+    "ncurses": ["ncurses", "ncurses-terminfo"],
+    "sqlite": ["sqlite", "sqlite-libs"]
+  },
   "groups": {
     "reliefos-kernel": {
       "destination": "reliefos",
@@ -37,7 +42,13 @@
       "destination": "reliefos",
       "components": ["reliefplayer"],
       "paths": ["usr/bin/reliefplayer", "usr/share/applications/reliefos-reliefplayer.desktop"],
-      "reason": "ReliefPlayer audio executable, launcher, desktop entry and component artwork are installed and removed together. minimp3 remains embedded in its consumers."
+      "reason": "ReliefPlayer audio/video executable, launcher, desktop entry and component artwork are installed and removed together. minimp3 remains embedded in its consumers."
+    },
+    "reliefos-media-codecs": {
+      "destination": "reliefos",
+      "components": [],
+      "paths": ["usr/lib/libavformat-reliefplayer.so", "usr/lib/libavcodec-reliefplayer.so", "usr/lib/libavutil-reliefplayer.so", "usr/lib/libswresample-reliefplayer.so", "usr/lib/libswscale-reliefplayer.so", "usr/share/licenses/ffmpeg"],
+      "reason": "Pinned LGPL FFmpeg libraries for local MP4 decoding in ReliefPlayer; headers and development files stay outside the runtime image."
     },
     "reliefos-network-controller": {
       "destination": "reliefos",
@@ -209,31 +220,12 @@
       "alpine_candidates": ["e2fsprogs", "dosfstools", "exfatprogs"],
       "reason": "Transfer formatter/checker aliases with commands; preserve ext2 installer behavior."
     },
-    "ncurses": {
-      "destination": "alpine-after-validation",
-      "components": ["ncurses"],
-      "alpine_candidates": ["ncurses", "ncurses-terminfo"],
-      "reason": "Resolve terminal data/tools split and libraries from repository metadata; preserve leonos TERM support."
-    },
     "ca-certificates-bundle": {
       "destination": "alpine-after-validation",
       "components": [],
       "paths": ["etc/ssl/certs/ca-certificates.crt"],
       "alpine_candidates": ["ca-certificates-bundle"],
       "reason": "The actual CA bundle is packaged separately so curl dependencies and authenticated upstream updates can own it."
-    },
-    "sqlite": {
-      "destination": "alpine-after-validation",
-      "components": ["sqlite"],
-      "paths": ["usr/lib/sqlite.so.3"],
-      "alpine_candidates": ["sqlite", "sqlite-libs"],
-      "reason": "Current custom SONAME and native consumers need migration before upstream library replacement."
-    },
-    "sl": {
-      "destination": "alpine-after-validation",
-      "components": ["sl"],
-      "alpine_candidates": ["sl"],
-      "reason": "Generic optional terminal application."
     },
     "trust": {
       "destination": "alpine-after-validation",

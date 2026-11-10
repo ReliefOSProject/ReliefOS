@@ -1,17 +1,22 @@
 #ifndef RELIEFPLAYER_SESSION_H
 #define RELIEFPLAYER_SESSION_H
 #include "protocol.h"
+#include "media.h"
 #include <sys/types.h>
 namespace rp {
 class Session {
   int commands_ = -1, statuses_ = -1;
   pid_t child_ = -1;
   bool closing_ = false, pending_open_ = false;
+  bool frame_failed_ = false;
   uint64_t deadline_ = 0;
   char path_[4096]{};
   unsigned initial_volume_ = 70, received_ = 0, queued_ = 0;
   Command queue_[16];
   PlaybackStatus partial_, status_;
+  VideoShared *video_ = nullptr;
+  unsigned char *pixels_ = nullptr;
+  uint32_t serial_ = 0, width_ = 0, height_ = 0;
   void start();
   void close_pipes();
   void flush();
@@ -27,6 +32,10 @@ public:
   void shutdown();
   bool active() const { return child_ > 0 || pending_open_; }
   const PlaybackStatus &status() const { return status_; }
+  const unsigned char *pixels() const { return pixels_; }
+  unsigned width() const { return width_; }
+  unsigned height() const { return height_; }
+  uint32_t video_serial() const { return serial_; }
 };
 } // namespace rp
 #endif

@@ -145,11 +145,6 @@ if [ -f scripts/kconfig/conf.c ] && [ -f scripts/Makefile.build ]; then
 else
     missing 'scripts/Makefile.build or scripts/kconfig/conf.c'
 fi
-if [ -f third_party/zlib/contrib/puff/puff.c ]; then
-    reliefos_log OK 'zlib reference inflate (contrib/puff) present'
-else
-    missing 'third_party/zlib/contrib/puff/puff.c'
-fi
 # Which upstream sources the build needs is the lock file's job, so doctor asks
 # it rather than keeping a second, easily stale list here.
 lock=${LOCK:-}

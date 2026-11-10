@@ -13,6 +13,7 @@ struct installer_setup {
     uint8_t skip_xorg;
     uint8_t skip_bios;
     uint8_t skip_uefi;
+    uint8_t format_esp;
     bool swap_enabled;
     uint64_t swap_size_mib;
 };

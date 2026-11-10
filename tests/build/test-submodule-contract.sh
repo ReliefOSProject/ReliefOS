@@ -152,14 +152,9 @@ if [ -z "${other:-}" ]; then
 elif git clone -q --no-checkout "$repo_root/kernel/reliefnt" \
         "$clone/kernel/reliefnt" 2>"$work/sub-clone.log"; then
     git -C "$clone/kernel/reliefnt" checkout -q --detach "$other" 2>/dev/null
-    # The fixture's make needs the config chain: seed the two submodules it
-    # parses/builds from the (already initialized) worktree checkouts.
-    # git >= 2.38 blocks the file transport for submodules by default.
+    # The release guard runs before dependency builds; no third-party source
+    # checkout is needed for its gitlink-mismatch fixture.
     cp "$repo_root/.gitmodules" "$clone/.gitmodules"
-    git -C "$clone" config submodule.third_party/zlib.url "$repo_root/third_party/zlib"
-    git -c protocol.file.allow=always -C "$clone" submodule update -q --init \
-        third_party/zlib \
-        2>"$work/fixture-submodules.log"
     if make -s -j1 -C "$clone" O="$work/clone-out" rpr-pages \
             >"$work/mismatch.log" 2>&1; then
         fail "make rpr-pages refuses a gitlink mismatch" 'make exited 0'

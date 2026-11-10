@@ -105,6 +105,8 @@ int main(int argc,char **argv)
     bool published=success || !strcmp(which,"backup-unlink") || !strcmp(which,"dir-close");
     if (published) {
         assert(committed && (success ? !rc : rc<0 && faulted));contents(path,"/dev/disk/by-partuuid/root-id");
+        contents(path,"/dev/disk/by-partuuid/esp-id /efi vfat defaults 0 2");
+        contents(path,"/efi/reliefos/instances/root-id /boot none bind 0 0");
         if (enabled) contents(path,"/swapfile none swap sw 0 0");
     } else {assert(rc<0 && !committed && faulted);if (!strcmp(which,"sync-close")) assert(rc==-ENOSPC && close_fault);
             contents(path,"old fstab");}

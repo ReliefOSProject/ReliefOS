@@ -10,6 +10,7 @@
 #include <libintl.h>
 
 #include "installer_tty.h"
+#include "installer_update.h"
 #include "installer_capacity.h"
 #include "model.h"
 
@@ -255,8 +256,17 @@ static int tty_partition_menu(const struct installer_tty_context *context)
     for (;;) {
         tty_print_partitions(context);
         puts("Commands: auto, init, create SIZE FS NAME, resize SIZE, rename NAME,");
-        puts("format FS LABEL, bios, esp, root, data, delete, refresh, done. FS raw creates an unformatted partition.");
+        puts("format FS LABEL, format-esp yes|no, bios, esp, root, data, delete, refresh, done. FS raw creates an unformatted partition.");
+        printf("ESP: %s\n", context->setup->format_esp ? "format (erase EFI files)" : "preserve existing FAT32 files");
         if (!tty_read_line("partition> ", input, sizeof(input))) return 0;
+        if (tty_line_is(input, "format-esp yes")) {
+            context->setup->format_esp = 1;
+            continue;
+        }
+        if (tty_line_is(input, "format-esp no")) {
+            context->setup->format_esp = 0;
+            continue;
+        }
         if (tty_line_is(input, "done")) {
             if (context->partition_plan_valid()) return 1;
             puts(context->setup->skip_bios
@@ -312,6 +322,12 @@ static int tty_partition_menu(const struct installer_tty_context *context)
     }
 }
 
+static void tty_update_progress(void *context, unsigned progress, const char *message)
+{
+    (void)context;
+    printf("[%3u%%] %s\n", progress, T(message));
+}
+
 int installer_tty_main(const struct installer_tty_context *context)
 {
     char input[32];
@@ -326,8 +342,7 @@ int installer_tty_main(const struct installer_tty_context *context)
         !context->partition_create || !context->partition_resize ||
         !context->partition_rename || !context->partition_set_type ||
         !context->partition_delete || !context->partition_format ||
-        !context->prepare_update ||
-        !context->perform_install || !context->perform_update) {
+        !context->perform_install) {
         return 1;
     }
 
@@ -356,17 +371,51 @@ int installer_tty_main(const struct installer_tty_context *context)
     }
 
     if (*context->install_mode == INSTALLER_TTY_MODE_UPDATE) {
-        context->prepare_update();
-        if (*context->page == INSTALLER_PAGE_FINISH && !*context->install_success) {
+        struct installer_update_info inspected, result;
+        const char *disk = context->disks[*context->selected_disk].path;
+        char root_uuid[37] = {0}, esp_uuid[37] = {0};
+        context->refresh_partitions();
+        tty_print_partitions(context);
+        char *end;
+        for (int role = 0; role < 2; ++role) {
+            if (!tty_read_line(role ? T("ESP partition number (blank: use fstab): ")
+                                    : T("ReliefOS root partition number (blank: auto): "), input, sizeof(input))) return 1;
+            if (!input[0]) continue;
+            errno = 0;
+            unsigned long index = strtoul(input, &end, 10);
+            if (errno || *end || index >= *context->partition_count) return 1;
+            const struct reliefos_block_partition *part = &context->partitions[index];
+            if (part->gpt_type != (role ? RELIEFOS_BLOCK_GPT_ESP : RELIEFOS_BLOCK_GPT_LINUX)) return 1;
+            if (reliefos_block_partition_uuid(disk, part->index, role ? esp_uuid : root_uuid)) return 1;
+        }
+        int error = installer_update_check_target(disk, root_uuid, esp_uuid, &inspected, tty_update_progress, NULL);
+        if (error) {
+            fprintf(stderr, "%s: %s\n", T(inspected.failure), strerror(-error));
             return 1;
         }
+        printf("\n%s: %s -> %s\n%s: %s\n%s: %s\n%s: %s\n",
+               T("System version"), inspected.installed_version, inspected.media_version,
+               T("Target disk"), inspected.disk, T("System partition"), inspected.root_device,
+               T("Boot partition"), inspected.esp_device);
+        printf("%s: %llu MiB / %llu MiB\n", T("Free / required space"),
+               (unsigned long long)(inspected.free_bytes / (1024u * 1024u)),
+               (unsigned long long)((inspected.required_bytes + 1024u * 1024u - 1) / (1024u * 1024u)));
+        puts(T("Accounts, personal files, installed software and local configuration are preserved."));
+        context->setup->skip_bios = !(inspected.boot_modes & 1u);
+        context->setup->skip_uefi = !(inspected.boot_modes & 2u);
         if (!tty_bootloaders(context->setup)) return 1;
-        if (!tty_read_line("Type UPDATE to confirm an in-place update: ",
-                           input, sizeof(input)) || !tty_line_is(input, "UPDATE")) {
+        if (!tty_read_line(T("Proceed with system update? [y/N]: "), input, sizeof(input)) ||
+            (!tty_line_is(input, "y") && !tty_line_is(input, "Y") && !tty_line_is(input, "yes"))) {
             puts("Update not confirmed. Installation cancelled.");
             return 1;
         }
-        context->perform_update();
+        error = installer_update_apply(&inspected,
+            (context->setup->skip_bios ? 0u : 1u) | (context->setup->skip_uefi ? 0u : 2u),
+            &result, tty_update_progress, NULL);
+        if (!error && !context->setup->skip_uefi) printf("UEFI: %s\n", result.boot_file);
+        *context->install_success = error == 0;
+        *context->page = INSTALLER_PAGE_FINISH;
+        if (error) fprintf(stderr, "%s: %s\n", T(result.failure), strerror(-error));
     } else {
         if (!tty_bootloaders(context->setup)) return 1;
         context->refresh_partitions();
@@ -383,12 +432,19 @@ int installer_tty_main(const struct installer_tty_context *context)
             return 1;
         }
         if (!installer_tty_select_swap(context->setup)) return 1;
+        puts(*context->partition_auto ? T("Automatic installation erases the selected disk.") :
+             context->setup->format_esp ? T("The selected root and ESP will be formatted.") :
+             T("Only the selected root is formatted; existing ESP files are preserved."));
         if (!tty_read_line("Type INSTALL to confirm the partition layout and installation: ",
                            input, sizeof(input)) || !tty_line_is(input, "INSTALL")) {
             puts("Installation not confirmed. Installation cancelled.");
             return 1;
         }
         context->perform_install();
+        if (*context->install_success && !context->setup->skip_uefi && context->boot_entry_path) {
+            char entry[128];
+            if (!context->boot_entry_path(entry, sizeof(entry))) printf("UEFI: %s\n", entry);
+        }
     }
 
     if (!*context->install_success) {

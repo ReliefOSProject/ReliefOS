@@ -22,14 +22,14 @@ Runtime, libraries, and applications
 
 * GNU GRUB 2: GPL-3.0-or-later. See the GRUB source and boot artifacts.
 * Mbed TLS 3.6.7: Apache-2.0 OR GPL-2.0-or-later. See
-  third_party/mbedtls/LICENSE.
+  resources/licenses/mbedtls3-LICENSE.
 * musl 1.2.6: MIT and upstream notices; see third_party/musl/COPYRIGHT.
 * mimalloc 3.5.1: MIT; see third_party/mimalloc/LICENSE.
-* zlib 1.3.2: zlib License. See third_party/zlib/LICENSE.
+* zlib 1.4: zlib License. See resources/licenses/zlib-LICENSE.
   Copyright (C) 1995-2026 Jean-loup Gailly and Mark Adler.
-* libpng 1.6.58: libpng License. See third_party/libpng/LICENSE.
-* SQLite 3.46.1: public-domain dedication and blessing. See
-  third_party/sqlite/LICENSE.md.
+* libpng 1.6.59: libpng License. See resources/licenses/libpng-LICENSE.
+* SQLite 3.53.4: public-domain dedication and blessing. See
+  resources/licenses/sqlite-LICENSE.
 * BusyBox 1.36.1: GPL-2.0-only. See third_party/busybox/LICENSE.
 * GNU findutils 4.10.0: GPL-3.0-or-later. The unmodified official Alpine APK
   and its pinned checksum are recorded in configs/openrc-packages.json.
@@ -54,7 +54,7 @@ Runtime, libraries, and applications
   isolated staging root's /usr/share/licenses/<package>/ directory.
 * Vim (vim, vim-common, xxd): Vim License. Installed from signed Alpine APKs;
   versions and archive hashes are recorded in configs/dependencies.lock.json.
-* ncurses 6.6: MIT-style license. See third_party/ncurses/COPYING.
+* ncurses 6.6: MIT-style license. See resources/licenses/ncurses-LICENSE.
 * Dyne musl 2.2.0 native toolchain: GCC 15.1.0 and GNU binutils 2.44
   (GPL-3.0-or-later), musl (MIT), and the upstream bundled static libraries.
   GCC runtime libraries use the GCC Runtime Library Exception where applicable.
@@ -68,7 +68,7 @@ Runtime, libraries, and applications
   license metadata is in .PKGINFO.
 * StardustUI: MIT. See third_party/stardustui/LICENSE.
 * PL Editor (LeonOS fork): MIT. See third_party/pl_editor/LICENSE.
-* sl: permissive upstream license. See third_party/sl/LICENSE.
+* sl: permissive upstream license. See resources/licenses/sl-LICENSE.
 * litehtml: BSD-3-Clause. See third_party/litehtml/LICENSE.
 * Gumbo HTML Parser: Apache-2.0. See third_party/litehtml/src/gumbo/LICENSE.
 * ab_glyph_rasterizer 0.1.10: Apache-2.0. See the nested StardustUI
@@ -114,3 +114,9 @@ covered by their own GPL-2.0 terms, with texts in LICENSES/preferred/GPL-2.0
 and LICENSES/kbuild/COPYING. Project compiler-policy adapters are separate
 files. These build-tool terms do not relabel the ReliefOS-owned application
 or operating-system source.
+
+Binary dependencies sl, ncurses, zlib, libpng, SQLite and mbedtls3 are distributed
+as unmodified signed Alpine v3.24 APKs. Exact versions, archive URLs, SHA256 and
+license metadata are recorded in configs/dependencies.lock.json. Source recipes
+are available at https://gitlab.alpinelinux.org/alpine/aports (v3.24). SDK archives
+include matching development/static inputs and their original .PKGINFO records.

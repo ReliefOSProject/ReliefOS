@@ -235,14 +235,17 @@ def inspect_install(disk, output, bios, uefi):
     """Check actual GPT and loader records after the installing VM has exited."""
     table = json.loads(subprocess.check_output(["sfdisk", "--json", disk]))["partitiontable"]
     parts = table["partitions"]
-    assert len(parts) == 3 and parts[0]["start"] == 2048 and parts[0]["size"] == 2048
-    assert parts[0]["type"].lower() == "21686148-6449-6e6f-744e-656564454649"
+    assert len(parts) == (3 if bios else 2)
+    if bios:
+        assert parts[0]["start"] == 2048 and parts[0]["size"] == 2048
+        assert parts[0]["type"].lower() == "21686148-6449-6e6f-744e-656564454649"
     esp = next(p for p in parts if p["type"].lower() == "c12a7328-f81f-11d2-ba4b-00a0c93ec93b")
     root = next(p for p in parts if p["type"].lower() == "0fc63daf-8483-4772-8e79-3d69d8477de4")
     source = f"{disk}@@{esp['start'] * 512}"
-    record = subprocess.check_output(["mtype", "-i", source, "::/reliefos/config/bootloaders.conf"], text=True)
+    instance = f"::/reliefos/instances/{root['uuid'].lower()}"
+    record = subprocess.check_output(["mtype", "-i", source, instance + "/reliefos/config/bootloaders.conf"], text=True)
     assert record == f"version=1\nbios={int(bios)}\nuefi={int(uefi)}\n", record
-    binding = subprocess.check_output(["mtype", "-i", source, "::/reliefos/config/root.cfg"], text=True)
+    binding = subprocess.check_output(["mtype", "-i", source, instance + "/reliefos/config/root.cfg"], text=True)
     assert binding.strip() == f"set reliefos_root=PARTUUID={root['uuid'].lower()}"
     efi = subprocess.run(["mdir", "-i", source, "::/EFI/BOOT/BOOTX64.EFI"],
                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0

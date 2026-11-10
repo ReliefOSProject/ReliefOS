@@ -10,6 +10,7 @@ include $(srctree)/scripts/reliefos/Makefile.headers
 include $(srctree)/scripts/reliefos/Makefile.boot
 include $(srctree)/scripts/reliefos/Makefile.third-party
 include $(srctree)/scripts/reliefos/Makefile.pam
+include $(srctree)/scripts/reliefos/Makefile.apk-dependencies
 include $(srctree)/scripts/reliefos/Makefile.runtime
 include $(srctree)/scripts/reliefos/Makefile.upstream
 include $(srctree)/scripts/reliefos/Makefile.modules

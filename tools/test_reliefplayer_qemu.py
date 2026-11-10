@@ -64,6 +64,8 @@ echo "RP_EXIT status=$status" >/dev/ttyS0
                (probe, fltk.PROBE_GUEST, 0o100755), (runner, '/usr/bin/rptest', 0o100755)]
     for name in ('sample.wav', 'sample.mp3', 'short.wav', 'invalid.wav'):
         payload.append((fixtures / name, '/home/test/' + name, 0o100644))
+    for library in (build_dir / 'upstream/ffmpeg/root/usr/lib').glob('*.so.*'):
+        payload.append((library.resolve(), '/usr/lib/' + library.name, 0o100755))
     fltk.validate_target_elf(build_dir / 'userland/reliefplayer.elf', sysroot=build_dir / 'sysroot/musl', required_needed=('libfltk.so.1.3',))
     metadata = fltk.prepare_disk(image, kernel, output, payload)
     (output / 'prepare.json').write_text(json.dumps(metadata, indent=2) + '\n')
@@ -109,7 +111,7 @@ class Session(CommonSession):
         self.probe.key('ctrl-u')
         self.probe.text('rptest' + (' ' + path if path else ''))
         self.probe.key('ret')
-        self.wait('[reliefplayer.elf] FLTK audio player ready', self.launch_offset)
+        self.wait('[reliefplayer.elf] FLTK media player ready', self.launch_offset)
         log = self.serial.read_text(errors='replace')[self.launch_offset:]
         self.pid = int(re.search(r'RP_START pid=(\d+)', log)[1])
         self.geometry = fltk.wait_client_geometry(self.serial, self.process, self.pid, self.launch_offset)

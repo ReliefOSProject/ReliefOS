@@ -52,11 +52,6 @@ static void reliefos_tls_log_verify_failure(const char *hostname, uint32_t flags
            (flags & MBEDTLS_X509_BADCERT_BAD_MD) != 0);
 }
 
-static int reliefos_tls_is_leap_year(int year)
-{
-    return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
-}
-
 static int reliefos_tls_header_name_equal(const char *line, const char *name)
 {
     while (*name && *line) {
@@ -120,102 +115,8 @@ int64_t reliefos_mbedtls_time(int64_t *seconds)
     return value;
 }
 
-struct tm *mbedtls_platform_gmtime_r(const int64_t *seconds, struct tm *out)
-{
-    static const int month_days[] = {
-        31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
-    };
-    int64_t days;
-    int64_t remainder;
-    int year = 1970;
-    int month = 0;
-    if (!seconds || !out || *seconds < 0) {
-        return 0;
-    }
-    days = *seconds / 86400;
-    remainder = *seconds % 86400;
-    while (days >= (reliefos_tls_is_leap_year(year) ? 366 : 365)) {
-        days -= reliefos_tls_is_leap_year(year) ? 366 : 365;
-        ++year;
-    }
-    while (month < 12) {
-        int count = month_days[month];
-        if (month == 1 && reliefos_tls_is_leap_year(year)) {
-            ++count;
-        }
-        if (days < count) {
-            break;
-        }
-        days -= count;
-        ++month;
-    }
-    out->tm_sec = (int)(remainder % 60);
-    out->tm_min = (int)((remainder / 60) % 60);
-    out->tm_hour = (int)(remainder / 3600);
-    out->tm_mday = (int)days + 1;
-    out->tm_mon = month;
-    out->tm_year = year - 1900;
-    out->tm_wday = (int)(((*seconds / 86400) + 4) % 7);
-    out->tm_yday = (int)((*seconds / 86400) -
-                         ((int64_t)(year - 1970) * 365));
-    for (int current = 1970; current < year; ++current) {
-        if (reliefos_tls_is_leap_year(current)) {
-            --out->tm_yday;
-        }
-    }
-    out->tm_isdst = 0;
-    return out;
-}
-
-static int reliefos_tls_rdrand_available(void)
-{
-    uint32_t eax = 1;
-    uint32_t ebx;
-    uint32_t ecx;
-    uint32_t edx;
-    __asm__ volatile("cpuid"
-                     : "+a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
-                     : "c"(0));
-    (void)ebx;
-    (void)edx;
-    return (ecx & (1U << 30)) != 0;
-}
-
-static int reliefos_tls_rdrand64(uint64_t *value)
-{
-    unsigned char ready;
-    __asm__ volatile("rdrand %0; setc %1"
-                     : "=r"(*value), "=qm"(ready));
-    return ready != 0;
-}
-
-int mbedtls_hardware_poll(void *data, unsigned char *output,
-                          size_t len, size_t *olen)
-{
-    size_t written = 0;
-    (void)data;
-    if (olen) {
-        *olen = 0;
-    }
-    if (!output || !olen || !reliefos_tls_rdrand_available()) {
-        return MBEDTLS_ERR_ENTROPY_SOURCE_FAILED;
-    }
-    while (written < len) {
-        uint64_t random = 0;
-        int ready = 0;
-        for (int attempt = 0; attempt < 10 && !ready; ++attempt) {
-            ready = reliefos_tls_rdrand64(&random);
-        }
-        if (!ready) {
-            return MBEDTLS_ERR_ENTROPY_SOURCE_FAILED;
-        }
-        for (uint32_t index = 0; index < sizeof(random) && written < len; ++index) {
-            output[written++] = (unsigned char)(random >> (index * 8U));
-        }
-    }
-    *olen = written;
-    return 0;
-}
+/* Official mbedTLS uses musl time/gmtime and its platform entropy source.
+ * Do not interpose ALT hooks compiled for the retired private configuration. */
 
 static int reliefos_tls_load_roots(void)
 {

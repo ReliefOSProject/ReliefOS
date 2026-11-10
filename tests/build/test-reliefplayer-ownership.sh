@@ -21,3 +21,12 @@ if ! awk -F '\t' '$2=="dir" {next} $1!="reliefos-reliefplayer" {bad=1} {count++}
     cat "$work/rows"; exit 1
 fi
 printf 'ReliefPlayer ownership: executable, launcher, desktop entry and artwork travel together\n'
+mkdir -p "$work/root/usr/share/licenses/ffmpeg"
+printf 'LGPL fixture\n' > "$work/root/usr/share/licenses/ffmpeg/COPYING.LGPLv2.1"
+for lib in avformat avcodec avutil swresample swscale; do
+    printf 'library fixture\n' > "$work/root/usr/lib/lib$lib-reliefplayer.so.62.1.0"
+    ln -s "lib$lib-reliefplayer.so.62.1.0" "$work/root/usr/lib/lib$lib-reliefplayer.so.62"
+done
+"$work/own" --policy "$src/configs/apk-ownership.json" --root "$work/root" --output "$work/rows-codecs"
+awk -F '\t' '$2=="dir" {next} $4 ~ /-reliefplayer.so|licenses\/ffmpeg/ {if($1!="reliefos-media-codecs")exit 1;count++} END {if(count!=11)exit 1}' "$work/rows-codecs"
+printf 'ReliefPlayer codec ownership: private SONAMEs, versioned links and LGPL notice grouped separately\n'

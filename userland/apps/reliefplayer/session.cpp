@@ -3,7 +3,9 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <sys/wait.h>
 #include <unistd.h>
 namespace rp {
@@ -22,6 +24,7 @@ Session::~Session() {
     }
   }
   close_pipes();
+  free(pixels_);
 }
 void Session::close_pipes() {
   if (commands_ >= 0)
@@ -30,10 +33,26 @@ void Session::close_pipes() {
     close(statuses_);
   commands_ = statuses_ = -1;
   queued_ = received_ = 0;
+  if (video_)
+    munmap(video_, sizeof(VideoShared));
+  video_ = nullptr;
 }
 void Session::start() {
   pending_open_ = false;
   closing_ = false;
+  frame_failed_ = false;
+  free(pixels_);
+  pixels_ = nullptr;
+  width_ = height_ = serial_ = 0;
+  int frame_fd = memfd_create("reliefplayer-video", MFD_CLOEXEC);
+  if (frame_fd >= 0 && ftruncate(frame_fd, sizeof(VideoShared)) == 0) {
+    void *memory = mmap(nullptr, sizeof(VideoShared), PROT_READ | PROT_WRITE,
+                        MAP_SHARED, frame_fd, 0);
+    if (memory != MAP_FAILED)
+      video_ = static_cast<VideoShared *>(memory);
+  }
+  if (frame_fd >= 0)
+    close(frame_fd);
   int command_pipe[2] = {-1, -1}, status_pipe[2] = {-1, -1};
   if (pipe(command_pipe) < 0 || pipe(status_pipe) < 0 ||
       !nonblocking(command_pipe[0]) || !nonblocking(command_pipe[1]) ||
@@ -46,6 +65,7 @@ void Session::start() {
         close(fd);
     status_.state = State::Failed;
     status_.error = Error::Worker;
+    close_pipes();
     return;
   }
   child_ = fork();
@@ -55,7 +75,7 @@ void Session::start() {
     signal(SIGTERM, SIG_DFL);
     signal(SIGINT, SIG_DFL);
     int result =
-        worker(path_, command_pipe[0], status_pipe[1], initial_volume_);
+        worker(path_, command_pipe[0], status_pipe[1], initial_volume_, video_);
     close(command_pipe[0]);
     close(status_pipe[1]);
     _exit(result);
@@ -67,6 +87,7 @@ void Session::start() {
     close(status_pipe[0]);
     status_.state = State::Failed;
     status_.error = Error::Worker;
+    close_pipes();
     return;
   }
   commands_ = command_pipe[1];
@@ -137,9 +158,30 @@ void Session::poll() {
     received_ += unsigned(n);
     if (received_ == sizeof(PlaybackStatus)) {
       received_ = 0;
-      if (partial_.magic == Protocol && !closing_)
+      if (partial_.magic == Protocol && !closing_ && !frame_failed_)
         status_ = partial_;
     }
+  }
+  if (video_ && !closing_ && !frame_failed_ &&
+      !__atomic_exchange_n(&video_->lock, 1u, __ATOMIC_ACQUIRE)) {
+    if (video_->serial != serial_ && video_->width && video_->height &&
+        video_->width <= VideoWidth && video_->height <= VideoWidth &&
+        uint64_t(video_->width) * video_->height * 3 <= VideoBytes) {
+      if (!pixels_)
+        pixels_ = static_cast<unsigned char *>(malloc(VideoBytes));
+      if (pixels_) {
+        width_ = video_->width;
+        height_ = video_->height;
+        memcpy(pixels_, video_->pixels, size_t(width_) * height_ * 3);
+        serial_ = video_->serial;
+      } else {
+        frame_failed_ = true;
+        status_.state = State::Failed;
+        status_.error = Error::Memory;
+        command(Op::Quit);
+      }
+    }
+    __atomic_store_n(&video_->lock, 0u, __ATOMIC_RELEASE);
   }
   int result = 0;
   pid_t reaped = waitpid(child_, &result, WNOHANG);

@@ -1,7 +1,7 @@
 """Check a running installer's redraw latency through an isolated QEMU QMP socket.
 
 Start the installer at its language page with no writable disk attached. This
-test visits only Language, Thanks, Welcome, and Mode; it never starts a copy.
+test visits only Language, License, Welcome, and Mode; it never starts a copy.
 Requires Pillow. Screenshots and measured response times are saved in --output.
 """
 

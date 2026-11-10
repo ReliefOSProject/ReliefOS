@@ -524,7 +524,7 @@ entry = true
 sdk = false
 api = false
 open_with = true
-extensions = [".mp3", ".wav"]
+extensions = [".mp3", ".wav", ".mp4"]
 
 [[components]]
 id = "wavplay"

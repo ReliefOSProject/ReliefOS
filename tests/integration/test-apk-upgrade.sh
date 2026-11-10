@@ -58,7 +58,25 @@ printf 'canonical-local-setting=yes\n' > "$work/runner/target/etc/reliefos/upgra
 printf 'LANG=C\nMUSL_LOCPATH=/usr/share/musl/locales\n' > "$work/runner/target/etc/leonos/locale.conf"
 cp "$work/runner/target/etc/leonos/locale.conf" "$work/legacy-locale-before"
 cp "$work/runner/target/etc/apk/world" "$work/world-before"
-sed 's/^leonos-/reliefos-/' "$work/world-before" > "$work/world-after-rename"
+python3 - "$work/world-before" "$work/world-after-rename" <<'PY'
+from pathlib import Path
+import re, sys
+requests = [re.sub('^leonos-', 'reliefos-', line)
+            for line in Path(sys.argv[1]).read_text().splitlines()]
+upstream = {'reliefos-sl': ('sl',), 'reliefos-ncurses': ('ncurses', 'ncurses-terminfo'),
+            'reliefos-sqlite': ('sqlite', 'sqlite-libs')}
+selected = {re.split(r'[@<>=~]', request, 1)[0] for request in requests}
+expected = set()
+for request in requests:
+    name = re.split(r'[@<>=~]', request, 1)[0]
+    if name not in upstream:
+        expected.add(request)
+    else:
+        tag = re.search(r'@([a-zA-Z0-9_.+-]+)', request)
+        expected.update(package + ('@' + tag[1] if tag else '')
+                        for package in upstream[name] if package not in selected)
+Path(sys.argv[2]).write_text('\n'.join(sorted(expected)) + '\n')
+PY
 awk '/^P:/{if($0=="P:leonos-apps") found=1} END{exit !found}' \
     "$work/runner/target/lib/apk/db/installed" || {
     echo 'legacy fixture does not contain an installed leonos-apps package' >&2
@@ -77,7 +95,7 @@ cp "$work/runner/target/etc/apk/keys/$legacy_key" "$work/old-signing-key.pub"
 awk '/^P:/{p=$0} /^V:/{if(p=="P:external-fixture")print}' "$work/runner/target/lib/apk/db/installed" > "$work/external-before"
 # Install the new command path while keeping old command aliases in the target.
 mkdir -p "$work/runner/usr/lib/reliefos" "$work/runner/usr/lib/leonos"
-cp "$src/userland/storage/leonos-apk-update" "$work/runner/usr/lib/reliefos/reliefos-apk-update"
+cp "$src/userland/storage/reliefos-apk-update" "$work/runner/usr/lib/reliefos/reliefos-apk-update"
 ln -sfn reliefos-apk-update "$work/runner/usr/lib/reliefos/leonos-apk-update"
 ln -sfn ../reliefos/reliefos-apk-update "$work/runner/usr/lib/leonos/leonos-apk-update"
 # pivot_root, rather than chroot, lets APK create its script sandbox on Linux.

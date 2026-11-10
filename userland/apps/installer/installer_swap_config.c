@@ -179,8 +179,9 @@ int installer_swap_configure(const char *root,const char *root_uuid,const char *
     int n=snprintf(fstab,sizeof(fstab),
         "# <source> <mountpoint> <type> <options> <dump> <pass>\n"
         "/dev/disk/by-partuuid/%s / ext4 defaults 0 1\n"
-        "/dev/disk/by-partuuid/%s /boot vfat defaults 0 2\n%s",
-        root_uuid,esp_uuid,enabled ? "/swapfile none swap sw 0 0\n" : "");
+        "/dev/disk/by-partuuid/%s /efi vfat defaults 0 2\n"
+        "/efi/reliefos/instances/%s /boot none bind 0 0\n%s",
+        root_uuid,esp_uuid,root_uuid,enabled ? "/swapfile none swap sw 0 0\n" : "");
     if (n<0 || (size_t)n>=sizeof(fstab)) return -EOVERFLOW;
     int rootfd=-1,etc=-1,conf=-1,levels=-1,run=-1,rc=0;
     bool published=false;

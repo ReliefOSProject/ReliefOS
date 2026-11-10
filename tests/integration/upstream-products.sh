@@ -17,13 +17,14 @@ done
 "$root/apk/apk.static" --version
 printf '%s\n' 'upstream production ELF/archive checks: PASS'
 apps=${2:-$root/userland}
-for app in busybox sl pleditor; do
+for app in busybox pleditor; do
  test -f "$apps/$app.elf"
  readelf -h "$apps/$app.elf" | grep -q 'Advanced Micro Devices X86-64'
  if readelf -d "$apps/$app.elf" | grep -E 'libc\.so\.6|ld-linux'; then exit 1; fi
 done
-for library in sqlite.so.3; do
- readelf -d "$apps/$library" | grep -q '(SONAME)'
+development=$root/runtime-development/usr/lib
+for library in libsqlite3.so.0 libz.so.1 libpng16.so.16 libmbedtls.so.21 libmbedx509.so.7 libmbedcrypto.so.16; do
+ readelf -d "$development/$library" | grep -q '(SONAME)'
 done
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
 sh "$src/tools/build/busybox-check.sh" "$root/busybox/build/.config" "$apps/busybox.links"

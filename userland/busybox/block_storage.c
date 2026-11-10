@@ -22,9 +22,6 @@
 //config:config LEONOS_UMOUNT
 //config: bool "umount"
 //config: default y
-//config:config LEONOS_GRUB_INSTALLER
-//config: bool "leonos-grub-installer (copy EFI payload)"
-//config: default y
 //config:config LEONOS_FSCK
 //config: bool "fsck.*"
 //config: default y
@@ -44,7 +41,6 @@
 //applet:IF_LEONOS_MKFS_EXFAT(APPLET_ODDNAME(mkfs.exfat, leonos_mkfs_exfat, BB_DIR_SBIN, BB_SUID_DROP, leonos_mkfs_exfat))
 //applet:IF_LEONOS_MOUNT(APPLET(mount, BB_DIR_BIN, BB_SUID_DROP))
 //applet:IF_LEONOS_UMOUNT(APPLET(umount, BB_DIR_SBIN, BB_SUID_DROP))
-//applet:IF_LEONOS_GRUB_INSTALLER(APPLET_ODDNAME(leonos-grub-installer, leonos_grub_installer, BB_DIR_SBIN, BB_SUID_DROP, leonos_grub_installer))
 //applet:IF_LEONOS_FSCK(APPLET_ODDNAME(fsck.fat, leonos_fsck_fat, BB_DIR_SBIN, BB_SUID_DROP, leonos_fsck_fat))
 //applet:IF_LEONOS_FSCK(APPLET_ODDNAME(fsck.fat32, leonos_fsck_fat, BB_DIR_SBIN, BB_SUID_DROP, leonos_fsck_fat))
 //applet:IF_LEONOS_FSCK(APPLET_ODDNAME(fsck.vfat, leonos_fsck_fat, BB_DIR_SBIN, BB_SUID_DROP, leonos_fsck_fat))
@@ -69,8 +65,6 @@
 //usage:#define mount_full_usage "\n\nMount a FAT32, exFAT, ext4, or legacy ext2 block device\n"
 //usage:#define umount_trivial_usage "DIR"
 //usage:#define umount_full_usage "\n\nUnmount a filesystem by mount point\n"
-//usage:#define leonos_grub_installer_trivial_usage "ESP-MOUNTPOINT"
-//usage:#define leonos_grub_installer_full_usage "\n\nInstall the ReliefOS EFI/GRUB payload into an ESP mount\n"
 //usage:#define leonos_fsck_fat_trivial_usage "BLOCKDEV"
 //usage:#define leonos_fsck_fat_full_usage "\n\nCheck a FAT32 filesystem signature\n"
 //usage:#define leonos_fsck_ext2_trivial_usage "BLOCKDEV"
@@ -123,7 +117,6 @@ static int print_partitions(const char *disk)
     }
     return 0;
 }
-
 static int print_all_partitions(void)
 {
     struct leonos_block_disk_info disks[LEONOS_BLOCK_MAX_DISKS];
@@ -385,57 +378,5 @@ int lsblk_main(int argc, char **argv)
                    (unsigned long long)parts[i].sector_count * disks[d].sector_size,
                    leonos_block_filesystem_name(parts[i].filesystem), parts[i].name);
     }
-    return 0;
-}
-
-static int grub_copy_file(const char *source, const char *destination)
-{
-    FILE *in = fopen(source, "rb"); FILE *out; unsigned char buffer[8192]; size_t got;
-    if (!in || !(out = fopen(destination, "wb"))) { if (in) fclose(in); return -1; }
-    while ((got = fread(buffer, 1, sizeof(buffer), in)) != 0)
-        if (fwrite(buffer, 1, got, out) != got) { fclose(in); fclose(out); return -1; }
-    fclose(in); return fclose(out);
-}
-static int grub_copy_tree(const char *source, const char *destination)
-{
-    DIR *dir = opendir(source); struct dirent *entry;
-    if (!dir) return -1;
-    (void)mkdir(destination, 0777);
-    while ((entry = readdir(dir)) != NULL) {
-        char src[LEONOS_FS_PATH_LEN], dst[LEONOS_FS_PATH_LEN];
-        if (snprintf(src, sizeof(src), "%s/%s", source, entry->d_name) < 0 ||
-            snprintf(dst, sizeof(dst), "%s/%s", destination, entry->d_name) < 0 ||
-            (entry->d_type == DT_DIR ? grub_copy_tree(src, dst) : grub_copy_file(src, dst)) < 0) {
-            closedir(dir); return -1;
-        }
-    }
-    closedir(dir); return 0;
-}
-int leonos_grub_installer_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
-int leonos_grub_installer_main(int argc, char **argv)
-{
-    const char *esp = argc == 2 ? argv[1] : NULL;
-    static const char *const files[] = {"EFI/BOOT/BOOTX64.EFI", "reliefos/kernel.sys", "leonos/kernel.sys", NULL};
-    if (!esp) bb_show_usage();
-    {
-        char path[LEONOS_FS_PATH_LEN];
-        snprintf(path, sizeof(path), "%s/EFI", esp); (void)mkdir(path, 0777);
-        snprintf(path, sizeof(path), "%s/EFI/BOOT", esp); (void)mkdir(path, 0777);
-        snprintf(path, sizeof(path), "%s/reliefos", esp); (void)mkdir(path, 0777);
-        snprintf(path, sizeof(path), "%s/leonos", esp); (void)mkdir(path, 0777);
-    }
-    for (uint32_t i = 0; files[i]; ++i) {
-        char source[LEONOS_FS_PATH_LEN], destination[LEONOS_FS_PATH_LEN];
-        snprintf(source, sizeof(source), "/install/esp/%s", files[i]);
-        snprintf(destination, sizeof(destination), "%s/%s", esp, files[i]);
-        if (grub_copy_file(source, destination) < 0) { bb_error_msg("cannot install %s", files[i]); return 1; }
-    }
-    {
-        char source[LEONOS_FS_PATH_LEN], destination[LEONOS_FS_PATH_LEN];
-        snprintf(source, sizeof(source), "/install/esp/grub");
-        snprintf(destination, sizeof(destination), "%s/grub", esp);
-        if (grub_copy_tree(source, destination) < 0) { bb_error_msg("cannot install GRUB files"); return 1; }
-    }
-    printf("ReliefOS GRUB payload installed to %s.\n", esp);
     return 0;
 }

@@ -6,6 +6,10 @@ esp=$1 root=$2 raw=$3 vmdk=$4 epoch=$5
 bios=$6 mkimage=$7 setup=$8
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
 export SOURCE_DATE_EPOCH=$epoch TZ=UTC LC_ALL=C
+root_uuid=$(sh "$src/tools/build/image-identity.sh" root)
+esp_uuid=$(sh "$src/tools/build/image-identity.sh" esp)
+bios_uuid=$(sh "$src/tools/build/image-identity.sh" bios)
+disk_uuid=$(sh "$src/tools/build/image-identity.sh" disk)
 [ "$raw" != "$vmdk" ] || { echo 'raw and VMDK outputs must differ' >&2; exit 2; }
 [ ! "$raw" -ef "$vmdk" ] || { echo 'raw and VMDK outputs alias one file' >&2; exit 2; }
 [ -f "$root" ] && [ -s "$root" ] || { echo 'root input must be a nonempty regular image' >&2; exit 1; }
@@ -49,9 +53,9 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 cp -a "$esp" "$work/esp"
 mkdir -p "$work/esp/reliefos/config"
-printf 'set reliefos_root=PARTUUID=5c13543b-732c-4f81-8652-621124484420\n' > "$work/esp/reliefos/config/root.cfg"
+printf 'set reliefos_root=PARTUUID=%s\n' "$root_uuid" > "$work/esp/reliefos/config/root.cfg"
 printf 'version=1\nbios=1\nuefi=1\n' > "$work/esp/reliefos/config/bootloaders.conf"
-marker=reliefos/config/esp-41a3ee19-ba85-47a0-9705-a5c128374021.marker
+marker=reliefos/config/esp-$esp_uuid.marker
 printf 'ReliefOS ESP identity\n' > "$work/esp/$marker"
 cat > "$work/bios.cfg" <<CONFIG
 # GRUB executes embedded config with its simple rescue parser.
@@ -73,12 +77,12 @@ if [ "$((minimum * 2048))" -gt "$total_sectors" ]; then total_sectors=$((minimum
 truncate -s "$((total_sectors * 512))" "$work/disk.raw"
 sfdisk "$work/disk.raw" <<TABLE
 label: gpt
-label-id: B4A70D6A-278B-4A2C-986B-D79B8044C840
+label-id: $disk_uuid
 unit: sectors
 
-start=2048,size=2048,type=21686148-6449-6E6F-744E-656564454649,uuid=7C2A9C78-48C7-49E0-A057-9821ECA5C029,name=RELIEFOS_BIOS
-start=4096,size=$esp_sectors,type=U,uuid=41A3EE19-BA85-47A0-9705-A5C128374021,name=RELIEFOS_ESP
-start=$root_start,size=$root_sectors,type=L,uuid=5C13543B-732C-4F81-8652-621124484420,name=RELIEFOS_ROOT
+start=2048,size=2048,type=21686148-6449-6E6F-744E-656564454649,uuid=$bios_uuid,name=RELIEFOS_BIOS
+start=4096,size=$esp_sectors,type=U,uuid=$esp_uuid,name=RELIEFOS_ESP
+start=$root_start,size=$root_sectors,type=L,uuid=$root_uuid,name=RELIEFOS_ROOT
 TABLE
 truncate -s "${esp_mib}M" "$work/esp.fat"
 mkfs.fat --invariant -F 32 -s 2 -n RELIEFOS "$work/esp.fat"
@@ -90,6 +94,11 @@ cp "$bios/boot.img" "$work/boot.img"
     -o "$work/core.img" $(cat "$src/boot/grub/bios-modules.list")
 printf '(hd0) %s\n' "$work/disk.raw" > "$work/device.map"
 "$setup" -s --root-device=hd0,gpt2 -d "$work" -m "$work/device.map" "$work/disk.raw"
+# Keep GRUB's generated core input beside its mode record, as grub-install
+# does. The executable raw copy also carries embedding and RS metadata.
+touch -d "@$epoch" "$work/core.img"
+mcopy -o -m -i "$work/esp.fat" "$work/core.img" ::/grub/i386-pc/core.img
+dd if="$work/esp.fat" of="$work/disk.raw" bs=512 seek=4096 conv=notrunc status=none
 sfdisk --verify "$work/disk.raw"
 qemu-img convert -f raw -O vmdk "$work/disk.raw" "$work/disk.vmdk"
 qemu-img check -f vmdk "$work/disk.vmdk"
