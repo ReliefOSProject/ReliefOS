@@ -122,11 +122,9 @@ int kernel_payload_stage(int argc, char **argv)
         if (kernel_stage_copy(module_root, name, stage.root_fd, name, hash, 0644)) goto out;
     }
     char prefix[96], member[128]; snprintf(prefix, sizeof(prefix), "usr/lib/reliefos/kernel/%s/", release);
-    const char *names[] = {"kernel.sys", "kerneldebug.sys"};
-    for (size_t i = 0; i < 2; ++i) {
-        snprintf(member, sizeof(member), "%s%s", prefix, names[i]);
-        if (kernel_stage_copy(bundle.root_fd, names[i], stage.root_fd, member, kernel_bundle_find(&bundle, names[i])->sha256, 0644)) goto out;
-    }
+    snprintf(member, sizeof(member), "%skernel.sys", prefix);
+    if (kernel_stage_copy(bundle.root_fd, "kernel.sys", stage.root_fd, member,
+                          kernel_bundle_find(&bundle, "kernel.sys")->sha256, 0644)) goto out;
     snprintf(member, sizeof(member), "%sinitramfs.cpio", prefix);
     if (kernel_stage_copy_fd(pair.archive, stage.root_fd, member, pair.archive_hash, 0644)) goto out;
     snprintf(member, sizeof(member), "%sboot.env", prefix);

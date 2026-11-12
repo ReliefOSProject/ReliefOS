@@ -5,8 +5,8 @@ tmp_root=${TMPDIR:-$src/out/tmp}
 mkdir -p "$tmp_root"
 work=$(mktemp -d "$tmp_root/reliefos-fltk-apps.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
-if [ ! -f "$src/userland/apps/calc/engine.c" ] || [ ! -f "$src/userland/apps/osver/debug_click.h" ]; then
-    printf 'FAIL - calculator and system information have no toolkit-independent behavior boundary\n' >&2
+if [ ! -f "$src/userland/apps/calc/engine.c" ]; then
+    printf 'FAIL - calculator has no toolkit-independent behavior boundary\n' >&2
     exit 1
 fi
 for app in taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher installer; do
@@ -16,10 +16,10 @@ for app in taskmgr minesweeper leonmmcoset xiaobai paint imageview doomlauncher 
     fi
 done
 ${HOSTCC:-cc} -std=c11 -Wall -Wextra -Werror -fsanitize=undefined -fno-sanitize-recover=all \
-    -I"$src/userland/apps" -I"$src/userland/apps/calc" -I"$src/userland/apps/osver" \
+    -I"$src/userland/apps" -I"$src/userland/apps/calc" \
     -I"$src/userland/apps/taskmgr" \
     "$src/tests/host/test_motif_apps.c" "$src/userland/apps/calc/engine.c" \
-    "$src/userland/apps/osver/debug_click.c" "$src/userland/apps/taskmgr/model.c" \
+    "$src/userland/apps/taskmgr/model.c" \
     "$src/userland/apps/minesweeper/model.c" "$src/userland/apps/leonmmcoset/model.c" \
     "$src/userland/apps/xiaobai/model.c" "$src/userland/apps/paint/model.c" \
     "$src/userland/apps/imageview/model.c" "$src/userland/apps/doomlauncher/model.c" \

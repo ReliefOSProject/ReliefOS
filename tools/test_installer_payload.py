@@ -49,7 +49,7 @@ class InstallerPayloadTests(unittest.TestCase):
         ):
             (self.root / "install/root" / name).mkdir(parents=True, exist_ok=True)
         for name in (
-            "root/usr/lib/reliefos/kerneldebug.sys", "root/lib/ld-musl-x86_64.so.1",
+            "root/lib/ld-musl-x86_64.so.1",
             "root/lib/libc.so", "root/lib/libmimalloc.so.3",
             "root/usr/lib/reliefos/libreliefos.so.2", "root/usr/lib/leonos/libleonos.so.2",
             "esp/reliefos/kernel.sys", "esp/leonos/kernel.sys",

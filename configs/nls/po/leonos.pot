@@ -2738,10 +2738,6 @@ msgstr ""
 msgid "Could not open the search result"
 msgstr ""
 
-#: userland/apps/osver/main.cpp:29
-msgid "Could not persist kernel debug mode."
-msgstr ""
-
 #: userland/apps/reliefmail/window_actions.cpp:606
 msgid "Could not prepare the bounded SMTP confirmation."
 msgstr ""
@@ -6340,18 +6336,6 @@ msgstr ""
 
 #: userland/apps/osver/main.cpp:107
 msgid "Kernel"
-msgstr ""
-
-#: userland/apps/osver/main.cpp:27
-msgid "Kernel debug mode"
-msgstr ""
-
-#: userland/apps/osver/main.cpp:26
-msgid "Kernel debug mode enabled"
-msgstr ""
-
-#: userland/apps/osver/main.cpp:28
-msgid "Kernel debug mode enabled. Reboot to enter it."
 msgstr ""
 
 #: userland/apps/devmgr/main.c:280

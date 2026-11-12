@@ -45,8 +45,7 @@ class NativeBundle(unittest.TestCase):
         self.prefix = "lib/modules/" + RELEASE + "/"
         self.modules = self.install / self.prefix
         (self.modules / "kernel").mkdir(parents=True)
-        for name, value in {"kernel.sys": b"native kernel", "kernel.debug": b"symbols",
-                            "kerneldebug.sys": b"debug tool"}.items():
+        for name, value in {"kernel.sys": b"native kernel", "kernel.debug": b"symbols"}.items():
             (self.install / name).write_bytes(value)
         self.configuration = {"MODULES": "y", "EXT4_FS": "m", "FAT_FS": "y"}
         self.products = {"config": "".join("CONFIG_%s=%s\n" % item for item in self.configuration.items()),
@@ -121,7 +120,7 @@ class NativeBundle(unittest.TestCase):
         original = json.loads(json.dumps(self.manifest))
         for mutate in (lambda: self.manifest.update(module_abi="f" * 64),
                        lambda: self.manifest.update(module_directory="lib/modules/other"),
-                       lambda: self.manifest["files"].pop("kerneldebug.sys"),
+                       lambda: self.manifest["files"].pop("kernel.debug"),
                        lambda: self.manifest["files"].update({"../escape": {"sha256": "0" * 64, "size": 0}}),
                        lambda: self.manifest["files"].update({self.prefix + "kernel/../escape": {"sha256": "0" * 64, "size": 0}})):
             self.manifest = json.loads(json.dumps(original))

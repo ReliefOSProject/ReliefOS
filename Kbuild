@@ -30,7 +30,7 @@ include $(srctree)/scripts/reliefos/Makefile.tests
 include $(srctree)/tools/host/Kbuild
 tools: $(RELIEFOS_HOST_TOOLS)
 
-kernel: $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_DEBUG)
+kernel: $(RELIEFOS_KERNEL_SYS) $(RELIEFOS_KERNEL_SYMBOLS)
 
 test: test-tools test-build
 

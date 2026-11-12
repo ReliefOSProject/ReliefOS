@@ -35,7 +35,6 @@ main	compatibility	include/leonos/gpu_sdk.h	逐文件确认含 canonical reliefo
 main	compatibility	include/leonos/http.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/ini.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/inputm.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
-main	compatibility	include/leonos/kernel_debug.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/lat15_vga16.psf	旧 include/leonos/lat15_vga16.psf 入口转发 canonical reliefos/reliefnt 定义并提供旧宏/类型别名；不另定义 ABI
 main	compatibility	include/leonos/lat15_vga16_psf.inc	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/launch_result.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
