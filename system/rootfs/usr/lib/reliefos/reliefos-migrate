@@ -156,8 +156,6 @@ for pair in \
     'var/lib/leonos/startup.db var/lib/reliefos/startup.db' \
     'var/lib/leonos/startup-denials.db var/lib/reliefos/startup-denials.db' \
     'var/lib/leonos/oobe.done var/lib/reliefos/oobe.done' \
-    'var/lib/leonos/kerneldebug.enabled var/lib/reliefos/kerneldebug.enabled' \
-    'var/lib/leonos/kernel-debug var/lib/reliefos/kernel-debug' \
     'var/lib/leonos/browser/cookies.txt var/lib/reliefos/browser/cookies.txt' \
     'var/lib/leonos/browser/bookmarks.txt var/lib/reliefos/browser/bookmarks.txt'; do
     set -- $pair

@@ -169,22 +169,17 @@ P_ACCOUNTS_DB = P_VAR_LIB_RELIEFOS + "/accounts.db"
 P_STARTUP_DB = P_VAR_LIB_RELIEFOS + "/startup.db"
 P_STARTUP_DENIALS_DB = P_VAR_LIB_RELIEFOS + "/startup-denials.db"
 P_OOBE_DONE = P_VAR_LIB_RELIEFOS + "/oobe.done"
-P_KERNELDEBUG_ENABLED = P_VAR_LIB_RELIEFOS + "/kerneldebug.enabled"
-P_KERNELDEBUG_CONTROL = P_VAR_LIB_RELIEFOS + "/kernel-debug"
 P_SESSION_USER = P_RUN_RELIEFOS + "/session-user"
 
 # Runtime boot payload paths (the ESP is normally mounted at /boot).
 P_BOOT_KERNEL = "/boot/reliefos/kernel.sys"
-P_BOOT_KERNELDEBUG_MARKER = "/boot/reliefos/state/kerneldebug.next"
 P_BOOT_DISPLAY_CONF = "/boot/reliefos/config/display.conf"
-P_KERNELDEBUG_MODULE = P_RELIEFOS_LIB + "/kerneldebug.sys"
 
 # ESP-internal (EFI FAT) paths.  GRUB and the kernel read these before any
 # root filesystem exists.  kernel.sys carries the Multiboot2 header GRUB
 # searches for (``search --file /reliefos/kernel.sys``).
 ESP_KERNEL = "/reliefos/kernel.sys"
 ESP_KERNEL_LEGACY = "/leonos/kernel.sys"
-ESP_KERNELDEBUG_MARKER = "/reliefos/state/kerneldebug.next"
 ESP_DISPLAY_CONF = "/reliefos/config/display.conf"
 ESP_DISPLAY_CONF_LEGACY = "/leonos/config/display.conf"
 

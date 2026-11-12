@@ -1637,58 +1637,6 @@ int reliefos_system_shutdown(void)
     return reliefos_auth_request_power(RB_POWER_OFF);
 }
 
-int reliefos_kernel_debug_get_state(uint32_t *flags)
-{
-    char buffer[128] = {0};
-    int fd;
-    if (!flags) return -1;
-    *flags = 0;
-    fd = open(RELIEFOS_PATH_KERNELDEBUG_CONTROL, RELIEFOS_O_RDONLY, 0);
-    if (fd < 0) return 0;
-    {
-        long got = read(fd, buffer, sizeof(buffer) - 1u);
-        if (got > 0) {
-            if (buffer[0] == '1') *flags |= RELIEFOS_KERNEL_DEBUG_STATE_ENABLED;
-            for (long i = 0; i + 1 < got; ++i) {
-                if (buffer[i] == 'a' && buffer[i+1] == 'r' && buffer[i+2] == 'm') {
-                    *flags |= RELIEFOS_KERNEL_DEBUG_STATE_NEXT_BOOT;
-                }
-            }
-        }
-    }
-    close(fd);
-    return 0;
-}
-
-static int reliefos_kernel_debug_write(const char *text)
-{
-    int fd = open(RELIEFOS_PATH_KERNELDEBUG_CONTROL,
-                  RELIEFOS_O_WRONLY | RELIEFOS_O_CREAT | RELIEFOS_O_TRUNC, 0666);
-    uint32_t len = 0;
-    if (fd < 0) return fd;
-    while (text && text[len]) ++len;
-    {
-        long wrote = write(fd, text, len);
-        close(fd);
-        return wrote == (long)len ? 0 : -1;
-    }
-}
-
-int reliefos_kernel_debug_set_enabled(int enabled)
-{
-    return reliefos_kernel_debug_write(enabled ? "1\n" : "0\n");
-}
-
-int reliefos_kernel_debug_arm_next_boot(void)
-{
-    return reliefos_kernel_debug_write("arm\n");
-}
-
-int reliefos_kernel_debug_clear(void)
-{
-    return reliefos_kernel_debug_write("");
-}
-
 /* Published libleonos.so.2 aliases; keep these in the defining translation unit. */
 extern __typeof__(reliefos_fs_acl_get) leonos_fs_acl_get __attribute__((alias("reliefos_fs_acl_get")));
 extern __typeof__(reliefos_fs_acl_repair) leonos_fs_acl_repair __attribute__((alias("reliefos_fs_acl_repair")));
@@ -1699,10 +1647,6 @@ extern __typeof__(reliefos_http_download) leonos_http_download __attribute__((al
 extern __typeof__(reliefos_http_get) leonos_http_get __attribute__((alias("reliefos_http_get")));
 extern __typeof__(reliefos_http_request) leonos_http_request __attribute__((alias("reliefos_http_request")));
 extern __typeof__(reliefos_http_resolve_url) leonos_http_resolve_url __attribute__((alias("reliefos_http_resolve_url")));
-extern __typeof__(reliefos_kernel_debug_arm_next_boot) leonos_kernel_debug_arm_next_boot __attribute__((alias("reliefos_kernel_debug_arm_next_boot")));
-extern __typeof__(reliefos_kernel_debug_clear) leonos_kernel_debug_clear __attribute__((alias("reliefos_kernel_debug_clear")));
-extern __typeof__(reliefos_kernel_debug_get_state) leonos_kernel_debug_get_state __attribute__((alias("reliefos_kernel_debug_get_state")));
-extern __typeof__(reliefos_kernel_debug_set_enabled) leonos_kernel_debug_set_enabled __attribute__((alias("reliefos_kernel_debug_set_enabled")));
 extern __typeof__(reliefos_stat_legacy) leonos_stat_legacy __attribute__((alias("reliefos_stat_legacy")));
 extern __typeof__(reliefos_system_reboot) leonos_system_reboot __attribute__((alias("reliefos_system_reboot")));
 extern __typeof__(reliefos_system_shutdown) leonos_system_shutdown __attribute__((alias("reliefos_system_shutdown")));

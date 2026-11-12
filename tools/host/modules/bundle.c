@@ -346,7 +346,7 @@ int kernel_bundle_open(struct kernel_bundle *bundle, const char *directory,
             json_int(json_member(properties, "size"), &size) || size < 0)
             return fail(bundle, "invalid installed product record: %s", file->name);
         if (strcmp(file->name, "kernel.sys") && strcmp(file->name, "kernel.debug") &&
-            strcmp(file->name, "kerneldebug.sys") && strncmp(file->name, bundle->prefix, strlen(bundle->prefix)))
+            strncmp(file->name, bundle->prefix, strlen(bundle->prefix)))
             return fail(bundle, "product outside installed release: %s", file->name);
         file->size = (off_t)size;
         if ((long)file->size != size) return fail(bundle, "product size overflow: %s", file->name);
@@ -359,8 +359,8 @@ int kernel_bundle_open(struct kernel_bundle *bundle, const char *directory,
     }
     static const char *const required[] = {"config", "module.abi", "Module.symvers", "System.map",
         "modules.order", "modules.builtin", "modules.builtin.modinfo"};
-    if (!kernel_bundle_find(bundle, "kernel.sys") || !kernel_bundle_find(bundle, "kernel.debug") ||
-        !kernel_bundle_find(bundle, "kerneldebug.sys")) return fail(bundle, "incomplete installed kernel products");
+    if (!kernel_bundle_find(bundle, "kernel.sys") || !kernel_bundle_find(bundle, "kernel.debug"))
+        return fail(bundle, "incomplete installed kernel products");
     for (size_t i = 0; i < sizeof(required) / sizeof(required[0]); ++i) {
         char name[sizeof(bundle->prefix) + 32];
         snprintf(name, sizeof(name), "%s%s", bundle->prefix, required[i]);

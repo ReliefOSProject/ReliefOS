@@ -53,7 +53,6 @@ printf '%s\n' fixture > "$work/out/system/lib/libreliefos.so.2"
 legacy_brand=leon
 legacy_brand=${legacy_brand}os
 printf '%s\n' fixture > "$work/out/system/lib/lib${legacy_brand}.so.2"
-printf '%s\n' fixture > "$work/out/generated/system/kerneldebug.sys"
 # This layout-only fixture represents the separately verified kernel bundle.
 # Real identity/checksum and dependency validation belongs to test-kernel-payload.
 mkdir -p "$work/out/stage/kernel-payload/lib/modules/desktop-fixture" \

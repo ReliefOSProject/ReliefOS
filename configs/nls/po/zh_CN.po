@@ -2779,10 +2779,6 @@ msgstr "无法打开指定路径"
 msgid "Could not open the search result"
 msgstr "无法打开搜索结果"
 
-#: userland/apps/osver/main.cpp:29
-msgid "Could not persist kernel debug mode."
-msgstr "无法保存内核调试模式状态。"
-
 #: userland/apps/reliefmail/window_actions.cpp:606
 msgid "Could not prepare the bounded SMTP confirmation."
 msgstr "无法准备受限大小的 SMTP 确认信息。"
@@ -6424,18 +6420,6 @@ msgstr "开尔文 (K)"
 #: userland/apps/osver/main.cpp:107
 msgid "Kernel"
 msgstr "内核"
-
-#: userland/apps/osver/main.cpp:27
-msgid "Kernel debug mode"
-msgstr "内核调试模式"
-
-#: userland/apps/osver/main.cpp:26
-msgid "Kernel debug mode enabled"
-msgstr "内核调试模式已启用"
-
-#: userland/apps/osver/main.cpp:28
-msgid "Kernel debug mode enabled. Reboot to enter it."
-msgstr "已启用内核调试模式，重启后进入。"
 
 #: userland/apps/devmgr/main.c:280
 msgid "Kernel device list"
@@ -14821,9 +14805,6 @@ msgstr "工作进程错误"
 #~ msgid "Invalid shortcut."
 #~ msgstr "快捷方式无效。"
 
-#~ msgid "Kernel debugger"
-#~ msgstr "内核调试工具"
-
 #~ msgid "Label:"
 #~ msgstr "卷标:"
 
@@ -14979,9 +14960,6 @@ msgstr "工作进程错误"
 
 #~ msgid "Restart ReliefOS now?"
 #~ msgstr "是否立即重启 ReliefOS？"
-
-#~ msgid "Restart into kernel debugger"
-#~ msgstr "重启并进入内核调试工具"
 
 #~ msgid "Ring-3 desktop shadow blit"
 #~ msgstr "Ring-3 桌面阴影缓冲绘制"
@@ -15355,9 +15333,6 @@ msgstr "工作进程错误"
 #~ msgid "Items deleted permanently"
 #~ msgstr "项目已永久删除"
 
-#~ msgid "Kernel debug mode enabled. Use Start > Power to reboot into it."
-#~ msgstr "内核调试模式已启用。请从开始菜单的电源页面重启进入。"
-
 #~ msgid "Kernel driver modules"
 #~ msgstr "内核驱动模块"
 
@@ -15568,9 +15543,6 @@ msgstr "工作进程错误"
 
 #~ msgid "You can inspect loaded modules, but cannot change them."
 #~ msgstr "可以查看模块，但不能修改它们。"
-
-#~ msgid "boot, libraries, kerneldebug, EFI, docs, and drivers will be refreshed. Extra target applications and drivers are kept."
-#~ msgstr "boot、运行库、kerneldebug、EFI、内置文档和驱动程序会刷新；目标中多出的应用和驱动会保留。"
 
 #~ msgid "exFAT root cannot carry the current symlink layout; use a fresh ext2 install"
 #~ msgstr "exFAT 根分区无法承载当前符号链接布局，请改为 ext2 全新安装"

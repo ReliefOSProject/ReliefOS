@@ -29,8 +29,7 @@ class ModulesStage(unittest.TestCase):
         self.module_dir = self.install / "lib/modules" / RELEASE
         (self.module_dir / "kernel").mkdir(parents=True)
         self.output = self.work / "stage"
-        for name, data in {"kernel.sys": b"kernel fixture", "kerneldebug.sys": b"debug tool",
-                           "kernel.debug": b"kernel symbols"}.items():
+        for name, data in {"kernel.sys": b"kernel fixture", "kernel.debug": b"kernel symbols"}.items():
             (self.install / name).write_bytes(data)
         for name, data in {"config": b"CONFIG_MODULES=y\nCONFIG_EXT4_FS=m\nCONFIG_FAT_FS=y\n",
                            "module.abi": (ABI + "\n").encode(), "modules.order": b"",

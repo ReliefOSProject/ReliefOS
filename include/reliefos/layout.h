@@ -84,8 +84,6 @@
 #define RELIEFOS_PATH_STARTUP_DB RELIEFOS_LAYOUT_VAR_LIB_RELIEFOS "/startup.db"
 #define RELIEFOS_PATH_STARTUP_DENIALS_DB RELIEFOS_LAYOUT_VAR_LIB_RELIEFOS "/startup-denials.db"
 #define RELIEFOS_PATH_OOBE_DONE RELIEFOS_LAYOUT_VAR_LIB_RELIEFOS "/oobe.done"
-#define RELIEFOS_PATH_KERNELDEBUG_ENABLED RELIEFOS_LAYOUT_VAR_LIB_RELIEFOS "/kerneldebug.enabled"
-#define RELIEFOS_PATH_KERNELDEBUG_CONTROL RELIEFOS_LAYOUT_VAR_LIB_RELIEFOS "/kernel-debug"
 #define RELIEFOS_PATH_SESSION_USER RELIEFOS_LAYOUT_RUN_RELIEFOS "/session-user"
 
 /* Shared resources. */
@@ -109,12 +107,10 @@
 #define RELIEFOS_PATH_LIBRELIEFOS RELIEFOS_LAYOUT_RELIEFOS_LIB "/libreliefos.so.2"
 #define RELIEFOS_PATH_LIBRELIEFOS_COMPAT RELIEFOS_LAYOUT_RELIEFOS_LIB "/libleonos.so.1"
 #define RELIEFOS_PATH_OLD_NATIVE_INTERP RELIEFOS_LAYOUT_RELIEFOS_LIB "/ld-leonos.elf"
-#define RELIEFOS_PATH_KERNELDEBUG_MODULE RELIEFOS_LAYOUT_RELIEFOS_LIB "/kerneldebug.sys"
 
 /* Runtime view of the boot partition; the ESP itself normally mounts /boot. */
 #define RELIEFOS_PATH_BOOT_KERNEL "/boot/reliefos/kernel.sys"
 #define RELIEFOS_PATH_BOOT_KERNEL_LEGACY "/boot/leonos/kernel.sys"
-#define RELIEFOS_PATH_BOOT_KERNELDEBUG_MARKER "/boot/reliefos/state/kerneldebug.next"
 #define RELIEFOS_PATH_BOOT_DISPLAY_CONF "/boot/reliefos/config/display.conf"
 
 #endif /* RELIEFOS_LAYOUT_H */

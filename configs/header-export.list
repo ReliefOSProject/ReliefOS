@@ -8,7 +8,6 @@ include/uapi/reliefos/driver_abi.h
 include/uapi/reliefos/fs_abi.h
 include/uapi/reliefos/gpu_abi.h
 include/uapi/reliefos/inputm_abi.h
-include/uapi/reliefos/kernel_debug_abi.h
 include/uapi/reliefos/net_abi.h
 include/uapi/reliefos/net_control.h
 include/uapi/reliefos/pty_abi.h
