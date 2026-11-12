@@ -25,7 +25,7 @@ class Resolver(unittest.TestCase):
                     shutil.copy2(source, destination)
             # BusyBox no longer provides every coreutils applet. Exercise the
             # POSIX utility boundary, without assuming an obsolete applet set.
-            for name in ('sh', 'cat', 'rm', 'mktemp', 'chmod', 'mv'):
+            for name in ('sh', 'cat', 'rm', 'mktemp', 'chmod', 'mv', 'mkdir', 'flock'):
                 source = Path(shutil.which(name))
                 shutil.copy2(source, root / 'bin' / name)
                 libraries(source)

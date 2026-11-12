@@ -195,7 +195,6 @@ App::App(Session &s) : session_(s) {
   controls();
   Fl::add_timeout(.025, timer, this);
   enqueue(Op::Snapshot, Sample, T("Refresh interfaces"));
-  enqueue(Op::ReadConfig, Load, T("Read configuration"));
 }
 App::~App() {
   closing_ = true;
@@ -306,6 +305,7 @@ void App::next() {
 }
 void App::finish(int code) {
   unsigned purpose = current_.purpose;
+  bool load_selection = false;
   if (!code && purpose == Sample) {
     Array<Interface> next;
     Text gw, dns;
@@ -338,15 +338,29 @@ void App::finish(int code) {
         if (interfaces_[i].name == selected_)
           selected = i + 1;
       }
-      if (!selected)
+      if (!selected && dirty_) {
+        adapters_->value(0);
+        overview();
+      } else if (!selected)
         for (size_t i = 0; i < interfaces_.size(); ++i)
           if (interfaces_[i].name == "eth0")
             selected = i + 1;
-      if (!selected && !interfaces_.empty())
+      if (!selected && !dirty_)
+        for (size_t i = 0; i < interfaces_.size(); ++i)
+          if (ethernet_name(interfaces_[i].name.c_str())) {
+            selected = i + 1;
+            break;
+          }
+      if (!selected && !dirty_ && !interfaces_.empty())
         selected = 1;
       adapters_->value(selected);
-      if (selected)
+      if (selected && !(interfaces_[selected - 1].name == selected_)) {
         selected_ = interfaces_[selected - 1].name;
+        loaded_ = dirty_ = false;
+        original_ = Snapshot{};
+        populate(Config{});
+        load_selection = ethernet_name(selected_.c_str());
+      }
       overview();
     } else {
       code = 1;
@@ -394,6 +408,8 @@ void App::finish(int code) {
   } else if (queue_.empty())
     status(dirty_ ? T("Unsaved configuration changes") : T("Ready"));
   controls();
+  if (!code && load_selection)
+    enqueue(Op::ReadConfig, Load, T("Read configuration"), selected_.c_str());
   next();
 }
 void App::pump() {
@@ -436,10 +452,25 @@ void App::dispatch(Fl_Widget *w, void *p) {
   if (w == a->adapters_) {
     int i = a->adapters_->value() - 1;
     if (i >= 0 && static_cast<size_t>(i) < a->interfaces_.size()) {
+      if (a->interfaces_[i].name == a->selected_)
+        return;
+      if (a->busy_ || (a->dirty_ &&
+          fl_choice("%s", T("Cancel"), T("Discard"), nullptr,
+                    T("Discard unsaved changes and select another adapter?")) != 1)) {
+        for (size_t n = 0; n < a->interfaces_.size(); ++n)
+          if (a->interfaces_[n].name == a->selected_)
+            a->adapters_->value(n + 1);
+        return;
+      }
       a->selected_ = a->interfaces_[i].name;
+      a->loaded_ = a->dirty_ = false;
+      a->original_ = Snapshot{};
+      a->populate(Config{});
       a->rx_rate_ = a->tx_rate_ = 0;
       a->overview();
       a->controls();
+      if (ethernet_name(a->selected_.c_str()))
+        a->enqueue(Op::ReadConfig, Load, T("Read configuration"), a->selected_.c_str());
     }
   }
 }
@@ -449,11 +480,11 @@ void App::edited(Fl_Widget *widget, void *p) {
     return;
   if (widget == a->mode_ && a->mode_->value() == 1) {
     for (size_t n = 0; n < a->interfaces_.size(); ++n)
-      if (a->interfaces_[n].name == "eth0") {
+      if (a->interfaces_[n].name == a->selected_) {
         if (!*a->address_->value() && !(a->interfaces_[n].address == "0.0.0.0"))
           a->address_->value(a->interfaces_[n].address.c_str());
-        if (!*a->gateway_->value())
-          a->gateway_->value(a->default_gateway_.c_str());
+        if (!*a->gateway_->value() && !a->interfaces_[n].gateway.empty())
+          a->gateway_->value(a->interfaces_[n].gateway.c_str());
       }
     if (a->dns_mode_->value() == 0) {
       a->dns_mode_->value(1);
@@ -486,7 +517,7 @@ void App::overview() {
           : T("Disabled"));
   information_[1]->value(i->address.c_str());
   information_[2]->value(i->mask.c_str());
-  information_[3]->value(i->name == "eth0" ? default_gateway_.c_str() : "-");
+  information_[3]->value(i->gateway.empty() ? "-" : i->gateway.c_str());
   information_[4]->value(i->mac.c_str());
   char b[160];
   snprintf(b, sizeof(b), "%u", i->mtu);
@@ -518,9 +549,10 @@ void App::overview() {
               "diagnostics report actual results.")
           : T("Adapter counters are not exported by this kernel. Address, "
               "gateway, DNS and connection diagnostics remain available."));
-  if (!i->counters)
-    overview_note_->resize(tabs_->x() + 16, tabs_->y() + 330, tabs_->w() - 32,
-                           80);
+  overview_note_->resize(tabs_->x() + 16,
+                         tabs_->y() + (i->counters ? 448 : 330),
+                         tabs_->w() - 32,
+                         i->counters ? tabs_->h() - 458 : 80);
 }
 void App::populate(const Config &c) {
   setting_ = true;
@@ -546,12 +578,15 @@ void App::populate(const Config &c) {
 }
 void App::controls() {
   bool live = session_.ready() && session_.alive(), idle = live && !busy_,
-       ethernet = selected_ == "eth0",
+       ethernet = ethernet_name(selected_.c_str()),
        editable = live && loaded_ && ethernet &&
                   (!busy_ || current_.purpose == Sample);
-  Fl_Widget *general[] = {refresh_, renew_, reload_, ping_, dns_button_, tcp_};
+  Fl_Widget *general[] = {refresh_, ping_, dns_button_, tcp_};
   for (auto w : general)
     idle ? w->activate() : w->deactivate();
+  idle ? adapters_->activate() : adapters_->deactivate();
+  (idle && loaded_ && ethernet) ? renew_->activate() : renew_->deactivate();
+  (idle && ethernet) ? reload_->activate() : reload_->deactivate();
   Fl_Widget *mutations[] = {apply_, save_, restore_};
   for (auto w : mutations)
     (idle && loaded_ && ethernet) ? w->activate() : w->deactivate();
@@ -563,13 +598,17 @@ void App::controls() {
     (editable && mode_->value() == 1) ? w->activate() : w->deactivate();
   (editable && dns_mode_->value() == 1) ? servers_->activate()
                                         : servers_->deactivate();
-  config_note_->copy_label(
-      !ethernet
-          ? T("Persistent configuration is available for eth0. Loopback and "
-              "other interfaces are shown for inspection.")
-          : T("Settings: /etc/reliefos/network.conf\nSaving keeps a backup and "
-              "detects external changes. Applying may briefly disconnect the "
-              "network. Static mode requires explicit DNS."));
+  char note[512];
+  if (!ethernet)
+    snprintf(note, sizeof(note), "%s", T("Select an Ethernet adapter to edit its configuration."));
+  else
+    snprintf(note, sizeof(note), "%s: %s%s%s%s\n%s",
+             T("Settings"), "/etc/reliefos/",
+             selected_ == "eth0" ? "network.conf" : "network.d/",
+             selected_ == "eth0" ? "" : selected_.c_str(),
+             selected_ == "eth0" ? "" : ".conf",
+             T("Saving keeps a backup and detects external changes. Applying may interrupt this adapter. Static mode requires explicit DNS."));
+  config_note_->copy_label(note);
 }
 bool App::form(Config &c, Text &e) {
   c = Config{};
@@ -608,7 +647,7 @@ bool App::form(Config &c, Text &e) {
   return valid_config(c, e);
 }
 void App::save(bool apply) {
-  if (busy_ || !loaded_ || !(selected_ == "eth0"))
+  if (busy_ || !loaded_ || !ethernet_name(selected_.c_str()))
     return;
   Config c;
   Text e, canonical;
@@ -637,13 +676,14 @@ void App::save(bool apply) {
   r.a = canonical;
   r.b = original_.bytes;
   r.c.set(original_.exists ? "1" : "0");
+  r.d = selected_;
   enqueue(r, Write, T("Save network configuration"));
   if (apply)
-    enqueue(Op::Apply, Mutation, T("Apply Ethernet configuration"));
+    enqueue(Op::Apply, Mutation, T("Apply Ethernet configuration"), selected_.c_str());
   enqueue(Op::Snapshot, Sample, T("Refresh interfaces"));
 }
 void App::restore() {
-  if (busy_ || !loaded_ || !(selected_ == "eth0"))
+  if (busy_ || !loaded_ || !ethernet_name(selected_.c_str()))
     return;
   if (fl_choice("%s", T("Cancel"), T("Restore and apply"), nullptr,
                 T("Restore the previous profile and apply it? The current "
@@ -653,9 +693,10 @@ void App::restore() {
   r.op = Op::RestoreConfig;
   r.b = original_.bytes;
   r.c.set(original_.exists ? "1" : "0");
+  r.d = selected_;
   enqueue(r, RestoreJob, T("Restore previous configuration"));
-  enqueue(Op::ReadConfig, Load, T("Read configuration"));
-  enqueue(Op::Apply, Mutation, T("Apply Ethernet configuration"));
+  enqueue(Op::ReadConfig, Load, T("Read configuration"), selected_.c_str());
+  enqueue(Op::Apply, Mutation, T("Apply Ethernet configuration"), selected_.c_str());
   enqueue(Op::Snapshot, Sample, T("Refresh interfaces"));
 }
 void App::export_output() {
@@ -743,7 +784,7 @@ void App::action(Action a) {
   }
   if (a == Help) {
     fl_message("%s",
-               T("Select an adapter to inspect its live state. Configure eth0 "
+               T("Select an adapter to inspect and configure its live state. Configure Ethernet "
                  "with DHCP, static IPv4 or disabled mode. Save and apply uses "
                  "the existing OpenRC network service.\n\nStatic mode requires "
                  "custom or Cloudflare DNS. Use spaces between custom DNS "
@@ -784,11 +825,12 @@ void App::action(Action a) {
                   T("Discard unsaved edits and reload the network profile?")) !=
             1)
       return;
-    enqueue(Op::ReadConfig, Load, T("Read configuration"));
+    if (ethernet_name(selected_.c_str()))
+      enqueue(Op::ReadConfig, Load, T("Read configuration"), selected_.c_str());
     return;
   }
   if (a == Enable || a == Disable) {
-    if (!(selected_ == "eth0") || !loaded_)
+    if (!ethernet_name(selected_.c_str()) || !loaded_)
       return;
     mode_->value(a == Enable ? 0 : 2);
     dirty_ = true;
@@ -798,7 +840,9 @@ void App::action(Action a) {
     return;
   }
   if (a == Renew) {
-    enqueue(Op::Renew, Mutation, T("Renew DHCP"));
+    if (!ethernet_name(selected_.c_str()))
+      return;
+    enqueue(Op::Renew, Mutation, T("Renew DHCP"), selected_.c_str());
     enqueue(Op::Snapshot, Sample, T("Refresh interfaces"));
     return;
   }
@@ -832,8 +876,12 @@ void App::action(Action a) {
                      : a == Log         ? "log"
                                         : "report";
   tabs_->value(pages_[3]);
-  enqueue(Op::View, Display,
-          a == Report ? T("Diagnostic report") : T("Network information"),
-          view);
+  Request r;
+  r.op = Op::View;
+  r.a.set(view);
+  if (a == Lease && ethernet_name(selected_.c_str()))
+    r.b = selected_;
+  enqueue(r, Display,
+          a == Report ? T("Diagnostic report") : T("Network information"));
 }
 } // namespace nc

@@ -27,13 +27,21 @@ ${HOSTCXX:-c++} -std=c++17 -Wall -Wextra -Werror -nostdinc++ -fno-exceptions -fn
     "$src/userland/apps/network-controller/model.cpp" "$src/userland/apps/network-controller/config.cpp" \
     "$src/userland/apps/network-controller/session.cpp" "$src/userland/apps/network-controller/worker.cpp" -o "$work/session"
 mkdir -p "$work/root/etc/reliefos" "$work/root/bin" "$work/root/sbin" "$work/root/dev" \
-    "$work/root/usr/lib/reliefos/apps/network-controller"
+    "$work/root/proc/net" "$work/root/usr/lib/reliefos/apps/network-controller"
+printf 'Inter-| Receive | Transmit\n lo: 0\n eth0: 0\n eth1: 0\n eth998: 0\n' > "$work/root/proc/net/dev"
 ${HOSTCC:-cc} -static -O2 -Wall -Wextra -Werror "$src/tools/tests/network_controller_fake_command.c" -o "$work/root/bin/busybox"
 cp "$work/root/bin/busybox" "$work/root/sbin/rc-service"
+mkdir -p "$work/root/usr/lib/reliefos"
+cp "$work/root/bin/busybox" "$work/root/usr/lib/reliefos/network-profile"
 cp "$work/session" "$work/root/session"
 cp "$work/session" "$work/root/usr/lib/reliefos/apps/network-controller/network-controller.elf"
 ldd "$work/session" | awk '{for(i=1;i<=NF;i++)if($i~/^\//)print $i}' | while read -r lib; do
     mkdir -p "$work/root$(dirname "$lib")";cp "$lib" "$work/root$lib"
 done
 touch "$work/root/dev/null"
-LC_ALL=C LANG=C unshare -Urn chroot "$work/root" /session
+LC_ALL=C LANG=C unshare -Urn sh -c '
+    ip link add eth0 type dummy
+    ip link add eth1 type dummy
+    ip link add eth998 index 1000 type dummy
+    exec chroot "$1" /session
+' _ "$work/root"

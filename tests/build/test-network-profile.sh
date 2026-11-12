@@ -6,10 +6,10 @@ mkdir -p "$TMPDIR"
 work=$(mktemp -d "$TMPDIR/network-profile.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 root=$work/root
-mkdir -p "$root/bin" "$root/sbin" "$root/etc/reliefos" "$root/etc/udhcpc" "$root/etc/init.d" "$root/usr/lib/reliefos" "$root/run/reliefos" "$root/dev"
+mkdir -p "$root/bin" "$root/sbin" "$root/etc/reliefos" "$root/etc/udhcpc" "$root/etc/init.d" "$root/usr/lib/reliefos" "$root/usr/share/udhcpc" "$root/run/reliefos" "$root/dev" "$root/proc/net"
 # Only this private chroot can see the fake adapter commands. No host network
 # command or resolver path is used by the production scripts under test.
-for utility in sh stat cat mkdir mv rm chmod mktemp grep tr wc; do
+for utility in sh stat cat mkdir mv rm chmod mktemp grep tr wc flock; do
     binary=$(command -v "$utility")
     cp "$binary" "$root/bin/$utility"
     ldd "$binary" | awk '{for(i=1;i<=NF;i++)if($i~/^\//)print $i}' | while read -r lib; do
@@ -18,6 +18,9 @@ for utility in sh stat cat mkdir mv rm chmod mktemp grep tr wc; do
 done
 cp "$src/system/rootfs/usr/lib/reliefos/network-profile" "$src/system/rootfs/usr/lib/reliefos/publish-resolver" "$root/usr/lib/reliefos/"
 cp "$src/system/rootfs/etc/init.d/reliefos-dhcp" "$root/etc/init.d/"
+cp "$src/system/rootfs/usr/share/udhcpc/default.script" "$root/usr/share/udhcpc/"
+printf 'Inter-| Receive | Transmit\n  eth0: 0\n  eth1: 0\n' > "$root/proc/net/dev"
+printf '100.00 0.00\n' > "$root/proc/uptime"
 cat > "$root/sbin/ifconfig" <<'SCRIPT'
 #!/bin/sh
 printf '%s' "$0" >> /commands
@@ -25,7 +28,21 @@ for arg do printf ' <%s>' "$arg" >> /commands; done
 printf '\n' >> /commands
 SCRIPT
 cp "$root/sbin/ifconfig" "$root/sbin/route"
-chmod 755 "$root/sbin/ifconfig" "$root/sbin/route"
+cat > "$root/sbin/supervise-daemon" <<'SCRIPT'
+#!/bin/sh
+printf '%s' "$RC_SVCNAME" >> /events
+for arg do printf ' <%s>' "$arg" >> /events; done
+printf '\n' >> /events
+SCRIPT
+cat > "$root/sbin/rc-service" <<'SCRIPT'
+#!/bin/sh
+case "$2" in
+    status) test ! -e /service-stopped ;;
+    start) printf 'rc-service-start\n' >> /events; rm -f /service-stopped ;;
+    *) exit 1 ;;
+esac
+SCRIPT
+chmod 755 "$root/sbin/ifconfig" "$root/sbin/route" "$root/sbin/supervise-daemon" "$root/sbin/rc-service"
 touch "$root/dev/null"
 cat > "$root/test.sh" <<'SCRIPT'
 set -eu
@@ -72,26 +89,57 @@ if $tool check; then echo 'FAIL - embedded NUL accepted';exit 1;fi
 write_profile dhcp automatic ''
 chmod 666 "$profile"
 if $tool check; then echo 'FAIL - writable profile accepted';exit 1;fi
-write_profile static cloudflare ''
-# Exercise the actual service functions; the supervisor boundary is isolated.
-. /etc/init.d/reliefos-dhcp
-ebegin() { :; }
-eend() { return "$1"; }
-default_start() { printf 'dhcp-start\n' >> /events; }
-default_stop() { printf 'dhcp-stop\n' >> /events; }
-service_set_value() { printf '%s\n' "$2" > /mode-value; }
-service_get_value() { cat /mode-value; }
-start_pre;start
+# Different profiles and leases belong to the named, enumerated adapter.
 write_profile dhcp automatic ''
-stop;stop_post
-test ! -e /events
-start_pre;start
-write_profile disabled automatic ''
-stop;stop_post
-grep -q '^dhcp-stop$' /events
-start_pre;start
-grep -q '<eth0> <down>' /commands
-test "$(cat /mode-value)" = disabled
-printf 'PASS Network profile: static/DHCP/disabled, resolver compatibility, validation and old-mode stop\n'
+printf '10.0.0.53\n' > /run/reliefos/dhcp-dns
+mkdir -p /etc/reliefos/network.d
+printf 'version=1\nmode=static\naddress=192.168.9.2\nprefix=24\ngateway=192.168.9.1\ndns_mode=custom\ndns_servers=9.9.9.9\n' > /etc/reliefos/network.d/eth1.conf
+test "$("$tool" mode eth1)" = static
+"$tool" prepare eth1
+grep -q '<eth1> <192.168.9.2> <netmask> <255.255.255.0> <up>' /commands
+test "$(grep '^nameserver ' /etc/resolv.conf)" = "nameserver 9.9.9.9
+nameserver 10.0.0.53"
+"$tool" stop eth1
+grep -q '^nameserver 10.0.0.53$' /etc/resolv.conf
+if grep -q '^nameserver 9.9.9.9$' /etc/resolv.conf; then echo 'FAIL - stopped interface retained explicit DNS'; exit 1; fi
+"$tool" prepare eth1
+if "$tool" mode '../eth1'; then echo 'FAIL - invalid interface accepted'; exit 1; fi
+if "$tool" mode eth9; then echo 'FAIL - nonexistent interface accepted'; exit 1; fi
+mkdir /proc/123
+printf '/sbin/udhcpc\000-f\000-i\000eth0\000-p\000/run/reliefos/udhcpc.pid\000' > /proc/123/cmdline
+printf '123\n' > /run/reliefos/udhcpc.eth1.pid
+if "$tool" stop-dhcp eth1; then echo 'FAIL - another interface PID accepted'; exit 1; fi
+rm -f /run/reliefos/udhcpc.eth1.pid
+printf 'version=1\nmode=dhcp\naddress=0.0.0.0\nprefix=24\ngateway=0.0.0.0\ndns_mode=automatic\ndns_servers=\n' > /etc/reliefos/network.d/eth1.conf
+printf '10.0.0.53\n' > /run/reliefos/dhcp-dns
+interface=eth1 ip=192.168.9.2 subnet=255.255.255.0 router=192.168.9.1 dns=192.168.9.53 lease=300 /usr/share/udhcpc/default.script bound
+grep -q '^nameserver 10.0.0.53$' /etc/resolv.conf
+grep -q '^nameserver 192.168.9.53$' /etc/resolv.conf
+test -f /run/reliefos/dhcp-lease.eth1
+interface=eth1 /usr/share/udhcpc/default.script deconfig
+test -f /run/reliefos/dhcp-dns
+test ! -f /run/reliefos/dhcp-lease.eth1
+grep -q '^nameserver 10.0.0.53$' /etc/resolv.conf
+if grep -q '^nameserver 192.168.9.53$' /etc/resolv.conf; then echo 'FAIL - stale DNS retained'; exit 1; fi
+# OpenRC starts every real Ethernet interface, and apply only stops one.
+write_profile dhcp automatic ''
+printf 'version=1\nmode=disabled\naddress=0.0.0.0\nprefix=24\ngateway=0.0.0.0\ndns_mode=automatic\ndns_servers=\n' > /etc/reliefos/network.d/eth1.conf
+. /etc/init.d/reliefos-dhcp
+start
+grep -q 'reliefos-dhcp.eth0 <reliefos-dhcp.eth0> <--start>' /events
+grep -q '<eth1> <down>' /commands
+printf 'version=1\nmode=dhcp\naddress=0.0.0.0\nprefix=24\ngateway=0.0.0.0\ndns_mode=automatic\ndns_servers=\n' > /etc/reliefos/network.d/eth1.conf
+: > /events
+"$tool" apply eth1
+grep -q 'reliefos-dhcp.eth1 <reliefos-dhcp.eth1> <--stop>' /events
+grep -q 'reliefos-dhcp.eth1 <reliefos-dhcp.eth1> <--start>' /events
+if grep -q 'reliefos-dhcp.eth0' /events; then echo 'FAIL - applying eth1 interrupted eth0'; exit 1; fi
+stop
+grep -q 'reliefos-dhcp.eth0 <reliefos-dhcp.eth0> <--stop>' /events
+: > /events
+: > /service-stopped
+"$tool" apply eth1
+grep -q '^rc-service-start$' /events
+printf 'PASS Network profiles: per-interface modes, DNS priority, lease isolation and scoped apply\n'
 SCRIPT
 LC_ALL=C LANG=C unshare -Ur chroot "$root" /bin/sh /test.sh

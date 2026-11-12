@@ -59,6 +59,24 @@ int main(int argc, char **argv) {
   assert(unlink(path) == 0 && symlink(outside, path) == 0);
   assert(!store.save(current, updated, error));
   assert(!store.restore(current, error));
+  // Saving and restoring a second adapter must not alter eth0's profile.
+  ConfigStore second(argv[1], "eth1");
+  Snapshot second_original, second_current, eth0_before;
+  assert(store.read(eth0_before, error));
+  assert(second.read(second_original, error) && !second_original.exists);
+  assert(second.save(second_original, updated, error));
+  assert(second.read(second_current, error) && second_current.bytes == updated);
+  assert(store.read(current, error) && current.bytes == eth0_before.bytes);
+  assert(second.restore(second_current, error));
+  assert(second.read(second_current, error) && !second_current.exists);
+  ConfigStore unsafe(argv[1], "../eth1");
+  assert(!unsafe.read(second_current, error));
+  char dir_path[1024], saved_dir[1024];
+  snprintf(dir_path, sizeof(dir_path), "%s/network.d", argv[1]);
+  snprintf(saved_dir, sizeof(saved_dir), "%s/network.d.saved", argv[1]);
+  assert(rename(dir_path, saved_dir) == 0 && symlink(saved_dir, dir_path) == 0);
+  assert(!second.read(second_current, error));
+  assert(unlink(dir_path) == 0 && rename(saved_dir, dir_path) == 0);
   puts("PASS Network Controller configuration: save, absence restore, backup, "
        "conflict and symlink isolation");
 }

@@ -377,24 +377,53 @@ bool snapshot(Text &out) {
   size_t count = conf.ifc_len / sizeof(struct ifreq);
   if (count > 64)
     count = 64;
-  // SIOCGIFCONF lists configured IPv4 addresses, not all adapters. Include
-  // real interfaces without an address so Disabled remains reversible.
-  // ReliefOS currently exposes eth0 at index 2; probe bounded indices using
-  // the standard name ioctl rather than inventing interface names.
-  for (int index = 1; index <= 64 && count < 64; ++index) {
-    struct ifreq candidate{};
-    candidate.ifr_ifindex = index;
-    if (ioctl(fd, SIOCGIFNAME, &candidate) < 0)
-      continue;
-    candidate.ifr_name[IFNAMSIZ - 1] = 0;
-    if (!interface_name(candidate.ifr_name))
-      continue;
-    bool duplicate = false;
-    for (size_t n = 0; n < count; ++n)
-      if (!strncmp(entries[n].ifr_name, candidate.ifr_name, IFNAMSIZ))
-        duplicate = true;
-    if (!duplicate)
-      entries[count++] = candidate;
+  // /proc/net/dev enumerates even unconfigured devices and sparse indices.
+  Text devices;
+  if (read_text("/proc/net/dev", devices, 65536)) {
+    const char *line = devices.c_str();
+    while (line && *line && count < 64) {
+      const char *end = strchr(line, '\n');
+      if (!end)
+        end = line + strlen(line);
+      const char *name = line;
+      while (name < end && (*name == ' ' || *name == '\t'))
+        ++name;
+      const char *colon = static_cast<const char *>(memchr(name, ':', end - name));
+      size_t length = colon ? static_cast<size_t>(colon - name) : 0;
+      while (length && (name[length - 1] == ' ' || name[length - 1] == '\t'))
+        --length;
+      if (length && length < IFNAMSIZ) {
+        struct ifreq candidate{};
+        memcpy(candidate.ifr_name, name, length);
+        if (interface_name(candidate.ifr_name) &&
+            ioctl(fd, SIOCGIFINDEX, &candidate) == 0) {
+          bool duplicate = false;
+          for (size_t n = 0; n < count; ++n)
+            if (!strncmp(entries[n].ifr_name, candidate.ifr_name, IFNAMSIZ))
+              duplicate = true;
+          if (!duplicate)
+            entries[count++] = candidate;
+        }
+      }
+      line = *end ? end + 1 : nullptr;
+    }
+  } else {
+    // Some host fixtures lack procfs; retain the standard bounded fallback.
+    for (int index = 1; index <= 64 && count < 64; ++index) {
+      struct ifreq candidate{};
+      candidate.ifr_ifindex = index;
+      if (ioctl(fd, SIOCGIFNAME, &candidate) < 0)
+        continue;
+      candidate.ifr_name[IFNAMSIZ - 1] = 0;
+      if (!interface_name(candidate.ifr_name))
+        continue;
+      bool duplicate = false;
+      for (size_t n = 0; n < count; ++n)
+        if (!strncmp(entries[n].ifr_name, candidate.ifr_name, IFNAMSIZ))
+          duplicate = true;
+      if (!duplicate)
+        entries[count++] = candidate;
+    }
   }
   for (size_t n = 0; n < count; ++n) {
     entries[n].ifr_name[IFNAMSIZ - 1] = 0;
@@ -467,32 +496,32 @@ bool snapshot(Text &out) {
     if (!append(out, b))
       return false;
   }
-  struct reliefos_net_control config{};
-  if (management(RELIEFOS_NET_CONTROL_CONFIG, config)) {
-    if (config.data.config.gateway_ip) {
-      char ip[16];
-      format_ip(config.data.config.gateway_ip, ip);
-      snprintf(b, sizeof(b), "G\t%s\n", ip);
-      if (!append(out, b))
-        return false;
-    }
-  } else if (read_text("/proc/net/route", bytes, 65536)) {
+  if (read_text("/proc/net/route", bytes, 65536)) {
     const char *s = bytes.c_str();
     while (s && *s) {
       char name[16];
       unsigned dst, gw, flags;
-      if (sscanf(s, "%15s %x %x %x", name, &dst, &gw, &flags) == 4 && !dst &&
-          (flags & 2) && !strcmp(name, "eth0")) {
+      if (sscanf(s, "%15s %x %x %x", name, &dst, &gw, &flags) == 4 &&
+          !dst && (flags & 2) && interface_name(name)) {
         char ip[16];
         format_ip(ntohl(gw), ip);
-        snprintf(b, sizeof(b), "G\t%s\n", ip);
+        snprintf(b, sizeof(b), "G\t%s\t%s\n", name, ip);
         if (!append(out, b))
           return false;
-        break;
       }
       s = strchr(s, '\n');
       if (s)
         ++s;
+    }
+  } else {
+    struct reliefos_net_control config{};
+    if (management(RELIEFOS_NET_CONTROL_CONFIG, config) &&
+        config.data.config.gateway_ip) {
+      char ip[16];
+      format_ip(config.data.config.gateway_ip, ip);
+      snprintf(b, sizeof(b), "G\teth0\t%s\n", ip);
+      if (!append(out, b))
+        return false;
     }
   }
   if (read_text("/etc/resolv.conf", bytes, 16384)) {
@@ -603,12 +632,22 @@ bool native_information(const Text &what, Text &text) {
 }
 int view(const Request &r, unsigned id) {
   Text bytes;
+  char lease_path[64];
+  const char *iface = r.b.empty() ? "eth0" : r.b.c_str();
+  if (!strcmp(iface, "eth0"))
+    snprintf(lease_path, sizeof(lease_path), "/run/reliefos/dhcp-lease");
+  else
+    snprintf(lease_path, sizeof(lease_path), "/run/reliefos/dhcp-lease.%s", iface);
   const char *path = r.a == "routes"        ? "/proc/net/route"
                      : r.a == "arp"         ? "/proc/net/arp"
                      : r.a == "connections" ? "/proc/net/tcp"
-                     : r.a == "lease"       ? "/run/reliefos/dhcp-lease"
+                     : r.a == "lease"       ? lease_path
                      : r.a == "log"         ? "/var/log/udhcpc.log"
                                             : "/etc/resolv.conf";
+  if (r.a == "routes" && read_text("/proc/net/route", bytes, 65536, true)) {
+    output(id, bytes.c_str());
+    return 0;
+  }
   if ((r.a == "routes" || r.a == "connections") &&
       native_information(r.a, bytes)) {
     output(id, bytes.c_str());
@@ -647,9 +686,30 @@ int view(const Request &r, unsigned id) {
   output(id, bytes.c_str());
   return 0;
 }
+bool present_ethernet(const char *name) {
+  if (!ethernet_name(name))
+    return false;
+  int fd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+  if (fd < 0)
+    return false;
+  struct ifreq request{};
+  snprintf(request.ifr_name, sizeof(request.ifr_name), "%s", name);
+  bool found = ioctl(fd, SIOCGIFINDEX, &request) == 0;
+  close(fd);
+  return found;
+}
 int dispatch(const Request &r, unsigned id, Text &input, bool &quit) {
   Text text, error;
-  ConfigStore store;
+  const Text &field = (r.op == Op::WriteConfig || r.op == Op::RestoreConfig)
+                          ? r.d : r.a;
+  const char *iface = field.empty() ? "eth0" : field.c_str();
+  if ((r.op == Op::ReadConfig || r.op == Op::WriteConfig ||
+       r.op == Op::RestoreConfig || r.op == Op::Apply || r.op == Op::Renew) &&
+      !present_ethernet(iface)) {
+    output(id, "The selected Ethernet interface is no longer present.\n");
+    return 1;
+  }
+  ConfigStore store("/etc/reliefos", iface);
   Snapshot state;
   switch (r.op) {
   case Op::Snapshot:
@@ -669,7 +729,7 @@ int dispatch(const Request &r, unsigned id, Text &input, bool &quit) {
         if (!parse_config(state.bytes, c, error))
           c = Config{};
       }
-      if (!state.exists || c.legacy)
+      if (!strcmp(iface, "eth0") && (!state.exists || c.legacy))
         legacy_dns(c);
       if (!encode_profile(state.exists, state.bytes, c, text))
         return 1;

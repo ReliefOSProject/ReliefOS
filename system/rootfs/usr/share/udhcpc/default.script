@@ -1,17 +1,22 @@
 #!/bin/sh
-# DHCP protocol/renewal is upstream BusyBox. This hook applies its lease.
-# One interface and one client; no competing ifup DHCP provider.
+# Each BusyBox client owns only its interface's address, route and cache.
 set -eu
-test "${interface:-}" = eth0 || exit 1
+interface=${interface:-}
+test -n "$interface" || exit 1
+# This also verifies that the validated name is an enumerated Ethernet device.
+/usr/lib/reliefos/network-profile interface "$interface"
+case "$interface" in
+    eth0) dns_file=/run/reliefos/dhcp-dns; lease_file=/run/reliefos/dhcp-lease ;;
+    *) dns_file=/run/reliefos/dhcp-dns.$interface; lease_file=/run/reliefos/dhcp-lease.$interface ;;
+esac
 case "${1:-}" in
     bound|renew)
         /sbin/ifconfig "$interface" "$ip" netmask "$subnet" ${broadcast:+broadcast "$broadcast"} up
-        # This is the sole route owner for eth0.
         /sbin/route del default dev "$interface" 2>/dev/null || :
         for gateway in ${router:-}; do /sbin/route add default gw "$gateway" dev "$interface"; break; done
         tmp=$(mktemp /run/reliefos/.dhcp-dns.XXXXXX)
         printf '%s\n' "${dns:-}" > "$tmp"
-        mv -f "$tmp" /run/reliefos/dhcp-dns
+        mv -f "$tmp" "$dns_file"
         /usr/lib/reliefos/publish-resolver
         read -r uptime rest < /proc/uptime
         acquired=${uptime%%.*}
@@ -19,12 +24,12 @@ case "${1:-}" in
         trap 'rm -f "$lease_tmp"' EXIT HUP INT TERM
         printf 'ip=%s\nsubnet=%s\nrouter=%s\ndns=%s\nlease=%s\nacquired=%s\n' "$ip" "$subnet" "${router:-}" "${dns:-}" "${lease:-}" "$acquired" > "$lease_tmp"
         chmod 0644 "$lease_tmp"
-        mv -f "$lease_tmp" /run/reliefos/dhcp-lease
+        mv -f "$lease_tmp" "$lease_file"
         trap - EXIT HUP INT TERM
         ;;
     deconfig)
         /sbin/ifconfig "$interface" 0.0.0.0
-        rm -f /run/reliefos/dhcp-dns /run/reliefos/dhcp-lease
+        rm -f "$dns_file" "$lease_file"
         /usr/lib/reliefos/publish-resolver
         ;;
     leasefail|nak) echo "DHCP $1 on $interface" >&2; exit 1 ;;

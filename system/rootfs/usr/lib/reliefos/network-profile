@@ -17,13 +17,44 @@ ip_number() (
     printf '%s\n' "$((($1 << 24) | ($2 << 16) | ($3 << 8) | $4))"
 )
 print_ip() { printf '%s.%s.%s.%s\n' "$((($1 >> 24) & 255))" "$((($1 >> 16) & 255))" "$((($1 >> 8) & 255))" "$(($1 & 255))"; }
+# Kernel Ethernet devices are named eth followed by their stable index.
+valid_interface() {
+    case "$1" in eth*) number=${1#eth} ;; *) return 1 ;; esac
+    case "$number" in ''|*[!0-9]*|0[0-9]*) return 1 ;; esac
+    test "${#1}" -le 15
+}
+interfaces() {
+    test -r /proc/net/dev || fail 'cannot enumerate network interfaces'
+    while IFS= read -r line; do
+        case "$line" in *:*) name=${line%%:*} ;; *) continue ;; esac
+        while :; do case "$name" in ' '*) name=${name# } ;; *) break ;; esac; done
+        if valid_interface "$name"; then printf '%s\n' "$name"; fi
+    done < /proc/net/dev
+}
+if test "${1:-}" = list; then interfaces; exit; fi
+iface=${2:-eth0}
+valid_interface "$iface" || fail 'invalid Ethernet interface'
+case "${1:-}" in
+    start|stop|apply)
+        mkdir -p /run/reliefos
+        exec 8>"/run/reliefos/interface.$iface.lock"
+        flock -x 8
+        ;;
+esac
+found=no
+for name in $(interfaces); do test "$name" != "$iface" || found=yes; done
+test "$found" = yes || fail 'Ethernet interface is not present'
+test "${1:-}" != interface || exit 0
+case "$iface" in
+    eth0) client=/run/reliefos/udhcpc.pid; lease=/run/reliefos/dhcp-lease; dns_file=/run/reliefos/dhcp-dns ;;
+    *) client=/run/reliefos/udhcpc.$iface.pid; lease=/run/reliefos/dhcp-lease.$iface; dns_file=/run/reliefos/dhcp-dns.$iface ;;
+esac
 clear_lease() {
-    /sbin/route del default dev eth0 2>/dev/null || :
-    /sbin/ifconfig eth0 0.0.0.0
-    rm -f /run/reliefos/dhcp-lease /run/reliefos/dhcp-dns
+    /sbin/route del default dev "$iface" 2>/dev/null || :
+    /sbin/ifconfig "$iface" 0.0.0.0
+    rm -f "$lease" "$dns_file"
 }
 stop_dhcp() {
-    client=/run/reliefos/udhcpc.pid
     if test ! -e "$client" && test ! -L "$client"; then return 0; fi
     test -f "$client" && test ! -L "$client" || fail 'unsafe DHCP PID file'
     test "$(stat -c %u "$client")" = 0 || fail 'DHCP PID file must belong to root'
@@ -33,8 +64,8 @@ stop_dhcp() {
     case "$pid" in ''|*[!0-9]*) fail 'invalid DHCP PID' ;; esac
     test -z "$extra" && test "${#pid}" -le 10 && test "$pid" -gt 1 && test "$pid" -le 2147483647 || fail 'invalid DHCP PID'
     if test ! -d "/proc/$pid"; then rm -f "$client"; return 0; fi
-    # Match the recorded service client, including BusyBox multicall argv.
-    # Refuse an unrelated process if the recorded PID has been reused.
+    # Require both the DHCP executable and its precise -i argument: a PID
+    # reused by another interface must never terminate that interface.
     command=$(tr '\000' '\n' < "/proc/$pid/cmdline")
     newline='
 '
@@ -42,17 +73,39 @@ stop_dhcp() {
         /sbin/udhcpc"$newline"*|udhcpc"$newline"*|/bin/busybox"$newline"udhcpc"$newline"*) ;;
         *) fail 'PID no longer identifies the DHCP client' ;;
     esac
+    case "$newline$command$newline" in *"$newline-i$newline$iface$newline"*) ;; *) fail 'DHCP PID belongs to another interface' ;; esac
     /sbin/start-stop-daemon --stop --retry TERM/10/KILL/2 --pidfile "$client" || return $?
     rm -f "$client"
+}
+stop_interface() {
+    # Stop the supervisor before its child so it cannot respawn during apply.
+    if test "$iface" = eth0; then
+        RC_SVCNAME=reliefos-dhcp /sbin/supervise-daemon reliefos-dhcp --stop 8>&- || return $?
+    fi
+    RC_SVCNAME=reliefos-dhcp.$iface /sbin/supervise-daemon "reliefos-dhcp.$iface" --stop 8>&- || return $?
+    stop_dhcp
+    clear_lease
+    : > "/run/reliefos/network-stopped.$iface"
+    /usr/lib/reliefos/publish-resolver
 }
 case "${1:-}" in
     stop-dhcp) stop_dhcp; exit ;;
     release) clear_lease; /usr/lib/reliefos/publish-resolver; exit ;;
-    mode|dns|prepare|check) ;;
-    *) fail 'expected mode, dns, prepare, check, release or stop-dhcp' ;;
+    stop) stop_interface; exit ;;
+    mode|dns|prepare|check|start|apply) ;;
+    *) fail 'expected list, mode, dns, prepare, check, start, stop, apply, release or stop-dhcp' ;;
 esac
 mode=dhcp address=0.0.0.0 prefix=24 gateway=0.0.0.0 dns_mode=automatic dns_servers= dns_custom=
-profile=/etc/reliefos/network.conf
+case "$iface" in eth0) profile=/etc/reliefos/network.conf ;; *) profile=/etc/reliefos/network.d/$iface.conf ;; esac
+# Reject a replaced directory before touching any per-interface profile.
+for dir in /etc/reliefos /etc/reliefos/network.d; do
+    if test -e "$dir" || test -L "$dir"; then
+        test -d "$dir" && test ! -L "$dir" || fail 'unsafe profile directory'
+        test "$(stat -c %u "$dir")" = 0 || fail 'profile directory must belong to root'
+        permissions=$(stat -c %a "$dir")
+        test "$((0$permissions & 022))" -eq 0 || fail 'profile directory is writable by another user'
+    fi
+done
 if test -e "$profile" || test -L "$profile"; then
     test -f "$profile" && test ! -L "$profile" || fail 'profile is not a regular file'
     test "$(stat -c %u "$profile")" = 0 || fail 'profile must belong to root'
@@ -114,6 +167,14 @@ if test -e "$profile" || test -L "$profile"; then
             fi
             ;;
     esac
+elif test "$iface" = eth0 && test -r /etc/udhcpc/leonos-dns; then
+    read -r previous_mode previous_servers < /etc/udhcpc/leonos-dns
+    case "$previous_mode" in
+        0) dns_mode=cloudflare ;;
+        1) dns_mode=automatic ;;
+        2) dns_mode=custom; dns_servers=$previous_servers ;;
+        *) fail 'invalid published DNS mode' ;;
+    esac
 fi
 case "$mode" in dhcp|static|disabled) ;; *) fail 'invalid mode' ;; esac
 case "$dns_mode" in automatic|custom|cloudflare) ;; *) fail 'invalid DNS mode' ;; esac
@@ -156,17 +217,34 @@ case "$1" in
     dns)
         case "$dns_mode" in automatic) printf '1 0.0.0.0\n' ;; cloudflare) printf '0 0.0.0.0\n' ;; custom) printf '2 %s\n' "$dns_servers" ;; esac
         ;;
-    prepare)
+    prepare|start|apply)
+        if test "$1" = apply; then
+            # Preserve OpenRC service ownership if the service was stopped.
+            # Release the per-interface lock before OpenRC starts every NIC.
+            if ! /sbin/rc-service reliefos-dhcp status >/dev/null 2>&1; then
+                exec 8>&-
+                exec /sbin/rc-service reliefos-dhcp start
+            fi
+            stop_interface
+        fi
         mkdir -p /run/reliefos
         clear_lease
+        rm -f "/run/reliefos/network-stopped.$iface"
         case "$mode" in
-            dhcp) /sbin/ifconfig eth0 up ;;
+            dhcp) /sbin/ifconfig "$iface" up ;;
             static)
-                /sbin/ifconfig eth0 "$address" netmask "$(print_ip "$mask")" up
-                test "$gw" -eq 0 || /sbin/route add default gw "$gateway" dev eth0
+                /sbin/ifconfig "$iface" "$address" netmask "$(print_ip "$mask")" up
+                test "$gw" -eq 0 || /sbin/route add default gw "$gateway" dev "$iface"
                 ;;
-            disabled) /sbin/ifconfig eth0 down ;;
+            disabled) /sbin/ifconfig "$iface" down ;;
         esac
         /usr/lib/reliefos/publish-resolver
+        if test "$1" != prepare && test "$mode" = dhcp; then
+            RC_SVCNAME=reliefos-dhcp.$iface /sbin/supervise-daemon "reliefos-dhcp.$iface" --start \
+                --retry TERM/1/KILL/1 --stdin /dev/null --stdout /var/log/udhcpc.log \
+                --stderr /var/log/udhcpc.log --respawn-delay 5 --respawn-max 3 --respawn-period 60 \
+                /sbin/udhcpc -- -f -R -i "$iface" -p "$client" \
+                -s /usr/share/udhcpc/default.script -t 3 -T 1 -A 30 8>&-
+        fi
         ;;
 esac

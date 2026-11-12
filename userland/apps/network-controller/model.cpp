@@ -252,6 +252,18 @@ bool interface_name(const char *s) {
       return false;
   return true;
 }
+bool ethernet_name(const char *s) {
+  if (!s || strncmp(s, "eth", 3) || !s[3] || strlen(s) > 15 ||
+      (s[3] == '0' && s[4]))
+    return false;
+  for (s += 3; *s; ++s)
+    if (*s < '0' || *s > '9')
+      return false;
+  return true;
+}
+static bool ethernet_or_legacy(const Text &s) {
+  return s.empty() || ethernet_name(s.c_str());
+}
 bool validate(const Request &r, Text &e) {
   const Text *fields[] = {&r.a, &r.b, &r.c, &r.d};
   for (auto f : fields)
@@ -263,25 +275,28 @@ bool validate(const Request &r, Text &e) {
   Config config;
   switch (r.op) {
   case Op::Snapshot:
-  case Op::ReadConfig:
-  case Op::Apply:
-  case Op::Renew:
   case Op::Cancel:
   case Op::Quit:
     ok = r.a.empty() && r.b.empty() && r.c.empty() && r.d.empty();
     break;
+  case Op::ReadConfig:
+  case Op::Apply:
+  case Op::Renew:
+    ok = ethernet_or_legacy(r.a) && r.b.empty() && r.c.empty() && r.d.empty();
+    break;
   case Op::WriteConfig:
-    ok = (r.c == "0" || r.c == "1") && r.d.empty() &&
+    ok = (r.c == "0" || r.c == "1") && ethernet_or_legacy(r.d) &&
          parse_config(r.a, config, e);
     break;
   case Op::RestoreConfig:
-    ok = r.a.empty() && (r.c == "0" || r.c == "1") && r.d.empty();
+    ok = r.a.empty() && (r.c == "0" || r.c == "1") && ethernet_or_legacy(r.d);
     break;
   case Op::View:
     ok = (r.a == "routes" || r.a == "arp" || r.a == "connections" ||
           r.a == "lease" || r.a == "log" || r.a == "resolver" ||
           r.a == "report") &&
-         r.b.empty() && r.c.empty() && r.d.empty();
+         (r.a == "lease" ? ethernet_or_legacy(r.b) : r.b.empty()) &&
+         r.c.empty() && r.d.empty();
     break;
   case Op::Ping:
     ok = target(r.a.c_str()) && r.b.empty() && r.c.empty() && r.d.empty();
@@ -307,8 +322,8 @@ bool command(const Request &r, Array<Text> &v, Text &e) {
   if (!validate(r, e))
     return false;
   if (r.op == Op::Apply || r.op == Op::Renew)
-    return arg(v, "/sbin/rc-service") && arg(v, "reliefos-dhcp") &&
-           arg(v, "restart");
+    return arg(v, "/usr/lib/reliefos/network-profile") && arg(v, "apply") &&
+           arg(v, r.a.empty() ? "eth0" : r.a.c_str());
   if (r.op == Op::Ping)
     return arg(v, "/bin/busybox") && arg(v, "ping") && arg(v, "-c") &&
            arg(v, "4") && arg(v, "-W") && arg(v, "2") && arg(v, r.a.c_str());
@@ -496,8 +511,23 @@ bool parse_snapshot(const Text &t, Array<Interface> &out, Text &gateway,
       if (!next.push(i))
         return false;
     } else if (line[0] == 'G' && line[1] == '\t') {
-      if (!g.set(line + 2))
+      const char *name = line + 2;
+      char *address = strchr(line + 2, '\t');
+      if (address)
+        *address++ = 0;
+      else {
+        address = line + 2;
+        name = "eth0";
+      }
+      uint32_t ip;
+      if (!interface_name(name) || !ipv4(address, ip))
         return false;
+      if (!strcmp(name, "eth0") && g.empty() && !g.set(address))
+        return false;
+      for (size_t n = 0; n < next.size(); ++n)
+        if (next[n].name == name && next[n].gateway.empty() &&
+            !next[n].gateway.set(address))
+          return false;
     } else if (line[0] == 'D' && line[1] == '\t') {
       if (!d.empty() && !append(d, ", "))
         return false;

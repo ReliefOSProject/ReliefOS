@@ -58,8 +58,14 @@ int main(int argc, char **argv) {
   // SIOCGIFCONF omits interfaces without IPv4 addresses. They must still be
   // visible, otherwise disabling an adapter makes it impossible to select.
   assert(parse_snapshot(out, interfaces, gw, dns));
-  assert(interfaces.size() == 1 && interfaces[0].name == "lo" &&
-         interfaces[0].address == "0.0.0.0" && !(interfaces[0].flags & 1));
+  bool found_second = false, found_sparse = false;
+  for (size_t i = 0; i < interfaces.size(); ++i) {
+    if (interfaces[i].name == "eth1" && interfaces[i].address == "0.0.0.0")
+      found_second = true;
+    if (interfaces[i].name == "eth998" && interfaces[i].address == "0.0.0.0")
+      found_sparse = true;
+  }
+  assert(found_second && found_sparse);
   r.op = Op::ReadConfig;
   out.clear();
   assert(s.send(r, 2));
@@ -82,6 +88,33 @@ int main(int argc, char **argv) {
   assert(s.send(r, 4));
   assert(result(s, 4, out) ==
          1); // Stale snapshot cannot overwrite saved settings.
+  // Worker selects eth1 independently; eth0 must retain its own snapshot.
+  r = Request{};
+  r.op = Op::ReadConfig;
+  r.a = text("eth1");
+  out.clear();
+  assert(s.send(r, 30));
+  assert(!result(s, 30, out));
+  assert(decode_profile(out, exists, original, initial) && !exists);
+  r = Request{};
+  r.op = Op::WriteConfig;
+  r.a = bytes;
+  r.c = text("0");
+  r.d = text("eth1");
+  out.clear();
+  assert(s.send(r, 31));
+  assert(!result(s, 31, out));
+  r = Request{};
+  r.op = Op::ReadConfig;
+  r.a = text("eth0");
+  out.clear();
+  assert(s.send(r, 32));
+  assert(!result(s, 32, out));
+  assert(decode_profile(out, exists, original, initial) && exists && original == bytes);
+  r.a = text("eth99");
+  out.clear();
+  assert(s.send(r, 33));
+  assert(result(s, 33, out) != 0);
   r = Request{};
   r.op = Op::Ping;
   r.a = text("example.com");
