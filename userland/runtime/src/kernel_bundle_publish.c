@@ -90,23 +90,21 @@ static int sync_parent(int root, const char *relative)
  */
 static int publish_version(const struct kernel_bundle_checked *bundle, int root)
 {
-    const char *names[] = {"kernel.sys", "initramfs.cpio", "kerneldebug.sys", "boot.env"};
-    const char *hashes[4] = {bundle->identity.kernel_sha256, bundle->identity.initramfs_sha256, NULL, NULL};
+    const char *names[] = {"kernel.sys", "initramfs.cpio", "boot.env"};
+    const char *hashes[] = {bundle->identity.kernel_sha256, bundle->identity.initramfs_sha256, NULL};
     char source[128];
-    for (size_t i = 2; i < 4; ++i) {
+    for (size_t i = 2; i < sizeof(names) / sizeof(names[0]); ++i) {
         snprintf(source, sizeof(source), "%s%s", bundle->prefix, names[i]);
         for (size_t j = 0; j < bundle->count; ++j)
             if (!strcmp(source, bundle->products[j].name)) { hashes[i] = bundle->products[j].hash; break; }
         if (!hashes[i]) return -EINVAL;
     }
-    for (size_t i = 0; i < 4; ++i) {
+    for (size_t i = 0; i < sizeof(names) / sizeof(names[0]); ++i) {
         int result = copy_version(bundle, root, names[i], hashes[i]);
         if (result) return result;
     }
     char checksum[400], path[192], version[160];
-    /* Match the original native-media format exactly; the debugger is verified
-     * before publication but is not a GRUB-loaded member of this checksum list. */
-    int length = snprintf(checksum, sizeof(checksum), "%s  kernel.sys\n%s  initramfs.cpio\n%s  boot.env\n", hashes[0], hashes[1], hashes[3]);
+    int length = snprintf(checksum, sizeof(checksum), "%s  kernel.sys\n%s  initramfs.cpio\n%s  boot.env\n", hashes[0], hashes[1], hashes[2]);
     int result = reliefos_kernel_boot_directory(&bundle->identity, version, sizeof(version));
     if (result) return result;
     snprintf(path, sizeof(path), "%s/SHA256SUMS", version);

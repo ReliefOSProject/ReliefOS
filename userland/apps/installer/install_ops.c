@@ -1312,7 +1312,6 @@ static int check_payload_required(const char *root)
         RELIEFOS_LAYOUT_LICENSES, RELIEFOS_LAYOUT_ETC_SSL_CERTS,
     };
     static const char *const root_files[] = {
-        RELIEFOS_LAYOUT_RELIEFOS_LIB "/kerneldebug.sys",
         RELIEFOS_LAYOUT_LIB "/ld-musl-x86_64.so.1",
         RELIEFOS_LAYOUT_LIB "/libc.so", RELIEFOS_LAYOUT_LIB "/libmimalloc.so.3",
         RELIEFOS_PATH_LIBRELIEFOS, "/usr/lib/leonos/libleonos.so.2",

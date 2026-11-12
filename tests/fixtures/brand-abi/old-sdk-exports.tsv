@@ -145,10 +145,6 @@ leonos_ipc_recv_fd	T
 leonos_ipc_send	T
 leonos_ipc_send_fd	T
 leonos_ipc_set_nonblock	T
-leonos_kernel_debug_arm_next_boot	T
-leonos_kernel_debug_clear	T
-leonos_kernel_debug_get_state	T
-leonos_kernel_debug_set_enabled	T
 leonos_launch_argv	T
 leonos_launch_assoc_apps	T
 leonos_launch_builtin_path	T

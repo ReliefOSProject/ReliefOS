@@ -198,11 +198,6 @@ check_current_docs() {
     else
         fail 'browser guide must document about:reliefos'
     fi
-    if grep -q 'About ReliefOS' "$root/Documentation/admin-guide/console.rst"; then
-        ok 'kernel debugger guide uses the ReliefOS product name'
-    else
-        fail 'kernel debugger guide must use About ReliefOS'
-    fi
 }
 
 # Layer 2: canonical guest paths and service names.

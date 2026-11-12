@@ -1,5 +1,4 @@
 #include "engine.h"
-#include "debug_click.h"
 #include "taskmgr/model.h"
 #include "installer/model.h"
 #include "doomlauncher/model.h"
@@ -61,19 +60,6 @@ int main(void)
     calc_input(&calc, "C");
     for (unsigned i = 0; i < 200; ++i) calc_input(&calc, "1");
     assert(strlen(calc.expression) == CALC_EXPR_MAX - 1);
-
-    struct osver_debug_click clicks = {0};
-    for (unsigned i = 0; i < 4; ++i) assert(!osver_debug_click(&clicks, 100 + i * 100, 1));
-    assert(osver_debug_click(&clicks, 500, 1));
-    assert(!osver_debug_click(&clicks, 600, 1));
-    assert(!osver_debug_click(&clicks, 700, 0));
-    for (unsigned i = 0; i < 4; ++i) assert(!osver_debug_click(&clicks, 800 + i * 100, 1));
-    assert(!osver_debug_click(&clicks, 3001, 1));
-    for (unsigned i = 0; i < 3; ++i) assert(!osver_debug_click(&clicks, 3100 + i * 100, 1));
-    assert(osver_debug_click(&clicks, 3400, 1));
-    clicks = (struct osver_debug_click){0};
-    for (unsigned i = 0; i < 4; ++i) assert(!osver_debug_click(&clicks, UINT_MAX - 300 + i * 100, 1));
-    assert(osver_debug_click(&clicks, 50, 1));
 
     /* Task manager model: formatting, utilization math, history ring and tree order. */
     {
@@ -712,7 +698,7 @@ int main(void)
         assert(strcmp(secret, "中文") == 0);
     }
 
-    puts("ok - calculator arithmetic, editing, bounds and logo click timing");
+    puts("ok - calculator arithmetic, editing and bounds");
     puts("ok - task manager formatting, utilization, history ring and tree order");
     puts("ok - minesweeper placement, reveal, flags, win/lose and sprite parsing");
     puts("ok - easter egg image fitting for leonmmcoset and xiaobai");

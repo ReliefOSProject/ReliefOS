@@ -39,8 +39,8 @@ Runtime, libraries, and applications
 * util-linux 2.41.6 (su/runuser and storage utilities/libraries): upstream
   GPL/LGPL and file-specific terms;
   see README.licensing.
-* e2fsprogs 1.47.3: upstream GPL/LGPL/BSD/MIT and file-specific terms;
-  see NOTICE. dosfstools 4.2 and exfatprogs 1.4.3: see their COPYING files
+* e2fsprogs 1.47.4: upstream GPL/LGPL/BSD/MIT and file-specific terms;
+  see NOTICE. dosfstools 4.2 and exfatprogs 1.4.4: see their COPYING files
   and individual source headers. Fixed archive references and checksums are
   in configs/storage-upstream.json; notices are installed under
   /usr/share/licenses/<package>/.

@@ -28,7 +28,7 @@ def make_bundle(root,config,corrupt=False):
     environment=("# GRUB Environment Block\nreliefos_generation=1\nreliefos_release="+RELEASE+
         "\nreliefos_module_abi="+abi+"\nreliefos_kernel_sha256="+hashlib.sha256(kernel).hexdigest()+
         "\nreliefos_initramfs_sha256="+hashlib.sha256(initramfs).hexdigest()+"\n").encode()
-    files={boot+"kernel.sys":kernel,boot+"kerneldebug.sys":b"debug\n",boot+"initramfs.cpio":initramfs,
+    files={boot+"kernel.sys":kernel,boot+"initramfs.cpio":initramfs,
            boot+"boot.env":environment+b"#"*(1024-len(environment)),modules+"config":config,
            modules+"module.abi":(abi+"\n").encode()}
     for name in ("Module.symvers","System.map","modules.order","modules.builtin","modules.builtin.modinfo",

@@ -7,7 +7,6 @@
  * `#include <reliefos/system.h>` callers keep working.
  */
 #include <reliefos/system_abi.h>
-#include <reliefos/kernel_debug.h>
 #include <stdint.h>
 
 int reliefos_system_info(struct reliefos_system_info *info);

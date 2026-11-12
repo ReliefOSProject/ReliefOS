@@ -13,12 +13,6 @@ for name in kernel.sys kernel.debug; do
     done
     cmp "$audio_out/generated/system/$name" "$audio_out/kernel-install/$name"
 done
-for product in "$audio_out/generated/system/kerneldebug.sys" "$audio_out/kernel-install/kerneldebug.sys"; do
-    if [ ! -s "$product" ]; then
-        echo "FAIL missing product: $product" >&2
-        exit 1
-    fi
-done
 if find "$audio_out/generated" "$audio_out/kernel-install" "$audio_root/usr/lib" -name '*.drv' | grep -q .; then
     echo "FAIL stale .drv driver modules are still produced or staged" >&2
     exit 1
@@ -48,11 +42,9 @@ for name in bundle['modules']:
     assert (root/name).read_bytes()==(install/name).read_bytes(),name
 payload=json.loads((root/'usr/lib/reliefos/kernel'/release/'bundle.json').read_bytes())
 assert payload['release']==release and payload['module_abi']==bundle['module_abi']
-assert (root/'usr/lib/reliefos/kernel'/release/'kerneldebug.sys').is_file()
 manifest=json.loads((out/'rootfs/manifest.json').read_bytes());text=json.dumps(manifest)
 assert 'usr/lib/reliefos/drivers' not in text, 'staged driver directory in manifest'
 assert '.drv' not in text, 'staged .drv driver module in manifest'
-assert f'usr/lib/reliefos/kernel/{release}/kerneldebug.sys' in text
 print('Configured kernel products and staged manifest PASS')
 PY
 release=$(cat "$audio_out/rootfs/raw/usr/lib/reliefos/kernel/current-release")

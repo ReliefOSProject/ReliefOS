@@ -7,7 +7,7 @@
 
 输出均相对于 O：
 
-* ``kernel`` / ``kerneldebug``：generated/system 内核与调试载荷。
+* ``kernel``：generated/system 内核与独立调试符号。
 * ``runtime`` / ``userland``：公共运行库与所选应用。
 * ``sdk``：packages/reliefos-musl-sdk.tar.gz。
 * ``apk-repo``：packages/apk/repository。

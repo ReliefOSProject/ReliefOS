@@ -42,14 +42,14 @@ static struct kernel_bundle_product *find_product(struct kernel_bundle_checked *
 /** @brief Reject checksum records outside this exact release's publication scope.
  * @param bundle Borrowed validated release identity.
  * @param name Canonical relative product name.
- * @return Nonzero only for module products, the platform policy or four boot members.
+ * @return Nonzero only for module products, the platform policy or three boot members.
  */
 static int allowed_product(const struct kernel_bundle_checked *bundle, const char *name)
 {
     if (!strncmp(name, bundle->modules, strlen(bundle->modules))) return 1;
     if (strncmp(name, bundle->prefix, strlen(bundle->prefix))) return 0;
     name += strlen(bundle->prefix);
-    return !strcmp(name, "kernel.sys") || !strcmp(name, "kerneldebug.sys") ||
+    return !strcmp(name, "kernel.sys") ||
            !strcmp(name, "initramfs.cpio") || !strcmp(name, "boot.env");
 }
 
@@ -98,7 +98,7 @@ static int checksum_list(struct kernel_bundle_checked *bundle)
  */
 static int required_products(struct kernel_bundle_checked *bundle)
 {
-    const char *const boot[] = {"kernel.sys", "kerneldebug.sys", "initramfs.cpio", "boot.env"};
+    const char *const boot[] = {"kernel.sys", "initramfs.cpio", "boot.env"};
     const char *const modules[] = {"config", "module.abi", "Module.symvers", "System.map", "modules.order",
         "modules.builtin", "modules.builtin.modinfo", "modules.dep", "modules.alias", "modules.symbols",
         "modules-load.d/reliefnt-platform.conf"};
@@ -107,7 +107,7 @@ static int required_products(struct kernel_bundle_checked *bundle)
         snprintf(path, sizeof(path), "%s%s", bundle->prefix, boot[i]);
         struct kernel_bundle_product *product = find_product(bundle, path);
         if (!product) return -EINVAL;
-        const char *expected = i == 0 ? bundle->identity.kernel_sha256 : i == 2 ? bundle->identity.initramfs_sha256 : NULL;
+        const char *expected = i == 0 ? bundle->identity.kernel_sha256 : i == 1 ? bundle->identity.initramfs_sha256 : NULL;
         if (expected && strcmp(product->hash, expected)) return -EINVAL;
     }
     for (size_t i = 0; i < sizeof(modules) / sizeof(modules[0]); ++i) {
