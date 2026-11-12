@@ -70,6 +70,19 @@ int main() {
   assert(target("example.com") && target("10.0.2.2") && !target("-c") &&
          !target("x;id") && !target("a b") && !target("$(id)"));
   Request r;
+  r.op = Op::ReadConfig;
+  r.a = text("eth1");
+  assert(validate(r, error));
+  r.a = text("../eth1");
+  assert(!validate(r, error));
+  r.a = text("eth1");
+  r.op = Op::Apply;
+  Array<Text> apply_args;
+  assert(command(r, apply_args, error));
+  assert(apply_args.size() == 3 &&
+         apply_args[0] == "/usr/lib/reliefos/network-profile" &&
+         apply_args[1] == "apply" && apply_args[2] == "eth1");
+  r = Request{};
   r.op = Op::Ping;
   r.a = text("-f");
   assert(!validate(r, error));
@@ -122,6 +135,13 @@ int main() {
   assert(interfaces.size() == 1 && interfaces[0].rx == 4096 &&
          interfaces[0].tx_errors == 1 && gateway == "10.0.2.2" &&
          dns == "10.0.2.3");
+  assert(parse_snapshot(
+      text("I\teth0\t10.0.2.15\t255.255.255.0\t-\t65\t1500\t0\t0\t0\t0\t0\t0\t0\n"
+           "I\teth1\t192.168.9.2\t255.255.255.0\t-\t65\t1500\t0\t0\t0\t0\t0\t0\t0\n"
+           "G\teth0\t10.0.2.2\nG\teth1\t192.168.9.1\n"),
+      interfaces, gateway, dns));
+  assert(gateway == "10.0.2.2" && interfaces[0].gateway == "10.0.2.2" &&
+         interfaces[1].gateway == "192.168.9.1");
   parse_counters("Inter-| Receive | Transmit\n  eth0: 9000 32 2 0 0 0 0 0 5000 "
                  "19 1 0 0 0 0 0\n",
                  interfaces);

@@ -29,6 +29,7 @@ bool parse_config(const Text &, Config &, Text &);
 bool serialize_config(const Config &, Text &, Text &);
 bool target(const char *);
 bool interface_name(const char *);
+bool ethernet_name(const char *);
 bool append(Text &, const char *, size_t);
 inline bool append(Text &t, const char *s) { return append(t, s, strlen(s)); }
 enum class Op : unsigned {
@@ -65,7 +66,7 @@ bool encode_profile(bool exists, const Text &original, const Config &, Text &);
 bool decode_profile(const Text &, bool &exists, Text &original, Config &);
 struct Interface {
   bool counters = false;
-  Text name, address, mask, mac;
+  Text name, address, mask, mac, gateway;
   unsigned flags = 0, mtu = 0;
   uint64_t rx = 0, tx = 0, rx_packets = 0, tx_packets = 0, rx_errors = 0,
            tx_errors = 0;

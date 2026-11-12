@@ -131,19 +131,76 @@ bool atomic(int dir, const char *name, const Text &bytes, Text &error) {
   return true;
 }
 } // namespace
+int ConfigStore::profile_directory(bool create, Text &error) {
+  if (!ethernet_name(interface_)) {
+    errno = EINVAL;
+    failure(error, "Invalid Ethernet interface");
+    return -1;
+  }
+  int root = directory(directory_, error);
+  if (root < 0 || !strcmp(interface_, "eth0"))
+    return root;
+  int dir = openat(root, "network.d", O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+  if (dir < 0 && errno == ENOENT && create) {
+    int made = mkdirat(root, "network.d", 0755);
+    if (made < 0 && errno != EEXIST) {
+      failure(error, "Cannot create network configuration directory");
+      close(root);
+      return -1;
+    }
+    if (made == 0 && fsync(root) < 0) {
+      failure(error, "Cannot synchronize network configuration directory");
+      close(root);
+      return -1;
+    }
+    dir = openat(root, "network.d", O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+  }
+  int saved = errno;
+  close(root);
+  errno = saved;
+  if (dir < 0) {
+    if (errno == ENOENT && !create)
+      return -2;
+    failure(error, "Cannot open network configuration directory");
+    return -1;
+  }
+  struct stat st{};
+  if (fstat(dir, &st) < 0 || st.st_uid != geteuid() || (st.st_mode & 0022)) {
+    close(dir);
+    errno = EPERM;
+    failure(error, "Unsafe configuration directory");
+    return -1;
+  }
+  return dir;
+}
+void ConfigStore::profile_names(char (&name)[32], char (&backup)[40]) const {
+  if (!strcmp(interface_, "eth0"))
+    snprintf(name, sizeof(name), "network.conf");
+  else
+    snprintf(name, sizeof(name), "%s.conf", interface_);
+  snprintf(backup, sizeof(backup), "%s.bak", name);
+}
 bool ConfigStore::read(Snapshot &out, Text &error) {
-  int dir = directory(directory_, error);
+  int dir = profile_directory(false, error);
+  if (dir == -2) {
+    out = Snapshot{};
+    return true;
+  }
   if (dir < 0)
     return false;
-  bool ok = load(dir, "network.conf", out, error);
+  char name[32], backup[40];
+  profile_names(name, backup);
+  bool ok = load(dir, name, out, error);
   close(dir);
   return ok;
 }
 bool ConfigStore::replace(const Snapshot &expected, const Snapshot &next,
                           Text &error) {
-  int dir = directory(directory_, error);
+  int dir = profile_directory(true, error);
   if (dir < 0)
     return false;
+  char name[32], backup_name[40];
+  profile_names(name, backup_name);
   int lock = openat(dir, ".network-controller.lock",
                     O_RDWR | O_CREAT | O_NOFOLLOW | O_CLOEXEC, 0600);
   struct stat st{};
@@ -156,7 +213,7 @@ bool ConfigStore::replace(const Snapshot &expected, const Snapshot &next,
     return failure(error, "Network configuration is locked or unsafe");
   }
   Snapshot current;
-  ok = load(dir, "network.conf", current, error);
+  ok = load(dir, name, current, error);
   if (ok && (current.exists != expected.exists ||
              !(current.bytes == expected.bytes))) {
     error.set(
@@ -169,12 +226,12 @@ bool ConfigStore::replace(const Snapshot &expected, const Snapshot &next,
       backup = current.bytes;
     else
       backup.set(Absent);
-    ok = atomic(dir, "network.conf.bak", backup, error);
+    ok = atomic(dir, backup_name, backup, error);
   }
   if (ok) {
     if (next.exists)
-      ok = atomic(dir, "network.conf", next.bytes, error);
-    else if (unlinkat(dir, "network.conf", 0) < 0 && errno != ENOENT)
+      ok = atomic(dir, name, next.bytes, error);
+    else if (unlinkat(dir, name, 0) < 0 && errno != ENOENT)
       ok = failure(error, "Cannot restore absent network profile");
     else if (fsync(dir) < 0)
       ok = failure(error, "Cannot synchronize restored network profile");
@@ -196,11 +253,16 @@ bool ConfigStore::save(const Snapshot &expected, const Text &bytes,
   return replace(expected, next, error);
 }
 bool ConfigStore::restore(const Snapshot &expected, Text &error) {
-  int dir = directory(directory_, error);
-  if (dir < 0)
+  int dir = profile_directory(false, error);
+  if (dir < 0) {
+    if (dir == -2)
+      error.set("No previous network configuration backup is available.");
     return false;
+  }
+  char name[32], backup[40];
+  profile_names(name, backup);
   Snapshot next;
-  bool ok = load(dir, "network.conf.bak", next, error);
+  bool ok = load(dir, backup, next, error);
   close(dir);
   if (!ok)
     return false;

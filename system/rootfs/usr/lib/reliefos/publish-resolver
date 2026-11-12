@@ -2,8 +2,6 @@
 # Sole resolver writer. Inputs are numeric data, never sourced shell text.
 set -eu
 valid_ipv4() (
-    # A subshell keeps field splitting local to validation. Reject empty
-    # octets before splitting, including a trailing dot discarded by the shell.
     case "$1" in *[!0-9.]*|''|.*|*.|*..*) return 1 ;; esac
     IFS=.
     set -- $1
@@ -12,23 +10,54 @@ valid_ipv4() (
         test "${#octet}" -le 3 && test "$octet" -le 255 || return 1
     done
 )
-mode=1
-custom=0.0.0.0
-if test -e /etc/reliefos/network.conf || test -L /etc/reliefos/network.conf; then
-    settings=$(/usr/lib/reliefos/network-profile dns)
-    read -r mode custom <<EOF
+# Every writer publishes after updating its own cache. Serializing the read
+# and rename prevents an older callback from replacing a newer combined view.
+mkdir -p /run/reliefos
+exec 9>/run/reliefos/resolver.lock
+flock -x 9
+explicit= automatic= ra=no
+if test -x /usr/lib/reliefos/network-profile && test -r /proc/net/dev; then
+    interfaces=$(/usr/lib/reliefos/network-profile list)
+    for iface in $interfaces; do
+        if test -e "/run/reliefos/network-stopped.$iface"; then continue; fi
+        state=$(/usr/lib/reliefos/network-profile mode "$iface")
+        test "$state" != disabled || continue
+        settings=$(/usr/lib/reliefos/network-profile dns "$iface")
+        read -r mode custom <<SETTINGS
 $settings
-EOF
-elif test -r /etc/udhcpc/leonos-dns; then
-    read -r mode custom < /etc/udhcpc/leonos-dns
+SETTINGS
+        case "$mode" in
+            0) explicit="$explicit 1.1.1.1" ;;
+            2) explicit="$explicit $custom" ;;
+            1)
+                test "$iface" != eth0 || ra=yes
+                case "$iface" in eth0) cache=/run/reliefos/dhcp-dns ;; *) cache=/run/reliefos/dhcp-dns.$iface ;; esac
+                automatic="$automatic $(cat "$cache" 2>/dev/null || :)"
+                ;;
+            *) exit 1 ;;
+        esac
+    done
+else
+    # Compatibility with the old DNS-only configuration and standalone hook.
+    mode=1 custom=0.0.0.0
+    if test -e /etc/reliefos/network.conf || test -L /etc/reliefos/network.conf; then
+        settings=$(/usr/lib/reliefos/network-profile dns)
+        read -r mode custom <<SETTINGS
+$settings
+SETTINGS
+    elif test -r /etc/udhcpc/leonos-dns; then
+        read -r mode custom < /etc/udhcpc/leonos-dns
+    fi
+    case "$mode" in
+        0) explicit=1.1.1.1 ;;
+        1) ra=yes; automatic=$(cat /run/reliefos/dhcp-dns 2>/dev/null || :) ;;
+        2) explicit=$custom ;;
+        *) exit 1 ;;
+    esac
 fi
-case "$mode" in
-    1) servers="$(cat /run/reliefos/ra-dns 2>/dev/null || :)
-$(cat /run/reliefos/dhcp-dns 2>/dev/null || :)" ;;
-    0) servers=1.1.1.1 ;;
-    2) servers=$custom ;;
-    *) exit 1 ;;
-esac
+servers=$explicit
+if test "$ra" = yes; then servers="$servers $(cat /run/reliefos/ra-dns 2>/dev/null || :)"; fi
+servers="$servers $automatic"
 umask 022
 tmp=$(mktemp /etc/.resolv.conf.XXXXXX)
 trap 'rm -f "$tmp"' EXIT HUP INT TERM
@@ -42,8 +71,7 @@ for server in $servers; do
     esac
     case "$seen" in *" $server "*) continue ;; esac
     seen="$seen$server "
-    # musl consumes at most three nameservers. Keep additional advertised
-    # entries in their source cache so expiry can expose the next server.
+    # musl consumes at most three nameservers. Keep remaining source caches.
     test "$count" -lt 3 || continue
     printf 'nameserver %s\n' "$server" >> "$tmp"
     count=$((count + 1))
