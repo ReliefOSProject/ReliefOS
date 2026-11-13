@@ -10,6 +10,7 @@
    installation
    vga-text
    desktop
+   reliefsettings
    packages
    coreutils
    network-controller

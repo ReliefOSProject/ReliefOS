@@ -44,10 +44,12 @@ int main(int argc, char **argv)
     reliefos_fltk::style(&window);
     window.set_modal();
     window.show();
+    Fl::disable_im();
     password.take_focus();
     Fl::run();
     int result = accepted ? askpass_write_password(password.value()) : 1;
     explicit_bzero(const_cast<char *>(password.value()), strlen(password.value()));
     password.value("");
+    Fl::enable_im();
     return result;
 }

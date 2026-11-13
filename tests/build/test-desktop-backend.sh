@@ -79,9 +79,9 @@ for locale in $(cat configs/nls/LINGUAS); do
     done
 done
 printf 'busybox\ttool\t1\t1\t0\t0\t0\tBusyBox\tTools\t\t0\n' > "$work/metadata"
-for app in fileman installer leonmmcoset reliefword reliefppt soundctl sudo fastfetch; do
+for app in fileman installer leonmmcoset reliefword reliefppt reliefsettings soundctl sudo fastfetch; do
     entry=0
-    case $app in fileman|fastfetch) entry=1 ;; esac
+    case $app in fileman|reliefsettings|fastfetch) entry=1 ;; esac
     printf '%s\tsystem-app\t1\t1\t%s\t0\t0\t%s\tSystem applications\t\t0\n' "$app" "$entry" "$app" >> "$work/metadata"
     printf 'app fixture\n' > "$work/out/userland/$app.elf"
 done
@@ -161,7 +161,7 @@ test ! -e "$work/root-no-player/usr/lib/libavformat-reliefplayer.so.62"
 test ! -e "$work/root-no-player/usr/share/licenses/ffmpeg"
 
 # Only self-authored graphical apps receive artwork, including hidden entries.
-for app in fileman installer leonmmcoset reliefword reliefppt reliefmath reliefmathpp; do
+for app in fileman installer leonmmcoset reliefword reliefppt reliefmath reliefmathpp reliefsettings; do
     for size in 16 32 48 64 128 256; do
         icon=usr/share/icons/hicolor/${size}x${size}/apps/reliefos-$app.png
         cmp "$repo_root/resources/build-art/app-icons/hicolor/${size}x${size}/apps/reliefos-$app.png" "$xorg_root/$icon"

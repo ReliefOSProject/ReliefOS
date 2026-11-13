@@ -215,6 +215,20 @@ api = false
 depends = ["sudo", "su"]
 
 [[components]]
+id = "reliefsettings"
+symbol = "APP_RELIEFSETTINGS"
+label = "ReliefSettings"
+category = "System applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+depends = ["sudo", "reliefaskpass"]
+
+[[components]]
 id = "openrc-controller"
 symbol = "APP_OPENRC_CONTROLLER"
 label = "OpenRC Controller"

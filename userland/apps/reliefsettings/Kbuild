@@ -1,0 +1,10 @@
+RELIEFOS_APP_NAME := reliefsettings
+RELIEFOS_APP_OBJECTS := main.o model.o config.o backend.o window.o shared_reliefapk_process.o
+RELIEFOS_APP_C_OBJECTS :=
+RELIEFOS_APP_CXX_OBJECTS := $(RELIEFOS_APP_OBJECTS)
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+$(obj)/shared_reliefapk_process.o: $(srctree)/userland/apps/reliefapk/process.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+endif

@@ -723,6 +723,26 @@ config RELIEFOS_COMPONENT_APP_RELIEFAPK_ENTRY
     default y
     depends on RELIEFOS_COMPONENT_APP_RELIEFAPK_IMAGE
 
+menuconfig RELIEFOS_COMPONENT_APP_RELIEFSETTINGS_BUILD
+    bool "ReliefSettings"
+    default y
+    select RELIEFOS_COMPONENT_APP_SUDO_BUILD
+    select RELIEFOS_COMPONENT_APP_RELIEFASKPASS_BUILD
+    help
+      Enable ReliefSettings (reliefsettings). Dependencies may enable it
+      automatically. Libraries may also be built when another product
+      needs them; image membership is controlled separately below.
+
+config RELIEFOS_COMPONENT_APP_RELIEFSETTINGS_IMAGE
+    bool "Include in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFSETTINGS_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFSETTINGS_ENTRY
+    bool "Enable the legacy application-registry entry"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFSETTINGS_IMAGE
+
 menuconfig RELIEFOS_COMPONENT_APP_SOUNDCTL_BUILD
     bool "Sound controls"
     default y

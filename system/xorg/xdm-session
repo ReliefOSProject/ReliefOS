@@ -103,6 +103,14 @@ if test -x /usr/lib/reliefos/dillo-config-init; then
     /usr/lib/reliefos/dillo-config-init || event 'Dillo defaults could not be initialized'
 fi
 
+# Login shells and XDM share the same validated per-user locale import.
+if test -r /etc/profile.d/reliefos-locale.sh; then
+    . /etc/profile.d/reliefos-locale.sh
+fi
+if test -x /usr/bin/reliefsettings; then
+    /usr/bin/reliefsettings --apply-session || event 'Some personal desktop settings could not be applied'
+fi
+
 # IceWM's native session supervisor starts icewmbg, which reads background
 # preferences from the selected theme and follows subsequent theme changes.
 start_child icewm /usr/bin/icewm-session || exit 1
