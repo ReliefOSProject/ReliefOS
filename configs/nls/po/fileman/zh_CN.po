@@ -30,27 +30,31 @@ msgstr " 个文件夹"
 msgid " item(s) completed; "
 msgstr " 个项目完成；"
 
-#: userland/apps/fileman/main.cpp:647
+#: userland/apps/fileman/main.cpp:694
 msgid "%s — %lu checked, %u matches, %lu skipped"
 msgstr "%s — 已检查 %lu 项，匹配 %u 项，跳过 %lu 项"
 
-#: userland/apps/fileman/main.cpp:898
+#: userland/apps/fileman/main.cpp:945
 msgid "%u items, %u selected"
 msgstr "%u 项，已选择 %u 项"
 
-#: userland/apps/fileman/main.cpp:1242
+#: userland/apps/fileman/main.cpp:1293
 msgid "About"
 msgstr "关于"
 
-#: userland/apps/fltk_support.h:48
+#: userland/apps/fltk_support.h:28
 msgid "Add to Favorites"
 msgstr "添加到收藏夹"
 
-#: userland/apps/fileman/main.cpp:1251
+#: userland/apps/fileman/main.cpp:1302
 msgid "Address"
 msgstr "地址"
 
-#: userland/apps/fltk_support.h:49
+#: userland/apps/fileman/volume_ui.cpp:184
+msgid "Administrator permission is required for this device operation."
+msgstr "此设备操作需要管理员权限。"
+
+#: userland/apps/fltk_support.h:29
 msgid "All Files (*)"
 msgstr "所有文件 (*)"
 
@@ -58,15 +62,15 @@ msgstr "所有文件 (*)"
 msgid "All items marked"
 msgstr "已标记所有项目"
 
-#: userland/apps/fileman/main.cpp:973
+#: userland/apps/fileman/main.cpp:1020
 msgid "Application"
 msgstr "应用程序"
 
-#: userland/apps/fileman/main.cpp:599
+#: userland/apps/fileman/main.cpp:646
 msgid "Application launched"
 msgstr "程序已启动"
 
-#: userland/apps/fileman/main.cpp:1243
+#: userland/apps/fileman/main.cpp:1294
 msgid "Archive"
 msgstr "归档"
 
@@ -74,19 +78,23 @@ msgstr "归档"
 msgid "Archive Conflict"
 msgstr "归档文件冲突"
 
-#: userland/apps/fileman/main.cpp:881
+#: userland/apps/fileman/volume_ui.cpp:182
+msgid "Authentication was cancelled or the device operation failed."
+msgstr "验证已取消或设备操作失败。"
+
+#: userland/apps/fileman/main.cpp:928
 msgid "Automatic refresh unavailable; press F5"
 msgstr "自动刷新不可用，请按 F5 刷新"
 
-#: userland/apps/fileman/main.cpp:883
+#: userland/apps/fileman/main.cpp:930
 msgid "Automatic refresh unavailable; refresh manually (F5)"
 msgstr "自动刷新不可用，请手动刷新（F5）"
 
-#: userland/apps/fileman/main.cpp:854
+#: userland/apps/fileman/main.cpp:901
 msgid "Browse files, manage folders and launch X11 applications."
 msgstr "浏览文件、管理文件夹并启动 X11 应用程序。"
 
-#: userland/apps/fileman/main.cpp:359
+#: userland/apps/fileman/main.cpp:406
 msgid "Cancel"
 msgstr "取消"
 
@@ -94,23 +102,35 @@ msgstr "取消"
 msgid "Cannot create extraction folder"
 msgstr "无法创建解压文件夹"
 
-#: userland/apps/fileman/main.cpp:580
+#: userland/apps/fileman/volume_ui.cpp:126
+msgid "Cannot read the device list."
+msgstr "无法读取设备列表。"
+
+#: userland/apps/fileman/volume_ui.cpp:113
+msgid "Cannot start the device operation."
+msgstr "无法启动设备操作。"
+
+#: userland/apps/fileman/main.cpp:627
 msgid "Choose an installed X11 executable using its absolute path"
 msgstr "请输入已安装 X11 程序的可执行文件绝对路径"
 
-#: userland/apps/fileman/main.cpp:1236
+#: userland/apps/fileman/main.cpp:1287
 msgid "Clear Marks"
 msgstr "清除标记"
+
+#: userland/apps/fileman/volume_ui.cpp:21
+msgid "Click a removable volume to mount and open it."
+msgstr "点击可移动卷以挂载并打开。"
 
 #: userland/apps/fileman/operations.c:266
 msgid "Clipboard is empty"
 msgstr "剪贴板为空"
 
-#: userland/apps/fileman/main.cpp:528
+#: userland/apps/fileman/main.cpp:575
 msgid "Close"
 msgstr "关闭"
 
-#: userland/apps/fileman/main.cpp:1243
+#: userland/apps/fileman/main.cpp:1294
 msgid "Compress to .tar"
 msgstr "压缩为tar"
 
@@ -122,7 +142,7 @@ msgstr "正在压缩为tar..."
 msgid "Compression canceled"
 msgstr "已取消压缩"
 
-#: userland/apps/fileman/main.cpp:1230
+#: userland/apps/fileman/main.cpp:1281
 msgid "Copy"
 msgstr "复制"
 
@@ -130,7 +150,7 @@ msgstr "复制"
 msgid "Copy complete"
 msgstr "复制完成"
 
-#: userland/apps/fileman/main.cpp:1269
+#: userland/apps/fileman/main.cpp:1320
 msgid "Copy selected items (Ctrl+C)"
 msgstr "复制所选项目（Ctrl+C）"
 
@@ -142,11 +162,11 @@ msgstr "正在复制文件..."
 msgid "Could not decode image"
 msgstr "无法解码图像"
 
-#: userland/apps/fileman/main.cpp:1024
+#: userland/apps/fileman/main.cpp:100
 msgid "Could not open the requested path"
 msgstr "无法打开指定路径"
 
-#: userland/apps/fileman/main.cpp:813
+#: userland/apps/fileman/main.cpp:860
 msgid "Could not open the search result"
 msgstr "无法打开搜索结果"
 
@@ -154,11 +174,11 @@ msgstr "无法打开搜索结果"
 msgid "Could not save file manager settings "
 msgstr "无法保存文件资源管理器设置 "
 
-#: userland/apps/fileman/main.cpp:588
+#: userland/apps/fileman/main.cpp:635
 msgid "Could not save the file association"
 msgstr "无法保存文件关联"
 
-#: userland/apps/fileman/main.cpp:749
+#: userland/apps/fileman/main.cpp:796
 msgid "Could not start search"
 msgstr "无法开始搜索"
 
@@ -166,31 +186,31 @@ msgstr "无法开始搜索"
 msgid "Create Shortcut"
 msgstr "创建快捷方式"
 
-#: userland/apps/fileman/main.cpp:1266
+#: userland/apps/fileman/main.cpp:1317
 msgid "Create a folder in the current location"
 msgstr "在当前位置新建文件夹"
 
-#: userland/apps/fltk_support.h:57
+#: userland/apps/fltk_support.h:37
 msgid "Create a new directory"
 msgstr "创建新目录"
 
-#: userland/apps/fltk_support.h:50
+#: userland/apps/fltk_support.h:30
 msgid "Custom Filter"
 msgstr "自定义筛选器"
 
-#: userland/apps/fileman/main.cpp:1231
+#: userland/apps/fileman/main.cpp:1282
 msgid "Cut"
 msgstr "剪切"
 
-#: userland/apps/fileman/main.cpp:573
+#: userland/apps/fileman/main.cpp:620
 msgid "Default Program"
 msgstr "默认程序"
 
-#: userland/apps/fileman/main.cpp:1224
+#: userland/apps/fileman/main.cpp:1275
 msgid "Default Program..."
 msgstr "默认程序..."
 
-#: userland/apps/fileman/main.cpp:592
+#: userland/apps/fileman/main.cpp:639
 msgid "Default application saved"
 msgstr "已保存默认程序"
 
@@ -198,7 +218,7 @@ msgstr "已保存默认程序"
 msgid "Default program is for files"
 msgstr "默认程序仅用于文件"
 
-#: userland/apps/fileman/main.cpp:1229
+#: userland/apps/fileman/main.cpp:1280
 msgid "Delete"
 msgstr "删除"
 
@@ -206,7 +226,7 @@ msgstr "删除"
 msgid "Delete canceled"
 msgstr "已取消删除"
 
-#: userland/apps/fileman/main.cpp:1273
+#: userland/apps/fileman/main.cpp:1324
 msgid "Delete selected items after confirmation"
 msgstr "确认后删除所选项目"
 
@@ -218,35 +238,51 @@ msgstr "正在删除项目..."
 msgid "Desktop folder unavailable"
 msgstr "桌面文件夹不可用"
 
-#: userland/apps/fileman/main.cpp:1226
+#: userland/apps/fileman/main.cpp:1277
 msgid "Details"
 msgstr "详细信息"
 
-#: userland/apps/fileman/main.cpp:972
+#: userland/apps/fileman/main.cpp:1019
 msgid "Device"
 msgstr "设备"
 
-#: userland/apps/fileman/main.cpp:1299
+#: userland/apps/fileman/volume_ui.cpp:180
+msgid "Device is busy. Close files and terminals on it, then try again."
+msgstr "设备正被占用。请关闭其中的文件和终端后重试。"
+
+#: userland/apps/fileman/volume_ui.cpp:178
+msgid "Device mounted."
+msgstr "设备已挂载。"
+
+#: userland/apps/fileman/volume_ui.cpp:12
+msgid "Devices"
+msgstr "设备"
+
+#: userland/apps/fileman/main.cpp:1350
 msgid "Double-click a folder to expand or collapse its tree"
 msgstr "双击文件夹展开或折叠目录树"
 
-#: userland/apps/fileman/main.cpp:1307
+#: userland/apps/fileman/main.cpp:1360
 msgid "Double-click to open. Ctrl/Shift selects multiple items."
 msgstr "双击打开，按 Ctrl 或 Shift 可多选。"
 
-#: userland/apps/fileman/main.cpp:1230
+#: userland/apps/fileman/main.cpp:1281
 msgid "Edit"
 msgstr "编辑"
+
+#: userland/apps/fileman/volume_ui.cpp:24
+msgid "Eject"
+msgstr "弹出"
 
 #: userland/apps/fileman/model.c:734
 msgid "Elevated - items "
 msgstr "已提权 - 项目 "
 
-#: userland/apps/fileman/main.cpp:1256
+#: userland/apps/fileman/main.cpp:1307
 msgid "Enter a folder path, then press Enter (Ctrl+L)"
 msgstr "输入文件夹路径后按 Enter（Ctrl+L）"
 
-#: userland/apps/fileman/main.cpp:733
+#: userland/apps/fileman/main.cpp:780
 msgid "Enter part of a file or folder name."
 msgstr "请输入文件或文件夹名称的一部分。"
 
@@ -262,11 +298,11 @@ msgstr "正在解压tar..."
 msgid "Extraction canceled"
 msgstr "已取消解压"
 
-#: userland/apps/fltk_support.h:52
+#: userland/apps/fltk_support.h:32
 msgid "Favorites"
 msgstr "收藏夹"
 
-#: userland/apps/fileman/main.cpp:974
+#: userland/apps/fileman/main.cpp:1021
 msgid "File"
 msgstr "文件"
 
@@ -274,11 +310,11 @@ msgstr "文件"
 msgid "File Conflict"
 msgstr "文件冲突"
 
-#: userland/apps/fileman/main.cpp:853
+#: userland/apps/fileman/main.cpp:900
 msgid "File Manager"
 msgstr "文件资源管理器"
 
-#: userland/apps/fileman/main.cpp:434
+#: userland/apps/fileman/main.cpp:481
 msgid "File Manager Settings"
 msgstr "文件资源管理器设置"
 
@@ -286,15 +322,15 @@ msgstr "文件资源管理器设置"
 msgid "File Manager settings saved"
 msgstr "文件资源管理器设置已保存"
 
-#: userland/apps/fltk_support.h:54
+#: userland/apps/fltk_support.h:34
 msgid "File Systems"
 msgstr "文件系统"
 
-#: userland/apps/fileman/main.cpp:768
+#: userland/apps/fileman/main.cpp:815
 msgid "File name:"
 msgstr "文件名："
 
-#: userland/apps/fileman/main.cpp:971
+#: userland/apps/fileman/main.cpp:1018
 msgid "Folder"
 msgstr "文件夹"
 
@@ -314,19 +350,19 @@ msgstr "文件夹名称为空"
 msgid "Folder name:"
 msgstr "文件夹名称:"
 
-#: userland/apps/fileman/main.cpp:1286
+#: userland/apps/fileman/main.cpp:1337
 msgid "Folders"
 msgstr "文件夹"
 
-#: userland/apps/fileman/main.cpp:520
+#: userland/apps/fileman/main.cpp:567
 msgid "GID"
 msgstr "组 ID"
 
-#: userland/apps/fileman/main.cpp:777
+#: userland/apps/fileman/main.cpp:824
 msgid "Ignore English letter case"
 msgstr "忽略英文字母大小写"
 
-#: userland/apps/fileman/main.cpp:775
+#: userland/apps/fileman/main.cpp:822
 msgid "Include subfolders"
 msgstr "包含子文件夹"
 
@@ -334,7 +370,7 @@ msgstr "包含子文件夹"
 msgid "Input is too long"
 msgstr "输入内容过长"
 
-#: userland/apps/fileman/main.cpp:371
+#: userland/apps/fileman/main.cpp:418
 msgid "Input is too long; the value was not changed."
 msgstr "输入内容过长，原值未更改。"
 
@@ -350,7 +386,7 @@ msgstr "文件名无效或路径过长"
 msgid "Invalid folder name or path too long"
 msgstr "文件夹名称无效或路径过长"
 
-#: userland/apps/fileman/main.cpp:551
+#: userland/apps/fileman/main.cpp:598
 msgid "Invalid mode, UID or GID"
 msgstr "权限、用户 ID 或组 ID 无效"
 
@@ -362,7 +398,7 @@ msgstr "已标记项目"
 msgid "Item unmarked"
 msgstr "已取消标记项目"
 
-#: userland/apps/fileman/main.cpp:874
+#: userland/apps/fileman/main.cpp:921
 msgid "Items "
 msgstr "项目 "
 
@@ -382,15 +418,19 @@ msgstr "已删除所选项目"
 msgid "Launch failed "
 msgstr "启动失败 "
 
-#: userland/apps/fltk_support.h:55
+#: userland/apps/fileman/volume_ui.cpp:20
+msgid "Looking for devices..."
+msgstr "正在查找设备…"
+
+#: userland/apps/fltk_support.h:35
 msgid "Manage Favorites"
 msgstr "管理收藏夹"
 
-#: userland/apps/fileman/main.cpp:1235
+#: userland/apps/fileman/main.cpp:1286
 msgid "Mark All"
 msgstr "标记全部"
 
-#: userland/apps/fileman/main.cpp:1234
+#: userland/apps/fileman/main.cpp:1285
 msgid "Mark for Batch"
 msgstr "标记为批量操作"
 
@@ -398,19 +438,23 @@ msgstr "标记为批量操作"
 msgid "Marks cleared"
 msgstr "已清除标记"
 
-#: userland/apps/fileman/main.cpp:781
+#: userland/apps/fileman/main.cpp:828
 msgid "Matches part of a file or folder name."
 msgstr "按文件或文件夹名称的一部分匹配。"
 
-#: userland/apps/fileman/main.cpp:509
+#: userland/apps/fileman/main.cpp:556
 msgid "Mode (octal)"
 msgstr "权限（八进制）"
+
+#: userland/apps/fileman/volume_ui.cpp:117
+msgid "Mounting device..."
+msgstr "正在挂载设备…"
 
 #: userland/apps/fileman/operations.c:345
 msgid "Move complete"
 msgstr "移动完成"
 
-#: userland/apps/fileman/main.cpp:1270
+#: userland/apps/fileman/main.cpp:1321
 msgid "Move selected items using Cut and Paste (Ctrl+X)"
 msgstr "通过剪切和粘贴移动所选项目（Ctrl+X）"
 
@@ -418,11 +462,11 @@ msgstr "通过剪切和粘贴移动所选项目（Ctrl+X）"
 msgid "Moving files..."
 msgstr "正在移动文件..."
 
-#: userland/apps/fileman/main.cpp:499
+#: userland/apps/fileman/main.cpp:546
 msgid "Name"
 msgstr "名称"
 
-#: userland/apps/fltk_support.h:56
+#: userland/apps/fltk_support.h:36
 msgid "New Directory?"
 msgstr "新建目录？"
 
@@ -442,35 +486,43 @@ msgstr "新名称为空"
 msgid "New name:"
 msgstr "新名称:"
 
-#: userland/apps/fileman/main.cpp:387
+#: userland/apps/fileman/main.cpp:434
 msgid "No"
 msgstr "否"
 
-#: userland/apps/fileman/main.cpp:645
+#: userland/apps/fileman/main.cpp:692
 msgid "No matches found"
 msgstr "未找到匹配项"
 
-#: userland/apps/fileman/main.cpp:358
+#: userland/apps/fileman/volume_ui.cpp:142
+msgid "No removable devices"
+msgstr "没有可移动设备"
+
+#: userland/apps/fileman/volume_ui.cpp:79
+msgid "Not mounted"
+msgstr "尚未挂载"
+
+#: userland/apps/fileman/main.cpp:405
 msgid "OK"
 msgstr "确定"
 
-#: userland/apps/fileman/main.cpp:790
+#: userland/apps/fileman/main.cpp:837
 msgid "Open"
 msgstr "打开"
 
-#: userland/apps/fileman/main.cpp:793
+#: userland/apps/fileman/main.cpp:840
 msgid "Open Containing Folder"
 msgstr "打开所在文件夹"
 
-#: userland/apps/fileman/main.cpp:573
+#: userland/apps/fileman/main.cpp:620
 msgid "Open With"
 msgstr "打开方式"
 
-#: userland/apps/fileman/main.cpp:576
+#: userland/apps/fileman/main.cpp:623
 msgid "Open With canceled"
 msgstr "已取消打开方式"
 
-#: userland/apps/fileman/main.cpp:598
+#: userland/apps/fileman/main.cpp:645
 msgid "Open With failed"
 msgstr "使用指定程序打开失败"
 
@@ -478,27 +530,27 @@ msgstr "使用指定程序打开失败"
 msgid "Open With is for files"
 msgstr "打开方式仅用于文件"
 
-#: userland/apps/fileman/main.cpp:1223
+#: userland/apps/fileman/main.cpp:1274
 msgid "Open With..."
 msgstr "打开方式..."
 
-#: userland/apps/fileman/main.cpp:1267
+#: userland/apps/fileman/main.cpp:1318
 msgid "Open the selected item (Enter)"
 msgstr "打开所选项目（Enter）"
 
-#: userland/apps/fileman/main.cpp:1232
+#: userland/apps/fileman/main.cpp:1283
 msgid "Paste"
 msgstr "粘贴"
 
-#: userland/apps/fileman/main.cpp:1271
+#: userland/apps/fileman/main.cpp:1322
 msgid "Paste into the current folder (Ctrl+V)"
 msgstr "粘贴到当前文件夹（Ctrl+V）"
 
-#: userland/apps/fileman/main.cpp:501
+#: userland/apps/fileman/main.cpp:548
 msgid "Path"
 msgstr "路径"
 
-#: userland/apps/fileman/main.cpp:1020
+#: userland/apps/fileman/main.cpp:1067
 msgid "Path is too long"
 msgstr "路径过长"
 
@@ -510,7 +562,7 @@ msgstr "路径过长"
 msgid "Permanently delete the selected items and all folder contents? This cannot be undone."
 msgstr "永久删除所选项目及文件夹中的全部内容？此操作无法撤销。"
 
-#: userland/apps/fileman/main.cpp:526
+#: userland/apps/fileman/main.cpp:573
 msgid "Permission changes use the current user's access rights."
 msgstr "修改权限时使用当前用户的访问权限。"
 
@@ -518,7 +570,7 @@ msgstr "修改权限时使用当前用户的访问权限。"
 msgid "Permission denied; administrator access requires a terminal in X11"
 msgstr "权限不足；在 X11 环境中需要通过终端获取管理员权限"
 
-#: userland/apps/fileman/main.cpp:562
+#: userland/apps/fileman/main.cpp:609
 msgid "Permissions saved"
 msgstr "权限已保存"
 
@@ -526,35 +578,39 @@ msgstr "权限已保存"
 msgid "Place shortcut on Desktop? No creates it here."
 msgstr "是否放到桌面？选择“否”则放在当前目录。"
 
-#: userland/apps/fltk_support.h:51
+#: userland/apps/fltk_support.h:31
 msgid "Please choose an existing file!"
 msgstr "请选择已存在的文件！"
 
-#: userland/apps/fltk_support.h:58
+#: userland/apps/fileman/volume_ui.cpp:117
+msgid "Preparing device for removal..."
+msgstr "正在准备移除设备…"
+
+#: userland/apps/fltk_support.h:38
 msgid "Preview"
 msgstr "预览"
 
-#: userland/apps/fileman/main.cpp:506
+#: userland/apps/fileman/main.cpp:553
 msgid "Properties"
 msgstr "属性"
 
-#: userland/apps/fileman/main.cpp:486
+#: userland/apps/fileman/main.cpp:533
 msgid "Properties failed"
 msgstr "属性操作失败"
 
-#: userland/apps/fileman/main.cpp:881
+#: userland/apps/fileman/main.cpp:928
 msgid "Ready"
 msgstr "就绪"
 
-#: userland/apps/fileman/main.cpp:1240
+#: userland/apps/fileman/main.cpp:1291
 msgid "Refresh"
 msgstr "刷新"
 
-#: userland/apps/fileman/main.cpp:882
+#: userland/apps/fileman/main.cpp:929
 msgid "Refresh (F5)"
 msgstr "刷新（F5）"
 
-#: userland/apps/fileman/main.cpp:584
+#: userland/apps/fileman/main.cpp:631
 msgid "Remember this application for files with the same extension?"
 msgstr "将此程序设为相同扩展名文件的默认打开程序？"
 
@@ -570,7 +626,7 @@ msgstr "重命名冲突"
 msgid "Rename canceled"
 msgstr "已取消重命名"
 
-#: userland/apps/fileman/main.cpp:1272
+#: userland/apps/fileman/main.cpp:1323
 msgid "Rename the selected item (F2)"
 msgstr "重命名所选项目（F2）"
 
@@ -582,51 +638,51 @@ msgstr "已重命名"
 msgid "Renamed (elevated)"
 msgstr "已重命名（已提权）"
 
-#: userland/apps/fileman/main.cpp:1239
+#: userland/apps/fileman/main.cpp:1290
 msgid "Root"
 msgstr "根目录"
 
-#: userland/apps/fileman/main.cpp:438
+#: userland/apps/fileman/main.cpp:485
 msgid "Save"
 msgstr "保存"
 
-#: userland/apps/fileman/main.cpp:773
+#: userland/apps/fileman/main.cpp:820
 msgid "Search"
 msgstr "搜索"
 
-#: userland/apps/fileman/main.cpp:761
+#: userland/apps/fileman/main.cpp:808
 msgid "Search Files"
 msgstr "搜索文件"
 
-#: userland/apps/fileman/main.cpp:1233
+#: userland/apps/fileman/main.cpp:1284
 msgid "Search Files..."
 msgstr "搜索文件…"
 
-#: userland/apps/fileman/main.cpp:645
+#: userland/apps/fileman/main.cpp:692
 msgid "Search complete"
 msgstr "搜索完成"
 
-#: userland/apps/fileman/main.cpp:644
+#: userland/apps/fileman/main.cpp:691
 msgid "Search complete (partial)"
 msgstr "搜索完成（部分）"
 
-#: userland/apps/fileman/main.cpp:764
+#: userland/apps/fileman/main.cpp:811
 msgid "Search in:"
 msgstr "搜索目录："
 
-#: userland/apps/fileman/main.cpp:642
+#: userland/apps/fileman/main.cpp:689
 msgid "Search stopped"
 msgstr "搜索已停止"
 
-#: userland/apps/fileman/main.cpp:643
+#: userland/apps/fileman/main.cpp:690
 msgid "Search stopped at limit"
 msgstr "已达上限，搜索已停止"
 
-#: userland/apps/fileman/main.cpp:1259
+#: userland/apps/fileman/main.cpp:1310
 msgid "Search this folder and subfolders (Ctrl+F)"
 msgstr "搜索当前文件夹及子文件夹（Ctrl+F）"
 
-#: userland/apps/fileman/main.cpp:641
+#: userland/apps/fileman/main.cpp:688
 msgid "Searching"
 msgstr "正在搜索"
 
@@ -642,11 +698,11 @@ msgstr "请选择一个tar文件"
 msgid "Select an item"
 msgstr "请选择一个项目"
 
-#: userland/apps/fileman/main.cpp:1241
+#: userland/apps/fileman/main.cpp:1292
 msgid "Settings..."
 msgstr "设置..."
 
-#: userland/apps/fileman/main.cpp:974
+#: userland/apps/fileman/main.cpp:1021
 msgid "Shortcut"
 msgstr "快捷方式"
 
@@ -654,23 +710,23 @@ msgstr "快捷方式"
 msgid "Shortcut created"
 msgstr "快捷方式已创建"
 
-#: userland/apps/fileman/main.cpp:436
+#: userland/apps/fileman/main.cpp:483
 msgid "Show files and folders starting with a dot"
 msgstr "显示名称以点开头的文件和文件夹"
 
-#: userland/apps/fileman/main.cpp:779
+#: userland/apps/fileman/main.cpp:826
 msgid "Show hidden files"
 msgstr "显示隐藏文件"
 
-#: userland/apps/fltk_support.h:60
+#: userland/apps/fltk_support.h:40
 msgid "Show:"
 msgstr "显示："
 
-#: userland/apps/fileman/main.cpp:502
+#: userland/apps/fileman/main.cpp:549
 msgid "Size"
 msgstr "大小"
 
-#: userland/apps/fileman/main.cpp:796
+#: userland/apps/fileman/main.cpp:843
 msgid "Stop"
 msgstr "停止"
 
@@ -702,15 +758,23 @@ msgstr "目标已存在，是否替换？"
 msgid "The destination exists. Replace it? Choose No to save with another name."
 msgstr "目标已存在。要替换它吗？选择“否”将使用其他名称保存。"
 
+#: userland/apps/fileman/volume_ui.cpp:181
+msgid "The device changed or is unavailable. Refresh and try again."
+msgstr "设备已更换或不可用。请刷新后重试。"
+
 #: userland/apps/fileman/actions.c:320
 msgid "The extraction folder exists. Existing files may be replaced. Continue?"
 msgstr "解压文件夹已存在，现有文件可能被替换，是否继续？"
 
-#: userland/apps/fileman/main.cpp:500
+#: userland/apps/fileman/volume_ui.cpp:183
+msgid "This filesystem is not supported."
+msgstr "不支持此文件系统。"
+
+#: userland/apps/fileman/main.cpp:547
 msgid "Type"
 msgstr "类型"
 
-#: userland/apps/fileman/main.cpp:515
+#: userland/apps/fileman/main.cpp:562
 msgid "UID"
 msgstr "用户 ID"
 
@@ -718,29 +782,41 @@ msgstr "用户 ID"
 msgid "Unmark"
 msgstr "取消标记"
 
-#: userland/apps/fileman/main.cpp:1238
+#: userland/apps/fileman/volume_ui.cpp:26
+msgid "Unmount every volume on this device before unplugging it."
+msgstr "拔出前卸载此设备上的所有卷。"
+
+#: userland/apps/fileman/main.cpp:1289
 msgid "Up"
 msgstr "上级"
 
-#: userland/apps/fileman/main.cpp:1248
+#: userland/apps/fileman/main.cpp:1299
 msgid "Up one folder (Alt+Up)"
 msgstr "返回上一级文件夹（Alt+Up）"
 
-#: userland/apps/fileman/main.cpp:1238
+#: userland/apps/fileman/main.cpp:1289
 msgid "View"
 msgstr "查看"
 
-#: userland/apps/fileman/main.cpp:1268
+#: userland/apps/fileman/main.cpp:1319
 msgid "View properties and permissions"
 msgstr "查看属性和权限"
 
-#: userland/apps/fileman/main.cpp:574
+#: userland/apps/fileman/main.cpp:127
+msgid "Wait for the device operation to finish before closing this window."
+msgstr "请等待设备操作完成后再关闭窗口。"
+
+#: userland/apps/fileman/main.cpp:621
 msgid "X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"
 msgstr "X11 程序路径（NEdit：/usr/bin/nedit，Dillo：/usr/bin/dillo）："
 
-#: userland/apps/fileman/main.cpp:386
+#: userland/apps/fileman/main.cpp:433
 msgid "Yes"
 msgstr "是"
+
+#: userland/apps/fileman/volume_ui.cpp:178
+msgid "You can safely unplug the device."
+msgstr "现在可以安全拔出设备。"
 
 #: userland/apps/fileman/operations.c:390
 msgid "failed"

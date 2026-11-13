@@ -22,27 +22,31 @@ msgstr ""
 msgid " item(s) completed; "
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:647
+#: userland/apps/fileman/main.cpp:694
 msgid "%s — %lu checked, %u matches, %lu skipped"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:898
+#: userland/apps/fileman/main.cpp:945
 msgid "%u items, %u selected"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1242
+#: userland/apps/fileman/main.cpp:1293
 msgid "About"
 msgstr ""
 
-#: userland/apps/fltk_support.h:48
+#: userland/apps/fltk_support.h:28
 msgid "Add to Favorites"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1251
+#: userland/apps/fileman/main.cpp:1302
 msgid "Address"
 msgstr ""
 
-#: userland/apps/fltk_support.h:49
+#: userland/apps/fileman/volume_ui.cpp:184
+msgid "Administrator permission is required for this device operation."
+msgstr ""
+
+#: userland/apps/fltk_support.h:29
 msgid "All Files (*)"
 msgstr ""
 
@@ -50,15 +54,15 @@ msgstr ""
 msgid "All items marked"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:973
+#: userland/apps/fileman/main.cpp:1020
 msgid "Application"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:599
+#: userland/apps/fileman/main.cpp:646
 msgid "Application launched"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1243
+#: userland/apps/fileman/main.cpp:1294
 msgid "Archive"
 msgstr ""
 
@@ -66,19 +70,23 @@ msgstr ""
 msgid "Archive Conflict"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:881
+#: userland/apps/fileman/volume_ui.cpp:182
+msgid "Authentication was cancelled or the device operation failed."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:928
 msgid "Automatic refresh unavailable; press F5"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:883
+#: userland/apps/fileman/main.cpp:930
 msgid "Automatic refresh unavailable; refresh manually (F5)"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:854
+#: userland/apps/fileman/main.cpp:901
 msgid "Browse files, manage folders and launch X11 applications."
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:359
+#: userland/apps/fileman/main.cpp:406
 msgid "Cancel"
 msgstr ""
 
@@ -86,23 +94,35 @@ msgstr ""
 msgid "Cannot create extraction folder"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:580
+#: userland/apps/fileman/volume_ui.cpp:126
+msgid "Cannot read the device list."
+msgstr ""
+
+#: userland/apps/fileman/volume_ui.cpp:113
+msgid "Cannot start the device operation."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:627
 msgid "Choose an installed X11 executable using its absolute path"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1236
+#: userland/apps/fileman/main.cpp:1287
 msgid "Clear Marks"
+msgstr ""
+
+#: userland/apps/fileman/volume_ui.cpp:21
+msgid "Click a removable volume to mount and open it."
 msgstr ""
 
 #: userland/apps/fileman/operations.c:266
 msgid "Clipboard is empty"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:528
+#: userland/apps/fileman/main.cpp:575
 msgid "Close"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1243
+#: userland/apps/fileman/main.cpp:1294
 msgid "Compress to .tar"
 msgstr ""
 
@@ -114,7 +134,7 @@ msgstr ""
 msgid "Compression canceled"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1230
+#: userland/apps/fileman/main.cpp:1281
 msgid "Copy"
 msgstr ""
 
@@ -122,7 +142,7 @@ msgstr ""
 msgid "Copy complete"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1269
+#: userland/apps/fileman/main.cpp:1320
 msgid "Copy selected items (Ctrl+C)"
 msgstr ""
 
@@ -134,11 +154,11 @@ msgstr ""
 msgid "Could not decode image"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1024
+#: userland/apps/fileman/main.cpp:100
 msgid "Could not open the requested path"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:813
+#: userland/apps/fileman/main.cpp:860
 msgid "Could not open the search result"
 msgstr ""
 
@@ -146,11 +166,11 @@ msgstr ""
 msgid "Could not save file manager settings "
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:588
+#: userland/apps/fileman/main.cpp:635
 msgid "Could not save the file association"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:749
+#: userland/apps/fileman/main.cpp:796
 msgid "Could not start search"
 msgstr ""
 
@@ -158,31 +178,31 @@ msgstr ""
 msgid "Create Shortcut"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1266
+#: userland/apps/fileman/main.cpp:1317
 msgid "Create a folder in the current location"
 msgstr ""
 
-#: userland/apps/fltk_support.h:57
+#: userland/apps/fltk_support.h:37
 msgid "Create a new directory"
 msgstr ""
 
-#: userland/apps/fltk_support.h:50
+#: userland/apps/fltk_support.h:30
 msgid "Custom Filter"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1231
+#: userland/apps/fileman/main.cpp:1282
 msgid "Cut"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:573
+#: userland/apps/fileman/main.cpp:620
 msgid "Default Program"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1224
+#: userland/apps/fileman/main.cpp:1275
 msgid "Default Program..."
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:592
+#: userland/apps/fileman/main.cpp:639
 msgid "Default application saved"
 msgstr ""
 
@@ -190,7 +210,7 @@ msgstr ""
 msgid "Default program is for files"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1229
+#: userland/apps/fileman/main.cpp:1280
 msgid "Delete"
 msgstr ""
 
@@ -198,7 +218,7 @@ msgstr ""
 msgid "Delete canceled"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1273
+#: userland/apps/fileman/main.cpp:1324
 msgid "Delete selected items after confirmation"
 msgstr ""
 
@@ -210,35 +230,51 @@ msgstr ""
 msgid "Desktop folder unavailable"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1226
+#: userland/apps/fileman/main.cpp:1277
 msgid "Details"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:972
+#: userland/apps/fileman/main.cpp:1019
 msgid "Device"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1299
+#: userland/apps/fileman/volume_ui.cpp:180
+msgid "Device is busy. Close files and terminals on it, then try again."
+msgstr ""
+
+#: userland/apps/fileman/volume_ui.cpp:178
+msgid "Device mounted."
+msgstr ""
+
+#: userland/apps/fileman/volume_ui.cpp:12
+msgid "Devices"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1350
 msgid "Double-click a folder to expand or collapse its tree"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1307
+#: userland/apps/fileman/main.cpp:1360
 msgid "Double-click to open. Ctrl/Shift selects multiple items."
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1230
+#: userland/apps/fileman/main.cpp:1281
 msgid "Edit"
+msgstr ""
+
+#: userland/apps/fileman/volume_ui.cpp:24
+msgid "Eject"
 msgstr ""
 
 #: userland/apps/fileman/model.c:734
 msgid "Elevated - items "
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1256
+#: userland/apps/fileman/main.cpp:1307
 msgid "Enter a folder path, then press Enter (Ctrl+L)"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:733
+#: userland/apps/fileman/main.cpp:780
 msgid "Enter part of a file or folder name."
 msgstr ""
 
@@ -254,11 +290,11 @@ msgstr ""
 msgid "Extraction canceled"
 msgstr ""
 
-#: userland/apps/fltk_support.h:52
+#: userland/apps/fltk_support.h:32
 msgid "Favorites"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:974
+#: userland/apps/fileman/main.cpp:1021
 msgid "File"
 msgstr ""
 
@@ -266,11 +302,11 @@ msgstr ""
 msgid "File Conflict"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:853
+#: userland/apps/fileman/main.cpp:900
 msgid "File Manager"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:434
+#: userland/apps/fileman/main.cpp:481
 msgid "File Manager Settings"
 msgstr ""
 
@@ -278,15 +314,15 @@ msgstr ""
 msgid "File Manager settings saved"
 msgstr ""
 
-#: userland/apps/fltk_support.h:54
+#: userland/apps/fltk_support.h:34
 msgid "File Systems"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:768
+#: userland/apps/fileman/main.cpp:815
 msgid "File name:"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:971
+#: userland/apps/fileman/main.cpp:1018
 msgid "Folder"
 msgstr ""
 
@@ -306,19 +342,19 @@ msgstr ""
 msgid "Folder name:"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1286
+#: userland/apps/fileman/main.cpp:1337
 msgid "Folders"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:520
+#: userland/apps/fileman/main.cpp:567
 msgid "GID"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:777
+#: userland/apps/fileman/main.cpp:824
 msgid "Ignore English letter case"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:775
+#: userland/apps/fileman/main.cpp:822
 msgid "Include subfolders"
 msgstr ""
 
@@ -326,7 +362,7 @@ msgstr ""
 msgid "Input is too long"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:371
+#: userland/apps/fileman/main.cpp:418
 msgid "Input is too long; the value was not changed."
 msgstr ""
 
@@ -342,7 +378,7 @@ msgstr ""
 msgid "Invalid folder name or path too long"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:551
+#: userland/apps/fileman/main.cpp:598
 msgid "Invalid mode, UID or GID"
 msgstr ""
 
@@ -354,7 +390,7 @@ msgstr ""
 msgid "Item unmarked"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:874
+#: userland/apps/fileman/main.cpp:921
 msgid "Items "
 msgstr ""
 
@@ -374,15 +410,19 @@ msgstr ""
 msgid "Launch failed "
 msgstr ""
 
-#: userland/apps/fltk_support.h:55
+#: userland/apps/fileman/volume_ui.cpp:20
+msgid "Looking for devices..."
+msgstr ""
+
+#: userland/apps/fltk_support.h:35
 msgid "Manage Favorites"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1235
+#: userland/apps/fileman/main.cpp:1286
 msgid "Mark All"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1234
+#: userland/apps/fileman/main.cpp:1285
 msgid "Mark for Batch"
 msgstr ""
 
@@ -390,19 +430,23 @@ msgstr ""
 msgid "Marks cleared"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:781
+#: userland/apps/fileman/main.cpp:828
 msgid "Matches part of a file or folder name."
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:509
+#: userland/apps/fileman/main.cpp:556
 msgid "Mode (octal)"
+msgstr ""
+
+#: userland/apps/fileman/volume_ui.cpp:117
+msgid "Mounting device..."
 msgstr ""
 
 #: userland/apps/fileman/operations.c:345
 msgid "Move complete"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1270
+#: userland/apps/fileman/main.cpp:1321
 msgid "Move selected items using Cut and Paste (Ctrl+X)"
 msgstr ""
 
@@ -410,11 +454,11 @@ msgstr ""
 msgid "Moving files..."
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:499
+#: userland/apps/fileman/main.cpp:546
 msgid "Name"
 msgstr ""
 
-#: userland/apps/fltk_support.h:56
+#: userland/apps/fltk_support.h:36
 msgid "New Directory?"
 msgstr ""
 
@@ -434,35 +478,43 @@ msgstr ""
 msgid "New name:"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:387
+#: userland/apps/fileman/main.cpp:434
 msgid "No"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:645
+#: userland/apps/fileman/main.cpp:692
 msgid "No matches found"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:358
+#: userland/apps/fileman/volume_ui.cpp:142
+msgid "No removable devices"
+msgstr ""
+
+#: userland/apps/fileman/volume_ui.cpp:79
+msgid "Not mounted"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:405
 msgid "OK"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:790
+#: userland/apps/fileman/main.cpp:837
 msgid "Open"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:793
+#: userland/apps/fileman/main.cpp:840
 msgid "Open Containing Folder"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:573
+#: userland/apps/fileman/main.cpp:620
 msgid "Open With"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:576
+#: userland/apps/fileman/main.cpp:623
 msgid "Open With canceled"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:598
+#: userland/apps/fileman/main.cpp:645
 msgid "Open With failed"
 msgstr ""
 
@@ -470,27 +522,27 @@ msgstr ""
 msgid "Open With is for files"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1223
+#: userland/apps/fileman/main.cpp:1274
 msgid "Open With..."
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1267
+#: userland/apps/fileman/main.cpp:1318
 msgid "Open the selected item (Enter)"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1232
+#: userland/apps/fileman/main.cpp:1283
 msgid "Paste"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1271
+#: userland/apps/fileman/main.cpp:1322
 msgid "Paste into the current folder (Ctrl+V)"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:501
+#: userland/apps/fileman/main.cpp:548
 msgid "Path"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1020
+#: userland/apps/fileman/main.cpp:1067
 msgid "Path is too long"
 msgstr ""
 
@@ -502,7 +554,7 @@ msgstr ""
 msgid "Permanently delete the selected items and all folder contents? This cannot be undone."
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:526
+#: userland/apps/fileman/main.cpp:573
 msgid "Permission changes use the current user's access rights."
 msgstr ""
 
@@ -510,7 +562,7 @@ msgstr ""
 msgid "Permission denied; administrator access requires a terminal in X11"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:562
+#: userland/apps/fileman/main.cpp:609
 msgid "Permissions saved"
 msgstr ""
 
@@ -518,35 +570,39 @@ msgstr ""
 msgid "Place shortcut on Desktop? No creates it here."
 msgstr ""
 
-#: userland/apps/fltk_support.h:51
+#: userland/apps/fltk_support.h:31
 msgid "Please choose an existing file!"
 msgstr ""
 
-#: userland/apps/fltk_support.h:58
+#: userland/apps/fileman/volume_ui.cpp:117
+msgid "Preparing device for removal..."
+msgstr ""
+
+#: userland/apps/fltk_support.h:38
 msgid "Preview"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:506
+#: userland/apps/fileman/main.cpp:553
 msgid "Properties"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:486
+#: userland/apps/fileman/main.cpp:533
 msgid "Properties failed"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:881
+#: userland/apps/fileman/main.cpp:928
 msgid "Ready"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1240
+#: userland/apps/fileman/main.cpp:1291
 msgid "Refresh"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:882
+#: userland/apps/fileman/main.cpp:929
 msgid "Refresh (F5)"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:584
+#: userland/apps/fileman/main.cpp:631
 msgid "Remember this application for files with the same extension?"
 msgstr ""
 
@@ -562,7 +618,7 @@ msgstr ""
 msgid "Rename canceled"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1272
+#: userland/apps/fileman/main.cpp:1323
 msgid "Rename the selected item (F2)"
 msgstr ""
 
@@ -574,51 +630,51 @@ msgstr ""
 msgid "Renamed (elevated)"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1239
+#: userland/apps/fileman/main.cpp:1290
 msgid "Root"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:438
+#: userland/apps/fileman/main.cpp:485
 msgid "Save"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:773
+#: userland/apps/fileman/main.cpp:820
 msgid "Search"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:761
+#: userland/apps/fileman/main.cpp:808
 msgid "Search Files"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1233
+#: userland/apps/fileman/main.cpp:1284
 msgid "Search Files..."
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:645
+#: userland/apps/fileman/main.cpp:692
 msgid "Search complete"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:644
+#: userland/apps/fileman/main.cpp:691
 msgid "Search complete (partial)"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:764
+#: userland/apps/fileman/main.cpp:811
 msgid "Search in:"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:642
+#: userland/apps/fileman/main.cpp:689
 msgid "Search stopped"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:643
+#: userland/apps/fileman/main.cpp:690
 msgid "Search stopped at limit"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1259
+#: userland/apps/fileman/main.cpp:1310
 msgid "Search this folder and subfolders (Ctrl+F)"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:641
+#: userland/apps/fileman/main.cpp:688
 msgid "Searching"
 msgstr ""
 
@@ -634,11 +690,11 @@ msgstr ""
 msgid "Select an item"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1241
+#: userland/apps/fileman/main.cpp:1292
 msgid "Settings..."
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:974
+#: userland/apps/fileman/main.cpp:1021
 msgid "Shortcut"
 msgstr ""
 
@@ -646,23 +702,23 @@ msgstr ""
 msgid "Shortcut created"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:436
+#: userland/apps/fileman/main.cpp:483
 msgid "Show files and folders starting with a dot"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:779
+#: userland/apps/fileman/main.cpp:826
 msgid "Show hidden files"
 msgstr ""
 
-#: userland/apps/fltk_support.h:60
+#: userland/apps/fltk_support.h:40
 msgid "Show:"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:502
+#: userland/apps/fileman/main.cpp:549
 msgid "Size"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:796
+#: userland/apps/fileman/main.cpp:843
 msgid "Stop"
 msgstr ""
 
@@ -694,15 +750,23 @@ msgstr ""
 msgid "The destination exists. Replace it? Choose No to save with another name."
 msgstr ""
 
+#: userland/apps/fileman/volume_ui.cpp:181
+msgid "The device changed or is unavailable. Refresh and try again."
+msgstr ""
+
 #: userland/apps/fileman/actions.c:320
 msgid "The extraction folder exists. Existing files may be replaced. Continue?"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:500
+#: userland/apps/fileman/volume_ui.cpp:183
+msgid "This filesystem is not supported."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:547
 msgid "Type"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:515
+#: userland/apps/fileman/main.cpp:562
 msgid "UID"
 msgstr ""
 
@@ -710,28 +774,40 @@ msgstr ""
 msgid "Unmark"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1238
+#: userland/apps/fileman/volume_ui.cpp:26
+msgid "Unmount every volume on this device before unplugging it."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1289
 msgid "Up"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1248
+#: userland/apps/fileman/main.cpp:1299
 msgid "Up one folder (Alt+Up)"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1238
+#: userland/apps/fileman/main.cpp:1289
 msgid "View"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:1268
+#: userland/apps/fileman/main.cpp:1319
 msgid "View properties and permissions"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:574
+#: userland/apps/fileman/main.cpp:127
+msgid "Wait for the device operation to finish before closing this window."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:621
 msgid "X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"
 msgstr ""
 
-#: userland/apps/fileman/main.cpp:386
+#: userland/apps/fileman/main.cpp:433
 msgid "Yes"
+msgstr ""
+
+#: userland/apps/fileman/volume_ui.cpp:178
+msgid "You can safely unplug the device."
 msgstr ""
 
 #: userland/apps/fileman/operations.c:390

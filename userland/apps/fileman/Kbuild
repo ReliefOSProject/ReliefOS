@@ -1,8 +1,10 @@
 RELIEFOS_APP_NAME := fileman
-RELIEFOS_APP_OBJECTS := actions.o archive.o boundary.o elevation.o filesystem.o main.o model.o operations.o search.o selection.o state.o util.o watch.o
+RELIEFOS_APP_OBJECTS := actions.o archive.o boundary.o elevation.o filesystem.o main.o model.o operations.o search.o selection.o state.o util.o watch.o volumes.o volume_ui.o shared_reliefapk_process.o
 RELIEFOS_APP_C_OBJECTS := actions.o archive.o boundary.o elevation.o filesystem.o model.o operations.o selection.o state.o util.o watch.o
-RELIEFOS_APP_CXX_OBJECTS := main.o search.o
+RELIEFOS_APP_CXX_OBJECTS := main.o search.o volumes.o volume_ui.o shared_reliefapk_process.o
 RELIEFOS_APP_ASM_OBJECTS :=
 ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
 include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+$(obj)/shared_reliefapk_process.o: $(srctree)/userland/apps/reliefapk/process.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
 endif
