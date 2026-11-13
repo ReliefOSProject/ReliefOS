@@ -95,6 +95,9 @@ printf 'media player fixture\n' > "$work/out/userland/reliefplayer.elf"
 mkdir -p "$work/out/upstream/ffmpeg/root/usr/lib" \
     "$work/out/upstream/ffmpeg/root/usr/include/libavcodec" \
     "$work/out/upstream/ffmpeg/root/usr/share/licenses/ffmpeg"
+mkdir -p "$work/out/upstream/netsurf/root/usr/bin"
+printf 'NetSurf fixture\n' > "$work/out/upstream/netsurf/root/usr/bin/netsurf"
+chmod 755 "$work/out/upstream/netsurf/root/usr/bin/netsurf"
 for lib in avformat avcodec avutil swresample swscale; do
     printf 'codec fixture\n' > "$work/out/upstream/ffmpeg/root/usr/lib/lib$lib-reliefplayer.so.62.1.0"
     ln -s "lib$lib-reliefplayer.so.62.1.0" "$work/out/upstream/ffmpeg/root/usr/lib/lib$lib-reliefplayer.so.62"
@@ -133,7 +136,7 @@ cat > "$work/rootfs.config" <<CONFIG
 CONFIG_RPR_BASE_URL="https://example.invalid/rpr"
 CONFIG_VMDK_DEFAULT_LANG="zh_CN.UTF-8"
 CONFIG
-ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux fixture-provider ffmpeg' \
+ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux fixture-provider ffmpeg netsurf' \
 sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
     "$work/rootfs.config" "$work/metadata" "$work/stage" "$work/layout" \
     "$work/root" "$work/manifest.json" 1700000000
@@ -152,7 +155,7 @@ test -f "$xorg_root/usr/share/licenses/ffmpeg/COPYING.LGPLv2.1"
 test ! -e "$xorg_root/usr/include/libavcodec"
 grep -qx 'extensions=.mp3,.wav,.mp4' "$xorg_root/usr/lib/reliefos/apps/reliefplayer/manifest.ini"
 awk -F '\t' '$1!="reliefplayer"' "$work/metadata" > "$work/metadata-no-player"
-ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux fixture-provider ffmpeg' \
+ROOTFS_UPSTREAM_PACKAGES='sudo shadow util-linux fixture-provider ffmpeg netsurf' \
 sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
     "$work/rootfs.config" "$work/metadata-no-player" "$work/stage" "$work/layout" \
     "$work/root-no-player" "$work/no-player-manifest.json" 1700000000
@@ -243,13 +246,8 @@ test -f "$xorg_root/etc/X11/xdm/Xservers"
 test -f "$xorg_root/etc/X11/xdm/Xresources"
 test -x "$xorg_root/usr/lib/X11/xdm/Xsession"
 test -x "$xorg_root/usr/lib/X11/xdm/Xsetup_0"
-test -x "$xorg_root/usr/lib/reliefos/dillo-config-init"
-cmp "$repo_root/system/rootfs/etc/fonts/conf.d/09-reliefos-dillo-cjk.conf" "$xorg_root/etc/fonts/conf.d/09-reliefos-dillo-cjk.conf"
-test "$(stat -c %a "$xorg_root/etc/skel/.dillo")" = 700
-for name in dillorc style.css; do
-    cmp "$repo_root/system/rootfs/etc/skel/.dillo/$name" "$xorg_root/etc/skel/.dillo/$name"
-    test "$(stat -c %a "$xorg_root/etc/skel/.dillo/$name")" = 600
-done
+test -x "$xorg_root/usr/bin/netsurf"
+test ! -e "$xorg_root/usr/bin/dillo"
 test ! -e "$xorg_root/etc/reliefos/wallpaper.png"
 test -x "$xorg_root/usr/lib/reliefos/reliefos-xdm"
 test -x "$xorg_root/usr/lib/reliefos/xorg-tty-wrapper"

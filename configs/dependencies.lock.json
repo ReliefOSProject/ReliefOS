@@ -559,32 +559,6 @@
       "license_in_source": ".PKGINFO"
     },
     {
-      "id": "alpine-dillo",
-      "kind": "apk",
-      "version": "3.3.0-r2",
-      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/dillo-3.3.0-r2.apk",
-      "sha256": "96827651025531526d06b06e90ab62bf3de2e1ad7abcf4408c2a87ad96af5334",
-      "directory": "dillo-3.3.0-r2",
-      "script": "tools/build/upstream-apk.sh",
-      "target": "apk-root",
-      "feature": "xorg",
-      "note": "Alpine v3.24 community x86_64 APKINDEX license = GPL-3.0-or-later; embedded APK signature is verified by apk-tools",
-      "license_in_source": ".PKGINFO"
-    },
-    {
-      "id": "alpine-dillo-common",
-      "kind": "apk",
-      "version": "3.3.0-r2",
-      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/dillo-common-3.3.0-r2.apk",
-      "sha256": "e337bcc4b930cc08b34c3db35fb2ddffdb284a7621f9065a274ac5b594f2081c",
-      "directory": "dillo-common-3.3.0-r2",
-      "script": "tools/build/upstream-apk.sh",
-      "target": "apk-root",
-      "feature": "xorg",
-      "note": "Alpine v3.24 community x86_64 APKINDEX license = GPL-3.0-or-later; embedded APK signature is verified by apk-tools",
-      "license_in_source": ".PKGINFO"
-    },
-    {
       "id": "alpine-encodings",
       "kind": "apk",
       "version": "1.1.0-r0",
@@ -1871,6 +1845,19 @@
       "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/nedit-5.7-r4.apk",
       "sha256": "aba4ca66253696c5f3896d07236d15c655481302559fb7d977916188364fdb14",
       "directory": "nedit-5.7-r4",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Alpine v3.24 community x86_64 APKINDEX license = GPL-2.0-or-later; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-netsurf",
+      "kind": "apk",
+      "version": "3.11-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/netsurf-3.11-r1.apk",
+      "sha256": "4ea4200bb12faec841295d9e432be27c90a2c2b454ca8aa85e58507751d4c767",
+      "directory": "netsurf-3.11-r1",
       "script": "tools/build/upstream-apk.sh",
       "target": "apk-root",
       "feature": "xorg",

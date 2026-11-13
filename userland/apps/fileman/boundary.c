@@ -41,7 +41,7 @@ const char *fileman_x11_default_app(const char *path)
     if (extension && (!strcasecmp(extension, ".elf") || !strcasecmp(extension, ".desktop")))
         return NULL;
     if (extension && (!strcasecmp(extension, ".html") || !strcasecmp(extension, ".htm")))
-        return "/usr/bin/dillo";
+        return "/usr/bin/netsurf";
     if (extension && (!strcasecmp(extension, ".rexl") || !strcasecmp(extension, ".csv")))
         return "/usr/bin/reliefexcel";
     if (extension && !strcasecmp(extension, ".rword")) return "/usr/bin/reliefword";

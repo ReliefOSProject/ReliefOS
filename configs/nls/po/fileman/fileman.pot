@@ -799,7 +799,7 @@ msgid "Wait for the device operation to finish before closing this window."
 msgstr ""
 
 #: userland/apps/fileman/main.cpp:621
-msgid "X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"
+msgid "X11 executable path (NEdit: /usr/bin/nedit, NetSurf: /usr/bin/netsurf):"
 msgstr ""
 
 #: userland/apps/fileman/main.cpp:433

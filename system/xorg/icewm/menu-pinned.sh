@@ -19,7 +19,7 @@ printf 'prog "%s" reliefos-fileman fileman\n' "$fileman"
 printf 'prog "%s" reliefos-calc calc\n' "$calculator"
 printf 'prog "%s" reliefos-osver osver\n' "$information"
 printf 'prog "%s" file nedit\n' "$editor"
-printf 'prog "%s" app dillo\n' "$browser"
+printf 'prog "%s" app netsurf\n' "$browser"
 printf '%s\n' 'prog "xeyes" app xeyes'
 printf '%s\n' 'includeprog icewm-menu-fdo --sep-before -d1400 -D1650 -S --limit-max-len=42' 'separator'
 printf 'prog "%s" about xterm -title "%s" -geometry 62x12 -e sh /etc/reliefos/icewm/about.sh\n' "$about" "$about"

@@ -102,12 +102,6 @@ if test -x /usr/bin/xdg-user-dirs-update; then
     /usr/bin/xdg-user-dirs-update || :
 fi
 
-# New homes receive /etc/skel; existing accounts need the same Dillo defaults.
-# The helper only creates missing standard user files and keeps personal edits.
-if test -x /usr/lib/reliefos/dillo-config-init; then
-    /usr/lib/reliefos/dillo-config-init || event 'Dillo defaults could not be initialized'
-fi
-
 if test -x /usr/bin/reliefsettings; then
     /usr/bin/reliefsettings --apply-session || event 'Some personal desktop settings could not be applied'
 fi

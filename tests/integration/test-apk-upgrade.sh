@@ -58,6 +58,22 @@ printf 'canonical-local-setting=yes\n' > "$work/runner/target/etc/reliefos/upgra
 printf 'LANG=C\nMUSL_LOCPATH=/usr/share/musl/locales\n' > "$work/runner/target/etc/leonos/locale.conf"
 cp "$work/runner/target/etc/leonos/locale.conf" "$work/legacy-locale-before"
 cp "$work/runner/target/etc/apk/world" "$work/world-before"
+python3 - "$work/world-before" <<'PY'
+from pathlib import Path
+import re, sys
+requests = Path(sys.argv[1]).read_text().splitlines()
+selected = {re.split(r'[@<>=~]', request, 1)[0] for request in requests}
+for package in ("dillo", "dillo-common"):
+    if package not in selected:
+        raise SystemExit(f"legacy world is missing the {package} request")
+PY
+for package in dillo dillo-common; do
+    if ! awk -v wanted="P:$package" '/^P:/{if($0==wanted) found=1} END{exit !found}' \
+        "$work/runner/target/lib/apk/db/installed"; then
+        echo "legacy package database is missing $package" >&2
+        exit 1
+    fi
+done
 python3 - "$work/world-before" "$work/world-after-rename" <<'PY'
 from pathlib import Path
 import re, sys
@@ -69,7 +85,13 @@ selected = {re.split(r'[@<>=~]', request, 1)[0] for request in requests}
 expected = set()
 for request in requests:
     name = re.split(r'[@<>=~]', request, 1)[0]
-    if name not in upstream:
+    if name == 'dillo':
+        if 'netsurf' not in selected:
+            tag = re.search(r'@([a-zA-Z0-9_.+-]+)', request)
+            expected.add('netsurf' + ('@' + tag[1] if tag else ''))
+    elif name == 'dillo-common':
+        continue
+    elif name not in upstream:
         expected.add(request)
     else:
         tag = re.search(r'@([a-zA-Z0-9_.+-]+)', request)
@@ -172,6 +194,11 @@ run_update /newrepo
 LC_ALL=C sort "$work/world-after-rename" > "$work/world-after-rename.sorted"
 LC_ALL=C sort "$work/runner/target/etc/apk/world" > "$work/world-after-update.sorted"
 cmp "$work/world-after-rename.sorted" "$work/world-after-update.sorted"
+if grep -Eq '^(dillo|dillo-common)([@<>=~]|$)' "$work/runner/target/etc/apk/world"; then
+    echo 'obsolete Dillo package requests remain in the installed world' >&2
+    exit 1
+fi
+grep -Eq '^netsurf([@<>=~]|$)' "$work/runner/target/etc/apk/world"
 cmp "$work/old-signing-key.pub" "$work/runner/target/etc/apk/keys/$legacy_key"
 for tool in ar strings; do
     if [ -f "$old/usr/bin/$tool" ] && [ ! -L "$old/usr/bin/$tool" ]; then
@@ -191,6 +218,11 @@ fi
 unshare -Ur "$apk" --root "$work/runner/target" info --exists reliefos-apps
 if unshare -Ur "$apk" --root "$work/runner/target" info --exists leonos-apps; then
     echo 'obsolete leonos-apps package remains installed after replacement' >&2
+    exit 1
+fi
+if awk '/^P:/{if($0=="P:dillo" || $0=="P:dillo-common") found=1} END {exit !found}' \
+    "$work/runner/target/lib/apk/db/installed"; then
+    echo 'obsolete Dillo packages remain installed after the ReliefOS upgrade' >&2
     exit 1
 fi
 awk '

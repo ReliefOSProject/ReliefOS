@@ -807,8 +807,8 @@ msgid "Wait for the device operation to finish before closing this window."
 msgstr "デバイス操作が完了してからウィンドウを閉じてください。"
 
 #: userland/apps/fileman/main.cpp:621
-msgid "X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"
-msgstr "X11 実行ファイルのパス (NEdit: /usr/bin/nedit、Dillo: /usr/bin/dillo):"
+msgid "X11 executable path (NEdit: /usr/bin/nedit, NetSurf: /usr/bin/netsurf):"
+msgstr "X11 実行ファイルのパス (NEdit: /usr/bin/nedit、NetSurf: /usr/bin/netsurf):"
 
 #: userland/apps/fileman/main.cpp:433
 msgid "Yes"
