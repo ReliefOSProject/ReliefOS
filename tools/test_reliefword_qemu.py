@@ -70,7 +70,7 @@ echo "RW_EXIT status=$status" >/dev/ttyS0
     payload=[
         (OUT/'userland/reliefword.elf','/usr/lib/reliefos/apps/reliefword/reliefword.elf',0o100755),
         (OUT/'userland/fileman.elf','/usr/lib/reliefos/apps/fileman/fileman.elf',0o100755),
-        (OUT/'generated/nls/zh_CN/LC_MESSAGES/leonos.mo',fltk.LOCALE_GUEST,0o100644),
+        *fltk.locale_payload(OUT),
         (ROOT/'userland/apps/reliefword/reliefword.desktop','/usr/share/applications/reliefword.desktop',0o100644),
         (ROOT/'resources/build-art/app-icons/reliefword.bmp','/usr/lib/reliefos/apps/reliefword/reliefword.bmp',0o100644),
         (entry,'/usr/bin/reliefword',0o100755),(runner,'/usr/bin/rw',0o100755),

@@ -1,0 +1,763 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/reliefppt/window.cpp:636
+msgid "A native ReliefOS presentation editor.\nDouble-click text to edit. Drag handles to resize.\nF5: present · Ctrl+S: save · Esc: finish editing\nUse .rppt to keep editable slides and embedded pictures."
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:54
+msgid "About ReliefPPT"
+msgstr ""
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:193
+msgid "Align bottom"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:188
+msgid "Align left"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:190
+msgid "Align right"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:194
+msgid "Align selected objects"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:191
+msgid "Align top"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:336
+msgid "An unsaved ReliefPPT recovery copy is available. Recover it into a new presentation?"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:94
+msgid "Apply"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:186
+msgid "Arrow"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:241
+msgid "Arrow keys: change slide\nB: black screen   Esc: return"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:207
+msgid "Background..."
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:130
+msgid "Blank slide"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:208
+msgid "Blue theme"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:157
+msgid "Bold (Ctrl+B)"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:169
+msgid "Bullets"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:167
+msgid "Center"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:189
+msgid "Center X"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:192
+msgid "Center Y"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:140
+msgid "Chinese / serif"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:241
+msgid "Choose an export file different from the editable presentation"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:127
+msgid "Clipboard"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:126
+msgid "Copy"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:5
+msgid "Could not capture the edited text"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:17
+msgid "Could not decode the PNG image"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:11
+msgid "Could not encode the slide image"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:18
+msgid "Could not open the image"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:213
+msgid "Could not open the presentation"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:19
+msgid "Could not read the image"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:15
+msgid "Could not read the image file"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:10
+msgid "Could not render the slide image"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:323
+msgid "Could not save the recovery copy"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:211
+msgid "Current slide colors"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:125
+msgid "Cut"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:177
+msgid "Delete"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:137
+msgid "Delete slide"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:56
+msgid "Design"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:61
+msgid "Discard"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:48
+msgid "Draw outline"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:176
+msgid "Duplicate"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:136
+msgid "Duplicate slide"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:237
+msgid "Editor view"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:184
+msgid "Ellipse"
+msgstr ""
+
+#: userland/apps/reliefppt/slideshow.cpp:20
+msgid "End of presentation\nPress Esc to return, or Left to go back"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:490
+msgid "Enter a font size from 6 to 144 points"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:111
+msgid "Enter finite values that keep the object inside the slide"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:53
+msgid "Example presentation"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:55
+msgid "Exit"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:239
+msgid "Export HTML..."
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:238
+msgid "Export PNG..."
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:12
+msgid "Export cancelled"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:284
+msgid "Export complete; the editable presentation remains open"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:51
+msgid "Export current slide as PNG..."
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:52
+msgid "Export presentation as HTML..."
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:285
+msgid "Export was not completed"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:254
+msgid "Exporting presentation"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:249
+msgid "Exporting presentation..."
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:43
+msgid "File"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:100
+msgid "File path is too long"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:146
+msgid "Fill color"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:47
+msgid "Fill object"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:234
+msgid "Fit slide"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:144
+msgid "Font for the selected text boxes"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:154
+msgid "Font size: 6–144 points; press Enter"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:223
+msgid "From beginning"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:224
+msgid "From current slide"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:209
+msgid "Green theme"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:217
+msgid "Guides"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:13
+msgid "HTML export is too large"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:42
+msgid "Height"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:56
+msgid "Home tab"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:16
+msgid "Image dimensions exceed the supported limit"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:56
+msgid "Insert"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:187
+msgid "Insert objects"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:90
+msgid "Insert picture"
+msgstr ""
+
+#: userland/apps/reliefppt/canvas.cpp:152
+msgid "Insert text, pictures or shapes to start your slide"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:7
+msgid "Invalid image reference"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:157
+msgid "Italic (Ctrl+I)"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:54
+msgid "Keep aspect ratio"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:335
+msgid "Later"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:135
+msgid "Layout for the next new slide"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:166
+msgid "Left"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:210
+msgid "Light theme"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:185
+msgid "Line"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:147
+msgid "Line color"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:51
+msgid "Line width (0–20)"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:198
+msgid "Lower"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:142
+msgid "Monospace"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:219
+msgid "Move slide down"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:218
+msgid "Move slide up"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:47
+msgid "New"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:128
+msgid "New slide"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/reliefppt/canvas.cpp:266
+msgid "Not enough memory"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:9
+msgid "Not enough memory to draw text"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:8
+msgid "Not enough memory to draw the image"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:14
+msgid "Not enough memory to export HTML"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:83
+msgid "Notes"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:201
+msgid "Object"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:178
+msgid "Objects"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:409
+msgid "Objects copied"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:91
+msgid "Open presentation"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:48
+msgid "Open..."
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:200
+msgid "Opening presentation..."
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:199
+msgid "Order"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:124
+msgid "Paste"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:173
+msgid "Picture..."
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:40
+msgid "Position and size"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:200
+msgid "Position and size..."
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:87
+msgid "Positions and sizes are measured in slide units.\nThe object must remain inside the slide."
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:226
+msgid "Present"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:224
+msgid "Presentation opened"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:182
+msgid "Presentation saved"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:170
+msgid "Presentation was not saved"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:170
+msgid "Properties..."
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:196
+msgid "Raise"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:91
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:335
+msgid "Recover"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:359
+msgid "Recovered — save this presentation to a new file"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:321
+msgid "Recovery copy saved"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:183
+msgid "Rectangle"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:63
+msgid "Redo"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:141
+msgid "Replace"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:141
+msgid "Replace the existing file?\n%s"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:168
+msgid "Right"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:141
+msgid "Sans serif"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:157
+msgid "Save a copy..."
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:50
+msgid "Save as..."
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:61
+msgid "Save changes to this presentation?"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:89
+msgid "Save presentation or export"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:147
+msgid "Saving presentation..."
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:542
+msgid "Select a text box first"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:136
+msgid "Select an object first"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:33
+msgid "Select one object to edit its position and size"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:240
+msgid "Share"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:212
+msgid "Show grid"
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:349
+msgid "Slide %zu / %zu  ·  %zu selected  ·  %d%%"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:144
+msgid "Slide background"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:220
+msgid "Slide order"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:56
+msgid "Slide show"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:206
+msgid "Slide size"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:138
+msgid "Slides"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:216
+msgid "Snap movement to 10 units; hold Alt to bypass"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:214
+msgid "Snap to grid"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:235
+msgid "Speaker notes"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:205
+msgid "Standard 4:3"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:225
+msgid "Start from current slide (Shift+F5)"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:223
+msgid "Start slide show (F5)"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:165
+msgid "Text"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:171
+msgid "Text / object"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:172
+msgid "Text box"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:145
+msgid "Text color"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:86
+msgid "Text exceeds this box. Increase its height or reduce the font size."
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:21
+msgid "The BMP image is truncated"
+msgstr ""
+
+#: userland/apps/reliefppt/files.cpp:158
+msgid "The file changed outside ReliefPPT. Save a copy or explicitly replace it."
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:6
+msgid "The file changed while it was being opened"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:132
+msgid "Title and content"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:131
+msgid "Title slide"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:197
+msgid "To back"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:195
+msgid "To front"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:133
+msgid "Two columns"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:157
+msgid "Underline (Ctrl+U)"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:63
+msgid "Undo"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:284
+msgid "Untitled presentation"
+msgstr ""
+
+#: userland/apps/reliefppt/main.cpp:16
+msgid "Usage: reliefppt [presentation.rppt]"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:20
+msgid "Use PNG or an uncompressed 24/32-bit BMP image"
+msgstr ""
+
+#: userland/apps/reliefppt/window.cpp:204
+msgid "Widescreen 16:9"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:42
+msgid "Width"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:41
+msgid "X position"
+msgstr ""
+
+#: userland/apps/reliefppt/dialogs.cpp:41
+msgid "Y position"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""

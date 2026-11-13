@@ -1843,8 +1843,8 @@ static void handle_key(const struct reliefos_gui_app_event *event)
 int main(int argc, char **argv, char **envp)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("oshlp", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("oshlp");
     struct reliefos_gui_app_event event;
     const char *path = OSHLP_DEFAULT_PATH;
     const char *doc_id = 0;

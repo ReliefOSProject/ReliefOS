@@ -1,0 +1,419 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/taskmgr/main.cpp:1042
+msgid "About"
+msgstr "关于"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "添加到收藏夹"
+
+#: userland/apps/taskmgr/main.cpp:188
+msgid "Admin"
+msgstr "管理员"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "所有文件 (*)"
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "CPU"
+msgstr "CPU"
+
+#: userland/apps/taskmgr/main.cpp:560
+msgid "CPU Usage"
+msgstr "CPU 占用"
+
+#: userland/apps/taskmgr/main.cpp:755
+msgid "CPU time:"
+msgstr "CPU 时间:"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "取消"
+
+#: userland/apps/taskmgr/main.cpp:710
+msgid "Cannot end protected or non-user task"
+msgstr "无法结束受保护或非用户任务"
+
+#: userland/apps/taskmgr/main.cpp:1106
+msgid "Choose which user's startup entries to manage."
+msgstr "选择要管理启动项的用户。"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/taskmgr/main.cpp:774
+msgid "Could not change startup app"
+msgstr "无法更改启动应用"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "无法解码图像"
+
+#: userland/apps/taskmgr/main.cpp:795
+msgid "Could not remove startup app"
+msgstr "无法删除启动应用"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "创建新目录"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "自定义筛选器"
+
+#: userland/apps/taskmgr/main.cpp:1041
+msgid "Details"
+msgstr "详细信息"
+
+#: userland/apps/taskmgr/main.cpp:233
+msgid "Disable"
+msgstr "禁用"
+
+#: userland/apps/taskmgr/main.cpp:409
+msgid "Disabled"
+msgstr "已禁用"
+
+#: userland/apps/taskmgr/main.cpp:187
+msgid "Elevated"
+msgstr "已提升"
+
+#: userland/apps/taskmgr/main.cpp:233
+msgid "Enable"
+msgstr "启用"
+
+#: userland/apps/taskmgr/main.cpp:1111
+msgid "Enable or disable the selected startup entry."
+msgstr "启用或禁用所选启动项。"
+
+#: userland/apps/taskmgr/main.cpp:409
+msgid "Enabled"
+msgstr "已启用"
+
+#: userland/apps/taskmgr/main.cpp:716
+msgid "End Task"
+msgstr "结束任务"
+
+#: userland/apps/taskmgr/main.cpp:720
+msgid "End Task failed"
+msgstr "结束任务失败"
+
+#: userland/apps/taskmgr/main.cpp:715
+msgid "End task %s (PID %u)?"
+msgstr "结束任务 %s（PID %u）？"
+
+#: userland/apps/taskmgr/main.cpp:1063
+msgid "End the selected task after confirmation."
+msgstr "确认后结束所选任务。"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "收藏夹"
+
+#: userland/apps/taskmgr/main.cpp:1039
+msgid "File"
+msgstr "文件"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "文件系统"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "文件名："
+
+#: userland/apps/taskmgr/main.cpp:621
+msgid "Free memory:"
+msgstr "可用内存:"
+
+#: userland/apps/taskmgr/main.cpp:574
+msgid "GPU (est.)"
+msgstr "GPU (估算)"
+
+#: userland/apps/taskmgr/main.cpp:574
+msgid "GPU (estimated)"
+msgstr "GPU (估算)"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "输入内容过长"
+
+#: userland/apps/taskmgr/main.cpp:1053
+msgid "Inspect running tasks and open details or end a task."
+msgstr "查看运行中的进程、详细信息或结束任务。"
+
+#: userland/apps/taskmgr/main.cpp:752
+msgid "Kind:"
+msgstr "类型:"
+
+#: userland/apps/taskmgr/main.cpp:1092
+msgid "Live CPU, memory, and estimated GPU history with per-core usage."
+msgstr "实时 CPU、内存与 GPU 估算历史，以及各核心使用情况。"
+
+#: userland/apps/taskmgr/main.cpp:807
+msgid "Live task and performance snapshot from the system."
+msgstr "实时显示系统任务与性能信息。"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
+#: userland/apps/taskmgr/main.cpp:1100
+msgid "Manage startup entries for the selected user."
+msgstr "管理所选用户的启动项。"
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "Memory"
+msgstr "内存"
+
+#: userland/apps/taskmgr/main.cpp:567
+msgid "Memory Usage"
+msgstr "内存占用"
+
+#: userland/apps/taskmgr/main.cpp:756
+msgid "Memory:"
+msgstr "内存:"
+
+#: userland/apps/taskmgr/main.cpp:748
+msgid "Name:"
+msgstr "名称:"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新建目录？"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "否"
+
+#: userland/apps/taskmgr/main.cpp:769
+msgid "No startup app selected"
+msgstr "未选择启动应用"
+
+#: userland/apps/taskmgr/main.cpp:706
+msgid "No task selected"
+msgstr "未选择任务"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/taskmgr/main.cpp:1043
+msgid "Options"
+msgstr "选项"
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "PID"
+msgstr "PID"
+
+#: userland/apps/taskmgr/main.cpp:750
+msgid "Parent PID:"
+msgstr "父 PID:"
+
+#: userland/apps/taskmgr/main.cpp:583
+msgid "Per-core usage"
+msgstr "每核占用"
+
+#: userland/apps/taskmgr/main.cpp:1044
+msgid "Performance"
+msgstr "性能"
+
+#: userland/apps/taskmgr/main.cpp:438
+msgid "Performance data unavailable"
+msgstr "性能数据不可用"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "请选择已存在的文件！"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "预览"
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "Privileges"
+msgstr "权限"
+
+#: userland/apps/taskmgr/main.cpp:754
+msgid "Privileges:"
+msgstr "权限:"
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "Process"
+msgstr "进程"
+
+#: userland/apps/taskmgr/main.cpp:1043
+msgid "Processes"
+msgstr "进程"
+
+#: userland/apps/taskmgr/main.cpp:1048
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/taskmgr/main.cpp:632
+msgid "Ready "
+msgstr "就绪 "
+
+#: userland/apps/taskmgr/main.cpp:1039
+msgid "Refresh"
+msgstr "刷新"
+
+#: userland/apps/taskmgr/main.cpp:1057
+msgid "Refresh task and performance data now."
+msgstr "立即刷新进程和性能数据。"
+
+#: userland/apps/taskmgr/main.cpp:1112
+msgid "Remove"
+msgstr "删除"
+
+#: userland/apps/taskmgr/main.cpp:793
+msgid "Remove Startup App"
+msgstr "删除启动应用"
+
+#: userland/apps/taskmgr/main.cpp:793
+msgid "Remove the selected startup app?"
+msgstr "删除选中的启动应用？"
+
+#: userland/apps/taskmgr/main.cpp:1115
+msgid "Remove the selected startup entry after confirmation."
+msgstr "确认后移除所选启动项。"
+
+#: userland/apps/taskmgr/main.cpp:631
+msgid "Running "
+msgstr "运行 "
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/taskmgr/main.cpp:1089
+msgid "Scroll to see per-core CPU usage and memory totals."
+msgstr "向下滚动可查看各核心使用率和内存统计。"
+
+#: userland/apps/taskmgr/main.cpp:1078
+msgid "Select a row; press Enter for details or Delete to end the task."
+msgstr "选择一行，按 Enter 查看详情，按 Delete 结束任务。"
+
+#: userland/apps/taskmgr/main.cpp:1120
+msgid "Select a startup entry before using Enable, Disable, or Remove."
+msgstr "先选择启动项，再使用启用、禁用或移除。"
+
+#: userland/apps/taskmgr/main.cpp:1060
+msgid "Show details for the selected task."
+msgstr "查看所选任务的详细信息。"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "显示："
+
+#: userland/apps/taskmgr/main.cpp:633
+msgid "Sleeping "
+msgstr "休眠 "
+
+#: userland/apps/taskmgr/main.cpp:189
+msgid "Standard"
+msgstr "标准"
+
+#: userland/apps/taskmgr/main.cpp:777
+msgid "Startup app disabled"
+msgstr "启动应用已禁用"
+
+#: userland/apps/taskmgr/main.cpp:777
+msgid "Startup app enabled"
+msgstr "启动应用已启用"
+
+#: userland/apps/taskmgr/main.cpp:799
+msgid "Startup app removed"
+msgstr "启动应用已删除"
+
+#: userland/apps/taskmgr/main.cpp:1045
+msgid "Startup applications"
+msgstr "启动应用程序"
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "State"
+msgstr "状态"
+
+#: userland/apps/taskmgr/main.cpp:751
+msgid "State:"
+msgstr "状态:"
+
+#: userland/apps/taskmgr/main.cpp:181
+msgid "System"
+msgstr "系统"
+
+#: userland/apps/taskmgr/main.cpp:759
+msgid "Task Details"
+msgstr "任务详细信息"
+
+#: userland/apps/taskmgr/main.cpp:806
+msgid "Task Manager"
+msgstr "任务管理器"
+
+#: userland/apps/taskmgr/main.cpp:723
+msgid "Task ended"
+msgstr "任务已结束"
+
+#: userland/apps/taskmgr/main.cpp:630
+msgid "Tasks "
+msgstr "任务 "
+
+#: userland/apps/taskmgr/main.cpp:613
+msgid "Total memory:"
+msgstr "总内存:"
+
+#: userland/apps/taskmgr/main.cpp:373
+msgid "Unavailable"
+msgstr "不可用"
+
+#: userland/apps/taskmgr/main.cpp:181
+msgid "Unknown"
+msgstr "未知"
+
+#: userland/apps/taskmgr/main.cpp:625
+msgid "Uptime:"
+msgstr "运行时间:"
+
+#: userland/apps/taskmgr/main.cpp:617
+msgid "Used memory:"
+msgstr "已用内存:"
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "User"
+msgstr "用户"
+
+#: userland/apps/taskmgr/main.cpp:753
+msgid "User:"
+msgstr "用户:"
+
+#: userland/apps/taskmgr/main.cpp:1084
+msgid "View live CPU, memory, and estimated GPU usage."
+msgstr "查看实时 CPU、内存与 GPU 估算使用情况。"
+
+#: userland/apps/taskmgr/main.cpp:757
+msgid "Wake tick:"
+msgstr "唤醒 tick:"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "是"
+
+#: userland/apps/taskmgr/main.cpp:743
+msgid "ticks"
+msgstr "时钟节拍"

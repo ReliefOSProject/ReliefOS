@@ -4,9 +4,10 @@
 set -eu
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
 
-grep -q 'LC_MESSAGES/leonos.mo' "$src/tools/build/rootfs-stage.sh"
+grep -Fq 'LC_MESSAGES/$domain.mo' "$src/tools/build/rootfs-stage.sh"
 grep -q 'reliefos-nls' "$src/tools/build/rootfs-stage.sh"
 grep -q 'configs/nls/LINGUAS' "$src/tools/build/rootfs-stage.sh"
+grep -q 'configs/nls/DOMAINS' "$src/tools/build/rootfs-stage.sh"
 
 group=$(sed -n '/"reliefos-nls"/,/^[[:space:]]*}[[:space:]]*$/p' \
     "$src/configs/apk-ownership.json")

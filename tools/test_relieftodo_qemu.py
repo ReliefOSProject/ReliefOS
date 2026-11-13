@@ -101,7 +101,7 @@ echo "RTFM_EXIT status=$status" >/dev/ttyS0
     payload = [
         (OUT / 'userland/relieftodo.elf', '/usr/lib/reliefos/apps/relieftodo/relieftodo.elf', 0o100755),
         (OUT / 'userland/fileman.elf', '/usr/lib/reliefos/apps/fileman/fileman.elf', 0o100755),
-        (OUT / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
+        *fltk.locale_payload(OUT),
         (core / 'relieftodo.desktop', '/usr/share/applications/reliefos-relieftodo.desktop', 0o100644),
         (ROOT / 'system/rootfs/usr/share/mime/packages/relieftodo.xml', '/usr/share/mime/packages/relieftodo.xml', 0o100644),
         (ROOT / 'resources/build-art/app-icons/relieftodo.bmp', '/usr/lib/reliefos/apps/relieftodo/relieftodo.bmp', 0o100644),

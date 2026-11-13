@@ -1,0 +1,115 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/devmgr/main.c:114
+msgid "Active"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:97
+msgid "Audio"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:120
+msgid "Boot"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:205
+msgid "Class"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:209
+msgid "Details"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:252
+msgid "Details:"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:206
+msgid "Device"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:279
+msgid "Device Manager"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:135
+msgid "Device refresh failed"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:250
+msgid "Device:"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:153
+msgid "Devices refreshed: "
+msgstr ""
+
+#: userland/apps/devmgr/main.c:89
+msgid "Display"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:208
+msgid "Flags"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:219
+msgid "Hardware detected by the kernel"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:87
+msgid "Input"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:280
+msgid "Kernel device list"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:95
+msgid "Network"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:259
+msgid "No device selected"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:123
+msgid "None"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:99
+msgid "Other"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:108
+msgid "Present"
+msgstr ""
+
+#: configs/nls/messages/devmgr.c:5
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:218
+msgid "Refresh"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:93
+msgid "Serial"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:207
+msgid "Status"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:251
+msgid "Status:"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:91
+msgid "Storage"
+msgstr ""
+
+#: userland/apps/devmgr/main.c:85
+msgid "System"
+msgstr ""

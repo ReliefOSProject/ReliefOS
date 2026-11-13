@@ -1,0 +1,495 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: configs/nls/messages/browser.c:5
+msgid " bytes"
+msgstr " 字节"
+
+#: userland/apps/browser/view.c:922
+msgid " controls"
+msgstr " 控件"
+
+#: userland/apps/browser/view.c:920
+msgid " forms, "
+msgstr " 表单, "
+
+#: userland/apps/browser/view.c:916
+msgid " lines, "
+msgstr " 行, "
+
+#: userland/apps/browser/view.c:918
+msgid " links, "
+msgstr " 链接, "
+
+#: userland/apps/browser/view.c:895
+msgid " source limit reached"
+msgstr " 源码已截断"
+
+#: userland/apps/browser/view.c:906
+msgid "; content: "
+msgstr "; 内容: "
+
+#: userland/apps/browser/view.c:934
+msgid "; status: "
+msgstr "; 状态: "
+
+#: userland/apps/browser/util.c:158
+msgid "ARP timeout"
+msgstr "ARP 超时"
+
+#: userland/apps/browser/input.c:280
+msgid "About Browser"
+msgstr "关于浏览器"
+
+#: userland/apps/browser/bookmarks.c:308
+msgid "Add"
+msgstr "添加"
+
+#: userland/apps/browser/bookmarks.c:202
+msgid "Add Bookmark"
+msgstr "添加书签"
+
+#: userland/apps/browser/bookmarks.c:219
+msgid "Add Current Page"
+msgstr "添加当前页面"
+
+#: userland/apps/browser/view.c:1003
+msgid "Address"
+msgstr "地址"
+
+#: userland/apps/browser/input.c:217
+msgid "Address cleared"
+msgstr "地址已清空"
+
+#: userland/apps/browser/input.c:141
+msgid "Address selected"
+msgstr "已选中地址"
+
+#: userland/apps/browser/navigation.c:786
+msgid "Application download started"
+msgstr "应用下载已开始"
+
+#: userland/apps/browser/view.c:963
+msgid "Back"
+msgstr "后退"
+
+#: userland/apps/browser/util.c:160
+msgid "Bad argument"
+msgstr "参数无效"
+
+#: userland/apps/browser/util.c:186
+msgid "Bad socket"
+msgstr "Socket 无效"
+
+#: userland/apps/browser/bookmarks.c:208
+msgid "Bookmark saved"
+msgstr "书签已保存"
+
+#: userland/apps/browser/bookmarks.c:272
+msgid "Bookmarks"
+msgstr "书签"
+
+#: userland/apps/browser/input.c:232
+msgid "Bottom"
+msgstr "底部"
+
+#: userland/apps/browser/input.c:249
+msgid "Bottom of page"
+msgstr "页面底部"
+
+#: userland/apps/browser/forms.c:1517
+msgid "Checkbox checked"
+msgstr "复选框已选中"
+
+#: userland/apps/browser/forms.c:1518
+msgid "Checkbox unchecked"
+msgstr "复选框已取消"
+
+#: userland/apps/browser/input.c:291
+msgid "Classic HTTP browser for ReliefOS."
+msgstr "ReliefOS 经典 HTTP 浏览器。"
+
+#: userland/apps/browser/main.c:36
+msgid "Classic Web Browser"
+msgstr "经典网页浏览器"
+
+#: userland/apps/browser/input.c:200
+msgid "Clear Address"
+msgstr "清空地址"
+
+#: userland/apps/browser/bookmarks.c:314
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/browser/navigation.c:784
+msgid "Could not start API Installer"
+msgstr "无法启动 API 安装程序"
+
+#: userland/apps/browser/navigation.c:769
+msgid "Could not start Download Manager"
+msgstr "无法启动下载管理器"
+
+#: userland/apps/browser/util.c:166
+msgid "DHCP failed"
+msgstr "DHCP 失败"
+
+#: userland/apps/browser/util.c:164
+msgid "DHCP timeout"
+msgstr "DHCP 超时"
+
+#: userland/apps/browser/util.c:170
+msgid "DNS failed"
+msgstr "DNS 失败"
+
+#: userland/apps/browser/util.c:168
+msgid "DNS timeout"
+msgstr "DNS 超时"
+
+#: userland/apps/browser/bookmarks.c:312
+msgid "Delete"
+msgstr "删除"
+
+#: userland/apps/browser/bookmarks.c:378
+msgid "Delete Bookmark"
+msgstr "删除书签"
+
+#: userland/apps/browser/view.c:877
+msgid "Developer Tools"
+msgstr "开发者工具"
+
+#: userland/apps/browser/view.c:889
+msgid "Document: "
+msgstr "文档: "
+
+#: userland/apps/browser/input.c:173
+msgid "Download Current Page"
+msgstr "下载当前页面"
+
+#: userland/apps/browser/navigation.c:771
+msgid "Download started"
+msgstr "下载已开始"
+
+#: userland/apps/browser/bookmarks.c:310
+msgid "Edit"
+msgstr "编辑"
+
+#: userland/apps/browser/bookmarks.c:364
+msgid "Edit Bookmark"
+msgstr "编辑书签"
+
+#: userland/apps/browser/forms.c:1040
+msgid "Editing form input"
+msgstr "正在编辑表单输入"
+
+#: userland/apps/browser/input.c:153
+msgid "Favorites"
+msgstr "收藏夹"
+
+#: userland/apps/browser/input.c:150
+msgid "File"
+msgstr "文件"
+
+#: userland/apps/browser/navigation.c:703
+msgid "File Error"
+msgstr "文件错误"
+
+#: userland/apps/browser/navigation.c:734
+msgid "File loaded"
+msgstr "文件已打开"
+
+#: userland/apps/browser/navigation.c:733
+msgid "File loaded, truncated"
+msgstr "文件已打开，内容被截断"
+
+#: userland/apps/browser/input.c:202
+msgid "Find Next"
+msgstr "查找下一个"
+
+#: userland/apps/browser/bookmarks.c:458
+msgid "Find in Page"
+msgstr "在页面中查找"
+
+#: userland/apps/browser/input.c:201
+msgid "Find in Page..."
+msgstr "在页面中查找..."
+
+#: userland/apps/browser/bookmarks.c:459
+msgid "Find:"
+msgstr "查找:"
+
+#: userland/apps/browser/forms.c:1565
+msgid "Form reset"
+msgstr "表单已重置"
+
+#: userland/apps/browser/view.c:964
+msgid "Forward"
+msgstr "前进"
+
+#: userland/apps/browser/view.c:1007
+msgid "Go"
+msgstr "转到"
+
+#: userland/apps/browser/auth.c:100
+msgid "HTTP Authentication"
+msgstr "HTTP 身份验证"
+
+#: userland/apps/browser/navigation.c:580
+msgid "HTTP Page"
+msgstr "HTTP 页面"
+
+#: userland/apps/browser/navigation.c:532
+msgid "HTTP client failed"
+msgstr "HTTP 客户端失败"
+
+#: userland/apps/browser/util.c:180
+msgid "HTTP failed"
+msgstr "HTTP 失败"
+
+#: userland/apps/browser/input.c:154
+msgid "Help"
+msgstr "帮助"
+
+#: userland/apps/browser/input.c:171
+msgid "Home"
+msgstr "主页"
+
+#: userland/apps/browser/navigation.c:497
+msgid "Invalid URL"
+msgstr "无效地址"
+
+#: userland/apps/browser/view.c:970
+msgid "License Website"
+msgstr "许可证网站"
+
+#: userland/apps/browser/view.c:882
+msgid "Location: "
+msgstr "地址: "
+
+#: userland/apps/browser/bookmarks.c:221
+msgid "Manage Bookmarks..."
+msgstr "管理书签..."
+
+#: userland/apps/browser/navigation.c:533
+msgid "Network Error"
+msgstr "网络错误"
+
+#: userland/apps/browser/util.c:172
+msgid "No A record"
+msgstr "没有 A 记录"
+
+#: userland/apps/browser/util.c:156
+msgid "No e1000 adapter"
+msgstr "没有 e1000 网卡"
+
+#: userland/apps/browser/bookmarks.c:230
+msgid "No saved bookmarks"
+msgstr "没有保存的书签"
+
+#: userland/apps/browser/input.c:292
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/browser/bookmarks.c:198
+msgid "Only pages with an address can be bookmarked"
+msgstr "只有带地址的页面可以加入书签"
+
+#: userland/apps/browser/bookmarks.c:306
+msgid "Open"
+msgstr "打开"
+
+#: userland/apps/browser/navigation.c:702
+msgid "Open failed"
+msgstr "打开失败"
+
+#: userland/apps/browser/navigation.c:608
+msgid "Opening page..."
+msgstr "正在打开页面..."
+
+#: userland/apps/browser/auth.c:105
+msgid "Password (kept only for this browser session):"
+msgstr "密码（只保存在本次浏览器会话中）:"
+
+#: configs/nls/messages/browser.c:6
+msgid "Path"
+msgstr "路径"
+
+#: userland/apps/browser/util.c:192
+msgid "Protocol unsupported"
+msgstr "协议不支持"
+
+#: userland/apps/browser/forms.c:1531
+msgid "Radio option selected"
+msgstr "单选项已选择"
+
+#: userland/apps/browser/navigation.c:716
+msgid "Read failed"
+msgstr "读取失败"
+
+#: userland/apps/browser/navigation.c:187
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/browser/input.c:172
+msgid "Refresh"
+msgstr "刷新"
+
+#: userland/apps/browser/input.c:290
+msgid "ReliefOS Browser"
+msgstr "ReliefOS 浏览器"
+
+#: userland/apps/browser/view.c:914
+msgid "Rendered: "
+msgstr "渲染: "
+
+#: configs/nls/messages/browser.c:7
+msgid "Reset"
+msgstr "重置"
+
+#: userland/apps/browser/util.c:182
+msgid "Response too large"
+msgstr "响应过大"
+
+#: userland/apps/browser/navigation.c:528
+msgid "Retrying form submission..."
+msgstr "正在重新提交表单..."
+
+#: userland/apps/browser/navigation.c:630
+msgid "Retrying..."
+msgstr "正在重试..."
+
+#: userland/apps/browser/view.c:967
+msgid "Return to Setup"
+msgstr "返回"
+
+#: userland/apps/browser/bookmarks.c:273
+msgid "Saved browser pages"
+msgstr "已保存的网页"
+
+#: userland/apps/browser/view.c:928
+msgid "Scroll: line "
+msgstr "滚动: 行 "
+
+#: userland/apps/browser/input.c:199
+msgid "Select Address"
+msgstr "选中地址"
+
+#: userland/apps/browser/forms.c:1555
+msgid "Selection changed"
+msgstr "选项已更改"
+
+#: userland/apps/browser/util.c:190
+msgid "Socket closed"
+msgstr "Socket 已关闭"
+
+#: userland/apps/browser/util.c:184
+msgid "Socket limit reached"
+msgstr "Socket 数量已满"
+
+#: userland/apps/browser/util.c:188
+msgid "Socket not connected"
+msgstr "Socket 未连接"
+
+#: userland/apps/browser/view.c:994
+msgid "Stop"
+msgstr "停止"
+
+#: userland/apps/browser/navigation.c:507
+msgid "Submitting form..."
+msgstr "正在提交表单..."
+
+#: userland/apps/browser/util.c:154
+msgid "Succeeded"
+msgstr "成功"
+
+#: userland/apps/browser/util.c:178
+msgid "TCP failed"
+msgstr "TCP 失败"
+
+#: userland/apps/browser/util.c:176
+msgid "TCP reset"
+msgstr "TCP 复位"
+
+#: userland/apps/browser/util.c:174
+msgid "TCP timeout"
+msgstr "TCP 超时"
+
+#: userland/apps/browser/util.c:194
+msgid "TLS verification failed"
+msgstr "TLS 验证失败"
+
+#: userland/apps/browser/bookmarks.c:444
+msgid "Text found"
+msgstr "已找到文本"
+
+#: userland/apps/browser/bookmarks.c:451
+msgid "Text not found"
+msgstr "未找到文本"
+
+#: userland/apps/browser/navigation.c:599
+msgid "The address could not be parsed as HTTP."
+msgstr "无法把该地址解析为 HTTP。"
+
+#: userland/apps/browser/navigation.c:498
+msgid "The form action could not be parsed as HTTP."
+msgstr "无法把表单提交地址解析为 HTTP。"
+
+#: userland/apps/browser/bookmarks.c:203
+msgid "Title:"
+msgstr "标题:"
+
+#: userland/apps/browser/input.c:231
+msgid "Top"
+msgstr "顶部"
+
+#: userland/apps/browser/input.c:245
+msgid "Top of page"
+msgstr "页面顶部"
+
+#: userland/apps/browser/util.c:162
+msgid "Transmit failed"
+msgstr "发送失败"
+
+#: userland/apps/browser/bookmarks.c:352
+msgid "URL:"
+msgstr "地址:"
+
+#: userland/apps/browser/util.c:196
+msgid "Unknown network status"
+msgstr "未知网络状态"
+
+#: userland/apps/browser/navigation.c:811
+msgid "Unsupported Address"
+msgstr "不支持的地址"
+
+#: userland/apps/browser/litehtml_core.c:1884
+msgid "Untitled Page"
+msgstr "无标题"
+
+#: userland/apps/browser/navigation.c:812
+msgid "Use http://, https://, about:, or a ReliefOS file path such as /file.html."
+msgstr "请使用 http://、https://、about:，或类似 /file.html 的 ReliefOS 文件路径。"
+
+#: userland/apps/browser/auth.c:101
+msgid "Username for this HTTP host:"
+msgstr "此 HTTP 主机的用户名:"
+
+#: userland/apps/browser/input.c:152
+msgid "View"
+msgstr "查看"
+
+#: userland/apps/browser/view.c:902
+msgid "Viewport: "
+msgstr "视口: "
+
+#: configs/nls/messages/browser.c:8
+msgid "none"
+msgstr "无"

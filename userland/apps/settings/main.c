@@ -2155,8 +2155,8 @@ static void handle_click(int32_t x, int32_t y)
 int main(void)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("settings", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("settings");
     selected_language = language_selection();
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;

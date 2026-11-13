@@ -1,0 +1,3207 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/reliefmail/tools.cpp:396
+msgid "  (container)"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1102
+msgid "  · Default"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:111
+msgid "  · Disabled"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:624
+msgid "%s %u"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:620
+msgid "%s %u: %s (%llu bytes)"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:331
+msgid "%s (%llu bytes)"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:726
+msgid "%s · %s · %llu messages"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:588
+msgid "(no subject)"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:131
+msgid "163 Mail"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1143
+msgid "A new draft will be created under this sender. Current edits and attachments are copied; the original stays unchanged."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:171
+msgid "About ReliefMail"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:473
+msgid "Account"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:44
+msgid "Account %llu · %s · UIDVALIDITY %llu · UID %u\n"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:483
+msgid "Account %llu\nServer folder: %s\nFolder generation %llu · UIDVALIDITY %llu\nDeletes are targeted by exact UIDPLUS identity."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:299
+msgid "Account changed, but the local view could not be refreshed."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:668
+msgid "Account folders loaded from the local profile."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:287
+msgid "Account list is too large to show safely."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:387
+msgid "Account removal is running in the background."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:634
+msgid "Account removal returned an invalid result"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:611
+msgid "Account save returned an invalid result"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:616
+msgid "Account saved, but session credentials could not be retained; enter them again before connecting."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:962
+msgid "Account settings"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:545
+msgid "Account settings are being saved."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:295
+msgid "Account settings changed. Refreshing the local view."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:75
+msgid "Accounts"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:960
+msgid "Add account"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:916
+msgid "Add an account before composing a message."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:117
+msgid "Add mail account"
+msgstr ""
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:194
+msgid "Advanced"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:464
+msgid "All"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:718
+msgid "All fields"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:475
+msgid "All mail"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1431
+msgid "An attachment belongs to an older draft revision; reload the draft before copying."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:396
+msgid "An open editor must be resolved before closing."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:485
+msgid "Any (including unknown)"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:134
+msgid "Append the accepted message to its reviewed Sent folder over IMAP; never resends SMTP"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:141
+msgid "Application password / code"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:512
+msgid "Apply"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:391
+msgid "Archive"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:137
+msgid "Archive (IMAP only)"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:154
+msgid "Archive destination"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:91
+msgid "Archive failed"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:233
+msgid "Archive folder"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:90
+msgid "Archive pending"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1140
+msgid "Archive retry completed using IMAP only; SMTP was not contacted."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1923
+msgid "Archive retry completed without an archived result."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1145
+msgid "Archive retry did not reach the archived state; SMTP was not retried."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1924
+msgid "Archive retry failed; SMTP was not retried."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1909
+msgid "Archive retry returned no matching operation."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:92
+msgid "Archived in Sent"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1920
+msgid "Archiving is still pending; SMTP was not retried."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:949
+msgid "At least one result is uncertain. Refresh the server folder before deciding whether to act again."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:765
+msgid "Attach"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2124
+msgid "Attach a file"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:105
+msgid "Attachment"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2126
+msgid "Attachment limit reached."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:327
+msgid "Attachment name cannot be displayed safely."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:302
+msgid "Attachment saved to the selected path."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:484
+msgid "Attachment state"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:763
+msgid "Attachments"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:136
+msgid "Attachments are not available until the full message is fetched."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:472
+msgid "Attachments: none"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:82
+msgid "Authenticating"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:139
+msgid "Authentication"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:722
+msgid "B"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:957
+msgid "Background mail action failed."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:551
+msgid "Background operation failed"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:959
+msgid "Background work"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:812
+msgid "Bcc +"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:809
+msgid "Bcc:"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:467
+msgid "Body"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:735
+msgid "Bullets"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:208
+msgid "Cache days"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:143
+msgid "Cancel queued"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:650
+msgid "Cancel queued send"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1122
+msgid "Cancelling background work..."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:811
+msgid "Cc +"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:808
+msgid "Cc:"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:733
+msgid "Center"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:466
+msgid "Certificate repair is already open in ReliefAPK."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1154
+msgid "Change account"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:30
+msgid "Change password"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1152
+msgid "Change sender account"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:147
+msgid "Changing encrypted storage password"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:357
+msgid "Check the port, timeout, poll interval, and cache days."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:144
+msgid "Checking encrypted password storage"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:128
+msgid "Choose"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:242
+msgid "Choose a folder or search this account's cached mail."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2012
+msgid "Choose a matching contact to append its address to the active recipient field."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:105
+msgid "Choose a new vault password"
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:35
+msgid "Choose a real folder before using folder scope."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:167
+msgid "Choose a regular file owned by this user; links and shared files cannot be replaced."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:834
+msgid "Choose a selectable destination in this same account."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:157
+msgid "Choose a selectable folder in this same account"
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:39
+msgid "Choose an account before using account scope."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:289
+msgid "Choose an enabled account before using its server folders."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:135
+msgid "Choose archive target"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:107
+msgid "Choose destination folder"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:124
+msgid "Clear Trash"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:729
+msgid "Clear format"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1267
+msgid "Clear the Bcc field before hiding it."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1265
+msgid "Clear the Cc field before hiding it."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:709
+msgid "Clipboard"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:728
+msgid "Color"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1934
+msgid "Compose catalog could not be loaded."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1636
+msgid "Compose catalog request could not start."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1611
+msgid "Compose catalog request limit reached; reopen this window."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:766
+msgid "Configure this account's Archive folder before archiving messages."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:773
+msgid "Configure this account's Junk folder first."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:779
+msgid "Configure this account's Trash folder first."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:614
+msgid "Confirm SMTP attempt"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:490
+msgid "Confirm Trash clear"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:170
+msgid "Confirm action"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:405
+msgid "Confirm archive destination"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:574
+msgid "Confirm archive-only retry"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:138
+msgid "Confirm delivered"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:373
+msgid "Confirm delivery review"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:884
+msgid "Confirm exact message action"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:407
+msgid "Confirm folder"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:469
+msgid "Confirm folder deletion"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:457
+msgid "Confirm folder rename"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:881
+msgid "Confirm message action"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:139
+msgid "Confirm not delivered"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:405
+msgid "Confirm password"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:653
+msgid "Confirm queued cancellation"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1491
+msgid "Confirm queueing"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1491
+msgid "Confirm sending"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:202
+msgid "Connect timeout ms"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:81
+msgid "Connecting"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:430
+msgid "Connection test failed. Review the diagnostic below."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2046
+msgid "Contact address appended. The complete recipient field remains the send-time authority."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2300
+msgid "Contact search could not be retained safely."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1607
+msgid "Contact search or template request is invalid."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1998
+msgid "Contact suggestions could not be retained safely."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1940
+msgid "Contact, signature, or template data changed accounts; retry from the current draft."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:780
+msgid "Contacts"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:492
+msgid "Container"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:408
+msgid "Continue"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1006
+msgid "Convert a plain-text copy for editing? The saved draft remains unchanged until you save."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1007
+msgid "Convert to plain text"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:711
+msgid "Copy"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1144
+msgid "Copy draft"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1142
+msgid "Copy draft to another account"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:944
+msgid "Copy..."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1461
+msgid "Copying this exact draft revision under the selected account…"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2133
+msgid "Could not add this attachment."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2034
+msgid "Could not add this contact."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:692
+msgid "Could not allocate the bounded original preview."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:406
+msgid "Could not begin safe shutdown"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1123
+msgid "Could not cancel the current task"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:278
+msgid "Could not close the temporary export file."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:295
+msgid "Could not copy the folder name."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:195
+msgid "Could not create a private temporary export beside the selected file."
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:241
+msgid "Could not display this link safely."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:174
+msgid "Could not inspect the selected file safely."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1266
+msgid "Could not load saved drafts."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:278
+msgid "Could not load send history."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:127
+msgid "Could not load the bounded original preview"
+msgstr ""
+
+#: userland/apps/reliefmail/main.cpp:40
+msgid "Could not locate the ReliefMail worker executable."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:303
+msgid "Could not open the local profile"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:606
+msgid "Could not prepare the bounded SMTP confirmation."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:566
+msgid "Could not prepare the bounded archive retry confirmation."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:378
+msgid "Could not prepare the bounded archive review."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:645
+msgid "Could not prepare the bounded cancellation confirmation."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:361
+msgid "Could not prepare the bounded delivery review."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:392
+msgid "Could not prepare the exact archive destination review."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:877
+msgid "Could not prepare the exact message identity confirmation."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2281
+msgid "Could not prepare the signature text."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:94
+msgid "Could not queue encrypted credential storage"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:110
+msgid "Could not queue message fetch"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:594
+msgid "Could not queue the IMAP archive retry."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:634
+msgid "Could not queue the SMTP attempt."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:668
+msgid "Could not queue the cancellation."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:417
+msgid "Could not queue the delivery review."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:325
+msgid "Could not queue the folder operation."
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:138
+msgid "Could not queue this search"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:120
+msgid "Could not queue vault password change"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:74
+msgid "Could not queue vault unlock"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:864
+msgid "Could not refresh destination UIDVALIDITY."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:829
+msgid "Could not refresh destination folders."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:541
+msgid "Could not refresh the selected archive folder."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1284
+msgid "Could not reopen the selected draft."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:333
+msgid "Could not start profile initialization"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:424
+msgid "Could not start the certificate repair tool."
+msgstr ""
+
+#: userland/apps/reliefmail/main.cpp:46
+msgid "Could not start the local mail profile."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:227
+msgid "Could not start the selected export"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2129
+msgid "Could not store the selected path."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:781
+msgid "Could not write the selected message data"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:267
+msgid "Could not write the temporary export file."
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:99
+msgid "Create an encrypted vault before changing its password."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:21
+msgid "Create encrypted password vault"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1520
+msgid "Creating a local queued operation; no message will be sent now…"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:965
+msgid "Credentials"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:868
+msgid "Cross-account message moves and copies are not available."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:713
+msgid "Current account"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:712
+msgid "Current folder"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:196
+msgid "Custom CA file (optional)"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:129
+msgid "Custom IMAP"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:712
+msgid "Cut"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:596
+msgid "Date"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:590
+msgid "Date unavailable"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:503
+msgid "Dates use received time (IMAP INTERNALDATE) in UTC; both dates are inclusive, format YYYY-MM-DD."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:144
+msgid "Default account"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:470
+msgid "Delete"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:249
+msgid "Delete account"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:123
+msgid "Delete folder"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:946
+msgid "Delete permanently"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:466
+msgid "Delete server folder"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:86
+msgid "Delivered; archive pending"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:755
+msgid "Delivery"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1102
+msgid "Delivery history loaded."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1839
+msgid "Delivery is uncertain. This message will not be sent again automatically."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:87
+msgid "Delivery needs review"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:106
+msgid "Delivery queue"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1161
+msgid "Delivery review recorded. No SMTP retry was started."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:51
+msgid "Destination account %llu · %s · folder generation %llu · UIDVALIDITY %llu\n"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:125
+msgid "Destructive actions"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2064
+msgid "Discard and close"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2100
+msgid "Discard edits"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:135
+msgid "Display name"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:79
+msgid "Draft"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1824
+msgid "Draft copied under the selected account. The original draft remains unchanged."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1457
+msgid "Draft copy could not start; the original remains open."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1792
+msgid "Draft copy failed; the original remains open."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1356
+msgid "Draft edit counter reached its limit."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1467
+msgid "Draft is already saved."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:882
+msgid "Draft list no longer matches this account configuration."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1035
+msgid "Draft reopened — saves use its exact current revision"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1394
+msgid "Draft save could not start; edits remain here."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:523
+msgid "Draft save failed; local edits are preserved."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1767
+msgid "Draft saved safely."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1745
+msgid "Draft saved, but attachment metadata could not be refreshed."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1760
+msgid "Draft saved, but attachment references could not be refreshed."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1339
+msgid "Draft sender identity changed; reopen or copy the draft first."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:388
+msgid "Drafts"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:227
+msgid "Drafts folder"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:167
+msgid "Drafts..."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:39
+msgid "Drag to resize panes"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1101
+msgid "Durable send history loaded. SMTP and archive actions require separate explicit confirmation."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:655
+msgid "Edit"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:122
+msgid "Edit folder"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:117
+msgid "Edit mail account"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:751
+msgid "Editing"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:137
+msgid "Email address"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:143
+msgid "Enabled"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:805
+msgid "Encrypted credentials unlocked for this session."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:30
+msgid "Encrypted password vault"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:10
+msgid "Encrypted password vault is locked or available from Passwords..."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:504
+msgid "Enter a new incoming password when the IMAP server or user changes."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:517
+msgid "Enter a new outgoing password when the SMTP server or user changes."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:418
+msgid "Enter a non-empty matching password."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:18
+msgid "Enter account passwords first, then save them to an encrypted vault if desired."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:382
+msgid "Enter both incoming and outgoing passwords or application codes."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:404
+msgid "Enter the IMAP password before testing incoming authentication."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:403
+msgid "Enter the SMTP password before testing outgoing authentication."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:890
+msgid "Enter the account's incoming password before changing server mail."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:840
+msgid "Enter the account's incoming password before checking the destination."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:809
+msgid "Enter the account's incoming password before refreshing its folders."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:314
+msgid "Enter the current account's incoming password first."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:521
+msgid "Enter this account's current incoming password before checking the destination."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:579
+msgid "Enter this account's current incoming password first."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:619
+msgid "Enter this account's current outgoing password first."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:173
+msgid "Exit"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:495
+msgid "Export stopped because its profile context is no longer current."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:481
+msgid "Export stopped because the local profile changed."
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:79
+msgid "Export stopped because the search view changed."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:402
+msgid "Export stopped because the window is closing."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:610
+msgid "Export the complete raw message without truncating the display preview"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:88
+msgid "Failed before delivery"
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:198
+msgid "Fetch body"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1205
+msgid "Fetch the complete message before replying or forwarding it."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:138
+msgid "Fetching complete message"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:528
+msgid "Field: %s · Scope: %s"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:651
+msgid "File"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:236
+msgid "Filters..."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1519
+msgid "Finalizing the selected draft revision before SMTP…"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:752
+msgid "Find"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:782
+msgid "Find contact"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2296
+msgid "Find contacts by name or address"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2237
+msgid "Find text"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:474
+msgid "Folder"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1035
+msgid "Folder identity refreshed through IMAP."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1082
+msgid "Folder identity refreshed."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:289
+msgid "Folder list is too large to show safely."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1081
+msgid "Folder list refreshed from the server."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:668
+msgid "Folder list synchronized; cached messages remain available offline."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1000
+msgid "Folder worker returned an invalid snapshot."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:221
+msgid "Folders"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:714
+msgid "Font"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2253
+msgid "Formatting and hyperlinks will be omitted from the outgoing message. The saved rich document remains available if you switch back before sending."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:932
+msgid "Forward as .eml"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1083
+msgid "Forward draft — the complete original will be attached on first save."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:931
+msgid "Forward mail"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:465
+msgid "From"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:794
+msgid "From:"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:486
+msgid "Has attachments"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:194
+msgid "Headers"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:761
+msgid "Headers are cached. Fetch the complete message to read its body."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1317
+msgid "Headers only"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:760
+msgid "Headers only are cached; this is not a complete original message."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1263
+msgid "Hide Bcc"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1262
+msgid "Hide Cc"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:975
+msgid "Hide preview"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:176
+msgid "Home"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:724
+msgid "I"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:204
+msgid "I/O timeout ms"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:146
+msgid "IMAP is required in this build. OAuth2-only login is not available. Use your provider's application password when required."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:165
+msgid "IMAP password / app code"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:153
+msgid "IMAP server"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:162
+msgid "IMAP username"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:126
+msgid "Identity"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:158
+msgid "Implicit TLS"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:386
+msgid "Inbox"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:223
+msgid "Inbox folder"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:151
+msgid "Incoming"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:169
+msgid "Incoming and outgoing authentication are tested separately. Tests never send mail."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:646
+msgid "Incoming authentication succeeded; no messages were sent."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:738
+msgid "Indent"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:567
+msgid "Inline image preview is unavailable; plain text remains available."
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:655
+msgid "Insert"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:390
+msgid "Junk"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:231
+msgid "Junk folder"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1144
+msgid "Keep current"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:652
+msgid "Keep queued"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1007
+msgid "Keep read-only"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2254
+msgid "Keep rich formatting"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:458
+msgid "Later"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:979
+msgid "Layout"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:198
+msgid "Leave blank to use the system certificates. Private CAs are provided by your administrator."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:732
+msgid "Left"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:771
+msgid "Link"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2222
+msgid "Link target (http, https, or mailto)"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:769
+msgid "Links"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1201
+msgid "Load a complete selected message before creating a reply or forward."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:336
+msgid "Loading local accounts and folders..."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:129
+msgid "Loading local profile"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1335
+msgid "Loading the local profile..."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1640
+msgid "Loading the selected template…"
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:233
+msgid "Loading this message from the local cache..."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:203
+msgid "Mail navigation"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:100
+msgid "Mail tools"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:961
+msgid "Manage accounts"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:169
+msgid "Manage accounts..."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:939
+msgid "Mark read"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:940
+msgid "Mark unread"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:404
+msgid "Master password"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:783
+msgid "Matches"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2246
+msgid "Matching text selected."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:119
+msgid "Membership"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:655
+msgid "Message"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1373
+msgid "Message added to the selection"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:302
+msgid "Message data saved to the selected path."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:943
+msgid "Message flags"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:746
+msgid "Message format"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:684
+msgid "Message headers synchronized; bodies are fetched only when you open a message."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:761
+msgid "Message loaded from the local cache."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1373
+msgid "Message removed from the selection"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1323
+msgid "Message text unavailable"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:468
+msgid "Message-ID"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:249
+msgid "Messages"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:716
+msgid "Mono"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:238
+msgid "More"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:937
+msgid "Move..."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:928
+msgid "New"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:239
+msgid "New accounts need both passwords. For an edit, leave a password blank only when reusing a matching session credential; a changed server or user needs a new password. Credentials stay in this session unless you explicitly save them to the encrypted vault."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:958
+msgid "New draft — changes save automatically"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:120
+msgid "New folder"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:404
+msgid "New master password"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:628
+msgid "New message"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:443
+msgid "New server folder name"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:479
+msgid "Newest received first"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:131
+msgid "Next"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:127
+msgid "No account is configured. Add one from the Send/Receive tab."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:487
+msgid "No attachments"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1119
+msgid "No background task is running"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1565
+msgid "No confirmed delivery is available for archive retry."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1576
+msgid "No current IMAP credential is available to retry Sent-folder archiving."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1534
+msgid "No current SMTP credential is available. Unlock the vault or enter the account password first."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:474
+msgid "No durable send operations are recorded for this account."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2275
+msgid "No enabled signature is available for this account."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:47
+msgid "No encrypted password vault is available to unlock."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:11
+msgid "No encrypted vault is saved; account credentials remain session-only."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:279
+msgid "No message selected"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1334
+msgid "No messages match this view.\nSynchronize headers or change filters."
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:67
+msgid "No more cached rows can be added to this view."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:740
+msgid "No safe HTML preview is available. Choose Plain text to read this message."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:614
+msgid "No saved account credential matches the current account settings."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2010
+msgid "No saved contacts matched that search."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:150
+msgid "Not enough memory to choose an export name."
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:55
+msgid "Not enough memory to copy the search text."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:377
+msgid "Not enough memory to handle account passwords."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:426
+msgid "Not enough memory to handle the password."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:203
+msgid "Not enough memory to prepare this export."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:346
+msgid "Not enough memory to read account settings."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:57
+msgid "Not enough memory to retain the vault password for this operation."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:736
+msgid "Number"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:480
+msgid "Oldest received first"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:640
+msgid "Only a ready operation can be cancelled."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:601
+msgid "Only a ready operation under the current account generation can be sent."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:236
+msgid "Only bounded HTTP or HTTPS links can be opened."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:925
+msgid "Open a new rich-text draft"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:927
+msgid "Open a saved draft using its exact current revision"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:970
+msgid "Open additional mail tools"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:571
+msgid "Open draft"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1005
+msgid "Open draft safely"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:244
+msgid "Open link"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:214
+msgid "Open link..."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:673
+msgid "Open the selected address after reviewing its destination"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:244
+msgid "Open this exact link in the system browser?"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:513
+msgid "Operation #%llu · %s · delivery count %u\nMessage-ID: %s\nFrom: %s\nTo: %s\nArchive target: %s · account generation %llu · folder generation %llu · UIDVALIDITY %llu\n%s"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:157
+msgid "Operation #%llu\nMessage-ID: %s\nStage %u · delivery count %u\nFrom: %s\nTo: "
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:971
+msgid "Operations"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:938
+msgid "Organize"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:195
+msgid "Original preview"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:737
+msgid "Outdent"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:174
+msgid "Outgoing"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:649
+msgid "Outgoing authentication succeeded; no messages were sent."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:731
+msgid "Paragraph"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:140
+msgid "Password"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:813
+msgid "Password vault saved with cleanup pending."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:814
+msgid "Passwords saved in the encrypted vault."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:963
+msgid "Passwords..."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:710
+msgid "Paste"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:948
+msgid "Permanent deletion"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:947
+msgid "Permanently delete only these exact UIDs with the server's UIDPLUS capability"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:192
+msgid "Plain text"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:563
+msgid "Plain-text preview is truncated; save the original to view the complete message."
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:206
+msgid "Poll minutes"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:155
+msgid "Port"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:130
+msgid "Previous"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2052
+msgid "Profile changed. This editor is preserved locally and cannot save or send until reopened."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1354
+msgid "Profile changed; this draft is read-only until reopened."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1364
+msgid "Profile or a send operation is in progress; saving is blocked."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:487
+msgid "Profile recovery needs attention before mail can be read"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:128
+msgid "Provider"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:130
+msgid "QQ Mail"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:707
+msgid "Queue"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1494
+msgid "Queue locally"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:933
+msgid "Queued %zu exact-identity message actions."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:928
+msgid "Queued %zu of %zu message actions; inspect the results before repeating any uncertain action."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1846
+msgid "Queued locally. No SMTP connection was started."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:80
+msgid "Queued; not sent"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:817
+msgid "Raw Bcc field is preserved exactly and validated at send time"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:816
+msgid "Raw Cc field is preserved exactly and validated at send time"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:815
+msgid "Raw To field is preserved exactly and validated at send time"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:115
+msgid "Read the selected account's current server folder list"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:139
+msgid "Reading a bounded message section"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:137
+msgid "Reading cached message"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:976
+msgid "Reading pane"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1136
+msgid "Reading pane arranged below the message list"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1133
+msgid "Reading pane arranged beside the message list"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:177
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:144
+msgid "Ready operations"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:835
+msgid "Ready to compose"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:496
+msgid "Received date end (UTC)"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:494
+msgid "Received date start (UTC)"
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:53
+msgid "Received-after date must not be later than received-before."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:588
+msgid "Recipient unavailable"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:374
+msgid "Record review"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:668
+msgid "Redo"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:114
+msgid "Refresh folders"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:129
+msgid "Refresh queue"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:428
+msgid "Refresh the account list before using this account."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:475
+msgid "Refresh the queue to load durable send history."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:955
+msgid "Refresh the selected account's folder list"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:425
+msgid "ReliefAPK closed. If certificate repair completed, test the connection again."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:214
+msgid "ReliefAPK downloads the signed CA package and requests administrator authentication. Test the connection again after repair."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:470
+msgid "ReliefAPK is not installed. Install the signed ca-certificates-bundle package with your system package manager."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:155
+msgid "ReliefMail"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1137
+msgid "ReliefMail\nNative mail reader and account client"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:767
+msgid "Remove"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:367
+msgid "Remove account"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:368
+msgid "Remove the selected account? Its local cached messages will be kept."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:143
+msgid "Removing account settings"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:121
+msgid "Rename"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:454
+msgid "Rename server folder"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:455
+msgid "Renaming may change server-side message locations. Review the wire name before continuing."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:458
+msgid "Repair certificates"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:210
+msgid "Repair/update system certificates"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:171
+msgid "Replace"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:170
+msgid "Replace the existing file?"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:929
+msgid "Reply"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:930
+msgid "Reply all"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:933
+msgid "Reply and forward"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1084
+msgid "Reply draft — the message is quoted and will save locally."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:571
+msgid "Retry Sent-folder archive"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:757
+msgid "Retry archive"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1598
+msgid "Retrying Sent-folder archiving only; SMTP will not be contacted."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:167
+msgid "Reuse session password if identity is unchanged"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:402
+msgid "Review Sent-folder destination"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:561
+msgid "Review and confirm a current Sent-folder destination first."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:483
+msgid "Review certificate repair in ReliefAPK. After completion, test the mail connection again."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:136
+msgid "Review the current account generation and exact IMAP archive target"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1492
+msgid "Review the full message identity and recipients before SMTP submission."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:371
+msgid "Review uncertain delivery"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:93
+msgid "Reviewed as delivered"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:748
+msgid "Rich text"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:734
+msgid "Right"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1152
+msgid "SMTP delivery and Sent-folder archive completed."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:403
+msgid "SMTP delivery is already accepted or explicitly reviewed. This confirmation only binds a current IMAP folder; it never resends SMTP."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1879
+msgid "SMTP delivery is confirmed and the Sent-folder archive completed."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1154
+msgid "SMTP delivery is confirmed; Sent-folder archive needs review. Do not resend."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1885
+msgid "SMTP delivery is confirmed; Sent-folder archiving needs attention. SMTP will not be retried."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1890
+msgid "SMTP delivery is uncertain. Do not retry this message."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1156
+msgid "SMTP delivery is uncertain. No automatic retry was started."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1895
+msgid "SMTP did not accept this message. You may review the draft and retry explicitly."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:188
+msgid "SMTP password / app code"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:176
+msgid "SMTP server"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1870
+msgid "SMTP submission failed."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1555
+msgid "SMTP submission is running; closing is blocked until its result is known."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:185
+msgid "SMTP username"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:159
+msgid "STARTTLS"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:193
+msgid "Safe HTML"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:451
+msgid "Safe shutdown could not finish"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:716
+msgid "Sans"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:256
+msgid "Save account"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2064
+msgid "Save and close"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:155
+msgid "Save attachment"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:206
+msgid "Save attachment..."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2063
+msgid "Save changes to this draft before closing ReliefMail?"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2099
+msgid "Save changes to this draft before closing?"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:652
+msgid "Save draft"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:665
+msgid "Save draft (Ctrl+S)"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:34
+msgid "Save encrypted credentials"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:608
+msgid "Save headers..."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:155
+msgid "Save message data"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:200
+msgid "Save original..."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:609
+msgid "Save the cached message headers"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1484
+msgid "Save the draft before queueing this revision."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1409
+msgid "Save this draft first and choose a different account to copy it."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:30
+msgid "Save/update"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:773
+msgid "Saved content"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:142
+msgid "Saving account settings"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:146
+msgid "Saving encrypted password storage"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:230
+msgid "Saving message data in bounded background chunks..."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:140
+msgid "Saving the complete original as a forwarded attachment"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2079
+msgid "Saving the draft before closing ReliefMail."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1399
+msgid "Saving the first draft revision…"
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:231
+msgid "Saving the selected attachment in bounded background chunks..."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1399
+msgid "Saving this exact draft revision…"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:234
+msgid "Search"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:218
+msgid "Search cached sender, subject, body coverage, or message ID"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:463
+msgid "Search field"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:456
+msgid "Search filters"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:471
+msgid "Search scope"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:505
+msgid "Search selected IMAP folder on server"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:135
+msgid "Searching local mail"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1639
+msgid "Searching saved contacts…"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:136
+msgid "Searching the selected IMAP folder"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:157
+msgid "Security"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:261
+msgid "Select a cached message in this folder."
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:84
+msgid "Select a cached message to read it."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:511
+msgid "Select a delivered operation and a selectable same-account destination."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:132
+msgid "Select a loaded message before saving its content."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:79
+msgid "Select a message before fetching its body."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:115
+msgid "Select a message before viewing its original source."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:251
+msgid "Select a message to read its cached content."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1088
+msgid "Select a real folder before using folder scope."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:366
+msgid "Select a saved account to remove."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:438
+msgid "Select a selectable server folder first."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:550
+msgid "Select a send operation whose SMTP delivery is uncertain."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:488
+msgid "Select a server folder. Containers cannot be selected for server actions."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:753
+msgid "Select all"
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:164
+msgid "Select an account and a selectable folder before synchronizing headers."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1256
+msgid "Select an account before opening its drafts."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:304
+msgid "Select an account before synchronizing folders."
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:120
+msgid "Select an account with a real folder before server search."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:171
+msgid "Select an operation to review its exact identity and last result."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:351
+msgid "Select and refresh a selectable folder in this same account."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:707
+msgid "Select messages from one enabled IMAP account before applying server actions."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2153
+msgid "Select text before copying."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2159
+msgid "Select text before cutting."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:477
+msgid "Select the configured, selectable Trash folder first."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:492
+msgid "Selectable"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:699
+msgid "Send"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:132
+msgid "Send history"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1095
+msgid "Send history no longer matches the selected account."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:706
+msgid "Send now"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1898
+msgid "Send operation completed."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1899
+msgid "Send operation needs attention."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:141
+msgid "Send queued"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:611
+msgid "Send queued message"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:176
+msgid "Send/Receive"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:481
+msgid "Sender"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:586
+msgid "Sender unavailable"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:83
+msgid "Sending envelope"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:84
+msgid "Sending message data"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:387
+msgid "Sent"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:225
+msgid "Sent folder"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1915
+msgid "Sent-folder archive completed. SMTP was not retried."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1595
+msgid "Sent-folder archive retry could not start."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:950
+msgid "Server actions completed; the local view is refreshing."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:116
+msgid "Server folders"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:508
+msgid "Server search cannot apply local-only date, unread, starred, attachment, unified-inbox, or all-mail scope."
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1267
+msgid "Show or hide the Bcc field."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1265
+msgid "Show or hide the Cc field."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1049
+msgid "Show preview"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:774
+msgid "Showing a bounded original preview."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2011
+msgid "Showing the first 32 matching contact addresses."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:768
+msgid "Showing the first 64 KiB; use Save original to export the full message.\n\n"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2014
+msgid "Showing the first 64 templates; manage the catalog in Tools."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:977
+msgid "Side by side"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:775
+msgid "Signature"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2292
+msgid "Signature inserted at the current caret."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:716
+msgid "SimSun"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:569
+msgid "Some HTML content uses a safe fallback."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:478
+msgid "Sort whole query"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:978
+msgid "Stacked"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:941
+msgid "Star"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:492
+msgid "Starred only"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:300
+msgid "Starting local profile..."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:409
+msgid "Stopping background work safely..."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:466
+msgid "Subject"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1347
+msgid "Subject is invalid or too long."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:584
+msgid "Subject unavailable"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:810
+msgid "Subject:"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:142
+msgid "Submit this ready operation through SMTP only after explicit confirmation"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:117
+msgid "Subscribe"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:187
+msgid "Sync"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:954
+msgid "Sync folders"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:952
+msgid "Sync headers"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:953
+msgid "Synchronize selected folder headers"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:132
+msgid "Synchronizing folder names"
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:197
+msgid "Synchronizing headers. Message bodies are not fetched yet."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:133
+msgid "Synchronizing message headers"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:448
+msgid "TLS negotiation failed before verification completed. Check the port, TLS/STARTTLS setting and network connection."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:776
+msgid "Template"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1975
+msgid "Template content inserted at the current caret; the subject was filled only if empty."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:242
+msgid "Test incoming"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:245
+msgid "Test outgoing"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:130
+msgid "Testing incoming sign-in"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:131
+msgid "Testing outgoing sign-in"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2186
+msgid "Text color"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2243
+msgid "Text not found."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1008
+msgid "The account changed while destination folders were being refreshed. Review the current account and select messages again."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1056
+msgid "The archive destination identity changed during review. Choose it again."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1435
+msgid "The attachment list exceeds its safe copy limit."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:744
+msgid "The bounded original preview is not loaded. Use Save original to export the complete message."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:445
+msgid "The certificate does not match the server hostname. Check the IMAP/SMTP server address; updating CAs will not fix a hostname mismatch."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:442
+msgid "The certificate is expired or not yet valid. Check the system date and time, then the server certificate."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1946
+msgid "The compose account changed before catalog results arrived."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1193
+msgid "The compose window could not be opened."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:251
+msgid "The confirmed link was handed to the system browser."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2041
+msgid "The contact address is not valid UTF-8."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1798
+msgid "The copy completed, but this compose window is no longer available."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1814
+msgid "The copy completed, but this editor or account changed. Reopen the target account's draft list."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1820
+msgid "The copy was saved, but could not replace this editor. The original draft remains on its account."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:436
+msgid "The custom CA file could not be loaded. Check its path and contents, or leave it blank to use system certificates."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:294
+msgid "The destination changed or could not be installed safely; the original file was kept."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:804
+msgid "The destination folder is no longer available; choose it again."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:895
+msgid "The draft changed or its account identity no longer matches. Reload the draft list."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2077
+msgid "The draft could not be saved; ReliefMail remains open."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1067
+msgid "The draft edit counter reached its limit."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1831
+msgid "The finalized send operation could not be created."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:483
+msgid "The local profile changed. Reloading the current profile."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1323
+msgid "The local profile changed; this compose window cannot save or send."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1188
+msgid "The local profile is still loading."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:90
+msgid "The message account changed. Refresh the folder before fetching."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1060
+msgid "The new message body could not be opened safely."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:25
+msgid "The operation failed."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:515
+msgid "The operation has no durable source generation and cannot be reviewed."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1162
+msgid "The operation is ready only for a separately confirmed SMTP attempt."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:337
+msgid "The operation no longer matches the selected account."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:245
+msgid "The original message selection changed while refreshing the destination."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:719
+msgid "The original message selection changed while refreshing the destination. Select it again."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:695
+msgid "The original message selection could not be retained. Select the messages again."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:516
+msgid "The password vault could not be checked; cached mail will still load."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:213
+msgid "The previous export was replaced by a new one."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:352
+msgid "The profile changed while account settings were open. Reopen the account dialog."
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:13
+msgid "The query is invalid."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:741
+msgid "The reader result no longer matches the selected message."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1158
+msgid "The ready send operation was cancelled before SMTP submission."
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:48
+msgid "The received date is out of range."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2028
+msgid "The recipient field is too long to add this contact."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1014
+msgid "The refreshed folder identity could not be retained safely."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1247
+msgid "The reply or forward window could not be opened safely."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:222
+msgid "The selected account is no longer available."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:309
+msgid "The selected account is no longer in the local profile."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:143
+msgid "The selected attachment is no longer available."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:901
+msgid "The selected draft could not be opened safely."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:160
+msgid "The selected file path is too long."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:303
+msgid "The selected folder identity is stale."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1240
+msgid "The selected message cannot be used to create this draft."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1177
+msgid "The selected sender account is no longer available."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1960
+msgid "The selected template changed before it could be inserted."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2336
+msgid "The sender account list could not be refreshed."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1331
+msgid "The sending account is no longer available."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:439
+msgid "The server certificate chain is not trusted. Check the server address and certificate chain; the system CA bundle may need updating."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:1219
+msgid "The source message account changed. Reload it before composing."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:435
+msgid "The system CA certificate bundle could not be loaded. Repair the system certificates, then test again."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:248
+msgid "The system browser could not open this link."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1168
+msgid "The tool operation completed."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:802
+msgid "The unlocked vault contained no usable account credentials."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2066
+msgid "The unsaved draft is still open."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1128
+msgid "The worker result does not match the reviewed operation."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:261
+msgid "The worker returned an inconsistent export chunk."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1327
+msgid "This account changed while the compose window was open."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2114
+msgid "This compose action is unavailable while the profile or current operation is unresolved."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:467
+msgid "This deletes the folder on the server. The special Inbox, Sent, Drafts, Trash, Junk, and Archive mappings cannot be deleted here."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1840
+msgid "This draft already has a finalized send operation; no new payload was created."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1003
+msgid "This draft uses a rich-editor format this version cannot read."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1004
+msgid "This draft's rich-editor state is damaged."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:794
+msgid "This message action is unavailable."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:83
+msgid "This message body is already cached."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:736
+msgid "This message has no cached body text."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:735
+msgid "This message is stored as headers only.\nFetch the complete message to read it."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1153
+msgid "This new draft will use the following identity."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:488
+msgid "This permanently deletes messages in the configured Trash folder. It never issues an unrestricted EXPUNGE."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:651
+msgid "This removes the ready operation from future SMTP submission. It does not affect a message already sent."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:572
+msgid "This retries only IMAP append to the exact reviewed folder. SMTP will not be contacted."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1493
+msgid "This saves a finalized local send operation. No SMTP connection will be started."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1130
+msgid "This sender cannot change while the current operation is unresolved."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:882
+msgid "This server action applies only to the exact account, folder, UIDVALIDITY, and UIDs shown below."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:774
+msgid "This source contains headers only, not a complete original message."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:612
+msgid "This starts a new SMTP attempt for this ready operation. Confirm the recipient and Message-ID carefully."
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:596
+msgid "To"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:807
+msgid "To:"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:601
+msgid "Too many saved credentials."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:176
+msgid "Tools"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:389
+msgid "Trash"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1112
+msgid "Trash deletion completed. Refreshing the server folder."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:1113
+msgid "Trash deletion completed; refreshing the server folder."
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:229
+msgid "Trash folder"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:491
+msgid "Type the account-bound Trash phrase."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:470
+msgid "Type the account-bound delete phrase."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:458
+msgid "Type the account-bound rename phrase."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:885
+msgid "Type the action and selected-message count."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:374
+msgid "Type the exact decision to record."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:406
+msgid "Type the operation review phrase to save this exact IMAP destination."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:575
+msgid "Type the operation-bound archive phrase."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:654
+msgid "Type the operation-bound cancellation phrase."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:615
+msgid "Type the operation-bound send phrase."
+msgstr ""
+
+#: userland/apps/reliefmail/ui_widgets.cpp:316
+msgid "Type the text above"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:726
+msgid "U"
+msgstr ""
+
+#: configs/nls/messages/reliefmail.c:5
+msgid "UID"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:140
+msgid "Uncertain delivery"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:666
+msgid "Undo"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:472
+msgid "Unified"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:714
+msgid "Unified inbox"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:95
+msgid "Unknown delivery state"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:488
+msgid "Unknown only"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:31
+msgid "Unlock"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:30
+msgid "Unlock again"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:52
+msgid "Unlock encrypted password vault"
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:81
+msgid "Unlock or enter at least one account password before saving the vault."
+msgstr ""
+
+#: userland/apps/reliefmail/window_query.cpp:125
+msgid "Unlock or enter the selected account's incoming password before server search."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:964
+msgid "Unlock or save the optional encrypted password vault"
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:315
+msgid "Unlock the password vault or add this account's incoming password before syncing."
+msgstr ""
+
+#: userland/apps/reliefmail/window_reader.cpp:98
+msgid "Unlock the password vault or enter this account's incoming password before fetching."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:507
+msgid "Unlock the vault or enter the incoming password before reusing it."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:520
+msgid "Unlock the vault or enter the outgoing password before reusing it."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:145
+msgid "Unlocking encrypted password storage"
+msgstr ""
+
+#: userland/apps/reliefmail/dialogs.cpp:490
+msgid "Unread only"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1359
+msgid "Unsaved changes — autosave scheduled"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:942
+msgid "Unstar"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:118
+msgid "Unsubscribe"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2254
+msgid "Use plain text"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2252
+msgid "Use plain-text format"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:819
+msgid "Vault password changed."
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:818
+msgid "Vault password changed; cleanup is pending."
+msgstr ""
+
+#: userland/apps/reliefmail/window_vault.cpp:102
+msgid "Verify current vault password"
+msgstr ""
+
+#: userland/apps/reliefmail/reader.cpp:105
+msgid "View"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1405
+msgid "Wait for the current compose operation before copying this draft."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:689
+msgid "Wait for the current message action batch to finish before starting another."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2123
+msgid "Wait for the current save before changing attachments."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1135
+msgid "Wait for the current save before changing the sender account."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2095
+msgid "Wait for the current save or send result before closing."
+msgstr ""
+
+#: userland/apps/reliefmail/window_accounts.cpp:334
+msgid "Wait for the local account list to load."
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:2061
+msgid "Wait for the open compose operation to finish before closing ReliefMail."
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:85
+msgid "Waiting for SMTP result"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:1479
+msgid "Waiting for the current save before finalizing this message…"
+msgstr ""
+
+#: userland/apps/reliefmail/window.cpp:148
+msgid "Working in the background"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:370
+msgid "You are recording a user decision that delivery did not succeed. This decision will not send; SMTP retry requires a second confirmation."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:369
+msgid "You are recording a user decision that delivery succeeded. This decision will not contact SMTP."
+msgstr ""
+
+#: userland/apps/reliefmail/window_actions.cpp:384
+msgid "\nCurrent account generation %llu\nExact IMAP destination: %s\nFolder generation %llu · UIDVALIDITY %llu\n"
+msgstr ""
+
+#: configs/nls/messages/reliefmail.c:6
+msgid "none"
+msgstr ""
+
+#: userland/apps/reliefmail/tools.cpp:516
+msgid "not configured"
+msgstr ""
+
+#: configs/nls/messages/reliefmail.c:7
+msgid "s"
+msgstr ""
+
+#: userland/apps/reliefmail/compose_window.cpp:509
+msgid "size checked on save"
+msgstr ""
+
+#: configs/nls/messages/reliefmail.c:8
+msgid "worker error"
+msgstr ""

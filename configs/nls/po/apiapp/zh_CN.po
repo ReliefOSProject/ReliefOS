@@ -1,0 +1,147 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/apiapp/main.c:347
+msgid " bytes"
+msgstr " 字节"
+
+#: userland/apps/apiapp/main.c:379
+msgid " bytes processed"
+msgstr " 字节已处理"
+
+#: userland/apps/apiapp/main.c:349
+msgid " of "
+msgstr " / "
+
+#: userland/apps/apiapp/main.c:759
+msgid "< Back"
+msgstr "< 上一步"
+
+#: userland/apps/apiapp/main.c:617
+msgid "API Installer"
+msgstr "API 安装程序"
+
+#: userland/apps/apiapp/main.c:708
+msgid "Application Installer"
+msgstr "应用安装程序"
+
+#: userland/apps/apiapp/main.c:530
+msgid "Authorizing installation..."
+msgstr "正在授权安装..."
+
+#: userland/apps/apiapp/main.c:355
+msgid "Cancel"
+msgstr "取消"
+
+#: userland/apps/apiapp/main.c:787
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/apiapp/main.c:654
+msgid "Connecting..."
+msgstr "正在连接..."
+
+#: userland/apps/apiapp/main.c:780
+msgid "Could not install:"
+msgstr "无法安装："
+
+#: userland/apps/apiapp/main.c:638
+msgid "Could not start download"
+msgstr "无法启动下载"
+
+#: userland/apps/apiapp/main.c:749
+msgid "Create desktop shortcut"
+msgstr "创建桌面快捷方式"
+
+#: userland/apps/apiapp/main.c:697
+msgid "Download cancelled"
+msgstr "下载已取消"
+
+#: userland/apps/apiapp/main.c:661
+msgid "Download failed"
+msgstr "下载失败"
+
+#: userland/apps/apiapp/main.c:341
+msgid "Downloaded"
+msgstr "已下载"
+
+#: userland/apps/apiapp/main.c:331
+msgid "Downloading Application"
+msgstr "正在下载应用"
+
+#: userland/apps/apiapp/main.c:618
+msgid "Downloading application"
+msgstr "正在下载应用"
+
+#: userland/apps/apiapp/main.c:653
+msgid "Downloading..."
+msgstr "正在下载..."
+
+#: userland/apps/apiapp/main.c:658
+msgid "Finalizing download..."
+msgstr "正在完成下载..."
+
+#: userland/apps/apiapp/main.c:753
+msgid "Install"
+msgstr "安装"
+
+#: userland/apps/apiapp/main.c:741
+msgid "Install Options"
+msgstr "安装选项"
+
+#: userland/apps/apiapp/main.c:723
+msgid "Install location:"
+msgstr "安装位置："
+
+#: userland/apps/apiapp/main.c:744
+msgid "Install path:"
+msgstr "安装路径："
+
+#: userland/apps/apiapp/main.c:768
+msgid "Installation Complete"
+msgstr "安装完成"
+
+#: userland/apps/apiapp/main.c:777
+msgid "Installation Failed"
+msgstr "安装失败"
+
+#: userland/apps/apiapp/main.c:368
+msgid "Installing Application"
+msgstr "正在安装应用"
+
+#: userland/apps/apiapp/main.c:558
+msgid "Installing..."
+msgstr "正在安装..."
+
+#: userland/apps/apiapp/main.c:730
+msgid "Next >"
+msgstr "下一步 >"
+
+#: userland/apps/apiapp/main.c:386
+msgid "Please keep this window open until installation completes."
+msgstr "请保持此窗口打开，直到安装完成。"
+
+#: userland/apps/apiapp/main.c:624
+msgid "Preparing download..."
+msgstr "正在准备下载..."
+
+#: userland/apps/apiapp/main.c:711
+msgid "Ready to install:"
+msgstr "准备安装："
+
+#: userland/apps/apiapp/main.c:771
+msgid "Successfully installed:"
+msgstr "成功安装："
+
+#: userland/apps/apiapp/main.c:717
+msgid "Version:"
+msgstr "版本："

@@ -1,0 +1,127 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/servicemgr/main.c:44
+msgid "ALSA state"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:44
+msgid "Audio"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:47
+msgid "BusyBox ntpd"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:45
+msgid "BusyBox udhcpc"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:45
+msgid "DHCP"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:152
+msgid "Default runlevel updated"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:227
+msgid "Detail"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:46
+msgid "Devices"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:208
+msgid "Failed"
+msgstr ""
+
+#: configs/nls/messages/servicemgr.c:5
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:262
+msgid "Refresh"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:161
+msgid "Refreshing OpenRC..."
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:46
+msgid "ReliefOS device protocol"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:279
+msgid "Restart"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:202
+msgid "Running"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:222
+msgid "Runtime state is visible. Administrator rights are required to control services."
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:264
+msgid "Save"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:224
+msgid "Service"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:351
+msgid "Service Manager"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:314
+msgid "Service setting changed"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:352
+msgid "Services"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:267
+msgid "Start"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:211
+msgid "Starting"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:225
+msgid "State"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:273
+msgid "Stop"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:205
+msgid "Stopped"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:47
+msgid "Time sync"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:213
+msgid "Unknown"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:149
+msgid "Updating runlevel..."
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:221
+msgid "View service runtime state and control startup services."
+msgstr ""
+
+#: configs/nls/messages/servicemgr.c:6
+msgid "failed"
+msgstr ""

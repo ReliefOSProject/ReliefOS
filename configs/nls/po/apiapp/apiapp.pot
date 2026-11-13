@@ -1,0 +1,139 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/apiapp/main.c:347
+msgid " bytes"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:379
+msgid " bytes processed"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:349
+msgid " of "
+msgstr ""
+
+#: userland/apps/apiapp/main.c:759
+msgid "< Back"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:617
+msgid "API Installer"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:708
+msgid "Application Installer"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:530
+msgid "Authorizing installation..."
+msgstr ""
+
+#: userland/apps/apiapp/main.c:355
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:787
+msgid "Close"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:654
+msgid "Connecting..."
+msgstr ""
+
+#: userland/apps/apiapp/main.c:780
+msgid "Could not install:"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:638
+msgid "Could not start download"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:749
+msgid "Create desktop shortcut"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:697
+msgid "Download cancelled"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:661
+msgid "Download failed"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:341
+msgid "Downloaded"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:331
+msgid "Downloading Application"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:618
+msgid "Downloading application"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:653
+msgid "Downloading..."
+msgstr ""
+
+#: userland/apps/apiapp/main.c:658
+msgid "Finalizing download..."
+msgstr ""
+
+#: userland/apps/apiapp/main.c:753
+msgid "Install"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:741
+msgid "Install Options"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:723
+msgid "Install location:"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:744
+msgid "Install path:"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:768
+msgid "Installation Complete"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:777
+msgid "Installation Failed"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:368
+msgid "Installing Application"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:558
+msgid "Installing..."
+msgstr ""
+
+#: userland/apps/apiapp/main.c:730
+msgid "Next >"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:386
+msgid "Please keep this window open until installation completes."
+msgstr ""
+
+#: userland/apps/apiapp/main.c:624
+msgid "Preparing download..."
+msgstr ""
+
+#: userland/apps/apiapp/main.c:711
+msgid "Ready to install:"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:771
+msgid "Successfully installed:"
+msgstr ""
+
+#: userland/apps/apiapp/main.c:717
+msgid "Version:"
+msgstr ""

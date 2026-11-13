@@ -1,0 +1,179 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:171
+msgid "Brush"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:42
+msgid "Could not create canvas"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:69
+msgid "Could not open image"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:97
+msgid "Could not save image"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:51
+msgid "Discard"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:50
+msgid "Discard changes?"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:171
+msgid "Eraser"
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:73
+msgid "Image opened"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:99
+msgid "Image saved"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:51
+msgid "Keep"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:152
+msgid "New"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:152
+msgid "Open"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:162
+msgid "Open image"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:32
+msgid "Paint"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:171
+msgid "Pencil"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:187
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:106
+msgid "Replace existing file?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:152
+msgid "Save as"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:113
+msgid "Save changes?"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:104
+msgid "Save image"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:114
+msgid "Save the current drawing before closing?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/paint/main.cpp:51
+msgid "The current drawing has not been saved."
+msgstr ""
+
+#: userland/apps/paint/main.cpp:32
+msgid "Untitled"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""

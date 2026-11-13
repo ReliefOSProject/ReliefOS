@@ -1,0 +1,27 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/hello/main.c:24
+msgid "Button pressed"
+msgstr ""
+
+#: userland/apps/hello/main.c:22
+msgid "Hello"
+msgstr ""
+
+#: userland/apps/hello/main.c:20
+msgid "Hello from hello.elf"
+msgstr ""
+
+#: userland/apps/hello/main.c:38
+msgid "Hello from hello.elf process"
+msgstr ""
+
+#: userland/apps/hello/main.c:21
+msgid "This window is rendered by the app"
+msgstr ""
+
+#: userland/apps/hello/main.c:24
+msgid "Window server v2"
+msgstr ""

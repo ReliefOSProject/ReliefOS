@@ -1,0 +1,587 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/settings/main.c:389
+msgid "Administrator"
+msgstr ""
+
+#: userland/apps/settings/main.c:569
+msgid "Administrator rights required"
+msgstr ""
+
+#: userland/apps/settings/main.c:1433
+msgid "Administrators can create and manage local accounts."
+msgstr ""
+
+#: userland/apps/settings/main.c:1112
+msgid "At sign-in"
+msgstr ""
+
+#: userland/apps/settings/main.c:1295
+msgid "BMP only, up to 1280 x 720."
+msgstr ""
+
+#: userland/apps/settings/main.c:1803
+msgid "Bitmap (*.bmp)"
+msgstr ""
+
+#: userland/apps/settings/main.c:144
+msgid "Bitmap images"
+msgstr ""
+
+#: userland/apps/settings/main.c:287
+msgid "Blue"
+msgstr ""
+
+#: userland/apps/settings/main.c:161
+msgid "Boot and service runtime should request an address automatically."
+msgstr ""
+
+#: userland/apps/settings/main.c:1285
+msgid "Browse"
+msgstr ""
+
+#: userland/apps/settings/main.c:1384
+msgid "Candidates"
+msgstr ""
+
+#: userland/apps/settings/main.c:297
+msgid "Center"
+msgstr ""
+
+#: userland/apps/settings/main.c:1460
+msgid "Change Password"
+msgstr ""
+
+#: configs/nls/messages/settings.c:5
+msgid "Chinese punctuation"
+msgstr ""
+
+#: userland/apps/settings/main.c:1474
+msgid "Choose the default app used by File Manager and desktop shortcuts."
+msgstr ""
+
+#: userland/apps/settings/main.c:1801
+msgid "Choose wallpaper"
+msgstr ""
+
+#: userland/apps/settings/main.c:1146
+msgid "Could not apply personalization"
+msgstr ""
+
+#: userland/apps/settings/main.c:1702
+msgid "Could not create user"
+msgstr ""
+
+#: userland/apps/settings/main.c:1870
+msgid "Could not save file association"
+msgstr ""
+
+#: userland/apps/settings/main.c:1953
+msgid "Could not save input method"
+msgstr ""
+
+#: userland/apps/settings/main.c:2035
+msgid "Could not save input method order"
+msgstr ""
+
+#: userland/apps/settings/main.c:1632
+msgid "Could not save language settings"
+msgstr ""
+
+#: userland/apps/settings/main.c:601
+msgid "Could not save services."
+msgstr ""
+
+#: userland/apps/settings/main.c:2116
+msgid "Could not start dictionary update"
+msgstr ""
+
+#: userland/apps/settings/main.c:1714
+msgid "Could not start passwd"
+msgstr ""
+
+#: userland/apps/settings/main.c:2105
+msgid "Could not start provider settings"
+msgstr ""
+
+#: userland/apps/settings/main.c:1689
+msgid "Create user"
+msgstr ""
+
+#: userland/apps/settings/main.c:161
+msgid "DHCP auto connect"
+msgstr ""
+
+#: userland/apps/settings/main.c:1287
+msgid "Default"
+msgstr ""
+
+#: userland/apps/settings/main.c:1469
+msgid "Default app"
+msgstr ""
+
+#: userland/apps/settings/main.c:2014
+msgid "Default input method saved"
+msgstr ""
+
+#: userland/apps/settings/main.c:1848
+msgid "Default wallpaper restored"
+msgstr ""
+
+#: userland/apps/settings/main.c:1201
+msgid "Desktop "
+msgstr ""
+
+#: userland/apps/settings/main.c:160
+msgid "Desktop window service"
+msgstr ""
+
+#: userland/apps/settings/main.c:2115
+msgid "Dictionary update started"
+msgstr ""
+
+#: userland/apps/settings/main.c:1356
+msgid "Disable"
+msgstr ""
+
+#: userland/apps/settings/main.c:1442
+msgid "Disabled"
+msgstr ""
+
+#: userland/apps/settings/main.c:1544
+msgid "Display"
+msgstr ""
+
+#: userland/apps/settings/main.c:1289
+msgid "Display mode"
+msgstr ""
+
+#: userland/apps/settings/main.c:1790
+msgid "Display settings reverted"
+msgstr ""
+
+#: userland/apps/settings/main.c:1785
+msgid "Display settings saved"
+msgstr ""
+
+#: userland/apps/settings/main.c:1329
+msgid "Enable"
+msgstr ""
+
+#: userland/apps/settings/main.c:1443
+msgid "Enabled"
+msgstr ""
+
+#: userland/apps/settings/main.c:1467
+msgid "Extension"
+msgstr ""
+
+#: userland/apps/settings/main.c:1547
+msgid "File Types"
+msgstr ""
+
+#: userland/apps/settings/main.c:1867
+msgid "File association saved"
+msgstr ""
+
+#: userland/apps/settings/main.c:303
+msgid "Fill"
+msgstr ""
+
+#: userland/apps/settings/main.c:295
+msgid "Fit"
+msgstr ""
+
+#: userland/apps/settings/main.c:1196
+msgid "Framebuffer "
+msgstr ""
+
+#: configs/nls/messages/settings.c:6
+msgid "Full-width space"
+msgstr ""
+
+#: userland/apps/settings/main.c:283
+msgid "Graphite"
+msgstr ""
+
+#: userland/apps/settings/main.c:277
+msgid "Green"
+msgstr ""
+
+#: userland/apps/settings/main.c:142
+msgid "HTML pages"
+msgstr ""
+
+#: userland/apps/settings/main.c:145
+msgid "Help files"
+msgstr ""
+
+#: userland/apps/settings/main.c:1549
+msgid "Input Method"
+msgstr ""
+
+#: userland/apps/settings/main.c:1328
+msgid "Input method"
+msgstr ""
+
+#: userland/apps/settings/main.c:2000
+msgid "Input method disabled"
+msgstr ""
+
+#: userland/apps/settings/main.c:1999
+msgid "Input method enabled"
+msgstr ""
+
+#: userland/apps/settings/main.c:2050
+msgid "Input method moved"
+msgstr ""
+
+#: userland/apps/settings/main.c:2094
+msgid "Input method setting changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1344
+msgid "Input methods and learning data are isolated for the current user."
+msgstr ""
+
+#: userland/apps/settings/main.c:1973
+msgid "Input shortcut changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:285
+msgid "Kawaii Pink"
+msgstr ""
+
+#: userland/apps/settings/main.c:1225
+msgid "Keep"
+msgstr ""
+
+#: userland/apps/settings/main.c:1220
+msgid "Keep these display settings? Reverting in "
+msgstr ""
+
+#: userland/apps/settings/main.c:1214
+msgid "Language"
+msgstr ""
+
+#: configs/nls/messages/settings.c:7
+msgid "Learn selected candidates"
+msgstr ""
+
+#: userland/apps/settings/main.c:1926
+msgid "Login startup approval requested"
+msgstr ""
+
+#: userland/apps/settings/main.c:1117
+msgid "Manual"
+msgstr ""
+
+#: userland/apps/settings/main.c:141
+msgid "Markdown notes"
+msgstr ""
+
+#: userland/apps/settings/main.c:1262
+msgid "Metro color"
+msgstr ""
+
+#: userland/apps/settings/main.c:1655
+msgid "Metro color changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1374
+msgid "Move down"
+msgstr ""
+
+#: userland/apps/settings/main.c:1370
+msgid "Move up"
+msgstr ""
+
+#: configs/nls/messages/settings.c:12
+msgid "Mute"
+msgstr ""
+
+#: userland/apps/settings/main.c:1528
+msgid "NTP runtime state:"
+msgstr ""
+
+#: userland/apps/settings/main.c:164
+msgid "NTP time sync"
+msgstr ""
+
+#: userland/apps/settings/main.c:1451
+msgid "New User"
+msgstr ""
+
+#: userland/apps/settings/main.c:1350
+msgid "No"
+msgstr ""
+
+#: userland/apps/settings/main.c:399
+msgid "None"
+msgstr ""
+
+#: userland/apps/settings/main.c:1115
+msgid "On demand"
+msgstr ""
+
+#: userland/apps/settings/main.c:1407
+msgid "Open provider settings"
+msgstr ""
+
+#: userland/apps/settings/main.c:1693
+msgid "Password"
+msgstr ""
+
+#: userland/apps/settings/main.c:1254
+msgid "Personalization is saved for the current user. Metro and Win95 keep separate colors."
+msgstr ""
+
+#: userland/apps/settings/main.c:1143
+msgid "Personalization updated"
+msgstr ""
+
+#: userland/apps/settings/main.c:1545
+msgid "Personalize"
+msgstr ""
+
+#: userland/apps/settings/main.c:2104
+msgid "Provider settings started"
+msgstr ""
+
+#: userland/apps/settings/main.c:279
+msgid "Purple"
+msgstr ""
+
+#: userland/apps/settings/main.c:163
+msgid "RTC taskbar clock"
+msgstr ""
+
+#: configs/nls/messages/settings.c:13
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/settings/main.c:281
+msgid "Red"
+msgstr ""
+
+#: userland/apps/settings/main.c:1630
+msgid "Reopen applications to apply the language"
+msgstr ""
+
+#: userland/apps/settings/main.c:160
+msgid "Required system shell. Cannot be disabled here."
+msgstr ""
+
+#: userland/apps/settings/main.c:1457
+msgid "Reset Pass"
+msgstr ""
+
+#: userland/apps/settings/main.c:1206
+msgid "Resolution"
+msgstr ""
+
+#: userland/apps/settings/main.c:1608
+msgid "Resolution changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1226
+msgid "Revert"
+msgstr ""
+
+#: userland/apps/settings/main.c:1427
+msgid "Role"
+msgstr ""
+
+#: userland/apps/settings/main.c:1535
+msgid "Save"
+msgstr ""
+
+#: userland/apps/settings/main.c:1208
+msgid "Scale"
+msgstr ""
+
+#: userland/apps/settings/main.c:1618
+msgid "Scale changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1902
+msgid "Service setting changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:609
+msgid "Service settings saved"
+msgstr ""
+
+#: userland/apps/settings/main.c:1548
+msgid "Services"
+msgstr ""
+
+#: userland/apps/settings/main.c:2167
+msgid "Settings"
+msgstr ""
+
+#: userland/apps/settings/main.c:162
+msgid "Show network state in the desktop taskbar."
+msgstr ""
+
+#: userland/apps/settings/main.c:163
+msgid "Show the hardware clock in the taskbar."
+msgstr ""
+
+#: userland/apps/settings/main.c:1981
+msgid "Sign in to change input methods"
+msgstr ""
+
+#: userland/apps/settings/main.c:1300
+msgid "Sign in to change personalization."
+msgstr ""
+
+#: userland/apps/settings/main.c:1550
+msgid "Sound"
+msgstr ""
+
+#: userland/apps/settings/main.c:1330
+msgid "Startup"
+msgstr ""
+
+#: userland/apps/settings/main.c:1952
+msgid "Startup behavior saved"
+msgstr ""
+
+#: userland/apps/settings/main.c:1510
+msgid "Startup policy is saved here; Service Manager shows runtime state."
+msgstr ""
+
+#: userland/apps/settings/main.c:1428
+msgid "State"
+msgstr ""
+
+#: userland/apps/settings/main.c:301
+msgid "Stretch"
+msgstr ""
+
+#: userland/apps/settings/main.c:1378
+msgid "Switch shortcut"
+msgstr ""
+
+#: userland/apps/settings/main.c:164
+msgid "Synchronize the system clock through pool.ntp.org."
+msgstr ""
+
+#: userland/apps/settings/main.c:1386
+msgid "System overlay"
+msgstr ""
+
+#: userland/apps/settings/main.c:2168
+msgid "System settings"
+msgstr ""
+
+#: userland/apps/settings/main.c:162
+msgid "Taskbar network icon"
+msgstr ""
+
+#: userland/apps/settings/main.c:275
+msgid "Teal"
+msgstr ""
+
+#: userland/apps/settings/main.c:140
+msgid "Text documents"
+msgstr ""
+
+#: userland/apps/settings/main.c:1257
+msgid "Theme style"
+msgstr ""
+
+#: userland/apps/settings/main.c:1644
+msgid "Theme style changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1402
+msgid "This input method has no configurable options."
+msgstr ""
+
+#: userland/apps/settings/main.c:299
+msgid "Tile"
+msgstr ""
+
+#: userland/apps/settings/main.c:1468
+msgid "Type"
+msgstr ""
+
+#: userland/apps/settings/main.c:1408
+msgid "Update dictionary"
+msgstr ""
+
+#: userland/apps/settings/main.c:576
+msgid "Updating OpenRC..."
+msgstr ""
+
+#: userland/apps/settings/main.c:1361
+msgid "Use as default"
+msgstr ""
+
+#: userland/apps/settings/main.c:389
+msgid "User"
+msgstr ""
+
+#: userland/apps/settings/main.c:1699
+msgid "User created"
+msgstr ""
+
+#: userland/apps/settings/main.c:1739
+msgid "User state change denied"
+msgstr ""
+
+#: userland/apps/settings/main.c:1737
+msgid "User state updated"
+msgstr ""
+
+#: userland/apps/settings/main.c:1689
+msgid "Username"
+msgstr ""
+
+#: userland/apps/settings/main.c:1546
+msgid "Users"
+msgstr ""
+
+#: userland/apps/settings/main.c:1280
+msgid "Wallpaper"
+msgstr ""
+
+#: userland/apps/settings/main.c:1809
+msgid "Wallpaper BMP must be uncompressed 24/32-bit and no larger than 1280 x 720."
+msgstr ""
+
+#: userland/apps/settings/main.c:1814
+msgid "Wallpaper changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1677
+msgid "Wallpaper mode changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1271
+msgid "Win95 color"
+msgstr ""
+
+#: userland/apps/settings/main.c:1666
+msgid "Win95 color changed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1350
+msgid "Yes"
+msgstr ""
+
+#: userland/apps/settings/main.c:1434
+msgid "You can change your password."
+msgstr ""
+
+#: configs/nls/messages/settings.c:14
+msgid "failed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1222
+msgid "s"
+msgstr ""

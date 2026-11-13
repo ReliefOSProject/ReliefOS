@@ -292,8 +292,8 @@ static int askpass(const char *prompt)
 int main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("sudod", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("sudod");
     struct sudod_request request;
     struct sudod_path dir;
     const char *confirm;

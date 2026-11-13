@@ -47,7 +47,6 @@ APP_NAMES = (
 APP_DIR = "/usr/lib/reliefos/apps"
 TEST_DIR = "/usr/lib/reliefos/tests"
 FIXTURE_DIR = "/home/test/桌面验收目录"
-LOCALE_GUEST = "/usr/share/locale/zh_CN/LC_MESSAGES/leonos.mo"
 PROBE_GUEST = TEST_DIR + "/fltk-ui-probe"
 APP_RUNNER_GUEST = TEST_DIR + "/fltk-app-runner"
 PROBE_RUNNER_GUEST = TEST_DIR + "/fltk-probe-runner"
@@ -96,6 +95,21 @@ READY_MARKERS = {
 DOOM_SECONDS = 60
 PNG_CONTENT_MATCH_MIN_FRACTION = 0.995
 PNG_PIXEL_CHANNEL_TOLERANCE = 4
+
+
+def locale_payload(build: Path) -> list[tuple[Path, str, int]]:
+    """Inject the per-application catalogs produced by the native nls target."""
+    languages = (ROOT / "configs/nls/LINGUAS").read_text().split()
+    domains = (ROOT / "configs/nls/DOMAINS").read_text().split()
+    items = []
+    for language in languages:
+        for domain in domains:
+            relative = f"{language}/LC_MESSAGES/{domain}.mo"
+            catalog = build / "generated/nls" / relative
+            if not catalog.is_file():
+                raise FileNotFoundError(f"current application catalog is missing: {catalog}")
+            items.append((catalog, f"/usr/share/locale/{relative}", 0o100644))
+    return items
 
 
 def run(command: list[object], **kwargs) -> subprocess.CompletedProcess:
@@ -382,10 +396,7 @@ def payload_files(output: Path, probe: Path) -> list[tuple[Path, str, int]]:
         source = ROOT / "resources/build-art/minesweeper" / name
         items.append((source, f"/usr/share/reliefos/resources/{name}", 0o100644))
 
-    catalog = OUT / "generated/nls/zh_CN/LC_MESSAGES/leonos.mo"
-    if not catalog.is_file():
-        raise FileNotFoundError(f"current zh_CN catalog is missing: {catalog}")
-    items.append((catalog, LOCALE_GUEST, 0o100644))
+    items.extend(locale_payload(OUT))
     items.append((probe, PROBE_GUEST, 0o100755))
     helpers = generated_guest_helpers(output)
     items.extend([
@@ -1940,7 +1951,6 @@ def main() -> int:
         (sysroot / "lib/libmimalloc.so.3", "musl mimalloc runtime"),
         (X11_ROOT / "usr/include/FL/Fl.H", "staged FLTK headers"),
         (X11_ROOT / "usr/lib/libfltk.so", "staged target FLTK library"),
-        (OUT / "generated/nls/zh_CN/LC_MESSAGES/leonos.mo", "current zh_CN catalog"),
     ):
         if not path.is_file():
             raise SystemExit(f"missing {label}: {path}")

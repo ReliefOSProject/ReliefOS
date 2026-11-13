@@ -1,0 +1,607 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/relieftodo/actions.cpp:113
+msgid "%s\n\nTotal: %zu    Active: %zu    Done: %zu\nDue today: %zu    Overdue: %zu\n\nActive priorities\nUrgent: %zu    High: %zu    Normal: %zu    Low: %zu\n\nProjects: %zu    Visible tasks: %zu"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:218
+msgid "%zu tasks · %zu active · %zu done · %zu selected"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:285
+msgid "A task needs a nonempty title and valid bounded text"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:15
+msgid "Active tasks"
+msgstr ""
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:140
+msgid "All filters cleared"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:242
+msgid "All projects"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:10
+msgid "All tasks"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:129
+msgid "Apply changes"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:67
+msgid "Checking destination..."
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:58
+msgid "Choose a different path for the exported file"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:180
+msgid "Clear all filters"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:124
+msgid "Clear date"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:170
+msgid "Clear selection"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:13
+msgid "Completed"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:165
+msgid "Completion"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:34
+msgid "Ctrl or Shift selects multiple tasks; double-click toggles completion"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:169
+msgid "Delete"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:169
+msgid "Delete the selected tasks? You can undo this action."
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:259
+msgid "Details of the active task"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:21
+msgid "Discard"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:53
+msgid "Done"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:18
+msgid "Due date"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:117
+msgid "Due date (YYYY-MM-DD)"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:164
+msgid "Duplicate"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:169
+msgid "Editing"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:275
+msgid "Enter a valid date as YYYY-MM-DD, or leave it empty"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:79
+msgid "Example task list"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:33
+msgid "Example task list loaded"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:80
+msgid "Exit"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:177
+msgid "Export"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:78
+msgid "Export CSV..."
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:78
+msgid "Export Markdown..."
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:74
+msgid "File"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:73
+msgid "File operation failed"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:97
+msgid "File saved, but not enough memory to track saved state"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:180
+msgid "Filters"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:8
+msgid "High"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:81
+msgid "Home tab"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:8
+msgid "Invalid path or not enough memory"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:150
+msgid "Invalid task list title"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:178
+msgid "Learn"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:6
+msgid "Low"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:16
+msgid "Manual order"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:165
+msgid "Mark done"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:168
+msgid "Move down"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:168
+msgid "Move up"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:157
+msgid "New task"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:162
+msgid "New task created"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:76
+msgid "New task list"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:33
+msgid "New task list created"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:167
+msgid "Next week"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:54
+msgid "No date"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:7
+msgid "Normal"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:29
+msgid "Not enough memory"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:265
+msgid "Not enough memory for undo history"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:117
+msgid "Notes"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:137
+msgid "Nothing to redo"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:134
+msgid "Nothing to undo"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:6
+msgid "Open task list"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:76
+msgid "Open..."
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:38
+msgid "Opening task list..."
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:270
+msgid "Operation failed: check task limits or memory"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:175
+msgid "Organize"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:14
+msgid "Overdue"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:118
+msgid "Please wait for the file operation to finish"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:17
+msgid "Priority"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:43
+msgid "Project"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:173
+msgid "Project (empty removes it):"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:104
+msgid "Projects"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:135
+msgid "Ready"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:19
+msgid "Recently updated"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:86
+msgid "Redo"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:137
+msgid "Redo complete"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:5
+msgid "ReliefTodo"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:80
+msgid "ReliefTodo help"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:147
+msgid "ReliefTodo\nNative offline task manager for ReliefOS\n\nCreate tasks with titles, notes, projects, tags, priority and due dates.\nUse the left sidebar to search and filter; Ctrl or Shift selects multiple rows.\nThe right panel edits the active task; Apply changes or Ctrl+Enter commits it.\nRibbon tools apply to every selected task. Undo and redo cover task changes.\n\nCtrl+N: new list    Ctrl+O: open    Ctrl+S: save\nCtrl+F: search    Ctrl+Insert: new task    F1: help\nSpace in the table: toggle completion    Delete in the table: delete\n\nSave editable lists as .rtodo; export all tasks as CSV or Markdown.\nDates follow the system local date. No background alarms or cloud sync."
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:176
+msgid "Rename task list"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:78
+msgid "Replace"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:165
+msgid "Restore task"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:130
+msgid "Revert changes"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:77
+msgid "Save as..."
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:79
+msgid "Save cancelled"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:21
+msgid "Save changes to this task list?"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:6
+msgid "Save task list"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:67
+msgid "Saving task list..."
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:167
+msgid "Schedule"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:96
+msgid "Search tasks"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:98
+msgid "Search titles, notes, projects and tags"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:177
+msgid "Select a single task to change its manual order"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:260
+msgid "Select a task to edit details"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:170
+msgid "Select all"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:168
+msgid "Select one or more tasks first"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:208
+msgid "Selected tasks updated"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:170
+msgid "Selection"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:175
+msgid "Set project..."
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:175
+msgid "Set tags..."
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:112
+msgid "Sort tasks"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:43
+msgid "Status"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:117
+msgid "Tags (comma separated)"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:173
+msgid "Tags, separated by commas (empty removes them):"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:260
+msgid "Task #%llu · Ctrl+Enter to apply"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:126
+msgid "Task completed"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:116
+msgid "Task details"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:155
+msgid "Task details have unapplied changes"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:176
+msgid "Task list"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:102
+msgid "Task list exported"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:91
+msgid "Task list opened"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:152
+msgid "Task list renamed"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:102
+msgid "Task list saved"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:149
+msgid "Task list title:"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:79
+msgid "Task statistics"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:20
+msgid "Task title"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:81
+msgid "Task tools"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:132
+msgid "Task updated"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:164
+msgid "Tasks"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:320
+msgid "Tasks sorted"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:78
+msgid "The destination already exists. Replace it?"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:53
+msgid "To do"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:11
+msgid "Today"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:124
+msgid "Tomorrow"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:171
+msgid "Tools"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:119
+msgid "Unapplied changes reverted"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:86
+msgid "Undo"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:134
+msgid "Undo complete"
+msgstr ""
+
+#: userland/apps/relieftodo/actions.cpp:27
+msgid "Untitled task list"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:12
+msgid "Upcoming"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:9
+msgid "Urgent"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:117
+msgid "Use Ctrl+Enter to apply changes"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:81
+msgid "View"
+msgstr ""
+
+#: userland/apps/relieftodo/window.cpp:181
+msgid "Visible tasks"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""

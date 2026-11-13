@@ -20,7 +20,6 @@ main	compatibility	boot/grub/theme/theme.txt	LeonOS Pixel Regular 16 是实际 P
 main	compatibility	configs/apk-ownership.json	旧目录/工具/PAM/TERM/fastfetch alias 真实归属与已安装包迁移说明
 main	compatibility	configs/dependencies.lock.json	fastfetch 精确锁定归档内部目录名，不可改目录导致锁定产物读取失败
 main	attribution	configs/locale/zh_CN.po	Last-Translator: LeonOS 是原翻译署名，Project-Id-Version 已改 ReliefOS
-main	compatibility	configs/nls/po/leonos.pot	gettext 历史 domain 文件名与旧安装 boot/leonos 迁移提示 msgid
 main	compatibility	include/leonos/admin.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/api.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
 main	compatibility	include/leonos/audio.h	逐文件确认含 canonical reliefos/reliefnt include；旧 guard/宏/类型名只转发别名，无第二份 struct/enum/typedef/extern 布局定义。
@@ -56,7 +55,6 @@ main	compatibility	Documentation/kbuild/third-party.rst	说明 libleonos.so.2 �
 main	compatibility	scripts/reliefos/Makefile.apk	沿用用户已存在签名私钥路径、旧工具脚本源文件及兼容 APK protected_paths 文件名
 main	compatibility	scripts/reliefos/Makefile.host	LEONOS_* 旧输入变量回退，RELIEFOS_* 优先
 main	compatibility	scripts/reliefos/Makefile.kernel	NTCLKS_DIR/O 输入兼容及 ntclks-fetch 目标别名；旧外部 URL 说明
-main	compatibility	scripts/reliefos/Makefile.nls	已发布 gettext domain 数据文件 leonos.mo 与应用 textdomain 配对
 main	compatibility	scripts/reliefos/Makefile.pam	PAM 已发布模块名 pam_leonos_password.so、旧源路径及 leonos-pam 目标别名
 main	compatibility	scripts/reliefos/Makefile.resources	冻结字体输出文件名 leonos-metro/win95.ttf 和 PF2/BDF 字体引用
 main	compatibility	scripts/reliefos/Makefile.rpr	旧 ntclks-release-guard Make 目标仅转发新目标
@@ -218,30 +216,9 @@ main	compatibility	tools/tests/openrc_authorization_test.c	显式使用已发布
 main	history	tools/tests/pam_runtime_probe.c	退役 authd.sock 的独立旧 PAM 原型参考 fixture；独立环境变量隔离键
 main	compatibility	tools/tests/password_policy_runtime_probe.c	存在旧 authd 才等待旧 socket；PAM pam_leonos_password.so 为冻结模块文件名。
 main	compatibility	tools/tests/storage_upstream_guest.c	使用旧 leonos-grub-installer 和旧 ESP payload 输入验证存储命令兼容复制。
-main	compatibility	userland/apps/apiapp/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/browser/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/device-agent/main.c	/proc/leonos-drivers 是冻结运行时接口值
-main	compatibility	userland/apps/devmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/downloadmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/drvmgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/dynlinkerror/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/fltk_support.h	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/guitest/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/hello/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/helloworld/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/httpget/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/mp3play/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/netctl/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/notepad/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/oschinpt/main.c	旧 leonos 输入词条仍解析到 ReliefOS 候选，不是旧品牌展示
-main	compatibility	userland/apps/oshlp/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/run/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/servicemgr/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/settings/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/sudod/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/apps/sudod/paths.h	LEONOS_FILEOP_* 是已发布 wire 值的历史名称，数值冻结
-main	compatibility	userland/apps/sysconfdialog/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
-main	compatibility	userland/apps/terminal/main.c	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/auth/account_store.c	账户提交 prepared/committed/cleanup 持久事务标记，旧安装中断后恢复需识别原值
 main	compatibility	userland/auth/standard_accounts.c	此文件全部旧名命中为已发布 ELF 导出符号 alias 与其说明，从同一实现提供新旧入口
 main	compatibility	userland/busybox/block_storage.c	保留旧 BusyBox 端口 CONFIG_LEONOS_* 开关/旧 grub applet 入口及旧 ESP 回滚路径；当前诊断显示 ReliefOS
@@ -314,7 +291,6 @@ main	compatibility	tools/test_linux_ioctl_cloexec.py	旧 GRUB module tag、marke
 main	compatibility	tools/test_storage_upstream_runtime.py	LEONOS_UPSTREAM_TREE 接受旧测试输入环境；不存在的私有设备名已 canonical
 main	compatibility	tools/test_upstream_tools_images.py	检查 legacy ESP 内核字节与旧 grub 安装命令兼容入口；输出镜像名已 canonical
 main	history	tools/tests/oobe_auth_boot_test.c	已退役 authd/OOBE 架构测试夹具，引用已删除 authd 源；旧 marker 与保留的历史实现对应，未宣称当前回归通过
-main	compatibility	userland/apps/installer/main.cpp	仅已发布 gettext domain leonos，匹配 leonos.mo；非 UI 展示品牌
 main	compatibility	userland/storage/leonos-check-update	保留旧命令源文件名与 leonos-* 包升级识别；当前帮助/临时文件名已 canonical
 main	compatibility	userland/storage/leonos-grub-installer	旧命令源文件名及 legacy ESP 回滚保留、旧布局残留清理路径；帮助已 canonical
 main	compatibility	userland/storage/leonos-kernel-update	旧命令源文件名、legacy ESP 与共享旧更新锁防止并发旧客户端；当前帮助/临时名已 canonical
@@ -331,7 +307,6 @@ main	compatibility	tools/test_dual_boot_regressions.py	旧 UEFI 真实更新后�
 main	compatibility	userland/runtime/src/bootloader.c	共用引导预检识别冻结的旧 ESP 内核回滚路径及 GRUB 字体文件名
 main	compatibility	userland/runtime/src/bootloader_publish.c	共用引导发布保留旧 ESP 回滚内核并清理旧 loader 文件，不能破坏已安装磁盘兼容
 main	compatibility	Documentation/userspace-api/abi.rst	旧 SONAME、转发头和既有协议名称的兼容边界，不是当前展示品牌
-main	compatibility	Documentation/userspace-api/locale.rst	现行 gettext leonos domain 与 MO 文件名保持字节兼容
 main	compatibility	Documentation/process/assets.rst	历史来源渲染器文件名用于资产来源说明
 main	history	Documentation/releases/5.1.2.rst	已发布 5.1.2 正文的独立 RST 归档，外部标签链接保持历史原值
 main	compatibility	tests/build/test-x11-only.sh	负向检查退休的旧窗口头与协议服务不存在，不提供兼容实现。

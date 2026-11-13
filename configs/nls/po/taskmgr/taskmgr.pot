@@ -1,0 +1,411 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/taskmgr/main.cpp:1042
+msgid "About"
+msgstr ""
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:188
+msgid "Admin"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "CPU"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:560
+msgid "CPU Usage"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:755
+msgid "CPU time:"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:710
+msgid "Cannot end protected or non-user task"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1106
+msgid "Choose which user's startup entries to manage."
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:774
+msgid "Could not change startup app"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:795
+msgid "Could not remove startup app"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1041
+msgid "Details"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:233
+msgid "Disable"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:409
+msgid "Disabled"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:187
+msgid "Elevated"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:233
+msgid "Enable"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1111
+msgid "Enable or disable the selected startup entry."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:409
+msgid "Enabled"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:716
+msgid "End Task"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:720
+msgid "End Task failed"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:715
+msgid "End task %s (PID %u)?"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1063
+msgid "End the selected task after confirmation."
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1039
+msgid "File"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:621
+msgid "Free memory:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:574
+msgid "GPU (est.)"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:574
+msgid "GPU (estimated)"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1053
+msgid "Inspect running tasks and open details or end a task."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:752
+msgid "Kind:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1092
+msgid "Live CPU, memory, and estimated GPU history with per-core usage."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:807
+msgid "Live task and performance snapshot from the system."
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1100
+msgid "Manage startup entries for the selected user."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "Memory"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:567
+msgid "Memory Usage"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:756
+msgid "Memory:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:748
+msgid "Name:"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:769
+msgid "No startup app selected"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:706
+msgid "No task selected"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1043
+msgid "Options"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "PID"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:750
+msgid "Parent PID:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:583
+msgid "Per-core usage"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1044
+msgid "Performance"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:438
+msgid "Performance data unavailable"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "Privileges"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:754
+msgid "Privileges:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "Process"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1043
+msgid "Processes"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1048
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:632
+msgid "Ready "
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1039
+msgid "Refresh"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1057
+msgid "Refresh task and performance data now."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1112
+msgid "Remove"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:793
+msgid "Remove Startup App"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:793
+msgid "Remove the selected startup app?"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1115
+msgid "Remove the selected startup entry after confirmation."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:631
+msgid "Running "
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1089
+msgid "Scroll to see per-core CPU usage and memory totals."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1078
+msgid "Select a row; press Enter for details or Delete to end the task."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1120
+msgid "Select a startup entry before using Enable, Disable, or Remove."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1060
+msgid "Show details for the selected task."
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:633
+msgid "Sleeping "
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:189
+msgid "Standard"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:777
+msgid "Startup app disabled"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:777
+msgid "Startup app enabled"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:799
+msgid "Startup app removed"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1045
+msgid "Startup applications"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "State"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:751
+msgid "State:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:181
+msgid "System"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:759
+msgid "Task Details"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:806
+msgid "Task Manager"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:723
+msgid "Task ended"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:630
+msgid "Tasks "
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:613
+msgid "Total memory:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:373
+msgid "Unavailable"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:181
+msgid "Unknown"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:625
+msgid "Uptime:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:617
+msgid "Used memory:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1066
+msgid "User"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:753
+msgid "User:"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:1084
+msgid "View live CPU, memory, and estimated GPU usage."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:757
+msgid "Wake tick:"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:743
+msgid "ticks"
+msgstr ""

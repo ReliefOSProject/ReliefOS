@@ -1464,9 +1464,9 @@ int main(int argc, char **argv)
     int graphical = argc == 2 && strcmp(argv[1], "--graphical") == 0;
 
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    bind_textdomain_codeset("leonos", "UTF-8");
-    textdomain("leonos");
+    bindtextdomain("installer", RELIEFOS_LAYOUT_LOCALE);
+    bind_textdomain_codeset("installer", "UTF-8");
+    textdomain("installer");
     setvbuf(stdout, NULL, _IOLBF, 0);
     if (argc != 1 && !graphical) {
         fputs("usage: installer [--graphical]\n", stderr);

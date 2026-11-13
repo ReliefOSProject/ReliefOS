@@ -74,7 +74,7 @@ echo "RX_EXIT status=$status" >/dev/ttyS0
     payload = [
         (OUT/'userland/reliefexcel.elf','/usr/lib/reliefos/apps/reliefexcel/reliefexcel.elf',0o100755),
         (OUT/'userland/fileman.elf','/usr/lib/reliefos/apps/fileman/fileman.elf',0o100755),
-        (OUT/'generated/nls/zh_CN/LC_MESSAGES/leonos.mo',fltk.LOCALE_GUEST,0o100644),
+        *fltk.locale_payload(OUT),
         (ROOT/'userland/apps/reliefexcel/reliefexcel.desktop','/usr/share/applications/reliefexcel.desktop',0o100644),
         (ROOT/'resources/build-art/app-icons/reliefexcel.bmp','/usr/lib/reliefos/apps/reliefexcel/reliefexcel.bmp',0o100644),
         (entry,'/usr/bin/reliefexcel',0o100755),

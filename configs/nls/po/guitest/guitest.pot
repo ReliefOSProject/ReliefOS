@@ -1,0 +1,127 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/guitest/main.c:86
+msgid "App starting"
+msgstr ""
+
+#: userland/apps/guitest/main.c:58
+msgid "Arrow"
+msgstr ""
+
+#: userland/apps/guitest/main.c:161
+msgid "Close"
+msgstr ""
+
+#: userland/apps/guitest/main.c:66
+msgid "Crosshair"
+msgstr ""
+
+#: userland/apps/guitest/main.c:127
+msgid "Cursor style: "
+msgstr ""
+
+#: userland/apps/guitest/main.c:98
+msgid "GUI API Tester"
+msgstr ""
+
+#: userland/apps/guitest/main.c:173
+msgid "GUI API title update passed"
+msgstr ""
+
+#: userland/apps/guitest/main.c:60
+msgid "Hand"
+msgstr ""
+
+#: userland/apps/guitest/main.c:72
+msgid "Help"
+msgstr ""
+
+#: userland/apps/guitest/main.c:152
+msgid "Hide desktop taskbar"
+msgstr ""
+
+#: userland/apps/guitest/main.c:149
+msgid "Hide window from taskbar"
+msgstr ""
+
+#: userland/apps/guitest/main.c:68
+msgid "Move"
+msgstr ""
+
+#: userland/apps/guitest/main.c:155
+msgid "Move mouse to 320, 240"
+msgstr ""
+
+#: userland/apps/guitest/main.c:157
+msgid "Next cursor style"
+msgstr ""
+
+#: userland/apps/guitest/main.c:70
+msgid "Not allowed"
+msgstr ""
+
+#: userland/apps/guitest/main.c:74
+msgid "Progress"
+msgstr ""
+
+#: configs/nls/messages/guitest.c:5
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/guitest/main.c:120
+msgid "ReliefOS GUI API Tester"
+msgstr ""
+
+#: userland/apps/guitest/main.c:159
+msgid "Reset all"
+msgstr ""
+
+#: userland/apps/guitest/main.c:80
+msgid "Resize diagonal"
+msgstr ""
+
+#: userland/apps/guitest/main.c:78
+msgid "Resize horizontal"
+msgstr ""
+
+#: userland/apps/guitest/main.c:76
+msgid "Resize vertical"
+msgstr ""
+
+#: userland/apps/guitest/main.c:146
+msgid "Restore borders"
+msgstr ""
+
+#: userland/apps/guitest/main.c:143
+msgid "Set alternate title"
+msgstr ""
+
+#: userland/apps/guitest/main.c:144
+msgid "Set test title"
+msgstr ""
+
+#: userland/apps/guitest/main.c:153
+msgid "Show desktop taskbar"
+msgstr ""
+
+#: userland/apps/guitest/main.c:150
+msgid "Show window in taskbar"
+msgstr ""
+
+#: userland/apps/guitest/main.c:62
+msgid "Text"
+msgstr ""
+
+#: userland/apps/guitest/main.c:147
+msgid "Toggle borderless"
+msgstr ""
+
+#: userland/apps/guitest/main.c:84
+msgid "Up arrow"
+msgstr ""
+
+#: userland/apps/guitest/main.c:64
+msgid "Wait"
+msgstr ""

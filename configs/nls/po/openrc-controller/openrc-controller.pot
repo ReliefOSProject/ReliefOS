@@ -1,0 +1,747 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/openrc-controller/window.cpp:345
+msgid "%zu / %zu services · current: %s"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:171
+msgid "About"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:147
+msgid "Add services to runlevel…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:654
+msgid "Add the selected services to this runlevel? This changes startup configuration."
+msgstr ""
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:46
+msgid "Administrator permission is required to manage OpenRC services."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:591
+msgid "Administrator session ended. Close and reopen the application."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:5
+msgid "Advanced"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:666
+msgid "Advanced service action"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:140
+msgid "Advanced service action…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:179
+msgid "Advanced…"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:156
+msgid "All runlevel states"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:502
+msgid "All services"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:839
+msgid "An operation is running. Closing cancels it; check service state before retrying."
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:48
+msgid "Authenticate with"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:6
+msgid "Authenticating"
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:115
+msgid "Authenticating…"
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:84
+msgid "Authentication failed. Check the password or choose another method."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:166
+msgid "Boot log"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:179
+msgid "Cancel operation"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:858
+msgid "Canceling operation…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:812
+msgid "Cannot create the output file."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:495
+msgid "Cannot parse OpenRC status."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:487
+msgid "Cannot parse the OpenRC service catalog."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:443
+msgid "Cannot send request to the privileged worker."
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:29
+msgid "Cannot start the OpenRC worker."
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:101
+msgid "Cannot start the authentication program."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:770
+msgid "Changing runlevel may stop services and disconnect the desktop. Start only keeps existing services running."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:224
+msgid "Choose a service configuration or global rc.conf."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:243
+msgid "Clear"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:667
+msgid "Command"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:669
+msgid "Condition / mode"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:221
+msgid "Configuration"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:793
+msgid "Configuration has unsaved changes."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:254
+msgid "Connecting to OpenRC…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:611
+msgid "Continue"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:828
+msgid "Could not completely write the output file."
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:113
+msgid "Crashed"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:157
+msgid "Crashed services"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:149
+msgid "Create runlevel…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:650
+msgid "Create this runlevel before adding services."
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:674
+msgid "Debug output"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:150
+msgid "Delete empty runlevel…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:780
+msgid "Delete this empty, inactive, unreferenced custom runlevel?"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:214
+msgid "Dependencies"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:143
+msgid "Dependencies…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:923
+msgid "Dependency type: ineed, iuse, iwant, iafter, ibefore; reverse: needsme, usesme, wantsme, beforeme, afterme"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:204
+msgid "Description / commands"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:141
+msgid "Description and commands"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:167
+msgid "Diagnostic report"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:7
+msgid "Disable"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:179
+msgid "Disable…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:792
+msgid "Discard changes"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:670
+msgid "Dry run"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:208
+msgid "Edit configuration"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:162
+msgid "Edit global rc.conf"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:144
+msgid "Edit service configuration"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:8
+msgid "Enable"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:178
+msgid "Enable…"
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:94
+msgid "Enter your password to continue authentication."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:132
+msgid "Exit"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:801
+msgid "Export output"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:131
+msgid "Export output…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:115
+msgid "Failed"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:503
+msgid "Failed / crashed"
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:129
+msgid "File"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:168
+msgid "Help"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:673
+msgid "Ignore dependencies"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:504
+msgid "In transition"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:117
+msgid "Inactive"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:536
+msgid "Invalid configuration response."
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:106
+msgid "Invalid password input."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:642
+msgid "Invalid runlevel name."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:702
+msgid "Invalid service command."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:410
+msgid "Invalid service, runlevel, or operation."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:944
+msgid "Load a configuration first."
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:158
+msgid "Manually started services"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:610
+msgid "More selected services…"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:462
+msgid "No crashed services were reported."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:670
+msgid "Normal"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:418
+msgid "Not enough memory."
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:673
+msgid "Only if crashed"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:672
+msgid "Only if inactive"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:672
+msgid "Only if not started"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:671
+msgid "Only if started"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:671
+msgid "Only if stopped"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:886
+msgid "OpenRC Controller\nC++ / FLTK service and runlevel manager for ReliefOS.\nUses the system OpenRC commands and native FLTK gtk+ controls."
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:42
+msgid "OpenRC authentication"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:968
+msgid "OpenRC diagnostics"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:163
+msgid "OpenRC log"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:567
+msgid "Operation completed"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:472
+msgid "Operation failed (exit %d). Remaining operations were stopped."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:240
+msgid "Output"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:830
+msgid "Output exported"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:202
+msgid "Overview"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:761
+msgid "Parent runlevel (the selected runlevel is stacked into this level):"
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:52
+msgid "Password"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:215
+msgid "Query dependencies…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:927
+msgid "Querying dependency tree…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:142
+msgid "Read service script"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:796
+msgid "Reading configuration…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:918
+msgid "Reading service script…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:455
+msgid "Reading service states…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:454
+msgid "Reading services and runlevels…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:532
+msgid "Ready · administrator session active"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:161
+msgid "Rebuild dependency cache"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:177
+msgid "Refresh"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:173
+msgid "Refresh every 10 seconds"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:138
+msgid "Reload"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:561
+msgid "Reloading saved configuration…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:148
+msgid "Remove services from runlevel…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:656
+msgid "Remove the selected services from this runlevel? This does not stop them immediately."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:806
+msgid "Replace"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:949
+msgid "Replace the current configuration with its last backup? Unsaved editor changes will be discarded."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:137
+msgid "Restart"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:948
+msgid "Restore"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:231
+msgid "Restore backup"
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:83
+msgid "Retry"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:685
+msgid "Run"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:711
+msgid "Run this advanced command for the selected services? zap only resets OpenRC state; it does not stop a running process."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:635
+msgid "Runlevel name (use Tools / all runlevel states to inspect membership):"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:745
+msgid "Runlevel name:"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:81
+msgid "Runlevels"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:105
+msgid "Running"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:961
+msgid "Saving configuration…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:119
+msgid "Scheduled"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:193
+msgid "Search"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:620
+msgid "Select at least one service."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:624
+msgid "Select at most 512 services per operation."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:909
+msgid "Select exactly one service."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:873
+msgid "Select services and use the toolbar or Service menu. Ctrl/Shift selects multiple services; column headers sort.\n\nEnabling changes runlevel membership; starting changes the current running state. Use the Configuration tab to edit conf.d or global rc.conf; saving makes a backup and detects external changes.\n\nAdvanced actions support conditions, dry run, zap and custom service commands. Canceling may leave OpenRC in a transitional state; inspect status before using zap.\n\nThe application never invokes shutdown, reboot, boot or sysinit runlevels. Logs are available when the corresponding system logger is configured."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:365
+msgid "Select services to inspect them. Ctrl/Shift selects multiple rows."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:81
+msgid "Service"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:139
+msgid "Service status"
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:151
+msgid "Stack runlevel…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:135
+msgid "Start"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:769
+msgid "Start only"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:109
+msgid "Starting"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:81
+msgid "State"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:136
+msgid "Stop"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:838
+msgid "Stop and close"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:107
+msgid "Stopped"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:111
+msgid "Stopping"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:159
+msgid "Supervised services"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:769
+msgid "Switch fully"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:153
+msgid "Switch runlevel…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:165
+msgid "System log"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:164
+msgid "System messages"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:398
+msgid "The privileged session has ended. Reopen the application."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:807
+msgid "This file already exists. Replace it?"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:661
+msgid "This operation may interrupt networking, audio, or services required by other programs. Continue?"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:154
+msgid "Tools"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:378
+msgid "Unassigned"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:160
+msgid "Unassigned services"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:122
+msgid "Unknown"
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:58
+msgid "Unlock"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:152
+msgid "Unstack runlevel…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:121
+msgid "Unsupervised"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:785
+msgid "Updating runlevel…"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:82
+msgid "Uptime"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:170
+msgid "Usage and precautions"
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:679
+msgid "Use an OpenRC command such as start, stop, reload, zap, or a command advertised by the service."
+msgstr ""
+
+#: userland/apps/openrc-controller/window.cpp:402
+msgid "Wait for the current operation or cancel it first."
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:9
+msgid "failed"
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:50
+msgid "root account password"
+msgstr ""
+
+#: userland/apps/openrc-controller/dialogs.cpp:49
+msgid "sudo: current user password"
+msgstr ""

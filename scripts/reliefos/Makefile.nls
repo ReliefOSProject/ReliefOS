@@ -1,23 +1,36 @@
-# Locale / NLS pipeline.
-#
-# The tool variable and its RELIEFOS_HOST_TOOLS registration live in scripts/reliefos/Makefile.host;
-# only the link rule is here, because the object comes from that file's generic
-# host rule, which already matches tools/host/nls/*.c.
+# Per-application gettext catalogs. The native extractor is registered in
+# Makefile.host; regular builds compile PO files, and explicit update targets
+# refresh each application's templates and translations.
 
 RELIEFOS_NLS_PO := $(RELIEFOS_SRC)/configs/nls/po
 RELIEFOS_NLS_LANGS := $(strip $(shell cat $(RELIEFOS_SRC)/configs/nls/LINGUAS))
+RELIEFOS_NLS_DOMAINS := $(strip $(file <$(RELIEFOS_SRC)/configs/nls/DOMAINS))
+ifeq ($(RELIEFOS_NLS_DOMAINS),)
+$(error configs/nls/DOMAINS must list the application translation domains)
+endif
+RELIEFOS_NLS_FLTK_APPS := $(strip $(file <$(RELIEFOS_SRC)/configs/fltk-apps.list))
 NLS_DIR := $(O_GENERATED)/nls
-NLS_MO := $(addsuffix /LC_MESSAGES/leonos.mo,$(addprefix $(NLS_DIR)/,$(RELIEFOS_NLS_LANGS)))
+NLS_MO := $(foreach lang,$(RELIEFOS_NLS_LANGS),\
+    $(addsuffix .mo,$(addprefix $(NLS_DIR)/$(lang)/LC_MESSAGES/,$(RELIEFOS_NLS_DOMAINS))))
 NLS_MUSL_MO := $(addsuffix .UTF-8,$(addprefix $(O_GENERATED)/musl-locales/,$(RELIEFOS_NLS_LANGS)))
-RELIEFOS_NLS_SOURCES := $(sort $(wildcard $(RELIEFOS_SRC)/userland/apps/*/*.c $(RELIEFOS_SRC)/userland/apps/*/*.cpp \
-    $(RELIEFOS_SRC)/userland/apps/fltk_*.h \
-    $(RELIEFOS_SRC)/userland/apps/*/*.h $(RELIEFOS_SRC)/userland/runtime/src/*.c $(RELIEFOS_SRC)/configs/nls/messages.c))
-RELIEFOS_NLS_REL_SOURCES := $(patsubst $(RELIEFOS_SRC)/%,%,$(RELIEFOS_NLS_SOURCES))
-RELIEFOS_PARAMETERS_nls := msgfmt=$(shell msgfmt --version 2>/dev/null | head -n1)|flags=-c --check --endianness=little|langs=$(RELIEFOS_NLS_LANGS)|sources=$(RELIEFOS_NLS_REL_SOURCES)
+# Shared implementations follow the same consumers as their app Kbuilds.
+RELIEFOS_NLS_SHARED_installer := userland/apps/reliefapk/process.cpp
+RELIEFOS_NLS_SHARED_reliefdiagram := userland/apps/relieftodo/file_io.cpp
+RELIEFOS_NLS_SHARED_reliefmathpp := userland/apps/relieftodo/file_io.cpp
+RELIEFOS_NLS_SHARED_reliefmail := userland/apps/reliefword/layout.cpp userland/apps/reliefword/model.cpp
+
+reliefos_nls_directory_sources = $(wildcard $(1)/*.[ch] $(1)/*.cpp) \
+    $(foreach directory,$(wildcard $(1)/*/),\
+        $(call reliefos_nls_directory_sources,$(patsubst %/,%,$(directory))))
+reliefos_nls_app_sources = $(sort $(call reliefos_nls_directory_sources,$(RELIEFOS_SRC)/userland/apps/$(1)) \
+    $(if $(filter $(1),$(RELIEFOS_NLS_FLTK_APPS)),$(wildcard $(RELIEFOS_SRC)/userland/apps/fltk_*.h)) \
+    $(wildcard $(RELIEFOS_SRC)/configs/nls/messages/$(1).c) \
+    $(addprefix $(RELIEFOS_SRC)/,$(RELIEFOS_NLS_SHARED_$(1))))
+RELIEFOS_PARAMETERS_nls := msgfmt=$(shell msgfmt --version 2>/dev/null | head -n1)|flags=-c --check --endianness=little|langs=$(RELIEFOS_NLS_LANGS)|domains=$(RELIEFOS_NLS_DOMAINS)
 $(if $(RELIEFOS_PASSIVE),,$(eval $(call KBUILD_PARAMETERS,nls)))
 
 define reliefos-nls-mo-rule
-$(NLS_DIR)/$(1)/LC_MESSAGES/leonos.mo: $(RELIEFOS_NLS_PO)/$(1).po $(O_META)/nls.parameters $(RELIEFOS_SRC)/scripts/reliefos/Makefile.nls
+$(NLS_DIR)/$(2)/LC_MESSAGES/$(1).mo: $(RELIEFOS_NLS_PO)/$(1)/$(2).po $(O_META)/nls.parameters $(RELIEFOS_SRC)/scripts/reliefos/Makefile.nls
 	$$(call RELIEFOS_LOG,MSGFMT,$$@)
 	$$(Q)mkdir -p $$(@D)
 	$$(Q)set -eu; trap 'rm -f $$@.tmp $$@.log' EXIT HUP INT TERM; \
@@ -25,7 +38,7 @@ $(NLS_DIR)/$(1)/LC_MESSAGES/leonos.mo: $(RELIEFOS_NLS_PO)/$(1).po $(O_META)/nls.
 	        mv $$@.tmp $$@; \
 	    else cat $$@.log >&2; exit 1; fi
 endef
-$(foreach lang,$(RELIEFOS_NLS_LANGS),$(eval $(call reliefos-nls-mo-rule,$(lang))))
+$(foreach domain,$(RELIEFOS_NLS_DOMAINS),$(foreach lang,$(RELIEFOS_NLS_LANGS),$(eval $(call reliefos-nls-mo-rule,$(domain),$(lang)))))
 
 .PHONY: nls nls-update
 nls: $(NLS_MO)
@@ -41,13 +54,18 @@ $(foreach lang,$(RELIEFOS_NLS_LANGS),$(eval $(call reliefos-musl-locale-rule,$(l
 .PHONY: musl-locales
 musl-locales: $(NLS_MUSL_MO)
 
-# Explicit maintenance only: normal builds never rewrite the source corpus.
-nls-update: $(RELIEFOS_NLS_EXTRACT)
-	$(Q)mkdir -p $(NLS_DIR)
-	$(Q)cd $(RELIEFOS_SRC) && $(abspath $(RELIEFOS_NLS_EXTRACT)) $(abspath $(NLS_DIR))/leonos.pot $(RELIEFOS_NLS_REL_SOURCES)
-	$(Q)set -eu; cd $(RELIEFOS_SRC); for lang in $(RELIEFOS_NLS_LANGS); do \
-	    $(abspath $(RELIEFOS_NLS_EXTRACT)) --merge $(RELIEFOS_NLS_PO)/$$lang.po $(abspath $(NLS_DIR))/$$lang.po $(RELIEFOS_NLS_REL_SOURCES); \
-	    msgfmt -c --check --endianness=little -o /dev/null $(abspath $(NLS_DIR))/$$lang.po; \
+# Explicit maintenance only. Each app can refresh its own source corpus.
+define reliefos-nls-update-rule
+.PHONY: nls-update-$(1)
+nls-update-$(1): $(RELIEFOS_NLS_EXTRACT)
+	$$(Q)mkdir -p $(NLS_DIR)/update/$(1)
+	$$(Q)cd $(RELIEFOS_SRC) && $(abspath $(RELIEFOS_NLS_EXTRACT)) $(abspath $(NLS_DIR))/update/$(1)/$(1).pot $(patsubst $(RELIEFOS_SRC)/%,%,$(call reliefos_nls_app_sources,$(1)))
+	$$(Q)set -eu; cd $(RELIEFOS_SRC); for lang in $(RELIEFOS_NLS_LANGS); do \
+	    $(abspath $(RELIEFOS_NLS_EXTRACT)) --merge $(RELIEFOS_NLS_PO)/$(1)/$$$$lang.po $(abspath $(NLS_DIR))/update/$(1)/$$$$lang.po $(patsubst $(RELIEFOS_SRC)/%,%,$(call reliefos_nls_app_sources,$(1))); \
+	    msgfmt -c --check --endianness=little -o /dev/null $(abspath $(NLS_DIR))/update/$(1)/$$$$lang.po; \
 	 done
-	$(Q)cp $(NLS_DIR)/leonos.pot $(RELIEFOS_NLS_PO)/leonos.pot
-	$(Q)set -eu; for lang in $(RELIEFOS_NLS_LANGS); do cp $(NLS_DIR)/$$lang.po $(RELIEFOS_NLS_PO)/$$lang.po; done
+	$$(Q)cp $(NLS_DIR)/update/$(1)/$(1).pot $(RELIEFOS_NLS_PO)/$(1)/$(1).pot
+	$$(Q)set -eu; for lang in $(RELIEFOS_NLS_LANGS); do cp $(NLS_DIR)/update/$(1)/$$$$lang.po $(RELIEFOS_NLS_PO)/$(1)/$$$$lang.po; done
+endef
+$(foreach domain,$(RELIEFOS_NLS_DOMAINS),$(eval $(call reliefos-nls-update-rule,$(domain))))
+nls-update: $(addprefix nls-update-,$(RELIEFOS_NLS_DOMAINS))

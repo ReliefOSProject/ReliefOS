@@ -29,7 +29,7 @@ public:
  }
 };
 int main(){
- reliefos_fltk::init();fl_open_display();
+ reliefos_fltk::init("reliefmath");fl_open_display();
  // X11 selection requests in FLTK require a mapped first_window(). This
  // override-redirect test window never takes focus or covers the editor.
  Fl_Window window(0,0,1,1);window.border(0);window.set_override();Receiver receiver;window.end();window.show();Fl::check();

@@ -1,0 +1,487 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: configs/nls/messages/browser.c:5
+msgid " bytes"
+msgstr ""
+
+#: userland/apps/browser/view.c:922
+msgid " controls"
+msgstr ""
+
+#: userland/apps/browser/view.c:920
+msgid " forms, "
+msgstr ""
+
+#: userland/apps/browser/view.c:916
+msgid " lines, "
+msgstr ""
+
+#: userland/apps/browser/view.c:918
+msgid " links, "
+msgstr ""
+
+#: userland/apps/browser/view.c:895
+msgid " source limit reached"
+msgstr ""
+
+#: userland/apps/browser/view.c:906
+msgid "; content: "
+msgstr ""
+
+#: userland/apps/browser/view.c:934
+msgid "; status: "
+msgstr ""
+
+#: userland/apps/browser/util.c:158
+msgid "ARP timeout"
+msgstr ""
+
+#: userland/apps/browser/input.c:280
+msgid "About Browser"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:308
+msgid "Add"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:202
+msgid "Add Bookmark"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:219
+msgid "Add Current Page"
+msgstr ""
+
+#: userland/apps/browser/view.c:1003
+msgid "Address"
+msgstr ""
+
+#: userland/apps/browser/input.c:217
+msgid "Address cleared"
+msgstr ""
+
+#: userland/apps/browser/input.c:141
+msgid "Address selected"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:786
+msgid "Application download started"
+msgstr ""
+
+#: userland/apps/browser/view.c:963
+msgid "Back"
+msgstr ""
+
+#: userland/apps/browser/util.c:160
+msgid "Bad argument"
+msgstr ""
+
+#: userland/apps/browser/util.c:186
+msgid "Bad socket"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:208
+msgid "Bookmark saved"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:272
+msgid "Bookmarks"
+msgstr ""
+
+#: userland/apps/browser/input.c:232
+msgid "Bottom"
+msgstr ""
+
+#: userland/apps/browser/input.c:249
+msgid "Bottom of page"
+msgstr ""
+
+#: userland/apps/browser/forms.c:1517
+msgid "Checkbox checked"
+msgstr ""
+
+#: userland/apps/browser/forms.c:1518
+msgid "Checkbox unchecked"
+msgstr ""
+
+#: userland/apps/browser/input.c:291
+msgid "Classic HTTP browser for ReliefOS."
+msgstr ""
+
+#: userland/apps/browser/main.c:36
+msgid "Classic Web Browser"
+msgstr ""
+
+#: userland/apps/browser/input.c:200
+msgid "Clear Address"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:314
+msgid "Close"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:784
+msgid "Could not start API Installer"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:769
+msgid "Could not start Download Manager"
+msgstr ""
+
+#: userland/apps/browser/util.c:166
+msgid "DHCP failed"
+msgstr ""
+
+#: userland/apps/browser/util.c:164
+msgid "DHCP timeout"
+msgstr ""
+
+#: userland/apps/browser/util.c:170
+msgid "DNS failed"
+msgstr ""
+
+#: userland/apps/browser/util.c:168
+msgid "DNS timeout"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:312
+msgid "Delete"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:378
+msgid "Delete Bookmark"
+msgstr ""
+
+#: userland/apps/browser/view.c:877
+msgid "Developer Tools"
+msgstr ""
+
+#: userland/apps/browser/view.c:889
+msgid "Document: "
+msgstr ""
+
+#: userland/apps/browser/input.c:173
+msgid "Download Current Page"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:771
+msgid "Download started"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:310
+msgid "Edit"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:364
+msgid "Edit Bookmark"
+msgstr ""
+
+#: userland/apps/browser/forms.c:1040
+msgid "Editing form input"
+msgstr ""
+
+#: userland/apps/browser/input.c:153
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/browser/input.c:150
+msgid "File"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:703
+msgid "File Error"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:734
+msgid "File loaded"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:733
+msgid "File loaded, truncated"
+msgstr ""
+
+#: userland/apps/browser/input.c:202
+msgid "Find Next"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:458
+msgid "Find in Page"
+msgstr ""
+
+#: userland/apps/browser/input.c:201
+msgid "Find in Page..."
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:459
+msgid "Find:"
+msgstr ""
+
+#: userland/apps/browser/forms.c:1565
+msgid "Form reset"
+msgstr ""
+
+#: userland/apps/browser/view.c:964
+msgid "Forward"
+msgstr ""
+
+#: userland/apps/browser/view.c:1007
+msgid "Go"
+msgstr ""
+
+#: userland/apps/browser/auth.c:100
+msgid "HTTP Authentication"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:580
+msgid "HTTP Page"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:532
+msgid "HTTP client failed"
+msgstr ""
+
+#: userland/apps/browser/util.c:180
+msgid "HTTP failed"
+msgstr ""
+
+#: userland/apps/browser/input.c:154
+msgid "Help"
+msgstr ""
+
+#: userland/apps/browser/input.c:171
+msgid "Home"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:497
+msgid "Invalid URL"
+msgstr ""
+
+#: userland/apps/browser/view.c:970
+msgid "License Website"
+msgstr ""
+
+#: userland/apps/browser/view.c:882
+msgid "Location: "
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:221
+msgid "Manage Bookmarks..."
+msgstr ""
+
+#: userland/apps/browser/navigation.c:533
+msgid "Network Error"
+msgstr ""
+
+#: userland/apps/browser/util.c:172
+msgid "No A record"
+msgstr ""
+
+#: userland/apps/browser/util.c:156
+msgid "No e1000 adapter"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:230
+msgid "No saved bookmarks"
+msgstr ""
+
+#: userland/apps/browser/input.c:292
+msgid "OK"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:198
+msgid "Only pages with an address can be bookmarked"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:306
+msgid "Open"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:702
+msgid "Open failed"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:608
+msgid "Opening page..."
+msgstr ""
+
+#: userland/apps/browser/auth.c:105
+msgid "Password (kept only for this browser session):"
+msgstr ""
+
+#: configs/nls/messages/browser.c:6
+msgid "Path"
+msgstr ""
+
+#: userland/apps/browser/util.c:192
+msgid "Protocol unsupported"
+msgstr ""
+
+#: userland/apps/browser/forms.c:1531
+msgid "Radio option selected"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:716
+msgid "Read failed"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:187
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/browser/input.c:172
+msgid "Refresh"
+msgstr ""
+
+#: userland/apps/browser/input.c:290
+msgid "ReliefOS Browser"
+msgstr ""
+
+#: userland/apps/browser/view.c:914
+msgid "Rendered: "
+msgstr ""
+
+#: configs/nls/messages/browser.c:7
+msgid "Reset"
+msgstr ""
+
+#: userland/apps/browser/util.c:182
+msgid "Response too large"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:528
+msgid "Retrying form submission..."
+msgstr ""
+
+#: userland/apps/browser/navigation.c:630
+msgid "Retrying..."
+msgstr ""
+
+#: userland/apps/browser/view.c:967
+msgid "Return to Setup"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:273
+msgid "Saved browser pages"
+msgstr ""
+
+#: userland/apps/browser/view.c:928
+msgid "Scroll: line "
+msgstr ""
+
+#: userland/apps/browser/input.c:199
+msgid "Select Address"
+msgstr ""
+
+#: userland/apps/browser/forms.c:1555
+msgid "Selection changed"
+msgstr ""
+
+#: userland/apps/browser/util.c:190
+msgid "Socket closed"
+msgstr ""
+
+#: userland/apps/browser/util.c:184
+msgid "Socket limit reached"
+msgstr ""
+
+#: userland/apps/browser/util.c:188
+msgid "Socket not connected"
+msgstr ""
+
+#: userland/apps/browser/view.c:994
+msgid "Stop"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:507
+msgid "Submitting form..."
+msgstr ""
+
+#: userland/apps/browser/util.c:154
+msgid "Succeeded"
+msgstr ""
+
+#: userland/apps/browser/util.c:178
+msgid "TCP failed"
+msgstr ""
+
+#: userland/apps/browser/util.c:176
+msgid "TCP reset"
+msgstr ""
+
+#: userland/apps/browser/util.c:174
+msgid "TCP timeout"
+msgstr ""
+
+#: userland/apps/browser/util.c:194
+msgid "TLS verification failed"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:444
+msgid "Text found"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:451
+msgid "Text not found"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:599
+msgid "The address could not be parsed as HTTP."
+msgstr ""
+
+#: userland/apps/browser/navigation.c:498
+msgid "The form action could not be parsed as HTTP."
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:203
+msgid "Title:"
+msgstr ""
+
+#: userland/apps/browser/input.c:231
+msgid "Top"
+msgstr ""
+
+#: userland/apps/browser/input.c:245
+msgid "Top of page"
+msgstr ""
+
+#: userland/apps/browser/util.c:162
+msgid "Transmit failed"
+msgstr ""
+
+#: userland/apps/browser/bookmarks.c:352
+msgid "URL:"
+msgstr ""
+
+#: userland/apps/browser/util.c:196
+msgid "Unknown network status"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:811
+msgid "Unsupported Address"
+msgstr ""
+
+#: userland/apps/browser/litehtml_core.c:1884
+msgid "Untitled Page"
+msgstr ""
+
+#: userland/apps/browser/navigation.c:812
+msgid "Use http://, https://, about:, or a ReliefOS file path such as /file.html."
+msgstr ""
+
+#: userland/apps/browser/auth.c:101
+msgid "Username for this HTTP host:"
+msgstr ""
+
+#: userland/apps/browser/input.c:152
+msgid "View"
+msgstr ""
+
+#: userland/apps/browser/view.c:902
+msgid "Viewport: "
+msgstr ""
+
+#: configs/nls/messages/browser.c:8
+msgid "none"
+msgstr ""

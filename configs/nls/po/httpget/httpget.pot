@@ -1,0 +1,147 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: configs/nls/messages/httpget.c:5
+msgid " bytes"
+msgstr ""
+
+#: userland/apps/httpget/main.c:134
+msgid "ARP timeout"
+msgstr ""
+
+#: userland/apps/httpget/main.c:136
+msgid "Bad argument"
+msgstr ""
+
+#: userland/apps/httpget/main.c:162
+msgid "Bad socket"
+msgstr ""
+
+#: userland/apps/httpget/main.c:142
+msgid "DHCP failed"
+msgstr ""
+
+#: userland/apps/httpget/main.c:140
+msgid "DHCP timeout"
+msgstr ""
+
+#: userland/apps/httpget/main.c:146
+msgid "DNS failed"
+msgstr ""
+
+#: userland/apps/httpget/main.c:144
+msgid "DNS timeout"
+msgstr ""
+
+#: userland/apps/httpget/main.c:302
+msgid "GET"
+msgstr ""
+
+#: userland/apps/httpget/main.c:372
+msgid "HTTP GET"
+msgstr ""
+
+#: userland/apps/httpget/main.c:257
+msgid "HTTP client failed"
+msgstr ""
+
+#: userland/apps/httpget/main.c:156
+msgid "HTTP failed"
+msgstr ""
+
+#: userland/apps/httpget/main.c:292
+msgid "HTTP/HTTPS GET over TCP"
+msgstr ""
+
+#: userland/apps/httpget/main.c:295
+msgid "Host:"
+msgstr ""
+
+#: userland/apps/httpget/main.c:148
+msgid "No A record"
+msgstr ""
+
+#: userland/apps/httpget/main.c:132
+msgid "No e1000 adapter"
+msgstr ""
+
+#: userland/apps/httpget/main.c:297
+msgid "Path:"
+msgstr ""
+
+#: userland/apps/httpget/main.c:238
+msgid "Port must be 1-65535"
+msgstr ""
+
+#: userland/apps/httpget/main.c:299
+msgid "Port:"
+msgstr ""
+
+#: userland/apps/httpget/main.c:168
+msgid "Protocol unsupported"
+msgstr ""
+
+#: configs/nls/messages/httpget.c:6
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/httpget/main.c:158
+msgid "Response too large"
+msgstr ""
+
+#: userland/apps/httpget/main.c:251
+msgid "Sending HTTP GET..."
+msgstr ""
+
+#: userland/apps/httpget/main.c:250
+msgid "Sending HTTPS GET..."
+msgstr ""
+
+#: userland/apps/httpget/main.c:166
+msgid "Socket closed"
+msgstr ""
+
+#: userland/apps/httpget/main.c:160
+msgid "Socket limit reached"
+msgstr ""
+
+#: userland/apps/httpget/main.c:164
+msgid "Socket not connected"
+msgstr ""
+
+#: userland/apps/httpget/main.c:130
+msgid "Succeeded"
+msgstr ""
+
+#: userland/apps/httpget/main.c:373
+msgid "TCP and HTTP test"
+msgstr ""
+
+#: userland/apps/httpget/main.c:154
+msgid "TCP failed"
+msgstr ""
+
+#: userland/apps/httpget/main.c:152
+msgid "TCP reset"
+msgstr ""
+
+#: userland/apps/httpget/main.c:150
+msgid "TCP timeout"
+msgstr ""
+
+#: userland/apps/httpget/main.c:170
+msgid "TLS verification failed"
+msgstr ""
+
+#: userland/apps/httpget/main.c:138
+msgid "Transmit failed"
+msgstr ""
+
+#: userland/apps/httpget/main.c:245
+msgid "URL is too large"
+msgstr ""
+
+#: userland/apps/httpget/main.c:172
+msgid "Unknown status"
+msgstr ""

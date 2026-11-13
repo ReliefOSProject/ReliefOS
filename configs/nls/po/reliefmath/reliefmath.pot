@@ -1,0 +1,3583 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: configs/nls/messages/reliefmath.c:10
+msgid "%d pt"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:277
+msgid "%zu completed · %zu failed · %zu cancelled · %zu total"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:142
+msgid "%zu formulas · %zu characters · %d%%"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1143
+msgid "A document can contain up to 256 formulas; a formula name is limited to 256 UTF-8 bytes."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:187
+msgid "A file task is already running"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:92
+msgid "A file task is running; wait or cancel it"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1146
+msgid "A preview or export is limited to 16,384 pixels per dimension and 16,777,216 raster pixels."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:222
+msgid "A previous session left recoverable formula documents."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:188
+msgid "A required formula glyph is unavailable"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:189
+msgid "A required function glyph is unavailable"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:190
+msgid "A required large operator is unavailable"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:191
+msgid "A required text glyph is unavailable"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:192
+msgid "A script cannot be a spacing command"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:193
+msgid "A script marker has no base atom"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:18
+msgid "Absolute value"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:194
+msgid "Accent glyph has no outline"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:19
+msgid "Accents"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:51
+msgid "Add"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:318
+msgid "Add current"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:105
+msgid "Add favorite..."
+msgstr ""
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:293
+msgid "Added current formula."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:20
+msgid "Aligned equations"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:109
+msgid "Aligned..."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:195
+msgid "Alignment marker outside an alignment environment"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:21
+msgid "All categories"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:243
+msgid "All formulas"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:105
+msgid "All symbols..."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:22
+msgid "Alpha"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:196
+msgid "An export is already running"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:113
+msgid "An export is running. Cancel it before switching documents?"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:23
+msgid "Angle brackets"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:115
+msgid "Appearance"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:24
+msgid "Approximately equal"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:25
+msgid "Arrows"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:103
+msgid "Arrows and sets"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:197
+msgid "ArtifactChunk has no matching bounded artifact"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:198
+msgid "ArtifactChunk type is invalid"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:199
+msgid "ArtifactEnd arrived before the declared bytes"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:26
+msgid "Automatic absolute value"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:27
+msgid "Automatic curly brackets"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:28
+msgid "Automatic parentheses"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:29
+msgid "Automatic square brackets"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:123
+msgid "Background tasks"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:107
+msgid "Basic structures"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:200
+msgid "Begin metadata exceeds render limits"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:30
+msgid "Beta"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:31
+msgid "Big operators"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:32
+msgid "Binary operators"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:114
+msgid "Bold"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:33
+msgid "Bold math font"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:201
+msgid "Bracket source is null"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:34
+msgid "Bracketed matrix"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:35
+msgid "Brackets"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:246
+msgid "Browse..."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1150
+msgid "Built-in tools, commands, and examples"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:113
+msgid "Cancel export"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:99
+msgid "Cancel task"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:46
+msgid "Cancelled"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:223
+msgid "Cancelling task..."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:202
+msgid "Cannot allocate LaTeX output"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:203
+msgid "Cannot allocate accent glyph"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:204
+msgid "Cannot allocate bounded frame payload"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:256
+msgid "Cannot allocate clipboard image"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:205
+msgid "Cannot allocate declared render artifact"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:206
+msgid "Cannot allocate delimiter glyph"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:207
+msgid "Cannot allocate formula layout"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:208
+msgid "Cannot allocate formula output"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:209
+msgid "Cannot allocate glyph layout"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:210
+msgid "Cannot allocate matrix cells"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:211
+msgid "Cannot allocate matrix row data"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:212
+msgid "Cannot allocate radical glyph"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:213
+msgid "Cannot allocate rectangular matrix"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:214
+msgid "Cannot allocate renderer client"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:215
+msgid "Cannot allocate rule"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:216
+msgid "Cannot allocate vector output"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:217
+msgid "Cannot append formula box"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:218
+msgid "Cannot change worker path during a render"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:219
+msgid "Cannot change worker path while its child is being reaped"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:220
+msgid "Cannot copy source chunk"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:221
+msgid "Cannot create export filename"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:222
+msgid "Cannot create formula outline"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:223
+msgid "Cannot create renderer pipes"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:224
+msgid "Cannot encode Begin metadata"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:225
+msgid "Cannot encode Done metadata"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:226
+msgid "Cannot encode Failure metadata"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:227
+msgid "Cannot encode artifact descriptor"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:228
+msgid "Cannot encode frame"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:302
+msgid "Cannot find a writable user configuration path."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:229
+msgid "Cannot initialize FreeType"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:230
+msgid "Cannot load glyph outline"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:231
+msgid "Cannot load required formula fonts"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:232
+msgid "Cannot make renderer pipes nonblocking"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:233
+msgid "Cannot poll renderer pipes"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:234
+msgid "Cannot prepare export snapshots"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:235
+msgid "Cannot prepare recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:236
+msgid "Cannot prepare save snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:237
+msgid "Cannot produce formula image"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:238
+msgid "Cannot queue decoded frame"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:239
+msgid "Cannot queue render request"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:240
+msgid "Cannot read render protocol input"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:241
+msgid "Cannot reserve bounded formula source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:242
+msgid "Cannot start renderer worker"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:243
+msgid "Cannot store Failure message"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:244
+msgid "Cannot store file path"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:245
+msgid "Cannot store formula source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:246
+msgid "Cannot store output path"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:247
+msgid "Cannot store vector path"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:248
+msgid "Cannot write artifact response"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:36
+msgid "Capital delta"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:37
+msgid "Capital gamma"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:38
+msgid "Capital lambda"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:39
+msgid "Capital omega"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:40
+msgid "Capital phi"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:41
+msgid "Capital pi"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:42
+msgid "Capital psi"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:43
+msgid "Capital sigma"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:44
+msgid "Capital theta"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:45
+msgid "Capital upsilon"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:46
+msgid "Capital xi"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:709
+msgid "Cases"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:109
+msgid "Cases..."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:135
+msgid "Category"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:47
+msgid "Ceiling brackets"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:48
+msgid "Centered dot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:49
+msgid "Chi"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:137
+msgid "Chinese formula"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:249
+msgid "Choose an export directory and filename pattern"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:127
+msgid "Choose an item to see its command and example."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:69
+msgid "Clearing recovery snapshot..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:93
+msgid "Clipboard"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:431
+msgid "Close anyway"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:50
+msgid "Closed integral"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:725
+msgid "Columns"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:136
+msgid "Command"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:635
+msgid "Command details"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1069
+msgid "Command prefix"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:96
+msgid "Complete"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1067
+msgid "Complete command"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:93
+msgid "Copy"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:122
+msgid "Copy LaTeX"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:98
+msgid "Copy image"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:51
+msgid "Cosine"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:933
+msgid "Could not prepare the source edit."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:250
+msgid "Could not start background file task"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1131
+msgid "Ctrl+A  Select all"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1132
+msgid "Ctrl+C  Copy"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1135
+msgid "Ctrl+F  Find"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1136
+msgid "Ctrl+H  Find and replace"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1125
+msgid "Ctrl+N  New document"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1126
+msgid "Ctrl+O  Open document"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1127
+msgid "Ctrl+S  Save document"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1128
+msgid "Ctrl+Shift+S  Save as"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1137
+msgid "Ctrl+Space  Complete the backslash command at the caret"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1134
+msgid "Ctrl+V  Paste"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1133
+msgid "Ctrl+X  Cut"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1130
+msgid "Ctrl+Y or Ctrl+Shift+Z  Redo"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1129
+msgid "Ctrl+Z  Undo"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:52
+msgid "Curly brackets"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:243
+msgid "Current formula"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:780
+msgid "Custom source will be inserted as typed; generated Tab stops are cleared."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:93
+msgid "Cut"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:250
+msgid "DPI:"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:320
+msgid "Delete"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:243
+msgid "Delete the current formula?"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:251
+msgid "Delimiter geometry overflow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:53
+msgid "Delimiters"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:54
+msgid "Delta"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:245
+msgid "Directory:"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:77
+msgid "Discard"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:225
+msgid "Discard snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:55
+msgid "Display fraction"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:113
+msgid "Display style"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:56
+msgid "Division"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:178
+msgid "Document opened"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:62
+msgid "Document saved"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:46
+msgid "Done"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:252
+msgid "Done arrived before all requested artifacts"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:57
+msgid "Double integral"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:58
+msgid "Double quad space"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:94
+msgid "Duplicate"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:253
+msgid "Duplicate script on one math atom"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:254
+msgid "EOF before request End frame"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:255
+msgid "EOF before the declared artifact completed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:256
+msgid "EOF in a partial frame"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1144
+msgid "Each formula source is limited to 64 KiB and nesting is limited to 128 levels."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:607
+msgid "Editable LaTeX source; generated placeholders support Tab."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:96
+msgid "Editing"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:257
+msgid "Editor source is null"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:258
+msgid "Editor undo snapshot is too large"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:59
+msgid "Element of"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:60
+msgid "Empty set"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:833
+msgid "Enter text to find."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:259
+msgid "Environment has an invalid number of columns"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:61
+msgid "Epsilon"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:62
+msgid "Equals"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:63
+msgid "Equivalent"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:64
+msgid "Eta"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:137
+msgid "Euler identity"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:137
+msgid "Example"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:142
+msgid "Example document · save it as a new file"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:135
+msgid "Example formulas"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:32
+msgid "Exit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:260
+msgid "Expected SourceChunk or complete End frame"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:261
+msgid "Expected a braced argument"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:262
+msgid "Expected a braced text argument"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:263
+msgid "Expected a control sequence"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:264
+msgid "Expected a matching right delimiter"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:265
+msgid "Expected a math atom"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:266
+msgid "Expected an alignment marker or matching end"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:267
+msgid "Expected an environment name after begin"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:65
+msgid "Exponential"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:253
+msgid "Export"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:30
+msgid "Export LaTeX..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:98
+msgid "Export PNG"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:98
+msgid "Export SVG"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:29
+msgid "Export SVG..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:31
+msgid "Export all formulas..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:98
+msgid "Export all..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:246
+msgid "Export directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:268
+msgid "Export filename is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:269
+msgid "Export filenames cannot contain parent path components"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:242
+msgid "Export formulas"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:270
+msgid "Export path is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:271
+msgid "Export request identifiers exhausted"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:272
+msgid "Export result does not match its source snapshot"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:262
+msgid "Export results"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:273
+msgid "Export scale or DPI is outside the supported range"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:30
+msgid "Export selected formulas..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:117
+msgid "Export settings..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:268
+msgid "Export started in background"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:29
+msgid "Export transparent PNG..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:252
+msgid "Exports use a source snapshot. Editing can continue.\nEach result is reported separately; cancelling keeps completed files."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1139
+msgid "F1  Open this help"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:46
+msgid "Failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:274
+msgid "Failure details exceed protocol limits"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:275
+msgid "Failure interrupted an artifact stream"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:276
+msgid "Failure message is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:277
+msgid "Failure range or message length is invalid"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:351
+msgid "Favorite deleted."
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:430
+msgid "Favorites could not be saved. Close without saving?"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:393
+msgid "Favorites loaded."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:408
+msgid "Favorites saved."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:97
+msgid "Favorites..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:25
+msgid "File"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:40
+msgid "File changed externally"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:99
+msgid "File path is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:278
+msgid "File task cancelled"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:247
+msgid "Filename pattern:"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:48
+msgid "Filter formulas by name or source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:66
+msgid "Final sigma"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:886
+msgid "Find"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:885
+msgid "Find and replace"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:895
+msgid "Find next"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:96
+msgid "Find..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:119
+msgid "Fit preview"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:67
+msgid "Floor brackets"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:279
+msgid "Font book already initialized"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:68
+msgid "For all"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:244
+msgid "Format:"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:6
+msgid "Formula"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:240
+msgid "Formula %zu"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:140
+msgid "Formula 1"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:115
+msgid "Formula color"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:280
+msgid "Formula effective size must be finite and positive"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:281
+msgid "Formula exceeds image dimensions or pixel limit"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:306
+msgid "Formula favorites"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:282
+msgid "Formula fonts must have scalable outlines"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:283
+msgid "Formula geometry overflow"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:242
+msgid "Formula name:"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:284
+msgid "Formula nesting exceeds 128 levels"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:285
+msgid "Formula point size must be between 1 and 512"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:286
+msgid "Formula render settings exceed supported limits"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:287
+msgid "Formula resource path is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:288
+msgid "Formula source exceeds 64 KiB"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:289
+msgid "Formula source is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:290
+msgid "Formula source is null"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:113
+msgid "Formula style"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:291
+msgid "Formula width overflow"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:94
+msgid "Formulas"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:243
+msgid "Formulas:"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:69
+msgid "Fraction"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:292
+msgid "Fraction geometry overflow"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:514
+msgid "Fraction style"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:107
+msgid "Fraction..."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:70
+msgid "Fractions"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:293
+msgid "Frame decoder is in a failed state"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:294
+msgid "Frame payload exceeds 65536 bytes"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:295
+msgid "Function width overflow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:71
+msgid "Functions"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:72
+msgid "Gamma"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:137
+msgid "Gaussian integral"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:736
+msgid "Generated editable LaTeX source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:296
+msgid "Generated snippet is empty"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:297
+msgid "Glyph has no vector outline"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:298
+msgid "Glyph metrics exceed layout limits"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:74
+msgid "Greater than"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:73
+msgid "Greater than or equal"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:75
+msgid "Greek letters"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:110
+msgid "Hat"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:76
+msgid "Hat accent"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:99
+msgid "Help"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:33
+msgid "Home tab"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:299
+msgid "I/O error"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:300
+msgid "Incomplete control sequence"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:77
+msgid "Indexed root"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:78
+msgid "Infinity"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:113
+msgid "Inline style"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:319
+msgid "Insert"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:301
+msgid "Inserted source is too large"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1017
+msgid "Insertion"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:79
+msgid "Integral"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:519
+msgid "Integral type"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:108
+msgid "Integral..."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:80
+msgid "Intersection"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:302
+msgid "Invalid ArtifactBegin metadata"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:303
+msgid "Invalid Begin display flag"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:304
+msgid "Invalid Begin frame or metadata length"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:305
+msgid "Invalid Done metadata"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:306
+msgid "Invalid Failure metadata"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:307
+msgid "Invalid PNG output declaration"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:308
+msgid "Invalid RGBA extent or stride"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:309
+msgid "Invalid SVG header"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:310
+msgid "Invalid SVG output declaration"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:311
+msgid "Invalid UTF-8 in formula"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:312
+msgid "Invalid UTF-8 in text"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:313
+msgid "Invalid accent geometry"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:314
+msgid "Invalid box placement"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:315
+msgid "Invalid delimiter geometry"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:316
+msgid "Invalid formula scale"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:317
+msgid "Invalid fraction geometry"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:318
+msgid "Invalid frame kind or flags"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:319
+msgid "Invalid frame magic"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:320
+msgid "Invalid glyph outline"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:321
+msgid "Invalid glyph size"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:322
+msgid "Invalid horizontal spacing"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:323
+msgid "Invalid layout coordinates"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:324
+msgid "Invalid matrix cell geometry"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:250
+msgid "Invalid padding value"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:325
+msgid "Invalid path coordinate"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:326
+msgid "Invalid radical geometry"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:327
+msgid "Invalid render snapshot metadata"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:328
+msgid "Invalid renderer baseline"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:329
+msgid "Invalid script geometry"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:81
+msgid "Iota"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:114
+msgid "Italic"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:82
+msgid "Italic math font"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:83
+msgid "Kappa"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:225
+msgid "Keep for later"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:431
+msgid "Keep open"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:113
+msgid "Keep working"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1124
+msgid "Keyboard shortcuts"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:244
+msgid "LaTeX source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:84
+msgid "Lambda"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:108
+msgid "Large operators"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:121
+msgid "Learning"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:85
+msgid "Left and right arrow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:86
+msgid "Left arrow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:87
+msgid "Left double arrow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:89
+msgid "Less than"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:88
+msgid "Less than or equal"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:330
+msgid "Lexer input is too large"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:331
+msgid "Lexer source is null"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:332
+msgid "Lexer token output capacity is too small"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:97
+msgid "Library"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:90
+msgid "Limit"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:316
+msgid "Loading favorites..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:68
+msgid "Locate error"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:91
+msgid "Logarithm"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:104
+msgid "Logic"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:333
+msgid "Malformed environment name"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:639
+msgid "Manage favorites"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:93
+msgid "Maps to"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:92
+msgid "Maps to the right"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:856
+msgid "Match selected."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:334
+msgid "Matching bracket was not found"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1073
+msgid "Matching commands"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:114
+msgid "Math fonts"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:94
+msgid "Matrices"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1145
+msgid "Matrices must be rectangular and no larger than 16 rows by 16 columns."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:95
+msgid "Matrix"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:335
+msgid "Matrix cell count overflow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:336
+msgid "Matrix column count exceeds 16"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:337
+msgid "Matrix dimensions are limited to 16 by 16"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:338
+msgid "Matrix dimensions exceed 16 by 16"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:339
+msgid "Matrix dimensions must be between 1 and 16"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:528
+msgid "Matrix form"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:340
+msgid "Matrix geometry overflow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:341
+msgid "Matrix row count exceeds 16"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:109
+msgid "Matrix..."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:96
+msgid "Maximum"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:97
+msgid "Medium space"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:98
+msgid "Minimum"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:100
+msgid "Minus"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:99
+msgid "Minus or plus"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:342
+msgid "Mismatched scalable delimiters"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:343
+msgid "Missing a matching right delimiter"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:344
+msgid "Missing delimiter"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:345
+msgid "Missing left delimiter"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:346
+msgid "Missing right delimiter"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:347
+msgid "Missing script argument"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:167
+msgid "Modified"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:95
+msgid "Move down"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:95
+msgid "Move up"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:101
+msgid "Mu"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:102
+msgid "Much greater than"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:103
+msgid "Much less than"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:109
+msgid "Multiline structures"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:104
+msgid "Multiplication"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:105
+msgid "Natural logarithm"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:106
+msgid "Negative thin space"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:348
+msgid "Nested ArtifactBegin frame"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:27
+msgid "New"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1060
+msgid "No catalog command matches this prefix."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:349
+msgid "No editor change to undo"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:396
+msgid "No favorites saved yet."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:350
+msgid "No formulas selected for export"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:850
+msgid "No matching text was found."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:107
+msgid "Norm"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:515
+msgid "Normal fraction"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:108
+msgid "Not an element of"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:155
+msgid "Not enough memory to list items."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1055
+msgid "Not enough memory to show command completions."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:109
+msgid "Not equal"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:110
+msgid "Nu"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:351
+msgid "Null frame input"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:352
+msgid "Offset does not identify a bracket"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:193
+msgid "Old preview · error"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:186
+msgid "Old preview · rendering..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:179
+msgid "Old preview · waiting for render"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:111
+msgid "Omega"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:112
+msgid "Omicron"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:952
+msgid "One match replaced."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:353
+msgid "Only escaped characters are allowed in text"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:264
+msgid "Open directory"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:106
+msgid "Open formula document"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:27
+msgid "Open..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:129
+msgid "Opening document in background..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:220
+msgid "Opening document · wait or cancel the file task"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:102
+msgid "Operators and relations"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:95
+msgid "Order"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:117
+msgid "Output"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:110
+msgid "Overline"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:113
+msgid "Overline accent"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:42
+msgid "Overwrite"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:354
+msgid "PNG exceeds protocol byte limit"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:250
+msgid "Padding in points (0–4096):"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:115
+msgid "Padding..."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:120
+msgid "Panels"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:114
+msgid "Parallel"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1159
+msgid "Parameters"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:115
+msgid "Parentheses"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:116
+msgid "Parenthesized matrix"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:93
+msgid "Paste"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:117
+msgid "Perpendicular"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:118
+msgid "Phi"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:119
+msgid "Pi"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:120
+msgid "Piecewise cases"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1047
+msgid "Place the caret inside a backslash command to complete it."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:355
+msgid "Placeholder byte range overflow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:356
+msgid "Placeholder shift underflow"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:529
+msgid "Plain matrix"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:122
+msgid "Plus"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:121
+msgid "Plus or minus"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:192
+msgid "Preview · up to date"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:123
+msgid "Product"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:124
+msgid "Proportional to"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:125
+msgid "Psi"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:126
+msgid "Quad space"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:137
+msgid "Quadratic formula"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:46
+msgid "Queued"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:357
+msgid "RGBA output exceeds its buffer limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:358
+msgid "Radical geometry overflow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:359
+msgid "Radical glyph has no measurable extent"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:360
+msgid "Radical width overflow"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:142
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:225
+msgid "Recover as new"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:221
+msgid "Recover formula document"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:173
+msgid "Recovered into a new document · choose Save as"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:169
+msgid "Recovery snapshot saved"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:39
+msgid "Redo"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:127
+msgid "Relations"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:5
+msgid "ReliefMath"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:9
+msgid "ReliefMath Favorites"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1121
+msgid "ReliefMath edits UTF-8 math source and renders a supported LaTeX-like subset."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1120
+msgid "ReliefMath help"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1147
+msgid "ReliefMath is not a full TeX engine; arbitrary macros, packages, file input, and unknown environments are unsupported."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:42
+msgid "Reload"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:52
+msgid "Rename"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:193
+msgid "Render error"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:361
+msgid "Render request cancelled"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:258
+msgid "Rendered image copied"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:362
+msgid "Renderer declared an unrequested or duplicate artifact"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:363
+msgid "Renderer emitted data after request completion"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:364
+msgid "Renderer request exceeded 10 seconds"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:365
+msgid "Renderer response identity or sequence mismatch"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:366
+msgid "Renderer worker died from signal %d; submit again to retry"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:367
+msgid "Renderer worker disappeared; submit again to retry"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:368
+msgid "Renderer worker exited with status %d; submit again to retry"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:369
+msgid "Renderer worker path has not been configured"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:370
+msgid "Renderer worker path is empty"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:371
+msgid "Renderer worker path is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:372
+msgid "Renderer worker rejected the request"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:46
+msgid "Rendering"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:186
+msgid "Rendering..."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:896
+msgid "Replace"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:897
+msgid "Replace all"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:251
+msgid "Replace existing output files"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:891
+msgid "Replace with"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:96
+msgid "Replace..."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:984
+msgid "Replaced %zu matches."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:373
+msgid "Replaced text is too large"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:374
+msgid "Replacement text is null"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:375
+msgid "Request frame identity does not match Begin"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:376
+msgid "Required glyph is missing from formula fonts"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:377
+msgid "Reserved TeX character must be escaped"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:321
+msgid "Retry save"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:128
+msgid "Rho"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:129
+msgid "Right arrow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:378
+msgid "Right delimiter has no matching left delimiter"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:130
+msgid "Right double arrow"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:114
+msgid "Roman"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:131
+msgid "Roman math font"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:707
+msgid "Root"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:107
+msgid "Root..."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:132
+msgid "Roots"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:379
+msgid "Row break outside a matrix or alignment"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:718
+msgid "Rows"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:380
+msgid "SVG exceeds protocol byte limit"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:42
+msgid "Save as..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:208
+msgid "Save cancelled · original file kept"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:77
+msgid "Save changes before continuing?"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:96
+msgid "Save formula document"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:309
+msgid "Saved in the .rmath format."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:46
+msgid "Saving"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:102
+msgid "Saving document in background..."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:262
+msgid "Saving favorites..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:249
+msgid "Scale:"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:133
+msgid "Scripts"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:107
+msgid "Scripts..."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:624
+msgid "Search"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:626
+msgid "Search Chinese names, English names, categories, or commands."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:381
+msgid "Search start is not a UTF-8 boundary"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:382
+msgid "Search text is empty"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:383
+msgid "Search text is null"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:384
+msgid "Search text was not found"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1009
+msgid "Select a command to see its insertion form and example."
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:96
+msgid "Select all"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:258
+msgid "Select at least one formula"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:243
+msgid "Selected formulas"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:134
+msgid "Sets"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:120
+msgid "Show formula list"
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:120
+msgid "Show preview"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:135
+msgid "Sigma"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:136
+msgid "Similar"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:137
+msgid "Sine"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:520
+msgid "Single integral"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:185
+msgid "Snapshot saved · newer edits remain unsaved"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:385
+msgid "Snippet exceeds the source byte limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:386
+msgid "Snippet placeholder must not be empty"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:387
+msgid "Snippet placeholders are invalid"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:388
+msgid "Snippet source is empty"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1142
+msgid "Source and rendering limits"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:312
+msgid "Source preview"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:389
+msgid "Source text is null"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:390
+msgid "SourceChunk exceeds declared source length"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:138
+msgid "Spacing"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:391
+msgid "Spacing overflow"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:139
+msgid "Square brackets"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:140
+msgid "Square root"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:141
+msgid "Star product"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:8
+msgid "Structure"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:702
+msgid "Structure wizard"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:33
+msgid "Structures"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:142
+msgid "Subscript"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:144
+msgid "Subset"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:143
+msgid "Subset or equal"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:108
+msgid "Sum..."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:145
+msgid "Summation"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:146
+msgid "Superscript"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:105
+msgid "Symbol library"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:7
+msgid "Symbols"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:1138
+msgid "Tab and Shift+Tab  Move between generated placeholders"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:147
+msgid "Tangent"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:148
+msgid "Tau"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:621
+msgid "Templates"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:97
+msgid "Templates..."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:710
+msgid "Text"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:149
+msgid "Text and fonts"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:392
+msgid "Text exceeds the source byte limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:150
+msgid "Text in math"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:393
+msgid "Text is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:394
+msgid "Text range is outside the source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:395
+msgid "Text range must start and end at UTF-8 boundaries"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:396
+msgid "Text width overflow"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:107
+msgid "Text..."
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:41
+msgid "The file differs from the version you opened.\nReload it, save to another path, or explicitly replace it."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:397
+msgid "The filename pattern creates duplicate output paths; include {index}"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:796
+msgid "The source is invalid UTF-8 or exceeds the source limit."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:151
+msgid "There exists"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:152
+msgid "Theta"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:153
+msgid "Thick space"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:154
+msgid "Thin space"
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:276
+msgid "This formula is already a favorite."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:398
+msgid "Too many complete frames buffered"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:99
+msgid "Tools"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:399
+msgid "Trailing partial frame after render completion"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:244
+msgid "Transparent PNG"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:155
+msgid "Triple integral"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:33
+msgid "Typesetting"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:400
+msgid "Unable to allocate bracket matcher state"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:401
+msgid "Unable to allocate inserted source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:402
+msgid "Unable to allocate lexer state"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:403
+msgid "Unable to allocate placeholder range"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:404
+msgid "Unable to allocate replaced text"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:405
+msgid "Unable to allocate snippet placeholders"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:406
+msgid "Unable to allocate undo snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:407
+msgid "Unable to assemble inserted source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:408
+msgid "Unable to assemble replaced text"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:409
+msgid "Unable to build snippet source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:410
+msgid "Unable to copy editor undo snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:411
+msgid "Unable to preserve placeholder range"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:412
+msgid "Unable to restore editor placeholders"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:413
+msgid "Unable to restore editor source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:414
+msgid "Unable to shift existing placeholders"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:415
+msgid "Unable to store editor source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:416
+msgid "Unable to store generated snippet"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:417
+msgid "Unable to store inserted source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:418
+msgid "Unable to store replaced text"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:419
+msgid "Unable to update active placeholder"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:421
+msgid "Unclosed group"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:420
+msgid "Unclosed group or layout construct"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:422
+msgid "Unclosed math environment"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:423
+msgid "Unclosed root index"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:424
+msgid "Unclosed text argument"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:39
+msgid "Undo"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:425
+msgid "Unexpected closing brace"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:426
+msgid "Unexpected environment terminator"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:427
+msgid "Unexpected frame from renderer worker"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:428
+msgid "Unexpected input after formula"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:156
+msgid "Union"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:429
+msgid "Unknown artifact type"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:430
+msgid "Unknown frame kind or flags"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:431
+msgid "Unknown function tool"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:432
+msgid "Unknown mathematical tool"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:433
+msgid "Unsupported ReliefMath protocol version"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:434
+msgid "Unsupported control symbol"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:435
+msgid "Unsupported math command"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:436
+msgid "Unsupported math environment"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:437
+msgid "Unsupported scalable delimiter"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:438
+msgid "Unsupported text escape"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:135
+msgid "Untitled"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:157
+msgid "Upsilon"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:11
+msgid "Usage: reliefmath [document.rmath]\nOffline mathematical formula editor with SVG, transparent PNG and LaTeX export."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:439
+msgid "Use {index} and {name} without path separators"
+msgstr ""
+
+#: userland/apps/reliefmath/files.cpp:248
+msgid "Use {index} and {name}; the extension is added automatically."
+msgstr ""
+
+#: userland/apps/reliefmath/dialogs.cpp:714
+msgid "Variant"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:158
+msgid "Variant epsilon"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:159
+msgid "Variant phi"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:160
+msgid "Variant pi"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:161
+msgid "Variant rho"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:162
+msgid "Variant theta"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:110
+msgid "Vector"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:163
+msgid "Vector accent"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:33
+msgid "View"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:255
+msgid "Wait for a successful current preview before copying an image"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:179
+msgid "Waiting for render..."
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:440
+msgid "XDG state path exceeds the path limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:164
+msgid "Xi"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:165
+msgid "Zeta"
+msgstr ""
+
+#: userland/apps/reliefmath/window.cpp:119
+msgid "Zoom"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:441
+msgid "active recovery snapshot changed outside ReliefMath"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:166
+msgid "argument: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:442
+msgid "atomic file data is null or exceeds the bounded storage limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:167
+msgid "base and exponent: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:168
+msgid "base and subscript: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:169
+msgid "base: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:170
+msgid "bounds and integrand: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:443
+msgid "cannot mark an active transaction saved"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:444
+msgid "cannot redo an active transaction"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:445
+msgid "cannot undo an active transaction"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:446
+msgid "caret is not on a UTF-8 boundary"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:171
+msgid "content: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:447
+msgid "could not allocate replacement result"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:449
+msgid "could not close document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:448
+msgid "could not close document directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:451
+msgid "could not close recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:450
+msgid "could not close recovery directory scan"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:452
+msgid "could not close recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:453
+msgid "could not close temporary document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:454
+msgid "could not create a recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:455
+msgid "could not create recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:456
+msgid "could not create temporary document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:457
+msgid "could not discard recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:458
+msgid "could not inspect document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:459
+msgid "could not inspect opened document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:460
+msgid "could not inspect opened recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:461
+msgid "could not inspect own recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:462
+msgid "could not inspect recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:463
+msgid "could not inspect recovery entry"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:464
+msgid "could not inspect recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:465
+msgid "could not inspect recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:466
+msgid "could not inspect save target"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:467
+msgid "could not inspect synced document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:468
+msgid "could not inspect temporary document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:469
+msgid "could not lock recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:470
+msgid "could not open a recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:472
+msgid "could not open document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:471
+msgid "could not open document parent directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:473
+msgid "could not open recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:474
+msgid "could not open recovery path root"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:475
+msgid "could not open recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:476
+msgid "could not read document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:477
+msgid "could not read recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:478
+msgid "could not read recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:479
+msgid "could not recheck document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:480
+msgid "could not recheck recovery snapshot"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:481
+msgid "could not remove own recovery lock"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:482
+msgid "could not replace document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:483
+msgid "could not reserve a unique recovery instance ID"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:484
+msgid "could not reserve a unique temporary document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:485
+msgid "could not retain recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:486
+msgid "could not scan recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:487
+msgid "could not secure recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:488
+msgid "could not secure recovery instance lock"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:489
+msgid "could not secure recovery lock descriptor"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:490
+msgid "could not store replacement result"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:491
+msgid "could not store the completion prefix"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:492
+msgid "could not sync recovery directory parent"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:493
+msgid "could not sync recovery directory permissions"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:494
+msgid "could not sync temporary document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:495
+msgid "could not verify document length"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:496
+msgid "could not write temporary document"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:497
+msgid "current recovery ID is invalid"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:498
+msgid "document I/O was cancelled"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:499
+msgid "document changed outside ReliefMath; original was preserved"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:500
+msgid "document changed while it was being opened"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:501
+msgid "document changed while it was being read"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:502
+msgid "document contains trailing bytes"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:503
+msgid "document differs from current history state"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:504
+msgid "document does not exist"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:505
+msgid "document encoding allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:506
+msgid "document exceeds the .rmath v1 length range"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:507
+msgid "document exceeds the 16 MiB limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:508
+msgid "document fields exceed the .rmath v1 range"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:509
+msgid "document formula allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:510
+msgid "document formula count exceeds the limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:511
+msgid "document formula record is truncated"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:512
+msgid "document grew while it was being read"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:513
+msgid "document header is truncated"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:514
+msgid "document input is null"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:515
+msgid "document length does not match its header"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:516
+msgid "document magic is invalid"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:517
+msgid "document must be a regular non-symbolic-link file"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:518
+msgid "document parent directory is invalid"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:519
+msgid "document parent path allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:520
+msgid "document path allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:521
+msgid "document path changed while it was being read"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:522
+msgid "document path contains a symbolic link or non-directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:523
+msgid "document path exceeds the path limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:524
+msgid "document path has an unsafe file name"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:525
+msgid "document path is empty"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:526
+msgid "document path may not traverse a parent directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:527
+msgid "document read allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:528
+msgid "document revision exhausted"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:529
+msgid "document snapshot allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:530
+msgid "document text allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:531
+msgid "document title exceeds the limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:532
+msgid "document title is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:533
+msgid "document title is truncated"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:534
+msgid "document was replaced, but directory persistence is unconfirmed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:535
+msgid "document was replaced, but directory persistence is unconfirmed: %s"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:536
+msgid "document was replaced, but its installed stamp could not be confirmed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:537
+msgid "document was truncated while it was being read"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:538
+msgid "duplicate ID in formula ordering"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:539
+msgid "duplicate formula ID"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:540
+msgid "expected --render-worker"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:541
+msgid "file exceeds the bounded storage limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:542
+msgid "filesystem root cannot be a recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:543
+msgid "find and replace text must be provided"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:544
+msgid "find and replace text must be valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:545
+msgid "formula ID and generation must be nonzero"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:547
+msgid "formula ID not found"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:546
+msgid "formula ID not found in ordering"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:548
+msgid "formula ID space exhausted"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:549
+msgid "formula array allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:550
+msgid "formula display flag is invalid"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:551
+msgid "formula generation exhausted"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:552
+msgid "formula index out of range"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:553
+msgid "formula limit reached"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:554
+msgid "formula name allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:555
+msgid "formula name is empty"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:556
+msgid "formula name is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:557
+msgid "formula ordering allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:558
+msgid "formula ordering must contain every ID"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:559
+msgid "formula reserved bytes must be zero"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:560
+msgid "formula source allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:561
+msgid "formula source is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:562
+msgid "formula text exceeds the field limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:563
+msgid "formula text is truncated"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:564
+msgid "history baseline allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:565
+msgid "history state allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:566
+msgid "history transaction already active"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:567
+msgid "home state path exceeds the path limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:172
+msgid "index and radicand: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:568
+msgid "invalid document title"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:569
+msgid "invalid formula name"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:570
+msgid "invalid formula source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:571
+msgid "invalid formula style"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:173
+msgid "lower bound, upper bound, and term: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:572
+msgid "next formula ID is not monotonic"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:573
+msgid "no absolute XDG_STATE_HOME or HOME is available"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:574
+msgid "no active history transaction"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:174
+msgid "none"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:575
+msgid "nothing to redo"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:576
+msgid "nothing to undo"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:175
+msgid "numerator and denominator: display-style math"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:176
+msgid "numerator and denominator: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:577
+msgid "own recovery lock was removed but directory persistence is unconfirmed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:177
+msgid "path and integrand: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:578
+msgid "place the caret in a backslash command"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:178
+msgid "radicand: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:579
+msgid "recovery I/O was cancelled"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:580
+msgid "recovery ID is invalid"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:581
+msgid "recovery directory contains too many snapshots"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:582
+msgid "recovery directory must be an absolute bounded path"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:583
+msgid "recovery directory must belong to the current user"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:584
+msgid "recovery directory path allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:585
+msgid "recovery entry is not a private regular file"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:586
+msgid "recovery list allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:587
+msgid "recovery lock is not a private regular file"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:588
+msgid "recovery lock name is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:589
+msgid "recovery path allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:590
+msgid "recovery path contains a symbolic link or non-directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:591
+msgid "recovery path exceeds the path limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:592
+msgid "recovery path hint allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:593
+msgid "recovery path hint exceeds the limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:594
+msgid "recovery path hint is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:595
+msgid "recovery path may not traverse a parent directory"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:596
+msgid "recovery snapshot allocation failed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:597
+msgid "recovery snapshot belongs to a live instance"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:598
+msgid "recovery snapshot changed since it was listed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:599
+msgid "recovery snapshot changed while opening"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:600
+msgid "recovery snapshot changed while reading"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:601
+msgid "recovery snapshot does not exist"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:602
+msgid "recovery snapshot exceeds the bounded storage limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:603
+msgid "recovery snapshot has an invalid length"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:604
+msgid "recovery snapshot is not a private regular file"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:605
+msgid "recovery snapshot length is outside its limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:606
+msgid "recovery snapshot lengths are inconsistent"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:607
+msgid "recovery snapshot magic is invalid"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:608
+msgid "recovery snapshot was removed but directory persistence is unconfirmed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:609
+msgid "recovery snapshot was removed but its lock could not be cleaned up"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:610
+msgid "recovery snapshot was truncated while reading"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:611
+msgid "recovery store is already open"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:612
+msgid "recovery store is not open"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:613
+msgid "recovery store or ID is invalid"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:12
+msgid "reliefmath: unsupported argument\n"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:614
+msgid "replacement result exceeds the source limit"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:179
+msgid "rows and columns: 1..16"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:615
+msgid "save failed and its temporary file could not be removed"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:616
+msgid "save target must be a regular non-symbolic-link file"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:617
+msgid "search text cannot be empty"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:618
+msgid "source is not valid UTF-8"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:619
+msgid "source text is missing"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:620
+msgid "temporary document is not a private regular file"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:621
+msgid "temporary document write made no progress"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:622
+msgid "temporary file name is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:180
+msgid "text content; selected UTF-8 text is preserved"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:623
+msgid "the backslash is escaped"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:624
+msgid "too many formulas"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:625
+msgid "unsupported .rmath document version"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:626
+msgid "unsupported recovery snapshot version"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:181
+msgid "variable, target, and expression: math source"
+msgstr ""
+
+#: configs/nls/messages/reliefmath.c:627
+msgid "worker error"
+msgstr ""

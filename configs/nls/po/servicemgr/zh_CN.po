@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/servicemgr/main.c:44
+msgid "ALSA state"
+msgstr ""
+
+#: userland/apps/servicemgr/main.c:44
+msgid "Audio"
+msgstr "音频"
+
+#: userland/apps/servicemgr/main.c:47
+msgid "BusyBox ntpd"
+msgstr "BusyBox ntpd"
+
+#: userland/apps/servicemgr/main.c:45
+msgid "BusyBox udhcpc"
+msgstr "BusyBox udhcpc"
+
+#: userland/apps/servicemgr/main.c:45
+msgid "DHCP"
+msgstr "DHCP"
+
+#: userland/apps/servicemgr/main.c:152
+msgid "Default runlevel updated"
+msgstr "默认运行级别已更新"
+
+#: userland/apps/servicemgr/main.c:227
+msgid "Detail"
+msgstr "详情"
+
+#: userland/apps/servicemgr/main.c:46
+msgid "Devices"
+msgstr "设备"
+
+#: userland/apps/servicemgr/main.c:208
+msgid "Failed"
+msgstr "失败"
+
+#: configs/nls/messages/servicemgr.c:5
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/servicemgr/main.c:262
+msgid "Refresh"
+msgstr "刷新"
+
+#: userland/apps/servicemgr/main.c:161
+msgid "Refreshing OpenRC..."
+msgstr "正在查询 OpenRC…"
+
+#: userland/apps/servicemgr/main.c:46
+msgid "ReliefOS device protocol"
+msgstr "ReliefOS 设备协议"
+
+#: userland/apps/servicemgr/main.c:279
+msgid "Restart"
+msgstr "重启"
+
+#: userland/apps/servicemgr/main.c:202
+msgid "Running"
+msgstr "运行中"
+
+#: userland/apps/servicemgr/main.c:222
+msgid "Runtime state is visible. Administrator rights are required to control services."
+msgstr "可以查看运行状态，控制服务需要管理员权限。"
+
+#: userland/apps/servicemgr/main.c:264
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/servicemgr/main.c:224
+msgid "Service"
+msgstr "服务"
+
+#: userland/apps/servicemgr/main.c:351
+msgid "Service Manager"
+msgstr "服务管理器"
+
+#: userland/apps/servicemgr/main.c:314
+msgid "Service setting changed"
+msgstr "服务设置已更改"
+
+#: userland/apps/servicemgr/main.c:352
+msgid "Services"
+msgstr "服务"
+
+#: userland/apps/servicemgr/main.c:267
+msgid "Start"
+msgstr "启动"
+
+#: userland/apps/servicemgr/main.c:211
+msgid "Starting"
+msgstr "启动中"
+
+#: userland/apps/servicemgr/main.c:225
+msgid "State"
+msgstr "状态"
+
+#: userland/apps/servicemgr/main.c:273
+msgid "Stop"
+msgstr "停止"
+
+#: userland/apps/servicemgr/main.c:205
+msgid "Stopped"
+msgstr "已停止"
+
+#: userland/apps/servicemgr/main.c:47
+msgid "Time sync"
+msgstr "网络校时"
+
+#: userland/apps/servicemgr/main.c:213
+msgid "Unknown"
+msgstr "未知"
+
+#: userland/apps/servicemgr/main.c:149
+msgid "Updating runlevel..."
+msgstr "正在更新运行级别…"
+
+#: userland/apps/servicemgr/main.c:221
+msgid "View service runtime state and control startup services."
+msgstr "查看服务运行状态并控制启动服务。"
+
+#: configs/nls/messages/servicemgr.c:6
+msgid "failed"
+msgstr "失败"

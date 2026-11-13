@@ -72,7 +72,7 @@ echo "RM_EXIT status=$status" >/dev/ttyS0
              (OUT/'userland/reliefmath-render.elf','/usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf',0o100755),
              (OUT/'tests/reliefmath-backend-probe.elf','/usr/lib/reliefos/tests/reliefmath-backend-probe',0o100755),
              (OUT/'userland/fileman.elf','/usr/lib/reliefos/apps/fileman/fileman.elf',0o100755),
-             (OUT/'generated/nls/zh_CN/LC_MESSAGES/leonos.mo',fltk.LOCALE_GUEST,0o100644),
+             *fltk.locale_payload(OUT),
              (ROOT/'resources/reliefmath/STIXTwoMath-Regular.otf','/usr/share/reliefmath/STIXTwoMath-Regular.otf',0o100444),
              (ROOT/'userland/apps/reliefmath/reliefmath.desktop','/usr/share/applications/reliefos-reliefmath.desktop',0o100644),
              (ROOT/'resources/build-art/app-icons/reliefmath.bmp','/usr/lib/reliefos/apps/reliefmath/reliefmath.bmp',0o100644),

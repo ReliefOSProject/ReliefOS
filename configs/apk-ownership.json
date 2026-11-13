@@ -30,7 +30,7 @@
       "destination": "reliefos",
       "components": [],
       "paths": ["usr/share/locale/zh_CN"],
-      "reason": "Message catalogs from configs/nls/po, scoped per language to preserve upstream catalog ownership."
+      "reason": "Per-application gettext catalogs from configs/nls/po/<domain>, scoped per language to preserve upstream catalog ownership."
     },
     "reliefos-apps": {
       "destination": "reliefos",

@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/dynlinkerror/main.c:26
+msgid "(unknown library)"
+msgstr ""
+
+#: userland/apps/dynlinkerror/main.c:25
+msgid "(unknown program)"
+msgstr ""
+
+#: userland/apps/dynlinkerror/main.c:31
+msgid "Application:"
+msgstr ""
+
+#: userland/apps/dynlinkerror/main.c:42
+msgid "Close"
+msgstr ""
+
+#: userland/apps/dynlinkerror/main.c:60
+msgid "Dynamic Link Error"
+msgstr ""
+
+#: userland/apps/dynlinkerror/main.c:61
+msgid "Required shared library is missing"
+msgstr ""
+
+#: userland/apps/dynlinkerror/main.c:34
+msgid "Required shared library is missing:"
+msgstr ""
+
+#: userland/apps/dynlinkerror/main.c:39
+msgid "Restore the library from the system image, then try again."
+msgstr ""
+
+#: userland/apps/dynlinkerror/main.c:29
+msgid "The application could not be started."
+msgstr ""

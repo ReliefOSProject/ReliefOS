@@ -74,7 +74,9 @@ printf '%s\n' fixture > "$work/out/upstream/grub/root/usr/lib/grub/i386-pc/boot.
 printf '%s\n' fixture > "$work/out/upstream/grub/root/usr/share/licenses/grub/COPYING"
 for locale in $(cat configs/nls/LINGUAS); do
     mkdir -p "$work/out/generated/nls/$locale/LC_MESSAGES"
-    printf '%s\n' fixture > "$work/out/generated/nls/$locale/LC_MESSAGES/${legacy_brand}.mo"
+    for domain in $(cat configs/nls/DOMAINS); do
+        printf '%s\n' fixture > "$work/out/generated/nls/$locale/LC_MESSAGES/$domain.mo"
+    done
 done
 printf 'busybox\ttool\t1\t1\t0\t0\t0\tBusyBox\tTools\t\t0\n' > "$work/metadata"
 for app in fileman installer leonmmcoset reliefword reliefppt soundctl sudo fastfetch; do
@@ -136,6 +138,12 @@ sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
     "$work/rootfs.config" "$work/metadata" "$work/stage" "$work/layout" \
     "$work/root" "$work/manifest.json" 1700000000
 xorg_root=$work/root
+for locale in $(cat configs/nls/LINGUAS); do
+    for domain in $(cat configs/nls/DOMAINS); do
+        cmp "$work/out/generated/nls/$locale/LC_MESSAGES/$domain.mo" \
+            "$xorg_root/usr/share/locale/$locale/LC_MESSAGES/$domain.mo"
+    done
+done
 for lib in avformat avcodec avutil swresample swscale; do
     test -f "$xorg_root/usr/lib/lib$lib-reliefplayer.so.62"
     test -L "$xorg_root/usr/lib/lib$lib-reliefplayer.so.62"

@@ -14,8 +14,8 @@ static uint32_t pixels[WIN_W * WIN_H];
 int main(void)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("helloworld", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("helloworld");
     struct reliefos_gui_app_event event;
     struct reliefos_ui_surface ui;
     int window_id;

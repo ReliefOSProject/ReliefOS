@@ -38,4 +38,10 @@ grep -qx '#~ msgid "Removed"' "$w/new.po"
 "$w/extract" --merge "$w/new.po" "$w/again.po" "$w/source.c"
 cmp "$w/new.po" "$w/again.po"
 msgfmt -o "$w/catalog.mo" "$w/new.po"
+for catalog in "$w/messages.pot" "$w/new.po"; do
+    if [ -z "$(tail -c 2 "$catalog")" ]; then
+        printf 'FAIL - extracted catalogs must end with one newline\n'
+        exit 1
+    fi
+done
 printf 'nls extract: lexical extraction, rewrite and merge idempotence passed\n'

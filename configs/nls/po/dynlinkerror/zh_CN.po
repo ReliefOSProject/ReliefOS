@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/dynlinkerror/main.c:26
+msgid "(unknown library)"
+msgstr "(未知库)"
+
+#: userland/apps/dynlinkerror/main.c:25
+msgid "(unknown program)"
+msgstr "(未知程序)"
+
+#: userland/apps/dynlinkerror/main.c:31
+msgid "Application:"
+msgstr "应用程序："
+
+#: userland/apps/dynlinkerror/main.c:42
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/dynlinkerror/main.c:60
+msgid "Dynamic Link Error"
+msgstr "动态链接错误"
+
+#: userland/apps/dynlinkerror/main.c:61
+msgid "Required shared library is missing"
+msgstr "缺少必需的动态链接库"
+
+#: userland/apps/dynlinkerror/main.c:34
+msgid "Required shared library is missing:"
+msgstr "缺少必需的动态链接库："
+
+#: userland/apps/dynlinkerror/main.c:39
+msgid "Restore the library from the system image, then try again."
+msgstr "请从系统镜像恢复该库，然后重试。"
+
+#: userland/apps/dynlinkerror/main.c:29
+msgid "The application could not be started."
+msgstr "无法启动该应用程序。"

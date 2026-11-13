@@ -53,7 +53,7 @@ echo "RD_EXIT status=$status" >/dev/ttyS0
     fltk.validate_target_elf(elf, sysroot=OUT / 'sysroot/musl', required_needed=('libfltk.so.1.3',))
     payload = [(elf, '/usr/lib/reliefos/apps/reliefdiagram/reliefdiagram.elf', 0o100755),
                (ROOT / 'resources/build-art/app-icons/reliefdiagram.bmp', '/usr/lib/reliefos/apps/reliefdiagram/reliefdiagram.bmp', 0o100644),
-               (OUT / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
+               *fltk.locale_payload(OUT),
                (ROOT / 'userland/apps/reliefdiagram/reliefdiagram.desktop', '/usr/share/applications/reliefos-reliefdiagram.desktop', 0o100644),
                (ROOT / 'system/rootfs/usr/share/mime/packages/reliefdiagram.xml', '/usr/share/mime/packages/reliefdiagram.xml', 0o100644),
                (probe, fltk.PROBE_GUEST, 0o100755), (runner, '/usr/bin/rdtest', 0o100755),

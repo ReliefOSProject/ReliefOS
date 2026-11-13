@@ -79,8 +79,6 @@ system/rootfs/etc/issue
 system/docs/leonos.hlp
 system/docs/zh_CN/leonos.hlp
 configs/components.toml
-configs/nls/po/leonos.pot
-configs/nls/po/zh_CN.po
 userland/apps/installer/main.cpp
 userland/apps/installer/installer_tty.c
 userland/apps/login/main.c
@@ -112,6 +110,12 @@ userland/apps/notepad/main.c
 userland/apps/terminal/main.c
 userland/apps/shell/main.c
 '
+    for domain in $(cat "$root/configs/nls/DOMAINS"); do
+        ui_files="$ui_files configs/nls/po/$domain/$domain.pot"
+        for language in $(cat "$root/configs/nls/LINGUAS"); do
+            ui_files="$ui_files configs/nls/po/$domain/$language.po"
+        done
+    done
     old_surfaces=
     for ui_file in $ui_files; do
         if grep -Fq 'LeonOS' "$root/$ui_file"; then

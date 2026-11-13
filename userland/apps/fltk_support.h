@@ -18,12 +18,12 @@
 
 namespace reliefos_fltk {
 
-inline void init(const char *app = nullptr)
+inline void init(const char *app)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    bind_textdomain_codeset("leonos", "UTF-8");
-    textdomain("leonos");
+    bindtextdomain(app, RELIEFOS_LAYOUT_LOCALE);
+    bind_textdomain_codeset(app, "UTF-8");
+    textdomain(app);
     /* The shipped SimSun font covers both Latin and Chinese. Map the
      * standard text faces as well, so inputs and dialogs use the same face.
      * FLTK's Xft backend consumes Unicode UTF-8 for all widget strings. */

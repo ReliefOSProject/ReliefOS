@@ -1,0 +1,743 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/fileman/model.c:551
+msgid " (partial)"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:342
+msgid " failed"
+msgstr ""
+
+#: userland/apps/fileman/model.c:547
+msgid " files, "
+msgstr ""
+
+#: userland/apps/fileman/model.c:549
+msgid " folders"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:340
+msgid " item(s) completed; "
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:647
+msgid "%s — %lu checked, %u matches, %lu skipped"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:898
+msgid "%u items, %u selected"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1242
+msgid "About"
+msgstr ""
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1251
+msgid "Address"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/fileman/model.c:83
+msgid "All items marked"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:973
+msgid "Application"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:599
+msgid "Application launched"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1243
+msgid "Archive"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:370
+msgid "Archive Conflict"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:881
+msgid "Automatic refresh unavailable; press F5"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:883
+msgid "Automatic refresh unavailable; refresh manually (F5)"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:854
+msgid "Browse files, manage folders and launch X11 applications."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:359
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:316
+msgid "Cannot create extraction folder"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:580
+msgid "Choose an installed X11 executable using its absolute path"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1236
+msgid "Clear Marks"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:266
+msgid "Clipboard is empty"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:528
+msgid "Close"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1243
+msgid "Compress to .tar"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:385
+msgid "Compressing to tar..."
+msgstr ""
+
+#: userland/apps/fileman/actions.c:371
+msgid "Compression canceled"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1230
+msgid "Copy"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:346
+msgid "Copy complete"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1269
+msgid "Copy selected items (Ctrl+C)"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:167
+msgid "Copying files..."
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1024
+msgid "Could not open the requested path"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:813
+msgid "Could not open the search result"
+msgstr ""
+
+#: userland/apps/fileman/model.c:200
+msgid "Could not save file manager settings "
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:588
+msgid "Could not save the file association"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:749
+msgid "Could not start search"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:136
+msgid "Create Shortcut"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1266
+msgid "Create a folder in the current location"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1231
+msgid "Cut"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:573
+msgid "Default Program"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1224
+msgid "Default Program..."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:592
+msgid "Default application saved"
+msgstr ""
+
+#: userland/apps/fileman/model.c:631
+msgid "Default program is for files"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1229
+msgid "Delete"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:368
+msgid "Delete canceled"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1273
+msgid "Delete selected items after confirmation"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:371
+msgid "Deleting items..."
+msgstr ""
+
+#: userland/apps/fileman/actions.c:142
+msgid "Desktop folder unavailable"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1226
+msgid "Details"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:972
+msgid "Device"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1299
+msgid "Double-click a folder to expand or collapse its tree"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1307
+msgid "Double-click to open. Ctrl/Shift selects multiple items."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1230
+msgid "Edit"
+msgstr ""
+
+#: userland/apps/fileman/model.c:734
+msgid "Elevated - items "
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1256
+msgid "Enter a folder path, then press Enter (Ctrl+L)"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:733
+msgid "Enter part of a file or folder name."
+msgstr ""
+
+#: userland/apps/fileman/actions.c:319
+msgid "Extract tar"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:327
+msgid "Extracting tar..."
+msgstr ""
+
+#: userland/apps/fileman/actions.c:321
+msgid "Extraction canceled"
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:974
+msgid "File"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:96
+msgid "File Conflict"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:853
+msgid "File Manager"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:434
+msgid "File Manager Settings"
+msgstr ""
+
+#: userland/apps/fileman/model.c:207
+msgid "File Manager settings saved"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:768
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:971
+msgid "Folder"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:119
+msgid "Folder created"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:103
+msgid "Folder created (elevated)"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:86
+msgid "Folder name is empty"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:81
+msgid "Folder name:"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1286
+msgid "Folders"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:520
+msgid "GID"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:777
+msgid "Ignore English letter case"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:775
+msgid "Include subfolders"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:371
+msgid "Input is too long; the value was not changed."
+msgstr ""
+
+#: userland/apps/fileman/actions.c:309
+msgid "Invalid extraction folder name"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:197
+msgid "Invalid file name or path too long"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:90
+msgid "Invalid folder name or path too long"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:551
+msgid "Invalid mode, UID or GID"
+msgstr ""
+
+#: userland/apps/fileman/model.c:75
+msgid "Item marked"
+msgstr ""
+
+#: userland/apps/fileman/model.c:76
+msgid "Item unmarked"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:874
+msgid "Items "
+msgstr ""
+
+#: userland/apps/fileman/operations.c:254
+msgid "Items copied. Open a folder and paste."
+msgstr ""
+
+#: userland/apps/fileman/operations.c:253
+msgid "Items cut. Open a folder and paste."
+msgstr ""
+
+#: userland/apps/fileman/operations.c:392
+msgid "Items deleted"
+msgstr ""
+
+#: configs/nls/messages/fileman.c:5
+msgid "Launch failed "
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1235
+msgid "Mark All"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1234
+msgid "Mark for Batch"
+msgstr ""
+
+#: userland/apps/fileman/model.c:89
+msgid "Marks cleared"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:781
+msgid "Matches part of a file or folder name."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:509
+msgid "Mode (octal)"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:345
+msgid "Move complete"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1270
+msgid "Move selected items using Cut and Paste (Ctrl+X)"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:272
+msgid "Moving files..."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:499
+msgid "Name"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:81
+msgid "New Folder"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:82
+msgid "New folder canceled"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:192
+msgid "New name is empty"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:187
+msgid "New name:"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:387
+msgid "No"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:645
+msgid "No matches found"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:358
+msgid "OK"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:790
+msgid "Open"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:793
+msgid "Open Containing Folder"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:573
+msgid "Open With"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:576
+msgid "Open With canceled"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:598
+msgid "Open With failed"
+msgstr ""
+
+#: userland/apps/fileman/model.c:616
+msgid "Open With is for files"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1223
+msgid "Open With..."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1267
+msgid "Open the selected item (Enter)"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1232
+msgid "Paste"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1271
+msgid "Paste into the current folder (Ctrl+V)"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:501
+msgid "Path"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1020
+msgid "Path is too long"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:365
+msgid "Path too long"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:367
+msgid "Permanently delete the selected items and all folder contents? This cannot be undone."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:526
+msgid "Permission changes use the current user's access rights."
+msgstr ""
+
+#: userland/apps/fileman/elevation.c:14
+msgid "Permission denied; administrator access requires a terminal in X11"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:562
+msgid "Permissions saved"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:137
+msgid "Place shortcut on Desktop? No creates it here."
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:506
+msgid "Properties"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:486
+msgid "Properties failed"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:881
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1240
+msgid "Refresh"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:882
+msgid "Refresh (F5)"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:584
+msgid "Remember this application for files with the same extension?"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:187
+msgid "Rename"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:202
+msgid "Rename Conflict"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:188
+msgid "Rename canceled"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1272
+msgid "Rename the selected item (F2)"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:230
+msgid "Renamed"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:214
+msgid "Renamed (elevated)"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1239
+msgid "Root"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:438
+msgid "Save"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:773
+msgid "Search"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:761
+msgid "Search Files"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1233
+msgid "Search Files..."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:645
+msgid "Search complete"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:644
+msgid "Search complete (partial)"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:764
+msgid "Search in:"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:642
+msgid "Search stopped"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:643
+msgid "Search stopped at limit"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1259
+msgid "Search this folder and subfolders (Ctrl+F)"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:641
+msgid "Searching"
+msgstr ""
+
+#: userland/apps/fileman/model.c:612
+msgid "Select a file"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:303
+msgid "Select a tar file"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:26
+msgid "Select an item"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1241
+msgid "Settings..."
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:974
+msgid "Shortcut"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:173
+msgid "Shortcut created"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:436
+msgid "Show files and folders starting with a dot"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:779
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:502
+msgid "Size"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:796
+msgid "Stop"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:392
+msgid "Tar created successfully"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:391
+msgid "Tar creation failed"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:335
+msgid "Tar extracted successfully"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:334
+msgid "Tar extraction failed; check the archive and destination permissions"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:370
+msgid "The archive exists. Replace it?"
+msgstr ""
+
+#: userland/apps/fileman/actions.c:202
+msgid "The destination exists. Replace it?"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:97
+msgid "The destination exists. Replace it? Choose No to save with another name."
+msgstr ""
+
+#: userland/apps/fileman/actions.c:320
+msgid "The extraction folder exists. Existing files may be replaced. Continue?"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:500
+msgid "Type"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:515
+msgid "UID"
+msgstr ""
+
+#: userland/apps/fileman/model.c:467
+msgid "Unmark"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1238
+msgid "Up"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1248
+msgid "Up one folder (Alt+Up)"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1238
+msgid "View"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:1268
+msgid "View properties and permissions"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:574
+msgid "X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"
+msgstr ""
+
+#: userland/apps/fileman/main.cpp:386
+msgid "Yes"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:390
+msgid "failed"
+msgstr ""
+
+#: userland/apps/fileman/operations.c:390
+msgid "item(s) deleted"
+msgstr ""

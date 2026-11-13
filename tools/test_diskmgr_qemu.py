@@ -18,6 +18,7 @@ os.chdir(W);sys.path.insert(0,str(W/'tools'))
 from test_dual_boot_qemu import boot,wait_xdm,wait_for,greeter_crop,digest,copy_disk
 from test_xorg_vm_qemu import _bright_panel_bbox,_session_st_visible
 from test_installer_accounts_qemu import USER_PASSWORD
+import test_fltk_apps_qemu as fltk
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--template',type=Path,required=True,help='Immutable installed QEMU fixture with root/r and alice/U!+30*u accounts')
 parser.add_argument('--build',type=Path,default=Path('out/dualboot-build'))
@@ -43,7 +44,7 @@ table=json.loads(subprocess.check_output(['sfdisk','--json',system]))['partition
 part=next(p for p in table['partitions'] if p['type'].lower()=='0fc63daf-8483-4772-8e79-3d69d8477de4')
 root=out/'root.ext4'
 subprocess.run(['dd',f'if={system}',f'of={root}','bs=4M','iflag=skip_bytes,count_bytes',f"skip={part['start']*512}",f"count={part['size']*512}",'conv=sparse','status=none'],check=True)
-changes=[(probe_dir/'dm-block-probe.elf','/usr/bin/dm-block-probe',0o100755),(build/'system/lib/libreliefos.so.2','/usr/lib/reliefos/libreliefos.so.2',0o100755),(build/'userland/diskmgr.elf','/usr/lib/reliefos/apps/diskmgr/diskmgr.elf',0o100755),(build/'generated/nls/zh_CN/LC_MESSAGES/leonos.mo','/usr/share/locale/zh_CN/LC_MESSAGES/leonos.mo',0o100644),(W/'userland/apps/diskmgr/diskmgr.desktop','/usr/share/applications/reliefos-diskmgr.desktop',0o100644),(probe_dir/'dm-x11-probe.elf','/usr/bin/dm-x11-probe',0o100755)]
+changes=[(probe_dir/'dm-block-probe.elf','/usr/bin/dm-block-probe',0o100755),(build/'system/lib/libreliefos.so.2','/usr/lib/reliefos/libreliefos.so.2',0o100755),(build/'userland/diskmgr.elf','/usr/lib/reliefos/apps/diskmgr/diskmgr.elf',0o100755),*fltk.locale_payload(build),(W/'userland/apps/diskmgr/diskmgr.desktop','/usr/share/applications/reliefos-diskmgr.desktop',0o100644),(probe_dir/'dm-x11-probe.elf','/usr/bin/dm-x11-probe',0o100755)]
 with (out/'prepare.log').open('w') as log:
  for src,dest,mode in changes:
   subprocess.run(['debugfs','-w','-R',f'rm {dest}',root],stdout=log,stderr=subprocess.STDOUT)

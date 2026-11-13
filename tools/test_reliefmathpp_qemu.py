@@ -38,7 +38,7 @@ echo "RMP_EXIT status=$status" >/dev/ttyS0
     entry.write_text('#!/bin/sh\nexec /usr/lib/reliefos/apps/reliefmathpp/reliefmathpp.elf "$@"\n')
     payload = [(OUT / 'userland/reliefmathpp.elf', '/usr/lib/reliefos/apps/reliefmathpp/reliefmathpp.elf', 0o100755),
                (OUT / 'userland/fileman.elf', '/usr/lib/reliefos/apps/fileman/fileman.elf', 0o100755),
-               (OUT / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
+               *fltk.locale_payload(OUT),
                (ROOT / 'userland/apps/reliefmathpp/reliefmathpp.desktop', '/usr/share/applications/reliefos-reliefmathpp.desktop', 0o100644),
                (ROOT / 'system/rootfs/usr/share/mime/packages/reliefmathpp.xml', '/usr/share/mime/packages/reliefmathpp.xml', 0o100644),
                (ROOT / 'resources/build-art/app-icons/reliefmathpp.bmp', '/usr/lib/reliefos/apps/reliefmathpp/reliefmathpp.bmp', 0o100644),

@@ -270,8 +270,8 @@ static int hit_rect_i(int32_t x, int32_t y, int32_t rx, int32_t ry, int32_t rw, 
 int main(void)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("devmgr", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("devmgr");
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     int window_id;

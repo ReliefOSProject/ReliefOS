@@ -1,0 +1,27 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/run/main.c:106
+msgid "Enter a file path and press Enter"
+msgstr ""
+
+#: userland/apps/run/main.c:84
+msgid "Launch failed "
+msgstr ""
+
+#: userland/apps/run/main.c:69
+msgid "Open ReliefOS program or file path"
+msgstr ""
+
+#: userland/apps/run/main.c:107
+msgid "Open file path"
+msgstr ""
+
+#: userland/apps/run/main.c:70
+msgid "Path:"
+msgstr ""
+
+#: userland/apps/run/main.c:107
+msgid "Run"
+msgstr ""

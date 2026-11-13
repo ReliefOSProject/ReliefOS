@@ -27,7 +27,7 @@ ${HOSTCC:-cc} -std=c11 -Wall -Wextra -Werror -Wno-address-of-packed-member \
     -idirafter "$src/userland/runtime/include" \
     "$src/tests/host/test_blockdev_names.c" -o "$work/names"
 "$work/names"
-msgfmt -c --check -o "$work/zh_CN.mo" "$src/configs/nls/po/zh_CN.po"
+msgfmt -c --check -o "$work/zh_CN.mo" "$src/configs/nls/po/diskmgr/zh_CN.po"
 python3 - "$src" "$work/zh_CN.mo" <<'PY'
 import ast,gettext,re,sys
 from pathlib import Path

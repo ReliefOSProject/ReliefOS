@@ -58,7 +58,7 @@ echo "RC_EXIT status=$status" >/dev/ttyS0
     payload = [(elf, '/usr/lib/reliefos/apps/reliefcapture/reliefcapture.elf', 0o100755),
                (ROOT / 'resources/build-art/app-icons/reliefcapture.bmp', '/usr/lib/reliefos/apps/reliefcapture/reliefcapture.bmp', 0o100644),
                (ROOT / 'userland/apps/reliefcapture/reliefcapture.desktop', '/usr/share/applications/reliefos-reliefcapture.desktop', 0o100644),
-               (build_dir / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
+               *fltk.locale_payload(build_dir),
                (build_dir / 'upstream/x11-development/usr/lib/libX11.so', '/usr/lib/libX11.so.6', 0o100755),
                (ROOT / 'system/xorg/icewm/keys', '/etc/reliefos/icewm/keys', 0o100644),
                (runner, '/usr/bin/reliefcapture', 0o100755), (probe, fltk.PROBE_GUEST, 0o100755),

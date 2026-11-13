@@ -1,0 +1,87 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/drvmgr/main.c:153
+msgid "ABI"
+msgstr "ABI"
+
+#: userland/apps/drvmgr/main.c:185
+msgid "Available"
+msgstr "可用"
+
+#: userland/apps/drvmgr/main.c:217
+msgid "Built-in kernel drivers"
+msgstr "内核内建驱动"
+
+#: userland/apps/drvmgr/main.c:154
+msgid "Details"
+msgstr "详细信息"
+
+#: userland/apps/drvmgr/main.c:83
+msgid "Disabled"
+msgstr "已禁用"
+
+#: userland/apps/drvmgr/main.c:151
+msgid "Driver"
+msgstr "驱动"
+
+#: userland/apps/drvmgr/main.c:216
+msgid "Driver Manager"
+msgstr "驱动管理器"
+
+#: userland/apps/drvmgr/main.c:130
+msgid "Driver refresh failed"
+msgstr "驱动刷新失败"
+
+#: userland/apps/drvmgr/main.c:160
+msgid "Drivers are built into the kernel image. This view is read-only."
+msgstr "驱动已内建到内核镜像中，此视图仅供查看。"
+
+#: userland/apps/drvmgr/main.c:85
+msgid "Failed"
+msgstr "失败"
+
+#: userland/apps/drvmgr/main.c:150
+msgid "File"
+msgstr "文件"
+
+#: userland/apps/drvmgr/main.c:81
+msgid "Loaded"
+msgstr "已加载"
+
+#: userland/apps/drvmgr/main.c:79
+msgid "Loading"
+msgstr "正在加载"
+
+#: userland/apps/drvmgr/main.c:142
+msgid "Read-only: drivers are built into the kernel"
+msgstr "只读：驱动已内建到内核"
+
+#: configs/nls/messages/drvmgr.c:5
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/drvmgr/main.c:158
+msgid "Refresh"
+msgstr "刷新"
+
+#: userland/apps/drvmgr/main.c:184
+msgid "Skipped at boot"
+msgstr "启动时跳过"
+
+#: userland/apps/drvmgr/main.c:152
+msgid "State"
+msgstr "状态"
+
+#: userland/apps/drvmgr/main.c:87
+msgid "Unloaded"
+msgstr "未加载"

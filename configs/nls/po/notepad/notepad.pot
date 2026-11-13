@@ -1,0 +1,203 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/notepad/main.c:256
+msgid "  Bytes "
+msgstr ""
+
+#: userland/apps/notepad/main.c:270
+msgid "  Empty"
+msgstr ""
+
+#: userland/apps/notepad/main.c:258
+msgid "  Encoding "
+msgstr ""
+
+#: userland/apps/notepad/main.c:267
+msgid "  Invalid bytes replaced"
+msgstr ""
+
+#: userland/apps/notepad/main.c:261
+msgid "  Modified"
+msgstr ""
+
+#: userland/apps/notepad/main.c:249
+msgid "  Read-only"
+msgstr ""
+
+#: userland/apps/notepad/main.c:264
+msgid "  Truncated"
+msgstr ""
+
+#: userland/apps/notepad/main.c:688
+msgid "About"
+msgstr ""
+
+#: userland/apps/notepad/main.c:683
+msgid "Beginning"
+msgstr ""
+
+#: userland/apps/notepad/main.c:809
+msgid "Choose a text file or PNG image"
+msgstr ""
+
+#: userland/apps/notepad/main.c:676
+msgid "Choose file"
+msgstr ""
+
+#: userland/apps/notepad/main.c:682
+msgid "Clear"
+msgstr ""
+
+#: userland/apps/notepad/main.c:443
+msgid "Could not decode PNG (maximum 1024x1024)."
+msgstr ""
+
+#: userland/apps/notepad/main.c:415
+msgid "Could not decode text file"
+msgstr ""
+
+#: userland/apps/notepad/main.c:662
+msgid "Edit"
+msgstr ""
+
+#: userland/apps/notepad/main.c:536
+msgid "Encoding"
+msgstr ""
+
+#: userland/apps/notepad/main.c:684
+msgid "End"
+msgstr ""
+
+#: userland/apps/notepad/main.c:661
+msgid "File"
+msgstr ""
+
+#: userland/apps/notepad/main.c:254
+msgid "Lines "
+msgstr ""
+
+#: userland/apps/notepad/main.c:677
+msgid "New"
+msgstr ""
+
+#: userland/apps/notepad/main.c:486
+msgid "Notepad"
+msgstr ""
+
+#: userland/apps/notepad/main.c:697
+msgid "Notepad - "
+msgstr ""
+
+#: userland/apps/notepad/main.c:788
+msgid "OK"
+msgstr ""
+
+#: userland/apps/notepad/main.c:571
+msgid "Open"
+msgstr ""
+
+#: userland/apps/notepad/main.c:788
+msgid "Open files from File Manager or Run."
+msgstr ""
+
+#: userland/apps/notepad/main.c:245
+msgid "PNG preview "
+msgstr ""
+
+#: userland/apps/notepad/main.c:474
+msgid "PNG preview cannot be saved as text"
+msgstr ""
+
+#: userland/apps/notepad/main.c:625
+msgid "PNG preview is unavailable."
+msgstr ""
+
+#: userland/apps/notepad/main.c:810
+msgid "ReliefOS text viewer"
+msgstr ""
+
+#: userland/apps/notepad/main.c:678
+msgid "Save"
+msgstr ""
+
+#: userland/apps/notepad/main.c:557
+msgid "Save As"
+msgstr ""
+
+#: userland/apps/notepad/main.c:757
+msgid "Save changes before clearing this file?"
+msgstr ""
+
+#: userland/apps/notepad/main.c:831
+msgid "Save changes before closing?"
+msgstr ""
+
+#: userland/apps/notepad/main.c:736
+msgid "Save changes before creating a new file?"
+msgstr ""
+
+#: userland/apps/notepad/main.c:579
+msgid "Save changes before opening another file?"
+msgstr ""
+
+#: userland/apps/notepad/main.c:368
+msgid "Selected path is not a file"
+msgstr ""
+
+#: userland/apps/notepad/main.c:487
+msgid "Some characters are not available in this encoding. Save them as '?'?"
+msgstr ""
+
+#: userland/apps/notepad/main.c:572
+msgid "Text and PNG (*.txt; *.png)"
+msgstr ""
+
+#: userland/apps/notepad/main.c:558
+msgid "Text files (*.txt)"
+msgstr ""
+
+#: userland/apps/notepad/main.c:482
+msgid "Text is too large for selected encoding"
+msgstr ""
+
+#: userland/apps/notepad/main.c:687
+msgid "Top"
+msgstr ""
+
+#: userland/apps/notepad/main.c:408
+msgid "Unsupported text encoding"
+msgstr ""
+
+#: userland/apps/notepad/main.c:192
+msgid "Untitled"
+msgstr ""
+
+#: userland/apps/notepad/main.c:663
+msgid "View"
+msgstr ""
+
+#: userland/apps/notepad/main.c:373
+msgid "open failed "
+msgstr ""
+
+#: userland/apps/notepad/main.c:388
+msgid "read failed "
+msgstr ""
+
+#: userland/apps/notepad/main.c:493
+msgid "save open failed "
+msgstr ""
+
+#: userland/apps/notepad/main.c:501
+msgid "save write failed "
+msgstr ""
+
+#: userland/apps/notepad/main.c:506
+msgid "save write incomplete"
+msgstr ""
+
+#: userland/apps/notepad/main.c:364
+msgid "stat failed "
+msgstr ""

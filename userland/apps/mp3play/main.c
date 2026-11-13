@@ -419,8 +419,8 @@ static int handle_event(struct mp3_player *player,
 int main(int argc, char **argv, char **envp)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("mp3play", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("mp3play");
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     struct mp3_player player = {.fd = -1, .dsp_fd = -1};

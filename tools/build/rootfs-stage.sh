@@ -227,7 +227,9 @@ case $locale_name in *[!A-Za-z0-9._@-]*|'') echo 'rootfs-stage: invalid locale n
 printf 'LANG=%s\nMUSL_LOCPATH=/usr/share/musl/locales\n' "$locale_name" > "$work/data/locale.conf"
 file "$work/data/locale.conf" etc/reliefos/locale.conf 0644 product-policy override
 for loc in $(cat "$src/configs/nls/LINGUAS"); do
-    file "$out/generated/nls/$loc/LC_MESSAGES/leonos.mo" "usr/share/locale/$loc/LC_MESSAGES/leonos.mo" 0644 reliefos-nls
+    for domain in $(cat "$src/configs/nls/DOMAINS"); do
+        file "$out/generated/nls/$loc/LC_MESSAGES/$domain.mo" "usr/share/locale/$loc/LC_MESSAGES/$domain.mo" 0644 reliefos-nls
+    done
     if [ -f "$out/generated/musl-locales/$loc.UTF-8" ]; then
         file "$out/generated/musl-locales/$loc.UTF-8" "usr/share/musl/locales/$loc.UTF-8" 0644 reliefos-nls
     fi

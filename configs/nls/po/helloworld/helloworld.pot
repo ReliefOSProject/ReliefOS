@@ -1,0 +1,23 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/helloworld/main.c:25
+msgid "Hello World"
+msgstr ""
+
+#: userland/apps/helloworld/main.c:36
+msgid "Hello, World!"
+msgstr ""
+
+#: userland/apps/helloworld/main.c:39
+msgid "Installed via API package"
+msgstr ""
+
+#: userland/apps/helloworld/main.c:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/helloworld/main.c:26
+msgid "helloworld"
+msgstr ""

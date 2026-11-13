@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/helloworld/main.c:25
+msgid "Hello World"
+msgstr "你好世界"
+
+#: userland/apps/helloworld/main.c:36
+msgid "Hello, World!"
+msgstr "你好，世界！"
+
+#: userland/apps/helloworld/main.c:39
+msgid "Installed via API package"
+msgstr "通过 API 包安装"
+
+#: userland/apps/helloworld/main.c:43
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/helloworld/main.c:26
+msgid "helloworld"
+msgstr "helloworld"

@@ -27,8 +27,8 @@ static void draw_hello(struct reliefos_ui_surface *ui, uint32_t hover)
 int main(void)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("hello", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("hello");
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     int window_id;

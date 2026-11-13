@@ -12,7 +12,22 @@
 配置与翻译
 ==========
 
-区域配置位于 ``/etc/reliefos/locale.conf``。gettext 翻译源位于
-``configs/nls/po/``，现有 ``leonos`` domain 与 MO 文件名是兼容数据，不是产品名。
-新增 UI 字符串同步消息表与翻译；nls 目标生成资源，只写所选输出树。
+区域配置位于 ``/etc/reliefos/locale.conf``。应用通过 gettext 加载各自的翻译域，
+域名与应用源码目录名一致。``configs/nls/DOMAINS`` 登记翻译域，
+``configs/nls/LINGUAS`` 登记随系统构建的语言。
+
+例如，Fileman 的模板位于 ``configs/nls/po/fileman/fileman.pot``，中文译文位于
+``configs/nls/po/fileman/zh_CN.po``。``make nls`` 将其编译为
+``O/generated/nls/zh_CN/LC_MESSAGES/fileman.mo``，镜像安装到
+``/usr/share/locale/zh_CN/LC_MESSAGES/fileman.mo``。Taskmgr 使用独立的
+``taskmgr`` 翻译域和对应目录。FLTK 公共按钮与文件选择器文案收录在各自应用的目录中。
+
+修改 Fileman 文案后执行 ``make nls-update-fileman``，可更新该应用的模板和译文。
+``make nls-update`` 更新已登记的全部应用。提取范围包含应用的子目录、
+公共 FLTK 头文件、Kbuild 中复用的实现及该应用的
+``configs/nls/messages/<应用名>.c`` 动态文案标记。
+新增应用时登记翻译域，并为 ``LINGUAS`` 中的每种语言创建对应的 PO 文件。
+常规构建只生成所选输出树中的资源，翻译源文件由显式维护目标更新。
+系统更新时，应用二进制与对应翻译资源一起更新。
+
 原生文件格式的容量、恢复与字符边界见各应用手册。

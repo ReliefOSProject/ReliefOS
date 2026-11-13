@@ -1,0 +1,679 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/network-controller/window.cpp:86
+msgid "About"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:550
+msgid "Adapter counters are not exported by this kernel. Address, gateway, DNS and connection diagnostics remain available."
+msgstr ""
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:120
+msgid "Address mode"
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:46
+msgid "Administrator permission is required to manage network settings."
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:671
+msgid "Apply"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:682
+msgid "Apply Ethernet configuration"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:406
+msgid "Applying the network failed. Saved settings remain on disk. Check the output and restore or correct the configuration."
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:48
+msgid "Authenticate with"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:5
+msgid "Authenticating"
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:115
+msgid "Authenticating…"
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:84
+msgid "Authentication failed. Check the password or choose another method."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:95
+msgid "Auto refresh"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:121
+msgid "Automatic (DHCP)"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:760
+msgid "Broadcast"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:168
+msgid "Calculate"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:94
+msgid "Cancel operation"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:735
+msgid "Cancel the running operation and close? Configuration changes already saved remain on disk."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:803
+msgid "Cancellation requested; waiting for the running command."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:723
+msgid "Cannot export the diagnostic output."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:294
+msgid "Cannot send the network operation."
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:101
+msgid "Cannot start the authentication program."
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:29
+msgid "Cannot start the network worker."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:182
+msgid "Clear output"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:130
+msgid "Cloudflare (1.1.1.1)"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:394
+msgid "Completed"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:119
+msgid "Configuration"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:516
+msgid "Connected"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:65
+msgid "Copy output"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:129
+msgid "Custom servers"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:80
+msgid "DHCP lease"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:82
+msgid "DHCP log"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:158
+msgid "DNS lookup"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:127
+msgid "DNS policy"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:81
+msgid "DNS resolver"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:152
+msgid "DNS server (optional)"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:107
+msgid "DNS servers"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:106
+msgid "Default gateway"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:64
+msgid "Diagnostic report"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:148
+msgid "Diagnostics"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:73
+msgid "Disable Ethernet"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:123
+msgid "Disabled"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:458
+msgid "Discard"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:459
+msgid "Discard unsaved changes and select another adapter?"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:825
+msgid "Discard unsaved edits and reload the network profile?"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:731
+msgid "Discard unsaved network settings and close?"
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:219
+msgid "Duplicate network profile field."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:72
+msgid "Enable Ethernet"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:336
+msgid "Enabled"
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:86
+msgid "Enter a usable static IPv4 address and prefix."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:861
+msgid "Enter a valid host, IPv4 DNS server and TCP port (1–65535)."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:750
+msgid "Enter an IPv4 address and a prefix from 0 to 32."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:99
+msgid "Enter one to three IPv4 DNS servers."
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:94
+msgid "Enter your password to continue authentication."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:703
+msgid "Export network diagnostics"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:6
+msgid "Export output"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:66
+msgid "Export output…"
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:63
+msgid "File"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:128
+msgid "From DHCP"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:126
+msgid "Gateway (optional)"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:84
+msgid "Help"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:149
+msgid "Host or IPv4"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:761
+msgid "Host range"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:105
+msgid "IPv4 address"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:160
+msgid "IPv4 subnet calculator"
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:226
+msgid "Incomplete network profile."
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:194
+msgid "Invalid DNS policy."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:198
+msgid "Invalid DNS server."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:173
+msgid "Invalid IPv4 address."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:181
+msgid "Invalid IPv4 gateway."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:177
+msgid "Invalid IPv4 prefix."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:80
+msgid "Invalid network profile."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:271
+msgid "Invalid network request."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:314
+msgid "Invalid or unsupported network request."
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:106
+msgid "Invalid password input."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:115
+msgid "Live interface data. Configuration is managed by OpenRC; diagnostics report actual results."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:106
+msgid "MAC address"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:106
+msgid "MTU"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:367
+msgid "Malformed interface response.\n"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:68
+msgid "Network"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:22
+msgid "Network Controller"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:781
+msgid "Network Controller\nIPv4 Ethernet configuration and network diagnostics for ReliefOS.\nC++ / FLTK"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:97
+msgid "Network adapters"
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:42
+msgid "Network authentication"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:885
+msgid "Network information"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:426
+msgid "Network response is too large."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:437
+msgid "Network worker disconnected. Reopen the application to authenticate."
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:104
+msgid "Only custom DNS accepts server addresses."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:394
+msgid "Operation failed"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:402
+msgid "Operation failed. See Output for details."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:175
+msgid "Output"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:725
+msgid "Output exported."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:103
+msgid "Overview"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:108
+msgid "Packets / errors"
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:52
+msgid "Password"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:157
+msgid "Ping"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:165
+msgid "Prefix length"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:125
+msgid "Prefix length (0–32)"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:412
+msgid "Read configuration"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:409
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:107
+msgid "Receive rate"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:108
+msgid "Received total"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:69
+msgid "Refresh"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:197
+msgid "Refresh interfaces"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:145
+msgid "Reload"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:74
+msgid "Reload configuration"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:71
+msgid "Renew DHCP"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:708
+msgid "Replace"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:709
+msgid "Replace the existing file?"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:688
+msgid "Restore and apply"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:75
+msgid "Restore previous configuration"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:144
+msgid "Restore previous…"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:689
+msgid "Restore the previous profile and apply it? The current network connection may be interrupted."
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:83
+msgid "Retry"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:77
+msgid "Routing table"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:70
+msgid "Save and apply"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:664
+msgid "Save and apply this Ethernet configuration?"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:680
+msgid "Save network configuration"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:143
+msgid "Save only"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:610
+msgid "Saving keeps a backup and detects external changes. Applying may interrupt this adapter. Static mode requires explicit DNS."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:603
+msgid "Select an Ethernet adapter to edit its configuration."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:787
+msgid "Select an adapter to inspect and configure its live state. Configure Ethernet with DHCP, static IPv4 or disabled mode. Save and apply uses the existing OpenRC network service.\n\nStatic mode requires custom or Cloudflare DNS. Use spaces between custom DNS addresses. Saving detects external changes and keeps the previous configuration.\n\nDiagnostics use real network operations. TCP success confirms a connection, not TLS or application health. Wi-Fi, IPv6, VPN and changing the kernel's fixed MTU are not supported."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:107
+msgid "Send rate"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:108
+msgid "Sent total"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:606
+msgid "Settings"
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:105
+msgid "State"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:122
+msgid "Static IPv4"
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:95
+msgid "Static mode requires custom or Cloudflare DNS."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:105
+msgid "Subnet mask"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:79
+msgid "TCP connections"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:154
+msgid "TCP port"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:868
+msgid "TCP port test"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:159
+msgid "Test TCP port"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:670
+msgid "The current network connection may be interrupted."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:93
+msgid "The gateway must be a different usable address in the same subnet."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:333
+msgid "This operation does not execute a command."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:269
+msgid "Too many queued operations."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:76
+msgid "Tools"
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:217
+msgid "Unknown network profile field."
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:58
+msgid "Unlock"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:409
+msgid "Unsaved configuration changes"
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:159
+msgid "Unsupported network profile version."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:132
+msgid "Up to three IPv4 addresses separated by spaces."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:516
+msgid "Up, carrier not reported"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:761
+msgid "Usable addresses"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:85
+msgid "Usage and limitations"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:807
+msgid "Wait for the current operation or cancel it."
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:50
+msgid "root account password"
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:49
+msgid "sudo: current user password"
+msgstr ""

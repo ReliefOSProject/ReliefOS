@@ -110,7 +110,7 @@ extern "C" void DG_Init()
 {
     headless_mode = M_CheckParm(headless_option) > 0;
     if (headless_mode) return;
-    reliefos_fltk::init();
+    reliefos_fltk::init("doom");
     window = new DoomWindow;
     window->callback([](Fl_Widget *, void *) { I_Quit(); });
     window->resizable(window);

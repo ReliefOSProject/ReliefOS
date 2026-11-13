@@ -1,0 +1,87 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/oshlp/main.c:983
+msgid "Author: "
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1665
+msgid "Back"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1207
+msgid "Could not open help"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:959
+msgid "Could not open help file."
+msgstr ""
+
+#: userland/apps/oshlp/main.c:212
+msgid "Document"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1667
+msgid "Forward"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1861
+msgid "Help Viewer"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:958
+msgid "Help error"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1213
+msgid "Invalid help file"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1859
+msgid "Loading"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:974
+msgid "No document"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1679
+msgid "No pages"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1209
+msgid "Open failed"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1215
+msgid "Parse failed"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1223
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1860
+msgid "ReliefOS Help"
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1208
+msgid "The .hlp file could not be read."
+msgstr ""
+
+#: userland/apps/oshlp/main.c:1214
+msgid "The .hlp file format is invalid or too large."
+msgstr ""
+
+#: userland/apps/oshlp/main.c:998
+msgid "This document has no body."
+msgstr ""
+
+#: userland/apps/oshlp/main.c:974
+msgid "This help file has no pages."
+msgstr ""
+
+#: userland/apps/oshlp/main.c:990
+msgid "Version: "
+msgstr ""

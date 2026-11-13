@@ -28,7 +28,7 @@ static void cancel(Fl_Widget *widget, void *)
 int main(int argc, char **argv)
 {
     if (argc != 2) return 2;
-    reliefos_fltk::init();
+    reliefos_fltk::init("reliefaskpass");
     Fl_Double_Window window(480, 182, T("Authentication"));
     window.callback(cancel);
     Fl_Box prompt(18, 14, 444, 48);
