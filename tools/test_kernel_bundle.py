@@ -145,6 +145,15 @@ class KernelBundle(unittest.TestCase):
         checksum = hashlib.sha256((self.payload / member).read_bytes()).hexdigest()
         path.write_text("\n".join(checksum + "  " + member if line[66:] == member else line for line in lines) + "\n")
 
+    def add_checksum_product(self, name, contents):
+        member = self.prefix + name
+        path = self.payload / member
+        path.write_bytes(contents)
+        sums = self.payload / self.prefix / "SHA256SUMS"
+        with sums.open("a") as stream:
+            stream.write(hashlib.sha256(contents).hexdigest() + "  " + member + "\n")
+        return path
+
     def test_complete_bundle_corruption_and_module_order(self):
         self.check()
         module = self.payload / f"lib/modules/{fixtures.RELEASE}/kernel/helper.ko"
@@ -286,6 +295,55 @@ class KernelBundle(unittest.TestCase):
         self.assertEqual((self.payload / "user-data").read_text(), "keep user data\n")
         self.assertEqual((self.payload / pointer_name).read_text(), "next-package-release\n")
         subprocess.run([str(self.binary), "restore", str(self.payload), fixtures.RELEASE], check=True)
+
+    def test_legacy_bundle_retention_restore_and_boot_publication(self):
+        legacy = self.add_checksum_product("kerneldebug.sys", b"historical diagnostic payload\n")
+        sums = self.payload / self.prefix / "SHA256SUMS"
+        expected = {line[66:]: (self.payload / line[66:]).read_bytes()
+                    for line in sums.read_text().splitlines()}
+        expected[self.prefix + "SHA256SUMS"] = sums.read_bytes()
+        pointer = self.payload / "usr/lib/reliefos/kernel/current-release"
+        pointer_before = pointer.read_bytes()
+        result = subprocess.run([fixtures.RECOVERY, "--retain-installed", self.payload],
+                                text=True, capture_output=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.check()
+        cache = self.payload / "var/lib/reliefos/kernel-retained" / fixtures.RELEASE
+        self.assertEqual(len(list(cache.glob("*/root/" + self.prefix + "kerneldebug.sys"))), 1)
+        esp = self.fixture.work / "legacy-bundle-esp"
+        esp.mkdir()
+        result = subprocess.run([str(self.binary), "publish", self.payload, esp, fixtures.RELEASE],
+                                text=True, capture_output=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse(list(esp.rglob(legacy.name)))
+        for name in expected:
+            (self.payload / name).unlink()
+        result = subprocess.run([fixtures.RECOVERY, "--restore-all", self.payload],
+                                text=True, capture_output=True, timeout=20)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.check()
+        for name, contents in expected.items():
+            self.assertEqual((self.payload / name).read_bytes(), contents, name)
+        self.assertEqual(pointer.read_bytes(), pointer_before)
+
+    def test_legacy_product_corruption_links_and_unknown_members_are_refused(self):
+        contents = b"historical diagnostic payload\n"
+        legacy = self.add_checksum_product("kerneldebug.sys", contents)
+        legacy.write_bytes(contents + b"corrupt")
+        self.check(False)
+        result = subprocess.run([fixtures.RECOVERY, "--retain-installed", self.payload],
+                                text=True, capture_output=True, timeout=20)
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.payload / "var/lib/reliefos/kernel-retained").exists())
+        outside = self.fixture.work / "outside-legacy-product"
+        outside.write_bytes(contents)
+        legacy.unlink()
+        legacy.symlink_to(outside)
+        self.check(False)
+        legacy.unlink()
+        legacy.write_bytes(contents)
+        self.add_checksum_product("unknown.sys", b"unrecognized boot product\n")
+        self.check(False)
 
     def test_partial_or_corrupt_retention_cannot_replace_root_products(self):
         command = [str(self.binary), "retain", str(self.payload), fixtures.RELEASE]
