@@ -42,13 +42,16 @@ static struct kernel_bundle_product *find_product(struct kernel_bundle_checked *
 /** @brief Reject checksum records outside this exact release's publication scope.
  * @param bundle Borrowed validated release identity.
  * @param name Canonical relative product name.
- * @return Nonzero only for module products, the platform policy or three boot members.
+ * @return Nonzero only for module products, current boot members or the optional legacy member.
  */
 static int allowed_product(const struct kernel_bundle_checked *bundle, const char *name)
 {
     if (!strncmp(name, bundle->modules, strlen(bundle->modules))) return 1;
     if (strncmp(name, bundle->prefix, strlen(bundle->prefix))) return 0;
     name += strlen(bundle->prefix);
+    /* Older signed inventories include this retired product. Keep validating
+     * and retaining it so those installations remain recoverable on upgrade. */
+    if (!strcmp(name, "kerneldebug.sys")) return 1;
     return !strcmp(name, "kernel.sys") ||
            !strcmp(name, "initramfs.cpio") || !strcmp(name, "boot.env");
 }
