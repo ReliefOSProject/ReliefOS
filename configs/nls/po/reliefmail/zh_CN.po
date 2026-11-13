@@ -1,0 +1,3273 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/reliefmail/tools.cpp:396
+msgid "  (container)"
+msgstr "  （容器）"
+
+#: userland/apps/reliefmail/compose_window.cpp:1102
+msgid "  · Default"
+msgstr "  · 默认"
+
+#: userland/apps/reliefmail/window_accounts.cpp:111
+msgid "  · Disabled"
+msgstr "  · 已禁用"
+
+#: userland/apps/reliefmail/reader.cpp:624
+msgid "%s %u"
+msgstr "%s %u"
+
+#: userland/apps/reliefmail/reader.cpp:620
+msgid "%s %u: %s (%llu bytes)"
+msgstr "%s %u：%s（%llu 字节）"
+
+#: userland/apps/reliefmail/reader.cpp:331
+msgid "%s (%llu bytes)"
+msgstr "%s（%llu 字节）"
+
+#: userland/apps/reliefmail/window.cpp:726
+msgid "%s · %s · %llu messages"
+msgstr "%s · %s · %llu 封邮件"
+
+#: userland/apps/reliefmail/compose_window.cpp:588
+msgid "(no subject)"
+msgstr "（无主题）"
+
+#: userland/apps/reliefmail/dialogs.cpp:131
+msgid "163 Mail"
+msgstr "163 邮箱"
+
+#: userland/apps/reliefmail/compose_window.cpp:1143
+msgid "A new draft will be created under this sender. Current edits and attachments are copied; the original stays unchanged."
+msgstr "将以此账户创建新草稿，并复制当前更改和附件；原草稿保持不变。"
+
+#: userland/apps/reliefmail/window.cpp:171
+msgid "About ReliefMail"
+msgstr "关于 ReliefMail"
+
+#: userland/apps/reliefmail/dialogs.cpp:473
+msgid "Account"
+msgstr "账户"
+
+#: userland/apps/reliefmail/window_actions.cpp:44
+msgid "Account %llu · %s · UIDVALIDITY %llu · UID %u\n"
+msgstr "账户 %llu · %s · UID 有效标识 %llu · UID %u\n"
+
+#: userland/apps/reliefmail/window_actions.cpp:483
+msgid ""
+"Account %llu\n"
+"Server folder: %s\n"
+"Folder generation %llu · UIDVALIDITY %llu\n"
+"Deletes are targeted by exact UIDPLUS identity."
+msgstr ""
+"账户 %llu\n"
+"服务器文件夹：%s\n"
+"文件夹代次 %llu · UID 有效标识 %llu\n"
+"删除操作将严格针对 UIDPLUS 标识。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:299
+msgid "Account changed, but the local view could not be refreshed."
+msgstr "账户已更改，但无法刷新本地视图。"
+
+#: userland/apps/reliefmail/window.cpp:668
+msgid "Account folders loaded from the local profile."
+msgstr "已从本地配置加载账户文件夹。"
+
+#: userland/apps/reliefmail/tools.cpp:287
+msgid "Account list is too large to show safely."
+msgstr "账户列表过大，无法安全显示。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:387
+msgid "Account removal is running in the background."
+msgstr "正在后台删除账户。"
+
+#: userland/apps/reliefmail/window.cpp:634
+msgid "Account removal returned an invalid result"
+msgstr "账户删除返回了无效结果"
+
+#: userland/apps/reliefmail/window.cpp:611
+msgid "Account save returned an invalid result"
+msgstr "账户保存返回了无效结果"
+
+#: userland/apps/reliefmail/window.cpp:616
+msgid "Account saved, but session credentials could not be retained; enter them again before connecting."
+msgstr "账户已保存，但无法保留会话凭据；连接前请重新输入密码。"
+
+#: userland/apps/reliefmail/window.cpp:962
+msgid "Account settings"
+msgstr "账户设置"
+
+#: userland/apps/reliefmail/window_accounts.cpp:545
+msgid "Account settings are being saved."
+msgstr "正在保存账户设置。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:295
+msgid "Account settings changed. Refreshing the local view."
+msgstr "账户设置已更改，正在刷新本地视图。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:75
+msgid "Accounts"
+msgstr "账户"
+
+#: userland/apps/reliefmail/window.cpp:960
+msgid "Add account"
+msgstr "添加账户"
+
+#: userland/apps/reliefmail/compose_window.cpp:916
+msgid "Add an account before composing a message."
+msgstr "请先添加账户，再撰写邮件。"
+
+#: userland/apps/reliefmail/dialogs.cpp:117
+msgid "Add mail account"
+msgstr "添加邮件账户"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "添加到收藏夹"
+
+#: userland/apps/reliefmail/dialogs.cpp:194
+msgid "Advanced"
+msgstr "高级"
+
+#: userland/apps/reliefmail/dialogs.cpp:464
+msgid "All"
+msgstr "全部"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "所有文件 (*)"
+
+#: userland/apps/reliefmail/window.cpp:718
+msgid "All fields"
+msgstr "全部字段"
+
+#: userland/apps/reliefmail/dialogs.cpp:475
+msgid "All mail"
+msgstr "全部邮件"
+
+#: userland/apps/reliefmail/compose_window.cpp:1431
+msgid "An attachment belongs to an older draft revision; reload the draft before copying."
+msgstr "有附件属于较旧的草稿版本；请重新载入草稿后再复制。"
+
+#: userland/apps/reliefmail/window.cpp:396
+msgid "An open editor must be resolved before closing."
+msgstr "关闭前请先处理尚未关闭的编辑器窗口。"
+
+#: userland/apps/reliefmail/dialogs.cpp:485
+msgid "Any (including unknown)"
+msgstr "不限（含未知）"
+
+#: userland/apps/reliefmail/tools.cpp:134
+msgid "Append the accepted message to its reviewed Sent folder over IMAP; never resends SMTP"
+msgstr "仅通过 IMAP 将已投递邮件追加到已复核的已发送文件夹；绝不重发 SMTP"
+
+#: userland/apps/reliefmail/dialogs.cpp:141
+msgid "Application password / code"
+msgstr "应用密码/授权码"
+
+#: userland/apps/reliefmail/dialogs.cpp:512
+msgid "Apply"
+msgstr "应用"
+
+#: userland/apps/reliefmail/tools.cpp:391
+msgid "Archive"
+msgstr "归档"
+
+#: userland/apps/reliefmail/tools.cpp:137
+msgid "Archive (IMAP only)"
+msgstr "归档（仅 IMAP）"
+
+#: userland/apps/reliefmail/tools.cpp:154
+msgid "Archive destination"
+msgstr "归档目标"
+
+#: userland/apps/reliefmail/tools.cpp:91
+msgid "Archive failed"
+msgstr "归档失败"
+
+#: userland/apps/reliefmail/dialogs.cpp:233
+msgid "Archive folder"
+msgstr "归档"
+
+#: userland/apps/reliefmail/tools.cpp:90
+msgid "Archive pending"
+msgstr "等待归档"
+
+#: userland/apps/reliefmail/window_actions.cpp:1140
+msgid "Archive retry completed using IMAP only; SMTP was not contacted."
+msgstr "仅通过 IMAP 完成归档重试；未连接 SMTP。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1923
+msgid "Archive retry completed without an archived result."
+msgstr "归档重试结束，但邮件尚未归档。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1145
+msgid "Archive retry did not reach the archived state; SMTP was not retried."
+msgstr "归档重试尚未完成；未重试 SMTP。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1924
+msgid "Archive retry failed; SMTP was not retried."
+msgstr "归档重试失败，未重试 SMTP 投递。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1909
+msgid "Archive retry returned no matching operation."
+msgstr "归档重试未返回匹配的操作。"
+
+#: userland/apps/reliefmail/tools.cpp:92
+msgid "Archived in Sent"
+msgstr "已归档到已发送"
+
+#: userland/apps/reliefmail/compose_window.cpp:1920
+msgid "Archiving is still pending; SMTP was not retried."
+msgstr "归档仍在等待处理，未重试 SMTP 投递。"
+
+#: userland/apps/reliefmail/window_actions.cpp:949
+msgid "At least one result is uncertain. Refresh the server folder before deciding whether to act again."
+msgstr "至少一项结果尚不确定。再次操作前请刷新服务器文件夹。"
+
+#: userland/apps/reliefmail/compose_window.cpp:765
+msgid "Attach"
+msgstr "添加附件"
+
+#: userland/apps/reliefmail/compose_window.cpp:2124
+msgid "Attach a file"
+msgstr "添加文件附件"
+
+#: userland/apps/reliefmail/reader.cpp:105
+msgid "Attachment"
+msgstr "附件"
+
+#: userland/apps/reliefmail/compose_window.cpp:2126
+msgid "Attachment limit reached."
+msgstr "已达到附件数量上限。"
+
+#: userland/apps/reliefmail/reader.cpp:327
+msgid "Attachment name cannot be displayed safely."
+msgstr "无法安全显示附件名称。"
+
+#: userland/apps/reliefmail/window_reader.cpp:302
+msgid "Attachment saved to the selected path."
+msgstr "附件已保存到所选路径。"
+
+#: userland/apps/reliefmail/dialogs.cpp:484
+msgid "Attachment state"
+msgstr "附件状态"
+
+#: userland/apps/reliefmail/compose_window.cpp:763
+msgid "Attachments"
+msgstr "附件"
+
+#: userland/apps/reliefmail/window_reader.cpp:136
+msgid "Attachments are not available until the full message is fetched."
+msgstr "获取完整邮件后才能使用附件。"
+
+#: userland/apps/reliefmail/compose_window.cpp:472
+msgid "Attachments: none"
+msgstr "附件：无"
+
+#: userland/apps/reliefmail/tools.cpp:82
+msgid "Authenticating"
+msgstr "正在验证身份"
+
+#: userland/apps/reliefmail/dialogs.cpp:139
+msgid "Authentication"
+msgstr "身份验证"
+
+#: userland/apps/reliefmail/compose_window.cpp:722
+msgid "B"
+msgstr "B"
+
+#: userland/apps/reliefmail/window_actions.cpp:957
+msgid "Background mail action failed."
+msgstr "后台邮件操作失败。"
+
+#: userland/apps/reliefmail/window.cpp:551
+msgid "Background operation failed"
+msgstr "后台操作失败"
+
+#: userland/apps/reliefmail/window.cpp:959
+msgid "Background work"
+msgstr "后台任务"
+
+#: userland/apps/reliefmail/compose_window.cpp:812
+msgid "Bcc +"
+msgstr "密送 +"
+
+#: userland/apps/reliefmail/compose_window.cpp:809
+msgid "Bcc:"
+msgstr "密送："
+
+#: userland/apps/reliefmail/dialogs.cpp:467
+msgid "Body"
+msgstr "正文"
+
+#: userland/apps/reliefmail/compose_window.cpp:735
+msgid "Bullets"
+msgstr "项目符号"
+
+#: userland/apps/reliefmail/dialogs.cpp:208
+msgid "Cache days"
+msgstr "缓存天数"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "取消"
+
+#: userland/apps/reliefmail/tools.cpp:143
+msgid "Cancel queued"
+msgstr "取消排队"
+
+#: userland/apps/reliefmail/window_actions.cpp:650
+msgid "Cancel queued send"
+msgstr "取消排队发送"
+
+#: userland/apps/reliefmail/window.cpp:1122
+msgid "Cancelling background work..."
+msgstr "正在取消后台任务..."
+
+#: userland/apps/reliefmail/compose_window.cpp:811
+msgid "Cc +"
+msgstr "抄送 +"
+
+#: userland/apps/reliefmail/compose_window.cpp:808
+msgid "Cc:"
+msgstr "抄送："
+
+#: userland/apps/reliefmail/compose_window.cpp:733
+msgid "Center"
+msgstr "居中"
+
+#: userland/apps/reliefmail/window_accounts.cpp:466
+msgid "Certificate repair is already open in ReliefAPK."
+msgstr "证书修复已在 ReliefAPK 中打开。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1154
+msgid "Change account"
+msgstr "更改账户"
+
+#: userland/apps/reliefmail/window_vault.cpp:30
+msgid "Change password"
+msgstr "更改主密码"
+
+#: userland/apps/reliefmail/compose_window.cpp:1152
+msgid "Change sender account"
+msgstr "更改发件账户"
+
+#: userland/apps/reliefmail/window.cpp:147
+msgid "Changing encrypted storage password"
+msgstr "正在更改密码库主密码"
+
+#: userland/apps/reliefmail/dialogs.cpp:357
+msgid "Check the port, timeout, poll interval, and cache days."
+msgstr "请检查端口、超时、轮询间隔和缓存天数。"
+
+#: userland/apps/reliefmail/window.cpp:144
+msgid "Checking encrypted password storage"
+msgstr "正在检查加密密码库"
+
+#: userland/apps/reliefmail/window_actions.cpp:128
+msgid "Choose"
+msgstr "选择"
+
+#: userland/apps/reliefmail/window_accounts.cpp:242
+msgid "Choose a folder or search this account's cached mail."
+msgstr "选择文件夹，或搜索此账户的缓存邮件。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2012
+msgid "Choose a matching contact to append its address to the active recipient field."
+msgstr "选择匹配的联系人，将其地址追加到当前收件人栏。"
+
+#: userland/apps/reliefmail/window_vault.cpp:105
+msgid "Choose a new vault password"
+msgstr "设置新的密码库密码"
+
+#: userland/apps/reliefmail/window_query.cpp:35
+msgid "Choose a real folder before using folder scope."
+msgstr "使用文件夹范围前，请先选择真实文件夹。"
+
+#: userland/apps/reliefmail/window_reader.cpp:167
+msgid "Choose a regular file owned by this user; links and shared files cannot be replaced."
+msgstr "请选择当前用户拥有的普通文件；不会替换链接或共享文件。"
+
+#: userland/apps/reliefmail/window_actions.cpp:834
+msgid "Choose a selectable destination in this same account."
+msgstr "请选择此账户中的可选目标文件夹。"
+
+#: userland/apps/reliefmail/tools.cpp:157
+msgid "Choose a selectable folder in this same account"
+msgstr "选择此账户中的可选文件夹"
+
+#: userland/apps/reliefmail/window_query.cpp:39
+msgid "Choose an account before using account scope."
+msgstr "使用账户范围前，请先选择账户。"
+
+#: userland/apps/reliefmail/window_actions.cpp:289
+msgid "Choose an enabled account before using its server folders."
+msgstr "使用服务器文件夹前，请先选择已启用的账户。"
+
+#: userland/apps/reliefmail/tools.cpp:135
+msgid "Choose archive target"
+msgstr "选择归档目标"
+
+#: userland/apps/reliefmail/window_actions.cpp:107
+msgid "Choose destination folder"
+msgstr "选择目标文件夹"
+
+#: userland/apps/reliefmail/tools.cpp:124
+msgid "Clear Trash"
+msgstr "清空废纸篓"
+
+#: userland/apps/reliefmail/compose_window.cpp:729
+msgid "Clear format"
+msgstr "清除格式"
+
+#: userland/apps/reliefmail/compose_window.cpp:1267
+msgid "Clear the Bcc field before hiding it."
+msgstr "请先清空密送内容，再收起此栏。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1265
+msgid "Clear the Cc field before hiding it."
+msgstr "请先清空抄送内容，再收起此栏。"
+
+#: userland/apps/reliefmail/compose_window.cpp:709
+msgid "Clipboard"
+msgstr "剪贴板"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/reliefmail/compose_window.cpp:728
+msgid "Color"
+msgstr "颜色"
+
+#: userland/apps/reliefmail/compose_window.cpp:1934
+msgid "Compose catalog could not be loaded."
+msgstr "无法加载撰写联系人、签名和模板。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1636
+msgid "Compose catalog request could not start."
+msgstr "无法启动撰写目录查询。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1611
+msgid "Compose catalog request limit reached; reopen this window."
+msgstr "撰写目录查询次数已达上限，请重新打开此窗口。"
+
+#: userland/apps/reliefmail/window_actions.cpp:766
+msgid "Configure this account's Archive folder before archiving messages."
+msgstr "归档邮件前，请先配置此账户的归档文件夹。"
+
+#: userland/apps/reliefmail/window_actions.cpp:773
+msgid "Configure this account's Junk folder first."
+msgstr "请先配置此账户的垃圾邮件文件夹。"
+
+#: userland/apps/reliefmail/window_actions.cpp:779
+msgid "Configure this account's Trash folder first."
+msgstr "请先配置此账户的废纸篓文件夹。"
+
+#: userland/apps/reliefmail/window_actions.cpp:614
+msgid "Confirm SMTP attempt"
+msgstr "确认 SMTP 发送"
+
+#: userland/apps/reliefmail/window_actions.cpp:490
+msgid "Confirm Trash clear"
+msgstr "确认清空废纸篓"
+
+#: userland/apps/reliefmail/window_reader.cpp:170
+msgid "Confirm action"
+msgstr "确认操作"
+
+#: userland/apps/reliefmail/window_actions.cpp:405
+msgid "Confirm archive destination"
+msgstr "确认归档目标"
+
+#: userland/apps/reliefmail/window_actions.cpp:574
+msgid "Confirm archive-only retry"
+msgstr "确认仅重试归档"
+
+#: userland/apps/reliefmail/tools.cpp:138
+msgid "Confirm delivered"
+msgstr "确认已投递"
+
+#: userland/apps/reliefmail/window_actions.cpp:373
+msgid "Confirm delivery review"
+msgstr "确认投递复核"
+
+#: userland/apps/reliefmail/window_actions.cpp:884
+msgid "Confirm exact message action"
+msgstr "确认精确邮件操作"
+
+#: userland/apps/reliefmail/window_actions.cpp:407
+msgid "Confirm folder"
+msgstr "确认文件夹"
+
+#: userland/apps/reliefmail/window_actions.cpp:469
+msgid "Confirm folder deletion"
+msgstr "确认删除文件夹"
+
+#: userland/apps/reliefmail/window_actions.cpp:457
+msgid "Confirm folder rename"
+msgstr "确认重命名文件夹"
+
+#: userland/apps/reliefmail/window_actions.cpp:881
+msgid "Confirm message action"
+msgstr "确认邮件操作"
+
+#: userland/apps/reliefmail/tools.cpp:139
+msgid "Confirm not delivered"
+msgstr "确认未投递"
+
+#: userland/apps/reliefmail/dialogs.cpp:405
+msgid "Confirm password"
+msgstr "确认密码"
+
+#: userland/apps/reliefmail/window_actions.cpp:653
+msgid "Confirm queued cancellation"
+msgstr "确认取消排队项"
+
+#: userland/apps/reliefmail/compose_window.cpp:1491
+msgid "Confirm queueing"
+msgstr "确认加入队列"
+
+#: userland/apps/reliefmail/compose_window.cpp:1491
+msgid "Confirm sending"
+msgstr "确认发送"
+
+#: userland/apps/reliefmail/dialogs.cpp:202
+msgid "Connect timeout ms"
+msgstr "连接超时"
+
+#: userland/apps/reliefmail/tools.cpp:81
+msgid "Connecting"
+msgstr "正在连接"
+
+#: userland/apps/reliefmail/window_accounts.cpp:430
+msgid "Connection test failed. Review the diagnostic below."
+msgstr "连接测试失败，请查看下面的诊断信息。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2046
+msgid "Contact address appended. The complete recipient field remains the send-time authority."
+msgstr "已追加联系人地址。发送时仍以完整收件人栏内容为准。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2300
+msgid "Contact search could not be retained safely."
+msgstr "无法安全保存联系人搜索内容。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1607
+msgid "Contact search or template request is invalid."
+msgstr "联系人搜索或模板请求无效。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1998
+msgid "Contact suggestions could not be retained safely."
+msgstr "无法安全保存联系人建议。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1940
+msgid "Contact, signature, or template data changed accounts; retry from the current draft."
+msgstr "联系人、签名或模板所属账户已更改，请从当前草稿重试。"
+
+#: userland/apps/reliefmail/compose_window.cpp:780
+msgid "Contacts"
+msgstr "联系人"
+
+#: userland/apps/reliefmail/tools.cpp:492
+msgid "Container"
+msgstr "容器"
+
+#: userland/apps/reliefmail/dialogs.cpp:408
+msgid "Continue"
+msgstr "继续"
+
+#: userland/apps/reliefmail/compose_window.cpp:1006
+msgid "Convert a plain-text copy for editing? The saved draft remains unchanged until you save."
+msgstr "是否转换为纯文本副本进行编辑？保存前不会更改已保存的草稿。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1007
+msgid "Convert to plain text"
+msgstr "转换为纯文本"
+
+#: userland/apps/reliefmail/compose_window.cpp:711
+msgid "Copy"
+msgstr "复制"
+
+#: userland/apps/reliefmail/compose_window.cpp:1144
+msgid "Copy draft"
+msgstr "复制草稿"
+
+#: userland/apps/reliefmail/compose_window.cpp:1142
+msgid "Copy draft to another account"
+msgstr "将草稿复制到其他账户"
+
+#: userland/apps/reliefmail/window.cpp:944
+msgid "Copy..."
+msgstr "复制…"
+
+#: userland/apps/reliefmail/compose_window.cpp:1461
+msgid "Copying this exact draft revision under the selected account…"
+msgstr "正在所选账户下复制此确切草稿版本…"
+
+#: userland/apps/reliefmail/compose_window.cpp:2133
+msgid "Could not add this attachment."
+msgstr "无法添加此附件。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2034
+msgid "Could not add this contact."
+msgstr "无法添加此联系人。"
+
+#: userland/apps/reliefmail/reader.cpp:692
+msgid "Could not allocate the bounded original preview."
+msgstr "无法分配有大小限制的原始内容预览。"
+
+#: userland/apps/reliefmail/window.cpp:406
+msgid "Could not begin safe shutdown"
+msgstr "无法开始安全关闭"
+
+#: userland/apps/reliefmail/window.cpp:1123
+msgid "Could not cancel the current task"
+msgstr "无法取消当前任务"
+
+#: userland/apps/reliefmail/window_reader.cpp:278
+msgid "Could not close the temporary export file."
+msgstr "无法关闭临时导出文件。"
+
+#: userland/apps/reliefmail/window_actions.cpp:295
+msgid "Could not copy the folder name."
+msgstr "无法复制文件夹名称。"
+
+#: userland/apps/reliefmail/window_reader.cpp:195
+msgid "Could not create a private temporary export beside the selected file."
+msgstr "无法在所选文件旁创建私有临时导出文件。"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "无法解码图像"
+
+#: userland/apps/reliefmail/window_reader.cpp:241
+msgid "Could not display this link safely."
+msgstr "无法安全显示此链接。"
+
+#: userland/apps/reliefmail/window_reader.cpp:174
+msgid "Could not inspect the selected file safely."
+msgstr "无法安全检查所选文件。"
+
+#: userland/apps/reliefmail/window.cpp:1266
+msgid "Could not load saved drafts."
+msgstr "无法加载已保存的草稿。"
+
+#: userland/apps/reliefmail/window_actions.cpp:278
+msgid "Could not load send history."
+msgstr "无法载入发送历史。"
+
+#: userland/apps/reliefmail/window_reader.cpp:127
+msgid "Could not load the bounded original preview"
+msgstr "无法加载受限大小的原始内容预览"
+
+#: userland/apps/reliefmail/main.cpp:40
+msgid "Could not locate the ReliefMail worker executable."
+msgstr "无法定位 ReliefMail 工作进程程序。"
+
+#: userland/apps/reliefmail/window.cpp:303
+msgid "Could not open the local profile"
+msgstr "无法打开本地配置文件"
+
+#: userland/apps/reliefmail/window_actions.cpp:606
+msgid "Could not prepare the bounded SMTP confirmation."
+msgstr "无法准备受限大小的 SMTP 确认信息。"
+
+#: userland/apps/reliefmail/window_actions.cpp:566
+msgid "Could not prepare the bounded archive retry confirmation."
+msgstr "无法准备受限大小的归档重试确认信息。"
+
+#: userland/apps/reliefmail/window_actions.cpp:378
+msgid "Could not prepare the bounded archive review."
+msgstr "无法准备受限大小的归档复核信息。"
+
+#: userland/apps/reliefmail/window_actions.cpp:645
+msgid "Could not prepare the bounded cancellation confirmation."
+msgstr "无法准备受限大小的取消确认信息。"
+
+#: userland/apps/reliefmail/window_actions.cpp:361
+msgid "Could not prepare the bounded delivery review."
+msgstr "无法准备受限大小的投递复核信息。"
+
+#: userland/apps/reliefmail/window_actions.cpp:392
+msgid "Could not prepare the exact archive destination review."
+msgstr "无法准备确切归档目标复核信息。"
+
+#: userland/apps/reliefmail/window_actions.cpp:877
+msgid "Could not prepare the exact message identity confirmation."
+msgstr "无法准备确切邮件身份确认信息。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2281
+msgid "Could not prepare the signature text."
+msgstr "无法准备签名文本。"
+
+#: userland/apps/reliefmail/window_vault.cpp:94
+msgid "Could not queue encrypted credential storage"
+msgstr "无法提交加密凭据保存任务"
+
+#: userland/apps/reliefmail/window_reader.cpp:110
+msgid "Could not queue message fetch"
+msgstr "无法提交邮件获取任务"
+
+#: userland/apps/reliefmail/window_actions.cpp:594
+msgid "Could not queue the IMAP archive retry."
+msgstr "无法将 IMAP 归档重试加入队列。"
+
+#: userland/apps/reliefmail/window_actions.cpp:634
+msgid "Could not queue the SMTP attempt."
+msgstr "无法将 SMTP 发送加入队列。"
+
+#: userland/apps/reliefmail/window_actions.cpp:668
+msgid "Could not queue the cancellation."
+msgstr "无法将取消操作加入队列。"
+
+#: userland/apps/reliefmail/window_actions.cpp:417
+msgid "Could not queue the delivery review."
+msgstr "无法将投递复核加入队列。"
+
+#: userland/apps/reliefmail/window_actions.cpp:325
+msgid "Could not queue the folder operation."
+msgstr "无法将文件夹操作加入队列。"
+
+#: userland/apps/reliefmail/window_query.cpp:138
+msgid "Could not queue this search"
+msgstr "无法提交此搜索任务"
+
+#: userland/apps/reliefmail/window_vault.cpp:120
+msgid "Could not queue vault password change"
+msgstr "无法提交密码库密码更改任务"
+
+#: userland/apps/reliefmail/window_vault.cpp:74
+msgid "Could not queue vault unlock"
+msgstr "无法提交密码库解锁任务"
+
+#: userland/apps/reliefmail/window_actions.cpp:864
+msgid "Could not refresh destination UIDVALIDITY."
+msgstr "无法刷新目标文件夹的 UID 有效标识。"
+
+#: userland/apps/reliefmail/window_actions.cpp:829
+msgid "Could not refresh destination folders."
+msgstr "无法刷新目标文件夹列表。"
+
+#: userland/apps/reliefmail/window_actions.cpp:541
+msgid "Could not refresh the selected archive folder."
+msgstr "无法刷新所选归档文件夹。"
+
+#: userland/apps/reliefmail/window.cpp:1284
+msgid "Could not reopen the selected draft."
+msgstr "无法重新打开所选草稿。"
+
+#: userland/apps/reliefmail/window.cpp:333
+msgid "Could not start profile initialization"
+msgstr "无法启动配置文件初始化"
+
+#: userland/apps/reliefmail/window.cpp:424
+msgid "Could not start the certificate repair tool."
+msgstr "无法启动证书修复工具。"
+
+#: userland/apps/reliefmail/main.cpp:46
+msgid "Could not start the local mail profile."
+msgstr "无法启动本地邮件配置文件。"
+
+#: userland/apps/reliefmail/window_reader.cpp:227
+msgid "Could not start the selected export"
+msgstr "无法启动所选导出任务"
+
+#: userland/apps/reliefmail/compose_window.cpp:2129
+msgid "Could not store the selected path."
+msgstr "无法保存所选文件路径。"
+
+#: userland/apps/reliefmail/window.cpp:781
+msgid "Could not write the selected message data"
+msgstr "无法写入所选邮件数据"
+
+#: userland/apps/reliefmail/window_reader.cpp:267
+msgid "Could not write the temporary export file."
+msgstr "无法写入临时导出文件。"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "创建新目录"
+
+#: userland/apps/reliefmail/window_vault.cpp:99
+msgid "Create an encrypted vault before changing its password."
+msgstr "更改密码前，请先创建加密密码库。"
+
+#: userland/apps/reliefmail/window_vault.cpp:21
+msgid "Create encrypted password vault"
+msgstr "创建加密密码库"
+
+#: userland/apps/reliefmail/compose_window.cpp:1520
+msgid "Creating a local queued operation; no message will be sent now…"
+msgstr "正在创建本地发送队列任务；现在不会发送邮件…"
+
+#: userland/apps/reliefmail/window.cpp:965
+msgid "Credentials"
+msgstr "凭据"
+
+#: userland/apps/reliefmail/window_actions.cpp:868
+msgid "Cross-account message moves and copies are not available."
+msgstr "暂不支持跨账户移动或复制邮件。"
+
+#: userland/apps/reliefmail/window.cpp:713
+msgid "Current account"
+msgstr "当前账户"
+
+#: userland/apps/reliefmail/window.cpp:712
+msgid "Current folder"
+msgstr "当前文件夹"
+
+#: userland/apps/reliefmail/dialogs.cpp:196
+msgid "Custom CA file (optional)"
+msgstr "自定义 CA 文件（可选）"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "自定义筛选器"
+
+#: userland/apps/reliefmail/dialogs.cpp:129
+msgid "Custom IMAP"
+msgstr "自定义 IMAP"
+
+#: userland/apps/reliefmail/compose_window.cpp:712
+msgid "Cut"
+msgstr "剪切"
+
+#: userland/apps/reliefmail/reader.cpp:596
+msgid "Date"
+msgstr "日期"
+
+#: userland/apps/reliefmail/reader.cpp:590
+msgid "Date unavailable"
+msgstr "日期不可用"
+
+#: userland/apps/reliefmail/dialogs.cpp:503
+msgid "Dates use received time (IMAP INTERNALDATE) in UTC; both dates are inclusive, format YYYY-MM-DD."
+msgstr "日期按收件时间（IMAP INTERNALDATE，UTC）筛选，起止日期均包含在内，格式为 YYYY-MM-DD。"
+
+#: userland/apps/reliefmail/dialogs.cpp:144
+msgid "Default account"
+msgstr "默认账户"
+
+#: userland/apps/reliefmail/window_actions.cpp:470
+msgid "Delete"
+msgstr "删除"
+
+#: userland/apps/reliefmail/dialogs.cpp:249
+msgid "Delete account"
+msgstr "删除账户"
+
+#: userland/apps/reliefmail/tools.cpp:123
+msgid "Delete folder"
+msgstr "删除文件夹"
+
+#: userland/apps/reliefmail/window.cpp:946
+msgid "Delete permanently"
+msgstr "永久删除"
+
+#: userland/apps/reliefmail/window_actions.cpp:466
+msgid "Delete server folder"
+msgstr "删除服务器文件夹"
+
+#: userland/apps/reliefmail/tools.cpp:86
+msgid "Delivered; archive pending"
+msgstr "已投递，等待归档"
+
+#: userland/apps/reliefmail/compose_window.cpp:755
+msgid "Delivery"
+msgstr "投递"
+
+#: userland/apps/reliefmail/window_actions.cpp:1102
+msgid "Delivery history loaded."
+msgstr "已加载投递历史。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1839
+msgid "Delivery is uncertain. This message will not be sent again automatically."
+msgstr "投递状态不确定。不会自动重新发送此邮件。"
+
+#: userland/apps/reliefmail/tools.cpp:87
+msgid "Delivery needs review"
+msgstr "投递待复核"
+
+#: userland/apps/reliefmail/tools.cpp:106
+msgid "Delivery queue"
+msgstr "投递队列"
+
+#: userland/apps/reliefmail/window_actions.cpp:1161
+msgid "Delivery review recorded. No SMTP retry was started."
+msgstr "已记录投递复核；未开始 SMTP 重试。"
+
+#: userland/apps/reliefmail/window_actions.cpp:51
+msgid "Destination account %llu · %s · folder generation %llu · UIDVALIDITY %llu\n"
+msgstr "目标账户 %llu · %s · 文件夹代次 %llu · UID 有效标识 %llu\n"
+
+#: userland/apps/reliefmail/tools.cpp:125
+msgid "Destructive actions"
+msgstr "危险操作"
+
+#: userland/apps/reliefmail/compose_window.cpp:2064
+msgid "Discard and close"
+msgstr "放弃并关闭"
+
+#: userland/apps/reliefmail/compose_window.cpp:2100
+msgid "Discard edits"
+msgstr "放弃更改"
+
+#: userland/apps/reliefmail/dialogs.cpp:135
+msgid "Display name"
+msgstr "显示名称"
+
+#: userland/apps/reliefmail/tools.cpp:79
+msgid "Draft"
+msgstr "草稿"
+
+#: userland/apps/reliefmail/compose_window.cpp:1824
+msgid "Draft copied under the selected account. The original draft remains unchanged."
+msgstr "草稿已复制到所选账户。原草稿保持不变。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1457
+msgid "Draft copy could not start; the original remains open."
+msgstr "无法开始复制草稿；原草稿仍保持打开。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1792
+msgid "Draft copy failed; the original remains open."
+msgstr "草稿复制失败；原草稿仍保持打开。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1356
+msgid "Draft edit counter reached its limit."
+msgstr "草稿编辑计数已达到上限。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1467
+msgid "Draft is already saved."
+msgstr "草稿已保存。"
+
+#: userland/apps/reliefmail/window.cpp:882
+msgid "Draft list no longer matches this account configuration."
+msgstr "草稿列表与当前账户配置不再一致。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1035
+msgid "Draft reopened — saves use its exact current revision"
+msgstr "草稿已重新打开 — 保存将使用其当前确切版本"
+
+#: userland/apps/reliefmail/compose_window.cpp:1394
+msgid "Draft save could not start; edits remain here."
+msgstr "无法开始保存草稿；编辑内容仍保留在此窗口。"
+
+#: userland/apps/reliefmail/window.cpp:523
+msgid "Draft save failed; local edits are preserved."
+msgstr "草稿保存失败；本地编辑内容已保留。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1767
+msgid "Draft saved safely."
+msgstr "草稿已安全保存。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1745
+msgid "Draft saved, but attachment metadata could not be refreshed."
+msgstr "草稿已保存，但无法刷新附件元数据。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1760
+msgid "Draft saved, but attachment references could not be refreshed."
+msgstr "草稿已保存，但无法刷新附件引用。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1339
+msgid "Draft sender identity changed; reopen or copy the draft first."
+msgstr "草稿的发件身份已更改；请先重新打开或复制草稿。"
+
+#: userland/apps/reliefmail/tools.cpp:388
+msgid "Drafts"
+msgstr "草稿"
+
+#: userland/apps/reliefmail/dialogs.cpp:227
+msgid "Drafts folder"
+msgstr "草稿"
+
+#: userland/apps/reliefmail/window.cpp:167
+msgid "Drafts..."
+msgstr "草稿..."
+
+#: userland/apps/reliefmail/window.cpp:39
+msgid "Drag to resize panes"
+msgstr "拖动以调整窗格大小"
+
+#: userland/apps/reliefmail/window_actions.cpp:1101
+msgid "Durable send history loaded. SMTP and archive actions require separate explicit confirmation."
+msgstr "已载入已保存的发送历史。SMTP 发送和归档操作需要分别明确确认。"
+
+#: userland/apps/reliefmail/compose_window.cpp:655
+msgid "Edit"
+msgstr "编辑"
+
+#: userland/apps/reliefmail/tools.cpp:122
+msgid "Edit folder"
+msgstr "编辑文件夹"
+
+#: userland/apps/reliefmail/dialogs.cpp:117
+msgid "Edit mail account"
+msgstr "编辑邮件账户"
+
+#: userland/apps/reliefmail/compose_window.cpp:751
+msgid "Editing"
+msgstr "编辑"
+
+#: userland/apps/reliefmail/dialogs.cpp:137
+msgid "Email address"
+msgstr "邮箱地址"
+
+#: userland/apps/reliefmail/dialogs.cpp:143
+msgid "Enabled"
+msgstr "已启用"
+
+#: userland/apps/reliefmail/window.cpp:805
+msgid "Encrypted credentials unlocked for this session."
+msgstr "已解锁加密凭据，本次会话内可用。"
+
+#: userland/apps/reliefmail/window_vault.cpp:30
+msgid "Encrypted password vault"
+msgstr "加密密码库"
+
+#: userland/apps/reliefmail/window_vault.cpp:10
+msgid "Encrypted password vault is locked or available from Passwords..."
+msgstr "加密密码库已锁定，或可从“密码…”中打开。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:504
+msgid "Enter a new incoming password when the IMAP server or user changes."
+msgstr "IMAP 服务器或用户名变更后，请输入新的收件密码。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:517
+msgid "Enter a new outgoing password when the SMTP server or user changes."
+msgstr "SMTP 服务器或用户名变更后，请输入新的发件密码。"
+
+#: userland/apps/reliefmail/dialogs.cpp:418
+msgid "Enter a non-empty matching password."
+msgstr "请输入并确认相同的非空密码。"
+
+#: userland/apps/reliefmail/window_vault.cpp:18
+msgid "Enter account passwords first, then save them to an encrypted vault if desired."
+msgstr "请先输入账户密码；如有需要，再保存到加密密码库。"
+
+#: userland/apps/reliefmail/dialogs.cpp:382
+msgid "Enter both incoming and outgoing passwords or application codes."
+msgstr "请输入收件和发件密码或应用授权码。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:404
+msgid "Enter the IMAP password before testing incoming authentication."
+msgstr "测试收件认证前，请输入 IMAP 密码。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:403
+msgid "Enter the SMTP password before testing outgoing authentication."
+msgstr "测试发件认证前，请输入 SMTP 密码。"
+
+#: userland/apps/reliefmail/window_actions.cpp:890
+msgid "Enter the account's incoming password before changing server mail."
+msgstr "更改服务器邮件前，请输入此账户的收件密码。"
+
+#: userland/apps/reliefmail/window_actions.cpp:840
+msgid "Enter the account's incoming password before checking the destination."
+msgstr "检查目标文件夹前，请输入此账户的收件密码。"
+
+#: userland/apps/reliefmail/window_actions.cpp:809
+msgid "Enter the account's incoming password before refreshing its folders."
+msgstr "刷新文件夹前，请输入此账户的收件密码。"
+
+#: userland/apps/reliefmail/window_actions.cpp:314
+msgid "Enter the current account's incoming password first."
+msgstr "请先输入当前账户的收件密码。"
+
+#: userland/apps/reliefmail/window_actions.cpp:521
+msgid "Enter this account's current incoming password before checking the destination."
+msgstr "检查目标文件夹前，请输入此账户当前的收件密码。"
+
+#: userland/apps/reliefmail/window_actions.cpp:579
+msgid "Enter this account's current incoming password first."
+msgstr "请先输入此账户当前的收件密码。"
+
+#: userland/apps/reliefmail/window_actions.cpp:619
+msgid "Enter this account's current outgoing password first."
+msgstr "请先输入此账户当前的发件密码。"
+
+#: userland/apps/reliefmail/window.cpp:173
+msgid "Exit"
+msgstr "退出"
+
+#: userland/apps/reliefmail/window.cpp:495
+msgid "Export stopped because its profile context is no longer current."
+msgstr "导出所用配置已失效，已停止导出。"
+
+#: userland/apps/reliefmail/window.cpp:481
+msgid "Export stopped because the local profile changed."
+msgstr "本地配置已更改，已停止导出。"
+
+#: userland/apps/reliefmail/window_query.cpp:79
+msgid "Export stopped because the search view changed."
+msgstr "搜索视图已更改，导出已停止。"
+
+#: userland/apps/reliefmail/window.cpp:402
+msgid "Export stopped because the window is closing."
+msgstr "窗口关闭，已停止导出。"
+
+#: userland/apps/reliefmail/reader.cpp:610
+msgid "Export the complete raw message without truncating the display preview"
+msgstr "导出完整原始邮件，不受显示预览截断限制"
+
+#: userland/apps/reliefmail/tools.cpp:88
+msgid "Failed before delivery"
+msgstr "投递前失败"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "收藏夹"
+
+#: userland/apps/reliefmail/reader.cpp:198
+msgid "Fetch body"
+msgstr "获取正文"
+
+#: userland/apps/reliefmail/window.cpp:1205
+msgid "Fetch the complete message before replying or forwarding it."
+msgstr "回复或转发前，请先获取完整邮件。"
+
+#: userland/apps/reliefmail/window.cpp:138
+msgid "Fetching complete message"
+msgstr "正在获取完整邮件"
+
+#: userland/apps/reliefmail/dialogs.cpp:528
+msgid "Field: %s · Scope: %s"
+msgstr "字段：%s · 范围：%s"
+
+#: userland/apps/reliefmail/compose_window.cpp:651
+msgid "File"
+msgstr "文件"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "文件系统"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "文件名："
+
+#: userland/apps/reliefmail/window.cpp:236
+msgid "Filters..."
+msgstr "筛选…"
+
+#: userland/apps/reliefmail/compose_window.cpp:1519
+msgid "Finalizing the selected draft revision before SMTP…"
+msgstr "正在定稿所选草稿版本，然后提交至 SMTP…"
+
+#: userland/apps/reliefmail/compose_window.cpp:752
+msgid "Find"
+msgstr "查找"
+
+#: userland/apps/reliefmail/compose_window.cpp:782
+msgid "Find contact"
+msgstr "查找联系人"
+
+#: userland/apps/reliefmail/compose_window.cpp:2296
+msgid "Find contacts by name or address"
+msgstr "按姓名或地址查找联系人"
+
+#: userland/apps/reliefmail/compose_window.cpp:2237
+msgid "Find text"
+msgstr "查找文本"
+
+#: userland/apps/reliefmail/dialogs.cpp:474
+msgid "Folder"
+msgstr "文件夹"
+
+#: userland/apps/reliefmail/window_actions.cpp:1035
+msgid "Folder identity refreshed through IMAP."
+msgstr "已通过 IMAP 刷新文件夹身份。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1082
+msgid "Folder identity refreshed."
+msgstr "已刷新文件夹身份。"
+
+#: userland/apps/reliefmail/tools.cpp:289
+msgid "Folder list is too large to show safely."
+msgstr "文件夹列表过大，无法安全显示。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1081
+msgid "Folder list refreshed from the server."
+msgstr "已从服务器刷新文件夹列表。"
+
+#: userland/apps/reliefmail/window.cpp:668
+msgid "Folder list synchronized; cached messages remain available offline."
+msgstr "文件夹已同步；缓存邮件仍可离线查看。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1000
+msgid "Folder worker returned an invalid snapshot."
+msgstr "文件夹工作进程返回了无效快照。"
+
+#: userland/apps/reliefmail/dialogs.cpp:221
+msgid "Folders"
+msgstr "文件夹"
+
+#: userland/apps/reliefmail/compose_window.cpp:714
+msgid "Font"
+msgstr "字体"
+
+#: userland/apps/reliefmail/compose_window.cpp:2253
+msgid "Formatting and hyperlinks will be omitted from the outgoing message. The saved rich document remains available if you switch back before sending."
+msgstr "发送的邮件将不包含格式和超链接。发送前切回富文本模式，仍可恢复已保存的富文本内容。"
+
+#: userland/apps/reliefmail/window.cpp:932
+msgid "Forward as .eml"
+msgstr "附件转发"
+
+#: userland/apps/reliefmail/compose_window.cpp:1083
+msgid "Forward draft — the complete original will be attached on first save."
+msgstr "转发草稿 — 首次保存时将附上完整原邮件。"
+
+#: userland/apps/reliefmail/window.cpp:931
+msgid "Forward mail"
+msgstr "转发"
+
+#: userland/apps/reliefmail/dialogs.cpp:465
+msgid "From"
+msgstr "发件人"
+
+#: userland/apps/reliefmail/compose_window.cpp:794
+msgid "From:"
+msgstr "发件人："
+
+#: userland/apps/reliefmail/dialogs.cpp:486
+msgid "Has attachments"
+msgstr "有附件"
+
+#: userland/apps/reliefmail/reader.cpp:194
+msgid "Headers"
+msgstr "邮件头"
+
+#: userland/apps/reliefmail/window.cpp:761
+msgid "Headers are cached. Fetch the complete message to read its body."
+msgstr "邮件头已缓存。获取完整邮件后即可阅读正文。"
+
+#: userland/apps/reliefmail/window.cpp:1317
+msgid "Headers only"
+msgstr "仅邮件头"
+
+#: userland/apps/reliefmail/reader.cpp:760
+msgid "Headers only are cached; this is not a complete original message."
+msgstr "当前仅缓存邮件头，并非完整原始邮件。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1263
+msgid "Hide Bcc"
+msgstr "收起密送"
+
+#: userland/apps/reliefmail/compose_window.cpp:1262
+msgid "Hide Cc"
+msgstr "收起抄送"
+
+#: userland/apps/reliefmail/window.cpp:975
+msgid "Hide preview"
+msgstr "隐藏预览"
+
+#: userland/apps/reliefmail/window.cpp:176
+msgid "Home"
+msgstr "主页"
+
+#: userland/apps/reliefmail/compose_window.cpp:724
+msgid "I"
+msgstr "I"
+
+#: userland/apps/reliefmail/dialogs.cpp:204
+msgid "I/O timeout ms"
+msgstr "收发超时"
+
+#: userland/apps/reliefmail/dialogs.cpp:146
+msgid "IMAP is required in this build. OAuth2-only login is not available. Use your provider's application password when required."
+msgstr "此版本需要使用 IMAP；不支持仅使用 OAuth2 登录。服务商要求时，请使用应用专用密码。"
+
+#: userland/apps/reliefmail/dialogs.cpp:165
+msgid "IMAP password / app code"
+msgstr "IMAP 密码/授权码"
+
+#: userland/apps/reliefmail/dialogs.cpp:153
+msgid "IMAP server"
+msgstr "IMAP 服务器"
+
+#: userland/apps/reliefmail/dialogs.cpp:162
+msgid "IMAP username"
+msgstr "IMAP 用户名"
+
+#: userland/apps/reliefmail/dialogs.cpp:126
+msgid "Identity"
+msgstr "身份"
+
+#: userland/apps/reliefmail/dialogs.cpp:158
+msgid "Implicit TLS"
+msgstr "隐式 TLS"
+
+#: userland/apps/reliefmail/tools.cpp:386
+msgid "Inbox"
+msgstr "收件箱"
+
+#: userland/apps/reliefmail/dialogs.cpp:223
+msgid "Inbox folder"
+msgstr "收件箱"
+
+#: userland/apps/reliefmail/dialogs.cpp:151
+msgid "Incoming"
+msgstr "接收邮件"
+
+#: userland/apps/reliefmail/dialogs.cpp:169
+msgid "Incoming and outgoing authentication are tested separately. Tests never send mail."
+msgstr "收件与发件身份验证分别测试；测试过程不会发送邮件。"
+
+#: userland/apps/reliefmail/window.cpp:646
+msgid "Incoming authentication succeeded; no messages were sent."
+msgstr "收件认证成功；未发送邮件。"
+
+#: userland/apps/reliefmail/compose_window.cpp:738
+msgid "Indent"
+msgstr "增加缩进"
+
+#: userland/apps/reliefmail/reader.cpp:567
+msgid "Inline image preview is unavailable; plain text remains available."
+msgstr "内嵌图片预览不可用；纯文本仍可查看。"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "输入内容过长"
+
+#: userland/apps/reliefmail/compose_window.cpp:655
+msgid "Insert"
+msgstr "插入"
+
+#: userland/apps/reliefmail/tools.cpp:390
+msgid "Junk"
+msgstr "垃圾邮件"
+
+#: userland/apps/reliefmail/dialogs.cpp:231
+msgid "Junk folder"
+msgstr "垃圾邮件"
+
+#: userland/apps/reliefmail/compose_window.cpp:1144
+msgid "Keep current"
+msgstr "保持当前账户"
+
+#: userland/apps/reliefmail/window_actions.cpp:652
+msgid "Keep queued"
+msgstr "保留排队项"
+
+#: userland/apps/reliefmail/compose_window.cpp:1007
+msgid "Keep read-only"
+msgstr "保持只读"
+
+#: userland/apps/reliefmail/compose_window.cpp:2254
+msgid "Keep rich formatting"
+msgstr "保留富文本格式"
+
+#: userland/apps/reliefmail/window_accounts.cpp:458
+msgid "Later"
+msgstr "稍后"
+
+#: userland/apps/reliefmail/window.cpp:979
+msgid "Layout"
+msgstr "布局"
+
+#: userland/apps/reliefmail/dialogs.cpp:198
+msgid "Leave blank to use the system certificates. Private CAs are provided by your administrator."
+msgstr "留空使用系统证书；私有 CA 证书由管理员提供。"
+
+#: userland/apps/reliefmail/compose_window.cpp:732
+msgid "Left"
+msgstr "左对齐"
+
+#: userland/apps/reliefmail/compose_window.cpp:771
+msgid "Link"
+msgstr "链接"
+
+#: userland/apps/reliefmail/compose_window.cpp:2222
+msgid "Link target (http, https, or mailto)"
+msgstr "链接目标（http、https 或 mailto）"
+
+#: userland/apps/reliefmail/compose_window.cpp:769
+msgid "Links"
+msgstr "链接"
+
+#: userland/apps/reliefmail/window.cpp:1201
+msgid "Load a complete selected message before creating a reply or forward."
+msgstr "创建回复或转发前，请先加载所选邮件的完整内容。"
+
+#: userland/apps/reliefmail/window.cpp:336
+msgid "Loading local accounts and folders..."
+msgstr "正在加载本地账户和文件夹..."
+
+#: userland/apps/reliefmail/window.cpp:129
+msgid "Loading local profile"
+msgstr "正在加载本地配置"
+
+#: userland/apps/reliefmail/window.cpp:1335
+msgid "Loading the local profile..."
+msgstr "正在加载本地配置…"
+
+#: userland/apps/reliefmail/compose_window.cpp:1640
+msgid "Loading the selected template…"
+msgstr "正在加载所选模板…"
+
+#: userland/apps/reliefmail/window_query.cpp:233
+msgid "Loading this message from the local cache..."
+msgstr "正在从本地缓存加载邮件…"
+
+#: userland/apps/reliefmail/window.cpp:203
+msgid "Mail navigation"
+msgstr "邮件导航"
+
+#: userland/apps/reliefmail/tools.cpp:100
+msgid "Mail tools"
+msgstr "邮件工具"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
+#: userland/apps/reliefmail/window.cpp:961
+msgid "Manage accounts"
+msgstr "管理账户"
+
+#: userland/apps/reliefmail/window.cpp:169
+msgid "Manage accounts..."
+msgstr "管理账户..."
+
+#: userland/apps/reliefmail/window.cpp:939
+msgid "Mark read"
+msgstr "标记为已读"
+
+#: userland/apps/reliefmail/window.cpp:940
+msgid "Mark unread"
+msgstr "标记为未读"
+
+#: userland/apps/reliefmail/dialogs.cpp:404
+msgid "Master password"
+msgstr "主密码"
+
+#: userland/apps/reliefmail/compose_window.cpp:783
+msgid "Matches"
+msgstr "匹配项"
+
+#: userland/apps/reliefmail/compose_window.cpp:2246
+msgid "Matching text selected."
+msgstr "已选中匹配文本。"
+
+#: userland/apps/reliefmail/tools.cpp:119
+msgid "Membership"
+msgstr "订阅状态"
+
+#: userland/apps/reliefmail/compose_window.cpp:655
+msgid "Message"
+msgstr "邮件"
+
+#: userland/apps/reliefmail/window.cpp:1373
+msgid "Message added to the selection"
+msgstr "已将邮件加入所选项"
+
+#: userland/apps/reliefmail/window_reader.cpp:302
+msgid "Message data saved to the selected path."
+msgstr "邮件数据已保存到所选路径。"
+
+#: userland/apps/reliefmail/window.cpp:943
+msgid "Message flags"
+msgstr "邮件标记"
+
+#: userland/apps/reliefmail/compose_window.cpp:746
+msgid "Message format"
+msgstr "邮件格式"
+
+#: userland/apps/reliefmail/window.cpp:684
+msgid "Message headers synchronized; bodies are fetched only when you open a message."
+msgstr "邮件头已同步；打开邮件时才会获取正文。"
+
+#: userland/apps/reliefmail/window.cpp:761
+msgid "Message loaded from the local cache."
+msgstr "已从本地缓存加载邮件。"
+
+#: userland/apps/reliefmail/window.cpp:1373
+msgid "Message removed from the selection"
+msgstr "已从所选项中移除邮件"
+
+#: userland/apps/reliefmail/window.cpp:1323
+msgid "Message text unavailable"
+msgstr "邮件文字不可用"
+
+#: userland/apps/reliefmail/dialogs.cpp:468
+msgid "Message-ID"
+msgstr "邮件 ID"
+
+#: userland/apps/reliefmail/window.cpp:249
+msgid "Messages"
+msgstr "邮件"
+
+#: userland/apps/reliefmail/compose_window.cpp:716
+msgid "Mono"
+msgstr "等宽"
+
+#: userland/apps/reliefmail/window.cpp:238
+msgid "More"
+msgstr "更多"
+
+#: userland/apps/reliefmail/window.cpp:937
+msgid "Move..."
+msgstr "移动…"
+
+#: userland/apps/reliefmail/window.cpp:928
+msgid "New"
+msgstr "新建"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新建目录？"
+
+#: userland/apps/reliefmail/dialogs.cpp:239
+msgid "New accounts need both passwords. For an edit, leave a password blank only when reusing a matching session credential; a changed server or user needs a new password. Credentials stay in this session unless you explicitly save them to the encrypted vault."
+msgstr ""
+"新账户必须填写收件和发件密码。编辑时，仅当身份未变且沿用会话凭据才可留空；\n"
+"服务器或用户名变更后需重新输入密码。凭据仅保留在本次会话，除非你主动保存到加密密码库。"
+
+#: userland/apps/reliefmail/compose_window.cpp:958
+msgid "New draft — changes save automatically"
+msgstr "新草稿 — 更改将自动保存"
+
+#: userland/apps/reliefmail/tools.cpp:120
+msgid "New folder"
+msgstr "新建文件夹"
+
+#: userland/apps/reliefmail/dialogs.cpp:404
+msgid "New master password"
+msgstr "新主密码"
+
+#: userland/apps/reliefmail/compose_window.cpp:628
+msgid "New message"
+msgstr "新邮件"
+
+#: userland/apps/reliefmail/window_actions.cpp:443
+msgid "New server folder name"
+msgstr "新的服务器文件夹名称"
+
+#: userland/apps/reliefmail/dialogs.cpp:479
+msgid "Newest received first"
+msgstr "按收件时间从新到旧"
+
+#: userland/apps/reliefmail/tools.cpp:131
+msgid "Next"
+msgstr "下一步"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "否"
+
+#: userland/apps/reliefmail/window_accounts.cpp:127
+msgid "No account is configured. Add one from the Send/Receive tab."
+msgstr "尚未配置账户。请在“发送/接收”选项卡中添加账户。"
+
+#: userland/apps/reliefmail/dialogs.cpp:487
+msgid "No attachments"
+msgstr "无附件"
+
+#: userland/apps/reliefmail/window.cpp:1119
+msgid "No background task is running"
+msgstr "当前没有后台任务"
+
+#: userland/apps/reliefmail/compose_window.cpp:1565
+msgid "No confirmed delivery is available for archive retry."
+msgstr "没有已确认投递的邮件可供重试归档。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1576
+msgid "No current IMAP credential is available to retry Sent-folder archiving."
+msgstr "没有可用的当前 IMAP 凭据来重试已发送文件夹归档。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1534
+msgid "No current SMTP credential is available. Unlock the vault or enter the account password first."
+msgstr "当前没有可用的 SMTP 凭据。请先解锁密码库或输入账户密码。"
+
+#: userland/apps/reliefmail/tools.cpp:474
+msgid "No durable send operations are recorded for this account."
+msgstr "此账户没有已保存的发送操作。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2275
+msgid "No enabled signature is available for this account."
+msgstr "此账户没有启用的签名。"
+
+#: userland/apps/reliefmail/window_vault.cpp:47
+msgid "No encrypted password vault is available to unlock."
+msgstr "没有可供解锁的加密密码库。"
+
+#: userland/apps/reliefmail/window_vault.cpp:11
+msgid "No encrypted vault is saved; account credentials remain session-only."
+msgstr "尚未保存加密密码库；账户凭据仅保留在本次会话。"
+
+#: userland/apps/reliefmail/window.cpp:279
+msgid "No message selected"
+msgstr "未选择邮件"
+
+#: userland/apps/reliefmail/window.cpp:1334
+msgid ""
+"No messages match this view.\n"
+"Synchronize headers or change filters."
+msgstr ""
+"当前视图中没有匹配邮件。\n"
+"同步邮件头或调整筛选条件。"
+
+#: userland/apps/reliefmail/window_query.cpp:67
+msgid "No more cached rows can be added to this view."
+msgstr "此视图无法再添加更多缓存项目。"
+
+#: userland/apps/reliefmail/reader.cpp:740
+msgid "No safe HTML preview is available. Choose Plain text to read this message."
+msgstr "没有可安全显示的 HTML 预览。请选择“纯文本”阅读邮件。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:614
+msgid "No saved account credential matches the current account settings."
+msgstr "没有与当前账户设置相匹配的已保存凭据。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2010
+msgid "No saved contacts matched that search."
+msgstr "没有已保存的联系人符合此搜索条件。"
+
+#: userland/apps/reliefmail/window_reader.cpp:150
+msgid "Not enough memory to choose an export name."
+msgstr "内存不足，无法选择导出文件名。"
+
+#: userland/apps/reliefmail/window_query.cpp:55
+msgid "Not enough memory to copy the search text."
+msgstr "内存不足，无法复制搜索文本。"
+
+#: userland/apps/reliefmail/dialogs.cpp:377
+msgid "Not enough memory to handle account passwords."
+msgstr "内存不足，无法处理账户密码。"
+
+#: userland/apps/reliefmail/dialogs.cpp:426
+msgid "Not enough memory to handle the password."
+msgstr "内存不足，无法处理密码。"
+
+#: userland/apps/reliefmail/window_reader.cpp:203
+msgid "Not enough memory to prepare this export."
+msgstr "内存不足，无法准备导出。"
+
+#: userland/apps/reliefmail/dialogs.cpp:346
+msgid "Not enough memory to read account settings."
+msgstr "内存不足，无法读取账户设置。"
+
+#: userland/apps/reliefmail/window_vault.cpp:57
+msgid "Not enough memory to retain the vault password for this operation."
+msgstr "内存不足，无法为此操作暂存密码库密码。"
+
+#: userland/apps/reliefmail/compose_window.cpp:736
+msgid "Number"
+msgstr "数字"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/reliefmail/dialogs.cpp:480
+msgid "Oldest received first"
+msgstr "按收件时间从旧到新"
+
+#: userland/apps/reliefmail/window_actions.cpp:640
+msgid "Only a ready operation can be cancelled."
+msgstr "只能取消尚未发送的排队操作。"
+
+#: userland/apps/reliefmail/window_actions.cpp:601
+msgid "Only a ready operation under the current account generation can be sent."
+msgstr "只能发送当前账户配置代次下尚未发送的操作。"
+
+#: userland/apps/reliefmail/window_reader.cpp:236
+msgid "Only bounded HTTP or HTTPS links can be opened."
+msgstr "只能打开经过限制的 HTTP 或 HTTPS 链接。"
+
+#: userland/apps/reliefmail/window.cpp:925
+msgid "Open a new rich-text draft"
+msgstr "新建富文本草稿"
+
+#: userland/apps/reliefmail/window.cpp:927
+msgid "Open a saved draft using its exact current revision"
+msgstr "按当前确切版本打开已保存的草稿"
+
+#: userland/apps/reliefmail/window.cpp:970
+msgid "Open additional mail tools"
+msgstr "打开其他邮件工具"
+
+#: userland/apps/reliefmail/compose_window.cpp:571
+msgid "Open draft"
+msgstr "打开草稿"
+
+#: userland/apps/reliefmail/compose_window.cpp:1005
+msgid "Open draft safely"
+msgstr "安全打开草稿"
+
+#: userland/apps/reliefmail/window_reader.cpp:244
+msgid "Open link"
+msgstr "打开链接"
+
+#: userland/apps/reliefmail/reader.cpp:214
+msgid "Open link..."
+msgstr "打开链接…"
+
+#: userland/apps/reliefmail/reader.cpp:673
+msgid "Open the selected address after reviewing its destination"
+msgstr "检查目标地址后打开所选链接"
+
+#: userland/apps/reliefmail/window_reader.cpp:244
+msgid "Open this exact link in the system browser?"
+msgstr "要在系统浏览器中打开以下完整链接吗？"
+
+#: userland/apps/reliefmail/tools.cpp:513
+msgid ""
+"Operation #%llu · %s · delivery count %u\n"
+"Message-ID: %s\n"
+"From: %s\n"
+"To: %s\n"
+"Archive target: %s · account generation %llu · folder generation %llu · UIDVALIDITY %llu\n"
+"%s"
+msgstr ""
+"操作 #%llu · %s · 投递次数 %u\n"
+"邮件 ID：%s\n"
+"发件人：%s\n"
+"收件人：%s\n"
+"归档目标：%s · 账户配置代次 %llu · 文件夹代次 %llu · UID 有效标识 %llu\n"
+"%s"
+
+#: userland/apps/reliefmail/window_actions.cpp:157
+msgid ""
+"Operation #%llu\n"
+"Message-ID: %s\n"
+"Stage %u · delivery count %u\n"
+"From: %s\n"
+"To: "
+msgstr ""
+"操作 #%llu\n"
+"邮件 ID：%s\n"
+"阶段 %u · 投递次数 %u\n"
+"发件人：%s\n"
+"收件人："
+
+#: userland/apps/reliefmail/window.cpp:971
+msgid "Operations"
+msgstr "操作"
+
+#: userland/apps/reliefmail/window.cpp:938
+msgid "Organize"
+msgstr "整理邮件"
+
+#: userland/apps/reliefmail/reader.cpp:195
+msgid "Original preview"
+msgstr "原始内容预览"
+
+#: userland/apps/reliefmail/compose_window.cpp:737
+msgid "Outdent"
+msgstr "减少缩进"
+
+#: userland/apps/reliefmail/dialogs.cpp:174
+msgid "Outgoing"
+msgstr "发送邮件"
+
+#: userland/apps/reliefmail/window.cpp:649
+msgid "Outgoing authentication succeeded; no messages were sent."
+msgstr "发件认证成功；未发送邮件。"
+
+#: userland/apps/reliefmail/compose_window.cpp:731
+msgid "Paragraph"
+msgstr "段落"
+
+#: userland/apps/reliefmail/dialogs.cpp:140
+msgid "Password"
+msgstr "密码"
+
+#: userland/apps/reliefmail/window.cpp:813
+msgid "Password vault saved with cleanup pending."
+msgstr "密码库已保存，尚有清理工作待完成。"
+
+#: userland/apps/reliefmail/window.cpp:814
+msgid "Passwords saved in the encrypted vault."
+msgstr "密码已保存到加密密码库。"
+
+#: userland/apps/reliefmail/window.cpp:963
+msgid "Passwords..."
+msgstr "密码…"
+
+#: userland/apps/reliefmail/compose_window.cpp:710
+msgid "Paste"
+msgstr "粘贴"
+
+#: userland/apps/reliefmail/window.cpp:948
+msgid "Permanent deletion"
+msgstr "永久删除"
+
+#: userland/apps/reliefmail/window.cpp:947
+msgid "Permanently delete only these exact UIDs with the server's UIDPLUS capability"
+msgstr "使用服务器的 UIDPLUS 功能，仅永久删除选定的确切邮件。"
+
+#: userland/apps/reliefmail/reader.cpp:192
+msgid "Plain text"
+msgstr "纯文本"
+
+#: userland/apps/reliefmail/reader.cpp:563
+msgid "Plain-text preview is truncated; save the original to view the complete message."
+msgstr "纯文本预览已截断，请保存原文查看全文。"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "请选择已存在的文件！"
+
+#: userland/apps/reliefmail/dialogs.cpp:206
+msgid "Poll minutes"
+msgstr "轮询分钟"
+
+#: userland/apps/reliefmail/dialogs.cpp:155
+msgid "Port"
+msgstr "端口"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "预览"
+
+#: userland/apps/reliefmail/tools.cpp:130
+msgid "Previous"
+msgstr "上一张"
+
+#: userland/apps/reliefmail/compose_window.cpp:2052
+msgid "Profile changed. This editor is preserved locally and cannot save or send until reopened."
+msgstr "配置文件已更改。此编辑器内容保留在本地，重新打开前无法保存或发送。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1354
+msgid "Profile changed; this draft is read-only until reopened."
+msgstr "配置文件已更改；重新打开前，此草稿为只读。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1364
+msgid "Profile or a send operation is in progress; saving is blocked."
+msgstr "配置文件切换或投递操作进行中，暂时无法保存。"
+
+#: userland/apps/reliefmail/window.cpp:487
+msgid "Profile recovery needs attention before mail can be read"
+msgstr "配置恢复需要处理后才能读取邮件"
+
+#: userland/apps/reliefmail/dialogs.cpp:128
+msgid "Provider"
+msgstr "服务商"
+
+#: userland/apps/reliefmail/dialogs.cpp:130
+msgid "QQ Mail"
+msgstr "QQ 邮箱"
+
+#: userland/apps/reliefmail/compose_window.cpp:707
+msgid "Queue"
+msgstr "排队"
+
+#: userland/apps/reliefmail/compose_window.cpp:1494
+msgid "Queue locally"
+msgstr "仅加入本地队列"
+
+#: userland/apps/reliefmail/window_actions.cpp:933
+msgid "Queued %zu exact-identity message actions."
+msgstr "已将 %zu 项精确身份邮件操作加入队列。"
+
+#: userland/apps/reliefmail/window_actions.cpp:928
+msgid "Queued %zu of %zu message actions; inspect the results before repeating any uncertain action."
+msgstr "已将 %zu/%zu 项邮件操作加入队列；对任何不确定操作再次执行前，请先检查结果。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1846
+msgid "Queued locally. No SMTP connection was started."
+msgstr "已加入本地队列。未启动 SMTP 连接。"
+
+#: userland/apps/reliefmail/tools.cpp:80
+msgid "Queued; not sent"
+msgstr "已排队，尚未发送"
+
+#: userland/apps/reliefmail/compose_window.cpp:817
+msgid "Raw Bcc field is preserved exactly and validated at send time"
+msgstr "密送字段按原样保存，并在发送时验证"
+
+#: userland/apps/reliefmail/compose_window.cpp:816
+msgid "Raw Cc field is preserved exactly and validated at send time"
+msgstr "抄送字段按原样保存，并在发送时验证"
+
+#: userland/apps/reliefmail/compose_window.cpp:815
+msgid "Raw To field is preserved exactly and validated at send time"
+msgstr "收件人字段按原样保存，并在发送时验证"
+
+#: userland/apps/reliefmail/tools.cpp:115
+msgid "Read the selected account's current server folder list"
+msgstr "读取所选账户当前的服务器文件夹列表"
+
+#: userland/apps/reliefmail/window.cpp:139
+msgid "Reading a bounded message section"
+msgstr "正在读取受限大小的邮件内容"
+
+#: userland/apps/reliefmail/window.cpp:137
+msgid "Reading cached message"
+msgstr "正在读取缓存邮件"
+
+#: userland/apps/reliefmail/window.cpp:976
+msgid "Reading pane"
+msgstr "阅读窗格"
+
+#: userland/apps/reliefmail/window.cpp:1136
+msgid "Reading pane arranged below the message list"
+msgstr "阅读窗格已调整为列表下方"
+
+#: userland/apps/reliefmail/window.cpp:1133
+msgid "Reading pane arranged beside the message list"
+msgstr "阅读窗格已调整为列表右侧"
+
+#: userland/apps/reliefmail/tools.cpp:177
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/reliefmail/tools.cpp:144
+msgid "Ready operations"
+msgstr "待处理操作"
+
+#: userland/apps/reliefmail/compose_window.cpp:835
+msgid "Ready to compose"
+msgstr "可以开始撰写"
+
+#: userland/apps/reliefmail/dialogs.cpp:496
+msgid "Received date end (UTC)"
+msgstr "收件日期止（UTC）"
+
+#: userland/apps/reliefmail/dialogs.cpp:494
+msgid "Received date start (UTC)"
+msgstr "收件日期起（UTC）"
+
+#: userland/apps/reliefmail/window_query.cpp:53
+msgid "Received-after date must not be later than received-before."
+msgstr "起始收件日期不能晚于结束日期。"
+
+#: userland/apps/reliefmail/reader.cpp:588
+msgid "Recipient unavailable"
+msgstr "收件人不可用"
+
+#: userland/apps/reliefmail/window_actions.cpp:374
+msgid "Record review"
+msgstr "记录复核结果"
+
+#: userland/apps/reliefmail/compose_window.cpp:668
+msgid "Redo"
+msgstr "重做"
+
+#: userland/apps/reliefmail/tools.cpp:114
+msgid "Refresh folders"
+msgstr "刷新文件夹"
+
+#: userland/apps/reliefmail/tools.cpp:129
+msgid "Refresh queue"
+msgstr "刷新队列"
+
+#: userland/apps/reliefmail/window_actions.cpp:428
+msgid "Refresh the account list before using this account."
+msgstr "使用此账户前，请先刷新账户列表。"
+
+#: userland/apps/reliefmail/tools.cpp:475
+msgid "Refresh the queue to load durable send history."
+msgstr "刷新队列以载入已保存的发送历史。"
+
+#: userland/apps/reliefmail/window.cpp:955
+msgid "Refresh the selected account's folder list"
+msgstr "刷新所选账户的文件夹列表"
+
+#: userland/apps/reliefmail/window.cpp:425
+msgid "ReliefAPK closed. If certificate repair completed, test the connection again."
+msgstr "ReliefAPK 已关闭。如已完成证书修复，请重新测试连接。"
+
+#: userland/apps/reliefmail/dialogs.cpp:214
+msgid "ReliefAPK downloads the signed CA package and requests administrator authentication. Test the connection again after repair."
+msgstr "ReliefAPK 将下载带签名的 CA 软件包并请求管理员认证。修复完成后请重新测试连接。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:470
+msgid "ReliefAPK is not installed. Install the signed ca-certificates-bundle package with your system package manager."
+msgstr "尚未安装 ReliefAPK。请使用系统包管理器安装带签名的 ca-certificates-bundle 软件包。"
+
+#: userland/apps/reliefmail/window.cpp:155
+msgid "ReliefMail"
+msgstr "ReliefMail"
+
+#: userland/apps/reliefmail/window.cpp:1137
+msgid ""
+"ReliefMail\n"
+"Native mail reader and account client"
+msgstr ""
+"ReliefMail\n"
+"本地邮件阅读器与账户客户端"
+
+#: userland/apps/reliefmail/compose_window.cpp:767
+msgid "Remove"
+msgstr "删除"
+
+#: userland/apps/reliefmail/window_accounts.cpp:367
+msgid "Remove account"
+msgstr "删除账户"
+
+#: userland/apps/reliefmail/window_accounts.cpp:368
+msgid "Remove the selected account? Its local cached messages will be kept."
+msgstr "确定删除所选账户？本地缓存邮件将保留。"
+
+#: userland/apps/reliefmail/window.cpp:143
+msgid "Removing account settings"
+msgstr "正在删除账户设置"
+
+#: userland/apps/reliefmail/tools.cpp:121
+msgid "Rename"
+msgstr "重命名"
+
+#: userland/apps/reliefmail/window_actions.cpp:454
+msgid "Rename server folder"
+msgstr "重命名服务器文件夹"
+
+#: userland/apps/reliefmail/window_actions.cpp:455
+msgid "Renaming may change server-side message locations. Review the wire name before continuing."
+msgstr "重命名可能改变服务器上的邮件位置。继续前请检查服务器文件夹名。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:458
+msgid "Repair certificates"
+msgstr "修复证书"
+
+#: userland/apps/reliefmail/dialogs.cpp:210
+msgid "Repair/update system certificates"
+msgstr "修复或更新系统证书"
+
+#: userland/apps/reliefmail/window_reader.cpp:171
+msgid "Replace"
+msgstr "替换"
+
+#: userland/apps/reliefmail/window_reader.cpp:170
+msgid "Replace the existing file?"
+msgstr "替换现有文件？"
+
+#: userland/apps/reliefmail/window.cpp:929
+msgid "Reply"
+msgstr "回复"
+
+#: userland/apps/reliefmail/window.cpp:930
+msgid "Reply all"
+msgstr "回复全部"
+
+#: userland/apps/reliefmail/window.cpp:933
+msgid "Reply and forward"
+msgstr "回复和转发"
+
+#: userland/apps/reliefmail/compose_window.cpp:1084
+msgid "Reply draft — the message is quoted and will save locally."
+msgstr "回复草稿 — 已引用邮件内容，并将保存在本地。"
+
+#: userland/apps/reliefmail/window_actions.cpp:571
+msgid "Retry Sent-folder archive"
+msgstr "重试已发送文件夹归档"
+
+#: userland/apps/reliefmail/compose_window.cpp:757
+msgid "Retry archive"
+msgstr "重试归档"
+
+#: userland/apps/reliefmail/compose_window.cpp:1598
+msgid "Retrying Sent-folder archiving only; SMTP will not be contacted."
+msgstr "仅重试将邮件归档到已发送文件夹；不会连接 SMTP。"
+
+#: userland/apps/reliefmail/dialogs.cpp:167
+msgid "Reuse session password if identity is unchanged"
+msgstr "身份未变时沿用会话密码"
+
+#: userland/apps/reliefmail/window_actions.cpp:402
+msgid "Review Sent-folder destination"
+msgstr "复核已发送文件夹目标"
+
+#: userland/apps/reliefmail/window_actions.cpp:561
+msgid "Review and confirm a current Sent-folder destination first."
+msgstr "请先复核并确认当前的已发送文件夹目标。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:483
+msgid "Review certificate repair in ReliefAPK. After completion, test the mail connection again."
+msgstr "请在 ReliefAPK 中检查并执行证书修复，完成后重新测试邮箱连接。"
+
+#: userland/apps/reliefmail/tools.cpp:136
+msgid "Review the current account generation and exact IMAP archive target"
+msgstr "复核当前账户代次和确切 IMAP 归档目标"
+
+#: userland/apps/reliefmail/compose_window.cpp:1492
+msgid "Review the full message identity and recipients before SMTP submission."
+msgstr "通过 SMTP 提交前，请检查完整邮件身份和收件人。"
+
+#: userland/apps/reliefmail/window_actions.cpp:371
+msgid "Review uncertain delivery"
+msgstr "复核不确定的投递"
+
+#: userland/apps/reliefmail/tools.cpp:93
+msgid "Reviewed as delivered"
+msgstr "已复核为投递成功"
+
+#: userland/apps/reliefmail/compose_window.cpp:748
+msgid "Rich text"
+msgstr "富文本"
+
+#: userland/apps/reliefmail/compose_window.cpp:734
+msgid "Right"
+msgstr "右对齐"
+
+#: userland/apps/reliefmail/window_actions.cpp:1152
+msgid "SMTP delivery and Sent-folder archive completed."
+msgstr "SMTP 投递和已发送文件夹归档均已完成。"
+
+#: userland/apps/reliefmail/window_actions.cpp:403
+msgid "SMTP delivery is already accepted or explicitly reviewed. This confirmation only binds a current IMAP folder; it never resends SMTP."
+msgstr "SMTP 投递已确认或已明确复核。本确认仅绑定当前 IMAP 文件夹，不会重新发送 SMTP。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1879
+msgid "SMTP delivery is confirmed and the Sent-folder archive completed."
+msgstr "已确认 SMTP 投递成功，并完成已发送邮件归档。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1154
+msgid "SMTP delivery is confirmed; Sent-folder archive needs review. Do not resend."
+msgstr "SMTP 投递已确认；需要复核已发送文件夹归档。请勿重发。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1885
+msgid "SMTP delivery is confirmed; Sent-folder archiving needs attention. SMTP will not be retried."
+msgstr "已确认 SMTP 投递成功；需要处理已发送邮件归档。不会重试 SMTP。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1890
+msgid "SMTP delivery is uncertain. Do not retry this message."
+msgstr "SMTP 投递状态不确定。请勿重试此邮件。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1156
+msgid "SMTP delivery is uncertain. No automatic retry was started."
+msgstr "SMTP 投递结果不确定；未启动自动重试。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1895
+msgid "SMTP did not accept this message. You may review the draft and retry explicitly."
+msgstr "SMTP 未接受此邮件。您可以检查草稿并明确选择重试。"
+
+#: userland/apps/reliefmail/dialogs.cpp:188
+msgid "SMTP password / app code"
+msgstr "SMTP 密码/授权码"
+
+#: userland/apps/reliefmail/dialogs.cpp:176
+msgid "SMTP server"
+msgstr "SMTP 服务器"
+
+#: userland/apps/reliefmail/compose_window.cpp:1870
+msgid "SMTP submission failed."
+msgstr "SMTP 提交失败。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1555
+msgid "SMTP submission is running; closing is blocked until its result is known."
+msgstr "正在提交 SMTP；结果明确前无法关闭窗口。"
+
+#: userland/apps/reliefmail/dialogs.cpp:185
+msgid "SMTP username"
+msgstr "SMTP 用户名"
+
+#: userland/apps/reliefmail/dialogs.cpp:159
+msgid "STARTTLS"
+msgstr "STARTTLS"
+
+#: userland/apps/reliefmail/reader.cpp:193
+msgid "Safe HTML"
+msgstr "安全 HTML"
+
+#: userland/apps/reliefmail/window.cpp:451
+msgid "Safe shutdown could not finish"
+msgstr "安全关闭尚未完成"
+
+#: userland/apps/reliefmail/compose_window.cpp:716
+msgid "Sans"
+msgstr "无衬线"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/reliefmail/dialogs.cpp:256
+msgid "Save account"
+msgstr "保存账户"
+
+#: userland/apps/reliefmail/compose_window.cpp:2064
+msgid "Save and close"
+msgstr "保存并关闭"
+
+#: userland/apps/reliefmail/window_reader.cpp:155
+msgid "Save attachment"
+msgstr "保存附件"
+
+#: userland/apps/reliefmail/reader.cpp:206
+msgid "Save attachment..."
+msgstr "保存附件…"
+
+#: userland/apps/reliefmail/compose_window.cpp:2063
+msgid "Save changes to this draft before closing ReliefMail?"
+msgstr "关闭 ReliefMail 前要保存此草稿的更改吗？"
+
+#: userland/apps/reliefmail/compose_window.cpp:2099
+msgid "Save changes to this draft before closing?"
+msgstr "关闭前要保存对草稿的更改吗？"
+
+#: userland/apps/reliefmail/compose_window.cpp:652
+msgid "Save draft"
+msgstr "保存草稿"
+
+#: userland/apps/reliefmail/compose_window.cpp:665
+msgid "Save draft (Ctrl+S)"
+msgstr "保存草稿 (Ctrl+S)"
+
+#: userland/apps/reliefmail/window_vault.cpp:34
+msgid "Save encrypted credentials"
+msgstr "保存加密凭据"
+
+#: userland/apps/reliefmail/reader.cpp:608
+msgid "Save headers..."
+msgstr "保存邮件头…"
+
+#: userland/apps/reliefmail/window_reader.cpp:155
+msgid "Save message data"
+msgstr "保存邮件数据"
+
+#: userland/apps/reliefmail/reader.cpp:200
+msgid "Save original..."
+msgstr "保存原始邮件…"
+
+#: userland/apps/reliefmail/reader.cpp:609
+msgid "Save the cached message headers"
+msgstr "保存已缓存的邮件头"
+
+#: userland/apps/reliefmail/compose_window.cpp:1484
+msgid "Save the draft before queueing this revision."
+msgstr "请先保存草稿，再将此版本加入发送队列。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1409
+msgid "Save this draft first and choose a different account to copy it."
+msgstr "请先保存此草稿，再选择其他账户进行复制。"
+
+#: userland/apps/reliefmail/window_vault.cpp:30
+msgid "Save/update"
+msgstr "保存/更新"
+
+#: userland/apps/reliefmail/compose_window.cpp:773
+msgid "Saved content"
+msgstr "已保存内容"
+
+#: userland/apps/reliefmail/window.cpp:142
+msgid "Saving account settings"
+msgstr "正在保存账户设置"
+
+#: userland/apps/reliefmail/window.cpp:146
+msgid "Saving encrypted password storage"
+msgstr "正在保存加密密码库"
+
+#: userland/apps/reliefmail/window_reader.cpp:230
+msgid "Saving message data in bounded background chunks..."
+msgstr "正在后台分块保存邮件数据…"
+
+#: userland/apps/reliefmail/window.cpp:140
+msgid "Saving the complete original as a forwarded attachment"
+msgstr "正在将完整原始邮件保存为转发附件"
+
+#: userland/apps/reliefmail/compose_window.cpp:2079
+msgid "Saving the draft before closing ReliefMail."
+msgstr "正在保存草稿，然后关闭 ReliefMail。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1399
+msgid "Saving the first draft revision…"
+msgstr "正在保存草稿的首个版本…"
+
+#: userland/apps/reliefmail/window_reader.cpp:231
+msgid "Saving the selected attachment in bounded background chunks..."
+msgstr "正在后台分块保存所选附件…"
+
+#: userland/apps/reliefmail/compose_window.cpp:1399
+msgid "Saving this exact draft revision…"
+msgstr "正在保存此确切草稿版本…"
+
+#: userland/apps/reliefmail/window.cpp:234
+msgid "Search"
+msgstr "搜索"
+
+#: userland/apps/reliefmail/window.cpp:218
+msgid "Search cached sender, subject, body coverage, or message ID"
+msgstr "搜索缓存的发件人、主题、正文或邮件 ID"
+
+#: userland/apps/reliefmail/dialogs.cpp:463
+msgid "Search field"
+msgstr "搜索字段"
+
+#: userland/apps/reliefmail/dialogs.cpp:456
+msgid "Search filters"
+msgstr "搜索筛选"
+
+#: userland/apps/reliefmail/dialogs.cpp:471
+msgid "Search scope"
+msgstr "搜索范围"
+
+#: userland/apps/reliefmail/dialogs.cpp:505
+msgid "Search selected IMAP folder on server"
+msgstr "在所选 IMAP 文件夹中搜索"
+
+#: userland/apps/reliefmail/window.cpp:135
+msgid "Searching local mail"
+msgstr "正在搜索本地邮件"
+
+#: userland/apps/reliefmail/compose_window.cpp:1639
+msgid "Searching saved contacts…"
+msgstr "正在搜索已保存的联系人…"
+
+#: userland/apps/reliefmail/window.cpp:136
+msgid "Searching the selected IMAP folder"
+msgstr "正在搜索所选 IMAP 文件夹"
+
+#: userland/apps/reliefmail/dialogs.cpp:157
+msgid "Security"
+msgstr "安全"
+
+#: userland/apps/reliefmail/window_accounts.cpp:261
+msgid "Select a cached message in this folder."
+msgstr "选择此文件夹中的缓存邮件。"
+
+#: userland/apps/reliefmail/window_query.cpp:84
+msgid "Select a cached message to read it."
+msgstr "选择一封缓存邮件以阅读。"
+
+#: userland/apps/reliefmail/window_actions.cpp:511
+msgid "Select a delivered operation and a selectable same-account destination."
+msgstr "请选择一项已投递操作及同一账户中的可选目标文件夹。"
+
+#: userland/apps/reliefmail/window_reader.cpp:132
+msgid "Select a loaded message before saving its content."
+msgstr "保存内容前请先加载并选择邮件。"
+
+#: userland/apps/reliefmail/window_reader.cpp:79
+msgid "Select a message before fetching its body."
+msgstr "获取正文前请先选择邮件。"
+
+#: userland/apps/reliefmail/window_reader.cpp:115
+msgid "Select a message before viewing its original source."
+msgstr "查看原始内容前请先选择邮件。"
+
+#: userland/apps/reliefmail/reader.cpp:251
+msgid "Select a message to read its cached content."
+msgstr "选择邮件以阅读已缓存的内容。"
+
+#: userland/apps/reliefmail/window.cpp:1088
+msgid "Select a real folder before using folder scope."
+msgstr "使用文件夹范围前，请先选择真实文件夹。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:366
+msgid "Select a saved account to remove."
+msgstr "选择要删除的已保存账户。"
+
+#: userland/apps/reliefmail/window_actions.cpp:438
+msgid "Select a selectable server folder first."
+msgstr "请先选择可用的服务器文件夹。"
+
+#: userland/apps/reliefmail/window_actions.cpp:550
+msgid "Select a send operation whose SMTP delivery is uncertain."
+msgstr "请选择一项 SMTP 投递结果不确定的发送操作。"
+
+#: userland/apps/reliefmail/tools.cpp:488
+msgid "Select a server folder. Containers cannot be selected for server actions."
+msgstr "请选择服务器文件夹。容器不能用于服务器操作。"
+
+#: userland/apps/reliefmail/compose_window.cpp:753
+msgid "Select all"
+msgstr "全选"
+
+#: userland/apps/reliefmail/window_query.cpp:164
+msgid "Select an account and a selectable folder before synchronizing headers."
+msgstr "同步邮件头前，请选择账户和可选文件夹。"
+
+#: userland/apps/reliefmail/window.cpp:1256
+msgid "Select an account before opening its drafts."
+msgstr "打开草稿前请先选择账户。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:304
+msgid "Select an account before synchronizing folders."
+msgstr "同步文件夹前请先选择账户。"
+
+#: userland/apps/reliefmail/window_query.cpp:120
+msgid "Select an account with a real folder before server search."
+msgstr "服务器搜索前，请选择含真实文件夹的账户。"
+
+#: userland/apps/reliefmail/tools.cpp:171
+msgid "Select an operation to review its exact identity and last result."
+msgstr "选择一项操作以查看其确切身份和最近结果。"
+
+#: userland/apps/reliefmail/window_actions.cpp:351
+msgid "Select and refresh a selectable folder in this same account."
+msgstr "请选择并刷新此账户中的可选文件夹。"
+
+#: userland/apps/reliefmail/window_actions.cpp:707
+msgid "Select messages from one enabled IMAP account before applying server actions."
+msgstr "执行服务器操作前，请选择同一已启用 IMAP 账户中的邮件。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2153
+msgid "Select text before copying."
+msgstr "请先选择要复制的文字。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2159
+msgid "Select text before cutting."
+msgstr "请先选择要剪切的文字。"
+
+#: userland/apps/reliefmail/window_actions.cpp:477
+msgid "Select the configured, selectable Trash folder first."
+msgstr "请先选择已配置且可选的废纸篓文件夹。"
+
+#: userland/apps/reliefmail/tools.cpp:492
+msgid "Selectable"
+msgstr "可选"
+
+#: userland/apps/reliefmail/compose_window.cpp:699
+msgid "Send"
+msgstr "发送"
+
+#: userland/apps/reliefmail/tools.cpp:132
+msgid "Send history"
+msgstr "投递历史"
+
+#: userland/apps/reliefmail/window_actions.cpp:1095
+msgid "Send history no longer matches the selected account."
+msgstr "发送历史与当前所选账户不再匹配。"
+
+#: userland/apps/reliefmail/compose_window.cpp:706
+msgid "Send now"
+msgstr "立即发送"
+
+#: userland/apps/reliefmail/compose_window.cpp:1898
+msgid "Send operation completed."
+msgstr "发送任务已完成。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1899
+msgid "Send operation needs attention."
+msgstr "发送任务需要处理。"
+
+#: userland/apps/reliefmail/tools.cpp:141
+msgid "Send queued"
+msgstr "发送排队项"
+
+#: userland/apps/reliefmail/window_actions.cpp:611
+msgid "Send queued message"
+msgstr "发送排队邮件"
+
+#: userland/apps/reliefmail/window.cpp:176
+msgid "Send/Receive"
+msgstr "发送/接收"
+
+#: userland/apps/reliefmail/dialogs.cpp:481
+msgid "Sender"
+msgstr "发件人"
+
+#: userland/apps/reliefmail/reader.cpp:586
+msgid "Sender unavailable"
+msgstr "发件人不可用"
+
+#: userland/apps/reliefmail/tools.cpp:83
+msgid "Sending envelope"
+msgstr "正在发送信封信息"
+
+#: userland/apps/reliefmail/tools.cpp:84
+msgid "Sending message data"
+msgstr "正在发送邮件内容"
+
+#: userland/apps/reliefmail/tools.cpp:387
+msgid "Sent"
+msgstr "已发送"
+
+#: userland/apps/reliefmail/dialogs.cpp:225
+msgid "Sent folder"
+msgstr "已发送"
+
+#: userland/apps/reliefmail/compose_window.cpp:1915
+msgid "Sent-folder archive completed. SMTP was not retried."
+msgstr "已完成已发送文件夹归档。未重试 SMTP 投递。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1595
+msgid "Sent-folder archive retry could not start."
+msgstr "无法启动已发送文件夹归档重试。"
+
+#: userland/apps/reliefmail/window_actions.cpp:950
+msgid "Server actions completed; the local view is refreshing."
+msgstr "服务器操作已完成；正在刷新本地视图。"
+
+#: userland/apps/reliefmail/tools.cpp:116
+msgid "Server folders"
+msgstr "服务器文件夹"
+
+#: userland/apps/reliefmail/dialogs.cpp:508
+msgid "Server search cannot apply local-only date, unread, starred, attachment, unified-inbox, or all-mail scope."
+msgstr ""
+"服务器搜索无法应用仅本地的日期、未读、星标、附件，\n"
+"也无法搜索统一收件箱或全部邮件范围。"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
+
+#: userland/apps/reliefmail/compose_window.cpp:1267
+msgid "Show or hide the Bcc field."
+msgstr "显示或收起密送栏。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1265
+msgid "Show or hide the Cc field."
+msgstr "显示或收起抄送栏。"
+
+#: userland/apps/reliefmail/window.cpp:1049
+msgid "Show preview"
+msgstr "显示预览"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "显示："
+
+#: userland/apps/reliefmail/window.cpp:774
+msgid "Showing a bounded original preview."
+msgstr "正在显示受限大小的原始内容预览。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2011
+msgid "Showing the first 32 matching contact addresses."
+msgstr "仅显示前 32 个匹配的联系人地址。"
+
+#: userland/apps/reliefmail/reader.cpp:768
+msgid ""
+"Showing the first 64 KiB; use Save original to export the full message.\n"
+"\n"
+msgstr ""
+"当前显示前 64 KiB；使用“保存原始邮件”导出完整邮件。\n"
+"\n"
+
+#: userland/apps/reliefmail/compose_window.cpp:2014
+msgid "Showing the first 64 templates; manage the catalog in Tools."
+msgstr "仅显示前 64 个模板；请在“工具”中管理模板。"
+
+#: userland/apps/reliefmail/window.cpp:977
+msgid "Side by side"
+msgstr "左右排列"
+
+#: userland/apps/reliefmail/compose_window.cpp:775
+msgid "Signature"
+msgstr "签名"
+
+#: userland/apps/reliefmail/compose_window.cpp:2292
+msgid "Signature inserted at the current caret."
+msgstr "已在当前光标处插入签名。"
+
+#: userland/apps/reliefmail/compose_window.cpp:716
+msgid "SimSun"
+msgstr "宋体"
+
+#: userland/apps/reliefmail/reader.cpp:569
+msgid "Some HTML content uses a safe fallback."
+msgstr "部分 HTML 内容采用了安全回退显示。"
+
+#: userland/apps/reliefmail/dialogs.cpp:478
+msgid "Sort whole query"
+msgstr "全量结果排序"
+
+#: userland/apps/reliefmail/window.cpp:978
+msgid "Stacked"
+msgstr "上下排列"
+
+#: userland/apps/reliefmail/window.cpp:941
+msgid "Star"
+msgstr "加星标"
+
+#: userland/apps/reliefmail/dialogs.cpp:492
+msgid "Starred only"
+msgstr "仅星标"
+
+#: userland/apps/reliefmail/window.cpp:300
+msgid "Starting local profile..."
+msgstr "正在启动本地配置文件..."
+
+#: userland/apps/reliefmail/window.cpp:409
+msgid "Stopping background work safely..."
+msgstr "正在安全停止后台任务..."
+
+#: userland/apps/reliefmail/dialogs.cpp:466
+msgid "Subject"
+msgstr "主题"
+
+#: userland/apps/reliefmail/compose_window.cpp:1347
+msgid "Subject is invalid or too long."
+msgstr "主题无效或过长。"
+
+#: userland/apps/reliefmail/reader.cpp:584
+msgid "Subject unavailable"
+msgstr "主题不可用"
+
+#: userland/apps/reliefmail/compose_window.cpp:810
+msgid "Subject:"
+msgstr "主题："
+
+#: userland/apps/reliefmail/tools.cpp:142
+msgid "Submit this ready operation through SMTP only after explicit confirmation"
+msgstr "仅在明确确认后通过 SMTP 提交此待发送操作"
+
+#: userland/apps/reliefmail/tools.cpp:117
+msgid "Subscribe"
+msgstr "订阅"
+
+#: userland/apps/reliefmail/window.cpp:187
+msgid "Sync"
+msgstr "同步"
+
+#: userland/apps/reliefmail/window.cpp:954
+msgid "Sync folders"
+msgstr "同步文件夹"
+
+#: userland/apps/reliefmail/window.cpp:952
+msgid "Sync headers"
+msgstr "同步邮件头"
+
+#: userland/apps/reliefmail/window.cpp:953
+msgid "Synchronize selected folder headers"
+msgstr "同步所选文件夹的邮件头"
+
+#: userland/apps/reliefmail/window.cpp:132
+msgid "Synchronizing folder names"
+msgstr "正在同步文件夹名称"
+
+#: userland/apps/reliefmail/window_query.cpp:197
+msgid "Synchronizing headers. Message bodies are not fetched yet."
+msgstr "正在同步邮件头；尚未获取邮件正文。"
+
+#: userland/apps/reliefmail/window.cpp:133
+msgid "Synchronizing message headers"
+msgstr "正在同步邮件头"
+
+#: userland/apps/reliefmail/window_accounts.cpp:448
+msgid "TLS negotiation failed before verification completed. Check the port, TLS/STARTTLS setting and network connection."
+msgstr "TLS 协商未完成。请检查端口、TLS/STARTTLS 设置和网络连接。"
+
+#: userland/apps/reliefmail/compose_window.cpp:776
+msgid "Template"
+msgstr "模板"
+
+#: userland/apps/reliefmail/compose_window.cpp:1975
+msgid "Template content inserted at the current caret; the subject was filled only if empty."
+msgstr "已在当前光标处插入模板正文；仅在主题为空时填入模板主题。"
+
+#: userland/apps/reliefmail/dialogs.cpp:242
+msgid "Test incoming"
+msgstr "测试收件"
+
+#: userland/apps/reliefmail/dialogs.cpp:245
+msgid "Test outgoing"
+msgstr "测试发件"
+
+#: userland/apps/reliefmail/window.cpp:130
+msgid "Testing incoming sign-in"
+msgstr "正在测试收件登录"
+
+#: userland/apps/reliefmail/window.cpp:131
+msgid "Testing outgoing sign-in"
+msgstr "正在测试发件登录"
+
+#: userland/apps/reliefmail/compose_window.cpp:2186
+msgid "Text color"
+msgstr "文字色"
+
+#: userland/apps/reliefmail/compose_window.cpp:2243
+msgid "Text not found."
+msgstr "未找到文本。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1008
+msgid "The account changed while destination folders were being refreshed. Review the current account and select messages again."
+msgstr "刷新目标文件夹期间，账户已变化。请检查当前账户并重新选择邮件。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1056
+msgid "The archive destination identity changed during review. Choose it again."
+msgstr "复核期间归档目标身份已变化。请重新选择目标。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1435
+msgid "The attachment list exceeds its safe copy limit."
+msgstr "附件列表超出安全复制上限。"
+
+#: userland/apps/reliefmail/reader.cpp:744
+msgid "The bounded original preview is not loaded. Use Save original to export the complete message."
+msgstr "尚未加载受限大小的原始预览。使用“保存原始邮件”导出完整邮件。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:445
+msgid "The certificate does not match the server hostname. Check the IMAP/SMTP server address; updating CAs will not fix a hostname mismatch."
+msgstr "证书与服务器域名不匹配。请检查 IMAP/SMTP 地址；更新 CA 无法解决域名不匹配。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:442
+msgid "The certificate is expired or not yet valid. Check the system date and time, then the server certificate."
+msgstr "证书已过期或尚未生效。请先检查系统日期和时间，再检查服务器证书。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1946
+msgid "The compose account changed before catalog results arrived."
+msgstr "撰写账户在目录结果返回前已更改。"
+
+#: userland/apps/reliefmail/window.cpp:1193
+msgid "The compose window could not be opened."
+msgstr "无法打开撰写窗口。"
+
+#: userland/apps/reliefmail/window_reader.cpp:251
+msgid "The confirmed link was handed to the system browser."
+msgstr "已将确认的链接交给系统浏览器。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2041
+msgid "The contact address is not valid UTF-8."
+msgstr "联系人地址不是有效的 UTF-8 文本。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1798
+msgid "The copy completed, but this compose window is no longer available."
+msgstr "复制已完成，但撰写窗口已不可用。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1814
+msgid "The copy completed, but this editor or account changed. Reopen the target account's draft list."
+msgstr "复制已完成，但编辑器或账户已更改。请重新打开目标账户的草稿列表。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1820
+msgid "The copy was saved, but could not replace this editor. The original draft remains on its account."
+msgstr "副本已保存，但无法替换此编辑器。原草稿仍保留在原账户中。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:436
+msgid "The custom CA file could not be loaded. Check its path and contents, or leave it blank to use system certificates."
+msgstr "无法加载自定义 CA 文件。请检查文件路径和内容，或留空使用系统证书。"
+
+#: userland/apps/reliefmail/window_reader.cpp:294
+msgid "The destination changed or could not be installed safely; the original file was kept."
+msgstr "目标文件已更改或无法安全安装；原文件已保留。"
+
+#: userland/apps/reliefmail/window_actions.cpp:804
+msgid "The destination folder is no longer available; choose it again."
+msgstr "目标文件夹已不可用，请重新选择。"
+
+#: userland/apps/reliefmail/window.cpp:895
+msgid "The draft changed or its account identity no longer matches. Reload the draft list."
+msgstr "草稿或账户身份已更改。请重新加载草稿列表。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2077
+msgid "The draft could not be saved; ReliefMail remains open."
+msgstr "无法保存草稿；ReliefMail 将保持打开。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1067
+msgid "The draft edit counter reached its limit."
+msgstr "草稿编辑计数已达到上限。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1831
+msgid "The finalized send operation could not be created."
+msgstr "无法创建已定稿的发送任务。"
+
+#: userland/apps/reliefmail/window.cpp:483
+msgid "The local profile changed. Reloading the current profile."
+msgstr "本地配置已更改，正在重新加载。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1323
+msgid "The local profile changed; this compose window cannot save or send."
+msgstr "本地配置文件已更改；此撰写窗口无法保存或发送。"
+
+#: userland/apps/reliefmail/window.cpp:1188
+msgid "The local profile is still loading."
+msgstr "本地配置仍在加载。"
+
+#: userland/apps/reliefmail/window_reader.cpp:90
+msgid "The message account changed. Refresh the folder before fetching."
+msgstr "邮件所属账户已更改；获取前请刷新文件夹。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1060
+msgid "The new message body could not be opened safely."
+msgstr "无法安全打开新邮件正文。"
+
+#: userland/apps/reliefmail/compose_window.cpp:25
+msgid "The operation failed."
+msgstr "操作失败。"
+
+#: userland/apps/reliefmail/window_actions.cpp:515
+msgid "The operation has no durable source generation and cannot be reviewed."
+msgstr "此操作没有持久化的来源代次，无法复核。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1162
+msgid "The operation is ready only for a separately confirmed SMTP attempt."
+msgstr "此操作仅可在另行确认后尝试 SMTP 发送。"
+
+#: userland/apps/reliefmail/window_actions.cpp:337
+msgid "The operation no longer matches the selected account."
+msgstr "此操作与当前所选账户不再匹配。"
+
+#: userland/apps/reliefmail/window_actions.cpp:245
+msgid "The original message selection changed while refreshing the destination."
+msgstr "刷新目标文件夹期间，原邮件选择已变化，请重新选择。"
+
+#: userland/apps/reliefmail/window_actions.cpp:719
+msgid "The original message selection changed while refreshing the destination. Select it again."
+msgstr "刷新目标文件夹期间，原邮件选择已变化。请重新选择。"
+
+#: userland/apps/reliefmail/window_actions.cpp:695
+msgid "The original message selection could not be retained. Select the messages again."
+msgstr "无法保留原邮件选择。请重新选择邮件。"
+
+#: userland/apps/reliefmail/window.cpp:516
+msgid "The password vault could not be checked; cached mail will still load."
+msgstr "无法检查密码库；仍会加载缓存邮件。"
+
+#: userland/apps/reliefmail/window_reader.cpp:213
+msgid "The previous export was replaced by a new one."
+msgstr "新的导出任务已替代之前的任务。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:352
+msgid "The profile changed while account settings were open. Reopen the account dialog."
+msgstr "账户设置打开期间配置已更改。请重新打开账户对话框。"
+
+#: userland/apps/reliefmail/window_query.cpp:13
+msgid "The query is invalid."
+msgstr "搜索条件无效。"
+
+#: userland/apps/reliefmail/window.cpp:741
+msgid "The reader result no longer matches the selected message."
+msgstr "阅读结果与当前所选邮件不匹配。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1158
+msgid "The ready send operation was cancelled before SMTP submission."
+msgstr "尚未提交 SMTP，已取消此排队发送操作。"
+
+#: userland/apps/reliefmail/window_query.cpp:48
+msgid "The received date is out of range."
+msgstr "收件日期超出范围。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2028
+msgid "The recipient field is too long to add this contact."
+msgstr "收件人栏过长，无法添加此联系人。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1014
+msgid "The refreshed folder identity could not be retained safely."
+msgstr "无法安全保留刷新的文件夹身份。"
+
+#: userland/apps/reliefmail/window.cpp:1247
+msgid "The reply or forward window could not be opened safely."
+msgstr "无法安全打开回复或转发窗口。"
+
+#: userland/apps/reliefmail/window_actions.cpp:222
+msgid "The selected account is no longer available."
+msgstr "所选账户已不可用。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:309
+msgid "The selected account is no longer in the local profile."
+msgstr "所选账户已不在本地配置中。"
+
+#: userland/apps/reliefmail/window_reader.cpp:143
+msgid "The selected attachment is no longer available."
+msgstr "所选附件已不可用。"
+
+#: userland/apps/reliefmail/window.cpp:901
+msgid "The selected draft could not be opened safely."
+msgstr "无法安全打开所选草稿。"
+
+#: userland/apps/reliefmail/window_reader.cpp:160
+msgid "The selected file path is too long."
+msgstr "所选文件路径过长。"
+
+#: userland/apps/reliefmail/window_actions.cpp:303
+msgid "The selected folder identity is stale."
+msgstr "所选文件夹身份已过期。"
+
+#: userland/apps/reliefmail/window.cpp:1240
+msgid "The selected message cannot be used to create this draft."
+msgstr "无法使用所选邮件创建此草稿。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1177
+msgid "The selected sender account is no longer available."
+msgstr "所选发件账户已不可用。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1960
+msgid "The selected template changed before it could be inserted."
+msgstr "所选模板在插入前已更改。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2336
+msgid "The sender account list could not be refreshed."
+msgstr "无法刷新发件账户列表。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1331
+msgid "The sending account is no longer available."
+msgstr "发件账户已不可用。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:439
+msgid "The server certificate chain is not trusted. Check the server address and certificate chain; the system CA bundle may need updating."
+msgstr "服务器证书链不受信任。请检查服务器地址和证书链，系统 CA 证书库也可能需要更新。"
+
+#: userland/apps/reliefmail/window.cpp:1219
+msgid "The source message account changed. Reload it before composing."
+msgstr "源邮件所属账户已更改。请重新加载后再撰写。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:435
+msgid "The system CA certificate bundle could not be loaded. Repair the system certificates, then test again."
+msgstr "无法加载系统 CA 证书库。请修复系统证书，然后重新测试连接。"
+
+#: userland/apps/reliefmail/window_reader.cpp:248
+msgid "The system browser could not open this link."
+msgstr "系统浏览器无法打开此链接。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1168
+msgid "The tool operation completed."
+msgstr "工具操作已完成。"
+
+#: userland/apps/reliefmail/window.cpp:802
+msgid "The unlocked vault contained no usable account credentials."
+msgstr "已解锁的密码库中没有可用账户凭据。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2066
+msgid "The unsaved draft is still open."
+msgstr "未保存的草稿仍处于打开状态。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1128
+msgid "The worker result does not match the reviewed operation."
+msgstr "工作进程结果与已复核的操作不匹配。"
+
+#: userland/apps/reliefmail/window_reader.cpp:261
+msgid "The worker returned an inconsistent export chunk."
+msgstr "后台任务返回的导出数据块不一致。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1327
+msgid "This account changed while the compose window was open."
+msgstr "撰写窗口打开期间，此账户的设置已更改。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2114
+msgid "This compose action is unavailable while the profile or current operation is unresolved."
+msgstr "配置文件切换或当前操作完成前，无法执行此撰写操作。"
+
+#: userland/apps/reliefmail/window_actions.cpp:467
+msgid "This deletes the folder on the server. The special Inbox, Sent, Drafts, Trash, Junk, and Archive mappings cannot be deleted here."
+msgstr "这会从服务器删除文件夹。此处不能删除收件箱、已发送、草稿、废纸篓、垃圾邮件和归档等特殊映射。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1840
+msgid "This draft already has a finalized send operation; no new payload was created."
+msgstr "此草稿已有已定稿的发送任务；未创建新的邮件内容。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1003
+msgid "This draft uses a rich-editor format this version cannot read."
+msgstr "此草稿使用了当前版本无法读取的富文本格式。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1004
+msgid "This draft's rich-editor state is damaged."
+msgstr "此草稿的富文本编辑状态已损坏。"
+
+#: userland/apps/reliefmail/window_actions.cpp:794
+msgid "This message action is unavailable."
+msgstr "此邮件操作当前不可用。"
+
+#: userland/apps/reliefmail/window_reader.cpp:83
+msgid "This message body is already cached."
+msgstr "此邮件正文已缓存。"
+
+#: userland/apps/reliefmail/reader.cpp:736
+msgid "This message has no cached body text."
+msgstr "此邮件没有缓存正文。"
+
+#: userland/apps/reliefmail/reader.cpp:735
+msgid ""
+"This message is stored as headers only.\n"
+"Fetch the complete message to read it."
+msgstr ""
+"此邮件目前仅保存邮件头。\n"
+"获取完整邮件后即可阅读正文。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1153
+msgid "This new draft will use the following identity."
+msgstr "此新草稿将使用以下发件身份。"
+
+#: userland/apps/reliefmail/window_actions.cpp:488
+msgid "This permanently deletes messages in the configured Trash folder. It never issues an unrestricted EXPUNGE."
+msgstr "这会永久删除已配置废纸篓中的邮件，且绝不发送不受限的 EXPUNGE。"
+
+#: userland/apps/reliefmail/window_actions.cpp:651
+msgid "This removes the ready operation from future SMTP submission. It does not affect a message already sent."
+msgstr "这会阻止此排队操作今后提交 SMTP，不影响已发送的邮件。"
+
+#: userland/apps/reliefmail/window_actions.cpp:572
+msgid "This retries only IMAP append to the exact reviewed folder. SMTP will not be contacted."
+msgstr "这只会通过 IMAP 向确切的已复核文件夹追加邮件，不会连接 SMTP。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1493
+msgid "This saves a finalized local send operation. No SMTP connection will be started."
+msgstr "此操作会在本地保存已定稿的发送任务，不会启动 SMTP 连接。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1130
+msgid "This sender cannot change while the current operation is unresolved."
+msgstr "当前操作尚未完成，暂时无法更改发件账户。"
+
+#: userland/apps/reliefmail/window_actions.cpp:882
+msgid "This server action applies only to the exact account, folder, UIDVALIDITY, and UIDs shown below."
+msgstr "此服务器操作仅适用于下方列出的确切账户、文件夹、UID 有效标识和 UID。"
+
+#: userland/apps/reliefmail/window.cpp:774
+msgid "This source contains headers only, not a complete original message."
+msgstr "此内容仅含邮件头，并非完整原始邮件。"
+
+#: userland/apps/reliefmail/window_actions.cpp:612
+msgid "This starts a new SMTP attempt for this ready operation. Confirm the recipient and Message-ID carefully."
+msgstr "这将为此排队操作启动一次新的 SMTP 发送。请仔细确认收件人和邮件 ID。"
+
+#: userland/apps/reliefmail/reader.cpp:596
+msgid "To"
+msgstr "收件人"
+
+#: userland/apps/reliefmail/compose_window.cpp:807
+msgid "To:"
+msgstr "收件人："
+
+#: userland/apps/reliefmail/window_accounts.cpp:601
+msgid "Too many saved credentials."
+msgstr "已保存的凭据过多。"
+
+#: userland/apps/reliefmail/window.cpp:176
+msgid "Tools"
+msgstr "工具"
+
+#: userland/apps/reliefmail/tools.cpp:389
+msgid "Trash"
+msgstr "废纸篓"
+
+#: userland/apps/reliefmail/window_actions.cpp:1112
+msgid "Trash deletion completed. Refreshing the server folder."
+msgstr "已完成废纸篓删除；正在刷新服务器文件夹。"
+
+#: userland/apps/reliefmail/window_actions.cpp:1113
+msgid "Trash deletion completed; refreshing the server folder."
+msgstr "已完成废纸篓删除；正在刷新服务器文件夹。"
+
+#: userland/apps/reliefmail/dialogs.cpp:229
+msgid "Trash folder"
+msgstr "垃圾箱"
+
+#: userland/apps/reliefmail/window_actions.cpp:491
+msgid "Type the account-bound Trash phrase."
+msgstr "输入与此账户绑定的废纸篓确认短语。"
+
+#: userland/apps/reliefmail/window_actions.cpp:470
+msgid "Type the account-bound delete phrase."
+msgstr "输入与此账户绑定的删除确认短语。"
+
+#: userland/apps/reliefmail/window_actions.cpp:458
+msgid "Type the account-bound rename phrase."
+msgstr "输入与此账户绑定的重命名确认短语。"
+
+#: userland/apps/reliefmail/window_actions.cpp:885
+msgid "Type the action and selected-message count."
+msgstr "输入操作名称和所选邮件数量。"
+
+#: userland/apps/reliefmail/window_actions.cpp:374
+msgid "Type the exact decision to record."
+msgstr "输入要记录的确切决定。"
+
+#: userland/apps/reliefmail/window_actions.cpp:406
+msgid "Type the operation review phrase to save this exact IMAP destination."
+msgstr "输入操作复核短语以保存此确切 IMAP 目标。"
+
+#: userland/apps/reliefmail/window_actions.cpp:575
+msgid "Type the operation-bound archive phrase."
+msgstr "输入与此操作绑定的归档短语。"
+
+#: userland/apps/reliefmail/window_actions.cpp:654
+msgid "Type the operation-bound cancellation phrase."
+msgstr "输入与此操作绑定的取消短语。"
+
+#: userland/apps/reliefmail/window_actions.cpp:615
+msgid "Type the operation-bound send phrase."
+msgstr "输入与此操作绑定的发送短语。"
+
+#: userland/apps/reliefmail/ui_widgets.cpp:316
+msgid "Type the text above"
+msgstr "输入上方显示的口令"
+
+#: userland/apps/reliefmail/compose_window.cpp:726
+msgid "U"
+msgstr "U"
+
+#: configs/nls/messages/reliefmail.c:5
+msgid "UID"
+msgstr "用户 ID"
+
+#: userland/apps/reliefmail/tools.cpp:140
+msgid "Uncertain delivery"
+msgstr "投递待复核"
+
+#: userland/apps/reliefmail/compose_window.cpp:666
+msgid "Undo"
+msgstr "撤销"
+
+#: userland/apps/reliefmail/dialogs.cpp:472
+msgid "Unified"
+msgstr "统一收件箱"
+
+#: userland/apps/reliefmail/window.cpp:714
+msgid "Unified inbox"
+msgstr "统一收件箱"
+
+#: userland/apps/reliefmail/tools.cpp:95
+msgid "Unknown delivery state"
+msgstr "投递状态未知"
+
+#: userland/apps/reliefmail/dialogs.cpp:488
+msgid "Unknown only"
+msgstr "仅未知"
+
+#: userland/apps/reliefmail/window_vault.cpp:31
+msgid "Unlock"
+msgstr "解锁"
+
+#: userland/apps/reliefmail/window_vault.cpp:30
+msgid "Unlock again"
+msgstr "重新解锁"
+
+#: userland/apps/reliefmail/window_vault.cpp:52
+msgid "Unlock encrypted password vault"
+msgstr "解锁加密密码库"
+
+#: userland/apps/reliefmail/window_vault.cpp:81
+msgid "Unlock or enter at least one account password before saving the vault."
+msgstr "保存密码库前，请先解锁密码库或输入至少一个账户密码。"
+
+#: userland/apps/reliefmail/window_query.cpp:125
+msgid "Unlock or enter the selected account's incoming password before server search."
+msgstr "服务器搜索前，请解锁密码库或输入所选账户的收件密码。"
+
+#: userland/apps/reliefmail/window.cpp:964
+msgid "Unlock or save the optional encrypted password vault"
+msgstr "解锁或保存可选的加密密码库"
+
+#: userland/apps/reliefmail/window_accounts.cpp:315
+msgid "Unlock the password vault or add this account's incoming password before syncing."
+msgstr "同步前请解锁密码库，或输入此账户的收件密码。"
+
+#: userland/apps/reliefmail/window_reader.cpp:98
+msgid "Unlock the password vault or enter this account's incoming password before fetching."
+msgstr "获取邮件前请解锁密码库或输入此账户的收件密码。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:507
+msgid "Unlock the vault or enter the incoming password before reusing it."
+msgstr "重新使用收件密码前，请解锁密码库或输入该密码。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:520
+msgid "Unlock the vault or enter the outgoing password before reusing it."
+msgstr "重新使用发件密码前，请解锁密码库或输入该密码。"
+
+#: userland/apps/reliefmail/window.cpp:145
+msgid "Unlocking encrypted password storage"
+msgstr "正在解锁加密密码库"
+
+#: userland/apps/reliefmail/dialogs.cpp:490
+msgid "Unread only"
+msgstr "仅未读"
+
+#: userland/apps/reliefmail/compose_window.cpp:1359
+msgid "Unsaved changes — autosave scheduled"
+msgstr "有未保存的更改 — 已安排自动保存"
+
+#: userland/apps/reliefmail/window.cpp:942
+msgid "Unstar"
+msgstr "取消星标"
+
+#: userland/apps/reliefmail/tools.cpp:118
+msgid "Unsubscribe"
+msgstr "取消订阅"
+
+#: userland/apps/reliefmail/compose_window.cpp:2254
+msgid "Use plain text"
+msgstr "使用纯文本"
+
+#: userland/apps/reliefmail/compose_window.cpp:2252
+msgid "Use plain-text format"
+msgstr "使用纯文本格式"
+
+#: userland/apps/reliefmail/window.cpp:819
+msgid "Vault password changed."
+msgstr "密码库主密码已更改。"
+
+#: userland/apps/reliefmail/window.cpp:818
+msgid "Vault password changed; cleanup is pending."
+msgstr "密码库主密码已更改，尚有清理工作待完成。"
+
+#: userland/apps/reliefmail/window_vault.cpp:102
+msgid "Verify current vault password"
+msgstr "验证当前密码库密码"
+
+#: userland/apps/reliefmail/reader.cpp:105
+msgid "View"
+msgstr "查看"
+
+#: userland/apps/reliefmail/compose_window.cpp:1405
+msgid "Wait for the current compose operation before copying this draft."
+msgstr "请等待当前撰写操作完成，再复制此草稿。"
+
+#: userland/apps/reliefmail/window_actions.cpp:689
+msgid "Wait for the current message action batch to finish before starting another."
+msgstr "请等待当前邮件操作批次完成后再开始另一项操作。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2123
+msgid "Wait for the current save before changing attachments."
+msgstr "请等待当前保存完成，再更改附件。"
+
+#: userland/apps/reliefmail/compose_window.cpp:1135
+msgid "Wait for the current save before changing the sender account."
+msgstr "请等待当前保存完成后再更改发件账户。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2095
+msgid "Wait for the current save or send result before closing."
+msgstr "请等待当前保存或发送结果后再关闭。"
+
+#: userland/apps/reliefmail/window_accounts.cpp:334
+msgid "Wait for the local account list to load."
+msgstr "请等待本地账户列表加载完成。"
+
+#: userland/apps/reliefmail/compose_window.cpp:2061
+msgid "Wait for the open compose operation to finish before closing ReliefMail."
+msgstr "请等待撰写操作完成后再关闭 ReliefMail。"
+
+#: userland/apps/reliefmail/tools.cpp:85
+msgid "Waiting for SMTP result"
+msgstr "等待 SMTP 结果"
+
+#: userland/apps/reliefmail/compose_window.cpp:1479
+msgid "Waiting for the current save before finalizing this message…"
+msgstr "正在等待当前保存完成，然后定稿此邮件…"
+
+#: userland/apps/reliefmail/window.cpp:148
+msgid "Working in the background"
+msgstr "正在后台处理"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "是"
+
+#: userland/apps/reliefmail/window_actions.cpp:370
+msgid "You are recording a user decision that delivery did not succeed. This decision will not send; SMTP retry requires a second confirmation."
+msgstr "你正在记录“投递未成功”的决定。此决定不会发送邮件；重试 SMTP 还需再次确认。"
+
+#: userland/apps/reliefmail/window_actions.cpp:369
+msgid "You are recording a user decision that delivery succeeded. This decision will not contact SMTP."
+msgstr "你正在记录“投递成功”的决定。此决定不会连接 SMTP。"
+
+#: userland/apps/reliefmail/window_actions.cpp:384
+msgid ""
+"\n"
+"Current account generation %llu\n"
+"Exact IMAP destination: %s\n"
+"Folder generation %llu · UIDVALIDITY %llu\n"
+msgstr ""
+"\n"
+"当前账户配置代次 %llu\n"
+"确切 IMAP 目标：%s\n"
+"文件夹代次 %llu · UID 有效标识 %llu\n"
+
+#: configs/nls/messages/reliefmail.c:6
+msgid "none"
+msgstr "无"
+
+#: userland/apps/reliefmail/tools.cpp:516
+msgid "not configured"
+msgstr "未配置"
+
+#: configs/nls/messages/reliefmail.c:7
+msgid "s"
+msgstr " 秒后还原"
+
+#: userland/apps/reliefmail/compose_window.cpp:509
+msgid "size checked on save"
+msgstr "保存时检查大小"
+
+#: configs/nls/messages/reliefmail.c:8
+msgid "worker error"
+msgstr "工作进程错误"

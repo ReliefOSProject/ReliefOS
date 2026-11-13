@@ -1,0 +1,27 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/mp3play/main.c:347
+msgid "MP3 audio (*.mp3)"
+msgstr ""
+
+#: configs/nls/messages/mp3play.c:5
+msgid "Open"
+msgstr ""
+
+#: userland/apps/mp3play/main.c:346
+msgid "Open MP3"
+msgstr ""
+
+#: configs/nls/messages/mp3play.c:6
+msgid "Playback complete"
+msgstr ""
+
+#: configs/nls/messages/mp3play.c:7
+msgid "Playing"
+msgstr ""
+
+#: configs/nls/messages/mp3play.c:8
+msgid "Stop"
+msgstr ""

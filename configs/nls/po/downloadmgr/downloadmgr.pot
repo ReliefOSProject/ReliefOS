@@ -1,0 +1,99 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/downloadmgr/main.c:257
+msgid " bytes to "
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:284
+msgid "Connecting..."
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:330
+msgid "Could not choose target file."
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:339
+msgid "Could not save file."
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:239
+msgid "DNS failed"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:359
+msgid "Download"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:402
+msgid "Download Manager"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:345
+msgid "Download complete"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:322
+msgid "Download is too large for v1 client."
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:305
+msgid "HTTP client failed"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:314
+msgid "HTTP status "
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:247
+msgid "Network failed"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:241
+msgid "No DNS answer"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:294
+msgid "Only http:// and https:// downloads are supported."
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:360
+msgid "Progress"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:243
+msgid "Protocol unsupported"
+msgstr ""
+
+#: configs/nls/messages/downloadmgr.c:5
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:255
+msgid "Saved "
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:235
+msgid "Succeeded"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:237
+msgid "TCP timeout"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:245
+msgid "TLS verification failed"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:356
+msgid "URL:"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:403
+msgid "Web downloads"
+msgstr ""
+
+#: userland/apps/downloadmgr/main.c:354
+msgid "Web downloads are saved to the current user's Downloads folder."
+msgstr ""

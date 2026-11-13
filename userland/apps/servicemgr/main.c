@@ -339,8 +339,8 @@ static void handle_click(int32_t x, int32_t y)
 int main(void)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("servicemgr", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("servicemgr");
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     int window_id;

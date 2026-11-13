@@ -76,7 +76,7 @@ echo "RP_EXIT status=$status" >/dev/ttyS0
     payload=[
         (OUT/'userland/reliefppt.elf','/usr/lib/reliefos/apps/reliefppt/reliefppt.elf',0o100755),
         (OUT/'userland/fileman.elf','/usr/lib/reliefos/apps/fileman/fileman.elf',0o100755),
-        (OUT/'generated/nls/zh_CN/LC_MESSAGES/leonos.mo',fltk.LOCALE_GUEST,0o100644),
+        *fltk.locale_payload(OUT),
         (ROOT/'userland/apps/reliefppt/reliefppt.desktop','/usr/share/applications/reliefppt.desktop',0o100644),
         (ROOT/'resources/build-art/app-icons/reliefppt.bmp','/usr/lib/reliefos/apps/reliefppt/reliefppt.bmp',0o100644),
         (entry,'/usr/bin/reliefppt',0o100755),(runner,'/usr/bin/rp',0o100755),

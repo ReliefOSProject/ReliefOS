@@ -90,7 +90,7 @@ bool valid_config(const Config &c, Text &e) {
                        (c.gateway == s.network || c.gateway == s.broadcast))))
       return fail(
           e,
-          "The gateway must be a different usable address in the same subnet.");
+          N_("The gateway must be a different usable address in the same subnet."));
     if (c.dns == Dns::Automatic)
       return fail(e, N_("Static mode requires custom or Cloudflare DNS."));
   }

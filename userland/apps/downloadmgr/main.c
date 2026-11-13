@@ -388,8 +388,8 @@ static int hit_rect(int32_t px, int32_t py, uint32_t x, uint32_t y,
 int main(int argc, char **argv, char **envp)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("downloadmgr", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("downloadmgr");
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     int window_id;

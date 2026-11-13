@@ -1,0 +1,43 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/sysconfdialog/main.c:88
+msgid "Allow"
+msgstr ""
+
+#: userland/apps/sysconfdialog/main.c:66
+msgid "Allow startup application?"
+msgstr ""
+
+#: userland/apps/sysconfdialog/main.c:69
+msgid "Allow this app to start a process when you sign in?"
+msgstr ""
+
+#: userland/apps/sysconfdialog/main.c:86
+msgid "Deny"
+msgstr ""
+
+#: userland/apps/sysconfdialog/main.c:83
+msgid "Do not ask again if I deny this request"
+msgstr ""
+
+#: userland/apps/sysconfdialog/main.c:47
+msgid "None"
+msgstr ""
+
+#: userland/apps/sysconfdialog/main.c:71
+msgid "Requesting application"
+msgstr ""
+
+#: userland/apps/sysconfdialog/main.c:107
+msgid "Startup Application"
+msgstr ""
+
+#: userland/apps/sysconfdialog/main.c:75
+msgid "Startup command"
+msgstr ""
+
+#: userland/apps/sysconfdialog/main.c:108
+msgid "Startup permission"
+msgstr ""

@@ -149,15 +149,49 @@ static void ready(void *data)
     fflush(stdout);
 }
 
+static int nls_domain_checks(void)
+{
+    struct expectation {
+        const char *domain;
+        const char *message;
+        const char *translation;
+        const char *other_message;
+    };
+    const expectation checks[] = {
+        {"fileman", "New Folder", "新建文件夹", "Processes"},
+        {"taskmgr", "Processes", "进程", "New Folder"},
+        {"reliefexcel", "I/O error", "输入输出错误", "Processes"},
+        {"reliefword", "The file changed while it was being opened",
+         "文件在打开期间发生变化", "Processes"},
+        {"network-controller", "Authenticating", "正在验证身份", "New Folder"},
+    };
+    for (const auto &check : checks) {
+        reliefos_fltk::init(check.domain);
+        if (strcmp(textdomain(nullptr), check.domain) != 0 ||
+            strcmp(T(check.message), check.translation) != 0 ||
+            strcmp(T(check.other_message), check.other_message) != 0 ||
+            strcmp(fl_cancel, "取消") != 0) {
+            printf("FLTK_NLS_FAIL %s domain=%s message=%s cancel=%s\n",
+                   check.domain, textdomain(nullptr), T(check.message), fl_cancel);
+            return 1;
+        }
+        printf("FLTK_NLS_PASS %s message=%s cancel=%s\n",
+               check.domain, T(check.message), fl_cancel);
+    }
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
+    if (argc == 2 && strcmp(argv[1], "--nls-domains") == 0)
+        return nls_domain_checks();
     if (argc == 3 && strcmp(argv[1], "--window-info") == 0)
         return window_info(strtoul(argv[2], nullptr, 10));
     if (argc == 3 && strcmp(argv[1], "--watch-window") == 0)
         return window_info(strtoul(argv[2], nullptr, 10), true);
     if (argc == 3 && strcmp(argv[1], "--watch-window-focus") == 0)
         return window_info(strtoul(argv[2], nullptr, 10), true, true);
-    reliefos_fltk::init();
+    reliefos_fltk::init("fileman");
     if (!copy_input_checks()) {
         puts("FLTK_PROBE_FAIL copy_input_capacity");
         return 1;

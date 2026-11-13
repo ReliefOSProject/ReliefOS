@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/guitest/main.c:86
+msgid "App starting"
+msgstr "应用启动"
+
+#: userland/apps/guitest/main.c:58
+msgid "Arrow"
+msgstr "箭头"
+
+#: userland/apps/guitest/main.c:161
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/guitest/main.c:66
+msgid "Crosshair"
+msgstr "十字"
+
+#: userland/apps/guitest/main.c:127
+msgid "Cursor style: "
+msgstr "光标样式: "
+
+#: userland/apps/guitest/main.c:98
+msgid "GUI API Tester"
+msgstr "GUI API 测试"
+
+#: userland/apps/guitest/main.c:173
+msgid "GUI API title update passed"
+msgstr "GUI API 标题更新成功"
+
+#: userland/apps/guitest/main.c:60
+msgid "Hand"
+msgstr "手形"
+
+#: userland/apps/guitest/main.c:72
+msgid "Help"
+msgstr "帮助"
+
+#: userland/apps/guitest/main.c:152
+msgid "Hide desktop taskbar"
+msgstr "隐藏桌面任务栏"
+
+#: userland/apps/guitest/main.c:149
+msgid "Hide window from taskbar"
+msgstr "从任务栏隐藏窗口"
+
+#: userland/apps/guitest/main.c:68
+msgid "Move"
+msgstr "移动"
+
+#: userland/apps/guitest/main.c:155
+msgid "Move mouse to 320, 240"
+msgstr "移动鼠标到 320, 240"
+
+#: userland/apps/guitest/main.c:157
+msgid "Next cursor style"
+msgstr "下一个光标样式"
+
+#: userland/apps/guitest/main.c:70
+msgid "Not allowed"
+msgstr "禁止"
+
+#: userland/apps/guitest/main.c:74
+msgid "Progress"
+msgstr "进度"
+
+#: configs/nls/messages/guitest.c:5
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/guitest/main.c:120
+msgid "ReliefOS GUI API Tester"
+msgstr "ReliefOS GUI API 测试器"
+
+#: userland/apps/guitest/main.c:159
+msgid "Reset all"
+msgstr "重置全部"
+
+#: userland/apps/guitest/main.c:80
+msgid "Resize diagonal"
+msgstr "对角调整大小"
+
+#: userland/apps/guitest/main.c:78
+msgid "Resize horizontal"
+msgstr "水平调整大小"
+
+#: userland/apps/guitest/main.c:76
+msgid "Resize vertical"
+msgstr "垂直调整大小"
+
+#: userland/apps/guitest/main.c:146
+msgid "Restore borders"
+msgstr "恢复边框"
+
+#: userland/apps/guitest/main.c:143
+msgid "Set alternate title"
+msgstr "设置备用标题"
+
+#: userland/apps/guitest/main.c:144
+msgid "Set test title"
+msgstr "设置测试标题"
+
+#: userland/apps/guitest/main.c:153
+msgid "Show desktop taskbar"
+msgstr "显示桌面任务栏"
+
+#: userland/apps/guitest/main.c:150
+msgid "Show window in taskbar"
+msgstr "在任务栏显示窗口"
+
+#: userland/apps/guitest/main.c:62
+msgid "Text"
+msgstr "文本"
+
+#: userland/apps/guitest/main.c:147
+msgid "Toggle borderless"
+msgstr "切换无边框"
+
+#: userland/apps/guitest/main.c:84
+msgid "Up arrow"
+msgstr "向上箭头"
+
+#: userland/apps/guitest/main.c:64
+msgid "Wait"
+msgstr "等待"

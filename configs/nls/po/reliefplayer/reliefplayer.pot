@@ -1,0 +1,247 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:12
+msgid "Audio device is busy"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:11
+msgid "Audio device is unavailable"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:112
+msgid "Back 10 s"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:19
+msgid "Cancelled"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:6
+msgid "Could not read the media file"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:108
+msgid "Drag to seek; Left/Right: 10 seconds"
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:113
+msgid "Forward 10 s"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:88
+msgid "Help"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:7
+msgid "Invalid or truncated media file"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:9
+msgid "Media exceeds the supported size or resolution"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:188
+msgid "Media files (*.{mp3,MP3,wav,WAV,mp4,MP4})"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:13
+msgid "Media playback failed"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:306
+msgid "Mono audio"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:121
+msgid "Mute"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:302
+msgid "No audio track"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:91
+msgid "No media file selected"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:10
+msgid "Not enough memory"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:49
+msgid "Open an MP3, WAV or MP4 file to begin"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:188
+msgid "Open media"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:87
+msgid "Open media..."
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:274
+msgid "Pause"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:55
+msgid "Paused"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:109
+msgid "Play"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:110
+msgid "Play or pause (Space)"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:59
+msgid "Playback complete"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:14
+msgid "Playback process stopped unexpectedly"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:53
+msgid "Playing"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:51
+msgid "Reading media information..."
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:20
+msgid "Ready"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:5
+msgid "ReliefPlayer"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:360
+msgid "ReliefPlayer\nMP3 / WAV audio and MP4 video player\n\nCtrl+O: open media\nSpace: play or pause\nLeft / Right: seek 10 seconds\nHome: return to the beginning\n\nVolume changes affect this player only.\nSupports PCM WAV 8/16/24/32-bit and float32, mono or stereo.\nMP4: H.264, MPEG-4 or HEVC video; AAC or MP3 audio.\nLocal files only; no network streams or media library."
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:302
+msgid "Stereo audio"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:111
+msgid "Stop"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:57
+msgid "Stopped"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:228
+msgid "Stopping playback..."
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:166
+msgid "The file path is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:8
+msgid "Unsupported media format or codec"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:114
+msgid "Volume"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""
+
+#: userland/apps/reliefplayer/window.cpp:307
+msgid "bit"
+msgstr ""
+
+#: configs/nls/messages/reliefplayer.c:21
+msgid "failed"
+msgstr ""

@@ -1,0 +1,187 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "添加到收藏夹"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "所有文件 (*)"
+
+#: userland/apps/paint/main.cpp:171
+msgid "Brush"
+msgstr "画笔"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "取消"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/paint/main.cpp:42
+msgid "Could not create canvas"
+msgstr "无法创建画布"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "无法解码图像"
+
+#: userland/apps/paint/main.cpp:69
+msgid "Could not open image"
+msgstr "无法打开图片"
+
+#: userland/apps/paint/main.cpp:97
+msgid "Could not save image"
+msgstr "无法保存图片"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "创建新目录"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "自定义筛选器"
+
+#: userland/apps/paint/main.cpp:51
+msgid "Discard"
+msgstr "放弃"
+
+#: userland/apps/paint/main.cpp:50
+msgid "Discard changes?"
+msgstr "放弃更改？"
+
+#: userland/apps/paint/main.cpp:171
+msgid "Eraser"
+msgstr "橡皮"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "收藏夹"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "文件系统"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "文件名："
+
+#: userland/apps/paint/main.cpp:73
+msgid "Image opened"
+msgstr "图片已打开"
+
+#: userland/apps/paint/main.cpp:99
+msgid "Image saved"
+msgstr "图片已保存"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "输入内容过长"
+
+#: userland/apps/paint/main.cpp:51
+msgid "Keep"
+msgstr "保留"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
+#: userland/apps/paint/main.cpp:152
+msgid "New"
+msgstr "新建"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新建目录？"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "否"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/paint/main.cpp:152
+msgid "Open"
+msgstr "打开"
+
+#: userland/apps/paint/main.cpp:162
+msgid "Open image"
+msgstr "打开图片"
+
+#: userland/apps/paint/main.cpp:32
+msgid "Paint"
+msgstr "画图"
+
+#: userland/apps/paint/main.cpp:171
+msgid "Pencil"
+msgstr "铅笔"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "请选择已存在的文件！"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "预览"
+
+#: userland/apps/paint/main.cpp:187
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/paint/main.cpp:106
+msgid "Replace existing file?"
+msgstr "替换已存在的文件？"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/paint/main.cpp:152
+msgid "Save as"
+msgstr "另存为"
+
+#: userland/apps/paint/main.cpp:113
+msgid "Save changes?"
+msgstr "保存更改？"
+
+#: userland/apps/paint/main.cpp:104
+msgid "Save image"
+msgstr "保存图片"
+
+#: userland/apps/paint/main.cpp:114
+msgid "Save the current drawing before closing?"
+msgstr "关闭前保存当前绘画？"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "显示："
+
+#: userland/apps/paint/main.cpp:51
+msgid "The current drawing has not been saved."
+msgstr "当前绘画尚未保存。"
+
+#: userland/apps/paint/main.cpp:32
+msgid "Untitled"
+msgstr "未命名"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "是"

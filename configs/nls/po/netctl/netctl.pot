@@ -1,0 +1,291 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/netctl/main.c:572
+msgid " resolving "
+msgstr ""
+
+#: userland/apps/netctl/main.c:220
+msgid "ARP timeout"
+msgstr ""
+
+#: userland/apps/netctl/main.c:622
+msgid "Active"
+msgstr ""
+
+#: userland/apps/netctl/main.c:646
+msgid "Apply"
+msgstr ""
+
+#: userland/apps/netctl/main.c:414
+msgid "Authorization denied or cancelled"
+msgstr ""
+
+#: userland/apps/netctl/main.c:354
+msgid "Authorization failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:357
+msgid "Authorizing DHCP update..."
+msgstr ""
+
+#: userland/apps/netctl/main.c:222
+msgid "Bad argument"
+msgstr ""
+
+#: userland/apps/netctl/main.c:248
+msgid "Bad socket"
+msgstr ""
+
+#: userland/apps/netctl/main.c:636
+msgid "Cloudflare"
+msgstr ""
+
+#: userland/apps/netctl/main.c:173
+msgid "Cloudflare DNS"
+msgstr ""
+
+#: userland/apps/netctl/main.c:326
+msgid "Config query failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:627
+msgid "Config:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:342
+msgid "Connection query failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:642
+msgid "Custom"
+msgstr ""
+
+#: userland/apps/netctl/main.c:171
+msgid "Custom DNS"
+msgstr ""
+
+#: userland/apps/netctl/main.c:639
+msgid "DHCP"
+msgstr ""
+
+#: userland/apps/netctl/main.c:169
+msgid "DHCP DNS"
+msgstr ""
+
+#: userland/apps/netctl/main.c:734
+msgid "DHCP and DNS"
+msgstr ""
+
+#: userland/apps/netctl/main.c:228
+msgid "DHCP failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:363
+msgid "DHCP request failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:226
+msgid "DHCP timeout"
+msgstr ""
+
+#: userland/apps/netctl/main.c:402
+msgid "DHCP update interrupted"
+msgstr ""
+
+#: userland/apps/netctl/main.c:397
+msgid "DHCP worker failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:232
+msgid "DNS failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:555
+msgid "DNS ioctl failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:633
+msgid "DNS mode:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:546
+msgid "DNS policy applied and saved"
+msgstr ""
+
+#: userland/apps/netctl/main.c:514
+msgid "DNS policy change failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:309
+msgid "DNS policy query failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:535
+msgid "DNS save failed; previous policy restored."
+msgstr ""
+
+#: userland/apps/netctl/main.c:538
+msgid "DNS save failed; runtime policy may differ."
+msgstr ""
+
+#: userland/apps/netctl/main.c:230
+msgid "DNS timeout"
+msgstr ""
+
+#: userland/apps/netctl/main.c:631
+msgid "DNS:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:650
+msgid "Domain:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:503
+msgid "Enter a valid custom IPv4 DNS address."
+msgstr ""
+
+#: userland/apps/netctl/main.c:630
+msgid "Gateway:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:242
+msgid "HTTP failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:628
+msgid "IPv4:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:616
+msgid "Intel e1000 Network"
+msgstr ""
+
+#: userland/apps/netctl/main.c:632
+msgid "Lease:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:626
+msgid "MAC:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:629
+msgid "Mask:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:733
+msgid "Network Controller"
+msgstr ""
+
+#: userland/apps/netctl/main.c:332
+msgid "Network configuration refreshed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:234
+msgid "No A record"
+msgstr ""
+
+#: userland/apps/netctl/main.c:624
+msgid "No DHCP lease"
+msgstr ""
+
+#: userland/apps/netctl/main.c:662
+msgid "No TCP client sockets."
+msgstr ""
+
+#: userland/apps/netctl/main.c:218
+msgid "No e1000 adapter"
+msgstr ""
+
+#: userland/apps/netctl/main.c:284
+msgid "None"
+msgstr ""
+
+#: userland/apps/netctl/main.c:254
+msgid "Protocol unsupported"
+msgstr ""
+
+#: configs/nls/messages/netctl.c:5
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/netctl/main.c:648
+msgid "Refresh"
+msgstr ""
+
+#: userland/apps/netctl/main.c:649
+msgid "Renew DHCP"
+msgstr ""
+
+#: userland/apps/netctl/main.c:652
+msgid "Resolve"
+msgstr ""
+
+#: userland/apps/netctl/main.c:244
+msgid "Response too large"
+msgstr ""
+
+#: userland/apps/netctl/main.c:252
+msgid "Socket closed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:246
+msgid "Socket limit reached"
+msgstr ""
+
+#: userland/apps/netctl/main.c:250
+msgid "Socket not connected"
+msgstr ""
+
+#: configs/nls/messages/netctl.c:6
+msgid "State"
+msgstr ""
+
+#: userland/apps/netctl/main.c:618
+msgid "State:"
+msgstr ""
+
+#: userland/apps/netctl/main.c:282
+msgid "Static fallback"
+msgstr ""
+
+#: userland/apps/netctl/main.c:216
+msgid "Succeeded"
+msgstr ""
+
+#: userland/apps/netctl/main.c:657
+msgid "TCP Connections"
+msgstr ""
+
+#: userland/apps/netctl/main.c:240
+msgid "TCP failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:238
+msgid "TCP reset"
+msgstr ""
+
+#: userland/apps/netctl/main.c:236
+msgid "TCP timeout"
+msgstr ""
+
+#: userland/apps/netctl/main.c:224
+msgid "Transmit failed"
+msgstr ""
+
+#: userland/apps/netctl/main.c:509
+msgid "Unable to read the current DNS policy."
+msgstr ""
+
+#: userland/apps/netctl/main.c:625
+msgid "Unavailable"
+msgstr ""
+
+#: userland/apps/netctl/main.c:256
+msgid "Unknown status"
+msgstr ""
+
+#: configs/nls/messages/netctl.c:7
+msgid "s"
+msgstr ""

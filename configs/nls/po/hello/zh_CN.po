@@ -1,0 +1,35 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/hello/main.c:24
+msgid "Button pressed"
+msgstr "按钮已按下"
+
+#: userland/apps/hello/main.c:22
+msgid "Hello"
+msgstr "你好"
+
+#: userland/apps/hello/main.c:20
+msgid "Hello from hello.elf"
+msgstr "来自 hello.elf 的问候"
+
+#: userland/apps/hello/main.c:38
+msgid "Hello from hello.elf process"
+msgstr "来自 hello.elf 进程的问候"
+
+#: userland/apps/hello/main.c:21
+msgid "This window is rendered by the app"
+msgstr "此窗口由应用程序渲染"
+
+#: userland/apps/hello/main.c:24
+msgid "Window server v2"
+msgstr "窗口服务 v2"

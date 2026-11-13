@@ -1,0 +1,698 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/network-controller/window.cpp:86
+msgid "About"
+msgstr "关于"
+
+#: userland/apps/network-controller/window.cpp:550
+msgid "Adapter counters are not exported by this kernel. Address, gateway, DNS and connection diagnostics remain available."
+msgstr "当前内核尚未导出网卡流量计数。地址、网关、DNS 与连接诊断仍可正常使用。"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "添加到收藏夹"
+
+#: userland/apps/network-controller/window.cpp:120
+msgid "Address mode"
+msgstr "地址模式"
+
+#: userland/apps/network-controller/dialogs.cpp:46
+msgid "Administrator permission is required to manage network settings."
+msgstr "管理网络设置需要管理员权限。"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "所有文件 (*)"
+
+#: userland/apps/network-controller/window.cpp:671
+msgid "Apply"
+msgstr "应用"
+
+#: userland/apps/network-controller/window.cpp:682
+msgid "Apply Ethernet configuration"
+msgstr "应用以太网配置"
+
+#: userland/apps/network-controller/window.cpp:406
+msgid "Applying the network failed. Saved settings remain on disk. Check the output and restore or correct the configuration."
+msgstr "应用网络配置失败。设置已保存在磁盘上，请查看输出并恢复或修正配置。"
+
+#: userland/apps/network-controller/dialogs.cpp:48
+msgid "Authenticate with"
+msgstr "认证方式"
+
+#: configs/nls/messages/network-controller.c:5
+msgid "Authenticating"
+msgstr "正在验证身份"
+
+#: userland/apps/network-controller/dialogs.cpp:115
+msgid "Authenticating…"
+msgstr "正在认证…"
+
+#: userland/apps/network-controller/dialogs.cpp:84
+msgid "Authentication failed. Check the password or choose another method."
+msgstr "认证失败，请检查密码或选择其他认证方式。"
+
+#: userland/apps/network-controller/window.cpp:95
+msgid "Auto refresh"
+msgstr "自动刷新"
+
+#: userland/apps/network-controller/window.cpp:121
+msgid "Automatic (DHCP)"
+msgstr "自动获取（DHCP）"
+
+#: userland/apps/network-controller/window.cpp:760
+msgid "Broadcast"
+msgstr "广播地址"
+
+#: userland/apps/network-controller/window.cpp:168
+msgid "Calculate"
+msgstr "计算"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "取消"
+
+#: userland/apps/network-controller/window.cpp:94
+msgid "Cancel operation"
+msgstr "取消操作"
+
+#: userland/apps/network-controller/window.cpp:735
+msgid "Cancel the running operation and close? Configuration changes already saved remain on disk."
+msgstr "取消正在运行的操作并关闭？已经保存的配置会保留在磁盘上。"
+
+#: userland/apps/network-controller/window.cpp:803
+msgid "Cancellation requested; waiting for the running command."
+msgstr "已请求取消，正在等待命令结束。"
+
+#: userland/apps/network-controller/window.cpp:723
+msgid "Cannot export the diagnostic output."
+msgstr "无法导出诊断输出。"
+
+#: userland/apps/network-controller/window.cpp:294
+msgid "Cannot send the network operation."
+msgstr "无法发送网络操作。"
+
+#: userland/apps/network-controller/dialogs.cpp:101
+msgid "Cannot start the authentication program."
+msgstr "无法启动认证程序。"
+
+#: userland/apps/network-controller/dialogs.cpp:29
+msgid "Cannot start the network worker."
+msgstr "无法启动网络工作进程。"
+
+#: userland/apps/network-controller/window.cpp:182
+msgid "Clear output"
+msgstr "清空输出"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/network-controller/window.cpp:130
+msgid "Cloudflare (1.1.1.1)"
+msgstr "Cloudflare（1.1.1.1）"
+
+#: userland/apps/network-controller/window.cpp:394
+msgid "Completed"
+msgstr "已完成"
+
+#: userland/apps/network-controller/window.cpp:119
+msgid "Configuration"
+msgstr "配置"
+
+#: userland/apps/network-controller/window.cpp:516
+msgid "Connected"
+msgstr "已连接"
+
+#: userland/apps/network-controller/window.cpp:65
+msgid "Copy output"
+msgstr "复制输出"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "无法解码图像"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "创建新目录"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "自定义筛选器"
+
+#: userland/apps/network-controller/window.cpp:129
+msgid "Custom servers"
+msgstr "自定义服务器"
+
+#: userland/apps/network-controller/window.cpp:80
+msgid "DHCP lease"
+msgstr "DHCP 租约"
+
+#: userland/apps/network-controller/window.cpp:82
+msgid "DHCP log"
+msgstr "DHCP 日志"
+
+#: userland/apps/network-controller/window.cpp:158
+msgid "DNS lookup"
+msgstr "DNS 查询"
+
+#: userland/apps/network-controller/window.cpp:127
+msgid "DNS policy"
+msgstr "DNS 策略"
+
+#: userland/apps/network-controller/window.cpp:81
+msgid "DNS resolver"
+msgstr "DNS 解析器"
+
+#: userland/apps/network-controller/window.cpp:152
+msgid "DNS server (optional)"
+msgstr "DNS 服务器（可选）"
+
+#: userland/apps/network-controller/window.cpp:107
+msgid "DNS servers"
+msgstr "DNS 服务器"
+
+#: userland/apps/network-controller/window.cpp:106
+msgid "Default gateway"
+msgstr "默认网关"
+
+#: userland/apps/network-controller/window.cpp:64
+msgid "Diagnostic report"
+msgstr "诊断报告"
+
+#: userland/apps/network-controller/window.cpp:148
+msgid "Diagnostics"
+msgstr "诊断工具"
+
+#: userland/apps/network-controller/window.cpp:73
+msgid "Disable Ethernet"
+msgstr "禁用以太网"
+
+#: userland/apps/network-controller/window.cpp:123
+msgid "Disabled"
+msgstr "已禁用"
+
+#: userland/apps/network-controller/window.cpp:458
+msgid "Discard"
+msgstr "放弃"
+
+#: userland/apps/network-controller/window.cpp:459
+msgid "Discard unsaved changes and select another adapter?"
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:825
+msgid "Discard unsaved edits and reload the network profile?"
+msgstr "放弃未保存的编辑并重新读取网络配置？"
+
+#: userland/apps/network-controller/window.cpp:731
+msgid "Discard unsaved network settings and close?"
+msgstr "放弃未保存的网络设置并关闭？"
+
+#: userland/apps/network-controller/model.cpp:219
+msgid "Duplicate network profile field."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:72
+msgid "Enable Ethernet"
+msgstr "启用以太网"
+
+#: userland/apps/network-controller/window.cpp:336
+msgid "Enabled"
+msgstr "已启用"
+
+#: userland/apps/network-controller/model.cpp:86
+msgid "Enter a usable static IPv4 address and prefix."
+msgstr "请输入可用的静态 IPv4 地址和前缀长度。"
+
+#: userland/apps/network-controller/window.cpp:861
+msgid "Enter a valid host, IPv4 DNS server and TCP port (1–65535)."
+msgstr "请输入有效的主机、IPv4 DNS 服务器和 TCP 端口（1–65535）。"
+
+#: userland/apps/network-controller/window.cpp:750
+msgid "Enter an IPv4 address and a prefix from 0 to 32."
+msgstr "请输入 IPv4 地址及 0 至 32 的前缀长度。"
+
+#: userland/apps/network-controller/model.cpp:99
+msgid "Enter one to three IPv4 DNS servers."
+msgstr "请输入一至三个 IPv4 DNS 服务器地址。"
+
+#: userland/apps/network-controller/dialogs.cpp:94
+msgid "Enter your password to continue authentication."
+msgstr "请输入密码以继续认证。"
+
+#: userland/apps/network-controller/window.cpp:703
+msgid "Export network diagnostics"
+msgstr "导出网络诊断"
+
+#: configs/nls/messages/network-controller.c:6
+msgid "Export output"
+msgstr "导出输出"
+
+#: userland/apps/network-controller/window.cpp:66
+msgid "Export output…"
+msgstr "导出输出…"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "收藏夹"
+
+#: userland/apps/network-controller/window.cpp:63
+msgid "File"
+msgstr "文件"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "文件系统"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "文件名："
+
+#: userland/apps/network-controller/window.cpp:128
+msgid "From DHCP"
+msgstr "通过 DHCP 获取"
+
+#: userland/apps/network-controller/window.cpp:126
+msgid "Gateway (optional)"
+msgstr "网关（可选）"
+
+#: userland/apps/network-controller/window.cpp:84
+msgid "Help"
+msgstr "帮助"
+
+#: userland/apps/network-controller/window.cpp:149
+msgid "Host or IPv4"
+msgstr "主机或 IPv4 地址"
+
+#: userland/apps/network-controller/window.cpp:761
+msgid "Host range"
+msgstr "主机范围"
+
+#: userland/apps/network-controller/window.cpp:105
+msgid "IPv4 address"
+msgstr "IPv4 地址"
+
+#: userland/apps/network-controller/window.cpp:160
+msgid "IPv4 subnet calculator"
+msgstr "IPv4 子网计算器"
+
+#: userland/apps/network-controller/model.cpp:226
+msgid "Incomplete network profile."
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "输入内容过长"
+
+#: userland/apps/network-controller/model.cpp:194
+msgid "Invalid DNS policy."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:198
+msgid "Invalid DNS server."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:173
+msgid "Invalid IPv4 address."
+msgstr "IPv4 地址无效。"
+
+#: userland/apps/network-controller/model.cpp:181
+msgid "Invalid IPv4 gateway."
+msgstr "IPv4 网关无效。"
+
+#: userland/apps/network-controller/model.cpp:177
+msgid "Invalid IPv4 prefix."
+msgstr "IPv4 前缀长度无效。"
+
+#: userland/apps/network-controller/model.cpp:80
+msgid "Invalid network profile."
+msgstr "网络配置无效。"
+
+#: userland/apps/network-controller/model.cpp:271
+msgid "Invalid network request."
+msgstr ""
+
+#: userland/apps/network-controller/model.cpp:314
+msgid "Invalid or unsupported network request."
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:106
+msgid "Invalid password input."
+msgstr "密码输入无效。"
+
+#: userland/apps/network-controller/window.cpp:115
+msgid "Live interface data. Configuration is managed by OpenRC; diagnostics report actual results."
+msgstr "显示网卡的实时数据。配置由 OpenRC 管理，诊断工具展示实际结果。"
+
+#: userland/apps/network-controller/window.cpp:106
+msgid "MAC address"
+msgstr "MAC 地址"
+
+#: userland/apps/network-controller/window.cpp:106
+msgid "MTU"
+msgstr "MTU"
+
+#: userland/apps/network-controller/window.cpp:367
+msgid "Malformed interface response.\n"
+msgstr "网卡响应格式错误。\n"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
+#: userland/apps/network-controller/window.cpp:68
+msgid "Network"
+msgstr "网络"
+
+#: userland/apps/network-controller/window.cpp:22
+msgid "Network Controller"
+msgstr "网络控制器"
+
+#: userland/apps/network-controller/window.cpp:781
+msgid ""
+"Network Controller\n"
+"IPv4 Ethernet configuration and network diagnostics for ReliefOS.\n"
+"C++ / FLTK"
+msgstr ""
+"Network Controller（网络控制器）\n"
+"ReliefOS IPv4 以太网配置与网络诊断工具。\n"
+"C++ / FLTK"
+
+#: userland/apps/network-controller/window.cpp:97
+msgid "Network adapters"
+msgstr "网络接口"
+
+#: userland/apps/network-controller/dialogs.cpp:42
+msgid "Network authentication"
+msgstr "网络身份认证"
+
+#: userland/apps/network-controller/window.cpp:885
+msgid "Network information"
+msgstr "网络信息"
+
+#: userland/apps/network-controller/window.cpp:426
+msgid "Network response is too large."
+msgstr "网络响应过大。"
+
+#: userland/apps/network-controller/window.cpp:437
+msgid "Network worker disconnected. Reopen the application to authenticate."
+msgstr "网络工作进程已断开，请重新打开程序进行认证。"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新建目录？"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "否"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/network-controller/model.cpp:104
+msgid "Only custom DNS accepts server addresses."
+msgstr "只有自定义 DNS 模式需要填写服务器地址。"
+
+#: userland/apps/network-controller/window.cpp:394
+msgid "Operation failed"
+msgstr "操作失败"
+
+#: userland/apps/network-controller/window.cpp:402
+msgid "Operation failed. See Output for details."
+msgstr "操作失败，请查看“输出”中的详细信息。"
+
+#: userland/apps/network-controller/window.cpp:175
+msgid "Output"
+msgstr "输出"
+
+#: userland/apps/network-controller/window.cpp:725
+msgid "Output exported."
+msgstr "输出已导出。"
+
+#: userland/apps/network-controller/window.cpp:103
+msgid "Overview"
+msgstr "概览"
+
+#: userland/apps/network-controller/window.cpp:108
+msgid "Packets / errors"
+msgstr "数据包 / 错误"
+
+#: userland/apps/network-controller/dialogs.cpp:52
+msgid "Password"
+msgstr "密码"
+
+#: userland/apps/network-controller/window.cpp:157
+msgid "Ping"
+msgstr "Ping"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "请选择已存在的文件！"
+
+#: userland/apps/network-controller/window.cpp:165
+msgid "Prefix length"
+msgstr "前缀长度"
+
+#: userland/apps/network-controller/window.cpp:125
+msgid "Prefix length (0–32)"
+msgstr "前缀长度（0–32）"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "预览"
+
+#: userland/apps/network-controller/window.cpp:412
+msgid "Read configuration"
+msgstr "读取配置"
+
+#: userland/apps/network-controller/window.cpp:409
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/network-controller/window.cpp:107
+msgid "Receive rate"
+msgstr "接收速率"
+
+#: userland/apps/network-controller/window.cpp:108
+msgid "Received total"
+msgstr "累计接收"
+
+#: userland/apps/network-controller/window.cpp:69
+msgid "Refresh"
+msgstr "刷新"
+
+#: userland/apps/network-controller/window.cpp:197
+msgid "Refresh interfaces"
+msgstr "刷新网卡"
+
+#: userland/apps/network-controller/window.cpp:145
+msgid "Reload"
+msgstr "重新加载"
+
+#: userland/apps/network-controller/window.cpp:74
+msgid "Reload configuration"
+msgstr "重新读取配置"
+
+#: userland/apps/network-controller/window.cpp:71
+msgid "Renew DHCP"
+msgstr "更新 DHCP"
+
+#: userland/apps/network-controller/window.cpp:708
+msgid "Replace"
+msgstr "替换"
+
+#: userland/apps/network-controller/window.cpp:709
+msgid "Replace the existing file?"
+msgstr "替换现有文件？"
+
+#: userland/apps/network-controller/window.cpp:688
+msgid "Restore and apply"
+msgstr "恢复并应用"
+
+#: userland/apps/network-controller/window.cpp:75
+msgid "Restore previous configuration"
+msgstr "恢复上次配置"
+
+#: userland/apps/network-controller/window.cpp:144
+msgid "Restore previous…"
+msgstr "恢复上次配置…"
+
+#: userland/apps/network-controller/window.cpp:689
+msgid "Restore the previous profile and apply it? The current network connection may be interrupted."
+msgstr "恢复上次配置并应用？当前网络连接可能中断。"
+
+#: userland/apps/network-controller/dialogs.cpp:83
+msgid "Retry"
+msgstr "重试"
+
+#: userland/apps/network-controller/window.cpp:77
+msgid "Routing table"
+msgstr "路由表"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/network-controller/window.cpp:70
+msgid "Save and apply"
+msgstr "保存并应用"
+
+#: userland/apps/network-controller/window.cpp:664
+msgid "Save and apply this Ethernet configuration?"
+msgstr "保存并应用此以太网配置？"
+
+#: userland/apps/network-controller/window.cpp:680
+msgid "Save network configuration"
+msgstr "保存网络配置"
+
+#: userland/apps/network-controller/window.cpp:143
+msgid "Save only"
+msgstr "仅保存"
+
+#: userland/apps/network-controller/window.cpp:610
+msgid "Saving keeps a backup and detects external changes. Applying may interrupt this adapter. Static mode requires explicit DNS."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:603
+msgid "Select an Ethernet adapter to edit its configuration."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:787
+msgid ""
+"Select an adapter to inspect and configure its live state. Configure Ethernet with DHCP, static IPv4 or disabled mode. Save and apply uses the existing OpenRC network service.\n"
+"\n"
+"Static mode requires custom or Cloudflare DNS. Use spaces between custom DNS addresses. Saving detects external changes and keeps the previous configuration.\n"
+"\n"
+"Diagnostics use real network operations. TCP success confirms a connection, not TLS or application health. Wi-Fi, IPv6, VPN and changing the kernel's fixed MTU are not supported."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:107
+msgid "Send rate"
+msgstr "发送速率"
+
+#: userland/apps/network-controller/window.cpp:108
+msgid "Sent total"
+msgstr "累计发送"
+
+#: userland/apps/network-controller/window.cpp:606
+msgid "Settings"
+msgstr "设置"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "显示："
+
+#: userland/apps/network-controller/window.cpp:105
+msgid "State"
+msgstr "状态"
+
+#: userland/apps/network-controller/window.cpp:122
+msgid "Static IPv4"
+msgstr "静态 IPv4"
+
+#: userland/apps/network-controller/model.cpp:95
+msgid "Static mode requires custom or Cloudflare DNS."
+msgstr "静态模式需要自定义或 Cloudflare DNS。"
+
+#: userland/apps/network-controller/window.cpp:105
+msgid "Subnet mask"
+msgstr "子网掩码"
+
+#: userland/apps/network-controller/window.cpp:79
+msgid "TCP connections"
+msgstr "TCP 连接"
+
+#: userland/apps/network-controller/window.cpp:154
+msgid "TCP port"
+msgstr "TCP 端口"
+
+#: userland/apps/network-controller/window.cpp:868
+msgid "TCP port test"
+msgstr "TCP 端口测试"
+
+#: userland/apps/network-controller/window.cpp:159
+msgid "Test TCP port"
+msgstr "测试 TCP 端口"
+
+#: userland/apps/network-controller/window.cpp:670
+msgid "The current network connection may be interrupted."
+msgstr "当前网络连接可能中断。"
+
+#: userland/apps/network-controller/model.cpp:93
+msgid "The gateway must be a different usable address in the same subnet."
+msgstr "网关必须是同一子网内另一个可用地址。"
+
+#: userland/apps/network-controller/model.cpp:333
+msgid "This operation does not execute a command."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:269
+msgid "Too many queued operations."
+msgstr "排队操作过多。"
+
+#: userland/apps/network-controller/window.cpp:76
+msgid "Tools"
+msgstr "工具"
+
+#: userland/apps/network-controller/model.cpp:217
+msgid "Unknown network profile field."
+msgstr ""
+
+#: userland/apps/network-controller/dialogs.cpp:58
+msgid "Unlock"
+msgstr "解锁"
+
+#: userland/apps/network-controller/window.cpp:409
+msgid "Unsaved configuration changes"
+msgstr "网络配置尚未保存"
+
+#: userland/apps/network-controller/model.cpp:159
+msgid "Unsupported network profile version."
+msgstr ""
+
+#: userland/apps/network-controller/window.cpp:132
+msgid "Up to three IPv4 addresses separated by spaces."
+msgstr "最多输入三个 IPv4 地址，以空格分隔。"
+
+#: userland/apps/network-controller/window.cpp:516
+msgid "Up, carrier not reported"
+msgstr "已启用，未报告链路状态"
+
+#: userland/apps/network-controller/window.cpp:761
+msgid "Usable addresses"
+msgstr "可用地址数"
+
+#: userland/apps/network-controller/window.cpp:85
+msgid "Usage and limitations"
+msgstr "使用方法与限制"
+
+#: userland/apps/network-controller/window.cpp:807
+msgid "Wait for the current operation or cancel it."
+msgstr "请等待当前操作结束，或先取消该操作。"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "是"
+
+#: userland/apps/network-controller/dialogs.cpp:50
+msgid "root account password"
+msgstr "root 账户密码"
+
+#: userland/apps/network-controller/dialogs.cpp:49
+msgid "sudo: current user password"
+msgstr "sudo：当前用户密码"

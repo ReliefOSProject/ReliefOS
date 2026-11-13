@@ -26,7 +26,7 @@ public:
     }
 };
 int main() {
-    reliefos_fltk::init(); fl_open_display();
+    reliefos_fltk::init("calc"); fl_open_display();
     Fl_Window anchor(0,0,1,1); anchor.set_override(); Receiver receiver;
     anchor.end(); anchor.show(); Fl::check();
     Fl::copy("probe",5,1);

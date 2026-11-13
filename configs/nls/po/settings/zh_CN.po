@@ -1,0 +1,595 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/settings/main.c:389
+msgid "Administrator"
+msgstr "管理员"
+
+#: userland/apps/settings/main.c:569
+msgid "Administrator rights required"
+msgstr "需要管理员权限"
+
+#: userland/apps/settings/main.c:1433
+msgid "Administrators can create and manage local accounts."
+msgstr "管理员可以创建和管理本地账户。"
+
+#: userland/apps/settings/main.c:1112
+msgid "At sign-in"
+msgstr "登录时启动"
+
+#: userland/apps/settings/main.c:1295
+msgid "BMP only, up to 1280 x 720."
+msgstr "仅 BMP，最大 1280 x 720。"
+
+#: userland/apps/settings/main.c:1803
+msgid "Bitmap (*.bmp)"
+msgstr "BMP 图片 (*.bmp)"
+
+#: userland/apps/settings/main.c:144
+msgid "Bitmap images"
+msgstr "BMP 图片"
+
+#: userland/apps/settings/main.c:287
+msgid "Blue"
+msgstr "蓝色"
+
+#: userland/apps/settings/main.c:161
+msgid "Boot and service runtime should request an address automatically."
+msgstr "启动和服务运行时自动请求地址。"
+
+#: userland/apps/settings/main.c:1285
+msgid "Browse"
+msgstr "浏览"
+
+#: userland/apps/settings/main.c:1384
+msgid "Candidates"
+msgstr "候选框"
+
+#: userland/apps/settings/main.c:297
+msgid "Center"
+msgstr "居中"
+
+#: userland/apps/settings/main.c:1460
+msgid "Change Password"
+msgstr "修改密码"
+
+#: configs/nls/messages/settings.c:5
+msgid "Chinese punctuation"
+msgstr "中文标点"
+
+#: userland/apps/settings/main.c:1474
+msgid "Choose the default app used by File Manager and desktop shortcuts."
+msgstr "选择文件资源管理器和桌面快捷方式打开文件时使用的默认应用。"
+
+#: userland/apps/settings/main.c:1801
+msgid "Choose wallpaper"
+msgstr "选择壁纸"
+
+#: userland/apps/settings/main.c:1146
+msgid "Could not apply personalization"
+msgstr "无法应用个性化设置"
+
+#: userland/apps/settings/main.c:1702
+msgid "Could not create user"
+msgstr "无法创建用户"
+
+#: userland/apps/settings/main.c:1870
+msgid "Could not save file association"
+msgstr "无法保存文件关联"
+
+#: userland/apps/settings/main.c:1953
+msgid "Could not save input method"
+msgstr "无法保存输入法设置"
+
+#: userland/apps/settings/main.c:2035
+msgid "Could not save input method order"
+msgstr "无法保存输入法顺序"
+
+#: userland/apps/settings/main.c:1632
+msgid "Could not save language settings"
+msgstr "无法保存语言设置"
+
+#: userland/apps/settings/main.c:601
+msgid "Could not save services."
+msgstr "无法保存服务设置。"
+
+#: userland/apps/settings/main.c:2116
+msgid "Could not start dictionary update"
+msgstr "无法启动词库更新"
+
+#: userland/apps/settings/main.c:1714
+msgid "Could not start passwd"
+msgstr "无法启动 passwd"
+
+#: userland/apps/settings/main.c:2105
+msgid "Could not start provider settings"
+msgstr "无法启动输入法设置"
+
+#: userland/apps/settings/main.c:1689
+msgid "Create user"
+msgstr "创建用户"
+
+#: userland/apps/settings/main.c:161
+msgid "DHCP auto connect"
+msgstr "DHCP 自动连接"
+
+#: userland/apps/settings/main.c:1287
+msgid "Default"
+msgstr "默认"
+
+#: userland/apps/settings/main.c:1469
+msgid "Default app"
+msgstr "默认应用"
+
+#: userland/apps/settings/main.c:2014
+msgid "Default input method saved"
+msgstr "默认输入法已保存"
+
+#: userland/apps/settings/main.c:1848
+msgid "Default wallpaper restored"
+msgstr "已恢复默认壁纸"
+
+#: userland/apps/settings/main.c:1201
+msgid "Desktop "
+msgstr "桌面 "
+
+#: userland/apps/settings/main.c:160
+msgid "Desktop window service"
+msgstr "桌面窗口服务"
+
+#: userland/apps/settings/main.c:2115
+msgid "Dictionary update started"
+msgstr "词库更新已开始"
+
+#: userland/apps/settings/main.c:1356
+msgid "Disable"
+msgstr "禁用"
+
+#: userland/apps/settings/main.c:1442
+msgid "Disabled"
+msgstr "已禁用"
+
+#: userland/apps/settings/main.c:1544
+msgid "Display"
+msgstr "显示"
+
+#: userland/apps/settings/main.c:1289
+msgid "Display mode"
+msgstr "显示方式"
+
+#: userland/apps/settings/main.c:1790
+msgid "Display settings reverted"
+msgstr "显示设置已还原"
+
+#: userland/apps/settings/main.c:1785
+msgid "Display settings saved"
+msgstr "显示设置已保存"
+
+#: userland/apps/settings/main.c:1329
+msgid "Enable"
+msgstr "启用"
+
+#: userland/apps/settings/main.c:1443
+msgid "Enabled"
+msgstr "已启用"
+
+#: userland/apps/settings/main.c:1467
+msgid "Extension"
+msgstr "扩展名"
+
+#: userland/apps/settings/main.c:1547
+msgid "File Types"
+msgstr "文件类型"
+
+#: userland/apps/settings/main.c:1867
+msgid "File association saved"
+msgstr "文件关联已保存"
+
+#: userland/apps/settings/main.c:303
+msgid "Fill"
+msgstr "填充"
+
+#: userland/apps/settings/main.c:295
+msgid "Fit"
+msgstr "适应"
+
+#: userland/apps/settings/main.c:1196
+msgid "Framebuffer "
+msgstr "帧缓冲 "
+
+#: configs/nls/messages/settings.c:6
+msgid "Full-width space"
+msgstr "全角空格"
+
+#: userland/apps/settings/main.c:283
+msgid "Graphite"
+msgstr "石墨色"
+
+#: userland/apps/settings/main.c:277
+msgid "Green"
+msgstr "绿色"
+
+#: userland/apps/settings/main.c:142
+msgid "HTML pages"
+msgstr "HTML 页面"
+
+#: userland/apps/settings/main.c:145
+msgid "Help files"
+msgstr "帮助文件"
+
+#: userland/apps/settings/main.c:1549
+msgid "Input Method"
+msgstr "输入法"
+
+#: userland/apps/settings/main.c:1328
+msgid "Input method"
+msgstr "输入法"
+
+#: userland/apps/settings/main.c:2000
+msgid "Input method disabled"
+msgstr "输入法已禁用"
+
+#: userland/apps/settings/main.c:1999
+msgid "Input method enabled"
+msgstr "输入法已启用"
+
+#: userland/apps/settings/main.c:2050
+msgid "Input method moved"
+msgstr "已调整输入法顺序"
+
+#: userland/apps/settings/main.c:2094
+msgid "Input method setting changed"
+msgstr "输入法设置已更改"
+
+#: userland/apps/settings/main.c:1344
+msgid "Input methods and learning data are isolated for the current user."
+msgstr "输入法和学习数据按当前用户隔离保存。"
+
+#: userland/apps/settings/main.c:1973
+msgid "Input shortcut changed"
+msgstr "输入法快捷键已更改"
+
+#: userland/apps/settings/main.c:285
+msgid "Kawaii Pink"
+msgstr "卡哇伊粉"
+
+#: userland/apps/settings/main.c:1225
+msgid "Keep"
+msgstr "保留"
+
+#: userland/apps/settings/main.c:1220
+msgid "Keep these display settings? Reverting in "
+msgstr "保留这些显示设置？将在 "
+
+#: userland/apps/settings/main.c:1214
+msgid "Language"
+msgstr "语言"
+
+#: configs/nls/messages/settings.c:7
+msgid "Learn selected candidates"
+msgstr "学习已选候选词"
+
+#: userland/apps/settings/main.c:1926
+msgid "Login startup approval requested"
+msgstr "已请求登录启动权限"
+
+#: userland/apps/settings/main.c:1117
+msgid "Manual"
+msgstr "手动启动"
+
+#: userland/apps/settings/main.c:141
+msgid "Markdown notes"
+msgstr "Markdown 文档"
+
+#: userland/apps/settings/main.c:1262
+msgid "Metro color"
+msgstr "Metro 颜色"
+
+#: userland/apps/settings/main.c:1655
+msgid "Metro color changed"
+msgstr "Metro 颜色已更改"
+
+#: userland/apps/settings/main.c:1374
+msgid "Move down"
+msgstr "下移"
+
+#: userland/apps/settings/main.c:1370
+msgid "Move up"
+msgstr "上移"
+
+#: configs/nls/messages/settings.c:12
+msgid "Mute"
+msgstr "静音"
+
+#: userland/apps/settings/main.c:1528
+msgid "NTP runtime state:"
+msgstr "NTP 运行状态:"
+
+#: userland/apps/settings/main.c:164
+msgid "NTP time sync"
+msgstr "NTP 时间同步"
+
+#: userland/apps/settings/main.c:1451
+msgid "New User"
+msgstr "新建用户"
+
+#: userland/apps/settings/main.c:1350
+msgid "No"
+msgstr "否"
+
+#: userland/apps/settings/main.c:399
+msgid "None"
+msgstr "无"
+
+#: userland/apps/settings/main.c:1115
+msgid "On demand"
+msgstr "按需启动"
+
+#: userland/apps/settings/main.c:1407
+msgid "Open provider settings"
+msgstr "打开输入法设置"
+
+#: userland/apps/settings/main.c:1693
+msgid "Password"
+msgstr "密码"
+
+#: userland/apps/settings/main.c:1254
+msgid "Personalization is saved for the current user. Metro and Win95 keep separate colors."
+msgstr "个性化设置按当前用户保存。Metro 和 Win95 保留各自独立的颜色。"
+
+#: userland/apps/settings/main.c:1143
+msgid "Personalization updated"
+msgstr "个性化设置已更新"
+
+#: userland/apps/settings/main.c:1545
+msgid "Personalize"
+msgstr "个性化"
+
+#: userland/apps/settings/main.c:2104
+msgid "Provider settings started"
+msgstr "已启动输入法设置"
+
+#: userland/apps/settings/main.c:279
+msgid "Purple"
+msgstr "紫色"
+
+#: userland/apps/settings/main.c:163
+msgid "RTC taskbar clock"
+msgstr "RTC 任务栏时钟"
+
+#: configs/nls/messages/settings.c:13
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/settings/main.c:281
+msgid "Red"
+msgstr "红色"
+
+#: userland/apps/settings/main.c:1630
+msgid "Reopen applications to apply the language"
+msgstr "重新打开应用后生效"
+
+#: userland/apps/settings/main.c:160
+msgid "Required system shell. Cannot be disabled here."
+msgstr "必需的系统外壳，不能在这里禁用。"
+
+#: userland/apps/settings/main.c:1457
+msgid "Reset Pass"
+msgstr "重置密码"
+
+#: userland/apps/settings/main.c:1206
+msgid "Resolution"
+msgstr "分辨率"
+
+#: userland/apps/settings/main.c:1608
+msgid "Resolution changed"
+msgstr "分辨率已更改"
+
+#: userland/apps/settings/main.c:1226
+msgid "Revert"
+msgstr "还原"
+
+#: userland/apps/settings/main.c:1427
+msgid "Role"
+msgstr "权限"
+
+#: userland/apps/settings/main.c:1535
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/settings/main.c:1208
+msgid "Scale"
+msgstr "缩放"
+
+#: userland/apps/settings/main.c:1618
+msgid "Scale changed"
+msgstr "缩放已更改"
+
+#: userland/apps/settings/main.c:1902
+msgid "Service setting changed"
+msgstr "服务设置已更改"
+
+#: userland/apps/settings/main.c:609
+msgid "Service settings saved"
+msgstr "服务设置已保存"
+
+#: userland/apps/settings/main.c:1548
+msgid "Services"
+msgstr "服务"
+
+#: userland/apps/settings/main.c:2167
+msgid "Settings"
+msgstr "设置"
+
+#: userland/apps/settings/main.c:162
+msgid "Show network state in the desktop taskbar."
+msgstr "在桌面任务栏显示网络状态。"
+
+#: userland/apps/settings/main.c:163
+msgid "Show the hardware clock in the taskbar."
+msgstr "在任务栏显示硬件时钟。"
+
+#: userland/apps/settings/main.c:1981
+msgid "Sign in to change input methods"
+msgstr "登录后才能更改输入法"
+
+#: userland/apps/settings/main.c:1300
+msgid "Sign in to change personalization."
+msgstr "登录后才能更改个性化设置。"
+
+#: userland/apps/settings/main.c:1550
+msgid "Sound"
+msgstr ""
+
+#: userland/apps/settings/main.c:1330
+msgid "Startup"
+msgstr "启动方式"
+
+#: userland/apps/settings/main.c:1952
+msgid "Startup behavior saved"
+msgstr "启动方式已保存"
+
+#: userland/apps/settings/main.c:1510
+msgid "Startup policy is saved here; Service Manager shows runtime state."
+msgstr "这里保存启动策略；服务管理器显示运行状态。"
+
+#: userland/apps/settings/main.c:1428
+msgid "State"
+msgstr "状态"
+
+#: userland/apps/settings/main.c:301
+msgid "Stretch"
+msgstr "拉伸"
+
+#: userland/apps/settings/main.c:1378
+msgid "Switch shortcut"
+msgstr "切换快捷键"
+
+#: userland/apps/settings/main.c:164
+msgid "Synchronize the system clock through pool.ntp.org."
+msgstr "通过 pool.ntp.org 同步系统时钟。"
+
+#: userland/apps/settings/main.c:1386
+msgid "System overlay"
+msgstr "系统覆盖层"
+
+#: userland/apps/settings/main.c:2168
+msgid "System settings"
+msgstr "系统设置"
+
+#: userland/apps/settings/main.c:162
+msgid "Taskbar network icon"
+msgstr "任务栏网络图标"
+
+#: userland/apps/settings/main.c:275
+msgid "Teal"
+msgstr "青色"
+
+#: userland/apps/settings/main.c:140
+msgid "Text documents"
+msgstr "文本文档"
+
+#: userland/apps/settings/main.c:1257
+msgid "Theme style"
+msgstr "主题样式"
+
+#: userland/apps/settings/main.c:1644
+msgid "Theme style changed"
+msgstr "主题样式已更改"
+
+#: userland/apps/settings/main.c:1402
+msgid "This input method has no configurable options."
+msgstr "此输入法没有可配置选项。"
+
+#: userland/apps/settings/main.c:299
+msgid "Tile"
+msgstr "平铺"
+
+#: userland/apps/settings/main.c:1468
+msgid "Type"
+msgstr "类型"
+
+#: userland/apps/settings/main.c:1408
+msgid "Update dictionary"
+msgstr "更新词库"
+
+#: userland/apps/settings/main.c:576
+msgid "Updating OpenRC..."
+msgstr "正在更新 OpenRC…"
+
+#: userland/apps/settings/main.c:1361
+msgid "Use as default"
+msgstr "设为默认"
+
+#: userland/apps/settings/main.c:389
+msgid "User"
+msgstr "用户"
+
+#: userland/apps/settings/main.c:1699
+msgid "User created"
+msgstr "用户已创建"
+
+#: userland/apps/settings/main.c:1739
+msgid "User state change denied"
+msgstr "用户状态更改被拒绝"
+
+#: userland/apps/settings/main.c:1737
+msgid "User state updated"
+msgstr "用户状态已更新"
+
+#: userland/apps/settings/main.c:1689
+msgid "Username"
+msgstr "用户名"
+
+#: userland/apps/settings/main.c:1546
+msgid "Users"
+msgstr "用户"
+
+#: userland/apps/settings/main.c:1280
+msgid "Wallpaper"
+msgstr "壁纸"
+
+#: userland/apps/settings/main.c:1809
+msgid "Wallpaper BMP must be uncompressed 24/32-bit and no larger than 1280 x 720."
+msgstr "壁纸 BMP 必须是未压缩 24/32 位，且不超过 1280 x 720。"
+
+#: userland/apps/settings/main.c:1814
+msgid "Wallpaper changed"
+msgstr "壁纸已更改"
+
+#: userland/apps/settings/main.c:1677
+msgid "Wallpaper mode changed"
+msgstr "壁纸显示方式已更改"
+
+#: userland/apps/settings/main.c:1271
+msgid "Win95 color"
+msgstr "Win95 颜色"
+
+#: userland/apps/settings/main.c:1666
+msgid "Win95 color changed"
+msgstr "Win95 颜色已更改"
+
+#: userland/apps/settings/main.c:1350
+msgid "Yes"
+msgstr "是"
+
+#: userland/apps/settings/main.c:1434
+msgid "You can change your password."
+msgstr "你可以修改自己的密码。"
+
+#: configs/nls/messages/settings.c:14
+msgid "failed"
+msgstr "失败"
+
+#: userland/apps/settings/main.c:1222
+msgid "s"
+msgstr " 秒后还原"

@@ -6,7 +6,7 @@
 #include <time.h>
 #include <unistd.h>
 int main() {
-    reliefos_fltk::init();
+    reliefos_fltk::init("reliefexcel");
     fl_open_display();
     const char text[]="中文输入框粘贴测试";
     Fl::copy(text,int(strlen(text)),1);

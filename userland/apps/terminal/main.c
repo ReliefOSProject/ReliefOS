@@ -1570,8 +1570,8 @@ static int terminal_handle_mouse(int32_t x, int32_t y, uint8_t buttons,
 int main(int argc, char **argv, char **envp)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("terminal", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("terminal");
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     char *shell_argv[4];

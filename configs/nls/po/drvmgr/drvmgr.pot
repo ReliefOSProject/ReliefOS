@@ -1,0 +1,79 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/drvmgr/main.c:153
+msgid "ABI"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:185
+msgid "Available"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:217
+msgid "Built-in kernel drivers"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:154
+msgid "Details"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:83
+msgid "Disabled"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:151
+msgid "Driver"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:216
+msgid "Driver Manager"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:130
+msgid "Driver refresh failed"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:160
+msgid "Drivers are built into the kernel image. This view is read-only."
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:85
+msgid "Failed"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:150
+msgid "File"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:81
+msgid "Loaded"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:79
+msgid "Loading"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:142
+msgid "Read-only: drivers are built into the kernel"
+msgstr ""
+
+#: configs/nls/messages/drvmgr.c:5
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:158
+msgid "Refresh"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:184
+msgid "Skipped at boot"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:152
+msgid "State"
+msgstr ""
+
+#: userland/apps/drvmgr/main.c:87
+msgid "Unloaded"
+msgstr ""

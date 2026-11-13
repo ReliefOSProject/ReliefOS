@@ -1,0 +1,211 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/notepad/main.c:256
+msgid "  Bytes "
+msgstr "  字节 "
+
+#: userland/apps/notepad/main.c:270
+msgid "  Empty"
+msgstr "  空文件"
+
+#: userland/apps/notepad/main.c:258
+msgid "  Encoding "
+msgstr "  编码 "
+
+#: userland/apps/notepad/main.c:267
+msgid "  Invalid bytes replaced"
+msgstr "  无效字节已替换"
+
+#: userland/apps/notepad/main.c:261
+msgid "  Modified"
+msgstr "  已修改"
+
+#: userland/apps/notepad/main.c:249
+msgid "  Read-only"
+msgstr "  只读"
+
+#: userland/apps/notepad/main.c:264
+msgid "  Truncated"
+msgstr "  已截断"
+
+#: userland/apps/notepad/main.c:688
+msgid "About"
+msgstr "关于"
+
+#: userland/apps/notepad/main.c:683
+msgid "Beginning"
+msgstr "开头"
+
+#: userland/apps/notepad/main.c:809
+msgid "Choose a text file or PNG image"
+msgstr "请选择文本文件或 PNG 图片"
+
+#: userland/apps/notepad/main.c:676
+msgid "Choose file"
+msgstr "选择文件"
+
+#: userland/apps/notepad/main.c:682
+msgid "Clear"
+msgstr "清空"
+
+#: userland/apps/notepad/main.c:443
+msgid "Could not decode PNG (maximum 1024x1024)."
+msgstr "无法解码 PNG（最大 1024x1024）。"
+
+#: userland/apps/notepad/main.c:415
+msgid "Could not decode text file"
+msgstr "无法解码文本文件"
+
+#: userland/apps/notepad/main.c:662
+msgid "Edit"
+msgstr "编辑"
+
+#: userland/apps/notepad/main.c:536
+msgid "Encoding"
+msgstr "编码"
+
+#: userland/apps/notepad/main.c:684
+msgid "End"
+msgstr "末尾"
+
+#: userland/apps/notepad/main.c:661
+msgid "File"
+msgstr "文件"
+
+#: userland/apps/notepad/main.c:254
+msgid "Lines "
+msgstr "行数 "
+
+#: userland/apps/notepad/main.c:677
+msgid "New"
+msgstr "新建"
+
+#: userland/apps/notepad/main.c:486
+msgid "Notepad"
+msgstr "记事本"
+
+#: userland/apps/notepad/main.c:697
+msgid "Notepad - "
+msgstr "记事本 - "
+
+#: userland/apps/notepad/main.c:788
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/notepad/main.c:571
+msgid "Open"
+msgstr "打开"
+
+#: userland/apps/notepad/main.c:788
+msgid "Open files from File Manager or Run."
+msgstr "从文件管理器或运行打开文件。"
+
+#: userland/apps/notepad/main.c:245
+msgid "PNG preview "
+msgstr "PNG 预览 "
+
+#: userland/apps/notepad/main.c:474
+msgid "PNG preview cannot be saved as text"
+msgstr "PNG 预览不能保存为文本"
+
+#: userland/apps/notepad/main.c:625
+msgid "PNG preview is unavailable."
+msgstr "PNG 预览不可用。"
+
+#: userland/apps/notepad/main.c:810
+msgid "ReliefOS text viewer"
+msgstr "ReliefOS 文本查看器"
+
+#: userland/apps/notepad/main.c:678
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/notepad/main.c:557
+msgid "Save As"
+msgstr "另存为"
+
+#: userland/apps/notepad/main.c:757
+msgid "Save changes before clearing this file?"
+msgstr "清空文件前保存更改？"
+
+#: userland/apps/notepad/main.c:831
+msgid "Save changes before closing?"
+msgstr "关闭前保存更改？"
+
+#: userland/apps/notepad/main.c:736
+msgid "Save changes before creating a new file?"
+msgstr "新建文件前保存更改？"
+
+#: userland/apps/notepad/main.c:579
+msgid "Save changes before opening another file?"
+msgstr "打开其他文件前保存更改？"
+
+#: userland/apps/notepad/main.c:368
+msgid "Selected path is not a file"
+msgstr "所选路径不是文件"
+
+#: userland/apps/notepad/main.c:487
+msgid "Some characters are not available in this encoding. Save them as '?'?"
+msgstr "所选编码无法表示部分字符。将其保存为 '?' 吗？"
+
+#: userland/apps/notepad/main.c:572
+msgid "Text and PNG (*.txt; *.png)"
+msgstr "文本和 PNG (*.txt; *.png)"
+
+#: userland/apps/notepad/main.c:558
+msgid "Text files (*.txt)"
+msgstr "文本文件 (*.txt)"
+
+#: userland/apps/notepad/main.c:482
+msgid "Text is too large for selected encoding"
+msgstr "文本过大，无法使用所选编码保存"
+
+#: userland/apps/notepad/main.c:687
+msgid "Top"
+msgstr "顶部"
+
+#: userland/apps/notepad/main.c:408
+msgid "Unsupported text encoding"
+msgstr "不支持的文本编码"
+
+#: userland/apps/notepad/main.c:192
+msgid "Untitled"
+msgstr "未命名"
+
+#: userland/apps/notepad/main.c:663
+msgid "View"
+msgstr "查看"
+
+#: userland/apps/notepad/main.c:373
+msgid "open failed "
+msgstr "打开失败 "
+
+#: userland/apps/notepad/main.c:388
+msgid "read failed "
+msgstr "读取失败 "
+
+#: userland/apps/notepad/main.c:493
+msgid "save open failed "
+msgstr "保存打开失败 "
+
+#: userland/apps/notepad/main.c:501
+msgid "save write failed "
+msgstr "保存写入失败 "
+
+#: userland/apps/notepad/main.c:506
+msgid "save write incomplete"
+msgstr "保存写入不完整"
+
+#: userland/apps/notepad/main.c:364
+msgid "stat failed "
+msgstr "状态读取失败 "

@@ -1,0 +1,747 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/reliefword/window.cpp:256
+msgid ""
+"%s\n"
+"Characters: %zu\n"
+"Non-space characters: %zu\n"
+"Words / CJK characters: %zu\n"
+"Paragraphs: %zu\n"
+"Pages: %u"
+msgstr ""
+"%s\n"
+"字符数：%zu\n"
+"不含空格：%zu\n"
+"词语/汉字：%zu\n"
+"段落：%zu\n"
+"页数：%u"
+
+#: userland/apps/reliefword/window.cpp:258
+msgid ""
+"A native ReliefOS word processor.\n"
+"Ctrl+S: save  ·  Ctrl+F: find  ·  Ctrl+Enter: page break\n"
+"Use the original .rword format to keep all formatting."
+msgstr ""
+"ReliefOS 内置文字处理器。\n"
+"Ctrl+S：保存  ·  Ctrl+F：查找  ·  Ctrl+Enter：分页\n"
+"保存为 .rword 原生格式可保留全部排版。"
+
+#: userland/apps/reliefword/window.cpp:37
+msgid "About ReliefWord"
+msgstr "关于 ReliefWord"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "添加到收藏夹"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Alignment"
+msgstr "对齐方式"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "所有文件 (*)"
+
+#: userland/apps/reliefword/files.cpp:164
+msgid "An unsaved ReliefWord recovery copy is available. Recover it into a new document?"
+msgstr "发现 ReliefWord 未保存的恢复副本。要恢复为新文档吗？"
+
+#: userland/apps/reliefword/dialogs.cpp:61
+msgid "Apply"
+msgstr "应用"
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Body text"
+msgstr "正文"
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Bold (Ctrl+B)"
+msgstr "加粗（Ctrl+B）"
+
+#: userland/apps/reliefword/dialogs.cpp:54
+msgid "Bottom margin (mm)"
+msgstr "下页边距（毫米）"
+
+#: userland/apps/reliefword/dialogs.cpp:94
+msgid "Bullets"
+msgstr "项目符号"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "取消"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Center"
+msgstr "居中"
+
+#: userland/apps/reliefword/files.cpp:124
+msgid "Choose a different export file"
+msgstr "请选择另一个导出文件"
+
+#: userland/apps/reliefword/window.cpp:84
+msgid "Clear format"
+msgstr "清除格式"
+
+#: userland/apps/reliefword/window.cpp:77
+msgid "Clipboard"
+msgstr "剪贴板"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Copy"
+msgstr "复制"
+
+#: userland/apps/reliefword/window.cpp:174
+msgid "Could not create a new document"
+msgstr "无法新建文档"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "无法解码图像"
+
+#: userland/apps/reliefword/files.cpp:130
+msgid "Could not export the document"
+msgstr "无法导出文档"
+
+#: userland/apps/reliefword/files.cpp:101
+msgid "Could not open the document"
+msgstr "无法打开文档"
+
+#: userland/apps/reliefword/files.cpp:149
+msgid "Could not save the recovery copy"
+msgstr "无法保存恢复副本"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "创建新目录"
+
+#: userland/apps/reliefword/dialogs.cpp:47
+msgid "Custom"
+msgstr "自定义"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "自定义筛选器"
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Cut"
+msgstr "剪切"
+
+#: userland/apps/reliefword/files.cpp:37
+msgid "Discard"
+msgstr "放弃"
+
+#: userland/apps/reliefword/window.cpp:119
+msgid "Display"
+msgstr "显示"
+
+#: userland/apps/reliefword/window.cpp:256
+msgid "Document"
+msgstr "文档"
+
+#: userland/apps/reliefword/files.cpp:130
+msgid "Document exported; original remains open"
+msgstr "文档已导出，原文档继续保留"
+
+#: userland/apps/reliefword/files.cpp:86
+msgid "Document saved"
+msgstr "文档已保存"
+
+#: userland/apps/reliefword/files.cpp:83
+msgid "Document was not saved"
+msgstr "文档未保存"
+
+#: userland/apps/reliefword/window.cpp:102
+msgid "Editing"
+msgstr "编辑"
+
+#: userland/apps/reliefword/window.cpp:214
+msgid "Enter a font size from 6 to 96 points"
+msgstr "请输入 6 到 96 磅之间的字号"
+
+#: userland/apps/reliefword/dialogs.cpp:75
+msgid "Enter finite page values within the displayed ranges"
+msgstr "请输入显示范围内的有效页面数值"
+
+#: userland/apps/reliefword/dialogs.cpp:108
+msgid "Enter finite paragraph values within the displayed ranges"
+msgstr "请输入显示范围内的有效段落数值"
+
+#: userland/apps/reliefword/dialogs.cpp:146
+msgid "Enter search text"
+msgstr "请输入查找内容"
+
+#: userland/apps/reliefword/window.cpp:37
+msgid "Example document"
+msgstr "示例文档"
+
+#: userland/apps/reliefword/window.cpp:37
+msgid "Exit"
+msgstr "退出"
+
+#: userland/apps/reliefword/files.cpp:119
+msgid "Export"
+msgstr "导出"
+
+#: userland/apps/reliefword/window.cpp:36
+msgid "Export HTML..."
+msgstr "导出 HTML..."
+
+#: userland/apps/reliefword/window.cpp:36
+msgid "Export TXT..."
+msgstr "导出 TXT..."
+
+#: userland/apps/reliefword/files.cpp:127
+msgid "Exporting document..."
+msgstr "正在导出文档..."
+
+#: userland/apps/reliefword/files.cpp:123
+msgid "Exporting over the imported source could discard content ReliefWord did not preserve"
+msgstr "导出到原导入文件会丢失 ReliefWord 无法保留的内容，请使用其他文件名。"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "收藏夹"
+
+#: userland/apps/reliefword/window.cpp:31
+msgid "File"
+msgstr "文件"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "文件系统"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "文件名："
+
+#: userland/apps/reliefword/files.cpp:53
+msgid "File path is too long"
+msgstr "文件路径过长"
+
+#: userland/apps/reliefword/dialogs.cpp:119
+msgid "Find and replace"
+msgstr "查找与替换"
+
+#: userland/apps/reliefword/dialogs.cpp:123
+msgid "Find next"
+msgstr "查找下一个"
+
+#: userland/apps/reliefword/window.cpp:100
+msgid "Find..."
+msgstr "查找..."
+
+#: userland/apps/reliefword/dialogs.cpp:120
+msgid "Find:"
+msgstr "查找:"
+
+#: userland/apps/reliefword/dialogs.cpp:97
+msgid "First line indent (mm)"
+msgstr "首行缩进（毫米）"
+
+#: userland/apps/reliefword/window.cpp:115
+msgid "Fit width"
+msgstr "适应宽度"
+
+#: userland/apps/reliefword/window.cpp:90
+msgid "Font"
+msgstr "字体"
+
+#: userland/apps/reliefword/window.cpp:79
+msgid "Font family"
+msgstr "字体"
+
+#: userland/apps/reliefword/window.cpp:80
+msgid "Font size in points (6–96); press Enter to apply"
+msgstr "字号（6–96 磅），按回车应用"
+
+#: userland/apps/reliefword/dialogs.cpp:58
+msgid "Footer ({page} inserts the page number)"
+msgstr "页脚（{page} 表示页码）"
+
+#: userland/apps/reliefword/dialogs.cpp:57
+msgid "Header"
+msgstr "页眉"
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Heading 1"
+msgstr "标题 1"
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Heading 2"
+msgstr "标题 2"
+
+#: userland/apps/reliefword/dialogs.cpp:51
+msgid "Height (mm)"
+msgstr "高度（毫米）"
+
+#: userland/apps/reliefword/window.cpp:89
+msgid "Highlight"
+msgstr "高亮"
+
+#: userland/apps/reliefword/window.cpp:38
+msgid "Home tab"
+msgstr "开始"
+
+#: configs/nls/messages/reliefword.c:10
+msgid "I/O error"
+msgstr "输入输出错误"
+
+#: userland/apps/reliefword/files.cpp:102
+msgid "Import"
+msgstr "导入"
+
+#: userland/apps/reliefword/window.cpp:35
+msgid "Import HTML..."
+msgstr "导入 HTML..."
+
+#: userland/apps/reliefword/window.cpp:35
+msgid "Import TXT..."
+msgstr "导入 TXT..."
+
+#: userland/apps/reliefword/files.cpp:113
+msgid "Imported — save as .rword to keep formatting"
+msgstr "已导入，请保存为 .rword 以保留排版"
+
+#: userland/apps/reliefword/window.cpp:99
+msgid "Indent"
+msgstr "增加缩进"
+
+#: userland/apps/reliefword/window.cpp:107
+msgid "Indentation, spacing and line height"
+msgstr "缩进、段前段后和行距"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "输入内容过长"
+
+#: userland/apps/reliefword/window.cpp:105
+msgid "Insert a page break (Ctrl+Enter)"
+msgstr "插入分页符（Ctrl+Enter）"
+
+#: userland/apps/reliefword/window.cpp:106
+msgid "Insert date"
+msgstr "插入日期"
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Italic (Ctrl+I)"
+msgstr "斜体（Ctrl+I）"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Justify"
+msgstr "两端对齐"
+
+#: userland/apps/reliefword/dialogs.cpp:50
+msgid "Landscape"
+msgstr "横向"
+
+#: userland/apps/reliefword/files.cpp:164
+msgid "Later"
+msgstr "稍后"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Left"
+msgstr "左对齐"
+
+#: userland/apps/reliefword/dialogs.cpp:95
+msgid "Left indent (mm)"
+msgstr "左缩进（毫米）"
+
+#: userland/apps/reliefword/dialogs.cpp:53
+msgid "Left margin (mm)"
+msgstr "左页边距（毫米）"
+
+#: userland/apps/reliefword/dialogs.cpp:97
+msgid "Line spacing (%)"
+msgstr "行距（百分比）"
+
+#: userland/apps/reliefword/dialogs.cpp:94
+msgid "List"
+msgstr "列表"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
+#: userland/apps/reliefword/dialogs.cpp:122
+msgid "Match case"
+msgstr "区分大小写"
+
+#: userland/apps/reliefword/dialogs.cpp:150
+msgid "Match selected"
+msgstr "已选中匹配文字"
+
+#: userland/apps/reliefword/window.cpp:155
+msgid "Modified"
+msgstr "已修改"
+
+#: userland/apps/reliefword/window.cpp:78
+msgid "Monospace"
+msgstr "等宽"
+
+#: userland/apps/reliefword/window.cpp:33
+msgid "New"
+msgstr "新建"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新建目录？"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "否"
+
+#: userland/apps/reliefword/dialogs.cpp:94
+msgid "None"
+msgstr "无"
+
+#: userland/apps/reliefword/dialogs.cpp:84
+msgid "Not enough memory"
+msgstr "内存不足"
+
+#: userland/apps/reliefword/dialogs.cpp:94
+msgid "Numbering"
+msgstr "编号"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/reliefword/files.cpp:43
+msgid "Open document"
+msgstr "打开文档"
+
+#: userland/apps/reliefword/window.cpp:33
+msgid "Open..."
+msgstr "打开…"
+
+#: userland/apps/reliefword/files.cpp:96
+msgid "Opening document..."
+msgstr "正在打开文档..."
+
+#: userland/apps/reliefword/view.cpp:107
+msgid "Operation failed"
+msgstr "操作失败"
+
+#: userland/apps/reliefword/dialogs.cpp:50
+msgid "Orientation"
+msgstr "方向"
+
+#: userland/apps/reliefword/window.cpp:99
+msgid "Outdent"
+msgstr "减少缩进"
+
+#: userland/apps/reliefword/window.cpp:106
+msgid "Page"
+msgstr "页面"
+
+#: userland/apps/reliefword/window.cpp:145
+msgid "Page %u / %u   ·   %zu characters   ·   %zu words   ·   %d%%"
+msgstr "第 %u / %u 页   ·   %zu 字符   ·   %zu 词/汉字   ·   %d%%"
+
+#: userland/apps/reliefword/window.cpp:105
+msgid "Page break"
+msgstr "分页符"
+
+#: userland/apps/reliefword/window.cpp:38
+msgid "Page layout"
+msgstr "页面布局"
+
+#: userland/apps/reliefword/dialogs.cpp:46
+msgid "Page setup"
+msgstr "页面设置"
+
+#: userland/apps/reliefword/window.cpp:104
+msgid "Page setup..."
+msgstr "页面设置..."
+
+#: userland/apps/reliefword/dialogs.cpp:47
+msgid "Paper size"
+msgstr "纸张大小"
+
+#: userland/apps/reliefword/window.cpp:104
+msgid "Paper, orientation, margins, headers and footers"
+msgstr "纸张、方向、页边距及页眉页脚"
+
+#: userland/apps/reliefword/dialogs.cpp:92
+msgid "Paragraph"
+msgstr "段落"
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Paragraph..."
+msgstr "段落..."
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Paste"
+msgstr "粘贴"
+
+#: userland/apps/reliefword/window.cpp:75
+msgid "Paste (Ctrl+V)"
+msgstr "粘贴（Ctrl+V）"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "请选择已存在的文件！"
+
+#: userland/apps/reliefword/dialogs.cpp:50
+msgid "Portrait"
+msgstr "纵向"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "预览"
+
+#: userland/apps/reliefword/window.cpp:54
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/reliefword/files.cpp:164
+msgid "Recover"
+msgstr "恢复"
+
+#: userland/apps/reliefword/files.cpp:172
+msgid "Recovered — save this document to a new file"
+msgstr "已恢复，请将文档另存为新文件"
+
+#: userland/apps/reliefword/files.cpp:148
+msgid "Recovery copy saved"
+msgstr "恢复副本已保存"
+
+#: userland/apps/reliefword/window.cpp:41
+msgid "Redo"
+msgstr "重做"
+
+#: userland/apps/reliefword/window.cpp:267
+msgid ""
+"ReliefOS project report\n"
+"A document made with ReliefWord\n"
+"\n"
+"Overview\n"
+"Write, edit and arrange Chinese and English text on real pages. The ribbon keeps everyday commands within reach.\n"
+"\n"
+"This week's work\n"
+"Draft the proposal and collect feedback.\n"
+"Review the document together.\n"
+"Save the final document in the original format.\n"
+"\n"
+"Next steps\n"
+"Use headings, lists and paragraph spacing to make the report easy to read. You can open TXT or HTML and save an editable .rword copy.\n"
+"\n"
+"Prepared with ReliefWord — simple tools for everyday writing."
+msgstr ""
+"ReliefOS 项目报告\n"
+"使用 ReliefWord 编写的工作文档\n"
+"\n"
+"工作概览\n"
+"在真实的纸张页面中编写、编辑和排版中文与英文。常用工具集中在顶部功能区，便于随时操作。\n"
+"\n"
+"本周工作\n"
+"整理项目方案并收集反馈。\n"
+"共同审阅文档，完善重点内容。\n"
+"使用原生格式保存最终版本。\n"
+"\n"
+"下一步计划\n"
+"使用标题、列表和段落间距，让报告更清晰易读。还可以导入 TXT 或 HTML，另存为可继续编辑的 .rword 文档。\n"
+"\n"
+"由 ReliefWord 编写——用于日常写作的简单工具。"
+
+#: userland/apps/reliefword/dialogs.cpp:125
+msgid "Replace"
+msgstr "替换"
+
+#: userland/apps/reliefword/dialogs.cpp:127
+msgid "Replace all"
+msgstr "全部替换"
+
+#: userland/apps/reliefword/files.cpp:70
+msgid ""
+"Replace the existing file?\n"
+"%s"
+msgstr ""
+"是否替换现有文件？\n"
+"%s"
+
+#: userland/apps/reliefword/window.cpp:100
+msgid "Replace..."
+msgstr "替换..."
+
+#: userland/apps/reliefword/dialogs.cpp:121
+msgid "Replace:"
+msgstr "替换为："
+
+#: userland/apps/reliefword/dialogs.cpp:167
+msgid "Replaced %u matches"
+msgstr "已替换 %u 处匹配内容"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Right"
+msgstr "右对齐"
+
+#: userland/apps/reliefword/dialogs.cpp:95
+msgid "Right indent (mm)"
+msgstr "右缩进（毫米）"
+
+#: userland/apps/reliefword/dialogs.cpp:53
+msgid "Right margin (mm)"
+msgstr "右页边距（毫米）"
+
+#: userland/apps/reliefword/window.cpp:117
+msgid "Ruler"
+msgstr "标尺"
+
+#: userland/apps/reliefword/window.cpp:78
+msgid "Sans serif"
+msgstr "无衬线"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/reliefword/files.cpp:78
+msgid "Save a copy..."
+msgstr "另存副本..."
+
+#: userland/apps/reliefword/window.cpp:34
+msgid "Save as..."
+msgstr "另存为…"
+
+#: userland/apps/reliefword/files.cpp:37
+msgid "Save changes before continuing?"
+msgstr "继续之前保存修改吗？"
+
+#: userland/apps/reliefword/files.cpp:43
+msgid "Save document"
+msgstr "保存文档"
+
+#: userland/apps/reliefword/files.cpp:72
+msgid "Saving document..."
+msgstr "正在保存文档..."
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Select all"
+msgstr "全选"
+
+#: userland/apps/reliefword/window.cpp:256
+msgid "Selection"
+msgstr "选中内容"
+
+#: userland/apps/reliefword/window.cpp:78
+msgid "Serif"
+msgstr "宋体"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
+
+#: userland/apps/reliefword/dialogs.cpp:59
+msgid "Show page numbers"
+msgstr "显示页码"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "显示："
+
+#: configs/nls/messages/reliefword.c:5
+msgid "Some HTML links, tables, or embedded objects were flattened or skipped"
+msgstr "部分 HTML 链接、表格或嵌入对象已转为文字或跳过。请保留源文件，并将导入结果另存为新的文档。"
+
+#: userland/apps/reliefword/dialogs.cpp:99
+msgid "Space after (pt)"
+msgstr "段后间距（磅）"
+
+#: userland/apps/reliefword/dialogs.cpp:99
+msgid "Space before (pt)"
+msgstr "段前间距（磅）"
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Strikethrough"
+msgstr "删除线"
+
+#: userland/apps/reliefword/window.cpp:99
+msgid "Styles"
+msgstr "样式"
+
+#: userland/apps/reliefword/files.cpp:119
+msgid "TXT keeps text only. Character formatting, paragraph layout and page settings are not saved. Your original document remains open."
+msgstr "TXT 仅保留文字，不保存字符格式、段落排版或页面设置。原文档会继续保留。"
+
+#: userland/apps/reliefword/window.cpp:89
+msgid "Text color"
+msgstr "文字色"
+
+#: userland/apps/reliefword/dialogs.cpp:149
+msgid "Text not found"
+msgstr "未找到文本"
+
+#: userland/apps/reliefword/files.cpp:78
+msgid "The file changed outside ReliefWord. Save a copy or explicitly replace it."
+msgstr "文件已被其他程序修改。可以另存副本，或明确选择替换。"
+
+#: configs/nls/messages/reliefword.c:11
+msgid "The file changed while it was being opened"
+msgstr "文件在打开期间发生变化"
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Title"
+msgstr "标题"
+
+#: userland/apps/reliefword/dialogs.cpp:54
+msgid "Top margin (mm)"
+msgstr "上页边距（毫米）"
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Underline (Ctrl+U)"
+msgstr "下划线（Ctrl+U）"
+
+#: userland/apps/reliefword/window.cpp:41
+msgid "Undo"
+msgstr "撤销"
+
+#: userland/apps/reliefword/window.cpp:147
+msgid "Untitled"
+msgstr "未命名"
+
+#: userland/apps/reliefword/main.cpp:10
+msgid "Usage: reliefword [document.rword | text.txt | page.html]"
+msgstr "用法：reliefword [文档.rword | 文本.txt | 网页.html]"
+
+#: userland/apps/reliefword/window.cpp:38
+msgid "View"
+msgstr "查看"
+
+#: userland/apps/reliefword/dialogs.cpp:51
+msgid "Width (mm)"
+msgstr "宽度（毫米）"
+
+#: userland/apps/reliefword/window.cpp:101
+msgid "Word count"
+msgstr "字数统计"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "是"
+
+#: userland/apps/reliefword/window.cpp:116
+msgid "Zoom"
+msgstr "缩放"
+
+#: configs/nls/messages/reliefword.c:12
+msgid "none"
+msgstr "无"
+
+#: configs/nls/messages/reliefword.c:13
+msgid "s"
+msgstr " 秒后还原"

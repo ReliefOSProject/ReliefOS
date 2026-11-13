@@ -231,7 +231,6 @@ static void emit_block(FILE *f, const char *block, bool obsolete)
         }
         block += n + (end ? 1U : 0U);
     }
-    fputc('\n', f);
 }
 
 int main(int argc, char **argv)
@@ -251,15 +250,19 @@ int main(int argc, char **argv)
     if (!f) fail("cannot open output");
     struct catalog *header = lookup("");
     if (header) emit_block(f, header->block, false);
-    else fputs("msgid \"\"\nmsgstr \"\"\n\"Content-Type: text/plain; charset=UTF-8\\n\"\n\n", f);
+    else fputs("msgid \"\"\nmsgstr \"\"\n\"Content-Type: text/plain; charset=UTF-8\\n\"\n", f);
     for (size_t i = 0; i < count; i++) {
         struct catalog *old = lookup(messages[i].id);
+        fputc('\n', f);
         fprintf(f, "#: %s:%zu\n", messages[i].file, messages[i].line);
         if (old) emit_block(f, old->block, false);
-        else fprintf(f, "msgid \"%s\"\nmsgstr \"\"\n\n", messages[i].id);
+        else fprintf(f, "msgid \"%s\"\nmsgstr \"\"\n", messages[i].id);
     }
     for (size_t i = 0; i < catalog_count; i++) {
-        if (!catalog[i].used) emit_block(f, catalog[i].block, true);
+        if (!catalog[i].used) {
+            fputc('\n', f);
+            emit_block(f, catalog[i].block, true);
+        }
         free(catalog[i].id);
         free(catalog[i].block);
     }

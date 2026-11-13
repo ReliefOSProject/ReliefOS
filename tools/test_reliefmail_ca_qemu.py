@@ -193,7 +193,7 @@ echo "MAIL_CA_EXIT status=$status" >/dev/ttyS0
     payload = [(OUT / f'userland/{app}.elf', f'/usr/lib/reliefos/apps/{app}/{app}.elf', 0o100755)
                for app in ['reliefmail', 'reliefapk']]
     payload += [(OUT / 'system/lib/libreliefos.so.2', '/usr/lib/reliefos/libreliefos.so.2', 0o100755),
-                (OUT / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
+                *fltk.locale_payload(OUT),
                 (bundle, '/usr/share/reliefos/certs/ca-certificates.crt', 0o100644),
                 (broken, '/etc/ssl/certs/ca-certificates.crt', 0o100644),
                 (public, '/etc/apk/keys/' + public.name, 0o100644),

@@ -135,12 +135,12 @@ if not any(node.get("type") == "application/x-reliefmath" and
 PY
 
 for label in ReliefMath Formula Symbols Structure; do
-    grep -Fq "N_(\"$label\")" "$src/configs/nls/messages.c"
-    grep -Fxq "msgid \"$label\"" "$src/configs/nls/po/leonos.pot"
-    grep -Fq "msgid \"$label\"" "$src/configs/nls/po/zh_CN.po"
+    grep -Fq "N_(\"$label\")" "$src/configs/nls/messages/reliefmath.c"
+    grep -Fxq "msgid \"$label\"" "$src/configs/nls/po/reliefmath/reliefmath.pot"
+    grep -Fq "msgid \"$label\"" "$src/configs/nls/po/reliefmath/zh_CN.po"
 done
 for translated in 'msgstr "ReliefMath"' 'msgstr "公式"' 'msgstr "符号"' 'msgstr "结构"'; do
-    grep -Fq "$translated" "$src/configs/nls/po/zh_CN.po"
+    grep -Fq "$translated" "$src/configs/nls/po/reliefmath/zh_CN.po"
 done
 
 # This fixture drives rootfs-stage.sh twice: with ReliefMath selected and

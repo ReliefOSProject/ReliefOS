@@ -1,0 +1,468 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/reliefcapture/window.cpp:127
+msgid "10 seconds"
+msgstr "10 秒"
+
+#: userland/apps/reliefcapture/window.cpp:127
+msgid "3 seconds"
+msgstr "3 秒"
+
+#: userland/apps/reliefcapture/window.cpp:127
+msgid "5 seconds"
+msgstr "5 秒"
+
+#: configs/nls/messages/reliefcapture.c:7
+msgid "A screenshot operation is already running"
+msgstr "已有截图任务正在运行"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "添加到收藏夹"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "所有文件 (*)"
+
+#: userland/apps/reliefcapture/window.cpp:135
+msgid "Annotation"
+msgstr "标注工具"
+
+#: userland/apps/reliefcapture/window.cpp:77
+msgid "Annotation text"
+msgstr "输入标注文字"
+
+#: userland/apps/reliefcapture/window.cpp:136
+msgid "Arrow"
+msgstr "箭头"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Black"
+msgstr "黑色"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Blue"
+msgstr "蓝色"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "取消"
+
+#: userland/apps/reliefcapture/window.cpp:229
+msgid "Capture canceled"
+msgstr "已取消截图"
+
+#: userland/apps/reliefcapture/window.cpp:327
+msgid "Capture in %d seconds; click Cancel to stop"
+msgstr "%d 秒后截图；点击“取消”可停止"
+
+#: userland/apps/reliefcapture/window.cpp:124
+msgid "Capture mode"
+msgstr "截图模式"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/reliefcapture/window.cpp:137
+msgid "Color"
+msgstr "颜色"
+
+#: userland/apps/reliefcapture/window.cpp:128
+msgid "Copy image"
+msgstr "复制图像"
+
+#: userland/apps/reliefcapture/window.cpp:81
+msgid "Could not add the annotation; check its length or the annotation limit"
+msgstr "无法添加标注：请检查文字长度或标注数量上限"
+
+#: configs/nls/messages/reliefcapture.c:8
+msgid "Could not configure the screenshot channel"
+msgstr "无法配置截图通信通道"
+
+#: configs/nls/messages/reliefcapture.c:9
+msgid "Could not connect to the X11 display"
+msgstr "无法连接 X11 显示服务"
+
+#: configs/nls/messages/reliefcapture.c:10
+msgid "Could not contact the existing screenshot window"
+msgstr "无法联系已打开的截图窗口"
+
+#: configs/nls/messages/reliefcapture.c:11
+msgid "Could not create the screenshot channel"
+msgstr "无法创建截图通信通道"
+
+#: configs/nls/messages/reliefcapture.c:12
+msgid "Could not create the temporary screenshot"
+msgstr "无法创建截图临时文件"
+
+#: configs/nls/messages/reliefcapture.c:6
+msgid "Could not crop the screenshot"
+msgstr "无法裁剪截图"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "无法解码图像"
+
+#: configs/nls/messages/reliefcapture.c:13
+msgid "Could not encode the screenshot"
+msgstr "无法编码截图"
+
+#: configs/nls/messages/reliefcapture.c:14
+msgid "Could not inspect the destination"
+msgstr "无法检查目标文件"
+
+#: configs/nls/messages/reliefcapture.c:15
+msgid "Could not open the destination folder"
+msgstr "无法打开目标文件夹"
+
+#: configs/nls/messages/reliefcapture.c:16
+msgid "Could not read the screen image"
+msgstr "无法读取屏幕图像"
+
+#: configs/nls/messages/reliefcapture.c:17
+msgid "Could not read the screenshot process reply"
+msgstr "无法读取截图工作进程的结果"
+
+#: configs/nls/messages/reliefcapture.c:18
+msgid "Could not register the screenshot window"
+msgstr "无法注册截图窗口"
+
+#: configs/nls/messages/reliefcapture.c:19
+msgid "Could not render the screenshot"
+msgstr "无法渲染截图"
+
+#: configs/nls/messages/reliefcapture.c:5
+msgid "Could not reserve Escape for capture cancellation"
+msgstr "无法启用 Esc 取消截图，请稍后重试"
+
+#: configs/nls/messages/reliefcapture.c:20
+msgid "Could not save the screenshot"
+msgstr "无法保存截图"
+
+#: configs/nls/messages/reliefcapture.c:21
+msgid "Could not start the screenshot process"
+msgstr "无法启动截图工作进程"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "创建新目录"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "自定义筛选器"
+
+#: userland/apps/reliefcapture/window.cpp:126
+msgid "Delay"
+msgstr "延时"
+
+#: userland/apps/reliefcapture/window.cpp:201
+msgid "Discard"
+msgstr "放弃"
+
+#: userland/apps/reliefcapture/window.cpp:202
+msgid "Discard annotations and take a new screenshot?"
+msgstr "放弃当前标注并重新截图？"
+
+#: userland/apps/reliefcapture/overlay.cpp:25
+msgid "Drag a region · R: region · W: window · F: full screen · Esc: cancel"
+msgstr "拖动选区 · R 区域 · W 窗口 · F 全屏 · Esc 取消"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "收藏夹"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "文件系统"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "文件名："
+
+#: userland/apps/reliefcapture/window.cpp:301
+msgid "Finishing the screenshot save before closing..."
+msgstr "正在完成截图保存，随后关闭…"
+
+#: userland/apps/reliefcapture/window.cpp:150
+msgid "Fit to window"
+msgstr "适应窗口"
+
+#: userland/apps/reliefcapture/overlay.cpp:18
+msgid "Full screen"
+msgstr "全屏"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Green"
+msgstr "绿色"
+
+#: userland/apps/reliefcapture/window.cpp:132
+msgid "Help"
+msgstr "帮助"
+
+#: userland/apps/reliefcapture/window.cpp:263
+msgid "Image copied; keep ReliefCapture open while pasting"
+msgstr "图像已复制；粘贴时请保持 ReliefCapture 打开"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "输入内容过长"
+
+#: configs/nls/messages/reliefcapture.c:22
+msgid "Invalid destination path"
+msgstr "目标文件路径无效"
+
+#: configs/nls/messages/reliefcapture.c:23
+msgid "Invalid screenshot process reply"
+msgstr "截图工作进程返回了无效结果"
+
+#: userland/apps/reliefcapture/window.cpp:141
+msgid "Line width"
+msgstr "线宽"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新建目录？"
+
+#: userland/apps/reliefcapture/window.cpp:118
+msgid "New capture"
+msgstr "新建截图"
+
+#: userland/apps/reliefcapture/window.cpp:119
+msgid "New capture (Ctrl+N); Win+Shift+S selects a region"
+msgstr "新建截图（Ctrl+N）；Win+Shift+S 选择区域"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "否"
+
+#: userland/apps/reliefcapture/window.cpp:127
+msgid "No delay"
+msgstr "无延时"
+
+#: userland/apps/reliefcapture/window.cpp:192
+msgid "No screenshot"
+msgstr "尚无截图"
+
+#: userland/apps/reliefcapture/window.cpp:61
+msgid "No screenshot. Click New capture or press Win+Shift+S."
+msgstr "尚无截图。点击“新建截图”或按 Win+Shift+S 开始。"
+
+#: configs/nls/messages/reliefcapture.c:24
+msgid "Not enough memory"
+msgstr "内存不足"
+
+#: userland/apps/reliefcapture/window.cpp:191
+msgid "Not saved"
+msgstr "未保存"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Orange"
+msgstr "橙色"
+
+#: userland/apps/reliefcapture/window.cpp:136
+msgid "Pen"
+msgstr "画笔"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "请选择已存在的文件！"
+
+#: userland/apps/reliefcapture/window.cpp:255
+msgid "Preparing screenshot..."
+msgstr "正在准备截图…"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "预览"
+
+#: userland/apps/reliefcapture/window.cpp:155
+msgid "Ready to capture"
+msgstr "就绪，可开始截图"
+
+#: userland/apps/reliefcapture/window.cpp:136
+msgid "Rectangle"
+msgstr "矩形"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Red"
+msgstr "红色"
+
+#: userland/apps/reliefcapture/window.cpp:147
+msgid "Redo"
+msgstr "重做"
+
+#: userland/apps/reliefcapture/overlay.cpp:14
+msgid "Region"
+msgstr "区域"
+
+#: configs/nls/messages/reliefcapture.c:25
+msgid "ReliefCapture"
+msgstr "ReliefCapture"
+
+#: userland/apps/reliefcapture/window.cpp:284
+msgid "Replace"
+msgstr "替换"
+
+#: userland/apps/reliefcapture/window.cpp:284
+msgid "Replace the existing screenshot?"
+msgstr "替换已有的截图文件？"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/reliefcapture/window.cpp:130
+msgid "Save PNG..."
+msgstr "保存 PNG…"
+
+#: userland/apps/reliefcapture/window.cpp:276
+msgid "Save screenshot"
+msgstr "保存截图"
+
+#: userland/apps/reliefcapture/window.cpp:303
+msgid "Save this screenshot before closing?"
+msgstr "关闭前保存这张截图？"
+
+#: userland/apps/reliefcapture/window.cpp:191
+msgid "Saved"
+msgstr "已保存"
+
+#: userland/apps/reliefcapture/window.cpp:290
+msgid "Saving screenshot..."
+msgstr "正在保存截图…"
+
+#: userland/apps/reliefcapture/window.cpp:217
+msgid "Screenshot queued; finish the current dialog first"
+msgstr "截图请求已排队，请先完成当前对话框"
+
+#: userland/apps/reliefcapture/window.cpp:355
+msgid "Screenshot saved"
+msgstr "截图已保存"
+
+#: configs/nls/messages/reliefcapture.c:26
+msgid "Screenshot saved, but folder synchronization failed"
+msgstr "截图已保存，但文件夹同步失败"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "显示："
+
+#: userland/apps/reliefcapture/window.cpp:136
+msgid "Text"
+msgstr "文本"
+
+#: userland/apps/reliefcapture/window.cpp:143
+msgid "Text size"
+msgstr "字号"
+
+#: configs/nls/messages/reliefcapture.c:27
+msgid "The destination changed; choose Save again"
+msgstr "目标文件已变化，请重新选择保存"
+
+#: configs/nls/messages/reliefcapture.c:28
+msgid "The destination must be a regular file"
+msgstr "目标必须是普通文件"
+
+#: userland/apps/reliefcapture/window.cpp:280
+msgid "The file path is too long"
+msgstr "文件路径过长"
+
+#: userland/apps/reliefcapture/window.cpp:99
+msgid "The pen stroke reached its point limit; start a new stroke"
+msgstr "画笔轨迹已达到点数上限，请开始新笔画"
+
+#: configs/nls/messages/reliefcapture.c:29
+msgid "The screen is too large or its pixel format is unsupported"
+msgstr "屏幕超过尺寸上限，或像素格式不受支持"
+
+#: configs/nls/messages/reliefcapture.c:30
+msgid "The screenshot operation failed"
+msgstr "截图操作失败"
+
+#: configs/nls/messages/reliefcapture.c:31
+msgid "The screenshot operation timed out"
+msgstr "截图操作超时"
+
+#: configs/nls/messages/reliefcapture.c:32
+msgid "The screenshot process stopped unexpectedly"
+msgstr "截图工作进程意外退出"
+
+#: configs/nls/messages/reliefcapture.c:33
+msgid "There is no screenshot to save"
+msgstr "尚无可保存的截图"
+
+#: userland/apps/reliefcapture/window.cpp:145
+msgid "Undo"
+msgstr "撤销"
+
+#: userland/apps/reliefcapture/window.cpp:199
+msgid "Wait for the current screenshot operation to finish"
+msgstr "请等待当前截图任务完成"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "White"
+msgstr "白色"
+
+#: userland/apps/reliefcapture/window.cpp:312
+msgid ""
+"Win+Shift+S: select a screenshot\n"
+"Ctrl+N: new capture\n"
+"Ctrl+C: copy image\n"
+"Ctrl+S: save PNG\n"
+"Ctrl+Z: undo\n"
+"Ctrl+Y / Ctrl+Shift+Z: redo\n"
+"\n"
+"Selection: R region, W window, F full screen, Esc cancel.\n"
+"Window captures include visible decorations and occlusions.\n"
+"Images remain in the clipboard while ReliefCapture is running."
+msgstr ""
+"Win+Shift+S：选择截图\n"
+"Ctrl+N：新建截图\n"
+"Ctrl+C：复制图像\n"
+"Ctrl+S：保存 PNG\n"
+"Ctrl+Z：撤销\n"
+"Ctrl+Y / Ctrl+Shift+Z：重做\n"
+"\n"
+"选区中：R 区域、W 窗口、F 全屏、Esc 取消。\n"
+"窗口截图包含实际可见的边框及遮挡内容。\n"
+"粘贴图像时请保持 ReliefCapture 运行。"
+
+#: userland/apps/reliefcapture/overlay.cpp:16
+msgid "Window"
+msgstr "窗口"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Yellow"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "是"
+
+#: userland/apps/reliefcapture/window.cpp:149
+#. ReliefWord
+msgid "Zoom"
+msgstr "缩放"

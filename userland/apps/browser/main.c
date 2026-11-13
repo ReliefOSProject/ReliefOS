@@ -23,8 +23,8 @@ static void browser_update_inputm_context(void)
 int main(int argc, char **argv, char **envp)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("browser", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("browser");
     struct reliefos_gui_app_event event;
     const char *initial = "about:reliefos";
     (void)envp;

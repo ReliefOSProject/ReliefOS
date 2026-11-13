@@ -164,8 +164,8 @@ static void draw_test_window(struct reliefos_ui_surface *ui, uint32_t width,
 int main(void)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("guitest", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("guitest");
     struct reliefos_gui_app_event event;
     struct reliefos_ui_surface ui;
     const char *titles[] = {

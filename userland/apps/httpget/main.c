@@ -355,8 +355,8 @@ static void present(int window_id, struct reliefos_ui_surface *ui)
 int main(int argc, char **argv, char **envp)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("httpget", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("httpget");
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     int window_id;

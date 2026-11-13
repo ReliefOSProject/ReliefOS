@@ -1,32 +1,55 @@
 #!/bin/sh
-# The catalog must be reproducible: same .po, same msgfmt flags, same bytes --
-# and pinned to little-endian, which the flags are not without being told.
+# Each application catalog must be independently loadable and reproducible.
 set -eu
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
 w=$(mktemp -d); trap 'rm -rf "$w"' EXIT HUP INT TERM
 
 grep -qx 'zh_CN' "$src/configs/nls/LINGUAS"
-test -s "$src/configs/nls/po/zh_CN.po"
+test -s "$src/configs/nls/DOMAINS"
+catalogs=0
+for domain in $(cat "$src/configs/nls/DOMAINS"); do
+    test -s "$src/configs/nls/po/$domain/$domain.pot"
+    for language in $(cat "$src/configs/nls/LINGUAS"); do
+        po=$src/configs/nls/po/$domain/$language.po
+        directory=$w/$language/LC_MESSAGES
+        mkdir -p "$directory"
+        msgfmt -c --check --endianness=little -o "$directory/$domain.mo" "$po" >"$w/log" 2>&1
+        test ! -s "$w/log"
+        SOURCE_DATE_EPOCH=1000000 TZ=UTC+9 msgfmt -c --check --endianness=little \
+            -o "$w/repeated.mo" "$po" >"$w/log" 2>&1
+        test ! -s "$w/log"
+        cmp "$directory/$domain.mo" "$w/repeated.mo"
+        msgfmt -c --check --endianness=big -o "$w/big.mo" "$po"
+        if cmp -s "$directory/$domain.mo" "$w/big.mo"; then
+            printf 'FAIL - %s endianness does not affect output\n' "$domain"
+            exit 1
+        fi
+        catalogs=$((catalogs + 1))
+    done
+done
 
-msgfmt -c --check --endianness=little -o "$w/a.mo" "$src/configs/nls/po/zh_CN.po" >"$w/log" 2>&1
-test ! -s "$w/log"
-SOURCE_DATE_EPOCH=1000000 TZ=UTC+9 msgfmt -c --check --endianness=little \
-    -o "$w/b.mo" "$src/configs/nls/po/zh_CN.po" >"$w/log" 2>&1
-test ! -s "$w/log"
-cmp "$w/a.mo" "$w/b.mo"
+python3 - "$w" <<'PY'
+import gettext
+import sys
 
-# Little and big must differ, otherwise the pin is meaningless.
-msgfmt -c --check --endianness=big -o "$w/c.mo" "$src/configs/nls/po/zh_CN.po"
-if cmp -s "$w/a.mo" "$w/c.mo"; then
-    printf 'FAIL - endianness does not affect output, pin is pointless\n'
-    exit 1
-fi
+fileman = gettext.translation("fileman", sys.argv[1], languages=["zh_CN"])
+taskmgr = gettext.translation("taskmgr", sys.argv[1], languages=["zh_CN"])
+assert fileman.gettext("New Folder") == "新建文件夹"
+assert taskmgr.gettext("Processes") == "进程"
+assert taskmgr.gettext("New Folder") == "New Folder"
+assert fileman.gettext("Processes") == "Processes"
+assert fileman.gettext("Cancel") == "取消"
+assert taskmgr.gettext("Cancel") == "取消"
+excel = gettext.translation("reliefexcel", sys.argv[1], languages=["zh_CN"])
+word = gettext.translation("reliefword", sys.argv[1], languages=["zh_CN"])
+network = gettext.translation("network-controller", sys.argv[1], languages=["zh_CN"])
+assert excel.gettext("I/O error") == "输入输出错误"
+assert word.gettext("The file changed while it was being opened") == "文件在打开期间发生变化"
+assert network.gettext("Authenticating") == "正在验证身份"
+print("nls domains: independent translations and shared dialog labels passed")
+PY
 
 # The recipe must carry the flags; a bare msgfmt would be host-endian.
 grep -q -- '--endianness=little' "$src/scripts/reliefos/Makefile.nls"
 
-# Every msgid in the catalog is used by a live source site.
-awk '/^msgid "/{s++} /^msgstr[0 ]/{g++} END{exit !(s>1000 && g==s)}' \
-    "$src/configs/nls/po/zh_CN.po"
-
-printf 'nls build: reproducibility, endianness pin and catalog shape passed\n'
+printf 'nls build: %s independent catalogs, reproducibility and endianness passed\n' "$catalogs"

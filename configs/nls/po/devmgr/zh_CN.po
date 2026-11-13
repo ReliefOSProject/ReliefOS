@@ -1,0 +1,123 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/devmgr/main.c:114
+msgid "Active"
+msgstr "活动"
+
+#: userland/apps/devmgr/main.c:97
+msgid "Audio"
+msgstr "音频"
+
+#: userland/apps/devmgr/main.c:120
+msgid "Boot"
+msgstr "启动"
+
+#: userland/apps/devmgr/main.c:205
+msgid "Class"
+msgstr "类别"
+
+#: userland/apps/devmgr/main.c:209
+msgid "Details"
+msgstr "详细信息"
+
+#: userland/apps/devmgr/main.c:252
+msgid "Details:"
+msgstr "详情:"
+
+#: userland/apps/devmgr/main.c:206
+msgid "Device"
+msgstr "设备"
+
+#: userland/apps/devmgr/main.c:279
+msgid "Device Manager"
+msgstr "设备管理器"
+
+#: userland/apps/devmgr/main.c:135
+msgid "Device refresh failed"
+msgstr "设备刷新失败"
+
+#: userland/apps/devmgr/main.c:250
+msgid "Device:"
+msgstr "设备:"
+
+#: userland/apps/devmgr/main.c:153
+msgid "Devices refreshed: "
+msgstr "设备已刷新: "
+
+#: userland/apps/devmgr/main.c:89
+msgid "Display"
+msgstr "显示"
+
+#: userland/apps/devmgr/main.c:208
+msgid "Flags"
+msgstr "标志"
+
+#: userland/apps/devmgr/main.c:219
+msgid "Hardware detected by the kernel"
+msgstr "内核检测到的硬件设备"
+
+#: userland/apps/devmgr/main.c:87
+msgid "Input"
+msgstr "输入"
+
+#: userland/apps/devmgr/main.c:280
+msgid "Kernel device list"
+msgstr "内核设备列表"
+
+#: userland/apps/devmgr/main.c:95
+msgid "Network"
+msgstr "网络"
+
+#: userland/apps/devmgr/main.c:259
+msgid "No device selected"
+msgstr "未选择设备"
+
+#: userland/apps/devmgr/main.c:123
+msgid "None"
+msgstr "无"
+
+#: userland/apps/devmgr/main.c:99
+msgid "Other"
+msgstr "其它"
+
+#: userland/apps/devmgr/main.c:108
+msgid "Present"
+msgstr "存在"
+
+#: configs/nls/messages/devmgr.c:5
+msgid "Ready"
+msgstr "就绪"
+
+#: userland/apps/devmgr/main.c:218
+msgid "Refresh"
+msgstr "刷新"
+
+#: userland/apps/devmgr/main.c:93
+msgid "Serial"
+msgstr "串口"
+
+#: userland/apps/devmgr/main.c:207
+msgid "Status"
+msgstr "状态"
+
+#: userland/apps/devmgr/main.c:251
+msgid "Status:"
+msgstr "状态:"
+
+#: userland/apps/devmgr/main.c:91
+msgid "Storage"
+msgstr "存储"
+
+#: userland/apps/devmgr/main.c:85
+msgid "System"
+msgstr "系统"

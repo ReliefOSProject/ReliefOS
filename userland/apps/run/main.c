@@ -93,8 +93,8 @@ static void launch_path(int window_id)
 int main(int argc, char **argv, char **envp)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("run", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("run");
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     int window_id;

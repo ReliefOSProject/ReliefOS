@@ -60,7 +60,7 @@ echo "RP_EXIT status=$status" >/dev/ttyS0
     payload = [(build_dir / 'userland/reliefplayer.elf', '/usr/lib/reliefos/apps/reliefplayer/reliefplayer.elf', 0o100755),
                (ROOT / 'resources/build-art/app-icons/reliefplayer.bmp', '/usr/lib/reliefos/apps/reliefplayer/reliefplayer.bmp', 0o100644),
                (ROOT / 'userland/apps/reliefplayer/reliefplayer.desktop', '/usr/share/applications/reliefos-reliefplayer.desktop', 0o100644),
-               (build_dir / 'generated/nls/zh_CN/LC_MESSAGES/leonos.mo', fltk.LOCALE_GUEST, 0o100644),
+               *fltk.locale_payload(build_dir),
                (probe, fltk.PROBE_GUEST, 0o100755), (runner, '/usr/bin/rptest', 0o100755)]
     for name in ('sample.wav', 'sample.mp3', 'short.wav', 'invalid.wav'):
         payload.append((fixtures / name, '/home/test/' + name, 0o100644))

@@ -901,8 +901,8 @@ static int run_wizard(const char *api_path)
 int main(int argc, char *argv[])
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("apiapp", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("apiapp");
     char downloaded_path[RELIEFOS_API_PATH_MAX];
     if (argc == 5 && argv && argv[1] && argv[2] && argv[3] && argv[4] &&
         strcmp(argv[1], "--download-worker") == 0) {

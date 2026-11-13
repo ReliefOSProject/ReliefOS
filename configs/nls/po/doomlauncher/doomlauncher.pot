@@ -1,0 +1,155 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:58
+msgid "An IWAD path is required"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:36
+msgid "Arguments are empty"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:86
+msgid "DOOM Launcher"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:74
+msgid "DOOM exited with code "
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:77
+msgid "DOOM is no longer running"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:93
+msgid "Disable sound"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:89
+msgid "Extra DOOM arguments"
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:94
+msgid "Fullscreen"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:87
+msgid "IWAD path"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:49
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:95
+msgid "Launch"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:61
+msgid "Launch failed: "
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:38
+msgid "Missing closing quote"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:98
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:96
+msgid "Reset"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:30
+msgid "Settings reset"
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:65
+msgid "Starting DOOM: the game window shows loading progress"
+msgstr ""
+
+#: userland/apps/doomlauncher/main.cpp:37
+msgid "Too many arguments"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""

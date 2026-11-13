@@ -91,8 +91,8 @@ static void draw_dialog(struct reliefos_ui_surface *ui,
 int main(int argc, char *argv[])
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("sysconfdialog", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("sysconfdialog");
     struct reliefos_startup_dialog_request request;
     struct reliefos_gui_app_event event;
     struct reliefos_ui_surface ui;

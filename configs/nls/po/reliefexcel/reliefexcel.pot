@@ -1,0 +1,899 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "ABS(number) returns its absolute value."
+msgstr ""
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Adds numeric cells in a range."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:145
+msgid "Alignment"
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:525
+msgid "Amount"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:709
+msgid "An unfinished workbook was found. Recover it?"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:446
+msgid "Apply"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:157
+msgid "AutoSum"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Average expense"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:267
+msgid "Average:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Balance"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:142
+msgid "Bold"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:142
+msgid "Borders"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Budget status"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:85
+msgid "Budget template"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "COUNTIF(range, criteria)"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:567
+msgid "CSV exported"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:562
+msgid "CSV exports only this sheet's values. Formulas, styles and other sheets remain in the native workbook."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:385
+msgid "CSV imported; save as a native workbook to keep formulas and formatting"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:158
+msgid "Calculation"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:296
+msgid "Calculation canceled; results will update when accessed"
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Category"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:103
+msgid "Cell address, for example A1 or C25"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:148
+msgid "Cells"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:575
+msgid "Cells copied"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:144
+msgid "Center"
+msgstr ""
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Clear contents"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:162
+msgid "Clear filters"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:140
+msgid "Clipboard"
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:433
+msgid "Column:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:152
+msgid "Columns"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:358
+msgid "Columns:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:356
+msgid "Comma|Semicolon|Tab"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:442
+msgid "Condition:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:442
+msgid "Contains|Equals|Greater than|Less than|Not empty"
+msgstr ""
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Copy"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:688
+msgid "Could not save the recovery copy"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:267
+msgid "Count:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Counts nonempty cells."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Counts numeric cells."
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:139
+msgid "Ctrl+C"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:140
+msgid "Ctrl+D"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:163
+msgid "Ctrl+F"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:163
+msgid "Ctrl+H"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:148
+msgid "Ctrl+R"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:139
+msgid "Ctrl+V"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:139
+msgid "Ctrl+X"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:147
+msgid "Currency"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Cut"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "Data"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:164
+msgid "Data exchange"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Date"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:152
+msgid "Delete column"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:151
+msgid "Delete row"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:153
+msgid "Delete sheet"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:627
+msgid "Delete this worksheet? You can undo this operation."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Description"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Dinner"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:709
+msgid "Discard"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:300
+msgid "Discard changes"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:168
+msgid "Display"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:105
+msgid "Edit cell content or formula; Enter applies the change"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Electricity"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:667
+msgid "Enter a zoom value from 25 to 400"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:201
+msgid "Enter an address between A1 and IV10000"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:475
+msgid "Enter text to find"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:159
+msgid "Examples: =SUM(B2:B20)    =IF(C2>0,C2,0)"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:85
+msgid "Exit"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Expense"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:562
+msgid "Export"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:164
+msgid "Export CSV"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:84
+msgid "Export CSV..."
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:80
+msgid "File"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:143
+msgid "Fill color"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:140
+msgid "Fill down"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:148
+msgid "Fill right"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:162
+msgid "Filter"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:445
+msgid "Filtering hides rows and preserves their contents."
+msgstr ""
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Find"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:163
+msgid "Find and replace"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:468
+msgid "Find next"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:465
+msgid "Find:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:441
+msgid "First row is a header"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:143
+msgid "Font"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:141
+msgid "Font size"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Food"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Food expenses"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Food purchases"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "Formulas"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:167
+msgid "Freeze both"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:166
+msgid "Freeze first column"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:166
+msgid "Freeze first row"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:167
+msgid "Freeze panes"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:412
+msgid "Function:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:157
+msgid "Functions"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:146
+msgid "General"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:168
+msgid "Gridlines"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Groceries"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "Home tab"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:5
+msgid "I/O error"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "IF(condition, value_if_true, value_if_false)"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:372
+msgid "Import"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:164
+msgid "Import CSV"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:84
+msgid "Import CSV..."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Income"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "Insert"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:152
+msgid "Insert column"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:104
+msgid "Insert function"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:151
+msgid "Insert row"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:142
+msgid "Italic"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Item"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:709
+msgid "Later"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:498
+msgid "Ledger"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:144
+msgid "Left"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Lunch"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:467
+msgid "Match case"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:145
+msgid "Merge"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Monthly rent"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Monthly salary"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:154
+msgid "Move sheet left"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:154
+msgid "Move sheet right"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:82
+msgid "New"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:153
+msgid "New sheet"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:143
+msgid "No borders"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:477
+msgid "No matching cell found"
+msgstr ""
+
+#: userland/apps/reliefexcel/grid.cpp:58
+msgid "Not enough memory"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:146
+msgid "Number"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:147
+msgid "Number format"
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Office supplies"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:617
+msgid "Only the upper-left cell's content is kept when merging. Continue?"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:311
+msgid "Open workbook"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:82
+msgid "Open..."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:533
+msgid "Overspent"
+msgstr ""
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Paste"
+msgstr ""
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Paste values"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:147
+msgid "Percent"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:371
+msgid "Preview of the first rows. Text and leading zeros are preserved; formulas are not executed."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "ROUND(number, decimal_places)"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:110
+msgid "Ready"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:158
+msgid "Recalculate"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:709
+msgid "Recover"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:687
+msgid "Recovery copy saved"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:92
+msgid "Redo"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Remaining balance"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:154
+msgid "Rename sheet"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Rent"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:163
+msgid "Replace"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:468
+msgid "Replace all"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:468
+msgid "Replace current"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:466
+msgid "Replace with:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:480
+msgid "Replacements:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Returns the largest number."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Returns the mean of numeric cells."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Returns the smallest number."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:144
+msgid "Right"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:151
+msgid "Rows"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:445
+msgid "Rows and their formatting move together within the selected range."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:358
+msgid "Rows:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "SUMIF(range, criteria, sum_range)"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Salary"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:83
+msgid "Save as..."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:334
+msgid "Save canceled; original file preserved"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:300
+msgid "Save changes to this workbook?"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:311
+msgid "Save workbook"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:575
+msgid "Select a destination and paste to move the cells"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:585
+msgid "Select at least two columns to fill right"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:584
+msgid "Select at least two rows to fill down"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:640
+msgid "Select numbers or a cell below the numbers to sum"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:356
+msgid "Separator:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:623
+msgid "Sheet%u"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:75
+msgid "Sheet1"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Shopping"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:158
+msgid "Show formulas"
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:161
+msgid "Sort"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:161
+msgid "Sort ascending"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:161
+msgid "Sort descending"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:267
+msgid "Sum:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:521
+msgid "Summary"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:143
+msgid "Text color"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:643
+msgid "The destination contains data. Replace it?"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:332
+msgid "The file changed outside ReliefExcel. Choose how to save."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:641
+msgid "There is no room below this range"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:326
+msgid "This file already exists. Replace it?"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Total expenses"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Total income"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Transit pass"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Transport"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:92
+msgid "Undo"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:167
+msgid "Unfreeze"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:148
+msgid "Unmerge"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:293
+msgid "Untitled"
+msgstr ""
+
+#: userland/apps/reliefexcel/main.cpp:12
+msgid "Usage: reliefexcel [workbook.rexl | data.csv]"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Utilities"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:443
+msgid "Value:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "View"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:533
+msgid "Within budget"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:385
+msgid "Workbook opened"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:343
+msgid "Workbook saved"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:232
+msgid "Working..."
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:630
+msgid "Worksheet name:"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:154
+msgid "Worksheets"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:145
+msgid "Wrap text"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:666
+msgid "Zoom percentage (25–400):"
+msgstr ""
+
+#: userland/apps/reliefexcel/window.cpp:168
+msgid "Zoom..."
+msgstr ""

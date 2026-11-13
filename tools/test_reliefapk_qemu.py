@@ -74,7 +74,7 @@ echo "RA_EXIT status=$status" >/dev/ttyS0
     repositories=fixtures/'repositories';repositories.write_text('# ReliefAPK private acceptance repositories\n/usr/share/reliefos/apk/repository/packages.adb\n'+FIX+'/v1/packages.adb\n')
     preferences=fixtures/'reliefapk.conf';preferences.write_text('offline=1\ntimeout=15\ncache_max_age=10080\nauth=sudo\n')
     payload=[(OUT/'userland/reliefapk.elf','/usr/lib/reliefos/apps/reliefapk/reliefapk.elf',0o100755),
-        (OUT/'generated/nls/zh_CN/LC_MESSAGES/leonos.mo',fltk.LOCALE_GUEST,0o100644),
+        *fltk.locale_payload(OUT),
         (ROOT/'resources/build-art/app-icons/reliefapk.bmp','/usr/lib/reliefos/apps/reliefapk/reliefapk.bmp',0o100644),
         (ROOT/'userland/apps/reliefapk/reliefapk.desktop','/usr/share/applications/reliefos-reliefapk.desktop',0o100644),
         (entry,'/usr/bin/reliefapk',0o100755),(runner,'/usr/bin/ra',0o100755),

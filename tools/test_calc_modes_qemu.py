@@ -69,7 +69,7 @@ echo "CALC_EXIT status=$status" >/dev/ttyS0
     elf=OUT/'userland/calc.elf'
     fltk.validate_target_elf(elf,sysroot=OUT/'sysroot/musl',required_needed=('libfltk.so.1.3',))
     payload=[(elf,'/usr/lib/reliefos/apps/calc/calc.elf',0o100755),
-             (OUT/'generated/nls/zh_CN/LC_MESSAGES/leonos.mo',fltk.LOCALE_GUEST,0o100644),
+             *fltk.locale_payload(OUT),
              (OUT/'system/lib/libreliefos.so.2','/usr/lib/reliefos/libreliefos.so.2',0o100755),
              (runner,'/usr/bin/calctest',0o100755),(probe,fltk.PROBE_GUEST,0o100755),
              (output/'calc-core.elf','/usr/lib/reliefos/tests/calc-core',0o100755),

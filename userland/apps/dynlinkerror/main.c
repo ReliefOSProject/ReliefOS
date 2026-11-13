@@ -45,8 +45,8 @@ static void draw_error(struct reliefos_ui_surface *ui, const char *program,
 int main(int argc, char **argv)
 {
     setlocale(LC_ALL, "");
-    bindtextdomain("leonos", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("leonos");
+    bindtextdomain("dynlinkerror", RELIEFOS_LAYOUT_LOCALE);
+    textdomain("dynlinkerror");
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     const char *program = argc > 1 ? argv[1] : "";
