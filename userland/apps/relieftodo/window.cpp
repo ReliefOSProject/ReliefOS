@@ -213,7 +213,7 @@ void TodoWindow::layout() {
 void TodoWindow::resize(int x,int y,int width,int height) { Fl_Double_Window::resize(x,y,width,height); if (table_) layout(); }
 bool TodoWindow::dirty() const { return force_dirty_ || !same_document_content(document_,saved_); }
 void TodoWindow::update_status(const char *message) {
-    if (message) status_->copy_label(message);
+    if (message) status_->copy_label(*message ? T(message) : "");
     size_t done=0; for (size_t n=0;n<document_.tasks.size();++n) if (document_.tasks[n].completed) ++done;
     char text[1024]; snprintf(text,sizeof(text),T("%zu tasks · %zu active · %zu done · %zu selected"),document_.tasks.size(),document_.tasks.size()-done,done,selected_.size()); summary_->copy_label(text);
     const char *name=path_.empty()?document_.title.c_str():strrchr(path_.c_str(),'/');

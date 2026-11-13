@@ -1,6 +1,8 @@
 #ifndef RELIEFMATHPP_WINDOW_H
 #define RELIEFMATHPP_WINDOW_H
 #include "../fltk_support.h"
+#include <stdio.h>
+#include <string.h>
 #ifdef None
 #undef None
 #endif
@@ -19,6 +21,37 @@
 #include <FL/Fl_Tabs.H>
 #include <FL/Fl_Value_Slider.H>
 namespace rmp {
+// Keep backend errors canonical; translate only when presenting them.
+inline const char *ui_error(const char *message) {
+  static char translated[1024];
+  if (!message || !*message) return "";
+  const char *direct = T(message);
+  if (strcmp(direct, message)) return direct;
+  const char *position = strstr(message, "（位置 ");
+  if (position) {
+    size_t number; int end = -1;
+    if (sscanf(position, "（位置 %zu）%n", &number, &end) == 1 && end >= 0 && !position[end]) {
+      size_t length = size_t(position - message);
+      if (length < sizeof translated) {
+        char prefix[1024]; memcpy(prefix, message, length); prefix[length] = 0;
+        int written = snprintf(translated, sizeof translated, T("%s（位置 %zu）"),
+                               *prefix ? T(prefix) : prefix, number);
+        return written >= 0 && size_t(written) < sizeof translated ? translated : message;
+      }
+    }
+  }
+  const char *separator = strstr(message, "：");
+  if (separator && size_t(separator - message) < sizeof translated) {
+    char prefix[1024]; size_t length = size_t(separator - message);
+    memcpy(prefix, message, length); prefix[length] = 0;
+    const char *label = *prefix ? T(prefix) : prefix;
+    if (strcmp(label, prefix)) {
+      int written = snprintf(translated, sizeof translated, "%s%s", label, separator);
+      return written >= 0 && size_t(written) < sizeof translated ? translated : message;
+    }
+  }
+  return message;
+}
 enum class Command {
   New,
   Open,

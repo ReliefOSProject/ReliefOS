@@ -1,0 +1,11 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/rcctl/main.c:39
+msgid "Execute OpenRC"
+msgstr ""
+
+#: userland/apps/rcctl/main.c:43
+msgid "OpenRC operation"
+msgstr ""

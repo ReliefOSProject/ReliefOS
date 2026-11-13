@@ -1,3 +1,4 @@
+#include "localization.h"
 #include "tools.h"
 #include "action_policy.h"
 #include "window.h"
@@ -349,7 +350,7 @@ void MailToolsWindow::set_send_page(const WorkerSendOperationPage &page) {
 }
 
 void MailToolsWindow::set_status(const char *text) {
-    if (status_) status_->text(text && *text ? text : T("Ready"));
+    if (status_) status_->text(text && *text ? DiagnosticForDisplay(text).c_str() : T("Ready"));
 }
 
 void MailToolsWindow::set_busy(bool busy) {
@@ -488,7 +489,7 @@ void MailToolsWindow::render_detail() {
             detail_->text(T("Select a server folder. Containers cannot be selected for server actions."));
         } else {
             char text[4608];
-            snprintf(text, sizeof(text), "%s\n%s · generation %llu · UIDVALIDITY %llu · %u messages",
+            snprintf(text, sizeof(text), T("%s\n%s · generation %llu · UIDVALIDITY %llu · %u messages"),
                 folder->key.server_name.c_str(), folder->selectable ? T("Selectable") : T("Container"),
                 static_cast<unsigned long long>(folder->generation),
                 static_cast<unsigned long long>(folder->uidvalidity), folder->message_count);
@@ -516,7 +517,8 @@ void MailToolsWindow::render_detail() {
         archive.empty() ? T("not configured") : archive.c_str(),
         static_cast<unsigned long long>(operation->archive_review_generation),
         static_cast<unsigned long long>(operation->archive_folder_generation),
-        static_cast<unsigned long long>(operation->archive_folder_uidvalidity), diagnostic.c_str());
+        static_cast<unsigned long long>(operation->archive_folder_uidvalidity),
+        DiagnosticForDisplay(diagnostic.c_str()).c_str());
     detail_->text(text);
     fit_plain_text_scroll(detail_scroll_, detail_, kOperationDetailMaxHeight);
 }

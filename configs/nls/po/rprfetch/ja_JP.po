@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/rprfetch/main.c:23
+msgid "Usage: %s HTTPS_URL OUTPUT\n"
+msgstr "使用法: %s HTTPS_URL OUTPUT\n"
+
+#: userland/apps/rprfetch/main.c:40
+msgid "rprfetch: OUTPUT must be a file path\n"
+msgstr "rprfetch: OUTPUT にはファイルパスを指定してください\n"
+
+#: userland/apps/rprfetch/main.c:47
+msgid "rprfetch: download failed (network status %u, HTTP %u)\n"
+msgstr "rprfetch: ダウンロードに失敗しました (ネットワーク状態 %u、HTTP %u)\n"
+
+#: userland/apps/rprfetch/main.c:36
+msgid "rprfetch: refusing non-HTTPS URL\n"
+msgstr "rprfetch: HTTPS 以外の URL は使用できません\n"
+
+#: userland/apps/rprfetch/main.c:53
+msgid "rprfetch: server returned HTTP %u\n"
+msgstr "rprfetch: サーバーが HTTP %u を返しました\n"

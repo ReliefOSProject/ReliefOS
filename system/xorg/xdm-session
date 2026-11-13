@@ -90,6 +90,11 @@ cleanup() {
 }
 trap cleanup EXIT HUP INT TERM
 
+# Import the account's language before initializing locale-dependent clients.
+if test -r /etc/profile.d/reliefos-locale.sh; then
+    . /etc/profile.d/reliefos-locale.sh
+fi
+
 # Create the freedesktop.org XDG user directories before any session client
 # starts.  This is the same hook Xsession/xinitrc startup runs on other
 # distributions; GTK file libraries expect e.g. $HOME/Templates to exist.
@@ -103,10 +108,6 @@ if test -x /usr/lib/reliefos/dillo-config-init; then
     /usr/lib/reliefos/dillo-config-init || event 'Dillo defaults could not be initialized'
 fi
 
-# Login shells and XDM share the same validated per-user locale import.
-if test -r /etc/profile.d/reliefos-locale.sh; then
-    . /etc/profile.d/reliefos-locale.sh
-fi
 if test -x /usr/bin/reliefsettings; then
     /usr/bin/reliefsettings --apply-session || event 'Some personal desktop settings could not be applied'
 fi

@@ -1,4 +1,5 @@
 #include "geometry.h"
+#include <libintl.h>
 #include <math.h>
 
 namespace rp {
@@ -142,18 +143,18 @@ bool append_line(Array<TextLine> &lines, const Object &object, const char *norma
                  void *context, float max_width, float line_height, float &total_height,
                  Text &error, bool clip_overflow) {
     if (lines.size() >= MaxTextBytes) {
-        error.set("文字行数超限", strlen("文字行数超限"));
+        error.set(gettext("文字行数超限"));
         return false;
     }
     const size_t length = end - start;
     const float width = measure(context, normalized + start, length, object.style);
     if (!isfinite(width) || width < 0 || (!clip_overflow && width > max_width + 0.01f)) {
-        error.set("文字行无法放入文本框", strlen("文字行无法放入文本框"));
+        error.set(gettext("文字行无法放入文本框"));
         return false;
     }
     total_height += line_height;
     if (!isfinite(total_height) || (!clip_overflow && total_height > object.rect.h + 0.01f)) {
-        error.set("文字内容超出文本框高度", strlen("文字内容超出文本框高度"));
+        error.set(gettext("文字内容超出文本框高度"));
         return false;
     }
     TextLine line;
@@ -162,7 +163,7 @@ bool append_line(Array<TextLine> &lines, const Object &object, const char *norma
     line.width = width;
     line.paragraph_start = paragraph_start;
     if (!lines.push(line)) {
-        error.set("内存不足", strlen("内存不足"));
+        error.set(gettext("内存不足"));
         return false;
     }
     return true;
@@ -187,17 +188,17 @@ bool wrap_paragraph(const Object &object, const char *normalized, size_t start, 
             size_t next = cursor;
             uint32_t cp = 0;
             if (!cluster_end(normalized, end, cursor, next, cp) || next <= cursor) {
-                error.set("文字编码无效", strlen("文字编码无效"));
+                error.set(gettext("文字编码无效"));
                 return false;
             }
             const float cluster_width = measure(context, normalized + cursor, next - cursor, object.style);
             if (!isfinite(cluster_width) || cluster_width < 0) {
-                error.set("文字测量结果无效", strlen("文字测量结果无效"));
+                error.set(gettext("文字测量结果无效"));
                 return false;
             }
             if (cluster_width > max_width + 0.01f && cursor == line_start) {
                 if (!clip_overflow) {
-                    error.set("单个文字簇超出文本框宽度", strlen("单个文字簇超出文本框宽度"));
+                    error.set(gettext("单个文字簇超出文本框宽度"));
                     return false;
                 }
                 cursor = next;
@@ -225,7 +226,7 @@ bool wrap_paragraph(const Object &object, const char *normalized, size_t start, 
         }
         size_t line_end = last_break > line_start ? last_break : cursor;
         if (line_end <= line_start || line_end > end) {
-            error.set("无法排版文字", strlen("无法排版文字"));
+            error.set(gettext("无法排版文字"));
             return false;
         }
         if (!append_line(lines, object, normalized, line_start, line_end, first_line, measure,
@@ -382,7 +383,7 @@ bool wrap_text(const Object &object, Measure measure, void *context,
 
 bool wrap_text(const Object &object, Measure measure, void *context,
                Array<TextLine> &output, Text &error, bool clip_overflow) {
-    if (!measure) { error.set("文字测量函数无效", strlen("文字测量函数无效")); return false; }
+    if (!measure) { error.set(gettext("文字测量函数无效")); return false; }
     if (object.kind != Kind::Text || object.text.size() > MaxTextBytes ||
         !valid_utf8(object.text.c_str(), object.text.size()) || !finite_rect(object.rect) ||
         object.rect.w <= 0 || object.rect.h <= 0 || !isfinite(object.style.font_size) ||
@@ -391,19 +392,19 @@ bool wrap_text(const Object &object, Measure measure, void *context,
         object.style.stroke > 0xffffff || !isfinite(object.style.line_width) ||
         object.style.line_width < 0 || object.style.line_width > 20 || object.style.family > 2 ||
         static_cast<unsigned>(object.style.alignment) > static_cast<unsigned>(Alignment::Right)) {
-        error.set("文本对象无效", strlen("文本对象无效"));
+        error.set(gettext("文本对象无效"));
         return false;
     }
     const float reserved = object.style.bullets ? object.style.font_size * 0.8f : 0.0f;
     const float max_width = object.rect.w - 16.0f - reserved;
     const float line_height = object.style.font_size * 1.25f;
     if (!isfinite(max_width) || !isfinite(line_height) || line_height <= 0) {
-        error.set("文本框没有可用排版区域", strlen("文本框没有可用排版区域"));
+        error.set(gettext("文本框没有可用排版区域"));
         return false;
     }
     if (max_width <= 0) {
         if (!clip_overflow) {
-            error.set("文本框没有可用排版区域", strlen("文本框没有可用排版区域"));
+            error.set(gettext("文本框没有可用排版区域"));
             return false;
         }
         Array<TextLine> empty;
@@ -413,7 +414,7 @@ bool wrap_text(const Object &object, Measure measure, void *context,
     }
     Array<char> normalized;
     if (object.text.size() == SIZE_MAX || !normalized.resize(object.text.size() + 1)) {
-        error.set("内存不足", strlen("内存不足"));
+        error.set(gettext("内存不足"));
         return false;
     }
     if (object.text.size()) memcpy(normalized.data(), object.text.c_str(), object.text.size());

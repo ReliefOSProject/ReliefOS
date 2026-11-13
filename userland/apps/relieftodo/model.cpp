@@ -1,4 +1,5 @@
 #include "model.h"
+#include <libintl.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <time.h>
@@ -226,13 +227,13 @@ bool seed_example(Document &out) {
     Document doc; TaskId id = 0;
     char today[11]{}, tomorrow[11]{}, next[11]{}, yesterday[11]{};
     if (!local_date(today) || !local_date(tomorrow,1) || !local_date(next,3) || !local_date(yesterday,-1) ||
-        !doc.title.set("我的任务清单")) return false;
-    if (!add_task(doc,"规划今天的三件重要任务","先确定优先级，再把工作拆成可以完成的小步骤。\n\n提示：在右侧编辑详情，点击“应用修改”；选择多行可批量完成。","个人",today,Priority::High,"计划,今日",id) ||
-        !add_task(doc,"整理 ReliefOS 项目文档","梳理待办事项，补充操作说明和验收记录。","ReliefOS",today,Priority::High,"文档,开发",id) ||
-        !add_task(doc,"复查上一轮待办事项","检查未完成的工作，调整截止日期。","ReliefOS",yesterday,Priority::Urgent,"复查",id) ||
-        !add_task(doc,"准备每周例会提纲","整理本周进展、问题与下周计划。","工作",tomorrow,Priority::Normal,"会议",id) ||
-        !add_task(doc,"阅读一本喜欢的书","每天给阅读留出一点时间。","个人",next,Priority::Low,"阅读",id) ||
-        !add_task(doc,"体验 ReliefTodo 的任务工具","试试搜索、日期筛选、项目和标签。","个人","",Priority::Normal,"入门",id) ||
+        !doc.title.set(gettext("我的任务清单"))) return false;
+    if (!add_task(doc,gettext("规划今天的三件重要任务"),gettext("先确定优先级，再把工作拆成可以完成的小步骤。\n\n提示：在右侧编辑详情，点击“应用修改”；选择多行可批量完成。"),gettext("个人"),today,Priority::High,gettext("计划,今日"),id) ||
+        !add_task(doc,gettext("整理 ReliefOS 项目文档"),gettext("梳理待办事项，补充操作说明和验收记录。"),"ReliefOS",today,Priority::High,gettext("文档,开发"),id) ||
+        !add_task(doc,gettext("复查上一轮待办事项"),gettext("检查未完成的工作，调整截止日期。"),"ReliefOS",yesterday,Priority::Urgent,gettext("复查"),id) ||
+        !add_task(doc,gettext("准备每周例会提纲"),gettext("整理本周进展、问题与下周计划。"),gettext("工作"),tomorrow,Priority::Normal,gettext("会议"),id) ||
+        !add_task(doc,gettext("阅读一本喜欢的书"),gettext("每天给阅读留出一点时间。"),gettext("个人"),next,Priority::Low,gettext("阅读"),id) ||
+        !add_task(doc,gettext("体验 ReliefTodo 的任务工具"),gettext("试试搜索、日期筛选、项目和标签。"),gettext("个人"),"",Priority::Normal,gettext("入门"),id) ||
         !set_task_done(doc,id,true)) return false;
     out = static_cast<Document &&>(doc); return true;
 }

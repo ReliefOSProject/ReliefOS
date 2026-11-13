@@ -136,6 +136,36 @@ void MathWindow::refill_list(){
         if(choose)list_->select(list_->size(),1);
     }
 }
+// Error messages cross worker and file boundaries as English identifiers.
+// Translate only at the UI boundary, retaining any system-error detail.
+const char *ui_error(const char *message) {
+    static char translated[1024];
+    if (!message || !*message) return "";
+    const char *direct = T(message);
+    if (strcmp(direct, message) != 0) return direct;
+    int value = 0, end = -1;
+    if (sscanf(message, "Renderer worker died from signal %d; submit again to retry%n", &value, &end) == 1 && end >= 0 && !message[end]) {
+        int written = snprintf(translated, sizeof translated, T("Renderer worker died from signal %d; submit again to retry"), value);
+        return written >= 0 && size_t(written) < sizeof translated ? translated : message;
+    }
+    end = -1;
+    if (sscanf(message, "Renderer worker exited with status %d; submit again to retry%n", &value, &end) == 1 && end >= 0 && !message[end]) {
+        int written = snprintf(translated, sizeof translated, T("Renderer worker exited with status %d; submit again to retry"), value);
+        return written >= 0 && size_t(written) < sizeof translated ? translated : message;
+    }
+    const char *separator = strstr(message, ": ");
+    if (separator && size_t(separator - message) < sizeof translated) {
+        char prefix[1024];
+        size_t length = size_t(separator - message);
+        memcpy(prefix, message, length); prefix[length] = 0;
+        const char *label = *prefix ? T(prefix) : prefix;
+        if (strcmp(label, prefix) != 0) {
+            int written = snprintf(translated, sizeof translated, "%s%s", label, separator);
+            return written >= 0 && size_t(written) < sizeof translated ? translated : message;
+        }
+    }
+    return message;
+}
 void MathWindow::update_status(const char *message){
     if(message)notice_.set(message);status_->copy_label(notice_.empty()?T("Ready"):notice_.c_str());
     Formula *f=current();size_t chars=0;if(f)for(size_t n=0;n<f->source.size();n++)if((static_cast<unsigned char>(f->source.c_str()[n])&0xc0)!=0x80)chars++;
@@ -163,11 +193,11 @@ void MathWindow::source_changed(int pos,int inserted,int removed,int,const char*
     Error e;char *text=w.source_.text_range(pos,pos+inserted);bool okay=text&&editor_replace_text(w.core,{size_t(pos),size_t(pos+removed)},text,e);free(text);
     if(okay&&!w.history.in_transaction())okay=w.history.begin(w.document,e);
     if(okay)okay=set_formula_source(w.document,w.active_,w.core.source.c_str(),e);
-    if(!okay){Error reason=e;w.loading_=true;w.source_.text(w.current()->source.c_str());w.loading_=false;editor_set_text(w.core,w.current()->source.c_str(),e);w.update_status(reason.message.c_str());}
+    if(!okay){Error reason=e;w.loading_=true;w.source_.text(w.current()->source.c_str());w.loading_=false;editor_set_text(w.core,w.current()->source.c_str(),e);w.update_status(ui_error(reason.message.c_str()));}
     else {w.last_edit_=now();w.schedule_render();w.update_status(T("Modified"));}
     w.restyle();
 }
-void MathWindow::flush_edit(){if(history.in_transaction()){Error e;if(!history.commit(document,e)){refresh_source();update_status(e.message.c_str());}}}
+void MathWindow::flush_edit(){if(history.in_transaction()){Error e;if(!history.commit(document,e)){refresh_source();update_status(ui_error(e.message.c_str()));}}}
 void MathWindow::restyle(){
     size_t size=size_t(source_.length());Bytes style;if(!style.resize(size+1))return;memset(style.data(),'A',size);style.data()[size]=0;
     Array<LexToken> tokens;Error e;size_t count=0;if(tokens.resize(size+1)&&lex_source(core.source.c_str(),core.source.size(),tokens.data(),tokens.size(),count,e))
@@ -183,21 +213,21 @@ void MathWindow::poll(){
     if(history.in_transaction()&&now()-last_edit_>.25)flush_edit();
     if(render_pending_&&now()-last_edit_>.18&&current()){
         Snapshot s;s.formula=*current();s.session_id=session_;s.request_id=++request_;s.artifacts=WantRaster;
-        Error e;if(renderer_->submit(s,e)){submitted_=s;render_pending_=false;render_label_->copy_label(stale_?T("Old preview · rendering..."):T("Rendering..."));}else {render_error_=e;render_pending_=false;render_label_->copy_label(e.message.c_str());error_button_->show();}
+        Error e;if(renderer_->submit(s,e)){submitted_=s;render_pending_=false;render_label_->copy_label(stale_?T("Old preview · rendering..."):T("Rendering..."));}else {render_error_=e;render_pending_=false;render_label_->copy_label(ui_error(e.message.c_str()));error_button_->show();}
     }
     renderer_->pump();Rendered r;Error e;
     if(renderer_->take(r,e)){
         Snapshot expected;expected.session_id=session_;if(current())expected.formula=*current();
         if(same_snapshot(r.snapshot,expected)&&r.request_id==submitted_.request_id){
             if(e.code==Code::None){displayed_=r.snapshot;preview->set_raster(static_cast<Raster&&>(r.raster));stale_=false;render_error_.clear();error_button_->hide();render_label_->copy_label(T("Preview · up to date"));}
-            else {render_error_=e;stale_=preview->raster().width!=0;char label[768];snprintf(label,sizeof label,"%s: %s",stale_?T("Old preview · error"):T("Render error"),T(e.message.c_str()));render_label_->copy_label(label);error_button_->show();update_status(label);}
+            else {render_error_=e;stale_=preview->raster().width!=0;char label[768];snprintf(label,sizeof label,"%s: %s",stale_?T("Old preview · error"):T("Render error"),ui_error(e.message.c_str()));render_label_->copy_label(label);error_button_->show();update_status(label);}
         }
     }
     if(!interaction_depth_)finish_file_job();exports_->pump();export_progress();
 }
 void MathWindow::commit_core(bool select_stop){
-    if(document_locked_||!current())return;flush_edit();Error e;if(!history.begin(document,e)){refresh_source();update_status(e.message.c_str());return;}
-    if(!set_formula_source(document,active_,core.source.c_str(),e)||!history.commit(document,e)){refresh_source();update_status(e.message.c_str());return;}
+    if(document_locked_||!current())return;flush_edit();Error e;if(!history.begin(document,e)){refresh_source();update_status(ui_error(e.message.c_str()));return;}
+    if(!set_formula_source(document,active_,core.source.c_str(),e)||!history.commit(document,e)){refresh_source();update_status(ui_error(e.message.c_str()));return;}
     loading_=true;source_.text(core.source.c_str());loading_=false;restyle();schedule_render();update_status(T("Modified"));
     if(select_stop&&!core.stops.empty()){Range r=core.stops[0];source_.select(int(r.begin),int(r.end));editor->insert_position(int(r.end));}
     editor->take_focus();
@@ -205,15 +235,15 @@ void MathWindow::commit_core(bool select_stop){
 void MathWindow::insert_tool(Tool tool){
     if(document_locked_||!current())return;ToolArgs args{};args.rows=2;args.columns=2;int a=editor->insert_position(),b=a;source_.selection_position(&a,&b);
     if(a!=b){char *text=source_.text_range(a,b);args.selected.set(text);free(text);}Snippet s;Error e;
-    if(!build_snippet(tool,args,s,e)||!editor_insert_snippet(core,{size_t(a),size_t(b)},s,e)){update_status(e.message.c_str());return;}commit_core(true);
+    if(!build_snippet(tool,args,s,e)||!editor_insert_snippet(core,{size_t(a),size_t(b)},s,e)){update_status(ui_error(e.message.c_str()));return;}commit_core(true);
 }
-void MathWindow::insert_source(const char *text){if(document_locked_)return;Snippet s;Error e;if(!s.source.set(text))return;int a=editor->insert_position(),b=a;source_.selection_position(&a,&b);if(editor_insert_snippet(core,{size_t(a),size_t(b)},s,e))commit_core(false);else update_status(e.message.c_str());}
+void MathWindow::insert_source(const char *text){if(document_locked_)return;Snippet s;Error e;if(!s.source.set(text))return;int a=editor->insert_position(),b=a;source_.selection_position(&a,&b);if(editor_insert_snippet(core,{size_t(a),size_t(b)},s,e))commit_core(false);else update_status(ui_error(e.message.c_str()));}
 bool MathWindow::placeholder(bool reverse){bool handled=false;Range r{};Error e;if(editor_tab(core,reverse,handled,r,e)&&handled){source_.select(int(r.begin),int(r.end));editor->insert_position(int(r.end));editor->show_insert_position();return true;}return false;}
 void MathWindow::style_changed(Fl_Widget *control,void *p){
     auto *w=static_cast<MathWindow*>(p);if(w->document_locked_)return;w->flush_edit();Formula *f=w->current();if(!f)return;Style style=f->style;
     if(control==w->size_choice_){int selected=w->size_choice_->value();if(selected>=0&&selected<int(sizeof(Sizes)/sizeof(Sizes[0])))style.point_size=uint16_t(Sizes[selected]);}
     else if(control==w->display_choice_)style.display=w->display_choice_->value()==0;
-    Error e;if(w->history.begin(w->document,e)&&set_formula_style(w->document,w->active_,style,e)&&w->history.commit(w->document,e)){w->schedule_render();w->update_status(T("Modified"));}else w->update_status(e.message.c_str());
+    Error e;if(w->history.begin(w->document,e)&&set_formula_style(w->document,w->active_,style,e)&&w->history.commit(w->document,e)){w->schedule_render();w->update_status(T("Modified"));}else w->update_status(ui_error(e.message.c_str()));
 }
 void MathWindow::run(Command command){
     UiGuard guard(interaction_depth_);
@@ -265,7 +295,7 @@ void MathWindow::run(Command command){
     case Command::Help:help_dialog();return;default:return;
     }
     if(changed){if(!current())active_=document.formulas.empty()?0:document.formulas[0].id;refill_list();refresh_source();}
-    if(!okay)update_status(e.message.c_str());else if(changed)update_status(T("Modified"));
+    if(!okay)update_status(ui_error(e.message.c_str()));else if(changed)update_status(T("Modified"));
 }
 void MathWindow::layout_panels(){
     OfficeLayout p=OfficeLayout::compute(w(),h(),show_list_,show_preview_);

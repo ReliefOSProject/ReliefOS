@@ -5,8 +5,8 @@
 namespace rd {
 Canvas::Canvas(int x, int y, int w, int h, DiagramWindow *owner)
     : Fl_Widget(x, y, w, h), owner_(owner) {
-  tooltip("拖动图形移动；右下角手柄调整尺寸；Shift "
-          "多选；空白框选；中键平移；滚轮缩放");
+  tooltip(T("拖动图形移动；右下角手柄调整尺寸；Shift "
+          "多选；空白框选；中键平移；滚轮缩放"));
 }
 bool Canvas::prepare() {
   if (valid_)
@@ -197,13 +197,13 @@ int Canvas::handle(int event) {
     if (owner_->mode() == 1) {
       if (!node(owner_->document, id)) {
         source_ = 0;
-        owner_->update_status("请选择图形作为连线端点");
+        owner_->update_status(T("请选择图形作为连线端点"));
         return 1;
       }
       if (!source_) {
         source_ = id;
         owner_->select(id);
-        owner_->update_status("已选择起点，点击另一个图形完成连线");
+        owner_->update_status(T("已选择起点，点击另一个图形完成连线"));
       } else {
         owner_->connect(source_, id);
         source_ = 0;
@@ -242,7 +242,7 @@ int Canvas::handle(int event) {
           if (take && !originals_.push(a)) {
             originals_.clear();
             drag_ = Drag::None;
-            owner_->update_status("移动内存不足");
+            owner_->update_status(T("移动内存不足"));
             return 1;
           }
         }

@@ -3618,3 +3618,7 @@ msgstr "变量、趋近值和表达式：数学源码"
 #: configs/nls/messages/reliefmath.c:627
 msgid "worker error"
 msgstr "工作进程错误"
+
+#: configs/nls/messages/reliefmath.c
+msgid "Cannot construct formula layout"
+msgstr "无法构建公式布局"

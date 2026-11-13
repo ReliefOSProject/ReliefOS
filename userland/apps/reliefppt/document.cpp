@@ -3,6 +3,7 @@
 #endif
 
 #include "document.h"
+#include <libintl.h>
 
 #include <errno.h>
 #include <dirent.h>
@@ -37,6 +38,7 @@ static_assert(FLT_RADIX == 2 && FLT_MANT_DIG == 24 && FLT_MIN_EXP == -125 && FLT
     "ReliefPPT v1 requires IEEE-754 binary32 float");
 
 bool set_error(Text &error, const char *message) {
+    if (*message) message = gettext(message);
     if (!error.set(message, strlen(message))) error.clear();
     return false;
 }
@@ -45,8 +47,9 @@ bool set_errno_error(Text &error, const char *operation) {
     const int saved = errno;
     const char *detail = strerror(saved);
     char message[320];
+    operation = gettext(operation);
     int n = snprintf(message, sizeof(message), "%s：%s", operation,
-        detail ? detail : "I/O 错误");
+        detail ? detail : gettext("I/O 错误"));
     errno = saved;
     if (n < 0 || static_cast<size_t>(n) >= sizeof(message)) return set_error(error, operation);
     return set_error(error, message);
@@ -889,14 +892,14 @@ bool atomic_write(const char *path, const char *bytes, size_t length, Text &erro
             const int sync_result = fsync(directory);
             char message[640];
             if (sync_result == 0) {
-                snprintf(message, sizeof(message), "%s；%s", commit_error.c_str(),
-                    initial.exists ? "原文件已恢复" : "新目标已删除");
+                snprintf(message, sizeof(message), gettext("%s；%s"), commit_error.c_str(),
+                    initial.exists ? gettext("原文件已恢复") : gettext("新目标已删除"));
             } else {
                 const int saved = errno;
                 const char *detail = strerror(saved);
-                snprintf(message, sizeof(message), "%s；%s，但恢复目录项同步失败：%s",
-                    commit_error.c_str(), initial.exists ? "原文件已恢复" : "新目标已删除",
-                    detail ? detail : "I/O 错误");
+                snprintf(message, sizeof(message), gettext("%s；%s，但恢复目录项同步失败：%s"),
+                    commit_error.c_str(), initial.exists ? gettext("原文件已恢复") : gettext("新目标已删除"),
+                    detail ? detail : gettext("I/O 错误"));
                 errno = saved;
             }
             set_error(error, message);
@@ -905,7 +908,7 @@ bool atomic_write(const char *path, const char *bytes, size_t length, Text &erro
             char message[640];
             if (initial.exists && backup_exists) {
                 snprintf(message, sizeof(message),
-                    "无法同步输出目录或恢复原文件；回滚副本保留在同目录：%s", backup);
+                    gettext("无法同步输出目录或恢复原文件；回滚副本保留在同目录：%s"), backup);
             } else if (initial.exists) {
                 snprintf(message, sizeof(message), "无法同步输出目录或恢复原文件");
             } else {

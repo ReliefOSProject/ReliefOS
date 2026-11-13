@@ -1,4 +1,5 @@
 #include "document.h"
+#include <libintl.h>
 #include <stdio.h>
 namespace rt {
 namespace {
@@ -56,7 +57,7 @@ bool md_text(Writer &w, const char *s) {
     return true;
 }
 const char *priority_name(Priority p) {
-    const char *names[]={"低","普通","高","紧急"}; return names[unsigned(p)];
+    const char *names[]={"低","普通","高","紧急"}; return gettext(names[unsigned(p)]);
 }
 }
 bool encode_document(const Document &doc, Bytes &out, Text &error) {
@@ -98,10 +99,10 @@ bool decode_document(const char *bytes, size_t size, Document &out, Text &error)
 }
 bool export_csv(const Document &doc, Bytes &out, Text &error) {
     if (!validate_document(doc,error)) return false;
-    Writer w; bool ok=w.text("\xef\xbb\xbf标题,状态,优先级,截止日期,项目,标签,备注\r\n");
+    Writer w; bool ok=w.text("\xef\xbb\xbf") && w.text(gettext("标题,状态,优先级,截止日期,项目,标签,备注\r\n"));
     for (size_t n=0; ok && n<doc.tasks.size(); ++n) {
         const Task &t=doc.tasks[n];
-        const char *cells[]={t.title.c_str(),t.completed?"已完成":"待办",priority_name(t.priority),t.due.c_str(),t.project.c_str(),t.tags.c_str(),t.notes.c_str()};
+        const char *cells[]={t.title.c_str(),gettext(t.completed?"已完成":"待办"),priority_name(t.priority),t.due.c_str(),t.project.c_str(),t.tags.c_str(),t.notes.c_str()};
         for (unsigned c=0; ok && c<7; ++c) ok=csv_field(w,cells[c]) && w.text(c==6?"\r\n":",");
     }
     if (!ok) { error.set("导出内容超出限制或内存不足"); return false; }
@@ -109,13 +110,13 @@ bool export_csv(const Document &doc, Bytes &out, Text &error) {
 }
 bool export_markdown(const Document &doc, Bytes &out, Text &error) {
     if (!validate_document(doc,error)) return false;
-    Writer w; bool ok=w.text("# ") && md_text(w,doc.title.empty()?"任务清单":doc.title.c_str()) && w.text("\n\n");
+    Writer w; bool ok=w.text("# ") && md_text(w,doc.title.empty()?gettext("任务清单"):doc.title.c_str()) && w.text("\n\n");
     for (size_t n=0; ok && n<doc.tasks.size(); ++n) {
         const Task &t=doc.tasks[n];
         ok=w.text(t.completed?"- [x] ":"- [ ] ") && md_text(w,t.title.c_str()) && w.text("\n");
         const char *names[]={"优先级：","截止日期：","项目：","标签："};
         const char *values[]={priority_name(t.priority),t.due.c_str(),t.project.c_str(),t.tags.c_str()};
-        for (unsigned c=0; ok && c<4; ++c) if (*values[c]) ok=w.text("  - ") && w.text(names[c]) && md_text(w,values[c]) && w.text("\n");
+        for (unsigned c=0; ok && c<4; ++c) if (*values[c]) ok=w.text("  - ") && w.text(gettext(names[c])) && md_text(w,values[c]) && w.text("\n");
         if (ok && !t.notes.empty()) {
             ok=w.text("\n    ");
             for (const char *p=t.notes.c_str(); ok && *p; ++p) ok=w.raw(p,1) && (*p!='\n' || w.text("    "));

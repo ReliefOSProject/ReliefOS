@@ -1,0 +1,183 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/driverinfo/main.c:161
+msgid "    ABI: %u  Version: %u\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:168
+msgid "    Error: %s\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:113
+msgid "    Flags:"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:151
+msgid "    ID: %u\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:164
+msgid "    Image size: %llu bytes\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:156
+msgid "    Kind: %s\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:158
+msgid "    Kind: Unknown (%u)\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:162
+msgid "    Load address: 0x%llx\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:152
+msgid "    State: %s\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:239
+msgid "  (none)\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:304
+msgid "  -a, --all  show disabled, failed and inactive entries too\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:115
+msgid " built-in"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:127
+msgid " none"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:146
+msgid "(no description)"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:142
+msgid "(unnamed)"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:72
+msgid "Audio"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:237
+msgid "Devices (%u):\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:54
+msgid "Disabled"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:86
+msgid "Display"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:333
+msgid "Drivers (%u):\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:56
+msgid "Failed"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:66
+msgid "Input"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:52
+msgid "Loaded"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:50
+msgid "Loading"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:331
+msgid "Mode: %s\n\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:70
+msgid "Network"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:96
+msgid "Other"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:329
+msgid "ReliefOS active drivers\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:68
+msgid "Serial"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:88
+msgid "Storage"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:94
+msgid "System"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:222
+msgid "Unknown"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:58
+msgid "Unloaded"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:303
+msgid "Usage: driverinfo [-a|--all]\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:345
+msgid "\nSummary: %u %s, %u %s\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:332
+msgid "active drivers and devices"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:331
+msgid "all driver and device states"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:119
+msgid "autostart"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:347
+msgid "device"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:347
+msgid "devices"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:123
+msgid "disabled"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:346
+msgid "driver"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:317
+msgid "driverinfo: failed to query devices (return %d)\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:312
+msgid "driverinfo: failed to query drivers (return %d)\n"
+msgstr ""
+
+#: userland/apps/driverinfo/main.c:346
+msgid "drivers"
+msgstr ""

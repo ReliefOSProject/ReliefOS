@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/login/main.c:37
+msgid "Initialize accounts"
+msgstr "アカウントの初期化"
+
+#: userland/apps/login/main.c:29
+msgid "Initialize login terminal"
+msgstr "ログイン端末の初期化"
+
+#: userland/apps/login/main.c:72
+msgid "Installer shell requires a TTY\n"
+msgstr "インストーラーシェルには TTY が必要です\n"
+
+#: userland/apps/login/main.c:53
+msgid "Set installer shell"
+msgstr "インストーラーシェルの設定"
+
+#: userland/apps/login/main.c:48
+msgid "Start installer shell"
+msgstr "インストーラーシェルの起動"
+
+#: userland/apps/login/main.c:40
+msgid "Start login"
+msgstr "ログインの開始"
+
+#: userland/apps/login/main.c:67
+msgid "usage: login.elf [--installer-shell]\n"
+msgstr "使用法: login.elf [--installer-shell]\n"

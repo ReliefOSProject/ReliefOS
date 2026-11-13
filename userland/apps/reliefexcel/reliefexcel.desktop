@@ -1,8 +1,10 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefExcel
+Name[ja]=ReliefExcel
 Name[zh_CN]=ReliefExcel
 GenericName=Spreadsheet
+GenericName[ja]=表計算
 Exec=/usr/bin/reliefexcel %f
 TryExec=/usr/bin/reliefexcel
 Icon=reliefos-reliefexcel

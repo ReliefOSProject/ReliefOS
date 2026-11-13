@@ -2,139 +2,155 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: userland/apps/reliefapk/window.cpp:531
+#: userland/apps/reliefapk/window.cpp:534
 msgid " · Offline"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:859
+#: userland/apps/reliefapk/window.cpp:879
 msgid " — executing\n"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:859
+#: userland/apps/reliefapk/window.cpp:879
 msgid " — simulation\n"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:530
+#: userland/apps/reliefapk/window.cpp:533
 msgid "%zu packages shown · %zu total%s"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:768
+#: userland/apps/reliefapk/window.cpp:787
 msgid "%zu pending changes. Review before applying."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:313
+#: userland/apps/reliefapk/window.cpp:316
 msgid "&Help/About ReliefAPK"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:312
+#: userland/apps/reliefapk/window.cpp:315
 msgid "&Help/How to use ReliefAPK"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:291
+#: userland/apps/reliefapk/window.cpp:294
 msgid "&Package/Install"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:296
+#: userland/apps/reliefapk/window.cpp:299
 msgid "&Package/Install by name or version..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:297
+#: userland/apps/reliefapk/window.cpp:300
 msgid "&Package/Install local APK..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:298
+#: userland/apps/reliefapk/window.cpp:301
 msgid "&Package/Pending changes..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:299
+#: userland/apps/reliefapk/window.cpp:302
 msgid "&Package/Quit"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:294
+#: userland/apps/reliefapk/window.cpp:297
 msgid "&Package/Reinstall"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:292
+#: userland/apps/reliefapk/window.cpp:295
 msgid "&Package/Remove"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:295
+#: userland/apps/reliefapk/window.cpp:298
 msgid "&Package/Repair"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:293
+#: userland/apps/reliefapk/window.cpp:296
 msgid "&Package/Upgrade selected"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:304
+#: userland/apps/reliefapk/window.cpp:307
 msgid "&Tools/Audit system files"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:306
+#: userland/apps/reliefapk/window.cpp:309
 msgid "&Tools/Clean cache..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:305
+#: userland/apps/reliefapk/window.cpp:308
 msgid "&Tools/Compare versions..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:305
+#: userland/apps/reliefapk/window.cpp:308
 msgid "&Tools/Dependency graph (DOT)"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:306
+#: userland/apps/reliefapk/window.cpp:309
 msgid "&Tools/Download cache..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:303
+#: userland/apps/reliefapk/window.cpp:306
 msgid "&Tools/Download packages..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:303
+#: userland/apps/reliefapk/window.cpp:306
 msgid "&Tools/Find file owner..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:305
+#: userland/apps/reliefapk/window.cpp:308
 msgid "&Tools/Package checksums"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:304
+#: userland/apps/reliefapk/window.cpp:307
 msgid "&Tools/Package statistics"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:301
+#: userland/apps/reliefapk/window.cpp:304
 msgid "&Tools/Preferences..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:300
+#: userland/apps/reliefapk/window.cpp:303
 msgid "&Tools/Repositories..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:306
+#: userland/apps/reliefapk/window.cpp:309
 msgid "&Tools/Trusted keys"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:303
+#: userland/apps/reliefapk/window.cpp:306
 msgid "&Tools/Verify APK file..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:304
+#: userland/apps/reliefapk/window.cpp:307
 msgid "&Tools/World constraints"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:364
+#: userland/apps/reliefapk/certificate_display.h:23
+msgid "A trusted OS recovery CA bundle is unavailable. Update the ReliefOS trust package or image."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:31
+msgid "APK left an updated CA bundle as .apk-new. Check the protected-path policy before treating this as an updated trust store."
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:384
 msgid "APK repositories"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:68
+#: userland/apps/reliefapk/certificate_display.h:34
+msgid "APK repository diagnostic redacted; check configured sources and TLS."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:35
+msgid "APK skipped an unavailable package or its output was incomplete; certificate repair failed."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:71
 msgid "About ReliefAPK"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:197
+#: userland/apps/reliefapk/dialogs.cpp:217
 msgid "Absolute path of the file:"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:402
+#: userland/apps/reliefapk/dialogs.cpp:422
 msgid "Add"
 msgstr ""
 
@@ -142,15 +158,15 @@ msgstr ""
 msgid "Add to Favorites"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:397
+#: userland/apps/reliefapk/dialogs.cpp:417
 msgid "Address:"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:77
+#: userland/apps/reliefapk/dialogs.cpp:97
 msgid "Administrator authentication"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:298
+#: userland/apps/reliefapk/dialogs.cpp:318
 msgid "Administrator authentication:"
 msgstr ""
 
@@ -158,43 +174,67 @@ msgstr ""
 msgid "All Files (*)"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:340
+#: userland/apps/reliefapk/window.cpp:343
 msgid "All packages"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1115
+#: userland/apps/reliefapk/window.cpp:1140
 msgid "An operation is still running. Finish or cancel it in the operation window."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:864
+#: userland/apps/reliefapk/window.cpp:884
 msgid "Another operation is running."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:948
+#: userland/apps/reliefapk/window.cpp:973
 msgid "Apply changes"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:683
+#: userland/apps/reliefapk/window.cpp:686
 msgid "Architecture"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:164
+#: userland/apps/reliefapk/window.cpp:167
 msgid "Audit system files"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:85
+#: userland/apps/reliefapk/dialogs.cpp:105
 msgid "Authenticate"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:268
+#: userland/apps/reliefapk/window.cpp:271
 msgid "Available"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:234
+#: userland/apps/reliefapk/window.cpp:237
 msgid "Available version"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:301
+#: userland/apps/reliefapk/certificate_display.h:24
+msgid "CA RECOVERY PLAN: the system CA file is unusable. Apply will first restore the trusted OS CA bundle, preserving the old regular file in a private backup."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:51
+msgid "CA bundle changed during recovery; retry after checking the system state"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:38
+msgid "CA directory ownership or permissions are unsafe"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:37
+msgid "CA parent directories must be root-owned and not group/other writable or symlinks"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:41
+msgid "CA recovery directory ownership or permissions are unsafe"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:40
+msgid "CA trust file must be an owned regular file, not group/other writable, and at most 4 MiB"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:321
 msgid "Cache directory:"
 msgstr ""
 
@@ -202,59 +242,67 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1095
+#: userland/apps/reliefapk/window.cpp:1120
 msgid "Canceling..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:608
+#: userland/apps/reliefapk/certificate_display.h:44
+msgid "Cannot inspect the current CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:39
+msgid "Cannot inspect the current CA trust path"
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:611
 msgid "Cannot read package information."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:148
+#: userland/apps/reliefapk/dialogs.cpp:168
 msgid "Cannot read world constraints."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:933
+#: userland/apps/reliefapk/window.cpp:958
 msgid "Cannot save the log."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:113
+#: userland/apps/reliefapk/dialogs.cpp:133
 msgid "Cannot send the password to the system authentication service."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:596
+#: userland/apps/reliefapk/window.cpp:599
 msgid "Cannot start apk."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:505
+#: userland/apps/reliefapk/window.cpp:508
 msgid "Cannot start apk. Check that /sbin/apk is installed."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:590
+#: userland/apps/reliefapk/dialogs.cpp:611
 msgid "Cannot start the requested operation."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1037
+#: userland/apps/reliefapk/window.cpp:1062
 msgid "Certificate recovery checked. Review the recovery plan and package output, then apply."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:335
+#: userland/apps/reliefapk/dialogs.cpp:355
 msgid "Choose an absolute cache directory, or leave it empty."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:156
+#: userland/apps/reliefapk/window.cpp:159
 msgid "Clean cache"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:228
+#: userland/apps/reliefapk/dialogs.cpp:248
 msgid "Clean unused apk cache entries?"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:789
+#: userland/apps/reliefapk/window.cpp:808
 msgid "Clear all"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:946
+#: userland/apps/reliefapk/window.cpp:971
 msgid "Clear log"
 msgstr ""
 
@@ -262,24 +310,52 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:180
+#: userland/apps/reliefapk/window.cpp:183
 msgid "Compare versions"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1064
+#: userland/apps/reliefapk/window.cpp:1089
 msgid "Completed successfully."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:365
+#: userland/apps/reliefapk/dialogs.cpp:385
 msgid "Config file:"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:227
+#: userland/apps/reliefapk/dialogs.cpp:247
 msgid "Continue"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:52
+msgid "Could not atomically install the OS recovery CA bundle"
 msgstr ""
 
 #: userland/apps/fltk_png_app.h:46
 msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:27
+msgid "Could not determine whether the system CA package is installed"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:46
+msgid "Could not prepare the complete OS recovery CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:48
+msgid "Could not preserve the complete previous CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:47
+msgid "Could not preserve the previous CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:50
+msgid "Could not sync CA recovery files"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:49
+msgid "Could not sync the previous CA bundle backup"
 msgstr ""
 
 #: userland/apps/fltk_support.h:57
@@ -290,68 +366,72 @@ msgstr ""
 msgid "Custom Filter"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:172
+#: userland/apps/reliefapk/window.cpp:175
 msgid "Dependencies"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:182
+#: userland/apps/reliefapk/window.cpp:185
 msgid "Dependency graph (DOT)"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:235
+#: userland/apps/reliefapk/window.cpp:238
 msgid "Description"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:355
+#: userland/apps/reliefapk/window.cpp:358
 msgid "Details"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:155
+#: userland/apps/reliefapk/dialogs.cpp:175
 msgid "Directory"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:383
+#: userland/apps/reliefapk/dialogs.cpp:403
 msgid "Discard changes"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:384
+#: userland/apps/reliefapk/dialogs.cpp:404
 msgid "Discard the unsaved repository changes?"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:446
+#: userland/apps/reliefapk/dialogs.cpp:466
 msgid "Down"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:158
+#: userland/apps/reliefapk/window.cpp:161
 msgid "Download cache"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:229
+#: userland/apps/reliefapk/dialogs.cpp:249
 msgid "Download missing packages into the apk cache?"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:190
+#: userland/apps/reliefapk/dialogs.cpp:210
 msgid "Download package dependencies as well?"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:160
+#: userland/apps/reliefapk/window.cpp:163
 msgid "Download packages"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:179
+#: userland/apps/reliefapk/dialogs.cpp:199
 msgid "Download packages to"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:400
+#: userland/apps/reliefapk/dialogs.cpp:420
 msgid "Enabled"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:95
+#: userland/apps/reliefapk/dialogs.cpp:115
 msgid "Enter the root password to authorize this operation."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:96
+#: userland/apps/reliefapk/dialogs.cpp:116
 msgid "Enter the sudo password for %s."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:45
+msgid "Existing CA bundle must be an owned regular file of at most 4 MiB"
 msgstr ""
 
 #: userland/apps/fltk_support.h:52
@@ -366,39 +446,39 @@ msgstr ""
 msgid "File name:"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:170
+#: userland/apps/reliefapk/window.cpp:173
 msgid "Files"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:328
+#: userland/apps/reliefapk/window.cpp:331
 msgid "Filter package names and descriptions (Ctrl+F)"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:176
+#: userland/apps/reliefapk/window.cpp:179
 msgid "Find file owner"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:129
+#: userland/apps/reliefapk/dialogs.cpp:149
 msgid "Finish or close the current operation first."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:202
+#: userland/apps/reliefapk/dialogs.cpp:222
 msgid "First version:"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:685
+#: userland/apps/reliefapk/window.cpp:688
 msgid "Home page"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:189
+#: userland/apps/reliefapk/dialogs.cpp:209
 msgid "Include dependencies"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:297
+#: userland/apps/reliefapk/dialogs.cpp:317
 msgid "Index cache age (minutes):"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:329
+#: userland/apps/reliefapk/dialogs.cpp:349
 msgid "Index cache age must be between 0 and 10080 minutes."
 msgstr ""
 
@@ -406,47 +486,67 @@ msgstr ""
 msgid "Input is too long"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:142
+#: userland/apps/reliefapk/window.cpp:145
 msgid "Install"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:322
+#: userland/apps/reliefapk/window.cpp:325
 msgid "Install local APK"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:268
+#: userland/apps/reliefapk/window.cpp:271
 msgid "Installed"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:688
+#: userland/apps/reliefapk/window.cpp:691
 msgid "Installed size"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:234
+#: userland/apps/reliefapk/window.cpp:237
 msgid "Installed version"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:340
+#: userland/apps/reliefapk/dialogs.cpp:360
 msgid "Invalid cache directory."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:719
+#: userland/apps/reliefapk/window.cpp:738
 msgid "Invalid package name, constraint or APK path."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:407
+#: userland/apps/reliefapk/certificate_display.h:22
+msgid "Invalid privileged apk request"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:5
+msgid "Invalid repository address or tag"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:427
 msgid "Invalid repository address or tag."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:302
+#: configs/nls/messages/reliefapk.c:6
+msgid "Invalid repository file"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:7
+msgid "JSON input exceeds limits"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:8
+msgid "JSON package object exceeds depth limit"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:322
 msgid "Leave empty to use the system apk cache."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:684
+#: userland/apps/reliefapk/window.cpp:687
 msgid "License"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:402
+#: userland/apps/reliefapk/window.cpp:405
 msgid "Loading installed packages..."
 msgstr ""
 
@@ -454,11 +554,11 @@ msgstr ""
 msgid "Manage Favorites"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:296
+#: userland/apps/reliefapk/dialogs.cpp:316
 msgid "Network timeout (seconds):"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:324
+#: userland/apps/reliefapk/dialogs.cpp:344
 msgid "Network timeout must be between 1 and 600 seconds."
 msgstr ""
 
@@ -470,11 +570,11 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:652
+#: userland/apps/reliefapk/window.cpp:655
 msgid "No package details available."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:193
+#: userland/apps/reliefapk/window.cpp:196
 msgid "None"
 msgstr ""
 
@@ -482,83 +582,115 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:295
+#: userland/apps/reliefapk/certificate_display.h:69
+msgid "OS CA baseline restored atomically; previous file backup: "
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:53
+msgid "OS CA bundle was restored, but directory synchronization failed"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:68
+msgid "OS CA recovery failed: "
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:43
+msgid "OS recovery CA bundle has no usable certificates"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:42
+msgid "OS recovery CA bundle is empty or too large"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:315
 msgid "Offline: use installed packages and cached indexes only"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:189
+#: userland/apps/reliefapk/certificate_display.h:26
+msgid "Online package simulation is deferred until trust is restored. The authenticated worker will then check signed repositories, simulate and repair ca-certificates and ca-certificates-bundle together."
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:209
 msgid "Only selected"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1020
+#: configs/nls/messages/reliefapk.c:9
+msgid "Open cache directory"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:10
+msgid "Open repositories"
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:1045
 msgid "Operation failed. Review the output below."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1025
+#: userland/apps/reliefapk/window.cpp:1050
 msgid "Operation failed; remaining changes were not executed."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:833
+#: userland/apps/reliefapk/window.cpp:852
 msgid "Operations run in the order shown. Separate apk transactions are checked again before execution.\n\n"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:399
+#: userland/apps/reliefapk/dialogs.cpp:419
 msgid "Optional repository tag, without @"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:341
+#: userland/apps/reliefapk/window.cpp:344
 msgid "Orphaned"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:498
+#: userland/apps/reliefapk/window.cpp:501
 msgid "Out of memory"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:234
+#: userland/apps/reliefapk/window.cpp:237
 msgid "Package"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:184
+#: userland/apps/reliefapk/window.cpp:187
 msgid "Package checksums"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:60
+#: userland/apps/reliefapk/window.cpp:63
 msgid "Package name, version constraint or repository tag:"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:214
+#: userland/apps/reliefapk/dialogs.cpp:234
 msgid "Package name:"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:183
+#: userland/apps/reliefapk/dialogs.cpp:203
 msgid "Package names or version constraints, separated by spaces:"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:607
+#: userland/apps/reliefapk/window.cpp:610
 msgid "Package query"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:605
+#: userland/apps/reliefapk/window.cpp:608
 msgid "Package query failed. Refresh indexes or check the operation log."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:166
+#: userland/apps/reliefapk/window.cpp:169
 msgid "Package statistics"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:82
+#: userland/apps/reliefapk/dialogs.cpp:102
 msgid "Password:"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:773
+#: userland/apps/reliefapk/window.cpp:792
 msgid "Pending changes"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:757
+#: userland/apps/reliefapk/window.cpp:776
 msgid "Pending changes (%zu)"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:324
+#: userland/apps/reliefapk/window.cpp:327
 msgid "Pending changes (0)"
 msgstr ""
 
@@ -566,11 +698,11 @@ msgstr ""
 msgid "Please choose an existing file!"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:890
+#: userland/apps/reliefapk/window.cpp:915
 msgid "Please wait"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:355
+#: userland/apps/reliefapk/window.cpp:358
 msgid "Policy"
 msgstr ""
 
@@ -578,91 +710,127 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:799
+#: userland/apps/reliefapk/window.cpp:818
 msgid "Preview changes"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:692
+#: userland/apps/reliefapk/window.cpp:695
 msgid "Provides"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:594
+#: configs/nls/messages/reliefapk.c:11
+msgid "Read repositories"
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:597
 msgid "Reading package details..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:508
+#: userland/apps/reliefapk/window.cpp:511
 msgid "Reading packages..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:314
+#: userland/apps/reliefapk/window.cpp:317
 msgid "Refresh"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:154
+#: userland/apps/reliefapk/window.cpp:157
 msgid "Refresh indexes"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:315
+#: userland/apps/reliefapk/window.cpp:318
 msgid "Refresh the displayed package list (F5)"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:148
+#: userland/apps/reliefapk/certificate_display.h:29
+msgid "Refresh the two world requests as plain package names without version/tag constraints, then reinstall both so source certificates and generated output agree. Other world requests are preserved."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:151
 msgid "Reinstall"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:50
+#: userland/apps/reliefapk/window.cpp:53
 msgid "ReliefAPK help"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:293
+#: userland/apps/reliefapk/dialogs.cpp:313
 msgid "ReliefAPK preferences"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:69
+#: userland/apps/reliefapk/window.cpp:72
 msgid "ReliefAPK\nGraphical front end for Alpine Package Keeper\n\nC++ / FLTK — ReliefOS\nPackage queries and transactions are performed by the system apk command."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:457
+#: userland/apps/reliefapk/dialogs.cpp:477
 msgid "Reload"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:432
+#: userland/apps/reliefapk/dialogs.cpp:452
 msgid "Remove"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:777
+#: userland/apps/reliefapk/window.cpp:796
 msgid "Remove selected"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:150
+#: userland/apps/reliefapk/window.cpp:153
 msgid "Repair"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:140
+#: userland/apps/reliefapk/certificate_display.h:28
+msgid "Repair targets: ca-certificates and ca-certificates-bundle (package signatures and TLS verification required)."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:143
 msgid "Repair/update system certificates"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:686
+#: configs/nls/messages/reliefapk.c:12
+msgid "Replace repositories"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:13
+msgid "Repositories changed outside ReliefAPK. Reload before saving."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:689
 msgid "Repository"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:561
+#: configs/nls/messages/reliefapk.c:14
+msgid "Repository configuration is too large"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:582
 msgid "Repository configuration is too large."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:168
+#: configs/nls/messages/reliefapk.c:15
+msgid "Repository path too long"
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:171
 msgid "Repository policy"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:174
+#: userland/apps/reliefapk/window.cpp:177
 msgid "Reverse dependencies"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:832
+#: userland/apps/reliefapk/window.cpp:851
 msgid "Review package changes"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:898
+#: userland/apps/reliefapk/certificate_display.h:21
+msgid "Root authentication required"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:20
+msgid "Root authentication required for certificate repair"
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:923
 msgid "Running apk..."
 msgstr ""
 
@@ -670,51 +838,55 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:466
+#: configs/nls/messages/reliefapk.c:16
+msgid "Save backup"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:486
 msgid "Save changes"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:924
+#: userland/apps/reliefapk/window.cpp:949
 msgid "Save log..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:928
+#: userland/apps/reliefapk/window.cpp:953
 msgid "Save operation log"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:573
+#: userland/apps/reliefapk/dialogs.cpp:594
 msgid "Save repositories"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:586
+#: userland/apps/reliefapk/dialogs.cpp:607
 msgid "Saving repositories..."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:574
+#: userland/apps/reliefapk/dialogs.cpp:595
 msgid "Saving repository configuration. The previous file is kept as .reliefapk.bak.\n"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:51
+#: userland/apps/reliefapk/window.cpp:54
 msgid "Search by package name or description. Select one or more packages, choose an operation, then review the pending changes.\n\nPreview runs apk --simulate. Apply executes the changes in the displayed order. Each operation is checked again before execution.\n\nRefresh indexes after changing repositories or when available packages are missing. Installed packages remain available offline.\n\nAdministrator operations use your system sudo or root authentication policy. Passwords are never saved.\n\nCtrl+F: search    F5: refresh list    Ctrl+Enter: preview changes"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:326
+#: userland/apps/reliefapk/window.cpp:329
 msgid "Search:"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:206
+#: userland/apps/reliefapk/dialogs.cpp:226
 msgid "Second version:"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:192
+#: userland/apps/reliefapk/dialogs.cpp:212
 msgid "Select APK package"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:552
+#: userland/apps/reliefapk/window.cpp:555
 msgid "Select a package to view its details."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:742
+#: userland/apps/reliefapk/window.cpp:761
 msgid "Select one or more packages first."
 msgstr ""
 
@@ -726,83 +898,115 @@ msgstr ""
 msgid "Show:"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:897
+#: userland/apps/reliefapk/window.cpp:922
 msgid "Simulating changes..."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1038
+#: userland/apps/reliefapk/window.cpp:1063
 msgid "Simulation completed. Review the output, then apply."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:235
+#: userland/apps/reliefapk/window.cpp:238
 msgid "Size"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:639
+#: userland/apps/reliefapk/window.cpp:642
 msgid "Some repository indexes are unavailable. Refresh indexes to see all packages."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:234
+#: userland/apps/reliefapk/window.cpp:237
 msgid "Status"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:398
+#: configs/nls/messages/reliefapk.c:17
+msgid "Sync repositories directory"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:33
+msgid "System CA bundle installed and parsed successfully"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:418
 msgid "Tag:"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:818
+#: configs/nls/messages/reliefapk.c:18
+msgid "The administrator cache and its parent directories must exist, be root-owned, and not be writable by other users."
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:19
+msgid "The administrator cache must be an absolute directory."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:32
+msgid "The installed CA bundle is still unusable. Check the APK protected-path policy and .apk-new files; update the ReliefOS trust package/configuration."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:25
+msgid "The two CA world requests will be refreshed as plain package names (without version or tag constraints); all other world requests are preserved."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:837
 msgid "There are no pending changes."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:872
+#: userland/apps/reliefapk/window.cpp:892
 msgid "Too many packages in one operation."
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:186
+#: userland/apps/reliefapk/window.cpp:189
 msgid "Trusted keys"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:444
+#: userland/apps/reliefapk/certificate_display.h:67
+msgid "Unsafe system CA trust path; no online operation started: "
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:464
 msgid "Up"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:415
+#: userland/apps/reliefapk/dialogs.cpp:435
 msgid "Update entry"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:340
+#: userland/apps/reliefapk/window.cpp:343
 msgid "Upgradable"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:146
+#: userland/apps/reliefapk/window.cpp:149
 msgid "Upgrade selected"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:152
+#: userland/apps/reliefapk/window.cpp:155
 msgid "Upgrade system"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:162
+#: userland/apps/reliefapk/certificate_display.h:30
+msgid "Verified CA package metadata is unavailable. Check HTTPS, repository signatures, keys and sources. The restored OS CA bundle, if any, has been retained."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:165
 msgid "Verify APK file"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:681
+#: userland/apps/reliefapk/window.cpp:684
 msgid "Version"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:448
+#: userland/apps/reliefapk/dialogs.cpp:468
 msgid "View source"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:102
+#: userland/apps/reliefapk/dialogs.cpp:122
 msgid "Waiting for administrator authentication..."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:146
+#: userland/apps/reliefapk/dialogs.cpp:166
 msgid "World constraints"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:340
+#: userland/apps/reliefapk/window.cpp:343
 msgid "World packages and dependencies"
 msgstr ""
 
@@ -810,26 +1014,158 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1081
+#: userland/apps/reliefapk/window.cpp:1106
 msgid "\nApplying the reviewed operations...\n"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:900
+#: userland/apps/reliefapk/window.cpp:925
 msgid "\nCannot start the requested operation.\n"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1011
+#: userland/apps/reliefapk/window.cpp:1036
 msgid "\nExit status: %d\n"
 msgstr ""
 
-#: userland/apps/reliefapk/window.cpp:1097
+#: configs/nls/messages/reliefapk.c:20
+msgid "action does not take targets"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:21
+msgid "action requires package targets"
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:1122
 msgid "apk is applying changes. Wait for it to finish before closing."
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:300
+#: configs/nls/messages/reliefapk.c:22
+msgid "certificate repair is unavailable"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:23
+msgid "certificate repair requires the fixed CA package and online mode"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:24
+msgid "control byte in JSON package object"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:25
+msgid "could not build command arguments"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:26
+msgid "could not prepare the certificate package operation"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:27
+msgid "expected JSON package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:28
+msgid "expected comma or end of package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:29
+msgid "expected package object"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:30
+msgid "fetch requires an output directory and package constraints"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:31
+msgid "invalid JSON package object structure"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:32
+msgid "invalid apk settings"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:33
+msgid "invalid package constraint"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:34
+msgid "invalid package object"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:35
+msgid "key management is handled by the GUI"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:36
+msgid "metadata requires a package name"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:54
+msgid "none (file was missing)"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:37
+msgid "out of memory"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:38
+msgid "out of memory while building package catalog"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:39
+msgid "owner requires one absolute file path"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:40
+msgid "package catalog exceeds limit"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:41
+msgid "package object exceeds limit"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:42
+msgid "simulation is not supported for this action"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:320
 msgid "su — root password"
 msgstr ""
 
-#: userland/apps/reliefapk/dialogs.cpp:299
+#: userland/apps/reliefapk/dialogs.cpp:319
 msgid "sudo — current user's password"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:43
+msgid "trailing comma in package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:44
+msgid "trailing data after JSON array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:45
+msgid "truncated JSON package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:46
+msgid "truncated JSON package object"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:47
+msgid "unknown package query filter"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:48
+msgid "upgrade all does not take package targets"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:49
+msgid "verify requires absolute .apk paths"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:50
+msgid "verify requires local package files"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:51
+msgid "version comparison requires two version strings"
 msgstr ""

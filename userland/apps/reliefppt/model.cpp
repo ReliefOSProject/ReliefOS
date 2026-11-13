@@ -1,4 +1,5 @@
 #include "model.h"
+#include <libintl.h>
 #include <math.h>
 #include <stdint.h>
 
@@ -10,6 +11,7 @@ constexpr size_t HistoryLimit = 64;
 constexpr size_t HistoryBudget = 64u * 1024u * 1024u;
 
 bool set_error(Text &error, const char *message) {
+    if (*message) message = gettext(message);
     error.set(message, strlen(message));
     return false;
 }
@@ -151,7 +153,7 @@ bool make_layout_slide(Layout layout, Deck &deck, Slide &slide) {
     title.rect = {64, 32, deck.width - 128, 88};
     title.style.font_size = 36;
     title.style.bold = true;
-    if (!title.text.set("标题", strlen("标题")) || !slide.objects.push(static_cast<Object &&>(title))) return false;
+    if (!title.text.set(gettext("标题")) || !slide.objects.push(static_cast<Object &&>(title))) return false;
     if (layout == Layout::Title) return true;
 
     if (layout == Layout::Content) {
@@ -161,7 +163,7 @@ bool make_layout_slide(Layout layout, Deck &deck, Slide &slide) {
         content.kind = Kind::Text;
         content.rect = {80, 150, deck.width - 160, deck.height - 200};
         content.style.bullets = true;
-        return content.text.set("在此输入内容", strlen("在此输入内容")) &&
+        return content.text.set(gettext("在此输入内容")) &&
             slide.objects.push(static_cast<Object &&>(content));
     }
     if (deck.next_id >= UINT32_MAX - 2) return false;
@@ -170,13 +172,13 @@ bool make_layout_slide(Layout layout, Deck &deck, Slide &slide) {
     left.kind = Kind::Text;
     left.rect = {64, 150, deck.width * 0.40f, deck.height - 200};
     left.style.bullets = true;
-    if (!left.text.set("左侧内容", strlen("左侧内容")) || !slide.objects.push(static_cast<Object &&>(left))) return false;
+    if (!left.text.set(gettext("左侧内容")) || !slide.objects.push(static_cast<Object &&>(left))) return false;
     Object right;
     right.id = deck.next_id++;
     right.kind = Kind::Text;
     right.rect = {deck.width * 0.55f, 150, deck.width * 0.40f, deck.height - 200};
     right.style.bullets = true;
-    return right.text.set("右侧内容", strlen("右侧内容")) &&
+    return right.text.set(gettext("右侧内容")) &&
         slide.objects.push(static_cast<Object &&>(right));
 }
 
@@ -1079,9 +1081,9 @@ bool example_deck(Deck &out, Text &error) {
     heading.rect = {80, 100, 800, 100};
     heading.style.font_size = 42;
     heading.style.bold = true;
-    if (!heading.text.set("欢迎使用 ReliefPPT", strlen("欢迎使用 ReliefPPT")) ||
+    if (!heading.text.set(gettext("欢迎使用 ReliefPPT")) ||
         !title.objects.push(static_cast<Object &&>(heading)) ||
-        !title.notes.set("这是一个三页演示文稿示例。", strlen("这是一个三页演示文稿示例。")) ||
+        !title.notes.set(gettext("这是一个三页演示文稿示例。")) ||
         !next.slides.push(static_cast<Slide &&>(title))) return set_error(error, "内存不足");
 
     Slide content;
@@ -1090,7 +1092,7 @@ bool example_deck(Deck &out, Text &error) {
     body.kind = Kind::Text;
     body.rect = {72, 70, 816, 120};
     body.style.font_size = 32;
-    if (!body.text.set("清晰表达每一个想法", strlen("清晰表达每一个想法")))
+    if (!body.text.set(gettext("清晰表达每一个想法")))
         return set_error(error, "内存不足");
     Object rectangle;
     rectangle.id = next.next_id++;
@@ -1107,7 +1109,7 @@ bool example_deck(Deck &out, Text &error) {
     if (!content.objects.push(static_cast<Object &&>(body)) ||
         !content.objects.push(static_cast<Object &&>(rectangle)) ||
         !content.objects.push(static_cast<Object &&>(ellipse)) ||
-        !content.notes.set("第二页介绍文字与形状。", strlen("第二页介绍文字与形状。")) ||
+        !content.notes.set(gettext("第二页介绍文字与形状。")) ||
         !next.slides.push(static_cast<Slide &&>(content))) return set_error(error, "内存不足");
 
     const unsigned char rgba[] = {
@@ -1131,10 +1133,10 @@ bool example_deck(Deck &out, Text &error) {
     caption.rect = {220, 430, 520, 55};
     caption.style.alignment = Alignment::Center;
     caption.style.font_size = 24;
-    if (!image.text.set("", 0) || !caption.text.set("图片保存在演示文稿中", strlen("图片保存在演示文稿中")) ||
+    if (!image.text.set("", 0) || !caption.text.set(gettext("图片保存在演示文稿中")) ||
         !last.objects.push(static_cast<Object &&>(image)) ||
         !last.objects.push(static_cast<Object &&>(caption)) ||
-        !last.notes.set("图片数据已嵌入，无需保留来源文件。", strlen("图片数据已嵌入，无需保留来源文件。")) ||
+        !last.notes.set(gettext("图片数据已嵌入，无需保留来源文件。")) ||
         !next.slides.push(static_cast<Slide &&>(last))) return set_error(error, "内存不足");
     Text validation;
     if (!next.validate(validation)) return set_error(error, validation.c_str());

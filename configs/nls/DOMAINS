@@ -6,6 +6,7 @@ diskmgr
 doom
 doomlauncher
 downloadmgr
+driverinfo
 drvmgr
 dynlinkerror
 fileman
@@ -16,7 +17,10 @@ httpget
 imageview
 installer
 leonmmcoset
+login
+matrix
 minesweeper
+motd
 mp3play
 netctl
 network-controller
@@ -25,6 +29,7 @@ openrc-controller
 oshlp
 osver
 paint
+rcctl
 reliefapk
 reliefaskpass
 reliefcapture
@@ -38,11 +43,16 @@ reliefppt
 reliefsettings
 relieftodo
 reliefword
+rprfetch
 run
 servicemgr
 settings
+shell
+snake
+soundctl
 sudod
 sysconfdialog
 taskmgr
 terminal
+wavplay
 xiaobai

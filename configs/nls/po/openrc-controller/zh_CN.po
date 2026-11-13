@@ -773,3 +773,115 @@ msgstr "root 账户密码"
 #: userland/apps/openrc-controller/dialogs.cpp:49
 msgid "sudo: current user password"
 msgstr "sudo：当前用户密码"
+
+#: configs/nls/messages/openrc-controller.c:18
+msgid "Backup path is unsafe."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:19
+msgid "Cannot change runlevel: it may exist, be active, referenced, nonempty, or unsafe."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:20
+msgid "Cannot create command output pipe.\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:21
+msgid "Cannot create temporary configuration file."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:22
+msgid "Cannot open configuration (symbolic links are not allowed)."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:23
+msgid "Cannot read OpenRC services and runlevels.\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:24
+msgid "Cannot read service script.\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:25
+msgid "Configuration changed externally. Reload before saving."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:26
+msgid "Configuration changed while saving. Reload before saving."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:27
+msgid "Configuration directory is missing or unsafe."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:28
+msgid "Configuration is too large or contains NUL bytes."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:29
+msgid "Configuration lock is unsafe or another editor is saving. Retry after it finishes."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:30
+msgid "Configuration must be a safe, readable text file up to 256 KiB."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:31
+msgid "Configuration replaced, but directory synchronization failed. Check disk status."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:32
+msgid "Configuration saved. Previous contents: .openrc-controller.bak\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:33
+msgid "Configuration write or atomic replacement failed."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:34
+msgid "Invalid configuration path."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:35
+msgid "Invalid or unsupported OpenRC request."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:36
+msgid "Log is absent or cannot be read. Enable OpenRC rc_logger or the system logger if needed.\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:37
+msgid "NUL bytes are not allowed in a request."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:38
+msgid "No configuration backup is available."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:39
+msgid "OpenRC Controller diagnostics\n\nService membership:\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:40
+msgid "Runlevel updated.\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:41
+msgid "This request does not execute a command."
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:14
+msgid "\nOpenRC status:\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:15
+msgid "\nOperation canceled. Check service state before retrying.\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:16
+msgid "\nOperation timed out after 180 seconds. Check service state before retrying.\n"
+msgstr ""
+
+#: configs/nls/messages/openrc-controller.c:17
+msgid "\nUnassigned services:\n"
+msgstr ""

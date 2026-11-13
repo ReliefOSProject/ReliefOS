@@ -228,14 +228,14 @@ public:
 };
 } // namespace
 void MathWindow::calculate_dialog() {
-  Fl_Double_Window dialog(740, 522, "函数与数值计算");
+  Fl_Double_Window dialog(740, 522, T("函数与数值计算"));
   caption(18, 12, 700,
-          "数值近似计算 · 使用当前 a、b、c、d 参数 · 区间内应满足连续性要求");
-  caption(18, 47, 90, "计算工具");
+          T("数值近似计算 · 使用当前 a、b、c、d 参数 · 区间内应满足连续性要求"));
+  caption(18, 47, 90, T("计算工具"));
   Fl_Choice mode(116, 45, 600, 29);
-  mode.add("函数值 f(x)|一阶导数 f'(x)|二阶导数 "
+  mode.add(T("函数值 f(x)|一阶导数 f'(x)|二阶导数 "
            "f''(x)|定积分|区间零点|两个函数交点|区间最小值（采样搜索）|"
-           "区间最大值（采样搜索）|函数弧长");
+           "区间最大值（采样搜索）|函数弧长"));
   mode.value(0);
   caption(18, 87, 90, "f(x)");
   Fl_Input source(116, 85, 600, 29);
@@ -246,26 +246,26 @@ void MathWindow::calculate_dialog() {
   caption(18, 127, 90, "g(x)");
   Fl_Input second(116, 125, 600, 29);
   second.value("cos(x)");
-  caption(18, 165, 95, "点 x");
+  caption(18, 165, 95, T("点 x"));
   Fl_Input point(116, 163, 136, 29);
   point.value("1");
-  caption(274, 165, 40, "下限");
+  caption(274, 165, 40, T("下限"));
   Fl_Input lo(320, 163, 155, 29);
   lo.value("0");
-  caption(493, 165, 40, "上限");
+  caption(493, 165, 40, T("上限"));
   Fl_Input hi(540, 163, 176, 29);
   hi.value("3.141592653589793");
-  Fl_Button compute(116, 207, 144, 31, "开始计算");
-  Fl_Button cancel(274, 207, 120, 31, "取消计算");
-  Fl_Button tangent(408, 207, 150, 31, "添加此点切线");
+  Fl_Button compute(116, 207, 144, 31, T("开始计算"));
+  Fl_Button cancel(274, 207, 120, 31, T("取消计算"));
+  Fl_Button tangent(408, 207, 150, 31, T("添加此点切线"));
   Fl_Multiline_Output output(18, 254, 698, 196);
   output.textsize(15);
   output.wrap(1);
-  output.value("选择工具并输入表达式。求根需要端点异号；交点计算 "
+  output.value(T("选择工具并输入表达式。求根需要端点异号；交点计算 "
                "f(x)-g(x)="
                "0。\n积分与求导可能在间断点、振荡过快或浮点误差过大时失败。\n极"
-               "值为数值采样搜索结果，不能证明已找到所有局部极值。");
-  Fl_Button close(596, 472, 120, 31, "关闭");
+               "值为数值采样搜索结果，不能证明已找到所有局部极值。"));
+  Fl_Button close(596, 472, 120, 31, T("关闭"));
   close.callback(close_modal);
   dialog.end();
   CalcJob job;
@@ -292,23 +292,23 @@ void MathWindow::calculate_dialog() {
         if (!q.expression.compile(formula, err, 961) ||
             !number(c->point->value(), q.x) || !number(c->lo->value(), q.a) ||
             !number(c->hi->value(), q.b)) {
-          c->output->value(err.empty() ? "请输入有限数值，坐标绝对值不超过 1e12"
-                                       : err.c_str());
+          c->output->value(err.empty() ? T("请输入有限数值，坐标绝对值不超过 1e12")
+                                       : ui_error(err.c_str()));
           return;
         }
         q.vars = c->owner->document.vars;
         if (!c->job->start(q)) {
-          c->output->value("不能启动数值计算进程");
+          c->output->value(T("不能启动数值计算进程"));
           return;
         }
-        c->output->value("计算中… 可继续操作窗口或取消计算。");
+        c->output->value(T("计算中… 可继续操作窗口或取消计算。"));
       },
       &c);
   cancel.callback(
       [](Fl_Widget *, void *p) {
         auto *c = static_cast<Context *>(p);
         c->job->cancel();
-        c->output->value("计算已取消");
+        c->output->value(T("计算已取消"));
       },
       &c);
   tangent.callback(
@@ -319,7 +319,7 @@ void MathWindow::calculate_dialog() {
         double x;
         if (!number(c->point->value(), x) ||
             !e.compile(c->source->value(), err, 961)) {
-          c->output->value("切线表达式或坐标无效");
+          c->output->value(T("切线表达式或坐标无效"));
           return;
         }
         Variables v = c->owner->document.vars;
@@ -327,7 +327,7 @@ void MathWindow::calculate_dialog() {
         double y = e.eval(v);
         Result slope = derivative(e, v, x);
         if (!slope.ok || !isfinite(y)) {
-          c->output->value("此点不能取得有限的导数");
+          c->output->value(T("此点不能取得有限的导数"));
           return;
         }
         if (!c->owner->checkpoint())
@@ -342,7 +342,7 @@ void MathWindow::calculate_dialog() {
         if (append(c->owner->document, line, c->owner->active_)) {
           c->owner->changed();
           c->owner->refresh();
-          c->output->value("切线已加入文档；切线保存计算时的参数值。");
+          c->output->value(T("切线已加入文档；切线保存计算时的参数值。"));
         }
       },
       &c);
@@ -358,31 +358,31 @@ void MathWindow::calculate_dialog() {
         int m = r.mode;
         if (m == 4 || m == 5 || m == 6 || m == 7)
           snprintf(b, sizeof(b),
-                   "x ≈ %.14g\nf(x) / 差值 ≈ %.14g\n残差或区间宽度 ≈ "
-                   "%.4g\n结果为数值近似。",
+                   T("x ≈ %.14g\nf(x) / 差值 ≈ %.14g\n残差或区间宽度 ≈ "
+                   "%.4g\n结果为数值近似。"),
                    r.value, r.y, r.error);
         else
           snprintf(b, sizeof(b),
-                   "结果 ≈ %.14g\n估计差异 / 误差 ≈ %.4g\n结果为数值近似。",
+                   T("结果 ≈ %.14g\n估计差异 / 误差 ≈ %.4g\n结果为数值近似。"),
                    r.value, r.error);
         printf("[reliefmathpp.elf] calculation mode=%d value=%.14g\n", m,
                r.value);
         fflush(stdout);
       } else
         snprintf(b, sizeof(b),
-                 "未得到可靠结果。\n请检查定义域、连续性、区间和端点符号；可缩"
-                 "小区间重试。\n区间宽度很小并不能证明间断点是零点。");
+                 T("未得到可靠结果。\n请检查定义域、连续性、区间和端点符号；可缩"
+                 "小区间重试。\n区间宽度很小并不能证明间断点是零点。"));
       output.value(b);
     }
   }
 }
 void MathWindow::surface_dialog() {
-  Fl_Double_Window dialog(760, 560, "三维函数计算");
+  Fl_Double_Window dialog(760, 560, T("三维函数计算"));
   caption(18, 12, 720,
-          "对显函数 z=f(x,y) 计算；使用当前 a/b/c/d 参数；结果为数值近似");
-  caption(18, 48, 90, "工具");
+          T("对显函数 z=f(x,y) 计算；使用当前 a/b/c/d 参数；结果为数值近似"));
+  caption(18, 48, 90, T("工具"));
   Fl_Choice mode(114, 46, 620, 29);
-  mode.add("函数值 z(x,y)|梯度与法向量|拉普拉斯算子|矩形区域二重积分|曲面面积");
+  mode.add(T("函数值 z(x,y)|梯度与法向量|拉普拉斯算子|矩形区域二重积分|曲面面积"));
   mode.value(0);
   caption(18, 88, 90, "z(x,y)");
   Fl_Input formula(114, 86, 620, 29);
@@ -396,28 +396,28 @@ void MathWindow::surface_dialog() {
   caption(382, 128, 32, "y");
   Fl_Input y(428, 126, 306, 29);
   y.value("2");
-  caption(18, 171, 90, "X 区间");
+  caption(18, 171, 90, T("X 区间"));
   Fl_Input a(114, 169, 112, 29);
   a.value("0");
   Fl_Input b(242, 169, 112, 29);
   b.value("1");
-  caption(382, 171, 90, "Y 区间");
+  caption(382, 171, 90, T("Y 区间"));
   Fl_Input c(478, 169, 112, 29);
   c.value("0");
   Fl_Input d(606, 169, 128, 29);
   d.value("1");
-  Fl_Button compute(114, 214, 138, 31, "开始计算");
-  Fl_Button cancel(268, 214, 118, 31, "取消计算");
-  Fl_Button tangent(402, 214, 174, 31, "添加此点切平面");
+  Fl_Button compute(114, 214, 138, 31, T("开始计算"));
+  Fl_Button cancel(268, 214, 118, 31, T("取消计算"));
+  Fl_Button tangent(402, 214, 174, 31, T("添加此点切平面"));
   Fl_Multiline_Output output(18, 263, 716, 223);
   output.textsize(15);
   output.wrap(1);
   output.value(
-      "梯度为 (∂z/∂x, ∂z/∂y)，法向量为 (-∂z/∂x, -∂z/∂y, "
+      T("梯度为 (∂z/∂x, ∂z/∂y)，法向量为 (-∂z/∂x, -∂z/∂y, "
       "1)"
       "。\n二重积分为带符号的体积；曲面面积只计算指定矩形区域。\n积分采用两级 "
-      "Simpson 网格估计误差，不适用于奇点或未解析的高频结构。");
-  Fl_Button close(614, 510, 120, 31, "关闭");
+      "Simpson 网格估计误差，不适用于奇点或未解析的高频结构。"));
+  Fl_Button close(614, 510, 120, 31, T("关闭"));
   close.callback(close_modal);
   dialog.end();
   CalcJob job;
@@ -439,20 +439,20 @@ void MathWindow::surface_dialog() {
             !number(c->x->value(), q.x) || !number(c->y->value(), q.y) ||
             !number(c->a->value(), q.a) || !number(c->b->value(), q.b) ||
             !number(c->c->value(), q.c) || !number(c->d->value(), q.d)) {
-          c->output->value(error.empty() ? "坐标或区间无效" : error.c_str());
+          c->output->value(error.empty() ? T("坐标或区间无效") : ui_error(error.c_str()));
           return;
         }
         if (c->job->start(q))
-          c->output->value("计算中… 可取消。");
+          c->output->value(T("计算中… 可取消。"));
         else
-          c->output->value("不能启动计算进程");
+          c->output->value(T("不能启动计算进程"));
       },
       &ctx);
   cancel.callback(
       [](Fl_Widget *, void *p) {
         auto *c = static_cast<Context *>(p);
         c->job->cancel();
-        c->output->value("计算已取消");
+        c->output->value(T("计算已取消"));
       },
       &ctx);
   tangent.callback(
@@ -463,7 +463,7 @@ void MathWindow::surface_dialog() {
         Text err;
         if (!number(c->x->value(), x) || !number(c->y->value(), y) ||
             !e.compile(c->formula->value(), err, 963)) {
-          c->output->value("表达式或坐标无效");
+          c->output->value(T("表达式或坐标无效"));
           return;
         }
         Variables v = c->owner->document.vars;
@@ -472,7 +472,7 @@ void MathWindow::surface_dialog() {
         double z = e.eval(v);
         Result dx = partial(e, v, x, y, 0), dy = partial(e, v, x, y, 1);
         if (!dx.ok || !dy.ok || !isfinite(z)) {
-          c->output->value("此点不能取得有限梯度");
+          c->output->value(T("此点不能取得有限梯度"));
           return;
         }
         Object o = make_object(Kind::Plane3);
@@ -483,7 +483,7 @@ void MathWindow::surface_dialog() {
         o.p[3] = z - dx.value * x - dy.value * y;
         o.color = 1;
         if (!valid_object(o, err)) {
-          c->output->value(err.c_str());
+          c->output->value(ui_error(err.c_str()));
           return;
         }
         if (!c->owner->checkpoint())
@@ -491,9 +491,9 @@ void MathWindow::surface_dialog() {
         if (append(c->owner->document, o, c->owner->active_)) {
           c->owner->changed();
           c->owner->refresh();
-          c->output->value("切平面已添加；保存计算时的参数值。");
+          c->output->value(T("切平面已添加；保存计算时的参数值。"));
         } else
-          c->output->value("不能添加切平面");
+          c->output->value(T("不能添加切平面"));
       },
       &ctx);
   reliefos_fltk::style(&dialog);
@@ -507,38 +507,38 @@ void MathWindow::surface_dialog() {
       if (r.ok) {
         if (r.mode == 11)
           snprintf(result, sizeof(result),
-                   "z ≈ %.14g\n梯度 ≈ (%.12g, %.12g)\n法向量 ≈ (%.12g, %.12g, "
-                   "1)\n估计差异 ≈ %.5g",
+                   T("z ≈ %.14g\n梯度 ≈ (%.12g, %.12g)\n法向量 ≈ (%.12g, %.12g, "
+                   "1)\n估计差异 ≈ %.5g"),
                    r.value, r.gx, r.gy, -r.gx, -r.gy, r.error);
         else
           snprintf(result, sizeof(result),
-                   "结果 ≈ %.14g\n估计差异 / 误差 ≈ %.5g", r.value, r.error);
+                   T("结果 ≈ %.14g\n估计差异 / 误差 ≈ %.5g"), r.value, r.error);
         printf("[reliefmathpp.elf] calculation mode=%d value=%.14g\n", r.mode,
                r.value);
         fflush(stdout);
       } else
         snprintf(result, sizeof(result),
-                 "未取得可靠结果，请检查定义域、连续性和区间。\n积分区间下限必"
-                 "须小于上限，绝对值不超过 1e6。");
+                 T("未取得可靠结果，请检查定义域、连续性和区间。\n积分区间下限必"
+                 "须小于上限，绝对值不超过 1e6。"));
       output.value(result);
     }
   }
 }
 void MathWindow::table_dialog() {
-  Fl_Double_Window dialog(720, 550, "函数值表与 CSV");
-  caption(18, 12, 680, "采样二维显函数，最多 2000 行；未定义值显示 undefined");
+  Fl_Double_Window dialog(720, 550, T("函数值表与 CSV"));
+  caption(18, 12, 680, T("采样二维显函数，最多 2000 行；未定义值显示 undefined"));
   caption(18, 48, 80, "f(x)");
   Fl_Input formula(108, 46, 588, 29);
   Object *o = current();
   formula.value(o && o->kind == Kind::Function2 ? o->formula[0].c_str()
                                                 : "sin(x)");
-  caption(18, 88, 60, "下限");
+  caption(18, 88, 60, T("下限"));
   Fl_Input lo(78, 86, 140, 28);
   lo.value("-5");
-  caption(234, 88, 60, "上限");
+  caption(234, 88, 60, T("上限"));
   Fl_Input hi(294, 86, 140, 28);
   hi.value("5");
-  caption(450, 88, 60, "行数");
+  caption(450, 88, 60, T("行数"));
   Fl_Input count(510, 86, 186, 28);
   count.value("101");
   Fl_Text_Buffer buffer;
@@ -546,9 +546,9 @@ void MathWindow::table_dialog() {
   display.buffer(&buffer);
   display.textfont(FL_COURIER);
   display.textsize(14);
-  Fl_Button generate(18, 495, 128, 31, "生成值表");
-  Fl_Button export_csv(160, 495, 128, 31, "导出 CSV");
-  Fl_Button close(576, 495, 120, 31, "关闭");
+  Fl_Button generate(18, 495, 128, 31, T("生成值表"));
+  Fl_Button export_csv(160, 495, 128, 31, T("导出 CSV"));
+  Fl_Button close(576, 495, 120, 31, T("关闭"));
   close.callback(close_modal);
   dialog.end();
   Bytes csv;
@@ -569,8 +569,8 @@ void MathWindow::table_dialog() {
             a >= b || !number(c->count->value(), count) || count < 2 ||
             count > 2000 || floor(count) != count ||
             !e.compile(c->formula->value(), err, 961)) {
-          c->buffer->text(err.empty() ? "区间或行数无效；需要 2–2000 行"
-                                      : err.c_str());
+          c->buffer->text(err.empty() ? T("区间或行数无效；需要 2–2000 行")
+                                      : ui_error(err.c_str()));
           return;
         }
         Bytes out;
@@ -588,7 +588,7 @@ void MathWindow::table_dialog() {
                   : snprintf(line, sizeof(line), "%.17g,undefined\r\n", v.x);
           size_t pos = out.size();
           if (bytes <= 0 || !out.resize(pos + size_t(bytes))) {
-            c->buffer->text("内存不足");
+            c->buffer->text(T("内存不足"));
             return;
           }
           memcpy(out.data() + pos, line, size_t(bytes));
@@ -603,16 +603,16 @@ void MathWindow::table_dialog() {
       [](Fl_Widget *w, void *p) {
         auto *c = static_cast<Context *>(p);
         if (c->csv->empty()) {
-          fl_message("请先生成值表");
+          fl_message(T("请先生成值表"));
           return;
         }
         const char *path =
-            fl_file_chooser("导出函数值表", "*.csv", "values.csv", 0);
+            fl_file_chooser(T("导出函数值表"), "*.csv", "values.csv", 0);
         if (!path)
           return;
         Bytes copy;
         if (!copy.clone_from(*c->csv)) {
-          fl_alert("内存不足");
+          fl_alert(T("内存不足"));
           return;
         }
         c->owner->pending_bytes_.swap(copy);
@@ -624,18 +624,18 @@ void MathWindow::table_dialog() {
   display.buffer(nullptr);
 }
 void MathWindow::vectors_dialog() {
-  Fl_Double_Window dialog(660, 420, "向量与两点计算");
-  caption(18, 15, 620, "输入三维分量；二维计算将 Z 设为 0");
-  caption(18, 55, 90, "A / 向量 u");
+  Fl_Double_Window dialog(660, 420, T("向量与两点计算"));
+  caption(18, 15, 620, T("输入三维分量；二维计算将 Z 设为 0"));
+  caption(18, 55, 90, T("A / 向量 u"));
   Fl_Input a(120, 53, 516, 30);
   a.value("1, 0, 0");
-  caption(18, 99, 90, "B / 向量 v");
+  caption(18, 99, 90, T("B / 向量 v"));
   Fl_Input b(120, 97, 516, 30);
   b.value("0, 1, 0");
   Fl_Multiline_Output result(18, 147, 618, 207);
   result.textsize(15);
-  Fl_Button compute(18, 374, 120, 30, "计算");
-  Fl_Button close(516, 374, 120, 30, "关闭");
+  Fl_Button compute(18, 374, 120, 30, T("计算"));
+  Fl_Button close(516, 374, 120, 30, T("关闭"));
   close.callback(close_modal);
   dialog.end();
   struct Context {
@@ -647,7 +647,7 @@ void MathWindow::vectors_dialog() {
         auto *c = static_cast<Context *>(p);
         Vec3 a, b;
         if (!coordinates(c->a->value(), a) || !coordinates(c->b->value(), b)) {
-          c->out->value("请用英文逗号输入三个有限坐标");
+          c->out->value(T("请用英文逗号输入三个有限坐标"));
           return;
         }
         Vec3 mid = scale(rmp::add(a, b), .5), cross = cross_product(a, b);
@@ -655,10 +655,10 @@ void MathWindow::vectors_dialog() {
                angle = n ? acos(fmax(-1, fmin(1, dot(a, b) / n))) : NAN;
         char text[1000];
         snprintf(text, sizeof(text),
-                 "两点距离 ≈ %.12g\n中点 = (%.10g, %.10g, %.10g)\n点积 u·v = "
+                 T("两点距离 ≈ %.12g\n中点 = (%.10g, %.10g, %.10g)\n点积 u·v = "
                  "%.12g\n叉积 u×v = (%.10g, %.10g, %.10g)\n|u| ≈ %.10g，|v| ≈ "
                  "%.10g\n夹角 ≈ %.10g 弧度 / %.10g "
-                 "度（零向量无定义）\n平行四边形面积 ≈ %.12g",
+                 "度（零向量无定义）\n平行四边形面积 ≈ %.12g"),
                  norm(subtract(a, b)), mid.x, mid.y, mid.z, dot(a, b), cross.x,
                  cross.y, cross.z, norm(a), norm(b), angle,
                  angle * 180 / acos(-1), norm(cross));
@@ -668,14 +668,14 @@ void MathWindow::vectors_dialog() {
   run_modal(dialog);
 }
 void MathWindow::help_dialog() {
-  Fl_Double_Window dialog(790, 602, "ReliefMath++ 使用说明");
+  Fl_Double_Window dialog(790, 602, T("ReliefMath++ 使用说明"));
   Fl_Text_Buffer buffer;
   Fl_Text_Display display(16, 16, 758, 525);
   display.buffer(&buffer);
   display.textsize(15);
   display.wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   buffer.text(
-      "ReliefMath++ · 二维 / "
+      T("ReliefMath++ · 二维 / "
       "三维几何、函数与数值计算\n\n选择工具创建对象，在左侧编辑名称、公式、坐标"
       "和范围，按“应用属性”或 "
       "Ctrl+Enter。选中对象可复制、隐藏、删除、撤销和重做。\n\n二维工具：y=f(x)"
@@ -711,8 +711,8 @@ void MathWindow::help_dialog() {
       "和函数值 CSV 导出。每文档最多 64 个对象，公式 1024 字节，文件 16 "
       "MiB。坐标绝对值不超过 1e8，范围不超过 "
       "1e6。多对象场景会降低有效网格精度。\n\n此应用与 ReliefMath "
-      "公式排版编辑器是两个独立程序。");
-  Fl_Button close(654, 557, 120, 30, "关闭");
+      "公式排版编辑器是两个独立程序。"));
+  Fl_Button close(654, 557, 120, 30, T("关闭"));
   close.callback(close_modal);
   dialog.end();
   run_modal(dialog);

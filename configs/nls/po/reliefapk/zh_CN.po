@@ -890,3 +890,339 @@ msgstr "su — root 密码"
 #: userland/apps/reliefapk/dialogs.cpp:299
 msgid "sudo — current user's password"
 msgstr "sudo — 当前用户密码"
+
+#: configs/nls/messages/reliefapk.c:5
+msgid "Invalid repository address or tag"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:6
+msgid "Invalid repository file"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:7
+msgid "JSON input exceeds limits"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:8
+msgid "JSON package object exceeds depth limit"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:9
+msgid "Open cache directory"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:10
+msgid "Open repositories"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:11
+msgid "Read repositories"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:12
+msgid "Replace repositories"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:13
+msgid "Repositories changed outside ReliefAPK. Reload before saving."
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:14
+msgid "Repository configuration is too large"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:15
+msgid "Repository path too long"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:16
+msgid "Save backup"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:17
+msgid "Sync repositories directory"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:18
+msgid "The administrator cache and its parent directories must exist, be root-owned, and not be writable by other users."
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:19
+msgid "The administrator cache must be an absolute directory."
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:20
+msgid "action does not take targets"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:21
+msgid "action requires package targets"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:22
+msgid "certificate repair is unavailable"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:23
+msgid "certificate repair requires the fixed CA package and online mode"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:24
+msgid "control byte in JSON package object"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:25
+msgid "could not build command arguments"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:26
+msgid "could not prepare the certificate package operation"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:27
+msgid "expected JSON package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:28
+msgid "expected comma or end of package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:29
+msgid "expected package object"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:30
+msgid "fetch requires an output directory and package constraints"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:31
+msgid "invalid JSON package object structure"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:32
+msgid "invalid apk settings"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:33
+msgid "invalid package constraint"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:34
+msgid "invalid package object"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:35
+msgid "key management is handled by the GUI"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:36
+msgid "metadata requires a package name"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:37
+msgid "out of memory"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:38
+msgid "out of memory while building package catalog"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:39
+msgid "owner requires one absolute file path"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:40
+msgid "package catalog exceeds limit"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:41
+msgid "package object exceeds limit"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:42
+msgid "simulation is not supported for this action"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:43
+msgid "trailing comma in package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:44
+msgid "trailing data after JSON array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:45
+msgid "truncated JSON package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:46
+msgid "truncated JSON package object"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:47
+msgid "unknown package query filter"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:48
+msgid "upgrade all does not take package targets"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:49
+msgid "verify requires absolute .apk paths"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:50
+msgid "verify requires local package files"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:51
+msgid "version comparison requires two version strings"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:23
+msgid "A trusted OS recovery CA bundle is unavailable. Update the ReliefOS trust package or image."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:31
+msgid "APK left an updated CA bundle as .apk-new. Check the protected-path policy before treating this as an updated trust store."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:34
+msgid "APK repository diagnostic redacted; check configured sources and TLS."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:35
+msgid "APK skipped an unavailable package or its output was incomplete; certificate repair failed."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:24
+msgid "CA RECOVERY PLAN: the system CA file is unusable. Apply will first restore the trusted OS CA bundle, preserving the old regular file in a private backup."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:51
+msgid "CA bundle changed during recovery; retry after checking the system state"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:38
+msgid "CA directory ownership or permissions are unsafe"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:37
+msgid "CA parent directories must be root-owned and not group/other writable or symlinks"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:41
+msgid "CA recovery directory ownership or permissions are unsafe"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:40
+msgid "CA trust file must be an owned regular file, not group/other writable, and at most 4 MiB"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:44
+msgid "Cannot inspect the current CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:39
+msgid "Cannot inspect the current CA trust path"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:52
+msgid "Could not atomically install the OS recovery CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:27
+msgid "Could not determine whether the system CA package is installed"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:46
+msgid "Could not prepare the complete OS recovery CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:48
+msgid "Could not preserve the complete previous CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:47
+msgid "Could not preserve the previous CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:50
+msgid "Could not sync CA recovery files"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:49
+msgid "Could not sync the previous CA bundle backup"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:45
+msgid "Existing CA bundle must be an owned regular file of at most 4 MiB"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:22
+msgid "Invalid privileged apk request"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:69
+msgid "OS CA baseline restored atomically; previous file backup: "
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:53
+msgid "OS CA bundle was restored, but directory synchronization failed"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:68
+msgid "OS CA recovery failed: "
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:43
+msgid "OS recovery CA bundle has no usable certificates"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:42
+msgid "OS recovery CA bundle is empty or too large"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:26
+msgid "Online package simulation is deferred until trust is restored. The authenticated worker will then check signed repositories, simulate and repair ca-certificates and ca-certificates-bundle together."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:29
+msgid "Refresh the two world requests as plain package names without version/tag constraints, then reinstall both so source certificates and generated output agree. Other world requests are preserved."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:28
+msgid "Repair targets: ca-certificates and ca-certificates-bundle (package signatures and TLS verification required)."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:21
+msgid "Root authentication required"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:20
+msgid "Root authentication required for certificate repair"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:33
+msgid "System CA bundle installed and parsed successfully"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:32
+msgid "The installed CA bundle is still unusable. Check the APK protected-path policy and .apk-new files; update the ReliefOS trust package/configuration."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:25
+msgid "The two CA world requests will be refreshed as plain package names (without version or tag constraints); all other world requests are preserved."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:67
+msgid "Unsafe system CA trust path; no online operation started: "
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:30
+msgid "Verified CA package metadata is unavailable. Check HTTPS, repository signatures, keys and sources. The restored OS CA bundle, if any, has been retained."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:54
+msgid "none (file was missing)"
+msgstr ""

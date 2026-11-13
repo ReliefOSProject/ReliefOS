@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Calculator
+Name[ja]=電卓
 Name[zh_CN]=计算器
 Exec=/usr/bin/calc
 TryExec=/usr/bin/calc

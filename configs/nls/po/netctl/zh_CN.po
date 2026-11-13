@@ -297,3 +297,23 @@ msgstr "未知状态"
 #: configs/nls/messages/netctl.c:7
 msgid "s"
 msgstr " 秒后还原"
+
+#: userland/apps/netctl/main.c:594
+msgid "Bytes"
+msgstr ""
+
+#: userland/apps/netctl/main.c:726
+msgid "Enter a host name and resolve an A record."
+msgstr ""
+
+#: userland/apps/netctl/main.c:592
+msgid "Local"
+msgstr ""
+
+#: userland/apps/netctl/main.c:593
+msgid "Remote"
+msgstr ""
+
+#: userland/apps/netctl/main.c:589
+msgid "Socket"
+msgstr ""

@@ -11,6 +11,44 @@
 #include <time.h>
 namespace oc {
 namespace {
+const char *localized_output(const char *message, Text &scratch) {
+  // Match only diagnostics emitted by this application; tool output is opaque.
+  static const char *const messages[] = {
+      "\nOpenRC status:\n",
+      "\nOperation canceled. Check service state before retrying.\n",
+      "\nOperation timed out after 180 seconds. Check service state before retrying.\n",
+      "\nUnassigned services:\n",
+      "Backup path is unsafe.",
+      "Cannot change runlevel: it may exist, be active, referenced, nonempty, or unsafe.",
+      "Cannot create command output pipe.\n",
+      "Cannot create temporary configuration file.",
+      "Cannot open configuration (symbolic links are not allowed).",
+      "Cannot read OpenRC services and runlevels.\n",
+      "Cannot read service script.\n",
+      "Configuration changed externally. Reload before saving.",
+      "Configuration changed while saving. Reload before saving.",
+      "Configuration directory is missing or unsafe.",
+      "Configuration is too large or contains NUL bytes.",
+      "Configuration lock is unsafe or another editor is saving. Retry after it finishes.",
+      "Configuration must be a safe, readable text file up to 256 KiB.",
+      "Configuration replaced, but directory synchronization failed. Check disk status.",
+      "Configuration saved. Previous contents: .openrc-controller.bak\n",
+      "Configuration write or atomic replacement failed.",
+      "Invalid configuration path.",
+      "Invalid or unsupported OpenRC request.",
+      "Log is absent or cannot be read. Enable OpenRC rc_logger or the system logger if needed.\n",
+      "NUL bytes are not allowed in a request.",
+      "No configuration backup is available.",
+      "OpenRC Controller diagnostics\n\nService membership:\n",
+      "Runlevel updated.\n",
+      "This request does not execute a command.",
+  };
+  for (const char *key : messages)
+    if (!strcmp(message, key))
+      return T(key);
+  (void)scratch;
+  return message;
+}
 enum Purpose {
   Inventory = 1,
   State,
@@ -475,8 +513,10 @@ void App::finish(int code) {
     log(message);
     log("\n");
     if (!response_.empty() && current_.purpose != Mutation &&
-        current_.purpose != Diagnostic)
-      log(response_.c_str());
+        current_.purpose != Diagnostic) {
+      Text translated;
+      log(localized_output(response_.c_str(), translated));
+    }
     tabs_->value(output_);
     return;
   }
@@ -578,8 +618,10 @@ void App::tick(void *p) {
       if (app->response_.size() + event.body.size() <= MaxPayload)
         append(app->response_, event.body.c_str(), event.body.size());
       if (app->current_.purpose == Mutation ||
-          app->current_.purpose == Diagnostic)
-        app->log(event.body.c_str());
+          app->current_.purpose == Diagnostic) {
+        Text translated;
+        app->log(localized_output(event.body.c_str(), translated));
+      }
     } else if (event.kind == Kind::Done)
       app->finish(atoi(event.body.c_str()));
   }

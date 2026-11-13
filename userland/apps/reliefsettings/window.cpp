@@ -1,4 +1,5 @@
 #include "window.h"
+#include "../locale_settings.h"
 #include <FL/Fl_Text_Display.H>
 #include <FL/fl_ask.H>
 #include <FL/x.H>
@@ -51,7 +52,7 @@ template <class Widget> Widget *field(int y, const char *label) {
 }
 const char *page_names[] = {"Language", "Date and time", "Display",
                             "Keyboard", "Network",       "Services"};
-const char *language_names[] = {"", "zh_CN.UTF-8", "en_US.UTF-8"};
+constexpr int language_count = sizeof(language_options) / sizeof(language_options[0]);
 } // namespace
 App::App() {
     Text error;
@@ -69,8 +70,8 @@ App::App() {
     pages_[0] = new Fl_Group(208, 14, 680, 490);
     language_ = field<Fl_Choice>(64, T("Application language"));
     language_->add(T("System default"));
-    language_->add("简体中文");
-    language_->add("English");
+    for (const auto &option : language_options)
+        menu_item(language_, option.name);
     language_->value(0);
     note(114, 58,
          T("The language is used the next time you sign in. Save your work before signing out."));
@@ -299,16 +300,15 @@ void App::reload() {
     if (locale_ok_) {
         language_->clear();
         language_->add(T("System default"));
-        language_->add("简体中文");
-        language_->add("English");
+        for (const auto &option : language_options)
+            menu_item(language_, option.name);
         int index = 0;
-        if (language == "zh_CN.UTF-8")
-            index = 1;
-        else if (language == "en_US.UTF-8")
-            index = 2;
-        else if (!language.empty()) {
+        for (int i = 0; i < language_count; ++i)
+            if (language == language_options[i].locale)
+                index = i + 1;
+        if (!index && !language.empty()) {
             menu_item(language_, language.c_str());
-            index = 3;
+            index = language_count + 1;
         }
         language_->value(index);
     }
@@ -406,12 +406,13 @@ void App::apply() {
     if (page == 0) {
         int selected = language_->value();
         Text original;
-        if (selected == 3)
+        if (selected == language_count + 1)
             read_language(locale_snapshot_.bytes.c_str(), original, error);
-        const char *chosen = selected == 3
+        const char *chosen = selected == language_count + 1
                                  ? original.c_str()
-                                 : (selected >= 0 && selected < 3 ? language_names[selected] : "");
-        if (selected < 0 || selected > 3 ||
+                                 : (selected > 0 && selected <= language_count
+                                        ? language_options[selected - 1].locale : "");
+        if (selected < 0 || selected > language_count + 1 ||
             !update_language(locale_snapshot_.bytes.c_str(), chosen, contents, error)) {
             status(T(error.c_str()));
             return;

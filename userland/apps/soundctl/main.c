@@ -1,3 +1,17 @@
+#include <libintl.h>
+#include <locale.h>
+#include <reliefos/layout.h>
+
+#define T(text) gettext(text)
+
+static void init_localization(void)
+{
+    setlocale(LC_ALL, "");
+    bindtextdomain("soundctl", RELIEFOS_LAYOUT_LOCALE);
+    bind_textdomain_codeset("soundctl", "UTF-8");
+    textdomain("soundctl");
+}
+
 #include <reliefos/audio_control.h>
 #include <reliefos/audio_test.h>
 #include <alsa/asoundlib.h>
@@ -23,9 +37,9 @@ static int number(const char *text, int64_t *out)
 static int failure(const char *operation) { fprintf(stderr, "soundctl: %s: %s\n", operation, strerror(errno)); return 1; }
 static int usage(void)
 {
-    fputs("Usage: soundctl [--card N] cards|controls|get NAME|set NAME VALUE[,VALUE]\n"
-          "       soundctl [--card N] route LABEL|capture-source LABEL|watch\n"
-          "       soundctl [--pcm NAME] test [--channels 1|2] [--seconds 1..30]\n", stderr);
+    fputs(T("Usage: soundctl [--card N] cards|controls|get NAME|set NAME VALUE[,VALUE]\n"
+            "       soundctl [--card N] route LABEL|capture-source LABEL|watch\n"
+            "       soundctl [--pcm NAME] test [--channels 1|2] [--seconds 1..30]\n"), stderr);
     return 2;
 }
 static int list(struct reliefos_audio_control *c, struct reliefos_audio_control_desc **descs, uint32_t *count)
@@ -122,6 +136,7 @@ static int set(struct reliefos_audio_control *c, struct reliefos_audio_control_d
 }
 int main(int argc, char **argv)
 {
+    init_localization();
     uint32_t card = 0, channels = 2, seconds = 2;
     const char *pcm = "default"; int a = 1;
     stopped = 0;
@@ -138,10 +153,10 @@ int main(int argc, char **argv)
         int id = -1, r;
         while ((r = snd_card_next(&id)) >= 0 && id >= 0) {
             char *name;
-            r = snd_card_get_name(id, &name); if (r < 0) { errno = -r; return failure("card name"); }
+            r = snd_card_get_name(id, &name); if (r < 0) { errno = -r; return failure(T("card name")); }
             printf("%d: %s\n", id, name); free(name);
         }
-        if (r < 0) { errno = -r; return failure("cards"); }
+        if (r < 0) { errno = -r; return failure(T("cards")); }
         return 0;
     }
     struct sigaction action = {0}; action.sa_handler = stop;
@@ -155,7 +170,7 @@ int main(int argc, char **argv)
             else return usage();
             a += 2;
         }
-        if (reliefos_audio_test_tone(pcm, channels, seconds, cancelled, NULL)) return failure("test");
+        if (reliefos_audio_test_tone(pcm, channels, seconds, cancelled, NULL)) return failure(T("test"));
         return 0;
     }
     int controls = !strcmp(command, "controls"), watch = !strcmp(command, "watch");
@@ -165,10 +180,10 @@ int main(int argc, char **argv)
         ((controls || watch) && a != argc) || ((get || route || source) && argc - a != 1) ||
         (write && argc - a < 2)) return usage();
     struct reliefos_audio_control *c;
-    if (reliefos_audio_control_open(card, &c)) return failure("open");
+    if (reliefos_audio_control_open(card, &c)) return failure(T("open"));
     struct reliefos_audio_control_desc *descs; uint32_t count;
     int status = 0;
-    if (list(c, &descs, &count)) { status = failure("controls"); goto close; }
+    if (list(c, &descs, &count)) { status = failure(T("controls")); goto close; }
     if (controls) {
         for (uint32_t i = 0; i < count; ++i) {
             printf("numid=%u name='%s' type=%u count=%u min=%" PRId64 " max=%" PRId64 " step=%" PRId64 "\n",
@@ -176,7 +191,7 @@ int main(int argc, char **argv)
             if (descs[i].type == SND_CTL_ELEM_TYPE_ENUMERATED)
                 for (uint32_t item = 0; item < descs[i].items; ++item) {
                     char label[64];
-                    if (reliefos_audio_control_item_name(c, descs[i].numid, item, label, sizeof(label))) { status = failure("enum label"); goto free_list; }
+                    if (reliefos_audio_control_item_name(c, descs[i].numid, item, label, sizeof(label))) { status = failure(T("enum label")); goto free_list; }
                     printf("  %u: %s\n", item, label);
                 }
         }
@@ -184,7 +199,7 @@ int main(int argc, char **argv)
         while (!stopped) {
             uint32_t id, mask;
             int r = reliefos_audio_control_wait(c, 100, &id, &mask);
-            if (r < 0) { if (errno == EINTR) continue; status = failure("watch"); break; }
+            if (r < 0) { if (errno == EINTR) continue; status = failure(T("watch")); break; }
             if (r) { printf("numid=%u event=0x%x\n", id, mask); fflush(stdout); }
         }
     } else {
@@ -192,7 +207,7 @@ int main(int argc, char **argv)
         struct reliefos_audio_control_desc *d = find(descs, count, name);
         if (!d) {
             if (route || source) {
-                fputs("soundctl: available controls:\n", stderr);
+                fputs(T("soundctl: available controls:\n"), stderr);
                 for (uint32_t i = 0; i < count; ++i) fprintf(stderr, "  %u: %s\n", descs[i].numid, descs[i].name);
                 errno = ENOTSUP;
             }

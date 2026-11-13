@@ -1,4 +1,6 @@
 #include "scene.h"
+#include <libintl.h>
+#define T(text) gettext(text)
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -314,8 +316,8 @@ bool frame(const Document &d, const Array<Mesh> &meshes, int tab, int width,
   }
   if (!row)
     p.label(24, 36,
-            tab ? "三维视图：使用工具添加曲面或几何体"
-                : "二维视图：添加函数，或选择几何工具在画布上拾点");
+            tab ? T("三维视图：使用工具添加曲面或几何体")
+                : T("二维视图：添加函数，或选择几何工具在画布上拾点"));
   if (!p.ok)
     return false;
   out = static_cast<Frame &&>(f);

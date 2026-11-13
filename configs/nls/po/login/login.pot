@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/login/main.c:37
+msgid "Initialize accounts"
+msgstr ""
+
+#: userland/apps/login/main.c:29
+msgid "Initialize login terminal"
+msgstr ""
+
+#: userland/apps/login/main.c:72
+msgid "Installer shell requires a TTY\n"
+msgstr ""
+
+#: userland/apps/login/main.c:53
+msgid "Set installer shell"
+msgstr ""
+
+#: userland/apps/login/main.c:48
+msgid "Start installer shell"
+msgstr ""
+
+#: userland/apps/login/main.c:40
+msgid "Start login"
+msgstr ""
+
+#: userland/apps/login/main.c:67
+msgid "usage: login.elf [--installer-shell]\n"
+msgstr ""

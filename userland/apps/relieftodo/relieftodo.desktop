@@ -1,10 +1,13 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefTodo
+Name[ja]=ReliefTodo
 Name[zh_CN]=ReliefTodo
 GenericName=Task Manager
+GenericName[ja]=タスク管理
 GenericName[zh_CN]=待办事项管理器
 Comment=Organize tasks, projects, priorities and due dates
+Comment[ja]=タスク、プロジェクト、優先度、期限の管理
 Comment[zh_CN]=管理任务、项目、优先级与截止日期
 Exec=/usr/bin/relieftodo %f
 TryExec=/usr/bin/relieftodo

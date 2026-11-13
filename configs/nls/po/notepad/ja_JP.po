@@ -1,0 +1,211 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/notepad/main.c:256
+msgid "  Bytes "
+msgstr "  バイト数 "
+
+#: userland/apps/notepad/main.c:270
+msgid "  Empty"
+msgstr "  空"
+
+#: userland/apps/notepad/main.c:258
+msgid "  Encoding "
+msgstr "  文字コード "
+
+#: userland/apps/notepad/main.c:267
+msgid "  Invalid bytes replaced"
+msgstr "  不正なバイトを置換済み"
+
+#: userland/apps/notepad/main.c:261
+msgid "  Modified"
+msgstr "  変更あり"
+
+#: userland/apps/notepad/main.c:249
+msgid "  Read-only"
+msgstr "  読み取り専用"
+
+#: userland/apps/notepad/main.c:264
+msgid "  Truncated"
+msgstr "  一部省略"
+
+#: userland/apps/notepad/main.c:688
+msgid "About"
+msgstr "バージョン情報"
+
+#: userland/apps/notepad/main.c:683
+msgid "Beginning"
+msgstr "先頭"
+
+#: userland/apps/notepad/main.c:809
+msgid "Choose a text file or PNG image"
+msgstr "テキストファイルまたは PNG 画像を選択してください"
+
+#: userland/apps/notepad/main.c:676
+msgid "Choose file"
+msgstr "ファイルを選択"
+
+#: userland/apps/notepad/main.c:682
+msgid "Clear"
+msgstr "クリア"
+
+#: userland/apps/notepad/main.c:443
+msgid "Could not decode PNG (maximum 1024x1024)."
+msgstr "PNG をデコードできませんでした (最大 1024x1024)。"
+
+#: userland/apps/notepad/main.c:415
+msgid "Could not decode text file"
+msgstr "テキストファイルをデコードできませんでした"
+
+#: userland/apps/notepad/main.c:662
+msgid "Edit"
+msgstr "編集"
+
+#: userland/apps/notepad/main.c:536
+msgid "Encoding"
+msgstr "文字コード"
+
+#: userland/apps/notepad/main.c:684
+msgid "End"
+msgstr "末尾"
+
+#: userland/apps/notepad/main.c:661
+msgid "File"
+msgstr "ファイル"
+
+#: userland/apps/notepad/main.c:254
+msgid "Lines "
+msgstr "行数 "
+
+#: userland/apps/notepad/main.c:677
+msgid "New"
+msgstr "新規作成"
+
+#: userland/apps/notepad/main.c:486
+msgid "Notepad"
+msgstr "メモ帳"
+
+#: userland/apps/notepad/main.c:697
+msgid "Notepad - "
+msgstr "メモ帳 - "
+
+#: userland/apps/notepad/main.c:788
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/notepad/main.c:571
+msgid "Open"
+msgstr "開く"
+
+#: userland/apps/notepad/main.c:788
+msgid "Open files from File Manager or Run."
+msgstr "ファイルマネージャーまたは「実行」からファイルを開いてください。"
+
+#: userland/apps/notepad/main.c:245
+msgid "PNG preview "
+msgstr "PNG プレビュー "
+
+#: userland/apps/notepad/main.c:474
+msgid "PNG preview cannot be saved as text"
+msgstr "PNG プレビューをテキストとして保存することはできません"
+
+#: userland/apps/notepad/main.c:625
+msgid "PNG preview is unavailable."
+msgstr "PNG プレビューを利用できません。"
+
+#: userland/apps/notepad/main.c:810
+msgid "ReliefOS text viewer"
+msgstr "ReliefOS テキストビューアー"
+
+#: userland/apps/notepad/main.c:678
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/notepad/main.c:557
+msgid "Save As"
+msgstr "名前を付けて保存"
+
+#: userland/apps/notepad/main.c:757
+msgid "Save changes before clearing this file?"
+msgstr "このファイルの内容を消去する前に変更を保存しますか?"
+
+#: userland/apps/notepad/main.c:831
+msgid "Save changes before closing?"
+msgstr "閉じる前に変更を保存しますか?"
+
+#: userland/apps/notepad/main.c:736
+msgid "Save changes before creating a new file?"
+msgstr "新しいファイルを作成する前に変更を保存しますか?"
+
+#: userland/apps/notepad/main.c:579
+msgid "Save changes before opening another file?"
+msgstr "別のファイルを開く前に変更を保存しますか?"
+
+#: userland/apps/notepad/main.c:368
+msgid "Selected path is not a file"
+msgstr "選択したパスはファイルではありません"
+
+#: userland/apps/notepad/main.c:487
+msgid "Some characters are not available in this encoding. Save them as '?'?"
+msgstr "この文字コードで表せない文字があります。「?」として保存しますか?"
+
+#: userland/apps/notepad/main.c:572
+msgid "Text and PNG (*.txt; *.png)"
+msgstr "テキストと PNG (*.txt; *.png)"
+
+#: userland/apps/notepad/main.c:558
+msgid "Text files (*.txt)"
+msgstr "テキストファイル (*.txt)"
+
+#: userland/apps/notepad/main.c:482
+msgid "Text is too large for selected encoding"
+msgstr "選択した文字コードではテキストが大きすぎます"
+
+#: userland/apps/notepad/main.c:687
+msgid "Top"
+msgstr "上端"
+
+#: userland/apps/notepad/main.c:408
+msgid "Unsupported text encoding"
+msgstr "未対応の文字コード"
+
+#: userland/apps/notepad/main.c:192
+msgid "Untitled"
+msgstr "無題"
+
+#: userland/apps/notepad/main.c:663
+msgid "View"
+msgstr "表示"
+
+#: userland/apps/notepad/main.c:373
+msgid "open failed "
+msgstr "開く操作に失敗しました "
+
+#: userland/apps/notepad/main.c:388
+msgid "read failed "
+msgstr "読み取りに失敗しました "
+
+#: userland/apps/notepad/main.c:493
+msgid "save open failed "
+msgstr "保存先を開けませんでした "
+
+#: userland/apps/notepad/main.c:501
+msgid "save write failed "
+msgstr "保存時の書き込みに失敗しました "
+
+#: userland/apps/notepad/main.c:506
+msgid "save write incomplete"
+msgstr "保存時の書き込みが不完全です"
+
+#: userland/apps/notepad/main.c:364
+msgid "stat failed "
+msgstr "stat に失敗しました "

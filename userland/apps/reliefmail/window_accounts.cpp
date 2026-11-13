@@ -1,3 +1,4 @@
+#include "localization.h"
 #include "window.h"
 #include "../fltk_support.h"
 #include <FL/Fl.H>
@@ -361,7 +362,7 @@ void MailWindow::handle_account_dialog(AccountSetupDialog &dialog, AccountDialog
         SecretBytes imap_password, smtp_password;
         Text error;
         if (!dialog.read(account, imap_password, smtp_password, error, false)) {
-            fl_alert("%s", error.c_str()); return;
+            fl_alert("%s", DiagnosticForDisplay(error.c_str()).c_str()); return;
         }
         if (!account.id || !account.generation) { fl_alert("%s", T("Select a saved account to remove.")); return; }
         if (!literal_confirmation(T("Remove account"),
@@ -382,7 +383,7 @@ void MailWindow::handle_account_dialog(AccountSetupDialog &dialog, AccountDialog
         if (!submit_task(WorkerTaskKind::AccountDelete, request, &input, SecretBytes(),
                 static_cast<PendingUiRequest &&>(pending), submit_error)) {
             --ui_generation_; --selection_generation_;
-            fl_alert("%s", submit_error.c_str()); return;
+            fl_alert("%s", DiagnosticForDisplay(submit_error.c_str()).c_str()); return;
         }
         reader_pane_->clear_message(T("Account removal is running in the background."));
         dialog.hide();
@@ -395,7 +396,7 @@ void MailWindow::start_account_test(AccountSetupDialog &dialog, bool smtp) {
     SecretBytes incoming_password, outgoing_password;
     Text error;
     if (!dialog.read(candidate, incoming_password, outgoing_password, error, false)) {
-        fl_alert("%s", error.c_str()); return;
+        fl_alert("%s", DiagnosticForDisplay(error.c_str()).c_str()); return;
     }
     SecretBytes password = smtp ? static_cast<SecretBytes &&>(outgoing_password) :
         static_cast<SecretBytes &&>(incoming_password);
@@ -411,7 +412,7 @@ void MailWindow::start_account_test(AccountSetupDialog &dialog, bool smtp) {
     SecretBytes credential;
     if (!worker_encode_account_credential(candidate, smtp ? CredentialPurpose::Smtp : CredentialPurpose::Imap,
             coordinator_.profile_epoch(), static_cast<SecretBytes &&>(password), credential, error)) {
-        fl_alert("%s", error.c_str()); return;
+        fl_alert("%s", DiagnosticForDisplay(error.c_str()).c_str()); return;
     }
     WorkerRequest request;
     PendingUiRequest pending;
@@ -420,7 +421,7 @@ void MailWindow::start_account_test(AccountSetupDialog &dialog, bool smtp) {
     if (!submit_task(smtp ? WorkerTaskKind::AccountTestSmtp : WorkerTaskKind::AccountTestImap,
             request, &input, static_cast<SecretBytes &&>(credential),
             static_cast<PendingUiRequest &&>(pending), error)) {
-        fl_alert("%s", error.c_str()); return;
+        fl_alert("%s", DiagnosticForDisplay(error.c_str()).c_str()); return;
     }
     dialog.clear_passwords();
 }
@@ -456,8 +457,8 @@ void MailWindow::account_test_failed(const PendingUiRequest &pending, const Text
             problem == TransportProblem::UntrustedCertificate);
     if (repairable) {
         if (fl_choice("%s\n\n%s", T("Later"), T("Repair certificates"), nullptr,
-                hint, diagnostic.c_str()) == 1) repair_system_certificates();
-    } else fl_alert("%s\n\n%s", hint, diagnostic.c_str());
+                hint, DiagnosticForDisplay(diagnostic.c_str()).c_str()) == 1) repair_system_certificates();
+    } else fl_alert("%s\n\n%s", hint, DiagnosticForDisplay(diagnostic.c_str()).c_str());
 }
 
 void MailWindow::repair_system_certificates() {
@@ -488,7 +489,7 @@ void MailWindow::start_account_save(AccountSetupDialog &dialog) {
     SecretBytes incoming_password, outgoing_password;
     Text error;
     if (!dialog.read(account, incoming_password, outgoing_password, error, false)) {
-        fl_alert("%s", error.c_str()); return;
+        fl_alert("%s", DiagnosticForDisplay(error.c_str()).c_str()); return;
     }
     if (!account.id && (incoming_password.empty() || outgoing_password.empty())) {
         fl_alert("%s", T("Enter both incoming and outgoing passwords or application codes."));
@@ -545,7 +546,7 @@ void MailWindow::start_account_save(AccountSetupDialog &dialog) {
     reader_pane_->clear_message(T("Account settings are being saved."));
     if (!submit_task(kind, request, &input, SecretBytes(), static_cast<PendingUiRequest &&>(pending), error)) {
         --ui_generation_; --selection_generation_;
-        fl_alert("%s", error.c_str());
+        fl_alert("%s", DiagnosticForDisplay(error.c_str()).c_str());
         schedule_query(true);
         return;
     }

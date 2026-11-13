@@ -1,0 +1,1011 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/reliefdiagram/window.h:37
+msgid "%s（位置 %zu）"
+msgstr "%s（位置 %zu）"
+
+#: userland/apps/reliefdiagram/window.cpp:573
+msgid "%zu 个图形  %zu 条连线  选中 %zu  %.0f%%"
+msgstr "図形 %zu 個  接続線 %zu 本  選択 %zu 個  %.0f%%"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/reliefdiagram/window.cpp:31
+msgid "Edit"
+msgstr "編集"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/reliefdiagram/window.cpp:31
+msgid "File"
+msgstr "ファイル"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/reliefdiagram/window.cpp:31
+msgid "Help"
+msgstr "ヘルプ"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/reliefdiagram/window.cpp:263
+msgid "Markdown 大纲"
+msgstr "Markdown アウトライン"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/reliefdiagram/window.cpp:76
+msgid "PNG 导出"
+msgstr "PNG エクスポート"
+
+#: configs/nls/messages/reliefdiagram.c:3
+msgid "PNG 编码失败"
+msgstr "PNG のエンコードに失敗しました"
+
+#: configs/nls/messages/reliefdiagram.c:4
+msgid "PNG 编码超时"
+msgstr "PNG のエンコードがタイムアウトしました"
+
+#: configs/nls/messages/reliefdiagram.c:5
+msgid "PNG 编码通道读取失败"
+msgstr "PNG エンコード用パイプの読み取りに失敗しました"
+
+#: configs/nls/messages/reliefdiagram.c:6
+msgid "PNG 超过限制或内存不足"
+msgstr "PNG が上限を超えているか、メモリが不足しています"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/reliefdiagram/window.cpp:71
+msgid "ReliefDiagram   思维导图 · 流程图 · 逻辑关系"
+msgstr "ReliefDiagram   マインドマップ · フローチャート · 関係図"
+
+#: userland/apps/reliefdiagram/actions.cpp:332
+msgid "ReliefDiagram\n\n图形：双击左侧图形库或使用插入工具。双击图形 / F2 编辑文字。\n主题：选中主题后 Tab 添加子主题，Enter 添加同级主题；折叠保留原数据。\n连线：选择“连接图形”，依次点击起点与终点；Esc 返回选择工具。\n画布：拖动移动，右下角手柄调整尺寸；Shift 多选，拖动空白框选。\n中键 / 右键或平移工具平移，滚轮缩放，Home 适合内容。\n方向键微调，Shift+方向键移动 20；布局页提供对齐、分布和层级。\n右侧修改后点击应用；多选样式应用到同类对象，文字和位置仅修改首个。\nCtrl+S 保存，Ctrl+Z / Y 撤销重做，Ctrl+C / V 使用应用内部图形剪贴板。\n\n.rdiagram 保存全部可编辑内容；SVG / PNG 导出完整展开图形，Markdown 包含折叠分支。\n首版最多 512 个图形、2048 条附加连线、8 MiB；不导入其他厂商格式。"
+msgstr "ReliefDiagram\n\n図形: 左側の図形ライブラリをダブルクリックするか、挿入ツールを使用します。図形をダブルクリックするか F2 で文字を編集します。\nトピック: トピックを選択して Tab で子トピック、Enter で同じ階層のトピックを追加します。折りたたんでも元のデータは保持されます。\n接続線:「図形を接続」を選び、始点と終点を順にクリックします。Esc で選択ツールに戻ります。\nキャンバス: ドラッグで移動し、右下のハンドルでサイズを変更します。Shift で複数選択、空白部分をドラッグして範囲選択します。\n中ボタン / 右ボタンまたはパンツールで移動、ホイールで拡大縮小、Home で内容に合わせます。\n矢印キーで微調整し、Shift+矢印キーで 20 移動します。レイアウトページで整列、均等配置、階層の調整ができます。\n右側で変更後に適用をクリックします。複数選択時のスタイルは同じ種類のオブジェクトに適用され、文字と位置は最初のオブジェクトだけを変更します。\nCtrl+S で保存、Ctrl+Z / Y で元に戻す / やり直す、Ctrl+C / V でアプリ内の図形をコピー / 貼り付けします。\n\n.rdiagram は編集可能な内容をすべて保存します。SVG / PNG は展開した図形を出力し、Markdown には折りたたんだ枝も含まれます。\n初版の上限は図形 512 個、追加の接続線 2048 本、8 MiB です。他社形式のインポートには対応していません。"
+
+#: userland/apps/reliefdiagram/window.cpp:76
+msgid "SVG 导出"
+msgstr "SVG エクスポート"
+
+#: configs/nls/messages/reliefdiagram.c:7
+msgid "SVG 超过限制或内存不足"
+msgstr "SVG が上限を超えているか、メモリが不足しています"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/reliefdiagram/window.cpp:31
+msgid "View"
+msgstr "表示"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: userland/apps/reliefdiagram/actions.cpp:194
+msgid "不保存"
+msgstr "保存しない"
+
+#: configs/nls/messages/reliefdiagram.c:8
+msgid "不能创建临时文件"
+msgstr "一時ファイルを作成できません"
+
+#: configs/nls/messages/reliefdiagram.c:9
+msgid "不能创建工作进程管道"
+msgstr "ワーカープロセスのパイプを作成できません"
+
+#: configs/nls/messages/reliefdiagram.c:10
+msgid "不能取得保存锁"
+msgstr "保存ロックを取得できません"
+
+#: configs/nls/messages/reliefdiagram.c:11
+msgid "不能启动文件工作进程"
+msgstr "ファイルワーカープロセスを起動できません"
+
+#: configs/nls/messages/reliefdiagram.c:12
+msgid "不能打开保存锁文件"
+msgstr "保存ロックファイルを開けません"
+
+#: configs/nls/messages/reliefdiagram.c:13
+msgid "不能打开文件"
+msgstr "ファイルを開けません"
+
+#: configs/nls/messages/reliefdiagram.c:14
+msgid "不能打开父目录（不支持符号链接）"
+msgstr "親ディレクトリを開けません（シンボリックリンクには対応していません）"
+
+#: configs/nls/messages/reliefdiagram.c:15
+msgid "不能核对导出目录"
+msgstr "エクスポート先ディレクトリを確認できません"
+
+#: configs/nls/messages/reliefdiagram.c:16
+msgid "不能检查保存目标"
+msgstr "保存先を確認できません"
+
+#: configs/nls/messages/reliefdiagram.c:17
+msgid "不能检查保存锁文件"
+msgstr "保存ロックファイルを確認できません"
+
+#: configs/nls/messages/reliefdiagram.c:18
+msgid "不能设置非阻塞管道"
+msgstr "パイプを非ブロッキングに設定できません"
+
+#: configs/nls/messages/reliefdiagram.c:19
+msgid "不能读取文件信息"
+msgstr "ファイル情報を読み取れません"
+
+#: configs/nls/messages/reliefdiagram.c:20
+msgid "主题父子关系缺失或存在循环"
+msgstr "トピックの親子関係が欠けているか、循環しています"
+
+#: userland/apps/reliefdiagram/window.cpp:69
+msgid "使用说明"
+msgstr "使い方"
+
+#: configs/nls/messages/reliefdiagram.c:21
+msgid "便笺"
+msgstr "付箋"
+
+#: userland/apps/reliefdiagram/actions.cpp:194
+msgid "保存"
+msgstr "保存"
+
+#: userland/apps/reliefdiagram/files.cpp:60
+msgid "保存 ReliefDiagram 文档"
+msgstr "ReliefDiagram 文書を保存"
+
+#: configs/nls/messages/reliefdiagram.c:22
+msgid "保存冲突：磁盘文件已更改，请另存为"
+msgstr "保存の競合: ディスク上のファイルが変更されました。名前を付けて保存してください"
+
+#: configs/nls/messages/reliefdiagram.c:23
+msgid "保存锁必须是当前用户拥有的普通文件，且不能有其他硬链接"
+msgstr "保存ロックは現在のユーザーが所有する通常ファイルで、他のハードリンクがない必要があります"
+
+#: userland/apps/reliefdiagram/window.cpp:53
+msgid "全选"
+msgstr "すべて選択"
+
+#: configs/nls/messages/reliefdiagram.c:24
+msgid "关闭临时文件失败"
+msgstr "一時ファイルを閉じられませんでした"
+
+#: userland/apps/reliefdiagram/actions.cpp:79
+msgid "内存不足"
+msgstr "メモリ不足"
+
+#: userland/apps/reliefdiagram/window.cpp:479
+msgid "内存不足，无法保存撤销记录"
+msgstr "メモリ不足のため、取り消し履歴を保存できません"
+
+#: configs/nls/messages/reliefdiagram.c:26
+msgid "内存不足，无法布局"
+msgstr "メモリ不足のため、レイアウトできません"
+
+#: userland/apps/reliefdiagram/window.cpp:492
+msgid "内存不足，无法移动"
+msgstr "メモリ不足のため、移動できません"
+
+#: userland/apps/reliefdiagram/actions.cpp:10
+msgid "内存不足，无法编辑文档"
+msgstr "メモリ不足のため、文書を編集できません"
+
+#: configs/nls/messages/reliefdiagram.c:27
+msgid "写入或同步失败"
+msgstr "書き込みまたは同期に失敗しました"
+
+#: userland/apps/reliefdiagram/window.cpp:51
+msgid "创建副本"
+msgstr "複製"
+
+#: userland/apps/reliefdiagram/window.cpp:244
+msgid "删除"
+msgstr "削除"
+
+#: userland/apps/reliefdiagram/window.cpp:52
+msgid "删除（含子主题）"
+msgstr "削除（子トピックを含む）"
+
+#: configs/nls/messages/reliefdiagram.c:28
+msgid "判断（菱形）"
+msgstr "判断（ひし形）"
+
+#: userland/apps/reliefdiagram/actions.cpp:133
+msgid "剪贴板中没有图形"
+msgstr "クリップボードに図形がありません"
+
+#: userland/apps/reliefdiagram/window.cpp:156
+msgid "加粗"
+msgstr "太字"
+
+#: userland/apps/reliefdiagram/actions.cpp:194
+msgid "取消"
+msgstr "キャンセル"
+
+#: configs/nls/messages/reliefdiagram.c:29
+msgid "另一个文档窗口正在保存此目录，请稍后重试"
+msgstr "別の文書ウィンドウがこのディレクトリに保存中です。しばらくしてから再試行してください"
+
+#: userland/apps/reliefdiagram/window.cpp:41
+msgid "另存为…"
+msgstr "名前を付けて保存…"
+
+#: configs/nls/messages/reliefdiagram.c:30
+msgid "只支持不超过 16 MiB 的普通文件"
+msgstr "16 MiB 以下の通常ファイルのみ対応しています"
+
+#: userland/apps/reliefdiagram/window.cpp:229
+msgid "同级主题"
+msgstr "同じ階層のトピック"
+
+#: userland/apps/reliefdiagram/window.cpp:247
+msgid "向右树形"
+msgstr "右向きツリー"
+
+#: userland/apps/reliefdiagram/window.cpp:65
+msgid "向右树形布局"
+msgstr "右向きツリーレイアウト"
+
+#: userland/apps/reliefdiagram/window.cpp:60
+msgid "吸附"
+msgstr "スナップ"
+
+#: userland/apps/reliefdiagram/window.cpp:31
+msgid "图形"
+msgstr "図形"
+
+#: configs/nls/messages/reliefdiagram.c:31
+msgid "图形参数无效"
+msgstr "図形のパラメーターが無効です"
+
+#: userland/apps/reliefdiagram/window.cpp:91
+msgid "图形库 · 双击添加"
+msgstr "図形ライブラリ · ダブルクリックで追加"
+
+#: configs/nls/messages/reliefdiagram.c:32
+msgid "图形的编号、文字、尺寸或样式无效"
+msgstr "図形の番号、文字、寸法またはスタイルが無効です"
+
+#: configs/nls/messages/reliefdiagram.c:33
+msgid "图形编号重复"
+msgstr "図形の番号が重複しています"
+
+#: configs/nls/messages/reliefdiagram.c:34
+msgid "圆角矩形"
+msgstr "角丸四角形"
+
+#: userland/apps/reliefdiagram/window.cpp:249
+msgid "垂直分布"
+msgstr "垂直方向に均等配置"
+
+#: userland/apps/reliefdiagram/window.cpp:248
+msgid "垂直居中"
+msgstr "垂直方向に中央揃え"
+
+#: userland/apps/reliefdiagram/window.cpp:146
+msgid "填充 / 边框 / 文字颜色"
+msgstr "塗りつぶし / 枠線 / 文字色"
+
+#: userland/apps/reliefdiagram/window.cpp:147
+msgid "填充…"
+msgstr "塗りつぶし…"
+
+#: userland/apps/reliefdiagram/window.cpp:141
+msgid "备注（保存在原生文档）"
+msgstr "メモ（ネイティブ文書に保存）"
+
+#: userland/apps/reliefdiagram/window.cpp:49
+msgid "复制"
+msgstr "コピー"
+
+#: configs/nls/messages/reliefdiagram.c:35
+msgid "复制后图形数量超过限制"
+msgstr "複製後の図形数が上限を超えます"
+
+#: configs/nls/messages/reliefdiagram.c:36
+msgid "复制后连线数量超过限制"
+msgstr "複製後の接続線数が上限を超えます"
+
+#: userland/apps/reliefdiagram/window.cpp:166
+msgid "多选时样式应用到同类对象"
+msgstr "複数選択時、スタイルは同じ種類のオブジェクトに適用されます"
+
+#: configs/nls/messages/reliefdiagram.c:37
+msgid "大纲超过限制或内存不足"
+msgstr "アウトラインが上限を超えているか、メモリが不足しています"
+
+#: userland/apps/reliefdiagram/window.cpp:228
+msgid "子主题"
+msgstr "子トピック"
+
+#: userland/apps/reliefdiagram/window.cpp:152
+msgid "字号"
+msgstr "文字サイズ"
+
+#: userland/apps/reliefdiagram/window.cpp:527
+msgid "字号必须在 10 到 48 之间"
+msgstr "文字サイズは 10 から 48 の範囲で指定してください"
+
+#: userland/apps/reliefdiagram/window.cpp:56
+msgid "实际大小"
+msgstr "実際のサイズ"
+
+#: userland/apps/reliefdiagram/window.cpp:260
+msgid "审批流程 · 流程图"
+msgstr "承認フロー · フローチャート"
+
+#: userland/apps/reliefdiagram/window.cpp:157
+msgid "宽"
+msgstr "幅"
+
+#: userland/apps/reliefdiagram/window.cpp:104
+msgid "对象与主题"
+msgstr "オブジェクトとトピック"
+
+#: userland/apps/reliefdiagram/files.cpp:179
+msgid "导出 Markdown 大纲"
+msgstr "Markdown アウトラインをエクスポート"
+
+#: userland/apps/reliefdiagram/window.cpp:45
+msgid "导出 Markdown 大纲…"
+msgstr "Markdown アウトラインをエクスポート…"
+
+#: userland/apps/reliefdiagram/window.cpp:44
+msgid "导出 PNG…"
+msgstr "PNG をエクスポート…"
+
+#: userland/apps/reliefdiagram/window.cpp:43
+msgid "导出 SVG…"
+msgstr "SVG をエクスポート…"
+
+#: userland/apps/reliefdiagram/files.cpp:152
+msgid "导出完成"
+msgstr "エクスポートが完了しました"
+
+#: userland/apps/reliefdiagram/files.cpp:179
+msgid "导出完整图形"
+msgstr "図形全体をエクスポート"
+
+#: configs/nls/messages/reliefdiagram.c:38
+msgid "导出目标是当前文档，请选择其他文件"
+msgstr "エクスポート先が現在の文書です。別のファイルを選択してください"
+
+#: userland/apps/reliefdiagram/window.cpp:190
+msgid "就绪"
+msgstr "準備完了"
+
+#: userland/apps/reliefdiagram/window.cpp:127
+msgid "属性"
+msgstr "プロパティ"
+
+#: userland/apps/reliefdiagram/window.cpp:411
+msgid "属性 · 多选"
+msgstr "プロパティ · 複数選択"
+
+#: userland/apps/reliefdiagram/window.cpp:412
+msgid "属性 · 当前对象"
+msgstr "プロパティ · 現在のオブジェクト"
+
+#: userland/apps/reliefdiagram/window.cpp:405
+msgid "属性 · 请选择图形或连线"
+msgstr "プロパティ · 図形または接続線を選択してください"
+
+#: userland/apps/reliefdiagram/window.cpp:306
+msgid "属性已修改，点击应用或按 Ctrl+Enter"
+msgstr "プロパティが変更されました。適用をクリックするか Ctrl+Enter を押してください"
+
+#: userland/apps/reliefdiagram/window.cpp:560
+msgid "属性已应用"
+msgstr "プロパティを適用しました"
+
+#: configs/nls/messages/reliefdiagram.c:39
+msgid "工作进程响应过大或内存不足"
+msgstr "ワーカーの応答が大きすぎるか、メモリが不足しています"
+
+#: configs/nls/messages/reliefdiagram.c:40
+msgid "工作进程读取失败"
+msgstr "ワーカーからの読み取りに失敗しました"
+
+#: userland/apps/reliefdiagram/window.cpp:247
+msgid "左对齐"
+msgstr "左揃え"
+
+#: userland/apps/reliefdiagram/actions.cpp:59
+msgid "已创建连线；可在右侧设置标签、线型和箭头"
+msgstr "接続線を作成しました。右側でラベル、線種、矢印を設定できます"
+
+#: userland/apps/reliefdiagram/actions.cpp:129
+msgid "已复制图形和内部连线，可在本文档粘贴"
+msgstr "図形と内部の接続線をコピーしました。この文書に貼り付けできます"
+
+#: userland/apps/reliefdiagram/actions.cpp:42
+msgid "已添加图形；双击文字或在右侧编辑属性"
+msgstr "図形を追加しました。文字をダブルクリックするか右側でプロパティを編集してください"
+
+#: userland/apps/reliefdiagram/actions.cpp:496
+msgid "已返回选择工具"
+msgstr "選択ツールに戻りました"
+
+#: userland/apps/reliefdiagram/actions.cpp:231
+msgid "已还原未应用的属性"
+msgstr "未適用のプロパティを元に戻しました"
+
+#: userland/apps/reliefdiagram/canvas.cpp:206
+msgid "已选择起点，点击另一个图形完成连线"
+msgstr "始点を選択しました。別の図形をクリックして接続してください"
+
+#: userland/apps/reliefdiagram/window.cpp:224
+msgid "布局与排列"
+msgstr "レイアウトと配置"
+
+#: userland/apps/reliefdiagram/window.cpp:247
+msgid "平衡导图"
+msgstr "マップを均等に配置"
+
+#: userland/apps/reliefdiagram/window.cpp:64
+msgid "平衡思维导图"
+msgstr "マインドマップを均等に配置"
+
+#: userland/apps/reliefdiagram/window.cpp:54
+msgid "应用属性"
+msgstr "プロパティを適用"
+
+#: userland/apps/reliefdiagram/window.cpp:185
+msgid "应用属性  Ctrl+Enter"
+msgstr "プロパティを適用  Ctrl+Enter"
+
+#: userland/apps/reliefdiagram/window.cpp:224
+msgid "开始与插入"
+msgstr "ホームと挿入"
+
+#: userland/apps/reliefdiagram/actions.cpp:194
+msgid "当前文档有未保存的修改。"
+msgstr "現在の文書に未保存の変更があります。"
+
+#: userland/apps/reliefdiagram/window.cpp:231
+msgid "思维导图 · Tab 子主题 · Enter 同级"
+msgstr "マインドマップ · Tab 子トピック · Enter 同じ階層"
+
+#: userland/apps/reliefdiagram/window.cpp:75
+msgid "打开"
+msgstr "開く"
+
+#: userland/apps/reliefdiagram/files.cpp:38
+msgid "打开 ReliefDiagram 文档"
+msgstr "ReliefDiagram 文書を開く"
+
+#: userland/apps/reliefdiagram/window.cpp:39
+msgid "打开…"
+msgstr "開く…"
+
+#: userland/apps/reliefdiagram/window.cpp:230
+msgid "折叠 / 展开"
+msgstr "折りたたむ / 展開"
+
+#: userland/apps/reliefdiagram/window.cpp:63
+msgid "折叠或展开分支"
+msgstr "枝を折りたたむ / 展開"
+
+#: userland/apps/reliefdiagram/window.cpp:341
+msgid "拖动图形移动；Shift 多选；拖动空白框选"
+msgstr "図形をドラッグして移動 · Shift で複数選択 · 空白部分をドラッグして範囲選択"
+
+#: userland/apps/reliefdiagram/canvas.cpp:8
+msgid "拖动图形移动；右下角手柄调整尺寸；Shift 多选；空白框选；中键平移；滚轮缩放"
+msgstr "図形をドラッグして移動。右下のハンドルでサイズ変更。Shift で複数選択。空白部分で範囲選択。中ボタンで移動、ホイールで拡大縮小"
+
+#: userland/apps/reliefdiagram/window.cpp:340
+msgid "拖动画布平移；滚轮缩放"
+msgstr "キャンバスをドラッグして移動。ホイールで拡大縮小"
+
+#: userland/apps/reliefdiagram/window.cpp:570
+msgid "拖动移动 · Shift 多选 · 滚轮缩放 · 双击编辑文字"
+msgstr "ドラッグで移動 · Shift で複数選択 · ホイールで拡大縮小 · ダブルクリックで文字編集"
+
+#: userland/apps/reliefdiagram/window.cpp:47
+msgid "撤销"
+msgstr "元に戻す"
+
+#: userland/apps/reliefdiagram/window.cpp:57
+msgid "放大"
+msgstr "拡大"
+
+#: configs/nls/messages/reliefdiagram.c:41
+msgid "数据库"
+msgstr "データベース"
+
+#: userland/apps/reliefdiagram/files.cpp:66
+msgid "文件名过长或内存不足"
+msgstr "ファイル名が長すぎるか、メモリが不足しています"
+
+#: configs/nls/messages/reliefdiagram.c:42
+msgid "文件在读取过程中被其他程序修改，请重试"
+msgstr "読み取り中にファイルが別のプログラムによって変更されました。再試行してください"
+
+#: configs/nls/messages/reliefdiagram.c:43
+msgid "文件工作进程响应无效"
+msgstr "ファイルワーカーの応答が無効です"
+
+#: configs/nls/messages/reliefdiagram.c:44
+msgid "文件工作进程意外退出，原文档仍保留在窗口中"
+msgstr "ファイルワーカーが予期せず終了しました。元の文書はウィンドウに保持されています"
+
+#: configs/nls/messages/reliefdiagram.c:45
+msgid "文件已截断"
+msgstr "ファイルが途中で切れています"
+
+#: configs/nls/messages/reliefdiagram.c:46
+msgid "文件已替换，但目录同步失败；请重新打开核对后再保存"
+msgstr "ファイルは置き換えられましたが、ディレクトリの同期に失敗しました。開き直して確認してから保存してください"
+
+#: configs/nls/messages/reliefdiagram.c:47
+msgid "文件已被其他程序修改；请重新打开或另存为，避免覆盖"
+msgstr "ファイルが別のプログラムによって変更されました。上書きを避けるため、開き直すか名前を付けて保存してください"
+
+#: configs/nls/messages/reliefdiagram.c:48
+msgid "文件操作正在进行"
+msgstr "ファイル操作が進行中です"
+
+#: configs/nls/messages/reliefdiagram.c:49
+msgid "文件超出 16 MiB 限制"
+msgstr "ファイルが 16 MiB の上限を超えています"
+
+#: configs/nls/messages/reliefdiagram.c:50
+msgid "文件路径不能包含上级目录"
+msgstr "ファイルパスに親ディレクトリを含めることはできません"
+
+#: configs/nls/messages/reliefdiagram.c:51
+msgid "文件路径为空或过长"
+msgstr "ファイルパスが空か長すぎます"
+
+#: userland/apps/reliefdiagram/window.cpp:131
+msgid "文字 / 连线标签"
+msgstr "文字 / 接続線ラベル"
+
+#: userland/apps/reliefdiagram/window.cpp:147
+msgid "文字…"
+msgstr "文字…"
+
+#: userland/apps/reliefdiagram/window.cpp:167
+msgid "文字与位置仅修改首个对象"
+msgstr "文字と位置は最初のオブジェクトのみ変更されます"
+
+#: configs/nls/messages/reliefdiagram.c:52
+msgid "文档"
+msgstr "文書"
+
+#: userland/apps/reliefdiagram/files.cpp:145
+msgid "文档已保存"
+msgstr "文書を保存しました"
+
+#: configs/nls/messages/reliefdiagram.c:53
+msgid "文档总大小超过 8 MiB，未应用修改"
+msgstr "文書の合計サイズが 8 MiB を超えるため、変更は適用されませんでした"
+
+#: userland/apps/reliefdiagram/actions.cpp:351
+msgid "文档标题"
+msgstr "文書タイトル"
+
+#: userland/apps/reliefdiagram/window.cpp:42
+msgid "文档标题…"
+msgstr "文書タイトル…"
+
+#: configs/nls/messages/reliefdiagram.c:54
+msgid "文档超过 8 MiB 限制或内存不足"
+msgstr "文書が 8 MiB の上限を超えているか、メモリが不足しています"
+
+#: configs/nls/messages/reliefdiagram.c:55
+msgid "文档超过限制或标题无效"
+msgstr "文書が上限を超えているか、タイトルが無効です"
+
+#: userland/apps/reliefdiagram/window.cpp:75
+msgid "新建"
+msgstr "新規作成"
+
+#: userland/apps/reliefdiagram/window.cpp:38
+msgid "新建空白图"
+msgstr "空白の図を新規作成"
+
+#: configs/nls/messages/reliefdiagram.c:56
+msgid "无效或损坏的 ReliefDiagram 文档"
+msgstr "無効または破損した ReliefDiagram 文書です"
+
+#: configs/nls/messages/reliefdiagram.c:57
+msgid "无效的文件路径"
+msgstr "無効なファイルパスです"
+
+#: configs/nls/messages/reliefdiagram.c:58
+msgid "无法分配临时文件"
+msgstr "一時ファイルを確保できません"
+
+#: configs/nls/messages/reliefdiagram.c:59
+msgid "无法创建 PNG 编码通道"
+msgstr "PNG エンコード用パイプを作成できません"
+
+#: configs/nls/messages/reliefdiagram.c:60
+msgid "无法启动 PNG 编码进程"
+msgstr "PNG エンコードプロセスを起動できません"
+
+#: configs/nls/messages/reliefdiagram.c:61
+msgid "无法获取导出图像"
+msgstr "エクスポート用画像を取得できません"
+
+#: configs/nls/messages/reliefdiagram.c:62
+msgid "无法设置 PNG 非阻塞通道"
+msgstr "PNG パイプを非ブロッキングに設定できません"
+
+#: userland/apps/reliefdiagram/window.cpp:175
+msgid "无箭头|终点箭头|双向箭头"
+msgstr "矢印なし|終点に矢印|両端に矢印"
+
+#: configs/nls/messages/reliefdiagram.c:63
+msgid "替换文件失败"
+msgstr "ファイルの置き換えに失敗しました"
+
+#: configs/nls/messages/reliefdiagram.c:64
+msgid "最多支持 2048 条连线"
+msgstr "接続線は最大 2048 本までです"
+
+#: configs/nls/messages/reliefdiagram.c:65
+msgid "最多支持 512 个图形"
+msgstr "図形は最大 512 個までです"
+
+#: userland/apps/reliefdiagram/window.cpp:582
+msgid "未命名"
+msgstr "無題"
+
+#: configs/nls/messages/reliefdiagram.c:66
+msgid "未知图形"
+msgstr "不明な図形"
+
+#: userland/apps/reliefdiagram/window.cpp:224
+msgid "模板与文档"
+msgstr "テンプレートと文書"
+
+#: userland/apps/reliefdiagram/window.cpp:266
+msgid "模板创建新文档；原生文档保留全部图形、分支、备注和样式。SVG / PNG 导出当前展开的内容。"
+msgstr "テンプレートから新しい文書を作成します。ネイティブ文書には図形、枝、メモ、スタイルがすべて保存されます。SVG / PNG には現在展開されている内容を出力します。"
+
+#: userland/apps/reliefdiagram/window.cpp:567
+msgid "正在后台编码 PNG…"
+msgstr "バックグラウンドで PNG をエンコード中…"
+
+#: userland/apps/reliefdiagram/window.cpp:568
+msgid "正在后台读写文件…"
+msgstr "バックグラウンドでファイルを読み書き中…"
+
+#: userland/apps/reliefdiagram/actions.cpp:203
+msgid "正在处理文件，请稍候"
+msgstr "ファイルを処理中です。しばらくお待ちください"
+
+#: configs/nls/messages/reliefdiagram.c:67
+msgid "正在编码 PNG，请稍后"
+msgstr "PNG をエンコード中です。しばらくお待ちください"
+
+#: configs/nls/messages/reliefdiagram.c:68
+msgid "此文件名由文档保存锁保留，请选择其他文件名"
+msgstr "このファイル名は文書の保存ロック用に予約されています。別の名前を選択してください"
+
+#: userland/apps/reliefdiagram/window.cpp:248
+msgid "水平分布"
+msgstr "水平方向に均等配置"
+
+#: userland/apps/reliefdiagram/window.cpp:248
+msgid "水平居中"
+msgstr "水平方向に中央揃え"
+
+#: userland/apps/reliefdiagram/actions.cpp:242
+msgid "没有可用的历史记录"
+msgstr "使用できる履歴がありません"
+
+#: userland/apps/reliefdiagram/window.cpp:247
+msgid "流程分层"
+msgstr "フローを階層配置"
+
+#: userland/apps/reliefdiagram/window.cpp:66
+msgid "流程分层布局"
+msgstr "フローの階層レイアウト"
+
+#: userland/apps/reliefdiagram/window.cpp:62
+msgid "添加同级主题"
+msgstr "同じ階層のトピックを追加"
+
+#: configs/nls/messages/reliefdiagram.c:69
+msgid "添加图形后文档将超过 8 MiB"
+msgstr "図形を追加すると文書が 8 MiB を超えます"
+
+#: userland/apps/reliefdiagram/window.cpp:61
+msgid "添加子主题"
+msgstr "子トピックを追加"
+
+#: userland/apps/reliefdiagram/window.cpp:98
+msgid "添加所选图形"
+msgstr "選択した図形を追加"
+
+#: configs/nls/messages/reliefdiagram.c:70
+msgid "添加连线后文档将超过 8 MiB"
+msgstr "接続線を追加すると文書が 8 MiB を超えます"
+
+#: configs/nls/messages/reliefdiagram.c:71
+msgid "父主题不存在"
+msgstr "親トピックが存在しません"
+
+#: userland/apps/reliefdiagram/files.cpp:108
+msgid "目标文件已存在，是否覆盖？"
+msgstr "保存先のファイルは既に存在します。上書きしますか?"
+
+#: configs/nls/messages/reliefdiagram.c:72
+msgid "目标文件已被锁定或属于保存锁，请重试或选择其他文件名"
+msgstr "保存先はロック中か保存ロックに属しています。再試行するか別のファイル名を選択してください"
+
+#: userland/apps/reliefdiagram/window.cpp:172
+msgid "直线|折线|曲线"
+msgstr "直線|折れ線|曲線"
+
+#: configs/nls/messages/reliefdiagram.c:73
+msgid "矩形"
+msgstr "四角形"
+
+#: userland/apps/reliefdiagram/canvas.cpp:245
+msgid "移动内存不足"
+msgstr "移動するためのメモリが不足しています"
+
+#: userland/apps/reliefdiagram/window.cpp:173
+msgid "箭头"
+msgstr "矢印"
+
+#: userland/apps/reliefdiagram/window.cpp:50
+msgid "粘贴"
+msgstr "貼り付け"
+
+#: userland/apps/reliefdiagram/actions.cpp:138
+msgid "粘贴后对象数量超过限制"
+msgstr "貼り付け後のオブジェクト数が上限を超えます"
+
+#: userland/apps/reliefdiagram/window.cpp:261
+msgid "系统逻辑 · 关系图"
+msgstr "システムロジック · 関係図"
+
+#: userland/apps/reliefdiagram/window.cpp:170
+msgid "线型"
+msgstr "線種"
+
+#: userland/apps/reliefdiagram/window.cpp:176
+msgid "线宽"
+msgstr "線の幅"
+
+#: userland/apps/reliefdiagram/window.cpp:545
+msgid "线宽必须在 1 到 6 之间"
+msgstr "線の幅は 1 から 6 の範囲で指定してください"
+
+#: configs/nls/messages/reliefdiagram.c:74
+msgid "终止（椭圆）"
+msgstr "終端（楕円）"
+
+#: userland/apps/reliefdiagram/actions.cpp:68
+msgid "编辑文字（多行文字请使用右侧属性）"
+msgstr "文字を編集（複数行の文字は右側のプロパティを使用）"
+
+#: userland/apps/reliefdiagram/window.cpp:58
+msgid "缩小"
+msgstr "縮小"
+
+#: userland/apps/reliefdiagram/window.cpp:59
+msgid "网格"
+msgstr "グリッド"
+
+#: userland/apps/reliefdiagram/window.cpp:68
+msgid "置于底层"
+msgstr "最背面へ移動"
+
+#: userland/apps/reliefdiagram/window.cpp:67
+msgid "置于顶层"
+msgstr "最前面へ移動"
+
+#: userland/apps/reliefdiagram/files.cpp:108
+msgid "覆盖"
+msgstr "上書き"
+
+#: configs/nls/messages/reliefdiagram.c:75
+msgid "视图参数无效"
+msgstr "表示パラメーターが無効です"
+
+#: userland/apps/reliefdiagram/actions.cpp:128
+msgid "请先选择图形；连线随两端图形一起复制"
+msgstr "先に図形を選択してください。接続線は両端の図形と一緒にコピーされます"
+
+#: userland/apps/reliefdiagram/actions.cpp:432
+msgid "请至少选择三个图形"
+msgstr "3 個以上の図形を選択してください"
+
+#: userland/apps/reliefdiagram/actions.cpp:432
+msgid "请至少选择两个图形"
+msgstr "2 個以上の図形を選択してください"
+
+#: configs/nls/messages/reliefdiagram.c:76
+msgid "请选择一个文件名"
+msgstr "ファイル名を選択してください"
+
+#: configs/nls/messages/reliefdiagram.c:77
+msgid "请选择两个不同的图形"
+msgstr "異なる 2 個の図形を選択してください"
+
+#: userland/apps/reliefdiagram/canvas.cpp:200
+msgid "请选择图形作为连线端点"
+msgstr "接続線の端点となる図形を選択してください"
+
+#: configs/nls/messages/reliefdiagram.c:78
+msgid "读取失败"
+msgstr "読み取りに失敗しました"
+
+#: configs/nls/messages/reliefdiagram.c:79
+msgid "输入输出"
+msgstr "入出力"
+
+#: userland/apps/reliefdiagram/window.cpp:147
+msgid "边框…"
+msgstr "枠線…"
+
+#: configs/nls/messages/reliefdiagram.c:80
+msgid "这两个图形之间已有同方向连线"
+msgstr "この 2 つの図形の間には同じ方向の接続線が既にあります"
+
+#: userland/apps/reliefdiagram/window.cpp:242
+msgid "连接图形"
+msgstr "図形を接続"
+
+#: userland/apps/reliefdiagram/window.cpp:182
+msgid "连接模式：依次点击两个图形"
+msgstr "接続モード: 2 つの図形を順にクリック"
+
+#: userland/apps/reliefdiagram/window.cpp:338
+msgid "连接模式：依次点击起点和终点；Esc 取消"
+msgstr "接続モード: 始点と終点を順にクリック。Esc でキャンセル"
+
+#: userland/apps/reliefdiagram/window.cpp:383
+msgid "连线"
+msgstr "接続線"
+
+#: configs/nls/messages/reliefdiagram.c:81
+msgid "连线的编号、端点或样式无效"
+msgstr "接続線の番号、端点またはスタイルが無効です"
+
+#: configs/nls/messages/reliefdiagram.c:82
+msgid "连线编号重复"
+msgstr "接続線の番号が重複しています"
+
+#: userland/apps/reliefdiagram/window.cpp:180
+msgid "连线颜色…"
+msgstr "接続線の色…"
+
+#: userland/apps/reliefdiagram/window.cpp:46
+msgid "退出"
+msgstr "終了"
+
+#: userland/apps/reliefdiagram/window.cpp:115
+msgid "适合"
+msgstr "画面に合わせる"
+
+#: userland/apps/reliefdiagram/window.cpp:55
+msgid "适合内容"
+msgstr "内容に合わせる"
+
+#: userland/apps/reliefdiagram/window.cpp:112
+msgid "选择与移动|连接图形|平移画布"
+msgstr "選択と移動|図形を接続|キャンバスを移動"
+
+#: userland/apps/reliefdiagram/actions.cpp:311
+msgid "选择内存不足"
+msgstr "選択するためのメモリが不足しています"
+
+#: userland/apps/reliefdiagram/window.cpp:318
+msgid "选择图形颜色"
+msgstr "図形の色を選択"
+
+#: userland/apps/reliefdiagram/window.cpp:245
+msgid "选择工具"
+msgstr "選択ツール"
+
+#: userland/apps/reliefdiagram/window.cpp:48
+msgid "重做"
+msgstr "やり直し"
+
+#: userland/apps/reliefdiagram/window.cpp:248
+msgid "顶端对齐"
+msgstr "上揃え"
+
+#: userland/apps/reliefdiagram/window.cpp:259
+msgid "项目规划 · 思维导图"
+msgstr "プロジェクト計画 · マインドマップ"
+
+#: userland/apps/reliefdiagram/window.cpp:323
+msgid "颜色已修改，点击应用"
+msgstr "色が変更されました。適用をクリックしてください"
+
+#: userland/apps/reliefdiagram/window.cpp:157
+msgid "高"
+msgstr "高さ"
+
+#: configs/nls/messages/reliefdiagram.c
+msgid "ReliefDiagram"
+msgstr "ReliefDiagram"
+
+#: configs/nls/messages/reliefdiagram.c
+msgid "none"
+msgstr "なし"

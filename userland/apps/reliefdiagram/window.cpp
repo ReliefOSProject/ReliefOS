@@ -28,52 +28,52 @@ DiagramWindow::DiagramWindow() : Fl_Double_Window(1240, 780, "ReliefDiagram") {
       this);
   begin();
   menus_ = new Fl_Group(0, 0, w(), 32);
-  const char *names[] = {T("File"), T("Edit"), T("View"), "图形", T("Help")};
+  const char *names[] = {T("File"), T("Edit"), T("View"), T("图形"), T("Help")};
   Fl_Menu_Button *menus[5];
   for (int n = 0; n < 5; ++n)
     menus[n] = new Fl_Menu_Button(8 + n * 76, 2, 70, 28, names[n]);
   auto item = [&](int n, const char *s, Command c, int key = 0) {
     menus[n]->add(s, key, click, reinterpret_cast<void *>(intptr_t(c)));
   };
-  item(0, "新建空白图", Command::New, FL_CTRL + 'n');
-  item(0, "打开…", Command::Open, FL_CTRL + 'o');
-  item(0, "保存", Command::Save, FL_CTRL + 's');
-  item(0, "另存为…", Command::SaveAs, FL_CTRL + FL_SHIFT + 's');
-  item(0, "文档标题…", Command::Title);
-  item(0, "导出 SVG…", Command::ExportSvg);
-  item(0, "导出 PNG…", Command::ExportPng);
-  item(0, "导出 Markdown 大纲…", Command::ExportOutline);
-  item(0, "退出", Command::Close, FL_ALT + FL_F + 4);
-  item(1, "撤销", Command::Undo, FL_CTRL + 'z');
-  item(1, "重做", Command::Redo, FL_CTRL + 'y');
-  item(1, "复制", Command::Copy, FL_CTRL + 'c');
-  item(1, "粘贴", Command::Paste, FL_CTRL + 'v');
-  item(1, "创建副本", Command::Duplicate, FL_CTRL + 'd');
-  item(1, "删除（含子主题）", Command::Delete);
-  item(1, "全选", Command::SelectAll, FL_CTRL + 'a');
-  item(1, "应用属性", Command::Apply, FL_CTRL + FL_Enter);
-  item(2, "适合内容", Command::Fit, FL_Home);
-  item(2, "实际大小", Command::ActualSize);
-  item(2, "放大", Command::ZoomIn);
-  item(2, "缩小", Command::ZoomOut);
-  item(2, "网格", Command::Grid);
-  item(2, "吸附", Command::Snap);
-  item(3, "添加子主题", Command::Child);
-  item(3, "添加同级主题", Command::Sibling);
-  item(3, "折叠或展开分支", Command::Fold);
-  item(3, "平衡思维导图", Command::MindLayout);
-  item(3, "向右树形布局", Command::TreeLayout);
-  item(3, "流程分层布局", Command::FlowLayout);
-  item(3, "置于顶层", Command::Front);
-  item(3, "置于底层", Command::Back);
-  item(4, "使用说明", Command::Help, FL_F + 1);
+  item(0, T("新建空白图"), Command::New, FL_CTRL + 'n');
+  item(0, T("打开…"), Command::Open, FL_CTRL + 'o');
+  item(0, T("保存"), Command::Save, FL_CTRL + 's');
+  item(0, T("另存为…"), Command::SaveAs, FL_CTRL + FL_SHIFT + 's');
+  item(0, T("文档标题…"), Command::Title);
+  item(0, T("导出 SVG…"), Command::ExportSvg);
+  item(0, T("导出 PNG…"), Command::ExportPng);
+  item(0, T("导出 Markdown 大纲…"), Command::ExportOutline);
+  item(0, T("退出"), Command::Close, FL_ALT + FL_F + 4);
+  item(1, T("撤销"), Command::Undo, FL_CTRL + 'z');
+  item(1, T("重做"), Command::Redo, FL_CTRL + 'y');
+  item(1, T("复制"), Command::Copy, FL_CTRL + 'c');
+  item(1, T("粘贴"), Command::Paste, FL_CTRL + 'v');
+  item(1, T("创建副本"), Command::Duplicate, FL_CTRL + 'd');
+  item(1, T("删除（含子主题）"), Command::Delete);
+  item(1, T("全选"), Command::SelectAll, FL_CTRL + 'a');
+  item(1, T("应用属性"), Command::Apply, FL_CTRL + FL_Enter);
+  item(2, T("适合内容"), Command::Fit, FL_Home);
+  item(2, T("实际大小"), Command::ActualSize);
+  item(2, T("放大"), Command::ZoomIn);
+  item(2, T("缩小"), Command::ZoomOut);
+  item(2, T("网格"), Command::Grid);
+  item(2, T("吸附"), Command::Snap);
+  item(3, T("添加子主题"), Command::Child);
+  item(3, T("添加同级主题"), Command::Sibling);
+  item(3, T("折叠或展开分支"), Command::Fold);
+  item(3, T("平衡思维导图"), Command::MindLayout);
+  item(3, T("向右树形布局"), Command::TreeLayout);
+  item(3, T("流程分层布局"), Command::FlowLayout);
+  item(3, T("置于顶层"), Command::Front);
+  item(3, T("置于底层"), Command::Back);
+  item(4, T("使用说明"), Command::Help, FL_F + 1);
   title_ = caption(418, 5, w() - 430,
-                   "ReliefDiagram   思维导图 · 流程图 · 逻辑关系");
+                   T("ReliefDiagram   思维导图 · 流程图 · 逻辑关系"));
   title_->labelsize(16);
   menus_->end();
   quick_ = new Fl_Group(0, 35, w(), 32);
-  const char *quick_names[] = {"新建", "打开", "保存",     "撤销",    "重做",
-                               "复制", "粘贴", "SVG 导出", "PNG 导出"};
+  const char *quick_names[] = {T("新建"), T("打开"), T("保存"),     T("撤销"),    T("重做"),
+                               T("复制"), T("粘贴"), T("SVG 导出"), T("PNG 导出")};
   Command quick_commands[] = {
       Command::New,   Command::Open,      Command::Save,
       Command::Undo,  Command::Redo,      Command::Copy,
@@ -88,20 +88,20 @@ DiagramWindow::DiagramWindow() : Fl_Double_Window(1240, 780, "ReliefDiagram") {
   build_tools();
   body_ = new Fl_Group(0, 180, w(), h() - 210);
   left_ = new Fl_Group(8, 181, 152, h() - 215);
-  caption(10, 183, 148, "图形库 · 双击添加");
+  caption(10, 183, 148, T("图形库 · 双击添加"));
   shapes_ = new Fl_Hold_Browser(10, 207, 148, 190);
   shapes_->textsize(14);
   shapes_->format_char(0);
   for (int i = 0; i < int(Shape::Count); ++i)
-    shapes_->add(shape_name(Shape(i)));
+    shapes_->add(T(shape_name(Shape(i))));
   shapes_->callback(choose, this);
-  button(10, 404, 148, "添加所选图形", Command::SelectMode,
+  button(10, 404, 148, T("添加所选图形"), Command::SelectMode,
          [](Fl_Widget *w, void *) {
            auto *s = static_cast<DiagramWindow *>(w->window());
            int at = s->shapes_->value();
            s->add_shape(at > 0 ? Shape(at - 1) : Shape::Rounded);
          });
-  caption(10, 442, 148, "对象与主题");
+  caption(10, 442, 148, T("对象与主题"));
   objects_ = new Fl_Hold_Browser(10, 466, 148, h() - 502);
   objects_->textsize(13);
   objects_->format_char(0);
@@ -109,52 +109,52 @@ DiagramWindow::DiagramWindow() : Fl_Double_Window(1240, 780, "ReliefDiagram") {
   left_->end();
   viewbar_ = new Fl_Group(172, 182, w() - 430, 31);
   mode_ = new Fl_Choice(172, 182, 114, 28);
-  mode_->add("选择与移动|连接图形|平移画布");
+  mode_->add(T("选择与移动|连接图形|平移画布"));
   mode_->value(0);
   mode_->callback(choose, this);
-  button(292, 182, 60, "适合", Command::Fit, click);
+  button(292, 182, 60, T("适合"), Command::Fit, click);
   button(358, 182, 36, "＋", Command::ZoomIn, click);
   button(400, 182, 36, "－", Command::ZoomOut, click);
-  grid_ = new Fl_Check_Button(448, 182, 68, 28, "网格");
+  grid_ = new Fl_Check_Button(448, 182, 68, 28, T("网格"));
   grid_->value(1);
   grid_->callback(click, reinterpret_cast<void *>(intptr_t(Command::Grid)));
-  snap_ = new Fl_Check_Button(518, 182, 68, 28, "吸附");
+  snap_ = new Fl_Check_Button(518, 182, 68, 28, T("吸附"));
   snap_->value(1);
   snap_->callback(click, reinterpret_cast<void *>(intptr_t(Command::Snap)));
   viewbar_->end();
   canvas = new Canvas(172, 220, w() - 430, h() - 256, this);
   right_ = new Fl_Group(w() - 248, 181, 240, h() - 215);
-  property_title_ = caption(w() - 240, 183, 224, "属性");
+  property_title_ = caption(w() - 240, 183, 224, T("属性"));
   properties_ = new Fl_Scroll(w() - 248, 208, 240, h() - 280);
   properties_->type(Fl_Scroll::VERTICAL_ALWAYS);
   int x = w() - 238;
-  caption(x, 211, 214, "文字 / 连线标签");
+  caption(x, 211, 214, T("文字 / 连线标签"));
   text_ = new Fl_Multiline_Input(x, 234, 208, 73);
   text_->maximum_size(4096);
   text_->wrap(1);
   text_->textsize(15);
   node_fields_ = new Fl_Group(x, 313, 214, 420);
-  caption(x, 314, 62, "图形");
+  caption(x, 314, 62, T("图形"));
   shape_ = new Fl_Choice(x + 64, 312, 144, 28);
   for (int i = 0; i < int(Shape::Count); ++i)
-    shape_->add(shape_name(Shape(i)));
-  caption(x, 350, 214, "备注（保存在原生文档）");
+    shape_->add(T(shape_name(Shape(i))));
+  caption(x, 350, 214, T("备注（保存在原生文档）"));
   note_ = new Fl_Multiline_Input(x, 372, 208, 64);
   note_->maximum_size(16384);
   note_->wrap(1);
   note_->textsize(14);
-  caption(x, 443, 214, "填充 / 边框 / 文字颜色");
-  const char *cnames[] = {"填充…", "边框…", "文字…"};
+  caption(x, 443, 214, T("填充 / 边框 / 文字颜色"));
+  const char *cnames[] = {T("填充…"), T("边框…"), T("文字…")};
   for (int n = 0; n < 3; ++n) {
     colors_[n] = new Fl_Button(x + n * 71, 466, 66, 27, cnames[n]);
     colors_[n]->callback(color_pick, this);
   }
-  caption(x, 503, 40, "字号");
+  caption(x, 503, 40, T("字号"));
   font_ = new Fl_Value_Input(x + 44, 500, 64, 28);
   font_->bounds(10, 48);
   font_->step(1);
-  bold_ = new Fl_Check_Button(x + 120, 500, 84, 28, "加粗");
-  const char *nlabels[] = {"X", "Y", "宽", "高"};
+  bold_ = new Fl_Check_Button(x + 120, 500, 84, 28, T("加粗"));
+  const char *nlabels[] = {"X", "Y", T("宽"), T("高")};
   for (int n = 0; n < 4; ++n) {
     int col = n % 2, row = n / 2;
     caption(x + col * 108, 542 + row * 36, 24, nlabels[n]);
@@ -163,31 +163,31 @@ DiagramWindow::DiagramWindow() : Fl_Double_Window(1240, 780, "ReliefDiagram") {
     numbers_[n]->step(1);
     numbers_[n]->bounds(n < 2 ? -100000 : 40, n < 2 ? 100000 : 2000);
   }
-  caption(x, 614, 208, "多选时样式应用到同类对象");
-  caption(x, 636, 208, "文字与位置仅修改首个对象");
+  caption(x, 614, 208, T("多选时样式应用到同类对象"));
+  caption(x, 636, 208, T("文字与位置仅修改首个对象"));
   node_fields_->end();
   edge_fields_ = new Fl_Group(x, 313, 214, 220);
-  caption(x, 316, 62, "线型");
+  caption(x, 316, 62, T("线型"));
   route_ = new Fl_Choice(x + 64, 312, 144, 28);
-  route_->add("直线|折线|曲线");
-  caption(x, 354, 62, "箭头");
+  route_->add(T("直线|折线|曲线"));
+  caption(x, 354, 62, T("箭头"));
   arrows_ = new Fl_Choice(x + 64, 350, 144, 28);
-  arrows_->add("无箭头|终点箭头|双向箭头");
-  caption(x, 392, 62, "线宽");
+  arrows_->add(T("无箭头|终点箭头|双向箭头"));
+  caption(x, 392, 62, T("线宽"));
   width_ = new Fl_Value_Input(x + 64, 388, 144, 28);
   width_->bounds(1, 6);
   width_->step(1);
-  auto *line_color = new Fl_Button(x, 430, 208, 28, "连线颜色…");
+  auto *line_color = new Fl_Button(x, 430, 208, 28, T("连线颜色…"));
   line_color->callback(color_pick, this);
-  caption(x, 470, 208, "连接模式：依次点击两个图形");
+  caption(x, 470, 208, T("连接模式：依次点击两个图形"));
   edge_fields_->end();
   properties_->end();
-  apply_ = new Fl_Button(x, h() - 68, 208, 30, "应用属性  Ctrl+Enter");
+  apply_ = new Fl_Button(x, h() - 68, 208, 30, T("应用属性  Ctrl+Enter"));
   apply_->callback(click, reinterpret_cast<void *>(intptr_t(Command::Apply)));
   right_->end();
   body_->end();
   bottom_ = new Fl_Group(0, h() - 28, w(), 28);
-  status_ = caption(8, h() - 25, w() - 330, "就绪");
+  status_ = caption(8, h() - 25, w() - 330, T("就绪"));
   counts_ = caption(w() - 320, h() - 25, 312, "");
   counts_->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
   bottom_->end();
@@ -221,17 +221,17 @@ DiagramWindow::DiagramWindow() : Fl_Double_Window(1240, 780, "ReliefDiagram") {
 DiagramWindow::~DiagramWindow() { Fl::remove_timeout(tick, this); }
 void DiagramWindow::build_tools() {
   tools_ = new Fl_Tabs(8, 74, w() - 16, 98);
-  const char *names[] = {"开始与插入", "布局与排列", "模板与文档"};
+  const char *names[] = {T("开始与插入"), T("布局与排列"), T("模板与文档")};
   for (int page = 0; page < 3; ++page) {
     toolpages_[page] = new Fl_Group(10, 99, w() - 20, 70, names[page]);
     if (page == 0) {
-      button(18, 105, 88, "子主题", Command::Child, click);
-      button(112, 105, 88, "同级主题", Command::Sibling, click);
-      button(206, 105, 88, "折叠 / 展开", Command::Fold, click);
-      caption(20, 143, 274, "思维导图 · Tab 子主题 · Enter 同级");
+      button(18, 105, 88, T("子主题"), Command::Child, click);
+      button(112, 105, 88, T("同级主题"), Command::Sibling, click);
+      button(206, 105, 88, T("折叠 / 展开"), Command::Fold, click);
+      caption(20, 143, 274, T("思维导图 · Tab 子主题 · Enter 同级"));
       for (int i = 0; i < 8; ++i) {
         auto *b = new Fl_Button(316 + (i % 4) * 124, 104 + (i / 4) * 31, 116,
-                                26, shape_name(Shape(i)));
+                                26, T(shape_name(Shape(i))));
         b->callback(
             [](Fl_Widget *w, void *p) {
               static_cast<DiagramWindow *>(w->window())
@@ -239,14 +239,14 @@ void DiagramWindow::build_tools() {
             },
             reinterpret_cast<void *>(intptr_t(i)));
       }
-      button(826, 105, 98, "连接图形", Command::ConnectMode, click);
-      button(930, 105, 98, "创建副本", Command::Duplicate, click);
-      button(826, 136, 98, "删除", Command::Delete, click);
-      button(930, 136, 98, "选择工具", Command::SelectMode, click);
+      button(826, 105, 98, T("连接图形"), Command::ConnectMode, click);
+      button(930, 105, 98, T("创建副本"), Command::Duplicate, click);
+      button(826, 136, 98, T("删除"), Command::Delete, click);
+      button(930, 136, 98, T("选择工具"), Command::SelectMode, click);
     } else if (page == 1) {
-      const char *labels[] = {"平衡导图", "向右树形", "流程分层", "左对齐",
-                              "水平居中", "顶端对齐", "垂直居中", "水平分布",
-                              "垂直分布", "置于顶层", "置于底层", "适合内容"};
+      const char *labels[] = {T("平衡导图"), T("向右树形"), T("流程分层"), T("左对齐"),
+                              T("水平居中"), T("顶端对齐"), T("垂直居中"), T("水平分布"),
+                              T("垂直分布"), T("置于顶层"), T("置于底层"), T("适合内容")};
       Command commands[] = {
           Command::MindLayout,  Command::TreeLayout,  Command::FlowLayout,
           Command::AlignLeft,   Command::AlignCenter, Command::AlignTop,
@@ -256,15 +256,15 @@ void DiagramWindow::build_tools() {
         button(18 + (i % 6) * 164, 104 + (i / 6) * 31, 154, labels[i],
                commands[i], click);
     } else {
-      button(18, 106, 166, "项目规划 · 思维导图", Command::TemplateMind, click);
-      button(194, 106, 166, "审批流程 · 流程图", Command::TemplateFlow, click);
-      button(370, 106, 166, "系统逻辑 · 关系图", Command::TemplateLogic, click);
-      button(552, 106, 132, "文档标题…", Command::Title, click);
-      button(696, 106, 142, "Markdown 大纲", Command::ExportOutline, click);
-      button(850, 106, 142, "使用说明", Command::Help, click);
+      button(18, 106, 166, T("项目规划 · 思维导图"), Command::TemplateMind, click);
+      button(194, 106, 166, T("审批流程 · 流程图"), Command::TemplateFlow, click);
+      button(370, 106, 166, T("系统逻辑 · 关系图"), Command::TemplateLogic, click);
+      button(552, 106, 132, T("文档标题…"), Command::Title, click);
+      button(696, 106, 142, T("Markdown 大纲"), Command::ExportOutline, click);
+      button(850, 106, 142, T("使用说明"), Command::Help, click);
       caption(20, 143, 1000,
-              "模板创建新文档；原生文档保留全部图形、分支、备注和样式。SVG / "
-              "PNG 导出当前展开的内容。");
+              T("模板创建新文档；原生文档保留全部图形、分支、备注和样式。SVG / "
+              "PNG 导出当前展开的内容。"));
     }
     toolpages_[page]->end();
     toolpages_[page]->resizable(nullptr);
@@ -303,7 +303,7 @@ void DiagramWindow::edit(Fl_Widget *, void *p) {
   auto *s = static_cast<DiagramWindow *>(p);
   if (!s->loading_) {
     s->fields_dirty_ = true;
-    s->update_status("属性已修改，点击应用或按 Ctrl+Enter");
+    s->update_status(T("属性已修改，点击应用或按 Ctrl+Enter"));
   }
 }
 void DiagramWindow::color_pick(Fl_Widget *w, void *p) {
@@ -315,12 +315,12 @@ void DiagramWindow::color_pick(Fl_Widget *w, void *p) {
   uint32_t old = s->color_values_[index];
   double r = (old >> 16) / 255.0, g = ((old >> 8) & 255) / 255.0,
          b = (old & 255) / 255.0;
-  if (fl_color_chooser("选择图形颜色", r, g, b)) {
+  if (fl_color_chooser(T("选择图形颜色"), r, g, b)) {
     s->color_values_[index] = (uint32_t(round(r * 255)) << 16) |
                               (uint32_t(round(g * 255)) << 8) |
                               uint32_t(round(b * 255));
     s->fields_dirty_ = true;
-    s->update_status("颜色已修改，点击应用");
+    s->update_status(T("颜色已修改，点击应用"));
   }
 }
 void DiagramWindow::choose(Fl_Widget *w, void *p) {
@@ -335,10 +335,10 @@ void DiagramWindow::choose(Fl_Widget *w, void *p) {
       s->add_shape(Shape(at - 1));
   } else if (w == s->mode_) {
     s->canvas->cancel();
-    s->update_status(s->mode() == 1 ? "连接模式：依次点击起点和终点；Esc 取消"
+    s->update_status(s->mode() == 1 ? T("连接模式：依次点击起点和终点；Esc 取消")
                      : s->mode() == 2
-                         ? "拖动画布平移；滚轮缩放"
-                         : "拖动图形移动；Shift 多选；拖动空白框选");
+                         ? T("拖动画布平移；滚轮缩放")
+                         : T("拖动图形移动；Shift 多选；拖动空白框选"));
   }
 }
 void DiagramWindow::refill() {
@@ -380,7 +380,7 @@ void DiagramWindow::refill() {
   for (size_t i = 0; i < document.edges.size(); ++i) {
     char buf[192];
     snprintf(buf, sizeof(buf), "↳ %s",
-             document.edges[i].text.empty() ? "连线"
+             document.edges[i].text.empty() ? T("连线")
                                             : document.edges[i].text.c_str());
     if (rows_.push(document.edges[i].id))
       objects_->add(buf);
@@ -402,14 +402,14 @@ void DiagramWindow::refresh() {
     edge_fields_->hide();
     text_->value("");
     properties_->redraw();
-    property_title_->copy_label("属性 · 请选择图形或连线");
+    property_title_->copy_label(T("属性 · 请选择图形或连线"));
     loading_ = false;
     return;
   }
   properties_->activate();
   apply_->activate();
-  property_title_->copy_label(selection.size() > 1 ? "属性 · 多选"
-                                                   : "属性 · 当前对象");
+  property_title_->copy_label(selection.size() > 1 ? T("属性 · 多选")
+                                                   : T("属性 · 当前对象"));
   text_->maximum_size(n ? 4096 : 1024);
   text_->value(n ? n->text.c_str() : a->text.c_str());
   if (n) {
@@ -456,7 +456,7 @@ bool DiagramWindow::select(uint64_t id, bool toggle) {
         return true;
       }
     if (!selection.push(id)) {
-      update_status("选择内存不足");
+      update_status(T("选择内存不足"));
       return false;
     }
   }
@@ -472,11 +472,11 @@ void DiagramWindow::selection_changed() {
 bool DiagramWindow::commit(Document &&next) {
   Text err;
   if (!validate(next, err)) {
-    fl_alert("%s", err.c_str());
+    fl_alert("%s", ui_error(err.c_str()));
     return false;
   }
   if (!history_.checkpoint(document)) {
-    fl_alert("内存不足，无法保存撤销记录");
+    fl_alert(T("内存不足，无法保存撤销记录"));
     return false;
   }
   document = static_cast<Document &&>(next);
@@ -489,7 +489,7 @@ bool DiagramWindow::begin_gesture() {
   if (!apply_fields())
     return false;
   if (!history_.checkpoint(document)) {
-    update_status("内存不足，无法移动");
+    update_status(T("内存不足，无法移动"));
     return false;
   }
   return true;
@@ -517,14 +517,14 @@ bool DiagramWindow::apply_fields() {
   }
   Document next;
   if (!next.clone_from(document)) {
-    fl_alert("内存不足");
+    fl_alert(T("内存不足"));
     return false;
   }
   uint64_t first = selection[0];
   if (Node *n = node(next, first)) {
     if (!isfinite(font_->value()) || font_->value() < 10 ||
         font_->value() > 48) {
-      fl_alert("字号必须在 10 到 48 之间");
+      fl_alert(T("字号必须在 10 到 48 之间"));
       return false;
     }
     if (!n->text.set(text_->value()) || !n->note.set(note_->value()))
@@ -542,7 +542,7 @@ bool DiagramWindow::apply_fields() {
   } else if (Edge *a = edge(next, first)) {
     if (!isfinite(width_->value()) || width_->value() < 1 ||
         width_->value() > 6) {
-      fl_alert("线宽必须在 1 到 6 之间");
+      fl_alert(T("线宽必须在 1 到 6 之间"));
       return false;
     }
     if (!a->text.set(text_->value()))
@@ -557,20 +557,20 @@ bool DiagramWindow::apply_fields() {
   }
   bool ok = commit(static_cast<Document &&>(next));
   if (ok)
-    update_status("属性已应用");
+    update_status(T("属性已应用"));
   return ok;
 }
 void DiagramWindow::update_status(const char *message) {
   if (message)
-    notice_.set(message);
+    notice_.set(ui_error(message));
   const char *text =
-      busy()             ? (operation_ == Operation::Png ? "正在后台编码 PNG…"
-                                                         : "正在后台读写文件…")
+      busy()             ? (operation_ == Operation::Png ? T("正在后台编码 PNG…")
+                                                         : T("正在后台读写文件…"))
       : !notice_.empty() ? notice_.c_str()
-                         : "拖动移动 · Shift 多选 · 滚轮缩放 · 双击编辑文字";
+                         : T("拖动移动 · Shift 多选 · 滚轮缩放 · 双击编辑文字");
   status_->copy_label(text);
   char buf[512];
-  snprintf(buf, sizeof(buf), "%zu 个图形  %zu 条连线  选中 %zu  %.0f%%",
+  snprintf(buf, sizeof(buf), T("%zu 个图形  %zu 条连线  选中 %zu  %.0f%%"),
            document.nodes.size(), document.edges.size(), selection.size(),
            document.view.zoom * 100);
   counts_->copy_label(buf);
@@ -579,7 +579,7 @@ void DiagramWindow::update_status(const char *message) {
   if (!path_.empty())
     name = name ? name + 1 : path_.c_str();
   if (!name || !*name)
-    name = "未命名";
+    name = T("未命名");
   snprintf(buf, sizeof(buf), "%s%s — ReliefDiagram",
            dirty_ || fields_dirty_ ? "* " : "", name);
   copy_label(buf);
@@ -597,7 +597,7 @@ void DiagramWindow::tick(void *p) {
     } else {
       s->operation_ = Operation::Idle;
       s->busy_ui(false);
-      fl_alert("%s", e.c_str());
+      fl_alert("%s", ui_error(e.c_str()));
     }
   }
   Fl::repeat_timeout(.03, tick, p);

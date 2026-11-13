@@ -1,0 +1,51 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/sysconfdialog/main.c:88
+msgid "Allow"
+msgstr "許可"
+
+#: userland/apps/sysconfdialog/main.c:66
+msgid "Allow startup application?"
+msgstr "自動起動を許可しますか?"
+
+#: userland/apps/sysconfdialog/main.c:69
+msgid "Allow this app to start a process when you sign in?"
+msgstr "サインイン時に、このアプリによるプロセスの起動を許可しますか?"
+
+#: userland/apps/sysconfdialog/main.c:86
+msgid "Deny"
+msgstr "拒否"
+
+#: userland/apps/sysconfdialog/main.c:83
+msgid "Do not ask again if I deny this request"
+msgstr "この要求を拒否した場合、次回から確認しない"
+
+#: userland/apps/sysconfdialog/main.c:47
+msgid "None"
+msgstr "なし"
+
+#: userland/apps/sysconfdialog/main.c:71
+msgid "Requesting application"
+msgstr "アプリケーションを要求中"
+
+#: userland/apps/sysconfdialog/main.c:107
+msgid "Startup Application"
+msgstr "自動起動アプリケーション"
+
+#: userland/apps/sysconfdialog/main.c:75
+msgid "Startup command"
+msgstr "自動起動コマンド"
+
+#: userland/apps/sysconfdialog/main.c:108
+msgid "Startup permission"
+msgstr "自動起動の許可"

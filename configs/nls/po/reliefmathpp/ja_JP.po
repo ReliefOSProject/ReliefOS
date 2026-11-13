@@ -1,0 +1,1211 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/reliefmathpp/window.cpp:985
+msgid "%s\n长度 / 周长 ≈ %.12g\n面积 / 表面积 ≈ %.12g\n体积 ≈ %.12g\n（不适用项为 0；椭圆周长为近似值）"
+msgstr "%s\n長さ / 周囲長 ≈ %.12g\n面積 / 表面積 ≈ %.12g\n体積 ≈ %.12g\n（該当しない項目は 0、楕円の周囲長は近似値です）"
+
+#: userland/apps/reliefmathpp/window.h:37
+msgid "%s（位置 %zu）"
+msgstr "%s（位置 %zu）"
+
+#: userland/apps/reliefmathpp/window.cpp:675
+msgid "%zu 个对象   %s   a=%.3g   %s"
+msgstr "オブジェクト %zu 個   %s   a=%.3g   %s"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:629
+msgid "A / 向量 u"
+msgstr "A / ベクトル u"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:632
+msgid "B / 向量 v"
+msgstr "B / ベクトル v"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: configs/nls/messages/reliefmathpp.c:4
+msgid "F(x,y) = 0（例如 x^2+y^2-9）"
+msgstr "F(x,y) = 0（例: x^2+y^2-9）"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/reliefmathpp/window.cpp:96
+msgid "PNG 导出"
+msgstr "PNG エクスポート"
+
+#: configs/nls/messages/reliefmathpp.c:5
+msgid "PNG 编码失败或图像超出限制"
+msgstr "PNG のエンコードに失敗したか、画像が上限を超えています"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/reliefmathpp/window.cpp:91
+msgid "ReliefMath++   几何 · 函数 · 数值计算"
+msgstr "ReliefMath++   幾何 · 関数 · 数値計算"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:678
+msgid "ReliefMath++ · 二维 / 三维几何、函数与数值计算\n\n选择工具创建对象，在左侧编辑名称、公式、坐标和范围，按“应用属性”或 Ctrl+Enter。选中对象可复制、隐藏、删除、撤销和重做。\n\n二维工具：y=f(x)、参数曲线 x(t)/y(t)、极坐标 r(t)、隐式 F(x,y)=0，以及点、线段、向量、圆、椭圆、矩形、三角形。隐式公式请输入左端减右端，例如 x^2+y^2-9。\n三维工具：z=f(x,y)、参数曲面 x(u,v)/y(u,v)/z(u,v)、空间曲线 x(t)/y(t)/z(t)，以及点、线段、向量、三角形、平面、球、长方体、圆柱和圆锥。\n\n画布：二维拖动平移，三维拖动旋转，滚轮缩放，Home 重置。“计算与工具”提供拾点构造，圆依次选择圆心与圆周一点。参数 a/b/c/d 可用滑块或右侧输入框（Enter）修改。视图、参数与对象一起保存。\n\n表达式语法\n+ - * / % ^，比较 < <= > >= == !=，逻辑 && ||。乘方右结合；-2^2=-4，2^3^2=512。乘法必须写 *，例如 2*x、a*sin(x)，不支持隐式乘法和 LaTeX 输入。\n常量：pi、tau、e；变量按对象类型使用 x/y、t、u/v，及 a/b/c/d。所有三角函数使用弧度。\n函数：sin cos tan asin acos atan sinh cosh tanh exp ln log log10 log2 sqrt abs floor ceil round sign；min(a,b)、max(a,b)、pow(a,b)、atan2(y,x)、hypot(a,b)、if(条件,真值,假值)。\n例子：if(x<0,-x,x)、sin(x)*exp(-x^2/10)。\n\n数值计算\n支持函数值、一二阶导数、定积分、区间夹根、两个显函数交点、采样搜索极值、弧长和切线；向量工具计算点积、叉积、夹角、两点距离和中点。几何度量显示周长/面积/体积，椭圆周长为近似值。\n这些是浮点近似，不是符号计算或形式证明。求根需要连续且端点异号，不能保证找到偶重根或所有零点。极值工具不是全局最优证明。高频振荡、奇点、细小结构可能超出采样精度；可调整范围和采样。三维使用正交软件投影和面片深度排序，交叠曲面存在绘制限制。\n\n文件与导出\n.rmathpp 保存全部对象与视图，支持版本、CRC 和范围校验；保存使用工作进程、原子替换与冲突检测。支持当前视图 SVG、PNG 和函数值 CSV 导出。每文档最多 64 个对象，公式 1024 字节，文件 16 MiB。坐标绝对值不超过 1e8，范围不超过 1e6。多对象场景会降低有效网格精度。\n\n此应用与 ReliefMath 公式排版编辑器是两个独立程序。"
+msgstr "ReliefMath++ · 二次元 / 三次元の幾何、関数、数値計算\n\nツールを選択してオブジェクトを作成し、左側で名前、式、座標、範囲を編集して「プロパティを適用」または Ctrl+Enter を押します。選択したオブジェクトは複製、非表示、削除、元に戻す、やり直しができます。\n\n二次元ツール: y=f(x)、媒介変数曲線 x(t)/y(t)、極座標 r(t)、陰関数 F(x,y)=0、および点、線分、ベクトル、円、楕円、四角形、三角形。陰関数は左辺から右辺を引いた式を入力してください。例: x^2+y^2-9。\n三次元ツール: z=f(x,y)、媒介変数曲面 x(u,v)/y(u,v)/z(u,v)、空間曲線 x(t)/y(t)/z(t)、および点、線分、ベクトル、三角形、平面、球、直方体、円柱、円錐。\n\nキャンバス: 二次元ではドラッグで平行移動、三次元ではドラッグで回転し、ホイールで拡大縮小、Home でリセットします。「計算とツール」で点を選んで図形を作成できます。円は中心と円周上の点を順に選びます。パラメーター a/b/c/d はスライダーまたは右側の入力欄（Enter）で変更できます。表示とパラメーターはオブジェクトと一緒に保存されます。\n\n式の構文\n+ - * / % ^、比較 < <= > >= == !=、論理 && ||。累乗は右から左に結合します。-2^2=-4、2^3^2=512。乗算には * が必要です。例: 2*x、a*sin(x)。暗黙の乗算と LaTeX 入力には対応していません。\n定数: pi、tau、e。変数はオブジェクトの種類に応じて x/y、t、u/v、および a/b/c/d を使用します。三角関数の角度はすべてラジアンです。\n関数: sin cos tan asin acos atan sinh cosh tanh exp ln log log10 log2 sqrt abs floor ceil round sign、min(a,b)、max(a,b)、pow(a,b)、atan2(y,x)、hypot(a,b)、if(条件,真値,偽値)。\n例: if(x<0,-x,x)、sin(x)*exp(-x^2/10)。\n\n数値計算\n関数値、1 階・2 階導関数、定積分、区間の両端で符号が異なる根、2 つの陽関数の交点、サンプリングによる極値探索、弧長、接線に対応しています。ベクトルツールは内積、外積、なす角、2 点間の距離と中点を計算します。幾何測定では周囲長 / 面積 / 体積を表示し、楕円の周囲長は近似値です。\nこれらは浮動小数点の近似であり、記号計算や形式的な証明ではありません。求根には連続性と区間の両端で異なる符号が必要で、偶数重根やすべての零点が見つかる保証はありません。極値ツールは大域的な最適性を証明しません。高周波の振動、特異点、細かな構造はサンプリング精度を超えることがあります。範囲とサンプリングを調整してください。三次元表示には直交ソフトウェア投影と面片の深度順ソートを使用するため、重なり合う曲面の描画には制限があります。\n\nファイルとエクスポート\n.rmathpp はすべてのオブジェクトと表示を保存し、バージョン、CRC、範囲を検証します。保存にはワーカープロセス、アトミックな置換、競合検出を使用します。現在の表示を SVG、PNG、関数値を CSV としてエクスポートできます。文書ごとに最大 64 個のオブジェクト、式 1024 バイト、ファイル 16 MiB です。座標の絶対値は 1e8 以下、範囲は 1e6 以下です。オブジェクトが多い場面では有効な格子精度が低下します。\n\nこのアプリと ReliefMath 数式組版エディターは別のプログラムです。"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:671
+msgid "ReliefMath++ 使用说明"
+msgstr "ReliefMath++ の使い方"
+
+#: userland/apps/reliefmathpp/window.cpp:96
+msgid "SVG 导出"
+msgstr "SVG エクスポート"
+
+#: configs/nls/messages/reliefmathpp.c:6
+msgid "SVG 超出大小限制或内存不足"
+msgstr "SVG がサイズの上限を超えているか、メモリが不足しています"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/reliefmathpp/window.cpp:143
+msgid "X / t / u 范围"
+msgstr "X / t / u の範囲"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:399
+msgid "X 区间"
+msgstr "X の区間"
+
+#: userland/apps/reliefmathpp/window.cpp:145
+msgid "Y / v 范围"
+msgstr "Y / v の範囲"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:404
+msgid "Y 区间"
+msgstr "Y の区間"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: configs/nls/messages/reliefmathpp.c:7
+msgid "nx*x+ny*y+nz*z=d；范围决定显示大小"
+msgstr "nx*x+ny*y+nz*z=d。範囲で表示サイズを決定"
+
+#: configs/nls/messages/reliefmathpp.c:8
+msgid "r(t)，t 是弧度"
+msgstr "r(t)、t はラジアン"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:361
+msgid "x ≈ %.14g\nf(x) / 差值 ≈ %.14g\n残差或区间宽度 ≈ %.4g\n结果为数值近似。"
+msgstr "x ≈ %.14g\nf(x) / 差 ≈ %.14g\n残差または区間幅 ≈ %.4g\n結果は数値近似です。"
+
+#: configs/nls/messages/reliefmathpp.c:9
+msgid "x(t)、y(t)，变量 t、a、b、c、d"
+msgstr "x(t)、y(t)、変数 t、a、b、c、d"
+
+#: configs/nls/messages/reliefmathpp.c:10
+msgid "y = f(x)，变量 x、a、b、c、d"
+msgstr "y = f(x)、変数 x、a、b、c、d"
+
+#: configs/nls/messages/reliefmathpp.c:11
+msgid "z = f(x,y)，变量 x、y、a、b、c、d"
+msgstr "z = f(x,y)、変数 x、y、a、b、c、d"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:510
+msgid "z ≈ %.14g\n梯度 ≈ (%.12g, %.12g)\n法向量 ≈ (%.12g, %.12g, 1)\n估计差异 ≈ %.5g"
+msgstr "z ≈ %.14g\n勾配 ≈ (%.12g, %.12g)\n法線ベクトル ≈ (%.12g, %.12g, 1)\n推定差 ≈ %.5g"
+
+#: configs/nls/messages/reliefmathpp.c:12
+msgid "三个顶点"
+msgstr "3 つの頂点"
+
+#: configs/nls/messages/reliefmathpp.c:13
+msgid "三维三角形"
+msgstr "三次元三角形"
+
+#: userland/apps/reliefmathpp/window.cpp:180
+msgid "三维几何 / 曲面"
+msgstr "三次元幾何 / 曲面"
+
+#: configs/nls/messages/reliefmathpp.c:14
+msgid "三维函数曲面"
+msgstr "三次元関数曲面"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:380
+msgid "三维函数计算"
+msgstr "三次元関数の計算"
+
+#: userland/apps/reliefmathpp/window.cpp:269
+msgid "三维函数计算…"
+msgstr "三次元関数の計算…"
+
+#: configs/nls/messages/reliefmathpp.c:15
+msgid "三维参数曲面"
+msgstr "三次元媒介変数曲面"
+
+#: configs/nls/messages/reliefmathpp.c:16
+msgid "三维向量"
+msgstr "三次元ベクトル"
+
+#: configs/nls/messages/reliefmathpp.c:17
+msgid "三维点"
+msgstr "三次元の点"
+
+#: userland/apps/reliefmathpp/window.cpp:85
+msgid "三维线框"
+msgstr "三次元ワイヤーフレーム"
+
+#: configs/nls/messages/reliefmathpp.c:18
+msgid "三维线段"
+msgstr "三次元の線分"
+
+#: userland/apps/reliefmathpp/window.cpp:247
+msgid "三维绘图"
+msgstr "三次元描画"
+
+#: userland/apps/reliefmathpp/scene.cpp:319
+msgid "三维视图：使用工具添加曲面或几何体"
+msgstr "三次元表示: ツールで曲面または図形を追加してください"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:255
+msgid "上限"
+msgstr "上限"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:252
+msgid "下限"
+msgstr "下限"
+
+#: configs/nls/messages/reliefmathpp.c:20
+msgid "不是 ReliefMath++ 文档或文件已截断"
+msgstr "ReliefMath++ 文書ではないか、ファイルが途中で切れています"
+
+#: configs/nls/messages/reliefmathpp.c:21
+msgid "不能创建临时文件"
+msgstr "一時ファイルを作成できません"
+
+#: configs/nls/messages/reliefmathpp.c:22
+msgid "不能创建工作进程管道"
+msgstr "ワーカープロセスのパイプを作成できません"
+
+#: configs/nls/messages/reliefmathpp.c:23
+msgid "不能取得保存锁"
+msgstr "保存ロックを取得できません"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:301
+msgid "不能启动数值计算进程"
+msgstr "数値計算プロセスを起動できません"
+
+#: configs/nls/messages/reliefmathpp.c:24
+msgid "不能启动文件工作进程"
+msgstr "ファイルワーカープロセスを起動できません"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:448
+msgid "不能启动计算进程"
+msgstr "計算プロセスを起動できません"
+
+#: userland/apps/reliefmathpp/window.cpp:862
+msgid "不能复制对象，文档最多 64 个对象"
+msgstr "オブジェクトを複製できません。文書の上限は 64 個です"
+
+#: configs/nls/messages/reliefmathpp.c:25
+msgid "不能打开保存锁文件"
+msgstr "保存ロックファイルを開けません"
+
+#: configs/nls/messages/reliefmathpp.c:26
+msgid "不能打开文件"
+msgstr "ファイルを開けません"
+
+#: configs/nls/messages/reliefmathpp.c:27
+msgid "不能打开父目录（不支持符号链接）"
+msgstr "親ディレクトリを開けません（シンボリックリンクには対応していません）"
+
+#: configs/nls/messages/reliefmathpp.c:28
+msgid "不能核对导出目录"
+msgstr "エクスポート先ディレクトリを確認できません"
+
+#: configs/nls/messages/reliefmathpp.c:29
+msgid "不能检查保存目标"
+msgstr "保存先を確認できません"
+
+#: configs/nls/messages/reliefmathpp.c:30
+msgid "不能检查保存锁文件"
+msgstr "保存ロックファイルを確認できません"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:496
+msgid "不能添加切平面"
+msgstr "接平面を追加できません"
+
+#: userland/apps/reliefmathpp/window.cpp:715
+msgid "不能添加对象"
+msgstr "オブジェクトを追加できません"
+
+#: userland/apps/reliefmathpp/window.cpp:758
+msgid "不能添加对象，可能已达到 64 个对象上限"
+msgstr "オブジェクトを追加できません。64 個の上限に達している可能性があります"
+
+#: userland/apps/reliefmathpp/files.cpp:167
+msgid "不能生成图片"
+msgstr "画像を生成できません"
+
+#: configs/nls/messages/reliefmathpp.c:31
+msgid "不能生成绘图"
+msgstr "描画を生成できません"
+
+#: configs/nls/messages/reliefmathpp.c:32
+msgid "不能获取画布图像"
+msgstr "キャンバスの画像を取得できません"
+
+#: configs/nls/messages/reliefmathpp.c:33
+msgid "不能设置非阻塞管道"
+msgstr "パイプを非ブロッキングに設定できません"
+
+#: configs/nls/messages/reliefmathpp.c:34
+msgid "不能读取文件信息"
+msgstr "ファイル情報を読み取れません"
+
+#: configs/nls/messages/reliefmathpp.c:35
+msgid "两个端点"
+msgstr "2 つの端点"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:658
+msgid "两点距离 ≈ %.12g\n中点 = (%.10g, %.10g, %.10g)\n点积 u·v = %.12g\n叉积 u×v = (%.10g, %.10g, %.10g)\n|u| ≈ %.10g，|v| ≈ %.10g\n夹角 ≈ %.10g 弧度 / %.10g 度（零向量无定义）\n平行四边形面积 ≈ %.12g"
+msgstr "2 点間の距離 ≈ %.12g\n中点 = (%.10g, %.10g, %.10g)\n内積 u·v = %.12g\n外積 u×v = (%.10g, %.10g, %.10g)\n|u| ≈ %.10g、|v| ≈ %.10g\nなす角 ≈ %.10g ラジアン / %.10g 度（零ベクトルでは未定義）\n平行四辺形の面積 ≈ %.12g"
+
+#: configs/nls/messages/reliefmathpp.c:36
+msgid "中心与两个正半轴"
+msgstr "中心と 2 つの正の半軸"
+
+#: configs/nls/messages/reliefmathpp.c:37
+msgid "二维三角形"
+msgstr "二次元三角形"
+
+#: userland/apps/reliefmathpp/window.cpp:180
+msgid "二维几何 / 函数"
+msgstr "二次元幾何 / 関数"
+
+#: configs/nls/messages/reliefmathpp.c:38
+msgid "二维函数"
+msgstr "二次元関数"
+
+#: configs/nls/messages/reliefmathpp.c:39
+msgid "二维参数曲线"
+msgstr "二次元媒介変数曲線"
+
+#: configs/nls/messages/reliefmathpp.c:40
+msgid "二维向量"
+msgstr "二次元ベクトル"
+
+#: configs/nls/messages/reliefmathpp.c:41
+msgid "二维点"
+msgstr "二次元の点"
+
+#: configs/nls/messages/reliefmathpp.c:42
+msgid "二维线段"
+msgstr "二次元の線分"
+
+#: userland/apps/reliefmathpp/window.cpp:247
+msgid "二维绘图"
+msgstr "二次元描画"
+
+#: userland/apps/reliefmathpp/scene.cpp:320
+msgid "二维视图：添加函数，或选择几何工具在画布上拾点"
+msgstr "二次元表示: 関数を追加するか、幾何ツールでキャンバス上の点を選択してください"
+
+#: userland/apps/reliefmathpp/window.cpp:90
+msgid "使用说明与表达式参考"
+msgstr "使い方と式のリファレンス"
+
+#: userland/apps/reliefmathpp/window.cpp:67
+msgid "保存"
+msgstr "保存"
+
+#: userland/apps/reliefmathpp/files.cpp:37
+msgid "保存 ReliefMath++ 文档"
+msgstr "ReliefMath++ 文書を保存"
+
+#: configs/nls/messages/reliefmathpp.c:44
+msgid "保存冲突：磁盘文件已更改，请另存为"
+msgstr "保存の競合: ディスク上のファイルが変更されました。名前を付けて保存してください"
+
+#: configs/nls/messages/reliefmathpp.c:45
+msgid "保存锁必须是当前用户拥有的普通文件，且不能有其他硬链接"
+msgstr "保存ロックは現在のユーザーが所有する通常ファイルで、他のハードリンクがない必要があります"
+
+#: configs/nls/messages/reliefmathpp.c:46
+msgid "公式为空或超过 1024 字节"
+msgstr "式が空か、1024 バイトを超えています"
+
+#: configs/nls/messages/reliefmathpp.c:47
+msgid "公式嵌套过深"
+msgstr "式の入れ子が深すぎます"
+
+#: configs/nls/messages/reliefmathpp.c:48
+msgid "公式过于复杂"
+msgstr "式が複雑すぎます"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:268
+msgid "关闭"
+msgstr "閉じる"
+
+#: configs/nls/messages/reliefmathpp.c:49
+msgid "关闭临时文件失败"
+msgstr "一時ファイルを閉じられませんでした"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:591
+msgid "内存不足"
+msgstr "メモリ不足"
+
+#: userland/apps/reliefmathpp/window.cpp:522
+msgid "内存不足，不能记录撤销历史"
+msgstr "メモリ不足のため、取り消し履歴を記録できません"
+
+#: configs/nls/messages/reliefmathpp.c:51
+msgid "写入或同步失败"
+msgstr "書き込みまたは同期に失敗しました"
+
+#: userland/apps/reliefmathpp/window.cpp:266
+msgid "几何度量"
+msgstr "幾何測定"
+
+#: userland/apps/reliefmathpp/window.cpp:770
+msgid "几何文档尚未保存。"
+msgstr "幾何文書はまだ保存されていません。"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:231
+msgid "函数与数值计算"
+msgstr "関数と数値計算"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:236
+msgid "函数值 f(x)|一阶导数 f'(x)|二阶导数 f''(x)|定积分|区间零点|两个函数交点|区间最小值（采样搜索）|区间最大值（采样搜索）|函数弧长"
+msgstr "関数値 f(x)|1 階導関数 f'(x)|2 階導関数 f''(x)|定積分|区間内の零点|2 つの関数の交点|区間の最小値（サンプリング探索）|区間の最大値（サンプリング探索）|関数の弧長"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:385
+msgid "函数值 z(x,y)|梯度与法向量|拉普拉斯算子|矩形区域二重积分|曲面面积"
+msgstr "関数値 z(x,y)|勾配と法線ベクトル|ラプラシアン|矩形領域の二重積分|曲面積"
+
+#: userland/apps/reliefmathpp/window.cpp:266
+msgid "函数值表…"
+msgstr "関数値の表…"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:528
+msgid "函数值表与 CSV"
+msgstr "関数値の表と CSV"
+
+#: userland/apps/reliefmathpp/window.cpp:71
+msgid "函数值表与 CSV…"
+msgstr "関数値の表と CSV…"
+
+#: configs/nls/messages/reliefmathpp.c:52
+msgid "函数参数需要逗号"
+msgstr "関数の引数にはコンマが必要です"
+
+#: configs/nls/messages/reliefmathpp.c:53
+msgid "函数后需要括号"
+msgstr "関数の後に括弧が必要です"
+
+#: userland/apps/reliefmathpp/window.cpp:266
+msgid "函数计算…"
+msgstr "関数の計算…"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:494
+msgid "切平面已添加；保存计算时的参数值。"
+msgstr "接平面を追加しました。計算時のパラメーター値を保存します。"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:345
+msgid "切线已加入文档；切线保存计算时的参数值。"
+msgstr "接線を文書に追加しました。接線には計算時のパラメーター値が保存されます。"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:322
+msgid "切线表达式或坐标无效"
+msgstr "接線の式または座標が無効です"
+
+#: userland/apps/reliefmathpp/window.cpp:76
+msgid "删除对象"
+msgstr "オブジェクトを削除"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:572
+msgid "区间或行数无效；需要 2–2000 行"
+msgstr "区間または行数が無効です。2–2000 行が必要です"
+
+#: configs/nls/messages/reliefmathpp.c:54
+msgid "半径、长宽高必须为正，平面法向量不能为零"
+msgstr "半径、幅、奥行き、高さは正の値で、平面の法線ベクトルはゼロ以外でなければなりません"
+
+#: userland/apps/reliefmathpp/window.cpp:591
+msgid "参数必须为绝对值不超过 1e8 的有限数值"
+msgstr "パラメーターには絶対値が 1e8 以下の有限値を指定してください"
+
+#: configs/nls/messages/reliefmathpp.c:55
+msgid "参数数量不正确或缺少右括号"
+msgstr "引数の数が正しくないか、右括弧がありません"
+
+#: configs/nls/messages/reliefmathpp.c:56
+msgid "参数无效"
+msgstr "パラメーターが無効です"
+
+#: userland/apps/reliefmathpp/files.cpp:87
+msgid "取消"
+msgstr "キャンセル"
+
+#: userland/apps/reliefmathpp/window.cpp:269
+msgid "取消拾点"
+msgstr "点の選択をキャンセル"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:259
+msgid "取消计算"
+msgstr "計算をキャンセル"
+
+#: configs/nls/messages/reliefmathpp.c:57
+msgid "另一个文档窗口正在保存此目录，请稍后重试"
+msgstr "別の文書ウィンドウがこのディレクトリに保存中です。しばらくしてから再試行してください"
+
+#: userland/apps/reliefmathpp/window.cpp:68
+msgid "另存为…"
+msgstr "名前を付けて保存…"
+
+#: configs/nls/messages/reliefmathpp.c:58
+msgid "只支持不超过 16 MiB 的普通文件"
+msgstr "16 MiB 以下の通常ファイルのみ対応しています"
+
+#: userland/apps/reliefmathpp/window.cpp:153
+msgid "可见"
+msgstr "表示"
+
+#: userland/apps/reliefmathpp/window.cpp:120
+msgid "名称"
+msgstr "名前"
+
+#: configs/nls/messages/reliefmathpp.c:59
+msgid "名称过长"
+msgstr "名前が長すぎます"
+
+#: userland/apps/reliefmathpp/window.cpp:267
+msgid "向量 / 两点…"
+msgstr "ベクトル / 2 点…"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:627
+msgid "向量与两点计算"
+msgstr "ベクトルと 2 点の計算"
+
+#: configs/nls/messages/reliefmathpp.c:60
+msgid "圆"
+msgstr "円"
+
+#: configs/nls/messages/reliefmathpp.c:61
+msgid "圆心与正半径"
+msgstr "円の中心と正の半径"
+
+#: configs/nls/messages/reliefmathpp.c:62
+msgid "圆柱"
+msgstr "円柱"
+
+#: configs/nls/messages/reliefmathpp.c:63
+msgid "圆锥"
+msgstr "円錐"
+
+#: userland/apps/reliefmathpp/window.cpp:1008
+msgid "在二维画布上选择点；Esc 取消拾点"
+msgstr "二次元キャンバスで点を選択。Esc でキャンセル"
+
+#: userland/apps/reliefmathpp/window.cpp:700
+msgid "坐标  x = %.7g    y = %.7g"
+msgstr "座標  x = %.7g    y = %.7g"
+
+#: userland/apps/reliefmathpp/window.cpp:498
+msgid "坐标 / 尺寸（此类型使用公式）"
+msgstr "座標 / 寸法（この種類は式を使用します）"
+
+#: userland/apps/reliefmathpp/window.cpp:139
+msgid "坐标 / 尺寸（逗号分隔）"
+msgstr "座標 / 寸法（コンマ区切り）"
+
+#: userland/apps/reliefmathpp/window.cpp:542
+msgid "坐标和范围请输入有限数值，并使用英文逗号分隔"
+msgstr "座標と範囲には有限値を半角コンマで区切って入力してください"
+
+#: configs/nls/messages/reliefmathpp.c:64
+msgid "坐标必须为有限数值，绝对值不超过 1e8"
+msgstr "座標には絶対値が 1e8 以下の有限値を指定してください"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:442
+msgid "坐标或区间无效"
+msgstr "座標または区間が無効です"
+
+#: userland/apps/reliefmathpp/window.cpp:84
+msgid "坐标轴"
+msgstr "座標軸"
+
+#: userland/apps/reliefmathpp/window.cpp:75
+msgid "复制对象"
+msgstr "オブジェクトを複製"
+
+#: configs/nls/messages/reliefmathpp.c:65
+msgid "多余字符；乘法请显式使用 *"
+msgstr "余分な文字があります。乗算には * を明示してください"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:382
+msgid "对显函数 z=f(x,y) 计算；使用当前 a/b/c/d 参数；结果为数值近似"
+msgstr "陽関数 z=f(x,y) を計算します。現在の a/b/c/d パラメーターを使用し、結果は数値近似です"
+
+#: configs/nls/messages/reliefmathpp.c:66
+msgid "对象名称、类型、颜色或采样精度无效"
+msgstr "オブジェクトの名前、種類、色またはサンプリング精度が無効です"
+
+#: userland/apps/reliefmathpp/window.cpp:119
+msgid "对象属性"
+msgstr "オブジェクトのプロパティ"
+
+#: userland/apps/reliefmathpp/window.cpp:112
+msgid "对象清单（选中后编辑；勾选可见性）"
+msgstr "オブジェクト一覧（選択して編集、チェックで表示切り替え）"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:550
+msgid "导出 CSV"
+msgstr "CSV をエクスポート"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:610
+msgid "导出函数值表"
+msgstr "関数値の表をエクスポート"
+
+#: userland/apps/reliefmathpp/files.cpp:171
+msgid "导出当前视图"
+msgstr "現在の表示をエクスポート"
+
+#: userland/apps/reliefmathpp/window.cpp:70
+msgid "导出当前视图 PNG…"
+msgstr "現在の表示を PNG でエクスポート…"
+
+#: userland/apps/reliefmathpp/window.cpp:69
+msgid "导出当前视图 SVG…"
+msgstr "現在の表示を SVG でエクスポート…"
+
+#: configs/nls/messages/reliefmathpp.c:67
+msgid "导出目标是当前文档，请选择其他文件"
+msgstr "エクスポート先が現在の文書です。別のファイルを選択してください"
+
+#: userland/apps/reliefmathpp/window.cpp:213
+msgid "就绪"
+msgstr "準備完了"
+
+#: userland/apps/reliefmathpp/window.cpp:670
+msgid "就绪 · 拖动平移/旋转，滚轮缩放"
+msgstr "準備完了 · ドラッグで移動 / 回転、ホイールで拡大縮小"
+
+#: userland/apps/reliefmathpp/window.cpp:399
+msgid "属性尚未应用；Ctrl+Enter 应用"
+msgstr "プロパティは未適用です。Ctrl+Enter で適用"
+
+#: configs/nls/messages/reliefmathpp.c:68
+msgid "工作进程响应过大或内存不足"
+msgstr "ワーカーの応答が大きすぎるか、メモリが不足しています"
+
+#: configs/nls/messages/reliefmathpp.c:69
+msgid "工作进程读取失败"
+msgstr "ワーカーからの読み取りに失敗しました"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:383
+msgid "工具"
+msgstr "ツール"
+
+#: configs/nls/messages/reliefmathpp.c:70
+msgid "左下角与正宽高"
+msgstr "左下の角と正の幅・高さ"
+
+#: userland/apps/reliefmathpp/window.cpp:677
+msgid "已保存"
+msgstr "保存済み"
+
+#: userland/apps/reliefmathpp/window.cpp:57
+msgid "帮助"
+msgstr "ヘルプ"
+
+#: configs/nls/messages/reliefmathpp.c:71
+msgid "平面"
+msgstr "平面"
+
+#: userland/apps/reliefmathpp/window.cpp:78
+msgid "应用属性"
+msgstr "プロパティを適用"
+
+#: userland/apps/reliefmathpp/window.cpp:154
+msgid "应用属性  Ctrl+Enter"
+msgstr "プロパティを適用  Ctrl+Enter"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:258
+msgid "开始计算"
+msgstr "計算を開始"
+
+#: userland/apps/reliefmathpp/window.cpp:95
+msgid "打开"
+msgstr "開く"
+
+#: userland/apps/reliefmathpp/files.cpp:11
+msgid "打开 ReliefMath++ 文档"
+msgstr "ReliefMath++ 文書を開く"
+
+#: userland/apps/reliefmathpp/window.cpp:66
+msgid "打开…"
+msgstr "開く…"
+
+#: userland/apps/reliefmathpp/canvas.cpp:9
+msgid "拖动平移；滚轮缩放；几何工具拾点；Esc 取消"
+msgstr "ドラッグで移動、ホイールで拡大縮小、幾何ツールで点を選択、Esc でキャンセル"
+
+#: userland/apps/reliefmathpp/canvas.cpp:8
+msgid "拖动旋转；滚轮缩放；Home 重置"
+msgstr "ドラッグで回転、ホイールで拡大縮小、Home でリセット"
+
+#: userland/apps/reliefmathpp/window.cpp:268
+msgid "拾点：三角形"
+msgstr "点を選択: 三角形"
+
+#: userland/apps/reliefmathpp/window.cpp:268
+msgid "拾点：向量"
+msgstr "点を選択: ベクトル"
+
+#: userland/apps/reliefmathpp/window.cpp:268
+msgid "拾点：圆"
+msgstr "点を選択: 円"
+
+#: userland/apps/reliefmathpp/window.cpp:267
+msgid "拾点：点"
+msgstr "点を選択: 点"
+
+#: userland/apps/reliefmathpp/window.cpp:267
+msgid "拾点：线段"
+msgstr "点を選択: 線分"
+
+#: userland/apps/reliefmathpp/window.cpp:156
+msgid "提示：公式乘法用 *；角度统一为弧度"
+msgstr "ヒント: 式の乗算には * を使用。角度はすべてラジアン"
+
+#: userland/apps/reliefmathpp/window.cpp:73
+msgid "撤销"
+msgstr "元に戻す"
+
+#: userland/apps/reliefmathpp/window.cpp:81
+msgid "放大"
+msgstr "拡大"
+
+#: userland/apps/reliefmathpp/window.cpp:770
+msgid "放弃更改"
+msgstr "変更を破棄"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:233
+msgid "数值近似计算 · 使用当前 a、b、c、d 参数 · 区间内应满足连续性要求"
+msgstr "数値近似計算 · 現在の a、b、c、d パラメーターを使用 · 区間内の連続性が必要です"
+
+#: userland/apps/reliefmathpp/window.cpp:57
+msgid "文件"
+msgstr "ファイル"
+
+#: configs/nls/messages/reliefmathpp.c:72
+msgid "文件在读取过程中被其他程序修改，请重试"
+msgstr "読み取り中にファイルが別のプログラムによって変更されました。再試行してください"
+
+#: configs/nls/messages/reliefmathpp.c:73
+msgid "文件工作进程响应无效"
+msgstr "ファイルワーカーの応答が無効です"
+
+#: configs/nls/messages/reliefmathpp.c:74
+msgid "文件工作进程意外退出，原文档仍保留在窗口中"
+msgstr "ファイルワーカーが予期せず終了しました。元の文書はウィンドウに保持されています"
+
+#: configs/nls/messages/reliefmathpp.c:75
+msgid "文件已截断"
+msgstr "ファイルが途中で切れています"
+
+#: configs/nls/messages/reliefmathpp.c:76
+msgid "文件已替换，但目录同步失败；请重新打开核对后再保存"
+msgstr "ファイルは置き換えられましたが、ディレクトリの同期に失敗しました。開き直して確認してから保存してください"
+
+#: configs/nls/messages/reliefmathpp.c:77
+msgid "文件已被其他程序修改；请重新打开或另存为，避免覆盖"
+msgstr "ファイルが別のプログラムによって変更されました。上書きを避けるため、開き直すか名前を付けて保存してください"
+
+#: configs/nls/messages/reliefmathpp.c:78
+msgid "文件操作正在进行"
+msgstr "ファイル操作が進行中です"
+
+#: configs/nls/messages/reliefmathpp.c:79
+msgid "文件超出 16 MiB 限制"
+msgstr "ファイルが 16 MiB の上限を超えています"
+
+#: configs/nls/messages/reliefmathpp.c:80
+msgid "文件路径不能包含上级目录"
+msgstr "ファイルパスに親ディレクトリを含めることはできません"
+
+#: configs/nls/messages/reliefmathpp.c:81
+msgid "文件路径为空或过长"
+msgstr "ファイルパスが空か長すぎます"
+
+#: configs/nls/messages/reliefmathpp.c:82
+msgid "文档含重复对象标识"
+msgstr "文書に重複するオブジェクト ID があります"
+
+#: configs/nls/messages/reliefmathpp.c:83
+msgid "文档对象过多或标识无效"
+msgstr "文書のオブジェクトが多すぎるか、ID が無効です"
+
+#: configs/nls/messages/reliefmathpp.c:84
+msgid "文档校验失败、版本不支持或内容损坏"
+msgstr "文書の検証に失敗したか、バージョンが未対応または内容が破損しています"
+
+#: configs/nls/messages/reliefmathpp.c:85
+msgid "文档超出限制、文本无效或内存不足"
+msgstr "文書が上限を超えているか、テキストが無効か、メモリが不足しています"
+
+#: userland/apps/reliefmathpp/window.cpp:95
+msgid "新建"
+msgstr "新規作成"
+
+#: userland/apps/reliefmathpp/window.cpp:65
+msgid "新建几何文档"
+msgstr "幾何文書を新規作成"
+
+#: configs/nls/messages/reliefmathpp.c:86
+msgid "无效或超范围的数值"
+msgstr "無効または範囲外の数値です"
+
+#: configs/nls/messages/reliefmathpp.c:87
+msgid "无效的文件路径"
+msgstr "無効なファイルパスです"
+
+#: configs/nls/messages/reliefmathpp.c:88
+msgid "无法分配临时文件"
+msgstr "一時ファイルを確保できません"
+
+#: userland/apps/reliefmathpp/window.cpp:77
+msgid "显示/隐藏对象"
+msgstr "オブジェクトを表示/非表示"
+
+#: configs/nls/messages/reliefmathpp.c:89
+msgid "曲面内存不足"
+msgstr "曲面用メモリが不足しています"
+
+#: configs/nls/messages/reliefmathpp.c:90
+msgid "替换文件失败"
+msgstr "ファイルの置き換えに失敗しました"
+
+#: configs/nls/messages/reliefmathpp.c:91
+msgid "最小角与正长宽高"
+msgstr "最小角と正の幅・奥行き・高さ"
+
+#: userland/apps/reliefmathpp/window.cpp:677
+msgid "未保存"
+msgstr "未保存"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:521
+msgid "未取得可靠结果，请检查定义域、连续性和区间。\n积分区间下限必须小于上限，绝对值不超过 1e6。"
+msgstr "信頼できる結果が得られませんでした。定義域、連続性、区間を確認してください。\n積分区間の下限は上限より小さく、絶対値は 1e6 以下でなければなりません。"
+
+#: userland/apps/reliefmathpp/window.cpp:682
+msgid "未命名几何文档"
+msgstr "無題の幾何文書"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:373
+msgid "未得到可靠结果。\n请检查定义域、连续性、区间和端点符号；可缩小区间重试。\n区间宽度很小并不能证明间断点是零点。"
+msgstr "信頼できる結果が得られませんでした。\n定義域、連続性、区間、端点の符号を確認してください。区間を狭めて再試行できます。\n区間幅が小さいことは、不連続点が零点であることの証明にはなりません。"
+
+#: configs/nls/messages/reliefmathpp.c:92
+msgid "未知函数或变量"
+msgstr "不明な関数または変数です"
+
+#: configs/nls/messages/reliefmathpp.c:93
+msgid "极坐标曲线"
+msgstr "極座標曲線"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:416
+msgid "梯度为 (∂z/∂x, ∂z/∂y)，法向量为 (-∂z/∂x, -∂z/∂y, 1)。\n二重积分为带符号的体积；曲面面积只计算指定矩形区域。\n积分采用两级 Simpson 网格估计误差，不适用于奇点或未解析的高频结构。"
+msgstr "勾配は (∂z/∂x, ∂z/∂y)、法線ベクトルは (-∂z/∂x, -∂z/∂y, 1) です。\n二重積分は符号付き体積です。曲面積は指定された矩形領域のみ計算します。\n積分の誤差推定には 2 段階の Simpson 格子を使用し、特異点や解像されていない高周波構造には適しません。"
+
+#: configs/nls/messages/reliefmathpp.c:94
+msgid "椭圆"
+msgstr "楕円"
+
+#: userland/apps/reliefmathpp/window.cpp:660
+msgid "正在分批采样…"
+msgstr "分割してサンプリング中…"
+
+#: userland/apps/reliefmathpp/window.cpp:662
+msgid "正在处理文件…"
+msgstr "ファイルを処理中…"
+
+#: userland/apps/reliefmathpp/window.cpp:86
+msgid "正弦、余弦与圆"
+msgstr "サイン、コサインと円"
+
+#: configs/nls/messages/reliefmathpp.c:95
+msgid "此对象不支持该变量"
+msgstr "このオブジェクトではその変数を使用できません"
+
+#: userland/apps/reliefmathpp/window.cpp:989
+msgid "此对象无内置几何度量。函数对象请使用“函数计算”。"
+msgstr "このオブジェクトに組み込みの幾何測定はありません。関数オブジェクトには「関数の計算」を使用してください。"
+
+#: configs/nls/messages/reliefmathpp.c:96
+msgid "此文件名由文档保存锁保留，请选择其他文件名"
+msgstr "このファイル名は文書の保存ロック用に予約されています。別の名前を選択してください"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:475
+msgid "此点不能取得有限梯度"
+msgstr "この点では有限の勾配を得られません"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:330
+msgid "此点不能取得有限的导数"
+msgstr "この点では有限の導関数を得られません"
+
+#: configs/nls/messages/reliefmathpp.c:97
+msgid "此范围内没有可绘制的有限值"
+msgstr "この範囲に描画可能な有限値がありません"
+
+#: userland/apps/reliefmathpp/window.cpp:707
+msgid "每个文档最多 64 个对象"
+msgstr "文書のオブジェクトは最大 64 個です"
+
+#: configs/nls/messages/reliefmathpp.c:98
+msgid "沿 Z 轴，底面中心、正半径和正高度"
+msgstr "Z 軸に沿い、底面の中心、正の半径と高さ"
+
+#: configs/nls/messages/reliefmathpp.c:99
+msgid "沿 Z 轴，正半径和正高度"
+msgstr "Z 軸に沿い、正の半径と高さ"
+
+#: userland/apps/reliefmathpp/window.cpp:87
+msgid "波纹曲面与螺旋线"
+msgstr "波紋の曲面とらせん"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:411
+msgid "添加此点切平面"
+msgstr "この点の接平面を追加"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:260
+msgid "添加此点切线"
+msgstr "この点の接線を追加"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:249
+msgid "点 x"
+msgstr "点 x"
+
+#: configs/nls/messages/reliefmathpp.c:100
+msgid "点的坐标"
+msgstr "点の座標"
+
+#: userland/apps/reliefmathpp/window.cpp:89
+msgid "玫瑰线与椭圆"
+msgstr "バラ曲線と楕円"
+
+#: userland/apps/reliefmathpp/window.cpp:88
+msgid "环面与空间向量"
+msgstr "トーラスと空間ベクトル"
+
+#: configs/nls/messages/reliefmathpp.c:101
+msgid "球体"
+msgstr "球"
+
+#: configs/nls/messages/reliefmathpp.c:102
+msgid "球心与正半径"
+msgstr "球の中心と正の半径"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:549
+msgid "生成值表"
+msgstr "値の表を生成"
+
+#: userland/apps/reliefmathpp/files.cpp:87
+msgid "目标文件已存在，是否覆盖？"
+msgstr "保存先のファイルは既に存在します。上書きしますか?"
+
+#: configs/nls/messages/reliefmathpp.c:103
+msgid "目标文件已被锁定或属于保存锁，请重试或选择其他文件名"
+msgstr "保存先はロック中か保存ロックに属しています。再試行するか別のファイル名を選択してください"
+
+#: configs/nls/messages/reliefmathpp.c:104
+msgid "矩形"
+msgstr "四角形"
+
+#: userland/apps/reliefmathpp/window.cpp:57
+msgid "示例"
+msgstr "サンプル"
+
+#: configs/nls/messages/reliefmathpp.c:105
+msgid "空间参数曲线"
+msgstr "空間媒介変数曲線"
+
+#: configs/nls/messages/reliefmathpp.c:106
+msgid "端点未夹住零点；请缩小到连续且异号的区间"
+msgstr "両端の符号が零点を挟んでいません。連続で符号が異なる区間に狭めてください"
+
+#: userland/apps/reliefmathpp/window.cpp:123
+msgid "类型"
+msgstr "種類"
+
+#: userland/apps/reliefmathpp/window.cpp:446
+msgid "类型已选择；应用后更新对象"
+msgstr "種類を選択しました。適用するとオブジェクトが更新されます"
+
+#: userland/apps/reliefmathpp/window.cpp:170
+msgid "线框"
+msgstr "ワイヤーフレーム"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:366
+msgid "结果 ≈ %.14g\n估计差异 / 误差 ≈ %.4g\n结果为数值近似。"
+msgstr "結果 ≈ %.14g\n推定差 / 誤差 ≈ %.4g\n結果は数値近似です。"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:515
+msgid "结果 ≈ %.14g\n估计差异 / 误差 ≈ %.5g"
+msgstr "結果 ≈ %.14g\n推定差 / 誤差 ≈ %.5g"
+
+#: userland/apps/reliefmathpp/canvas.cpp:44
+msgid "绘图内存不足，请减少对象或采样精度"
+msgstr "描画用メモリが不足しています。オブジェクト数またはサンプリング精度を減らしてください"
+
+#: userland/apps/reliefmathpp/window.cpp:730
+msgid "继续在画布上选择下一个点；Esc 取消"
+msgstr "キャンバス上で次の点を選択してください。Esc でキャンセル"
+
+#: userland/apps/reliefmathpp/window.cpp:57
+msgid "编辑"
+msgstr "編集"
+
+#: userland/apps/reliefmathpp/window.cpp:82
+msgid "缩小"
+msgstr "縮小"
+
+#: configs/nls/messages/reliefmathpp.c:107
+msgid "缺少右括号"
+msgstr "右括弧がありません"
+
+#: userland/apps/reliefmathpp/window.cpp:83
+msgid "网格"
+msgstr "グリッド"
+
+#: configs/nls/messages/reliefmathpp.c:108
+msgid "范围下限必须小于上限"
+msgstr "範囲の下限は上限より小さくしてください"
+
+#: configs/nls/messages/reliefmathpp.c:109
+msgid "范围必须为有限数值，绝对值不超过 1e6"
+msgstr "範囲には絶対値が 1e6 以下の有限値を指定してください"
+
+#: userland/apps/reliefmathpp/window.cpp:149
+msgid "蓝|红|绿|紫|金|青|粉|灰"
+msgstr "青|赤|緑|紫|金|シアン|ピンク|灰"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:541
+msgid "行数"
+msgstr "行数"
+
+#: userland/apps/reliefmathpp/window.cpp:269
+msgid "表达式帮助"
+msgstr "式のヘルプ"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:466
+msgid "表达式或坐标无效"
+msgstr "式または座標が無効です"
+
+#: userland/apps/reliefmathpp/files.cpp:87
+msgid "覆盖"
+msgstr "上書き"
+
+#: userland/apps/reliefmathpp/window.cpp:57
+msgid "视图"
+msgstr "表示"
+
+#: configs/nls/messages/reliefmathpp.c:110
+msgid "视图设置超出范围"
+msgstr "表示設定が範囲外です"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:637
+msgid "计算"
+msgstr "計算"
+
+#: userland/apps/reliefmathpp/window.cpp:247
+msgid "计算与工具"
+msgstr "計算とツール"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:446
+msgid "计算中… 可取消。"
+msgstr "計算中… キャンセルできます。"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:304
+msgid "计算中… 可继续操作窗口或取消计算。"
+msgstr "計算中… ウィンドウの操作を続けるかキャンセルできます。"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:234
+msgid "计算工具"
+msgstr "計算ツール"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:311
+msgid "计算已取消"
+msgstr "計算をキャンセルしました"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:606
+msgid "请先生成值表"
+msgstr "先に値の表を生成してください"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:650
+msgid "请用英文逗号输入三个有限坐标"
+msgstr "3 つの有限の座標を半角コンマで区切って入力してください"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:295
+msgid "请输入有限数值，坐标绝对值不超过 1e12"
+msgstr "絶対値が 1e12 以下の有限な座標を入力してください"
+
+#: configs/nls/messages/reliefmathpp.c:111
+msgid "请选择一个文件名"
+msgstr "ファイル名を選択してください"
+
+#: configs/nls/messages/reliefmathpp.c:112
+msgid "读取失败"
+msgstr "読み取りに失敗しました"
+
+#: configs/nls/messages/reliefmathpp.c:113
+msgid "起点和向量分量"
+msgstr "始点とベクトル成分"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:628
+msgid "输入三维分量；二维计算将 Z 设为 0"
+msgstr "三次元の成分を入力します。二次元の計算では Z を 0 にします"
+
+#: userland/apps/reliefmathpp/window.cpp:171
+msgid "追踪"
+msgstr "トレース"
+
+#: userland/apps/reliefmathpp/window.cpp:696
+msgid "追踪  x = %.7g    f(x) = %.7g"
+msgstr "トレース  x = %.7g    f(x) = %.7g"
+
+#: userland/apps/reliefmathpp/window.cpp:72
+msgid "退出"
+msgstr "終了"
+
+#: userland/apps/reliefmathpp/window.cpp:161
+msgid "适合"
+msgstr "画面に合わせる"
+
+#: userland/apps/reliefmathpp/window.cpp:80
+msgid "适合全部对象"
+msgstr "すべてのオブジェクトを画面に合わせる"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:264
+msgid "选择工具并输入表达式。求根需要端点异号；交点计算 f(x)-g(x)=0。\n积分与求导可能在间断点、振荡过快或浮点误差过大时失败。\n极值为数值采样搜索结果，不能证明已找到所有局部极值。"
+msgstr "ツールを選択して式を入力してください。求根には端点の符号が異なる必要があります。交点は f(x)-g(x)=0 を計算します。\n積分と微分は、不連続点、過度に速い振動、浮動小数点誤差が大きい場合に失敗することがあります。\n極値は数値サンプリングによる探索結果であり、すべての局所極値が見つかったことを証明するものではありません。"
+
+#: userland/apps/reliefmathpp/window.cpp:150
+msgid "采样"
+msgstr "サンプリング"
+
+#: userland/apps/reliefmathpp/dialogs.cpp:529
+msgid "采样二维显函数，最多 2000 行；未定义值显示 undefined"
+msgstr "二次元陽関数を最大 2000 行サンプリングします。未定義の値は undefined と表示します"
+
+#: configs/nls/messages/reliefmathpp.c:114
+msgid "采样内存不足"
+msgstr "サンプリング用メモリが不足しています"
+
+#: userland/apps/reliefmathpp/files.cpp:158
+msgid "采样尚未完成，请稍后导出。"
+msgstr "サンプリングが完了していません。しばらくしてからエクスポートしてください。"
+
+#: userland/apps/reliefmathpp/window.cpp:74
+msgid "重做"
+msgstr "やり直し"
+
+#: userland/apps/reliefmathpp/window.cpp:161
+msgid "重置"
+msgstr "リセット"
+
+#: userland/apps/reliefmathpp/window.cpp:79
+msgid "重置视图"
+msgstr "表示をリセット"
+
+#: configs/nls/messages/reliefmathpp.c:115
+msgid "长方体"
+msgstr "直方体"
+
+#: configs/nls/messages/reliefmathpp.c:116
+msgid "隐式曲线"
+msgstr "陰関数曲線"
+
+#: configs/nls/messages/reliefmathpp.c:117
+msgid "需要数值、变量或函数"
+msgstr "数値、変数または関数が必要です"
+
+#: userland/apps/reliefmathpp/window.cpp:147
+msgid "颜色"
+msgstr "色"

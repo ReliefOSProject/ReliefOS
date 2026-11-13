@@ -45,12 +45,12 @@ int conflict_dialog(){
 }
 const char *status_label(ExportStatus s){switch(s){case ExportStatus::Pending:return T("Queued");case ExportStatus::Rendering:return T("Rendering");case ExportStatus::Writing:return T("Saving");case ExportStatus::Done:return T("Done");case ExportStatus::Failed:return T("Failed");case ExportStatus::Cancelled:return T("Cancelled");}return "";}
 }
-void MathWindow::init_files(){files_=new FileState;Error e;if(!io_->recovery(IoKind::RecoveryInit,files_->recovery,nullptr,nullptr,0,e))update_status(e.message.c_str());}
+void MathWindow::init_files(){files_=new FileState;Error e;if(!io_->recovery(IoKind::RecoveryInit,files_->recovery,nullptr,nullptr,0,e))update_status(ui_error(e.message.c_str()));}
 void MathWindow::destroy_files(){if(files_){delete files_->progress;delete files_;files_=nullptr;}}
 void MathWindow::start_recovery_load(uint64_t id){
     if(!files_||!id)return;Error e;
     if(!io_->recovery(IoKind::RecoveryLoad,files_->recovery,nullptr,nullptr,id,e)){
-        files_->recovery_flow.load_start_failed();update_status(e.message.c_str());
+        files_->recovery_flow.load_start_failed();update_status(ui_error(e.message.c_str()));
     }else {document_locked_=true;editor->deactivate();}
 }
 void MathWindow::start_saved_recovery_cleanup(){
@@ -70,7 +70,7 @@ void MathWindow::start_saved_recovery_cleanup(){
     }
     if(files_->save_cleanup_recovered)files_->recovered_id=target.id;
     files_->save_cleanup_pending=false;files_->save_cleanup_recovered=false;files_->save_cleanup_id=0;
-    document_locked_=false;editor->activate();update_status(e.message.c_str());
+    document_locked_=false;editor->activate();update_status(ui_error(e.message.c_str()));
 }
 bool MathWindow::finish_dirty(){
     flush_edit();if(!history.is_dirty(document))return true;
@@ -100,7 +100,7 @@ void MathWindow::file_action(Command command){
         }
         Error e;FileStamp expected=new_path?FileStamp{}:files_->stamp;
         if(io_->save(target.c_str(),document,expected,false,session_,e))update_status(T("Saving document in background..."));
-        else {update_status(e.message.c_str());files_->abandon_continuation();}return;
+        else {update_status(ui_error(e.message.c_str()));files_->abandon_continuation();}return;
     }
     if(command==Command::Open&&files_->pending_open.empty()){
         const char *chosen=fl_file_chooser(T("Open formula document"),"*.rmath",path_.empty()?nullptr:path_.c_str(),1);
@@ -118,7 +118,7 @@ void MathWindow::file_action(Command command){
         if(files_->recovery.current_id()||files_->recovered_id){
             uint64_t id=files_->recovered_id;files_->recovered_id=0;
             if(io_->recovery(IoKind::RecoveryDiscard,files_->recovery,nullptr,nullptr,id,e)){update_status(T("Clearing recovery snapshot..."));return;}
-            update_status(e.message.c_str());files_->abandon_continuation();return;
+            update_status(ui_error(e.message.c_str()));files_->abandon_continuation();return;
         }
         files_->cleared=true;
     }
@@ -128,7 +128,7 @@ void MathWindow::file_action(Command command){
         Error e;Text next=files_->pending_open;files_->pending_open.clear();
         if(io_->load(next.c_str(),session_,e)){document_locked_=true;editor->deactivate();update_status(T("Opening document in background..."));}
         else {
-            update_status(e.message.c_str());
+            update_status(ui_error(e.message.c_str()));
             if(files_->startup_recovery_after_open){files_->startup_recovery_after_open=false;offer_recovery();}
         }return;
     }
@@ -136,8 +136,8 @@ void MathWindow::file_action(Command command){
     if(command==Command::Example){
         const char *names[]={T("Quadratic formula"),T("Gaussian integral"),T("Matrix"),T("Cases"),T("Aligned equations"),T("Chinese formula"),T("Euler identity")};
         const char *sources[]={"x=\\frac{-b\\pm\\sqrt{b^2-4ac}}{2a}","\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx=\\sqrt{\\pi}","A=\\begin{pmatrix}a&b\\\\c&d\\end{pmatrix}","f(x)=\\begin{cases}x^2 & x\\geq 0\\\\-x & x<0\\end{cases}","\\begin{aligned}a^2+b^2&=c^2\\\\E&=mc^2\\end{aligned}","\\text{中文公式}:\\quad S=\\sum_{k=1}^{n}k=\\frac{n(n+1)}{2}","e^{i\\pi}+1=0"};
-        for(size_t n=0;n<sizeof(names)/sizeof(names[0]);n++)if(!add_formula(next,names[n],sources[n],id,e)){update_status(e.message.c_str());return;}
-    }else if(!add_formula(next,T("Formula 1"),"E=mc^2",id,e)){update_status(e.message.c_str());return;}
+        for(size_t n=0;n<sizeof(names)/sizeof(names[0]);n++)if(!add_formula(next,names[n],sources[n],id,e)){update_status(ui_error(e.message.c_str()));return;}
+    }else if(!add_formula(next,T("Formula 1"),"E=mc^2",id,e)){update_status(ui_error(e.message.c_str()));return;}
     document=static_cast<Document&&>(next);history=History{};if(command!=Command::Example)history.mark_saved(document,e);
     session_++;active_=document.formulas[0].id;renderer_->cancel();preview->clear();path_.clear();files_->stamp=FileStamp{};filter_->value("");refill_list();refresh_source();update_status(command==Command::Example?T("Example document · save it as a new file"):T("Ready"));
 }
@@ -147,7 +147,7 @@ void MathWindow::finish_file_job(){
     }
     if(result.kind==IoKind::RecoveryInit){
         files_->recovery_ready=result.success;
-        if(!result.success)update_status(result.error.message.c_str());
+        if(!result.success)update_status(ui_error(result.error.message.c_str()));
         if(files_->continuation>=0){Command next=Command(files_->continuation);files_->continuation=-1;file_action(next);}else offer_recovery();return;
     }
     if(result.kind==IoKind::RecoveryDiscard){
@@ -158,31 +158,31 @@ void MathWindow::finish_file_job(){
                         if(files_->recovery.items()[n].id==files_->save_cleanup_id){files_->recovered_id=files_->save_cleanup_id;break;}
                 }
                 files_->save_cleanup_pending=false;files_->save_cleanup_recovered=false;files_->save_cleanup_id=0;
-                document_locked_=false;editor->activate();update_status(result.error.message.c_str());return;
+                document_locked_=false;editor->activate();update_status(ui_error(result.error.message.c_str()));return;
             }
             files_->save_cleanup_recovered=false;files_->save_cleanup_id=0;
             start_saved_recovery_cleanup();return;
         }
-        if(!result.success){update_status(result.error.message.c_str());files_->abandon_continuation();return;}
+        if(!result.success){update_status(ui_error(result.error.message.c_str()));files_->abandon_continuation();return;}
         if(files_->continuation>=0){Command next=Command(files_->continuation);file_action(next);}return;
     }
-    if(result.kind==IoKind::RecoverySave){update_status(result.success?T("Recovery snapshot saved"):result.error.message.c_str());return;}
+    if(result.kind==IoKind::RecoverySave){update_status(result.success?T("Recovery snapshot saved"):ui_error(result.error.message.c_str()));return;}
     if(result.kind==IoKind::RecoveryLoad){
         document_locked_=false;editor->activate();
         uint64_t recovered_id=files_->recovery_flow.finish_load();
         if(result.success){if(recovered_id)files_->recovered_id=recovered_id;files_->cleared=false;document=static_cast<Document&&>(result.document);history=History{};path_.clear();files_->stamp=FileStamp{};session_++;active_=document.formulas.empty()?0:document.formulas[0].id;preview->clear();renderer_->cancel();refill_list();refresh_source();update_status(T("Recovered into a new document · choose Save as"));}
-        else update_status(result.error.message.c_str());return;
+        else update_status(ui_error(result.error.message.c_str()));return;
     }
     if(result.kind==IoKind::Load){
         document_locked_=false;editor->activate();
         if(result.success&&result.session==session_){document=static_cast<Document&&>(result.document);history=History{};Error e;history.mark_saved(document,e);path_=result.path;files_->stamp=result.stamp;session_++;active_=document.formulas.empty()?0:document.formulas[0].id;preview->clear();renderer_->cancel();filter_->value("");refill_list();refresh_source();update_status(T("Document opened"));}
-        else update_status(result.error.message.c_str());
+        else update_status(ui_error(result.error.message.c_str()));
         if(files_->startup_recovery_after_open){files_->startup_recovery_after_open=false;offer_recovery();}return;
     }
     if(result.kind==IoKind::Save){
         if(result.success&&result.session==session_){
             path_=result.path;files_->stamp=result.stamp;flush_edit();Error e;bool marked=history.mark_saved(result.document,e);bool dirty=history.is_dirty(document);
-            if(!marked)update_status(e.message.c_str());else update_status(dirty?T("Snapshot saved · newer edits remain unsaved"):T("Document saved"));
+            if(!marked)update_status(ui_error(e.message.c_str()));else update_status(dirty?T("Snapshot saved · newer edits remain unsaved"):T("Document saved"));
             bool recovery_waiting=files_->recovery_flow.waiting_for_save();
             uint64_t recovery_id=files_->recovery_flow.save_result(RecoveryFlow::SaveResult::Succeeded,dirty||!marked);
             if(recovery_waiting&&!recovery_id&&(dirty||!marked)){
@@ -204,15 +204,15 @@ void MathWindow::finish_file_job(){
             int answer=conflict_dialog();Error e;
             if(answer==0){files_->recovery_flow.save_result(RecoveryFlow::SaveResult::Cancelled);files_->abandon_continuation();files_->pending_open=result.path;files_->approved=true;file_action(Command::Open);}
             else if(answer==1){files_->recovery_flow.save_result(RecoveryFlow::SaveResult::SaveAsRetry);file_action(Command::SaveAs);}
-            else if(answer==2){files_->recovery_flow.save_result(RecoveryFlow::SaveResult::OverwriteRetry);flush_edit();if(!io_->save(result.path.c_str(),document,FileStamp{},true,session_,e)){update_status(e.message.c_str());files_->abandon_continuation();}}
+            else if(answer==2){files_->recovery_flow.save_result(RecoveryFlow::SaveResult::OverwriteRetry);flush_edit();if(!io_->save(result.path.c_str(),document,FileStamp{},true,session_,e)){update_status(ui_error(e.message.c_str()));files_->abandon_continuation();}}
             else {files_->recovery_flow.save_result(RecoveryFlow::SaveResult::Cancelled);files_->abandon_continuation();update_status(T("Save cancelled · original file kept"));}return;
         }
-        files_->recovery_flow.save_result(RecoveryFlow::SaveResult::Failed);files_->abandon_continuation();update_status(result.error.message.c_str());
+        files_->recovery_flow.save_result(RecoveryFlow::SaveResult::Failed);files_->abandon_continuation();update_status(ui_error(result.error.message.c_str()));
     }
 }
 void MathWindow::recovery_tick(){
     if(!files_||!files_->recovery_ready||io_->pending()||document_locked_||!history.is_dirty(document))return;
-    flush_edit();Error e;if(!io_->recovery(IoKind::RecoverySave,files_->recovery,&document,path_.c_str(),0,e))update_status(e.message.c_str());
+    flush_edit();Error e;if(!io_->recovery(IoKind::RecoverySave,files_->recovery,&document,path_.c_str(),0,e))update_status(ui_error(e.message.c_str()));
 }
 void MathWindow::offer_recovery(){
     UiGuard guard(interaction_depth_);
@@ -235,7 +235,7 @@ void MathWindow::offer_recovery(){
         }
         start_recovery_load(files_->recovery_flow.begin_load());
     }
-    else if(action==2&&!io_->recovery(IoKind::RecoveryDiscard,files_->recovery,nullptr,nullptr,id,e))update_status(e.message.c_str());
+    else if(action==2&&!io_->recovery(IoKind::RecoveryDiscard,files_->recovery,nullptr,nullptr,id,e))update_status(ui_error(e.message.c_str()));
 }
 void MathWindow::export_action(Command command){
     if(exports_->busy()){if(files_->progress)files_->progress->show();update_status(T("An export is already running"));return;}
@@ -256,7 +256,7 @@ void MathWindow::export_action(Command command){
     ExportOptions options;options.directory.set(directory.value());options.pattern.set(pattern.value());options.scale=scale.value();options.dpi=uint32_t(dpi.value());options.overwrite=overwrite.value()!=0;options.format=format.value()==0?ExportFormat::Svg:format.value()==1?ExportFormat::Png:ExportFormat::Latex;
     Array<FormulaId> ids;if(scope.value()==0)ids.push(active_);else if(scope.value()==1)for(int n=1;n<=list_->size();n++)if(list_->selected(n))ids.push(visible_ids_[size_t(n-1)]);
     if(scope.value()!=2&&ids.empty()){update_status(T("Select at least one formula"));return;}
-    Error e;if(!exports_->start("/usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf",document,ids.data(),ids.size(),session_,options,e)){update_status(e.message.c_str());return;}
+    Error e;if(!exports_->start("/usr/lib/reliefos/apps/reliefmath/reliefmath-render.elf",document,ids.data(),ids.size(),session_,options,e)){update_status(ui_error(e.message.c_str()));return;}
     files_->export_directory=options.directory;files_->export_finished=false;
     if(!files_->progress){
         files_->progress=new Fl_Double_Window(780,428,T("Export results"));files_->progress_label=new Fl_Box(16,10,748,30);files_->progress_label->align(FL_ALIGN_LEFT|FL_ALIGN_INSIDE);
@@ -271,7 +271,7 @@ void MathWindow::export_progress(){
     if(!files_||!files_->progress||files_->export_finished)return;
     files_->results->clear();size_t good=0,bad=0,cancelled=0;
     for(size_t n=0;n<exports_->items().size();n++){
-        const auto &item=exports_->items()[n];char row[6144];snprintf(row,sizeof row,"%s | %s%s%s",status_label(item.status),item.path.c_str(),item.error.message.empty()?"":" | ",item.error.message.empty()?"":T(item.error.message.c_str()));files_->results->add(row);
+        const auto &item=exports_->items()[n];char row[6144];snprintf(row,sizeof row,"%s | %s%s%s",status_label(item.status),item.path.c_str(),item.error.message.empty()?"":" | ",item.error.message.empty()?"":ui_error(item.error.message.c_str()));files_->results->add(row);
         good+=item.status==ExportStatus::Done;bad+=item.status==ExportStatus::Failed;cancelled+=item.status==ExportStatus::Cancelled;
     }
     char summary[256];snprintf(summary,sizeof summary,T("%zu completed · %zu failed · %zu cancelled · %zu total"),good,bad,cancelled,exports_->items().size());files_->progress_label->copy_label(summary);

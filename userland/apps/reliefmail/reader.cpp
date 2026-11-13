@@ -1,3 +1,4 @@
+#include "localization.h"
 #include "reader.h"
 #include "mail_ui_layout.h"
 #include "reader_presentation.h"
@@ -520,7 +521,7 @@ void ReaderPane::clear_message(const char *status) {
     body_buffer_.text("");
     body_->hide();
     html_body_->hide();
-    empty_state_->text(status ? status : T("Select a message to read its cached content."));
+    empty_state_->text(status ? DiagnosticForDisplay(status).c_str() : T("Select a message to read its cached content."));
     empty_state_->show();
     notice_->hide();
     view_label_->hide();

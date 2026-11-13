@@ -7,6 +7,12 @@
 
 Look="nice"
 
+# Use the shipped CJK face for translated titles and application menus.
+TitleFontNameXft="SimSun:size=11"
+MenuFontNameXft="SimSun:size=11"
+NormalTaskBarFontNameXft="SimSun:size=10"
+ActiveTaskBarFontNameXft="SimSun:size=10:bold"
+
 # One workspace and a taskbar along the bottom edge.
 Workspaces=1
 TaskBarAtTop=0

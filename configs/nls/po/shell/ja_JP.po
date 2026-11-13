@@ -1,0 +1,111 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/shell/main.c:150
+msgid "%s  %s\n"
+msgstr "%s  %s\n"
+
+#: userland/apps/shell/main.c:216
+msgid "Built-ins: help clear pwd cd ls cat echo run exit"
+msgstr "組み込みコマンド: help clear pwd cd ls cat echo run exit"
+
+#: configs/nls/messages/shell.c:3
+msgid "Command line is empty"
+msgstr "コマンド行が空です"
+
+#: configs/nls/messages/shell.c:11
+msgid "Desktop is already running"
+msgstr "デスクトップは既に実行中です"
+
+#: configs/nls/messages/shell.c:8
+msgid "Invalid shortcut"
+msgstr "無効なショートカットです"
+
+#: configs/nls/messages/shell.c:12
+msgid "Launch failed"
+msgstr "起動に失敗しました"
+
+#: configs/nls/messages/shell.c:5
+msgid "Missing closing quote"
+msgstr "閉じ引用符がありません"
+
+#: configs/nls/messages/shell.c:7
+msgid "No file association for this item"
+msgstr "この項目に関連付けられたファイルがありません"
+
+#: configs/nls/messages/shell.c:6
+msgid "Program or path not found"
+msgstr "プログラムまたはパスが見つかりません"
+
+#: userland/apps/shell/main.c:260
+msgid "ReliefOS command shell 2"
+msgstr "ReliefOS コマンドシェル 2"
+
+#: configs/nls/messages/shell.c:10
+msgid "Shortcut already exists"
+msgstr "ショートカットは既に存在します"
+
+#: configs/nls/messages/shell.c:9
+msgid "Shortcut loop detected"
+msgstr "ショートカットの循環を検出しました"
+
+#: configs/nls/messages/shell.c:4
+msgid "Too many arguments"
+msgstr "引数が多すぎます"
+
+#: userland/apps/shell/main.c:261
+msgid "Type help to see available commands."
+msgstr "使用可能なコマンドを表示するには help と入力してください。"
+
+#: userland/apps/shell/main.c:161
+msgid "cat: a file path is required"
+msgstr "cat: ファイルパスが必要です"
+
+#: userland/apps/shell/main.c:166
+msgid "cat: cannot open %s (%d)\n"
+msgstr "cat: %s を開けません (%d)\n"
+
+#: userland/apps/shell/main.c:173
+msgid "cat: read failed (%d)\n"
+msgstr "cat: 読み取りに失敗しました (%d)\n"
+
+#: userland/apps/shell/main.c:227
+msgid "cd: %s (%d)\n"
+msgstr "cd: %s (%d)\n"
+
+#: userland/apps/shell/main.c:242
+msgid "closing shell"
+msgstr "シェルを終了します"
+
+#: userland/apps/shell/main.c:123
+msgid "ls: cannot open %s (%d)\n"
+msgstr "ls: %s を開けません (%d)\n"
+
+#: userland/apps/shell/main.c:237
+msgid "run: an application path is required"
+msgstr "run: アプリケーションのパスが必要です"
+
+#: userland/apps/shell/main.c:212
+msgid "shell: too many arguments"
+msgstr "shell: 引数が多すぎます"
+
+#: userland/apps/shell/main.c:208
+msgid "shell: unmatched quote"
+msgstr "shell: 対応しない引用符があります"
+
+#: userland/apps/shell/main.c:194
+msgid "started %s (pid %d)\n"
+msgstr "%s を起動しました (pid %d)\n"
+
+#: userland/apps/shell/main.c:197
+msgid "unable to start %s: %s\n"
+msgstr "%s を起動できません: %s\n"

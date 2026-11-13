@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/rprfetch/main.c:23
+msgid "Usage: %s HTTPS_URL OUTPUT\n"
+msgstr "用法: %s HTTPS_URL OUTPUT\n"
+
+#: userland/apps/rprfetch/main.c:40
+msgid "rprfetch: OUTPUT must be a file path\n"
+msgstr "rprfetch: OUTPUT 必须是文件路径\n"
+
+#: userland/apps/rprfetch/main.c:47
+msgid "rprfetch: download failed (network status %u, HTTP %u)\n"
+msgstr "rprfetch: 下载失败 (网络状态 %u，HTTP %u)\n"
+
+#: userland/apps/rprfetch/main.c:36
+msgid "rprfetch: refusing non-HTTPS URL\n"
+msgstr "rprfetch: 拒绝非 HTTPS URL\n"
+
+#: userland/apps/rprfetch/main.c:53
+msgid "rprfetch: server returned HTTP %u\n"
+msgstr "rprfetch: 服务器返回 HTTP %u\n"

@@ -18,6 +18,7 @@ RELIEFOS_NLS_SHARED_installer := userland/apps/reliefapk/process.cpp
 RELIEFOS_NLS_SHARED_reliefsettings := userland/apps/reliefapk/process.cpp
 RELIEFOS_NLS_SHARED_reliefdiagram := userland/apps/relieftodo/file_io.cpp
 RELIEFOS_NLS_SHARED_reliefmathpp := userland/apps/relieftodo/file_io.cpp
+RELIEFOS_NLS_SHARED_reliefmathpp := userland/apps/relieftodo/file_io.cpp
 RELIEFOS_NLS_SHARED_reliefmail := userland/apps/reliefword/layout.cpp userland/apps/reliefword/model.cpp
 
 reliefos_nls_directory_sources = $(wildcard $(1)/*.[ch] $(1)/*.cpp) \

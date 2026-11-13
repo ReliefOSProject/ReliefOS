@@ -1,0 +1,11 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/matrix/main.c:281
+msgid "[Paused - P resumes, Q exits]"
+msgstr ""
+
+#: userland/apps/matrix/main.c:313
+msgid "matrix requires an interactive terminal"
+msgstr ""

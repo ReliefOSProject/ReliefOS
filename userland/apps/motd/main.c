@@ -5,6 +5,10 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <locale.h>
+#include <libintl.h>
+#include <reliefos/layout.h>
+
+#define T(text) gettext(text)
 #include <net/if.h>
 #include <stdlib.h>
 #include <string.h>
@@ -90,7 +94,7 @@ static void address(char *out, size_t size, int zh)
     struct ifreq interfaces[64];
     struct ifconf config = {.ifc_len = sizeof(interfaces), .ifc_req = interfaces};
     if (ioctl(fd, SIOCGIFCONF, &config) == 0) {
-        snprintf(out, size, "%s", zh ? "未连接" : "Not connected");
+        snprintf(out, size, "%s", zh ? "未连接" : T("Not connected"));
         size_t count = config.ifc_len > 0 ? (size_t)config.ifc_len / sizeof(struct ifreq) : 0;
         if (count > 64) count = 64;
         for (size_t i = 0; i < count; ++i) {
@@ -107,7 +111,7 @@ static void address(char *out, size_t size, int zh)
 
 static void collect(struct motd_info *info, int zh)
 {
-    const char *missing = zh ? "不可用" : "N/A";
+    const char *missing = zh ? "不可用" : T("N/A");
     snprintf(info->system, sizeof(info->system), "%s", missing);
     snprintf(info->kernel, sizeof(info->kernel), "%s", missing);
     snprintf(info->timestamp, sizeof(info->timestamp), "%s", missing);
@@ -131,10 +135,10 @@ static void collect(struct motd_info *info, int zh)
         if (si.uptime >= 0) {
             unsigned long seconds = (unsigned long)si.uptime;
             if (seconds >= 86400)
-                snprintf(info->uptime, sizeof(info->uptime), zh ? "%lu天 %lu小时" : "%lud %luh", seconds / 86400, seconds / 3600 % 24);
+                snprintf(info->uptime, sizeof(info->uptime), zh ? "%lu天 %lu小时" : T("%lud %luh"), seconds / 86400, seconds / 3600 % 24);
             else if (seconds >= 3600)
-                snprintf(info->uptime, sizeof(info->uptime), zh ? "%lu小时 %lu分" : "%luh %lum", seconds / 3600, seconds / 60 % 60);
-            else snprintf(info->uptime, sizeof(info->uptime), zh ? "%lu分 %lu秒" : "%lum %lus", seconds / 60, seconds % 60);
+                snprintf(info->uptime, sizeof(info->uptime), zh ? "%lu小时 %lu分" : T("%luh %lum"), seconds / 3600, seconds / 60 % 60);
+            else snprintf(info->uptime, sizeof(info->uptime), zh ? "%lu分 %lu秒" : T("%lum %lus"), seconds / 60, seconds % 60);
         }
         snprintf(info->load, sizeof(info->load), "%.2f", (double)si.loads[0] / (1UL << SI_LOAD_SHIFT));
         if (si.totalram && si.freeram <= si.totalram)
@@ -155,13 +159,17 @@ int main(void)
 {
     const char *locale = message_locale();
     int zh = !strcmp(locale, "zh") || !strncmp(locale, "zh_", 3) || !strncmp(locale, "zh-", 3);
+    int ja = !strcmp(locale, "ja") || !strncmp(locale, "ja_", 3) || !strncmp(locale, "ja-", 3);
     setlocale(LC_ALL, "");
+    bindtextdomain("motd", RELIEFOS_LAYOUT_LOCALE);
+    bind_textdomain_codeset("motd", "UTF-8");
+    textdomain("motd");
     if (MB_CUR_MAX == 1) setlocale(LC_CTYPE, "C.UTF-8");
     struct motd_info info = {0};
     size_t columns = terminal_columns();
     collect(&info, zh);
     motd_render(stdout, &info, zh, columns);
-    FILE *links = fopen(zh ? "/etc/motd.zh_CN" : "/etc/motd", "r");
+    FILE *links = fopen(zh ? "/etc/motd.zh_CN" : ja ? "/etc/motd.ja_JP" : "/etc/motd", "r");
     if (links) {
         char *line = NULL; size_t capacity = 0;
         while (getline(&line, &capacity, links) >= 0) motd_wrap(stdout, line, columns);

@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Task manager
+Name[ja]=タスクマネージャー
 Name[zh_CN]=任务管理器
 Exec=/usr/bin/taskmgr
 TryExec=/usr/bin/taskmgr

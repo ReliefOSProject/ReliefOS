@@ -1,0 +1,447 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/reliefcapture/window.cpp:127
+msgid "10 seconds"
+msgstr "10 秒"
+
+#: userland/apps/reliefcapture/window.cpp:127
+msgid "3 seconds"
+msgstr "3 秒"
+
+#: userland/apps/reliefcapture/window.cpp:127
+msgid "5 seconds"
+msgstr "5 秒"
+
+#: configs/nls/messages/reliefcapture.c:7
+msgid "A screenshot operation is already running"
+msgstr "スクリーンショットの処理がすでに実行中です"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/reliefcapture/window.cpp:135
+msgid "Annotation"
+msgstr "注釈"
+
+#: userland/apps/reliefcapture/window.cpp:77
+msgid "Annotation text"
+msgstr "注釈のテキスト"
+
+#: userland/apps/reliefcapture/window.cpp:136
+msgid "Arrow"
+msgstr "矢印"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Black"
+msgstr "黒"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Blue"
+msgstr "青"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/reliefcapture/window.cpp:229
+msgid "Capture canceled"
+msgstr "撮影をキャンセルしました"
+
+#: userland/apps/reliefcapture/window.cpp:327
+msgid "Capture in %d seconds; click Cancel to stop"
+msgstr "%d 秒後に撮影します。「キャンセル」で中止できます"
+
+#: userland/apps/reliefcapture/window.cpp:124
+msgid "Capture mode"
+msgstr "撮影モード"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/reliefcapture/window.cpp:137
+msgid "Color"
+msgstr "色"
+
+#: userland/apps/reliefcapture/window.cpp:128
+msgid "Copy image"
+msgstr "画像をコピー"
+
+#: userland/apps/reliefcapture/window.cpp:81
+msgid "Could not add the annotation; check its length or the annotation limit"
+msgstr "注釈を追加できませんでした。文字数または注釈数の上限を確認してください"
+
+#: configs/nls/messages/reliefcapture.c:8
+msgid "Could not configure the screenshot channel"
+msgstr "スクリーンショットの通信チャネルを設定できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:9
+msgid "Could not connect to the X11 display"
+msgstr "X11 ディスプレイに接続できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:10
+msgid "Could not contact the existing screenshot window"
+msgstr "既存のスクリーンショットウィンドウと通信できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:11
+msgid "Could not create the screenshot channel"
+msgstr "スクリーンショットの通信チャネルを作成できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:12
+msgid "Could not create the temporary screenshot"
+msgstr "一時スクリーンショットを作成できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:6
+msgid "Could not crop the screenshot"
+msgstr "スクリーンショットを切り抜けませんでした"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: configs/nls/messages/reliefcapture.c:13
+msgid "Could not encode the screenshot"
+msgstr "スクリーンショットをエンコードできませんでした"
+
+#: configs/nls/messages/reliefcapture.c:14
+msgid "Could not inspect the destination"
+msgstr "保存先を確認できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:15
+msgid "Could not open the destination folder"
+msgstr "保存先フォルダーを開けませんでした"
+
+#: configs/nls/messages/reliefcapture.c:16
+msgid "Could not read the screen image"
+msgstr "画面の画像を読み取れませんでした"
+
+#: configs/nls/messages/reliefcapture.c:17
+msgid "Could not read the screenshot process reply"
+msgstr "スクリーンショットプロセスの応答を読み取れませんでした"
+
+#: configs/nls/messages/reliefcapture.c:18
+msgid "Could not register the screenshot window"
+msgstr "スクリーンショットウィンドウを登録できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:19
+msgid "Could not render the screenshot"
+msgstr "スクリーンショットを描画できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:5
+msgid "Could not reserve Escape for capture cancellation"
+msgstr "撮影キャンセル用に Escape キーを確保できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:20
+msgid "Could not save the screenshot"
+msgstr "スクリーンショットを保存できませんでした"
+
+#: configs/nls/messages/reliefcapture.c:21
+msgid "Could not start the screenshot process"
+msgstr "スクリーンショットプロセスを起動できませんでした"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/reliefcapture/window.cpp:126
+msgid "Delay"
+msgstr "遅延"
+
+#: userland/apps/reliefcapture/window.cpp:201
+msgid "Discard"
+msgstr "破棄"
+
+#: userland/apps/reliefcapture/window.cpp:202
+msgid "Discard annotations and take a new screenshot?"
+msgstr "注釈を破棄して新しいスクリーンショットを撮影しますか?"
+
+#: userland/apps/reliefcapture/overlay.cpp:25
+msgid "Drag a region · R: region · W: window · F: full screen · Esc: cancel"
+msgstr "領域をドラッグ · R: 領域 · W: ウィンドウ · F: 全画面 · Esc: キャンセル"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/reliefcapture/window.cpp:301
+msgid "Finishing the screenshot save before closing..."
+msgstr "閉じる前にスクリーンショットの保存を完了しています..."
+
+#: userland/apps/reliefcapture/window.cpp:150
+msgid "Fit to window"
+msgstr "ウィンドウに合わせる"
+
+#: userland/apps/reliefcapture/overlay.cpp:18
+msgid "Full screen"
+msgstr "全画面"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Green"
+msgstr "緑"
+
+#: userland/apps/reliefcapture/window.cpp:132
+msgid "Help"
+msgstr "ヘルプ"
+
+#: userland/apps/reliefcapture/window.cpp:263
+msgid "Image copied; keep ReliefCapture open while pasting"
+msgstr "画像をコピーしました。貼り付けが終わるまで ReliefCapture を開いたままにしてください"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: configs/nls/messages/reliefcapture.c:22
+msgid "Invalid destination path"
+msgstr "無効な保存先パス"
+
+#: configs/nls/messages/reliefcapture.c:23
+msgid "Invalid screenshot process reply"
+msgstr "スクリーンショットプロセスの応答が無効です"
+
+#: userland/apps/reliefcapture/window.cpp:141
+msgid "Line width"
+msgstr "線の幅"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/reliefcapture/window.cpp:118
+msgid "New capture"
+msgstr "新しく撮影"
+
+#: userland/apps/reliefcapture/window.cpp:119
+msgid "New capture (Ctrl+N); Win+Shift+S selects a region"
+msgstr "新しく撮影 (Ctrl+N)。Win+Shift+S で領域を選択します"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: userland/apps/reliefcapture/window.cpp:127
+msgid "No delay"
+msgstr "遅延なし"
+
+#: userland/apps/reliefcapture/window.cpp:192
+msgid "No screenshot"
+msgstr "スクリーンショットがありません"
+
+#: userland/apps/reliefcapture/window.cpp:61
+msgid "No screenshot. Click New capture or press Win+Shift+S."
+msgstr "スクリーンショットがありません。「新しく撮影」をクリックするか、Win+Shift+S を押してください。"
+
+#: configs/nls/messages/reliefcapture.c:24
+msgid "Not enough memory"
+msgstr "メモリが不足しています"
+
+#: userland/apps/reliefcapture/window.cpp:191
+msgid "Not saved"
+msgstr "未保存"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Orange"
+msgstr "オレンジ"
+
+#: userland/apps/reliefcapture/window.cpp:136
+msgid "Pen"
+msgstr "ペン"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/reliefcapture/window.cpp:255
+msgid "Preparing screenshot..."
+msgstr "スクリーンショットを準備中..."
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/reliefcapture/window.cpp:155
+msgid "Ready to capture"
+msgstr "撮影の準備ができました"
+
+#: userland/apps/reliefcapture/window.cpp:136
+msgid "Rectangle"
+msgstr "長方形"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Red"
+msgstr "赤"
+
+#: userland/apps/reliefcapture/window.cpp:147
+msgid "Redo"
+msgstr "やり直し"
+
+#: userland/apps/reliefcapture/overlay.cpp:14
+msgid "Region"
+msgstr "領域"
+
+#: configs/nls/messages/reliefcapture.c:25
+msgid "ReliefCapture"
+msgstr "ReliefCapture"
+
+#: userland/apps/reliefcapture/window.cpp:284
+msgid "Replace"
+msgstr "置換"
+
+#: userland/apps/reliefcapture/window.cpp:284
+msgid "Replace the existing screenshot?"
+msgstr "既存のスクリーンショットを置き換えますか?"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/reliefcapture/window.cpp:130
+msgid "Save PNG..."
+msgstr "PNG を保存..."
+
+#: userland/apps/reliefcapture/window.cpp:276
+msgid "Save screenshot"
+msgstr "スクリーンショットを保存"
+
+#: userland/apps/reliefcapture/window.cpp:303
+msgid "Save this screenshot before closing?"
+msgstr "閉じる前にこのスクリーンショットを保存しますか?"
+
+#: userland/apps/reliefcapture/window.cpp:191
+msgid "Saved"
+msgstr "保存済み"
+
+#: userland/apps/reliefcapture/window.cpp:290
+msgid "Saving screenshot..."
+msgstr "スクリーンショットを保存中..."
+
+#: userland/apps/reliefcapture/window.cpp:217
+msgid "Screenshot queued; finish the current dialog first"
+msgstr "スクリーンショットを待機中です。現在のダイアログを先に閉じてください"
+
+#: userland/apps/reliefcapture/window.cpp:355
+msgid "Screenshot saved"
+msgstr "スクリーンショットを保存しました"
+
+#: configs/nls/messages/reliefcapture.c:26
+msgid "Screenshot saved, but folder synchronization failed"
+msgstr "スクリーンショットを保存しましたが、フォルダーの同期に失敗しました"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/reliefcapture/window.cpp:136
+msgid "Text"
+msgstr "テキスト"
+
+#: userland/apps/reliefcapture/window.cpp:143
+msgid "Text size"
+msgstr "文字サイズ"
+
+#: configs/nls/messages/reliefcapture.c:27
+msgid "The destination changed; choose Save again"
+msgstr "保存先が変更されました。もう一度「保存」を選択してください"
+
+#: configs/nls/messages/reliefcapture.c:28
+msgid "The destination must be a regular file"
+msgstr "保存先は通常のファイルである必要があります"
+
+#: userland/apps/reliefcapture/window.cpp:280
+msgid "The file path is too long"
+msgstr "ファイルのパスが長すぎます"
+
+#: userland/apps/reliefcapture/window.cpp:99
+msgid "The pen stroke reached its point limit; start a new stroke"
+msgstr "ペンの線が点数の上限に達しました。新しい線を描いてください"
+
+#: configs/nls/messages/reliefcapture.c:29
+msgid "The screen is too large or its pixel format is unsupported"
+msgstr "画面が大きすぎるか、ピクセル形式に対応していません"
+
+#: configs/nls/messages/reliefcapture.c:30
+msgid "The screenshot operation failed"
+msgstr "スクリーンショットの処理に失敗しました"
+
+#: configs/nls/messages/reliefcapture.c:31
+msgid "The screenshot operation timed out"
+msgstr "スクリーンショットの処理がタイムアウトしました"
+
+#: configs/nls/messages/reliefcapture.c:32
+msgid "The screenshot process stopped unexpectedly"
+msgstr "スクリーンショットプロセスが予期せず停止しました"
+
+#: configs/nls/messages/reliefcapture.c:33
+msgid "There is no screenshot to save"
+msgstr "保存するスクリーンショットがありません"
+
+#: userland/apps/reliefcapture/window.cpp:145
+msgid "Undo"
+msgstr "元に戻す"
+
+#: userland/apps/reliefcapture/window.cpp:199
+msgid "Wait for the current screenshot operation to finish"
+msgstr "現在のスクリーンショット処理が完了するまでお待ちください"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "White"
+msgstr "白"
+
+#: userland/apps/reliefcapture/window.cpp:312
+msgid "Win+Shift+S: select a screenshot\nCtrl+N: new capture\nCtrl+C: copy image\nCtrl+S: save PNG\nCtrl+Z: undo\nCtrl+Y / Ctrl+Shift+Z: redo\n\nSelection: R region, W window, F full screen, Esc cancel.\nWindow captures include visible decorations and occlusions.\nImages remain in the clipboard while ReliefCapture is running."
+msgstr "Win+Shift+S: スクリーンショットの領域を選択\nCtrl+N: 新しく撮影\nCtrl+C: 画像をコピー\nCtrl+S: PNG を保存\nCtrl+Z: 元に戻す\nCtrl+Y / Ctrl+Shift+Z: やり直し\n\n範囲選択: R 領域、W ウィンドウ、F 全画面、Esc キャンセル。\nウィンドウの撮影には表示中の装飾と重なった部分が含まれます。\nReliefCapture の実行中は画像がクリップボードに保持されます。"
+
+#: userland/apps/reliefcapture/overlay.cpp:16
+msgid "Window"
+msgstr "ウィンドウ"
+
+#: userland/apps/reliefcapture/window.cpp:138
+msgid "Yellow"
+msgstr "黄"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: userland/apps/reliefcapture/window.cpp:149
+msgid "Zoom"
+msgstr "ズーム"

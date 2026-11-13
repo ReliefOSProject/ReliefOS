@@ -585,13 +585,13 @@ static void draw_row(struct reliefos_ui_surface *ui, uint32_t y,
 
 static void draw_netctl(struct reliefos_ui_surface *ui)
 {
-    static const struct reliefos_ui_list_column conn_cols[] = {
-        { "Socket", 58 },
+    const struct reliefos_ui_list_column conn_cols[] = {
+        { T("Socket"), 58 },
         { "PID", 48 },
-        { "State", 112 },
-        { "Local", 138 },
-        { "Remote", 188 },
-        { "Bytes", 104 },
+        { T("State"), 112 },
+        { T("Local"), 138 },
+        { T("Remote"), 188 },
+        { T("Bytes"), 104 },
     };
     char mac[32];
     char ip[32];
@@ -610,7 +610,7 @@ static void draw_netctl(struct reliefos_ui_surface *ui)
     dns_mode_text = dns_mode_name(dns_mode);
     lease[0] = 0;
     append_u32(lease, &pos, sizeof(lease), config.lease_seconds);
-    append_text(lease, &pos, sizeof(lease), "s");
+    append_text(lease, &pos, sizeof(lease), T("s"));
 
     reliefos_ui_rect(ui, 0, 0, NETCTL_W, NETCTL_H, RELIEFOS_UI_GRAY);
     reliefos_ui_text(ui, 24, 16, T("Intel e1000 Network"), RELIEFOS_UI_BLACK, RELIEFOS_UI_GRAY);
@@ -722,6 +722,8 @@ int main(int argc, char **argv)
     setlocale(LC_ALL, "");
     bindtextdomain("netctl", RELIEFOS_LAYOUT_LOCALE);
     textdomain("netctl");
+    copy_text(status_text, sizeof(status_text), T("Ready"));
+    copy_text(dns_text, sizeof(dns_text), T("Enter a host name and resolve an A record."));
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;
     int window_id;

@@ -1,0 +1,23 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/snake/main.c:337
+msgid "Arrows/WASD move, P pause, Q quit"
+msgstr ""
+
+#: userland/apps/snake/main.c:335
+msgid "GAME OVER - R restart, Q quit"
+msgstr ""
+
+#: userland/apps/snake/main.c:336
+msgid "PAUSED - P or Space to resume"
+msgstr ""
+
+#: userland/apps/snake/main.c:333
+msgid "Snake  Score: %u  High score: %u  %s\n"
+msgstr ""
+
+#: userland/apps/snake/main.c:545
+msgid "snake requires an interactive terminal"
+msgstr ""

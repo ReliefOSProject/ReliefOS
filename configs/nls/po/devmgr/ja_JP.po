@@ -1,0 +1,123 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/devmgr/main.c:114
+msgid "Active"
+msgstr "アクティブ"
+
+#: userland/apps/devmgr/main.c:97
+msgid "Audio"
+msgstr "オーディオ"
+
+#: userland/apps/devmgr/main.c:120
+msgid "Boot"
+msgstr "起動"
+
+#: userland/apps/devmgr/main.c:205
+msgid "Class"
+msgstr "クラス"
+
+#: userland/apps/devmgr/main.c:209
+msgid "Details"
+msgstr "詳細"
+
+#: userland/apps/devmgr/main.c:252
+msgid "Details:"
+msgstr "詳細:"
+
+#: userland/apps/devmgr/main.c:206
+msgid "Device"
+msgstr "デバイス"
+
+#: userland/apps/devmgr/main.c:279
+msgid "Device Manager"
+msgstr "デバイスマネージャー"
+
+#: userland/apps/devmgr/main.c:135
+msgid "Device refresh failed"
+msgstr "デバイスの更新に失敗しました"
+
+#: userland/apps/devmgr/main.c:250
+msgid "Device:"
+msgstr "デバイス:"
+
+#: userland/apps/devmgr/main.c:153
+msgid "Devices refreshed: "
+msgstr "デバイスを更新しました: "
+
+#: userland/apps/devmgr/main.c:89
+msgid "Display"
+msgstr "ディスプレイ"
+
+#: userland/apps/devmgr/main.c:208
+msgid "Flags"
+msgstr "フラグ"
+
+#: userland/apps/devmgr/main.c:219
+msgid "Hardware detected by the kernel"
+msgstr "カーネルが検出したハードウェア"
+
+#: userland/apps/devmgr/main.c:87
+msgid "Input"
+msgstr "入力"
+
+#: userland/apps/devmgr/main.c:280
+msgid "Kernel device list"
+msgstr "カーネルのデバイス一覧"
+
+#: userland/apps/devmgr/main.c:95
+msgid "Network"
+msgstr "ネットワーク"
+
+#: userland/apps/devmgr/main.c:259
+msgid "No device selected"
+msgstr "デバイスが選択されていません"
+
+#: userland/apps/devmgr/main.c:123
+msgid "None"
+msgstr "なし"
+
+#: userland/apps/devmgr/main.c:99
+msgid "Other"
+msgstr "その他"
+
+#: userland/apps/devmgr/main.c:108
+msgid "Present"
+msgstr "スライドショー"
+
+#: configs/nls/messages/devmgr.c:5
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/devmgr/main.c:218
+msgid "Refresh"
+msgstr "更新"
+
+#: userland/apps/devmgr/main.c:93
+msgid "Serial"
+msgstr "シリアル"
+
+#: userland/apps/devmgr/main.c:207
+msgid "Status"
+msgstr "状態"
+
+#: userland/apps/devmgr/main.c:251
+msgid "Status:"
+msgstr "状態:"
+
+#: userland/apps/devmgr/main.c:91
+msgid "Storage"
+msgstr "ストレージ"
+
+#: userland/apps/devmgr/main.c:85
+msgid "System"
+msgstr "システム"

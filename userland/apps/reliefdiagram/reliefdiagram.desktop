@@ -1,9 +1,12 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefDiagram
+Name[ja]=ReliefDiagram
 GenericName=Mind Map and Diagram Editor
+GenericName[ja]=マインドマップ・図表エディター
 GenericName[zh_CN]=思维导图与逻辑图编辑器
 Comment=Design mind maps, flowcharts and logic diagrams
+Comment[ja]=マインドマップ、フローチャート、論理図の作成
 Comment[zh_CN]=设计思维导图、流程图和逻辑关系图，编辑图形并导出图片
 Exec=/usr/bin/reliefdiagram %f
 TryExec=/usr/bin/reliefdiagram

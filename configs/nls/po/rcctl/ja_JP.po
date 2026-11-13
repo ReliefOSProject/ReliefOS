@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/rcctl/main.c:39
+msgid "Execute OpenRC"
+msgstr "OpenRC の実行"
+
+#: userland/apps/rcctl/main.c:43
+msgid "OpenRC operation"
+msgstr "OpenRC 操作"

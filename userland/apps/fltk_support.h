@@ -18,6 +18,29 @@
 
 namespace reliefos_fltk {
 
+inline void translate_dialogs()
+{
+    fl_ok = T("OK");
+    fl_cancel = T("Cancel");
+    fl_close = T("Close");
+    fl_yes = T("Yes");
+    fl_no = T("No");
+    Fl_File_Chooser::add_favorites_label = T("Add to Favorites");
+    Fl_File_Chooser::all_files_label = T("All Files (*)");
+    Fl_File_Chooser::custom_filter_label = T("Custom Filter");
+    Fl_File_Chooser::existing_file_label = T("Please choose an existing file!");
+    Fl_File_Chooser::favorites_label = T("Favorites");
+    Fl_File_Chooser::filename_label = T("File name:");
+    Fl_File_Chooser::filesystems_label = T("File Systems");
+    Fl_File_Chooser::manage_favorites_label = T("Manage Favorites");
+    Fl_File_Chooser::new_directory_label = T("New Directory?");
+    Fl_File_Chooser::new_directory_tooltip = T("Create a new directory");
+    Fl_File_Chooser::preview_label = T("Preview");
+    Fl_File_Chooser::save_label = T("Save");
+    Fl_File_Chooser::show_label = T("Show:");
+    Fl_File_Chooser::hidden_label = T("Show hidden files");
+}
+
 inline void init(const char *app)
 {
     setlocale(LC_ALL, "");
@@ -40,25 +63,7 @@ inline void init(const char *app)
     Fl::set_font(FL_TIMES_ITALIC, "ISimSun");
     Fl::set_font(FL_TIMES_BOLD_ITALIC, "PSimSun");
     fl_message_font(FL_HELVETICA, 15);
-    fl_ok = T("OK");
-    fl_cancel = T("Cancel");
-    fl_close = T("Close");
-    fl_yes = T("Yes");
-    fl_no = T("No");
-    Fl_File_Chooser::add_favorites_label = T("Add to Favorites");
-    Fl_File_Chooser::all_files_label = T("All Files (*)");
-    Fl_File_Chooser::custom_filter_label = T("Custom Filter");
-    Fl_File_Chooser::existing_file_label = T("Please choose an existing file!");
-    Fl_File_Chooser::favorites_label = T("Favorites");
-    Fl_File_Chooser::filename_label = T("File name:");
-    Fl_File_Chooser::filesystems_label = T("File Systems");
-    Fl_File_Chooser::manage_favorites_label = T("Manage Favorites");
-    Fl_File_Chooser::new_directory_label = T("New Directory?");
-    Fl_File_Chooser::new_directory_tooltip = T("Create a new directory");
-    Fl_File_Chooser::preview_label = T("Preview");
-    Fl_File_Chooser::save_label = T("Save");
-    Fl_File_Chooser::show_label = T("Show:");
-    Fl_File_Chooser::hidden_label = T("Show hidden files");
+    translate_dialogs();
     Fl::scheme("gtk+");
     app_icons(app);
 }

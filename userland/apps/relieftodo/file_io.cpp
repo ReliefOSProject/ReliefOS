@@ -1,4 +1,5 @@
 #include "file_io.h"
+#include <libintl.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -11,7 +12,9 @@
 namespace rt {
 namespace {
 bool fail(Text &error, const char *operation) {
-    char message[384]; snprintf(message,sizeof(message),"%s：%s",operation,strerror(errno));
+    const int saved = errno;
+    char message[384]; snprintf(message,sizeof(message),"%s：%s",gettext(operation),strerror(saved));
+    errno = saved;
     error.set(message); return false;
 }
 FileStamp from_stat(const struct stat &s, uint64_t digest=0) {

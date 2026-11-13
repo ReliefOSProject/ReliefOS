@@ -1,0 +1,1163 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/calc/actions.cpp:54
+msgid "%s (position %u)"
+msgstr "%s（位置 %u）"
+
+#: userland/apps/calc/actions.cpp:250
+msgid "%u values"
+msgstr "%u 個の値"
+
+#: userland/apps/calc/window.cpp:170
+msgid "16 bits"
+msgstr "16 ビット"
+
+#: userland/apps/calc/window.cpp:170
+msgid "32 bits"
+msgstr "32 ビット"
+
+#: userland/apps/calc/window.cpp:170
+msgid "64 bits"
+msgstr "64 ビット"
+
+#: userland/apps/calc/window.cpp:170
+msgid "8 bits"
+msgstr "8 ビット"
+
+#: userland/apps/calc/actions.cpp:311
+msgid "<p><b>Standard and scientific</b><br>Use + - * / ^, parentheses, postfix % and !. 200*10% = 20. ans is the last answer, mem is memory. Powers associate right to left; -2^2 = -4. Use explicit multiplication: 2*pi.</p><p>Functions: sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, ln, log, exp, abs, floor, ceil, round; pow(a,b), min(a,b), max(a,b), hypot(a,b), mod(a,b), atan2(y,x). Choose degrees or radians.</p><p><b>Programmer</b><br>Integer DEC/HEX/OCT/BIN, 8/16/32/64 bits. Prefixes: 0d, 0x, 0o, 0b. Operators: + - * / %, AND OR XOR NOT, &amp; | ^ ~, &lt;&lt; &gt;&gt;; rol(value,count), ror(value,count). Arithmetic wraps to the word width. Signed mode uses two's complement, signed division and arithmetic right shift. Shift counts must be smaller than the width. Calculated values keep their bit pattern when the base changes.</p><p><b>Conversions</b><br>Choose units and enter a value or expression. Preview is automatic; Convert adds history. Temperatures below absolute zero are rejected. MB is decimal, MiB is binary. US and UK volumes are distinct.</p><p><b>Statistics and dates</b><br>Up to 1024 finite numbers; sample variance requires two. Dates use the Gregorian calendar (0001 to 9999). Differences exclude the end date. Weekdays exclude Saturday and Sunday, without holidays. Add days uses whole calendar days.</p><p>Ctrl+1..6 switches mode. Enter calculates; Ctrl+Enter calculates statistics. Esc clears input. Ctrl+Shift+C copies the result. Double-click history to reuse an expression (other modes copy the result). Memory and history last for this session.</p>"
+msgstr "<p><b>標準・関数電卓</b><br>+ - * / ^、括弧、後置の % と ! を使用できます。200*10% = 20 です。ans は直前の答え、mem はメモリの値です。累乗は右から左に結合します。-2^2 = -4 です。乗算は 2*pi のように明示してください。</p><p>関数: sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, sqrt, cbrt, ln, log, exp, abs, floor, ceil, round; pow(a,b), min(a,b), max(a,b), hypot(a,b), mod(a,b), atan2(y,x)。角度の単位は度またはラジアンを選択してください。</p><p><b>プログラマー</b><br>整数を DEC/HEX/OCT/BIN、8/16/32/64 ビットで扱います。接頭辞: 0d, 0x, 0o, 0b。演算子: + - * / %, AND OR XOR NOT, &amp; | ^ ~, &lt;&lt; &gt;&gt;; rol(value,count), ror(value,count)。演算結果はワード幅で折り返します。符号付きモードでは 2 の補数、符号付き除算、算術右シフトを使用します。シフト回数はワード幅より小さくしてください。基数を変更しても計算値のビットパターンは保持されます。</p><p><b>単位変換</b><br>単位を選択し、値または式を入力してください。プレビューは自動更新され、変換すると履歴に追加されます。絶対零度未満の温度は入力できません。MB は十進、MiB は二進です。米国と英国の体積単位は異なります。</p><p><b>統計・日付</b><br>有限の数値を最大 1024 個まで入力できます。標本分散には 2 個以上必要です。日付にはグレゴリオ暦（0001 年から 9999 年）を使用します。差の日数に終了日は含まれません。平日には土日を含まず、祝日は考慮しません。日数の加算には暦日単位の整数を使用します。</p><p>Ctrl+1..6 でモードを切り替えます。Enter で計算、Ctrl+Enter で統計を計算します。Esc で入力を消去します。Ctrl+Shift+C で結果をコピーします。履歴をダブルクリックすると式を再利用できます（他のモードでは結果をコピーします）。メモリと履歴はこのセッション中のみ保持されます。</p>"
+
+#: userland/apps/calc/units.cpp:151
+msgid "Acceleration"
+msgstr "加速度"
+
+#: userland/apps/calc/units.cpp:22
+msgid "Acre"
+msgstr "エーカー"
+
+#: userland/apps/calc/window.cpp:282
+msgid "Add days"
+msgstr "日数を加算"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/calc/window.cpp:124
+msgid "Add to memory"
+msgstr "メモリに加算"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/calc/window.cpp:85
+msgid "All modes work\noffline."
+msgstr "すべてのモードは\nオフラインで動作します。"
+
+#: userland/apps/calc/units.cpp:152
+msgid "Angle"
+msgstr "角度"
+
+#: userland/apps/calc/window.cpp:129
+msgid "Angle unit"
+msgstr "角度の単位"
+
+#: userland/apps/calc/units.cpp:70
+msgid "Arcminute"
+msgstr "分角"
+
+#: userland/apps/calc/units.cpp:70
+msgid "Arcsecond"
+msgstr "秒角"
+
+#: userland/apps/calc/units.cpp:145
+msgid "Area"
+msgstr "面積"
+
+#: userland/apps/calc/actions.cpp:42
+msgid "At least two values are required."
+msgstr "2 個以上の値が必要です。"
+
+#: userland/apps/calc/units.cpp:93
+msgid "BTU (IT) per hour"
+msgstr "英国熱量単位（IT）毎時"
+
+#: userland/apps/calc/units.cpp:74
+msgid "Bar"
+msgstr "バール"
+
+#: userland/apps/calc/window.cpp:168
+msgid "Binary (BIN)"
+msgstr "二進数（BIN）"
+
+#: userland/apps/calc/units.cpp:106
+msgid "Bit (bit)"
+msgstr "ビット（bit）"
+
+#: userland/apps/calc/window.cpp:200
+msgid "Bit editor: high bits at left; click to toggle"
+msgstr "ビット編集: 左側が上位ビット。クリックで切り替え"
+
+#: userland/apps/calc/units.cpp:118
+msgid "Bits per second (bit/s)"
+msgstr "ビット毎秒（bit/s）"
+
+#: userland/apps/calc/units.cpp:85
+msgid "British thermal unit (IT)"
+msgstr "英国熱量単位（IT）"
+
+#: userland/apps/calc/units.cpp:106
+msgid "Byte (B)"
+msgstr "バイト（B）"
+
+#: userland/apps/calc/units.cpp:122
+msgid "Bytes per second (B/s)"
+msgstr "バイト毎秒（B/s）"
+
+#: userland/apps/calc/window.cpp:248
+msgid "Calculate"
+msgstr "計算"
+
+#: userland/apps/calc/window.cpp:61
+msgid "Calculator"
+msgstr "電卓"
+
+#: userland/apps/calc/actions.cpp:310
+msgid "Calculator help"
+msgstr "電卓のヘルプ"
+
+#: userland/apps/calc/window.cpp:275
+msgid "Calendar days (end minus start)"
+msgstr "暦日（終了日 − 開始日）"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/calc/actions.cpp:35
+msgid "Cannot divide by zero."
+msgstr "ゼロで除算できません。"
+
+#: userland/apps/calc/window.cpp:219
+msgid "Category"
+msgstr "カテゴリ"
+
+#: userland/apps/calc/units.cpp:46
+msgid "Celsius (C)"
+msgstr "摂氏（C）"
+
+#: userland/apps/calc/units.cpp:13
+msgid "Centimetre (cm)"
+msgstr "センチメートル（cm）"
+
+#: userland/apps/calc/units.cpp:59
+msgid "Centimetres per second (cm/s)"
+msgstr "センチメートル毎秒（cm/s）"
+
+#: userland/apps/calc/units.cpp:63
+msgid "Centimetres per second squared (cm/s2)"
+msgstr "センチメートル毎秒毎秒（cm/s2）"
+
+#: userland/apps/calc/window.cpp:96
+msgid "Clear"
+msgstr "クリア"
+
+#: userland/apps/calc/window.cpp:68
+msgid "Clear history"
+msgstr "履歴をクリア"
+
+#: userland/apps/calc/window.cpp:67
+msgid "Clear input"
+msgstr "入力をクリア"
+
+#: userland/apps/calc/window.cpp:124
+msgid "Clear memory"
+msgstr "メモリをクリア"
+
+#: userland/apps/calc/actions.cpp:312
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/calc/window.cpp:274
+msgid "Compare dates"
+msgstr "日付を比較"
+
+#: userland/apps/calc/window.cpp:234
+msgid "Convert"
+msgstr "変換"
+
+#: userland/apps/calc/window.cpp:232
+msgid "Converted value"
+msgstr "変換後の値"
+
+#: userland/apps/calc/window.cpp:66
+msgid "Copy result"
+msgstr "結果をコピー"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: userland/apps/calc/actions.cpp:239
+msgid "Count"
+msgstr "個数"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/calc/window.cpp:82
+msgid "Ctrl+1..6: mode\nEnter: calculate\nEsc: clear input\nF1: help"
+msgstr "Ctrl+1..6: モード切り替え\nEnter: 計算\nEsc: 入力をクリア\nF1: ヘルプ"
+
+#: userland/apps/calc/units.cpp:28
+msgid "Cubic centimetre (cm3)"
+msgstr "立方センチメートル（cm3）"
+
+#: userland/apps/calc/units.cpp:29
+msgid "Cubic foot (ft3)"
+msgstr "立方フィート（ft3）"
+
+#: userland/apps/calc/units.cpp:29
+msgid "Cubic inch (in3)"
+msgstr "立方インチ（in3）"
+
+#: userland/apps/calc/units.cpp:28
+msgid "Cubic metre (m3)"
+msgstr "立方メートル（m3）"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/calc/units.cpp:158
+msgid "Data storage"
+msgstr "データ容量"
+
+#: userland/apps/calc/units.cpp:159
+msgid "Data transfer rate"
+msgstr "データ転送速度"
+
+#: userland/apps/calc/window.cpp:77
+msgid "Date calculation"
+msgstr "日付計算"
+
+#: userland/apps/calc/actions.cpp:266
+msgid "Date difference"
+msgstr "日付の差"
+
+#: userland/apps/calc/units.cpp:53
+msgid "Day (24 h)"
+msgstr "日（24 h）"
+
+#: userland/apps/calc/window.cpp:279
+msgid "Days to add to the start date (negative subtracts)"
+msgstr "開始日に加算する日数（負の値で減算）"
+
+#: userland/apps/calc/window.cpp:167
+msgid "Decimal (DEC)"
+msgstr "十進数（DEC）"
+
+#: userland/apps/calc/window.cpp:159
+msgid "Decimal arithmetic, parentheses and percentage expressions"
+msgstr "十進数の四則演算、括弧、パーセント式"
+
+#: userland/apps/calc/units.cpp:15
+msgid "Decimetre (dm)"
+msgstr "デシメートル（dm）"
+
+#: userland/apps/calc/units.cpp:68
+msgid "Degree (deg)"
+msgstr "度（deg）"
+
+#: userland/apps/calc/window.cpp:131
+msgid "Degrees (DEG)"
+msgstr "度（DEG）"
+
+#: userland/apps/calc/units.cpp:160
+msgid "Density"
+msgstr "密度"
+
+#: userland/apps/calc/window.cpp:99
+msgid "Double-click to reuse"
+msgstr "ダブルクリックで再利用"
+
+#: userland/apps/calc/units.cpp:97
+msgid "Dyne (dyn)"
+msgstr "ダイン（dyn）"
+
+#: userland/apps/calc/window.cpp:65
+msgid "Edit"
+msgstr "編集"
+
+#: userland/apps/calc/units.cpp:84
+msgid "Electronvolt (eV)"
+msgstr "電子ボルト（eV）"
+
+#: userland/apps/calc/window.cpp:266
+msgid "End date (YYYY-MM-DD)"
+msgstr "終了日（YYYY-MM-DD）"
+
+#: userland/apps/calc/units.cpp:154
+msgid "Energy"
+msgstr "エネルギー"
+
+#: userland/apps/calc/actions.cpp:32
+msgid "Enter a value or expression."
+msgstr "値または式を入力してください。"
+
+#: userland/apps/calc/window.cpp:244
+msgid "Enter up to 1024 numbers separated by spaces, commas, semicolons or new lines."
+msgstr "最大 1024 個の数値を空白、コンマ、セミコロン、または改行で区切って入力してください。"
+
+#: userland/apps/calc/window.cpp:236
+msgid "Equivalent values"
+msgstr "同等の値"
+
+#: userland/apps/calc/actions.cpp:44
+msgid "Error"
+msgstr "エラー"
+
+#: userland/apps/calc/window.cpp:115
+msgid "Expression"
+msgstr "式"
+
+#: userland/apps/calc/units.cpp:46
+msgid "Fahrenheit (F)"
+msgstr "華氏（F）"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/calc/units.cpp:58
+msgid "Feet per second (ft/s)"
+msgstr "フィート毎秒（ft/s）"
+
+#: userland/apps/calc/units.cpp:64
+msgid "Feet per second squared (ft/s2)"
+msgstr "フィート毎秒毎秒（ft/s2）"
+
+#: userland/apps/calc/window.cpp:63
+msgid "File"
+msgstr "ファイル"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/calc/units.cpp:16
+msgid "Foot (ft)"
+msgstr "フィート（ft）"
+
+#: userland/apps/calc/units.cpp:86
+msgid "Foot pound-force (ft lbf)"
+msgstr "フートポンド力（ft lbf）"
+
+#: userland/apps/calc/units.cpp:156
+msgid "Force units"
+msgstr "力の単位"
+
+#: userland/apps/calc/units.cpp:157
+msgid "Frequency"
+msgstr "周波数"
+
+#: userland/apps/calc/actions.cpp:47
+msgid "Friday"
+msgstr "金曜日"
+
+#: userland/apps/calc/window.cpp:227
+msgid "From unit"
+msgstr "変換元の単位"
+
+#: userland/apps/calc/units.cpp:115
+msgid "Gibibit (Gibit)"
+msgstr "ギビビット（Gibit）"
+
+#: userland/apps/calc/units.cpp:111
+msgid "Gibibyte (GiB, 1024 MiB)"
+msgstr "ギビバイト（GiB、1024 MiB）"
+
+#: userland/apps/calc/units.cpp:128
+msgid "Gibibytes per second (GiB/s)"
+msgstr "ギビバイト毎秒（GiB/s）"
+
+#: userland/apps/calc/units.cpp:121
+msgid "Gigabits per second (Gbit/s)"
+msgstr "ギガビット毎秒（Gbit/s）"
+
+#: userland/apps/calc/units.cpp:108
+msgid "Gigabyte (GB, 1000 MB)"
+msgstr "ギガバイト（GB、1000 MB）"
+
+#: userland/apps/calc/units.cpp:125
+msgid "Gigabytes per second (GB/s)"
+msgstr "ギガバイト毎秒（GB/s）"
+
+#: userland/apps/calc/units.cpp:102
+msgid "Gigahertz (GHz)"
+msgstr "ギガヘルツ（GHz）"
+
+#: userland/apps/calc/units.cpp:69
+msgid "Gradian (gon)"
+msgstr "グラード（gon）"
+
+#: userland/apps/calc/units.cpp:43
+msgid "Grain (gr)"
+msgstr "グレーン（gr）"
+
+#: userland/apps/calc/units.cpp:38
+msgid "Gram (g)"
+msgstr "グラム（g）"
+
+#: userland/apps/calc/units.cpp:132
+msgid "Grams per cubic centimetre (g/cm3)"
+msgstr "グラム毎立方センチメートル（g/cm3）"
+
+#: userland/apps/calc/units.cpp:133
+msgid "Grams per litre (g/L)"
+msgstr "グラム毎リットル（g/L）"
+
+#: userland/apps/calc/units.cpp:22
+msgid "Hectare (ha)"
+msgstr "ヘクタール（ha）"
+
+#: userland/apps/calc/window.cpp:69
+msgid "Help"
+msgstr "ヘルプ"
+
+#: userland/apps/calc/units.cpp:101
+msgid "Hertz (Hz)"
+msgstr "ヘルツ（Hz）"
+
+#: userland/apps/calc/window.cpp:167
+msgid "Hexadecimal (HEX)"
+msgstr "十六進数（HEX）"
+
+#: userland/apps/calc/window.cpp:95
+msgid "History"
+msgstr "履歴"
+
+#: userland/apps/calc/units.cpp:52
+msgid "Hour (h)"
+msgstr "時間（h）"
+
+#: userland/apps/calc/units.cpp:15
+msgid "Inch (in)"
+msgstr "インチ（in）"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/calc/actions.cpp:34
+msgid "Input or nesting limit exceeded."
+msgstr "入力または入れ子が上限を超えました。"
+
+#: userland/apps/calc/window.cpp:249
+msgid "Insert example"
+msgstr "例を挿入"
+
+#: userland/apps/calc/actions.cpp:38
+msgid "Invalid digit for the selected number base."
+msgstr "選択された基数では使用できない数字です。"
+
+#: userland/apps/calc/actions.cpp:33
+msgid "Invalid expression. Check operators and parentheses."
+msgstr "無効な式です。演算子と括弧を確認してください。"
+
+#: userland/apps/calc/units.cpp:79
+msgid "Joule (J)"
+msgstr "ジュール（J）"
+
+#: userland/apps/calc/units.cpp:54
+msgid "Julian year (365.25 d)"
+msgstr "ユリウス年（365.25 d）"
+
+#: userland/apps/calc/units.cpp:47
+msgid "Kelvin (K)"
+msgstr "ケルビン（K）"
+
+#: userland/apps/calc/units.cpp:114
+msgid "Kibibit (Kibit)"
+msgstr "キビビット（Kibit）"
+
+#: userland/apps/calc/units.cpp:110
+msgid "Kibibyte (KiB, 1024 B)"
+msgstr "キビバイト（KiB、1024 B）"
+
+#: userland/apps/calc/units.cpp:126
+msgid "Kibibytes per second (KiB/s)"
+msgstr "キビバイト毎秒（KiB/s）"
+
+#: userland/apps/calc/units.cpp:119
+msgid "Kilobits per second (kbit/s)"
+msgstr "キロビット毎秒（kbit/s）"
+
+#: userland/apps/calc/units.cpp:107
+msgid "Kilobyte (kB, 1000 B)"
+msgstr "キロバイト（kB、1000 B）"
+
+#: userland/apps/calc/units.cpp:123
+msgid "Kilobytes per second (kB/s)"
+msgstr "キロバイト毎秒（kB/s）"
+
+#: userland/apps/calc/units.cpp:38
+msgid "Kilogram (kg)"
+msgstr "キログラム（kg）"
+
+#: userland/apps/calc/units.cpp:98
+msgid "Kilogram-force (kgf)"
+msgstr "キログラム重（kgf）"
+
+#: userland/apps/calc/units.cpp:131
+msgid "Kilograms per cubic metre (kg/m3)"
+msgstr "キログラム毎立方メートル（kg/m3）"
+
+#: userland/apps/calc/units.cpp:101
+msgid "Kilohertz (kHz)"
+msgstr "キロヘルツ（kHz）"
+
+#: userland/apps/calc/units.cpp:79
+msgid "Kilojoule (kJ)"
+msgstr "キロジュール（kJ）"
+
+#: userland/apps/calc/units.cpp:12
+msgid "Kilometre (km)"
+msgstr "キロメートル（km）"
+
+#: userland/apps/calc/units.cpp:57
+msgid "Kilometres per hour (km/h)"
+msgstr "キロメートル毎時（km/h）"
+
+#: userland/apps/calc/units.cpp:96
+msgid "Kilonewton (kN)"
+msgstr "キロニュートン（kN）"
+
+#: userland/apps/calc/units.cpp:138
+msgid "Kilonewton metre (kN m)"
+msgstr "キロニュートンメートル（kN m）"
+
+#: userland/apps/calc/units.cpp:73
+msgid "Kilopascal (kPa)"
+msgstr "キロパスカル（kPa）"
+
+#: userland/apps/calc/units.cpp:89
+msgid "Kilowatt (kW)"
+msgstr "キロワット（kW）"
+
+#: userland/apps/calc/units.cpp:81
+msgid "Kilowatt hour (kWh)"
+msgstr "キロワット時（kWh）"
+
+#: userland/apps/calc/units.cpp:59
+msgid "Knot (kn)"
+msgstr "ノット（kn）"
+
+#: userland/apps/calc/units.cpp:144
+msgid "Length"
+msgstr "長さ"
+
+#: userland/apps/calc/units.cpp:27
+msgid "Litre (L)"
+msgstr "リットル（L）"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/calc/units.cpp:147
+msgid "Mass"
+msgstr "質量"
+
+#: userland/apps/calc/actions.cpp:239
+msgid "Maximum"
+msgstr "最大値"
+
+#: userland/apps/calc/actions.cpp:239
+msgid "Mean"
+msgstr "平均"
+
+#: userland/apps/calc/units.cpp:114
+msgid "Mebibit (Mibit)"
+msgstr "メビビット（Mibit）"
+
+#: userland/apps/calc/units.cpp:110
+msgid "Mebibyte (MiB, 1024 KiB)"
+msgstr "メビバイト（MiB、1024 KiB）"
+
+#: userland/apps/calc/units.cpp:127
+msgid "Mebibytes per second (MiB/s)"
+msgstr "メビバイト毎秒（MiB/s）"
+
+#: userland/apps/calc/units.cpp:91
+msgid "Mechanical horsepower (hp)"
+msgstr "機械馬力（hp）"
+
+#: userland/apps/calc/actions.cpp:239
+msgid "Median"
+msgstr "中央値"
+
+#: userland/apps/calc/units.cpp:120
+msgid "Megabits per second (Mbit/s)"
+msgstr "メガビット毎秒（Mbit/s）"
+
+#: userland/apps/calc/units.cpp:107
+msgid "Megabyte (MB, 1000 kB)"
+msgstr "メガバイト（MB、1000 kB）"
+
+#: userland/apps/calc/units.cpp:124
+msgid "Megabytes per second (MB/s)"
+msgstr "メガバイト毎秒（MB/s）"
+
+#: userland/apps/calc/units.cpp:102
+msgid "Megahertz (MHz)"
+msgstr "メガヘルツ（MHz）"
+
+#: userland/apps/calc/units.cpp:80
+msgid "Megajoule (MJ)"
+msgstr "メガジュール（MJ）"
+
+#: userland/apps/calc/units.cpp:74
+msgid "Megapascal (MPa)"
+msgstr "メガパスカル（MPa）"
+
+#: userland/apps/calc/units.cpp:90
+msgid "Megawatt (MW)"
+msgstr "メガワット（MW）"
+
+#: userland/apps/calc/window.cpp:84
+msgid "Memory"
+msgstr "メモリ"
+
+#: userland/apps/calc/units.cpp:12
+msgid "Metre (m)"
+msgstr "メートル（m）"
+
+#: userland/apps/calc/units.cpp:57
+msgid "Metres per second (m/s)"
+msgstr "メートル毎秒（m/s）"
+
+#: userland/apps/calc/units.cpp:62
+msgid "Metres per second squared (m/s2)"
+msgstr "メートル毎秒毎秒（m/s2）"
+
+#: userland/apps/calc/units.cpp:43
+msgid "Metric carat (ct)"
+msgstr "メートル法カラット（ct）"
+
+#: userland/apps/calc/units.cpp:92
+msgid "Metric horsepower (PS)"
+msgstr "メートル馬力（PS）"
+
+#: userland/apps/calc/units.cpp:39
+msgid "Microgram (ug)"
+msgstr "マイクログラム（ug）"
+
+#: userland/apps/calc/units.cpp:14
+msgid "Micrometre (um)"
+msgstr "マイクロメートル（um）"
+
+#: userland/apps/calc/units.cpp:51
+msgid "Microsecond (us)"
+msgstr "マイクロ秒（us）"
+
+#: userland/apps/calc/units.cpp:17
+msgid "Mile (mi)"
+msgstr "マイル（mi）"
+
+#: userland/apps/calc/units.cpp:58
+msgid "Miles per hour (mph)"
+msgstr "マイル毎時（mph）"
+
+#: userland/apps/calc/units.cpp:75
+msgid "Millibar (mbar)"
+msgstr "ミリバール（mbar）"
+
+#: userland/apps/calc/units.cpp:39
+msgid "Milligram (mg)"
+msgstr "ミリグラム（mg）"
+
+#: userland/apps/calc/units.cpp:27
+msgid "Millilitre (mL)"
+msgstr "ミリリットル（mL）"
+
+#: userland/apps/calc/units.cpp:13
+msgid "Millimetre (mm)"
+msgstr "ミリメートル（mm）"
+
+#: userland/apps/calc/units.cpp:50
+msgid "Millisecond (ms)"
+msgstr "ミリ秒（ms）"
+
+#: userland/apps/calc/actions.cpp:239
+msgid "Minimum"
+msgstr "最小値"
+
+#: userland/apps/calc/units.cpp:52
+msgid "Minute (min)"
+msgstr "分（min）"
+
+#: userland/apps/calc/window.cpp:74
+msgid "Mode"
+msgstr "モード"
+
+#: userland/apps/calc/actions.cpp:47
+msgid "Monday"
+msgstr "月曜日"
+
+#: userland/apps/calc/units.cpp:14
+msgid "Nanometre (nm)"
+msgstr "ナノメートル（nm）"
+
+#: userland/apps/calc/units.cpp:51
+msgid "Nanosecond (ns)"
+msgstr "ナノ秒（ns）"
+
+#: userland/apps/calc/units.cpp:17
+msgid "Nautical mile (nmi)"
+msgstr "海里（nmi）"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/calc/units.cpp:96
+msgid "Newton (N)"
+msgstr "ニュートン（N）"
+
+#: userland/apps/calc/units.cpp:137
+msgid "Newton centimetre (N cm)"
+msgstr "ニュートンセンチメートル（N cm）"
+
+#: userland/apps/calc/units.cpp:137
+msgid "Newton metre (N m)"
+msgstr "ニュートンメートル（N m）"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: userland/apps/calc/actions.cpp:244
+msgid "Not available"
+msgstr "使用不可"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/calc/window.cpp:168
+msgid "Octal (OCT)"
+msgstr "八進数（OCT）"
+
+#: userland/apps/calc/units.cpp:41
+msgid "Ounce (oz)"
+msgstr "オンス（oz）"
+
+#: userland/apps/calc/units.cpp:73
+msgid "Pascal (Pa)"
+msgstr "パスカル（Pa）"
+
+#: userland/apps/calc/units.cpp:113
+msgid "Pebibyte (PiB, 1024 TiB)"
+msgstr "ペビバイト（PiB、1024 TiB）"
+
+#: userland/apps/calc/units.cpp:109
+msgid "Petabyte (PB, 1000 TB)"
+msgstr "ペタバイト（PB、1000 TB）"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/calc/actions.cpp:240
+msgid "Population std. deviation"
+msgstr "母標準偏差"
+
+#: userland/apps/calc/actions.cpp:240
+msgid "Population variance"
+msgstr "母分散"
+
+#: userland/apps/calc/units.cpp:40
+msgid "Pound (lb)"
+msgstr "ポンド（lb）"
+
+#: userland/apps/calc/units.cpp:97
+msgid "Pound-force (lbf)"
+msgstr "ポンド重（lbf）"
+
+#: userland/apps/calc/units.cpp:139
+msgid "Pound-force foot (lbf ft)"
+msgstr "ポンド力フィート（lbf ft）"
+
+#: userland/apps/calc/units.cpp:140
+msgid "Pound-force inch (lbf in)"
+msgstr "ポンド力インチ（lbf in）"
+
+#: userland/apps/calc/units.cpp:134
+msgid "Pounds per cubic foot (lb/ft3)"
+msgstr "ポンド毎立方フィート（lb/ft3）"
+
+#: userland/apps/calc/units.cpp:76
+msgid "Pounds per square inch (psi)"
+msgstr "ポンド毎平方インチ（psi）"
+
+#: userland/apps/calc/units.cpp:155
+msgid "Power units"
+msgstr "仕事率の単位"
+
+#: userland/apps/calc/units.cpp:153
+msgid "Pressure"
+msgstr "圧力"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/calc/window.cpp:77
+msgid "Programmer"
+msgstr "プログラマー"
+
+#: userland/apps/calc/units.cpp:68
+msgid "Radian (rad)"
+msgstr "ラジアン（rad）"
+
+#: userland/apps/calc/window.cpp:131
+msgid "Radians (RAD)"
+msgstr "ラジアン（RAD）"
+
+#: userland/apps/calc/units.cpp:47
+msgid "Rankine (R)"
+msgstr "ランキン（R）"
+
+#: userland/apps/calc/actions.cpp:31
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/calc/window.cpp:124
+msgid "Recall memory"
+msgstr "メモリを呼び出す"
+
+#: userland/apps/calc/actions.cpp:295
+msgid "Result copied to clipboard."
+msgstr "結果をクリップボードにコピーしました。"
+
+#: userland/apps/calc/units.cpp:103
+msgid "Revolutions per minute (rpm)"
+msgstr "毎分回転数（rpm）"
+
+#: userland/apps/calc/actions.cpp:240
+msgid "Sample std. deviation"
+msgstr "標本標準偏差"
+
+#: userland/apps/calc/actions.cpp:240
+msgid "Sample variance"
+msgstr "標本分散"
+
+#: userland/apps/calc/window.cpp:258
+msgid "Sample variance and deviation require at least two values."
+msgstr "標本分散と標本標準偏差には 2 個以上の値が必要です。"
+
+#: userland/apps/calc/actions.cpp:47
+msgid "Saturday"
+msgstr "土曜日"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/calc/window.cpp:77
+msgid "Scientific"
+msgstr "関数電卓"
+
+#: userland/apps/calc/units.cpp:50
+msgid "Second (s)"
+msgstr "秒（s）"
+
+#: userland/apps/calc/actions.cpp:39
+msgid "Shift and rotation counts must be smaller than the word width."
+msgstr "シフト回数と回転回数はワード幅より小さくしてください。"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/calc/window.cpp:172
+msgid "Signed (two's complement)"
+msgstr "符号付き（2 の補数）"
+
+#: userland/apps/calc/units.cpp:150
+msgid "Speed"
+msgstr "速度"
+
+#: userland/apps/calc/units.cpp:21
+msgid "Square centimetre (cm2)"
+msgstr "平方センチメートル（cm2）"
+
+#: userland/apps/calc/units.cpp:23
+msgid "Square foot (ft2)"
+msgstr "平方フィート（ft2）"
+
+#: userland/apps/calc/units.cpp:23
+msgid "Square inch (in2)"
+msgstr "平方インチ（in2）"
+
+#: userland/apps/calc/units.cpp:20
+msgid "Square kilometre (km2)"
+msgstr "平方キロメートル（km2）"
+
+#: userland/apps/calc/units.cpp:20
+msgid "Square metre (m2)"
+msgstr "平方メートル（m2）"
+
+#: userland/apps/calc/units.cpp:21
+msgid "Square millimetre (mm2)"
+msgstr "平方ミリメートル（mm2）"
+
+#: userland/apps/calc/units.cpp:24
+msgid "Square yard (yd2)"
+msgstr "平方ヤード（yd2）"
+
+#: userland/apps/calc/window.cpp:77
+msgid "Standard"
+msgstr "標準"
+
+#: userland/apps/calc/units.cpp:75
+msgid "Standard atmosphere (atm)"
+msgstr "標準大気圧（atm）"
+
+#: userland/apps/calc/units.cpp:65
+msgid "Standard gravity (g0)"
+msgstr "標準重力加速度（g0）"
+
+#: userland/apps/calc/window.cpp:265
+msgid "Start date (YYYY-MM-DD)"
+msgstr "開始日（YYYY-MM-DD）"
+
+#: userland/apps/calc/actions.cpp:250
+msgid "Statistics"
+msgstr "統計"
+
+#: userland/apps/calc/actions.cpp:41
+msgid "Statistics accepts at most 1024 values."
+msgstr "統計に入力できる値は最大 1024 個です。"
+
+#: userland/apps/calc/units.cpp:41
+msgid "Stone (st)"
+msgstr "ストーン（st）"
+
+#: userland/apps/calc/window.cpp:124
+msgid "Store in memory"
+msgstr "メモリに保存"
+
+#: userland/apps/calc/window.cpp:124
+msgid "Subtract from memory"
+msgstr "メモリから減算"
+
+#: userland/apps/calc/actions.cpp:239
+msgid "Sum"
+msgstr "合計"
+
+#: userland/apps/calc/actions.cpp:47
+msgid "Sunday"
+msgstr "日曜日"
+
+#: userland/apps/calc/window.cpp:233
+msgid "Swap units"
+msgstr "単位を入れ替え"
+
+#: userland/apps/calc/units.cpp:112
+msgid "Tebibyte (TiB, 1024 GiB)"
+msgstr "テビバイト（TiB、1024 GiB）"
+
+#: userland/apps/calc/units.cpp:148
+msgid "Temperature"
+msgstr "温度"
+
+#: userland/apps/calc/units.cpp:108
+msgid "Terabyte (TB, 1000 GB)"
+msgstr "テラバイト（TB、1000 GB）"
+
+#: userland/apps/calc/window.cpp:277
+msgid "The end date is excluded. Weekdays do not account for public holidays."
+msgstr "終了日は含まれません。平日の計算では祝日を考慮しません。"
+
+#: userland/apps/calc/actions.cpp:37
+msgid "The number exceeds the supported range."
+msgstr "数値が対応範囲を超えています。"
+
+#: userland/apps/calc/actions.cpp:185
+msgid "The result was truncated to the selected word width (modular arithmetic)."
+msgstr "結果は選択したワード幅に切り詰められました（剰余演算）。"
+
+#: userland/apps/calc/actions.cpp:36
+msgid "The value is outside the supported mathematical or physical domain."
+msgstr "値が対応する数学的または物理的な定義域の範囲外です。"
+
+#: userland/apps/calc/units.cpp:82
+msgid "Thermochemical calorie (cal)"
+msgstr "熱化学カロリー（cal）"
+
+#: userland/apps/calc/units.cpp:83
+msgid "Thermochemical kilocalorie (kcal)"
+msgstr "熱化学キロカロリー（kcal）"
+
+#: userland/apps/calc/actions.cpp:47
+msgid "Thursday"
+msgstr "木曜日"
+
+#: userland/apps/calc/units.cpp:149
+msgid "Time"
+msgstr "時間"
+
+#: userland/apps/calc/window.cpp:227
+msgid "To unit"
+msgstr "変換先の単位"
+
+#: userland/apps/calc/window.cpp:271
+msgid "Today"
+msgstr "今日"
+
+#: userland/apps/calc/units.cpp:40
+msgid "Tonne (t)"
+msgstr "トン（t）"
+
+#: userland/apps/calc/units.cpp:161
+msgid "Torque"
+msgstr "トルク"
+
+#: userland/apps/calc/units.cpp:76
+msgid "Torr"
+msgstr "トル"
+
+#: userland/apps/calc/actions.cpp:47
+msgid "Tuesday"
+msgstr "火曜日"
+
+#: userland/apps/calc/units.cpp:69
+msgid "Turn (rev)"
+msgstr "回転（rev）"
+
+#: userland/apps/calc/units.cpp:30
+msgid "UK imperial gallon"
+msgstr "英ガロン"
+
+#: userland/apps/calc/units.cpp:42
+msgid "UK long ton"
+msgstr "英ロングトン"
+
+#: userland/apps/calc/units.cpp:35
+msgid "US customary cup"
+msgstr "米カップ"
+
+#: userland/apps/calc/units.cpp:32
+msgid "US fluid ounce"
+msgstr "米液量オンス"
+
+#: userland/apps/calc/units.cpp:30
+msgid "US liquid gallon"
+msgstr "米液量ガロン"
+
+#: userland/apps/calc/units.cpp:31
+msgid "US liquid pint"
+msgstr "米液量パイント"
+
+#: userland/apps/calc/units.cpp:31
+msgid "US liquid quart"
+msgstr "米液量クォート"
+
+#: userland/apps/calc/units.cpp:42
+msgid "US short ton"
+msgstr "米ショートトン"
+
+#: userland/apps/calc/units.cpp:33
+msgid "US tablespoon"
+msgstr "米大さじ"
+
+#: userland/apps/calc/units.cpp:34
+msgid "US teaspoon"
+msgstr "米小さじ"
+
+#: userland/apps/calc/window.cpp:77
+msgid "Unit conversion"
+msgstr "単位変換"
+
+#: userland/apps/calc/actions.cpp:40
+msgid "Use a valid date from 0001-01-01 to 9999-12-31."
+msgstr "0001-01-01 から 9999-12-31 までの有効な日付を使用してください。"
+
+#: userland/apps/calc/window.cpp:224
+msgid "Value or expression"
+msgstr "値または式"
+
+#: userland/apps/calc/units.cpp:146
+msgid "Volume (capacity)"
+msgstr "体積（容量）"
+
+#: userland/apps/calc/units.cpp:89
+msgid "Watt (W)"
+msgstr "ワット（W）"
+
+#: userland/apps/calc/units.cpp:80
+msgid "Watt hour (Wh)"
+msgstr "ワット時（Wh）"
+
+#: userland/apps/calc/actions.cpp:47
+msgid "Wednesday"
+msgstr "水曜日"
+
+#: userland/apps/calc/units.cpp:53
+msgid "Week (7 d)"
+msgstr "週（7 d）"
+
+#: userland/apps/calc/window.cpp:276
+msgid "Weekdays (Monday to Friday)"
+msgstr "平日（月曜日から金曜日）"
+
+#: userland/apps/calc/units.cpp:16
+msgid "Yard (yd)"
+msgstr "ヤード（yd）"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: userland/apps/calc/window.cpp:159
+msgid "^ power   ! factorial   ans last answer   mem stored value"
+msgstr "^ 累乗   ! 階乗   ans 直前の答え   mem メモリの値"
+
+#: configs/nls/messages/calc.c:5
+msgid "bit"
+msgstr "ビット"
+
+#: userland/apps/calc/actions.cpp:265
+msgid "calendar days"
+msgstr "暦日"
+
+#: configs/nls/messages/calc.c:6
+msgid "s"
+msgstr "s"
+
+#: userland/apps/calc/actions.cpp:265
+msgid "weekdays"
+msgstr "平日"

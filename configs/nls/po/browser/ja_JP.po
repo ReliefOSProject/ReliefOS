@@ -1,0 +1,495 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: configs/nls/messages/browser.c:5
+msgid " bytes"
+msgstr " バイト"
+
+#: userland/apps/browser/view.c:922
+msgid " controls"
+msgstr " 個のコントロール"
+
+#: userland/apps/browser/view.c:920
+msgid " forms, "
+msgstr " 個のフォーム、"
+
+#: userland/apps/browser/view.c:916
+msgid " lines, "
+msgstr " 行、"
+
+#: userland/apps/browser/view.c:918
+msgid " links, "
+msgstr " 個のリンク、"
+
+#: userland/apps/browser/view.c:895
+msgid " source limit reached"
+msgstr " ソースの上限に到達"
+
+#: userland/apps/browser/view.c:906
+msgid "; content: "
+msgstr "、内容: "
+
+#: userland/apps/browser/view.c:934
+msgid "; status: "
+msgstr "、状態: "
+
+#: userland/apps/browser/util.c:158
+msgid "ARP timeout"
+msgstr "ARP タイムアウト"
+
+#: userland/apps/browser/input.c:280
+msgid "About Browser"
+msgstr "ブラウザーについて"
+
+#: userland/apps/browser/bookmarks.c:308
+msgid "Add"
+msgstr "追加"
+
+#: userland/apps/browser/bookmarks.c:202
+msgid "Add Bookmark"
+msgstr "ブックマークを追加"
+
+#: userland/apps/browser/bookmarks.c:219
+msgid "Add Current Page"
+msgstr "現在のページを追加"
+
+#: userland/apps/browser/view.c:1003
+msgid "Address"
+msgstr "アドレス"
+
+#: userland/apps/browser/input.c:217
+msgid "Address cleared"
+msgstr "アドレスをクリアしました"
+
+#: userland/apps/browser/input.c:141
+msgid "Address selected"
+msgstr "アドレスを選択しました"
+
+#: userland/apps/browser/navigation.c:786
+msgid "Application download started"
+msgstr "アプリケーションのダウンロードを開始しました"
+
+#: userland/apps/browser/view.c:963
+msgid "Back"
+msgstr "戻る"
+
+#: userland/apps/browser/util.c:160
+msgid "Bad argument"
+msgstr "不正な引数"
+
+#: userland/apps/browser/util.c:186
+msgid "Bad socket"
+msgstr "不正なソケット"
+
+#: userland/apps/browser/bookmarks.c:208
+msgid "Bookmark saved"
+msgstr "ブックマークを保存しました"
+
+#: userland/apps/browser/bookmarks.c:272
+msgid "Bookmarks"
+msgstr "ブックマーク"
+
+#: userland/apps/browser/input.c:232
+msgid "Bottom"
+msgstr "下端"
+
+#: userland/apps/browser/input.c:249
+msgid "Bottom of page"
+msgstr "ページの末尾"
+
+#: userland/apps/browser/forms.c:1517
+msgid "Checkbox checked"
+msgstr "チェックを入れました"
+
+#: userland/apps/browser/forms.c:1518
+msgid "Checkbox unchecked"
+msgstr "チェックを外しました"
+
+#: userland/apps/browser/input.c:291
+msgid "Classic HTTP browser for ReliefOS."
+msgstr "ReliefOS 用のクラシックな HTTP ブラウザー。"
+
+#: userland/apps/browser/main.c:36
+msgid "Classic Web Browser"
+msgstr "クラシック Web ブラウザー"
+
+#: userland/apps/browser/input.c:200
+msgid "Clear Address"
+msgstr "アドレスをクリア"
+
+#: userland/apps/browser/bookmarks.c:314
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/browser/navigation.c:784
+msgid "Could not start API Installer"
+msgstr "API インストーラーを起動できませんでした"
+
+#: userland/apps/browser/navigation.c:769
+msgid "Could not start Download Manager"
+msgstr "ダウンロードマネージャーを起動できませんでした"
+
+#: userland/apps/browser/util.c:166
+msgid "DHCP failed"
+msgstr "DHCP に失敗しました"
+
+#: userland/apps/browser/util.c:164
+msgid "DHCP timeout"
+msgstr "DHCP タイムアウト"
+
+#: userland/apps/browser/util.c:170
+msgid "DNS failed"
+msgstr "DNS に失敗しました"
+
+#: userland/apps/browser/util.c:168
+msgid "DNS timeout"
+msgstr "DNS タイムアウト"
+
+#: userland/apps/browser/bookmarks.c:312
+msgid "Delete"
+msgstr "削除"
+
+#: userland/apps/browser/bookmarks.c:378
+msgid "Delete Bookmark"
+msgstr "ブックマークを削除"
+
+#: userland/apps/browser/view.c:877
+msgid "Developer Tools"
+msgstr "開発ツール"
+
+#: userland/apps/browser/view.c:889
+msgid "Document: "
+msgstr "文書: "
+
+#: userland/apps/browser/input.c:173
+msgid "Download Current Page"
+msgstr "現在のページをダウンロード"
+
+#: userland/apps/browser/navigation.c:771
+msgid "Download started"
+msgstr "ダウンロードを開始しました"
+
+#: userland/apps/browser/bookmarks.c:310
+msgid "Edit"
+msgstr "編集"
+
+#: userland/apps/browser/bookmarks.c:364
+msgid "Edit Bookmark"
+msgstr "ブックマークを編集"
+
+#: userland/apps/browser/forms.c:1040
+msgid "Editing form input"
+msgstr "フォームの入力を編集中"
+
+#: userland/apps/browser/input.c:153
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/browser/input.c:150
+msgid "File"
+msgstr "ファイル"
+
+#: userland/apps/browser/navigation.c:703
+msgid "File Error"
+msgstr "ファイルエラー"
+
+#: userland/apps/browser/navigation.c:734
+msgid "File loaded"
+msgstr "ファイルを読み込みました"
+
+#: userland/apps/browser/navigation.c:733
+msgid "File loaded, truncated"
+msgstr "ファイルを読み込みました。一部は省略されています"
+
+#: userland/apps/browser/input.c:202
+msgid "Find Next"
+msgstr "次を検索"
+
+#: userland/apps/browser/bookmarks.c:458
+msgid "Find in Page"
+msgstr "ページ内を検索"
+
+#: userland/apps/browser/input.c:201
+msgid "Find in Page..."
+msgstr "ページ内を検索..."
+
+#: userland/apps/browser/bookmarks.c:459
+msgid "Find:"
+msgstr "検索:"
+
+#: userland/apps/browser/forms.c:1565
+msgid "Form reset"
+msgstr "フォームをリセットしました"
+
+#: userland/apps/browser/view.c:964
+msgid "Forward"
+msgstr "進む"
+
+#: userland/apps/browser/view.c:1007
+msgid "Go"
+msgstr "移動"
+
+#: userland/apps/browser/auth.c:100
+msgid "HTTP Authentication"
+msgstr "HTTP 認証"
+
+#: userland/apps/browser/navigation.c:580
+msgid "HTTP Page"
+msgstr "HTTP ページ"
+
+#: userland/apps/browser/navigation.c:532
+msgid "HTTP client failed"
+msgstr "HTTP クライアントに失敗しました"
+
+#: userland/apps/browser/util.c:180
+msgid "HTTP failed"
+msgstr "HTTP に失敗しました"
+
+#: userland/apps/browser/input.c:154
+msgid "Help"
+msgstr "ヘルプ"
+
+#: userland/apps/browser/input.c:171
+msgid "Home"
+msgstr "ホーム"
+
+#: userland/apps/browser/navigation.c:497
+msgid "Invalid URL"
+msgstr "無効な URL"
+
+#: userland/apps/browser/view.c:970
+msgid "License Website"
+msgstr "ライセンスの Web サイト"
+
+#: userland/apps/browser/view.c:882
+msgid "Location: "
+msgstr "場所: "
+
+#: userland/apps/browser/bookmarks.c:221
+msgid "Manage Bookmarks..."
+msgstr "ブックマークの管理..."
+
+#: userland/apps/browser/navigation.c:533
+msgid "Network Error"
+msgstr "ネットワークエラー"
+
+#: userland/apps/browser/util.c:172
+msgid "No A record"
+msgstr "A レコードがありません"
+
+#: userland/apps/browser/util.c:156
+msgid "No e1000 adapter"
+msgstr "e1000 アダプターがありません"
+
+#: userland/apps/browser/bookmarks.c:230
+msgid "No saved bookmarks"
+msgstr "保存済みのブックマークがありません"
+
+#: userland/apps/browser/input.c:292
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/browser/bookmarks.c:198
+msgid "Only pages with an address can be bookmarked"
+msgstr "アドレスのあるページのみブックマークに追加できます"
+
+#: userland/apps/browser/bookmarks.c:306
+msgid "Open"
+msgstr "開く"
+
+#: userland/apps/browser/navigation.c:702
+msgid "Open failed"
+msgstr "開く操作に失敗しました"
+
+#: userland/apps/browser/navigation.c:608
+msgid "Opening page..."
+msgstr "ページを開いています..."
+
+#: userland/apps/browser/auth.c:105
+msgid "Password (kept only for this browser session):"
+msgstr "パスワード (このブラウザーのセッション中のみ保持):"
+
+#: configs/nls/messages/browser.c:6
+msgid "Path"
+msgstr "パス"
+
+#: userland/apps/browser/util.c:192
+msgid "Protocol unsupported"
+msgstr "未対応のプロトコル"
+
+#: userland/apps/browser/forms.c:1531
+msgid "Radio option selected"
+msgstr "ラジオボタンを選択しました"
+
+#: userland/apps/browser/navigation.c:716
+msgid "Read failed"
+msgstr "読み取りに失敗しました"
+
+#: userland/apps/browser/navigation.c:187
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/browser/input.c:172
+msgid "Refresh"
+msgstr "更新"
+
+#: userland/apps/browser/input.c:290
+msgid "ReliefOS Browser"
+msgstr "ReliefOS ブラウザー"
+
+#: userland/apps/browser/view.c:914
+msgid "Rendered: "
+msgstr "描画済み: "
+
+#: configs/nls/messages/browser.c:7
+msgid "Reset"
+msgstr "リセット"
+
+#: userland/apps/browser/util.c:182
+msgid "Response too large"
+msgstr "応答が大きすぎます"
+
+#: userland/apps/browser/navigation.c:528
+msgid "Retrying form submission..."
+msgstr "フォームの送信を再試行中..."
+
+#: userland/apps/browser/navigation.c:630
+msgid "Retrying..."
+msgstr "再試行中..."
+
+#: userland/apps/browser/view.c:967
+msgid "Return to Setup"
+msgstr "セットアップに戻る"
+
+#: userland/apps/browser/bookmarks.c:273
+msgid "Saved browser pages"
+msgstr "保存済みのブラウザーページ"
+
+#: userland/apps/browser/view.c:928
+msgid "Scroll: line "
+msgstr "スクロール: 行 "
+
+#: userland/apps/browser/input.c:199
+msgid "Select Address"
+msgstr "アドレスを選択"
+
+#: userland/apps/browser/forms.c:1555
+msgid "Selection changed"
+msgstr "選択を変更しました"
+
+#: userland/apps/browser/util.c:190
+msgid "Socket closed"
+msgstr "ソケットが閉じられました"
+
+#: userland/apps/browser/util.c:184
+msgid "Socket limit reached"
+msgstr "ソケット数の上限に達しました"
+
+#: userland/apps/browser/util.c:188
+msgid "Socket not connected"
+msgstr "ソケットが接続されていません"
+
+#: userland/apps/browser/view.c:994
+msgid "Stop"
+msgstr "停止"
+
+#: userland/apps/browser/navigation.c:507
+msgid "Submitting form..."
+msgstr "フォームを送信中..."
+
+#: userland/apps/browser/util.c:154
+msgid "Succeeded"
+msgstr "成功"
+
+#: userland/apps/browser/util.c:178
+msgid "TCP failed"
+msgstr "TCP に失敗しました"
+
+#: userland/apps/browser/util.c:176
+msgid "TCP reset"
+msgstr "TCP がリセットされました"
+
+#: userland/apps/browser/util.c:174
+msgid "TCP timeout"
+msgstr "TCP タイムアウト"
+
+#: userland/apps/browser/util.c:194
+msgid "TLS verification failed"
+msgstr "TLS の検証に失敗しました"
+
+#: userland/apps/browser/bookmarks.c:444
+msgid "Text found"
+msgstr "テキストが見つかりました"
+
+#: userland/apps/browser/bookmarks.c:451
+msgid "Text not found"
+msgstr "テキストが見つかりません"
+
+#: userland/apps/browser/navigation.c:599
+msgid "The address could not be parsed as HTTP."
+msgstr "アドレスを HTTP として解析できませんでした。"
+
+#: userland/apps/browser/navigation.c:498
+msgid "The form action could not be parsed as HTTP."
+msgstr "フォームの送信先を HTTP として解析できませんでした。"
+
+#: userland/apps/browser/bookmarks.c:203
+msgid "Title:"
+msgstr "タイトル:"
+
+#: userland/apps/browser/input.c:231
+msgid "Top"
+msgstr "上端"
+
+#: userland/apps/browser/input.c:245
+msgid "Top of page"
+msgstr "ページの先頭"
+
+#: userland/apps/browser/util.c:162
+msgid "Transmit failed"
+msgstr "送信に失敗しました"
+
+#: userland/apps/browser/bookmarks.c:352
+msgid "URL:"
+msgstr "URL:"
+
+#: userland/apps/browser/util.c:196
+msgid "Unknown network status"
+msgstr "不明なネットワーク状態"
+
+#: userland/apps/browser/navigation.c:811
+msgid "Unsupported Address"
+msgstr "未対応のアドレス"
+
+#: userland/apps/browser/litehtml_core.c:1884
+msgid "Untitled Page"
+msgstr "無題のページ"
+
+#: userland/apps/browser/navigation.c:812
+msgid "Use http://, https://, about:, or a ReliefOS file path such as /file.html."
+msgstr "http://、https://、about:、または /file.html などの ReliefOS ファイルパスを使用してください。"
+
+#: userland/apps/browser/auth.c:101
+msgid "Username for this HTTP host:"
+msgstr "この HTTP ホストのユーザー名:"
+
+#: userland/apps/browser/input.c:152
+msgid "View"
+msgstr "表示"
+
+#: userland/apps/browser/view.c:902
+msgid "Viewport: "
+msgstr "表示領域: "
+
+#: configs/nls/messages/browser.c:8
+msgid "none"
+msgstr "なし"

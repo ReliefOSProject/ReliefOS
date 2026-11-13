@@ -58,6 +58,10 @@ msgstr "平均值："
 msgid "Balance"
 msgstr "余额"
 
+#: configs/nls/messages/reliefexcel.c:10
+msgid "Bare carriage return outside quoted field"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:142
 msgid "Bold"
 msgstr "加粗"
@@ -90,6 +94,10 @@ msgstr "CSV 仅导出当前工作表的数值和文本；公式、样式和其�
 msgid "CSV imported; save as a native workbook to keep formulas and formatting"
 msgstr "CSV 已导入；请保存为原生工作簿以保留公式和格式"
 
+#: configs/nls/messages/reliefexcel.c:11
+msgid "Calculated value exceeds CSV text limits"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:158
 msgid "Calculation"
 msgstr "计算"
@@ -109,6 +117,10 @@ msgstr "分类"
 #: userland/apps/reliefexcel/window.cpp:103
 msgid "Cell address, for example A1 or C25"
 msgstr "输入单元格地址，例如 A1 或 C25"
+
+#: configs/nls/messages/reliefexcel.c:12
+msgid "Cell coordinate is outside worksheet bounds"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:148
 msgid "Cells"
@@ -166,13 +178,137 @@ msgstr "包含|等于|大于|小于|非空"
 msgid "Copy"
 msgstr "复制"
 
+#: configs/nls/messages/reliefexcel.c:13
+msgid "Could not calculate imported worksheet"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:14
+msgid "Could not calculate workbook or operation cancelled"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:15
+msgid "Could not clean recovery reservation"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:16
+msgid "Could not close recovery reservation"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:17
+msgid "Could not close temporary save file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:18
+msgid "Could not create recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:19
+msgid "Could not create recovery reservation"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:20
+msgid "Could not create temporary save file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:21
+msgid "Could not create temporary save path"
+msgstr ""
+
 #: userland/apps/fltk_png_app.h:46
 msgid "Could not decode image"
 msgstr "无法解码图像"
 
+#: configs/nls/messages/reliefexcel.c:22
+msgid "Could not inspect delimited file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:23
+msgid "Could not inspect file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:24
+msgid "Could not inspect recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:25
+msgid "Could not inspect save target"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:26
+msgid "Could not inspect workbook"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:27
+msgid "Could not lock recovery file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:28
+msgid "Could not open delimited file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:29
+msgid "Could not open recovery lock"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:30
+msgid "Could not open save directory"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:31
+msgid "Could not open workbook"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:32
+msgid "Could not preserve workbook permissions"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:33
+msgid "Could not read delimited file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:34
+msgid "Could not read workbook"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:35
+msgid "Could not replace saved file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:36
+msgid "Could not reserve a unique recovery file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:37
+msgid "Could not reserve recovery file"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:688
 msgid "Could not save the recovery copy"
 msgstr "无法保存恢复副本"
+
+#: configs/nls/messages/reliefexcel.c:38
+msgid "Could not secure recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:39
+msgid "Could not secure recovery lock"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:40
+msgid "Could not secure recovery reservation"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:41
+msgid "Could not sync save directory"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:42
+msgid "Could not sync temporary save file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:43
+msgid "Could not write workbook"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:267
 msgid "Count:"
@@ -258,6 +394,46 @@ msgstr "删除工作表"
 msgid "Delete this worksheet? You can undo this operation."
 msgstr "删除当前工作表？此操作可以撤销。"
 
+#: configs/nls/messages/reliefexcel.c:44
+msgid "Delimited field exceeds resource limits"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:45
+msgid "Delimited field exceeds the text limit"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:46
+msgid "Delimited file has an invalid size or type"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:47
+msgid "Delimited file is truncated"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:48
+msgid "Delimited file path is empty"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:49
+msgid "Delimited input exceeds the resource limit"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:50
+msgid "Delimited input exceeds worksheet dimensions"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:51
+msgid "Delimited output exceeds resource limits"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:52
+msgid "Delimited output exceeds the resource limit"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:53
+msgid "Delimited text contains invalid UTF-8 or a NUL byte"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:499
 msgid "Description"
 msgstr "说明"
@@ -277,6 +453,18 @@ msgstr "放弃更改"
 #: userland/apps/reliefexcel/window.cpp:168
 msgid "Display"
 msgstr "显示"
+
+#: configs/nls/messages/reliefexcel.c:54
+msgid "Duplicate or unordered cell coordinate"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:55
+msgid "Duplicate worksheet identifier"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:56
+msgid "Duplicate worksheet name"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:105
 msgid "Edit cell content or formula; Enter applies the change"
@@ -322,6 +510,10 @@ msgstr "导出 CSV"
 msgid "Export CSV..."
 msgstr "导出 CSV…"
 
+#: configs/nls/messages/reliefexcel.c:57
+msgid "Export range exceeds resource limits"
+msgstr ""
+
 #: userland/apps/fltk_support.h:52
 msgid "Favorites"
 msgstr "收藏夹"
@@ -337,6 +529,14 @@ msgstr "文件系统"
 #: userland/apps/fltk_support.h:53
 msgid "File name:"
 msgstr "文件名："
+
+#: configs/nls/messages/reliefexcel.c:58
+msgid "File path is empty"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:59
+msgid "File stamp requires a regular file"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:143
 msgid "Fill color"
@@ -462,9 +662,17 @@ msgstr "导入 CSV"
 msgid "Import CSV..."
 msgstr "导入 CSV…"
 
+#: configs/nls/messages/reliefexcel.c:60
+msgid "Import exceeds the cell limit"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:499
 msgid "Income"
 msgstr "收入"
+
+#: configs/nls/messages/reliefexcel.c:61
+msgid "Incomplete temporary save file"
+msgstr ""
 
 #: userland/apps/fltk_files.h:23
 msgid "Input is too long"
@@ -485,6 +693,86 @@ msgstr "插入函数"
 #: userland/apps/reliefexcel/window.cpp:151
 msgid "Insert row"
 msgstr "插入行"
+
+#: configs/nls/messages/reliefexcel.c:62
+msgid "Invalid active worksheet or identifier sequence"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:63
+msgid "Invalid cell coordinate or style"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:64
+msgid "Invalid cell style"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:65
+msgid "Invalid cell text"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:66
+msgid "Invalid column dimensions"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:67
+msgid "Invalid column width"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:68
+msgid "Invalid delimited range"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:69
+msgid "Invalid field delimiter"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:70
+msgid "Invalid filter metadata"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:71
+msgid "Invalid filter range"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:72
+msgid "Invalid merged range"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:73
+msgid "Invalid merged range count"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:74
+msgid "Invalid row dimensions"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:75
+msgid "Invalid row height"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:207
+msgid "Invalid workbook header or length"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:76
+msgid "Invalid workbook metadata"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:77
+msgid "Invalid worksheet filter"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:78
+msgid "Invalid worksheet flags"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:79
+msgid "Invalid worksheet name or identifier"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:80
+msgid "Invalid worksheet view settings"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:142
 msgid "Italic"
@@ -562,9 +850,93 @@ msgstr "无边框"
 msgid "No matching cell found"
 msgstr "未找到匹配的单元格"
 
+#: configs/nls/messages/reliefexcel.c:81
+msgid "No per-user state directory is available"
+msgstr ""
+
 #: userland/apps/reliefexcel/grid.cpp:58
 msgid "Not enough memory"
 msgstr "内存不足"
+
+#: configs/nls/messages/reliefexcel.c:82
+msgid "Not enough memory to build delimited output"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:83
+msgid "Not enough memory to build recovery lock path"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:84
+msgid "Not enough memory to create recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:85
+msgid "Not enough memory to import worksheet"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:86
+msgid "Not enough memory to import worksheet cell"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:87
+msgid "Not enough memory to locate recovery directory"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:88
+msgid "Not enough memory to read cell input"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:89
+msgid "Not enough memory to read cell style"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:90
+msgid "Not enough memory to read cells"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:91
+msgid "Not enough memory to read delimited file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:92
+msgid "Not enough memory to read filters"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:93
+msgid "Not enough memory to read merged ranges"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:94
+msgid "Not enough memory to read workbook"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:95
+msgid "Not enough memory to read workbook text"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:96
+msgid "Not enough memory to read worksheets"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:97
+msgid "Not enough memory to reserve recovery file"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:98
+msgid "Not enough memory to return recovery path"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:99
+msgid "Not enough memory to save workbook"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:100
+msgid "Not enough memory to sync save directory"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:101
+msgid "Not enough memory to validate merged ranges"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:146
 msgid "Number"
@@ -593,6 +965,14 @@ msgstr "打开工作簿"
 #: userland/apps/reliefexcel/window.cpp:82
 msgid "Open..."
 msgstr "打开…"
+
+#: configs/nls/messages/reliefexcel.c:102
+msgid "Operation cancelled"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:103
+msgid "Overlapping merged ranges"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:533
 msgid "Overspent"
@@ -641,6 +1021,30 @@ msgstr "恢复"
 #: userland/apps/reliefexcel/window.cpp:687
 msgid "Recovery copy saved"
 msgstr "恢复副本已保存"
+
+#: configs/nls/messages/reliefexcel.c:104
+msgid "Recovery directory belongs to another user"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:105
+msgid "Recovery file is already in use"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:106
+msgid "Recovery lock path is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:107
+msgid "Recovery path contains a non-directory component"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:108
+msgid "Recovery path is empty"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:109
+msgid "Recovery path is not a directory"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:92
 msgid "Redo"
@@ -730,6 +1134,18 @@ msgstr "已取消保存，原文件保持不变"
 msgid "Save changes to this workbook?"
 msgstr "是否保存对工作簿的更改？"
 
+#: configs/nls/messages/reliefexcel.c:110
+msgid "Save path is empty"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:111
+msgid "Save path is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:112
+msgid "Save target must be a regular file"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:311
 msgid "Save workbook"
 msgstr "保存工作簿"
@@ -790,6 +1206,18 @@ msgstr "升序排序"
 msgid "Sort descending"
 msgstr "降序排序"
 
+#: configs/nls/messages/reliefexcel.c:113
+msgid "State directory must be an absolute path"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:114
+msgid "State directory path is too long"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:115
+msgid "String exceeds workbook resource limits"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:267
 msgid "Sum:"
 msgstr "求和："
@@ -810,6 +1238,10 @@ msgstr "目标单元格已有内容，是否替换？"
 msgid "The file changed outside ReliefExcel. Choose how to save."
 msgstr "文件已被其他程序修改，请选择保存方式。"
 
+#: configs/nls/messages/reliefexcel.c:116
+msgid "The file changed outside ReliefExcel; the original was preserved"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:641
 msgid "There is no room below this range"
 msgstr "此选区下方没有可用的单元格"
@@ -817,6 +1249,14 @@ msgstr "此选区下方没有可用的单元格"
 #: userland/apps/reliefexcel/window.cpp:326
 msgid "This file already exists. Replace it?"
 msgstr "文件已存在。是否替换？"
+
+#: configs/nls/messages/reliefexcel.c:117
+msgid "Too many merged ranges"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:118
+msgid "Too many worksheet filters"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:523
 msgid "Total expenses"
@@ -838,6 +1278,14 @@ msgstr "交通"
 msgid "Undo"
 msgstr "撤销"
 
+#: configs/nls/messages/reliefexcel.c:119
+msgid "Unexpected data after quoted field"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:120
+msgid "Unexpected quote in unquoted field"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:167
 msgid "Unfreeze"
 msgstr "取消冻结"
@@ -845,6 +1293,14 @@ msgstr "取消冻结"
 #: userland/apps/reliefexcel/window.cpp:148
 msgid "Unmerge"
 msgstr "取消合并"
+
+#: configs/nls/messages/reliefexcel.c:208
+msgid "Unsupported workbook version"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:121
+msgid "Unterminated quoted field"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:293
 msgid "Untitled"
@@ -870,21 +1326,65 @@ msgstr "查看"
 msgid "Within budget"
 msgstr "预算充足"
 
+#: configs/nls/messages/reliefexcel.c:122
+msgid "Workbook contains invalid UTF-8 text"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:123
+msgid "Workbook exceeds the cell limit"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:124
+msgid "Workbook exceeds the file size limit"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:125
+msgid "Workbook file has an invalid size or type"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:126
+msgid "Workbook has trailing or malformed data"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:127
+msgid "Workbook is truncated"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:385
 msgid "Workbook opened"
 msgstr "工作簿已打开"
+
+#: configs/nls/messages/reliefexcel.c:128
+msgid "Workbook path is empty"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:343
 msgid "Workbook saved"
 msgstr "工作簿已保存"
 
+#: configs/nls/messages/reliefexcel.c:129
+msgid "Workbook text exceeds the resource limit"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:232
 msgid "Working..."
 msgstr "正在处理…"
 
+#: configs/nls/messages/reliefexcel.c:130
+msgid "Worksheet dimensions exceed resource limits"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:131
+msgid "Worksheet is unavailable"
+msgstr ""
+
 #: userland/apps/reliefexcel/window.cpp:630
 msgid "Worksheet name:"
 msgstr "工作表名称："
+
+#: configs/nls/messages/reliefexcel.c:132
+msgid "Worksheet no longer exists"
+msgstr ""
 
 #: userland/apps/reliefexcel/window.cpp:154
 msgid "Worksheets"
@@ -905,3 +1405,291 @@ msgstr "缩放比例（25–400）："
 #: userland/apps/reliefexcel/window.cpp:168
 msgid "Zoom..."
 msgstr "缩放…"
+
+#: configs/nls/messages/reliefexcel.c:133
+msgid "内存不足或操作已取消，剪切未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:134
+msgid "内存不足，历史操作未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:135
+msgid "内存不足，合并未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:136
+msgid "内存不足，排序未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:137
+msgid "内存不足，操作未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:138
+msgid "内存不足，无法复制"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:139
+msgid "内存不足，无法排序"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:140
+msgid "内存不足，无法添加工作表"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:141
+msgid "内存不足，无法移动工作表"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:142
+msgid "内存不足，无法重命名工作表"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:143
+msgid "内存不足，替换未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:144
+msgid "内存不足，筛选未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:145
+msgid "内存不足，筛选未清除"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:146
+msgid "内存不足，粘贴未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:147
+msgid "内存不足，结构操作未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:148
+msgid "剪切内容已过期"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:149
+msgid "剪切范围与公式引用范围部分重叠，操作未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:150
+msgid "单元格地址无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:151
+msgid "单元格数据无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:152
+msgid "历史工作表已不存在"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:153
+msgid "历史数据超出工作簿限制"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:154
+msgid "合并会清除其他单元格内容，请确认后重试"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:155
+msgid "合并范围与现有合并单元格重叠"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:156
+msgid "合并范围无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:157
+msgid "填充内容无效或内存不足，操作未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:158
+msgid "填充范围无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:159
+msgid "复制范围无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:160
+msgid "工作簿内容无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:161
+msgid "工作簿单元格已达上限或内存不足"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:162
+msgid "工作簿单元格数量超出限制或内存不足，操作未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:163
+msgid "工作簿单元格数量超出限制，操作未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:164
+msgid "工作簿至少需要一个工作表"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:165
+msgid "工作表名称已存在"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:166
+msgid "工作表名称无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:167
+msgid "工作表名称无效或重复"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:168
+msgid "工作表已不存在"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:169
+msgid "工作表数量已达上限"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:170
+msgid "工作表移动方向无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:171
+msgid "工作表编号或名称重复"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:172
+msgid "排序时无法调整公式"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:173
+msgid "排序范围内包含合并单元格"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:174
+msgid "排序范围或关键列无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:175
+msgid "插入会使现有数据超出工作表范围"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:176
+msgid "插入或删除范围无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:177
+msgid "操作已取消"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:178
+msgid "操作范围无效或超出工作簿限制"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:179
+msgid "数值筛选条件无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:180
+msgid "文本无效、过长或内存不足"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:181
+msgid "无法更新公式引用"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:182
+msgid "无法更新工作表引用"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:183
+msgid "无法生成唯一工作表名称"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:184
+msgid "无法调整行高或列宽"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:185
+msgid "替换数量超出限制"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:186
+msgid "替换结果过长或内存不足，操作未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:187
+msgid "查找或替换文本无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:188
+msgid "格式范围或属性掩码无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:189
+msgid "格式范围无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:190
+msgid "格式范围超过工作簿单元格上限"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:191
+msgid "此操作会破坏合并单元格或视图范围"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:192
+msgid "没有匹配的合并范围"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:209
+msgid "没有可撤销的操作"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:193
+msgid "没有可用的工作表编号"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:210
+msgid "没有可重做的操作"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:194
+msgid "清除范围无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:195
+msgid "筛选文本无效或过长"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:196
+msgid "筛选范围或条件无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:197
+msgid "粘贴位置无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:198
+msgid "粘贴内容无效或内存不足，操作未执行"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:199
+msgid "粘贴范围超出工作表"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:200
+msgid "行高或列宽无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:201
+msgid "视图设置无效"
+msgstr ""
+
+#: configs/nls/messages/reliefexcel.c:202
+msgid "计算已取消，筛选未执行"
+msgstr ""

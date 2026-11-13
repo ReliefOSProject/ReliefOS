@@ -7,7 +7,7 @@ namespace {
 bool clone(const Document &d, Document &next) {
   if (next.clone_from(d))
     return true;
-  fl_alert("内存不足，无法编辑文档");
+  fl_alert(T("内存不足，无法编辑文档"));
   return false;
 }
 } // namespace
@@ -25,7 +25,7 @@ void DiagramWindow::add_shape(Shape shape) {
   uint64_t id;
   Text e;
   if (!add_node(next, shape, shape_name(shape), x, y, 0, id, e)) {
-    fl_alert("%s", e.c_str());
+    fl_alert("%s", ui_error(e.c_str()));
     return;
   }
   if (shape == Shape::Diamond) {
@@ -39,7 +39,7 @@ void DiagramWindow::add_shape(Shape shape) {
   if (commit(static_cast<Document &&>(next))) {
     select(id);
     canvas->take_focus();
-    update_status("已添加图形；双击文字或在右侧编辑属性");
+    update_status(T("已添加图形；双击文字或在右侧编辑属性"));
   }
 }
 void DiagramWindow::connect(uint64_t from, uint64_t to) {
@@ -56,7 +56,7 @@ void DiagramWindow::connect(uint64_t from, uint64_t to) {
   }
   if (commit(static_cast<Document &&>(next))) {
     select(id);
-    update_status("已创建连线；可在右侧设置标签、线型和箭头");
+    update_status(T("已创建连线；可在右侧设置标签、线型和箭头"));
   }
 }
 void DiagramWindow::edit_label() {
@@ -65,7 +65,7 @@ void DiagramWindow::edit_label() {
   const Node *n = node(document, selection[0]);
   const Edge *a = edge(document, selection[0]);
   const char *s =
-      fl_input("编辑文字（多行文字请使用右侧属性）", n   ? n->text.c_str()
+      fl_input(T("编辑文字（多行文字请使用右侧属性）"), n   ? n->text.c_str()
                                                      : a ? a->text.c_str()
                                                          : "");
   if (!s)
@@ -76,7 +76,7 @@ void DiagramWindow::edit_label() {
   Text *text =
       n ? &node(next, selection[0])->text : &edge(next, selection[0])->text;
   if (!text->set(s)) {
-    fl_alert("内存不足");
+    fl_alert(T("内存不足"));
     return;
   }
   commit(static_cast<Document &&>(next));
@@ -118,24 +118,24 @@ void DiagramWindow::copy_selection() {
     for (size_t j = 0; !keep && j < selection.size(); ++j)
       keep = tree.descendant(i, selection[j]);
     if (!keep && !remove.push(n.id)) {
-      fl_alert("内存不足");
+      fl_alert(T("内存不足"));
       return;
     }
   }
   erase(copy, remove, false);
   clipboard_ = static_cast<Document &&>(copy);
   update_status(clipboard_.nodes.empty()
-                    ? "请先选择图形；连线随两端图形一起复制"
-                    : "已复制图形和内部连线，可在本文档粘贴");
+                    ? T("请先选择图形；连线随两端图形一起复制")
+                    : T("已复制图形和内部连线，可在本文档粘贴"));
 }
 void DiagramWindow::paste_selection() {
   if (clipboard_.nodes.empty()) {
-    update_status("剪贴板中没有图形");
+    update_status(T("剪贴板中没有图形"));
     return;
   }
   if (document.nodes.size() + clipboard_.nodes.size() > MaxNodes ||
       document.edges.size() + clipboard_.edges.size() > MaxEdges) {
-    fl_alert("粘贴后对象数量超过限制");
+    fl_alert(T("粘贴后对象数量超过限制"));
     return;
   }
   Document next;
@@ -155,7 +155,7 @@ void DiagramWindow::paste_selection() {
     if (!add_node(next, a.shape, a.text.c_str(), a.x + 24, a.y + 24, 0,
                   fresh[i], e) ||
         !ids.push(fresh[i])) {
-      fl_alert("%s", e.empty() ? "内存不足" : e.c_str());
+      fl_alert("%s", e.empty() ? T("内存不足") : ui_error(e.c_str()));
       return;
     }
     Node *n = node(next, fresh[i]);
@@ -172,7 +172,7 @@ void DiagramWindow::paste_selection() {
     const Edge &a = clipboard_.edges[i];
     uint64_t id;
     if (!add_edge(next, mapped(a.from), mapped(a.to), a.route, id, e)) {
-      fl_alert("%s", e.c_str());
+      fl_alert("%s", ui_error(e.c_str()));
       return;
     }
     Edge *b = edge(next, id);
@@ -191,7 +191,7 @@ bool DiagramWindow::finish_dirty() {
     return false;
   if (!dirty_)
     return true;
-  int answer = fl_choice("当前文档有未保存的修改。", "取消", "不保存", "保存");
+  int answer = fl_choice(T("当前文档有未保存的修改。"), T("取消"), T("不保存"), T("保存"));
   if (answer == 1)
     return true;
   if (answer == 2)
@@ -200,7 +200,7 @@ bool DiagramWindow::finish_dirty() {
 }
 void DiagramWindow::run(Command c) {
   if (busy()) {
-    update_status("正在处理文件，请稍候");
+    update_status(T("正在处理文件，请稍候"));
     return;
   }
   bool replacing = c == Command::New || c == Command::Open ||
@@ -228,7 +228,7 @@ void DiagramWindow::run(Command c) {
   if (c == Command::Undo || c == Command::Redo) {
     if (fields_dirty_) {
       refresh();
-      update_status("已还原未应用的属性");
+      update_status(T("已还原未应用的属性"));
       return;
     }
     View view = document.view;
@@ -239,7 +239,7 @@ void DiagramWindow::run(Command c) {
       dirty_ = true;
       changed();
     } else
-      update_status("没有可用的历史记录");
+      update_status(T("没有可用的历史记录"));
     return;
   }
   if (!apply_fields())
@@ -255,7 +255,7 @@ void DiagramWindow::run(Command c) {
                         : c == Command::TemplateFlow ? 1
                                                      : 2,
                         e)) {
-      fl_alert("%s", e.c_str());
+      fl_alert("%s", ui_error(e.c_str()));
       return;
     }
     document = static_cast<Document &&>(next);
@@ -308,7 +308,7 @@ void DiagramWindow::run(Command c) {
   if (c == Command::SelectAll) {
     if (!canvas->prepare() ||
         !selection.clone_from(canvas->frame().visible_nodes)) {
-      update_status("选择内存不足");
+      update_status(T("选择内存不足"));
       return;
     }
     selection_changed();
@@ -329,7 +329,7 @@ void DiagramWindow::run(Command c) {
   }
   if (c == Command::Help) {
     fl_message(
-        "ReliefDiagram\n\n图形：双击左侧图形库或使用插入工具。双击图形 / F2 "
+        T("ReliefDiagram\n\n图形：双击左侧图形库或使用插入工具。双击图形 / F2 "
         "编辑文字。\n主题：选中主题后 Tab 添加子主题，Enter "
         "添加同级主题；折叠保留原数据。\n连线：选择“连接图形”，依次点击起点与终"
         "点；Esc 返回选择工具。\n画布：拖动移动，右下角手柄调整尺寸；Shift "
@@ -340,7 +340,7 @@ void DiagramWindow::run(Command c) {
         "撤销重做，Ctrl+C / V 使用应用内部图形剪贴板。\n\n.rdiagram "
         "保存全部可编辑内容；SVG / PNG 导出完整展开图形，Markdown "
         "包含折叠分支。\n首版最多 512 个图形、2048 条附加连线、8 "
-        "MiB；不导入其他厂商格式。");
+        "MiB；不导入其他厂商格式。"));
     return;
   }
   Document next;
@@ -348,11 +348,11 @@ void DiagramWindow::run(Command c) {
     return;
   Text e;
   if (c == Command::Title) {
-    const char *title = fl_input("文档标题", document.title.c_str());
+    const char *title = fl_input(T("文档标题"), document.title.c_str());
     if (!title)
       return;
     if (!next.title.set(title)) {
-      fl_alert("内存不足");
+      fl_alert(T("内存不足"));
       return;
     }
   } else if (c == Command::MindLayout || c == Command::TreeLayout ||
@@ -362,7 +362,7 @@ void DiagramWindow::run(Command c) {
                  : c == Command::TreeLayout ? Layout::Tree
                                             : Layout::Flow,
                  e)) {
-      fl_alert("%s", e.c_str());
+      fl_alert("%s", ui_error(e.c_str()));
       return;
     }
   } else if (c == Command::Delete) {
@@ -382,13 +382,13 @@ void DiagramWindow::run(Command c) {
     uint64_t id;
     if (!add_node(next, Shape::Rounded, parent ? "新主题" : "中心主题",
                   document.view.cx, document.view.cy, parent, id, e)) {
-      fl_alert("%s", e.c_str());
+      fl_alert("%s", ui_error(e.c_str()));
       return;
     }
     if (inherit)
       node(next, id)->style = inherited;
     if (!arrange(next, Layout::Mind, e)) {
-      fl_alert("%s", e.c_str());
+      fl_alert("%s", ui_error(e.c_str()));
       return;
     }
     if (commit(static_cast<Document &&>(next))) {
@@ -410,7 +410,7 @@ void DiagramWindow::run(Command c) {
         bool is_selected = selected(next.nodes[i].id),
              want = pass == (c == Command::Front ? 1 : 0);
         if (is_selected == want && !order.push(next.nodes[i])) {
-          fl_alert("内存不足");
+          fl_alert(T("内存不足"));
           return;
         }
       }
@@ -429,7 +429,7 @@ void DiagramWindow::run(Command c) {
       }
     bool distribute = c == Command::DistributeH || c == Command::DistributeV;
     if (count < (distribute ? 3U : 2U)) {
-      update_status(distribute ? "请至少选择三个图形" : "请至少选择两个图形");
+      update_status(distribute ? T("请至少选择三个图形") : T("请至少选择两个图形"));
       return;
     }
     if (distribute) {
@@ -493,7 +493,7 @@ int DiagramWindow::handle(int event) {
     if (fields_dirty_)
       refresh();
     canvas->take_focus();
-    update_status("已返回选择工具");
+    update_status(T("已返回选择工具"));
     return 1;
   }
   if (Fl_Double_Window::handle(event))

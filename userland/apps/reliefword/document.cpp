@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <libintl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -29,10 +30,10 @@ bool set_errno_error(Text &error, const char *operation) {
     const int saved_errno = errno;
     const char *detail = strerror(saved_errno);
     char message[256];
-    int n = snprintf(message, sizeof(message), "%s: %s", operation,
+    int n = snprintf(message, sizeof(message), "%s: %s", gettext(operation),
                      detail ? detail : "I/O error");
     errno = saved_errno;
-    if (n < 0 || (size_t)n >= sizeof(message)) return set_error(error, operation);
+    if (n < 0 || (size_t)n >= sizeof(message)) return set_error(error, gettext(operation));
     return set_error(error, message);
 }
 

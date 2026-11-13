@@ -13,6 +13,26 @@
 #include <unistd.h>
 namespace ra {
 namespace {
+const char *localized_output(const char *message, Text &scratch) {
+  const char *translated = T(message);
+  if (strcmp(translated, message))
+    return translated;
+  const char *separator = strstr(message, ": ");
+  if (!separator)
+    return message;
+  Text key;
+  if (!key.set(message, static_cast<size_t>(separator - message)))
+    return message;
+  translated = T(key.c_str());
+  if (!strcmp(translated, key.c_str()))
+    return message;
+  char combined[1024];
+  int length = snprintf(combined, sizeof(combined), "%s%s", translated, separator);
+  if (length < 0 || static_cast<size_t>(length) >= sizeof(combined) ||
+      !scratch.set(combined))
+    return message;
+  return scratch.c_str();
+}
 class TextWindow : public Fl_Double_Window {
     Fl_Text_Buffer buffer_;
     Fl_Text_Display *display_;
@@ -220,7 +240,7 @@ void App::tool(Action action) {
     Command c;
     Text error;
     if (!make_command(action, targets, options, false, c, error)) {
-        fl_alert("%s", error.c_str());
+        fl_alert("%s", T(error.c_str()));
         return;
     }
     if (action == Action::CacheClean || action == Action::CacheDownload) {
@@ -485,7 +505,8 @@ class RepositoryDialog : public Fl_Double_Window {
         if (selected < 0 || static_cast<size_t>(selected) >= files.size())
             return;
         if (!document.load(files[static_cast<size_t>(selected)].c_str())) {
-            fl_alert("%s", document.error.c_str());
+            Text translated;
+            fl_alert("%s", localized_output(document.error.c_str(), translated));
             return;
         }
         dirty = false;

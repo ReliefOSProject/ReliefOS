@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/dynlinkerror/main.c:26
+msgid "(unknown library)"
+msgstr "(不明なライブラリ)"
+
+#: userland/apps/dynlinkerror/main.c:25
+msgid "(unknown program)"
+msgstr "(不明なプログラム)"
+
+#: userland/apps/dynlinkerror/main.c:31
+msgid "Application:"
+msgstr "アプリケーション:"
+
+#: userland/apps/dynlinkerror/main.c:42
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/dynlinkerror/main.c:60
+msgid "Dynamic Link Error"
+msgstr "動的リンクエラー"
+
+#: userland/apps/dynlinkerror/main.c:61
+msgid "Required shared library is missing"
+msgstr "必要な共有ライブラリがありません"
+
+#: userland/apps/dynlinkerror/main.c:34
+msgid "Required shared library is missing:"
+msgstr "必要な共有ライブラリがありません:"
+
+#: userland/apps/dynlinkerror/main.c:39
+msgid "Restore the library from the system image, then try again."
+msgstr "システムイメージからライブラリを復元してから、もう一度お試しください。"
+
+#: userland/apps/dynlinkerror/main.c:29
+msgid "The application could not be started."
+msgstr "アプリケーションを起動できませんでした。"

@@ -35,7 +35,7 @@ void DiagramWindow::file_action(Command c) {
   Text e;
   if (c == Command::Open) {
     const char *path =
-        fl_file_chooser("打开 ReliefDiagram 文档", "*.rdiagram",
+        fl_file_chooser(T("打开 ReliefDiagram 文档"), "*.rdiagram",
                         path_.empty() ? getenv("HOME") : path_.c_str(), 0);
     if (!path)
       return;
@@ -43,13 +43,13 @@ void DiagramWindow::file_action(Command c) {
     return;
   }
   if (!encode(document, pending_bytes_, e)) {
-    fl_alert("%s", e.c_str());
+    fl_alert("%s", ui_error(e.c_str()));
     return;
   }
   if (c == Command::Save && !path_.empty()) {
     pending_path_ = path_;
     if (!io_.write(path_.c_str(), pending_bytes_, stamp_, e)) {
-      fl_alert("%s", e.c_str());
+      fl_alert("%s", ui_error(e.c_str()));
       return;
     }
     operation_ = Operation::Save;
@@ -57,13 +57,13 @@ void DiagramWindow::file_action(Command c) {
     busy_ui(true);
   } else {
     const char *path =
-        fl_file_chooser("保存 ReliefDiagram 文档", "*.rdiagram",
+        fl_file_chooser(T("保存 ReliefDiagram 文档"), "*.rdiagram",
                         path_.empty() ? "Untitled.rdiagram" : path_.c_str(), 0);
     if (!path)
       return;
     Text target;
     if (!filename(target, path, ".rdiagram")) {
-      fl_alert("文件名过长或内存不足");
+      fl_alert(T("文件名过长或内存不足"));
       return;
     }
     start_write(target.c_str(), false);
@@ -74,7 +74,7 @@ void DiagramWindow::load_initial(const char *path) {
     return;
   Text e;
   if (!pending_path_.set(path) || !io_.read(path, e)) {
-    fl_alert("%s", e.empty() ? "内存不足" : e.c_str());
+    fl_alert("%s", e.empty() ? T("内存不足") : ui_error(e.c_str()));
     return;
   }
   operation_ = Operation::Open;
@@ -89,7 +89,7 @@ void DiagramWindow::start_write(const char *path, bool exporting) {
     operation_ = Operation::Idle;
     resume_pending_ = false;
     busy_ui(false);
-    fl_alert("%s", e.empty() ? "内存不足" : e.c_str());
+    fl_alert("%s", e.empty() ? T("内存不足") : ui_error(e.c_str()));
     return;
   }
   operation_ = exporting ? Operation::Export : Operation::Save;
@@ -105,7 +105,7 @@ void DiagramWindow::poll_io() {
   Command action = resume_;
   if (reply.ok && stage_ == 0) {
     if (reply.stamp.exists &&
-        fl_choice("目标文件已存在，是否覆盖？", "取消", "覆盖", nullptr) != 1) {
+        fl_choice(T("目标文件已存在，是否覆盖？"), T("取消"), T("覆盖"), nullptr) != 1) {
       operation_ = Operation::Idle;
       resume_pending_ = false;
       pending_bytes_.clear();
@@ -142,20 +142,20 @@ void DiagramWindow::poll_io() {
     path_ = pending_path_;
     stamp_ = reply.stamp;
     dirty_ = false;
-    update_status("文档已保存");
+    update_status(T("文档已保存"));
     printf("[reliefdiagram.elf] saved nodes=%zu edges=%zu\n",
            document.nodes.size(), document.edges.size());
     fflush(stdout);
     resume = resume_pending_;
     resume_pending_ = false;
   } else if (reply.ok && operation_ == Operation::Export) {
-    update_status("导出完成");
+    update_status(T("导出完成"));
     puts("[reliefdiagram.elf] export complete");
     fflush(stdout);
   }
   if (!reply.ok) {
     resume_pending_ = false;
-    fl_alert("%s", reply.error.c_str());
+    fl_alert("%s", ui_error(reply.error.c_str()));
   }
   operation_ = Operation::Idle;
   pending_bytes_.clear();
@@ -176,18 +176,18 @@ void DiagramWindow::export_action(Command c) {
                              : c == Command::ExportPng ? "diagram.png"
                                                        : "diagram.md";
   const char *path = fl_file_chooser(
-      c == Command::ExportOutline ? "导出 Markdown 大纲" : "导出完整图形",
+      c == Command::ExportOutline ? T("导出 Markdown 大纲") : T("导出完整图形"),
       filter, default_name, 0);
   if (!path)
     return;
   Text target, e;
   if (!filename(target, path, suffix)) {
-    fl_alert("文件名过长或内存不足");
+    fl_alert(T("文件名过长或内存不足"));
     return;
   }
   if (c == Command::ExportPng) {
     if (!pending_path_.set(target.c_str()) || !png_.start(canvas->frame(), e)) {
-      fl_alert("%s", e.empty() ? "内存不足" : e.c_str());
+      fl_alert("%s", e.empty() ? T("内存不足") : ui_error(e.c_str()));
       return;
     }
     operation_ = Operation::Png;
@@ -197,7 +197,7 @@ void DiagramWindow::export_action(Command c) {
   bool ok = c == Command::ExportSvg ? svg(canvas->frame(), pending_bytes_, e)
                                     : markdown(document, pending_bytes_, e);
   if (!ok) {
-    fl_alert("%s", e.c_str());
+    fl_alert("%s", ui_error(e.c_str()));
     return;
   }
   start_write(target.c_str(), true);

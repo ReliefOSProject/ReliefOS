@@ -1,8 +1,10 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefPPT
+Name[ja]=ReliefPPT
 Name[zh_CN]=ReliefPPT
 GenericName=Presentation Editor
+GenericName[ja]=プレゼンテーションエディター
 GenericName[zh_CN]=演示文稿
 Exec=/usr/bin/reliefppt %f
 TryExec=/usr/bin/reliefppt

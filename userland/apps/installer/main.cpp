@@ -498,9 +498,14 @@ static void go_next(Fl_Widget *, void *)
 static void language_selected(Fl_Widget *, void *data)
 {
     unsigned target = (unsigned)(uintptr_t)data;
+    if (target >= sizeof(language_options) / sizeof(language_options[0])) return;
     if (target != language_selection() &&
         !setlocale(LC_ALL, language_options[target].locale))
         return;
+    reliefos_fltk::translate_dialogs();
+    main_window->copy_label(T("Install ReliefOS"));
+    back_button->copy_label(T("Previous Step"));
+    cancel_button->copy_label(T("Cancel"));
     schedule_render();
 }
 
@@ -509,20 +514,16 @@ static void build_language_page(void)
     make_heading(T("Select Language"), 20);
     make_label(T("Choose the language for Setup and the installed system."),
                CONTENT_X, 62, CONTENT_W, 30, 15, 1);
-    Fl_Round_Button *english = new Fl_Round_Button(CONTENT_X + 20, 126, 360, 34,
-                                                   language_options[0].name);
-    Fl_Round_Button *chinese = new Fl_Round_Button(CONTENT_X + 20, 174, 360, 34,
-                                                   language_options[1].name);
-    english->type(FL_RADIO_BUTTON);
-    chinese->type(FL_RADIO_BUTTON);
-    english->value(language_selection() == 0);
-    chinese->value(language_selection() == 1);
-    english->callback(language_selected, (void *)(uintptr_t)0);
-    chinese->callback(language_selected, (void *)(uintptr_t)1);
-    reliefos_fltk::style(english);
-    reliefos_fltk::style(chinese);
+    for (unsigned i = 0; i < sizeof(language_options) / sizeof(language_options[0]); ++i) {
+        Fl_Round_Button *option = new Fl_Round_Button(CONTENT_X + 20, 126 + (int)i * 48,
+                                                     360, 34, language_options[i].name);
+        option->type(FL_RADIO_BUTTON);
+        option->value(language_selection() == i);
+        option->callback(language_selected, (void *)(uintptr_t)i);
+        reliefos_fltk::style(option);
+    }
     make_label(T("The installed system will use the same language."),
-               CONTENT_X, 238, CONTENT_W, 32, 15, 1);
+               CONTENT_X, 286, CONTENT_W, 32, 15, 1);
 }
 
 static void build_license_page(void)

@@ -4,7 +4,20 @@
 #include <stdint.h>
 #include <string.h>
 
-#define T(s) (s)
+#include <libintl.h>
+#include <locale.h>
+#include <reliefos/layout.h>
+
+#define T(text) gettext(text)
+
+static void init_localization(void)
+{
+    setlocale(LC_ALL, "");
+    bindtextdomain("driverinfo", RELIEFOS_LAYOUT_LOCALE);
+    bind_textdomain_codeset("driverinfo", "UTF-8");
+    textdomain("driverinfo");
+}
+
 
 static const uint32_t device_classes[] = {
     SYSTEM_DEVICE_CLASS_AUDIO,
@@ -97,21 +110,21 @@ static int device_is_visible(const system_device_info_t *device, int show_all)
 static void print_driver_flags(uint32_t flags)
 {
     int first = 1;
-    printf("    Flags:");
+    printf(T("    Flags:"));
     if (flags & RELIEFOS_DRIVER_FLAG_BUILTIN) {
-        printf(" built-in");
+        printf(T(" built-in"));
         first = 0;
     }
     if (flags & RELIEFOS_DRIVER_FLAG_AUTOSTART) {
-        printf("%sautostart", first ? " " : ", ");
+        printf("%s%s", first ? " " : ", ", T("autostart"));
         first = 0;
     }
     if (flags & RELIEFOS_DRIVER_FLAG_DISABLED) {
-        printf("%sdisabled", first ? " " : ", ");
+        printf("%s%s", first ? " " : ", ", T("disabled"));
         first = 0;
     }
     if (first) {
-        printf(" none");
+        printf(T(" none"));
     }
     printf("\n");
 }
@@ -126,31 +139,33 @@ static void print_driver(const system_driver_info_t *driver)
     copy_field(name, sizeof(name), driver->name, sizeof(driver->name));
     copy_field(error, sizeof(error), driver->error, sizeof(driver->error));
     if (!file[0]) {
-        copy_field(file, sizeof(file), "(unnamed)", 9U);
+        const char *fallback = T("(unnamed)");
+        copy_field(file, sizeof(file), fallback, (uint32_t)strlen(fallback) + 1U);
     }
     if (!name[0]) {
-        copy_field(name, sizeof(name), "(no description)", 16U);
+        const char *fallback = T("(no description)");
+        copy_field(name, sizeof(name), fallback, (uint32_t)strlen(fallback) + 1U);
     }
 
     printf("  %s - %s\n", file, name);
-    printf("    ID: %u\n", driver->id);
-    printf("    State: %s\n", driver_state_name(driver->state));
+    printf(T("    ID: %u\n"), driver->id);
+    printf(T("    State: %s\n"), driver_state_name(driver->state));
     {
         const char *kind = driver_kind_name(driver->kind);
         if (kind) {
-            printf("    Kind: %s\n", kind);
+            printf(T("    Kind: %s\n"), kind);
         } else {
-            printf("    Kind: Unknown (%u)\n", driver->kind);
+            printf(T("    Kind: Unknown (%u)\n"), driver->kind);
         }
     }
-    printf("    ABI: %u  Version: %u\n", driver->abi_version, driver->version);
-    printf("    Load address: 0x%llx\n",
+    printf(T("    ABI: %u  Version: %u\n"), driver->abi_version, driver->version);
+    printf(T("    Load address: 0x%llx\n"),
            (unsigned long long)driver->load_address);
-    printf("    Image size: %llu bytes\n",
+    printf(T("    Image size: %llu bytes\n"),
            (unsigned long long)driver->image_size);
     print_driver_flags(driver->flags);
     if (error[0]) {
-        printf("    Error: %s\n", error);
+        printf(T("    Error: %s\n"), error);
     }
 }
 
@@ -200,10 +215,12 @@ static void print_devices_for_class(const system_device_info_t *devices,
         copy_field(status, sizeof(status), device->status, sizeof(device->status));
         copy_field(detail, sizeof(detail), device->detail, sizeof(device->detail));
         if (!name[0]) {
-            copy_field(name, sizeof(name), "(unnamed)", 9U);
+            const char *fallback = T("(unnamed)");
+            copy_field(name, sizeof(name), fallback, (uint32_t)strlen(fallback) + 1U);
         }
         if (!status[0]) {
-            copy_field(status, sizeof(status), "Unknown", 7U);
+            const char *fallback = T("Unknown");
+            copy_field(status, sizeof(status), fallback, (uint32_t)strlen(fallback) + 1U);
         }
         printf("    %s - %s\n", name, status);
         if (detail[0]) {
@@ -217,9 +234,9 @@ static void print_devices(const system_device_info_t *devices, uint32_t count,
                           int show_all, uint32_t visible_count)
 {
     uint32_t printed = 0;
-    printf("Devices (%u):\n", visible_count);
+    printf(T("Devices (%u):\n"), visible_count);
     if (!visible_count) {
-        printf("  (none)\n");
+        printf(T("  (none)\n"));
         return;
     }
     for (uint32_t index = 0;
@@ -272,6 +289,7 @@ static int parse_options(int argc, char **argv, int *show_all)
 
 int main(int argc, char **argv)
 {
+    init_localization();
     system_driver_info_t drivers[SYSTEM_DRIVER_MAX];
     system_device_info_t devices[SYSTEM_DEVICE_MAX];
     uint32_t driver_count = 0;
@@ -282,8 +300,8 @@ int main(int argc, char **argv)
     int ret;
 
     if (parse_options(argc, argv, &show_all) < 0) {
-        printf("Usage: driverinfo [-a|--all]\n");
-        printf("  -a, --all  show disabled, failed and inactive entries too\n");
+        printf(T("Usage: driverinfo [-a|--all]\n"));
+        printf(T("  -a, --all  show disabled, failed and inactive entries too\n"));
         return 2;
     }
 
@@ -291,12 +309,12 @@ int main(int argc, char **argv)
     memset(devices, 0, sizeof(devices));
     ret = system_driver_list(drivers, SYSTEM_DRIVER_MAX, &driver_count);
     if (ret < 0) {
-        printf("driverinfo: failed to query drivers (return %d)\n", ret);
+        printf(T("driverinfo: failed to query drivers (return %d)\n"), ret);
         return 1;
     }
     ret = system_device_list(devices, SYSTEM_DEVICE_MAX, &device_count);
     if (ret < 0) {
-        printf("driverinfo: failed to query devices (return %d)\n", ret);
+        printf(T("driverinfo: failed to query devices (return %d)\n"), ret);
         return 1;
     }
     if (driver_count > SYSTEM_DRIVER_MAX) {
@@ -308,13 +326,13 @@ int main(int argc, char **argv)
 
     shown_drivers = visible_driver_count(drivers, driver_count, show_all);
     shown_devices = visible_device_count(devices, device_count, show_all);
-    printf("ReliefOS active drivers\n");
+    printf(T("ReliefOS active drivers\n"));
     printf("=======================\n\n");
-    printf("Mode: %s\n\n", show_all ? "all driver and device states"
-                                      : "active drivers and devices");
-    printf("Drivers (%u):\n", shown_drivers);
+    printf(T("Mode: %s\n\n"), show_all ? T("all driver and device states")
+                                      : T("active drivers and devices"));
+    printf(T("Drivers (%u):\n"), shown_drivers);
     if (!shown_drivers) {
-        printf("  (none)\n");
+        printf(T("  (none)\n"));
     } else {
         for (uint32_t index = 0; index < driver_count; ++index) {
             if (driver_is_visible(&drivers[index], show_all)) {
@@ -324,8 +342,8 @@ int main(int argc, char **argv)
     }
     printf("\n");
     print_devices(devices, device_count, show_all, shown_devices);
-    printf("\nSummary: %u %s, %u %s\n", shown_drivers,
-           shown_drivers == 1U ? "driver" : "drivers", shown_devices,
-           shown_devices == 1U ? "device" : "devices");
+    printf(T("\nSummary: %u %s, %u %s\n"), shown_drivers,
+           shown_drivers == 1U ? T("driver") : T("drivers"), shown_devices,
+           shown_devices == 1U ? T("device") : T("devices"));
     return 0;
 }

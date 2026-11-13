@@ -54,7 +54,7 @@ MathWindow::MathWindow() : Fl_Double_Window(1200, 780, "ReliefMath++") {
            this);
   begin();
   top_ = new Fl_Group(0, 0, w(), 32);
-  const char *menus[] = {"文件", "编辑", "视图", "示例", "帮助"};
+  const char *menus[] = {T("文件"), T("编辑"), T("视图"), T("示例"), T("帮助")};
   Fl_Menu_Button *m[5];
   for (int n = 0; n < 5; ++n)
     m[n] = new Fl_Menu_Button(8 + n * 76, 2, 70, 28, menus[n]);
@@ -62,38 +62,38 @@ MathWindow::MathWindow() : Fl_Double_Window(1200, 780, "ReliefMath++") {
     m[n]->add(name, shortcut, click,
               reinterpret_cast<void *>(intptr_t(command)));
   };
-  menu(0, "新建几何文档", Command::New, FL_CTRL + 'n');
-  menu(0, "打开…", Command::Open, FL_CTRL + 'o');
-  menu(0, "保存", Command::Save, FL_CTRL + 's');
-  menu(0, "另存为…", Command::SaveAs, FL_CTRL + FL_SHIFT + 's');
-  menu(0, "导出当前视图 SVG…", Command::ExportSvg);
-  menu(0, "导出当前视图 PNG…", Command::ExportPng);
-  menu(0, "函数值表与 CSV…", Command::Table);
-  menu(0, "退出", Command::Close, FL_ALT + FL_F + 4);
-  menu(1, "撤销", Command::Undo, FL_CTRL + 'z');
-  menu(1, "重做", Command::Redo, FL_CTRL + 'y');
-  menu(1, "复制对象", Command::Duplicate, FL_CTRL + 'd');
-  menu(1, "删除对象", Command::Delete);
-  menu(1, "显示/隐藏对象", Command::Toggle);
-  menu(1, "应用属性", Command::Apply, FL_CTRL + FL_Enter);
-  menu(2, "重置视图", Command::Reset, FL_Home);
-  menu(2, "适合全部对象", Command::Fit);
-  menu(2, "放大", Command::ZoomIn);
-  menu(2, "缩小", Command::ZoomOut);
-  menu(2, "网格", Command::Grid);
-  menu(2, "坐标轴", Command::Axes);
-  menu(2, "三维线框", Command::Wire);
-  menu(3, "正弦、余弦与圆", Command::Example2);
-  menu(3, "波纹曲面与螺旋线", Command::Example3);
-  menu(3, "环面与空间向量", Command::ExampleTorus);
-  menu(3, "玫瑰线与椭圆", Command::ExamplePolar);
-  menu(4, "使用说明与表达式参考", Command::Help, FL_F + 1);
-  auto *title = caption(422, 5, 730, "ReliefMath++   几何 · 函数 · 数值计算");
+  menu(0, T("新建几何文档"), Command::New, FL_CTRL + 'n');
+  menu(0, T("打开…"), Command::Open, FL_CTRL + 'o');
+  menu(0, T("保存"), Command::Save, FL_CTRL + 's');
+  menu(0, T("另存为…"), Command::SaveAs, FL_CTRL + FL_SHIFT + 's');
+  menu(0, T("导出当前视图 SVG…"), Command::ExportSvg);
+  menu(0, T("导出当前视图 PNG…"), Command::ExportPng);
+  menu(0, T("函数值表与 CSV…"), Command::Table);
+  menu(0, T("退出"), Command::Close, FL_ALT + FL_F + 4);
+  menu(1, T("撤销"), Command::Undo, FL_CTRL + 'z');
+  menu(1, T("重做"), Command::Redo, FL_CTRL + 'y');
+  menu(1, T("复制对象"), Command::Duplicate, FL_CTRL + 'd');
+  menu(1, T("删除对象"), Command::Delete);
+  menu(1, T("显示/隐藏对象"), Command::Toggle);
+  menu(1, T("应用属性"), Command::Apply, FL_CTRL + FL_Enter);
+  menu(2, T("重置视图"), Command::Reset, FL_Home);
+  menu(2, T("适合全部对象"), Command::Fit);
+  menu(2, T("放大"), Command::ZoomIn);
+  menu(2, T("缩小"), Command::ZoomOut);
+  menu(2, T("网格"), Command::Grid);
+  menu(2, T("坐标轴"), Command::Axes);
+  menu(2, T("三维线框"), Command::Wire);
+  menu(3, T("正弦、余弦与圆"), Command::Example2);
+  menu(3, T("波纹曲面与螺旋线"), Command::Example3);
+  menu(3, T("环面与空间向量"), Command::ExampleTorus);
+  menu(3, T("玫瑰线与椭圆"), Command::ExamplePolar);
+  menu(4, T("使用说明与表达式参考"), Command::Help, FL_F + 1);
+  auto *title = caption(422, 5, 730, T("ReliefMath++   几何 · 函数 · 数值计算"));
   title->labelsize(16);
   top_->end();
   quick_ = new Fl_Group(0, 34, w(), 31);
-  const char *qnames[] = {"新建",     "打开",     "保存",     "撤销",    "重做",
-                          "复制对象", "删除对象", "SVG 导出", "PNG 导出"};
+  const char *qnames[] = {T("新建"),     T("打开"),     T("保存"),     T("撤销"),    T("重做"),
+                          T("复制对象"), T("删除对象"), T("SVG 导出"), T("PNG 导出")};
   const Command commands[] = {
       Command::New,    Command::Open,      Command::Save,
       Command::Undo,   Command::Redo,      Command::Duplicate,
@@ -109,21 +109,21 @@ MathWindow::MathWindow() : Fl_Double_Window(1200, 780, "ReliefMath++") {
   build_tools();
   body_ = new Fl_Group(0, 170, w(), h() - 200);
   left_ = new Fl_Group(8, 171, 350, h() - 207);
-  caption(10, 172, 340, "对象清单（选中后编辑；勾选可见性）");
+  caption(10, 172, 340, T("对象清单（选中后编辑；勾选可见性）"));
   list_ = new Fl_Hold_Browser(10, 195, 344, 137);
   list_->textsize(14);
   list_->format_char(0);
   list_->callback(choose, this);
   properties_ = new Fl_Scroll(8, 340, 350, h() - 374);
   properties_->type(Fl_Scroll::VERTICAL_ALWAYS);
-  caption(16, 342, 320, "对象属性");
-  caption(16, 365, 46, "名称");
+  caption(16, 342, 320, T("对象属性"));
+  caption(16, 365, 46, T("名称"));
   name_ = new Fl_Input(64, 363, 270, 27);
   name_->maximum_size(128);
-  caption(16, 399, 46, "类型");
+  caption(16, 399, 46, T("类型"));
   type_ = new Fl_Choice(64, 397, 270, 27);
   for (int n = 0; n < int(Kind::Count); ++n)
-    type_->add(info(Kind(n)).name);
+    type_->add(T(info(Kind(n)).name));
   type_->callback(choose, this);
   hint_ = caption(16, 430, 318, "");
   hint_->labelsize(12);
@@ -136,39 +136,39 @@ MathWindow::MathWindow() : Fl_Double_Window(1200, 780, "ReliefMath++") {
     formula_[n]->maximum_size(1024);
     formula_[n]->textsize(14);
   }
-  coord_label_ = caption(16, 558, 318, "坐标 / 尺寸（逗号分隔）");
+  coord_label_ = caption(16, 558, 318, T("坐标 / 尺寸（逗号分隔）"));
   coords_ = new Fl_Input(16, 579, 318, 29);
   coords_->maximum_size(400);
   coords_->textsize(14);
-  range_labels_[0] = caption(16, 615, 106, "X / t / u 范围");
+  range_labels_[0] = caption(16, 615, 106, T("X / t / u 范围"));
   ranges_[0] = new Fl_Input(122, 613, 212, 27);
-  range_labels_[1] = caption(16, 649, 106, "Y / v 范围");
+  range_labels_[1] = caption(16, 649, 106, T("Y / v 范围"));
   ranges_[1] = new Fl_Input(122, 647, 212, 27);
-  color_label_ = caption(16, 683, 46, "颜色");
+  color_label_ = caption(16, 683, 46, T("颜色"));
   color_ = new Fl_Choice(64, 681, 112, 27);
-  color_->add("蓝|红|绿|紫|金|青|粉|灰");
-  quality_label_ = caption(184, 683, 46, "采样");
+  color_->add(T("蓝|红|绿|紫|金|青|粉|灰"));
+  quality_label_ = caption(184, 683, 46, T("采样"));
   quality_ = new Fl_Choice(230, 681, 104, 27);
   quality_->add("24|32|48|64|96");
-  visible_ = new Fl_Check_Button(16, 717, 104, 28, "可见");
-  apply_ = new Fl_Button(128, 716, 206, 30, "应用属性  Ctrl+Enter");
+  visible_ = new Fl_Check_Button(16, 717, 104, 28, T("可见"));
+  apply_ = new Fl_Button(128, 716, 206, 30, T("应用属性  Ctrl+Enter"));
   apply_->callback(click, reinterpret_cast<void *>(intptr_t(Command::Apply)));
-  tip_ = caption(16, 754, 318, "提示：公式乘法用 *；角度统一为弧度");
+  tip_ = caption(16, 754, 318, T("提示：公式乘法用 *；角度统一为弧度"));
   properties_->end();
   left_->end();
   right_ = new Fl_Group(370, 171, w() - 380, h() - 205);
   viewbar_ = new Fl_Group(370, 171, w() - 380, 30);
-  const char *vnames[] = {"重置", "适合", "＋", "－"};
+  const char *vnames[] = {T("重置"), T("适合"), "＋", "－"};
   const Command vc[] = {Command::Reset, Command::Fit, Command::ZoomIn,
                         Command::ZoomOut};
   for (int n = 0; n < 4; ++n) {
     auto *b = new Fl_Button(370 + n * 58, 171, 52, 28, vnames[n]);
     b->callback(click, reinterpret_cast<void *>(intptr_t(vc[n])));
   }
-  grid_ = new Fl_Check_Button(608, 171, 70, 28, "网格");
-  axes_ = new Fl_Check_Button(680, 171, 70, 28, "坐标轴");
-  wire_ = new Fl_Check_Button(758, 171, 66, 28, "线框");
-  trace_ = new Fl_Check_Button(830, 171, 82, 28, "追踪");
+  grid_ = new Fl_Check_Button(608, 171, 70, 28, T("网格"));
+  axes_ = new Fl_Check_Button(680, 171, 70, 28, T("坐标轴"));
+  wire_ = new Fl_Check_Button(758, 171, 66, 28, T("线框"));
+  trace_ = new Fl_Check_Button(830, 171, 82, 28, T("追踪"));
   Fl_Check_Button *checks[] = {grid_, axes_, wire_, trace_};
   Command cc[] = {Command::Grid, Command::Axes, Command::Wire, Command::Trace};
   for (int n = 0; n < 4; ++n)
@@ -177,7 +177,7 @@ MathWindow::MathWindow() : Fl_Double_Window(1200, 780, "ReliefMath++") {
   views_ = new Fl_Tabs(370, 208, w() - 380, h() - 324);
   for (int n = 0; n < 2; ++n) {
     viewpages_[n] = new Fl_Group(372, 233, w() - 384, h() - 351,
-                                 n ? "三维几何 / 曲面" : "二维几何 / 函数");
+                                 n ? T("三维几何 / 曲面") : T("二维几何 / 函数"));
     canvas[n] = new Canvas(374, 235, w() - 388, h() - 355, this, n);
     viewpages_[n]->end();
     viewpages_[n]->resizable(canvas[n]);
@@ -210,7 +210,7 @@ MathWindow::MathWindow() : Fl_Double_Window(1200, 780, "ReliefMath++") {
   right_->end();
   body_->end();
   bottom_ = new Fl_Group(0, h() - 28, w(), 28);
-  status_ = caption(8, h() - 26, w() - 420, "就绪");
+  status_ = caption(8, h() - 26, w() - 420, T("就绪"));
   counts_ = caption(w() - 410, h() - 26, 402, "");
   counts_->align(FL_ALIGN_RIGHT | FL_ALIGN_INSIDE | FL_ALIGN_CLIP);
   bottom_->end();
@@ -244,7 +244,7 @@ MathWindow::MathWindow() : Fl_Double_Window(1200, 780, "ReliefMath++") {
 MathWindow::~MathWindow() { Fl::remove_timeout(tick, this); }
 void MathWindow::build_tools() {
   tools_ = new Fl_Tabs(8, 70, w() - 16, 92);
-  const char *tabs[] = {"二维绘图", "三维绘图", "计算与工具"};
+  const char *tabs[] = {T("二维绘图"), T("三维绘图"), T("计算与工具")};
   for (int page = 0; page < 3; ++page) {
     toolpages_[page] = new Fl_Group(10, 95, w() - 20, 64, tabs[page]);
     if (page < 2) {
@@ -253,20 +253,20 @@ void MathWindow::build_tools() {
       int n = 0;
       for (int kind = first; kind < last; ++kind, ++n) {
         auto *b = new Fl_Button(16 + (n % 7) * 136, 99 + (n / 7) * 29, 128, 25,
-                                info(Kind(kind)).name);
+                                T(info(Kind(kind)).name));
         b->callback(
             [](Fl_Widget *w, void *v) {
               static_cast<MathWindow *>(w->window())
                   ->add_object(Kind(intptr_t(v)));
             },
             reinterpret_cast<void *>(intptr_t(kind)));
-        b->tooltip(info(Kind(kind)).help);
+        b->tooltip(T(info(Kind(kind)).help));
       }
     } else {
-      const char *names[] = {"函数计算…",    "函数值表…",    "几何度量",
-                             "向量 / 两点…", "拾点：点",     "拾点：线段",
-                             "拾点：圆",     "拾点：三角形", "拾点：向量",
-                             "取消拾点",     "表达式帮助",   "三维函数计算…"};
+      const char *names[] = {T("函数计算…"),    T("函数值表…"),    T("几何度量"),
+                             T("向量 / 两点…"), T("拾点：点"),     T("拾点：线段"),
+                             T("拾点：圆"),     T("拾点：三角形"), T("拾点：向量"),
+                             T("取消拾点"),     T("表达式帮助"),   T("三维函数计算…")};
       Command cmd[] = {
           Command::Calculate,  Command::Table,        Command::Measure,
           Command::Vectors,    Command::PickPoint,    Command::PickSegment,
@@ -396,7 +396,7 @@ void MathWindow::edit(Fl_Widget *, void *p) {
   if (s->loading_)
     return;
   s->fields_dirty_ = true;
-  s->update_status("属性尚未应用；Ctrl+Enter 应用");
+  s->update_status(T("属性尚未应用；Ctrl+Enter 应用"));
 }
 void MathWindow::choose(Fl_Widget *w, void *p) {
   auto *s = static_cast<MathWindow *>(p);
@@ -428,7 +428,7 @@ void MathWindow::choose(Fl_Widget *w, void *p) {
       numbers(b, sizeof(b), o.range + 2 * n, 2);
       s->ranges_[n]->value(b);
     }
-    s->hint_->copy_label(info(o.kind).help);
+    s->hint_->copy_label(T(info(o.kind).help));
     s->coord_label_->copy_label(info(o.kind).fields);
     for (int n = 0; n < 3; ++n) {
       if (n < info(o.kind).formulas)
@@ -443,7 +443,7 @@ void MathWindow::choose(Fl_Widget *w, void *p) {
     s->loading_ = false;
     s->layout_properties();
     s->fields_dirty_ = true;
-    s->update_status("类型已选择；应用后更新对象");
+    s->update_status(T("类型已选择；应用后更新对象"));
   }
 }
 void MathWindow::refill() {
@@ -470,8 +470,8 @@ void MathWindow::refresh() {
   loading_ = true;
   name_->value(o->name.c_str());
   type_->value(int(o->kind));
-  hint_->copy_label(info(o->kind).help);
-  hint_->tooltip(info(o->kind).help);
+  hint_->copy_label(T(info(o->kind).help));
+  hint_->tooltip(T(info(o->kind).help));
   const char *labels2[] = {"y(x)", "y(t)", "z(t)"};
   const char *labels3[] = {"x(u,v)", "y(u,v)", "z(u,v)"};
   for (int n = 0; n < 3; ++n) {
@@ -495,7 +495,7 @@ void MathWindow::refresh() {
   coords_->value(b);
   coord_label_->copy_label(info(o->kind).values
                                ? info(o->kind).fields
-                               : "坐标 / 尺寸（此类型使用公式）");
+                               : T("坐标 / 尺寸（此类型使用公式）"));
   if (info(o->kind).values)
     coords_->activate();
   else
@@ -519,7 +519,7 @@ void MathWindow::refresh() {
 bool MathWindow::checkpoint() {
   if (history_.checkpoint(document))
     return true;
-  fl_alert("内存不足，不能记录撤销历史");
+  fl_alert(T("内存不足，不能记录撤销历史"));
   return false;
 }
 bool MathWindow::apply_fields() {
@@ -539,7 +539,7 @@ bool MathWindow::apply_fields() {
   if (!parse_numbers(coords_->value(), o.p, info(o.kind).values) ||
       !parse_numbers(ranges_[0]->value(), o.range, 2) ||
       !parse_numbers(ranges_[1]->value(), o.range + 2, 2)) {
-    fl_alert("坐标和范围请输入有限数值，并使用英文逗号分隔");
+    fl_alert(T("坐标和范围请输入有限数值，并使用英文逗号分隔"));
     return false;
   }
   int quality[] = {24, 32, 48, 64, 96};
@@ -547,7 +547,7 @@ bool MathWindow::apply_fields() {
   o.color = color_->value();
   o.visible = visible_->value() != 0;
   if (!valid_object(o, error)) {
-    fl_alert("%s", error.c_str());
+    fl_alert("%s", ui_error(error.c_str()));
     return false;
   }
   if (!checkpoint())
@@ -588,7 +588,7 @@ void MathWindow::parameter_changed(Fl_Widget *w, void *p) {
         value = s->sliders_[n]->value();
       else if (!parse_numbers(s->parameter_[n]->value(), &value, 1) ||
                fabs(value) > 1e8) {
-        fl_alert("参数必须为绝对值不超过 1e8 的有限数值");
+        fl_alert(T("参数必须为绝对值不超过 1e8 的有限数值"));
         return;
       }
       if (*values[n] == value)
@@ -655,11 +655,11 @@ void MathWindow::poll_sampling() {
 }
 void MathWindow::update_status(const char *message) {
   if (message)
-    notice_.set(message);
+    notice_.set(ui_error(message));
   else if (sampling_)
-    notice_.set("正在分批采样…");
+    notice_.set(T("正在分批采样…"));
   else if (io_.busy())
-    notice_.set("正在处理文件…");
+    notice_.set(T("正在处理文件…"));
   else {
     Object *o = current();
     Text err;
@@ -667,19 +667,19 @@ void MathWindow::update_status(const char *message) {
       for (size_t n = 0; n < document.objects.size() && n < meshes.size(); ++n)
         if (document.objects[n].id == o->id)
           err = meshes[n].error;
-    notice_.set(err.empty() ? "就绪 · 拖动平移/旋转，滚轮缩放" : err.c_str());
+    notice_.set(err.empty() ? T("就绪 · 拖动平移/旋转，滚轮缩放") : ui_error(err.c_str()));
   }
   if (status_)
     status_->copy_label(notice_.c_str());
   char b[192];
-  snprintf(b, sizeof(b), "%zu 个对象   %s   a=%.3g   %s",
+  snprintf(b, sizeof(b), T("%zu 个对象   %s   a=%.3g   %s"),
            document.objects.size(), document.view.tab ? "3D" : "2D",
-           document.vars.a, dirty_ ? "未保存" : "已保存");
+           document.vars.a, dirty_ ? T("未保存") : T("已保存"));
   if (counts_)
     counts_->copy_label(b);
   char title[512];
   snprintf(title, sizeof(title), "%s%s — ReliefMath++", dirty_ ? "* " : "",
-           path_.empty() ? "未命名几何文档" : path_.c_str());
+           path_.empty() ? T("未命名几何文档") : path_.c_str());
   copy_label(title);
 }
 void MathWindow::pointer(double x, double y) {
@@ -693,18 +693,18 @@ void MathWindow::pointer(double x, double y) {
     Variables v = document.vars;
     v.x = x;
     if (e.compile(o->formula[0].c_str(), err))
-      snprintf(b, sizeof(b), "追踪  x = %.7g    f(x) = %.7g", x, e.eval(v));
+      snprintf(b, sizeof(b), T("追踪  x = %.7g    f(x) = %.7g"), x, e.eval(v));
     else
       return;
   } else
-    snprintf(b, sizeof(b), "坐标  x = %.7g    y = %.7g", x, y);
+    snprintf(b, sizeof(b), T("坐标  x = %.7g    y = %.7g"), x, y);
   status_->copy_label(b);
 }
 void MathWindow::add_object(Kind kind) {
   if (io_.busy() || !apply_fields())
     return;
   if (document.objects.size() >= MaxObjects) {
-    fl_alert("每个文档最多 64 个对象");
+    fl_alert(T("每个文档最多 64 个对象"));
     return;
   }
   if (!checkpoint())
@@ -712,7 +712,7 @@ void MathWindow::add_object(Kind kind) {
   Object o = make_object(kind);
   o.color = int(document.objects.size() % 8);
   if (!append(document, o, active_)) {
-    fl_alert("不能添加对象");
+    fl_alert(T("不能添加对象"));
     return;
   }
   changed();
@@ -727,7 +727,7 @@ void MathWindow::picked(Vec3 p) {
                                                  : 2;
   picks_[pick_count_++] = p;
   if (pick_count_ < required) {
-    update_status("继续在画布上选择下一个点；Esc 取消");
+    update_status(T("继续在画布上选择下一个点；Esc 取消"));
     return;
   }
   Object o = make_object(pick_kind_);
@@ -755,7 +755,7 @@ void MathWindow::picked(Vec3 p) {
     return;
   o.color = int(document.objects.size() % 8);
   if (!append(document, o, active_)) {
-    update_status("不能添加对象，可能已达到 64 个对象上限");
+    update_status(T("不能添加对象，可能已达到 64 个对象上限"));
     return;
   }
   pick_kind_ = Kind::Count;
@@ -767,7 +767,7 @@ bool MathWindow::finish_dirty() {
     return false;
   if (!dirty_)
     return true;
-  int answer = fl_choice("几何文档尚未保存。", "取消", "保存", "放弃更改");
+  int answer = fl_choice(T("几何文档尚未保存。"), T("取消"), T("保存"), T("放弃更改"));
   if (answer == 2)
     return true;
   if (answer == 1)
@@ -859,7 +859,7 @@ void MathWindow::run(Command command) {
     if (o && checkpoint()) {
       Object copy = *o;
       if (!append(document, copy, active_)) {
-        fl_alert("不能复制对象，文档最多 64 个对象");
+        fl_alert(T("不能复制对象，文档最多 64 个对象"));
         break;
       }
       changed();
@@ -982,11 +982,11 @@ void MathWindow::run(Command command) {
     if (o) {
       Measures m = measure(*o);
       if (m.any)
-        fl_message("%s\n长度 / 周长 ≈ %.12g\n面积 / 表面积 ≈ %.12g\n体积 ≈ "
-                   "%.12g\n（不适用项为 0；椭圆周长为近似值）",
+        fl_message(T("%s\n长度 / 周长 ≈ %.12g\n面积 / 表面积 ≈ %.12g\n体积 ≈ "
+                   "%.12g\n（不适用项为 0；椭圆周长为近似值）"),
                    o->name.c_str(), m.length, m.area, m.volume);
       else
-        fl_message("此对象无内置几何度量。函数对象请使用“函数计算”。");
+        fl_message(T("此对象无内置几何度量。函数对象请使用“函数计算”。"));
     }
     break;
   case Command::ExportSvg:
@@ -1005,7 +1005,7 @@ void MathWindow::run(Command command) {
                                                    : Kind::Triangle2;
     pick_count_ = 0;
     select_tab(0);
-    update_status("在二维画布上选择点；Esc 取消拾点");
+    update_status(T("在二维画布上选择点；Esc 取消拾点"));
     break;
   case Command::CancelPick:
     pick_kind_ = Kind::Count;

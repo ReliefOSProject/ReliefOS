@@ -23,6 +23,7 @@ def controls():
         common = ["cc", "-std=c11", "-D_POSIX_C_SOURCE=200809L", "-Wall", "-Wextra", "-Werror",
                   "-g", "-fsanitize=address,undefined", "-fno-omit-frame-pointer",
                   "-I" + str(ROOT / "include"),
+                  "-I" + str(ROOT / "kernel/reliefnt/include/uapi"),
                   "-I" + str(ROOT / "out/audio-hda/upstream/alsa-lib/root/usr/include")]
         binary = str(Path(work) / "client")
         command = common + [str(ROOT / p) for p in ["tools/tests/audio_control_client_test.c",

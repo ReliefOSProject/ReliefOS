@@ -1,0 +1,163 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/doomlauncher/main.cpp:58
+msgid "An IWAD path is required"
+msgstr "IWAD のパスが必要です"
+
+#: userland/apps/doomlauncher/main.cpp:36
+msgid "Arguments are empty"
+msgstr "引数が空です"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/doomlauncher/main.cpp:86
+msgid "DOOM Launcher"
+msgstr "DOOM ランチャー"
+
+#: userland/apps/doomlauncher/main.cpp:74
+msgid "DOOM exited with code "
+msgstr "DOOM が終了しました。終了コード "
+
+#: userland/apps/doomlauncher/main.cpp:77
+msgid "DOOM is no longer running"
+msgstr "DOOM は実行されていません"
+
+#: userland/apps/doomlauncher/main.cpp:93
+msgid "Disable sound"
+msgstr "サウンドを無効にする"
+
+#: userland/apps/doomlauncher/main.cpp:89
+msgid "Extra DOOM arguments"
+msgstr "DOOM の追加引数"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/doomlauncher/main.cpp:94
+msgid "Fullscreen"
+msgstr "全画面"
+
+#: userland/apps/doomlauncher/main.cpp:87
+msgid "IWAD path"
+msgstr "IWAD のパス"
+
+#: userland/apps/doomlauncher/main.cpp:49
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/doomlauncher/main.cpp:95
+msgid "Launch"
+msgstr "起動"
+
+#: userland/apps/doomlauncher/main.cpp:61
+msgid "Launch failed: "
+msgstr "起動に失敗しました: "
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/doomlauncher/main.cpp:38
+msgid "Missing closing quote"
+msgstr "閉じる引用符がありません"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/doomlauncher/main.cpp:98
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/doomlauncher/main.cpp:96
+msgid "Reset"
+msgstr "リセット"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/doomlauncher/main.cpp:30
+msgid "Settings reset"
+msgstr "設定をリセットしました"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/doomlauncher/main.cpp:65
+msgid "Starting DOOM: the game window shows loading progress"
+msgstr "DOOM を起動中です。ゲームウィンドウに読み込み状況が表示されます"
+
+#: userland/apps/doomlauncher/main.cpp:37
+msgid "Too many arguments"
+msgstr "引数が多すぎます"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"

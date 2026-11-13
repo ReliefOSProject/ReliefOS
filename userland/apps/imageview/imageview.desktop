@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Image Viewer
+Name[ja]=画像ビューアー
 Name[zh_CN]=图片查看器
 Exec=/usr/bin/imageview
 TryExec=/usr/bin/imageview
