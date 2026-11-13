@@ -500,7 +500,7 @@ def draw_icon(name: str) -> list[list[tuple[int, int, int, int]]]:
         icon_terminal(c)
     elif name == "notepad":
         draw_document(c, BLUE)
-    elif name == "settings":
+    elif name in {"settings", "reliefsettings"}:
         icon_settings(c)
     elif name == "calc":
         icon_calc(c)

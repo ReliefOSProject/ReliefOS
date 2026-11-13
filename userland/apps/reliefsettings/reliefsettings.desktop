@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefSettings
+Name[zh_CN]=ReliefSettings 系统设置
+GenericName=System Settings
+GenericName[zh_CN]=系统设置
+Comment=Configure language, time zone, displays and keyboard
+Comment[zh_CN]=配置语言、时区、显示器和键盘
+Exec=/usr/bin/reliefsettings
+TryExec=/usr/bin/reliefsettings
+Icon=reliefos-reliefsettings
+Terminal=false
+Categories=Settings;DesktopSettings;
+StartupWMClass=reliefos-reliefsettings

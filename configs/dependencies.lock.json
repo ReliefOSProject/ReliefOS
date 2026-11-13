@@ -79,6 +79,45 @@
       "license_in_source": ".PKGINFO"
     },
     {
+      "id": "alpine-xrandr",
+      "kind": "apk",
+      "version": "1.5.4-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/xrandr-1.5.4-r0.apk",
+      "sha256": "4f8d9302be2d7587b3b6c1f1fa967d618dc2aeee8b9081875f2d1cc1d4959b8d",
+      "directory": "xrandr-1.5.4-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Official Alpine v3.24 community package; MIT; ReliefSettings runtime dependency, embedded APK signature verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-setxkbmap",
+      "kind": "apk",
+      "version": "1.3.5-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/community/x86_64/setxkbmap-1.3.5-r0.apk",
+      "sha256": "435315fb1950be93493f5e95b61cf8617903ebc864e64fd2f06e0ebd30fc0446",
+      "directory": "setxkbmap-1.3.5-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "xorg",
+      "note": "Official Alpine v3.24 community package; MIT; ReliefSettings runtime dependency, embedded APK signature verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-tzdata",
+      "kind": "apk",
+      "version": "2026f-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/tzdata-2026f-r0.apk",
+      "sha256": "f41a4a5913372a3694f157825f5133fe32743e679ed8476f258c984e13113602",
+      "directory": "tzdata-2026f-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "base",
+      "note": "Official Alpine v3.24 main package; Public-Domain; ReliefSettings runtime dependency, embedded APK signature verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
       "id": "alpine-icewm",
       "kind": "apk",
       "version": "4.0.0-r1",

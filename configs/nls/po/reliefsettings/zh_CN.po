@@ -1,0 +1,415 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 1\n"
+"PO-Revision-Date: 2026-09-21 00:00+0800\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "添加到收藏夹"
+
+#: userland/apps/reliefsettings/window.cpp:103
+msgid "After applying, choose Keep within 15 seconds. The previous mode is restored automatically if you do not confirm."
+msgstr "应用后，请在 15 秒内选择“保留”。未确认时会自动恢复原显示模式。"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "所有文件 (*)"
+
+#: userland/apps/reliefsettings/window.cpp:269
+msgid "All users"
+msgstr "所有用户"
+
+#: userland/apps/reliefsettings/window.cpp:70
+msgid "Application language"
+msgstr "应用程序语言"
+
+#: userland/apps/reliefsettings/window.cpp:656
+msgid "Application started."
+msgstr "已启动应用程序。"
+
+#: userland/apps/reliefsettings/window.cpp:268
+msgid "Apply"
+msgstr "应用"
+
+#: userland/apps/reliefsettings/window.cpp:116
+msgid "Apply a layout, then type in the test field. Chinese text input is provided by your input method."
+msgstr "应用布局后，可在上方输入框测试键盘。中文输入由输入法提供。"
+
+#: userland/apps/reliefsettings/window.cpp:493
+msgid "Applying…"
+msgstr "正在应用…"
+
+#: userland/apps/reliefsettings/window.cpp:106
+msgid "Available modes are reported by the X server and graphics driver. Confirmed settings are restored at your next sign-in."
+msgstr "可选模式由 X 服务器和显卡驱动提供。确认后的设置会在下次登录时恢复。"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "取消"
+
+#: configs/nls/messages/reliefsettings.c:4
+msgid "Cannot create a temporary configuration file."
+msgstr "无法创建临时配置文件。"
+
+#: configs/nls/messages/reliefsettings.c:5
+msgid "Cannot read the current keyboard layout."
+msgstr "无法读取当前键盘布局。"
+
+#: userland/apps/reliefsettings/window.cpp:656
+msgid "Cannot start the application."
+msgstr "无法启动应用程序。"
+
+#: userland/apps/reliefsettings/window.cpp:493
+msgid "Cannot start the settings worker."
+msgstr "无法启动设置工作进程。"
+
+#: userland/apps/reliefsettings/window.cpp:370
+msgid "Cannot start xrandr."
+msgstr "无法启动 xrandr。"
+
+#: userland/apps/reliefsettings/window.cpp:425
+msgid "Choose a time zone."
+msgstr "请选择时区。"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "关闭"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "无法解码图像"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "创建新目录"
+
+#: userland/apps/reliefsettings/window.cpp:100
+msgid "Current mode"
+msgstr "当前显示模式"
+
+#: userland/apps/reliefsettings/window.cpp:141
+msgid "Current user"
+msgstr "当前用户"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "自定义筛选器"
+
+#: userland/apps/reliefsettings/window.cpp:331
+msgid "Custom localtime file or UTC default"
+msgstr "自定义时区文件或默认 UTC"
+
+#: configs/nls/messages/reliefsettings.c:6
+msgid "Date and time"
+msgstr "日期与时间"
+
+#: userland/apps/reliefsettings/window.cpp:341
+msgid "Default"
+msgstr "默认"
+
+#: configs/nls/messages/reliefsettings.c:7
+msgid "Display"
+msgstr "显示"
+
+#: configs/nls/messages/reliefsettings.c:8
+msgid "Display information is too large."
+msgstr "显示器信息过多。"
+
+#: userland/apps/reliefsettings/window.cpp:98
+msgid "Display output"
+msgstr "显示器输出"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "收藏夹"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "文件系统"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "文件名："
+
+#: userland/apps/reliefsettings/window.cpp:86
+msgid "Find a time zone"
+msgstr "搜索时区"
+
+#: userland/apps/reliefsettings/window.cpp:660
+msgid "Finish or cancel administrator authentication before closing."
+msgstr "请完成或取消管理员验证后再关闭。"
+
+#: configs/nls/messages/reliefsettings.c:9
+msgid "HOME must be an absolute path."
+msgstr "HOME 必须为绝对路径。"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "输入内容过长"
+
+#: userland/apps/reliefsettings/window.cpp:133
+msgid "Inspect services, start or stop them and manage their startup runlevels."
+msgstr "查看服务状态，启动或停止服务，管理启动运行级别。"
+
+#: configs/nls/messages/reliefsettings.c:10
+msgid "Invalid configuration name or size."
+msgstr "配置文件名称或大小无效。"
+
+#: configs/nls/messages/reliefsettings.c:11
+msgid "Invalid configuration name."
+msgstr "配置文件名称无效。"
+
+#: configs/nls/messages/reliefsettings.c:12
+msgid "Invalid desktop configuration. Correct the file before saving."
+msgstr "桌面配置无效，请修正配置文件后再保存。"
+
+#: configs/nls/messages/reliefsettings.c:13
+msgid "Invalid language configuration."
+msgstr "语言配置无效。"
+
+#: configs/nls/messages/reliefsettings.c:14
+msgid "Invalid or oversized configuration file."
+msgstr "配置文件无效或过大。"
+
+#: configs/nls/messages/reliefsettings.c:15
+msgid "Invalid time zone."
+msgstr "时区无效。"
+
+#: userland/apps/reliefsettings/window.cpp:506
+msgid "Keep"
+msgstr "保留"
+
+#: userland/apps/reliefsettings/window.cpp:498
+msgid "Keep these display settings?"
+msgstr "保留这些显示设置？"
+
+#: configs/nls/messages/reliefsettings.c:16
+msgid "Keyboard"
+msgstr "键盘"
+
+#: configs/nls/messages/reliefsettings.c:17
+msgid "Keyboard information is too large."
+msgstr "键盘信息过多。"
+
+#: userland/apps/reliefsettings/window.cpp:111
+msgid "Keyboard layout"
+msgstr "键盘布局"
+
+#: configs/nls/messages/reliefsettings.c:18
+msgid "Language"
+msgstr "语言"
+
+#: userland/apps/reliefsettings/window.cpp:590
+msgid "Language saved. Sign out and sign in to use it."
+msgstr "语言已保存，重新登录后生效。"
+
+#: userland/apps/reliefsettings/window.cpp:113
+msgid "Layout variant"
+msgstr "布局变体"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
+#: userland/apps/reliefsettings/window.cpp:126
+msgid "Manage network adapters, automatic or static addressing, DNS and connection diagnostics."
+msgstr "管理网络适配器、自动或静态地址、DNS，并进行网络诊断。"
+
+#: configs/nls/messages/reliefsettings.c:19
+msgid "Network"
+msgstr "网络"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新建目录？"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "否"
+
+#: configs/nls/messages/reliefsettings.c:20
+msgid "No XKB keyboard layouts are installed."
+msgstr "尚未安装 XKB 键盘布局。"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/reliefsettings/window.cpp:123
+msgid "Open Network Controller"
+msgstr "打开网络控制器"
+
+#: userland/apps/reliefsettings/window.cpp:131
+msgid "Open OpenRC Controller"
+msgstr "打开 OpenRC 控制器"
+
+#: configs/nls/messages/reliefsettings.c:21
+msgid "Out of memory."
+msgstr "内存不足。"
+
+#: userland/apps/reliefsettings/window.cpp:393
+msgid "Output is disabled"
+msgstr "此输出尚未启用"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "请选择已存在的文件！"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "预览"
+
+#: userland/apps/reliefsettings/window.cpp:588
+msgid "Previous display mode restored."
+msgstr "已恢复原显示模式。"
+
+#: userland/apps/reliefsettings/window.cpp:142
+msgid "Reload"
+msgstr "重新加载"
+
+#: userland/apps/reliefsettings/window.cpp:101
+msgid "Resolution and refresh rate"
+msgstr "分辨率与刷新率"
+
+#: userland/apps/reliefsettings/window.cpp:503
+msgid "Restore"
+msgstr "恢复"
+
+#: userland/apps/reliefsettings/window.cpp:525
+msgid "Restoring the previous display mode…"
+msgstr "正在恢复原显示模式…"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/reliefsettings/window.cpp:524
+msgid "Saving display settings…"
+msgstr "正在保存显示设置…"
+
+#: configs/nls/messages/reliefsettings.c:22
+msgid "Services"
+msgstr "服务"
+
+#: userland/apps/reliefsettings/window.cpp:591
+msgid "Settings applied."
+msgstr "设置已应用。"
+
+#: userland/apps/reliefsettings/window.cpp:585
+msgid "Settings applied. Storage synchronization failed."
+msgstr "设置已应用，但存储同步失败。"
+
+#: configs/nls/messages/reliefsettings.c:23
+msgid "Settings are being saved by another program. Try again."
+msgstr "其他程序正在保存设置，请稍后重试。"
+
+#: userland/apps/reliefsettings/window.cpp:582
+msgid "Settings could not be applied."
+msgstr "无法应用设置。"
+
+#: userland/apps/reliefsettings/window.cpp:198
+msgid "Settings diagnostic"
+msgstr "设置诊断"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "显示："
+
+#: userland/apps/reliefsettings/window.cpp:71
+msgid "System default"
+msgstr "系统默认"
+
+#: userland/apps/reliefsettings/window.cpp:119
+msgid "System default clears your saved override and takes effect at your next sign-in."
+msgstr "选择“系统默认”会清除已保存的个人键盘设置，在下次登录时生效。"
+
+#: userland/apps/reliefsettings/window.cpp:84
+msgid "System time zone"
+msgstr "系统时区"
+
+#: userland/apps/reliefsettings/window.cpp:567
+msgid "System time zone updated."
+msgstr "系统时区已更新。"
+
+#: userland/apps/reliefsettings/window.cpp:114
+msgid "Test your keyboard here"
+msgstr "在此测试键盘"
+
+#: configs/nls/messages/reliefsettings.c:24
+msgid "The X server did not report any connected displays."
+msgstr "X 服务器未报告已连接的显示器。"
+
+#: configs/nls/messages/reliefsettings.c:26
+msgid "The command failed."
+msgstr "命令执行失败。"
+
+#: configs/nls/messages/reliefsettings.c:27
+msgid "The command timed out."
+msgstr "命令执行超时。"
+
+#: configs/nls/messages/reliefsettings.c:25
+msgid "The display mode changed. Reload and try again."
+msgstr "显示模式已发生变化，请重新加载后再试。"
+
+#: userland/apps/reliefsettings/window.cpp:76
+msgid "The language is used the next time you sign in. Save your work before signing out."
+msgstr "语言设置将在下次登录时生效。注销前请先保存工作。"
+
+#: userland/apps/reliefsettings/window.cpp:564
+msgid "The operation failed."
+msgstr "操作失败。"
+
+#: userland/apps/reliefsettings/window.cpp:605
+msgid "The previous display mode will be restored in %d seconds."
+msgstr "将在 %d 秒后恢复原显示模式。"
+
+#: userland/apps/reliefsettings/window.cpp:639
+msgid "The requested application exited with an error."
+msgstr "应用程序异常退出。"
+
+#: configs/nls/messages/reliefsettings.c:28
+msgid "The selected IANA time zone is not installed."
+msgstr "尚未安装所选的 IANA 时区。"
+
+#: configs/nls/messages/reliefsettings.c:29
+msgid "The settings changed in another program. Reload and try again."
+msgstr "其他程序已修改设置，请重新加载后再试。"
+
+#: configs/nls/messages/reliefsettings.c:30
+msgid "The settings worker exited unexpectedly."
+msgstr "设置工作进程异常退出。"
+
+#: userland/apps/reliefsettings/window.cpp:93
+msgid "Time zone changes apply system-wide. Administrator authentication is requested when needed."
+msgstr "时区设置对所有用户生效，修改时可能需要管理员验证。"
+
+#: userland/apps/reliefsettings/window.cpp:558
+msgid "Time zone updated. Storage synchronization failed."
+msgstr "时区已更新，但存储同步失败。"
+
+#: configs/nls/messages/reliefsettings.c:31
+msgid "Unsupported language."
+msgstr "不支持此语言。"
+
+#: userland/apps/reliefsettings/window.cpp:77
+msgid "User configuration directory"
+msgstr "用户配置目录"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "是"
+
+#: userland/apps/reliefsettings/window.cpp:80
+msgid "Your choice applies to this account. Other users keep their own language settings."
+msgstr "此选择仅对当前账户生效。其他用户使用各自的语言设置。"

@@ -1,0 +1,407 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:103
+msgid "After applying, choose Keep within 15 seconds. The previous mode is restored automatically if you do not confirm."
+msgstr ""
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:269
+msgid "All users"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:70
+msgid "Application language"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:656
+msgid "Application started."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:268
+msgid "Apply"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:116
+msgid "Apply a layout, then type in the test field. Chinese text input is provided by your input method."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:493
+msgid "Applying…"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:106
+msgid "Available modes are reported by the X server and graphics driver. Confirmed settings are restored at your next sign-in."
+msgstr ""
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:4
+msgid "Cannot create a temporary configuration file."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:5
+msgid "Cannot read the current keyboard layout."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:656
+msgid "Cannot start the application."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:493
+msgid "Cannot start the settings worker."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:370
+msgid "Cannot start xrandr."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:425
+msgid "Choose a time zone."
+msgstr ""
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:100
+msgid "Current mode"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:141
+msgid "Current user"
+msgstr ""
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:331
+msgid "Custom localtime file or UTC default"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:6
+msgid "Date and time"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:341
+msgid "Default"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:7
+msgid "Display"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:8
+msgid "Display information is too large."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:98
+msgid "Display output"
+msgstr ""
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:86
+msgid "Find a time zone"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:660
+msgid "Finish or cancel administrator authentication before closing."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:9
+msgid "HOME must be an absolute path."
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:133
+msgid "Inspect services, start or stop them and manage their startup runlevels."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:10
+msgid "Invalid configuration name or size."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:11
+msgid "Invalid configuration name."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:12
+msgid "Invalid desktop configuration. Correct the file before saving."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:13
+msgid "Invalid language configuration."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:14
+msgid "Invalid or oversized configuration file."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:15
+msgid "Invalid time zone."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:506
+msgid "Keep"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:498
+msgid "Keep these display settings?"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:16
+msgid "Keyboard"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:17
+msgid "Keyboard information is too large."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:111
+msgid "Keyboard layout"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:18
+msgid "Language"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:590
+msgid "Language saved. Sign out and sign in to use it."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:113
+msgid "Layout variant"
+msgstr ""
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:126
+msgid "Manage network adapters, automatic or static addressing, DNS and connection diagnostics."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:19
+msgid "Network"
+msgstr ""
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:20
+msgid "No XKB keyboard layouts are installed."
+msgstr ""
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:123
+msgid "Open Network Controller"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:131
+msgid "Open OpenRC Controller"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:21
+msgid "Out of memory."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:393
+msgid "Output is disabled"
+msgstr ""
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:588
+msgid "Previous display mode restored."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:142
+msgid "Reload"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:101
+msgid "Resolution and refresh rate"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:503
+msgid "Restore"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:525
+msgid "Restoring the previous display mode…"
+msgstr ""
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:524
+msgid "Saving display settings…"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:22
+msgid "Services"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:591
+msgid "Settings applied."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:585
+msgid "Settings applied. Storage synchronization failed."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:23
+msgid "Settings are being saved by another program. Try again."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:582
+msgid "Settings could not be applied."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:198
+msgid "Settings diagnostic"
+msgstr ""
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:71
+msgid "System default"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:119
+msgid "System default clears your saved override and takes effect at your next sign-in."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:84
+msgid "System time zone"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:567
+msgid "System time zone updated."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:114
+msgid "Test your keyboard here"
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:24
+msgid "The X server did not report any connected displays."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:26
+msgid "The command failed."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:27
+msgid "The command timed out."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:25
+msgid "The display mode changed. Reload and try again."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:76
+msgid "The language is used the next time you sign in. Save your work before signing out."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:564
+msgid "The operation failed."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:605
+msgid "The previous display mode will be restored in %d seconds."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:639
+msgid "The requested application exited with an error."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:28
+msgid "The selected IANA time zone is not installed."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:29
+msgid "The settings changed in another program. Reload and try again."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:30
+msgid "The settings worker exited unexpectedly."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:93
+msgid "Time zone changes apply system-wide. Administrator authentication is requested when needed."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:558
+msgid "Time zone updated. Storage synchronization failed."
+msgstr ""
+
+#: configs/nls/messages/reliefsettings.c:31
+msgid "Unsupported language."
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:77
+msgid "User configuration directory"
+msgstr ""
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr ""
+
+#: userland/apps/reliefsettings/window.cpp:80
+msgid "Your choice applies to this account. Other users keep their own language settings."
+msgstr ""

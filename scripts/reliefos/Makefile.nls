@@ -15,6 +15,7 @@ NLS_MO := $(foreach lang,$(RELIEFOS_NLS_LANGS),\
 NLS_MUSL_MO := $(addsuffix .UTF-8,$(addprefix $(O_GENERATED)/musl-locales/,$(RELIEFOS_NLS_LANGS)))
 # Shared implementations follow the same consumers as their app Kbuilds.
 RELIEFOS_NLS_SHARED_installer := userland/apps/reliefapk/process.cpp
+RELIEFOS_NLS_SHARED_reliefsettings := userland/apps/reliefapk/process.cpp
 RELIEFOS_NLS_SHARED_reliefdiagram := userland/apps/relieftodo/file_io.cpp
 RELIEFOS_NLS_SHARED_reliefmathpp := userland/apps/relieftodo/file_io.cpp
 RELIEFOS_NLS_SHARED_reliefmail := userland/apps/reliefword/layout.cpp userland/apps/reliefword/model.cpp
