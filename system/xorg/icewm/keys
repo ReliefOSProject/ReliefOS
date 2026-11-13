@@ -2,3 +2,4 @@
 # preferences (KeySys*/KeyWin*), so only program launchers appear here.
 key "Super+Return" sh /etc/reliefos/icewm/terminal.sh
 key "Super+Shift+s" /usr/bin/reliefcapture --select
+key "Super+v" /usr/bin/reliefclipboard --show

@@ -434,6 +434,13 @@ def icon_extra(c, name):
             fill(c, x, 12-height, 1, height, BLUE)
         for x in range(5):
             fill(c, 9+x, 4+x//2, 1, 7-x, GREEN)
+    elif name == "reliefclipboard":
+        fill(c, 3, 2, 10, 13, BLUE)
+        rect(c, 3, 2, 10, 13, DARK)
+        fill(c, 4, 4, 8, 10, WHITE)
+        fill(c, 6, 1, 4, 4, MID)
+        for y in (7, 10, 12):
+            fill(c, 6, y, 5, 1, BLUE)
     elif name == "reliefcapture":
         fill(c, 1, 2, 13, 10, WHITE); rect(c, 1, 2, 13, 10, DARK)
         fill(c, 2, 3, 11, 2, BLUE)

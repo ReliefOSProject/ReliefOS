@@ -2,13 +2,9 @@
 #include "filesystem.h"
 #include <errno.h>
 
-#define FILEMAN_CLIPBOARD_MAX FILEMAN_MAX_ENTRIES
 #define FILEMAN_COPY_BUFFER_SIZE 1024U
 #define FILEMAN_COPY_MAX_DEPTH 16U
 
-static char clipboard_paths[FILEMAN_CLIPBOARD_MAX][RELIEFOS_FS_PATH_LEN];
-static uint32_t clipboard_count;
-static uint8_t clipboard_cut;
 
 static void operation_set(uint32_t percent, const char *text)
 {
@@ -229,55 +225,34 @@ static uint64_t path_bytes(const char *path)
     return st.size;
 }
 
-int fileman_clipboard_available(void)
-{
-    return clipboard_count != 0;
-}
-
-void copy_selected_entries(uint8_t cut)
-{
-    uint32_t count = 0;
-    for (uint32_t i = 0; i < entry_count && i < FILEMAN_CLIPBOARD_MAX; ++i) {
-        if (fileman_entry_marked(i) ||
-            (!fileman_selected_count() && i == (uint32_t)(file_list.selected < 0 ? entry_count : file_list.selected))) {
-            if (fileman_entry_is_device(i)) {
-                continue;
-            }
-            build_child_path(clipboard_paths[count], sizeof(clipboard_paths[count]),
-                             entries[i].name);
-            ++count;
-        }
-    }
-    clipboard_count = count;
-    clipboard_cut = cut;
-    set_status(count ? (cut ? T("Items cut. Open a folder and paste.")
-                            : T("Items copied. Open a folder and paste."))
-                     : T("Select an item"));
-}
-
-void paste_clipboard(void)
+void fileman_paste_paths(const char *const *paths, uint32_t count, uint8_t cut, uint8_t *moved)
 {
     uint64_t total = 0;
     uint64_t done = 0;
     uint32_t completed = 0;
     uint32_t failed = 0;
-    uint8_t was_cut = clipboard_cut;
-    if (!clipboard_count) {
+    uint8_t was_cut = cut;
+    if (!count) {
         set_status(T("Clipboard is empty"));
         return;
     }
-    for (uint32_t i = 0; i < clipboard_count; ++i) {
-        total += path_bytes(clipboard_paths[i]);
+    for (uint32_t i = 0; i < count; ++i) {
+        total += path_bytes(paths[i]);
     }
     operation_set(0, was_cut ? T("Moving files...")
                              : T("Copying files..."));
-    for (uint32_t i = 0; i < clipboard_count; ++i) {
+    for (uint32_t i = 0; i < count; ++i) {
         char target[RELIEFOS_FS_PATH_LEN];
         char source_parent[RELIEFOS_FS_PATH_LEN];
-        const char *name = path_basename(clipboard_paths[i]);
+        struct stat source;
+        if (stat(paths[i], &source) < 0 || (!S_ISREG(source.st_mode) && !S_ISDIR(source.st_mode))) {
+            ++failed;
+            continue;
+        }
+        const char *name = path_basename(paths[i]);
         int conflict;
         int ret;
-        parent_path_of(source_parent, sizeof(source_parent), clipboard_paths[i]);
+        parent_path_of(source_parent, sizeof(source_parent), paths[i]);
         if (text_eq(source_parent, current_path)) {
             if (was_cut || choose_free_target_path(current_path, name, target,
                                                    sizeof(target)) != 0) {
@@ -286,7 +261,7 @@ void paste_clipboard(void)
             }
             conflict = 0;
         } else {
-            if (path_is_same_or_child(clipboard_paths[i], current_path)) {
+            if (path_is_same_or_child(paths[i], current_path)) {
                 ++failed;
                 continue;
             }
@@ -304,31 +279,28 @@ void paste_clipboard(void)
             }
         }
         if (was_cut) {
-            ret = rename(clipboard_paths[i], target);
+            ret = rename(paths[i], target);
             if (ret == 0) {
                 done += path_bytes(target);
             } else {
-                ret = copy_tree(clipboard_paths[i], target, total, &done, 0, 100, 0);
+                ret = copy_tree(paths[i], target, total, &done, 0, 100, 0);
                 if (ret == 0) {
-                    ret = fileman_remove_tree(clipboard_paths[i]);
+                    ret = fileman_remove_tree(paths[i]);
                 }
             }
         } else {
-            ret = copy_tree(clipboard_paths[i], target, total, &done, 0, 100, 0);
+            ret = copy_tree(paths[i], target, total, &done, 0, 100, 0);
         }
         if (ret < 0) {
             ++failed;
         } else {
             ++completed;
+            if (moved) moved[i] = 1;
         }
         operation_set(total ? (uint32_t)((done * 100ULL) / total)
-                            : ((i + 1U) * 100U) / clipboard_count,
+                            : ((i + 1U) * 100U) / count,
                       was_cut ? T("Moving files...")
                               : T("Copying files..."));
-    }
-    if (was_cut && !failed) {
-        clipboard_count = 0;
-        clipboard_cut = 0;
     }
     reload_dir();
     selected_mask = 0;

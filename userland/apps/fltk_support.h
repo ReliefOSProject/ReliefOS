@@ -11,6 +11,7 @@
 #include <locale.h>
 #include <reliefos/layout.h>
 #include "fltk_icons.h"
+#include "fltk_clipboard.h"
 
 #ifndef T
 #define T(text) gettext(text)
@@ -43,6 +44,7 @@ inline void translate_dialogs()
 
 inline void init(const char *app)
 {
+    initialize_clipboard_handoff();
     setlocale(LC_ALL, "");
     bindtextdomain(app, RELIEFOS_LAYOUT_LOCALE);
     bind_textdomain_codeset(app, "UTF-8");

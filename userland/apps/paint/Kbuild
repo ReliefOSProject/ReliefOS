@@ -1,8 +1,12 @@
 RELIEFOS_APP_NAME := paint
-RELIEFOS_APP_OBJECTS := main.o model.o
+RELIEFOS_APP_OBJECTS := main.o model.o clipboard.o clipboard_data.o clipboard_selection.o
 RELIEFOS_APP_C_OBJECTS := model.o
-RELIEFOS_APP_CXX_OBJECTS := main.o
+RELIEFOS_APP_CXX_OBJECTS := main.o clipboard.o clipboard_data.o clipboard_selection.o
 RELIEFOS_APP_ASM_OBJECTS :=
 ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
 include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+$(obj)/clipboard_data.o: $(srctree)/userland/apps/clipboard/data.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/clipboard_selection.o: $(srctree)/userland/apps/clipboard/selection.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
 endif

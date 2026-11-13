@@ -41,6 +41,12 @@ $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_DEPS_$(app) += $(X11_DEVELOP
 
 USERLAND_LIBS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
 USERLAND_DEPS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
+USERLAND_LIBS_reliefclipboard += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
+USERLAND_DEPS_reliefclipboard += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
+USERLAND_LIBS_fileman += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
+USERLAND_DEPS_fileman += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
+USERLAND_LIBS_paint += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
+USERLAND_DEPS_paint += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
 USERLAND_LIBS_reliefsettings += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
 USERLAND_DEPS_reliefsettings += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
 USERLAND_LIBS_reliefmail += $(RUNTIME_DEP_LIBDIR)/libsqlite3.so

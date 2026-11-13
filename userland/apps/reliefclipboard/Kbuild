@@ -1,0 +1,18 @@
+RELIEFOS_APP_NAME := reliefclipboard
+RELIEFOS_APP_OBJECTS := main.o tray.o image.o clipboard_data.o clipboard_history.o clipboard_selection.o clipboard_manager.o shared_paint_model.o
+RELIEFOS_APP_C_OBJECTS := shared_paint_model.o
+RELIEFOS_APP_CXX_OBJECTS := main.o tray.o image.o clipboard_data.o clipboard_history.o clipboard_selection.o clipboard_manager.o
+RELIEFOS_APP_ASM_OBJECTS :=
+ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
+include $(srctree)/scripts/reliefos/Makefile.app-kbuild
+$(obj)/clipboard_data.o: $(srctree)/userland/apps/clipboard/data.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/clipboard_history.o: $(srctree)/userland/apps/clipboard/history.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/clipboard_selection.o: $(srctree)/userland/apps/clipboard/selection.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/clipboard_manager.o: $(srctree)/userland/apps/clipboard/manager.cpp FORCE
+	$(call if_changed_dep,cxx_o_cpp)
+$(obj)/shared_paint_model.o: $(srctree)/userland/apps/paint/model.c FORCE
+	$(call if_changed_dep,cc_o_c)
+endif
