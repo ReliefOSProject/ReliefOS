@@ -62,6 +62,12 @@
       "paths": ["usr/bin/reliefsettings", "usr/share/applications/reliefos-reliefsettings.desktop"],
       "reason": "ReliefSettings GUI, session preferences helper, timezone helper, launcher, desktop entry and component artwork are installed and removed together."
     },
+    "reliefos-reliefclipboard": {
+      "destination": "reliefos",
+      "components": ["reliefclipboard"],
+      "paths": ["usr/bin/reliefclipboard", "usr/share/applications/reliefos-reliefclipboard.desktop"],
+      "reason": "Clipboard manager, history UI, launcher, desktop entry and artwork are installed together."
+    },
     "reliefos-reliefcapture": {
       "destination": "reliefos",
       "components": ["reliefcapture"],

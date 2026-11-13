@@ -1,0 +1,175 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/fltk_support.h:29
+msgid "Add to Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:30
+msgid "All Files (*)"
+msgstr ""
+
+#: userland/apps/fltk_support.h:25
+msgid "Cancel"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:66
+msgid "Clear"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:67
+msgid "Clear clipboard history and the current clipboard?"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:107
+msgid "Clear history"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:74
+msgid "Clipboard"
+msgstr ""
+
+#: userland/apps/fltk_support.h:26
+msgid "Close"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:97
+msgid "Copied. Paste into another application."
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:92
+msgid "Copy to clipboard"
+msgstr ""
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:293
+msgid "Could not load clipboard history"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:213
+msgid "Could not save clipboard history"
+msgstr ""
+
+#: userland/apps/fltk_support.h:38
+msgid "Create a new directory"
+msgstr ""
+
+#: userland/apps/fltk_support.h:31
+msgid "Custom Filter"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:188
+msgid "Empty text"
+msgstr ""
+
+#: userland/apps/fltk_support.h:33
+msgid "Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:35
+msgid "File Systems"
+msgstr ""
+
+#: userland/apps/fltk_support.h:34
+msgid "File name:"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:166
+msgid "History"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:235
+msgid "History saved"
+msgstr ""
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:115
+msgid "Keep history after logout"
+msgstr ""
+
+#: userland/apps/fltk_support.h:36
+msgid "Manage Favorites"
+msgstr ""
+
+#: userland/apps/fltk_support.h:37
+msgid "New Directory?"
+msgstr ""
+
+#: userland/apps/fltk_support.h:28
+msgid "No"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:192
+msgid "No clipboard history"
+msgstr ""
+
+#: userland/apps/fltk_support.h:24
+msgid "OK"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:109
+msgid "Pause recording"
+msgstr ""
+
+#: userland/apps/fltk_support.h:32
+msgid "Please choose an existing file!"
+msgstr ""
+
+#: userland/apps/fltk_support.h:39
+msgid "Preview"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:305
+msgid "Quit"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:113
+msgid "Recording paused"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:113
+msgid "Recording resumed"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:101
+msgid "Remove"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:303
+msgid "Resume recording"
+msgstr ""
+
+#: userland/apps/fltk_support.h:40
+msgid "Save"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:70
+msgid "Saving history..."
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:78
+msgid "Search"
+msgstr ""
+
+#: userland/apps/reliefclipboard/main.cpp:302
+msgid "Show clipboard"
+msgstr ""
+
+#: userland/apps/fltk_support.h:42
+msgid "Show hidden files"
+msgstr ""
+
+#: userland/apps/fltk_support.h:41
+msgid "Show:"
+msgstr ""
+
+#: userland/apps/fltk_support.h:27
+msgid "Yes"
+msgstr ""

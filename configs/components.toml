@@ -527,6 +527,19 @@ api = false
 open_with = false
 
 [[components]]
+id = "reliefclipboard"
+symbol = "APP_RELIEFCLIPBOARD"
+label = "ReliefClipboard"
+category = "Desktop applications"
+kind = "program-app"
+default = true
+required = false
+stage = true
+entry = true
+sdk = false
+api = false
+
+[[components]]
 id = "reliefplayer"
 symbol = "APP_RELIEFPLAYER"
 label = "ReliefPlayer"

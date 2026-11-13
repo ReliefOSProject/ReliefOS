@@ -6,6 +6,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Scroll.H>
+#include "clipboard.h"
 #include <limits.h>
 #include <stdio.h>
 extern "C" {
@@ -24,6 +25,7 @@ static Fl_Widget *canvas;
 static Fl_Scroll *scroll;
 static Fl_Double_Window *window;
 static Fl_Button *colors[6];
+static ImageClipboard *image_clipboard;
 static const unsigned palette[] = {0, 0xff0000, 0x0080ff, 0x00aa00, 0xffff00, 0xffffff};
 
 static void title()
@@ -143,6 +145,7 @@ public:
         else paint_draw_line(pixels, image_width, image_height, last_x_, last_y_, px, py, brush_color, brush_size, tool);
         last_x_ = px; last_y_ = py; dirty = true; redraw(); title(); return 1;
     }
+
 };
 
 int main(int argc, char **argv)
@@ -167,6 +170,23 @@ int main(int argc, char **argv)
             }
         }, reinterpret_cast<void *>(static_cast<intptr_t>(i)));
     }
+    Fl_Button *copy_button = new Fl_Button(500, 12, 114, 34, T("Copy"));
+    copy_button->shortcut(FL_CTRL + 'c');
+    copy_button->callback([](Fl_Widget *, void *) {
+        if (!pixels) return;
+        size_t count = size_t(image_width) * image_height;
+        unsigned char *rgb = static_cast<unsigned char *>(malloc(count * 3));
+        if (!rgb) return;
+        for (size_t i = 0; i < count; ++i) {
+            rgb[i * 3] = pixels[i] >> 16; rgb[i * 3 + 1] = pixels[i] >> 8; rgb[i * 3 + 2] = pixels[i];
+        }
+        Fl::copy_image(rgb, image_width, image_height, 1);
+        free(rgb);
+        status->copy_label(T("Image copied"));
+    });
+    Fl_Button *paste_button = new Fl_Button(622, 12, 114, 34, T("Paste"));
+    paste_button->shortcut(FL_CTRL + 'v');
+    paste_button->callback([](Fl_Widget *, void *) { if (image_clipboard) image_clipboard->paste(); });
     Fl_Choice *tools = new Fl_Choice(12, 56, 168, 32);
     tools->add(T("Pencil")); tools->add(T("Brush")); tools->add(T("Eraser")); tools->value(1); tools->textsize(15);
     tools->callback([](Fl_Widget *widget, void *) { tool = static_cast<paint_tool>(static_cast<Fl_Choice *>(widget)->value()); });
@@ -185,7 +205,17 @@ int main(int argc, char **argv)
     scroll = new Fl_Scroll(12, 102, 916, 548); scroll->box(FL_DOWN_FRAME);
     canvas = new Canvas(14, 104); scroll->end();
     status = new Fl_Box(12, 660, 916, 28, T("Ready")); status->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    root.end(); root.resizable(scroll); root.size_range(600, 400); reliefos_fltk::style(&root);
+    root.end(); root.resizable(scroll); root.size_range(760, 400); reliefos_fltk::style(&root);
+    ImageClipboard clipboard;
+    image_clipboard = &clipboard;
+    clipboard.accepted = [](uint32_t *next, unsigned width, unsigned height) {
+        if (!discard()) { free(next); return; }
+        free(pixels); pixels = next; image_width = width; image_height = height;
+        current_path[0] = 0; dirty = true; scroll->scroll_to(0, 0); refresh();
+        status->copy_label(T("Image pasted"));
+    };
+    clipboard.failed = []() { status->copy_label(T("Clipboard image is too large or unavailable")); };
+    (void)clipboard.initialize();
     if (!new_canvas()) return 1;
     if (argc > 1) load(argv[1]);
     root.show(); puts("[paint.elf] FLTK paint ready");

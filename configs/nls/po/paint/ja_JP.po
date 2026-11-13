@@ -10,27 +10,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: userland/apps/fltk_support.h:48
+#: userland/apps/fltk_support.h:29
 msgid "Add to Favorites"
 msgstr "お気に入りに追加"
 
-#: userland/apps/fltk_support.h:49
+#: userland/apps/fltk_support.h:30
 msgid "All Files (*)"
 msgstr "すべてのファイル (*)"
 
-#: userland/apps/paint/main.cpp:171
+#: userland/apps/paint/main.cpp:191
 msgid "Brush"
 msgstr "ブラシ"
 
-#: userland/apps/fltk_support.h:44
+#: userland/apps/fltk_support.h:25
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: userland/apps/fltk_support.h:45
+#: userland/apps/paint/main.cpp:217
+msgid "Clipboard image is too large or unavailable"
+msgstr "クリップボードの画像が大きすぎるか利用できません"
+
+#: userland/apps/fltk_support.h:26
 msgid "Close"
 msgstr "閉じる"
 
-#: userland/apps/paint/main.cpp:42
+#: userland/apps/paint/main.cpp:173
+msgid "Copy"
+msgstr "コピー"
+
+#: userland/apps/paint/main.cpp:44
 msgid "Could not create canvas"
 msgstr "キャンバスを作成できませんでした"
 
@@ -38,51 +46,59 @@ msgstr "キャンバスを作成できませんでした"
 msgid "Could not decode image"
 msgstr "画像をデコードできません"
 
-#: userland/apps/paint/main.cpp:69
+#: userland/apps/paint/main.cpp:71
 msgid "Could not open image"
 msgstr "画像を開けませんでした"
 
-#: userland/apps/paint/main.cpp:97
+#: userland/apps/paint/main.cpp:99
 msgid "Could not save image"
 msgstr "画像を保存できませんでした"
 
-#: userland/apps/fltk_support.h:57
+#: userland/apps/fltk_support.h:38
 msgid "Create a new directory"
 msgstr "新しいフォルダーを作成"
 
-#: userland/apps/fltk_support.h:50
+#: userland/apps/fltk_support.h:31
 msgid "Custom Filter"
 msgstr "カスタムフィルター"
 
-#: userland/apps/paint/main.cpp:51
+#: userland/apps/paint/main.cpp:53
 msgid "Discard"
 msgstr "破棄"
 
-#: userland/apps/paint/main.cpp:50
+#: userland/apps/paint/main.cpp:52
 msgid "Discard changes?"
 msgstr "変更を破棄しますか?"
 
-#: userland/apps/paint/main.cpp:171
+#: userland/apps/paint/main.cpp:191
 msgid "Eraser"
 msgstr "消しゴム"
 
-#: userland/apps/fltk_support.h:52
+#: userland/apps/fltk_support.h:33
 msgid "Favorites"
 msgstr "お気に入り"
 
-#: userland/apps/fltk_support.h:54
+#: userland/apps/fltk_support.h:35
 msgid "File Systems"
 msgstr "ファイルシステム"
 
-#: userland/apps/fltk_support.h:53
+#: userland/apps/fltk_support.h:34
 msgid "File name:"
 msgstr "ファイル名:"
 
-#: userland/apps/paint/main.cpp:73
+#: userland/apps/paint/main.cpp:185
+msgid "Image copied"
+msgstr "画像をコピーしました"
+
+#: userland/apps/paint/main.cpp:75
 msgid "Image opened"
 msgstr "画像を開きました"
 
-#: userland/apps/paint/main.cpp:99
+#: userland/apps/paint/main.cpp:215
+msgid "Image pasted"
+msgstr "画像を貼り付けました"
+
+#: userland/apps/paint/main.cpp:101
 msgid "Image saved"
 msgstr "画像を保存しました"
 
@@ -90,98 +106,102 @@ msgstr "画像を保存しました"
 msgid "Input is too long"
 msgstr "入力が長すぎます"
 
-#: userland/apps/paint/main.cpp:51
+#: userland/apps/paint/main.cpp:53
 msgid "Keep"
 msgstr "保持"
 
-#: userland/apps/fltk_support.h:55
+#: userland/apps/fltk_support.h:36
 msgid "Manage Favorites"
 msgstr "お気に入りの管理"
 
-#: userland/apps/paint/main.cpp:152
+#: userland/apps/paint/main.cpp:155
 msgid "New"
 msgstr "新規作成"
 
-#: userland/apps/fltk_support.h:56
+#: userland/apps/fltk_support.h:37
 msgid "New Directory?"
 msgstr "新しいフォルダーを作成しますか?"
 
-#: userland/apps/fltk_support.h:47
+#: userland/apps/fltk_support.h:28
 msgid "No"
 msgstr "いいえ"
 
-#: userland/apps/fltk_support.h:43
+#: userland/apps/fltk_support.h:24
 msgid "OK"
 msgstr "OK"
 
-#: userland/apps/paint/main.cpp:152
+#: userland/apps/paint/main.cpp:155
 msgid "Open"
 msgstr "開く"
 
-#: userland/apps/paint/main.cpp:162
+#: userland/apps/paint/main.cpp:165
 msgid "Open image"
 msgstr "画像を開く"
 
-#: userland/apps/paint/main.cpp:32
+#: userland/apps/paint/main.cpp:34
 msgid "Paint"
 msgstr "ペイント"
 
-#: userland/apps/paint/main.cpp:171
+#: userland/apps/paint/main.cpp:187
+msgid "Paste"
+msgstr "貼り付け"
+
+#: userland/apps/paint/main.cpp:191
 msgid "Pencil"
 msgstr "鉛筆"
 
-#: userland/apps/fltk_support.h:51
+#: userland/apps/fltk_support.h:32
 msgid "Please choose an existing file!"
 msgstr "既存のファイルを選択してください。"
 
-#: userland/apps/fltk_support.h:58
+#: userland/apps/fltk_support.h:39
 msgid "Preview"
 msgstr "プレビュー"
 
-#: userland/apps/paint/main.cpp:187
+#: userland/apps/paint/main.cpp:207
 msgid "Ready"
 msgstr "準備完了"
 
-#: userland/apps/paint/main.cpp:106
+#: userland/apps/paint/main.cpp:108
 msgid "Replace existing file?"
 msgstr "既存のファイルを置き換えますか?"
 
-#: userland/apps/fltk_support.h:59
+#: userland/apps/fltk_support.h:40
 msgid "Save"
 msgstr "保存"
 
-#: userland/apps/paint/main.cpp:152
+#: userland/apps/paint/main.cpp:155
 msgid "Save as"
 msgstr "名前を付けて保存"
 
-#: userland/apps/paint/main.cpp:113
+#: userland/apps/paint/main.cpp:115
 msgid "Save changes?"
 msgstr "変更を保存しますか?"
 
-#: userland/apps/paint/main.cpp:104
+#: userland/apps/paint/main.cpp:106
 msgid "Save image"
 msgstr "画像を保存"
 
-#: userland/apps/paint/main.cpp:114
+#: userland/apps/paint/main.cpp:116
 msgid "Save the current drawing before closing?"
 msgstr "閉じる前に現在の描画内容を保存しますか?"
 
-#: userland/apps/fltk_support.h:61
+#: userland/apps/fltk_support.h:42
 msgid "Show hidden files"
 msgstr "隠しファイルを表示"
 
-#: userland/apps/fltk_support.h:60
+#: userland/apps/fltk_support.h:41
 msgid "Show:"
 msgstr "表示:"
 
-#: userland/apps/paint/main.cpp:51
+#: userland/apps/paint/main.cpp:53
 msgid "The current drawing has not been saved."
 msgstr "現在の描画内容は保存されていません。"
 
-#: userland/apps/paint/main.cpp:32
+#: userland/apps/paint/main.cpp:34
 msgid "Untitled"
 msgstr "無題"
 
-#: userland/apps/fltk_support.h:46
+#: userland/apps/fltk_support.h:27
 msgid "Yes"
 msgstr "はい"

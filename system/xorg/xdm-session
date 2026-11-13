@@ -80,11 +80,12 @@ event 'PAM authentication accepted'
 
 icewm_pid=
 st_pid=
+clipboard_pid=
 cleanup() {
-    for pid in $st_pid $icewm_pid; do
+    for pid in $st_pid $icewm_pid $clipboard_pid; do
         kill "$pid" 2>/dev/null || :
     done
-    for pid in $st_pid $icewm_pid; do
+    for pid in $st_pid $icewm_pid $clipboard_pid; do
         wait "$pid" 2>/dev/null || :
     done
 }
@@ -117,6 +118,13 @@ fi
 start_child icewm /usr/bin/icewm-session || exit 1
 icewm_pid=$child_pid
 event "icewm started for uid=$uid"
+
+if test -x /usr/bin/reliefclipboard; then
+    if start_child reliefclipboard /usr/bin/reliefclipboard --daemon; then
+        clipboard_pid=$child_pid
+        event 'clipboard manager started'
+    fi
+fi
 
 # IceWM keeps the display service priority inherited from XDM.  Shells and
 # their build jobs use the normal nice value, including for a root login.

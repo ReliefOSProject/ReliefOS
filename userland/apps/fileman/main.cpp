@@ -1280,9 +1280,9 @@ void build_ui(int argc, char **argv)
     add_menu_action(T("File"), T("Rename"), FILEMAN_ACTION_RENAME);
     add_menu_action(T("File"), T("New Folder"), FILEMAN_ACTION_NEW_FOLDER);
     add_menu_action(T("File"), T("Delete"), FILEMAN_ACTION_DELETE);
-    add_menu_action(T("Edit"), T("Copy"), FILEMAN_ACTION_COPY);
-    add_menu_action(T("Edit"), T("Cut"), FILEMAN_ACTION_CUT);
-    add_menu_action(T("Edit"), T("Paste"), FILEMAN_ACTION_PASTE);
+    add_menu_action(T("Edit"), T("Copy"), FILEMAN_ACTION_COPY, 0, FL_CTRL + 'c');
+    add_menu_action(T("Edit"), T("Cut"), FILEMAN_ACTION_CUT, 0, FL_CTRL + 'x');
+    add_menu_action(T("Edit"), T("Paste"), FILEMAN_ACTION_PASTE, 0, FL_CTRL + 'v');
     add_menu_action(T("Edit"), T("Search Files..."), ACTION_SEARCH, 0, FL_CTRL + 'f');
     add_menu_action(T("Edit"), T("Mark for Batch"), FILEMAN_ACTION_TOGGLE_MARK, 1);
     add_menu_action(T("Edit"), T("Mark All"), FILEMAN_ACTION_SELECT_ALL);
@@ -1423,11 +1423,22 @@ extern "C" void fileman_refresh_view(void)
     if (main_window) Fl::flush();
 }
 
+extern "C" int fileman_clipboard_ready(void)
+{
+    return volume_ready();
+}
+
+extern "C" void fileman_clipboard_refresh(void)
+{
+    refresh_ui();
+}
+
 int main(int argc, char **argv)
 {
     int command = fm::volume_command(argc, argv);
     if (command >= 0) return command;
     reliefos_fltk::init("fileman");
+    (void)fileman_clipboard_initialize();
     int watch_result = fileman_watch_open(&directory_watch);
     if (watch_result < 0)
         fprintf(stderr, "[fileman.elf] automatic refresh unavailable (%d)\n", -watch_result);
@@ -1450,6 +1461,7 @@ int main(int argc, char **argv)
     puts("[fileman.elf] FLTK file manager ready");
     fflush(stdout);
     int result = Fl::run();
+    fileman_clipboard_shutdown();
     volume_panel->stop();
     if (watch_timer) Fl::remove_timeout(watch_timeout);
     stop_directory_watch();
