@@ -1,0 +1,51 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/motd/main.c:138
+msgid "%lud %luh"
+msgstr ""
+
+#: userland/apps/motd/main.c:140
+msgid "%luh %lum"
+msgstr ""
+
+#: userland/apps/motd/main.c:141
+msgid "%lum %lus"
+msgstr ""
+
+#: userland/apps/motd/format.c:55
+msgid "Address"
+msgstr ""
+
+#: userland/apps/motd/format.c:55
+msgid "Load"
+msgstr ""
+
+#: userland/apps/motd/format.c:55
+msgid "Memory"
+msgstr ""
+
+#: userland/apps/motd/main.c:114
+msgid "N/A"
+msgstr ""
+
+#: userland/apps/motd/main.c:97
+msgid "Not connected"
+msgstr ""
+
+#: userland/apps/motd/format.c:55
+msgid "Root"
+msgstr ""
+
+#: userland/apps/motd/format.c:61
+msgid "System information as of %s"
+msgstr ""
+
+#: userland/apps/motd/format.c:55
+msgid "Uptime"
+msgstr ""
+
+#: userland/apps/motd/format.c:59
+msgid "Welcome to %s (%s)"
+msgstr ""

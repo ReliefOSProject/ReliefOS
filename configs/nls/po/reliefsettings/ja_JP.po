@@ -1,0 +1,415 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/reliefsettings/window.cpp:103
+msgid "After applying, choose Keep within 15 seconds. The previous mode is restored automatically if you do not confirm."
+msgstr "適用後、15 秒以内に「保持」を選択してください。確認しない場合は以前のモードに自動的に戻ります。"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/reliefsettings/window.cpp:269
+msgid "All users"
+msgstr "すべてのユーザー"
+
+#: userland/apps/reliefsettings/window.cpp:70
+msgid "Application language"
+msgstr "アプリケーションの言語"
+
+#: userland/apps/reliefsettings/window.cpp:656
+msgid "Application started."
+msgstr "アプリケーションを起動しました。"
+
+#: userland/apps/reliefsettings/window.cpp:268
+msgid "Apply"
+msgstr "適用"
+
+#: userland/apps/reliefsettings/window.cpp:116
+msgid "Apply a layout, then type in the test field. Chinese text input is provided by your input method."
+msgstr "レイアウトを適用してから、テスト欄に入力してください。中国語の入力は入力メソッドが提供します。"
+
+#: userland/apps/reliefsettings/window.cpp:493
+msgid "Applying…"
+msgstr "適用中…"
+
+#: userland/apps/reliefsettings/window.cpp:106
+msgid "Available modes are reported by the X server and graphics driver. Confirmed settings are restored at your next sign-in."
+msgstr "利用可能なモードは X サーバーとグラフィックスドライバーが提供します。確認済みの設定は次回のサインイン時に復元されます。"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: configs/nls/messages/reliefsettings.c:4
+msgid "Cannot create a temporary configuration file."
+msgstr "一時設定ファイルを作成できません。"
+
+#: configs/nls/messages/reliefsettings.c:5
+msgid "Cannot read the current keyboard layout."
+msgstr "現在のキーボードレイアウトを読み取れません。"
+
+#: userland/apps/reliefsettings/window.cpp:656
+msgid "Cannot start the application."
+msgstr "アプリケーションを起動できません。"
+
+#: userland/apps/reliefsettings/window.cpp:493
+msgid "Cannot start the settings worker."
+msgstr "設定用のワーカープロセスを起動できません。"
+
+#: userland/apps/reliefsettings/window.cpp:370
+msgid "Cannot start xrandr."
+msgstr "xrandr を起動できません。"
+
+#: userland/apps/reliefsettings/window.cpp:425
+msgid "Choose a time zone."
+msgstr "タイムゾーンを選択してください。"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/reliefsettings/window.cpp:100
+msgid "Current mode"
+msgstr "現在のモード"
+
+#: userland/apps/reliefsettings/window.cpp:141
+msgid "Current user"
+msgstr "現在のユーザー"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/reliefsettings/window.cpp:331
+msgid "Custom localtime file or UTC default"
+msgstr "カスタム localtime ファイル、または既定の UTC"
+
+#: configs/nls/messages/reliefsettings.c:6
+msgid "Date and time"
+msgstr "日付と時刻"
+
+#: userland/apps/reliefsettings/window.cpp:341
+msgid "Default"
+msgstr "既定"
+
+#: configs/nls/messages/reliefsettings.c:7
+msgid "Display"
+msgstr "ディスプレイ"
+
+#: configs/nls/messages/reliefsettings.c:8
+msgid "Display information is too large."
+msgstr "ディスプレイ情報が大きすぎます。"
+
+#: userland/apps/reliefsettings/window.cpp:98
+msgid "Display output"
+msgstr "ディスプレイ出力"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/reliefsettings/window.cpp:86
+msgid "Find a time zone"
+msgstr "タイムゾーンを検索"
+
+#: userland/apps/reliefsettings/window.cpp:660
+msgid "Finish or cancel administrator authentication before closing."
+msgstr "閉じる前に管理者認証を完了するか、キャンセルしてください。"
+
+#: configs/nls/messages/reliefsettings.c:9
+msgid "HOME must be an absolute path."
+msgstr "HOME は絶対パスである必要があります。"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/reliefsettings/window.cpp:133
+msgid "Inspect services, start or stop them and manage their startup runlevels."
+msgstr "サービスの確認、開始、停止、および自動起動のランレベルの管理ができます。"
+
+#: configs/nls/messages/reliefsettings.c:10
+msgid "Invalid configuration name or size."
+msgstr "設定の名前またはサイズが無効です。"
+
+#: configs/nls/messages/reliefsettings.c:11
+msgid "Invalid configuration name."
+msgstr "設定の名前が無効です。"
+
+#: configs/nls/messages/reliefsettings.c:12
+msgid "Invalid desktop configuration. Correct the file before saving."
+msgstr "デスクトップの設定が無効です。保存する前にファイルを修正してください。"
+
+#: configs/nls/messages/reliefsettings.c:13
+msgid "Invalid language configuration."
+msgstr "言語の設定が無効です。"
+
+#: configs/nls/messages/reliefsettings.c:14
+msgid "Invalid or oversized configuration file."
+msgstr "設定ファイルが無効か、大きすぎます。"
+
+#: configs/nls/messages/reliefsettings.c:15
+msgid "Invalid time zone."
+msgstr "無効なタイムゾーンです。"
+
+#: userland/apps/reliefsettings/window.cpp:506
+msgid "Keep"
+msgstr "保持"
+
+#: userland/apps/reliefsettings/window.cpp:498
+msgid "Keep these display settings?"
+msgstr "このディスプレイ設定を保持しますか?"
+
+#: configs/nls/messages/reliefsettings.c:16
+msgid "Keyboard"
+msgstr "キーボード"
+
+#: configs/nls/messages/reliefsettings.c:17
+msgid "Keyboard information is too large."
+msgstr "キーボード情報が大きすぎます。"
+
+#: userland/apps/reliefsettings/window.cpp:111
+msgid "Keyboard layout"
+msgstr "キーボードレイアウト"
+
+#: configs/nls/messages/reliefsettings.c:18
+msgid "Language"
+msgstr "言語"
+
+#: userland/apps/reliefsettings/window.cpp:590
+msgid "Language saved. Sign out and sign in to use it."
+msgstr "保存しました。再ログインで反映されます。"
+
+#: userland/apps/reliefsettings/window.cpp:113
+msgid "Layout variant"
+msgstr "レイアウトのバリエーション"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/reliefsettings/window.cpp:126
+msgid "Manage network adapters, automatic or static addressing, DNS and connection diagnostics."
+msgstr "ネットワークアダプター、自動または固定アドレス、DNS、接続診断を管理します。"
+
+#: configs/nls/messages/reliefsettings.c:19
+msgid "Network"
+msgstr "ネットワーク"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: configs/nls/messages/reliefsettings.c:20
+msgid "No XKB keyboard layouts are installed."
+msgstr "XKB キーボードレイアウトがインストールされていません。"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/reliefsettings/window.cpp:123
+msgid "Open Network Controller"
+msgstr "ネットワークコントローラーを開く"
+
+#: userland/apps/reliefsettings/window.cpp:131
+msgid "Open OpenRC Controller"
+msgstr "OpenRC コントローラーを開く"
+
+#: configs/nls/messages/reliefsettings.c:21
+msgid "Out of memory."
+msgstr "メモリが不足しています。"
+
+#: userland/apps/reliefsettings/window.cpp:393
+msgid "Output is disabled"
+msgstr "出力は無効です"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/reliefsettings/window.cpp:588
+msgid "Previous display mode restored."
+msgstr "以前のディスプレイモードに戻しました。"
+
+#: userland/apps/reliefsettings/window.cpp:142
+msgid "Reload"
+msgstr "再読み込み"
+
+#: userland/apps/reliefsettings/window.cpp:101
+msgid "Resolution and refresh rate"
+msgstr "解像度とリフレッシュレート"
+
+#: userland/apps/reliefsettings/window.cpp:503
+msgid "Restore"
+msgstr "元に戻す"
+
+#: userland/apps/reliefsettings/window.cpp:525
+msgid "Restoring the previous display mode…"
+msgstr "以前のディスプレイモードに戻しています…"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/reliefsettings/window.cpp:524
+msgid "Saving display settings…"
+msgstr "ディスプレイ設定を保存中…"
+
+#: configs/nls/messages/reliefsettings.c:22
+msgid "Services"
+msgstr "サービス"
+
+#: userland/apps/reliefsettings/window.cpp:591
+msgid "Settings applied."
+msgstr "設定を適用しました。"
+
+#: userland/apps/reliefsettings/window.cpp:585
+msgid "Settings applied. Storage synchronization failed."
+msgstr "設定を適用しました。ストレージの同期に失敗しました。"
+
+#: configs/nls/messages/reliefsettings.c:23
+msgid "Settings are being saved by another program. Try again."
+msgstr "別のプログラムが設定を保存中です。もう一度お試しください。"
+
+#: userland/apps/reliefsettings/window.cpp:582
+msgid "Settings could not be applied."
+msgstr "設定を適用できませんでした。"
+
+#: userland/apps/reliefsettings/window.cpp:198
+msgid "Settings diagnostic"
+msgstr "設定の診断情報"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/reliefsettings/window.cpp:71
+msgid "System default"
+msgstr "システムの既定値"
+
+#: userland/apps/reliefsettings/window.cpp:119
+msgid "System default clears your saved override and takes effect at your next sign-in."
+msgstr "「システムの既定値」は保存した個人設定を解除します。次回のサインイン時に反映されます。"
+
+#: userland/apps/reliefsettings/window.cpp:84
+msgid "System time zone"
+msgstr "システムのタイムゾーン"
+
+#: userland/apps/reliefsettings/window.cpp:567
+msgid "System time zone updated."
+msgstr "システムのタイムゾーンを更新しました。"
+
+#: userland/apps/reliefsettings/window.cpp:114
+msgid "Test your keyboard here"
+msgstr "ここでキーボードをテストしてください"
+
+#: configs/nls/messages/reliefsettings.c:24
+msgid "The X server did not report any connected displays."
+msgstr "接続されたディスプレイの情報を X サーバーから取得できませんでした。"
+
+#: configs/nls/messages/reliefsettings.c:26
+msgid "The command failed."
+msgstr "コマンドに失敗しました。"
+
+#: configs/nls/messages/reliefsettings.c:27
+msgid "The command timed out."
+msgstr "コマンドがタイムアウトしました。"
+
+#: configs/nls/messages/reliefsettings.c:25
+msgid "The display mode changed. Reload and try again."
+msgstr "ディスプレイモードが変更されました。再読み込みしてからお試しください。"
+
+#: userland/apps/reliefsettings/window.cpp:76
+msgid "The language is used the next time you sign in. Save your work before signing out."
+msgstr "言語は次回のサインイン時に反映されます。サインアウトする前に作業を保存してください。"
+
+#: userland/apps/reliefsettings/window.cpp:564
+msgid "The operation failed."
+msgstr "操作に失敗しました。"
+
+#: userland/apps/reliefsettings/window.cpp:605
+msgid "The previous display mode will be restored in %d seconds."
+msgstr "%d 秒後に以前のディスプレイモードに戻ります。"
+
+#: userland/apps/reliefsettings/window.cpp:639
+msgid "The requested application exited with an error."
+msgstr "指定したアプリケーションがエラーで終了しました。"
+
+#: configs/nls/messages/reliefsettings.c:28
+msgid "The selected IANA time zone is not installed."
+msgstr "選択した IANA タイムゾーンはインストールされていません。"
+
+#: configs/nls/messages/reliefsettings.c:29
+msgid "The settings changed in another program. Reload and try again."
+msgstr "別のプログラムで設定が変更されました。再読み込みしてからお試しください。"
+
+#: configs/nls/messages/reliefsettings.c:30
+msgid "The settings worker exited unexpectedly."
+msgstr "設定用のワーカープロセスが予期せず終了しました。"
+
+#: userland/apps/reliefsettings/window.cpp:93
+msgid "Time zone changes apply system-wide. Administrator authentication is requested when needed."
+msgstr "タイムゾーンの変更はシステム全体に適用されます。必要に応じて管理者認証を求めます。"
+
+#: userland/apps/reliefsettings/window.cpp:558
+msgid "Time zone updated. Storage synchronization failed."
+msgstr "タイムゾーンを更新しました。ストレージの同期に失敗しました。"
+
+#: configs/nls/messages/reliefsettings.c:31
+msgid "Unsupported language."
+msgstr "未対応の言語です。"
+
+#: userland/apps/reliefsettings/window.cpp:77
+msgid "User configuration directory"
+msgstr "ユーザー設定ディレクトリ"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: userland/apps/reliefsettings/window.cpp:80
+msgid "Your choice applies to this account. Other users keep their own language settings."
+msgstr "この選択は現在のアカウントに適用されます。他のユーザーはそれぞれの言語設定を使用します。"

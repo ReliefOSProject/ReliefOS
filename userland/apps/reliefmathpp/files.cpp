@@ -8,19 +8,19 @@ void MathWindow::file_action(Command command) {
   Text err;
   if (command == Command::Open) {
     const char *p =
-        fl_file_chooser("打开 ReliefMath++ 文档", "*.rmathpp",
+        fl_file_chooser(T("打开 ReliefMath++ 文档"), "*.rmathpp",
                         path_.empty() ? getenv("HOME") : path_.c_str(), 0);
     if (!p)
       return;
     if (!pending_path_.set(p) || !io_.read(p, err)) {
-      fl_alert("%s", err.empty() ? "内存不足" : err.c_str());
+      fl_alert("%s", err.empty() ? T("内存不足") : ui_error(err.c_str()));
       return;
     }
     operation_ = Operation::Open;
     stage_ = 1;
   } else {
     if (!encode(document, pending_bytes_, err)) {
-      fl_alert("%s", err.c_str());
+      fl_alert("%s", ui_error(err.c_str()));
       return;
     }
     if (command == Command::Save && !path_.empty()) {
@@ -29,12 +29,12 @@ void MathWindow::file_action(Command command) {
       stage_ = 1;
       if (!io_.write(path_.c_str(), pending_bytes_, stamp_, err)) {
         operation_ = Operation::Idle;
-        fl_alert("%s", err.c_str());
+        fl_alert("%s", ui_error(err.c_str()));
         return;
       }
     } else {
       const char *p = fl_file_chooser(
-          "保存 ReliefMath++ 文档", "*.rmathpp",
+          T("保存 ReliefMath++ 文档"), "*.rmathpp",
           path_.empty() ? "Untitled.rmathpp" : path_.c_str(), 0);
       if (!p)
         return;
@@ -51,7 +51,7 @@ void MathWindow::file_action(Command command) {
 void MathWindow::load_initial(const char *path) {
   Text err;
   if (!pending_path_.set(path) || !io_.read(path, err)) {
-    fl_alert("%s", err.c_str());
+    fl_alert("%s", ui_error(err.c_str()));
     return;
   }
   operation_ = Operation::Open;
@@ -66,7 +66,7 @@ void MathWindow::start_write(const char *path, bool export_file) {
   Text err;
   if (!pending_path_.set(path) ||
       !io_.probe(path, err, export_file ? path_.c_str() : nullptr)) {
-    fl_alert("%s", err.empty() ? "内存不足" : err.c_str());
+    fl_alert("%s", err.empty() ? T("内存不足") : ui_error(err.c_str()));
     return;
   }
   operation_ = export_file ? Operation::Export : Operation::Save;
@@ -84,7 +84,7 @@ void MathWindow::poll_io() {
   Text err;
   if (reply.ok && stage_ == 0) {
     if (!reply.stamp.exists ||
-        fl_choice("目标文件已存在，是否覆盖？", "取消", "覆盖", nullptr) == 1) {
+        fl_choice(T("目标文件已存在，是否覆盖？"), T("取消"), T("覆盖"), nullptr) == 1) {
       stage_ = 1;
       if (io_.write(pending_path_.c_str(), pending_bytes_, reply.stamp, err,
                     operation_ == Operation::Export ? path_.c_str()
@@ -146,7 +146,7 @@ void MathWindow::poll_io() {
   if (!current())
     properties_->deactivate();
   if (!reply.ok) {
-    fl_alert("%s", reply.error.c_str());
+    fl_alert("%s", ui_error(reply.error.c_str()));
     closing_ = false;
   }
   operation_ = Operation::Idle;
@@ -155,7 +155,7 @@ void MathWindow::poll_io() {
 }
 void MathWindow::export_action(Command command) {
   if (sampling_) {
-    fl_message("采样尚未完成，请稍后导出。");
+    fl_message(T("采样尚未完成，请稍后导出。"));
     return;
   }
   Text err;
@@ -164,11 +164,11 @@ void MathWindow::export_action(Command command) {
                 ? canvas[tab()]->export_svg(bytes, err)
                 : canvas[tab()]->export_png(bytes, err);
   if (!ok) {
-    fl_alert("%s", err.empty() ? "不能生成图片" : err.c_str());
+    fl_alert("%s", err.empty() ? T("不能生成图片") : ui_error(err.c_str()));
     return;
   }
   const char *path = fl_file_chooser(
-      "导出当前视图", command == Command::ExportSvg ? "*.svg" : "*.png",
+      T("导出当前视图"), command == Command::ExportSvg ? "*.svg" : "*.png",
       command == Command::ExportSvg ? "plot.svg" : "plot.png", 0);
   if (!path)
     return;

@@ -696,3 +696,103 @@ msgstr "root 账户密码"
 #: userland/apps/network-controller/dialogs.cpp:49
 msgid "sudo: current user password"
 msgstr "sudo：当前用户密码"
+
+#: configs/nls/messages/network-controller.c:13
+msgid "Cannot create command output pipe.\n"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:14
+msgid "Cannot create network configuration directory"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:15
+msgid "Cannot create network configuration temporary file"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:16
+msgid "Cannot open network configuration directory"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:17
+msgid "Cannot query network interfaces.\n"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:18
+msgid "Cannot read network configuration"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:19
+msgid "Cannot restore absent network profile"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:20
+msgid "Cannot save network configuration"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:21
+msgid "Cannot synchronize network configuration directory"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:22
+msgid "Cannot synchronize restored network profile"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:23
+msgid "Configuration changed outside this window. Reload it before saving."
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:24
+msgid "Configuration replaced but directory synchronization failed"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:25
+msgid "DHCP renewal requires DHCP mode.\n"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:26
+msgid "Invalid Ethernet interface"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:27
+msgid "Network Controller diagnostics\n\nAdapters (live ioctl and counters):\n"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:28
+msgid "Network configuration is locked or unsafe"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:29
+msgid "Network configuration saved. Apply it to update the running network.\n"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:30
+msgid "No previous network configuration backup is available."
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:31
+msgid "Not available.\n"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:32
+msgid "Requested network information is absent or cannot be read.\n"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:33
+msgid "The selected Ethernet interface is no longer present.\n"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:34
+msgid "Unsafe configuration directory"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:35
+msgid "Unsafe network configuration file"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:11
+msgid "\nOperation canceled. Check service state before retrying.\n"
+msgstr ""
+
+#: configs/nls/messages/network-controller.c:12
+msgid "\nOperation timed out. Check service state before retrying.\n"
+msgstr ""

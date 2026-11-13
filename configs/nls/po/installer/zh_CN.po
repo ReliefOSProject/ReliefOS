@@ -897,3 +897,223 @@ msgstr "无"
 #: userland/apps/installer/main.cpp:548
 msgid "or replace the boot/reliefos and system files on an existing installation."
 msgstr "也可以替换现有安装中的启动和系统文件。"
+
+#: userland/apps/installer/installer_tty.c:427
+msgid "Account setup cancelled or input exceeds the transport buffer."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:278
+msgid "Automatic layout failed."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:73
+msgid "Check username and matching passwords (1-32 characters, no spaces)."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:460
+msgid "Command [reboot/shutdown/exit]: "
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:258
+msgid "Commands: auto, init, create SIZE FS NAME, resize SIZE, rename NAME,"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:69
+msgid "Confirm password: "
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:71
+msgid "Confirm root password: "
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:740
+msgid "Could not list disks"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:289
+msgid "Create failed."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:303
+msgid "Delete failed."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:431
+msgid "Desktop selection cancelled."
+msgstr ""
+
+#: userland/apps/installer/model.c:214
+msgid "Disk "
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:364
+msgid "Enter install or update."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:301
+msgid "Format failed."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:351
+msgid "Fresh install defaults to automatic partitioning; manual GPT editing is available."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:280
+msgid "GPT initialization failed."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:106
+msgid "Install Xorg desktop environment? [Y/n]: "
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:1398
+msgid "Install failed"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:458
+msgid "Installation finished."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:440
+msgid "Installation not confirmed. Installation cancelled."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:227
+msgid "Invalid disk selection."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:353
+msgid "Mode [install/update]: "
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:369
+msgid "No disk selected. Installation cancelled."
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:346
+msgid "Partition %u  %s  %llu MiB  %s  %s%s"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:423
+msgid "Partition setup cancelled."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:68
+msgid "Password: "
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:1449
+msgid "Preparing target disk"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:453
+msgid "Reboot now? [Y/n]: "
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:349
+msgid "ReliefOS installer (TTY)"
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:1401
+msgid "Remove the installation media before rebooting."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:295
+msgid "Rename failed."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:293
+msgid "Resize failed."
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:1460
+msgid "Root and boot partitions"
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:1450
+msgid "Root: /target (ext4), ESP: /target/boot (FAT32)"
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:1460
+msgid "Scanning installation payload"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:313
+msgid "Select a partition number first."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:208
+msgid "Select disk number (r to refresh, q to quit): "
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:224
+msgid "Selected: %s\n"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:466
+msgid "Shutdown failed"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:350
+msgid "This installer uses the same disk formatter and payload as the graphical installer."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:438
+msgid "Type INSTALL to confirm the partition layout and installation: "
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:470
+msgid "Unknown command. Use reboot, shutdown, or exit."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:319
+msgid "Unknown partition command."
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:348
+msgid "Unnamed"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:409
+msgid "Update not confirmed. Installation cancelled."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:67
+msgid "Username: "
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:1398
+msgid "\n%s (error %d)\n"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:193
+msgid "\nAvailable disks:"
+msgstr ""
+
+#: userland/apps/installer/install_ops.c:1400
+msgid "\nInstallation completed successfully."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:244
+msgid "\nPartitions:"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:260
+msgid "format (erase EFI files)"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:259
+msgid "format FS LABEL, format-esp yes|no, bios, esp, root, data, delete, refresh, done. FS raw creates an unformatted partition."
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:261
+msgid "partition> "
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:260
+msgid "preserve existing FAT32 files"
+msgstr ""
+
+#: userland/apps/installer/installer_tty.c:70
+msgid "root password: "
+msgstr ""

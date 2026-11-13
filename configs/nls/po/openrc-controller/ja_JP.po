@@ -1,0 +1,867 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/openrc-controller/window.cpp:383
+msgid "%zu / %zu services · current: %s"
+msgstr "%zu / %zu サービス · 現在: %s"
+
+#: userland/apps/openrc-controller/window.cpp:209
+msgid "About"
+msgstr "バージョン情報"
+
+#: userland/apps/openrc-controller/window.cpp:185
+msgid "Add services to runlevel…"
+msgstr "ランレベルにサービスを追加…"
+
+#: userland/apps/openrc-controller/window.cpp:696
+msgid "Add the selected services to this runlevel? This changes startup configuration."
+msgstr "選択したサービスをこのランレベルに追加しますか？ 起動設定が変更されます。"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/openrc-controller/dialogs.cpp:46
+msgid "Administrator permission is required to manage OpenRC services."
+msgstr "OpenRC サービスの管理には管理者権限が必要です。"
+
+#: userland/apps/openrc-controller/window.cpp:633
+msgid "Administrator session ended. Close and reopen the application."
+msgstr "管理者セッションが終了しました。アプリケーションを閉じて開き直してください。"
+
+#: configs/nls/messages/openrc-controller.c:5
+msgid "Advanced"
+msgstr "詳細設定"
+
+#: userland/apps/openrc-controller/window.cpp:708
+msgid "Advanced service action"
+msgstr "高度なサービス操作"
+
+#: userland/apps/openrc-controller/window.cpp:178
+msgid "Advanced service action…"
+msgstr "高度なサービス操作…"
+
+#: userland/apps/openrc-controller/window.cpp:217
+msgid "Advanced…"
+msgstr "詳細設定…"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/openrc-controller/window.cpp:194
+msgid "All runlevel states"
+msgstr "すべてのランレベルの状態"
+
+#: userland/apps/openrc-controller/window.cpp:542
+msgid "All services"
+msgstr "すべてのサービス"
+
+#: userland/apps/openrc-controller/window.cpp:881
+msgid "An operation is running. Closing cancels it; check service state before retrying."
+msgstr "操作を実行中です。閉じると操作はキャンセルされます。再試行する前にサービスの状態を確認してください。"
+
+#: userland/apps/openrc-controller/dialogs.cpp:48
+msgid "Authenticate with"
+msgstr "認証方法"
+
+#: configs/nls/messages/openrc-controller.c:6
+msgid "Authenticating"
+msgstr "認証中"
+
+#: userland/apps/openrc-controller/dialogs.cpp:115
+msgid "Authenticating…"
+msgstr "認証中…"
+
+#: userland/apps/openrc-controller/dialogs.cpp:84
+msgid "Authentication failed. Check the password or choose another method."
+msgstr "認証に失敗しました。パスワードを確認するか、別の方法を選択してください。"
+
+#: configs/nls/messages/openrc-controller.c:18
+msgid "Backup path is unsafe."
+msgstr "バックアップのパスが安全ではありません。"
+
+#: userland/apps/openrc-controller/window.cpp:204
+msgid "Boot log"
+msgstr "起動ログ"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/openrc-controller/window.cpp:217
+msgid "Cancel operation"
+msgstr "操作をキャンセル"
+
+#: userland/apps/openrc-controller/window.cpp:900
+msgid "Canceling operation…"
+msgstr "操作をキャンセルしています…"
+
+#: configs/nls/messages/openrc-controller.c:19
+msgid "Cannot change runlevel: it may exist, be active, referenced, nonempty, or unsafe."
+msgstr "ランレベルを変更できません。存在する、有効である、参照されている、空でない、または安全でない可能性があります。"
+
+#: configs/nls/messages/openrc-controller.c:20
+msgid "Cannot create command output pipe.\n"
+msgstr "コマンド出力用パイプを作成できません。\n"
+
+#: configs/nls/messages/openrc-controller.c:21
+msgid "Cannot create temporary configuration file."
+msgstr "一時設定ファイルを作成できません。"
+
+#: userland/apps/openrc-controller/window.cpp:854
+msgid "Cannot create the output file."
+msgstr "出力ファイルを作成できません。"
+
+#: configs/nls/messages/openrc-controller.c:22
+msgid "Cannot open configuration (symbolic links are not allowed)."
+msgstr "設定を開けません (シンボリックリンクは使用できません)。"
+
+#: userland/apps/openrc-controller/window.cpp:535
+msgid "Cannot parse OpenRC status."
+msgstr "OpenRC の状態を解析できません。"
+
+#: userland/apps/openrc-controller/window.cpp:527
+msgid "Cannot parse the OpenRC service catalog."
+msgstr "OpenRC のサービス一覧を解析できません。"
+
+#: configs/nls/messages/openrc-controller.c:23
+msgid "Cannot read OpenRC services and runlevels.\n"
+msgstr "OpenRC のサービスとランレベルを読み取れません。\n"
+
+#: configs/nls/messages/openrc-controller.c:24
+msgid "Cannot read service script.\n"
+msgstr "サービススクリプトを読み取れません。\n"
+
+#: userland/apps/openrc-controller/window.cpp:481
+msgid "Cannot send request to the privileged worker."
+msgstr "特権ワーカーに要求を送信できません。"
+
+#: userland/apps/openrc-controller/dialogs.cpp:29
+msgid "Cannot start the OpenRC worker."
+msgstr "OpenRC ワーカーを起動できません。"
+
+#: userland/apps/openrc-controller/dialogs.cpp:101
+msgid "Cannot start the authentication program."
+msgstr "認証プログラムを起動できません。"
+
+#: userland/apps/openrc-controller/window.cpp:812
+msgid "Changing runlevel may stop services and disconnect the desktop. Start only keeps existing services running."
+msgstr "ランレベルを切り替えるとサービスが停止し、デスクトップが切断される場合があります。「開始のみ」では既存のサービスは実行されたままです。"
+
+#: userland/apps/openrc-controller/window.cpp:262
+msgid "Choose a service configuration or global rc.conf."
+msgstr "サービス設定または全体の rc.conf を選択してください。"
+
+#: userland/apps/openrc-controller/window.cpp:281
+msgid "Clear"
+msgstr "クリア"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/openrc-controller/window.cpp:709
+msgid "Command"
+msgstr "コマンド"
+
+#: userland/apps/openrc-controller/window.cpp:711
+msgid "Condition / mode"
+msgstr "条件 / モード"
+
+#: userland/apps/openrc-controller/window.cpp:259
+msgid "Configuration"
+msgstr "設定"
+
+#: configs/nls/messages/openrc-controller.c:25
+msgid "Configuration changed externally. Reload before saving."
+msgstr "設定が外部で変更されました。保存する前に再読み込みしてください。"
+
+#: configs/nls/messages/openrc-controller.c:26
+msgid "Configuration changed while saving. Reload before saving."
+msgstr "保存中に設定が変更されました。保存する前に再読み込みしてください。"
+
+#: configs/nls/messages/openrc-controller.c:27
+msgid "Configuration directory is missing or unsafe."
+msgstr "設定ディレクトリが存在しないか、安全ではありません。"
+
+#: userland/apps/openrc-controller/window.cpp:835
+msgid "Configuration has unsaved changes."
+msgstr "設定に未保存の変更があります。"
+
+#: configs/nls/messages/openrc-controller.c:28
+msgid "Configuration is too large or contains NUL bytes."
+msgstr "設定が大きすぎるか、NUL バイトが含まれています。"
+
+#: configs/nls/messages/openrc-controller.c:29
+msgid "Configuration lock is unsafe or another editor is saving. Retry after it finishes."
+msgstr "設定のロックが安全ではないか、別のエディターが保存中です。完了後に再試行してください。"
+
+#: configs/nls/messages/openrc-controller.c:30
+msgid "Configuration must be a safe, readable text file up to 256 KiB."
+msgstr "設定は安全で読み取り可能な 256 KiB 以下のテキストファイルである必要があります。"
+
+#: configs/nls/messages/openrc-controller.c:31
+msgid "Configuration replaced, but directory synchronization failed. Check disk status."
+msgstr "設定は置き換えられましたが、ディレクトリの同期に失敗しました。ディスクの状態を確認してください。"
+
+#: configs/nls/messages/openrc-controller.c:32
+msgid "Configuration saved. Previous contents: .openrc-controller.bak\n"
+msgstr "設定を保存しました。以前の内容: .openrc-controller.bak\n"
+
+#: configs/nls/messages/openrc-controller.c:33
+msgid "Configuration write or atomic replacement failed."
+msgstr "設定の書き込みまたはアトミックな置換に失敗しました。"
+
+#: userland/apps/openrc-controller/window.cpp:292
+msgid "Connecting to OpenRC…"
+msgstr "OpenRC に接続しています…"
+
+#: userland/apps/openrc-controller/window.cpp:653
+msgid "Continue"
+msgstr "続行"
+
+#: userland/apps/openrc-controller/window.cpp:870
+msgid "Could not completely write the output file."
+msgstr "出力ファイルを完全に書き込めませんでした。"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: userland/apps/openrc-controller/window.cpp:151
+msgid "Crashed"
+msgstr "クラッシュ"
+
+#: userland/apps/openrc-controller/window.cpp:195
+msgid "Crashed services"
+msgstr "クラッシュしたサービス"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/openrc-controller/window.cpp:187
+msgid "Create runlevel…"
+msgstr "ランレベルを作成…"
+
+#: userland/apps/openrc-controller/window.cpp:692
+msgid "Create this runlevel before adding services."
+msgstr "サービスを追加する前に、このランレベルを作成してください。"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/openrc-controller/window.cpp:716
+msgid "Debug output"
+msgstr "デバッグ出力"
+
+#: userland/apps/openrc-controller/window.cpp:188
+msgid "Delete empty runlevel…"
+msgstr "空のランレベルを削除…"
+
+#: userland/apps/openrc-controller/window.cpp:822
+msgid "Delete this empty, inactive, unreferenced custom runlevel?"
+msgstr "この空で非アクティブかつ参照されていないカスタムランレベルを削除しますか？"
+
+#: userland/apps/openrc-controller/window.cpp:252
+msgid "Dependencies"
+msgstr "依存関係"
+
+#: userland/apps/openrc-controller/window.cpp:181
+msgid "Dependencies…"
+msgstr "依存関係…"
+
+#: userland/apps/openrc-controller/window.cpp:965
+msgid "Dependency type: ineed, iuse, iwant, iafter, ibefore; reverse: needsme, usesme, wantsme, beforeme, afterme"
+msgstr "依存関係の種類: ineed, iuse, iwant, iafter, ibefore; 逆方向: needsme, usesme, wantsme, beforeme, afterme"
+
+#: userland/apps/openrc-controller/window.cpp:242
+msgid "Description / commands"
+msgstr "説明 / コマンド"
+
+#: userland/apps/openrc-controller/window.cpp:179
+msgid "Description and commands"
+msgstr "説明とコマンド"
+
+#: userland/apps/openrc-controller/window.cpp:205
+msgid "Diagnostic report"
+msgstr "診断レポート"
+
+#: configs/nls/messages/openrc-controller.c:7
+msgid "Disable"
+msgstr "無効化"
+
+#: userland/apps/openrc-controller/window.cpp:217
+msgid "Disable…"
+msgstr "無効化…"
+
+#: userland/apps/openrc-controller/window.cpp:834
+msgid "Discard changes"
+msgstr "変更を破棄"
+
+#: userland/apps/openrc-controller/window.cpp:712
+msgid "Dry run"
+msgstr "試行実行"
+
+#: userland/apps/openrc-controller/window.cpp:246
+msgid "Edit configuration"
+msgstr "設定を編集"
+
+#: userland/apps/openrc-controller/window.cpp:200
+msgid "Edit global rc.conf"
+msgstr "全体の rc.conf を編集"
+
+#: userland/apps/openrc-controller/window.cpp:182
+msgid "Edit service configuration"
+msgstr "サービス設定を編集"
+
+#: configs/nls/messages/openrc-controller.c:8
+msgid "Enable"
+msgstr "有効化"
+
+#: userland/apps/openrc-controller/window.cpp:216
+msgid "Enable…"
+msgstr "有効化…"
+
+#: userland/apps/openrc-controller/dialogs.cpp:94
+msgid "Enter your password to continue authentication."
+msgstr "認証を続けるにはパスワードを入力してください。"
+
+#: userland/apps/openrc-controller/window.cpp:170
+msgid "Exit"
+msgstr "終了"
+
+#: userland/apps/openrc-controller/window.cpp:843
+msgid "Export output"
+msgstr "出力をエクスポート"
+
+#: userland/apps/openrc-controller/window.cpp:169
+msgid "Export output…"
+msgstr "出力をエクスポート…"
+
+#: userland/apps/openrc-controller/window.cpp:153
+msgid "Failed"
+msgstr "失敗"
+
+#: userland/apps/openrc-controller/window.cpp:543
+msgid "Failed / crashed"
+msgstr "失敗 / クラッシュ"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/openrc-controller/window.cpp:167
+msgid "File"
+msgstr "ファイル"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/openrc-controller/window.cpp:206
+msgid "Help"
+msgstr "ヘルプ"
+
+#: userland/apps/openrc-controller/window.cpp:715
+msgid "Ignore dependencies"
+msgstr "依存関係を無視"
+
+#: userland/apps/openrc-controller/window.cpp:544
+msgid "In transition"
+msgstr "移行中"
+
+#: userland/apps/openrc-controller/window.cpp:155
+msgid "Inactive"
+msgstr "非アクティブ"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: configs/nls/messages/openrc-controller.c:34
+msgid "Invalid configuration path."
+msgstr "設定パスが無効です。"
+
+#: userland/apps/openrc-controller/window.cpp:576
+msgid "Invalid configuration response."
+msgstr "設定の応答が無効です。"
+
+#: configs/nls/messages/openrc-controller.c:35
+msgid "Invalid or unsupported OpenRC request."
+msgstr "OpenRC 要求が無効か、サポートされていません。"
+
+#: userland/apps/openrc-controller/dialogs.cpp:106
+msgid "Invalid password input."
+msgstr "入力されたパスワードが無効です。"
+
+#: userland/apps/openrc-controller/window.cpp:684
+msgid "Invalid runlevel name."
+msgstr "ランレベル名が無効です。"
+
+#: userland/apps/openrc-controller/window.cpp:744
+msgid "Invalid service command."
+msgstr "サービスコマンドが無効です。"
+
+#: userland/apps/openrc-controller/window.cpp:448
+msgid "Invalid service, runlevel, or operation."
+msgstr "サービス、ランレベル、または操作が無効です。"
+
+#: userland/apps/openrc-controller/window.cpp:986
+msgid "Load a configuration first."
+msgstr "先に設定を読み込んでください。"
+
+#: configs/nls/messages/openrc-controller.c:36
+msgid "Log is absent or cannot be read. Enable OpenRC rc_logger or the system logger if needed.\n"
+msgstr "ログが存在しないか、読み取れません。必要に応じて OpenRC の rc_logger またはシステムロガーを有効にしてください。\n"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/openrc-controller/window.cpp:196
+msgid "Manually started services"
+msgstr "手動で開始したサービス"
+
+#: userland/apps/openrc-controller/window.cpp:652
+msgid "More selected services…"
+msgstr "ほかにも選択されたサービスがあります…"
+
+#: configs/nls/messages/openrc-controller.c:37
+msgid "NUL bytes are not allowed in a request."
+msgstr "要求に NUL バイトは使用できません。"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: configs/nls/messages/openrc-controller.c:38
+msgid "No configuration backup is available."
+msgstr "利用可能な設定のバックアップがありません。"
+
+#: userland/apps/openrc-controller/window.cpp:500
+msgid "No crashed services were reported."
+msgstr "クラッシュしたサービスは報告されていません。"
+
+#: userland/apps/openrc-controller/window.cpp:712
+msgid "Normal"
+msgstr "通常"
+
+#: userland/apps/openrc-controller/window.cpp:456
+msgid "Not enough memory."
+msgstr "メモリが不足しています。"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/openrc-controller/window.cpp:715
+msgid "Only if crashed"
+msgstr "クラッシュ時のみ"
+
+#: userland/apps/openrc-controller/window.cpp:714
+msgid "Only if inactive"
+msgstr "非アクティブ時のみ"
+
+#: userland/apps/openrc-controller/window.cpp:714
+msgid "Only if not started"
+msgstr "開始されていない場合のみ"
+
+#: userland/apps/openrc-controller/window.cpp:713
+msgid "Only if started"
+msgstr "開始済みの場合のみ"
+
+#: userland/apps/openrc-controller/window.cpp:713
+msgid "Only if stopped"
+msgstr "停止済みの場合のみ"
+
+#: configs/nls/messages/openrc-controller.c:39
+msgid "OpenRC Controller diagnostics\n\nService membership:\n"
+msgstr "OpenRC コントローラーの診断\n\nサービスの所属:\n"
+
+#: userland/apps/openrc-controller/window.cpp:928
+msgid "OpenRC Controller\nC++ / FLTK service and runlevel manager for ReliefOS.\nUses the system OpenRC commands and native FLTK gtk+ controls."
+msgstr "OpenRC コントローラー\nReliefOS 向けの C++ / FLTK サービス・ランレベルマネージャー。\nシステムの OpenRC コマンドと FLTK 標準の gtk+ コントロールを使用します。"
+
+#: userland/apps/openrc-controller/dialogs.cpp:42
+msgid "OpenRC authentication"
+msgstr "OpenRC 認証"
+
+#: userland/apps/openrc-controller/window.cpp:1010
+msgid "OpenRC diagnostics"
+msgstr "OpenRC 診断"
+
+#: userland/apps/openrc-controller/window.cpp:201
+msgid "OpenRC log"
+msgstr "OpenRC ログ"
+
+#: userland/apps/openrc-controller/window.cpp:607
+msgid "Operation completed"
+msgstr "操作が完了しました"
+
+#: userland/apps/openrc-controller/window.cpp:510
+msgid "Operation failed (exit %d). Remaining operations were stopped."
+msgstr "操作に失敗しました (終了コード %d)。残りの操作は停止されました。"
+
+#: userland/apps/openrc-controller/window.cpp:278
+msgid "Output"
+msgstr "出力"
+
+#: userland/apps/openrc-controller/window.cpp:872
+msgid "Output exported"
+msgstr "出力をエクスポートしました"
+
+#: userland/apps/openrc-controller/window.cpp:240
+msgid "Overview"
+msgstr "概要"
+
+#: userland/apps/openrc-controller/window.cpp:803
+msgid "Parent runlevel (the selected runlevel is stacked into this level):"
+msgstr "親ランレベル (選択したランレベルをこのレベルにスタックします):"
+
+#: userland/apps/openrc-controller/dialogs.cpp:52
+msgid "Password"
+msgstr "パスワード"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/openrc-controller/window.cpp:253
+msgid "Query dependencies…"
+msgstr "依存関係を問い合わせ…"
+
+#: userland/apps/openrc-controller/window.cpp:969
+msgid "Querying dependency tree…"
+msgstr "依存関係ツリーを問い合わせています…"
+
+#: userland/apps/openrc-controller/window.cpp:180
+msgid "Read service script"
+msgstr "サービススクリプトを読み込み"
+
+#: userland/apps/openrc-controller/window.cpp:838
+msgid "Reading configuration…"
+msgstr "設定を読み込んでいます…"
+
+#: userland/apps/openrc-controller/window.cpp:960
+msgid "Reading service script…"
+msgstr "サービススクリプトを読み込んでいます…"
+
+#: userland/apps/openrc-controller/window.cpp:493
+msgid "Reading service states…"
+msgstr "サービスの状態を読み込んでいます…"
+
+#: userland/apps/openrc-controller/window.cpp:492
+msgid "Reading services and runlevels…"
+msgstr "サービスとランレベルを読み込んでいます…"
+
+#: userland/apps/openrc-controller/window.cpp:572
+msgid "Ready · administrator session active"
+msgstr "準備完了 · 管理者セッションが有効"
+
+#: userland/apps/openrc-controller/window.cpp:199
+msgid "Rebuild dependency cache"
+msgstr "依存関係キャッシュを再構築"
+
+#: userland/apps/openrc-controller/window.cpp:215
+msgid "Refresh"
+msgstr "更新"
+
+#: userland/apps/openrc-controller/window.cpp:211
+msgid "Refresh every 10 seconds"
+msgstr "10 秒ごとに更新"
+
+#: userland/apps/openrc-controller/window.cpp:176
+msgid "Reload"
+msgstr "再読み込み"
+
+#: userland/apps/openrc-controller/window.cpp:601
+msgid "Reloading saved configuration…"
+msgstr "保存済みの設定を再読み込みしています…"
+
+#: userland/apps/openrc-controller/window.cpp:186
+msgid "Remove services from runlevel…"
+msgstr "ランレベルからサービスを削除…"
+
+#: userland/apps/openrc-controller/window.cpp:698
+msgid "Remove the selected services from this runlevel? This does not stop them immediately."
+msgstr "選択したサービスをこのランレベルから削除しますか？ サービスは直ちには停止しません。"
+
+#: userland/apps/openrc-controller/window.cpp:848
+msgid "Replace"
+msgstr "置き換え"
+
+#: userland/apps/openrc-controller/window.cpp:991
+msgid "Replace the current configuration with its last backup? Unsaved editor changes will be discarded."
+msgstr "現在の設定を最後のバックアップで置き換えますか？ エディターの未保存の変更は破棄されます。"
+
+#: userland/apps/openrc-controller/window.cpp:175
+msgid "Restart"
+msgstr "再起動"
+
+#: userland/apps/openrc-controller/window.cpp:990
+msgid "Restore"
+msgstr "復元"
+
+#: userland/apps/openrc-controller/window.cpp:269
+msgid "Restore backup"
+msgstr "バックアップを復元"
+
+#: userland/apps/openrc-controller/dialogs.cpp:83
+msgid "Retry"
+msgstr "再試行"
+
+#: userland/apps/openrc-controller/window.cpp:727
+msgid "Run"
+msgstr "実行"
+
+#: userland/apps/openrc-controller/window.cpp:753
+msgid "Run this advanced command for the selected services? zap only resets OpenRC state; it does not stop a running process."
+msgstr "選択したサービスに対してこの高度なコマンドを実行しますか？ zap は OpenRC の状態をリセットするだけで、実行中のプロセスは停止しません。"
+
+#: userland/apps/openrc-controller/window.cpp:677
+msgid "Runlevel name (use Tools / all runlevel states to inspect membership):"
+msgstr "ランレベル名 (所属を調べるには「ツール / すべてのランレベルの状態」を使用):"
+
+#: userland/apps/openrc-controller/window.cpp:787
+msgid "Runlevel name:"
+msgstr "ランレベル名:"
+
+#: configs/nls/messages/openrc-controller.c:40
+msgid "Runlevel updated.\n"
+msgstr "ランレベルを更新しました。\n"
+
+#: userland/apps/openrc-controller/window.cpp:119
+msgid "Runlevels"
+msgstr "ランレベル"
+
+#: userland/apps/openrc-controller/window.cpp:143
+msgid "Running"
+msgstr "実行中"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/openrc-controller/window.cpp:1003
+msgid "Saving configuration…"
+msgstr "設定を保存しています…"
+
+#: userland/apps/openrc-controller/window.cpp:157
+msgid "Scheduled"
+msgstr "予定済み"
+
+#: userland/apps/openrc-controller/window.cpp:231
+msgid "Search"
+msgstr "検索"
+
+#: userland/apps/openrc-controller/window.cpp:662
+msgid "Select at least one service."
+msgstr "サービスを少なくとも 1 つ選択してください。"
+
+#: userland/apps/openrc-controller/window.cpp:666
+msgid "Select at most 512 services per operation."
+msgstr "1 回の操作で選択できるサービスは最大 512 個です。"
+
+#: userland/apps/openrc-controller/window.cpp:951
+msgid "Select exactly one service."
+msgstr "サービスを 1 つだけ選択してください。"
+
+#: userland/apps/openrc-controller/window.cpp:915
+msgid "Select services and use the toolbar or Service menu. Ctrl/Shift selects multiple services; column headers sort.\n\nEnabling changes runlevel membership; starting changes the current running state. Use the Configuration tab to edit conf.d or global rc.conf; saving makes a backup and detects external changes.\n\nAdvanced actions support conditions, dry run, zap and custom service commands. Canceling may leave OpenRC in a transitional state; inspect status before using zap.\n\nThe application never invokes shutdown, reboot, boot or sysinit runlevels. Logs are available when the corresponding system logger is configured."
+msgstr "サービスを選択し、ツールバーまたは「サービス」メニューを使用します。Ctrl/Shift で複数選択でき、列見出しで並べ替えられます。\n\n有効化はランレベルへの所属を変更し、開始は現在の実行状態を変更します。「設定」タブで conf.d または全体の rc.conf を編集できます。保存時にバックアップを作成し、外部の変更を検出します。\n\n高度な操作は条件、試行実行、zap、カスタムサービスコマンドに対応しています。キャンセルすると OpenRC が移行中の状態のままになる場合があります。zap を使用する前に状態を確認してください。\n\nこのアプリケーションは shutdown、reboot、boot、sysinit のランレベルを呼び出しません。対応するシステムロガーが設定されている場合はログを利用できます。"
+
+#: userland/apps/openrc-controller/window.cpp:403
+msgid "Select services to inspect them. Ctrl/Shift selects multiple rows."
+msgstr "サービスを選択して詳細を確認します。Ctrl/Shift で複数行を選択できます。"
+
+#: userland/apps/openrc-controller/window.cpp:119
+msgid "Service"
+msgstr "サービス"
+
+#: userland/apps/openrc-controller/window.cpp:177
+msgid "Service status"
+msgstr "サービスの状態"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/openrc-controller/window.cpp:189
+msgid "Stack runlevel…"
+msgstr "ランレベルをスタック…"
+
+#: userland/apps/openrc-controller/window.cpp:173
+msgid "Start"
+msgstr "開始"
+
+#: userland/apps/openrc-controller/window.cpp:811
+msgid "Start only"
+msgstr "開始のみ"
+
+#: userland/apps/openrc-controller/window.cpp:147
+msgid "Starting"
+msgstr "開始中"
+
+#: userland/apps/openrc-controller/window.cpp:119
+msgid "State"
+msgstr "状態"
+
+#: userland/apps/openrc-controller/window.cpp:174
+msgid "Stop"
+msgstr "停止"
+
+#: userland/apps/openrc-controller/window.cpp:880
+msgid "Stop and close"
+msgstr "停止して閉じる"
+
+#: userland/apps/openrc-controller/window.cpp:145
+msgid "Stopped"
+msgstr "停止済み"
+
+#: userland/apps/openrc-controller/window.cpp:149
+msgid "Stopping"
+msgstr "停止中"
+
+#: userland/apps/openrc-controller/window.cpp:197
+msgid "Supervised services"
+msgstr "監視対象のサービス"
+
+#: userland/apps/openrc-controller/window.cpp:811
+msgid "Switch fully"
+msgstr "完全に切り替え"
+
+#: userland/apps/openrc-controller/window.cpp:191
+msgid "Switch runlevel…"
+msgstr "ランレベルを切り替え…"
+
+#: userland/apps/openrc-controller/window.cpp:203
+msgid "System log"
+msgstr "システムログ"
+
+#: userland/apps/openrc-controller/window.cpp:202
+msgid "System messages"
+msgstr "システムメッセージ"
+
+#: userland/apps/openrc-controller/window.cpp:436
+msgid "The privileged session has ended. Reopen the application."
+msgstr "特権セッションが終了しました。アプリケーションを開き直してください。"
+
+#: userland/apps/openrc-controller/window.cpp:849
+msgid "This file already exists. Replace it?"
+msgstr "このファイルは既に存在します。置き換えますか？"
+
+#: userland/apps/openrc-controller/window.cpp:703
+msgid "This operation may interrupt networking, audio, or services required by other programs. Continue?"
+msgstr "この操作によりネットワーク、音声、または他のプログラムに必要なサービスが中断される場合があります。続行しますか？"
+
+#: configs/nls/messages/openrc-controller.c:41
+msgid "This request does not execute a command."
+msgstr "この要求ではコマンドは実行されません。"
+
+#: userland/apps/openrc-controller/window.cpp:192
+msgid "Tools"
+msgstr "ツール"
+
+#: userland/apps/openrc-controller/window.cpp:416
+msgid "Unassigned"
+msgstr "未割り当て"
+
+#: userland/apps/openrc-controller/window.cpp:198
+msgid "Unassigned services"
+msgstr "未割り当てのサービス"
+
+#: userland/apps/openrc-controller/window.cpp:160
+msgid "Unknown"
+msgstr "不明"
+
+#: userland/apps/openrc-controller/dialogs.cpp:58
+msgid "Unlock"
+msgstr "ロック解除"
+
+#: userland/apps/openrc-controller/window.cpp:190
+msgid "Unstack runlevel…"
+msgstr "ランレベルのスタックを解除…"
+
+#: userland/apps/openrc-controller/window.cpp:159
+msgid "Unsupervised"
+msgstr "監視なし"
+
+#: userland/apps/openrc-controller/window.cpp:827
+msgid "Updating runlevel…"
+msgstr "ランレベルを更新しています…"
+
+#: userland/apps/openrc-controller/window.cpp:120
+msgid "Uptime"
+msgstr "稼働時間"
+
+#: userland/apps/openrc-controller/window.cpp:208
+msgid "Usage and precautions"
+msgstr "使用方法と注意事項"
+
+#: userland/apps/openrc-controller/window.cpp:721
+msgid "Use an OpenRC command such as start, stop, reload, zap, or a command advertised by the service."
+msgstr "start、stop、reload、zap などの OpenRC コマンド、またはサービスが提供するコマンドを使用してください。"
+
+#: userland/apps/openrc-controller/window.cpp:440
+msgid "Wait for the current operation or cancel it first."
+msgstr "現在の操作を待つか、先にキャンセルしてください。"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: configs/nls/messages/openrc-controller.c:14
+msgid "\nOpenRC status:\n"
+msgstr "\nOpenRC の状態:\n"
+
+#: configs/nls/messages/openrc-controller.c:15
+msgid "\nOperation canceled. Check service state before retrying.\n"
+msgstr "\n操作がキャンセルされました。再試行する前にサービスの状態を確認してください。\n"
+
+#: configs/nls/messages/openrc-controller.c:16
+msgid "\nOperation timed out after 180 seconds. Check service state before retrying.\n"
+msgstr "\n操作は 180 秒後にタイムアウトしました。再試行する前にサービスの状態を確認してください。\n"
+
+#: configs/nls/messages/openrc-controller.c:17
+msgid "\nUnassigned services:\n"
+msgstr "\n未割り当てのサービス:\n"
+
+#: configs/nls/messages/openrc-controller.c:9
+msgid "failed"
+msgstr "失敗"
+
+#: userland/apps/openrc-controller/dialogs.cpp:50
+msgid "root account password"
+msgstr "root アカウントのパスワード"
+
+#: userland/apps/openrc-controller/dialogs.cpp:49
+msgid "sudo: current user password"
+msgstr "sudo: 現在のユーザーのパスワード"

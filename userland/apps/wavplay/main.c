@@ -1,3 +1,17 @@
+#include <libintl.h>
+#include <locale.h>
+#include <reliefos/layout.h>
+
+#define T(text) gettext(text)
+
+static void init_localization(void)
+{
+    setlocale(LC_ALL, "");
+    bindtextdomain("wavplay", RELIEFOS_LAYOUT_LOCALE);
+    bind_textdomain_codeset("wavplay", "UTF-8");
+    textdomain("wavplay");
+}
+
 #include <reliefos/fs.h>
 #include <reliefos/stdio.h>
 #include <reliefos/syscall.h>
@@ -26,7 +40,7 @@ struct wav_info {
 
 static int audio_error(const char *operation)
 {
-    printf("wavplay: %s failed (errno=%d)\n", operation, errno);
+    printf(T("wavplay: %s failed (errno=%d)\n"), operation, errno);
     return -1;
 }
 
@@ -36,13 +50,13 @@ static int configure_audio(uint32_t requested_rate, uint32_t *actual_rate)
     int channels = 2;
     int rate = (int)requested_rate;
     if (requested_rate < 8000U || requested_rate > 48000U) {
-        printf("wavplay: unsupported sample rate %u\n", requested_rate);
+        printf(T("wavplay: unsupported sample rate %u\n"), requested_rate);
         return -1;
     }
     if (dsp_fd < 0) {
         dsp_fd = open("/dev/dsp", O_WRONLY | O_NONBLOCK, 0);
     }
-    if (dsp_fd < 0) return audio_error("open /dev/dsp");
+    if (dsp_fd < 0) return audio_error(T("open /dev/dsp"));
     if (ioctl(dsp_fd, SNDCTL_DSP_SETFMT, &format) < 0)
         return audio_error("SNDCTL_DSP_SETFMT");
     if (ioctl(dsp_fd, SNDCTL_DSP_CHANNELS, &channels) < 0)
@@ -51,7 +65,7 @@ static int configure_audio(uint32_t requested_rate, uint32_t *actual_rate)
         return audio_error("SNDCTL_DSP_SPEED");
     if (format != AFMT_S16_LE || channels < 2 ||
         channels > (int)WAVPLAY_MAX_CHANNELS || rate <= 0) {
-        printf("wavplay: unsupported negotiated format=%d channels=%d rate=%d\n",
+        printf(T("wavplay: unsupported negotiated format=%d channels=%d rate=%d\n"),
                format, channels, rate);
         return -1;
     }
@@ -99,7 +113,7 @@ static int write_audio_retry(const void *data, uint32_t length)
             continue;
         }
         if (written >= 0) errno = written ? EIO : EAGAIN;
-        return audio_error("PCM write");
+        return audio_error(T("PCM write"));
     }
     return 0;
 }
@@ -119,7 +133,7 @@ static int drain_audio(void)
  * carry zero PCM. The hardware's negotiated interleave is never mislabelled. */
 static int write_stereo_audio(const void *data, uint32_t length)
 {
-    if (length % 4U) { errno = EINVAL; return audio_error("stereo frame"); }
+    if (length % 4U) { errno = EINVAL; return audio_error(T("stereo frame")); }
     if (dsp_channels == 2U) return write_audio_retry(data, length);
     const uint8_t *source = data;
     uint32_t frames = length / 4U;
@@ -227,25 +241,25 @@ static int play_wav(const char *path)
     int ret;
     fd = open(path, RELIEFOS_O_RDONLY, 0);
     if (fd < 0) {
-        printf("wavplay: open failed %d\n", fd);
+        printf(T("wavplay: open failed %d\n"), fd);
         return 1;
     }
     if (parse_wav_header(fd, &info) < 0) {
-        puts("wavplay: supported files are PCM, stereo, 16-bit WAV");
+        puts(T("wavplay: supported files are PCM, stereo, 16-bit WAV"));
         close(fd);
         return 1;
     }
     ret = configure_audio(info.sample_rate, &info.sample_rate);
     if (ret < 0) {
-        printf("wavplay: audio format rejected %d\n", ret);
+        printf(T("wavplay: audio format rejected %d\n"), ret);
         close(fd);
         return 1;
     }
-    printf("wavplay: %u Hz stereo PCM through /dev/dsp (%u output channels)\n",
+    printf(T("wavplay: %u Hz stereo PCM through /dev/dsp (%u output channels)\n"),
            info.sample_rate, dsp_channels);
     buffer = malloc(WAVPLAY_BUFFER_BYTES + 4U);
     if (!buffer) {
-        puts("wavplay: out of memory");
+        puts(T("wavplay: out of memory"));
         close(fd);
         return 1;
     }
@@ -257,7 +271,7 @@ static int play_wav(const char *path)
         long got = read(fd, buffer, wanted);
         uint32_t padded;
         if (got <= 0) {
-            puts("wavplay: truncated WAV data");
+            puts(T("wavplay: truncated WAV data"));
             free(buffer);
             close(fd);
             return 1;
@@ -267,7 +281,7 @@ static int play_wav(const char *path)
             buffer[got++] = 0;
         }
         if (write_stereo_audio(buffer, padded) < 0) {
-            puts("wavplay: playback failed");
+            puts(T("wavplay: playback failed"));
             free(buffer);
             close(fd);
             return 1;
@@ -277,7 +291,7 @@ static int play_wav(const char *path)
     free(buffer);
     close(fd);
     if (drain_audio() < 0) return 1;
-    puts("wavplay: complete");
+    puts(T("wavplay: complete"));
     return 0;
 }
 
@@ -305,19 +319,20 @@ static int play_test_melody(void)
     if (configure_audio(WAVPLAY_TEST_RATE, 0) < 0) {
         return 1;
     }
-    printf("wavplay: playing 30-second 48000 Hz PCM tone (%u output channels)\n",
+    printf(T("wavplay: playing 30-second 48000 Hz PCM tone (%u output channels)\n"),
            dsp_channels);
     if (play_square_note(50U, WAVPLAY_TEST_RATE * WAVPLAY_TEST_SECONDS) < 0) {
-        puts("wavplay: PCM tone failed");
+        puts(T("wavplay: PCM tone failed"));
         return 1;
     }
     if (drain_audio() < 0) return 1;
-    puts("wavplay: PCM tone complete");
+    puts(T("wavplay: PCM tone complete"));
     return 0;
 }
 
 int main(int argc, char **argv, char **envp)
 {
+    init_localization();
     int result;
     (void)envp;
     if (argc > 1 && argv && argv[1] && argv[1][0]) {

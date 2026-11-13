@@ -199,6 +199,7 @@ static const char *const reliefmath_error_messages[] = {
     N_("ArtifactEnd arrived before the declared bytes"),
     N_("Begin metadata exceeds render limits"),
     N_("Bracket source is null"),
+    N_("Cannot construct formula layout"),
     N_("Cannot allocate LaTeX output"),
     N_("Cannot allocate accent glyph"),
     N_("Cannot allocate bounded frame payload"),

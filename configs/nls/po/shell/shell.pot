@@ -1,0 +1,103 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/shell/main.c:150
+msgid "%s  %s\n"
+msgstr ""
+
+#: userland/apps/shell/main.c:216
+msgid "Built-ins: help clear pwd cd ls cat echo run exit"
+msgstr ""
+
+#: configs/nls/messages/shell.c:3
+msgid "Command line is empty"
+msgstr ""
+
+#: configs/nls/messages/shell.c:11
+msgid "Desktop is already running"
+msgstr ""
+
+#: configs/nls/messages/shell.c:8
+msgid "Invalid shortcut"
+msgstr ""
+
+#: configs/nls/messages/shell.c:12
+msgid "Launch failed"
+msgstr ""
+
+#: configs/nls/messages/shell.c:5
+msgid "Missing closing quote"
+msgstr ""
+
+#: configs/nls/messages/shell.c:7
+msgid "No file association for this item"
+msgstr ""
+
+#: configs/nls/messages/shell.c:6
+msgid "Program or path not found"
+msgstr ""
+
+#: userland/apps/shell/main.c:260
+msgid "ReliefOS command shell 2"
+msgstr ""
+
+#: configs/nls/messages/shell.c:10
+msgid "Shortcut already exists"
+msgstr ""
+
+#: configs/nls/messages/shell.c:9
+msgid "Shortcut loop detected"
+msgstr ""
+
+#: configs/nls/messages/shell.c:4
+msgid "Too many arguments"
+msgstr ""
+
+#: userland/apps/shell/main.c:261
+msgid "Type help to see available commands."
+msgstr ""
+
+#: userland/apps/shell/main.c:161
+msgid "cat: a file path is required"
+msgstr ""
+
+#: userland/apps/shell/main.c:166
+msgid "cat: cannot open %s (%d)\n"
+msgstr ""
+
+#: userland/apps/shell/main.c:173
+msgid "cat: read failed (%d)\n"
+msgstr ""
+
+#: userland/apps/shell/main.c:227
+msgid "cd: %s (%d)\n"
+msgstr ""
+
+#: userland/apps/shell/main.c:242
+msgid "closing shell"
+msgstr ""
+
+#: userland/apps/shell/main.c:123
+msgid "ls: cannot open %s (%d)\n"
+msgstr ""
+
+#: userland/apps/shell/main.c:237
+msgid "run: an application path is required"
+msgstr ""
+
+#: userland/apps/shell/main.c:212
+msgid "shell: too many arguments"
+msgstr ""
+
+#: userland/apps/shell/main.c:208
+msgid "shell: unmatched quote"
+msgstr ""
+
+#: userland/apps/shell/main.c:194
+msgid "started %s (pid %d)\n"
+msgstr ""
+
+#: userland/apps/shell/main.c:197
+msgid "unable to start %s: %s\n"
+msgstr ""

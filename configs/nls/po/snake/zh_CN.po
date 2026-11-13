@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/snake/main.c:337
+msgid "Arrows/WASD move, P pause, Q quit"
+msgstr "方向键/WASD 移动，P 暂停，Q 退出"
+
+#: userland/apps/snake/main.c:335
+msgid "GAME OVER - R restart, Q quit"
+msgstr "游戏结束 - R 重新开始，Q 退出"
+
+#: userland/apps/snake/main.c:336
+msgid "PAUSED - P or Space to resume"
+msgstr "已暂停 - 按 P 或空格继续"
+
+#: userland/apps/snake/main.c:333
+msgid "Snake  Score: %u  High score: %u  %s\n"
+msgstr "贪吃蛇  得分: %u  最高分: %u  %s\n"
+
+#: userland/apps/snake/main.c:545
+msgid "snake requires an interactive terminal"
+msgstr "snake 需要交互式终端"

@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Doom
+Name[ja]=Doom
 Name[zh_CN]=毁灭战士
 Exec=/usr/bin/doom
 TryExec=/usr/bin/doom

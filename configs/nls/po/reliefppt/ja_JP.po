@@ -1,0 +1,1475 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/reliefppt/document.cpp:895
+msgid "%s；%s"
+msgstr "%s。%s"
+
+#: userland/apps/reliefppt/document.cpp:900
+msgid "%s；%s，但恢复目录项同步失败：%s"
+msgstr "%s。%s。ただし、復元後のディレクトリエントリーの同期に失敗しました: %s"
+
+#: userland/apps/reliefppt/window.cpp:636
+msgid "A native ReliefOS presentation editor.\nDouble-click text to edit. Drag handles to resize.\nF5: present · Ctrl+S: save · Esc: finish editing\nUse .rppt to keep editable slides and embedded pictures."
+msgstr "ReliefOS 用のプレゼンテーションエディター。\nテキストをダブルクリックして編集し、ハンドルをドラッグしてサイズを変更できます。\nF5: スライドショー · Ctrl+S: 保存 · Esc: 編集終了\n編集可能なスライドと埋め込み画像を保持するには .rppt 形式を使用してください。"
+
+#: userland/apps/reliefppt/window.cpp:54
+msgid "About ReliefPPT"
+msgstr "ReliefPPT について"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/reliefppt/window.cpp:193
+msgid "Align bottom"
+msgstr "下揃え"
+
+#: userland/apps/reliefppt/window.cpp:188
+msgid "Align left"
+msgstr "左揃え"
+
+#: userland/apps/reliefppt/window.cpp:190
+msgid "Align right"
+msgstr "右揃え"
+
+#: userland/apps/reliefppt/window.cpp:194
+msgid "Align selected objects"
+msgstr "選択したオブジェクトの配置"
+
+#: userland/apps/reliefppt/window.cpp:191
+msgid "Align top"
+msgstr "上揃え"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/reliefppt/files.cpp:336
+msgid "An unsaved ReliefPPT recovery copy is available. Recover it into a new presentation?"
+msgstr "未保存の ReliefPPT 復元用コピーがあります。新しいプレゼンテーションに復元しますか?"
+
+#: userland/apps/reliefppt/dialogs.cpp:94
+msgid "Apply"
+msgstr "適用"
+
+#: userland/apps/reliefppt/window.cpp:186
+msgid "Arrow"
+msgstr "矢印"
+
+#: userland/apps/reliefppt/window.cpp:241
+msgid "Arrow keys: change slide\nB: black screen   Esc: return"
+msgstr "矢印キー: スライド切り替え\nB: 画面を黒くする   Esc: 戻る"
+
+#: userland/apps/reliefppt/window.cpp:207
+msgid "Background..."
+msgstr "背景..."
+
+#: userland/apps/reliefppt/window.cpp:130
+msgid "Blank slide"
+msgstr "白紙のスライド"
+
+#: userland/apps/reliefppt/window.cpp:208
+msgid "Blue theme"
+msgstr "青のテーマ"
+
+#: userland/apps/reliefppt/window.cpp:157
+msgid "Bold (Ctrl+B)"
+msgstr "太字 (Ctrl+B)"
+
+#: userland/apps/reliefppt/window.cpp:169
+msgid "Bullets"
+msgstr "箇条書き"
+
+#: userland/apps/reliefppt/dialogs.cpp:92
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/reliefppt/window.cpp:167
+msgid "Center"
+msgstr "中央"
+
+#: userland/apps/reliefppt/window.cpp:189
+msgid "Center X"
+msgstr "水平方向の中央"
+
+#: userland/apps/reliefppt/window.cpp:192
+msgid "Center Y"
+msgstr "垂直方向の中央"
+
+#: userland/apps/reliefppt/window.cpp:140
+msgid "Chinese / serif"
+msgstr "中国語 / セリフ体"
+
+#: userland/apps/reliefppt/files.cpp:241
+msgid "Choose an export file different from the editable presentation"
+msgstr "編集可能なプレゼンテーションとは別の書き出し先ファイルを選択してください"
+
+#: userland/apps/reliefppt/window.cpp:127
+msgid "Clipboard"
+msgstr "クリップボード"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/reliefppt/window.cpp:126
+msgid "Copy"
+msgstr "コピー"
+
+#: configs/nls/messages/reliefppt.c:5
+msgid "Could not capture the edited text"
+msgstr "編集中のテキストを取得できませんでした"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: configs/nls/messages/reliefppt.c:17
+msgid "Could not decode the PNG image"
+msgstr "PNG 画像をデコードできませんでした"
+
+#: configs/nls/messages/reliefppt.c:11
+msgid "Could not encode the slide image"
+msgstr "スライド画像をエンコードできませんでした"
+
+#: configs/nls/messages/reliefppt.c:18
+msgid "Could not open the image"
+msgstr "画像を開けませんでした"
+
+#: userland/apps/reliefppt/files.cpp:213
+msgid "Could not open the presentation"
+msgstr "プレゼンテーションを開けませんでした"
+
+#: configs/nls/messages/reliefppt.c:19
+msgid "Could not read the image"
+msgstr "画像を読み取れませんでした"
+
+#: configs/nls/messages/reliefppt.c:15
+msgid "Could not read the image file"
+msgstr "画像ファイルを読み取れませんでした"
+
+#: configs/nls/messages/reliefppt.c:10
+msgid "Could not render the slide image"
+msgstr "スライド画像を描画できませんでした"
+
+#: userland/apps/reliefppt/files.cpp:323
+msgid "Could not save the recovery copy"
+msgstr "復元用コピーを保存できませんでした"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/reliefppt/window.cpp:211
+msgid "Current slide colors"
+msgstr "現在のスライドの色"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/reliefppt/window.cpp:125
+msgid "Cut"
+msgstr "切り取り"
+
+#: userland/apps/reliefppt/window.cpp:177
+msgid "Delete"
+msgstr "削除"
+
+#: userland/apps/reliefppt/window.cpp:137
+msgid "Delete slide"
+msgstr "スライドを削除"
+
+#: userland/apps/reliefppt/window.cpp:56
+msgid "Design"
+msgstr "デザイン"
+
+#: userland/apps/reliefppt/files.cpp:61
+msgid "Discard"
+msgstr "破棄"
+
+#: userland/apps/reliefppt/dialogs.cpp:48
+msgid "Draw outline"
+msgstr "輪郭を描画"
+
+#: userland/apps/reliefppt/window.cpp:176
+msgid "Duplicate"
+msgstr "複製"
+
+#: userland/apps/reliefppt/window.cpp:136
+msgid "Duplicate slide"
+msgstr "スライドを複製"
+
+#: userland/apps/reliefppt/window.cpp:237
+msgid "Editor view"
+msgstr "編集画面"
+
+#: userland/apps/reliefppt/window.cpp:184
+msgid "Ellipse"
+msgstr "楕円"
+
+#: userland/apps/reliefppt/slideshow.cpp:20
+msgid "End of presentation\nPress Esc to return, or Left to go back"
+msgstr "プレゼンテーションの終わり\nEsc キーで戻るか、左キーで前のスライドに戻ります"
+
+#: userland/apps/reliefppt/window.cpp:490
+msgid "Enter a font size from 6 to 144 points"
+msgstr "6 ～ 144 ポイントのフォントサイズを入力してください"
+
+#: userland/apps/reliefppt/dialogs.cpp:111
+msgid "Enter finite values that keep the object inside the slide"
+msgstr "オブジェクトがスライド内に収まる有限の値を入力してください"
+
+#: userland/apps/reliefppt/window.cpp:53
+msgid "Example presentation"
+msgstr "サンプルのプレゼンテーション"
+
+#: userland/apps/reliefppt/window.cpp:55
+msgid "Exit"
+msgstr "終了"
+
+#: userland/apps/reliefppt/window.cpp:239
+msgid "Export HTML..."
+msgstr "HTML にエクスポート..."
+
+#: userland/apps/reliefppt/window.cpp:238
+msgid "Export PNG..."
+msgstr "PNG にエクスポート..."
+
+#: configs/nls/messages/reliefppt.c:12
+msgid "Export cancelled"
+msgstr "エクスポートをキャンセルしました"
+
+#: userland/apps/reliefppt/files.cpp:284
+msgid "Export complete; the editable presentation remains open"
+msgstr "エクスポートが完了しました。編集可能なプレゼンテーションは開いたままです"
+
+#: userland/apps/reliefppt/window.cpp:51
+msgid "Export current slide as PNG..."
+msgstr "現在のスライドを PNG にエクスポート..."
+
+#: userland/apps/reliefppt/window.cpp:52
+msgid "Export presentation as HTML..."
+msgstr "プレゼンテーションを HTML にエクスポート..."
+
+#: userland/apps/reliefppt/files.cpp:285
+msgid "Export was not completed"
+msgstr "エクスポートが完了しませんでした"
+
+#: userland/apps/reliefppt/files.cpp:254
+msgid "Exporting presentation"
+msgstr "プレゼンテーションのエクスポート"
+
+#: userland/apps/reliefppt/files.cpp:249
+msgid "Exporting presentation..."
+msgstr "プレゼンテーションをエクスポート中..."
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/reliefppt/window.cpp:43
+msgid "File"
+msgstr "ファイル"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/reliefppt/files.cpp:100
+msgid "File path is too long"
+msgstr "ファイルのパスが長すぎます"
+
+#: userland/apps/reliefppt/dialogs.cpp:146
+msgid "Fill color"
+msgstr "塗り色"
+
+#: userland/apps/reliefppt/dialogs.cpp:47
+msgid "Fill object"
+msgstr "オブジェクトを塗りつぶす"
+
+#: userland/apps/reliefppt/window.cpp:234
+msgid "Fit slide"
+msgstr "スライドに合わせる"
+
+#: userland/apps/reliefppt/window.cpp:144
+msgid "Font for the selected text boxes"
+msgstr "選択したテキストボックスのフォント"
+
+#: userland/apps/reliefppt/window.cpp:154
+msgid "Font size: 6–144 points; press Enter"
+msgstr "フォントサイズ: 6 ～ 144 ポイント。Enter キーで確定します"
+
+#: userland/apps/reliefppt/window.cpp:223
+msgid "From beginning"
+msgstr "最初から"
+
+#: userland/apps/reliefppt/window.cpp:224
+msgid "From current slide"
+msgstr "現在のスライドから"
+
+#: userland/apps/reliefppt/window.cpp:209
+msgid "Green theme"
+msgstr "緑のテーマ"
+
+#: userland/apps/reliefppt/window.cpp:217
+msgid "Guides"
+msgstr "ガイド"
+
+#: configs/nls/messages/reliefppt.c:13
+msgid "HTML export is too large"
+msgstr "HTML のエクスポートサイズが大きすぎます"
+
+#: userland/apps/reliefppt/dialogs.cpp:42
+msgid "Height"
+msgstr "高さ"
+
+#: userland/apps/reliefppt/window.cpp:56
+msgid "Home tab"
+msgstr "ホームタブ"
+
+#: userland/apps/reliefppt/document.cpp:52
+msgid "I/O 错误"
+msgstr "入出力エラー"
+
+#: configs/nls/messages/reliefppt.c:16
+msgid "Image dimensions exceed the supported limit"
+msgstr "画像の寸法が対応する上限を超えています"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/reliefppt/window.cpp:56
+msgid "Insert"
+msgstr "挿入"
+
+#: userland/apps/reliefppt/window.cpp:187
+msgid "Insert objects"
+msgstr "オブジェクトを挿入"
+
+#: userland/apps/reliefppt/files.cpp:90
+msgid "Insert picture"
+msgstr "画像を挿入"
+
+#: userland/apps/reliefppt/canvas.cpp:152
+msgid "Insert text, pictures or shapes to start your slide"
+msgstr "テキスト、画像、図形を挿入してスライドを作成できます"
+
+#: configs/nls/messages/reliefppt.c:7
+msgid "Invalid image reference"
+msgstr "無効な画像参照"
+
+#: userland/apps/reliefppt/window.cpp:157
+msgid "Italic (Ctrl+I)"
+msgstr "斜体 (Ctrl+I)"
+
+#: userland/apps/reliefppt/dialogs.cpp:54
+msgid "Keep aspect ratio"
+msgstr "縦横比を維持"
+
+#: userland/apps/reliefppt/files.cpp:335
+msgid "Later"
+msgstr "後で"
+
+#: userland/apps/reliefppt/window.cpp:135
+msgid "Layout for the next new slide"
+msgstr "次の新しいスライドのレイアウト"
+
+#: userland/apps/reliefppt/window.cpp:166
+msgid "Left"
+msgstr "左"
+
+#: userland/apps/reliefppt/window.cpp:210
+msgid "Light theme"
+msgstr "ライトテーマ"
+
+#: userland/apps/reliefppt/window.cpp:185
+msgid "Line"
+msgstr "直線"
+
+#: userland/apps/reliefppt/dialogs.cpp:147
+msgid "Line color"
+msgstr "線の色"
+
+#: userland/apps/reliefppt/dialogs.cpp:51
+msgid "Line width (0–20)"
+msgstr "線の幅 (0 ～ 20)"
+
+#: userland/apps/reliefppt/window.cpp:198
+msgid "Lower"
+msgstr "背面へ"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/reliefppt/window.cpp:142
+msgid "Monospace"
+msgstr "等幅"
+
+#: userland/apps/reliefppt/window.cpp:219
+msgid "Move slide down"
+msgstr "スライドを下へ移動"
+
+#: userland/apps/reliefppt/window.cpp:218
+msgid "Move slide up"
+msgstr "スライドを上へ移動"
+
+#: userland/apps/reliefppt/window.cpp:47
+msgid "New"
+msgstr "新規作成"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/reliefppt/window.cpp:128
+msgid "New slide"
+msgstr "新規"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: userland/apps/reliefppt/canvas.cpp:266
+msgid "Not enough memory"
+msgstr "メモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:9
+msgid "Not enough memory to draw text"
+msgstr "テキストを描画するメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:8
+msgid "Not enough memory to draw the image"
+msgstr "画像を描画するメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:14
+msgid "Not enough memory to export HTML"
+msgstr "HTML をエクスポートするメモリが不足しています"
+
+#: userland/apps/reliefppt/window.cpp:83
+msgid "Notes"
+msgstr "メモ"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/reliefppt/window.cpp:201
+msgid "Object"
+msgstr "オブジェクト"
+
+#: userland/apps/reliefppt/window.cpp:178
+msgid "Objects"
+msgstr "オブジェクト"
+
+#: userland/apps/reliefppt/window.cpp:409
+msgid "Objects copied"
+msgstr "オブジェクトをコピーしました"
+
+#: userland/apps/reliefppt/files.cpp:91
+msgid "Open presentation"
+msgstr "プレゼンテーションを開く"
+
+#: userland/apps/reliefppt/window.cpp:48
+msgid "Open..."
+msgstr "開く..."
+
+#: userland/apps/reliefppt/files.cpp:200
+msgid "Opening presentation..."
+msgstr "プレゼンテーションを開いています..."
+
+#: userland/apps/reliefppt/window.cpp:199
+msgid "Order"
+msgstr "順序"
+
+#: userland/apps/reliefppt/window.cpp:124
+msgid "Paste"
+msgstr "貼り付け"
+
+#: userland/apps/reliefppt/window.cpp:173
+msgid "Picture..."
+msgstr "画像..."
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/reliefppt/dialogs.cpp:40
+msgid "Position and size"
+msgstr "位置とサイズ"
+
+#: userland/apps/reliefppt/window.cpp:200
+msgid "Position and size..."
+msgstr "位置とサイズ..."
+
+#: userland/apps/reliefppt/dialogs.cpp:87
+msgid "Positions and sizes are measured in slide units.\nThe object must remain inside the slide."
+msgstr "位置とサイズはスライド単位で指定します。\nオブジェクトはスライド内に収まる必要があります。"
+
+#: userland/apps/reliefppt/window.cpp:226
+msgid "Present"
+msgstr "発表"
+
+#: userland/apps/reliefppt/files.cpp:224
+msgid "Presentation opened"
+msgstr "プレゼンテーションを開きました"
+
+#: userland/apps/reliefppt/files.cpp:182
+msgid "Presentation saved"
+msgstr "プレゼンテーションを保存しました"
+
+#: userland/apps/reliefppt/files.cpp:170
+msgid "Presentation was not saved"
+msgstr "プレゼンテーションは保存されませんでした"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/reliefppt/window.cpp:170
+msgid "Properties..."
+msgstr "プロパティ..."
+
+#: userland/apps/reliefppt/window.cpp:196
+msgid "Raise"
+msgstr "前面へ"
+
+#: userland/apps/reliefppt/window.cpp:91
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/reliefppt/files.cpp:335
+msgid "Recover"
+msgstr "復元"
+
+#: userland/apps/reliefppt/files.cpp:359
+msgid "Recovered — save this presentation to a new file"
+msgstr "復元済み — このプレゼンテーションを新しいファイルに保存してください"
+
+#: userland/apps/reliefppt/files.cpp:321
+msgid "Recovery copy saved"
+msgstr "復元用コピーを保存しました"
+
+#: userland/apps/reliefppt/window.cpp:183
+msgid "Rectangle"
+msgstr "長方形"
+
+#: userland/apps/reliefppt/window.cpp:63
+msgid "Redo"
+msgstr "やり直し"
+
+#: userland/apps/reliefppt/files.cpp:141
+msgid "Replace"
+msgstr "置換"
+
+#: userland/apps/reliefppt/files.cpp:141
+msgid "Replace the existing file?\n%s"
+msgstr "既存のファイルを置き換えますか?\n%s"
+
+#: userland/apps/reliefppt/window.cpp:168
+msgid "Right"
+msgstr "右"
+
+#: userland/apps/reliefppt/window.cpp:141
+msgid "Sans serif"
+msgstr "サンセリフ体"
+
+#: userland/apps/reliefppt/files.cpp:61
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/reliefppt/files.cpp:157
+msgid "Save a copy..."
+msgstr "コピーを保存..."
+
+#: userland/apps/reliefppt/window.cpp:50
+msgid "Save as..."
+msgstr "名前を付けて保存..."
+
+#: userland/apps/reliefppt/files.cpp:61
+msgid "Save changes to this presentation?"
+msgstr "このプレゼンテーションへの変更を保存しますか?"
+
+#: userland/apps/reliefppt/files.cpp:89
+msgid "Save presentation or export"
+msgstr "プレゼンテーションを保存またはエクスポート"
+
+#: userland/apps/reliefppt/files.cpp:147
+msgid "Saving presentation..."
+msgstr "プレゼンテーションを保存中..."
+
+#: userland/apps/reliefppt/window.cpp:542
+msgid "Select a text box first"
+msgstr "先にテキストボックスを選択してください"
+
+#: userland/apps/reliefppt/dialogs.cpp:136
+msgid "Select an object first"
+msgstr "先にオブジェクトを選択してください"
+
+#: userland/apps/reliefppt/dialogs.cpp:33
+msgid "Select one object to edit its position and size"
+msgstr "位置とサイズを編集するオブジェクトを 1 つ選択してください"
+
+#: userland/apps/reliefppt/window.cpp:240
+msgid "Share"
+msgstr "共有"
+
+#: userland/apps/reliefppt/window.cpp:212
+msgid "Show grid"
+msgstr "グリッドを表示"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/reliefppt/window.cpp:349
+msgid "Slide %zu / %zu  ·  %zu selected  ·  %d%%"
+msgstr "スライド %zu / %zu  ·  %zu 個選択  ·  %d%%"
+
+#: userland/apps/reliefppt/dialogs.cpp:144
+msgid "Slide background"
+msgstr "スライドの背景"
+
+#: userland/apps/reliefppt/window.cpp:220
+msgid "Slide order"
+msgstr "スライドの順序"
+
+#: userland/apps/reliefppt/window.cpp:56
+msgid "Slide show"
+msgstr "発表"
+
+#: userland/apps/reliefppt/window.cpp:206
+msgid "Slide size"
+msgstr "スライドのサイズ"
+
+#: userland/apps/reliefppt/window.cpp:138
+msgid "Slides"
+msgstr "スライド"
+
+#: userland/apps/reliefppt/window.cpp:216
+msgid "Snap movement to 10 units; hold Alt to bypass"
+msgstr "10 単位ごとにスナップします。Alt キーを押すと一時解除できます"
+
+#: userland/apps/reliefppt/window.cpp:214
+msgid "Snap to grid"
+msgstr "グリッドにスナップ"
+
+#: userland/apps/reliefppt/window.cpp:235
+msgid "Speaker notes"
+msgstr "発表者ノート"
+
+#: userland/apps/reliefppt/window.cpp:205
+msgid "Standard 4:3"
+msgstr "標準 4:3"
+
+#: userland/apps/reliefppt/window.cpp:225
+msgid "Start from current slide (Shift+F5)"
+msgstr "現在のスライドから開始 (Shift+F5)"
+
+#: userland/apps/reliefppt/window.cpp:223
+msgid "Start slide show (F5)"
+msgstr "スライドショーを開始 (F5)"
+
+#: userland/apps/reliefppt/window.cpp:165
+msgid "Text"
+msgstr "テキスト"
+
+#: userland/apps/reliefppt/window.cpp:171
+msgid "Text / object"
+msgstr "テキスト / オブジェクト"
+
+#: userland/apps/reliefppt/window.cpp:172
+msgid "Text box"
+msgstr "テキスト"
+
+#: userland/apps/reliefppt/dialogs.cpp:145
+msgid "Text color"
+msgstr "文字の色"
+
+#: userland/apps/reliefppt/dialogs.cpp:86
+msgid "Text exceeds this box. Increase its height or reduce the font size."
+msgstr "テキストがボックスからはみ出しています。高さを増やすか、フォントサイズを小さくしてください。"
+
+#: configs/nls/messages/reliefppt.c:21
+msgid "The BMP image is truncated"
+msgstr "BMP 画像が不完全です"
+
+#: userland/apps/reliefppt/files.cpp:158
+msgid "The file changed outside ReliefPPT. Save a copy or explicitly replace it."
+msgstr "ReliefPPT の外部でファイルが変更されました。コピーを保存するか、置き換えを明示的に選択してください。"
+
+#: configs/nls/messages/reliefppt.c:6
+msgid "The file changed while it was being opened"
+msgstr "開いている間にファイルが変更されました"
+
+#: userland/apps/reliefppt/window.cpp:132
+msgid "Title and content"
+msgstr "タイトルと本文"
+
+#: userland/apps/reliefppt/window.cpp:131
+msgid "Title slide"
+msgstr "タイトルスライド"
+
+#: userland/apps/reliefppt/window.cpp:197
+msgid "To back"
+msgstr "最背面へ"
+
+#: userland/apps/reliefppt/window.cpp:195
+msgid "To front"
+msgstr "最前面へ"
+
+#: userland/apps/reliefppt/window.cpp:133
+msgid "Two columns"
+msgstr "2 段組み"
+
+#: userland/apps/reliefppt/window.cpp:157
+msgid "Underline (Ctrl+U)"
+msgstr "下線 (Ctrl+U)"
+
+#: userland/apps/reliefppt/window.cpp:63
+msgid "Undo"
+msgstr "元に戻す"
+
+#: userland/apps/reliefppt/window.cpp:284
+msgid "Untitled presentation"
+msgstr "無題のプレゼンテーション"
+
+#: userland/apps/reliefppt/main.cpp:16
+msgid "Usage: reliefppt [presentation.rppt]"
+msgstr "使い方: reliefppt [presentation.rppt]"
+
+#: configs/nls/messages/reliefppt.c:20
+msgid "Use PNG or an uncompressed 24/32-bit BMP image"
+msgstr "PNG または非圧縮の 24/32 ビット BMP 画像を使用してください"
+
+#: userland/apps/reliefppt/window.cpp:204
+msgid "Widescreen 16:9"
+msgstr "ワイドスクリーン 16:9"
+
+#: userland/apps/reliefppt/dialogs.cpp:42
+msgid "Width"
+msgstr "幅"
+
+#: userland/apps/reliefppt/dialogs.cpp:41
+msgid "X position"
+msgstr "X 座標"
+
+#: userland/apps/reliefppt/dialogs.cpp:41
+msgid "Y position"
+msgstr "Y 座標"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: configs/nls/messages/reliefppt.c:29
+msgid "不支持此原生演示文稿版本"
+msgstr "このネイティブプレゼンテーションのバージョンには対応していません"
+
+#: configs/nls/messages/reliefppt.c:30
+msgid "临时文件名过长"
+msgstr "一時ファイル名が長すぎます"
+
+#: configs/nls/messages/reliefppt.c:31
+msgid "保存原文件时发现文件已被截断"
+msgstr "元のファイルの保存中に、ファイルの切り詰めが検出されました"
+
+#: configs/nls/messages/reliefppt.c:32
+msgid "保存路径为空"
+msgstr "保存先のパスが空です"
+
+#: configs/nls/messages/reliefppt.c:33
+msgid "修订号已耗尽"
+msgstr "リビジョン番号を使い切りました"
+
+#: userland/apps/reliefppt/geometry.cpp:166
+msgid "内存不足"
+msgstr "メモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:35
+msgid "内存不足或图片资源超出文件大小限制"
+msgstr "メモリ不足、または画像リソースがファイルサイズの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:36
+msgid "内存不足或幻灯片内容超出文件大小限制"
+msgstr "メモリ不足、またはスライドの内容がファイルサイズの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:37
+msgid "内存不足或幻灯片对象超出文件大小限制"
+msgstr "メモリ不足、またはスライドのオブジェクトがファイルサイズの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:38
+msgid "内存不足或幻灯片超出文件大小限制"
+msgstr "メモリ不足、またはスライドがファイルサイズの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:39
+msgid "内存不足或演示文稿超出文件大小限制"
+msgstr "メモリ不足、またはプレゼンテーションがファイルサイズの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:40
+msgid "内存不足，无法保存幻灯片对象"
+msgstr "スライドのオブジェクトを保存するメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:41
+msgid "内存不足，无法保存恢复文件路径"
+msgstr "復元ファイルのパスを保存するメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:42
+msgid "内存不足，无法保存演示文稿图片"
+msgstr "プレゼンテーションの画像を保存するメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:43
+msgid "内存不足，无法保存演示文稿幻灯片"
+msgstr "プレゼンテーションのスライドを保存するメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:44
+msgid "内存不足，无法创建演示文稿"
+msgstr "プレゼンテーションを作成するメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:45
+msgid "内存不足，无法读取图片像素"
+msgstr "画像のピクセルを読み取るメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:46
+msgid "内存不足，无法读取幻灯片对象"
+msgstr "スライドのオブジェクトを読み取るメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:47
+msgid "内存不足，无法读取演示文稿"
+msgstr "プレゼンテーションを読み取るメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:48
+msgid "内存不足，无法读取演示文稿图片"
+msgstr "プレゼンテーションの画像を読み取るメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:49
+msgid "内存不足，无法读取演示文稿幻灯片"
+msgstr "プレゼンテーションのスライドを読み取るメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:50
+msgid "内存不足，无法读取演示文稿文本"
+msgstr "プレゼンテーションのテキストを読み取るメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:51
+msgid "内存不足，无法返回恢复文件路径"
+msgstr "復元ファイルのパスを返すメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:52
+msgid "内存不足，无法返回恢复目录"
+msgstr "復元ディレクトリを返すメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:53
+msgid "内存不足，无法返回演示文稿数据"
+msgstr "プレゼンテーションのデータを返すメモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:54
+msgid "剪贴对象格式无效"
+msgstr "クリップボードのオブジェクトの形式が無効です"
+
+#: userland/apps/reliefppt/geometry.cpp:201
+msgid "单个文字簇超出文本框宽度"
+msgstr "1 つの文字クラスターがテキストボックスの幅を超えています"
+
+#: userland/apps/reliefppt/document.cpp:896
+msgid "原文件已恢复"
+msgstr "元のファイルを復元しました"
+
+#: userland/apps/reliefppt/model.cpp:181
+msgid "右侧内容"
+msgstr "右側のコンテンツ"
+
+#: configs/nls/messages/reliefppt.c:58
+msgid "图层操作无效"
+msgstr "レイヤー操作が無効です"
+
+#: userland/apps/reliefppt/model.cpp:1136
+msgid "图片保存在演示文稿中"
+msgstr "画像はプレゼンテーション内に保存されます"
+
+#: configs/nls/messages/reliefppt.c:60
+msgid "图片尺寸或数据无效"
+msgstr "画像の寸法またはデータが無効です"
+
+#: configs/nls/messages/reliefppt.c:61
+msgid "图片尺寸无效"
+msgstr "画像の寸法が無効です"
+
+#: configs/nls/messages/reliefppt.c:62
+msgid "图片引用无效"
+msgstr "画像の参照が無効です"
+
+#: configs/nls/messages/reliefppt.c:63
+msgid "图片引用无效或内存不足"
+msgstr "画像の参照が無効か、メモリが不足しています"
+
+#: configs/nls/messages/reliefppt.c:64
+msgid "图片或对象数量超限"
+msgstr "画像数またはオブジェクト数が上限を超えています"
+
+#: userland/apps/reliefppt/model.cpp:1139
+msgid "图片数据已嵌入，无需保留来源文件。"
+msgstr "画像データは埋め込まれているため、元のファイルを保持する必要はありません。"
+
+#: configs/nls/messages/reliefppt.c:66
+msgid "图片数据超限"
+msgstr "画像データが上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:67
+msgid "图片数据长度无效"
+msgstr "画像データの長さが無効です"
+
+#: configs/nls/messages/reliefppt.c:68
+msgid "图片数量超限"
+msgstr "画像数が上限を超えています"
+
+#: userland/apps/reliefppt/model.cpp:166
+msgid "在此输入内容"
+msgstr "ここに内容を入力"
+
+#: configs/nls/messages/reliefppt.c:70
+msgid "备注文本无效"
+msgstr "ノートのテキストが無効です"
+
+#: configs/nls/messages/reliefppt.c:71
+msgid "对象属性无效"
+msgstr "オブジェクトの属性が無効です"
+
+#: configs/nls/messages/reliefppt.c:72
+msgid "对象数量超限"
+msgstr "オブジェクト数が上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:73
+msgid "对象文本超过长度限制"
+msgstr "オブジェクトのテキストが長さの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:74
+msgid "对象编号已耗尽"
+msgstr "オブジェクト番号を使い切りました"
+
+#: configs/nls/messages/reliefppt.c:75
+msgid "对象编号或修订号无效"
+msgstr "オブジェクト番号またはリビジョン番号が無効です"
+
+#: configs/nls/messages/reliefppt.c:76
+msgid "对象编号重复或无效"
+msgstr "オブジェクト番号が重複しているか、無効です"
+
+#: configs/nls/messages/reliefppt.c:77
+msgid "对齐方式无效"
+msgstr "配置方法が無効です"
+
+#: userland/apps/reliefppt/model.cpp:175
+msgid "左侧内容"
+msgstr "左側のコンテンツ"
+
+#: configs/nls/messages/reliefppt.c:79
+msgid "幻灯片备注超过长度限制"
+msgstr "スライドのノートが長さの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:80
+msgid "幻灯片属性无效"
+msgstr "スライドの属性が無効です"
+
+#: configs/nls/messages/reliefppt.c:81
+msgid "幻灯片数量无效"
+msgstr "スライド数が無効です"
+
+#: configs/nls/messages/reliefppt.c:82
+msgid "当前幻灯片对象数量超限"
+msgstr "現在のスライドのオブジェクト数が上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:83
+msgid "当前幻灯片无效"
+msgstr "現在のスライドが無効です"
+
+#: configs/nls/messages/reliefppt.c:84
+msgid "恢复文件不在私有恢复目录中"
+msgstr "復元ファイルが専用の復元ディレクトリ内にありません"
+
+#: configs/nls/messages/reliefppt.c:85
+msgid "恢复文件名过长"
+msgstr "復元ファイル名が長すぎます"
+
+#: configs/nls/messages/reliefppt.c:86
+msgid "恢复文件在扫描期间发生更改"
+msgstr "走査中に復元ファイルが変更されました"
+
+#: configs/nls/messages/reliefppt.c:87
+msgid "恢复文件已被其他进程使用"
+msgstr "復元ファイルは別のプロセスが使用中です"
+
+#: configs/nls/messages/reliefppt.c:88
+msgid "恢复文件必须使用 .rppt 扩展名"
+msgstr "復元ファイルには .rppt 拡張子が必要です"
+
+#: configs/nls/messages/reliefppt.c:89
+msgid "恢复文件必须是私有普通文件"
+msgstr "復元ファイルは非公開の通常ファイルである必要があります"
+
+#: configs/nls/messages/reliefppt.c:90
+msgid "恢复文件路径为空"
+msgstr "復元ファイルのパスが空です"
+
+#: configs/nls/messages/reliefppt.c:91
+msgid "恢复文件路径过长"
+msgstr "復元ファイルのパスが長すぎます"
+
+#: configs/nls/messages/reliefppt.c:92
+msgid "恢复目录必须属于当前用户"
+msgstr "復元ディレクトリは現在のユーザーが所有する必要があります"
+
+#: configs/nls/messages/reliefppt.c:93
+msgid "恢复目录权限不够安全"
+msgstr "復元ディレクトリのアクセス権が安全ではありません"
+
+#: configs/nls/messages/reliefppt.c:94
+msgid "恢复锁必须是私有普通文件"
+msgstr "復元用ロックは非公開の通常ファイルである必要があります"
+
+#: configs/nls/messages/reliefppt.c:95
+msgid "恢复锁文件名过长"
+msgstr "復元用ロックのファイル名が長すぎます"
+
+#: configs/nls/messages/reliefppt.c:96
+msgid "打开期间演示文稿已发生更改"
+msgstr "開いている間にプレゼンテーションが変更されました"
+
+#: configs/nls/messages/reliefppt.c:97
+msgid "找不到当前用户的状态目录"
+msgstr "現在のユーザーの状態ディレクトリが見つかりません"
+
+#: configs/nls/messages/reliefppt.c:98
+msgid "撤销历史不可用"
+msgstr "元に戻す履歴を利用できません"
+
+#: configs/nls/messages/reliefppt.c:99
+msgid "撤销历史无效"
+msgstr "元に戻す履歴が無効です"
+
+#: configs/nls/messages/reliefppt.c:100
+msgid "撤销历史超出内存限制"
+msgstr "元に戻す履歴がメモリの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:101
+msgid "撤销状态超出内存限制"
+msgstr "元に戻す状態がメモリの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:102
+msgid "文件名无效或过长"
+msgstr "ファイル名が無効か、長すぎます"
+
+#: configs/nls/messages/reliefppt.c:103
+msgid "文件已在 ReliefPPT 外部更改，已保留原文件"
+msgstr "ReliefPPT の外部でファイルが変更されたため、元のファイルを保持しました"
+
+#: configs/nls/messages/reliefppt.c:104
+msgid "文件时间戳仅支持非符号链接的普通文件"
+msgstr "ファイルのタイムスタンプは、シンボリックリンク以外の通常ファイルにのみ対応しています"
+
+#: configs/nls/messages/reliefppt.c:105
+msgid "文件路径为空"
+msgstr "ファイルのパスが空です"
+
+#: configs/nls/messages/reliefppt.c:106
+msgid "文件路径过长"
+msgstr "ファイルのパスが長すぎます"
+
+#: userland/apps/reliefppt/geometry.cpp:157
+msgid "文字内容超出文本框高度"
+msgstr "テキストがテキストボックスの高さを超えています"
+
+#: configs/nls/messages/reliefppt.c:108
+msgid "文字对象不存在"
+msgstr "テキストオブジェクトが存在しません"
+
+#: userland/apps/reliefppt/geometry.cpp:386
+msgid "文字测量函数无效"
+msgstr "文字計測関数が無効です"
+
+#: userland/apps/reliefppt/geometry.cpp:196
+msgid "文字测量结果无效"
+msgstr "文字計測の結果が無効です"
+
+#: userland/apps/reliefppt/geometry.cpp:191
+msgid "文字编码无效"
+msgstr "テキストの文字コードが無効です"
+
+#: userland/apps/reliefppt/geometry.cpp:146
+msgid "文字行数超限"
+msgstr "テキストの行数が上限を超えています"
+
+#: userland/apps/reliefppt/geometry.cpp:152
+msgid "文字行无法放入文本框"
+msgstr "テキストの行がテキストボックスに収まりません"
+
+#: userland/apps/reliefppt/geometry.cpp:395
+msgid "文本对象无效"
+msgstr "テキストオブジェクトが無効です"
+
+#: configs/nls/messages/reliefppt.c:115
+msgid "文本无效"
+msgstr "テキストが無効です"
+
+#: userland/apps/reliefppt/geometry.cpp:402
+msgid "文本框没有可用排版区域"
+msgstr "テキストボックスにレイアウト可能な領域がありません"
+
+#: configs/nls/messages/reliefppt.c:117
+msgid "文档信息文本无效"
+msgstr "文書情報のテキストが無効です"
+
+#: configs/nls/messages/reliefppt.c:118
+msgid "文档大小超限"
+msgstr "文書のサイズが上限を超えています"
+
+#: userland/apps/reliefppt/document.cpp:896
+msgid "新目标已删除"
+msgstr "新しい保存先を削除しました"
+
+#: configs/nls/messages/reliefppt.c:120
+msgid "无法保留原文件权限"
+msgstr "元のファイルのアクセス権を保持できません"
+
+#: configs/nls/messages/reliefppt.c:121
+msgid "无法关闭临时输出文件"
+msgstr "一時出力ファイルを閉じられません"
+
+#: configs/nls/messages/reliefppt.c:122
+msgid "无法关闭原文件回滚副本"
+msgstr "元のファイルのロールバック用コピーを閉じられません"
+
+#: configs/nls/messages/reliefppt.c:123
+msgid "无法关闭恢复目录"
+msgstr "復元ディレクトリを閉じられません"
+
+#: configs/nls/messages/reliefppt.c:124
+msgid "无法关闭演示文稿"
+msgstr "プレゼンテーションを閉じられません"
+
+#: configs/nls/messages/reliefppt.c:125
+msgid "无法关闭状态目录"
+msgstr "状態ディレクトリを閉じられません"
+
+#: configs/nls/messages/reliefppt.c:126
+msgid "无法关闭现有保存文件"
+msgstr "既存の保存ファイルを閉じられません"
+
+#: configs/nls/messages/reliefppt.c:127
+msgid "无法写入临时输出文件"
+msgstr "一時出力ファイルに書き込めません"
+
+#: configs/nls/messages/reliefppt.c:128
+msgid "无法写入原文件回滚副本"
+msgstr "元のファイルのロールバック用コピーに書き込めません"
+
+#: configs/nls/messages/reliefppt.c:129
+msgid "无法分配唯一临时文件名"
+msgstr "一意の一時ファイル名を割り当てられません"
+
+#: configs/nls/messages/reliefppt.c:130
+msgid "无法分配唯一恢复文件名"
+msgstr "一意の復元ファイル名を割り当てられません"
+
+#: configs/nls/messages/reliefppt.c:131
+msgid "无法创建临时文件"
+msgstr "一時ファイルを作成できません"
+
+#: configs/nls/messages/reliefppt.c:132
+msgid "无法创建原文件回滚副本"
+msgstr "元のファイルのロールバック用コピーを作成できません"
+
+#: configs/nls/messages/reliefppt.c:133
+msgid "无法创建恢复文件"
+msgstr "復元ファイルを作成できません"
+
+#: configs/nls/messages/reliefppt.c:134
+msgid "无法创建撤销历史"
+msgstr "元に戻す履歴を作成できません"
+
+#: configs/nls/messages/reliefppt.c:135
+msgid "无法创建状态目录"
+msgstr "状態ディレクトリを作成できません"
+
+#: configs/nls/messages/reliefppt.c:136
+msgid "无法创建空白文档"
+msgstr "白紙の文書を作成できません"
+
+#: configs/nls/messages/reliefppt.c:137
+msgid "无法创建输出文件"
+msgstr "出力ファイルを作成できません"
+
+#: configs/nls/messages/reliefppt.c:138
+msgid "无法同步临时输出文件"
+msgstr "一時出力ファイルを同期できません"
+
+#: configs/nls/messages/reliefppt.c:139
+msgid "无法同步原文件回滚副本"
+msgstr "元のファイルのロールバック用コピーを同期できません"
+
+#: configs/nls/messages/reliefppt.c:140
+msgid "无法同步原文件回滚目录项"
+msgstr "元のファイルのロールバック用ディレクトリエントリーを同期できません"
+
+#: configs/nls/messages/reliefppt.c:141
+msgid "无法同步输出目录"
+msgstr "出力ディレクトリを同期できません"
+
+#: configs/nls/messages/reliefppt.c:142
+msgid "无法同步输出目录或删除新目标；目标文件可能仍存在"
+msgstr "出力ディレクトリの同期、または新しい保存先の削除に失敗しました。保存先のファイルが残っている可能性があります"
+
+#: configs/nls/messages/reliefppt.c:143
+msgid "无法同步输出目录或恢复原文件"
+msgstr "出力ディレクトリの同期、または元のファイルの復元に失敗しました"
+
+#: userland/apps/reliefppt/document.cpp:911
+msgid "无法同步输出目录或恢复原文件；回滚副本保留在同目录：%s"
+msgstr "出力ディレクトリの同期、または元のファイルの復元に失敗しました。ロールバック用コピーを同じディレクトリに保持しました: %s"
+
+#: configs/nls/messages/reliefppt.c:145
+msgid "无法复制幻灯片"
+msgstr "スライドを複製できません"
+
+#: configs/nls/messages/reliefppt.c:146
+msgid "无法安全创建临时输出文件"
+msgstr "一時出力ファイルを安全に作成できません"
+
+#: configs/nls/messages/reliefppt.c:147
+msgid "无法打开恢复文件锁"
+msgstr "復元ファイルのロックを開けません"
+
+#: configs/nls/messages/reliefppt.c:148
+msgid "无法打开文件系统根目录"
+msgstr "ファイルシステムのルートディレクトリを開けません"
+
+#: configs/nls/messages/reliefppt.c:149
+msgid "无法打开演示文稿"
+msgstr "プレゼンテーションを開けません"
+
+#: configs/nls/messages/reliefppt.c:150
+msgid "无法打开现有保存文件"
+msgstr "既存の保存ファイルを開けません"
+
+#: configs/nls/messages/reliefppt.c:151
+msgid "无法打开目标目录"
+msgstr "保存先ディレクトリを開けません"
+
+#: configs/nls/messages/reliefppt.c:152
+msgid "无法扫描恢复目录"
+msgstr "復元ディレクトリを走査できません"
+
+#: userland/apps/reliefppt/geometry.cpp:229
+msgid "无法排版文字"
+msgstr "文字をレイアウトできません"
+
+#: configs/nls/messages/reliefppt.c:154
+msgid "无法替换演示文稿文件"
+msgstr "プレゼンテーションファイルを置き換えられません"
+
+#: configs/nls/messages/reliefppt.c:155
+msgid "无法检查恢复文件"
+msgstr "復元ファイルを検査できません"
+
+#: configs/nls/messages/reliefppt.c:156
+msgid "无法检查恢复目录"
+msgstr "復元ディレクトリを検査できません"
+
+#: configs/nls/messages/reliefppt.c:157
+msgid "无法检查文件"
+msgstr "ファイルを検査できません"
+
+#: configs/nls/messages/reliefppt.c:158
+msgid "无法检查演示文稿"
+msgstr "プレゼンテーションを検査できません"
+
+#: configs/nls/messages/reliefppt.c:159
+msgid "无法检查现有保存文件"
+msgstr "既存の保存ファイルを検査できません"
+
+#: configs/nls/messages/reliefppt.c:160
+msgid "无法添加幻灯片"
+msgstr "スライドを追加できません"
+
+#: configs/nls/messages/reliefppt.c:161
+msgid "无法设置恢复文件权限"
+msgstr "復元ファイルのアクセス権を設定できません"
+
+#: configs/nls/messages/reliefppt.c:162
+msgid "无法设置恢复目录权限"
+msgstr "復元ディレクトリのアクセス権を設定できません"
+
+#: configs/nls/messages/reliefppt.c:163
+msgid "无法读取演示文稿"
+msgstr "プレゼンテーションを読み取れません"
+
+#: configs/nls/messages/reliefppt.c:164
+msgid "无法读取现有保存文件"
+msgstr "既存の保存ファイルを読み取れません"
+
+#: configs/nls/messages/reliefppt.c:165
+msgid "无法重新检查演示文稿"
+msgstr "プレゼンテーションを再検査できません"
+
+#: configs/nls/messages/reliefppt.c:166
+msgid "无法重新检查现有保存文件"
+msgstr "既存の保存ファイルを再検査できません"
+
+#: configs/nls/messages/reliefppt.c:167
+msgid "无法锁定恢复文件"
+msgstr "復元ファイルをロックできません"
+
+#: configs/nls/messages/reliefppt.c:168
+msgid "更新对象编号无效"
+msgstr "更新するオブジェクト番号が無効です"
+
+#: configs/nls/messages/reliefppt.c:169
+msgid "更新对象编号重复"
+msgstr "更新するオブジェクト番号が重複しています"
+
+#: userland/apps/reliefppt/model.cpp:156
+msgid "标题"
+msgstr "タイトル"
+
+#: userland/apps/reliefppt/model.cpp:1084
+msgid "欢迎使用 ReliefPPT"
+msgstr "ReliefPPT へようこそ"
+
+#: userland/apps/reliefppt/model.cpp:1095
+msgid "清晰表达每一个想法"
+msgstr "すべてのアイデアを明確に伝える"
+
+#: configs/nls/messages/reliefppt.c:173
+msgid "演示文稿作者字段超过长度限制"
+msgstr "プレゼンテーションの作成者欄が長さの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:174
+msgid "演示文稿包含无效的 UTF-8 文本"
+msgstr "プレゼンテーションに不正な UTF-8 テキストが含まれています"
+
+#: configs/nls/messages/reliefppt.c:175
+msgid "演示文稿包含未知对象类型或样式值"
+msgstr "プレゼンテーションに不明なオブジェクトの種類またはスタイル値が含まれています"
+
+#: configs/nls/messages/reliefppt.c:176
+msgid "演示文稿图片尺寸无效"
+msgstr "プレゼンテーションの画像の寸法が無効です"
+
+#: configs/nls/messages/reliefppt.c:177
+msgid "演示文稿图片数据长度无效"
+msgstr "プレゼンテーションの画像データの長さが無効です"
+
+#: configs/nls/messages/reliefppt.c:178
+msgid "演示文稿图片数量无效"
+msgstr "プレゼンテーションの画像数が無効です"
+
+#: configs/nls/messages/reliefppt.c:179
+msgid "演示文稿对象数量无效"
+msgstr "プレゼンテーションのオブジェクト数が無効です"
+
+#: configs/nls/messages/reliefppt.c:180
+msgid "演示文稿幻灯片数量无效"
+msgstr "プレゼンテーションのスライド数が無効です"
+
+#: configs/nls/messages/reliefppt.c:181
+msgid "演示文稿文件包含多余数据"
+msgstr "プレゼンテーションファイルに余分なデータが含まれています"
+
+#: configs/nls/messages/reliefppt.c:182
+msgid "演示文稿文件大小无效"
+msgstr "プレゼンテーションファイルのサイズが無効です"
+
+#: configs/nls/messages/reliefppt.c:183
+msgid "演示文稿文件已截断"
+msgstr "プレゼンテーションファイルが不完全です"
+
+#: configs/nls/messages/reliefppt.c:184
+msgid "演示文稿文件超过 96 MiB 限制"
+msgstr "プレゼンテーションファイルが 96 MiB の上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:185
+msgid "演示文稿标题超过长度限制"
+msgstr "プレゼンテーションのタイトルが長さの上限を超えています"
+
+#: configs/nls/messages/reliefppt.c:186
+msgid "演示文稿签名、标志或长度无效"
+msgstr "プレゼンテーションのシグネチャ、フラグ、または長さが無効です"
+
+#: configs/nls/messages/reliefppt.c:187
+msgid "演示文稿类型无效或文件超过 96 MiB"
+msgstr "プレゼンテーションの種類が無効か、ファイルが 96 MiB を超えています"
+
+#: configs/nls/messages/reliefppt.c:188
+msgid "演示文稿路径为空"
+msgstr "プレゼンテーションのパスが空です"
+
+#: configs/nls/messages/reliefppt.c:189
+msgid "演示文稿路径过长"
+msgstr "プレゼンテーションのパスが長すぎます"
+
+#: configs/nls/messages/reliefppt.c:190
+msgid "状态目录包含无效路径段"
+msgstr "状態ディレクトリに無効なパス要素が含まれています"
+
+#: configs/nls/messages/reliefppt.c:191
+msgid "状态目录必须使用绝对路径"
+msgstr "状態ディレクトリには絶対パスを使用してください"
+
+#: configs/nls/messages/reliefppt.c:192
+msgid "状态目录路径过长"
+msgstr "状態ディレクトリのパスが長すぎます"
+
+#: configs/nls/messages/reliefppt.c:193
+msgid "状态路径包含符号链接或非目录文件"
+msgstr "状態ディレクトリのパスにシンボリックリンクまたはディレクトリ以外のファイルが含まれています"
+
+#: configs/nls/messages/reliefppt.c:194
+msgid "现有输出文件超过 256 MiB 回滚保护限制"
+msgstr "既存の出力ファイルが 256 MiB のロールバック保護の上限を超えています"
+
+#: userland/apps/reliefppt/model.cpp:1112
+msgid "第二页介绍文字与形状。"
+msgstr "2 枚目ではテキストと図形を紹介します。"
+
+#: configs/nls/messages/reliefppt.c:196
+msgid "背景颜色无效"
+msgstr "背景色が無効です"
+
+#: configs/nls/messages/reliefppt.c:197
+msgid "读取演示文稿时文件被截断"
+msgstr "プレゼンテーションの読み取り中にファイルが切り詰められました"
+
+#: configs/nls/messages/reliefppt.c:198
+msgid "输出数据超过 256 MiB 限制"
+msgstr "出力データが 256 MiB の上限を超えています"
+
+#: userland/apps/reliefppt/model.cpp:1086
+msgid "这是一个三页演示文稿示例。"
+msgstr "これは 3 枚のスライドからなるサンプルのプレゼンテーションです。"
+
+#: configs/nls/messages/reliefppt.c:200
+msgid "非图片对象包含图片引用"
+msgstr "画像以外のオブジェクトに画像の参照が含まれています"
+
+#: configs/nls/messages/reliefppt.c:201
+msgid "页面尺寸无效"
+msgstr "ページのサイズが無効です"

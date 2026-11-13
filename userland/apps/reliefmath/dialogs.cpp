@@ -245,14 +245,14 @@ bool start_favorite_save(FavoriteDialogState &state, IoJob &job) {
         state.save_failed = true;
         state.dirty = true;
         state.retry->show();
-        set_favorite_status(state, T(error.message.c_str()));
+        set_favorite_status(state, ui_error(error.message.c_str()));
         return false;
     }
     if (!job.write(state.path.c_str(), static_cast<Bytes &&>(bytes), true, error)) {
         state.save_failed = true;
         state.dirty = true;
         state.retry->show();
-        set_favorite_status(state, T(error.message.c_str()));
+        set_favorite_status(state, ui_error(error.message.c_str()));
         return false;
     }
     state.saving = true;
@@ -280,12 +280,12 @@ bool add_current_favorite(FavoriteDialogState &state) {
     Error error;
     FormulaId id = 0;
     if (!add_formula(state.favorites, current->name.c_str(), current->source.c_str(), id, error)) {
-        set_favorite_status(state, T(error.message.c_str()));
+        set_favorite_status(state, ui_error(error.message.c_str()));
         return false;
     }
     if (!set_formula_style(state.favorites, id, current->style, error)) {
         (void)delete_formula(state.favorites, id, error);
-        set_favorite_status(state, T(error.message.c_str()));
+        set_favorite_status(state, ui_error(error.message.c_str()));
         return false;
     }
     state.dirty = true;
@@ -349,7 +349,7 @@ void manage_favorites(MathWindow &owner) {
             s.dirty = true;
             refresh_favorites(s);
             set_favorite_status(s, T("Favorite deleted."));
-        } else set_favorite_status(s, T(error.message.c_str()));
+        } else set_favorite_status(s, ui_error(error.message.c_str()));
     }, &state);
     insert.callback([](Fl_Widget *, void *data) {
         FavoriteDialogState &s = *static_cast<FavoriteDialogState *>(data);
@@ -377,7 +377,7 @@ void manage_favorites(MathWindow &owner) {
     bool load_started = job.load(state.path.c_str(), 1, start_error);
     if (!load_started) {
         state.load_ready = true;
-        set_favorite_status(state, T(start_error.message.c_str()));
+        set_favorite_status(state, ui_error(start_error.message.c_str()));
     }
     place_dialog(owner, dialog);
     dialog.set_modal();
@@ -396,7 +396,7 @@ void manage_favorites(MathWindow &owner) {
                     set_favorite_status(state, T("No favorites saved yet."));
                 } else {
                     state.can_modify = false;
-                    set_favorite_status(state, T(result.error.message.c_str()));
+                    set_favorite_status(state, ui_error(result.error.message.c_str()));
                 }
                 refresh_favorites(state);
             } else if (result.kind == IoKind::Write) {
@@ -410,7 +410,7 @@ void manage_favorites(MathWindow &owner) {
                     state.save_failed = true;
                     state.dirty = true;
                     state.retry->show();
-                    set_favorite_status(state, T(result.error.message.c_str()));
+                    set_favorite_status(state, ui_error(result.error.message.c_str()));
                 }
             }
         }
@@ -596,7 +596,7 @@ void update_structure_preview(StructureDialogState &state) {
         state.generated_ok = false;
         state.accept->deactivate();
         state.source->value("");
-        state.status->copy_label(T(error.message.c_str()));
+        state.status->copy_label(ui_error(error.message.c_str()));
         return;
     }
     state.generated = static_cast<Snippet &&>(generated);
@@ -803,7 +803,7 @@ void MathWindow::structure_dialog(Tool tool) {
     if (!editor_insert_snippet(core,
                                {size_t(selection_begin), size_t(selection_end)},
                                insertion, error)) {
-        update_status(T(error.message.c_str()));
+        update_status(ui_error(error.message.c_str()));
         return;
     }
     const int inserted_end = int(size_t(selection_begin) + insertion.source.size());
@@ -936,11 +936,11 @@ void MathWindow::find_dialog(bool replace) {
         Error error;
         const char *insert = s.replacement->value();
         if (!replace_text(updated, selection, insert, error)) {
-            s.status->copy_label(T(error.message.c_str()));
+            s.status->copy_label(ui_error(error.message.c_str()));
             return;
         }
         if (!editor_set_text(s.owner->core, updated.c_str(), error)) {
-            s.status->copy_label(T(error.message.c_str()));
+            s.status->copy_label(ui_error(error.message.c_str()));
             return;
         }
         s.owner->commit_core(false);
@@ -963,7 +963,7 @@ void MathWindow::find_dialog(bool replace) {
         size_t count = 0;
         if (!replace_all_utf8(s.owner->core.source.c_str(), needle,
                               s.replacement->value(), updated, count, error)) {
-            s.status->copy_label(T(error.message.c_str()));
+            s.status->copy_label(ui_error(error.message.c_str()));
             return;
         }
         if (!count) {
@@ -971,7 +971,7 @@ void MathWindow::find_dialog(bool replace) {
             return;
         }
         if (!editor_set_text(s.owner->core, updated.c_str(), error)) {
-            s.status->copy_label(T(error.message.c_str()));
+            s.status->copy_label(ui_error(error.message.c_str()));
             return;
         }
         s.owner->commit_core(false);

@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Leonmmcoset
+Name[ja]=Leonmmcoset
 Exec=/usr/bin/leonmmcoset
 TryExec=/usr/bin/leonmmcoset
 Icon=reliefos-leonmmcoset

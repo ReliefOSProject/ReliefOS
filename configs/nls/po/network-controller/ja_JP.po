@@ -1,0 +1,787 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/network-controller/window.cpp:162
+msgid "About"
+msgstr "バージョン情報"
+
+#: userland/apps/network-controller/window.cpp:635
+msgid "Adapter counters are not exported by this kernel. Address, gateway, DNS and connection diagnostics remain available."
+msgstr "このカーネルはアダプターのカウンターを公開していません。アドレス、ゲートウェイ、DNS、接続の診断は引き続き利用できます。"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/network-controller/window.cpp:196
+msgid "Address mode"
+msgstr "アドレスモード"
+
+#: userland/apps/network-controller/dialogs.cpp:46
+msgid "Administrator permission is required to manage network settings."
+msgstr "ネットワーク設定の管理には管理者権限が必要です。"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/network-controller/window.cpp:756
+msgid "Apply"
+msgstr "適用"
+
+#: userland/apps/network-controller/window.cpp:767
+msgid "Apply Ethernet configuration"
+msgstr "Ethernet 設定を適用"
+
+#: userland/apps/network-controller/window.cpp:489
+msgid "Applying the network failed. Saved settings remain on disk. Check the output and restore or correct the configuration."
+msgstr "ネットワーク設定の適用に失敗しました。保存済みの設定はディスクに残っています。出力を確認し、設定を復元または修正してください。"
+
+#: userland/apps/network-controller/dialogs.cpp:48
+msgid "Authenticate with"
+msgstr "認証方法"
+
+#: configs/nls/messages/network-controller.c:5
+msgid "Authenticating"
+msgstr "認証中"
+
+#: userland/apps/network-controller/dialogs.cpp:115
+msgid "Authenticating…"
+msgstr "認証中…"
+
+#: userland/apps/network-controller/dialogs.cpp:84
+msgid "Authentication failed. Check the password or choose another method."
+msgstr "認証に失敗しました。パスワードを確認するか、別の方法を選択してください。"
+
+#: userland/apps/network-controller/window.cpp:171
+msgid "Auto refresh"
+msgstr "自動更新"
+
+#: userland/apps/network-controller/window.cpp:197
+msgid "Automatic (DHCP)"
+msgstr "自動 (DHCP)"
+
+#: userland/apps/network-controller/window.cpp:845
+msgid "Broadcast"
+msgstr "ブロードキャスト"
+
+#: userland/apps/network-controller/window.cpp:244
+msgid "Calculate"
+msgstr "計算"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/network-controller/window.cpp:170
+msgid "Cancel operation"
+msgstr "操作をキャンセル"
+
+#: userland/apps/network-controller/window.cpp:820
+msgid "Cancel the running operation and close? Configuration changes already saved remain on disk."
+msgstr "実行中の操作をキャンセルして閉じますか？ 保存済みの設定変更はディスクに残ります。"
+
+#: userland/apps/network-controller/window.cpp:888
+msgid "Cancellation requested; waiting for the running command."
+msgstr "キャンセルを要求しました。実行中のコマンドを待っています。"
+
+#: configs/nls/messages/network-controller.c:13
+msgid "Cannot create command output pipe.\n"
+msgstr "コマンド出力用パイプを作成できません。\n"
+
+#: configs/nls/messages/network-controller.c:14
+msgid "Cannot create network configuration directory"
+msgstr "ネットワーク設定ディレクトリを作成できません"
+
+#: configs/nls/messages/network-controller.c:15
+msgid "Cannot create network configuration temporary file"
+msgstr "ネットワーク設定の一時ファイルを作成できません"
+
+#: userland/apps/network-controller/window.cpp:808
+msgid "Cannot export the diagnostic output."
+msgstr "診断結果をエクスポートできません。"
+
+#: configs/nls/messages/network-controller.c:16
+msgid "Cannot open network configuration directory"
+msgstr "ネットワーク設定ディレクトリを開けません"
+
+#: configs/nls/messages/network-controller.c:17
+msgid "Cannot query network interfaces.\n"
+msgstr "ネットワークインターフェースを取得できません。\n"
+
+#: configs/nls/messages/network-controller.c:18
+msgid "Cannot read network configuration"
+msgstr "ネットワーク設定を読み取れません"
+
+#: configs/nls/messages/network-controller.c:19
+msgid "Cannot restore absent network profile"
+msgstr "存在しないネットワークプロファイルを復元できません"
+
+#: configs/nls/messages/network-controller.c:20
+msgid "Cannot save network configuration"
+msgstr "ネットワーク設定を保存できません"
+
+#: userland/apps/network-controller/window.cpp:370
+msgid "Cannot send the network operation."
+msgstr "ネットワーク操作を送信できません。"
+
+#: userland/apps/network-controller/dialogs.cpp:101
+msgid "Cannot start the authentication program."
+msgstr "認証プログラムを起動できません。"
+
+#: userland/apps/network-controller/dialogs.cpp:29
+msgid "Cannot start the network worker."
+msgstr "ネットワークワーカーを起動できません。"
+
+#: configs/nls/messages/network-controller.c:21
+msgid "Cannot synchronize network configuration directory"
+msgstr "ネットワーク設定ディレクトリを同期できません"
+
+#: configs/nls/messages/network-controller.c:22
+msgid "Cannot synchronize restored network profile"
+msgstr "復元したネットワークプロファイルを同期できません"
+
+#: userland/apps/network-controller/window.cpp:258
+msgid "Clear output"
+msgstr "出力をクリア"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/network-controller/window.cpp:206
+msgid "Cloudflare (1.1.1.1)"
+msgstr "Cloudflare (1.1.1.1)"
+
+#: userland/apps/network-controller/window.cpp:477
+msgid "Completed"
+msgstr "完了"
+
+#: userland/apps/network-controller/window.cpp:195
+msgid "Configuration"
+msgstr "設定"
+
+#: configs/nls/messages/network-controller.c:23
+msgid "Configuration changed outside this window. Reload it before saving."
+msgstr "設定がこのウィンドウの外部で変更されました。保存する前に再読み込みしてください。"
+
+#: configs/nls/messages/network-controller.c:24
+msgid "Configuration replaced but directory synchronization failed"
+msgstr "設定は置き換えられましたが、ディレクトリの同期に失敗しました"
+
+#: userland/apps/network-controller/window.cpp:601
+msgid "Connected"
+msgstr "接続済み"
+
+#: userland/apps/network-controller/window.cpp:141
+msgid "Copy output"
+msgstr "出力をコピー"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/network-controller/window.cpp:205
+msgid "Custom servers"
+msgstr "カスタムサーバー"
+
+#: userland/apps/network-controller/window.cpp:156
+msgid "DHCP lease"
+msgstr "DHCP リース"
+
+#: userland/apps/network-controller/window.cpp:158
+msgid "DHCP log"
+msgstr "DHCP ログ"
+
+#: configs/nls/messages/network-controller.c:25
+msgid "DHCP renewal requires DHCP mode.\n"
+msgstr "DHCP の更新には DHCP モードが必要です。\n"
+
+#: userland/apps/network-controller/window.cpp:234
+msgid "DNS lookup"
+msgstr "DNS 名前解決"
+
+#: userland/apps/network-controller/window.cpp:203
+msgid "DNS policy"
+msgstr "DNS ポリシー"
+
+#: userland/apps/network-controller/window.cpp:157
+msgid "DNS resolver"
+msgstr "DNS リゾルバー"
+
+#: userland/apps/network-controller/window.cpp:228
+msgid "DNS server (optional)"
+msgstr "DNS サーバー (任意)"
+
+#: userland/apps/network-controller/window.cpp:183
+msgid "DNS servers"
+msgstr "DNS サーバー"
+
+#: userland/apps/network-controller/window.cpp:182
+msgid "Default gateway"
+msgstr "デフォルトゲートウェイ"
+
+#: userland/apps/network-controller/window.cpp:140
+msgid "Diagnostic report"
+msgstr "診断レポート"
+
+#: userland/apps/network-controller/window.cpp:224
+msgid "Diagnostics"
+msgstr "診断"
+
+#: userland/apps/network-controller/window.cpp:149
+msgid "Disable Ethernet"
+msgstr "Ethernet を無効化"
+
+#: userland/apps/network-controller/window.cpp:199
+msgid "Disabled"
+msgstr "無効"
+
+#: userland/apps/network-controller/window.cpp:543
+msgid "Discard"
+msgstr "破棄"
+
+#: userland/apps/network-controller/window.cpp:544
+msgid "Discard unsaved changes and select another adapter?"
+msgstr "未保存の変更を破棄して別のアダプターを選択しますか？"
+
+#: userland/apps/network-controller/window.cpp:910
+msgid "Discard unsaved edits and reload the network profile?"
+msgstr "未保存の編集内容を破棄してネットワークプロファイルを再読み込みしますか？"
+
+#: userland/apps/network-controller/window.cpp:816
+msgid "Discard unsaved network settings and close?"
+msgstr "未保存のネットワーク設定を破棄して閉じますか？"
+
+#: userland/apps/network-controller/model.cpp:219
+msgid "Duplicate network profile field."
+msgstr "ネットワークプロファイルのフィールドが重複しています。"
+
+#: userland/apps/network-controller/window.cpp:148
+msgid "Enable Ethernet"
+msgstr "Ethernet を有効化"
+
+#: userland/apps/network-controller/window.cpp:413
+msgid "Enabled"
+msgstr "有効"
+
+#: userland/apps/network-controller/model.cpp:86
+msgid "Enter a usable static IPv4 address and prefix."
+msgstr "使用可能な静的 IPv4 アドレスとプレフィックスを入力してください。"
+
+#: userland/apps/network-controller/window.cpp:946
+msgid "Enter a valid host, IPv4 DNS server and TCP port (1–65535)."
+msgstr "有効なホスト、IPv4 DNS サーバー、TCP ポート (1–65535) を入力してください。"
+
+#: userland/apps/network-controller/window.cpp:835
+msgid "Enter an IPv4 address and a prefix from 0 to 32."
+msgstr "IPv4 アドレスと 0～32 のプレフィックスを入力してください。"
+
+#: userland/apps/network-controller/model.cpp:99
+msgid "Enter one to three IPv4 DNS servers."
+msgstr "IPv4 DNS サーバーを 1～3 個入力してください。"
+
+#: userland/apps/network-controller/dialogs.cpp:94
+msgid "Enter your password to continue authentication."
+msgstr "認証を続けるにはパスワードを入力してください。"
+
+#: userland/apps/network-controller/window.cpp:788
+msgid "Export network diagnostics"
+msgstr "ネットワーク診断をエクスポート"
+
+#: configs/nls/messages/network-controller.c:6
+msgid "Export output"
+msgstr "出力をエクスポート"
+
+#: userland/apps/network-controller/window.cpp:142
+msgid "Export output…"
+msgstr "出力をエクスポート…"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/network-controller/window.cpp:139
+msgid "File"
+msgstr "ファイル"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/network-controller/window.cpp:204
+msgid "From DHCP"
+msgstr "DHCP から取得"
+
+#: userland/apps/network-controller/window.cpp:202
+msgid "Gateway (optional)"
+msgstr "ゲートウェイ (任意)"
+
+#: userland/apps/network-controller/window.cpp:160
+msgid "Help"
+msgstr "ヘルプ"
+
+#: userland/apps/network-controller/window.cpp:225
+msgid "Host or IPv4"
+msgstr "ホストまたは IPv4"
+
+#: userland/apps/network-controller/window.cpp:846
+msgid "Host range"
+msgstr "ホスト範囲"
+
+#: userland/apps/network-controller/window.cpp:181
+msgid "IPv4 address"
+msgstr "IPv4 アドレス"
+
+#: userland/apps/network-controller/window.cpp:236
+msgid "IPv4 subnet calculator"
+msgstr "IPv4 サブネット計算機"
+
+#: userland/apps/network-controller/model.cpp:226
+msgid "Incomplete network profile."
+msgstr "ネットワークプロファイルが不完全です。"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/network-controller/model.cpp:194
+msgid "Invalid DNS policy."
+msgstr "DNS ポリシーが無効です。"
+
+#: userland/apps/network-controller/model.cpp:198
+msgid "Invalid DNS server."
+msgstr "DNS サーバーが無効です。"
+
+#: configs/nls/messages/network-controller.c:26
+msgid "Invalid Ethernet interface"
+msgstr "Ethernet インターフェースが無効です"
+
+#: userland/apps/network-controller/model.cpp:173
+msgid "Invalid IPv4 address."
+msgstr "IPv4 アドレスが無効です。"
+
+#: userland/apps/network-controller/model.cpp:181
+msgid "Invalid IPv4 gateway."
+msgstr "IPv4 ゲートウェイが無効です。"
+
+#: userland/apps/network-controller/model.cpp:177
+msgid "Invalid IPv4 prefix."
+msgstr "IPv4 プレフィックスが無効です。"
+
+#: userland/apps/network-controller/model.cpp:80
+msgid "Invalid network profile."
+msgstr "ネットワークプロファイルが無効です。"
+
+#: userland/apps/network-controller/model.cpp:271
+msgid "Invalid network request."
+msgstr "ネットワーク要求が無効です。"
+
+#: userland/apps/network-controller/model.cpp:314
+msgid "Invalid or unsupported network request."
+msgstr "ネットワーク要求が無効か、サポートされていません。"
+
+#: userland/apps/network-controller/dialogs.cpp:106
+msgid "Invalid password input."
+msgstr "入力されたパスワードが無効です。"
+
+#: userland/apps/network-controller/window.cpp:191
+msgid "Live interface data. Configuration is managed by OpenRC; diagnostics report actual results."
+msgstr "インターフェースの現在の情報です。設定は OpenRC で管理され、診断には実際の結果が表示されます。"
+
+#: userland/apps/network-controller/window.cpp:182
+msgid "MAC address"
+msgstr "MAC アドレス"
+
+#: userland/apps/network-controller/window.cpp:182
+msgid "MTU"
+msgstr "MTU"
+
+#: userland/apps/network-controller/window.cpp:444
+msgid "Malformed interface response.\n"
+msgstr "インターフェースの応答が不正です。\n"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/network-controller/window.cpp:144
+msgid "Network"
+msgstr "ネットワーク"
+
+#: userland/apps/network-controller/window.cpp:98
+msgid "Network Controller"
+msgstr "ネットワークコントローラー"
+
+#: configs/nls/messages/network-controller.c:27
+msgid "Network Controller diagnostics\n\nAdapters (live ioctl and counters):\n"
+msgstr "ネットワークコントローラーの診断\n\nアダプター (現在の ioctl 情報とカウンター):\n"
+
+#: userland/apps/network-controller/window.cpp:866
+msgid "Network Controller\nIPv4 Ethernet configuration and network diagnostics for ReliefOS.\nC++ / FLTK"
+msgstr "ネットワークコントローラー\nReliefOS の IPv4 Ethernet 設定とネットワーク診断。\nC++ / FLTK"
+
+#: userland/apps/network-controller/window.cpp:173
+msgid "Network adapters"
+msgstr "ネットワークアダプター"
+
+#: userland/apps/network-controller/dialogs.cpp:42
+msgid "Network authentication"
+msgstr "ネットワーク認証"
+
+#: configs/nls/messages/network-controller.c:28
+msgid "Network configuration is locked or unsafe"
+msgstr "ネットワーク設定はロックされているか、安全ではありません"
+
+#: configs/nls/messages/network-controller.c:29
+msgid "Network configuration saved. Apply it to update the running network.\n"
+msgstr "ネットワーク設定を保存しました。実行中のネットワークを更新するには適用してください。\n"
+
+#: userland/apps/network-controller/window.cpp:970
+msgid "Network information"
+msgstr "ネットワーク情報"
+
+#: userland/apps/network-controller/window.cpp:509
+msgid "Network response is too large."
+msgstr "ネットワーク応答が大きすぎます。"
+
+#: userland/apps/network-controller/window.cpp:522
+msgid "Network worker disconnected. Reopen the application to authenticate."
+msgstr "ネットワークワーカーとの接続が切断されました。アプリケーションを開き直して認証してください。"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: configs/nls/messages/network-controller.c:30
+msgid "No previous network configuration backup is available."
+msgstr "以前のネットワーク設定のバックアップはありません。"
+
+#: configs/nls/messages/network-controller.c:31
+msgid "Not available.\n"
+msgstr "利用できません。\n"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/network-controller/model.cpp:104
+msgid "Only custom DNS accepts server addresses."
+msgstr "サーバーアドレスを指定できるのはカスタム DNS のみです。"
+
+#: userland/apps/network-controller/window.cpp:477
+msgid "Operation failed"
+msgstr "操作に失敗しました"
+
+#: userland/apps/network-controller/window.cpp:485
+msgid "Operation failed. See Output for details."
+msgstr "操作に失敗しました。詳細は「出力」を参照してください。"
+
+#: userland/apps/network-controller/window.cpp:251
+msgid "Output"
+msgstr "出力"
+
+#: userland/apps/network-controller/window.cpp:810
+msgid "Output exported."
+msgstr "出力をエクスポートしました。"
+
+#: userland/apps/network-controller/window.cpp:179
+msgid "Overview"
+msgstr "概要"
+
+#: userland/apps/network-controller/window.cpp:184
+msgid "Packets / errors"
+msgstr "パケット / エラー"
+
+#: userland/apps/network-controller/dialogs.cpp:52
+msgid "Password"
+msgstr "パスワード"
+
+#: userland/apps/network-controller/window.cpp:233
+msgid "Ping"
+msgstr "Ping"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/network-controller/window.cpp:241
+msgid "Prefix length"
+msgstr "プレフィックス長"
+
+#: userland/apps/network-controller/window.cpp:201
+msgid "Prefix length (0–32)"
+msgstr "プレフィックス長 (0–32)"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/network-controller/window.cpp:495
+msgid "Read configuration"
+msgstr "設定を読み込み"
+
+#: userland/apps/network-controller/window.cpp:492
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/network-controller/window.cpp:183
+msgid "Receive rate"
+msgstr "受信速度"
+
+#: userland/apps/network-controller/window.cpp:184
+msgid "Received total"
+msgstr "受信合計"
+
+#: userland/apps/network-controller/window.cpp:145
+msgid "Refresh"
+msgstr "更新"
+
+#: userland/apps/network-controller/window.cpp:273
+msgid "Refresh interfaces"
+msgstr "インターフェースを更新"
+
+#: userland/apps/network-controller/window.cpp:221
+msgid "Reload"
+msgstr "再読み込み"
+
+#: userland/apps/network-controller/window.cpp:150
+msgid "Reload configuration"
+msgstr "設定を再読み込み"
+
+#: userland/apps/network-controller/window.cpp:147
+msgid "Renew DHCP"
+msgstr "DHCP を更新"
+
+#: userland/apps/network-controller/window.cpp:793
+msgid "Replace"
+msgstr "置き換え"
+
+#: userland/apps/network-controller/window.cpp:794
+msgid "Replace the existing file?"
+msgstr "既存のファイルを置き換えますか？"
+
+#: configs/nls/messages/network-controller.c:32
+msgid "Requested network information is absent or cannot be read.\n"
+msgstr "要求されたネットワーク情報が存在しないか、読み取れません。\n"
+
+#: userland/apps/network-controller/window.cpp:773
+msgid "Restore and apply"
+msgstr "復元して適用"
+
+#: userland/apps/network-controller/window.cpp:151
+msgid "Restore previous configuration"
+msgstr "以前の設定を復元"
+
+#: userland/apps/network-controller/window.cpp:220
+msgid "Restore previous…"
+msgstr "以前の設定を復元…"
+
+#: userland/apps/network-controller/window.cpp:774
+msgid "Restore the previous profile and apply it? The current network connection may be interrupted."
+msgstr "以前のプロファイルを復元して適用しますか？ 現在のネットワーク接続が中断される場合があります。"
+
+#: userland/apps/network-controller/dialogs.cpp:83
+msgid "Retry"
+msgstr "再試行"
+
+#: userland/apps/network-controller/window.cpp:153
+msgid "Routing table"
+msgstr "ルーティングテーブル"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/network-controller/window.cpp:146
+msgid "Save and apply"
+msgstr "保存して適用"
+
+#: userland/apps/network-controller/window.cpp:749
+msgid "Save and apply this Ethernet configuration?"
+msgstr "この Ethernet 設定を保存して適用しますか？"
+
+#: userland/apps/network-controller/window.cpp:765
+msgid "Save network configuration"
+msgstr "ネットワーク設定を保存"
+
+#: userland/apps/network-controller/window.cpp:219
+msgid "Save only"
+msgstr "保存のみ"
+
+#: userland/apps/network-controller/window.cpp:695
+msgid "Saving keeps a backup and detects external changes. Applying may interrupt this adapter. Static mode requires explicit DNS."
+msgstr "保存時にバックアップを保持し、外部の変更を検出します。適用するとこのアダプターが中断される場合があります。静的モードでは DNS の明示的な指定が必要です。"
+
+#: userland/apps/network-controller/window.cpp:688
+msgid "Select an Ethernet adapter to edit its configuration."
+msgstr "設定を編集する Ethernet アダプターを選択してください。"
+
+#: userland/apps/network-controller/window.cpp:872
+msgid "Select an adapter to inspect and configure its live state. Configure Ethernet with DHCP, static IPv4 or disabled mode. Save and apply uses the existing OpenRC network service.\n\nStatic mode requires custom or Cloudflare DNS. Use spaces between custom DNS addresses. Saving detects external changes and keeps the previous configuration.\n\nDiagnostics use real network operations. TCP success confirms a connection, not TLS or application health. Wi-Fi, IPv6, VPN and changing the kernel's fixed MTU are not supported."
+msgstr "アダプターを選択して現在の状態を確認し、設定します。Ethernet は DHCP、静的 IPv4、無効のいずれかに設定できます。「保存して適用」では既存の OpenRC ネットワークサービスを使用します。\n\n静的モードではカスタム DNS または Cloudflare DNS が必要です。カスタム DNS アドレスはスペースで区切ってください。保存時に外部の変更を検出し、以前の設定を保持します。\n\n診断では実際のネットワーク操作を使用します。TCP の成功は接続を確認するものであり、TLS やアプリケーションの正常性を保証するものではありません。Wi-Fi、IPv6、VPN、およびカーネルの固定 MTU の変更には対応していません。"
+
+#: userland/apps/network-controller/window.cpp:183
+msgid "Send rate"
+msgstr "送信速度"
+
+#: userland/apps/network-controller/window.cpp:184
+msgid "Sent total"
+msgstr "送信合計"
+
+#: userland/apps/network-controller/window.cpp:691
+msgid "Settings"
+msgstr "設定"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/network-controller/window.cpp:181
+msgid "State"
+msgstr "状態"
+
+#: userland/apps/network-controller/window.cpp:198
+msgid "Static IPv4"
+msgstr "静的 IPv4"
+
+#: userland/apps/network-controller/model.cpp:95
+msgid "Static mode requires custom or Cloudflare DNS."
+msgstr "静的モードではカスタム DNS または Cloudflare DNS が必要です。"
+
+#: userland/apps/network-controller/window.cpp:181
+msgid "Subnet mask"
+msgstr "サブネットマスク"
+
+#: userland/apps/network-controller/window.cpp:155
+msgid "TCP connections"
+msgstr "TCP 接続"
+
+#: userland/apps/network-controller/window.cpp:230
+msgid "TCP port"
+msgstr "TCP ポート"
+
+#: userland/apps/network-controller/window.cpp:953
+msgid "TCP port test"
+msgstr "TCP ポートテスト"
+
+#: userland/apps/network-controller/window.cpp:235
+msgid "Test TCP port"
+msgstr "TCP ポートをテスト"
+
+#: userland/apps/network-controller/window.cpp:755
+msgid "The current network connection may be interrupted."
+msgstr "現在のネットワーク接続が中断される場合があります。"
+
+#: userland/apps/network-controller/model.cpp:93
+msgid "The gateway must be a different usable address in the same subnet."
+msgstr "ゲートウェイには同じサブネット内の別の使用可能なアドレスを指定してください。"
+
+#: configs/nls/messages/network-controller.c:33
+msgid "The selected Ethernet interface is no longer present.\n"
+msgstr "選択した Ethernet インターフェースは存在しなくなりました。\n"
+
+#: userland/apps/network-controller/model.cpp:333
+msgid "This operation does not execute a command."
+msgstr "この操作ではコマンドは実行されません。"
+
+#: userland/apps/network-controller/window.cpp:345
+msgid "Too many queued operations."
+msgstr "キューに入った操作が多すぎます。"
+
+#: userland/apps/network-controller/window.cpp:152
+msgid "Tools"
+msgstr "ツール"
+
+#: userland/apps/network-controller/model.cpp:217
+msgid "Unknown network profile field."
+msgstr "不明なネットワークプロファイルフィールドです。"
+
+#: userland/apps/network-controller/dialogs.cpp:58
+msgid "Unlock"
+msgstr "ロック解除"
+
+#: configs/nls/messages/network-controller.c:34
+msgid "Unsafe configuration directory"
+msgstr "設定ディレクトリが安全ではありません"
+
+#: configs/nls/messages/network-controller.c:35
+msgid "Unsafe network configuration file"
+msgstr "ネットワーク設定ファイルが安全ではありません"
+
+#: userland/apps/network-controller/window.cpp:492
+msgid "Unsaved configuration changes"
+msgstr "未保存の設定変更"
+
+#: userland/apps/network-controller/model.cpp:159
+msgid "Unsupported network profile version."
+msgstr "サポートされていないネットワークプロファイルのバージョンです。"
+
+#: userland/apps/network-controller/window.cpp:208
+msgid "Up to three IPv4 addresses separated by spaces."
+msgstr "最大 3 個の IPv4 アドレスをスペースで区切って入力します。"
+
+#: userland/apps/network-controller/window.cpp:601
+msgid "Up, carrier not reported"
+msgstr "稼働中、キャリア情報なし"
+
+#: userland/apps/network-controller/window.cpp:846
+msgid "Usable addresses"
+msgstr "使用可能なアドレス"
+
+#: userland/apps/network-controller/window.cpp:161
+msgid "Usage and limitations"
+msgstr "使用方法と制限"
+
+#: userland/apps/network-controller/window.cpp:892
+msgid "Wait for the current operation or cancel it."
+msgstr "現在の操作を待つか、キャンセルしてください。"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: configs/nls/messages/network-controller.c:11
+msgid "\nOperation canceled. Check service state before retrying.\n"
+msgstr "\n操作がキャンセルされました。再試行する前にサービスの状態を確認してください。\n"
+
+#: configs/nls/messages/network-controller.c:12
+msgid "\nOperation timed out. Check service state before retrying.\n"
+msgstr "\n操作がタイムアウトしました。再試行する前にサービスの状態を確認してください。\n"
+
+#: userland/apps/network-controller/dialogs.cpp:50
+msgid "root account password"
+msgstr "root アカウントのパスワード"
+
+#: userland/apps/network-controller/dialogs.cpp:49
+msgid "sudo: current user password"
+msgstr "sudo: 現在のユーザーのパスワード"

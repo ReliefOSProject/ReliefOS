@@ -29,7 +29,7 @@
     "reliefos-nls": {
       "destination": "reliefos",
       "components": [],
-      "paths": ["usr/share/locale/zh_CN"],
+      "paths": ["usr/share/locale/zh_CN", "usr/share/locale/ja_JP", "usr/share/musl/locales/zh_CN.UTF-8", "usr/share/musl/locales/ja_JP.UTF-8"],
       "reason": "Per-application gettext catalogs from configs/nls/po/<domain>, scoped per language to preserve upstream catalog ownership."
     },
     "reliefos-apps": {

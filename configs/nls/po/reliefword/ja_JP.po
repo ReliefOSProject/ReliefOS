@@ -1,0 +1,1591 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/reliefword/window.cpp:256
+msgid "%s\nCharacters: %zu\nNon-space characters: %zu\nWords / CJK characters: %zu\nParagraphs: %zu\nPages: %u"
+msgstr "%s\n文字数: %zu\n空白を除く文字数: %zu\n単語数 / CJK 文字数: %zu\n段落数: %zu\nページ数: %u"
+
+#: userland/apps/reliefword/window.cpp:258
+msgid "A native ReliefOS word processor.\nCtrl+S: save  ·  Ctrl+F: find  ·  Ctrl+Enter: page break\nUse the original .rword format to keep all formatting."
+msgstr "ReliefOS のネイティブワープロです。\nCtrl+S: 保存  ·  Ctrl+F: 検索  ·  Ctrl+Enter: 改ページ\n書式をすべて保持するには、独自の .rword 形式を使用してください。"
+
+#: userland/apps/reliefword/window.cpp:37
+msgid "About ReliefWord"
+msgstr "ReliefWord について"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Alignment"
+msgstr "配置"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/reliefword/files.cpp:164
+msgid "An unsaved ReliefWord recovery copy is available. Recover it into a new document?"
+msgstr "保存されていない ReliefWord の復元用コピーがあります。新しい文書に復元しますか?"
+
+#: userland/apps/reliefword/dialogs.cpp:61
+msgid "Apply"
+msgstr "適用"
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Body text"
+msgstr "本文テキスト"
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Bold (Ctrl+B)"
+msgstr "太字 (Ctrl+B)"
+
+#: userland/apps/reliefword/dialogs.cpp:54
+msgid "Bottom margin (mm)"
+msgstr "下余白 (mm)"
+
+#: userland/apps/reliefword/dialogs.cpp:94
+msgid "Bullets"
+msgstr "箇条書き"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Center"
+msgstr "中央揃え"
+
+#: userland/apps/reliefword/files.cpp:124
+msgid "Choose a different export file"
+msgstr "別のエクスポート先ファイルを選択"
+
+#: userland/apps/reliefword/window.cpp:84
+msgid "Clear format"
+msgstr "書式をクリア"
+
+#: userland/apps/reliefword/window.cpp:77
+msgid "Clipboard"
+msgstr "クリップボード"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Copy"
+msgstr "コピー"
+
+#: configs/nls/messages/reliefword.c:18
+msgid "Could not clean recovery reservation"
+msgstr "復元用の予約を消去できませんでした"
+
+#: configs/nls/messages/reliefword.c:19
+msgid "Could not close document"
+msgstr "文書を閉じられませんでした"
+
+#: configs/nls/messages/reliefword.c:20
+msgid "Could not close existing save target"
+msgstr "既存の保存先を閉じられませんでした"
+
+#: configs/nls/messages/reliefword.c:21
+msgid "Could not close rollback copy"
+msgstr "ロールバック用コピーを閉じられませんでした"
+
+#: configs/nls/messages/reliefword.c:22
+msgid "Could not close temporary document"
+msgstr "一時文書を閉じられませんでした"
+
+#: userland/apps/reliefword/window.cpp:174
+msgid "Could not create a new document"
+msgstr "新しい文書を作成できませんでした"
+
+#: configs/nls/messages/reliefword.c:23
+msgid "Could not create recovery directory"
+msgstr "復元用フォルダーを作成できませんでした"
+
+#: configs/nls/messages/reliefword.c:24
+msgid "Could not create recovery file"
+msgstr "復元用ファイルを作成できませんでした"
+
+#: configs/nls/messages/reliefword.c:25
+msgid "Could not create rollback copy"
+msgstr "ロールバック用コピーを作成できませんでした"
+
+#: configs/nls/messages/reliefword.c:26
+msgid "Could not create temporary document"
+msgstr "一時文書を作成できませんでした"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: userland/apps/reliefword/files.cpp:130
+msgid "Could not export the document"
+msgstr "文書をエクスポートできませんでした"
+
+#: configs/nls/messages/reliefword.c:27
+msgid "Could not finalize recovery file"
+msgstr "復元用ファイルを確定できませんでした"
+
+#: configs/nls/messages/reliefword.c:28
+msgid "Could not inspect document"
+msgstr "文書を確認できませんでした"
+
+#: configs/nls/messages/reliefword.c:29
+msgid "Could not inspect existing save target"
+msgstr "既存の保存先を確認できませんでした"
+
+#: configs/nls/messages/reliefword.c:30
+msgid "Could not inspect file"
+msgstr "ファイルを確認できませんでした"
+
+#: configs/nls/messages/reliefword.c:31
+msgid "Could not inspect recovery directory"
+msgstr "復元用フォルダーを確認できませんでした"
+
+#: configs/nls/messages/reliefword.c:32
+msgid "Could not lock recovery file"
+msgstr "復元用ファイルをロックできませんでした"
+
+#: configs/nls/messages/reliefword.c:33
+msgid "Could not make a temporary save path"
+msgstr "保存用の一時パスを作成できませんでした"
+
+#: configs/nls/messages/reliefword.c:34
+msgid "Could not open document"
+msgstr "文書を開けませんでした"
+
+#: configs/nls/messages/reliefword.c:35
+msgid "Could not open existing save target"
+msgstr "既存の保存先を開けませんでした"
+
+#: configs/nls/messages/reliefword.c:36
+msgid "Could not open recovery lock"
+msgstr "復元用ロックを開けませんでした"
+
+#: configs/nls/messages/reliefword.c:37
+msgid "Could not open save directory"
+msgstr "保存先フォルダーを開けませんでした"
+
+#: userland/apps/reliefword/files.cpp:101
+msgid "Could not open the document"
+msgstr "文書を開けませんでした"
+
+#: configs/nls/messages/reliefword.c:38
+msgid "Could not read document"
+msgstr "文書を読み取れませんでした"
+
+#: configs/nls/messages/reliefword.c:39
+msgid "Could not read existing save target"
+msgstr "既存の保存先を読み取れませんでした"
+
+#: configs/nls/messages/reliefword.c:40
+msgid "Could not recheck existing save target"
+msgstr "既存の保存先を再確認できませんでした"
+
+#: configs/nls/messages/reliefword.c:41
+msgid "Could not remove temporary document"
+msgstr "一時文書を削除できませんでした"
+
+#: configs/nls/messages/reliefword.c:42
+msgid "Could not replace document"
+msgstr "文書を置き換えられませんでした"
+
+#: configs/nls/messages/reliefword.c:43
+msgid "Could not reserve a unique recovery file"
+msgstr "一意の復元用ファイルを確保できませんでした"
+
+#: configs/nls/messages/reliefword.c:44
+msgid "Could not reserve recovery file"
+msgstr "復元用ファイルを確保できませんでした"
+
+#: userland/apps/reliefword/files.cpp:149
+msgid "Could not save the recovery copy"
+msgstr "復元用コピーを保存できませんでした"
+
+#: configs/nls/messages/reliefword.c:45
+msgid "Could not secure recovery directory"
+msgstr "復元用フォルダーを保護できませんでした"
+
+#: configs/nls/messages/reliefword.c:46
+msgid "Could not secure recovery file"
+msgstr "復元用ファイルを保護できませんでした"
+
+#: configs/nls/messages/reliefword.c:47
+msgid "Could not secure recovery lock"
+msgstr "復元用ロックを保護できませんでした"
+
+#: configs/nls/messages/reliefword.c:48
+msgid "Could not secure rollback copy"
+msgstr "ロールバック用コピーを保護できませんでした"
+
+#: configs/nls/messages/reliefword.c:49
+msgid "Could not secure temporary document"
+msgstr "一時文書を保護できませんでした"
+
+#: configs/nls/messages/reliefword.c:50
+msgid "Could not sync rollback copy"
+msgstr "ロールバック用コピーを同期できませんでした"
+
+#: configs/nls/messages/reliefword.c:51
+msgid "Could not sync save directory"
+msgstr "保存先フォルダーを同期できませんでした"
+
+#: configs/nls/messages/reliefword.c:52
+msgid "Could not sync temporary document"
+msgstr "一時文書を同期できませんでした"
+
+#: configs/nls/messages/reliefword.c:53
+msgid "Could not sync the saved document or restore the original"
+msgstr "保存した文書を同期できず、元の文書も復元できませんでした"
+
+#: configs/nls/messages/reliefword.c:54
+msgid "Could not write rollback copy"
+msgstr "ロールバック用コピーを書き込めませんでした"
+
+#: configs/nls/messages/reliefword.c:55
+msgid "Could not write temporary document"
+msgstr "一時文書を書き込めませんでした"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/reliefword/dialogs.cpp:47
+msgid "Custom"
+msgstr "カスタム"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Cut"
+msgstr "切り取り"
+
+#: userland/apps/reliefword/files.cpp:37
+msgid "Discard"
+msgstr "破棄"
+
+#: userland/apps/reliefword/window.cpp:119
+msgid "Display"
+msgstr "表示"
+
+#: userland/apps/reliefword/window.cpp:256
+msgid "Document"
+msgstr "文書"
+
+#: configs/nls/messages/reliefword.c:56
+msgid "Document contains an invalid character or style reference"
+msgstr "文書に無効な文字またはスタイル参照が含まれています"
+
+#: configs/nls/messages/reliefword.c:57
+msgid "Document contains invalid or oversized UTF-8 text"
+msgstr "文書に無効またはサイズ超過の UTF-8 テキストが含まれています"
+
+#: configs/nls/messages/reliefword.c:58
+msgid "Document exceeds file resource limits"
+msgstr "文書がファイルリソースの上限を超えています"
+
+#: userland/apps/reliefword/files.cpp:130
+msgid "Document exported; original remains open"
+msgstr "文書をエクスポートしました。元の文書は開いたままです"
+
+#: configs/nls/messages/reliefword.c:59
+msgid "Document file exceeds the 16 MiB limit"
+msgstr "文書ファイルが 16 MiB の上限を超えています"
+
+#: configs/nls/messages/reliefword.c:60
+msgid "Document file has an invalid type or exceeds 16 MiB"
+msgstr "文書ファイルの種類が無効か、サイズが 16 MiB を超えています"
+
+#: configs/nls/messages/reliefword.c:61
+msgid "Document file is truncated"
+msgstr "文書ファイルが途中で切れています"
+
+#: configs/nls/messages/reliefword.c:62
+msgid "Document file was truncated while reading"
+msgstr "読み取り中に文書ファイルが短くなりました"
+
+#: configs/nls/messages/reliefword.c:63
+msgid "Document metadata is not valid UTF-8 text"
+msgstr "文書のメタデータが有効な UTF-8 テキストではありません"
+
+#: configs/nls/messages/reliefword.c:64
+msgid "Document path is empty"
+msgstr "文書のパスが空です"
+
+#: userland/apps/reliefword/files.cpp:86
+msgid "Document saved"
+msgstr "文書を保存しました"
+
+#: userland/apps/reliefword/files.cpp:83
+msgid "Document was not saved"
+msgstr "文書は保存されませんでした"
+
+#: userland/apps/reliefword/window.cpp:102
+msgid "Editing"
+msgstr "編集"
+
+#: configs/nls/messages/reliefword.c:65
+msgid "Encoded document length is invalid"
+msgstr "エンコードされた文書の長さが無効です"
+
+#: userland/apps/reliefword/window.cpp:214
+msgid "Enter a font size from 6 to 96 points"
+msgstr "フォントサイズを 6～96 ポイントで入力してください"
+
+#: userland/apps/reliefword/dialogs.cpp:75
+msgid "Enter finite page values within the displayed ranges"
+msgstr "表示された範囲内の有限なページ値を入力してください"
+
+#: userland/apps/reliefword/dialogs.cpp:108
+msgid "Enter finite paragraph values within the displayed ranges"
+msgstr "表示された範囲内の有限な段落値を入力してください"
+
+#: userland/apps/reliefword/dialogs.cpp:146
+msgid "Enter search text"
+msgstr "検索文字列を入力"
+
+#: userland/apps/reliefword/window.cpp:37
+msgid "Example document"
+msgstr "サンプル文書"
+
+#: configs/nls/messages/reliefword.c:66
+msgid "Existing save target changed while preserving it"
+msgstr "保持処理中に既存の保存先が変更されました"
+
+#: configs/nls/messages/reliefword.c:67
+msgid "Existing save target exceeds the rollback size limit"
+msgstr "既存の保存先がロールバック可能なサイズの上限を超えています"
+
+#: userland/apps/reliefword/window.cpp:37
+msgid "Exit"
+msgstr "終了"
+
+#: userland/apps/reliefword/files.cpp:119
+msgid "Export"
+msgstr "エクスポート"
+
+#: userland/apps/reliefword/window.cpp:36
+msgid "Export HTML..."
+msgstr "HTML をエクスポート..."
+
+#: userland/apps/reliefword/window.cpp:36
+msgid "Export TXT..."
+msgstr "TXT をエクスポート..."
+
+#: userland/apps/reliefword/files.cpp:127
+msgid "Exporting document..."
+msgstr "文書をエクスポートしています..."
+
+#: userland/apps/reliefword/files.cpp:123
+msgid "Exporting over the imported source could discard content ReliefWord did not preserve"
+msgstr "インポート元に上書きしてエクスポートすると、ReliefWord が保持しなかった内容が失われる可能性があります"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/reliefword/window.cpp:31
+msgid "File"
+msgstr "ファイル"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: configs/nls/messages/reliefword.c:68
+msgid "File path is empty"
+msgstr "ファイルパスが空です"
+
+#: userland/apps/reliefword/files.cpp:53
+msgid "File path is too long"
+msgstr "ファイルパスが長すぎます"
+
+#: configs/nls/messages/reliefword.c:69
+msgid "File stamp requires a regular non-symlink file"
+msgstr "ファイル情報の取得にはシンボリックリンクでない通常ファイルが必要です"
+
+#: userland/apps/reliefword/dialogs.cpp:119
+msgid "Find and replace"
+msgstr "検索と置換"
+
+#: userland/apps/reliefword/dialogs.cpp:123
+msgid "Find next"
+msgstr "次を検索"
+
+#: userland/apps/reliefword/window.cpp:100
+msgid "Find..."
+msgstr "検索..."
+
+#: userland/apps/reliefword/dialogs.cpp:120
+msgid "Find:"
+msgstr "検索:"
+
+#: userland/apps/reliefword/dialogs.cpp:97
+msgid "First line indent (mm)"
+msgstr "最初の行のインデント (mm)"
+
+#: userland/apps/reliefword/window.cpp:115
+msgid "Fit width"
+msgstr "幅に合わせる"
+
+#: userland/apps/reliefword/window.cpp:90
+msgid "Font"
+msgstr "フォント"
+
+#: userland/apps/reliefword/window.cpp:79
+msgid "Font family"
+msgstr "フォントファミリー"
+
+#: userland/apps/reliefword/window.cpp:80
+msgid "Font size in points (6–96); press Enter to apply"
+msgstr "フォントサイズ（ポイント、6～96）。Enter で適用"
+
+#: userland/apps/reliefword/dialogs.cpp:58
+msgid "Footer ({page} inserts the page number)"
+msgstr "フッター（{page} でページ番号を挿入）"
+
+#: configs/nls/messages/reliefword.c:70
+msgid "HTML attribute contains invalid text"
+msgstr "HTML の属性に無効なテキストが含まれています"
+
+#: configs/nls/messages/reliefword.c:71
+msgid "HTML contains an invalid Unicode scalar"
+msgstr "HTML に無効な Unicode スカラー値が含まれています"
+
+#: configs/nls/messages/reliefword.c:72
+msgid "HTML contains invalid UTF-8 text"
+msgstr "HTML に無効な UTF-8 テキストが含まれています"
+
+#: configs/nls/messages/reliefword.c:73
+msgid "HTML exceeds the document character limit"
+msgstr "HTML が文書の文字数の上限を超えています"
+
+#: configs/nls/messages/reliefword.c:74
+msgid "HTML exceeds the paragraph limit"
+msgstr "HTML が段落数の上限を超えています"
+
+#: configs/nls/messages/reliefword.c:75
+msgid "HTML file exceeds the size limit"
+msgstr "HTML ファイルがサイズの上限を超えています"
+
+#: configs/nls/messages/reliefword.c:76
+msgid "HTML file is not valid UTF-8"
+msgstr "HTML ファイルは有効な UTF-8 ではありません"
+
+#: configs/nls/messages/reliefword.c:77
+msgid "HTML nesting exceeds the supported depth"
+msgstr "HTML の入れ子が対応する深さを超えています"
+
+#: configs/nls/messages/reliefword.c:78
+msgid "HTML paragraph state is invalid"
+msgstr "HTML の段落の状態が無効です"
+
+#: configs/nls/messages/reliefword.c:79
+msgid "HTML uses too many distinct text styles"
+msgstr "HTML のテキストスタイルの種類が多すぎます"
+
+#: userland/apps/reliefword/dialogs.cpp:57
+msgid "Header"
+msgstr "ヘッダー"
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Heading 1"
+msgstr "見出し 1"
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Heading 2"
+msgstr "見出し 2"
+
+#: userland/apps/reliefword/dialogs.cpp:51
+msgid "Height (mm)"
+msgstr "高さ (mm)"
+
+#: userland/apps/reliefword/window.cpp:89
+msgid "Highlight"
+msgstr "蛍光ペン"
+
+#: userland/apps/reliefword/window.cpp:38
+msgid "Home tab"
+msgstr "ホームタブ"
+
+#: configs/nls/messages/reliefword.c:10
+msgid "I/O error"
+msgstr "入出力エラー"
+
+#: userland/apps/reliefword/files.cpp:102
+msgid "Import"
+msgstr "インポート"
+
+#: userland/apps/reliefword/window.cpp:35
+msgid "Import HTML..."
+msgstr "HTML をインポート..."
+
+#: userland/apps/reliefword/window.cpp:35
+msgid "Import TXT..."
+msgstr "TXT をインポート..."
+
+#: userland/apps/reliefword/files.cpp:113
+msgid "Imported — save as .rword to keep formatting"
+msgstr "インポートしました。書式を保持するには .rword として保存してください"
+
+#: userland/apps/reliefword/window.cpp:99
+msgid "Indent"
+msgstr "インデントを増やす"
+
+#: userland/apps/reliefword/window.cpp:107
+msgid "Indentation, spacing and line height"
+msgstr "インデント、間隔、行の高さ"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/reliefword/window.cpp:105
+msgid "Insert a page break (Ctrl+Enter)"
+msgstr "改ページを挿入 (Ctrl+Enter)"
+
+#: userland/apps/reliefword/window.cpp:106
+msgid "Insert date"
+msgstr "日付を挿入"
+
+#: configs/nls/messages/reliefword.c:80
+msgid "Invalid HTML page settings"
+msgstr "HTML のページ設定が無効です"
+
+#: configs/nls/messages/reliefword.c:81
+msgid "Invalid native document character count"
+msgstr "独自形式の文書の文字数が無効です"
+
+#: configs/nls/messages/reliefword.c:82
+msgid "Invalid native document paragraph count"
+msgstr "独自形式の文書の段落数が無効です"
+
+#: configs/nls/messages/reliefword.c:83
+msgid "Invalid native document style count"
+msgstr "独自形式の文書のスタイル数が無効です"
+
+#: configs/nls/messages/reliefword.c:84
+msgid "Invalid page settings in native document"
+msgstr "独自形式の文書のページ設定が無効です"
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Italic (Ctrl+I)"
+msgstr "斜体 (Ctrl+I)"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Justify"
+msgstr "両端揃え"
+
+#: userland/apps/reliefword/dialogs.cpp:50
+msgid "Landscape"
+msgstr "横向き"
+
+#: userland/apps/reliefword/files.cpp:164
+msgid "Later"
+msgstr "後で"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Left"
+msgstr "左揃え"
+
+#: userland/apps/reliefword/dialogs.cpp:95
+msgid "Left indent (mm)"
+msgstr "左インデント (mm)"
+
+#: userland/apps/reliefword/dialogs.cpp:53
+msgid "Left margin (mm)"
+msgstr "左余白 (mm)"
+
+#: userland/apps/reliefword/dialogs.cpp:97
+msgid "Line spacing (%)"
+msgstr "行間 (%)"
+
+#: userland/apps/reliefword/dialogs.cpp:94
+msgid "List"
+msgstr "リスト"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/reliefword/dialogs.cpp:122
+msgid "Match case"
+msgstr "大文字と小文字を区別"
+
+#: userland/apps/reliefword/dialogs.cpp:150
+msgid "Match selected"
+msgstr "一致する項目を選択しました"
+
+#: userland/apps/reliefword/window.cpp:155
+msgid "Modified"
+msgstr "更新日時"
+
+#: userland/apps/reliefword/window.cpp:78
+msgid "Monospace"
+msgstr "等幅"
+
+#: configs/nls/messages/reliefword.c:85
+msgid "Native document contains an invalid character or style reference"
+msgstr "独自形式の文書に無効な文字またはスタイル参照が含まれています"
+
+#: configs/nls/messages/reliefword.c:86
+msgid "Native document contains an invalid text style"
+msgstr "独自形式の文書に無効なテキストスタイルが含まれています"
+
+#: configs/nls/messages/reliefword.c:87
+msgid "Native document contains invalid paragraph settings"
+msgstr "独自形式の文書に無効な段落設定が含まれています"
+
+#: configs/nls/messages/reliefword.c:88
+msgid "Native document has an invalid size"
+msgstr "独自形式の文書のサイズが無効です"
+
+#: configs/nls/messages/reliefword.c:89
+msgid "Native document has trailing data"
+msgstr "独自形式の文書の末尾に余分なデータがあります"
+
+#: configs/nls/messages/reliefword.c:90
+msgid "Native document signature or length is invalid"
+msgstr "独自形式の文書のシグネチャまたは長さが無効です"
+
+#: userland/apps/reliefword/window.cpp:33
+msgid "New"
+msgstr "新規作成"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: configs/nls/messages/reliefword.c:91
+msgid "No per-user state directory is available"
+msgstr "ユーザーごとの状態フォルダーを利用できません"
+
+#: userland/apps/reliefword/dialogs.cpp:94
+msgid "None"
+msgstr "なし"
+
+#: userland/apps/reliefword/dialogs.cpp:84
+msgid "Not enough memory"
+msgstr "メモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:92
+msgid "Not enough memory to create HTML document"
+msgstr "HTML 文書を作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:93
+msgid "Not enough memory to create document"
+msgstr "文書を作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:94
+msgid "Not enough memory to create recovery directory"
+msgstr "復元用フォルダーを作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:95
+msgid "Not enough memory to create recovery lock path"
+msgstr "復元用ロックパスを作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:96
+msgid "Not enough memory to encode HTML"
+msgstr "HTML をエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:97
+msgid "Not enough memory to encode HTML character style"
+msgstr "HTML の文字スタイルをエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:98
+msgid "Not enough memory to encode HTML metadata"
+msgstr "HTML メタデータをエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:99
+msgid "Not enough memory to encode HTML page settings"
+msgstr "HTML のページ設定をエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:100
+msgid "Not enough memory to encode HTML paragraph"
+msgstr "HTML の段落をエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:101
+msgid "Not enough memory to encode HTML text"
+msgstr "HTML テキストをエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:102
+msgid "Not enough memory to encode document"
+msgstr "文書をエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:103
+msgid "Not enough memory to encode document characters"
+msgstr "文書の文字をエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:104
+msgid "Not enough memory to encode document styles"
+msgstr "文書のスタイルをエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:105
+msgid "Not enough memory to encode paragraphs"
+msgstr "段落をエンコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:106
+msgid "Not enough memory to export text"
+msgstr "テキストをエクスポートするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:107
+msgid "Not enough memory to finish HTML"
+msgstr "HTML を完成させるためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:108
+msgid "Not enough memory to import HTML paragraphs"
+msgstr "HTML の段落をインポートするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:109
+msgid "Not enough memory to import HTML styles"
+msgstr "HTML のスタイルをインポートするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:110
+msgid "Not enough memory to import HTML text"
+msgstr "HTML テキストをインポートするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:111
+msgid "Not enough memory to import HTML title"
+msgstr "HTML のタイトルをインポートするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:112
+msgid "Not enough memory to import paragraphs"
+msgstr "段落をインポートするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:113
+msgid "Not enough memory to import text"
+msgstr "テキストをインポートするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:114
+msgid "Not enough memory to locate recovery directory"
+msgstr "復元用フォルダーを探すためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:115
+msgid "Not enough memory to normalize text"
+msgstr "テキストを正規化するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:116
+msgid "Not enough memory to preserve save target"
+msgstr "保存先を保持するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:117
+msgid "Not enough memory to read HTML title"
+msgstr "HTML のタイトルを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:118
+msgid "Not enough memory to read characters"
+msgstr "文字を読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:119
+msgid "Not enough memory to read document"
+msgstr "文書を読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:120
+msgid "Not enough memory to read document text"
+msgstr "文書のテキストを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:121
+msgid "Not enough memory to read paragraphs"
+msgstr "段落を読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:122
+msgid "Not enough memory to read styles"
+msgstr "スタイルを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:123
+msgid "Not enough memory to record HTML import warning"
+msgstr "HTML インポートの警告を記録するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:124
+msgid "Not enough memory to reserve recovery file"
+msgstr "復元用ファイルを確保するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:125
+msgid "Not enough memory to retain the import source path"
+msgstr "インポート元のパスを保持するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:126
+msgid "Not enough memory to retain the opened file path"
+msgstr "開いたファイルのパスを保持するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:127
+msgid "Not enough memory to return HTML"
+msgstr "HTML を返すためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:128
+msgid "Not enough memory to return document"
+msgstr "文書を返すためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:129
+msgid "Not enough memory to return recovery path"
+msgstr "復元用パスを返すためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:130
+msgid "Not enough memory to save document"
+msgstr "文書を保存するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:131
+msgid "Not enough memory to sync save directory"
+msgstr "保存先フォルダーを同期するためのメモリが不足しています"
+
+#: userland/apps/reliefword/dialogs.cpp:94
+msgid "Numbering"
+msgstr "段落番号"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/reliefword/files.cpp:43
+msgid "Open document"
+msgstr "文書を開く"
+
+#: userland/apps/reliefword/window.cpp:33
+msgid "Open..."
+msgstr "開く..."
+
+#: userland/apps/reliefword/files.cpp:96
+msgid "Opening document..."
+msgstr "文書を開いています..."
+
+#: configs/nls/messages/reliefword.c:132
+msgid "Operation cancelled"
+msgstr "操作が中止されました"
+
+#: userland/apps/reliefword/view.cpp:107
+msgid "Operation failed"
+msgstr "操作に失敗しました"
+
+#: userland/apps/reliefword/dialogs.cpp:50
+msgid "Orientation"
+msgstr "印刷の向き"
+
+#: userland/apps/reliefword/window.cpp:99
+msgid "Outdent"
+msgstr "インデントを減らす"
+
+#: userland/apps/reliefword/window.cpp:106
+msgid "Page"
+msgstr "ページ"
+
+#: userland/apps/reliefword/window.cpp:145
+msgid "Page %u / %u   ·   %zu characters   ·   %zu words   ·   %d%%"
+msgstr "ページ %u / %u   ·   %zu 文字   ·   %zu 単語   ·   %d%%"
+
+#: userland/apps/reliefword/window.cpp:105
+msgid "Page break"
+msgstr "改ページ"
+
+#: userland/apps/reliefword/window.cpp:38
+msgid "Page layout"
+msgstr "ページレイアウト"
+
+#: userland/apps/reliefword/dialogs.cpp:46
+msgid "Page setup"
+msgstr "ページ設定"
+
+#: userland/apps/reliefword/window.cpp:104
+msgid "Page setup..."
+msgstr "ページ設定..."
+
+#: userland/apps/reliefword/dialogs.cpp:47
+msgid "Paper size"
+msgstr "用紙サイズ"
+
+#: userland/apps/reliefword/window.cpp:104
+msgid "Paper, orientation, margins, headers and footers"
+msgstr "用紙、印刷の向き、余白、ヘッダー、フッター"
+
+#: userland/apps/reliefword/dialogs.cpp:92
+msgid "Paragraph"
+msgstr "段落"
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Paragraph..."
+msgstr "段落..."
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Paste"
+msgstr "貼り付け"
+
+#: userland/apps/reliefword/window.cpp:75
+msgid "Paste (Ctrl+V)"
+msgstr "貼り付け (Ctrl+V)"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/reliefword/dialogs.cpp:50
+msgid "Portrait"
+msgstr "縦向き"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/reliefword/window.cpp:54
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/reliefword/files.cpp:164
+msgid "Recover"
+msgstr "復元"
+
+#: userland/apps/reliefword/files.cpp:172
+msgid "Recovered — save this document to a new file"
+msgstr "復元しました。この文書を新しいファイルに保存してください"
+
+#: configs/nls/messages/reliefword.c:133
+msgid "Recovery base directory must be an absolute path"
+msgstr "復元用の基準フォルダーは絶対パスで指定してください"
+
+#: userland/apps/reliefword/files.cpp:148
+msgid "Recovery copy saved"
+msgstr "復元用コピーを保存しました"
+
+#: configs/nls/messages/reliefword.c:134
+msgid "Recovery directory belongs to another user"
+msgstr "復元用フォルダーは別のユーザーが所有しています"
+
+#: configs/nls/messages/reliefword.c:135
+msgid "Recovery file is already in use"
+msgstr "復元用ファイルはすでに使用されています"
+
+#: configs/nls/messages/reliefword.c:136
+msgid "Recovery lock must be a private regular file"
+msgstr "復元用ロックは非公開の通常ファイルである必要があります"
+
+#: configs/nls/messages/reliefword.c:137
+msgid "Recovery lock path is too long"
+msgstr "復元用ロックのパスが長すぎます"
+
+#: configs/nls/messages/reliefword.c:138
+msgid "Recovery path contains a non-directory component"
+msgstr "復元用パスにフォルダー以外の要素が含まれています"
+
+#: configs/nls/messages/reliefword.c:139
+msgid "Recovery path is empty"
+msgstr "復元用パスが空です"
+
+#: configs/nls/messages/reliefword.c:140
+msgid "Recovery path is not a directory"
+msgstr "復元用パスはフォルダーではありません"
+
+#: configs/nls/messages/reliefword.c:141
+msgid "Recovery path is too long"
+msgstr "復元用パスが長すぎます"
+
+#: userland/apps/reliefword/window.cpp:41
+msgid "Redo"
+msgstr "やり直し"
+
+#: userland/apps/reliefword/window.cpp:267
+msgid "ReliefOS project report\nA document made with ReliefWord\n\nOverview\nWrite, edit and arrange Chinese and English text on real pages. The ribbon keeps everyday commands within reach.\n\nThis week's work\nDraft the proposal and collect feedback.\nReview the document together.\nSave the final document in the original format.\n\nNext steps\nUse headings, lists and paragraph spacing to make the report easy to read. You can open TXT or HTML and save an editable .rword copy.\n\nPrepared with ReliefWord — simple tools for everyday writing."
+msgstr "ReliefOS プロジェクト報告書\nReliefWord で作成した文書\n\n概要\n実際のページ上で中国語と英語のテキストを作成、編集、配置できます。リボンから日常的なコマンドにすぐアクセスできます。\n\n今週の作業\n提案書を作成し、フィードバックを集める。\n文書を一緒に確認する。\n最終文書を独自形式で保存する。\n\n次のステップ\n見出し、リスト、段落間隔を使って読みやすい報告書にしましょう。TXT または HTML を開き、編集可能な .rword のコピーとして保存できます。\n\nReliefWord で作成 — 日々の文章作成のためのシンプルなツール。"
+
+#: userland/apps/reliefword/dialogs.cpp:125
+msgid "Replace"
+msgstr "置換"
+
+#: userland/apps/reliefword/dialogs.cpp:127
+msgid "Replace all"
+msgstr "すべて置換"
+
+#: userland/apps/reliefword/files.cpp:70
+msgid "Replace the existing file?\n%s"
+msgstr "既存のファイルを置き換えますか?\n%s"
+
+#: userland/apps/reliefword/window.cpp:100
+msgid "Replace..."
+msgstr "置換..."
+
+#: userland/apps/reliefword/dialogs.cpp:121
+msgid "Replace:"
+msgstr "置換:"
+
+#: userland/apps/reliefword/dialogs.cpp:167
+msgid "Replaced %u matches"
+msgstr "%u 件を置換しました"
+
+#: userland/apps/reliefword/dialogs.cpp:93
+msgid "Right"
+msgstr "右揃え"
+
+#: userland/apps/reliefword/dialogs.cpp:95
+msgid "Right indent (mm)"
+msgstr "右インデント (mm)"
+
+#: userland/apps/reliefword/dialogs.cpp:53
+msgid "Right margin (mm)"
+msgstr "右余白 (mm)"
+
+#: userland/apps/reliefword/window.cpp:117
+msgid "Ruler"
+msgstr "ルーラー"
+
+#: userland/apps/reliefword/window.cpp:78
+msgid "Sans serif"
+msgstr "サンセリフ"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/reliefword/files.cpp:78
+msgid "Save a copy..."
+msgstr "コピーを保存..."
+
+#: userland/apps/reliefword/window.cpp:34
+msgid "Save as..."
+msgstr "名前を付けて保存..."
+
+#: userland/apps/reliefword/files.cpp:37
+msgid "Save changes before continuing?"
+msgstr "続行する前に変更を保存しますか?"
+
+#: userland/apps/reliefword/files.cpp:43
+msgid "Save document"
+msgstr "文書を保存"
+
+#: configs/nls/messages/reliefword.c:142
+msgid "Save path is empty"
+msgstr "保存先のパスが空です"
+
+#: configs/nls/messages/reliefword.c:143
+msgid "Save path is too long"
+msgstr "保存先のパスが長すぎます"
+
+#: userland/apps/reliefword/files.cpp:72
+msgid "Saving document..."
+msgstr "文書を保存しています..."
+
+#: userland/apps/reliefword/view.cpp:303
+msgid "Select all"
+msgstr "すべて選択"
+
+#: userland/apps/reliefword/window.cpp:256
+msgid "Selection"
+msgstr "選択"
+
+#: userland/apps/reliefword/window.cpp:78
+msgid "Serif"
+msgstr "セリフ"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/reliefword/dialogs.cpp:59
+msgid "Show page numbers"
+msgstr "ページ番号を表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: configs/nls/messages/reliefword.c:5
+msgid "Some HTML links, tables, or embedded objects were flattened or skipped"
+msgstr "一部の HTML リンク、表、埋め込みオブジェクトは単純化または省略されました"
+
+#: userland/apps/reliefword/dialogs.cpp:99
+msgid "Space after (pt)"
+msgstr "段落後の間隔 (pt)"
+
+#: userland/apps/reliefword/dialogs.cpp:99
+msgid "Space before (pt)"
+msgstr "段落前の間隔 (pt)"
+
+#: configs/nls/messages/reliefword.c:144
+msgid "State directory path is too long"
+msgstr "状態フォルダーのパスが長すぎます"
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Strikethrough"
+msgstr "取り消し線"
+
+#: userland/apps/reliefword/window.cpp:99
+msgid "Styles"
+msgstr "スタイル"
+
+#: userland/apps/reliefword/files.cpp:119
+msgid "TXT keeps text only. Character formatting, paragraph layout and page settings are not saved. Your original document remains open."
+msgstr "TXT ではテキストのみが保持されます。文字の書式、段落レイアウト、ページ設定は保存されません。元の文書は開いたままです。"
+
+#: configs/nls/messages/reliefword.c:145
+msgid "Temporary document write was incomplete"
+msgstr "一時文書の書き込みが完了しませんでした"
+
+#: userland/apps/reliefword/window.cpp:89
+msgid "Text color"
+msgstr "文字の色"
+
+#: configs/nls/messages/reliefword.c:146
+msgid "Text file exceeds document character limits"
+msgstr "テキストファイルが文書の文字数上限を超えています"
+
+#: configs/nls/messages/reliefword.c:147
+msgid "Text file exceeds the size limit"
+msgstr "テキストファイルがサイズの上限を超えています"
+
+#: configs/nls/messages/reliefword.c:148
+msgid "Text file is not valid UTF-8"
+msgstr "テキストファイルは有効な UTF-8 ではありません"
+
+#: userland/apps/reliefword/dialogs.cpp:149
+msgid "Text not found"
+msgstr "テキストが見つかりません"
+
+#: configs/nls/messages/reliefword.c:149
+msgid "Text output exceeds the file limit"
+msgstr "テキスト出力がファイルの上限を超えています"
+
+#: userland/apps/reliefword/files.cpp:78
+msgid "The file changed outside ReliefWord. Save a copy or explicitly replace it."
+msgstr "ファイルが ReliefWord の外部で変更されました。コピーを保存するか、明示的に置き換えてください。"
+
+#: configs/nls/messages/reliefword.c:150
+msgid "The file changed outside ReliefWord; the original was preserved"
+msgstr "ファイルが ReliefWord の外部で変更されました。元のファイルは保持されています"
+
+#: configs/nls/messages/reliefword.c:11
+msgid "The file changed while it was being opened"
+msgstr "ファイルを開いている間に変更されました"
+
+#: userland/apps/reliefword/window.cpp:96
+msgid "Title"
+msgstr "タイトル"
+
+#: userland/apps/reliefword/dialogs.cpp:54
+msgid "Top margin (mm)"
+msgstr "上余白 (mm)"
+
+#: configs/nls/messages/reliefword.c:151
+msgid "UTF-8 输入为空"
+msgstr "UTF-8 の入力が空です"
+
+#: configs/nls/messages/reliefword.c:152
+msgid "UTF-8 输入无效"
+msgstr "UTF-8 の入力が無効です"
+
+#: userland/apps/reliefword/window.cpp:85
+msgid "Underline (Ctrl+U)"
+msgstr "下線 (Ctrl+U)"
+
+#: userland/apps/reliefword/window.cpp:41
+msgid "Undo"
+msgstr "元に戻す"
+
+#: configs/nls/messages/reliefword.c:153
+msgid "Unknown document format"
+msgstr "不明な文書形式です"
+
+#: configs/nls/messages/reliefword.c:154
+msgid "Unsupported native document version"
+msgstr "対応していない独自形式の文書バージョンです"
+
+#: userland/apps/reliefword/window.cpp:147
+msgid "Untitled"
+msgstr "無題"
+
+#: userland/apps/reliefword/main.cpp:10
+msgid "Usage: reliefword [document.rword | text.txt | page.html]"
+msgstr "使い方: reliefword [document.rword | text.txt | page.html]"
+
+#: userland/apps/reliefword/window.cpp:38
+msgid "View"
+msgstr "表示"
+
+#: userland/apps/reliefword/dialogs.cpp:51
+msgid "Width (mm)"
+msgstr "幅 (mm)"
+
+#: userland/apps/reliefword/window.cpp:101
+msgid "Word count"
+msgstr "文字数と単語数"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: userland/apps/reliefword/window.cpp:116
+msgid "Zoom"
+msgstr "ズーム"
+
+#: configs/nls/messages/reliefword.c:12
+msgid "none"
+msgstr "なし"
+
+#: configs/nls/messages/reliefword.c:13
+msgid "s"
+msgstr "秒"
+
+#: configs/nls/messages/reliefword.c:155
+msgid "内存不足，无法保存撤销状态"
+msgstr "元に戻すための状態を保存するメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:156
+msgid "内存不足，无法保留文档内容"
+msgstr "文書の内容を保持するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:157
+msgid "内存不足，无法保留段落格式"
+msgstr "段落の書式を保持するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:158
+msgid "内存不足，无法创建剪贴板内容"
+msgstr "クリップボードの内容を作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:159
+msgid "内存不足，无法创建撤销历史"
+msgstr "元に戻すための履歴を作成するメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:160
+msgid "内存不足，无法创建文档"
+msgstr "文書を作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:161
+msgid "内存不足，无法复制字符格式"
+msgstr "文字の書式をコピーするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:162
+msgid "内存不足，无法复制段落格式"
+msgstr "段落の書式をコピーするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:163
+msgid "内存不足，无法复制选区"
+msgstr "選択範囲をコピーするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:164
+msgid "内存不足，无法建立替换副本"
+msgstr "置換用のコピーを作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:165
+msgid "内存不足，无法建立粘贴副本"
+msgstr "貼り付け用のコピーを作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:166
+msgid "内存不足，无法建立编辑副本"
+msgstr "編集用のコピーを作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:167
+msgid "内存不足，无法扩展文档"
+msgstr "文書を拡張するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:168
+msgid "内存不足，无法插入文本"
+msgstr "テキストを挿入するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:169
+msgid "内存不足，无法搜索文档"
+msgstr "文書を検索するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:170
+msgid "内存不足，无法撤销编辑"
+msgstr "編集を元に戻すためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:171
+msgid "内存不足，无法替换文本"
+msgstr "テキストを置換するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:172
+msgid "内存不足，无法替换文档内容"
+msgstr "文書の内容を置き換えるためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:173
+msgid "内存不足，无法粘贴文本"
+msgstr "テキストを貼り付けるためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:174
+msgid "内存不足，无法规范化换行"
+msgstr "改行を正規化するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:175
+msgid "内存不足，无法解码 UTF-8"
+msgstr "UTF-8 をデコードするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:176
+msgid "内存不足，无法记录撤销状态"
+msgstr "元に戻すための状態を記録するメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:177
+msgid "内存不足，无法记录编辑历史"
+msgstr "編集履歴を記録するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:178
+msgid "内存不足，无法记录重做状态"
+msgstr "やり直し用の状態を記録するメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:179
+msgid "内存不足，无法重做编辑"
+msgstr "編集をやり直すためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:180
+msgid "内存不足，无法重建替换段落"
+msgstr "置換後の段落を再構築するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:181
+msgid "内存不足，无法重建段落"
+msgstr "段落を再構築するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:224
+msgid "列表标记测量结果无效"
+msgstr "リストマーカーの測定結果が無効です"
+
+#: configs/nls/messages/reliefword.c:182
+msgid "剪贴板内容为空"
+msgstr "クリップボードの内容が空です"
+
+#: configs/nls/messages/reliefword.c:183
+msgid "剪贴板样式索引无效"
+msgstr "クリップボードのスタイルインデックスが無効です"
+
+#: configs/nls/messages/reliefword.c:184
+msgid "字符样式属性无效"
+msgstr "文字スタイルの属性が無効です"
+
+#: configs/nls/messages/reliefword.c:185
+msgid "字符样式数超过上限或内存不足"
+msgstr "文字スタイルの数が上限を超えているか、メモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:186
+msgid "字符样式索引无效"
+msgstr "文字スタイルのインデックスが無効です"
+
+#: configs/nls/messages/reliefword.c:187
+msgid "字符格式属性无效"
+msgstr "文字書式の属性が無効です"
+
+#: configs/nls/messages/reliefword.c:188
+msgid "字符格式掩码无效"
+msgstr "文字書式のマスクが無効です"
+
+#: configs/nls/messages/reliefword.c:225
+msgid "字符测量结果无效"
+msgstr "文字の測定結果が無効です"
+
+#: configs/nls/messages/reliefword.c:226
+msgid "布局内存分配失败"
+msgstr "レイアウト用のメモリ確保に失敗しました"
+
+#: configs/nls/messages/reliefword.c:227
+msgid "布局缺少字符测量函数"
+msgstr "レイアウトに文字の測定関数がありません"
+
+#: configs/nls/messages/reliefword.c:189
+msgid "插入字符样式无效"
+msgstr "挿入する文字スタイルが無効です"
+
+#: configs/nls/messages/reliefword.c:190
+msgid "撤销历史不可用"
+msgstr "元に戻す履歴を利用できません"
+
+#: configs/nls/messages/reliefword.c:191
+msgid "文档元信息无效"
+msgstr "文書のメタデータが無効です"
+
+#: configs/nls/messages/reliefword.c:192
+msgid "文档含无效 Unicode 标量"
+msgstr "文書に無効な Unicode スカラー値が含まれています"
+
+#: configs/nls/messages/reliefword.c:193
+msgid "文档字符数超过上限"
+msgstr "文書の文字数が上限を超えています"
+
+#: configs/nls/messages/reliefword.c:194
+msgid "文档字符样式数无效"
+msgstr "文書の文字スタイル数が無効です"
+
+#: configs/nls/messages/reliefword.c:195
+msgid "文档必须使用 LF 换行"
+msgstr "文書には LF 改行を使用してください"
+
+#: configs/nls/messages/reliefword.c:196
+msgid "文档段落数无效"
+msgstr "文書の段落数が無効です"
+
+#: configs/nls/messages/reliefword.c:197
+msgid "文档版本号已达上限"
+msgstr "文書のバージョン番号が上限に達しました"
+
+#: configs/nls/messages/reliefword.c:198
+msgid "文档版本号无效"
+msgstr "文書のバージョン番号が無効です"
+
+#: configs/nls/messages/reliefword.c:228
+msgid "文档缺少段落"
+msgstr "文書に段落がありません"
+
+#: configs/nls/messages/reliefword.c:229
+msgid "文档行数超过索引范围"
+msgstr "文書の行数がインデックスの範囲を超えています"
+
+#: configs/nls/messages/reliefword.c:230
+msgid "文档超过 4096 页限制"
+msgstr "文書が 4096 ページの上限を超えています"
+
+#: configs/nls/messages/reliefword.c:231
+msgid "文档超过排版上限"
+msgstr "文書がレイアウトの上限を超えています"
+
+#: configs/nls/messages/reliefword.c:232
+msgid "无法确定换行位置"
+msgstr "改行位置を特定できません"
+
+#: configs/nls/messages/reliefword.c:233
+msgid "无法确定组合字符边界"
+msgstr "結合文字の境界を特定できません"
+
+#: configs/nls/messages/reliefword.c:199
+msgid "替换后文档字符数超过上限"
+msgstr "置換後の文書の文字数が上限を超えています"
+
+#: configs/nls/messages/reliefword.c:200
+msgid "替换后段落数超过上限"
+msgstr "置換後の段落数が上限を超えています"
+
+#: configs/nls/messages/reliefword.c:201
+msgid "替换文本不是有效 UTF-8 或内存不足"
+msgstr "置換するテキストが有効な UTF-8 でないか、メモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:202
+msgid "替换结果超出上限"
+msgstr "置換結果が上限を超えています"
+
+#: configs/nls/messages/reliefword.c:203
+msgid "查找或替换文本为空"
+msgstr "検索または置換するテキストが空です"
+
+#: configs/nls/messages/reliefword.c:204
+msgid "查找或替换文本超过上限"
+msgstr "検索または置換するテキストが上限を超えています"
+
+#: configs/nls/messages/reliefword.c:205
+msgid "查找文本必须是非空的有效 UTF-8"
+msgstr "検索するテキストには、空でない有効な UTF-8 が必要です"
+
+#: configs/nls/messages/reliefword.c:234
+msgid "段前距与行高超过页面可用高度"
+msgstr "段落前の間隔と行の高さがページの使用可能な高さを超えています"
+
+#: configs/nls/messages/reliefword.c:235
+msgid "段落中包含未登记的换行符"
+msgstr "段落に登録されていない改行文字が含まれています"
+
+#: configs/nls/messages/reliefword.c:206
+msgid "段落数超过上限或内存不足"
+msgstr "段落数が上限を超えているか、メモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:207
+msgid "段落格式属性无效"
+msgstr "段落書式の属性が無効です"
+
+#: configs/nls/messages/reliefword.c:208
+msgid "段落格式掩码无效"
+msgstr "段落書式のマスクが無効です"
+
+#: configs/nls/messages/reliefword.c:236
+msgid "段落格式无效"
+msgstr "段落の書式が無効です"
+
+#: configs/nls/messages/reliefword.c:237
+msgid "段落缩进超出可用页面宽度"
+msgstr "段落のインデントがページの使用可能な幅を超えています"
+
+#: configs/nls/messages/reliefword.c:209
+msgid "段落起点与 LF 不匹配"
+msgstr "段落の開始位置が LF と一致しません"
+
+#: configs/nls/messages/reliefword.c:210
+msgid "段落起点数量与 LF 不匹配"
+msgstr "段落の開始位置の数が LF と一致しません"
+
+#: configs/nls/messages/reliefword.c:238
+msgid "段落起点无效"
+msgstr "段落の開始位置が無効です"
+
+#: configs/nls/messages/reliefword.c:239
+msgid "段落起点未对应换行符"
+msgstr "段落の開始位置が改行文字と対応していません"
+
+#: configs/nls/messages/reliefword.c:211
+msgid "没有可复制的选区"
+msgstr "コピーできる選択範囲がありません"
+
+#: configs/nls/messages/reliefword.c:240
+msgid "空文档未生成可编辑行"
+msgstr "空の文書に編集可能な行が生成されませんでした"
+
+#: configs/nls/messages/reliefword.c:241
+msgid "空行测量结果无效"
+msgstr "空行の測定結果が無効です"
+
+#: configs/nls/messages/reliefword.c:212
+msgid "粘贴后字符样式数超过上限或内存不足"
+msgstr "貼り付け後の文字スタイル数が上限を超えているか、メモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:213
+msgid "粘贴后文档字符数超过上限"
+msgstr "貼り付け後の文書の文字数が上限を超えています"
+
+#: configs/nls/messages/reliefword.c:214
+msgid "粘贴后段落数超过上限或内存不足"
+msgstr "貼り付け後の段落数が上限を超えているか、メモリが不足しています"
+
+#: configs/nls/messages/reliefword.c:242
+msgid "行高超过页面可用高度"
+msgstr "行の高さがページの使用可能な高さを超えています"
+
+#: configs/nls/messages/reliefword.c:215
+msgid "输入字符数超过上限"
+msgstr "入力した文字数が上限を超えています"
+
+#: configs/nls/messages/reliefword.c:216
+msgid "选区位置超出文档范围"
+msgstr "選択範囲の位置が文書の範囲外です"
+
+#: configs/nls/messages/reliefword.c:217
+msgid "选区字符样式索引无效"
+msgstr "選択範囲の文字スタイルのインデックスが無効です"
+
+#: configs/nls/messages/reliefword.c:243
+msgid "页面可用高度无效"
+msgstr "ページの使用可能な高さが無効です"
+
+#: configs/nls/messages/reliefword.c:218
+msgid "页面设置无效"
+msgstr "ページ設定が無効です"
+
+#: configs/nls/messages/reliefword.c:244
+msgid "页面边距超出页面范围"
+msgstr "ページの余白がページの範囲を超えています"
+
+#: configs/nls/messages/reliefword.c:219
+msgid "首段起点必须为零"
+msgstr "最初の段落の開始位置はゼロである必要があります"
+
+#: configs/nls/messages/reliefword.c:245
+msgid "首段起点无效"
+msgstr "最初の段落の開始位置が無効です"

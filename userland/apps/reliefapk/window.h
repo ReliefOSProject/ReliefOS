@@ -2,6 +2,7 @@
 #define RELIEFAPK_WINDOW_H
 #include "../fltk_support.h"
 #include "model.h"
+#include "certificate_display.h"
 #include "process.h"
 #include "repositories.h"
 #include <FL/Fl_Button.H>
@@ -49,6 +50,8 @@ class App : public Fl_Double_Window {
     int wanted_filter = 1, query_filter = 1, detail_kind = 0, detail_query_kind = 0, catalog_second = -1;
     Text detail_name, detail_version, initial_path;
     size_t current_group = 0, out_seen = 0, err_seen = 0;
+    CertificateDisplay certificate_stdout, certificate_stderr;
+    bool certificate_output = false;
     OperationMode mode = OperationMode::Idle;
     bool op_pending = false, op_error = false, quitting = false, repo_dirty = false;
     bool initial_ca_repair = false;

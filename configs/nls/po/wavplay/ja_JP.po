@@ -1,0 +1,79 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/wavplay/main.c:116
+msgid "PCM write"
+msgstr "PCM の書き込み"
+
+#: userland/apps/wavplay/main.c:59
+msgid "open /dev/dsp"
+msgstr "/dev/dsp のオープン"
+
+#: userland/apps/wavplay/main.c:136
+msgid "stereo frame"
+msgstr "ステレオフレーム"
+
+#: userland/apps/wavplay/main.c:43
+msgid "wavplay: %s failed (errno=%d)\n"
+msgstr "wavplay: %s に失敗しました (errno=%d)\n"
+
+#: userland/apps/wavplay/main.c:258
+msgid "wavplay: %u Hz stereo PCM through /dev/dsp (%u output channels)\n"
+msgstr "wavplay: %u Hz ステレオ PCM を /dev/dsp で再生 (%u 出力チャンネル)\n"
+
+#: userland/apps/wavplay/main.c:329
+msgid "wavplay: PCM tone complete"
+msgstr "wavplay: PCM テスト音が完了しました"
+
+#: userland/apps/wavplay/main.c:325
+msgid "wavplay: PCM tone failed"
+msgstr "wavplay: PCM テスト音の再生に失敗しました"
+
+#: userland/apps/wavplay/main.c:254
+msgid "wavplay: audio format rejected %d\n"
+msgstr "wavplay: 音声形式が拒否されました %d\n"
+
+#: userland/apps/wavplay/main.c:294
+msgid "wavplay: complete"
+msgstr "wavplay: 完了"
+
+#: userland/apps/wavplay/main.c:244
+msgid "wavplay: open failed %d\n"
+msgstr "wavplay: オープンに失敗しました %d\n"
+
+#: userland/apps/wavplay/main.c:262
+msgid "wavplay: out of memory"
+msgstr "wavplay: メモリ不足"
+
+#: userland/apps/wavplay/main.c:284
+msgid "wavplay: playback failed"
+msgstr "wavplay: 再生に失敗しました"
+
+#: userland/apps/wavplay/main.c:322
+msgid "wavplay: playing 30-second 48000 Hz PCM tone (%u output channels)\n"
+msgstr "wavplay: 30 秒の 48000 Hz PCM テスト音を再生中 (%u 出力チャンネル)\n"
+
+#: userland/apps/wavplay/main.c:248
+msgid "wavplay: supported files are PCM, stereo, 16-bit WAV"
+msgstr "wavplay: 対応ファイルは PCM、ステレオ、16 ビット WAV です"
+
+#: userland/apps/wavplay/main.c:274
+msgid "wavplay: truncated WAV data"
+msgstr "wavplay: WAV データが途中で切れています"
+
+#: userland/apps/wavplay/main.c:68
+msgid "wavplay: unsupported negotiated format=%d channels=%d rate=%d\n"
+msgstr "wavplay: 対応していないネゴシエート後の形式 format=%d channels=%d rate=%d\n"
+
+#: userland/apps/wavplay/main.c:53
+msgid "wavplay: unsupported sample rate %u\n"
+msgstr "wavplay: 対応していないサンプルレート %u\n"

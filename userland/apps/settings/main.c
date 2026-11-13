@@ -559,7 +559,7 @@ static void refresh_ntp_runtime_state(void)
     if (settings_rc_child < 0) {
         settings_rc_child = 0;
         copy_text(ntp_runtime_state, sizeof(ntp_runtime_state), "failed");
-        copy_text(ntp_runtime_detail, sizeof(ntp_runtime_detail), "OpenRC worker failed");
+        copy_text(ntp_runtime_detail, sizeof(ntp_runtime_detail), T("OpenRC worker failed"));
     }
 }
 
@@ -622,10 +622,10 @@ static int poll_settings_openrc(void)
         changed = 1;
         if (settings_rc_kind == 1) {
             copy_text(ntp_runtime_state, sizeof(ntp_runtime_state), result == 0 ? "running" : result == 3 ? "stopped" : "failed");
-            snprintf(ntp_runtime_detail, sizeof(ntp_runtime_detail), "OpenRC exit=%d (daemon status, not sync proof)", result);
+            snprintf(ntp_runtime_detail, sizeof(ntp_runtime_detail), T("OpenRC exit=%d (daemon status, not sync proof)"), result);
             settings_rc_kind = 0;
         } else if (result) {
-            snprintf(status_text, sizeof(status_text), "OpenRC update failed: exit=%d", result);
+            snprintf(status_text, sizeof(status_text), T("OpenRC update failed: exit=%d"), result);
             settings_rc_kind = settings_rc_save = 0;
             load_services_config();
         } else if (settings_rc_kind == 2) {
@@ -642,7 +642,7 @@ static int poll_settings_openrc(void)
     }
     if (settings_rc_child < 0) {
         settings_rc_child = settings_rc_kind = settings_rc_save = 0;
-        copy_text(status_text, sizeof(status_text), "OpenRC worker failed");
+        copy_text(status_text, sizeof(status_text), T("OpenRC worker failed"));
         changed = 1;
     }
     return changed;
@@ -1527,7 +1527,10 @@ static void draw_services_page(struct reliefos_ui_surface *ui)
     }
     reliefos_ui_text(ui, 34, 346, T("NTP runtime state:"),
                    RELIEFOS_UI_DARK, RELIEFOS_UI_GRAY);
-    reliefos_ui_text_clipped(ui, 174, 346, SETTINGS_W - 208, ntp_runtime_state,
+    reliefos_ui_text_clipped(ui, 174, 346, SETTINGS_W - 208,
+                           text_eq(ntp_runtime_state, "running") ? T("Running") :
+                           text_eq(ntp_runtime_state, "stopped") ? T("Stopped") :
+                           text_eq(ntp_runtime_state, "failed") ? T("Failed") : T("Unknown"),
                            text_eq(ntp_runtime_state, "failed") ? 0x00b03030U :
                            text_eq(ntp_runtime_state, "running") ? 0x00108040U :
                            RELIEFOS_UI_DARK, RELIEFOS_UI_GRAY);
@@ -2157,6 +2160,8 @@ int main(void)
     setlocale(LC_ALL, "");
     bindtextdomain("settings", RELIEFOS_LAYOUT_LOCALE);
     textdomain("settings");
+    copy_text(status_text, sizeof(status_text), T("Ready"));
+    copy_text(ntp_runtime_detail, sizeof(ntp_runtime_detail), T("runtime state unavailable"));
     selected_language = language_selection();
     struct reliefos_ui_surface ui;
     struct reliefos_gui_app_event event;

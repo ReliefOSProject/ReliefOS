@@ -3581,3 +3581,7 @@ msgstr ""
 #: configs/nls/messages/reliefmath.c:627
 msgid "worker error"
 msgstr ""
+
+#: configs/nls/messages/reliefmath.c
+msgid "Cannot construct formula layout"
+msgstr ""

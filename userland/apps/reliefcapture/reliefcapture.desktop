@@ -1,9 +1,12 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefCapture
+Name[ja]=ReliefCapture
 GenericName=Screenshot and Annotation
+GenericName[ja]=スクリーンショットと注釈
 GenericName[zh_CN]=截图与标注
 Comment=Capture, annotate and save screenshots
+Comment[ja]=スクリーンショットの撮影、注釈の追加、保存
 Comment[zh_CN]=截取屏幕、窗口或区域，添加标注并保存 PNG
 Exec=/usr/bin/reliefcapture
 TryExec=/usr/bin/reliefcapture

@@ -343,9 +343,9 @@ void format_partition_line(char *buf, uint32_t cap,
     if (disks[selected_disk].sector_size)
         size = (partition->sector_count * disks[selected_disk].sector_size) /
                (1024ULL * 1024ULL);
-    snprintf(buf, cap, "Partition %u  %s  %llu MiB  %s  %s%s",
+    snprintf(buf, cap, T("Partition %u  %s  %llu MiB  %s  %s%s"),
              partition->index + 1u,
-             partition->name[0] ? partition->name : "Unnamed",
+             partition->name[0] ? partition->name : T("Unnamed"),
              (unsigned long long)size,
              reliefos_block_filesystem_name(partition->filesystem),
              reliefos_block_gpt_type_name(partition->gpt_type),
@@ -737,7 +737,7 @@ void refresh_disks(void)
     if (ret < 0) {
         disk_count = 0;
         selected_disk = -1;
-        set_error_status("Could not list disks", ret);
+        set_error_status(T("Could not list disks"), ret);
         refresh_ui();
         return;
     }
@@ -1395,10 +1395,10 @@ static void finish_install(int ret,
     }
     if (installer_tty_mode) {
         if (ret < 0) {
-            printf("\n%s (error %d)\n", prefix ? prefix : "Install failed", ret);
+            printf(T("\n%s (error %d)\n"), prefix ? prefix : T("Install failed"), ret);
         } else {
-            puts("\nInstallation completed successfully.");
-            puts("Remove the installation media before rebooting.");
+            puts(T("\nInstallation completed successfully."));
+            puts(T("Remove the installation media before rebooting."));
         }
     } else {
         refresh_ui();
@@ -1446,18 +1446,18 @@ void perform_install(void)
     if (!ret) ret = reliefos_boot_validate_disk(&boot, !installer_partition_auto);
     if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return; }
 
-    show_progress(2, "Preparing target disk", "");
-    show_progress(22, "Mounting target filesystems", "Root: /target (ext4), ESP: /target/boot (FAT32)");
+    show_progress(2, T("Preparing target disk"), "");
+    show_progress(22, T("Mounting target filesystems"), T("Root: /target (ext4), ESP: /target/boot (FAT32)"));
     ret = installer_mount_targets(disks[selected_disk].path);
     if (ret < 0) {
-        finish_install(ret, "Mount failed");
+        finish_install(ret, T("Mount failed"));
         return;
     }
 
     ret = reliefos_boot_validate_target(&boot);
     if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return; }
 
-    show_progress(30, "Scanning installation payload", "Root and boot partitions");
+    show_progress(30, T("Scanning installation payload"), T("Root and boot partitions"));
     ret = count_files_recursive(fresh_root_payload(), &copy_total);
     if (ret >= 0) {
         ret = count_files_recursive(INSTALL_ESP_PAYLOAD, &copy_total);

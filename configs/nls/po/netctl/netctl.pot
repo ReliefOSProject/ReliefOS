@@ -38,6 +38,10 @@ msgstr ""
 msgid "Bad socket"
 msgstr ""
 
+#: userland/apps/netctl/main.c:594
+msgid "Bytes"
+msgstr ""
+
 #: userland/apps/netctl/main.c:636
 msgid "Cloudflare"
 msgstr ""
@@ -74,7 +78,7 @@ msgstr ""
 msgid "DHCP DNS"
 msgstr ""
 
-#: userland/apps/netctl/main.c:734
+#: userland/apps/netctl/main.c:736
 msgid "DHCP and DNS"
 msgstr ""
 
@@ -142,6 +146,10 @@ msgstr ""
 msgid "Domain:"
 msgstr ""
 
+#: userland/apps/netctl/main.c:726
+msgid "Enter a host name and resolve an A record."
+msgstr ""
+
 #: userland/apps/netctl/main.c:503
 msgid "Enter a valid custom IPv4 DNS address."
 msgstr ""
@@ -166,6 +174,10 @@ msgstr ""
 msgid "Lease:"
 msgstr ""
 
+#: userland/apps/netctl/main.c:592
+msgid "Local"
+msgstr ""
+
 #: userland/apps/netctl/main.c:626
 msgid "MAC:"
 msgstr ""
@@ -174,7 +186,7 @@ msgstr ""
 msgid "Mask:"
 msgstr ""
 
-#: userland/apps/netctl/main.c:733
+#: userland/apps/netctl/main.c:735
 msgid "Network Controller"
 msgstr ""
 
@@ -214,6 +226,10 @@ msgstr ""
 msgid "Refresh"
 msgstr ""
 
+#: userland/apps/netctl/main.c:593
+msgid "Remote"
+msgstr ""
+
 #: userland/apps/netctl/main.c:649
 msgid "Renew DHCP"
 msgstr ""
@@ -224,6 +240,10 @@ msgstr ""
 
 #: userland/apps/netctl/main.c:244
 msgid "Response too large"
+msgstr ""
+
+#: userland/apps/netctl/main.c:589
+msgid "Socket"
 msgstr ""
 
 #: userland/apps/netctl/main.c:252

@@ -1,0 +1,39 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/soundctl/main.c:40
+msgid "Usage: soundctl [--card N] cards|controls|get NAME|set NAME VALUE[,VALUE]\n       soundctl [--card N] route LABEL|capture-source LABEL|watch\n       soundctl [--pcm NAME] test [--channels 1|2] [--seconds 1..30]\n"
+msgstr ""
+
+#: userland/apps/soundctl/main.c:156
+msgid "card name"
+msgstr ""
+
+#: userland/apps/soundctl/main.c:159
+msgid "cards"
+msgstr ""
+
+#: userland/apps/soundctl/main.c:186
+msgid "controls"
+msgstr ""
+
+#: userland/apps/soundctl/main.c:194
+msgid "enum label"
+msgstr ""
+
+#: userland/apps/soundctl/main.c:183
+msgid "open"
+msgstr ""
+
+#: userland/apps/soundctl/main.c:210
+msgid "soundctl: available controls:\n"
+msgstr ""
+
+#: userland/apps/soundctl/main.c:173
+msgid "test"
+msgstr ""
+
+#: userland/apps/soundctl/main.c:202
+msgid "watch"
+msgstr ""

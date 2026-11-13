@@ -593,3 +593,35 @@ msgstr "失败"
 #: userland/apps/settings/main.c:1222
 msgid "s"
 msgstr " 秒后还原"
+
+#: userland/apps/settings/main.c:1533
+msgid "Failed"
+msgstr ""
+
+#: userland/apps/settings/main.c:625
+msgid "OpenRC exit=%d (daemon status, not sync proof)"
+msgstr ""
+
+#: userland/apps/settings/main.c:628
+msgid "OpenRC update failed: exit=%d"
+msgstr ""
+
+#: userland/apps/settings/main.c:562
+msgid "OpenRC worker failed"
+msgstr ""
+
+#: userland/apps/settings/main.c:1531
+msgid "Running"
+msgstr ""
+
+#: userland/apps/settings/main.c:1532
+msgid "Stopped"
+msgstr ""
+
+#: userland/apps/settings/main.c:1533
+msgid "Unknown"
+msgstr ""
+
+#: userland/apps/settings/main.c:2164
+msgid "runtime state unavailable"
+msgstr ""

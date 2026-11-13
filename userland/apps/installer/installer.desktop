@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefOS Setup
+Name[ja]=ReliefOS セットアップ
 Name[zh_CN]=ReliefOS 安装程序
 Exec=/usr/bin/installer --graphical
 TryExec=/usr/bin/installer

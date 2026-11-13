@@ -1,8 +1,10 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefMath
+Name[ja]=ReliefMath
 Name[zh_CN]=ReliefMath
 GenericName=Math Editor
+GenericName[ja]=数式エディター
 GenericName[zh_CN]=数学公式编辑器
 Exec=/usr/bin/reliefmath %f
 TryExec=/usr/bin/reliefmath

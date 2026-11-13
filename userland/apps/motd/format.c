@@ -3,6 +3,8 @@
 #endif
 #include "format.h"
 #include <string.h>
+#include <libintl.h>
+#define T(text) gettext(text)
 #include <wchar.h>
 
 /* Widths are terminal cells, never UTF-8 byte counts. Invalid/control bytes
@@ -50,13 +52,13 @@ void motd_render(FILE *output, const struct motd_info *info, int zh, size_t colu
 {
     char line[640], items[5][256];
     const char *labels[2][5] = {
-        {"Uptime", "Load", "Memory", "Root", "Address"},
+        {T("Uptime"), T("Load"), T("Memory"), T("Root"), T("Address")},
         {"运行", "负载", "内存", "根分区", "地址"}
     };
     const char *values[] = {info->uptime, info->load, info->memory, info->root, info->address};
-    snprintf(line, sizeof(line), zh ? "欢迎使用 %s (%s)" : "Welcome to %s (%s)", info->system, info->kernel);
+    snprintf(line, sizeof(line), zh ? "欢迎使用 %s (%s)" : T("Welcome to %s (%s)"), info->system, info->kernel);
     motd_wrap(output, line, columns);
-    snprintf(line, sizeof(line), zh ? "系统信息：%s" : "System information as of %s", info->timestamp);
+    snprintf(line, sizeof(line), zh ? "系统信息：%s" : T("System information as of %s"), info->timestamp);
     motd_wrap(output, line, columns);
     for (size_t i = 0; i < 5; ++i) snprintf(items[i], sizeof(items[i]), "%s: %s", labels[zh != 0][i], values[i]);
     size_t count, widths[3] = {0};

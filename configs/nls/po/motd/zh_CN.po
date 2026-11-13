@@ -1,0 +1,59 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/motd/main.c:138
+msgid "%lud %luh"
+msgstr "%lu天 %lu小时"
+
+#: userland/apps/motd/main.c:140
+msgid "%luh %lum"
+msgstr "%lu小时 %lu分"
+
+#: userland/apps/motd/main.c:141
+msgid "%lum %lus"
+msgstr "%lu分 %lu秒"
+
+#: userland/apps/motd/format.c:55
+msgid "Address"
+msgstr "地址"
+
+#: userland/apps/motd/format.c:55
+msgid "Load"
+msgstr "负载"
+
+#: userland/apps/motd/format.c:55
+msgid "Memory"
+msgstr "内存"
+
+#: userland/apps/motd/main.c:114
+msgid "N/A"
+msgstr "不可用"
+
+#: userland/apps/motd/main.c:97
+msgid "Not connected"
+msgstr "未连接"
+
+#: userland/apps/motd/format.c:55
+msgid "Root"
+msgstr "根分区"
+
+#: userland/apps/motd/format.c:61
+msgid "System information as of %s"
+msgstr "系统信息：%s"
+
+#: userland/apps/motd/format.c:55
+msgid "Uptime"
+msgstr "运行"
+
+#: userland/apps/motd/format.c:59
+msgid "Welcome to %s (%s)"
+msgstr "欢迎使用 %s (%s)"

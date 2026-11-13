@@ -1,0 +1,23 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: userland/apps/rprfetch/main.c:23
+msgid "Usage: %s HTTPS_URL OUTPUT\n"
+msgstr ""
+
+#: userland/apps/rprfetch/main.c:40
+msgid "rprfetch: OUTPUT must be a file path\n"
+msgstr ""
+
+#: userland/apps/rprfetch/main.c:47
+msgid "rprfetch: download failed (network status %u, HTTP %u)\n"
+msgstr ""
+
+#: userland/apps/rprfetch/main.c:36
+msgid "rprfetch: refusing non-HTTPS URL\n"
+msgstr ""
+
+#: userland/apps/rprfetch/main.c:53
+msgid "rprfetch: server returned HTTP %u\n"
+msgstr ""

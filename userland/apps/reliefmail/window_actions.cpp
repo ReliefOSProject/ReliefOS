@@ -1,4 +1,5 @@
 #include "window.h"
+#include "localization.h"
 #include "action_policy.h"
 #include "imap.h"
 #include "../fltk_support.h"
@@ -160,10 +161,12 @@ bool send_operation_details(const SendOperationSummary &operation, Text &details
         sender.c_str());
     if (written <= 0 || static_cast<size_t>(written) >= sizeof(header)) return false;
     Array<char> output;
+    const DiagnosticForDisplay displayed_diagnostic(diagnostic.c_str());
+    const char *diagnostic_text = displayed_diagnostic.c_str();
     if (!append_bytes(output, header, static_cast<size_t>(written)) ||
         !append_bytes(output, recipients.c_str(), recipients.size()) ||
         !append_bytes(output, "\n", 1) ||
-        !append_bytes(output, diagnostic.c_str(), diagnostic.size()) || !output.push('\0')) return false;
+        !append_bytes(output, diagnostic_text, strlen(diagnostic_text)) || !output.push('\0')) return false;
     return details.set(output.data(), output.size() - 1);
 }
 

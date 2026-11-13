@@ -1,3 +1,4 @@
+#include "localization.h"
 #include "window.h"
 #include "compose_window.h"
 #include "action_policy.h"
@@ -1179,7 +1180,7 @@ void MailWindow::perform(UiCommand command) {
 }
 
 void MailWindow::set_status(const char *text) {
-    status_->text(text && *text ? text : T("Ready"));
+    status_->text(text && *text ? DiagnosticForDisplay(text).c_str() : T("Ready"));
     status_->redraw();
 }
 

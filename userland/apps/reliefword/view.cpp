@@ -104,7 +104,7 @@ void PageView::draw() {
     fl_color(fl_rgb_color(177,181,187)); fl_rectf(x(),y(),canvas_width(),h()-Bar);
     if(!layout_current()) {
         fl_color(FL_BLACK); fl_font(FL_HELVETICA,14);
-        fl_draw(layout.error.empty()?T("Operation failed"):layout.error.c_str(),
+        fl_draw(layout.error.empty()?T("Operation failed"):T(layout.error.c_str()),
                 x()+24,y()+ruler_height()+24,canvas_width()-48,140,
                 FL_ALIGN_TOP_LEFT|FL_ALIGN_INSIDE|FL_ALIGN_WRAP);
         fl_pop_clip(); draw_children(); return;

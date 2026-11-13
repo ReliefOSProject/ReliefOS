@@ -1,9 +1,27 @@
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+#include <libintl.h>
+#include <locale.h>
+#include <reliefos/layout.h>
+
+#define T(text) gettext(text)
+
+static void init_localization(void)
+{
+    setlocale(LC_ALL, "");
+    bindtextdomain("matrix", RELIEFOS_LAYOUT_LOCALE);
+    bind_textdomain_codeset("matrix", "UTF-8");
+    textdomain("matrix");
+}
+
 #include <poll.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
+#include <wchar.h>
 
 #define MATRIX_MAX_COLUMNS 120U
 #define MATRIX_MAX_ROWS 40U
@@ -205,6 +223,27 @@ static void append_text(char *output, size_t capacity, size_t *length,
     }
 }
 
+/* Keep translated status text within the terminal's cell width and never
+ * split a UTF-8 character at the end of the render buffer. */
+static void append_status(char *output, size_t capacity, size_t *length,
+                          const char *text, unsigned columns)
+{
+    size_t cells = 0;
+    mbstate_t state = {0};
+    while (*text && *length < capacity) {
+        wchar_t wc;
+        size_t bytes = mbrtowc(&wc, text, strlen(text), &state);
+        if (bytes == (size_t)-1 || bytes == (size_t)-2 || bytes == 0) break;
+        int width = wcwidth(wc);
+        if (width < 0) width = 1;
+        if (cells + (size_t)width >= columns || bytes > capacity - *length) break;
+        memcpy(output + *length, text, bytes);
+        *length += bytes;
+        text += bytes;
+        cells += (size_t)width;
+    }
+}
+
 static void render_matrix(const struct matrix_state *state)
 {
     char *output = render_buffer;
@@ -233,7 +272,13 @@ static void render_matrix(const struct matrix_state *state)
         }
     }
     if (state->paused) {
-        append_text(output, MATRIX_RENDER_BUFFER_BYTES, &length, "\033[32m[Paused - P resumes, Q exits]");
+        struct winsize size = {0};
+        unsigned columns = state->columns_count;
+        if (tcgetwinsize(STDOUT_FILENO, &size) == 0 && size.ws_col && size.ws_col < columns)
+            columns = size.ws_col;
+        append_text(output, MATRIX_RENDER_BUFFER_BYTES, &length, "\033[32m");
+        append_status(output, MATRIX_RENDER_BUFFER_BYTES, &length,
+                      T("[Paused - P resumes, Q exits]"), columns);
     }
     write_bytes(output, length);
 }
@@ -251,6 +296,7 @@ static int read_key(void)
 
 int main(void)
 {
+    init_localization();
     struct matrix_state state;
     unsigned running = 1;
     unsigned columns;
@@ -264,7 +310,7 @@ int main(void)
     }
     reset_matrix(&state, columns, rows);
     if (setup_terminal() != 0) {
-        puts("matrix requires an interactive terminal");
+        puts(T("matrix requires an interactive terminal"));
         return 1;
     }
     while (running) {

@@ -10,6 +10,9 @@
 #include <unistd.h>
 namespace ra {
 namespace {
+void certificate_log_sink(void *context, const char *bytes, size_t size) {
+    static_cast<App *>(context)->append_log(bytes, size);
+}
 void tick_cb(void *p) {
     static_cast<App *>(p)->tick();
     Fl::repeat_timeout(.03, tick_cb, p);
@@ -490,7 +493,7 @@ void App::begin_catalog(int filter) {
     Command c;
     Text error;
     if (!query_command(query_filter, settings, c, error)) {
-        set_status(error.c_str());
+        set_status(T(error.c_str()));
         return;
     }
     Array<const char *> args;
@@ -570,7 +573,7 @@ void App::request_details() {
         Array<Text> targets;
         targets.push(p->name);
         if (!make_command(Action::Policy, targets, settings, false, c, error)) {
-            detail_buffers[3].text(error.c_str());
+            detail_buffers[3].text(T(error.c_str()));
             return;
         }
     } else if (detail_kind == 2) {
@@ -583,7 +586,7 @@ void App::request_details() {
         c.args.push(p->name);
     } else {
         if (!metadata_command(p->name.c_str(), settings, c, error)) {
-            detail_buffers[detail_kind].text(error.c_str());
+            detail_buffers[detail_kind].text(T(error.c_str()));
             return;
         }
     }
@@ -609,14 +612,14 @@ void App::tick() {
             } else if (parser.begin(query.output(), query.output_size()))
                 query_parsing = true;
             else
-                set_status(parser.error().c_str());
+                set_status(T(parser.error().c_str()));
         }
     } else if (query_pending)
         request_catalog();
     if (query_parsing) {
         if (!parser.step(96)) {
             query_parsing = false;
-            set_status(parser.error().c_str());
+            set_status(T(parser.error().c_str()));
         } else if (parser.done()) {
             query_parsing = false;
             Array<Package> parsed = parser.take();
@@ -655,13 +658,13 @@ void App::tick() {
             else if (detail_parser.begin(detail.output(), detail.output_size()))
                 detail_parsing = true;
             else
-                detail_buffers[detail_query_kind].text(detail_parser.error().c_str());
+                detail_buffers[detail_query_kind].text(T(detail_parser.error().c_str()));
         }
     }
     if (detail_parsing) {
         if (!detail_parser.step(8)) {
             detail_parsing = false;
-            detail_buffers[detail_kind].text(detail_parser.error().c_str());
+            detail_buffers[detail_kind].text(T(detail_parser.error().c_str()));
         } else if (detail_parser.done()) {
             detail_parsing = false;
             Array<Package> result = detail_parser.take();
@@ -696,17 +699,33 @@ void App::tick() {
     if (operation.running()) {
         operation.step();
         if (operation.output_size() > out_seen) {
-            append_log(operation.output() + out_seen, operation.output_size() - out_seen);
+            const char *bytes = operation.output() + out_seen;
+            const size_t size = operation.output_size() - out_seen;
+            if (certificate_output)
+                certificate_stdout.feed(bytes, size, certificate_log_sink, this);
+            else
+                append_log(bytes, size);
             out_seen = operation.output_size();
         }
         if (operation.errors_size() > err_seen) {
-            append_log(operation.errors() + err_seen, operation.errors_size() - err_seen);
+            const char *bytes = operation.errors() + err_seen;
+            const size_t size = operation.errors_size() - err_seen;
+            if (certificate_output)
+                certificate_stderr.feed(bytes, size, certificate_log_sink, this);
+            else
+                append_log(bytes, size);
             err_seen = operation.errors_size();
         }
         if (operation.password_requested() && (!auth_window || !auth_window->shown()))
             show_auth();
-        if (!operation.running())
+        if (!operation.running()) {
+            if (certificate_output) {
+                certificate_stdout.flush(certificate_log_sink, this);
+                certificate_stderr.flush(certificate_log_sink, this);
+                certificate_output = false;
+            }
             finish_operation();
+        }
     }
 }
 void App::queue_target(Action a, const char *target) {
@@ -848,7 +867,8 @@ void App::start_group(bool simulate) {
     Command c;
     Text error;
     if (!make_command(groups[current_group], targets, settings, simulate, c, error)) {
-        append_log(error.c_str(), error.size());
+        const char *message = T(error.c_str());
+        append_log(message, strlen(message));
         mode = OperationMode::Done;
         op_error = true;
         apply_button->deactivate();
@@ -883,6 +903,11 @@ bool App::launch(Command &c, OperationMode next) {
     args[c.args.size()] = nullptr;
     print_command(op_buffer, c);
     out_seen = err_seen = 0;
+    certificate_stdout.reset();
+    certificate_stderr.reset();
+    certificate_output = (next == OperationMode::Preview || next == OperationMode::Recheck ||
+                          next == OperationMode::Execute) && current_group < groups.size() &&
+                         groups[current_group] == Action::RepairCa;
     mode = next;
     op_pending = true;
     apply_button->deactivate();

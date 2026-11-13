@@ -1,0 +1,1695 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "ABS(number) returns its absolute value."
+msgstr "ABS(number) は絶対値を返します。"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Adds numeric cells in a range."
+msgstr "範囲内の数値セルを合計します。"
+
+#: userland/apps/reliefexcel/window.cpp:145
+msgid "Alignment"
+msgstr "配置"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/reliefexcel/window.cpp:525
+msgid "Amount"
+msgstr "金額"
+
+#: userland/apps/reliefexcel/window.cpp:709
+msgid "An unfinished workbook was found. Recover it?"
+msgstr "未完了のワークブックが見つかりました。復元しますか?"
+
+#: userland/apps/reliefexcel/window.cpp:446
+msgid "Apply"
+msgstr "適用"
+
+#: userland/apps/reliefexcel/window.cpp:157
+msgid "AutoSum"
+msgstr "オート SUM"
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Average expense"
+msgstr "平均支出"
+
+#: userland/apps/reliefexcel/window.cpp:267
+msgid "Average:"
+msgstr "平均:"
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Balance"
+msgstr "残高"
+
+#: configs/nls/messages/reliefexcel.c:10
+msgid "Bare carriage return outside quoted field"
+msgstr "引用符で囲まれていないフィールドに単独の復帰文字があります"
+
+#: userland/apps/reliefexcel/window.cpp:142
+msgid "Bold"
+msgstr "太字"
+
+#: userland/apps/reliefexcel/window.cpp:142
+msgid "Borders"
+msgstr "罫線"
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Budget status"
+msgstr "予算の状況"
+
+#: userland/apps/reliefexcel/window.cpp:85
+msgid "Budget template"
+msgstr "予算テンプレート"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "COUNTIF(range, criteria)"
+msgstr "COUNTIF(range, criteria)"
+
+#: userland/apps/reliefexcel/window.cpp:567
+msgid "CSV exported"
+msgstr "CSV をエクスポートしました"
+
+#: userland/apps/reliefexcel/window.cpp:562
+msgid "CSV exports only this sheet's values. Formulas, styles and other sheets remain in the native workbook."
+msgstr "CSV にエクスポートされるのはこのシートの値のみです。数式、スタイル、他のシートは元のワークブックに残ります。"
+
+#: userland/apps/reliefexcel/window.cpp:385
+msgid "CSV imported; save as a native workbook to keep formulas and formatting"
+msgstr "CSV をインポートしました。数式と書式を保持するには独自形式のワークブックとして保存してください"
+
+#: configs/nls/messages/reliefexcel.c:11
+msgid "Calculated value exceeds CSV text limits"
+msgstr "計算値が CSV テキストの上限を超えています"
+
+#: userland/apps/reliefexcel/window.cpp:158
+msgid "Calculation"
+msgstr "計算"
+
+#: userland/apps/reliefexcel/window.cpp:296
+msgid "Calculation canceled; results will update when accessed"
+msgstr "計算を中止しました。結果はアクセス時に更新されます"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Category"
+msgstr "カテゴリー"
+
+#: userland/apps/reliefexcel/window.cpp:103
+msgid "Cell address, for example A1 or C25"
+msgstr "セルのアドレス（例: A1、C25）"
+
+#: configs/nls/messages/reliefexcel.c:12
+msgid "Cell coordinate is outside worksheet bounds"
+msgstr "セルの座標がワークシートの範囲外です"
+
+#: userland/apps/reliefexcel/window.cpp:148
+msgid "Cells"
+msgstr "セル"
+
+#: userland/apps/reliefexcel/window.cpp:575
+msgid "Cells copied"
+msgstr "セルをコピーしました"
+
+#: userland/apps/reliefexcel/window.cpp:144
+msgid "Center"
+msgstr "中央揃え"
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Clear contents"
+msgstr "内容を消去"
+
+#: userland/apps/reliefexcel/window.cpp:162
+msgid "Clear filters"
+msgstr "フィルターを解除"
+
+#: userland/apps/reliefexcel/window.cpp:140
+msgid "Clipboard"
+msgstr "クリップボード"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/reliefexcel/window.cpp:433
+msgid "Column:"
+msgstr "列:"
+
+#: userland/apps/reliefexcel/window.cpp:152
+msgid "Columns"
+msgstr "列"
+
+#: userland/apps/reliefexcel/window.cpp:358
+msgid "Columns:"
+msgstr "列:"
+
+#: userland/apps/reliefexcel/window.cpp:356
+msgid "Comma|Semicolon|Tab"
+msgstr "カンマ|セミコロン|タブ"
+
+#: userland/apps/reliefexcel/window.cpp:442
+msgid "Condition:"
+msgstr "条件:"
+
+#: userland/apps/reliefexcel/window.cpp:442
+msgid "Contains|Equals|Greater than|Less than|Not empty"
+msgstr "含む|等しい|より大きい|より小さい|空でない"
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Copy"
+msgstr "コピー"
+
+#: configs/nls/messages/reliefexcel.c:13
+msgid "Could not calculate imported worksheet"
+msgstr "インポートしたワークシートを計算できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:14
+msgid "Could not calculate workbook or operation cancelled"
+msgstr "ワークブックを計算できなかったか、操作が中止されました"
+
+#: configs/nls/messages/reliefexcel.c:15
+msgid "Could not clean recovery reservation"
+msgstr "復元用の予約を消去できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:16
+msgid "Could not close recovery reservation"
+msgstr "復元用の予約を閉じられませんでした"
+
+#: configs/nls/messages/reliefexcel.c:17
+msgid "Could not close temporary save file"
+msgstr "保存用の一時ファイルを閉じられませんでした"
+
+#: configs/nls/messages/reliefexcel.c:18
+msgid "Could not create recovery directory"
+msgstr "復元用フォルダーを作成できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:19
+msgid "Could not create recovery reservation"
+msgstr "復元用ファイルを予約できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:20
+msgid "Could not create temporary save file"
+msgstr "保存用の一時ファイルを作成できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:21
+msgid "Could not create temporary save path"
+msgstr "保存用の一時パスを作成できませんでした"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: configs/nls/messages/reliefexcel.c:22
+msgid "Could not inspect delimited file"
+msgstr "区切り形式のファイルを確認できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:23
+msgid "Could not inspect file"
+msgstr "ファイルを確認できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:24
+msgid "Could not inspect recovery directory"
+msgstr "復元用フォルダーを確認できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:25
+msgid "Could not inspect save target"
+msgstr "保存先を確認できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:26
+msgid "Could not inspect workbook"
+msgstr "ワークブックを確認できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:27
+msgid "Could not lock recovery file"
+msgstr "復元用ファイルをロックできませんでした"
+
+#: configs/nls/messages/reliefexcel.c:28
+msgid "Could not open delimited file"
+msgstr "区切り形式のファイルを開けませんでした"
+
+#: configs/nls/messages/reliefexcel.c:29
+msgid "Could not open recovery lock"
+msgstr "復元用ロックを開けませんでした"
+
+#: configs/nls/messages/reliefexcel.c:30
+msgid "Could not open save directory"
+msgstr "保存先フォルダーを開けませんでした"
+
+#: configs/nls/messages/reliefexcel.c:31
+msgid "Could not open workbook"
+msgstr "ワークブックを開けませんでした"
+
+#: configs/nls/messages/reliefexcel.c:32
+msgid "Could not preserve workbook permissions"
+msgstr "ワークブックのアクセス権を保持できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:33
+msgid "Could not read delimited file"
+msgstr "区切り形式のファイルを読み取れませんでした"
+
+#: configs/nls/messages/reliefexcel.c:34
+msgid "Could not read workbook"
+msgstr "ワークブックを読み取れませんでした"
+
+#: configs/nls/messages/reliefexcel.c:35
+msgid "Could not replace saved file"
+msgstr "保存済みファイルを置き換えられませんでした"
+
+#: configs/nls/messages/reliefexcel.c:36
+msgid "Could not reserve a unique recovery file"
+msgstr "一意の復元用ファイルを確保できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:37
+msgid "Could not reserve recovery file"
+msgstr "復元用ファイルを確保できませんでした"
+
+#: userland/apps/reliefexcel/window.cpp:688
+msgid "Could not save the recovery copy"
+msgstr "復元用コピーを保存できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:38
+msgid "Could not secure recovery directory"
+msgstr "復元用フォルダーを保護できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:39
+msgid "Could not secure recovery lock"
+msgstr "復元用ロックを保護できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:40
+msgid "Could not secure recovery reservation"
+msgstr "復元用の予約を保護できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:41
+msgid "Could not sync save directory"
+msgstr "保存先フォルダーを同期できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:42
+msgid "Could not sync temporary save file"
+msgstr "保存用の一時ファイルを同期できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:43
+msgid "Could not write workbook"
+msgstr "ワークブックを書き込めませんでした"
+
+#: userland/apps/reliefexcel/window.cpp:267
+msgid "Count:"
+msgstr "件数:"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Counts nonempty cells."
+msgstr "空でないセルの数を数えます。"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Counts numeric cells."
+msgstr "数値セルの数を数えます。"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/reliefexcel/window.cpp:139
+msgid "Ctrl+C"
+msgstr "Ctrl+C"
+
+#: userland/apps/reliefexcel/window.cpp:140
+msgid "Ctrl+D"
+msgstr "Ctrl+D"
+
+#: userland/apps/reliefexcel/window.cpp:163
+msgid "Ctrl+F"
+msgstr "Ctrl+F"
+
+#: userland/apps/reliefexcel/window.cpp:163
+msgid "Ctrl+H"
+msgstr "Ctrl+H"
+
+#: userland/apps/reliefexcel/window.cpp:148
+msgid "Ctrl+R"
+msgstr "Ctrl+R"
+
+#: userland/apps/reliefexcel/window.cpp:139
+msgid "Ctrl+V"
+msgstr "Ctrl+V"
+
+#: userland/apps/reliefexcel/window.cpp:139
+msgid "Ctrl+X"
+msgstr "Ctrl+X"
+
+#: userland/apps/reliefexcel/window.cpp:147
+msgid "Currency"
+msgstr "通貨"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Cut"
+msgstr "切り取り"
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "Data"
+msgstr "データ"
+
+#: userland/apps/reliefexcel/window.cpp:164
+msgid "Data exchange"
+msgstr "データ交換"
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Date"
+msgstr "日付"
+
+#: userland/apps/reliefexcel/window.cpp:152
+msgid "Delete column"
+msgstr "列を削除"
+
+#: userland/apps/reliefexcel/window.cpp:151
+msgid "Delete row"
+msgstr "行を削除"
+
+#: userland/apps/reliefexcel/window.cpp:153
+msgid "Delete sheet"
+msgstr "シートを削除"
+
+#: userland/apps/reliefexcel/window.cpp:627
+msgid "Delete this worksheet? You can undo this operation."
+msgstr "このワークシートを削除しますか? この操作は元に戻せます。"
+
+#: configs/nls/messages/reliefexcel.c:44
+msgid "Delimited field exceeds resource limits"
+msgstr "区切り形式のフィールドがリソースの上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:45
+msgid "Delimited field exceeds the text limit"
+msgstr "区切り形式のフィールドがテキストの上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:46
+msgid "Delimited file has an invalid size or type"
+msgstr "区切り形式のファイルのサイズまたは種類が無効です"
+
+#: configs/nls/messages/reliefexcel.c:47
+msgid "Delimited file is truncated"
+msgstr "区切り形式のファイルが途中で切れています"
+
+#: configs/nls/messages/reliefexcel.c:48
+msgid "Delimited file path is empty"
+msgstr "区切り形式のファイルパスが空です"
+
+#: configs/nls/messages/reliefexcel.c:49
+msgid "Delimited input exceeds the resource limit"
+msgstr "区切り形式の入力がリソースの上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:50
+msgid "Delimited input exceeds worksheet dimensions"
+msgstr "区切り形式の入力がワークシートの範囲を超えています"
+
+#: configs/nls/messages/reliefexcel.c:51
+msgid "Delimited output exceeds resource limits"
+msgstr "区切り形式の出力がリソースの上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:52
+msgid "Delimited output exceeds the resource limit"
+msgstr "区切り形式の出力がリソースの上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:53
+msgid "Delimited text contains invalid UTF-8 or a NUL byte"
+msgstr "区切り形式のテキストに無効な UTF-8 または NUL バイトが含まれています"
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Description"
+msgstr "説明"
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Dinner"
+msgstr "夕食"
+
+#: userland/apps/reliefexcel/window.cpp:709
+msgid "Discard"
+msgstr "破棄"
+
+#: userland/apps/reliefexcel/window.cpp:300
+msgid "Discard changes"
+msgstr "変更を破棄"
+
+#: userland/apps/reliefexcel/window.cpp:168
+msgid "Display"
+msgstr "表示"
+
+#: configs/nls/messages/reliefexcel.c:54
+msgid "Duplicate or unordered cell coordinate"
+msgstr "セルの座標が重複しているか、順序が正しくありません"
+
+#: configs/nls/messages/reliefexcel.c:55
+msgid "Duplicate worksheet identifier"
+msgstr "ワークシートの識別子が重複しています"
+
+#: configs/nls/messages/reliefexcel.c:56
+msgid "Duplicate worksheet name"
+msgstr "ワークシート名が重複しています"
+
+#: userland/apps/reliefexcel/window.cpp:105
+msgid "Edit cell content or formula; Enter applies the change"
+msgstr "セルの内容または数式を編集します。Enter で変更を適用します"
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Electricity"
+msgstr "電気代"
+
+#: userland/apps/reliefexcel/window.cpp:667
+msgid "Enter a zoom value from 25 to 400"
+msgstr "ズーム値を 25～400 で入力してください"
+
+#: userland/apps/reliefexcel/window.cpp:201
+msgid "Enter an address between A1 and IV10000"
+msgstr "A1 から IV10000 までのアドレスを入力してください"
+
+#: userland/apps/reliefexcel/window.cpp:475
+msgid "Enter text to find"
+msgstr "検索する文字列を入力"
+
+#: userland/apps/reliefexcel/window.cpp:159
+msgid "Examples: =SUM(B2:B20)    =IF(C2>0,C2,0)"
+msgstr "例: =SUM(B2:B20)    =IF(C2>0,C2,0)"
+
+#: userland/apps/reliefexcel/window.cpp:85
+msgid "Exit"
+msgstr "終了"
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Expense"
+msgstr "支出"
+
+#: userland/apps/reliefexcel/window.cpp:562
+msgid "Export"
+msgstr "エクスポート"
+
+#: userland/apps/reliefexcel/window.cpp:164
+msgid "Export CSV"
+msgstr "CSV をエクスポート"
+
+#: userland/apps/reliefexcel/window.cpp:84
+msgid "Export CSV..."
+msgstr "CSV をエクスポート..."
+
+#: configs/nls/messages/reliefexcel.c:57
+msgid "Export range exceeds resource limits"
+msgstr "エクスポート範囲がリソースの上限を超えています"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/reliefexcel/window.cpp:80
+msgid "File"
+msgstr "ファイル"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: configs/nls/messages/reliefexcel.c:58
+msgid "File path is empty"
+msgstr "ファイルパスが空です"
+
+#: configs/nls/messages/reliefexcel.c:59
+msgid "File stamp requires a regular file"
+msgstr "ファイル情報の取得には通常ファイルが必要です"
+
+#: userland/apps/reliefexcel/window.cpp:143
+msgid "Fill color"
+msgstr "塗りつぶしの色"
+
+#: userland/apps/reliefexcel/window.cpp:140
+msgid "Fill down"
+msgstr "下方向にコピー"
+
+#: userland/apps/reliefexcel/window.cpp:148
+msgid "Fill right"
+msgstr "右方向にコピー"
+
+#: userland/apps/reliefexcel/window.cpp:162
+msgid "Filter"
+msgstr "フィルター"
+
+#: userland/apps/reliefexcel/window.cpp:445
+msgid "Filtering hides rows and preserves their contents."
+msgstr "フィルターは行を非表示にしますが、内容は保持されます。"
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Find"
+msgstr "検索"
+
+#: userland/apps/reliefexcel/window.cpp:163
+msgid "Find and replace"
+msgstr "検索と置換"
+
+#: userland/apps/reliefexcel/window.cpp:468
+msgid "Find next"
+msgstr "次を検索"
+
+#: userland/apps/reliefexcel/window.cpp:465
+msgid "Find:"
+msgstr "検索:"
+
+#: userland/apps/reliefexcel/window.cpp:441
+msgid "First row is a header"
+msgstr "先頭行を見出しにする"
+
+#: userland/apps/reliefexcel/window.cpp:143
+msgid "Font"
+msgstr "フォント"
+
+#: userland/apps/reliefexcel/window.cpp:141
+msgid "Font size"
+msgstr "フォントサイズ"
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Food"
+msgstr "食費"
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Food expenses"
+msgstr "食費の支出"
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Food purchases"
+msgstr "食料品の購入"
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "Formulas"
+msgstr "数式"
+
+#: userland/apps/reliefexcel/window.cpp:167
+msgid "Freeze both"
+msgstr "両方を固定"
+
+#: userland/apps/reliefexcel/window.cpp:166
+msgid "Freeze first column"
+msgstr "先頭列を固定"
+
+#: userland/apps/reliefexcel/window.cpp:166
+msgid "Freeze first row"
+msgstr "先頭行を固定"
+
+#: userland/apps/reliefexcel/window.cpp:167
+msgid "Freeze panes"
+msgstr "ウィンドウ枠を固定"
+
+#: userland/apps/reliefexcel/window.cpp:412
+msgid "Function:"
+msgstr "関数:"
+
+#: userland/apps/reliefexcel/window.cpp:157
+msgid "Functions"
+msgstr "関数"
+
+#: userland/apps/reliefexcel/window.cpp:146
+msgid "General"
+msgstr "標準"
+
+#: userland/apps/reliefexcel/window.cpp:168
+msgid "Gridlines"
+msgstr "グリッド線"
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Groceries"
+msgstr "食料品"
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "Home tab"
+msgstr "ホームタブ"
+
+#: configs/nls/messages/reliefexcel.c:5
+msgid "I/O error"
+msgstr "入出力エラー"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "IF(condition, value_if_true, value_if_false)"
+msgstr "IF(condition, value_if_true, value_if_false)"
+
+#: userland/apps/reliefexcel/window.cpp:372
+msgid "Import"
+msgstr "インポート"
+
+#: userland/apps/reliefexcel/window.cpp:164
+msgid "Import CSV"
+msgstr "CSV をインポート"
+
+#: userland/apps/reliefexcel/window.cpp:84
+msgid "Import CSV..."
+msgstr "CSV をインポート..."
+
+#: configs/nls/messages/reliefexcel.c:60
+msgid "Import exceeds the cell limit"
+msgstr "インポートがセル数の上限を超えています"
+
+#: userland/apps/reliefexcel/window.cpp:499
+msgid "Income"
+msgstr "収入"
+
+#: configs/nls/messages/reliefexcel.c:61
+msgid "Incomplete temporary save file"
+msgstr "保存用の一時ファイルが不完全です"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "Insert"
+msgstr "挿入"
+
+#: userland/apps/reliefexcel/window.cpp:152
+msgid "Insert column"
+msgstr "列を挿入"
+
+#: userland/apps/reliefexcel/window.cpp:104
+msgid "Insert function"
+msgstr "関数を挿入"
+
+#: userland/apps/reliefexcel/window.cpp:151
+msgid "Insert row"
+msgstr "行を挿入"
+
+#: configs/nls/messages/reliefexcel.c:62
+msgid "Invalid active worksheet or identifier sequence"
+msgstr "アクティブなワークシートまたは識別子の順序が無効です"
+
+#: configs/nls/messages/reliefexcel.c:63
+msgid "Invalid cell coordinate or style"
+msgstr "セルの座標またはスタイルが無効です"
+
+#: configs/nls/messages/reliefexcel.c:64
+msgid "Invalid cell style"
+msgstr "セルのスタイルが無効です"
+
+#: configs/nls/messages/reliefexcel.c:65
+msgid "Invalid cell text"
+msgstr "セルのテキストが無効です"
+
+#: configs/nls/messages/reliefexcel.c:66
+msgid "Invalid column dimensions"
+msgstr "列のサイズが無効です"
+
+#: configs/nls/messages/reliefexcel.c:67
+msgid "Invalid column width"
+msgstr "列幅が無効です"
+
+#: configs/nls/messages/reliefexcel.c:68
+msgid "Invalid delimited range"
+msgstr "区切り形式の範囲が無効です"
+
+#: configs/nls/messages/reliefexcel.c:69
+msgid "Invalid field delimiter"
+msgstr "フィールドの区切り文字が無効です"
+
+#: configs/nls/messages/reliefexcel.c:70
+msgid "Invalid filter metadata"
+msgstr "フィルターのメタデータが無効です"
+
+#: configs/nls/messages/reliefexcel.c:71
+msgid "Invalid filter range"
+msgstr "フィルターの範囲が無効です"
+
+#: configs/nls/messages/reliefexcel.c:72
+msgid "Invalid merged range"
+msgstr "結合範囲が無効です"
+
+#: configs/nls/messages/reliefexcel.c:73
+msgid "Invalid merged range count"
+msgstr "結合範囲の数が無効です"
+
+#: configs/nls/messages/reliefexcel.c:74
+msgid "Invalid row dimensions"
+msgstr "行のサイズが無効です"
+
+#: configs/nls/messages/reliefexcel.c:75
+msgid "Invalid row height"
+msgstr "行の高さが無効です"
+
+#: configs/nls/messages/reliefexcel.c:207
+msgid "Invalid workbook header or length"
+msgstr "ワークブックのヘッダーまたは長さが無効です"
+
+#: configs/nls/messages/reliefexcel.c:76
+msgid "Invalid workbook metadata"
+msgstr "ワークブックのメタデータが無効です"
+
+#: configs/nls/messages/reliefexcel.c:77
+msgid "Invalid worksheet filter"
+msgstr "ワークシートのフィルターが無効です"
+
+#: configs/nls/messages/reliefexcel.c:78
+msgid "Invalid worksheet flags"
+msgstr "ワークシートのフラグが無効です"
+
+#: configs/nls/messages/reliefexcel.c:79
+msgid "Invalid worksheet name or identifier"
+msgstr "ワークシート名または識別子が無効です"
+
+#: configs/nls/messages/reliefexcel.c:80
+msgid "Invalid worksheet view settings"
+msgstr "ワークシートの表示設定が無効です"
+
+#: userland/apps/reliefexcel/window.cpp:142
+msgid "Italic"
+msgstr "斜体"
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Item"
+msgstr "項目"
+
+#: userland/apps/reliefexcel/window.cpp:709
+msgid "Later"
+msgstr "後で"
+
+#: userland/apps/reliefexcel/window.cpp:498
+msgid "Ledger"
+msgstr "台帳"
+
+#: userland/apps/reliefexcel/window.cpp:144
+msgid "Left"
+msgstr "左揃え"
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Lunch"
+msgstr "昼食"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/reliefexcel/window.cpp:467
+msgid "Match case"
+msgstr "大文字と小文字を区別"
+
+#: userland/apps/reliefexcel/window.cpp:145
+msgid "Merge"
+msgstr "結合"
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Monthly rent"
+msgstr "月額家賃"
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Monthly salary"
+msgstr "月給"
+
+#: userland/apps/reliefexcel/window.cpp:154
+msgid "Move sheet left"
+msgstr "シートを左へ移動"
+
+#: userland/apps/reliefexcel/window.cpp:154
+msgid "Move sheet right"
+msgstr "シートを右へ移動"
+
+#: userland/apps/reliefexcel/window.cpp:82
+msgid "New"
+msgstr "新規作成"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/reliefexcel/window.cpp:153
+msgid "New sheet"
+msgstr "新しいシート"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: userland/apps/reliefexcel/window.cpp:143
+msgid "No borders"
+msgstr "罫線なし"
+
+#: userland/apps/reliefexcel/window.cpp:477
+msgid "No matching cell found"
+msgstr "一致するセルが見つかりません"
+
+#: configs/nls/messages/reliefexcel.c:81
+msgid "No per-user state directory is available"
+msgstr "ユーザーごとの状態フォルダーを利用できません"
+
+#: userland/apps/reliefexcel/grid.cpp:58
+msgid "Not enough memory"
+msgstr "メモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:82
+msgid "Not enough memory to build delimited output"
+msgstr "区切り形式の出力を作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:83
+msgid "Not enough memory to build recovery lock path"
+msgstr "復元用ロックパスを作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:84
+msgid "Not enough memory to create recovery directory"
+msgstr "復元用フォルダーを作成するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:85
+msgid "Not enough memory to import worksheet"
+msgstr "ワークシートをインポートするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:86
+msgid "Not enough memory to import worksheet cell"
+msgstr "ワークシートのセルをインポートするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:87
+msgid "Not enough memory to locate recovery directory"
+msgstr "復元用フォルダーを探すためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:88
+msgid "Not enough memory to read cell input"
+msgstr "セルの入力を読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:89
+msgid "Not enough memory to read cell style"
+msgstr "セルのスタイルを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:90
+msgid "Not enough memory to read cells"
+msgstr "セルを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:91
+msgid "Not enough memory to read delimited file"
+msgstr "区切り形式のファイルを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:92
+msgid "Not enough memory to read filters"
+msgstr "フィルターを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:93
+msgid "Not enough memory to read merged ranges"
+msgstr "結合範囲を読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:94
+msgid "Not enough memory to read workbook"
+msgstr "ワークブックを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:95
+msgid "Not enough memory to read workbook text"
+msgstr "ワークブックのテキストを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:96
+msgid "Not enough memory to read worksheets"
+msgstr "ワークシートを読み取るためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:97
+msgid "Not enough memory to reserve recovery file"
+msgstr "復元用ファイルを確保するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:98
+msgid "Not enough memory to return recovery path"
+msgstr "復元用パスを返すためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:99
+msgid "Not enough memory to save workbook"
+msgstr "ワークブックを保存するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:100
+msgid "Not enough memory to sync save directory"
+msgstr "保存先フォルダーを同期するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:101
+msgid "Not enough memory to validate merged ranges"
+msgstr "結合範囲を検証するためのメモリが不足しています"
+
+#: userland/apps/reliefexcel/window.cpp:146
+msgid "Number"
+msgstr "数値"
+
+#: userland/apps/reliefexcel/window.cpp:147
+msgid "Number format"
+msgstr "数値の書式"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Office supplies"
+msgstr "事務用品"
+
+#: userland/apps/reliefexcel/window.cpp:617
+msgid "Only the upper-left cell's content is kept when merging. Continue?"
+msgstr "結合すると左上のセルの内容だけが保持されます。続行しますか?"
+
+#: userland/apps/reliefexcel/window.cpp:311
+msgid "Open workbook"
+msgstr "ワークブックを開く"
+
+#: userland/apps/reliefexcel/window.cpp:82
+msgid "Open..."
+msgstr "開く..."
+
+#: configs/nls/messages/reliefexcel.c:102
+msgid "Operation cancelled"
+msgstr "操作が中止されました"
+
+#: configs/nls/messages/reliefexcel.c:103
+msgid "Overlapping merged ranges"
+msgstr "結合範囲が重複しています"
+
+#: userland/apps/reliefexcel/window.cpp:533
+msgid "Overspent"
+msgstr "予算超過"
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Paste"
+msgstr "貼り付け"
+
+#: userland/apps/reliefexcel/grid.cpp:314
+msgid "Paste values"
+msgstr "値を貼り付け"
+
+#: userland/apps/reliefexcel/window.cpp:147
+msgid "Percent"
+msgstr "パーセント"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/reliefexcel/window.cpp:371
+msgid "Preview of the first rows. Text and leading zeros are preserved; formulas are not executed."
+msgstr "先頭行のプレビューです。テキストと先頭のゼロは保持され、数式は実行されません。"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "ROUND(number, decimal_places)"
+msgstr "ROUND(number, decimal_places)"
+
+#: userland/apps/reliefexcel/window.cpp:110
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/reliefexcel/window.cpp:158
+msgid "Recalculate"
+msgstr "再計算"
+
+#: userland/apps/reliefexcel/window.cpp:709
+msgid "Recover"
+msgstr "復元"
+
+#: userland/apps/reliefexcel/window.cpp:687
+msgid "Recovery copy saved"
+msgstr "復元用コピーを保存しました"
+
+#: configs/nls/messages/reliefexcel.c:104
+msgid "Recovery directory belongs to another user"
+msgstr "復元用フォルダーは別のユーザーが所有しています"
+
+#: configs/nls/messages/reliefexcel.c:105
+msgid "Recovery file is already in use"
+msgstr "復元用ファイルはすでに使用されています"
+
+#: configs/nls/messages/reliefexcel.c:106
+msgid "Recovery lock path is too long"
+msgstr "復元用ロックのパスが長すぎます"
+
+#: configs/nls/messages/reliefexcel.c:107
+msgid "Recovery path contains a non-directory component"
+msgstr "復元用パスにフォルダー以外の要素が含まれています"
+
+#: configs/nls/messages/reliefexcel.c:108
+msgid "Recovery path is empty"
+msgstr "復元用パスが空です"
+
+#: configs/nls/messages/reliefexcel.c:109
+msgid "Recovery path is not a directory"
+msgstr "復元用パスはフォルダーではありません"
+
+#: userland/apps/reliefexcel/window.cpp:92
+msgid "Redo"
+msgstr "やり直し"
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Remaining balance"
+msgstr "残高"
+
+#: userland/apps/reliefexcel/window.cpp:154
+msgid "Rename sheet"
+msgstr "シートの名前を変更"
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Rent"
+msgstr "家賃"
+
+#: userland/apps/reliefexcel/window.cpp:163
+msgid "Replace"
+msgstr "置換"
+
+#: userland/apps/reliefexcel/window.cpp:468
+msgid "Replace all"
+msgstr "すべて置換"
+
+#: userland/apps/reliefexcel/window.cpp:468
+msgid "Replace current"
+msgstr "現在の項目を置換"
+
+#: userland/apps/reliefexcel/window.cpp:466
+msgid "Replace with:"
+msgstr "置換後:"
+
+#: userland/apps/reliefexcel/window.cpp:480
+msgid "Replacements:"
+msgstr "置換件数:"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Returns the largest number."
+msgstr "最大値を返します。"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Returns the mean of numeric cells."
+msgstr "数値セルの平均を返します。"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "Returns the smallest number."
+msgstr "最小値を返します。"
+
+#: userland/apps/reliefexcel/window.cpp:144
+msgid "Right"
+msgstr "右揃え"
+
+#: userland/apps/reliefexcel/window.cpp:151
+msgid "Rows"
+msgstr "行"
+
+#: userland/apps/reliefexcel/window.cpp:445
+msgid "Rows and their formatting move together within the selected range."
+msgstr "選択した範囲内で、行とその書式は一緒に移動します。"
+
+#: userland/apps/reliefexcel/window.cpp:358
+msgid "Rows:"
+msgstr "行:"
+
+#: userland/apps/reliefexcel/window.cpp:410
+msgid "SUMIF(range, criteria, sum_range)"
+msgstr "SUMIF(range, criteria, sum_range)"
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Salary"
+msgstr "給与"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/reliefexcel/window.cpp:83
+msgid "Save as..."
+msgstr "名前を付けて保存..."
+
+#: userland/apps/reliefexcel/window.cpp:334
+msgid "Save canceled; original file preserved"
+msgstr "保存を中止しました。元のファイルは保持されています"
+
+#: userland/apps/reliefexcel/window.cpp:300
+msgid "Save changes to this workbook?"
+msgstr "このワークブックの変更を保存しますか?"
+
+#: configs/nls/messages/reliefexcel.c:110
+msgid "Save path is empty"
+msgstr "保存先のパスが空です"
+
+#: configs/nls/messages/reliefexcel.c:111
+msgid "Save path is too long"
+msgstr "保存先のパスが長すぎます"
+
+#: configs/nls/messages/reliefexcel.c:112
+msgid "Save target must be a regular file"
+msgstr "保存先は通常ファイルである必要があります"
+
+#: userland/apps/reliefexcel/window.cpp:311
+msgid "Save workbook"
+msgstr "ワークブックを保存"
+
+#: userland/apps/reliefexcel/window.cpp:575
+msgid "Select a destination and paste to move the cells"
+msgstr "セルを移動するには、保存先を選択して貼り付けてください"
+
+#: userland/apps/reliefexcel/window.cpp:585
+msgid "Select at least two columns to fill right"
+msgstr "右方向にコピーするには少なくとも 2 列を選択してください"
+
+#: userland/apps/reliefexcel/window.cpp:584
+msgid "Select at least two rows to fill down"
+msgstr "下方向にコピーするには少なくとも 2 行を選択してください"
+
+#: userland/apps/reliefexcel/window.cpp:640
+msgid "Select numbers or a cell below the numbers to sum"
+msgstr "合計する数値、または数値の下のセルを選択してください"
+
+#: userland/apps/reliefexcel/window.cpp:356
+msgid "Separator:"
+msgstr "区切り文字:"
+
+#: userland/apps/reliefexcel/window.cpp:623
+msgid "Sheet%u"
+msgstr "シート%u"
+
+#: userland/apps/reliefexcel/window.cpp:75
+msgid "Sheet1"
+msgstr "シート1"
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Shopping"
+msgstr "買い物"
+
+#: userland/apps/reliefexcel/window.cpp:158
+msgid "Show formulas"
+msgstr "数式を表示"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/reliefexcel/window.cpp:161
+msgid "Sort"
+msgstr "並べ替え"
+
+#: userland/apps/reliefexcel/window.cpp:161
+msgid "Sort ascending"
+msgstr "昇順に並べ替え"
+
+#: userland/apps/reliefexcel/window.cpp:161
+msgid "Sort descending"
+msgstr "降順に並べ替え"
+
+#: configs/nls/messages/reliefexcel.c:113
+msgid "State directory must be an absolute path"
+msgstr "状態フォルダーは絶対パスで指定してください"
+
+#: configs/nls/messages/reliefexcel.c:114
+msgid "State directory path is too long"
+msgstr "状態フォルダーのパスが長すぎます"
+
+#: configs/nls/messages/reliefexcel.c:115
+msgid "String exceeds workbook resource limits"
+msgstr "文字列がワークブックのリソース上限を超えています"
+
+#: userland/apps/reliefexcel/window.cpp:267
+msgid "Sum:"
+msgstr "合計:"
+
+#: userland/apps/reliefexcel/window.cpp:521
+msgid "Summary"
+msgstr "概要"
+
+#: userland/apps/reliefexcel/window.cpp:143
+msgid "Text color"
+msgstr "文字の色"
+
+#: userland/apps/reliefexcel/window.cpp:643
+msgid "The destination contains data. Replace it?"
+msgstr "保存先にデータがあります。置き換えますか?"
+
+#: userland/apps/reliefexcel/window.cpp:332
+msgid "The file changed outside ReliefExcel. Choose how to save."
+msgstr "ファイルが ReliefExcel の外部で変更されました。保存方法を選択してください。"
+
+#: configs/nls/messages/reliefexcel.c:116
+msgid "The file changed outside ReliefExcel; the original was preserved"
+msgstr "ファイルが ReliefExcel の外部で変更されました。元のファイルは保持されています"
+
+#: userland/apps/reliefexcel/window.cpp:641
+msgid "There is no room below this range"
+msgstr "この範囲の下に空きがありません"
+
+#: userland/apps/reliefexcel/window.cpp:326
+msgid "This file already exists. Replace it?"
+msgstr "このファイルはすでに存在します。置き換えますか?"
+
+#: configs/nls/messages/reliefexcel.c:117
+msgid "Too many merged ranges"
+msgstr "結合範囲が多すぎます"
+
+#: configs/nls/messages/reliefexcel.c:118
+msgid "Too many worksheet filters"
+msgstr "ワークシートのフィルターが多すぎます"
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Total expenses"
+msgstr "支出合計"
+
+#: userland/apps/reliefexcel/window.cpp:523
+msgid "Total income"
+msgstr "収入合計"
+
+#: userland/apps/reliefexcel/window.cpp:503
+msgid "Transit pass"
+msgstr "定期券"
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Transport"
+msgstr "交通費"
+
+#: userland/apps/reliefexcel/window.cpp:92
+msgid "Undo"
+msgstr "元に戻す"
+
+#: configs/nls/messages/reliefexcel.c:119
+msgid "Unexpected data after quoted field"
+msgstr "引用符で囲まれたフィールドの後に予期しないデータがあります"
+
+#: configs/nls/messages/reliefexcel.c:120
+msgid "Unexpected quote in unquoted field"
+msgstr "引用符で囲まれていないフィールドに予期しない引用符があります"
+
+#: userland/apps/reliefexcel/window.cpp:167
+msgid "Unfreeze"
+msgstr "固定を解除"
+
+#: userland/apps/reliefexcel/window.cpp:148
+msgid "Unmerge"
+msgstr "セルの結合を解除"
+
+#: configs/nls/messages/reliefexcel.c:208
+msgid "Unsupported workbook version"
+msgstr "対応していないワークブックのバージョンです"
+
+#: configs/nls/messages/reliefexcel.c:121
+msgid "Unterminated quoted field"
+msgstr "引用符で囲まれたフィールドが閉じられていません"
+
+#: userland/apps/reliefexcel/window.cpp:293
+msgid "Untitled"
+msgstr "無題"
+
+#: userland/apps/reliefexcel/main.cpp:12
+msgid "Usage: reliefexcel [workbook.rexl | data.csv]"
+msgstr "使い方: reliefexcel [workbook.rexl | data.csv]"
+
+#: userland/apps/reliefexcel/window.cpp:502
+msgid "Utilities"
+msgstr "公共料金"
+
+#: userland/apps/reliefexcel/window.cpp:443
+msgid "Value:"
+msgstr "値:"
+
+#: userland/apps/reliefexcel/window.cpp:86
+msgid "View"
+msgstr "表示"
+
+#: userland/apps/reliefexcel/window.cpp:533
+msgid "Within budget"
+msgstr "予算内"
+
+#: configs/nls/messages/reliefexcel.c:122
+msgid "Workbook contains invalid UTF-8 text"
+msgstr "ワークブックに無効な UTF-8 テキストが含まれています"
+
+#: configs/nls/messages/reliefexcel.c:123
+msgid "Workbook exceeds the cell limit"
+msgstr "ワークブックがセル数の上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:124
+msgid "Workbook exceeds the file size limit"
+msgstr "ワークブックがファイルサイズの上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:125
+msgid "Workbook file has an invalid size or type"
+msgstr "ワークブックファイルのサイズまたは種類が無効です"
+
+#: configs/nls/messages/reliefexcel.c:126
+msgid "Workbook has trailing or malformed data"
+msgstr "ワークブックの末尾に余分なデータまたは不正なデータがあります"
+
+#: configs/nls/messages/reliefexcel.c:127
+msgid "Workbook is truncated"
+msgstr "ワークブックが途中で切れています"
+
+#: userland/apps/reliefexcel/window.cpp:385
+msgid "Workbook opened"
+msgstr "ワークブックを開きました"
+
+#: configs/nls/messages/reliefexcel.c:128
+msgid "Workbook path is empty"
+msgstr "ワークブックのパスが空です"
+
+#: userland/apps/reliefexcel/window.cpp:343
+msgid "Workbook saved"
+msgstr "ワークブックを保存しました"
+
+#: configs/nls/messages/reliefexcel.c:129
+msgid "Workbook text exceeds the resource limit"
+msgstr "ワークブックのテキストがリソースの上限を超えています"
+
+#: userland/apps/reliefexcel/window.cpp:232
+msgid "Working..."
+msgstr "処理しています..."
+
+#: configs/nls/messages/reliefexcel.c:130
+msgid "Worksheet dimensions exceed resource limits"
+msgstr "ワークシートのサイズがリソースの上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:131
+msgid "Worksheet is unavailable"
+msgstr "ワークシートを利用できません"
+
+#: userland/apps/reliefexcel/window.cpp:630
+msgid "Worksheet name:"
+msgstr "ワークシート名:"
+
+#: configs/nls/messages/reliefexcel.c:132
+msgid "Worksheet no longer exists"
+msgstr "ワークシートは存在しなくなりました"
+
+#: userland/apps/reliefexcel/window.cpp:154
+msgid "Worksheets"
+msgstr "ワークシート"
+
+#: userland/apps/reliefexcel/window.cpp:145
+msgid "Wrap text"
+msgstr "テキストを折り返す"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"
+
+#: userland/apps/reliefexcel/window.cpp:666
+msgid "Zoom percentage (25–400):"
+msgstr "ズーム率 (25～400):"
+
+#: userland/apps/reliefexcel/window.cpp:168
+msgid "Zoom..."
+msgstr "ズーム..."
+
+#: configs/nls/messages/reliefexcel.c:133
+msgid "内存不足或操作已取消，剪切未执行"
+msgstr "メモリ不足または操作の中止により、切り取りは実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:134
+msgid "内存不足，历史操作未执行"
+msgstr "メモリ不足のため、履歴操作は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:135
+msgid "内存不足，合并未执行"
+msgstr "メモリ不足のため、結合は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:136
+msgid "内存不足，排序未执行"
+msgstr "メモリ不足のため、並べ替えは実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:137
+msgid "内存不足，操作未执行"
+msgstr "メモリ不足のため、操作は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:138
+msgid "内存不足，无法复制"
+msgstr "コピーするためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:139
+msgid "内存不足，无法排序"
+msgstr "並べ替えるためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:140
+msgid "内存不足，无法添加工作表"
+msgstr "ワークシートを追加するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:141
+msgid "内存不足，无法移动工作表"
+msgstr "ワークシートを移動するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:142
+msgid "内存不足，无法重命名工作表"
+msgstr "ワークシート名を変更するためのメモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:143
+msgid "内存不足，替换未执行"
+msgstr "メモリ不足のため、置換は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:144
+msgid "内存不足，筛选未执行"
+msgstr "メモリ不足のため、フィルターは実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:145
+msgid "内存不足，筛选未清除"
+msgstr "メモリ不足のため、フィルターは解除されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:146
+msgid "内存不足，粘贴未执行"
+msgstr "メモリ不足のため、貼り付けは実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:147
+msgid "内存不足，结构操作未执行"
+msgstr "メモリ不足のため、構造の変更は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:148
+msgid "剪切内容已过期"
+msgstr "切り取り内容が古くなっています"
+
+#: configs/nls/messages/reliefexcel.c:149
+msgid "剪切范围与公式引用范围部分重叠，操作未执行"
+msgstr "切り取り範囲と数式の参照範囲が部分的に重なるため、操作は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:150
+msgid "单元格地址无效"
+msgstr "セルのアドレスが無効です"
+
+#: configs/nls/messages/reliefexcel.c:151
+msgid "单元格数据无效"
+msgstr "セルデータが無効です"
+
+#: configs/nls/messages/reliefexcel.c:152
+msgid "历史工作表已不存在"
+msgstr "履歴のワークシートは存在しなくなりました"
+
+#: configs/nls/messages/reliefexcel.c:153
+msgid "历史数据超出工作簿限制"
+msgstr "履歴データがワークブックの上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:154
+msgid "合并会清除其他单元格内容，请确认后重试"
+msgstr "結合すると他のセルの内容が消去されます。確認してから再試行してください"
+
+#: configs/nls/messages/reliefexcel.c:155
+msgid "合并范围与现有合并单元格重叠"
+msgstr "結合範囲が既存の結合セルと重なっています"
+
+#: configs/nls/messages/reliefexcel.c:156
+msgid "合并范围无效"
+msgstr "結合範囲が無効です"
+
+#: configs/nls/messages/reliefexcel.c:157
+msgid "填充内容无效或内存不足，操作未执行"
+msgstr "コピーする内容が無効か、メモリ不足のため、操作は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:158
+msgid "填充范围无效"
+msgstr "コピーする範囲が無効です"
+
+#: configs/nls/messages/reliefexcel.c:159
+msgid "复制范围无效"
+msgstr "コピー範囲が無効です"
+
+#: configs/nls/messages/reliefexcel.c:160
+msgid "工作簿内容无效"
+msgstr "ワークブックの内容が無効です"
+
+#: configs/nls/messages/reliefexcel.c:161
+msgid "工作簿单元格已达上限或内存不足"
+msgstr "ワークブックのセル数が上限に達したか、メモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:162
+msgid "工作簿单元格数量超出限制或内存不足，操作未执行"
+msgstr "ワークブックのセル数が上限を超えているか、メモリ不足のため、操作は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:163
+msgid "工作簿单元格数量超出限制，操作未执行"
+msgstr "ワークブックのセル数が上限を超えているため、操作は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:164
+msgid "工作簿至少需要一个工作表"
+msgstr "ワークブックには少なくとも 1 枚のワークシートが必要です"
+
+#: configs/nls/messages/reliefexcel.c:165
+msgid "工作表名称已存在"
+msgstr "ワークシート名がすでに存在します"
+
+#: configs/nls/messages/reliefexcel.c:166
+msgid "工作表名称无效"
+msgstr "ワークシート名が無効です"
+
+#: configs/nls/messages/reliefexcel.c:167
+msgid "工作表名称无效或重复"
+msgstr "ワークシート名が無効か、重複しています"
+
+#: configs/nls/messages/reliefexcel.c:168
+msgid "工作表已不存在"
+msgstr "ワークシートは存在しなくなりました"
+
+#: configs/nls/messages/reliefexcel.c:169
+msgid "工作表数量已达上限"
+msgstr "ワークシート数が上限に達しました"
+
+#: configs/nls/messages/reliefexcel.c:170
+msgid "工作表移动方向无效"
+msgstr "ワークシートの移動方向が無効です"
+
+#: configs/nls/messages/reliefexcel.c:171
+msgid "工作表编号或名称重复"
+msgstr "ワークシート番号または名前が重複しています"
+
+#: configs/nls/messages/reliefexcel.c:172
+msgid "排序时无法调整公式"
+msgstr "並べ替え時に数式を調整できませんでした"
+
+#: configs/nls/messages/reliefexcel.c:173
+msgid "排序范围内包含合并单元格"
+msgstr "並べ替え範囲に結合セルが含まれています"
+
+#: configs/nls/messages/reliefexcel.c:174
+msgid "排序范围或关键列无效"
+msgstr "並べ替え範囲またはキー列が無効です"
+
+#: configs/nls/messages/reliefexcel.c:175
+msgid "插入会使现有数据超出工作表范围"
+msgstr "挿入すると既存データがワークシートの範囲外になります"
+
+#: configs/nls/messages/reliefexcel.c:176
+msgid "插入或删除范围无效"
+msgstr "挿入または削除する範囲が無効です"
+
+#: configs/nls/messages/reliefexcel.c:177
+msgid "操作已取消"
+msgstr "操作が中止されました"
+
+#: configs/nls/messages/reliefexcel.c:178
+msgid "操作范围无效或超出工作簿限制"
+msgstr "操作範囲が無効か、ワークブックの上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:179
+msgid "数值筛选条件无效"
+msgstr "数値フィルターの条件が無効です"
+
+#: configs/nls/messages/reliefexcel.c:180
+msgid "文本无效、过长或内存不足"
+msgstr "テキストが無効または長すぎるか、メモリが不足しています"
+
+#: configs/nls/messages/reliefexcel.c:181
+msgid "无法更新公式引用"
+msgstr "数式の参照を更新できません"
+
+#: configs/nls/messages/reliefexcel.c:182
+msgid "无法更新工作表引用"
+msgstr "ワークシートの参照を更新できません"
+
+#: configs/nls/messages/reliefexcel.c:183
+msgid "无法生成唯一工作表名称"
+msgstr "一意のワークシート名を生成できません"
+
+#: configs/nls/messages/reliefexcel.c:184
+msgid "无法调整行高或列宽"
+msgstr "行の高さまたは列幅を調整できません"
+
+#: configs/nls/messages/reliefexcel.c:185
+msgid "替换数量超出限制"
+msgstr "置換件数が上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:186
+msgid "替换结果过长或内存不足，操作未执行"
+msgstr "置換結果が長すぎるか、メモリ不足のため、操作は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:187
+msgid "查找或替换文本无效"
+msgstr "検索または置換するテキストが無効です"
+
+#: configs/nls/messages/reliefexcel.c:188
+msgid "格式范围或属性掩码无效"
+msgstr "書式範囲または属性マスクが無効です"
+
+#: configs/nls/messages/reliefexcel.c:189
+msgid "格式范围无效"
+msgstr "書式範囲が無効です"
+
+#: configs/nls/messages/reliefexcel.c:190
+msgid "格式范围超过工作簿单元格上限"
+msgstr "書式範囲がワークブックのセル数の上限を超えています"
+
+#: configs/nls/messages/reliefexcel.c:191
+msgid "此操作会破坏合并单元格或视图范围"
+msgstr "この操作は結合セルまたは表示範囲を破壊します"
+
+#: configs/nls/messages/reliefexcel.c:192
+msgid "没有匹配的合并范围"
+msgstr "一致する結合範囲がありません"
+
+#: configs/nls/messages/reliefexcel.c:209
+msgid "没有可撤销的操作"
+msgstr "元に戻せる操作がありません"
+
+#: configs/nls/messages/reliefexcel.c:193
+msgid "没有可用的工作表编号"
+msgstr "利用可能なワークシート番号がありません"
+
+#: configs/nls/messages/reliefexcel.c:210
+msgid "没有可重做的操作"
+msgstr "やり直せる操作がありません"
+
+#: configs/nls/messages/reliefexcel.c:194
+msgid "清除范围无效"
+msgstr "消去する範囲が無効です"
+
+#: configs/nls/messages/reliefexcel.c:195
+msgid "筛选文本无效或过长"
+msgstr "フィルターテキストが無効か、長すぎます"
+
+#: configs/nls/messages/reliefexcel.c:196
+msgid "筛选范围或条件无效"
+msgstr "フィルター範囲または条件が無効です"
+
+#: configs/nls/messages/reliefexcel.c:197
+msgid "粘贴位置无效"
+msgstr "貼り付け位置が無効です"
+
+#: configs/nls/messages/reliefexcel.c:198
+msgid "粘贴内容无效或内存不足，操作未执行"
+msgstr "貼り付ける内容が無効か、メモリ不足のため、操作は実行されませんでした"
+
+#: configs/nls/messages/reliefexcel.c:199
+msgid "粘贴范围超出工作表"
+msgstr "貼り付け範囲がワークシートを超えています"
+
+#: configs/nls/messages/reliefexcel.c:200
+msgid "行高或列宽无效"
+msgstr "行の高さまたは列幅が無効です"
+
+#: configs/nls/messages/reliefexcel.c:201
+msgid "视图设置无效"
+msgstr "表示設定が無効です"
+
+#: configs/nls/messages/reliefexcel.c:202
+msgid "计算已取消，筛选未执行"
+msgstr "計算が中止されたため、フィルターは実行されませんでした"

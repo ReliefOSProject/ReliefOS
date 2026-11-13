@@ -23,6 +23,7 @@
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Menu_Button.H>
 namespace rm {
+const char *ui_error(const char *message);
 struct UiGuard {int &depth;explicit UiGuard(int &value):depth(value){++depth;}~UiGuard(){--depth;}};
 class RenderClient;
 class IoJob;

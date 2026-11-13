@@ -1,0 +1,147 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/apiapp/main.c:347
+msgid " bytes"
+msgstr " バイト"
+
+#: userland/apps/apiapp/main.c:379
+msgid " bytes processed"
+msgstr " バイト処理済み"
+
+#: userland/apps/apiapp/main.c:349
+msgid " of "
+msgstr " / "
+
+#: userland/apps/apiapp/main.c:759
+msgid "< Back"
+msgstr "< 戻る"
+
+#: userland/apps/apiapp/main.c:617
+msgid "API Installer"
+msgstr "API インストーラー"
+
+#: userland/apps/apiapp/main.c:708
+msgid "Application Installer"
+msgstr "アプリケーションインストーラー"
+
+#: userland/apps/apiapp/main.c:530
+msgid "Authorizing installation..."
+msgstr "インストールを承認中..."
+
+#: userland/apps/apiapp/main.c:355
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/apiapp/main.c:787
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/apiapp/main.c:654
+msgid "Connecting..."
+msgstr "接続中..."
+
+#: userland/apps/apiapp/main.c:780
+msgid "Could not install:"
+msgstr "インストールできませんでした:"
+
+#: userland/apps/apiapp/main.c:638
+msgid "Could not start download"
+msgstr "ダウンロードを開始できませんでした"
+
+#: userland/apps/apiapp/main.c:749
+msgid "Create desktop shortcut"
+msgstr "デスクトップにショートカットを作成"
+
+#: userland/apps/apiapp/main.c:697
+msgid "Download cancelled"
+msgstr "ダウンロードをキャンセルしました"
+
+#: userland/apps/apiapp/main.c:661
+msgid "Download failed"
+msgstr "ダウンロードに失敗しました"
+
+#: userland/apps/apiapp/main.c:341
+msgid "Downloaded"
+msgstr "ダウンロード済み"
+
+#: userland/apps/apiapp/main.c:331
+msgid "Downloading Application"
+msgstr "アプリケーションのダウンロード"
+
+#: userland/apps/apiapp/main.c:618
+msgid "Downloading application"
+msgstr "アプリケーションをダウンロード中"
+
+#: userland/apps/apiapp/main.c:653
+msgid "Downloading..."
+msgstr "ダウンロード中..."
+
+#: userland/apps/apiapp/main.c:658
+msgid "Finalizing download..."
+msgstr "ダウンロードを仕上げています..."
+
+#: userland/apps/apiapp/main.c:753
+msgid "Install"
+msgstr "インストール"
+
+#: userland/apps/apiapp/main.c:741
+msgid "Install Options"
+msgstr "インストールオプション"
+
+#: userland/apps/apiapp/main.c:723
+msgid "Install location:"
+msgstr "インストール先:"
+
+#: userland/apps/apiapp/main.c:744
+msgid "Install path:"
+msgstr "インストールパス:"
+
+#: userland/apps/apiapp/main.c:768
+msgid "Installation Complete"
+msgstr "インストール完了"
+
+#: userland/apps/apiapp/main.c:777
+msgid "Installation Failed"
+msgstr "インストール失敗"
+
+#: userland/apps/apiapp/main.c:368
+msgid "Installing Application"
+msgstr "アプリケーションのインストール"
+
+#: userland/apps/apiapp/main.c:558
+msgid "Installing..."
+msgstr "インストール中..."
+
+#: userland/apps/apiapp/main.c:730
+msgid "Next >"
+msgstr "次へ >"
+
+#: userland/apps/apiapp/main.c:386
+msgid "Please keep this window open until installation completes."
+msgstr "インストールが完了するまで、このウィンドウを開いたままにしてください。"
+
+#: userland/apps/apiapp/main.c:624
+msgid "Preparing download..."
+msgstr "ダウンロードを準備中..."
+
+#: userland/apps/apiapp/main.c:711
+msgid "Ready to install:"
+msgstr "インストールの準備ができました:"
+
+#: userland/apps/apiapp/main.c:771
+msgid "Successfully installed:"
+msgstr "インストールしました:"
+
+#: userland/apps/apiapp/main.c:717
+msgid "Version:"
+msgstr "バージョン:"

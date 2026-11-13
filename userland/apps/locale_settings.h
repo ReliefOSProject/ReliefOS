@@ -10,19 +10,27 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-/* Private settings/installer data, not a second translation API. */
+/* Language choices shared by the installer and system settings. */
 static const struct {
     const char *name;
     const char *locale;
 } language_options[] = {
     {"English", "en_US.UTF-8"},
     {"中文", "zh_CN.UTF-8"},
+    {"日本語", "ja_JP.UTF-8"},
 };
 
 static inline unsigned language_selection(void)
 {
     const char *locale = setlocale(LC_MESSAGES, NULL);
-    return locale && strncmp(locale, "zh", 2) == 0 ? 1U : 0U;
+    if (locale) {
+        for (unsigned i = 0; i < sizeof(language_options) / sizeof(language_options[0]); ++i) {
+            if (strncmp(locale, language_options[i].locale, 2) == 0 &&
+                (locale[2] == 0 || locale[2] == '_' || locale[2] == '.' || locale[2] == '@'))
+                return i;
+        }
+    }
+    return 0U;
 }
 
 static inline int write_locale_setting(const char *path, unsigned selection)

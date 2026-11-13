@@ -1,0 +1,135 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/servicemgr/main.c:44
+msgid "ALSA state"
+msgstr "ALSA の状態"
+
+#: userland/apps/servicemgr/main.c:44
+msgid "Audio"
+msgstr "オーディオ"
+
+#: userland/apps/servicemgr/main.c:47
+msgid "BusyBox ntpd"
+msgstr "BusyBox ntpd"
+
+#: userland/apps/servicemgr/main.c:45
+msgid "BusyBox udhcpc"
+msgstr "BusyBox udhcpc"
+
+#: userland/apps/servicemgr/main.c:45
+msgid "DHCP"
+msgstr "DHCP"
+
+#: userland/apps/servicemgr/main.c:152
+msgid "Default runlevel updated"
+msgstr "既定のランレベルを更新しました"
+
+#: userland/apps/servicemgr/main.c:227
+msgid "Detail"
+msgstr "詳細"
+
+#: userland/apps/servicemgr/main.c:46
+msgid "Devices"
+msgstr "デバイス"
+
+#: userland/apps/servicemgr/main.c:208
+msgid "Failed"
+msgstr "失敗"
+
+#: configs/nls/messages/servicemgr.c:5
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/servicemgr/main.c:262
+msgid "Refresh"
+msgstr "更新"
+
+#: userland/apps/servicemgr/main.c:161
+msgid "Refreshing OpenRC..."
+msgstr "OpenRC を更新中..."
+
+#: userland/apps/servicemgr/main.c:46
+msgid "ReliefOS device protocol"
+msgstr "ReliefOS デバイスプロトコル"
+
+#: userland/apps/servicemgr/main.c:279
+msgid "Restart"
+msgstr "再起動"
+
+#: userland/apps/servicemgr/main.c:202
+msgid "Running"
+msgstr "実行中"
+
+#: userland/apps/servicemgr/main.c:222
+msgid "Runtime state is visible. Administrator rights are required to control services."
+msgstr "実行状態を表示できます。サービスの操作には管理者権限が必要です。"
+
+#: userland/apps/servicemgr/main.c:264
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/servicemgr/main.c:224
+msgid "Service"
+msgstr "サービス"
+
+#: userland/apps/servicemgr/main.c:351
+msgid "Service Manager"
+msgstr "サービスマネージャー"
+
+#: userland/apps/servicemgr/main.c:314
+msgid "Service setting changed"
+msgstr "サービスの設定を変更しました"
+
+#: userland/apps/servicemgr/main.c:352
+msgid "Services"
+msgstr "サービス"
+
+#: userland/apps/servicemgr/main.c:267
+msgid "Start"
+msgstr "開始"
+
+#: userland/apps/servicemgr/main.c:211
+msgid "Starting"
+msgstr "起動中"
+
+#: userland/apps/servicemgr/main.c:225
+msgid "State"
+msgstr "状態"
+
+#: userland/apps/servicemgr/main.c:273
+msgid "Stop"
+msgstr "停止"
+
+#: userland/apps/servicemgr/main.c:205
+msgid "Stopped"
+msgstr "停止中"
+
+#: userland/apps/servicemgr/main.c:47
+msgid "Time sync"
+msgstr "時刻同期"
+
+#: userland/apps/servicemgr/main.c:213
+msgid "Unknown"
+msgstr "不明"
+
+#: userland/apps/servicemgr/main.c:149
+msgid "Updating runlevel..."
+msgstr "ランレベルを更新中..."
+
+#: userland/apps/servicemgr/main.c:221
+msgid "View service runtime state and control startup services."
+msgstr "サービスの実行状態を表示し、起動サービスを管理します。"
+
+#: configs/nls/messages/servicemgr.c:6
+msgid "failed"
+msgstr "失敗"

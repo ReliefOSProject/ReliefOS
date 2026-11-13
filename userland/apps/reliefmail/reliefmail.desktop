@@ -1,10 +1,13 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefMail
+Name[ja]=ReliefMail
 Name[zh_CN]=ReliefMail 邮件客户端
 GenericName=Mail Client
+GenericName[ja]=メールクライアント
 GenericName[zh_CN]=邮件客户端
 Comment=Read, write and manage email
+Comment[ja]=メールの閲覧、作成、管理
 Comment[zh_CN]=收发、撰写和管理邮件
 Exec=/usr/bin/reliefmail
 TryExec=/usr/bin/reliefmail

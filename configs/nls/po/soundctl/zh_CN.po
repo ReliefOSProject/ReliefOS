@@ -1,0 +1,47 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Chinese (Simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/soundctl/main.c:40
+msgid "Usage: soundctl [--card N] cards|controls|get NAME|set NAME VALUE[,VALUE]\n       soundctl [--card N] route LABEL|capture-source LABEL|watch\n       soundctl [--pcm NAME] test [--channels 1|2] [--seconds 1..30]\n"
+msgstr "用法: soundctl [--card N] cards|controls|get NAME|set NAME VALUE[,VALUE]\n      soundctl [--card N] route LABEL|capture-source LABEL|watch\n      soundctl [--pcm NAME] test [--channels 1|2] [--seconds 1..30]\n"
+
+#: userland/apps/soundctl/main.c:156
+msgid "card name"
+msgstr "声卡名称"
+
+#: userland/apps/soundctl/main.c:159
+msgid "cards"
+msgstr "声卡"
+
+#: userland/apps/soundctl/main.c:186
+msgid "controls"
+msgstr "控件"
+
+#: userland/apps/soundctl/main.c:194
+msgid "enum label"
+msgstr "枚举标签"
+
+#: userland/apps/soundctl/main.c:183
+msgid "open"
+msgstr "打开"
+
+#: userland/apps/soundctl/main.c:210
+msgid "soundctl: available controls:\n"
+msgstr "soundctl: 可用控件:\n"
+
+#: userland/apps/soundctl/main.c:173
+msgid "test"
+msgstr "测试"
+
+#: userland/apps/soundctl/main.c:202
+msgid "watch"
+msgstr "监视"

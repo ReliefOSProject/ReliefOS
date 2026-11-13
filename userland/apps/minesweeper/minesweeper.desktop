@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Minesweeper
+Name[ja]=マインスイーパー
 Name[zh_CN]=扫雷
 Exec=/usr/bin/minesweeper
 TryExec=/usr/bin/minesweeper

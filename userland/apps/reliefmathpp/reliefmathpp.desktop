@@ -1,9 +1,12 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefMath++
+Name[ja]=ReliefMath++
 GenericName=Geometry and Function Plotter
+GenericName[ja]=幾何学・関数グラフ
 GenericName[zh_CN]=几何与函数绘图工具
 Comment=Explore 2D and 3D geometry, functions and numerical calculations
+Comment[ja]=2D・3D 幾何学、関数、数値計算の探究
 Comment[zh_CN]=绘制二维和三维几何、函数曲线与曲面，并进行数值计算
 Exec=/usr/bin/reliefmathpp %f
 TryExec=/usr/bin/reliefmathpp

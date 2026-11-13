@@ -10,6 +10,14 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#: userland/apps/reliefppt/document.cpp:895
+msgid "%s；%s"
+msgstr ""
+
+#: userland/apps/reliefppt/document.cpp:900
+msgid "%s；%s，但恢复目录项同步失败：%s"
+msgstr ""
+
 #: userland/apps/reliefppt/window.cpp:636
 msgid ""
 "A native ReliefOS presentation editor.\n"
@@ -96,7 +104,7 @@ msgstr "加粗（Ctrl+B）"
 msgid "Bullets"
 msgstr "项目符号"
 
-#: userland/apps/fltk_support.h:44
+#: userland/apps/reliefppt/dialogs.cpp:92
 msgid "Cancel"
 msgstr "取消"
 
@@ -353,6 +361,10 @@ msgstr "高度"
 #: userland/apps/reliefppt/window.cpp:56
 msgid "Home tab"
 msgstr "开始"
+
+#: userland/apps/reliefppt/document.cpp:52
+msgid "I/O 错误"
+msgstr ""
 
 #: configs/nls/messages/reliefppt.c:16
 msgid "Image dimensions exceed the supported limit"
@@ -611,7 +623,7 @@ msgstr "右对齐"
 msgid "Sans serif"
 msgstr "无衬线"
 
-#: userland/apps/fltk_support.h:59
+#: userland/apps/reliefppt/files.cpp:61
 msgid "Save"
 msgstr "保存"
 
@@ -804,3 +816,695 @@ msgstr "垂直位置"
 #: userland/apps/fltk_support.h:46
 msgid "Yes"
 msgstr "是"
+
+#: configs/nls/messages/reliefppt.c:29
+msgid "不支持此原生演示文稿版本"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:30
+msgid "临时文件名过长"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:31
+msgid "保存原文件时发现文件已被截断"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:32
+msgid "保存路径为空"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:33
+msgid "修订号已耗尽"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:166
+msgid "内存不足"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:35
+msgid "内存不足或图片资源超出文件大小限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:36
+msgid "内存不足或幻灯片内容超出文件大小限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:37
+msgid "内存不足或幻灯片对象超出文件大小限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:38
+msgid "内存不足或幻灯片超出文件大小限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:39
+msgid "内存不足或演示文稿超出文件大小限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:40
+msgid "内存不足，无法保存幻灯片对象"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:41
+msgid "内存不足，无法保存恢复文件路径"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:42
+msgid "内存不足，无法保存演示文稿图片"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:43
+msgid "内存不足，无法保存演示文稿幻灯片"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:44
+msgid "内存不足，无法创建演示文稿"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:45
+msgid "内存不足，无法读取图片像素"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:46
+msgid "内存不足，无法读取幻灯片对象"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:47
+msgid "内存不足，无法读取演示文稿"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:48
+msgid "内存不足，无法读取演示文稿图片"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:49
+msgid "内存不足，无法读取演示文稿幻灯片"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:50
+msgid "内存不足，无法读取演示文稿文本"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:51
+msgid "内存不足，无法返回恢复文件路径"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:52
+msgid "内存不足，无法返回恢复目录"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:53
+msgid "内存不足，无法返回演示文稿数据"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:54
+msgid "剪贴对象格式无效"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:201
+msgid "单个文字簇超出文本框宽度"
+msgstr ""
+
+#: userland/apps/reliefppt/document.cpp:896
+msgid "原文件已恢复"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:181
+msgid "右侧内容"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:58
+msgid "图层操作无效"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:1136
+msgid "图片保存在演示文稿中"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:60
+msgid "图片尺寸或数据无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:61
+msgid "图片尺寸无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:62
+msgid "图片引用无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:63
+msgid "图片引用无效或内存不足"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:64
+msgid "图片或对象数量超限"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:1139
+msgid "图片数据已嵌入，无需保留来源文件。"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:66
+msgid "图片数据超限"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:67
+msgid "图片数据长度无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:68
+msgid "图片数量超限"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:166
+msgid "在此输入内容"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:70
+msgid "备注文本无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:71
+msgid "对象属性无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:72
+msgid "对象数量超限"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:73
+msgid "对象文本超过长度限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:74
+msgid "对象编号已耗尽"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:75
+msgid "对象编号或修订号无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:76
+msgid "对象编号重复或无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:77
+msgid "对齐方式无效"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:175
+msgid "左侧内容"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:79
+msgid "幻灯片备注超过长度限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:80
+msgid "幻灯片属性无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:81
+msgid "幻灯片数量无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:82
+msgid "当前幻灯片对象数量超限"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:83
+msgid "当前幻灯片无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:84
+msgid "恢复文件不在私有恢复目录中"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:85
+msgid "恢复文件名过长"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:86
+msgid "恢复文件在扫描期间发生更改"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:87
+msgid "恢复文件已被其他进程使用"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:88
+msgid "恢复文件必须使用 .rppt 扩展名"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:89
+msgid "恢复文件必须是私有普通文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:90
+msgid "恢复文件路径为空"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:91
+msgid "恢复文件路径过长"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:92
+msgid "恢复目录必须属于当前用户"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:93
+msgid "恢复目录权限不够安全"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:94
+msgid "恢复锁必须是私有普通文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:95
+msgid "恢复锁文件名过长"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:96
+msgid "打开期间演示文稿已发生更改"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:97
+msgid "找不到当前用户的状态目录"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:98
+msgid "撤销历史不可用"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:99
+msgid "撤销历史无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:100
+msgid "撤销历史超出内存限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:101
+msgid "撤销状态超出内存限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:102
+msgid "文件名无效或过长"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:103
+msgid "文件已在 ReliefPPT 外部更改，已保留原文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:104
+msgid "文件时间戳仅支持非符号链接的普通文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:105
+msgid "文件路径为空"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:106
+msgid "文件路径过长"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:157
+msgid "文字内容超出文本框高度"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:108
+msgid "文字对象不存在"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:386
+msgid "文字测量函数无效"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:196
+msgid "文字测量结果无效"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:191
+msgid "文字编码无效"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:146
+msgid "文字行数超限"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:152
+msgid "文字行无法放入文本框"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:395
+msgid "文本对象无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:115
+msgid "文本无效"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:402
+msgid "文本框没有可用排版区域"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:117
+msgid "文档信息文本无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:118
+msgid "文档大小超限"
+msgstr ""
+
+#: userland/apps/reliefppt/document.cpp:896
+msgid "新目标已删除"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:120
+msgid "无法保留原文件权限"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:121
+msgid "无法关闭临时输出文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:122
+msgid "无法关闭原文件回滚副本"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:123
+msgid "无法关闭恢复目录"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:124
+msgid "无法关闭演示文稿"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:125
+msgid "无法关闭状态目录"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:126
+msgid "无法关闭现有保存文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:127
+msgid "无法写入临时输出文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:128
+msgid "无法写入原文件回滚副本"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:129
+msgid "无法分配唯一临时文件名"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:130
+msgid "无法分配唯一恢复文件名"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:131
+msgid "无法创建临时文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:132
+msgid "无法创建原文件回滚副本"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:133
+msgid "无法创建恢复文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:134
+msgid "无法创建撤销历史"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:135
+msgid "无法创建状态目录"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:136
+msgid "无法创建空白文档"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:137
+msgid "无法创建输出文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:138
+msgid "无法同步临时输出文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:139
+msgid "无法同步原文件回滚副本"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:140
+msgid "无法同步原文件回滚目录项"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:141
+msgid "无法同步输出目录"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:142
+msgid "无法同步输出目录或删除新目标；目标文件可能仍存在"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:143
+msgid "无法同步输出目录或恢复原文件"
+msgstr ""
+
+#: userland/apps/reliefppt/document.cpp:911
+msgid "无法同步输出目录或恢复原文件；回滚副本保留在同目录：%s"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:145
+msgid "无法复制幻灯片"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:146
+msgid "无法安全创建临时输出文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:147
+msgid "无法打开恢复文件锁"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:148
+msgid "无法打开文件系统根目录"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:149
+msgid "无法打开演示文稿"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:150
+msgid "无法打开现有保存文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:151
+msgid "无法打开目标目录"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:152
+msgid "无法扫描恢复目录"
+msgstr ""
+
+#: userland/apps/reliefppt/geometry.cpp:229
+msgid "无法排版文字"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:154
+msgid "无法替换演示文稿文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:155
+msgid "无法检查恢复文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:156
+msgid "无法检查恢复目录"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:157
+msgid "无法检查文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:158
+msgid "无法检查演示文稿"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:159
+msgid "无法检查现有保存文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:160
+msgid "无法添加幻灯片"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:161
+msgid "无法设置恢复文件权限"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:162
+msgid "无法设置恢复目录权限"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:163
+msgid "无法读取演示文稿"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:164
+msgid "无法读取现有保存文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:165
+msgid "无法重新检查演示文稿"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:166
+msgid "无法重新检查现有保存文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:167
+msgid "无法锁定恢复文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:168
+msgid "更新对象编号无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:169
+msgid "更新对象编号重复"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:156
+msgid "标题"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:1084
+msgid "欢迎使用 ReliefPPT"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:1095
+msgid "清晰表达每一个想法"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:173
+msgid "演示文稿作者字段超过长度限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:174
+msgid "演示文稿包含无效的 UTF-8 文本"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:175
+msgid "演示文稿包含未知对象类型或样式值"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:176
+msgid "演示文稿图片尺寸无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:177
+msgid "演示文稿图片数据长度无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:178
+msgid "演示文稿图片数量无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:179
+msgid "演示文稿对象数量无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:180
+msgid "演示文稿幻灯片数量无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:181
+msgid "演示文稿文件包含多余数据"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:182
+msgid "演示文稿文件大小无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:183
+msgid "演示文稿文件已截断"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:184
+msgid "演示文稿文件超过 96 MiB 限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:185
+msgid "演示文稿标题超过长度限制"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:186
+msgid "演示文稿签名、标志或长度无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:187
+msgid "演示文稿类型无效或文件超过 96 MiB"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:188
+msgid "演示文稿路径为空"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:189
+msgid "演示文稿路径过长"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:190
+msgid "状态目录包含无效路径段"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:191
+msgid "状态目录必须使用绝对路径"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:192
+msgid "状态目录路径过长"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:193
+msgid "状态路径包含符号链接或非目录文件"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:194
+msgid "现有输出文件超过 256 MiB 回滚保护限制"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:1112
+msgid "第二页介绍文字与形状。"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:196
+msgid "背景颜色无效"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:197
+msgid "读取演示文稿时文件被截断"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:198
+msgid "输出数据超过 256 MiB 限制"
+msgstr ""
+
+#: userland/apps/reliefppt/model.cpp:1086
+msgid "这是一个三页演示文稿示例。"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:200
+msgid "非图片对象包含图片引用"
+msgstr ""
+
+#: configs/nls/messages/reliefppt.c:201
+msgid "页面尺寸无效"
+msgstr ""

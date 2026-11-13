@@ -1,6 +1,7 @@
 /* Installer wizard model: page flow shared by the FLTK and TTY frontends. */
 #include "model.h"
 
+#include <libintl.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -210,10 +211,10 @@ void installer_model_format_disk_line(char *buf, uint32_t cap, uint32_t id,
         size /= 1024ULL;
         suffix = " GiB";
     }
-    append_text(buf, cap, &pos, "Disk ");
+    append_text(buf, cap, &pos, gettext("Disk "));
     append_number(buf, cap, &pos, id);
     append_text(buf, cap, &pos, "  ");
-    append_text(buf, cap, &pos, (name && name[0]) ? name : "Disk");
+    append_text(buf, cap, &pos, (name && name[0]) ? name : gettext("Disk"));
     append_text(buf, cap, &pos, "  ");
     append_number(buf, cap, &pos, size);
     append_text(buf, cap, &pos, suffix);

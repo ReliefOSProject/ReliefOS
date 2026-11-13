@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Xiaobai
+Name[ja]=Xiaobai
 Exec=/usr/bin/xiaobai
 TryExec=/usr/bin/xiaobai
 Icon=reliefos-xiaobai

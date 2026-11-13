@@ -1,3 +1,4 @@
+#include "localization.h"
 #include "compose_window.h"
 #include "window.h"
 #include "../fltk_support.h"
@@ -1057,7 +1058,7 @@ bool ComposeWindow::open_prefilled(const AccountList &accounts, const Account &a
     if (!editor_.load_draft(draft_, state, error) || state != EditorStateLoad::PlainDraft) {
         forward_source_valid_ = false;
         finish_close();
-        status_->text(error.empty() ? T("The new message body could not be opened safely.") : error.c_str());
+        status_->text(DiagnosticForDisplay(error.empty() ? T("The new message body could not be opened safely.") : error.c_str()).c_str());
         return false;
     }
     save_gate_.reset_for_open(draft_);
@@ -1365,16 +1366,16 @@ bool ComposeWindow::submit_save() {
     if (save_gate_.pending()) return true;
     if (!save_gate_.dirty()) return true;
     Text error;
-    if (!sync_fields(error)) { status_->text(error.c_str()); return false; }
+    if (!sync_fields(error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false; }
     Account current;
-    if (!current_account(current, error)) { status_->text(error.c_str()); return false; }
+    if (!current_account(current, error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false; }
     WorkerTaskInput input;
     ComposeSaveToken token;
     const WorkerTaskKind create_kind = !draft_.id && forward_source_valid_ ?
         WorkerTaskKind::SaveForwardDraft : WorkerTaskKind::SaveDraft;
     if (!save_gate_.begin(draft_, current.generation, attachment_refs_, input, token, error,
             create_kind, create_kind == WorkerTaskKind::SaveForwardDraft ? &forward_source_ : nullptr)) {
-        status_->text(error.c_str()); return false;
+        status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false;
     }
     update_format_controls();
     WorkerRequest request;
@@ -1391,7 +1392,7 @@ bool ComposeWindow::submit_save() {
         Text ignored;
         (void)save_gate_.complete(token, false, nullptr, draft_, save_again, ignored);
         update_format_controls();
-        status_->text(error.empty() ? T("Draft save could not start; edits remain here.") : error.c_str());
+        status_->text(DiagnosticForDisplay(error.empty() ? T("Draft save could not start; edits remain here.") : error.c_str()).c_str());
         return false;
     }
     save_generation_ = token.edit_generation;
@@ -1410,16 +1411,16 @@ bool ComposeWindow::submit_copy(const Account &target) {
         return false;
     }
     Text error;
-    if (!sync_fields(error)) { status_->text(error.c_str()); return false; }
+    if (!sync_fields(error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false; }
     Account source;
-    if (!current_account(source, error)) { status_->text(error.c_str()); return false; }
+    if (!current_account(source, error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false; }
 
     WorkerTaskInput input;
     input.item_id = draft_.id;
     input.item_revision = draft_.revision;
     input.account = source;
     input.has_draft = true;
-    if (!clone_draft(draft_, input.draft, error)) { status_->text(error.c_str()); return false; }
+    if (!clone_draft(draft_, input.draft, error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false; }
     input.draft.id = 0;
     input.draft.revision = 0;
     input.draft.account_id = target.id;
@@ -1454,7 +1455,7 @@ bool ComposeWindow::submit_copy(const Account &target) {
             static_cast<MailWindow::PendingUiRequest &&>(pending), error)) {
         copy_pending_ = false;
         set_interaction_enabled(true);
-        status_->text(error.empty() ? T("Draft copy could not start; the original remains open.") : error.c_str());
+        status_->text(DiagnosticForDisplay(error.empty() ? T("Draft copy could not start; the original remains open.") : error.c_str()).c_str());
         if (save_gate_.dirty() && shown()) Fl::add_timeout(1.2, autosave_cb, this);
         return false;
     }
@@ -1473,7 +1474,7 @@ bool ComposeWindow::schedule_save(bool explicit_save) {
 bool ComposeWindow::submit_queue_or_send(bool transmit) {
     if (session_stale_ || send_in_progress_ || queue_pending_ || archive_retry_pending_ || copy_pending_) return false;
     Text error;
-    if (!sync_fields(error)) { status_->text(error.c_str()); return false; }
+    if (!sync_fields(error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false; }
     send_after_save_ = transmit;
     if (save_gate_.pending()) {
         status_->text(T("Waiting for the current save before finalizing this message…"));
@@ -1486,7 +1487,7 @@ bool ComposeWindow::submit_queue_or_send(bool transmit) {
     }
     Text confirmation;
     if (!compose_confirmation_text(account_, draft_, attachment_refs_.size(), confirmation, error)) {
-        status_->text(error.c_str()); send_after_save_ = false; return false;
+        status_->text(DiagnosticForDisplay(error.c_str()).c_str()); send_after_save_ = false; return false;
     }
     if (!compose_confirmation_accepted(literal_confirmation(transmit ? T("Confirm sending") : T("Confirm queueing"),
             transmit ? T("Review the full message identity and recipients before SMTP submission.") :
@@ -1496,7 +1497,7 @@ bool ComposeWindow::submit_queue_or_send(bool transmit) {
         return true;
     }
     Account current;
-    if (!current_account(current, error)) { status_->text(error.c_str()); send_after_save_ = false; return false; }
+    if (!current_account(current, error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); send_after_save_ = false; return false; }
     WorkerTaskInput input;
     input.item_id = draft_.id;
     input.item_revision = draft_.revision;
@@ -1514,7 +1515,7 @@ bool ComposeWindow::submit_queue_or_send(bool transmit) {
             static_cast<MailWindow::PendingUiRequest &&>(pending), error)) {
         queue_pending_ = false;
         set_interaction_enabled(true);
-        status_->text(error.c_str()); send_after_save_ = false; return false;
+        status_->text(DiagnosticForDisplay(error.c_str()).c_str()); send_after_save_ = false; return false;
     }
     status_->text(transmit ? T("Finalizing the selected draft revision before SMTP…") :
         T("Creating a local queued operation; no message will be sent now…"));
@@ -1524,9 +1525,9 @@ bool ComposeWindow::submit_queue_or_send(bool transmit) {
 bool ComposeWindow::submit_send(uint64_t operation_id) {
     Text error;
     Account current;
-    if (!operation_id || !current_account(current, error)) { status_->text(error.c_str()); return false; }
+    if (!operation_id || !current_account(current, error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false; }
     SecretBytes credentials;
-    if (!owner_->make_live_credentials(credentials, error)) { status_->text(error.c_str()); return false; }
+    if (!owner_->make_live_credentials(credentials, error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false; }
     const Text &smtp_user = current.smtp_username.empty() ? current.username : current.smtp_username;
     SecretBytes matched;
     if (!worker_find_credential(credentials, current, CredentialPurpose::Smtp, smtp_user,
@@ -1550,7 +1551,7 @@ bool ComposeWindow::submit_send(uint64_t operation_id) {
             static_cast<SecretBytes &&>(credentials), static_cast<MailWindow::PendingUiRequest &&>(pending), error)) {
         send_in_progress_ = false;
         set_interaction_enabled(true);
-        status_->text(error.c_str()); return false;
+        status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false;
     }
     status_->text(T("SMTP submission is running; closing is blocked until its result is known."));
     return true;
@@ -1562,12 +1563,12 @@ bool ComposeWindow::submit_archive_retry() {
     Text error;
     Account current;
     if (!operation_id_ || !current_account(current, error)) {
-        status_->text(error.empty() ? T("No confirmed delivery is available for archive retry.") : error.c_str());
+        status_->text(DiagnosticForDisplay(error.empty() ? T("No confirmed delivery is available for archive retry.") : error.c_str()).c_str());
         return false;
     }
     SecretBytes credentials;
     if (!owner_->make_live_credentials(credentials, error)) {
-        status_->text(error.c_str());
+        status_->text(DiagnosticForDisplay(error.c_str()).c_str());
         return false;
     }
     SecretBytes imap_credential;
@@ -1592,7 +1593,7 @@ bool ComposeWindow::submit_archive_retry() {
             static_cast<SecretBytes &&>(credentials), static_cast<MailWindow::PendingUiRequest &&>(pending), error)) {
         archive_retry_pending_ = false;
         set_interaction_enabled(true);
-        status_->text(error.empty() ? T("Sent-folder archive retry could not start.") : error.c_str());
+        status_->text(DiagnosticForDisplay(error.empty() ? T("Sent-folder archive retry could not start.") : error.c_str()).c_str());
         return false;
     }
     status_->text(T("Retrying Sent-folder archiving only; SMTP will not be contacted."));
@@ -1613,7 +1614,7 @@ bool ComposeWindow::request_compose_catalog(const Text &query, uint64_t template
     }
     Text error;
     Account current;
-    if (!current_account(current, error)) { status_->text(error.c_str()); return false; }
+    if (!current_account(current, error)) { status_->text(DiagnosticForDisplay(error.c_str()).c_str()); return false; }
     WorkerTaskInput input;
     input.item_id = template_id;
     input.query = query;
@@ -1633,7 +1634,7 @@ bool ComposeWindow::request_compose_catalog(const Text &query, uint64_t template
     }
     if (!owner_->submit_task(WorkerTaskKind::ComposeCatalog, request, &input, SecretBytes(),
             static_cast<MailWindow::PendingUiRequest &&>(pending), error)) {
-        status_->text(error.empty() ? T("Compose catalog request could not start.") : error.c_str());
+        status_->text(DiagnosticForDisplay(error.empty() ? T("Compose catalog request could not start.") : error.c_str()).c_str());
         return false;
     }
     if (!query.empty()) status_->text(T("Searching saved contacts…"));
@@ -1656,7 +1657,7 @@ void ComposeWindow::apply_style(unsigned mask, const rw::TextStyle &style) {
     if (editor_.apply_character_style(style, mask)) {
         if (editor_.word_editor().doc.revision != prior) changed(true);
         update_format_controls(); canvas_->redraw();
-    } else status_->text(editor_.error().c_str());
+    } else status_->text(DiagnosticForDisplay(editor_.error().c_str()).c_str());
 }
 
 void ComposeWindow::apply_paragraph(rw::ParagraphStyle style, unsigned mask) {
@@ -1665,7 +1666,7 @@ void ComposeWindow::apply_paragraph(rw::ParagraphStyle style, unsigned mask) {
         if (editor_.word_editor().doc.revision != prior) changed(true);
         update_format_controls();
         canvas_->redraw();
-    } else status_->text(editor_.error().c_str());
+    } else status_->text(DiagnosticForDisplay(editor_.error().c_str()).c_str());
 }
 
 void ComposeWindow::apply_font_family() {
@@ -1709,7 +1710,7 @@ void ComposeWindow::paste_text(const char *text, size_t length) {
     if (clipboard.valid && clipboard.plain.size() == length && !memcmp(clipboard.plain.c_str(), text, length))
         pasted_rich = editor_.paste_document(clipboard.document, clipboard.links);
     if (!pasted_rich && !editor_.insert_utf8(text, length, false)) {
-        status_->text(editor_.error().c_str()); return;
+        status_->text(DiagnosticForDisplay(editor_.error().c_str()).c_str()); return;
     }
     canvas_changed();
 }
@@ -1721,7 +1722,7 @@ void ComposeWindow::canvas_changed() {
 }
 
 void ComposeWindow::canvas_status(const char *message) {
-    if (message && *message) status_->text(message);
+    if (message && *message) status_->text(DiagnosticForDisplay(message).c_str());
 }
 
 void ComposeWindow::save_result(const ComposeSaveToken &token, bool succeeded,
@@ -1731,7 +1732,7 @@ void ComposeWindow::save_result(const ComposeSaveToken &token, bool succeeded,
     const bool saved = save_gate_.complete(token, succeeded, snapshot, draft_, save_again, error);
     update_format_controls();
     if (!saved) {
-        status_->text(diagnostic && *diagnostic ? diagnostic : error.c_str());
+        status_->text(DiagnosticForDisplay(diagnostic && *diagnostic ? diagnostic : error.c_str()).c_str());
         close_after_save_ = false;
         application_close_after_save_ = false;
         send_after_save_ = false;
@@ -1789,7 +1790,7 @@ void ComposeWindow::copy_result(bool succeeded, WorkerDraftSnapshot *snapshot, c
     const Account &source, uint64_t source_id, uint64_t source_revision, const char *diagnostic) {
     copy_pending_ = false;
     if (!succeeded || !snapshot) {
-        status_->text(diagnostic && *diagnostic ? diagnostic : T("Draft copy failed; the original remains open."));
+        status_->text(DiagnosticForDisplay(diagnostic && *diagnostic ? diagnostic : T("Draft copy failed; the original remains open.")).c_str());
         set_interaction_enabled(true);
         if (!session_stale_ && save_gate_.dirty() && shown()) Fl::add_timeout(1.2, autosave_cb, this);
         return;
@@ -1828,7 +1829,7 @@ void ComposeWindow::queue_result(bool succeeded, const WorkerOperationResult *op
     const char *diagnostic, bool transmit) {
     queue_pending_ = false;
     if (!succeeded || !operation) {
-        status_->text(diagnostic && *diagnostic ? diagnostic : T("The finalized send operation could not be created."));
+        status_->text(DiagnosticForDisplay(diagnostic && *diagnostic ? diagnostic : T("The finalized send operation could not be created.")).c_str());
         send_after_save_ = false;
         set_interaction_enabled(true);
         return;
@@ -1867,7 +1868,7 @@ void ComposeWindow::send_result(bool succeeded, const WorkerOperationResult *ope
     send_in_progress_ = false;
     if (!operation) {
         archive_retry_available_ = false;
-        status_->text(diagnostic && *diagnostic ? diagnostic : T("SMTP submission failed."));
+        status_->text(DiagnosticForDisplay(diagnostic && *diagnostic ? diagnostic : T("SMTP submission failed.")).c_str());
         set_interaction_enabled(true);
         return;
     }
@@ -1892,11 +1893,11 @@ void ComposeWindow::send_result(bool succeeded, const WorkerOperationResult *ope
     case SendStage::Ready:
     case SendStage::Failed:
         archive_retry_available_ = false;
-        status_->text(diagnostic && *diagnostic ? diagnostic : T("SMTP did not accept this message. You may review the draft and retry explicitly."));
+        status_->text(DiagnosticForDisplay(diagnostic && *diagnostic ? diagnostic : T("SMTP did not accept this message. You may review the draft and retry explicitly.")).c_str());
         break;
     default:
-        status_->text(succeeded ? T("Send operation completed.") :
-            (diagnostic && *diagnostic ? diagnostic : T("Send operation needs attention.")));
+        status_->text(DiagnosticForDisplay(succeeded ? T("Send operation completed.") :
+            (diagnostic && *diagnostic ? diagnostic : T("Send operation needs attention."))).c_str());
         break;
     }
     set_interaction_enabled(true);
@@ -1906,7 +1907,7 @@ void ComposeWindow::archive_retry_result(bool succeeded, const WorkerOperationRe
     const char *diagnostic) {
     archive_retry_pending_ = false;
     if (!operation || !operation->operation_id || operation->operation_id != operation_id_) {
-        status_->text(diagnostic && *diagnostic ? diagnostic : T("Archive retry returned no matching operation."));
+        status_->text(DiagnosticForDisplay(diagnostic && *diagnostic ? diagnostic : T("Archive retry returned no matching operation.")).c_str());
         set_interaction_enabled(true);
         return;
     }
@@ -1917,11 +1918,11 @@ void ComposeWindow::archive_retry_result(bool succeeded, const WorkerOperationRe
             (operation->stage == SendStage::ArchiveFailed || operation->stage == SendStage::ArchivePending ||
              operation->stage == SendStage::Accepted)) {
         archive_retry_available_ = true;
-        status_->text(diagnostic && *diagnostic ? diagnostic : T("Archiving is still pending; SMTP was not retried."));
+        status_->text(DiagnosticForDisplay(diagnostic && *diagnostic ? diagnostic : T("Archiving is still pending; SMTP was not retried.")).c_str());
     } else {
         archive_retry_available_ = false;
-        status_->text(succeeded ? T("Archive retry completed without an archived result.") :
-            (diagnostic && *diagnostic ? diagnostic : T("Archive retry failed; SMTP was not retried.")));
+        status_->text(T(succeeded ? T("Archive retry completed without an archived result.") :
+            (diagnostic && *diagnostic ? diagnostic : T("Archive retry failed; SMTP was not retried."))));
     }
     set_interaction_enabled(true);
 }
@@ -1931,7 +1932,7 @@ void ComposeWindow::compose_catalog_result(bool succeeded, WorkerComposeCatalog 
     const char *diagnostic) {
     if (serial != compose_catalog_serial_) return;
     if (!succeeded || !catalog) {
-        status_->text(diagnostic && *diagnostic ? diagnostic : T("Compose catalog could not be loaded."));
+        status_->text(DiagnosticForDisplay(diagnostic && *diagnostic ? diagnostic : T("Compose catalog could not be loaded.")).c_str());
         return;
     }
     if (!owner_ || session_stale_ || owner_->coordinator_.profile_epoch() != profile_epoch_ ||
@@ -1943,7 +1944,7 @@ void ComposeWindow::compose_catalog_result(bool succeeded, WorkerComposeCatalog 
     Account current;
     Text error;
     if (!current_account(current, error) || current.id != account.id || current.generation != account.generation) {
-        status_->text(error.empty() ? T("The compose account changed before catalog results arrived.") : error.c_str());
+        status_->text(DiagnosticForDisplay(error.empty() ? T("The compose account changed before catalog results arrived.") : error.c_str()).c_str());
         return;
     }
     if (catalog->has_signature) {
@@ -1963,7 +1964,7 @@ void ComposeWindow::compose_catalog_result(bool succeeded, WorkerComposeCatalog 
         if (!catalog->selected_template_body.empty() &&
             !editor_.insert_utf8(catalog->selected_template_body.c_str(),
                 catalog->selected_template_body.size(), false)) {
-            status_->text(editor_.error().c_str());
+            status_->text(DiagnosticForDisplay(editor_.error().c_str()).c_str());
             return;
         }
         if (!catalog->selected_template_body.empty()) canvas_changed();
@@ -2155,7 +2156,7 @@ void ComposeWindow::action_cb(Fl_Widget *widget, void *data) {
     case Action::Cut:
         if (window->copy_selection(ComposeClipboardOperation::KeyboardCut)) {
             if (window->editor_.erase(false)) window->canvas_changed();
-            else window->status_->text(window->editor_.error().c_str());
+            else window->status_->text(DiagnosticForDisplay(window->editor_.error().c_str()).c_str());
         } else window->status_->text(T("Select text before cutting."));
         return;
     case Action::Paste:
@@ -2221,17 +2222,17 @@ void ComposeWindow::action_cb(Fl_Widget *widget, void *data) {
     case Action::Link: {
         const char *target = fl_input(T("Link target (http, https, or mailto)"), "https://");
         if (!target) return;
-        if (!window->editor_.set_link(target, strlen(target))) window->status_->text(window->editor_.error().c_str());
+        if (!window->editor_.set_link(target, strlen(target))) window->status_->text(DiagnosticForDisplay(window->editor_.error().c_str()).c_str());
         else window->canvas_changed();
         return;
     }
     case Action::Undo:
         if (window->editor_.undo()) window->canvas_changed();
-        else window->status_->text(window->editor_.error().c_str());
+        else window->status_->text(DiagnosticForDisplay(window->editor_.error().c_str()).c_str());
         return;
     case Action::Redo:
         if (window->editor_.redo()) window->canvas_changed();
-        else window->status_->text(window->editor_.error().c_str());
+        else window->status_->text(DiagnosticForDisplay(window->editor_.error().c_str()).c_str());
         return;
     case Action::Find: {
         const char *query = fl_input(T("Find text"), "");
@@ -2255,7 +2256,7 @@ void ComposeWindow::action_cb(Fl_Widget *widget, void *data) {
             window->rich_mode_->value(window->editor_.rich_format());
             return;
         }
-        if (!window->editor_.set_rich_format(rich)) window->status_->text(window->editor_.error().c_str());
+        if (!window->editor_.set_rich_format(rich)) window->status_->text(DiagnosticForDisplay(window->editor_.error().c_str()).c_str());
         else { window->changed(); window->update_format_controls(); }
         return;
     }
@@ -2286,7 +2287,7 @@ void ComposeWindow::action_cb(Fl_Widget *widget, void *data) {
             }
         }
         if (!window->editor_.insert_utf8(insertion.data(), insertion.size(), false)) {
-            window->status_->text(window->editor_.error().c_str()); return;
+            window->status_->text(DiagnosticForDisplay(window->editor_.error().c_str()).c_str()); return;
         }
         window->canvas_changed();
         window->status_->text(T("Signature inserted at the current caret."));

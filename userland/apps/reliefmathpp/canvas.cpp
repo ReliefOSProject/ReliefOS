@@ -5,8 +5,8 @@
 namespace rmp {
 Canvas::Canvas(int x, int y, int w, int h, MathWindow *owner, int tab)
     : Fl_Widget(x, y, w, h), owner_(owner), tab_(tab) {
-  tooltip(tab ? "拖动旋转；滚轮缩放；Home 重置"
-              : "拖动平移；滚轮缩放；几何工具拾点；Esc 取消");
+  tooltip(tab ? T("拖动旋转；滚轮缩放；Home 重置")
+              : T("拖动平移；滚轮缩放；几何工具拾点；Esc 取消"));
 }
 bool Canvas::prepare() {
   if (valid_ && frame_.width == w() && frame_.height == h())
@@ -41,7 +41,7 @@ void Canvas::draw() {
     }
   else {
     fl_color(FL_FOREGROUND_COLOR);
-    fl_draw("绘图内存不足，请减少对象或采样精度", x() + 20, y() + 30);
+    fl_draw(T("绘图内存不足，请减少对象或采样精度"), x() + 20, y() + 30);
   }
   fl_line_style(0);
   fl_color(FL_DARK3);

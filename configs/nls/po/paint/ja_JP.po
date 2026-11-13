@@ -1,0 +1,187 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"PO-Revision-Date: 2026-11-13 00:00+0000\n"
+"Last-Translator: ReliefOS NLS\n"
+"Language-Team: Japanese\n"
+"Language: ja_JP\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: userland/apps/fltk_support.h:48
+msgid "Add to Favorites"
+msgstr "お気に入りに追加"
+
+#: userland/apps/fltk_support.h:49
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: userland/apps/paint/main.cpp:171
+msgid "Brush"
+msgstr "ブラシ"
+
+#: userland/apps/fltk_support.h:44
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: userland/apps/fltk_support.h:45
+msgid "Close"
+msgstr "閉じる"
+
+#: userland/apps/paint/main.cpp:42
+msgid "Could not create canvas"
+msgstr "キャンバスを作成できませんでした"
+
+#: userland/apps/fltk_png_app.h:46
+msgid "Could not decode image"
+msgstr "画像をデコードできません"
+
+#: userland/apps/paint/main.cpp:69
+msgid "Could not open image"
+msgstr "画像を開けませんでした"
+
+#: userland/apps/paint/main.cpp:97
+msgid "Could not save image"
+msgstr "画像を保存できませんでした"
+
+#: userland/apps/fltk_support.h:57
+msgid "Create a new directory"
+msgstr "新しいフォルダーを作成"
+
+#: userland/apps/fltk_support.h:50
+msgid "Custom Filter"
+msgstr "カスタムフィルター"
+
+#: userland/apps/paint/main.cpp:51
+msgid "Discard"
+msgstr "破棄"
+
+#: userland/apps/paint/main.cpp:50
+msgid "Discard changes?"
+msgstr "変更を破棄しますか?"
+
+#: userland/apps/paint/main.cpp:171
+msgid "Eraser"
+msgstr "消しゴム"
+
+#: userland/apps/fltk_support.h:52
+msgid "Favorites"
+msgstr "お気に入り"
+
+#: userland/apps/fltk_support.h:54
+msgid "File Systems"
+msgstr "ファイルシステム"
+
+#: userland/apps/fltk_support.h:53
+msgid "File name:"
+msgstr "ファイル名:"
+
+#: userland/apps/paint/main.cpp:73
+msgid "Image opened"
+msgstr "画像を開きました"
+
+#: userland/apps/paint/main.cpp:99
+msgid "Image saved"
+msgstr "画像を保存しました"
+
+#: userland/apps/fltk_files.h:23
+msgid "Input is too long"
+msgstr "入力が長すぎます"
+
+#: userland/apps/paint/main.cpp:51
+msgid "Keep"
+msgstr "保持"
+
+#: userland/apps/fltk_support.h:55
+msgid "Manage Favorites"
+msgstr "お気に入りの管理"
+
+#: userland/apps/paint/main.cpp:152
+msgid "New"
+msgstr "新規作成"
+
+#: userland/apps/fltk_support.h:56
+msgid "New Directory?"
+msgstr "新しいフォルダーを作成しますか?"
+
+#: userland/apps/fltk_support.h:47
+msgid "No"
+msgstr "いいえ"
+
+#: userland/apps/fltk_support.h:43
+msgid "OK"
+msgstr "OK"
+
+#: userland/apps/paint/main.cpp:152
+msgid "Open"
+msgstr "開く"
+
+#: userland/apps/paint/main.cpp:162
+msgid "Open image"
+msgstr "画像を開く"
+
+#: userland/apps/paint/main.cpp:32
+msgid "Paint"
+msgstr "ペイント"
+
+#: userland/apps/paint/main.cpp:171
+msgid "Pencil"
+msgstr "鉛筆"
+
+#: userland/apps/fltk_support.h:51
+msgid "Please choose an existing file!"
+msgstr "既存のファイルを選択してください。"
+
+#: userland/apps/fltk_support.h:58
+msgid "Preview"
+msgstr "プレビュー"
+
+#: userland/apps/paint/main.cpp:187
+msgid "Ready"
+msgstr "準備完了"
+
+#: userland/apps/paint/main.cpp:106
+msgid "Replace existing file?"
+msgstr "既存のファイルを置き換えますか?"
+
+#: userland/apps/fltk_support.h:59
+msgid "Save"
+msgstr "保存"
+
+#: userland/apps/paint/main.cpp:152
+msgid "Save as"
+msgstr "名前を付けて保存"
+
+#: userland/apps/paint/main.cpp:113
+msgid "Save changes?"
+msgstr "変更を保存しますか?"
+
+#: userland/apps/paint/main.cpp:104
+msgid "Save image"
+msgstr "画像を保存"
+
+#: userland/apps/paint/main.cpp:114
+msgid "Save the current drawing before closing?"
+msgstr "閉じる前に現在の描画内容を保存しますか?"
+
+#: userland/apps/fltk_support.h:61
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+#: userland/apps/fltk_support.h:60
+msgid "Show:"
+msgstr "表示:"
+
+#: userland/apps/paint/main.cpp:51
+msgid "The current drawing has not been saved."
+msgstr "現在の描画内容は保存されていません。"
+
+#: userland/apps/paint/main.cpp:32
+msgid "Untitled"
+msgstr "無題"
+
+#: userland/apps/fltk_support.h:46
+msgid "Yes"
+msgstr "はい"

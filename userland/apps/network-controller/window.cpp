@@ -8,6 +8,82 @@
 #include <unistd.h>
 namespace nc {
 namespace {
+const char *localized_output(const char *message, Text &scratch) {
+  // Match only diagnostics emitted by this application; tool output is opaque.
+  static const char *const messages[] = {
+      "\nOperation canceled. Check service state before retrying.\n",
+      "\nOperation timed out. Check service state before retrying.\n",
+      "Cannot create command output pipe.\n",
+      "Cannot create network configuration directory",
+      "Cannot create network configuration temporary file",
+      "Cannot open network configuration directory",
+      "Cannot query network interfaces.\n",
+      "Cannot read network configuration",
+      "Cannot restore absent network profile",
+      "Cannot save network configuration",
+      "Cannot synchronize network configuration directory",
+      "Cannot synchronize restored network profile",
+      "Configuration changed outside this window. Reload it before saving.",
+      "Configuration replaced but directory synchronization failed",
+      "DHCP renewal requires DHCP mode.\n",
+      "Invalid Ethernet interface",
+      "Network Controller diagnostics\n\nAdapters (live ioctl and counters):\n",
+      "Network configuration is locked or unsafe",
+      "Network configuration saved. Apply it to update the running network.\n",
+      "No previous network configuration backup is available.",
+      "Not available.\n",
+      "Requested network information is absent or cannot be read.\n",
+      "The selected Ethernet interface is no longer present.\n",
+      "Unsafe configuration directory",
+      "Unsafe network configuration file",
+      "Invalid network profile.",
+      "Enter a usable static IPv4 address and prefix.",
+      "The gateway must be a different usable address in the same subnet.",
+      "Static mode requires custom or Cloudflare DNS.",
+      "Enter one to three IPv4 DNS servers.",
+      "Only custom DNS accepts server addresses.",
+      "Unsupported network profile version.",
+      "Invalid IPv4 address.",
+      "Invalid IPv4 prefix.",
+      "Invalid IPv4 gateway.",
+      "Invalid DNS policy.",
+      "Invalid DNS server.",
+      "Unknown network profile field.",
+      "Duplicate network profile field.",
+      "Incomplete network profile.",
+      "Invalid network request.",
+      "Invalid or unsupported network request.",
+      "This operation does not execute a command.",
+  };
+  for (const char *key : messages)
+    if (!strcmp(message, key))
+      return T(key);
+  static const char *const prefixes[] = {
+      "Cannot open network configuration directory",
+      "Unsafe configuration directory",
+      "Cannot read network configuration",
+      "Unsafe network configuration file",
+      "Cannot create network configuration temporary file",
+      "Cannot save network configuration",
+      "Configuration replaced but directory synchronization failed",
+      "Invalid Ethernet interface",
+      "Cannot create network configuration directory",
+      "Cannot synchronize network configuration directory",
+      "Network configuration is locked or unsafe",
+      "Cannot restore absent network profile",
+      "Cannot synchronize restored network profile",
+  };
+  for (const char *key : prefixes) {
+    const size_t size = strlen(key);
+    if (strncmp(message, key, size) || strncmp(message + size, ": ", 2))
+      continue;
+    if (!scratch.set(T(key)) || !append(scratch, message + size))
+      return message;
+    return scratch.c_str();
+  }
+  (void)scratch;
+  return message;
+}
 enum Purpose { Sample = 1, Load, Write, Mutation, Display, RestoreJob };
 double seconds() {
   struct timespec t{};
@@ -305,6 +381,7 @@ void App::next() {
 }
 void App::finish(int code) {
   unsigned purpose = current_.purpose;
+  const bool worker_error = code != 0;
   bool load_selection = false;
   if (!code && purpose == Sample) {
     Array<Interface> next;
@@ -388,6 +465,12 @@ void App::finish(int code) {
     original_.bytes = current_.request.a;
     dirty_ = false;
   }
+  if (worker_error && (purpose == Sample || purpose == Load) && !response_.empty()) {
+    Text translated;
+    log(localized_output(response_.c_str(), translated));
+    if (response_.c_str()[response_.size() - 1] != '\n')
+      log("\n");
+  }
   if (purpose != Sample && purpose != Load) {
     char b[128];
     snprintf(b, sizeof(b), "\n%s (%d)\n",
@@ -425,8 +508,10 @@ void App::pump() {
           session_.stop();
           status(T("Network response is too large."));
         }
-      } else
-        log(p.body.c_str());
+      } else {
+        Text translated;
+        log(localized_output(p.body.c_str(), translated));
+      }
     } else if (p.kind == Kind::Done)
       finish(atoi(p.body.c_str()));
   }

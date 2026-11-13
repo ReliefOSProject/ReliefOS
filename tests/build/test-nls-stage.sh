@@ -14,6 +14,8 @@ group=$(sed -n '/"reliefos-nls"/,/^[[:space:]]*}[[:space:]]*$/p' \
 [ -n "$group" ] || { printf 'FAIL - reliefos-nls group missing\n'; exit 1; }
 echo "$group" | grep -q '"destination": "reliefos"'
 echo "$group" | grep -q '"usr/share/locale/zh_CN"'
+echo "$group" | grep -q '"usr/share/locale/ja_JP"'
+echo "$group" | grep -q '"usr/share/musl/locales/ja_JP.UTF-8"'
 if echo "$group" | grep -q '"usr/share/locale"'; then
     printf 'FAIL - group claims the whole locale tree\n'
     exit 1

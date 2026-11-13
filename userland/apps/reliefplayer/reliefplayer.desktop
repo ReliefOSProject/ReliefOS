@@ -1,9 +1,12 @@
 [Desktop Entry]
 Type=Application
 Name=ReliefPlayer
+Name[ja]=ReliefPlayer
 GenericName=Media Player
+GenericName[ja]=メディアプレーヤー
 GenericName[zh_CN]=媒体播放器
 Comment=Play local MP3 and WAV audio and MP4 video
+Comment[ja]=ローカルの MP3・WAV 音声と MP4 動画を再生
 Comment[zh_CN]=播放本地 MP3、WAV 音频和 MP4 视频
 Exec=/usr/bin/reliefplayer %f
 TryExec=/usr/bin/reliefplayer

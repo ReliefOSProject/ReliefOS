@@ -1,10 +1,13 @@
 [Desktop Entry]
 Type=Application
 Name=OpenRC Controller
+Name[ja]=OpenRC コントローラー
 Name[zh_CN]=OpenRC 控制器
 GenericName=Service Manager
+GenericName[ja]=サービス管理
 GenericName[zh_CN]=服务与运行级别管理器
 Comment=Manage OpenRC services, runlevels, configuration and diagnostics
+Comment[ja]=OpenRC のサービス、ランレベル、設定、診断を管理
 Comment[zh_CN]=管理 OpenRC 服务、运行级别、配置与诊断
 Exec=/usr/bin/openrc-controller
 TryExec=/usr/bin/openrc-controller

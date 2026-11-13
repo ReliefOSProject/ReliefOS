@@ -5,6 +5,7 @@ src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
 w=$(mktemp -d); trap 'rm -rf "$w"' EXIT HUP INT TERM
 
 grep -qx 'zh_CN' "$src/configs/nls/LINGUAS"
+grep -qx 'ja_JP' "$src/configs/nls/LINGUAS"
 test -s "$src/configs/nls/DOMAINS"
 catalogs=0
 for domain in $(cat "$src/configs/nls/DOMAINS"); do
@@ -15,6 +16,14 @@ for domain in $(cat "$src/configs/nls/DOMAINS"); do
         mkdir -p "$directory"
         msgfmt -c --check --endianness=little -o "$directory/$domain.mo" "$po" >"$w/log" 2>&1
         test ! -s "$w/log"
+        if [ "$language" = ja_JP ]; then
+            msgcmp --no-fuzzy-matching "$po" "$src/configs/nls/po/$domain/$domain.pot"
+            msgattrib --untranslated --no-obsolete "$po" > "$w/untranslated.po"
+            if [ -s "$w/untranslated.po" ]; then
+                printf 'FAIL - %s has untranslated Japanese messages\n' "$domain" >&2
+                exit 1
+            fi
+        fi
         SOURCE_DATE_EPOCH=1000000 TZ=UTC+9 msgfmt -c --check --endianness=little \
             -o "$w/repeated.mo" "$po" >"$w/log" 2>&1
         test ! -s "$w/log"
@@ -30,6 +39,8 @@ done
 
 python3 - "$w" <<'PY'
 import gettext
+from pathlib import Path
+import re
 import sys
 
 fileman = gettext.translation("fileman", sys.argv[1], languages=["zh_CN"])
@@ -46,6 +57,27 @@ network = gettext.translation("network-controller", sys.argv[1], languages=["zh_
 assert excel.gettext("I/O error") == "输入输出错误"
 assert word.gettext("The file changed while it was being opened") == "文件在打开期间发生变化"
 assert network.gettext("Authenticating") == "正在验证身份"
+fileman_ja = gettext.translation("fileman", sys.argv[1], languages=["ja_JP"])
+taskmgr_ja = gettext.translation("taskmgr", sys.argv[1], languages=["ja_JP"])
+driverinfo_ja = gettext.translation("driverinfo", sys.argv[1], languages=["ja_JP"])
+assert fileman_ja.gettext("New Folder") == "新規フォルダ"
+assert taskmgr_ja.gettext("Processes") == "プロセス"
+assert fileman_ja.gettext("Cancel") == "キャンセル"
+assert taskmgr_ja.gettext("New Folder") == "New Folder"
+assert driverinfo_ja.gettext("Loaded") != "Loaded"
+format_argument = re.compile(
+    r'%(?:[1-9][0-9]*\$)?[-+#0]*(?:[0-9]+|\*(?:[1-9][0-9]*\$)?)?'
+    r'(?:\.(?:[0-9]+|\*(?:[1-9][0-9]*\$)?))?(?:hh|ll|[hljztL])?[diouxXfFeEgGaAcspn%m]'
+)
+for path in (Path(sys.argv[1]) / "ja_JP/LC_MESSAGES").glob("*.mo"):
+    with path.open("rb") as stream:
+        catalog = gettext.GNUTranslations(stream)
+    for message, translation in catalog._catalog.items():
+        if not message:
+            continue
+        assert format_argument.findall(message) == format_argument.findall(translation), (path, message)
+        assert message.count("\n") == translation.count("\n"), (path, message)
+        assert message.count("\t") == translation.count("\t"), (path, message)
 print("nls domains: independent translations and shared dialog labels passed")
 PY
 

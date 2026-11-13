@@ -1,3 +1,17 @@
+#include <libintl.h>
+#include <locale.h>
+#include <reliefos/layout.h>
+
+#define T(text) gettext(text)
+
+static void init_localization(void)
+{
+    setlocale(LC_ALL, "");
+    bindtextdomain("shell", RELIEFOS_LAYOUT_LOCALE);
+    bind_textdomain_codeset("shell", "UTF-8");
+    textdomain("shell");
+}
+
 #include <dirent.h>
 #include <errno.h>
 #include <reliefos/fs.h>
@@ -106,7 +120,7 @@ static void shell_list(const char *path)
     DIR *dir = opendir(target);
     struct dirent *entry;
     if (!dir) {
-        printf("ls: cannot open %s (%d)\n", target, errno);
+        printf(T("ls: cannot open %s (%d)\n"), target, errno);
         return;
     }
     while ((entry = readdir(dir)) != NULL) {
@@ -133,7 +147,7 @@ static void shell_list(const char *path)
             if (S_ISDIR(st.st_mode)) kind = "dir ";
             else if (S_ISCHR(st.st_mode)) kind = "dev ";
         }
-        printf("%s  %s\n", kind, entry->d_name);
+        printf(T("%s  %s\n"), kind, entry->d_name);
     }
     closedir(dir);
 }
@@ -144,19 +158,19 @@ static void shell_cat(const char *path)
     int fd;
     long got;
     if (!path || !path[0]) {
-        shell_line("cat: a file path is required");
+        shell_line(T("cat: a file path is required"));
         return;
     }
     fd = open(path, RELIEFOS_O_RDONLY, 0);
     if (fd < 0) {
-        printf("cat: cannot open %s (%d)\n", path, fd);
+        printf(T("cat: cannot open %s (%d)\n"), path, fd);
         return;
     }
     while ((got = read(fd, buffer, sizeof(buffer))) > 0) {
         write(1, buffer, (size_t)got);
     }
     if (got < 0) {
-        printf("cat: read failed (%d)\n", (int)got);
+        printf(T("cat: read failed (%d)\n"), (int)got);
     }
     close(fd);
     shell_write("\n");
@@ -177,10 +191,10 @@ static void shell_start(char *argv[])
 {
     int pid = reliefos_launch_argv(argv);
     if (pid >= 0) {
-        printf("started %s (pid %d)\n", argv[0], pid);
+        printf(T("started %s (pid %d)\n"), argv[0], pid);
         return;
     }
-    printf("unable to start %s: %s\n", argv[0], reliefos_launch_error_text(pid));
+    printf(T("unable to start %s: %s\n"), argv[0], T(reliefos_launch_error_text(pid)));
 }
 
 static int shell_dispatch(char *line)
@@ -191,15 +205,15 @@ static int shell_dispatch(char *line)
         return 0;
     }
     if (argc == -1) {
-        shell_line("shell: unmatched quote");
+        shell_line(T("shell: unmatched quote"));
         return 0;
     }
     if (argc < 0) {
-        shell_line("shell: too many arguments");
+        shell_line(T("shell: too many arguments"));
         return 0;
     }
     if (shell_same(argv[0], "help")) {
-        shell_line("Built-ins: help clear pwd cd ls cat echo run exit");
+        shell_line(T("Built-ins: help clear pwd cd ls cat echo run exit"));
     } else if (shell_same(argv[0], "clear")) {
         shell_write("\x1b[2J\x1b[H");
     } else if (shell_same(argv[0], "pwd")) {
@@ -210,7 +224,7 @@ static int shell_dispatch(char *line)
     } else if (shell_same(argv[0], "cd")) {
         int result = chdir(argc > 1 ? argv[1] : "/");
         if (result < 0) {
-            printf("cd: %s (%d)\n", argc > 1 ? argv[1] : "/", result);
+            printf(T("cd: %s (%d)\n"), argc > 1 ? argv[1] : "/", result);
         }
     } else if (shell_same(argv[0], "ls")) {
         shell_list(argc > 1 ? argv[1] : ".");
@@ -220,12 +234,12 @@ static int shell_dispatch(char *line)
         shell_echo(argv);
     } else if (shell_same(argv[0], "run")) {
         if (argc < 2) {
-            shell_line("run: an application path is required");
+            shell_line(T("run: an application path is required"));
         } else {
             shell_start(&argv[1]);
         }
     } else if (shell_same(argv[0], "exit")) {
-        shell_line("closing shell");
+        shell_line(T("closing shell"));
         return 1;
     } else {
         shell_start(argv);
@@ -235,6 +249,7 @@ static int shell_dispatch(char *line)
 
 int main(int argc, char **argv, char **envp)
 {
+    init_localization();
     char line[SHELL_LINE_CAP];
     uint32_t length = 0;
     char input;
@@ -242,8 +257,8 @@ int main(int argc, char **argv, char **envp)
     if (argc > 1 && argv[1] && argv[1][0]) {
         (void)chdir(argv[1]);
     }
-    shell_line("ReliefOS command shell 2");
-    shell_line("Type help to see available commands.");
+    shell_line(T("ReliefOS command shell 2"));
+    shell_line(T("Type help to see available commands."));
     if (argc > 2 && argv[2] && argv[2][0]) {
         char startup[SHELL_LINE_CAP];
         uint32_t index = 0;

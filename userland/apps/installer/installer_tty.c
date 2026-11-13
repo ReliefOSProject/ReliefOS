@@ -64,13 +64,13 @@ static int tty_secret(const char *prompt, char *buffer, uint32_t capacity)
 static int tty_setup(struct installer_setup *setup)
 {
     for (;;) {
-        if (!tty_read_line("Username: ", setup->username, sizeof(setup->username)) ||
-            !tty_secret("Password: ", setup->password, sizeof(setup->password)) ||
-            !tty_secret("Confirm password: ", setup->password_confirm, sizeof(setup->password_confirm)) ||
-            !tty_secret("root password: ", setup->root_password, sizeof(setup->root_password)) ||
-            !tty_secret("Confirm root password: ", setup->root_password_confirm, sizeof(setup->root_password_confirm))) return 0;
+        if (!tty_read_line(T("Username: "), setup->username, sizeof(setup->username)) ||
+            !tty_secret(T("Password: "), setup->password, sizeof(setup->password)) ||
+            !tty_secret(T("Confirm password: "), setup->password_confirm, sizeof(setup->password_confirm)) ||
+            !tty_secret(T("root password: "), setup->root_password, sizeof(setup->root_password)) ||
+            !tty_secret(T("Confirm root password: "), setup->root_password_confirm, sizeof(setup->root_password_confirm))) return 0;
         if (installer_setup_valid(setup)) return 1;
-        puts("Check username and matching passwords (1-32 characters, no spaces).");
+        puts(T("Check username and matching passwords (1-32 characters, no spaces)."));
     }
 }
 
@@ -103,10 +103,10 @@ static int tty_install_xorg(struct installer_setup *setup)
     if (!setup) return 0;
     for (;;) {
         errno = 0;
-        if (!tty_read_line("Install Xorg desktop environment? [Y/n]: ",
+        if (!tty_read_line(T("Install Xorg desktop environment? [Y/n]: "),
                            input, sizeof(input))) {
             if (errno == EOVERFLOW) {
-                puts("Please answer yes or no.");
+                puts(T("Please answer yes or no."));
                 continue;
             }
             return 0;
@@ -119,7 +119,7 @@ static int tty_install_xorg(struct installer_setup *setup)
             setup->skip_xorg = 1;
             return 1;
         }
-        puts("Please answer yes or no.");
+        puts(T("Please answer yes or no."));
     }
 }
 
@@ -190,7 +190,7 @@ static int tty_bootloaders(struct installer_setup *setup)
 static void tty_print_disks(const struct installer_tty_context *context)
 {
     char line[160];
-    puts("\nAvailable disks:");
+    puts(T("\nAvailable disks:"));
     for (uint32_t i = 0; i < *context->disk_count; ++i) {
         context->format_disk_line(line, sizeof(line), &context->disks[i]);
         printf("  [%u] %s\n", i, line);
@@ -205,7 +205,7 @@ static int tty_choose_disk(const struct installer_tty_context *context)
     unsigned long value;
     for (;;) {
         tty_print_disks(context);
-        if (!tty_read_line("Select disk number (r to refresh, q to quit): ",
+        if (!tty_read_line(T("Select disk number (r to refresh, q to quit): "),
                            input, sizeof(input))) {
             return 0;
         }
@@ -221,10 +221,10 @@ static int tty_choose_disk(const struct installer_tty_context *context)
             *context->selected_disk = (int32_t)value;
             context->format_disk_line(line, sizeof(line),
                                       &context->disks[*context->selected_disk]);
-            printf("Selected: %s\n", line);
+            printf(T("Selected: %s\n"), line);
             return 1;
         }
-        puts("Invalid disk selection.");
+        puts(T("Invalid disk selection."));
     }
 }
 
@@ -241,7 +241,7 @@ static int tty_fs(const char *name)
 static void tty_print_partitions(const struct installer_tty_context *context)
 {
     char line[256];
-    puts("\nPartitions:");
+    puts(T("\nPartitions:"));
     for (uint32_t i = 0; i < *context->partition_count; ++i) {
         context->format_partition_line(line, sizeof(line), &context->partitions[i]);
         printf("  [%u] %s\n", i, line);
@@ -255,10 +255,10 @@ static int tty_partition_menu(const struct installer_tty_context *context)
     char *end;
     for (;;) {
         tty_print_partitions(context);
-        puts("Commands: auto, init, create SIZE FS NAME, resize SIZE, rename NAME,");
-        puts("format FS LABEL, format-esp yes|no, bios, esp, root, data, delete, refresh, done. FS raw creates an unformatted partition.");
-        printf("ESP: %s\n", context->setup->format_esp ? "format (erase EFI files)" : "preserve existing FAT32 files");
-        if (!tty_read_line("partition> ", input, sizeof(input))) return 0;
+        puts(T("Commands: auto, init, create SIZE FS NAME, resize SIZE, rename NAME,"));
+        puts(T("format FS LABEL, format-esp yes|no, bios, esp, root, data, delete, refresh, done. FS raw creates an unformatted partition."));
+        printf("ESP: %s\n", context->setup->format_esp ? T("format (erase EFI files)") : T("preserve existing FAT32 files"));
+        if (!tty_read_line(T("partition> "), input, sizeof(input))) return 0;
         if (tty_line_is(input, "format-esp yes")) {
             context->setup->format_esp = 1;
             continue;
@@ -275,9 +275,9 @@ static int tty_partition_menu(const struct installer_tty_context *context)
             continue;
         }
         if (tty_line_is(input, "auto")) {
-            if (context->partition_auto_layout() < 0) puts("Automatic layout failed.");
+            if (context->partition_auto_layout() < 0) puts(T("Automatic layout failed."));
         } else if (tty_line_is(input, "init")) {
-            if (context->partition_initialize() < 0) puts("GPT initialization failed.");
+            if (context->partition_initialize() < 0) puts(T("GPT initialization failed."));
         } else if (tty_line_is(input, "refresh")) {
             context->refresh_partitions();
         } else if (!strncmp(input, "create ", 7) &&
@@ -286,21 +286,21 @@ static int tty_partition_menu(const struct installer_tty_context *context)
             if (value > 0xffffffffUL || (filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN && strcmp(fs_name, "raw")) ||
                 context->partition_create((uint32_t)filesystem, (uint32_t)value,
                                           partition_name) < 0)
-                puts("Create failed.");
+                puts(T("Create failed."));
         } else if (!strncmp(input, "resize ", 7) &&
                    sscanf(input + 7, "%lu", &value) == 1) {
             if (value > 0xffffffffUL || context->partition_resize((uint32_t)value) < 0)
-                puts("Resize failed.");
+                puts(T("Resize failed."));
         } else if (!strncmp(input, "rename ", 7)) {
-            if (context->partition_rename(input + 7) < 0) puts("Rename failed.");
+            if (context->partition_rename(input + 7) < 0) puts(T("Rename failed."));
         } else if (!strncmp(input, "format ", 7) &&
                    sscanf(input + 7, "%15s %79s", fs_name, label) == 2) {
             int filesystem = tty_fs(fs_name);
             if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN ||
                 context->partition_format((uint32_t)filesystem, label) < 0)
-                puts("Format failed.");
+                puts(T("Format failed."));
         } else if (tty_line_is(input, "delete")) {
-            if (context->partition_delete() < 0) puts("Delete failed.");
+            if (context->partition_delete() < 0) puts(T("Delete failed."));
         } else if (tty_line_is(input, "esp") || tty_line_is(input, "root") ||
                    tty_line_is(input, "data") || tty_line_is(input, "bios")) {
             uint32_t type = tty_line_is(input, "esp") ? RELIEFOS_BLOCK_GPT_ESP :
@@ -310,13 +310,13 @@ static int tty_partition_menu(const struct installer_tty_context *context)
             if (*context->selected_partition < 0 ||
                 (uint32_t)*context->selected_partition >= *context->partition_count ||
                 context->partition_set_type(type) < 0) {
-                puts("Select a partition number first.");
+                puts(T("Select a partition number first."));
             }
         } else {
             value = strtoul(input, &end, 10);
             if (end != input && *end == 0 && value < *context->partition_count)
                 *context->selected_partition = (int32_t)value;
-            else puts("Unknown partition command.");
+            else puts(T("Unknown partition command."));
         }
         context->refresh_partitions();
     }
@@ -346,11 +346,11 @@ int installer_tty_main(const struct installer_tty_context *context)
         return 1;
     }
 
-    puts("ReliefOS installer (TTY)");
-    puts("This installer uses the same disk formatter and payload as the graphical installer.");
-    puts("Fresh install defaults to automatic partitioning; manual GPT editing is available.");
+    puts(T("ReliefOS installer (TTY)"));
+    puts(T("This installer uses the same disk formatter and payload as the graphical installer."));
+    puts(T("Fresh install defaults to automatic partitioning; manual GPT editing is available."));
     for (;;) {
-        if (!tty_read_line("Mode [install/update]: ", input, sizeof(input))) {
+        if (!tty_read_line(T("Mode [install/update]: "), input, sizeof(input))) {
             return 1;
         }
         if (tty_line_is(input, "install") || tty_line_is(input, "i")) {
@@ -361,12 +361,12 @@ int installer_tty_main(const struct installer_tty_context *context)
             *context->install_mode = INSTALLER_TTY_MODE_UPDATE;
             break;
         }
-        puts("Enter install or update.");
+        puts(T("Enter install or update."));
     }
 
     context->refresh_disks();
     if (!*context->disk_count || !tty_choose_disk(context)) {
-        puts("No disk selected. Installation cancelled.");
+        puts(T("No disk selected. Installation cancelled."));
         return 1;
     }
 
@@ -406,7 +406,7 @@ int installer_tty_main(const struct installer_tty_context *context)
         if (!tty_bootloaders(context->setup)) return 1;
         if (!tty_read_line(T("Proceed with system update? [y/N]: "), input, sizeof(input)) ||
             (!tty_line_is(input, "y") && !tty_line_is(input, "Y") && !tty_line_is(input, "yes"))) {
-            puts("Update not confirmed. Installation cancelled.");
+            puts(T("Update not confirmed. Installation cancelled."));
             return 1;
         }
         error = installer_update_apply(&inspected,
@@ -420,24 +420,24 @@ int installer_tty_main(const struct installer_tty_context *context)
         if (!tty_bootloaders(context->setup)) return 1;
         context->refresh_partitions();
         if (!tty_partition_menu(context)) {
-            puts("Partition setup cancelled.");
+            puts(T("Partition setup cancelled."));
             return 1;
         }
         if (!tty_setup(context->setup)) {
-            puts("Account setup cancelled or input exceeds the transport buffer.");
+            puts(T("Account setup cancelled or input exceeds the transport buffer."));
             return 1;
         }
         if (!tty_install_xorg(context->setup)) {
-            puts("Desktop selection cancelled.");
+            puts(T("Desktop selection cancelled."));
             return 1;
         }
         if (!installer_tty_select_swap(context->setup)) return 1;
         puts(*context->partition_auto ? T("Automatic installation erases the selected disk.") :
              context->setup->format_esp ? T("The selected root and ESP will be formatted.") :
              T("Only the selected root is formatted; existing ESP files are preserved."));
-        if (!tty_read_line("Type INSTALL to confirm the partition layout and installation: ",
+        if (!tty_read_line(T("Type INSTALL to confirm the partition layout and installation: "),
                            input, sizeof(input)) || !tty_line_is(input, "INSTALL")) {
-            puts("Installation not confirmed. Installation cancelled.");
+            puts(T("Installation not confirmed. Installation cancelled."));
             return 1;
         }
         context->perform_install();
@@ -450,24 +450,24 @@ int installer_tty_main(const struct installer_tty_context *context)
     if (!*context->install_success) {
         return 1;
     }
-    if (tty_read_line("Reboot now? [Y/n]: ", input, sizeof(input)) &&
+    if (tty_read_line(T("Reboot now? [Y/n]: "), input, sizeof(input)) &&
         input[0] != 'n' && input[0] != 'N') {
-        if (reliefos_system_reboot() < 0) perror("Restart failed");
+        if (reliefos_system_reboot() < 0) perror(T("Restart failed"));
     }
 
-    puts("Installation finished.");
+    puts(T("Installation finished."));
     for (;;) {
-        if (!tty_read_line("Command [reboot/shutdown/exit]: ", input, sizeof(input))) {
+        if (!tty_read_line(T("Command [reboot/shutdown/exit]: "), input, sizeof(input))) {
             return 0;
         }
         if (tty_line_is(input, "reboot") || tty_line_is(input, "r")) {
-            if (reliefos_system_reboot() < 0) perror("Restart failed");
+            if (reliefos_system_reboot() < 0) perror(T("Restart failed"));
         } else if (tty_line_is(input, "shutdown") || tty_line_is(input, "poweroff")) {
-            if (reliefos_system_shutdown() < 0) perror("Shutdown failed");
+            if (reliefos_system_shutdown() < 0) perror(T("Shutdown failed"));
         } else if (tty_line_is(input, "exit") || tty_line_is(input, "q")) {
             return 0;
         } else {
-            puts("Unknown command. Use reboot, shutdown, or exit.");
+            puts(T("Unknown command. Use reboot, shutdown, or exit."));
         }
     }
 }

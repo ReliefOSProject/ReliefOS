@@ -4,7 +4,7 @@ ReliefSettings
 
 ReliefSettings 是 C++/FLTK 系统设置中心，可从 IceWM 的设置菜单或
 ``reliefsettings`` 命令启动。应用使用独立的 ``reliefsettings`` gettext
-翻译域，随系统提供中文资源。
+翻译域，随系统提供中文和日语资源。语言列表提供 English、中文与日本語。
 
 语言、显示与键盘
 ================

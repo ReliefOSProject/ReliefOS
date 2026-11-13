@@ -1,3 +1,20 @@
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+#include <libintl.h>
+#include <locale.h>
+#include <reliefos/layout.h>
+
+#define T(text) gettext(text)
+
+static void init_localization(void)
+{
+    setlocale(LC_ALL, "");
+    bindtextdomain("snake", RELIEFOS_LAYOUT_LOCALE);
+    bind_textdomain_codeset("snake", "UTF-8");
+    textdomain("snake");
+}
+
 #include <fcntl.h>
 #include <poll.h>
 #include <stdint.h>
@@ -6,6 +23,7 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
+#include <wchar.h>
 
 #define SNAKE_MAX_WIDTH 32U
 #define SNAKE_MAX_HEIGHT 18U
@@ -304,7 +322,7 @@ static void save_high_score(unsigned score)
 static void render(const struct snake_game *game)
 {
     char output[4096];
-    char line[128];
+    char line[512];
     size_t output_length = 0;
     unsigned x;
     unsigned y;
@@ -312,14 +330,32 @@ static void render(const struct snake_game *game)
     memcpy(output, "\033[H\033[2J", 7);
     output_length = 7;
     length = snprintf(line, sizeof(line),
-                      "Snake  Score: %u  High score: %u  %s\n",
+                      T("Snake  Score: %u  High score: %u  %s\n"),
                       game->score, game->high_score,
-                      game->game_over ? "GAME OVER - R restart, Q quit" :
-                      game->paused ? "PAUSED - P or Space to resume" :
-                                     "Arrows/WASD move, P pause, Q quit");
+                      game->game_over ? T("GAME OVER - R restart, Q quit") :
+                      game->paused ? T("PAUSED - P or Space to resume") :
+                                     T("Arrows/WASD move, P pause, Q quit"));
     if (length > 0) {
-        memcpy(output + output_length, line, (size_t)length);
-        output_length += (size_t)length;
+        struct winsize size = {0};
+        unsigned columns = 80;
+        if (tcgetwinsize(STDOUT_FILENO, &size) == 0 && size.ws_col > 1)
+            columns = size.ws_col;
+        size_t available = (size_t)length < sizeof(line) ? (size_t)length : sizeof(line) - 1U;
+        size_t offset = 0, cells = 0;
+        mbstate_t state = {0};
+        while (offset < available && line[offset] != '\n') {
+            wchar_t wc;
+            size_t bytes = mbrtowc(&wc, line + offset, available - offset, &state);
+            if (bytes == (size_t)-1 || bytes == (size_t)-2 || bytes == 0) break;
+            int width = wcwidth(wc);
+            if (width < 0) width = 1;
+            if (cells + (size_t)width >= columns || output_length + bytes + 1U >= sizeof(output)) break;
+            memcpy(output + output_length, line + offset, bytes);
+            output_length += bytes;
+            offset += bytes;
+            cells += (size_t)width;
+        }
+        output[output_length++] = '\n';
     }
     for (x = 0; x < game->width + 2U; ++x) {
         output[output_length++] = '#';
@@ -490,6 +526,7 @@ static unsigned long current_tick_ms(const struct snake_game *game)
 
 int main(void)
 {
+    init_localization();
     struct snake_game game;
     unsigned running = 1;
     unsigned width;
@@ -505,7 +542,7 @@ int main(void)
     game.high_score = load_high_score();
     reset_game(&game);
     if (setup_terminal() != 0) {
-        puts("snake requires an interactive terminal");
+        puts(T("snake requires an interactive terminal"));
         return 1;
     }
     while (running) {

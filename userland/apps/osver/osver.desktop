@@ -1,6 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=System information
+Name[ja]=システム情報
 Name[zh_CN]=系统信息
 Exec=/usr/bin/osver
 TryExec=/usr/bin/osver

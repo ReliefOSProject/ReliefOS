@@ -62,7 +62,7 @@ msgstr "已清除全部筛选"
 msgid "All projects"
 msgstr "全部项目"
 
-#: configs/nls/messages/relieftodo.c:10
+#: userland/apps/relieftodo/window.cpp:108
 msgid "All tasks"
 msgstr "全部任务"
 
@@ -70,7 +70,7 @@ msgstr "全部任务"
 msgid "Apply changes"
 msgstr "应用更改"
 
-#: userland/apps/fltk_support.h:44
+#: userland/apps/relieftodo/actions.cpp:21
 msgid "Cancel"
 msgstr "取消"
 
@@ -142,7 +142,7 @@ msgstr "放弃"
 msgid "Done"
 msgstr "已完成"
 
-#: configs/nls/messages/relieftodo.c:18
+#: userland/apps/relieftodo/window.cpp:43
 msgid "Due date"
 msgstr "截止日期"
 
@@ -215,7 +215,7 @@ msgstr "文件已保存，但内存不足，无法记录保存状态"
 msgid "Filters"
 msgstr "筛选"
 
-#: configs/nls/messages/relieftodo.c:8
+#: userland/apps/relieftodo/window.cpp:173
 msgid "High"
 msgstr "高"
 
@@ -239,7 +239,7 @@ msgstr "任务清单标题无效"
 msgid "Learn"
 msgstr "入门"
 
-#: configs/nls/messages/relieftodo.c:6
+#: userland/apps/relieftodo/window.cpp:174
 msgid "Low"
 msgstr "低"
 
@@ -247,7 +247,7 @@ msgstr "低"
 msgid "Manage Favorites"
 msgstr "管理收藏夹"
 
-#: configs/nls/messages/relieftodo.c:16
+#: userland/apps/relieftodo/window.cpp:168
 msgid "Manual order"
 msgstr "手工顺序"
 
@@ -295,7 +295,7 @@ msgstr "否"
 msgid "No date"
 msgstr "无日期"
 
-#: configs/nls/messages/relieftodo.c:7
+#: userland/apps/relieftodo/window.cpp:174
 msgid "Normal"
 msgstr "普通"
 
@@ -359,7 +359,7 @@ msgstr "请等待文件操作完成"
 msgid "Preview"
 msgstr "预览"
 
-#: configs/nls/messages/relieftodo.c:17
+#: userland/apps/relieftodo/window.cpp:43
 msgid "Priority"
 msgstr "优先级"
 
@@ -447,7 +447,7 @@ msgstr "恢复待办"
 msgid "Revert changes"
 msgstr "还原修改"
 
-#: userland/apps/fltk_support.h:59
+#: userland/apps/relieftodo/actions.cpp:21
 msgid "Save"
 msgstr "保存"
 
@@ -586,7 +586,7 @@ msgstr "任务清单标题："
 msgid "Task statistics"
 msgstr "任务统计"
 
-#: configs/nls/messages/relieftodo.c:20
+#: userland/apps/relieftodo/window.cpp:43
 msgid "Task title"
 msgstr "任务标题"
 
@@ -614,7 +614,7 @@ msgstr "目标文件已存在，是否替换？"
 msgid "To do"
 msgstr "待办"
 
-#: configs/nls/messages/relieftodo.c:11
+#: userland/apps/relieftodo/window.cpp:124
 msgid "Today"
 msgstr "今天"
 
@@ -646,7 +646,7 @@ msgstr "未命名任务清单"
 msgid "Upcoming"
 msgstr "即将到期"
 
-#: configs/nls/messages/relieftodo.c:9
+#: userland/apps/relieftodo/window.cpp:173
 msgid "Urgent"
 msgstr "紧急"
 
@@ -665,3 +665,323 @@ msgstr "当前任务"
 #: userland/apps/fltk_support.h:46
 msgid "Yes"
 msgstr "是"
+
+#: configs/nls/messages/relieftodo.c:25
+msgid "不是有效的 ReliefTodo 文档，或文档已截断"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:26
+msgid "不能创建临时文件"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:27
+msgid "不能创建工作进程管道"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:28
+msgid "不能取得保存锁"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:29
+msgid "不能启动文件工作进程"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:30
+msgid "不能打开保存锁文件"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:31
+msgid "不能打开文件"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:32
+msgid "不能打开父目录（不支持符号链接）"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:33
+msgid "不能核对导出目录"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:34
+msgid "不能检查保存目标"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:35
+msgid "不能检查保存锁文件"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:36
+msgid "不能设置非阻塞管道"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:37
+msgid "不能读取文件信息"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:231
+msgid "个人"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:39
+msgid "任务内容、日期或任务编号无效"
+msgstr ""
+
+#: userland/apps/relieftodo/document.cpp:113
+msgid "任务清单"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:41
+msgid "优先级："
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:234
+msgid "会议"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:43
+msgid "低"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:236
+msgid "体验 ReliefTodo 的任务工具"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:45
+msgid "保存冲突：磁盘文件已更改，请另存为"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:46
+msgid "保存锁必须是当前用户拥有的普通文件，且不能有其他硬链接"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:231
+msgid "先确定优先级，再把工作拆成可以完成的小步骤。\n\n提示：在右侧编辑详情，点击“应用修改”；选择多行可批量完成。"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:236
+msgid "入门"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:49
+msgid "关闭临时文件失败"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:50
+msgid "内存不足"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:51
+msgid "写入或同步失败"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:234
+msgid "准备每周例会提纲"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:53
+msgid "另一个文档窗口正在保存此目录，请稍后重试"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:54
+msgid "只支持不超过 16 MiB 的普通文件"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:233
+msgid "复查"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:233
+msgid "复查上一轮待办事项"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:57
+msgid "导出内容超出限制或内存不足"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:58
+msgid "导出目标是当前文档，请选择其他文件"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:234
+msgid "工作"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:60
+msgid "工作进程响应过大或内存不足"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:61
+msgid "工作进程读取失败"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:62
+msgid "已完成"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:63
+msgid "待办"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:230
+msgid "我的任务清单"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:65
+msgid "截止日期："
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:232
+msgid "整理 ReliefOS 项目文档"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:234
+msgid "整理本周进展、问题与下周计划。"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:68
+msgid "文件在读取过程中被其他程序修改，请重试"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:69
+msgid "文件工作进程响应无效"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:70
+msgid "文件工作进程意外退出，原文档仍保留在窗口中"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:71
+msgid "文件已截断"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:72
+msgid "文件已替换，但目录同步失败；请重新打开核对后再保存"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:73
+msgid "文件已被其他程序修改；请重新打开或另存为，避免覆盖"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:74
+msgid "文件操作正在进行"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:75
+msgid "文件超出 16 MiB 限制"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:76
+msgid "文件路径不能包含上级目录"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:77
+msgid "文件路径为空或过长"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:232
+msgid "文档,开发"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:79
+msgid "文档中存在重复的任务编号"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:80
+msgid "文档信息无效或任务数量超出限制"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:81
+msgid "文档版本不支持、内容损坏或超出限制"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:82
+msgid "文档超出 16 MiB 限制"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:83
+msgid "文档超出大小限制或内存不足"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:84
+msgid "无效的文件路径"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:85
+msgid "无法分配临时文件"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:86
+msgid "普通"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:87
+msgid "替换文件失败"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:88
+msgid "标签："
+msgstr ""
+
+#: userland/apps/relieftodo/document.cpp:102
+msgid "标题,状态,优先级,截止日期,项目,标签,备注\r\n"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:232
+msgid "梳理待办事项，补充操作说明和验收记录。"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:233
+msgid "检查未完成的工作，调整截止日期。"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:92
+msgid "此文件名由文档保存锁保留，请选择其他文件名"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:235
+msgid "每天给阅读留出一点时间。"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:94
+msgid "目标文件已被锁定或属于保存锁，请重试或选择其他文件名"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:95
+msgid "紧急"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:231
+msgid "规划今天的三件重要任务"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:231
+msgid "计划,今日"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:236
+msgid "试试搜索、日期筛选、项目和标签。"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:99
+msgid "请选择一个文件名"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:100
+msgid "读取失败"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:235
+msgid "阅读"
+msgstr ""
+
+#: userland/apps/relieftodo/model.cpp:235
+msgid "阅读一本喜欢的书"
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:103
+msgid "项目："
+msgstr ""
+
+#: configs/nls/messages/relieftodo.c:104
+msgid "高"
+msgstr ""
