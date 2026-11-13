@@ -2,6 +2,7 @@
 #include "search.h"
 #include "selection.h"
 #include "watch.h"
+#include "volume_ui.h"
 
 extern "C" {
 #include <reliefos/launch_result.h>
@@ -46,6 +47,7 @@ Fl_Window *main_window;
 Fl_Menu_Bar *menu_bar;
 Fl_Input *address;
 Fl_Hold_Browser *folders;
+fm::VolumePanel *volume_panel;
 Fl_Multi_Browser *files;
 Fl_Output *status_output;
 Fl_Output *operation_output;
@@ -84,6 +86,53 @@ void menu_action(Fl_Widget *, void *data);
 void show_search();
 void layout_main();
 void watch_timeout(void *);
+void stop_directory_watch();
+void retry_directory_watch();
+
+void volume_status(const char *message)
+{
+    set_status(message);
+    update_status();
+}
+
+bool volume_open(const char *path)
+{
+    bool opened = navigate_to_path(path) >= 0;
+    if (!opened) set_status(T("Could not open the requested path"));
+    refresh_ui();
+    return opened;
+}
+
+void volume_leave(const fm::Volume &volume)
+{
+    struct stat current{};
+    bool known = stat(".", &current) == 0;
+    if (!fm::path_under(current_path, volume.mount.c_str()) &&
+        (!known || current.st_dev != volume.device)) return;
+    stop_directory_watch();
+    const char *destination = home_path[0] ? home_path : "/";
+    struct stat home{};
+    if (stat(destination, &home) < 0 || home.st_dev == volume.device) destination = "/";
+    if (navigate_to_path(destination) < 0) (void)navigate_to_path("/");
+    retry_directory_watch();
+    refresh_ui();
+}
+
+bool volume_ready()
+{
+    return !ui_activity_depth && !fileman_operation_active;
+}
+
+void close_main(Fl_Widget *widget, void *)
+{
+    if (volume_panel && volume_panel->acting()) {
+        set_status(T("Wait for the device operation to finish before closing this window."));
+        update_status();
+        return;
+    }
+    if (volume_panel) volume_panel->stop();
+    widget->hide();
+}
 
 void schedule_watch_refresh()
 {
@@ -1168,7 +1217,9 @@ void address_callback_wrapper(Fl_Widget *, void *) { address_callback(NULL, NULL
 
 void reap_children(void *)
 {
-    while (waitpid(-1, NULL, WNOHANG) > 0) {}
+    // The volume process owner must collect its own exit status and pipe EOF.
+    if (!volume_panel || !volume_panel->busy())
+        while (waitpid(-1, NULL, WNOHANG) > 0) {}
     Fl::repeat_timeout(1.0, reap_children);
 }
 
@@ -1197,7 +1248,8 @@ void layout_main()
     refresh_button->resize(w - 104, 36, 92, 30);
     int list_width = w - 224;
     int list_height = h - 182;
-    folders->resize(12, 136, 190, list_height);
+    folders->resize(12, 136, 190, list_height - 174);
+    if (volume_panel) volume_panel->resize(12, 136 + list_height - 166, 190, 166);
     files->resize(212, 136, list_width, list_height);
     // Reserve a native column for the type, while giving filenames all
     // remaining width. Column storage must outlive the FLTK browser.
@@ -1218,6 +1270,7 @@ void build_ui(int argc, char **argv)
     (void)argc;
     main_window = new FilemanWindow(960, 600, T("File Manager"));
     main_window->size_range(800, 480);
+    main_window->callback(close_main);
     menu_bar = new Fl_Menu_Bar(0, 0, 960, 28);
     add_menu_action(T("File"), T("Open"), FILEMAN_ACTION_OPEN);
     add_menu_action(T("File"), T("Open With..."), FILEMAN_ACTION_OPEN_WITH);
@@ -1297,6 +1350,8 @@ void build_ui(int argc, char **argv)
     folders->when(FL_WHEN_CHANGED | FL_WHEN_ENTER_KEY);
     folders->callback(tree_callback);
     folders->tooltip(T("Double-click a folder to expand or collapse its tree"));
+    volume_panel = new fm::VolumePanel(12, 388, 190, 166,
+        {volume_open, volume_leave, volume_status, volume_ready});
     files = new SearchShortcutWidget<FileBrowser>(212, 136, 736, 418);
     files->format_char(0);
     files->column_char('\t');
@@ -1370,6 +1425,8 @@ extern "C" void fileman_refresh_view(void)
 
 int main(int argc, char **argv)
 {
+    int command = fm::volume_command(argc, argv);
+    if (command >= 0) return command;
     reliefos_fltk::init("fileman");
     int watch_result = fileman_watch_open(&directory_watch);
     if (watch_result < 0)
@@ -1393,6 +1450,7 @@ int main(int argc, char **argv)
     puts("[fileman.elf] FLTK file manager ready");
     fflush(stdout);
     int result = Fl::run();
+    volume_panel->stop();
     if (watch_timer) Fl::remove_timeout(watch_timeout);
     stop_directory_watch();
     return result;

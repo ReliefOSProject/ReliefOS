@@ -94,6 +94,7 @@ stage = true
 entry = true
 sdk = false
 api = false
+depends = ["sudo", "reliefaskpass"]
 
 [[components]]
 id = "taskmgr"

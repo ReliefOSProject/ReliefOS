@@ -78,6 +78,10 @@ public:
     const Item *data() const { return data_; }
     Item &operator[](size_t n) { return data_[n]; }
     const Item &operator[](size_t n) const { return data_[n]; }
+    Item *begin() { return data_; }
+    Item *end() { return size_ ? data_ + size_ : data_; }
+    const Item *begin() const { return data_; }
+    const Item *end() const { return size_ ? data_ + size_ : data_; }
     bool reserve(size_t requested) {
         if (requested <= capacity_) return true;
         if (requested > SIZE_MAX / sizeof(Item)) return false;
