@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Name=ReliefClipboard
+Name[zh_CN]=ReliefClipboard 剪贴板
+Name[ja]=ReliefClipboard クリップボード
+GenericName=Clipboard Manager
+GenericName[zh_CN]=剪贴板管理器
+GenericName[ja]=クリップボードマネージャー
+Comment=Search and reuse clipboard history
+Comment[zh_CN]=搜索并重新使用剪贴板历史
+Comment[ja]=クリップボード履歴の検索と再利用
+Exec=/usr/bin/reliefclipboard --show
+TryExec=/usr/bin/reliefclipboard
+Icon=reliefos-reliefclipboard
+Terminal=false
+Categories=Utility;
+StartupWMClass=reliefos-reliefclipboard

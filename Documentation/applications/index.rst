@@ -20,5 +20,6 @@
    reliefmail
    reliefplayer
    reliefcapture
+   reliefclipboard
    reliefmath-rendering
    reliefmath-commands

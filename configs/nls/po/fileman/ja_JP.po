@@ -14,7 +14,7 @@ msgstr ""
 msgid " (partial)"
 msgstr " (一部)"
 
-#: userland/apps/fileman/operations.c:342
+#: userland/apps/fileman/operations.c:314
 msgid " failed"
 msgstr " 件失敗"
 
@@ -26,35 +26,39 @@ msgstr " 個のファイル、"
 msgid " folders"
 msgstr " 個のフォルダー"
 
-#: userland/apps/fileman/operations.c:340
+#: userland/apps/fileman/operations.c:312
 msgid " item(s) completed; "
 msgstr " 件完了、"
 
-#: userland/apps/fileman/main.cpp:694
+#: userland/apps/fileman/main.cpp:696
 msgid "%s — %lu checked, %u matches, %lu skipped"
 msgstr "%s — %lu 件確認、%u 件一致、%lu 件スキップ"
 
-#: userland/apps/fileman/main.cpp:945
+#: userland/apps/fileman/main.cpp:947
 msgid "%u items, %u selected"
 msgstr "%u 項目、%u 項目選択"
 
-#: userland/apps/fileman/main.cpp:1293
+#: userland/apps/fileman/clipboard.cpp:60
+msgid "A clipboard path is too long"
+msgstr "クリップボードのパスが長すぎます"
+
+#: userland/apps/fileman/main.cpp:1295
 msgid "About"
 msgstr "バージョン情報"
 
-#: userland/apps/fltk_support.h:28
+#: userland/apps/fltk_support.h:29
 msgid "Add to Favorites"
 msgstr "お気に入りに追加"
 
-#: userland/apps/fileman/main.cpp:1302
+#: userland/apps/fileman/main.cpp:1304
 msgid "Address"
 msgstr "場所"
 
-#: userland/apps/fileman/volume_ui.cpp:184
+#: userland/apps/fileman/volume_ui.cpp:186
 msgid "Administrator permission is required for this device operation."
 msgstr "このデバイス操作には管理者権限が必要です。"
 
-#: userland/apps/fltk_support.h:29
+#: userland/apps/fltk_support.h:30
 msgid "All Files (*)"
 msgstr "すべてのファイル (*)"
 
@@ -62,15 +66,15 @@ msgstr "すべてのファイル (*)"
 msgid "All items marked"
 msgstr "すべての項目にマークを付けました"
 
-#: userland/apps/fileman/main.cpp:1020
+#: userland/apps/fileman/main.cpp:1022
 msgid "Application"
 msgstr "アプリケーション"
 
-#: userland/apps/fileman/main.cpp:646
+#: userland/apps/fileman/main.cpp:648
 msgid "Application launched"
 msgstr "アプリケーションを起動しました"
 
-#: userland/apps/fileman/main.cpp:1294
+#: userland/apps/fileman/main.cpp:1296
 msgid "Archive"
 msgstr "アーカイブ"
 
@@ -78,23 +82,23 @@ msgstr "アーカイブ"
 msgid "Archive Conflict"
 msgstr "アーカイブの競合"
 
-#: userland/apps/fileman/volume_ui.cpp:182
+#: userland/apps/fileman/volume_ui.cpp:184
 msgid "Authentication was cancelled or the device operation failed."
 msgstr "認証がキャンセルされたか、デバイス操作に失敗しました。"
 
-#: userland/apps/fileman/main.cpp:928
+#: userland/apps/fileman/main.cpp:930
 msgid "Automatic refresh unavailable; press F5"
 msgstr "自動更新を利用できません。F5 キーで更新してください"
 
-#: userland/apps/fileman/main.cpp:930
+#: userland/apps/fileman/main.cpp:932
 msgid "Automatic refresh unavailable; refresh manually (F5)"
 msgstr "自動更新を利用できません。手動で更新してください (F5)"
 
-#: userland/apps/fileman/main.cpp:901
+#: userland/apps/fileman/main.cpp:903
 msgid "Browse files, manage folders and launch X11 applications."
 msgstr "ファイルの閲覧、フォルダーの管理、X11 アプリケーションの起動ができます。"
 
-#: userland/apps/fileman/main.cpp:406
+#: userland/apps/fileman/main.cpp:408
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -110,11 +114,11 @@ msgstr "デバイス一覧を読み込めません。"
 msgid "Cannot start the device operation."
 msgstr "デバイス操作を開始できません。"
 
-#: userland/apps/fileman/main.cpp:627
+#: userland/apps/fileman/main.cpp:629
 msgid "Choose an installed X11 executable using its absolute path"
 msgstr "インストール済みの X11 実行ファイルを絶対パスで選択してください"
 
-#: userland/apps/fileman/main.cpp:1287
+#: userland/apps/fileman/main.cpp:1289
 msgid "Clear Marks"
 msgstr "マークを解除"
 
@@ -122,15 +126,19 @@ msgstr "マークを解除"
 msgid "Click a removable volume to mount and open it."
 msgstr "リムーバブルボリュームをクリックすると、マウントして開きます。"
 
-#: userland/apps/fileman/operations.c:266
+#: userland/apps/fileman/clipboard.cpp:56
+msgid "Clipboard contains too many files"
+msgstr "クリップボードのファイルが多すぎます"
+
+#: userland/apps/fileman/clipboard.cpp:52
 msgid "Clipboard is empty"
 msgstr "クリップボードが空です"
 
-#: userland/apps/fileman/main.cpp:575
+#: userland/apps/fileman/main.cpp:577
 msgid "Close"
 msgstr "閉じる"
 
-#: userland/apps/fileman/main.cpp:1294
+#: userland/apps/fileman/main.cpp:1296
 msgid "Compress to .tar"
 msgstr ".tar に圧縮"
 
@@ -142,31 +150,35 @@ msgstr "tar に圧縮中..."
 msgid "Compression canceled"
 msgstr "圧縮をキャンセルしました"
 
-#: userland/apps/fileman/main.cpp:1281
+#: userland/apps/fileman/main.cpp:1283
 msgid "Copy"
 msgstr "コピー"
 
-#: userland/apps/fileman/operations.c:346
+#: userland/apps/fileman/operations.c:318
 msgid "Copy complete"
 msgstr "コピーが完了しました"
 
-#: userland/apps/fileman/main.cpp:1320
+#: userland/apps/fileman/main.cpp:1322
 msgid "Copy selected items (Ctrl+C)"
 msgstr "選択した項目をコピー (Ctrl+C)"
 
-#: userland/apps/fileman/operations.c:167
+#: userland/apps/fileman/operations.c:163
 msgid "Copying files..."
 msgstr "ファイルをコピー中..."
+
+#: userland/apps/fileman/clipboard.cpp:26
+msgid "Could not copy files to the system clipboard"
+msgstr "システムのクリップボードにファイルをコピーできません"
 
 #: userland/apps/fltk_png_app.h:46
 msgid "Could not decode image"
 msgstr "画像をデコードできません"
 
-#: userland/apps/fileman/main.cpp:100
+#: userland/apps/fileman/main.cpp:101
 msgid "Could not open the requested path"
 msgstr "指定されたパスを開けませんでした"
 
-#: userland/apps/fileman/main.cpp:860
+#: userland/apps/fileman/main.cpp:862
 msgid "Could not open the search result"
 msgstr "検索結果を開けませんでした"
 
@@ -174,11 +186,11 @@ msgstr "検索結果を開けませんでした"
 msgid "Could not save file manager settings "
 msgstr "ファイルマネージャーの設定を保存できませんでした "
 
-#: userland/apps/fileman/main.cpp:635
+#: userland/apps/fileman/main.cpp:637
 msgid "Could not save the file association"
 msgstr "ファイルの関連付けを保存できませんでした"
 
-#: userland/apps/fileman/main.cpp:796
+#: userland/apps/fileman/main.cpp:798
 msgid "Could not start search"
 msgstr "検索を開始できませんでした"
 
@@ -186,31 +198,31 @@ msgstr "検索を開始できませんでした"
 msgid "Create Shortcut"
 msgstr "ショートカットを作成"
 
-#: userland/apps/fileman/main.cpp:1317
+#: userland/apps/fileman/main.cpp:1319
 msgid "Create a folder in the current location"
 msgstr "現在の場所にフォルダーを作成"
 
-#: userland/apps/fltk_support.h:37
+#: userland/apps/fltk_support.h:38
 msgid "Create a new directory"
 msgstr "新しいフォルダーを作成"
 
-#: userland/apps/fltk_support.h:30
+#: userland/apps/fltk_support.h:31
 msgid "Custom Filter"
 msgstr "カスタムフィルター"
 
-#: userland/apps/fileman/main.cpp:1282
+#: userland/apps/fileman/main.cpp:1284
 msgid "Cut"
 msgstr "切り取り"
 
-#: userland/apps/fileman/main.cpp:620
+#: userland/apps/fileman/main.cpp:622
 msgid "Default Program"
 msgstr "既定のプログラム"
 
-#: userland/apps/fileman/main.cpp:1275
+#: userland/apps/fileman/main.cpp:1277
 msgid "Default Program..."
 msgstr "既定のプログラム..."
 
-#: userland/apps/fileman/main.cpp:639
+#: userland/apps/fileman/main.cpp:641
 msgid "Default application saved"
 msgstr "既定のアプリケーションを保存しました"
 
@@ -218,19 +230,19 @@ msgstr "既定のアプリケーションを保存しました"
 msgid "Default program is for files"
 msgstr "既定のプログラムはファイルに対して設定してください"
 
-#: userland/apps/fileman/main.cpp:1280
+#: userland/apps/fileman/main.cpp:1282
 msgid "Delete"
 msgstr "削除"
 
-#: userland/apps/fileman/operations.c:368
+#: userland/apps/fileman/operations.c:340
 msgid "Delete canceled"
 msgstr "削除をキャンセルしました"
 
-#: userland/apps/fileman/main.cpp:1324
+#: userland/apps/fileman/main.cpp:1326
 msgid "Delete selected items after confirmation"
 msgstr "確認後に選択した項目を削除"
 
-#: userland/apps/fileman/operations.c:371
+#: userland/apps/fileman/operations.c:343
 msgid "Deleting items..."
 msgstr "項目を削除中..."
 
@@ -238,19 +250,19 @@ msgstr "項目を削除中..."
 msgid "Desktop folder unavailable"
 msgstr "デスクトップフォルダーを利用できません"
 
-#: userland/apps/fileman/main.cpp:1277
+#: userland/apps/fileman/main.cpp:1279
 msgid "Details"
 msgstr "詳細"
 
-#: userland/apps/fileman/main.cpp:1019
+#: userland/apps/fileman/main.cpp:1021
 msgid "Device"
 msgstr "デバイス"
 
-#: userland/apps/fileman/volume_ui.cpp:180
+#: userland/apps/fileman/volume_ui.cpp:182
 msgid "Device is busy. Close files and terminals on it, then try again."
 msgstr "デバイスは使用中です。このデバイス内のファイルや端末を閉じてから再試行してください。"
 
-#: userland/apps/fileman/volume_ui.cpp:178
+#: userland/apps/fileman/volume_ui.cpp:179
 msgid "Device mounted."
 msgstr "デバイスをマウントしました。"
 
@@ -258,15 +270,15 @@ msgstr "デバイスをマウントしました。"
 msgid "Devices"
 msgstr "デバイス"
 
-#: userland/apps/fileman/main.cpp:1350
+#: userland/apps/fileman/main.cpp:1352
 msgid "Double-click a folder to expand or collapse its tree"
 msgstr "フォルダーをダブルクリックするとツリーを展開または折りたためます"
 
-#: userland/apps/fileman/main.cpp:1360
+#: userland/apps/fileman/main.cpp:1362
 msgid "Double-click to open. Ctrl/Shift selects multiple items."
 msgstr "ダブルクリックで開きます。Ctrl/Shift で複数の項目を選択できます。"
 
-#: userland/apps/fileman/main.cpp:1281
+#: userland/apps/fileman/main.cpp:1283
 msgid "Edit"
 msgstr "編集"
 
@@ -278,11 +290,11 @@ msgstr "取り外す"
 msgid "Elevated - items "
 msgstr "管理者権限 - 項目数 "
 
-#: userland/apps/fileman/main.cpp:1307
+#: userland/apps/fileman/main.cpp:1309
 msgid "Enter a folder path, then press Enter (Ctrl+L)"
 msgstr "フォルダーのパスを入力して Enter キーを押してください (Ctrl+L)"
 
-#: userland/apps/fileman/main.cpp:780
+#: userland/apps/fileman/main.cpp:782
 msgid "Enter part of a file or folder name."
 msgstr "ファイル名またはフォルダー名の一部を入力してください。"
 
@@ -298,23 +310,23 @@ msgstr "tar を展開中..."
 msgid "Extraction canceled"
 msgstr "展開をキャンセルしました"
 
-#: userland/apps/fltk_support.h:32
+#: userland/apps/fltk_support.h:33
 msgid "Favorites"
 msgstr "お気に入り"
 
-#: userland/apps/fileman/main.cpp:1021
+#: userland/apps/fileman/main.cpp:1023
 msgid "File"
 msgstr "ファイル"
 
-#: userland/apps/fileman/operations.c:96
+#: userland/apps/fileman/operations.c:92
 msgid "File Conflict"
 msgstr "ファイルの競合"
 
-#: userland/apps/fileman/main.cpp:900
+#: userland/apps/fileman/main.cpp:902
 msgid "File Manager"
 msgstr "ファイルマネージャー"
 
-#: userland/apps/fileman/main.cpp:481
+#: userland/apps/fileman/main.cpp:483
 msgid "File Manager Settings"
 msgstr "ファイルマネージャーの設定"
 
@@ -322,15 +334,15 @@ msgstr "ファイルマネージャーの設定"
 msgid "File Manager settings saved"
 msgstr "ファイルマネージャーの設定を保存しました"
 
-#: userland/apps/fltk_support.h:34
+#: userland/apps/fltk_support.h:35
 msgid "File Systems"
 msgstr "ファイルシステム"
 
-#: userland/apps/fileman/main.cpp:815
+#: userland/apps/fileman/main.cpp:817
 msgid "File name:"
 msgstr "ファイル名:"
 
-#: userland/apps/fileman/main.cpp:1018
+#: userland/apps/fileman/main.cpp:1020
 msgid "Folder"
 msgstr "フォルダー"
 
@@ -350,19 +362,19 @@ msgstr "フォルダー名が空です"
 msgid "Folder name:"
 msgstr "フォルダー名:"
 
-#: userland/apps/fileman/main.cpp:1337
+#: userland/apps/fileman/main.cpp:1339
 msgid "Folders"
 msgstr "フォルダー"
 
-#: userland/apps/fileman/main.cpp:567
+#: userland/apps/fileman/main.cpp:569
 msgid "GID"
 msgstr "GID"
 
-#: userland/apps/fileman/main.cpp:824
+#: userland/apps/fileman/main.cpp:826
 msgid "Ignore English letter case"
 msgstr "英字の大文字と小文字を区別しない"
 
-#: userland/apps/fileman/main.cpp:822
+#: userland/apps/fileman/main.cpp:824
 msgid "Include subfolders"
 msgstr "サブフォルダーを含める"
 
@@ -370,7 +382,7 @@ msgstr "サブフォルダーを含める"
 msgid "Input is too long"
 msgstr "入力が長すぎます"
 
-#: userland/apps/fileman/main.cpp:418
+#: userland/apps/fileman/main.cpp:420
 msgid "Input is too long; the value was not changed."
 msgstr "入力が長すぎます。値は変更されていません。"
 
@@ -386,7 +398,7 @@ msgstr "ファイル名が無効か、パスが長すぎます"
 msgid "Invalid folder name or path too long"
 msgstr "フォルダー名が無効か、パスが長すぎます"
 
-#: userland/apps/fileman/main.cpp:598
+#: userland/apps/fileman/main.cpp:600
 msgid "Invalid mode, UID or GID"
 msgstr "モード、UID、または GID が無効です"
 
@@ -398,19 +410,19 @@ msgstr "項目にマークを付けました"
 msgid "Item unmarked"
 msgstr "項目のマークを外しました"
 
-#: userland/apps/fileman/main.cpp:921
+#: userland/apps/fileman/main.cpp:923
 msgid "Items "
 msgstr "項目数 "
 
-#: userland/apps/fileman/operations.c:254
+#: userland/apps/fileman/clipboard.cpp:155
 msgid "Items copied. Open a folder and paste."
 msgstr "項目をコピーしました。フォルダーを開いて貼り付けてください。"
 
-#: userland/apps/fileman/operations.c:253
+#: userland/apps/fileman/clipboard.cpp:155
 msgid "Items cut. Open a folder and paste."
 msgstr "項目を切り取りました。フォルダーを開いて貼り付けてください。"
 
-#: userland/apps/fileman/operations.c:392
+#: userland/apps/fileman/operations.c:364
 msgid "Items deleted"
 msgstr "項目を削除しました"
 
@@ -422,15 +434,15 @@ msgstr "起動に失敗しました "
 msgid "Looking for devices..."
 msgstr "デバイスを検索中…"
 
-#: userland/apps/fltk_support.h:35
+#: userland/apps/fltk_support.h:36
 msgid "Manage Favorites"
 msgstr "お気に入りの管理"
 
-#: userland/apps/fileman/main.cpp:1286
+#: userland/apps/fileman/main.cpp:1288
 msgid "Mark All"
 msgstr "すべてマーク"
 
-#: userland/apps/fileman/main.cpp:1285
+#: userland/apps/fileman/main.cpp:1287
 msgid "Mark for Batch"
 msgstr "一括処理用にマーク"
 
@@ -438,11 +450,11 @@ msgstr "一括処理用にマーク"
 msgid "Marks cleared"
 msgstr "マークを解除しました"
 
-#: userland/apps/fileman/main.cpp:828
+#: userland/apps/fileman/main.cpp:830
 msgid "Matches part of a file or folder name."
 msgstr "ファイル名またはフォルダー名の一部に一致します。"
 
-#: userland/apps/fileman/main.cpp:556
+#: userland/apps/fileman/main.cpp:558
 msgid "Mode (octal)"
 msgstr "モード (8 進数)"
 
@@ -450,23 +462,23 @@ msgstr "モード (8 進数)"
 msgid "Mounting device..."
 msgstr "マウント中…"
 
-#: userland/apps/fileman/operations.c:345
+#: userland/apps/fileman/operations.c:317
 msgid "Move complete"
 msgstr "移動が完了しました"
 
-#: userland/apps/fileman/main.cpp:1321
+#: userland/apps/fileman/main.cpp:1323
 msgid "Move selected items using Cut and Paste (Ctrl+X)"
 msgstr "切り取りと貼り付けで選択した項目を移動 (Ctrl+X)"
 
-#: userland/apps/fileman/operations.c:272
+#: userland/apps/fileman/operations.c:242
 msgid "Moving files..."
 msgstr "ファイルを移動中..."
 
-#: userland/apps/fileman/main.cpp:546
+#: userland/apps/fileman/main.cpp:548
 msgid "Name"
 msgstr "名前"
 
-#: userland/apps/fltk_support.h:36
+#: userland/apps/fltk_support.h:37
 msgid "New Directory?"
 msgstr "新しいフォルダーを作成しますか?"
 
@@ -486,11 +498,11 @@ msgstr "新しい名前が空です"
 msgid "New name:"
 msgstr "新しい名前:"
 
-#: userland/apps/fileman/main.cpp:434
+#: userland/apps/fileman/main.cpp:436
 msgid "No"
 msgstr "いいえ"
 
-#: userland/apps/fileman/main.cpp:692
+#: userland/apps/fileman/main.cpp:694
 msgid "No matches found"
 msgstr "一致する項目がありません"
 
@@ -502,27 +514,27 @@ msgstr "リムーバブル機器なし"
 msgid "Not mounted"
 msgstr "未マウント"
 
-#: userland/apps/fileman/main.cpp:405
+#: userland/apps/fileman/main.cpp:407
 msgid "OK"
 msgstr "OK"
 
-#: userland/apps/fileman/main.cpp:837
+#: userland/apps/fileman/main.cpp:839
 msgid "Open"
 msgstr "開く"
 
-#: userland/apps/fileman/main.cpp:840
+#: userland/apps/fileman/main.cpp:842
 msgid "Open Containing Folder"
 msgstr "保存先フォルダーを開く"
 
-#: userland/apps/fileman/main.cpp:620
+#: userland/apps/fileman/main.cpp:622
 msgid "Open With"
 msgstr "別のプログラムで開く"
 
-#: userland/apps/fileman/main.cpp:623
+#: userland/apps/fileman/main.cpp:625
 msgid "Open With canceled"
 msgstr "プログラムを指定して開く操作をキャンセルしました"
 
-#: userland/apps/fileman/main.cpp:645
+#: userland/apps/fileman/main.cpp:647
 msgid "Open With failed"
 msgstr "指定したプログラムで開けませんでした"
 
@@ -530,27 +542,27 @@ msgstr "指定したプログラムで開けませんでした"
 msgid "Open With is for files"
 msgstr "プログラムを指定して開く操作はファイルに対して使用してください"
 
-#: userland/apps/fileman/main.cpp:1274
+#: userland/apps/fileman/main.cpp:1276
 msgid "Open With..."
 msgstr "別のプログラムで開く..."
 
-#: userland/apps/fileman/main.cpp:1318
+#: userland/apps/fileman/main.cpp:1320
 msgid "Open the selected item (Enter)"
 msgstr "選択した項目を開く (Enter)"
 
-#: userland/apps/fileman/main.cpp:1283
+#: userland/apps/fileman/main.cpp:1285
 msgid "Paste"
 msgstr "貼り付け"
 
-#: userland/apps/fileman/main.cpp:1322
+#: userland/apps/fileman/main.cpp:1324
 msgid "Paste into the current folder (Ctrl+V)"
 msgstr "現在のフォルダーに貼り付け (Ctrl+V)"
 
-#: userland/apps/fileman/main.cpp:548
+#: userland/apps/fileman/main.cpp:550
 msgid "Path"
 msgstr "パス"
 
-#: userland/apps/fileman/main.cpp:1067
+#: userland/apps/fileman/main.cpp:1069
 msgid "Path is too long"
 msgstr "パスが長すぎます"
 
@@ -558,11 +570,11 @@ msgstr "パスが長すぎます"
 msgid "Path too long"
 msgstr "パスが長すぎます"
 
-#: userland/apps/fileman/operations.c:367
+#: userland/apps/fileman/operations.c:339
 msgid "Permanently delete the selected items and all folder contents? This cannot be undone."
 msgstr "選択した項目とフォルダー内のすべての内容を完全に削除しますか? この操作は元に戻せません。"
 
-#: userland/apps/fileman/main.cpp:573
+#: userland/apps/fileman/main.cpp:575
 msgid "Permission changes use the current user's access rights."
 msgstr "アクセス権の変更には現在のユーザーの権限が適用されます。"
 
@@ -570,7 +582,7 @@ msgstr "アクセス権の変更には現在のユーザーの権限が適用さ
 msgid "Permission denied; administrator access requires a terminal in X11"
 msgstr "アクセスが拒否されました。X11 環境での管理者操作には端末が必要です"
 
-#: userland/apps/fileman/main.cpp:609
+#: userland/apps/fileman/main.cpp:611
 msgid "Permissions saved"
 msgstr "アクセス権を保存しました"
 
@@ -578,7 +590,7 @@ msgstr "アクセス権を保存しました"
 msgid "Place shortcut on Desktop? No creates it here."
 msgstr "デスクトップにショートカットを作成しますか? 「いいえ」を選ぶと現在の場所に作成します。"
 
-#: userland/apps/fltk_support.h:31
+#: userland/apps/fltk_support.h:32
 msgid "Please choose an existing file!"
 msgstr "既存のファイルを選択してください。"
 
@@ -586,31 +598,31 @@ msgstr "既存のファイルを選択してください。"
 msgid "Preparing device for removal..."
 msgstr "取り外しの準備中…"
 
-#: userland/apps/fltk_support.h:38
+#: userland/apps/fltk_support.h:39
 msgid "Preview"
 msgstr "プレビュー"
 
-#: userland/apps/fileman/main.cpp:553
+#: userland/apps/fileman/main.cpp:555
 msgid "Properties"
 msgstr "プロパティ"
 
-#: userland/apps/fileman/main.cpp:533
+#: userland/apps/fileman/main.cpp:535
 msgid "Properties failed"
 msgstr "プロパティの取得に失敗しました"
 
-#: userland/apps/fileman/main.cpp:928
+#: userland/apps/fileman/main.cpp:930
 msgid "Ready"
 msgstr "準備完了"
 
-#: userland/apps/fileman/main.cpp:1291
+#: userland/apps/fileman/main.cpp:1293
 msgid "Refresh"
 msgstr "更新"
 
-#: userland/apps/fileman/main.cpp:929
+#: userland/apps/fileman/main.cpp:931
 msgid "Refresh (F5)"
 msgstr "更新 (F5)"
 
-#: userland/apps/fileman/main.cpp:631
+#: userland/apps/fileman/main.cpp:633
 msgid "Remember this application for files with the same extension?"
 msgstr "同じ拡張子のファイルにこのアプリケーションを使用しますか?"
 
@@ -626,7 +638,7 @@ msgstr "名前変更の競合"
 msgid "Rename canceled"
 msgstr "名前変更をキャンセルしました"
 
-#: userland/apps/fileman/main.cpp:1323
+#: userland/apps/fileman/main.cpp:1325
 msgid "Rename the selected item (F2)"
 msgstr "選択した項目の名前を変更 (F2)"
 
@@ -638,51 +650,51 @@ msgstr "名前を変更しました"
 msgid "Renamed (elevated)"
 msgstr "名前を変更しました (管理者権限)"
 
-#: userland/apps/fileman/main.cpp:1290
+#: userland/apps/fileman/main.cpp:1292
 msgid "Root"
 msgstr "ルート"
 
-#: userland/apps/fileman/main.cpp:485
+#: userland/apps/fileman/main.cpp:487
 msgid "Save"
 msgstr "保存"
 
-#: userland/apps/fileman/main.cpp:820
+#: userland/apps/fileman/main.cpp:822
 msgid "Search"
 msgstr "検索"
 
-#: userland/apps/fileman/main.cpp:808
+#: userland/apps/fileman/main.cpp:810
 msgid "Search Files"
 msgstr "ファイルを検索"
 
-#: userland/apps/fileman/main.cpp:1284
+#: userland/apps/fileman/main.cpp:1286
 msgid "Search Files..."
 msgstr "ファイルを検索..."
 
-#: userland/apps/fileman/main.cpp:692
+#: userland/apps/fileman/main.cpp:694
 msgid "Search complete"
 msgstr "検索が完了しました"
 
-#: userland/apps/fileman/main.cpp:691
+#: userland/apps/fileman/main.cpp:693
 msgid "Search complete (partial)"
 msgstr "検索が完了しました (一部)"
 
-#: userland/apps/fileman/main.cpp:811
+#: userland/apps/fileman/main.cpp:813
 msgid "Search in:"
 msgstr "検索する場所:"
 
-#: userland/apps/fileman/main.cpp:689
+#: userland/apps/fileman/main.cpp:691
 msgid "Search stopped"
 msgstr "検索を停止しました"
 
-#: userland/apps/fileman/main.cpp:690
+#: userland/apps/fileman/main.cpp:692
 msgid "Search stopped at limit"
 msgstr "上限に達したため検索を停止しました"
 
-#: userland/apps/fileman/main.cpp:1310
+#: userland/apps/fileman/main.cpp:1312
 msgid "Search this folder and subfolders (Ctrl+F)"
 msgstr "このフォルダーとサブフォルダーを検索 (Ctrl+F)"
 
-#: userland/apps/fileman/main.cpp:688
+#: userland/apps/fileman/main.cpp:690
 msgid "Searching"
 msgstr "検索中"
 
@@ -698,11 +710,11 @@ msgstr "tar ファイルを選択"
 msgid "Select an item"
 msgstr "項目を選択してください"
 
-#: userland/apps/fileman/main.cpp:1292
+#: userland/apps/fileman/main.cpp:1294
 msgid "Settings..."
 msgstr "設定..."
 
-#: userland/apps/fileman/main.cpp:1021
+#: userland/apps/fileman/main.cpp:1023
 msgid "Shortcut"
 msgstr "ショートカット"
 
@@ -710,25 +722,29 @@ msgstr "ショートカット"
 msgid "Shortcut created"
 msgstr "ショートカットを作成しました"
 
-#: userland/apps/fileman/main.cpp:483
+#: userland/apps/fileman/main.cpp:485
 msgid "Show files and folders starting with a dot"
 msgstr "名前がドットで始まるファイルとフォルダーを表示"
 
-#: userland/apps/fileman/main.cpp:826
+#: userland/apps/fileman/main.cpp:828
 msgid "Show hidden files"
 msgstr "隠しファイルを表示"
 
-#: userland/apps/fltk_support.h:40
+#: userland/apps/fltk_support.h:41
 msgid "Show:"
 msgstr "表示:"
 
-#: userland/apps/fileman/main.cpp:549
+#: userland/apps/fileman/main.cpp:551
 msgid "Size"
 msgstr "サイズ"
 
-#: userland/apps/fileman/main.cpp:843
+#: userland/apps/fileman/main.cpp:845
 msgid "Stop"
 msgstr "停止"
+
+#: userland/apps/fileman/clipboard.cpp:141
+msgid "System clipboard is unavailable"
+msgstr "システムのクリップボードを利用できません"
 
 #: userland/apps/fileman/actions.c:392
 msgid "Tar created successfully"
@@ -750,15 +766,19 @@ msgstr "tar の展開に失敗しました。アーカイブと保存先のア�
 msgid "The archive exists. Replace it?"
 msgstr "アーカイブが存在します。置き換えますか?"
 
+#: userland/apps/fileman/clipboard.cpp:92
+msgid "The clipboard does not contain usable local files"
+msgstr "クリップボードに利用できるローカルファイルがありません"
+
 #: userland/apps/fileman/actions.c:202
 msgid "The destination exists. Replace it?"
 msgstr "保存先が存在します。置き換えますか?"
 
-#: userland/apps/fileman/operations.c:97
+#: userland/apps/fileman/operations.c:93
 msgid "The destination exists. Replace it? Choose No to save with another name."
 msgstr "保存先が存在します。置き換えますか? 別の名前で保存するには「いいえ」を選択してください。"
 
-#: userland/apps/fileman/volume_ui.cpp:181
+#: userland/apps/fileman/volume_ui.cpp:183
 msgid "The device changed or is unavailable. Refresh and try again."
 msgstr "デバイスが変更されたか、利用できません。更新して再試行してください。"
 
@@ -766,15 +786,19 @@ msgstr "デバイスが変更されたか、利用できません。更新して
 msgid "The extraction folder exists. Existing files may be replaced. Continue?"
 msgstr "展開先フォルダーが存在します。既存のファイルが置き換えられる場合があります。続行しますか?"
 
-#: userland/apps/fileman/volume_ui.cpp:183
+#: userland/apps/fileman/clipboard.cpp:47
+msgid "The folder changed or is busy. Paste again."
+msgstr "フォルダーが変更されたか処理中です。もう一度貼り付けてください。"
+
+#: userland/apps/fileman/volume_ui.cpp:185
 msgid "This filesystem is not supported."
 msgstr "このファイルシステムはサポートされていません。"
 
-#: userland/apps/fileman/main.cpp:547
+#: userland/apps/fileman/main.cpp:549
 msgid "Type"
 msgstr "種類"
 
-#: userland/apps/fileman/main.cpp:562
+#: userland/apps/fileman/main.cpp:564
 msgid "UID"
 msgstr "UID"
 
@@ -786,42 +810,42 @@ msgstr "マークを外す"
 msgid "Unmount every volume on this device before unplugging it."
 msgstr "取り外す前に、このデバイスのすべてのボリュームをアンマウントします。"
 
-#: userland/apps/fileman/main.cpp:1289
+#: userland/apps/fileman/main.cpp:1291
 msgid "Up"
 msgstr "上へ"
 
-#: userland/apps/fileman/main.cpp:1299
+#: userland/apps/fileman/main.cpp:1301
 msgid "Up one folder (Alt+Up)"
 msgstr "1 つ上のフォルダーへ (Alt+上)"
 
-#: userland/apps/fileman/main.cpp:1289
+#: userland/apps/fileman/main.cpp:1291
 msgid "View"
 msgstr "表示"
 
-#: userland/apps/fileman/main.cpp:1319
+#: userland/apps/fileman/main.cpp:1321
 msgid "View properties and permissions"
 msgstr "プロパティとアクセス権を表示"
 
-#: userland/apps/fileman/main.cpp:127
+#: userland/apps/fileman/main.cpp:129
 msgid "Wait for the device operation to finish before closing this window."
 msgstr "デバイス操作が完了してからウィンドウを閉じてください。"
 
-#: userland/apps/fileman/main.cpp:621
+#: userland/apps/fileman/main.cpp:623
 msgid "X11 executable path (NEdit: /usr/bin/nedit, NetSurf: /usr/bin/netsurf):"
 msgstr "X11 実行ファイルのパス (NEdit: /usr/bin/nedit、NetSurf: /usr/bin/netsurf):"
 
-#: userland/apps/fileman/main.cpp:433
+#: userland/apps/fileman/main.cpp:435
 msgid "Yes"
 msgstr "はい"
 
-#: userland/apps/fileman/volume_ui.cpp:178
+#: userland/apps/fileman/volume_ui.cpp:180
 msgid "You can safely unplug the device."
 msgstr "デバイスを安全に取り外せます。"
 
-#: userland/apps/fileman/operations.c:390
+#: userland/apps/fileman/operations.c:362
 msgid "failed"
 msgstr "失敗"
 
-#: userland/apps/fileman/operations.c:390
+#: userland/apps/fileman/operations.c:362
 msgid "item(s) deleted"
 msgstr "件削除しました"

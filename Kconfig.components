@@ -120,6 +120,24 @@ config RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_ENTRY
     default y
     depends on RELIEFOS_COMPONENT_APP_RELIEFCAPTURE_IMAGE
 
+menuconfig RELIEFOS_COMPONENT_APP_RELIEFCLIPBOARD_BUILD
+    bool "ReliefClipboard"
+    default y
+    help
+      Enable ReliefClipboard (reliefclipboard). Dependencies may enable it
+      automatically. Libraries may also be built when another product
+      needs them; image membership is controlled separately below.
+
+config RELIEFOS_COMPONENT_APP_RELIEFCLIPBOARD_IMAGE
+    bool "Include in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFCLIPBOARD_BUILD
+
+config RELIEFOS_COMPONENT_APP_RELIEFCLIPBOARD_ENTRY
+    bool "Enable the legacy application-registry entry"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_RELIEFCLIPBOARD_IMAGE
+
 menuconfig RELIEFOS_COMPONENT_APP_TASKMGR_BUILD
     bool "Task manager"
     default y
