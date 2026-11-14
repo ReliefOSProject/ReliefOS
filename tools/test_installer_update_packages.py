@@ -189,6 +189,54 @@ class UpdatePreflight(unittest.TestCase):
             self.assertEqual((target / "usr/share/reliefos-fixture/version").read_text(), "2.0-r0\n")
             self.assertFalse((target / "run/reliefos-kernel-activation.defer").exists())
 
+    def test_sudo_prompt_cleanup_removes_duplicate_catalogs_and_preserves_pam(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        old_config = "Path askpass /usr/lib/reliefos/apps/sudod/sudod.elf\n"
+        new_config = (ROOT / "system/rootfs/etc/sudo.conf").read_text()
+        remaining_catalogs = {
+            f"usr/share/locale/{language}/LC_MESSAGES/reliefaskpass.mo": "dialog labels\n"
+            for language in ("zh_CN", "ja_JP")}
+        retired_catalogs = {
+            f"usr/share/locale/{language}/LC_MESSAGES/sudod.mo": "duplicate prompt\n"
+            for language in ("zh_CN", "ja_JP")}
+        authentication = {
+            "usr/bin/sudo": "PAM sudo\n",
+            "etc/pam.d/sudo": (ROOT / "system/rootfs/etc/pam.d/sudo").read_text(),
+            "etc/pam.d/sudo-i": (ROOT / "system/rootfs/etc/pam.d/sudo-i").read_text(),
+            **{f"usr/share/locale/{language}/LC_MESSAGES/{domain}.mo": "upstream translation\n"
+               for language in ("zh_CN", "ja_JP") for domain in ("sudo", "sudoers")}}
+        self.package("reliefos-nls", "7.0-r0", old,
+                     payload={**remaining_catalogs, **retired_catalogs})
+        self.package("reliefos-nls", "8.0-r0", new, payload=remaining_catalogs)
+        self.package("reliefos-authentication", "7.0-r0", old,
+                     payload={**authentication, "etc/sudo.conf": old_config},
+                     modes={"usr/bin/sudo": 0o4755})
+        self.package("reliefos-authentication", "8.0-r0", new,
+                     payload={**authentication, "etc/sudo.conf": new_config},
+                     modes={"usr/bin/sudo": 0o4755})
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "add", "reliefos-nls",
+                 "reliefos-authentication")
+        administrator_config = old_config + "# administrator configuration\n"
+        (target / "etc/sudo.conf").write_text(administrator_config)
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            for path in retired_catalogs:
+                self.assertFalse((target / path).exists(), path)
+            for path, text in {**remaining_catalogs, **authentication}.items():
+                self.assertEqual((target / path).read_text(), text, path)
+            self.assertEqual((target / "etc/sudo.conf").read_text(), administrator_config)
+            self.assertEqual((target / "etc/sudo.conf.apk-new").read_text(), new_config)
+            self.assertEqual((target / "usr/bin/sudo").stat().st_mode & 0o7777, 0o4755)
+
     def test_filesystem_and_bsd_split_transfers_owners_and_preserves_configuration(self):
         old, new = self.runner / "oldrepo", self.runner / "newrepo"
         target = self.runner / "target"

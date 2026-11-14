@@ -13,7 +13,8 @@
 #include <termios.h>
 #include <unistd.h>
 
-#define ASKPASS "/usr/lib/reliefos/apps/sudod/sudod.elf"
+#define ASKPASS "/usr/lib/reliefos/apps/reliefaskpass/reliefaskpass.elf"
+#define FILEOP_WORKER "/usr/lib/reliefos/apps/sudod/sudod.elf"
 #define RESULT_MAGIC 0x524f4453u
 struct fileop_result {
     uint32_t magic;
@@ -252,7 +253,7 @@ int reliefos_fileop(uint32_t op, const char *path1, const char *path2,
     if ((username && *username) || (password && *password)) { errno = ENOTSUP; return -1; }
     char verb[16];
     snprintf(verb, sizeof(verb), "%u", op);
-    char *args[] = {"/usr/bin/sudo", "-A", "-u", "root", "--", ASKPASS,
+    char *args[] = {"/usr/bin/sudo", "-A", "-u", "root", "--", FILEOP_WORKER,
                     "--op", verb, "--path1", (char *)path1, "--path2", (char *)(path2 ? path2 : ""), NULL};
     struct fileop_result *reply = calloc(1, sizeof(*reply));
     if (!reply) return -1;
