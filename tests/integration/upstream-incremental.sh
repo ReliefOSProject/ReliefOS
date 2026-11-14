@@ -8,9 +8,10 @@ out=$(CDPATH= cd -- "$out" && pwd)
 work=$(mktemp -d "$out/meta/upstream-incremental.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 snapshot() {
- for pkg in libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs ncurses; do
+ for pkg in libmd libbsd util-linux sudo shadow exfatprogs; do
   find "$out/upstream/$pkg/root" -type f -printf '%p %T@ %s\n'
  done
+ find "$out/upstream/apk" "$out/upstream/runtime-development" -type f -printf '%p %T@ %s\n'
  find "$out/userland" -type f -printf '%p %T@ %s\n'
  if [ -d "$out/resources" ]; then find "$out/resources" -type f -printf '%p %T@ %s\n'; fi
 }
@@ -22,7 +23,9 @@ snapshot > "$work/after.unsorted"
 LC_ALL=C sort "$work/after.unsorted" > "$work/after"
 cmp "$work/before" "$work/after"
 # Exercise the complete install manifest, beyond the primary ELF outputs.
-secondary=$out/upstream/dosfstools/root/usr/share/doc/dosfstools/README
+set -- "$out/upstream/apk/packages/dosfstools-doc-"[0-9]*.apk
+test "$#" = 1
+secondary=$1
 test -f "$secondary"
 rm "$secondary"
 make -C "$src" O="$make_out" upstream-dosfstools -j8 > "$work/restore.log" 2>&1 || { cat "$work/restore.log" >&2; exit 1; }

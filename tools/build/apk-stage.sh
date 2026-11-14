@@ -287,7 +287,7 @@ version=$(printf '%s' "$version" | sed "s/-r[0-9]*$/.${content_number}-r0/")
 
 package_name()
 {
-    case $1 in reliefos-*|ca-certificates-bundle) printf '%s\n' "$1";; *) printf 'reliefos-%s\n' "$1";; esac
+    case $1 in reliefos-*) printf '%s\n' "$1";; *) printf 'reliefos-%s\n' "$1";; esac
 }
 
 # Copy exactly the classified payload. Quoting and tab-delimited reads preserve
@@ -335,6 +335,12 @@ while IFS= read -r group; do
     done
 done <"$scratch/groups"
 LC_ALL=C sort -u "$scratch/providers" -o "$scratch/providers"
+if awk -F '\t' 'FILENAME == ARGV[1] {upstream[$0]=1; next} $1 in upstream {print $0}' \
+    "$scratch/upstream-sonames" "$scratch/providers" | grep . >"$scratch/overlapping-sonames"; then
+    echo 'local payload duplicates an official APK SONAME; remove the obsolete overlay:' >&2
+    cat "$scratch/overlapping-sonames" >&2
+    exit 1
+fi
 if cut -f1 "$scratch/providers" | uniq -d | grep . >"$scratch/duplicate-sonames"; then
     echo 'multiple local APK providers for ELF SONAME:' >&2
     cat "$scratch/duplicate-sonames" >&2
@@ -367,7 +373,15 @@ while IFS= read -r group; do
     fi
     provides=$(awk -F '\t' -v package="$package" '$2 == package { printf " so:%s=0", $1 }' "$scratch/providers")
     if [ "$package" = reliefos-musl ] && [ -f "$tree/lib/ld-musl-x86_64.so.1" ]; then
-        provides="$provides so:libc.musl-x86_64.so.1=1"
+        # libbsd also requires the musl package by name. This package owns the
+        # real musl loader/libc; report its verified upstream version rather
+        # than the independent ReliefOS package generation.
+        musl_version=$("$deps" --lock "$lock" --id musl --print version)
+        case $musl_version in ''|*[!0-9.]*) echo 'invalid locked musl version' >&2; exit 1;; esac
+        cmp -s "$tree/lib/ld-musl-x86_64.so.1" "$tree/lib/libc.so" || { echo 'musl loader/libc mismatch' >&2; exit 1; }
+        "$tree/lib/ld-musl-x86_64.so.1" --version >"$scratch/musl-version" 2>&1 || :
+        grep -Fxq "Version $musl_version" "$scratch/musl-version" || { echo 'musl binary version differs from lock' >&2; exit 1; }
+        provides="$provides musl=$musl_version-r0 so:libc.musl-x86_64.so.1=1"
     fi
     if [ "$package" = reliefos-busybox ] && [ -x "$tree/bin/busybox" ] && [ -e "$tree/bin/sh" ]; then
         for applet in init ifup ifdown udhcpc ntpd; do
@@ -381,8 +395,19 @@ while IFS= read -r group; do
         reliefos-apk-tools) dependencies="$dependencies reliefos-busybox" ;;
         reliefos-busybox) dependencies="$dependencies reliefos-coreutils" ;;
         reliefos-coreutils) dependencies="$dependencies !coreutils !coreutils-single" ;;
+        # These local groups retain libmd/exFAT and compatibility aliases.
+        # Their real dependencies pull the migrated tools into older systems
+        # in the same signed transaction that upgrades the former file owner.
+        reliefos-auth-support-libraries) dependencies="$dependencies libbsd libbsd-doc" ;;
+        reliefos-storage-filesystems) dependencies="$dependencies e2fsprogs e2fsprogs-extra e2fsprogs-libs libcom_err e2fsprogs-doc dosfstools dosfstools-doc" ;;
         reliefos-kernel) dependencies="$dependencies reliefos-grub=$version" ;;
-        reliefos-trust) dependencies="$dependencies ca-certificates-bundle" ;;
+        # Upgrade old console images whose former local CA package contained
+        # only a directory. Require the real pinned release or a newer bundle,
+        # while allowing administrators to install future security updates.
+        reliefos-trust)
+            ca_version=$("$deps" --lock "$lock" --id alpine-ca-certificates-bundle --print version)
+            dependencies="$dependencies ca-certificates-bundle>=$ca_version"
+            ;;
         reliefos-fastfetch) dependencies="$dependencies !fastfetch" ;;
         reliefos-xdm-config)
             # The local server command uses the ReliefOS tty wrapper and Xorg

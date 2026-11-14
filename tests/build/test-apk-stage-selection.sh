@@ -360,6 +360,15 @@ if ! stage upstream-library; then
     exit 1
 fi
 expect_grep "$w/upstream-library/apk.log" 'depends:.*so:libfixture.so.1'
+mkdir -p "$w/raw/usr/lib"
+cp "$w/libfixture.so.1" "$w/raw/usr/lib/libfixture.so.1"
+if stage duplicate-library; then
+    echo 'FAIL - obsolete local library duplicated an official SONAME' >&2
+    exit 1
+fi
+expect_grep "$w/duplicate-library/stderr" 'local payload duplicates an official APK SONAME'
+expect_absent "$w/duplicate-library/managed"
+rm "$w/raw/usr/lib/libfixture.so.1"
 set_marker "reliefos
 "
 if stage filtered-library; then

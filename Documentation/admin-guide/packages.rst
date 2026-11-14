@@ -32,9 +32,15 @@ sl、ncurses、zlib、libpng、SQLite、mbedTLS 3 由签名 Alpine APK 提供。
 ``apk info --who-owns /usr/bin/sl``、``/usr/bin/tput``、``/usr/lib/libsqlite3.so.0`` 查询。
 离线更新器在预检时将旧包装包的 world 请求转换为官方包，保留其他包和配置；
 正式事务自动卸载旧包，完成后清除离线缓存中的旧包装包归档。
-新的自有包使用第 4 代版本前缀，保证从第 2、3 代包按正常版本顺序升级。
+新的自有包使用第 5 代版本前缀，保证从第 2、3、4 代包按正常版本顺序升级。
 旧的 ``sqlite.so.3`` ABI 已移除。
 依赖旧自定义 SQLite VFS 或厂商内部符号的外部程序需要重新编译。
+
+libbsd、dosfstools、e2fsprogs 及其运行库和文档也直接使用锁定的官方 Alpine APK。
+ext2/3/4 和 FAT 工具保留官方 ``/sbin`` 路径，旧 ``/usr/sbin`` 入口由兼容链接转发。
+本地认证支持包继续提供 libmd，本地文件系统包继续提供 exfatprogs；它们通过真实的
+APK 依赖安装已迁移的官方包，升级事务同时转移旧文件的所有权，不强制覆盖文件。
+shadow 构建使用独立提取的 libbsd 开发文件，不把 Alpine 的 Linux 头文件混入 SDK。
 
 RPR 本地发布树继续包含完整的签名索引、原始上游 APK 和自有包，构建
 ``rpr-pages`` 不等于部署到线上。运行库因新增 ELF NEEDED 而得到真实 APK

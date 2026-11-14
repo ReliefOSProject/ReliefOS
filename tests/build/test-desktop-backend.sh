@@ -111,7 +111,7 @@ mkdir -p "$work/out/upstream/ncurses/root/usr/bin" \
     "$work/out/upstream/ncurses/root/usr/share/terminfo" \
     "$work/out/upstream/ncurses/root/usr/include" \
     "$work/out/upstream/fixture-provider/root/usr/bin" \
-    "$work/out/upstream/fixture-provider/root/usr/sbin" \
+    "$work/out/upstream/fixture-provider/root/sbin" \
     "$work/out/upstream/inactive/root/usr/bin"
 printf 'ncurses clear\n' > "$work/out/upstream/ncurses/root/usr/bin/clear"
 ln -s clear "$work/out/upstream/ncurses/root/usr/bin/reset"
@@ -119,7 +119,7 @@ printf 'terminal data\n' > "$work/out/upstream/ncurses/root/usr/share/terminfo/f
 printf 'development header\n' > "$work/out/upstream/ncurses/root/usr/include/curses.h"
 printf 'selected provider\n' > "$work/out/upstream/fixture-provider/root/usr/bin/hexdump"
 printf 'external ping provider\n' > "$work/out/upstream/fixture-provider/root/usr/bin/ping"
-printf 'storage provider\n' > "$work/out/upstream/fixture-provider/root/usr/sbin/mkfs.ext4"
+printf 'storage provider\n' > "$work/out/upstream/fixture-provider/root/sbin/mkfs.ext4"
 printf 'inactive provider\n' > "$work/out/upstream/inactive/root/usr/bin/tree"
 printf 'BusyBox fixture\n' > "$work/out/userland/busybox.elf"
 printf '%s\n' /bin/sh /bin/ash /bin/false /bin/ping /bin/ping6 /bin/hexdump \
@@ -277,13 +277,13 @@ test "$(readlink "$xorg_root/bin/ping6")" = busybox
 # grow a BusyBox link, even under a different directory.
 cmp "$work/out/upstream/fixture-provider/root/usr/bin/hexdump" "$xorg_root/usr/bin/hexdump"
 cmp "$work/out/upstream/fixture-provider/root/usr/bin/ping" "$xorg_root/usr/bin/ping"
-cmp "$work/out/upstream/fixture-provider/root/usr/sbin/mkfs.ext4" "$xorg_root/usr/sbin/mkfs.ext4"
+cmp "$work/out/upstream/fixture-provider/root/sbin/mkfs.ext4" "$xorg_root/sbin/mkfs.ext4"
 test ! -e "$xorg_root/bin/hexdump"
 test ! -e "$xorg_root/bin/ping"
-# /sbin/mkfs.ext4 stays the storage compatibility alias to the upstream
-# provider; BusyBox must not claim the command.
-test -L "$xorg_root/sbin/mkfs.ext4"
-test "$(readlink "$xorg_root/sbin/mkfs.ext4")" = ../usr/sbin/mkfs.ext4
+# /sbin is the official provider; old /usr/sbin callers use a one-way alias.
+# BusyBox must not claim either entry point.
+test ! -L "$xorg_root/sbin/mkfs.ext4"
+test "$(readlink "$xorg_root/usr/sbin/mkfs.ext4")" = ../../sbin/mkfs.ext4
 # ncurses payloads are installed later from signed APKs, never overlaid.
 grep -Fx ncurses "$xorg_root/etc/reliefos/apk-components"
 test ! -e "$xorg_root/usr/share/doc/reliefos/apk-transitions"

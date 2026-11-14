@@ -8,10 +8,10 @@ APK_REPOSITORY := $(APK_WORK)/repository
 APK_MANIFEST := $(APK_WORK)/manifest.json
 APK_OWNERSHIP := $(APK_WORK)/ownership.tsv
 APK_SIGNING_KEY ?= $(HOME)/.local/share/leonos/apk-signing/key.pem
-# Generation 4 removes the terminal/SQLite wrapper packages entirely.
-# This sorts after generation 3 even for development builds at the same commit.
+# Generation 5 transfers libbsd and ext/FAT tools to official Alpine owners.
+# This sorts after generation 4 even for development builds at the same commit.
 # Published releases must still use an increasing SOURCE_DATE_EPOCH.
-APK_BUILD_VERSION ?= 4.$(SOURCE_DATE_EPOCH)-r0
+APK_BUILD_VERSION ?= 5.$(SOURCE_DATE_EPOCH)-r0
 APK_STAGE_SCRIPT := $(RELIEFOS_SRC)/tools/build/apk-stage.sh
 APK_STAGE_INPUTS := $(RELIEFOS_SRC)/tools/build/apk-layout.sh $(RELIEFOS_LAYOUT_TOOL) $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL)
 BUILD_LOG_INPUTS := $(RELIEFOS_SHELL_LOG) $(RELIEFOS_SRC)/tools/build/run-logged.sh $(RELIEFOS_SRC)/tools/build/format-log.awk

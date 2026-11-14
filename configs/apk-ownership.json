@@ -109,7 +109,7 @@
       "components": [],
       "paths": ["lib/ld-musl-x86_64.so.1", "lib/libc.so", "etc/ld-musl-x86_64.path"],
       "alpine_candidates": ["musl"],
-      "reason": "Password-file locking patch and loader ABI require validation before replacing the running system libc. No fabricated musl provides."
+      "reason": "The locally patched musl owns the real loader/libc. Its musl compatibility provider uses the binary-checked upstream version; it does not claim Alpine revisions."
     },
     "reliefos-mimalloc": {
       "destination": "reliefos",
@@ -212,10 +212,10 @@
     "auth-support-libraries": {
       "destination": "alpine-after-validation",
       "components": [],
-      "library_stems": ["lib/libbsd", "lib/libmd"],
-      "paths": ["usr/include/bsd", "usr/share/licenses/libbsd", "usr/share/licenses/libmd"],
-      "alpine_candidates": ["libbsd", "libmd"],
-      "reason": "Upstream dependencies of shadow; transfer headers, libraries and metadata with authentication consumers."
+      "library_stems": ["lib/libmd"],
+      "paths": ["usr/share/licenses/libmd"],
+      "alpine_candidates": ["libmd"],
+      "reason": "Local libmd 1.3.0 supplies the real libmd.so.0 ABI. Official libbsd owns its runtime; its development files are isolated for building shadow."
     },
     "storage-util-linux": {
       "destination": "alpine-after-validation",
@@ -227,17 +227,9 @@
     "storage-filesystems": {
       "destination": "alpine-after-validation",
       "components": [],
-      "library_stems": ["usr/lib/libcom_err", "usr/lib/libe2p", "usr/lib/libext2fs", "usr/lib/libss"],
-      "paths": ["usr/include/ext2fs", "usr/include/ss", "usr/include/e2p", "usr/include/et", "usr/include/com_err.h", "usr/share/et", "usr/share/ss"],
-      "alpine_candidates": ["e2fsprogs", "dosfstools", "exfatprogs"],
-      "reason": "Transfer formatter/checker aliases with commands; preserve ext2 installer behavior."
-    },
-    "ca-certificates-bundle": {
-      "destination": "alpine-after-validation",
-      "components": [],
-      "paths": ["etc/ssl/certs/ca-certificates.crt"],
-      "alpine_candidates": ["ca-certificates-bundle"],
-      "reason": "The actual CA bundle is packaged separately so curl dependencies and authenticated upstream updates can own it."
+      "paths": ["usr/bin/chattr", "usr/bin/lsattr", "usr/sbin/e2fsck", "usr/sbin/mke2fs", "usr/sbin/dosfsck", "usr/sbin/dosfslabel", "usr/sbin/fatlabel", "usr/sbin/mkdosfs", "usr/sbin/mkfs.ext3", "usr/sbin/fsck.ext3", "usr/sbin/mkfs.vfat", "usr/sbin/fsck.vfat", "usr/sbin/mkfs.msdos", "usr/sbin/fsck.msdos", "usr/sbin/mkfs.fat32", "usr/sbin/fsck.fat32", "sbin/mkfs.fat32", "sbin/fsck.fat32"],
+      "alpine_candidates": ["exfatprogs"],
+      "reason": "Local exfatprogs and compatibility aliases depend on official e2fsprogs/dosfstools packages. Official APKs retain ownership of ext/FAT executables, shared libraries, configuration and documentation."
     },
     "trust": {
       "destination": "alpine-after-validation",

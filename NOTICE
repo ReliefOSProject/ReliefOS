@@ -39,18 +39,23 @@ Runtime, libraries, and applications
 * util-linux 2.41.6 (su/runuser and storage utilities/libraries): upstream
   GPL/LGPL and file-specific terms;
   see README.licensing.
-* e2fsprogs 1.47.4: upstream GPL/LGPL/BSD/MIT and file-specific terms;
-  see NOTICE. dosfstools 4.2 and exfatprogs 1.4.4: see their COPYING files
-  and individual source headers. Fixed archive references and checksums are
-  in configs/storage-upstream.json; notices are installed under
-  /usr/share/licenses/<package>/.
+* e2fsprogs 1.47.4 and dosfstools 4.2: unmodified signed Alpine APKs,
+  including their split runtime libraries and documentation. Versions,
+  archive hashes, recipe commits and package licenses are recorded in
+  configs/dependencies.lock.json. See resources/licenses/e2fsprogs-NOTICE
+  and the dosfstools-doc package's /usr/share/doc/dosfstools/COPYING.
+  exfatprogs 1.4.4 remains source-built; see its COPYING and source headers,
+  configs/storage-upstream.json and /usr/share/licenses/exfatprogs/.
 * libxcrypt 4.5.2: LGPL-2.1-or-later and file-specific terms; see COPYING.LIB
   and LICENSING.
 * shadow-utils 4.20.2: BSD-3-Clause and file-specific SPDX terms; see COPYING.
-* libbsd 0.12.2: BSD/ISC/MIT and file-specific terms; see COPYING.
-* libmd 1.2.0: BSD/ISC/Beerware/public-domain and file-specific terms;
-  see COPYING. These authentication dependencies use verified release archives
-  listed in configs/auth-upstream.json; full notices are copied into the
+* libbsd 0.12.2: unmodified signed Alpine runtime/documentation APKs;
+  development APKs are extracted only for building shadow. See
+  resources/licenses/libbsd-LICENSE for BSD/ISC/MIT and file-specific terms,
+  and configs/dependencies.lock.json for archive identities.
+* libmd 1.3.0: BSD/ISC/Beerware/public-domain and file-specific terms;
+  see COPYING. This authentication dependency uses verified release archives
+  identified in configs/dependencies.lock.json; full notices are copied into the
   isolated staging root's /usr/share/licenses/<package>/ directory.
 * Vim (vim, vim-common, xxd): Vim License. Installed from signed Alpine APKs;
   versions and archive hashes are recorded in configs/dependencies.lock.json.

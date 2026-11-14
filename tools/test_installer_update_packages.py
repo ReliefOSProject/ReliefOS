@@ -75,10 +75,18 @@ class UpdatePreflight(unittest.TestCase):
                               check=True, capture_output=True, text=True)
 
     @classmethod
-    def package(cls, name, version, repository, dependencies=()):
+    def package(cls, name, version, repository, dependencies=(), payload=None, symlinks=None):
         files = cls.work / (name + "-" + version)
         (files / "usr/share" / name).mkdir(parents=True, exist_ok=True)
         (files / "usr/share" / name / "version").write_text(version + "\n")
+        for relative, text in (payload or {}).items():
+            path = files / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text)
+        for relative, destination in (symlinks or {}).items():
+            path = files / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.symlink_to(destination)
         arguments = ["mkpkg", "--files", files, "--output",
                      cls.base / repository / (name + "-" + version + ".apk"),
                      "--info", "name:" + name, "--info", "version:" + version,
@@ -173,6 +181,81 @@ class UpdatePreflight(unittest.TestCase):
             self.assertEqual((repository / "packages.adb").stat().st_mode & 0o777, 0o644)
             self.assertEqual((target / "usr/share/reliefos-fixture/version").read_text(), "2.0-r0\n")
             self.assertFalse((target / "run/reliefos-kernel-activation.defer").exists())
+
+    def test_filesystem_and_bsd_split_transfers_owners_and_preserves_configuration(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        self.package("reliefos-auth-support-libraries", "4.0-r0", old, payload={
+            "lib/libbsd.so.0": "old BSD library\n", "lib/libmd.so.0": "local MD library\n"})
+        self.package("reliefos-storage-filesystems", "4.0-r0", old, payload={
+            "usr/sbin/mkfs.ext4": "old formatter\n", "usr/sbin/mkfs.exfat": "local exFAT\n"},
+            symlinks={"sbin/mkfs.ext4": "../usr/sbin/mkfs.ext4"})
+        # Older rootfs fallback ownership also put configuration and extra
+        # tools in base; all old owners must join the same normal upgrade.
+        self.package("reliefos-base", "4.0-r0", old, payload={
+            "usr/lib/libext2fs.so.2": "old ext library\n", "etc/mke2fs.conf": "old defaults\n"})
+        self.package("reliefos-base", "5.0-r0", new)
+        self.package("libbsd", "0.12.2-r0", new, payload={"usr/lib/libbsd.so.0": "official BSD library\n"})
+        self.package("e2fsprogs", "1.47.4-r0", new, payload={
+            "sbin/mkfs.ext4": "official formatter\n", "usr/lib/libext2fs.so.2": "official ext library\n",
+            "etc/mke2fs.conf": "new defaults\n"})
+        self.package("reliefos-auth-support-libraries", "5.0-r0", new, ["libbsd"],
+                     payload={"lib/libmd.so.0": "local MD library\n"})
+        self.package("reliefos-storage-filesystems", "5.0-r0", new, ["e2fsprogs"],
+                     payload={"usr/sbin/mkfs.exfat": "local exFAT\n"},
+                     symlinks={"usr/sbin/mkfs.ext4": "../../sbin/mkfs.ext4"})
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "add", "reliefos-auth-support-libraries",
+                 "reliefos-storage-filesystems", "reliefos-base")
+        (target / "etc/mke2fs.conf").write_text("administrator defaults\n")
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertFalse((target / "lib/libbsd.so.0").exists())
+            self.assertEqual((target / "sbin/mkfs.ext4").read_text(), "official formatter\n")
+            self.assertFalse((target / "sbin/mkfs.ext4").is_symlink())
+            self.assertEqual(os.readlink(target / "usr/sbin/mkfs.ext4"), "../../sbin/mkfs.ext4")
+            self.assertEqual((target / "etc/mke2fs.conf").read_text(), "administrator defaults\n")
+            self.assertEqual((target / "lib/libmd.so.0").read_text(), "local MD library\n")
+            self.assertEqual((target / "usr/sbin/mkfs.exfat").read_text(), "local exFAT\n")
+            for path, owner in (("sbin/mkfs.ext4", "e2fsprogs"),
+                                ("usr/lib/libext2fs.so.2", "e2fsprogs"),
+                                ("usr/lib/libbsd.so.0", "libbsd")):
+                output = self.apk("--root", target, "info", "--who-owns", "/" + path).stdout
+                self.assertIn("owned by " + owner + "-", output)
+
+    def test_old_console_ca_placeholder_is_replaced_by_real_bundle(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        self.package("ca-certificates-bundle", "4.0-r0", old)
+        self.package("reliefos-trust", "4.0-r0", old, ["ca-certificates-bundle"])
+        self.package("ca-certificates-bundle", "20261020-r0", new, payload={
+            "etc/ssl/certs/ca-certificates.crt": "official bundle fixture\n"})
+        self.package("reliefos-trust", "5.0-r0", new,
+                     ["ca-certificates-bundle>=20261020-r0"])
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "add", "reliefos-trust")
+        self.assertFalse((target / "etc/ssl/certs/ca-certificates.crt").exists())
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual((target / "etc/ssl/certs/ca-certificates.crt").read_text(),
+                             "official bundle fixture\n")
+            owner = self.apk("--root", target, "info", "--who-owns",
+                             "/etc/ssl/certs/ca-certificates.crt").stdout
+            self.assertIn("owned by ca-certificates-bundle-20261020-r0", owner)
 
     def cache_events(self, result):
         events = []
