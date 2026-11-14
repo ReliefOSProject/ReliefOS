@@ -205,9 +205,9 @@
       "destination": "alpine-after-validation",
       "components": ["sudo", "su"],
       "library_stems": ["lib/libpam", "lib/libpam_misc", "lib/libpamc", "lib/libcrypt", "usr/lib/libsubid"],
-      "paths": ["bin/su", "usr/bin/sudo", "usr/bin/sudoedit", "usr/bin/passwd", "sbin/unix_chkpwd", "lib/security", "usr/lib/security", "usr/lib/sudo", "etc/pam.d", "etc/security", "etc/sudoers", "etc/sudoers.d", "etc/sudo.conf", "lib/libpam.so.0", "lib/libpam_misc.so.0", "lib/libpamc.so.0", "lib/libcrypt.so.2"],
+      "paths": ["bin/login", "usr/bin/newgrp", "sbin/nologin", "usr/bin/sudo", "usr/bin/sudoedit", "usr/bin/passwd", "sbin/unix_chkpwd", "lib/security", "usr/lib/security", "usr/lib/sudo", "etc/pam.d", "etc/security", "etc/sudoers", "etc/sudoers.d", "etc/sudo.conf", "lib/libpam.so.0", "lib/libpam_misc.so.0", "lib/libpamc.so.0", "lib/libcrypt.so.2"],
       "alpine_candidates": ["linux-pam", "shadow", "sudo", "libxcrypt"],
-      "reason": "PAM patches and pam_leonos_password need real local packaging; preserve policy, setuid modes and login semantics before any upstream replacement."
+      "reason": "PAM patches and shadow login/newgrp/nologin retain their real local owner. The signed authentication package replaces the overlapping util-linux-login files and su-l policy, while official APKs own su/runuser and their modes."
     },
     "auth-support-libraries": {
       "destination": "alpine-after-validation",
@@ -220,9 +220,9 @@
     "storage-util-linux": {
       "destination": "alpine-after-validation",
       "components": [],
-      "library_stems": ["usr/lib/libfdisk", "usr/lib/libsmartcols", "usr/lib/libuuid", "usr/lib/libblkid", "usr/lib/libmount"],
-      "alpine_candidates": ["util-linux"],
-      "reason": "Includes split libraries and command packages; resolve actual repository file ownership before choosing subpackages. Installer relies on these tools."
+      "paths": ["usr/sbin/fdisk", "usr/sbin/sfdisk", "usr/sbin/runuser", "usr/sbin/fsck", "usr/sbin/blkid", "usr/bin/mount", "usr/bin/umount", "usr/bin/lsblk", "sbin/umount"],
+      "alpine_candidates": [],
+      "reason": "Compatibility aliases depend on the official util-linux command, library and documentation packages. No locally built util-linux executables, libraries, headers or static archives enter the runtime."
     },
     "storage-filesystems": {
       "destination": "alpine-after-validation",

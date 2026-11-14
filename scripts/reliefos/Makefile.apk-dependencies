@@ -20,6 +20,18 @@ $(LIBBSD_DEVELOPMENT_ROOT)/.complete $(upstream_libbsd_products): $(O_META)/libb
 .PHONY: upstream-libbsd libbsd-development
 upstream-libbsd libbsd-development: $(LIBBSD_DEVELOPMENT_ROOT)/.complete $(upstream_libbsd_products)
 
+UTIL_LINUX_DEVELOPMENT_ROOT := $(UPSTREAM_ROOT)/util-linux/root
+upstream_util-linux_products := $(addprefix $(UTIL_LINUX_DEVELOPMENT_ROOT)/,usr/include/blkid/blkid.h usr/include/uuid/uuid.h usr/include/libeconf.h usr/lib/libblkid.a usr/lib/libuuid.a usr/lib/libeconf.a usr/lib/libblkid.so usr/lib/libuuid.so usr/lib/libeconf.so usr/lib/pkgconfig/blkid.pc usr/lib/pkgconfig/uuid.pc usr/lib/pkgconfig/libeconf.pc)
+$(UTIL_LINUX_DEVELOPMENT_ROOT)/.complete $(upstream_util-linux_products) &: $(RELIEFOS_SRC)/tools/build/util-linux-development.sh $(RELIEFOS_SRC)/scripts/reliefos/Makefile.apk-dependencies $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK) $(RELIEFOS_SRC)/resources/licenses/util-linux-README.licensing
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/util-linux-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(UTIL_LINUX_DEVELOPMENT_ROOT))
+	$(Q)touch $(upstream_util-linux_products)
+$(O_META)/util-linux-development-present.parameters: FORCE $(RELIEFOS_SRC)/tools/build/upstream-verify.sh
+	$(Q)sh $(RELIEFOS_SRC)/tools/build/upstream-verify.sh $(UTIL_LINUX_DEVELOPMENT_ROOT) $(UTIL_LINUX_DEVELOPMENT_ROOT).files $@
+$(UTIL_LINUX_DEVELOPMENT_ROOT)/.complete $(upstream_util-linux_products): $(O_META)/util-linux-development-present.parameters
+.PHONY: upstream-util-linux util-linux-development
+upstream-util-linux: upstream-apk util-linux-development
+util-linux-development: $(UTIL_LINUX_DEVELOPMENT_ROOT)/.complete $(upstream_util-linux_products)
+
 RUNTIME_DEVELOPMENT_ROOT := $(UPSTREAM_ROOT)/runtime-development
 RUNTIME_DEP_LIBDIR := $(RUNTIME_DEVELOPMENT_ROOT)/usr/lib
 RUNTIME_DEP_SHARED := $(addprefix $(RUNTIME_DEP_LIBDIR)/,libpng.so libz.so libmbedtls.so libmbedx509.so libmbedcrypto.so)

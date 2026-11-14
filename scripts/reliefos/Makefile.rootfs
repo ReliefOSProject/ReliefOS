@@ -10,7 +10,7 @@ ROOTFS_SOURCE_DIRS := $(RELIEFOS_SRC)/system $(RELIEFOS_SRC)/resources/build-art
 ROOTFS_SOURCE_DIRS += $(RELIEFOS_SRC)/resources/reliefmath $(RELIEFOS_SRC)/resources/licenses/reliefmath
 ROOTFS_SOURCE_DIRS += $(RELIEFOS_SRC)/userland/fastfetch $(RELIEFOS_SRC)/logo.png $(RELIEFOS_SRC)/test/test.mp3 $(RELIEFOS_SRC)/Documentation/admin-guide/packages.rst $(RELIEFOS_SRC)/configs/apk-ownership.json
 ROOTFS_SOURCE_DIRS += $(wildcard $(addprefix $(RELIEFOS_SRC)/third_party/,busybox/LICENSE pl_editor/LICENSE))
-ROOTFS_SOURCE_DIRS += $(RELIEFOS_SRC)/tools/build/rpr-config.sh $(addprefix $(RELIEFOS_SRC)/resources/licenses/,sl-LICENSE ncurses-LICENSE sqlite-LICENSE zlib-LICENSE libpng-LICENSE mbedtls3-LICENSE libbsd-LICENSE e2fsprogs-NOTICE)
+ROOTFS_SOURCE_DIRS += $(RELIEFOS_SRC)/tools/build/rpr-config.sh $(addprefix $(RELIEFOS_SRC)/resources/licenses/,sl-LICENSE ncurses-LICENSE sqlite-LICENSE zlib-LICENSE libpng-LICENSE mbedtls3-LICENSE libbsd-LICENSE e2fsprogs-NOTICE util-linux-README.licensing libeconf-LICENSE utmps-COPYING)
 $(O_META)/rootfs-sources.parameters: FORCE $(RELIEFOS_SRC)/tools/build/tree-signature.sh
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/tree-signature.sh $@ $(ROOTFS_SOURCE_DIRS)
 ROOTFS_UPSTREAM_PRODUCTS = $(foreach package,$(UPSTREAM_PACKAGES),$(UPSTREAM_ROOT)/$(package)/root/.complete $(upstream_$(package)_products))

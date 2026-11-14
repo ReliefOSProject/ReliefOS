@@ -40,6 +40,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--image", type=Path, required=True, help="fresh production raw disk")
     parser.add_argument("--smp", type=int, choices=(1, 2), default=2)
+    parser.add_argument("--allow-empty-fsver", action="store_true",
+                        help="accept the documented official Alpine lsblk 2.42.4-r3 probe limitation")
     args = parser.parse_args()
     output = ROOT / f"build/lsblk-filesystems-qemu/{args.smp}cpu"
     output.mkdir(parents=True, exist_ok=True)
@@ -109,11 +111,14 @@ printf '[lsblk-probe] DONE\\n' >/dev/serial0
     for i, name in enumerate(("sda1", "sda2")):
         device, metadata = devices[name], expected[i]
         for column, key in (("fstype", "TYPE"), ("fsver", "VERSION"), ("label", "LABEL"), ("uuid", "UUID")):
+            if column == "fsver" and args.allow_empty_fsver and not device[column]:
+                continue
             assert (device[column] or "") == metadata.get(key, ""), (name, column, device, metadata)
         assert device["partuuid"].lower() == partitions[i]["uuid"].lower(), device
         assert device["mountpoints"] == [["/boot", "/"][i]], device
         assert device["fsavail"] and device["fsuse%"].endswith("%"), device
-    print(f"PASS QEMU {args.smp} CPU: real filesystem type/version/label/UUID/PARTUUID, usage and block-read DAC")
+    version = " (empty FSVER permitted for the official APK)" if args.allow_empty_fsver else ""
+    print(f"PASS QEMU {args.smp} CPU: real filesystem metadata, usage and block-read DAC{version}")
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ except ModuleNotFoundError:
     import tomli as tomllib
 
 import reliefos_layout as layout
-from storage_tools import FORMATTER_COMMANDS, UTIL_LINUX_COMMANDS, UTIL_LINUX_LIBRARIES
+from storage_tools import FORMATTER_COMMANDS
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -63,8 +63,6 @@ def load_policy(policy_path: Path, components_path: Path):
                 claim(stem + suffix, group)
     if set(owners) & set(upstream) or set(owners) | set(upstream) != expected:
         raise ValueError(f"component policy mismatch: {sorted((set(owners) | set(upstream)) ^ expected)}")
-    for path in (*UTIL_LINUX_COMMANDS, *UTIL_LINUX_LIBRARIES):
-        claim(path, "storage-util-linux")
     for path in FORMATTER_COMMANDS:
         claim(path, "storage-filesystems")
     return policy, rules

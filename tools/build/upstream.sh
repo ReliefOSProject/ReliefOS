@@ -45,17 +45,13 @@ case $pkg in
 libmd) set -- "$@" --libdir=/lib ;;
 sudo) set -- "$@" --with-pam --with-pam-login --with-secure-path=/usr/sbin:/usr/bin:/sbin:/bin --with-rundir=/run/sudo --with-vardir=/var/lib/sudo --libexecdir=/usr/lib ;;
 shadow) set -- "$@" --bindir=/bin --sbindir=/sbin --with-libpam --with-yescrypt --without-su --disable-logind ;;
-util-linux) CPPFLAGS="$CPPFLAGS -include linux/openat2.h"; export CPPFLAGS
- # Without libudev, lsblk probes the device directly. Upstream's flags omit
- # VERSION even though -f requests FSVER; request it from the real superblock.
- awk '
- /BLKID_SUBLKS_TYPE\);/ {sub(/BLKID_SUBLKS_TYPE\);/, "BLKID_SUBLKS_TYPE | BLKID_SUBLKS_VERSION);"); changed++}
- {print}
- END {if (changed != 1) exit 1}
- ' "$source/misc-utils/lsblk-properties.c" > "$source/misc-utils/lsblk-properties.c.new"
- mv "$source/misc-utils/lsblk-properties.c.new" "$source/misc-utils/lsblk-properties.c"
- set -- "$@" --sbindir=/usr/sbin --disable-all-programs --enable-su --enable-runuser --enable-libuuid --enable-libfdisk --enable-libsmartcols --enable-fdisks=check --enable-libblkid --enable-libmount --enable-mount --enable-blkid --enable-lsblk --enable-fsck --without-python --without-systemd --without-systemdsystemunitdir --disable-makeinstall-chown ;;
-exfatprogs) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS; set -- "$@" --sbindir=/usr/sbin --disable-shared --enable-static ;;
+exfatprogs)
+    LDFLAGS="-static -L$auth/usr/lib"
+    # Alpine's static blkid archive uses libeconf. Request the real private
+    # dependency explicitly; its blkid.pc does not list libeconf.
+    BLKID_LIBS=$(pkg-config --static --libs blkid libeconf)
+    export LDFLAGS BLKID_LIBS
+    set -- "$@" --sbindir=/usr/sbin --disable-shared --enable-static ;;
 coreutils)
     # The optional dispatched CRC backend pulls compiler-rt's precompiled
     # cpu_model constructor into every single-binary invocation. Its host ISA
@@ -76,7 +72,7 @@ tmp=$(mktemp -d "$stage.new.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT
 cd "$work/build"
 "$source/configure" "$@"
-if [ "$pkg" = exfatprogs ]; then make "LDFLAGS=$LDFLAGS -all-static" "BLKID_LIBS=$auth/usr/lib/libblkid.a"; else make; fi
+if [ "$pkg" = exfatprogs ]; then make "LDFLAGS=$LDFLAGS -all-static" "BLKID_LIBS=$BLKID_LIBS"; else make; fi
 if [ "$pkg" = sudo ]; then make install "DESTDIR=$tmp" INSTALL_OWNER=; else make install "DESTDIR=$tmp"; fi
 # alsa-lib 1.2.14 forbids shared/static in one configure (upstream INSTALL).
 # Use two private builds of the same verified source; publish just the static

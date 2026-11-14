@@ -19,7 +19,7 @@ link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
 # Every enabled upstream root is passed by the build graph. The default keeps
 # standalone callers compatible with the complete product package set.
-rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd util-linux sudo shadow exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg'}
+rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd sudo shadow exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg'}
 for package in $rootfs_upstream_packages; do
     if [ "$package" = ffmpeg ]; then
         if enabled reliefplayer; then
@@ -35,7 +35,7 @@ for package in $rootfs_upstream_packages; do
         continue
     fi
     case $package in
-        libbsd|e2fsprogs|dosfstools)
+        libbsd|e2fsprogs|dosfstools|util-linux)
             echo "rootfs-stage: $package is supplied by official APKs; remove its local overlay" >&2
             exit 1
             ;;
@@ -103,7 +103,7 @@ done
 for name in shadow gshadow; do file "$src/system/rootfs/etc/$name" "etc/$name" 0600 product-policy override; done
 file "$src/system/rootfs/etc/sudoers" etc/sudoers 0440 product-policy override
 # Regular program modes remain explicit even when copied from a tool's stage.
-for spec in 'sudo usr/bin/sudo' 'shadow usr/bin/passwd' 'util-linux bin/su'; do
+for spec in 'sudo usr/bin/sudo' 'shadow usr/bin/passwd'; do
     set -- $spec; file "$out/upstream/$1/root/$2" "$2" 4755 authentication override
 done
 file "$out/pam/root/sbin/unix_chkpwd" sbin/unix_chkpwd 4755 authentication override
@@ -258,6 +258,9 @@ for library in zlib libpng mbedtls3; do
 done
 file "$src/resources/licenses/libbsd-LICENSE" usr/share/licenses/libbsd/COPYING
 file "$src/resources/licenses/e2fsprogs-NOTICE" usr/share/licenses/e2fsprogs/NOTICE
+file "$src/resources/licenses/util-linux-README.licensing" usr/share/licenses/util-linux/README.licensing
+file "$src/resources/licenses/libeconf-LICENSE" usr/share/licenses/libeconf/LICENSE
+file "$src/resources/licenses/utmps-COPYING" usr/share/licenses/utmps/COPYING
 
 for name in simsun.ttc system.psf; do file "$src/system/fonts/$name" "usr/share/fonts/reliefos/$name"; done
 file "$src/system/fonts/times.ttf" usr/share/fonts/reliefos/times-new-roman.ttf
@@ -268,7 +271,9 @@ for app in leonmmcoset xiaobai; do
 done
 # Compatibility links are explicit overrides of upstream aliases.
 link usr/bin/su ../../bin/su authentication override
-for command in fdisk sfdisk runuser fsck blkid mkfs.exfat fsck.exfat leonos-grub-installer; do link "sbin/$command" "../usr/sbin/$command" storage override; done
+for command in mkfs.exfat fsck.exfat leonos-grub-installer; do link "sbin/$command" "../usr/sbin/$command" storage override; done
+for command in fdisk sfdisk runuser fsck blkid; do link "usr/sbin/$command" "../../sbin/$command" storage; done
+for command in mount umount lsblk; do link "usr/bin/$command" "../../bin/$command" storage; done
 link sbin/umount ../bin/umount storage override
 # Official filesystem APKs own /sbin. Preserve older /usr/sbin callers with
 # one-way aliases, without replacing the official executables or their links.

@@ -32,7 +32,7 @@ sl、ncurses、zlib、libpng、SQLite、mbedTLS 3 由签名 Alpine APK 提供。
 ``apk info --who-owns /usr/bin/sl``、``/usr/bin/tput``、``/usr/lib/libsqlite3.so.0`` 查询。
 离线更新器在预检时将旧包装包的 world 请求转换为官方包，保留其他包和配置；
 正式事务自动卸载旧包，完成后清除离线缓存中的旧包装包归档。
-新的自有包使用第 5 代版本前缀，保证从第 2、3、4 代包按正常版本顺序升级。
+新的自有包使用第 6 代版本前缀，保证从第 2、3、4、5 代包按正常版本顺序升级。
 旧的 ``sqlite.so.3`` ABI 已移除。
 依赖旧自定义 SQLite VFS 或厂商内部符号的外部程序需要重新编译。
 
@@ -41,6 +41,20 @@ ext2/3/4 和 FAT 工具保留官方 ``/sbin`` 路径，旧 ``/usr/sbin`` 入口�
 本地认证支持包继续提供 libmd，本地文件系统包继续提供 exfatprogs；它们通过真实的
 APK 依赖安装已迁移的官方包，升级事务同时转移旧文件的所有权，不强制覆盖文件。
 shadow 构建使用独立提取的 libbsd 开发文件，不把 Alpine 的 Linux 头文件混入 SDK。
+
+util-linux 2.42.4 的命令、运行库和手册由锁定的官方 Alpine edge APK 提供。
+分区和文件系统工具保留官方 ``/sbin`` 路径，mount、umount、lsblk 保留 ``/bin`` 路径；
+旧入口通过单向兼容链接转发。exfatprogs 的开发依赖从官方 APK 单独提取，运行镜像不包含
+这份开发根。现有 shadow login、newgrp、nologin 和 PAM 策略由本地认证包明确接管重叠文件，
+官方包保留 su、runuser 的文件归属和权限。
+
+liblastlog2 依赖 SQLite 运行库，因此桌面和控制台基础系统均保留 sqlite-libs；
+SQLite 命令仍由组件开关控制。
+
+官方 lsblk 2.42.4-r3 的直接探测路径未请求文件系统版本，因此 ``FSVER`` 列可能为空。
+本版保留该原版行为；读取真实版本可使用::
+
+    sudo blkid -p -s VERSION -o value /dev/sda2
 
 RPR 本地发布树继续包含完整的签名索引、原始上游 APK 和自有包，构建
 ``rpr-pages`` 不等于部署到线上。运行库因新增 ELF NEEDED 而得到真实 APK

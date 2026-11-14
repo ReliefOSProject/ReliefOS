@@ -1,9 +1,8 @@
 # Include after third-party.mk, pam.mk and runtime.mk. Each package owns an isolated root.
 UPSTREAM_ROOT := $(O)/upstream
 UPSTREAM_SCRIPT := $(RELIEFOS_SRC)/tools/build/upstream.sh
-UPSTREAM_PACKAGES := libmd util-linux sudo shadow exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg
+UPSTREAM_PACKAGES := libmd sudo shadow exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg
 upstream_libmd_outputs := lib/libmd.so.0 usr/include/md5.h
-upstream_util-linux_outputs := usr/lib/libuuid.a usr/lib/libblkid.a bin/su usr/sbin/fdisk bin/mount bin/lsblk
 upstream_sudo_outputs := usr/bin/sudo usr/lib/sudo/sudoers.so
 upstream_shadow_outputs := bin/login usr/sbin/useradd usr/sbin/usermod usr/sbin/userdel
 upstream_exfatprogs_outputs := usr/sbin/mkfs.exfat usr/sbin/fsck.exfat

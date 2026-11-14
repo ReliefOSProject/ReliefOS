@@ -30,4 +30,12 @@ test -f "$secondary"
 rm "$secondary"
 make -C "$src" O="$make_out" upstream-dosfstools -j8 > "$work/restore.log" 2>&1 || { cat "$work/restore.log" >&2; exit 1; }
 test -f "$secondary"
+# Development inputs are isolated too, and every selected member must be
+# recovered even when it is not one of the Make rule's primary headers.
+secondary=$out/upstream/util-linux/root/usr/include/libeconf_ext.h
+test -s "$secondary"
+expected=$(sha256sum "$secondary")
+rm "$secondary"
+make -C "$src" O="$make_out" util-linux-development -j8 > "$work/restore-util-linux.log" 2>&1 || { cat "$work/restore-util-linux.log" >&2; exit 1; }
+test "$(sha256sum "$secondary")" = "$expected"
 printf '%s\n' 'upstream no-op mtimes and secondary-output restoration: PASS'

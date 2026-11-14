@@ -14,8 +14,8 @@ for entry in sbin/mkfs.ext4:e2fsprogs sbin/fsck.ext2:e2fsprogs sbin/mkfs.fat:dos
     apk info --who-owns "/$path" | grep -F "owned by $owner-"
 done
 apk info --who-owns /lib/libmd.so.0 | grep -F 'owned by reliefos-auth-support-libraries-'
-apk info --who-owns /usr/lib/libblkid.so.1 | grep -F 'owned by reliefos-storage-util-linux-'
-apk info --who-owns /usr/lib/libuuid.so.1 | grep -F 'owned by reliefos-storage-util-linux-'
+apk info --who-owns /usr/lib/libblkid.so.1 | grep -F 'owned by libblkid-'
+apk info --who-owns /usr/lib/libuuid.so.1 | grep -F 'owned by libuuid-'
 test ! -e /lib/libbsd.so.0
 test ! -e /usr/include/bsd
 test ! -e /usr/include/ext2fs

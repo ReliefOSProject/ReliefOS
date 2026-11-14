@@ -75,7 +75,8 @@ class UpdatePreflight(unittest.TestCase):
                               check=True, capture_output=True, text=True)
 
     @classmethod
-    def package(cls, name, version, repository, dependencies=(), payload=None, symlinks=None):
+    def package(cls, name, version, repository, dependencies=(), payload=None, symlinks=None,
+                replaces=(), modes=None):
         files = cls.work / (name + "-" + version)
         (files / "usr/share" / name).mkdir(parents=True, exist_ok=True)
         (files / "usr/share" / name / "version").write_text(version + "\n")
@@ -87,12 +88,16 @@ class UpdatePreflight(unittest.TestCase):
             path = files / relative
             path.parent.mkdir(parents=True, exist_ok=True)
             path.symlink_to(destination)
+        for relative, mode in (modes or {}).items():
+            (files / relative).chmod(mode)
         arguments = ["mkpkg", "--files", files, "--output",
                      cls.base / repository / (name + "-" + version + ".apk"),
                      "--info", "name:" + name, "--info", "version:" + version,
                      "--info", "arch:x86_64", "--sign-key", cls.key]
-        for dependency in dependencies:
-            arguments.extend(["--info", "depends:" + dependency])
+        if dependencies:
+            arguments.extend(["--info", "depends:" + " ".join(dependencies)])
+        if replaces:
+            arguments.extend(["--info", "replaces:" + " ".join(replaces)])
         cls.apk(*arguments)
 
     @classmethod
@@ -229,6 +234,75 @@ class UpdatePreflight(unittest.TestCase):
                                 ("usr/lib/libbsd.so.0", "libbsd")):
                 output = self.apk("--root", target, "info", "--who-owns", "/" + path).stdout
                 self.assertIn("owned by " + owner + "-", output)
+
+    def test_util_linux_transfer_retains_shadow_pam_and_official_su_modes(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        shadow = {"bin/login": "shadow login\n", "usr/bin/newgrp": "shadow newgrp\n",
+                  "sbin/nologin": "shadow nologin\n"}
+        self.package("reliefos-base", "5.0-r0", old, payload=shadow)
+        self.package("reliefos-authentication", "5.0-r0", old, payload={
+            "bin/su": "local su\n", "etc/pam.d/su-l": "product policy\n"})
+        self.package("reliefos-storage-util-linux", "5.0-r0", old, payload={
+            "usr/sbin/fdisk": "local fdisk\n", "usr/lib/libblkid.so.1": "local blkid\n"},
+            symlinks={"sbin/fdisk": "../usr/sbin/fdisk"})
+        self.package("reliefos-base", "6.0-r0", new)
+        self.package("util-linux-login", "2.42.4-r3", new, payload={
+            **{name: "official overlapping tool\n" for name in shadow},
+            "bin/su": "official su\n", "etc/pam.d/su-l": "upstream policy\n"},
+            modes={"bin/su": 0o4755})
+        self.package("util-linux-misc", "2.42.4-r3", new,
+                     payload={"sbin/fdisk": "official fdisk\n"})
+        self.package("libblkid", "2.42.4-r3", new,
+                     payload={"usr/lib/libblkid.so.1": "official blkid\n"})
+        self.package("reliefos-authentication", "6.0-r0", new, ["util-linux-login"],
+                     payload={**shadow, "etc/pam.d/su-l": "product policy\n"},
+                     replaces=["util-linux-login"])
+        self.package("reliefos-storage-util-linux", "6.0-r0", new,
+                     ["util-linux-misc", "libblkid"],
+                     symlinks={"usr/sbin/fdisk": "../../sbin/fdisk"})
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "add", "reliefos-base",
+                 "reliefos-authentication", "reliefos-storage-util-linux")
+        (target / "etc/pam.d/su-l").write_text("administrator policy\n")
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            for name, text in shadow.items():
+                self.assertEqual((target / name).read_text(), text)
+                owner = self.apk("--root", target, "info", "--who-owns", "/" + name).stdout
+                self.assertIn("owned by reliefos-authentication-", owner)
+            self.assertEqual((target / "etc/pam.d/su-l").read_text(), "administrator policy\n")
+            self.assertEqual((target / "bin/su").stat().st_mode & 0o7777, 0o4755)
+            self.assertEqual((target / "bin/su").read_text(), "official su\n")
+            self.assertEqual(os.readlink(target / "usr/sbin/fdisk"), "../../sbin/fdisk")
+            self.assertFalse((target / "sbin/fdisk").is_symlink())
+            for path, package in (("bin/su", "util-linux-login"),
+                                  ("sbin/fdisk", "util-linux-misc"),
+                                  ("usr/lib/libblkid.so.1", "libblkid")):
+                owner = self.apk("--root", target, "info", "--who-owns", "/" + path).stdout
+                self.assertIn("owned by " + package + "-", owner)
+        # A later upstream-only upgrade must still honor the already installed
+        # local replacement, without reinstalling/changing authentication.
+        self.package("util-linux-login", "2.42.5-r0", new, payload={
+            **{name: "new upstream overlap\n" for name in shadow},
+            "bin/su": "upgraded official su\n", "etc/pam.d/su-l": "new upstream policy\n"},
+            modes={"bin/su": 0o4755})
+        self.index(new)
+        repositories.write_text("ndx " + str(new / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "upgrade", "util-linux-login")
+        for name, text in shadow.items():
+            self.assertEqual((target / name).read_text(), text)
+        self.assertEqual((target / "bin/su").read_text(), "upgraded official su\n")
+        self.assertEqual((target / "bin/su").stat().st_mode & 0o7777, 0o4755)
+        self.assertEqual((target / "etc/pam.d/su-l").read_text(), "administrator policy\n")
 
     def test_old_console_ca_placeholder_is_replaced_by_real_bundle(self):
         old, new = self.runner / "oldrepo", self.runner / "newrepo"

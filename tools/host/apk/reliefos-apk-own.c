@@ -189,14 +189,6 @@ static int load_rules(struct state *state, const char *policy_path, json_value *
             {"reliefos-apps", "usr/share/licenses/pleditor"},
             {"busybox", "bin/busybox"}, {"busybox", "bin/sh"}, {"busybox", "usr/share/licenses/busybox"}
         };
-        static const char *const util_commands[] = {
-            "usr/sbin/fdisk", "usr/sbin/sfdisk", "usr/sbin/runuser", "usr/sbin/fsck",
-            "usr/sbin/blkid", "bin/mount", "bin/umount", "bin/lsblk"
-        };
-        static const char *const util_libraries[] = {
-            "usr/lib/libfdisk.so.1", "usr/lib/libsmartcols.so.1", "usr/lib/libuuid.so.1",
-            "usr/lib/libblkid.so.1", "usr/lib/libmount.so.1"
-        };
         static const char *const filesystem_commands[] = {
             "usr/sbin/mkfs.ext4", "usr/sbin/fsck.ext4", "usr/sbin/mkfs.ext2", "usr/sbin/fsck.ext2", "usr/sbin/mkfs.fat",
             "usr/sbin/fsck.fat", "usr/sbin/mkfs.exfat", "usr/sbin/fsck.exfat"
@@ -204,10 +196,6 @@ static int load_rules(struct state *state, const char *policy_path, json_value *
         size_t item;
         for (item = 0; item < sizeof(tool_paths) / sizeof(tool_paths[0]); item++)
             if (add_rule(state, tool_paths[item].path, tool_paths[item].group) != 0) return -1;
-        for (item = 0; item < sizeof(util_commands) / sizeof(util_commands[0]); item++)
-            if (add_rule(state, util_commands[item], "storage-util-linux") != 0) return -1;
-        for (item = 0; item < sizeof(util_libraries) / sizeof(util_libraries[0]); item++)
-            if (add_rule(state, util_libraries[item], "storage-util-linux") != 0) return -1;
         for (item = 0; item < sizeof(filesystem_commands) / sizeof(filesystem_commands[0]); item++)
             if (add_rule(state, filesystem_commands[item], "storage-filesystems") != 0) return -1;
     }

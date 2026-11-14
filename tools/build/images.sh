@@ -3,6 +3,7 @@
 set -eu
 [ "$#" -ge 1 ] || exit 2
 mode=$1; shift
+build_dir=$(CDPATH='' cd -- "$(dirname "$0")" && pwd -P)
 case $mode in
 ext2)
     [ "$#" = 4 ] || exit 2
@@ -26,13 +27,14 @@ ext2)
     # fakeroot intercepts chown/stat; real host privileges are unnecessary.
     E2FSPROGS_FAKE_TIME="$epoch" FAKEROOTDONTTRYCHOWN=1 fakeroot -- sh -eu -c '
         find "$1" -exec chown -h 0:0 {} +
+        sh "$5" "$1"
         if [ -f "$1/etc/reliefos/test-image" ]; then
             test "$(cat "$1/etc/reliefos/test-image")" = leonos-standalone-test-v1
             test ! -L "$1/home/test"
             find "$1/home/test" -exec chown -h 1000:1000 {} +
         fi
         mke2fs -q -t ext2 -F -b 4096 -I 128 -O none,filetype,sparse_super,large_file -m 0 -E root_owner=0:0,hash_seed="$4" -U "$4" -N "$3" -d "$1" "$2"
-    ' sh "$work/root" "$work/root.ext2" "$inodes" "$uuid"
+    ' sh "$work/root" "$work/root.ext2" "$inodes" "$uuid" "$build_dir/apk-permissions.sh"
     reliefos_ext2_time=${RELIEFOS_EXT2_TIME:-${LEONOS_EXT2_TIME:-}}
     : "${reliefos_ext2_time:?ext2 timestamp tool required}"
     "$reliefos_ext2_time" "$work/root.ext2" "$epoch"
@@ -59,13 +61,14 @@ ext4)
     truncate -s "${mib}M" "$work/root.ext4"
     E2FSPROGS_FAKE_TIME="$epoch" FAKEROOTDONTTRYCHOWN=1 fakeroot -- sh -eu -c '
         find "$1" -exec chown -h 0:0 {} +
+        sh "$5" "$1"
         if [ -f "$1/etc/reliefos/test-image" ]; then
             test "$(cat "$1/etc/reliefos/test-image")" = leonos-standalone-test-v1
             test ! -L "$1/home/test"
             find "$1/home/test" -exec chown -h 1000:1000 {} +
         fi
         mke2fs -q -t ext4 -F -b 4096 -I 256 -O none,filetype,extents,dir_index,metadata_csum,64bit,flex_bg,has_journal,large_file,huge_file,extra_isize -m 0 -E root_owner=0:0,hash_seed="$4" -U "$4" -N "$3" -d "$1" "$2"
-    ' sh "$work/root" "$work/root.ext4" "$inodes" "$uuid"
+    ' sh "$work/root" "$work/root.ext4" "$inodes" "$uuid" "$build_dir/apk-permissions.sh"
     reliefos_ext4_time=${RELIEFOS_EXT4_TIME:-${RELIEFOS_EXT2_TIME:-${LEONOS_EXT2_TIME:-}}}
     : "${reliefos_ext4_time:?ext4 timestamp tool required}"
     "$reliefos_ext4_time" "$work/root.ext4" "$epoch"

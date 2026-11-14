@@ -9,8 +9,9 @@ UTIL_LINUX_COMMANDS = ("usr/sbin/fdisk", "usr/sbin/sfdisk", "usr/sbin/runuser",
 UTIL_LINUX_LIBRARIES = tuple(f"usr/lib/lib{name}.so.1"
                            for name in ("fdisk", "smartcols", "uuid", "blkid", "mount"))
 
-COMPAT_LINKS = {"sbin/" + Path(path).name: "../" + path
+COMPAT_LINKS = {path: "../../sbin/" + Path(path).name
                 for path in UTIL_LINUX_COMMANDS if path.startswith("usr/sbin/")}
+COMPAT_LINKS.update({f"usr/bin/{name}": f"../../bin/{name}" for name in ("mount", "umount", "lsblk")})
 COMPAT_LINKS.update({"sbin/umount": "../bin/umount",
                      "sbin/leonos-grub-installer": "../usr/sbin/leonos-grub-installer"})
 for verb in ("mkfs", "fsck"):

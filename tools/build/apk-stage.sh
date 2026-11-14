@@ -27,8 +27,8 @@ done
 
 # Package triggers must execute chrooted inside the target root: they invoke
 # target-root tools by bare name or absolute path and write caches to
-# compiled-in absolute paths. fakeroot cannot chroot, so without user
-# namespaces the transaction would run trigger scripts against the host.
+# compiled-in absolute paths. apk's upstream usermode performs its own
+# namespace/chroot setup, while retaining numeric owners in its real database.
 unshare -Ur true >/dev/null 2>&1 ||
     { echo 'APK staging requires user namespaces (unshare -Ur): package triggers must run chrooted inside the target root' >&2; exit 1; }
 
@@ -172,8 +172,8 @@ fi
 
 # Files from pinned official archives retain their upstream signatures and
 # package ownership. The verified APK archive member list is the authority for
-# their file paths; metadata members are not root payload. Only the five XDM
-# policy files are retained for the signed reliefos-xdm-config replacement.
+# their file paths; metadata members are not root payload. Product XDM/PAM
+# policy and existing shadow tools have explicit signed local replacements.
 while IFS= read -r archive; do
     cp "$archive" "$repository/"
     tar --ignore-zeros -xOf "$archive" .PKGINFO >"$scratch/upstream-pkginfo" 2>/dev/null
@@ -187,6 +187,14 @@ while IFS= read -r archive; do
         case $path in ''|.*|*/) continue;; esac
         case $path in /*|*../*|../*|*"	"*) echo "unsafe upstream APK path: $path" >&2; exit 1;; esac
         case $backend:$upstream_name:$path in
+            *:util-linux-login:bin/login|*:util-linux-login:usr/bin/newgrp|\
+            *:util-linux-login:sbin/nologin|*:util-linux-login:etc/pam.d/su-l)
+                [ -f "$tree/$path" ] && [ ! -L "$tree/$path" ] || {
+                    echo "missing regular shadow/PAM product file: $path" >&2
+                    exit 1
+                }
+                continue
+                ;;
             xorg:xdm:etc/X11/xdm/xdm-config|xorg:xdm:etc/X11/xdm/Xservers|\
             xorg:xdm:etc/X11/xdm/Xresources|xorg:xdm:usr/lib/X11/xdm/Xsession|\
             xorg:xdm:usr/lib/X11/xdm/Xsetup_0)
@@ -349,10 +357,16 @@ fi
 
 run_apk()
 {
-    if [ "$1" = mkpkg ]; then apk_log=$work/logs/$package.log
-    else apk_log=$work/logs/install.log
+    if [ "$1" = mkpkg ]; then
+        sh "$src/tools/build/run-logged.sh" --tag APK "$work/logs/$package.log" unshare -Ur "$apk" "$@"
+    elif [ "$(id -u)" = 0 ]; then
+        sh "$src/tools/build/run-logged.sh" --tag APK "$work/logs/install.log" "$apk" "$@"
+    else
+        # A single-ID namespace cannot chown official root:tty files (wall).
+        # Usermode is apk's supported rootless extraction mode, not a forced
+        # transaction. images.sh restores the database ACLs under fakeroot.
+        sh "$src/tools/build/run-logged.sh" --tag APK "$work/logs/install.log" "$apk" --usermode "$@"
     fi
-    sh "$src/tools/build/run-logged.sh" --tag APK "$apk_log" unshare -Ur "$apk" "$@"
 }
 
 : >"$scratch/local-packages"
@@ -399,6 +413,8 @@ while IFS= read -r group; do
         # Their real dependencies pull the migrated tools into older systems
         # in the same signed transaction that upgrades the former file owner.
         reliefos-auth-support-libraries) dependencies="$dependencies libbsd libbsd-doc" ;;
+        reliefos-authentication) dependencies="$dependencies util-linux-login" ;;
+        reliefos-storage-util-linux) dependencies="$dependencies util-linux util-linux-misc util-linux-login runuser blkid lsblk sfdisk mount umount libblkid libfdisk libmount libsmartcols libuuid util-linux-doc util-linux-login-doc" ;;
         reliefos-storage-filesystems) dependencies="$dependencies e2fsprogs e2fsprogs-extra e2fsprogs-libs libcom_err e2fsprogs-doc dosfstools dosfstools-doc" ;;
         reliefos-kernel) dependencies="$dependencies reliefos-grub=$version" ;;
         # Upgrade old console images whose former local CA package contained
@@ -419,6 +435,9 @@ while IFS= read -r group; do
     replaces=
     case $package in reliefos-*) replaces="leonos-${package#reliefos-}";; esac
     [ "$package" != reliefos-xdm-config ] || replaces="$replaces xdm"
+    # util-linux bundles su with shadow-owned login/newgrp/nologin and su-l
+    # policy. The official su and runuser payloads keep their original owners.
+    [ "$package" != reliefos-authentication ] || replaces="$replaces util-linux-login"
     # Old images recorded the transferred command paths as BusyBox files.
     # APK must hand those paths to GNU in the same transaction that upgrades
     # BusyBox; an overwrite/force flag would conceal a packaging conflict.
