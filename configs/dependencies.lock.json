@@ -378,6 +378,19 @@
       "license_in_source": ".PKGINFO"
     },
     {
+      "id": "x11-dev-glib",
+      "kind": "apk",
+      "version": "2.88.1-r1",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/glib-dev-2.88.1-r1.apk",
+      "sha256": "ad1c0a360a2effd1e2d905f2e4e90de53b05ff012cb9e900f49d7ba20f33161d",
+      "directory": "glib-dev-2.88.1-r1",
+      "script": "tools/build/x11-development.sh",
+      "target": "x11-development",
+      "feature": "xorg",
+      "note": "Alpine v3.24 build-only GLib/GIO headers matching alpine-glib. LGPL-2.1-or-later; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
       "id": "x11-dev-libx11",
       "kind": "apk",
       "version": "1.8.14-r0",

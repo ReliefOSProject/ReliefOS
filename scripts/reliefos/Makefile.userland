@@ -30,6 +30,7 @@ export AUTOCONF_H HEADER_EXPORT_INCLUDE HEADER_EXPORT_MANIFEST RELIEFOS_CC_ID RE
 
 X11_DEVELOPMENT_ROOT := $(O)/upstream/x11-development
 X11_DEVELOPMENT_PRODUCTS := $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/FL/Fl.H usr/include/X11/Xlib.h usr/include/X11/X.h usr/lib/libfltk.so usr/lib/libstdc++.so.6 usr/lib/libgcc_s.so.1 usr/lib/libX11.so usr/lib/libX11.so.6)
+X11_DEVELOPMENT_PRODUCTS += $(addprefix $(X11_DEVELOPMENT_ROOT)/,usr/include/glib-2.0/glib.h usr/include/gio-unix-2.0/gio/gdesktopappinfo.h usr/lib/glib-2.0/include/glibconfig.h usr/lib/libgio-2.0.so usr/lib/libgobject-2.0.so usr/lib/libglib-2.0.so)
 $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK)
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/x11-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(X11_DEVELOPMENT_ROOT))
 	$(Q)touch $(X11_DEVELOPMENT_PRODUCTS)
@@ -38,6 +39,10 @@ USERLAND_FLTK_LIBS := $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libfltk.so li
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_CXX_EXTRA_$(app) := -I$(RELIEFOS_SRC)/userland/apps -isystem $(X11_DEVELOPMENT_ROOT)/usr/include))
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_LIBS_$(app) += $(USERLAND_FLTK_LIBS)))
 $(foreach app,$(USERLAND_FLTK_APPS),$(eval USERLAND_DEPS_$(app) += $(X11_DEVELOPMENT_ROOT)/.complete $(X11_DEVELOPMENT_PRODUCTS)))
+
+# Keep the public GLib API baseline usable without the C++ standard headers.
+USERLAND_CXX_EXTRA_taskmgr += -DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_66 -DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_66 $(addprefix -isystem $(X11_DEVELOPMENT_ROOT)/,usr/include/glib-2.0 usr/lib/glib-2.0/include usr/include/gio-unix-2.0)
+USERLAND_LIBS_taskmgr += $(addprefix $(X11_DEVELOPMENT_ROOT)/usr/lib/,libgio-2.0.so libgobject-2.0.so libglib-2.0.so)
 
 USERLAND_LIBS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so
 USERLAND_DEPS_reliefcapture += $(X11_DEVELOPMENT_ROOT)/usr/lib/libX11.so

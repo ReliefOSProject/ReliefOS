@@ -81,6 +81,7 @@ file "$src/system/xorg/xdm.conf" etc/X11/xdm/xdm-config 0644 product-policy over
 file "$src/system/xorg/xdm-Xservers" etc/X11/xdm/Xservers 0644 product-policy override
 file "$src/system/xorg/xdm-Xresources" etc/X11/xdm/Xresources 0644 product-policy override
 file "$src/system/xorg/xdm-session" usr/lib/X11/xdm/Xsession 0755 product-policy override
+file "$src/system/xorg/autostart-terminal" usr/libexec/reliefos/autostart/xdg-terminal-exec 0755 reliefos-apps
 file "$src/system/xorg/xdm-setup" usr/lib/X11/xdm/Xsetup_0 0755 product-policy override
 # IceWM reads these system defaults through its standard /etc/icewm path.
 tree "$src/system/xorg/icewm" etc/reliefos/icewm product-policy override

@@ -4,16 +4,16 @@ extern "C" {
 #include <reliefos/auth.h>
 #include <reliefos/system.h>
 #include <reliefos/launch.h>
-#include <reliefos/startup.h>
 #include <reliefos/system.h>
 }
 
 #include "fltk_support.h"
+#include "autostart.h"
+#include "startup_page.h"
 
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Choice.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Menu_Bar.H>
@@ -50,8 +50,6 @@ enum {
     TASKMGR_ACTION_PROCESSES = 5,
     TASKMGR_ACTION_PERFORMANCE = 6,
     TASKMGR_ACTION_STARTUP = 7,
-    TASKMGR_ACTION_ENABLE = 8,
-    TASKMGR_ACTION_REMOVE = 9,
 };
 
 class TaskWindow;
@@ -61,19 +59,13 @@ Fl_Menu_Bar *menu_bar;
 Fl_Tabs *tab_stack;
 Fl_Group *page_processes;
 Fl_Group *page_performance;
-Fl_Group *page_startup;
+StartupPage *page_startup;
 Fl_Browser *process_list;
 Fl_Box *process_headers[7];
-Fl_Browser *startup_list_widget;
-Fl_Choice *startup_choice;
-Fl_Box *startup_user_label;
-Fl_Output *startup_username;
 Fl_Output *status_output;
 Fl_Button *button_refresh;
 Fl_Button *button_end_task;
 Fl_Button *button_details;
-Fl_Button *button_startup_toggle;
-Fl_Button *button_startup_remove;
 Fl_Menu_Button *process_popup;
 Fl_Widget *performance_widget;
 class PerformanceView;
@@ -100,13 +92,6 @@ uint32_t cpu_percent, mem_percent;
 int cpu_snapshot_valid, perf_valid;
 struct taskmgr_gpu_sample gpu_sample;
 
-struct reliefos_startup_entry startup_entries[RELIEFOS_STARTUP_MAX_ENTRIES];
-uint32_t startup_entry_count;
-struct reliefos_user_info startup_users[16];
-uint32_t startup_user_count, startup_selected_uid;
-uint32_t selected_startup_id;
-int startup_available;
-int selected_startup = -1;
 int active_tab = TASKMGR_TAB_PROCESSES;
 int updating;
 int process_column_widths[8];
@@ -197,28 +182,8 @@ int selected_task_killable()
                                  task->state, task->flags);
 }
 
-void startup_command_line(char *text, uint32_t cap,
-                          const struct reliefos_startup_command *command)
-{
-    uint32_t used = 0;
-    text[0] = 0;
-    for (uint32_t i = 0; command && command->path[i] && used + 1 < cap; ++i)
-        text[used++] = command->path[i];
-    for (uint32_t a = 0; command && a < command->argc; ++a) {
-        if (used + 1 < cap) text[used++] = ' ';
-        for (uint32_t i = 0; command->args[a][i] && used + 1 < cap; ++i)
-            text[used++] = command->args[a][i];
-    }
-    text[used] = 0;
-}
-
 void update_controls()
 {
-    struct reliefos_task_info *task = selected_task();
-    struct reliefos_startup_entry *entry =
-        (active_tab == TASKMGR_TAB_STARTUP && selected_startup >= 0 &&
-         (uint32_t)selected_startup < startup_entry_count)
-            ? &startup_entries[selected_startup] : NULL;
     if (button_end_task) {
         if (active_tab == TASKMGR_TAB_PROCESSES && selected_task_killable())
             button_end_task->activate();
@@ -229,16 +194,7 @@ void update_controls()
             button_details->activate();
         else button_details->deactivate();
     }
-    if (button_startup_toggle) {
-        button_startup_toggle->copy_label(entry && entry->enabled ? T("Disable") : T("Enable"));
-        if (entry && startup_available) button_startup_toggle->activate();
-        else button_startup_toggle->deactivate();
-    }
-    if (button_startup_remove) {
-        if (entry && startup_available) button_startup_remove->activate();
-        else button_startup_remove->deactivate();
-    }
-    (void)task;
+
 }
 
 void refresh_tasks()
@@ -315,113 +271,9 @@ void refresh_tasks()
     }
 }
 
-void refresh_startup_users()
-{
-    struct reliefos_user_info current = {};
-    struct reliefos_user_info *allocated = NULL;
-    uint32_t count = 0;
-    startup_user_count = 0;
-    if (reliefos_auth_current(&current) < 0) {
-        startup_available = 0;
-        return;
-    }
-    if (current.role == RELIEFOS_AUTH_ROLE_ADMIN &&
-        reliefos_auth_users_alloc(&allocated, 0, &count) == 0 && count &&
-        count <= sizeof(startup_users) / sizeof(startup_users[0])) {
-        for (uint32_t i = 0; i < count; ++i) startup_users[i] = allocated[i];
-        startup_user_count = count;
-        free(allocated);
-    } else {
-        free(allocated);
-        startup_users[0] = current;
-        startup_user_count = 1;
-    }
-    for (uint32_t i = 0; i < startup_user_count; ++i) {
-        if (startup_users[i].uid == startup_selected_uid) return;
-    }
-    startup_selected_uid = startup_user_count ? startup_users[0].uid : 0;
-}
-
-void refresh_startup_choice()
-{
-    static uint32_t built_count;
-    static uint32_t built_uids[16];
-    int changed = built_count != startup_user_count;
-    for (uint32_t i = 0; !changed && i < startup_user_count; ++i)
-        if (built_uids[i] != startup_users[i].uid) changed = 1;
-    if (changed && startup_choice) {
-        updating = 1;
-        startup_choice->clear();
-        for (uint32_t i = 0; i < startup_user_count; ++i) {
-            char item[32];
-            snprintf(item, sizeof(item), "UID %u", startup_users[i].uid);
-            startup_choice->add(item);
-            built_uids[i] = startup_users[i].uid;
-        }
-        built_count = startup_user_count;
-        updating = 0;
-    }
-    if (startup_choice) {
-        int selected = 0;
-        for (uint32_t i = 0; i < startup_user_count; ++i)
-            if (startup_users[i].uid == startup_selected_uid) selected = (int)i;
-        updating = 1;
-        startup_choice->value(selected);
-        updating = 0;
-    }
-    if (startup_username) {
-        const char *name = T("Unavailable");
-        for (uint32_t i = 0; i < startup_user_count; ++i)
-            if (startup_users[i].uid == startup_selected_uid) name = startup_users[i].username;
-        startup_username->value(name);
-    }
-}
-
-void refresh_startup_entries()
-{
-    char lines[RELIEFOS_STARTUP_MAX_ENTRIES][800];
-    uint32_t count = 0;
-    int old_top = startup_list_widget ? startup_list_widget->topline() : 1;
-    if (!startup_user_count ||
-        reliefos_startup_list(startup_selected_uid, startup_entries,
-                              RELIEFOS_STARTUP_MAX_ENTRIES, &count) < 0) {
-        startup_available = 0;
-        startup_entry_count = 0;
-        count = 0;
-    } else {
-        startup_available = 1;
-        startup_entry_count = count > RELIEFOS_STARTUP_MAX_ENTRIES
-                                  ? RELIEFOS_STARTUP_MAX_ENTRIES : count;
-        count = startup_entry_count;
-    }
-    selected_startup = -1;
-    for (uint32_t i = 0; i < count; ++i)
-        if (selected_startup_id && startup_entries[i].id == selected_startup_id)
-            selected_startup = (int)i;
-    if (startup_list_widget) {
-        updating = 1;
-        startup_list_widget->clear();
-        startup_list_widget->format_char(0);
-        for (uint32_t i = 0; i < count; ++i) {
-            char command[736];
-            startup_command_line(command, sizeof(command), &startup_entries[i].command);
-            snprintf(lines[i], sizeof(lines[i]), "%s  %s",
-                     startup_entries[i].enabled ? T("Enabled") : T("Disabled"), command);
-            startup_list_widget->add(lines[i]);
-        }
-        if (selected_startup >= 0) startup_list_widget->value(selected_startup + 1);
-        else selected_startup_id = 0;
-        if (old_top > 0 && (uint32_t)old_top <= count) startup_list_widget->topline(old_top);
-        updating = 0;
-    }
-}
-
 void refresh_startup()
 {
-    refresh_startup_users();
-    refresh_startup_choice();
-    refresh_startup_entries();
-    update_controls();
+    if (page_startup) page_startup->refresh();
 }
 
 void refresh_performance()
@@ -760,47 +612,6 @@ void show_task_details()
     fl_message("%s", body);
 }
 
-void toggle_selected_startup_entry()
-{
-    struct reliefos_startup_entry *entry =
-        selected_startup >= 0 && (uint32_t)selected_startup < startup_entry_count
-            ? &startup_entries[selected_startup] : NULL;
-    if (!entry) {
-        set_status(T("No startup app selected"));
-        return;
-    }
-    if (reliefos_startup_set_enabled(startup_selected_uid, entry->id,
-                                     !entry->enabled) < 0) {
-        set_status(T("Could not change startup app"));
-        return;
-    }
-    set_status(entry->enabled ? T("Startup app disabled") : T("Startup app enabled"));
-    refresh_startup_entries();
-    update_controls();
-}
-
-void remove_selected_startup_entry()
-{
-    struct reliefos_startup_entry *entry =
-        selected_startup >= 0 && (uint32_t)selected_startup < startup_entry_count
-            ? &startup_entries[selected_startup] : NULL;
-    if (!entry) {
-        set_status(T("No startup app selected"));
-        return;
-    }
-    const uint32_t uid = startup_selected_uid;
-    const uint32_t entry_id = entry->id;
-    if (!confirm_dialog(T("Remove Startup App"), T("Remove the selected startup app?"))) return;
-    if (reliefos_startup_remove(uid, entry_id) < 0) {
-        set_status(T("Could not remove startup app"));
-        return;
-    }
-    selected_startup_id = 0;
-    set_status(T("Startup app removed"));
-    refresh_startup_entries();
-    update_controls();
-}
-
 void show_about()
 {
     fl_message_title(T("Task Manager"));
@@ -822,15 +633,16 @@ void select_page(int tab)
 void perform_action(uint32_t action)
 {
     switch (action) {
-    case TASKMGR_ACTION_REFRESH: refresh_all(); break;
+    case TASKMGR_ACTION_REFRESH:
+        refresh_all();
+        if (active_tab == TASKMGR_TAB_STARTUP) page_startup->refresh(true);
+        break;
     case TASKMGR_ACTION_END: kill_selected_task(); break;
     case TASKMGR_ACTION_DETAILS: show_task_details(); break;
     case TASKMGR_ACTION_ABOUT: show_about(); break;
     case TASKMGR_ACTION_PROCESSES: select_page(TASKMGR_TAB_PROCESSES); break;
     case TASKMGR_ACTION_PERFORMANCE: select_page(TASKMGR_TAB_PERFORMANCE); break;
     case TASKMGR_ACTION_STARTUP: select_page(TASKMGR_TAB_STARTUP); break;
-    case TASKMGR_ACTION_ENABLE: toggle_selected_startup_entry(); break;
-    case TASKMGR_ACTION_REMOVE: remove_selected_startup_entry(); break;
     default: break;
     }
 }
@@ -841,10 +653,9 @@ void action_callback(Fl_Widget *, void *data)
 }
 
 class TaskBrowser : public Fl_Browser {
-    int startup_;
 public:
-    TaskBrowser(int x, int y, int w, int h, int startup, const char *label = NULL)
-        : Fl_Browser(x, y, w, h, label), startup_(startup)
+    TaskBrowser(int x, int y, int w, int h, const char *label = NULL)
+        : Fl_Browser(x, y, w, h, label)
     {
         type(FL_HOLD_BROWSER);
     }
@@ -857,17 +668,16 @@ public:
                 return 1;
             }
             if (key == FL_Delete) {
-                if (startup_) remove_selected_startup_entry();
-                else kill_selected_task();
+                kill_selected_task();
                 return 1;
             }
-            if (!startup_ && (key == FL_Enter || key == FL_KP_Enter)) {
+            if ((key == FL_Enter || key == FL_KP_Enter)) {
                 show_task_details();
                 return 1;
             }
         }
         int result = Fl_Browser::handle(event);
-        if (event == FL_PUSH && Fl::event_button() == FL_RIGHT_MOUSE && !startup_) {
+        if (event == FL_PUSH && Fl::event_button() == FL_RIGHT_MOUSE) {
             int row = value();
             if (row > 0 && (uint32_t)row <= tree_count)
                 selected_pid = tasks[tree_rows[row - 1].index].pid;
@@ -890,33 +700,6 @@ void process_selected(Fl_Widget *widget, void *)
     int row = browser->value();
     if (row < 1 || (uint32_t)row > tree_count) selected_pid = 0;
     else selected_pid = tasks[tree_rows[row - 1].index].pid;
-    update_controls();
-}
-
-void startup_selected(Fl_Widget *widget, void *)
-{
-    if (updating) return;
-    int row = ((Fl_Browser *)widget)->value();
-    if (row < 1 || (uint32_t)row > startup_entry_count) {
-        selected_startup = -1;
-        selected_startup_id = 0;
-    } else {
-        selected_startup = row - 1;
-        selected_startup_id = startup_entries[selected_startup].id;
-    }
-    update_controls();
-}
-
-void startup_user_selected(Fl_Widget *widget, void *)
-{
-    if (updating) return;
-    int row = ((Fl_Choice *)widget)->value();
-    if (row < 0 || (uint32_t)row >= startup_user_count) return;
-    startup_selected_uid = startup_users[row].uid;
-    selected_startup = -1;
-    selected_startup_id = 0;
-    refresh_startup_choice();
-    refresh_startup_entries();
     update_controls();
 }
 
@@ -1012,15 +795,6 @@ void layout_ui(int width, int height)
         update_performance_layout();
     }
 
-    if (startup_user_label) startup_user_label->resize(20, 66, 48, 28);
-    if (startup_choice) startup_choice->resize(72, 66, 134, 28);
-    if (startup_username)
-        startup_username->resize(216, 66, width - 236, 28);
-    if (button_startup_toggle) button_startup_toggle->resize(20, 106, 96, 30);
-    if (button_startup_remove) button_startup_remove->resize(124, 106, 96, 30);
-    if (startup_list_widget)
-        startup_list_widget->resize(20, 148, width - 40, height - 196);
-
     if (process_list) process_list->redraw();
     shell->redraw();
 }
@@ -1070,7 +844,7 @@ void build_ui()
         process_headers[i]->align((i == 0 ? FL_ALIGN_LEFT : FL_ALIGN_CENTER) |
                                   FL_ALIGN_INSIDE);
     }
-    process_list = new TaskBrowser(20, 132, 960, 480, 0);
+    process_list = new TaskBrowser(20, 132, 960, 480);
     process_list->format_char(0);
     process_list->column_char('\t');
     process_list->when(FL_WHEN_CHANGED);
@@ -1096,30 +870,7 @@ void build_ui()
     page_performance->resizable(performance_scroll);
     page_performance->end();
 
-    page_startup = new Fl_Group(12, 56, 976, 564, T("Startup applications"));
-    page_startup->tooltip(T("Manage startup entries for the selected user."));
-    page_startup->begin();
-    startup_user_label = new Fl_Box(20, 66, 48, 28, T("User"));
-    startup_user_label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-    startup_choice = new Fl_Choice(72, 66, 134, 28);
-    startup_choice->callback(startup_user_selected);
-    startup_choice->tooltip(T("Choose which user's startup entries to manage."));
-    startup_username = new Fl_Output(216, 66, 560, 28);
-    button_startup_toggle = new Fl_Button(20, 106, 96, 30, T("Enable"));
-    button_startup_toggle->callback(action_callback,
-                                    (void *)(uintptr_t)TASKMGR_ACTION_ENABLE);
-    button_startup_toggle->tooltip(T("Enable or disable the selected startup entry."));
-    button_startup_remove = new Fl_Button(124, 106, 96, 30, T("Remove"));
-    button_startup_remove->callback(action_callback,
-                                    (void *)(uintptr_t)TASKMGR_ACTION_REMOVE);
-    button_startup_remove->tooltip(T("Remove the selected startup entry after confirmation."));
-    startup_list_widget = new TaskBrowser(20, 148, 960, 464, 1);
-    startup_list_widget->format_char(0);
-    startup_list_widget->when(FL_WHEN_CHANGED);
-    startup_list_widget->callback(startup_selected);
-    startup_list_widget->tooltip(T("Select a startup entry before using Enable, Disable, or Remove."));
-    page_startup->resizable(startup_list_widget);
-    page_startup->end();
+    page_startup = new StartupPage(12, 56, 976, 564, set_status);
 
     tab_stack->end();
     process_popup = new Fl_Menu_Button(0, 0, 0, 0);
@@ -1144,9 +895,10 @@ void build_ui()
 
 int main(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
+    if (argc == 2 && !strcmp(argv[1], "--run-autostart")) return autostart::run_session();
     reliefos_fltk::init("taskmgr");
+    // Configuration workers fork from this UI process. Use FLTK's file dialogs.
+    Fl::option(Fl::OPTION_FNFC_USES_GTK, false);
     taskmgr_perf_history_init(&history);
     build_ui();
     shell->show(argc, argv);
