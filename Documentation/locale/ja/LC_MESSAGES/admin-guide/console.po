@@ -1,0 +1,44 @@
+# ja translation of the ReliefOS documentation.
+# Copyright (C) 2021-2026, ReliefOS contributors
+# Distributed under the same license as ReliefOS.
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 5.3.2\n"
+"PO-Revision-Date: 2026-11-14 00:00+0800\n"
+"Last-Translator: ReliefOS translation contributors\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "控制台与诊断"
+msgstr "コンソールと診断"
+
+msgid "VT 与日志"
+msgstr "VT とログ"
+
+msgid ""
+"文本 VT 与图形会话共享内核设备，切换时必须正确交还显示和输入。 启动串口日志可用于没有图形输出的情况。内核启动徽标按发现的逻辑 CPU 数量 "
+"显示，启动完成前自动移除；它不是物理插槽数量的指示器。 ``logcolor=0`` 禁用内核日志颜色，``bootlog-pause=1`` "
+"用于启动日志暂停检查。 不要把只到达 GRUB 页面作为启动成功。"
+msgstr ""
+"テキスト VT "
+"とグラフィカルセッションはカーネルデバイスを共有するため、切り替え時には画面と入力の制御を正しく返す必要があります。グラフィカル出力がない場合は起動時のシリアルログを利用できます。カーネルの起動ロゴは検出された論理"
+" CPU 数に応じて表示され、起動完了前に自動的に消えます。物理ソケット数を示すものではありません。``logcolor=0`` "
+"はカーネルログの色を無効にし、``bootlog-pause=1`` は起動ログを一時停止して確認するために使用します。GRUB "
+"画面に到達しただけで起動成功と判断しないでください。"
+
+msgid "崩溃报告"
+msgstr "クラッシュレポート"
+
+msgid ""
+"Kernel panic 在当前文本 VT 输出诊断；在 GUI 中从左上角绘制黑底字符格， 保留其他像素。完整诊断继续写串口和 VT "
+"历史。记录异常码、RIP、CR2/CR3、 CPU/任务、内核版本和源码身份，使用同一构建的调试符号定位。 没有目标虚拟机故障注入的测试，不能宣称 "
+"panic 显示已在该平台通过。"
+msgstr ""
+"Kernel panic は現在のテキスト VT に診断情報を出力します。GUI "
+"では左上から黒背景の文字セルを描画し、それ以外のピクセルは保持します。完全な診断情報はシリアル出力と VT "
+"の履歴にも引き続き記録されます。例外コード、RIP、CR2/CR3、CPU／タスク、カーネルバージョン、ソースの識別情報を記録し、同じビルドのデバッグシンボルを使って障害箇所を特定してください。対象の仮想マシンで障害注入テストを実施していない場合、そのプラットフォームで"
+" panic 表示のテストに合格したと主張してはいけません。"

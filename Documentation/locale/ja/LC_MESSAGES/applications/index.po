@@ -1,0 +1,22 @@
+# ja translation of the ReliefOS documentation.
+# Copyright (C) 2021-2026, ReliefOS contributors
+# Distributed under the same license as ReliefOS.
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 5.3.2\n"
+"PO-Revision-Date: 2026-11-14 00:00+0800\n"
+"Last-Translator: ReliefOS translation contributors\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "应用手册"
+msgstr "アプリケーションマニュアル"
+
+msgid "应用按组件安装，使用系统中文字体和原生 FLTK 控件。各页说明实际支持格式与限制。"
+msgstr ""
+"アプリケーションはコンポーネント単位でインストールし、システムの中国語フォントとネイティブ FLTK "
+"ウィジェットを使います。各ページでは実際に対応する形式と制限を説明します。"

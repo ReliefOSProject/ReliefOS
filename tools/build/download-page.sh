@@ -28,25 +28,28 @@ iso_hash=$(sha256sum "$iso" | cut -d' ' -f1)
 # SHA256SUMS lists the bare filename so `sha256sum -c` runs inside download/.
 printf '%s  %s\n' "$iso_hash" "$name" > "$site/download/SHA256SUMS"
 
-{
-    site_page_begin "$(site_css_href 1)" "$(site_home_href 1)" \
-        "ReliefOS Download" "ReliefOS Download"
-    printf '<p class="subtitle">Latest release &middot; version %s &middot; x86_64</p>\n' \
-        "$(printf '%s' "$version" | site_html_escape)"
+for language in zh-CN en ja; do
+    site_use_language "$language"
+    page=$site/$(site_page_path "$language" download/index.html)
+    mkdir -p "$(dirname "$page")"
+    {
+    site_page_begin download/index.html "$(site_message download_title)" "$(site_message download_title)"
+    printf '<p class="subtitle">%s &middot; %s %s &middot; x86_64</p>\n' \
+        "$(site_text latest_release)" "$(site_text version)" "$(printf '%s' "$version" | site_html_escape)"
     cat <<HTML
 <section>
-<h2>Installer ISO</h2>
+<h2>$(site_text installer_iso)</h2>
 <dl class="meta">
-<dt>File</dt><dd>$(printf '%s' "$name" | site_html_escape)</dd>
-<dt>Architecture</dt><dd>x86_64</dd>
-<dt>Size</dt><dd>$(site_bytes_human "$size")</dd>
+<dt>$(site_text file)</dt><dd>$(printf '%s' "$name" | site_html_escape)</dd>
+<dt>$(site_text architecture)</dt><dd>x86_64</dd>
+<dt>$(site_text size)</dt><dd>$(site_bytes_human "$size")</dd>
 <dt>SHA256</dt><dd class="hash">$(printf '%s' "$iso_hash" | site_html_escape)</dd>
-<div class="clear"></div>
 </dl>
-<p><a class="button" href="$(printf '%s' "$name" | site_html_escape)">Download</a></p>
-<p><a href="SHA256SUMS">SHA256SUMS</a> &mdash; verify with
-<code>sha256sum -c SHA256SUMS</code> inside this directory.</p>
+<p><a class="button" href="$(site_href "download/$name")">$(site_text download)</a></p>
+<p><a href="$(site_href download/SHA256SUMS)">SHA256SUMS</a> &mdash; $(site_text checksum_help)</p>
+<pre>sha256sum -c SHA256SUMS</pre>
 </section>
 HTML
     site_page_end
-} > "$site/download/index.html"
+    } > "$page"
+done
