@@ -30,6 +30,25 @@ index_sha=${index_sha%% *}
 [ -z "$expected_index" ] || [ "$index_sha" = "$expected_index" ] || die 'installation media changed after inspection; check the update again'
 
 temporary=$(/bin/busybox mktemp -d /tmp/reliefos-update.XXXXXX)
+update_step=repository update_action=step update_package=- update_status=0
+files_done=0 files_total=0 bytes_done=0 bytes_total=0 bytes_reused=0
+cache_temporary=
+activity() {
+    printf 'activity\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+        "$update_step" "$update_action" "$update_package" "$files_done" "$files_total" \
+        "$bytes_done" "$bytes_total" "$bytes_reused" "$update_status"
+}
+stage() {
+    update_step=$1 update_action=step update_package=- update_status=0
+    files_done=0 files_total=0 bytes_done=0 bytes_total=0 bytes_reused=0
+    activity
+}
+failure() {
+    printf 'update: failed step=%s operation=%s package=%s exit=%s\n' \
+        "$update_step" "$update_action" "$update_package" "$1" >&2
+    update_action=failed update_status=$1
+    activity
+}
 world_changed=0
 retention_started=0
 activation_deferred=0
@@ -39,9 +58,17 @@ cleanup() {
     result=$?
     trap - EXIT HUP INT TERM
     set +e
+    [ "$result" -eq 0 ] || failure "$result"
     if [ "$retention_started" -eq 1 ]; then
-        "$kernel_bundle" --restore-all "$target" || result=1
+        [ "$result" -ne 0 ] || stage restore
+        if "$kernel_bundle" --restore-all "$target"; then :
+        else
+            restore_status=$?
+            [ "$result" -ne 0 ] || failure "$restore_status"
+            result=1
+        fi
     fi
+    if [ -n "$cache_temporary" ]; then /bin/busybox rm -f "$cache_temporary" || result=1; fi
     # Only roll world back when APK did not modify its database. A partially
     # committed database must keep APK's actual world for a consistent retry.
     if [ "$result" -ne 0 ] && [ "$world_changed" -eq 1 ] &&
@@ -214,6 +241,7 @@ run_transaction() {
 }
 
 echo 'Checking signed repository and package archives'
+stage repository
 packages=$(apk --root "$plan" --keys-dir "$target/etc/apk/keys" \
     --repositories-file "$configuration" --no-network search --quiet 'reliefos-*')
 [ -n "$packages" ] || die 'the signed repository has no ReliefOS packages'
@@ -229,15 +257,18 @@ done
 # Replacement commands are world selections, no longer dependencies of local
 # wrappers. Include them in the verified archive set before the solver runs.
 upstream_packages=$(/bin/busybox sort -u "$temporary/upstream-packages")
+stage fetch
 apk --root "$plan" --keys-dir "$target/etc/apk/keys" \
     --repositories-file "$configuration" --no-network fetch --recursive \
     --output "$temporary/repository" $packages $repair_packages $upstream_packages
+stage verify
 apk --root "$plan" --keys-dir "$target/etc/apk/keys" --no-network \
     verify "$temporary/repository/"*.apk
 /bin/busybox cp "$repository/packages.adb" "$temporary/repository/packages.adb"
 write_repositories "$temporary/repository" "$temporary/tagged-verified" > "$temporary/verified.repositories"
 configuration=$temporary/verified.repositories
 echo 'Calculating the offline package transaction'
+stage plan
 if [ -n "$repair_packages" ]; then
     run_transaction "$plan" "$temporary/repair-plan.log" fix --simulate
 fi
@@ -246,6 +277,7 @@ printf 'RELIEFOS_UPDATE_INDEX_SHA256=%s\n' "$index_sha"
 [ "$mode" != check ] || exit 0
 
 echo 'Preserving installed kernel modules and local configuration'
+stage retain
 case "$kernel_bundle" in /*) ;; *) die 'kernel retention helper must have an absolute path' ;; esac
 [ -x "$kernel_bundle" ] || die 'native kernel retention helper is missing'
 /bin/sh /usr/lib/reliefos/reliefos-migrate "$target"
@@ -266,36 +298,80 @@ activation_deferred=1
 world_changed=1
 echo 'Applying the signed package transaction'
 if [ -n "$repair_packages" ]; then
+    stage repair
     run_transaction "$target" "$temporary/repair.log" fix
 fi
+stage upgrade
 run_transaction "$target" "$temporary/transaction.log" upgrade
+stage shell
 /bin/busybox chroot "$target" /bin/sh /usr/lib/reliefos/migrate-shell
 
 echo 'Publishing the verified offline repository'
+stage cache
 for relative in usr usr/share usr/share/reliefos usr/share/reliefos/apk usr/share/reliefos/apk/repository; do
     path=$target/$relative
     [ ! -L "$path" ] && { [ ! -e "$path" ] || [ -d "$path" ]; } || die "unsafe repository directory: $path"
     [ -d "$path" ] || /bin/busybox mkdir -m 0755 "$path"
 done
 destination=$target/usr/share/reliefos/apk/repository
-for package in "$temporary/repository"/*.apk; do
+# Use the verified archive set, including the signed index, for exact totals.
+# Comparisons avoid rewriting an unchanged cache on update retries. An I/O
+# error is not a content difference and must not be hidden by a replacement.
+: > "$temporary/cache-files"
+for package in "$temporary/repository"/*.apk "$temporary/repository/packages.adb"; do
     name=${package##*/}
-    /bin/busybox cp "$package" "$destination/$name.new"
-    /bin/busybox chmod 0644 "$destination/$name.new"
-    /bin/busybox mv "$destination/$name.new" "$destination/$name"
+    update_package=$name
+    case "$name" in ''|*[!a-zA-Z0-9+_.-]*) die 'unsafe verified archive name' ;; esac
+    [ -f "$package" ] && [ ! -L "$package" ] || die "unsafe verified archive: $package"
+    size=$(/bin/busybox stat -c %s "$package")
+    next=$((bytes_total + size))
+    [ "$next" -ge "$bytes_total" ] || die 'offline cache size overflow'
+    bytes_total=$next files_total=$((files_total + 1))
+    printf '%s\t%s\n' "$size" "$name" >> "$temporary/cache-files"
 done
-/bin/busybox cp "$temporary/repository/packages.adb" "$destination/packages.adb.new"
-/bin/busybox chmod 0644 "$destination/packages.adb.new"
-/bin/busybox mv "$destination/packages.adb.new" "$destination/packages.adb"
+tab=$(printf '\t')
+while IFS="$tab" read -r size name; do
+    update_package=$name update_action=checking
+    activity
+    existing=$destination/$name
+    reuse=0
+    if [ -e "$existing" ] || [ -L "$existing" ]; then
+        [ -f "$existing" ] && [ ! -L "$existing" ] || die "unsafe cached archive: $existing"
+        if /bin/busybox cmp -s "$temporary/repository/$name" "$existing"; then reuse=1
+        else
+            compare_status=$?
+            [ "$compare_status" -eq 1 ] || die "cannot compare cached archive: $existing"
+        fi
+    fi
+    if [ "$reuse" -eq 1 ]; then
+        permissions=$(/bin/busybox stat -c %a "$existing")
+        [ "$permissions" = 644 ] || /bin/busybox chmod 0644 "$existing"
+        bytes_reused=$((bytes_reused + size)) update_action=reused
+    else
+        update_action=copying
+        activity
+        cache_temporary=$(/bin/busybox mktemp "$destination/.update-cache.XXXXXX")
+        /bin/busybox cp "$temporary/repository/$name" "$cache_temporary"
+        /bin/busybox cmp -s "$temporary/repository/$name" "$cache_temporary" || die "cache copy verification failed: $name"
+        /bin/busybox chmod 0644 "$cache_temporary"
+        /bin/busybox mv "$cache_temporary" "$existing"
+        cache_temporary= update_action=complete
+    fi
+    bytes_done=$((bytes_done + size)) files_done=$((files_done + 1))
+    activity
+done < "$temporary/cache-files"
 # Old offline archives must not keep the removed wrappers installable. Limit
 # cleanup to these retired package names; retain unrelated administrator files.
+stage prune
 for component in sl ncurses sqlite; do
     for prefix in reliefos leonos; do
         for archive in "$destination/$prefix-$component-"[0-9]*.apk; do
             [ -e "$archive" ] || [ -L "$archive" ] || continue
+            update_package=${archive##*/}
             [ -f "$archive" ] && [ ! -L "$archive" ] || die "unsafe retired package archive: $archive"
             /bin/busybox rm "$archive"
         done
     done
 done
+stage sync
 /bin/busybox sync

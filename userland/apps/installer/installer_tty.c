@@ -324,8 +324,11 @@ static int tty_partition_menu(const struct installer_tty_context *context)
 
 static void tty_update_progress(void *context, unsigned progress, const char *message)
 {
-    (void)context;
     printf("[%3u%%] %s\n", progress, T(message));
+    const struct installer_update_info *info = context;
+    char detail[768];
+    if (info && !installer_update_activity_format(&info->activity, detail, sizeof(detail)) && *detail)
+        puts(detail);
 }
 
 int installer_tty_main(const struct installer_tty_context *context)
@@ -388,7 +391,7 @@ int installer_tty_main(const struct installer_tty_context *context)
             if (part->gpt_type != (role ? RELIEFOS_BLOCK_GPT_ESP : RELIEFOS_BLOCK_GPT_LINUX)) return 1;
             if (reliefos_block_partition_uuid(disk, part->index, role ? esp_uuid : root_uuid)) return 1;
         }
-        int error = installer_update_check_target(disk, root_uuid, esp_uuid, &inspected, tty_update_progress, NULL);
+        int error = installer_update_check_target(disk, root_uuid, esp_uuid, &inspected, tty_update_progress, &inspected);
         if (error) {
             fprintf(stderr, "%s: %s\n", T(inspected.failure), strerror(-error));
             return 1;
@@ -411,7 +414,7 @@ int installer_tty_main(const struct installer_tty_context *context)
         }
         error = installer_update_apply(&inspected,
             (context->setup->skip_bios ? 0u : 1u) | (context->setup->skip_uefi ? 0u : 2u),
-            &result, tty_update_progress, NULL);
+            &result, tty_update_progress, &result);
         if (!error && !context->setup->skip_uefi) printf("UEFI: %s\n", result.boot_file);
         *context->install_success = error == 0;
         *context->page = INSTALLER_PAGE_FINISH;
