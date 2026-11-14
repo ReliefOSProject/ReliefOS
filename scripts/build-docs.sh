@@ -18,10 +18,24 @@ command -v "${SPHINXBUILD:-sphinx-build}" >/dev/null 2>&1 || {
 }
 mkdir -p "$(dirname "$output")"
 work=$(mktemp -d "$output.new.XXXXXX")
+work=$(CDPATH= cd -- "$work" && pwd -P)
 trap 'rm -rf "$work"' EXIT HUP INT TERM
-# Options use the usual space-separated convention; globbing is disabled.
-"${SPHINXBUILD:-sphinx-build}" -b html -n -W --keep-going ${SPHINXOPTS:-} \
-    -d "$work/doctrees" "$source" "$work/html"
+# Validate translations before publishing any language; never accept fallback.
+sh "$(dirname "$source")/scripts/docs-python.sh" \
+    "$(dirname "$source")/scripts/update-doc-translations.py" \
+    --check --output "$work/gettext"
+# Sphinx compiles PO files beside their source. Only compile the private copy.
+mkdir -p "$work/locale"
+if [ -d "$source/locale" ]; then cp -R "$source/locale/." "$work/locale/"; fi
+find "$work/locale" -name '*.mo' -type f -exec rm -f {} +
+for language in zh_CN en ja; do
+    destination=$work/html
+    if [ "$language" != zh_CN ]; then destination=$destination/$language; fi
+    # Options use the usual space-separated convention; globbing is disabled.
+    "${SPHINXBUILD:-sphinx-build}" ${SPHINXOPTS:-} -b html -n -W --keep-going \
+        -D language="$language" -D locale_dirs="$work/locale" \
+        -d "$work/doctrees/$language" "$source" "$destination"
+done
 : > "$work/html/.reliefos-docs-output"
 if [ -d "$output.previous" ] && [ ! -e "$output" ]; then
     [ -f "$output.previous/.reliefos-docs-output" ] || exit 1

@@ -114,6 +114,7 @@ jobs:
         run: |
           set -euo pipefail
           sh tools/build/verify-pages.sh out/x86_64/release/pages
+          python3 tools/test_documentation.py --site out/x86_64/release/pages/docs
 
       - name: Remove private key
         if: always() && steps.signing_key.outputs.path != ''

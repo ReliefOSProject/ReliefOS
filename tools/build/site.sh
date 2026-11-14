@@ -42,6 +42,9 @@ cp -R "$rpr_pages" "$work/pages/rpr"
 #    site root. The RPR subtree keeps its own /rpr/css copy for standalone use.
 mkdir -p "$work/pages/css"
 cp "$css" "$work/pages/css/reliefos.css"
+# Refresh all human RPR pages from the copied artifacts, including when the
+# input is an older prebuilt tree. The renderer never modifies machine files.
+sh "$here/rpr-human-pages.sh" "$work/pages/rpr" "$work/pages"
 # 3. Installer ISO into /download/ alongside its page.
 mkdir -p "$work/pages/download"
 cp "$iso" "$work/pages/download/${iso##*/}"

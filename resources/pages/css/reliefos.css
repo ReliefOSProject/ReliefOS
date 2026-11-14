@@ -15,7 +15,7 @@ body {
     padding: 0;
     background: #ffffff;
     color: #1a1a1a;
-    font-family: "Segoe UI", Tahoma, Verdana, Arial, sans-serif;
+    font-family: "Segoe UI", Tahoma, Verdana, Arial, "Noto Sans CJK SC", "Noto Sans CJK JP", "Microsoft YaHei", "Meiryo", sans-serif;
     font-size: 15px;
     line-height: 1.5;
 }
@@ -49,6 +49,23 @@ nav.site a {
     color: #1a5fa8;
     text-decoration: none;
     font-weight: bold;
+    display: inline-block;
+    margin-right: 16px;
+}
+
+nav.languages {
+    padding: 8px 0;
+    border-bottom: 1px solid #d7dde5;
+}
+
+nav.languages a {
+    display: inline-block;
+    margin-right: 16px;
+}
+
+nav a[aria-current="page"] {
+    font-weight: bold;
+    text-decoration: underline;
 }
 
 nav.site a:hover {
@@ -146,12 +163,13 @@ tr:nth-child(even) td {
 /* Definition list used on single-package and kernel pages. */
 dl.meta {
     margin: 0 0 14px 0;
+    overflow: auto;
 }
 
 dl.meta dt {
     float: left;
     clear: left;
-    width: 120px;
+    width: 160px;
     margin: 0;
     padding: 3px 0;
     color: #24527f;
@@ -159,7 +177,7 @@ dl.meta dt {
 }
 
 dl.meta dd {
-    margin: 0 0 0 120px;
+    margin: 0 0 0 160px;
     padding: 3px 0;
 }
 

@@ -1,0 +1,21 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-11-14 00:00+0000\n"
+"Last-Translator: ReliefOS translators\n"
+"Language-Team: en\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "构建系统"
+msgstr "Build system"
+
+msgid "自研源码使用固定的 Linux Kbuild/Kconfig；产品集成由根 Makefile 提供。"
+msgstr ""
+"In-house sources use a fixed version of Linux Kbuild/Kconfig; the root Makefile provides product "
+"integration."

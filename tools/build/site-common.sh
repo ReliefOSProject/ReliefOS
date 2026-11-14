@@ -1,3 +1,4 @@
+# shellcheck shell=sh
 # Shared helpers for the ReliefOS static GitHub Pages generators.
 #
 # Everything here is plain POSIX sh and produces static HTML/CSS only. There is
@@ -34,37 +35,114 @@ site_bytes_human() {
     fi
 }
 
-# site_page_begin <css_href> <rel_home> <title> <heading>
-#
-# Emit the shared document chrome: doctype, a single stylesheet <link>, header,
-# top navigation and the opening <main>. Callers feed this with the appropriate
-# relative stylesheet path (site_css_href) and relative home link (site_home_href)
-# so that a project-page served under /<repo>/ still resolves every link with
-# purely relative URLs -- the base path is never baked into the HTML (plan §25).
+# Public routes are relative to the deployment root, never the host root.
+# Chinese keeps the historical paths; only human pages get language prefixes.
+site_use_language() {
+    case $1 in
+        zh-CN) site_language_prefix= ;;
+        en|ja) site_language_prefix=$1/ ;;
+        *) printf 'unsupported site language: %s\n' "$1" >&2; return 1 ;;
+    esac
+    site_language=$1
+    # All generators live in tools/build. Tests may supply the resource root.
+    # shellcheck source=/dev/null
+    . "${SITE_I18N_DIR:-$(dirname "$0")/../../resources/pages/i18n}/$site_language.sh"
+}
+
+site_text() { site_message "$1" | site_html_escape; }
+
+site_page_path() (
+    case $1 in
+        zh-CN) printf '%s\n' "$2" ;;
+        en|ja) printf '%s/%s\n' "$1" "$2" ;;
+        *) return 1 ;;
+    esac
+)
+
+# site_relative_href <current-page> <target-from-site-root>
+# Remove shared directories before adding ../, including for file:// previews.
+site_relative_href() (
+    site_from=${1%/*}
+    [ "$site_from" != "$1" ] || site_from=
+    site_target=$2
+    while [ -n "$site_from" ] && [ "${site_from%%/*}" = "${site_target%%/*}" ]; do
+        case $site_from in */*) site_from=${site_from#*/} ;; *) site_from= ;; esac
+        site_target=${site_target#*/}
+    done
+    site_up=
+    while [ -n "$site_from" ]; do
+        site_up=../$site_up
+        case $site_from in */*) site_from=${site_from#*/} ;; *) site_from= ;; esac
+    done
+    printf '%s%s\n' "$site_up" "$site_target"
+)
+
+site_href() { site_relative_href "$site_current_path" "$1"; }
+site_ui_href() { site_href "$(site_page_path "$site_language" "$1")"; }
+
+# Documentation puts the language after the product (or after docs for portals).
+site_docs_href() (
+    site_manual=${1:-}
+    site_doc_prefix=docs/
+    [ -z "$site_manual" ] || site_doc_prefix=$site_doc_prefix$site_manual/
+    site_href "${site_doc_prefix}${site_language_prefix}${2:-index.html}"
+)
+
+site_language_name() {
+    case $1 in zh-CN) printf '%s' '简体中文' ;; en) printf '%s' 'English' ;; ja) printf '%s' '日本語' ;; esac
+}
+
+# site_page_begin <logical-page-without-language-prefix> <title> <heading>
+# Every alternate and language switch uses the same logical page, including
+# package detail pages. Titles and headings are plain text, escaped here.
 site_page_begin() {
-    css=$1
-    home=$2
-    title=$3
-    heading=$4
+    site_page=$1
+    site_current_path=$(site_page_path "$site_language" "$site_page")
     cat <<HEAD
 <!doctype html>
-<html lang="en">
+<html lang="$site_language">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${title}</title>
-<link rel="stylesheet" href="${css}">
+<title>$(printf '%s' "$2" | site_html_escape)</title>
+<link rel="stylesheet" href="$(site_href css/reliefos.css)">
+HEAD
+    for site_alternate in zh-CN en ja; do
+        printf '<link rel="alternate" hreflang="%s" href="%s">\n' \
+            "$site_alternate" "$(site_href "$(site_page_path "$site_alternate" "$site_page")")"
+    done
+    cat <<HEAD
+<link rel="alternate" hreflang="x-default" href="$(site_href "$site_page")">
 </head>
 <body>
 <div class="page">
 <header class="site">
-<h1>${heading}</h1>
+<h1>$(printf '%s' "$3" | site_html_escape)</h1>
 </header>
-<nav class="site">
-<a href="${home}index.html">Home</a> &middot;
-<a href="${home}download/index.html">Download</a> &middot;
-<a href="${home}rpr/index.html">RPR</a> &middot;
-<a href="${home}docs/index.html">Docs</a>
+<nav class="site" aria-label="$(site_text navigation)">
+HEAD
+    for site_nav in index.html download/index.html rpr/index.html docs/index.html; do
+        case $site_nav in
+            index.html) site_nav_label=$(site_text home) ;;
+            download/index.html) site_nav_label=$(site_text download) ;;
+            rpr/index.html) site_nav_label=RPR ;;
+            docs/index.html) site_nav_label=$(site_text docs) ;;
+        esac
+        site_nav_current=
+        [ "$site_nav" != "$site_page" ] || site_nav_current=' aria-current="page"'
+        if [ "$site_nav" = docs/index.html ]; then site_nav_href=$(site_docs_href)
+        else site_nav_href=$(site_ui_href "$site_nav"); fi
+        printf '<a href="%s"%s>%s</a>\n' "$site_nav_href" "$site_nav_current" "$site_nav_label"
+    done
+    printf '</nav>\n<nav class="languages" aria-label="%s">\n' "$(site_text language)"
+    for site_alternate in zh-CN en ja; do
+        site_language_current=
+        [ "$site_alternate" != "$site_language" ] || site_language_current=' aria-current="page"'
+        printf '<a href="%s" lang="%s" hreflang="%s"%s>%s</a>\n' \
+            "$(site_href "$(site_page_path "$site_alternate" "$site_page")")" \
+            "$site_alternate" "$site_alternate" "$site_language_current" "$(site_language_name "$site_alternate")"
+    done
+    cat <<HEAD
 </nav>
 <main>
 HEAD
@@ -72,43 +150,15 @@ HEAD
 
 # site_page_end: close <main>, emit the shared footer and finish the document.
 site_page_end() {
-    cat <<'FOOT'
+    cat <<FOOT
 </main>
 <footer class="site">
-ReliefOS Project &mdash; a free and open operating system.
+$(site_text footer)
 </footer>
 </div>
 </body>
 </html>
 FOOT
-}
-
-# site_css_href <depth>: relative path from a page at the given directory depth
-# (0 = site root, 1 = one level down such as /download/, 2 = /rpr/packages/) to
-# the shared stylesheet at the site root. Kept as a helper so no generator
-# hardcodes a wrong number of "../".
-site_css_href() {
-    depth=${1:-0}
-    prefix=
-    i=0
-    while [ "$i" -lt "$depth" ]; do
-        prefix="../$prefix"
-        i=$((i + 1))
-    done
-    printf '%scss/reliefos.css\n' "$prefix"
-}
-
-# site_home_href <depth>: relative path from a page at the given depth back to
-# the site root directory (with a trailing slash), used as the nav prefix.
-site_home_href() {
-    depth=${1:-0}
-    prefix=
-    i=0
-    while [ "$i" -lt "$depth" ]; do
-        prefix="../$prefix"
-        i=$((i + 1))
-    done
-    printf '%s\n' "$prefix"
 }
 
 # site_hash_for <sha256sums-file> <filename>: read a SHA256SUMS file and echo the

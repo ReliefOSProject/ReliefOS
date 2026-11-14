@@ -2,6 +2,8 @@
 ReliefOS
 ========
 
+简体中文 | `English <README.en.rst>`_ | `日本語 <README.ja.rst>`_
+
 ReliefOS 是面向 x86_64 的操作系统项目，内核位于 kernel/reliefnt 子仓。
 默认 Xorg/XDM/IceWM 桌面，支持中文原生应用、纯控制台安装及 BIOS/UEFI 启动。
 现行手册从 `Documentation/index.rst <Documentation/index.rst>`_ 开始。
@@ -11,6 +13,9 @@ ReliefOS 是面向 x86_64 的操作系统项目，内核位于 kernel/reliefnt �
 `构建手册 <Documentation/kbuild/building.rst>`_。HTML 手册使用::
 
     make O=out/docs htmldocs
+
+HTML 手册同时生成简体中文、英文和日文；默认中文入口保留原地址，英文位于
+输出的 en/，日文位于 ja/，每页可切换到另一语言的同一页面。
 
 编译、镜像和实际运行分别验证；已知问题见
 `支持范围 <Documentation/admin-guide/limitations.rst>`_。VMware 验证未完成。

@@ -8,6 +8,8 @@ on:
       - 'Makefile'
       - 'configs/build-version'
       - 'scripts/build-docs.sh'
+      - 'scripts/docs-python.sh'
+      - 'scripts/update-doc-translations.py'
       - 'scripts/reliefos/Makefile.site'
       - 'tools/build/docs-page.sh'
       - 'tools/test_documentation.py'

@@ -3,7 +3,7 @@
 # problem so the workflow is atomic: no half site ever gets deployed (plan §44).
 #
 # Checks (plan §33, §34, §35, §36):
-#   HTML   the six expected pages exist and no *.js file or inline script tag
+#   HTML   all three languages exist and no *.js file or inline script tag
 #          appears anywhere in the tree.
 #   CSS    the shared stylesheet is present at the site root and inside /rpr/.
 #   RPR    every machine-interface file is present and packages.adb references
@@ -14,6 +14,8 @@ set -eu
 [ "$#" = 1 ] || exit 2
 site=$1
 [ -d "$site" ] || { echo "not a Pages tree: $site" >&2; exit 1; }
+site=$(CDPATH= cd -- "$site" && pwd -P)
+. "$(dirname "$0")/site-common.sh"
 verify_work=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-pages-check.XXXXXX")
 trap 'rm -rf "$verify_work"' EXIT HUP INT TERM
 
@@ -35,11 +37,67 @@ for f in index.html download/index.html download/reliefos-installer.iso download
     [ -e "$site/$f" ] || report "missing $f"
 done
 
+# --- localized human pages --------------------------------------------------
+# Derive package detail pages from real APK filenames, not only existing HTML:
+# deleting all three translations of a package must still fail verification.
+printf '%s\n' index.html download/index.html rpr/index.html rpr/apk/index.html \
+    rpr/packages/index.html rpr/kernel/index.html > "$verify_work/human-pages"
+for package in "$site"/rpr/apk/*.apk; do
+    [ -f "$package" ] || continue
+    base=${package##*/}
+    base=${base%.apk}
+    without_revision=${base%-*}
+    printf 'rpr/packages/%s.html\n' "${without_revision%-*}" >> "$verify_work/human-pages"
+done
+for language in zh-CN en ja; do
+    site_use_language "$language"
+    while IFS= read -r logical_page; do
+        site_current_path=$(site_page_path "$language" "$logical_page")
+        page=$site/$site_current_path
+        [ -s "$page" ] || { report "missing $site_current_path"; continue; }
+        grep -Fqx "<html lang=\"$language\">" "$page" || report "incorrect language: $site_current_path"
+        sed -n '/<nav class="languages"/,/<\/nav>/p' "$page" > "$verify_work/language-nav"
+        for alternate in zh-CN en ja; do
+            href=$(site_href "$(site_page_path "$alternate" "$logical_page")")
+            grep -Fqx "<link rel=\"alternate\" hreflang=\"$alternate\" href=\"$href\">" "$page" \
+                || report "incorrect $alternate alternate: $site_current_path"
+            current=
+            [ "$alternate" != "$language" ] || current=' aria-current="page"'
+            expected="<a href=\"$href\" lang=\"$alternate\" hreflang=\"$alternate\"$current>$(site_language_name "$alternate")</a>"
+            grep -Fqx "$expected" "$verify_work/language-nav" \
+                || report "incorrect $alternate language switch: $site_current_path"
+        done
+        grep -Fqx "<link rel=\"alternate\" hreflang=\"x-default\" href=\"$(site_href "$logical_page")\">" "$page" \
+            || report "incorrect default alternate: $site_current_path"
+        [ "$(grep -c 'aria-current=' "$verify_work/language-nav")" = 1 ] \
+            || report "language navigation must have one current page: $site_current_path"
+        grep -Fq "<a href=\"$(site_docs_href)\">" "$page" \
+            || report "incorrect documentation portal language: $site_current_path"
+        case $logical_page in
+            rpr/index.html) manuals='reliefos reliefnt' ;;
+            rpr/kernel/index.html) manuals=reliefnt ;;
+            *) manuals= ;;
+        esac
+        for manual in $manuals; do
+            grep -Fq "<a href=\"$(site_docs_href "$manual")\">" "$page" \
+                || report "incorrect $manual manual language: $site_current_path"
+        done
+    done < "$verify_work/human-pages"
+done
+for language in en ja; do
+    if [ -d "$site/$language" ]; then
+        copies=$(find "$site/$language" -type f ! -name '*.html' -print)
+        [ -z "$copies" ] || report "translated website must share root artifacts: $copies"
+    fi
+done
+
 # --- Documentation section --------------------------------------------------
 # The manuals are rendered from each repository's Documentation/ tree, so the
 # index and at least one rendered document must exist, and no raw source may
 # leak into the published tree (only generated HTML and copied assets).
-for manual in index.html reliefos/index.html reliefnt/index.html; do
+for manual in index.html en/index.html ja/index.html \
+              reliefos/index.html reliefos/en/index.html reliefos/ja/index.html \
+              reliefnt/index.html reliefnt/en/index.html reliefnt/ja/index.html; do
     [ -s "$site/docs/$manual" ] || report "missing docs/$manual"
 done
 if [ -z "$(find "$site/docs" -name index.html 2>/dev/null | tail -n +2)" ]; then
@@ -144,21 +202,31 @@ fi
 # containing HTML file. This guards against a broken base path (plan §25).
 linkfails=$verify_work/links
 : > "$linkfails"
-for page in $(find "$site" -name '*.html' -print); do
+find "$site" -name '*.html' -print > "$verify_work/html-pages"
+while IFS= read -r page; do
     dir=$(dirname "$page")
-    grep -oE 'href="[^"#]+"' "$page" 2>/dev/null \
+    grep -oE 'href="[^"]*"' "$page" 2>/dev/null \
         | sed -e 's/^href="//' -e 's/"$//' \
         | while IFS= read -r href; do
             case "$href" in
                 ''|\#*) continue ;;
                 http://*|https://*|mailto:*) continue ;;
+                /*) printf '%s: root-relative href %s\n' "${page#"$site"/}" "$href" >> "$linkfails"; continue ;;
             esac
             target="${href%%#*}"
             target="${target%%\?*}"
             [ -n "$target" ] || continue
-            [ -e "$dir/$target" ] || printf '%s: broken href %s\n' "${page#"$site"/}" "$href" >> "$linkfails"
+            if [ ! -e "$dir/$target" ]; then
+                printf '%s: broken href %s\n' "${page#"$site"/}" "$href" >> "$linkfails"
+                continue
+            fi
+            resolved=$(CDPATH= cd -- "$(dirname "$dir/$target")" && pwd -P)
+            case $resolved/ in
+                "$site/"*) ;;
+                *) printf '%s: href escapes site %s\n' "${page#"$site"/}" "$href" >> "$linkfails" ;;
+            esac
         done
-done
+done < "$verify_work/html-pages"
 if [ -s "$linkfails" ]; then
     sort -u "$linkfails" | sed 's/^/verify-pages: /' >&2
     report "broken href detected"

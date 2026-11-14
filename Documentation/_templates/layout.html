@@ -1,2 +1,16 @@
 {% extends "!layout.html" %}
 {% block scripts %}{% endblock %}
+{% block extrahead %}
+{{ super() }}
+{% for item in manual_languages %}
+<link rel="alternate" hreflang="{{ item.tag }}" href="{{ item.href|e }}">
+{% endfor %}
+{% endblock %}
+{% block header %}
+{{ super() }}
+<nav class="language-switcher" aria-label="{{ manual_language_label }}">
+{% for item in manual_languages %}
+<a href="{{ item.href|e }}" lang="{{ item.tag }}" hreflang="{{ item.tag }}"{% if item.current %} aria-current="page"{% endif %}>{{ item.name }}</a>
+{% endfor %}
+</nav>
+{% endblock %}

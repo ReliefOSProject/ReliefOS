@@ -1,0 +1,41 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-11-14 00:00+0000\n"
+"Last-Translator: ReliefOS translators\n"
+"Language-Team: ja\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "显示与图形接口"
+msgstr "表示とグラフィック API"
+
+msgid "设备能力"
+msgstr "デバイスの機能"
+
+msgid ""
+"ReliefNT 提供 framebuffer、VT 与有限的 Linux DRM/vmwgfx 路线。 硬件和权限允许时提供 card/render 节点；必须处理缺设备、不支持的 ioctl、"
+" 超时和中断。用户属于 video 组并不保证所有 GPU 功能可用。 SVGA-II/VGPU9、同设备 PRIME 与通用跨设备 DMA-BUF 是不同范围。"
+msgstr ""
+"ReliefNT は framebuffer、VT、限定的な Linux DRM/vmwgfx 経路を提供します。ハードウェアと権限が許せば card/render "
+"ノードを提供します。デバイス欠落、未対応 ioctl、タイムアウト、割り込みを処理してください。video グループへの所属は全 GPU 機能の利用を保証しません。SVGA-"
+"II/VGPU9、同一デバイスの PRIME、汎用のデバイス間 DMA-BUF は異なる範囲です。"
+
+msgid "应用集成"
+msgstr "アプリケーション統合"
+
+msgid ""
+"X11 应用设置标准 desktop、MIME、图标与 WM_CLASS/_NET_WM_ICON 等适用信息。 FLTK 应用保留系统控件、主题和中文字体；功能内容区不放重复的大程序标题。 "
+"窗口、输入与状态更新不得被磁盘操作或网络连接长期阻塞，长操作走 worker。 XDM 与 IceWM 的独立主题策略见 :doc:`../admin-guide/desktop`。"
+msgstr ""
+"X11 アプリケーションは、標準の desktop、MIME、アイコン、WM_CLASS/_NET_WM_ICON など、適用可能な情報を設定します。FLTK "
+"アプリケーションはシステムのウィジェット、テーマ、中国語フォントを維持し、機能コンテンツ領域に大きなアプリ名を重複表示しません。ディスク操作やネットワーク接続でウィンドウ、入力、状態更新を長時間ブロックせず、長い操作は"
+" worker で行います。XDM と IceWM の独立したテーマ方針は :doc:`../admin-guide/desktop` を参照してください。"
+
+msgid "内核显示驱动源码位于 ``kernel/reliefnt/drivers/``，不消费旧中间层实现。"
+msgstr "カーネルの表示ドライバーのソースは ``kernel/reliefnt/drivers/`` にあり、旧中間層の実装は使用しません。"

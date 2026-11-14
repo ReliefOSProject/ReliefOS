@@ -76,13 +76,20 @@ grep -q '<title>ReliefOS</title>' "$tmp/pages/index.html" \
     && grep -q '<h1>ReliefOS</h1>' "$tmp/pages/index.html" \
     && ok 'home page is titled ReliefOS' \
     || bad 'home page title is not ReliefOS'
-grep -q '<title>ReliefNT Kernel</title>' "$tmp/pages/rpr/kernel/index.html" \
-    && grep -q '<h1>ReliefNT Kernel</h1>' "$tmp/pages/rpr/kernel/index.html" \
-    && ok 'kernel page is titled ReliefNT' \
-    || bad 'kernel page title is not ReliefNT'
-grep -q '<a class="button" href="reliefos-installer.iso">Download</a>' "$tmp/pages/download/index.html" \
-    && ok 'download page links to reliefos-installer.iso' \
-    || bad 'download page does not link to reliefos-installer.iso'
+for language in zh-CN en ja; do
+    case $language in
+        zh-CN) prefix=; kernel_title='ReliefNT 内核'; label='下载'; iso_href=reliefos-installer.iso ;;
+        en) prefix=en/; kernel_title='ReliefNT Kernel'; label=Download; iso_href=../../download/reliefos-installer.iso ;;
+        ja) prefix=ja/; kernel_title='ReliefNT カーネル'; label='ダウンロード'; iso_href=../../download/reliefos-installer.iso ;;
+    esac
+    grep -Fq "<title>$kernel_title</title>" "$tmp/pages/${prefix}rpr/kernel/index.html" \
+        && grep -Fq "<h1>$kernel_title</h1>" "$tmp/pages/${prefix}rpr/kernel/index.html" \
+        && ok "$language kernel page uses the ReliefNT title" \
+        || bad "$language kernel page has the wrong title"
+    grep -Fq "<a class=\"button\" href=\"$iso_href\">$label</a>" "$tmp/pages/${prefix}download/index.html" \
+        && ok "$language download page links to the canonical ISO" \
+        || bad "$language download page has the wrong ISO link"
+done
 sum_names=$(awk '{print $2}' "$tmp/pages/download/SHA256SUMS")
 [ "$sum_names" = reliefos-installer.iso ] \
     && ok 'SHA256SUMS names the published installer ISO' \
@@ -116,6 +123,7 @@ awk '/^      - name: Upload GitHub Pages artifact$/ { active=1; next }
      active && /^      - name:/ { exit }
      active { print }' "$pages_workflow" > "$pages_upload"
 grep -Fq 'sh tools/build/verify-pages.sh out/x86_64/release/pages' "$pages_verify" \
+    && grep -Fq 'python3 tools/test_documentation.py --site out/x86_64/release/pages/docs' "$pages_verify" \
     && grep -Fq 'path: out/x86_64/release/pages' "$pages_upload" \
     && ok 'Pages CI verifies and uploads the same assembled tree' \
     || bad 'Pages CI does not verify and upload the same assembled tree'
@@ -127,6 +135,16 @@ else
     cat "$tmp/verify-good.log" >&2
     bad 'verify-pages.sh rejected a good tree'
 fi
+python3 "$src/tests/build/test-site-i18n.py" "$tmp/pages" \
+    && ok 'three-language routes, content, switches and negative contracts pass' \
+    || bad 'three-language site contracts failed'
+
+# Every original RPR machine byte survives both rendering and assembly.
+(cd "$tmp/rpr-pages" && find . -type f ! -name '*.html' -exec sha256sum {} + | LC_ALL=C sort) > "$tmp/rpr-before"
+(cd "$tmp/pages/rpr" && find . -type f ! -name '*.html' -exec sha256sum {} + | LC_ALL=C sort) > "$tmp/rpr-after"
+cmp -s "$tmp/rpr-before" "$tmp/rpr-after" \
+    && ok 'RPR non-HTML files are byte-identical after site assembly' \
+    || bad 'site assembly modified RPR non-HTML files'
 
 # 3. Every machine-interface file survived the move under /rpr/.
 for f in rpr/apk/packages.adb rpr/apk/repository.json rpr/apk/reliefos-rpr.rsa.pub rpr/apk/leonos-rpr.rsa.pub \
@@ -183,22 +201,49 @@ grep -Fq 'href="../../docs/reliefnt/index.html"' "$tmp/pages/rpr/kernel/index.ht
     ok 'RPR links to both owning manuals' || bad 'RPR documentation links missing'
 
 # 5c. An unresolved RST cross-reference must fail without replacing a good manual.
-mkdir -p "$tmp/bad-docs"
-cp "$src/Documentation/conf.py" "$tmp/bad-docs/conf.py"
+bad_root=$tmp/bad-repository
+bad_docs=$bad_root/Documentation
+mkdir -p "$bad_docs" "$bad_root/configs" "$bad_root/scripts"
+cp "$src/Documentation/conf.py" "$bad_docs/conf.py"
 # The production conf reads release data relative to its repository root.
-mkdir -p "$tmp/configs"
-cp "$src/configs/build-version" "$tmp/configs/build-version"
-cp -R "$src/Documentation/_templates" "$tmp/bad-docs/_templates"
-cat > "$tmp/bad-docs/index.rst" <<'RST'
+cp "$src/configs/build-version" "$bad_root/configs/build-version"
+cp "$src/scripts/build-docs.sh" "$src/scripts/docs-python.sh" \
+    "$src/scripts/update-doc-translations.py" "$bad_root/scripts/"
+cp -R "$src/Documentation/_templates" "$bad_docs/_templates"
+cp -R "$src/Documentation/_static" "$bad_docs/_static"
+mkdir -p "$bad_docs/locale"
+cp "$src/Documentation/locale/identical.json" "$bad_docs/locale/identical.json"
+cat > "$bad_docs/index.rst" <<'RST'
 Broken reference
 ================
 
 See :doc:`missing-page`.
 RST
+# Complete catalogs let Sphinx process the actual invalid reference;
+# a missing script, static directory or translation must not satisfy this test.
+for language in en ja; do
+    case $language in
+        en) reference_title='Broken reference'; reference_body='See :doc:`missing-page`.' ;;
+        ja) reference_title='壊れた参照'; reference_body=':doc:`missing-page` を参照してください。' ;;
+    esac
+    mkdir -p "$bad_docs/locale/$language/LC_MESSAGES"
+    cat > "$bad_docs/locale/$language/LC_MESSAGES/index.po" <<EOF
+msgid ""
+msgstr ""
+"Language: $language\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Broken reference"
+msgstr "$reference_title"
+
+msgid "See :doc:\`missing-page\`."
+msgstr "$reference_body"
+EOF
+done
 before_docs=$(sha256sum "$tmp/pages/docs/reliefos/index.html")
-if sh "$src/scripts/build-docs.sh" "$tmp/bad-docs" "$tmp/pages/docs/reliefos" >"$tmp/bad-docs.log" 2>&1; then
+if sh "$src/scripts/build-docs.sh" "$bad_docs" "$tmp/pages/docs/reliefos" >"$tmp/bad-docs.log" 2>&1; then
     bad 'Sphinx accepted an unresolved document reference'
-elif grep -q 'missing-page' "$tmp/bad-docs.log" && [ "$before_docs" = "$(sha256sum "$tmp/pages/docs/reliefos/index.html")" ]; then
+elif grep -Eq 'unknown document:.*missing-page' "$tmp/bad-docs.log" && [ "$before_docs" = "$(sha256sum "$tmp/pages/docs/reliefos/index.html")" ]; then
     ok 'unresolved RST reference fails and preserves the published manual'
 else
     cat "$tmp/bad-docs.log" >&2
@@ -208,10 +253,10 @@ fi
 # A bad kernel manual must not publish even if the system manual built.
 before_site=$(sha256sum "$tmp/pages/index.html" "$tmp/pages/docs/reliefnt/index.html")
 if sh "$src/tools/build/site.sh" "$tmp/rpr-pages" "$tmp/reliefos-installer.iso" \
-    "$build" "$src/resources/pages/css/reliefos.css" "$tmp/pages" "$tmp/bad-docs" \
+    "$build" "$src/resources/pages/css/reliefos.css" "$tmp/pages" "$bad_docs" \
     >"$tmp/bad-kernel-docs.log" 2>&1; then
     bad 'site publication accepted a broken kernel manual'
-elif grep -q 'missing-page' "$tmp/bad-kernel-docs.log" &&
+elif grep -Eq 'unknown document:.*missing-page' "$tmp/bad-kernel-docs.log" &&
      [ "$before_site" = "$(sha256sum "$tmp/pages/index.html" "$tmp/pages/docs/reliefnt/index.html")" ]; then
     ok 'kernel documentation failure preserves the complete published site'
 else
@@ -222,16 +267,19 @@ fi
 # A query-only fixture exercises that rule without rebuilding product images.
 fixture="$tmp/make-fixture"
 mkdir -p "$fixture/os/Documentation" "$fixture/nt/Documentation" \
-    "$fixture/os/resources/pages/css" "$fixture/os/tools/build" \
-    "$fixture/os/scripts" "$fixture/os/configs" "$fixture/nt/configs" \
+    "$fixture/os/resources/pages/css" "$fixture/os/resources/pages/i18n" "$fixture/os/tools/build" \
+    "$fixture/os/scripts" "$fixture/nt/scripts" "$fixture/os/configs" "$fixture/nt/configs" \
     "$fixture/rpr" "$fixture/out/pages"
-for path in site.sh download-page.sh home-page.sh docs-page.sh site-common.sh; do
+for path in site.sh download-page.sh home-page.sh docs-page.sh site-common.sh rpr-human-pages.sh; do
     : > "$fixture/os/tools/build/$path"
 done
 for path in os/Documentation/index.rst os/Documentation/old.rst \
     nt/Documentation/index.rst nt/Documentation/old.rst \
     os/configs/build-version nt/configs/build-version os/scripts/build-docs.sh \
+    nt/scripts/build-docs.sh os/scripts/update-doc-translations.py nt/scripts/update-doc-translations.py \
+    os/scripts/docs-python.sh nt/scripts/docs-python.sh \
     os/resources/pages/css/reliefos.css rpr/.complete rpr/manifest.json \
+    os/resources/pages/i18n/zh-CN.sh os/resources/pages/i18n/en.sh os/resources/pages/i18n/ja.sh \
     installer.iso build_info.h; do
     : > "$fixture/$path"
 done

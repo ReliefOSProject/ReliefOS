@@ -124,7 +124,20 @@ cmp "$tmp/pages-repository/mbedtls3-3.6.7-r0.apk" "$tmp/pages-output/apk/mbedtls
 grep -F 'href="mbedtls3.html"' "$tmp/pages-output/packages/index.html"
 grep -F '../apk/mbedtls3-3.6.7-r0.apk' "$tmp/pages-output/packages/mbedtls3.html"
 grep -F 'href="libatk-1.0.html"' "$tmp/pages-output/packages/index.html"
-grep -F '<dt>Version</dt><dd>2.60.3-r0</dd>' "$tmp/pages-output/packages/libatk-1.0.html"
+grep -F '<html lang="zh-CN">' "$tmp/pages-output/packages/libatk-1.0.html"
+grep -F '<dt>版本</dt><dd>2.60.3-r0</dd>' "$tmp/pages-output/packages/libatk-1.0.html"
+grep -F '>下载 .apk</a>' "$tmp/pages-output/packages/libatk-1.0.html"
+
+# Rendering a previously built repository needs neither a key nor an encoder.
+# It may only add human HTML; every protocol/asset byte must remain unchanged.
+(cd "$tmp/pages-output" && find . -type f ! -name '*.html' -exec sha256sum {} + | LC_ALL=C sort) > "$tmp/machine-before"
+sh "$src/tools/build/rpr-human-pages.sh" "$tmp/pages-output" "$tmp/translated-site"
+(cd "$tmp/pages-output" && find . -type f ! -name '*.html' -exec sha256sum {} + | LC_ALL=C sort) > "$tmp/machine-after"
+cmp "$tmp/machine-before" "$tmp/machine-after"
+grep -F '<dt>Version</dt><dd>2.60.3-r0</dd>' "$tmp/translated-site/en/rpr/packages/libatk-1.0.html"
+grep -F '<dt>バージョン</dt><dd>2.60.3-r0</dd>' "$tmp/translated-site/ja/rpr/packages/libatk-1.0.html"
+grep -F 'href="../../../rpr/apk/libatk-1.0-2.60.3-r0.apk"' "$tmp/translated-site/en/rpr/packages/libatk-1.0.html"
+test -z "$(find "$tmp/translated-site" -type f ! -name '*.html' -print)"
 
 # Kbuild invokes the producer from its output directory with relative inputs.
 # Exercise the real runtime verifier with that calling convention as well.

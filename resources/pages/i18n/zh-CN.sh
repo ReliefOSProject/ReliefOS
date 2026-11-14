@@ -1,0 +1,60 @@
+# Plain text only. site_text escapes messages at the HTML boundary.
+site_message() {
+    case $1 in
+        home) printf '%s' '首页' ;;
+        download) printf '%s' '下载' ;;
+        docs) printf '%s' '文档' ;;
+        navigation) printf '%s' '主导航' ;;
+        language) printf '%s' '语言' ;;
+        footer) printf '%s' 'ReliefOS 项目 — 自由开放的操作系统。' ;;
+        tagline) printf '%s' '自由开放的操作系统。' ;;
+        latest_version) printf '%s' '最新版本' ;;
+        version) printf '%s' '版本' ;;
+        latest_release) printf '%s' '最新发行版' ;;
+        get_started) printf '%s' '开始使用' ;;
+        packages) printf '%s' '软件包' ;;
+        rpr_summary) printf '%s' '远程软件包仓库。' ;;
+        download_summary) printf '%s' '安装 ISO 镜像及校验和。' ;;
+        source) printf '%s' '源码' ;;
+        source_summary) printf '%s' '项目源码仓库。' ;;
+        docs_summary) printf '%s' '从源码树构建的使用指南。' ;;
+        download_title) printf '%s' 'ReliefOS 下载' ;;
+        installer_iso) printf '%s' '安装 ISO 镜像' ;;
+        file) printf '%s' '文件' ;;
+        architecture) printf '%s' '架构' ;;
+        size) printf '%s' '大小' ;;
+        checksum_help) printf '%s' '将镜像和校验和文件下载到同一目录后，在该目录执行：' ;;
+        rpr_title) printf '%s' 'ReliefOS 远程软件包仓库' ;;
+        packages_description) printf '%s' '浏览仓库中发布的已签名 APK 软件包。软件包列表由 ReliefOS 构建系统根据实际仓库内容生成。' ;;
+        browse_packages) printf '%s' '浏览软件包' ;;
+        apk_repository) printf '%s' 'APK 仓库' ;;
+        kernel) printf '%s' '内核' ;;
+        kernel_description) printf '%s' '相互匹配的内核、initramfs 和模块清单，由已签名的 APK 软件包提供。' ;;
+        kernel_information) printf '%s' '内核信息' ;;
+        manuals_description) printf '%s' '两套独立手册分别在各产品的源码仓库中维护和构建。' ;;
+        os_manual) printf '%s' 'ReliefOS 系统与应用手册' ;;
+        nt_manual) printf '%s' 'ReliefNT 内核手册' ;;
+        repository_metadata) printf '%s' '仓库元数据' ;;
+        metadata_description) printf '%s' '以下机器可读接口由 ReliefOS 软件包工具使用，其内容属于协议文件。' ;;
+        signed_index) printf '%s' '已签名索引' ;;
+        legacy_alias) printf '%s' '旧版兼容别名' ;;
+        apk_title) printf '%s' 'ReliefOS APK 仓库' ;;
+        downloadable_files) printf '%s' '可下载文件' ;;
+        apk_description) printf '%s' '已签名的软件包索引、签名公钥及校验和。以下目录是 APK 仓库根目录，其地址配置在' ;;
+        packages_title) printf '%s' 'ReliefOS 软件包' ;;
+        available_packages) printf '%s' '可用软件包' ;;
+        packages_caption) printf '%s' '本发行版发布的 APK 软件包' ;;
+        package) printf '%s' '软件包' ;;
+        download_apk) printf '%s' '下载 .apk' ;;
+        back_packages) printf '%s' '返回软件包列表' ;;
+        kernel_title) printf '%s' 'ReliefNT 内核' ;;
+        kernel_files) printf '%s' '内核文件' ;;
+        kernel_release) printf '%s' '内核发行标识' ;;
+        module_abi) printf '%s' '模块 ABI' ;;
+        download_kernel) printf '%s' '下载已签名内核软件包' ;;
+        module_inventory) printf '%s' '模块与文件清单' ;;
+        release_metadata) printf '%s' '机器可读发行元数据' ;;
+        strict_protocol) printf '%s' '严格客户端协议' ;;
+        *) printf 'unknown site message: %s\n' "$1" >&2; return 1 ;;
+    esac
+}

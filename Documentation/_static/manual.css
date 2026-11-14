@@ -1,0 +1,22 @@
+.language-switcher {
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 10px 16px;
+}
+
+.language-switcher a {
+    display: inline-block;
+    padding: 2px 0;
+}
+
+.language-switcher a[aria-current="page"] {
+    font-weight: bold;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
