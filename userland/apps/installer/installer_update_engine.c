@@ -34,15 +34,50 @@ struct update_run {
     unsigned progress;
     const char *stage;
     struct timespec presented;
+    struct installer_update_info *out;
+    struct installer_update_activity activity;
+    int applying;
 };
 
 static void report(struct update_run *run, unsigned progress, const char *stage)
 {
     run->progress = progress;
     run->stage = stage;
+    memset(&run->activity, 0, sizeof(run->activity));
+    if (run->out) run->out->activity = run->activity;
     fprintf(stderr, "[installer-update] %u%% %s\n", progress, stage);
     if (run->log) { fprintf(run->log, "[installer-update] %u%% %s\n", progress, stage); fflush(run->log); }
     if (run->observer) run->observer(run->context, progress, stage);
+}
+
+/** @brief Present bounded helper telemetry while preserving monotonic progress. */
+static void present_activity(struct update_run *run, const struct installer_update_activity *activity)
+{
+    if (run->activity.action == UPDATE_ACTION_FAILED) return;
+    run->activity = *activity;
+    run->out->activity = *activity;
+    run->stage = installer_update_activity_stage(activity->step);
+    unsigned value = installer_update_activity_percent(activity, run->applying);
+    if (value > run->progress) run->progress = value;
+    if (run->observer) run->observer(run->context, run->progress, run->stage);
+}
+
+/** @brief Decode complete helper lines only; ordinary command output stays data. */
+static int helper_line(struct update_run *run, const char *line)
+{
+    struct installer_update_activity activity = run->activity;
+    int result = installer_update_activity_decode(&activity, line);
+    int control = !strncmp(line, "activity\t", 9);
+    if (!result) result = installer_update_activity_apk(&activity, line);
+    if (result > 0) present_activity(run, &activity);
+    if (!control) fprintf(stderr, "%s\n", line);
+    else if (result > 0) {
+        char detail[768];
+        if (!installer_update_activity_format(&activity, detail, sizeof(detail)) && *detail)
+            fprintf(stderr, "%s\n", detail);
+        else fprintf(stderr, "[installer-update] %s\n", installer_update_activity_stage(activity.step));
+    }
+    return result < 0 ? result : 0;
 }
 
 /* Each command is owned by the isolated worker. APK output is streamed to
@@ -72,6 +107,8 @@ static int command(struct update_run *run, const char *const arguments[], char *
     if (result) { close(descriptors[0]); return -result; }
     size_t used = 0;
     char buffer[4096];
+    char line[512]; size_t line_used = 0; int dropping = 0;
+    int helper = !output && !strcmp(arguments[0], "/bin/sh") && arguments[1] && !strcmp(arguments[1], UPDATE_HELPER);
     int error = 0;
     for (;;) {
         ssize_t length = read(descriptors[0], buffer, sizeof(buffer));
@@ -82,11 +119,41 @@ static int command(struct update_run *run, const char *const arguments[], char *
             if ((size_t)length >= capacity - used) error = -EOVERFLOW;
             else { memcpy(output + used, buffer, (size_t)length); used += (size_t)length; }
         } else {
-            (void)fwrite(buffer, 1, (size_t)length, stderr);
+            if (!helper) (void)fwrite(buffer, 1, (size_t)length, stderr);
             if (run->log && fwrite(buffer, 1, (size_t)length, run->log) != (size_t)length) error = -EIO;
+            if (helper) for (ssize_t i = 0; i < length; ++i) {
+                if (buffer[i] == '\n') {
+                    if (!dropping) {
+                        if (line_used && line[line_used - 1] == '\r') --line_used;
+                        line[line_used] = 0;
+                        int decoded = helper_line(run, line);
+                        if (decoded && !error) error = decoded;
+                    } else if (dropping == 1) {
+                        (void)fwrite(line, 1, line_used, stderr);
+                        fputc('\n', stderr);
+                    }
+                    line_used = 0; dropping = 0;
+                } else if (dropping != 2) {
+                    if (line_used + 1 == sizeof(line)) {
+                        if (!dropping && !memcmp(line, "activity\t", 9)) {
+                            if (!error) error = -EOVERFLOW;
+                            dropping = 2;
+                        } else {
+                            (void)fwrite(line, 1, line_used, stderr);
+                            line_used = 0; dropping = 1;
+                        }
+                    }
+                    if (dropping != 2) line[line_used++] = buffer[i];
+                }
+            }
         }
     }
     close(descriptors[0]);
+    if (helper && line_used && dropping != 2) {
+        if (!dropping && !memcmp(line, "activity\t", line_used < 9 ? line_used : 9)) {
+            if (!error) error = -EPROTO;
+        } else (void)fwrite(line, 1, line_used, stderr);
+    }
     if (output) output[used] = 0;
     if (run->log && fflush(run->log) && !error) error = -errno;
     int status;
@@ -96,6 +163,12 @@ static int command(struct update_run *run, const char *const arguments[], char *
     }
     if (error) return error;
     if (!WIFEXITED(status) || WEXITSTATUS(status)) {
+        if (helper && run->activity.step && run->activity.action != UPDATE_ACTION_FAILED) {
+            struct installer_update_activity failed = run->activity;
+            failed.action = UPDATE_ACTION_FAILED;
+            failed.status = WIFEXITED(status) ? (unsigned)WEXITSTATUS(status) : 128u + (unsigned)WTERMSIG(status);
+            present_activity(run, &failed);
+        }
         fprintf(stderr, "[installer-update] command %s wait_status=%d\n", arguments[0], status);
         return -EPROTO;
     }
@@ -269,7 +342,8 @@ static int execute(const char *disk, const struct installer_update_info *expecte
 {
     struct installer_update_target target;
     struct installer_update_checkpoint checkpoint = {0};
-    struct update_run run = {.observer = observer, .context = context, .stage = N_("Checking update target")};
+    struct update_run run = {.observer = observer, .context = context, .stage = N_("Checking update target"),
+                             .out = out, .applying = expected != NULL};
     int applying = expected != NULL;
     memset(out, 0, sizeof(*out));
     if (geteuid()) { out->error_number = EACCES; strcpy(out->failure, N_("Administrator privileges are required")); return -EACCES; }
@@ -361,6 +435,7 @@ static int execute(const char *disk, const struct installer_update_info *expecte
     if (!result) report(&run, 98, N_("Finishing the system update"));
 done:
     *out = target.info;
+    out->activity = run.activity;
     int cleanup = installer_update_target_close(&target);
     if (!result) result = cleanup;
     if (result) {
@@ -368,6 +443,11 @@ done:
         snprintf(out->failure, sizeof(out->failure), "%s", run.stage);
         fprintf(stderr, "[installer-update] %s failed with %s (%d)\n", run.stage, strerror(-result), result);
         if (run.log) fprintf(run.log, "[installer-update] %s failed with %s (%d)\n", run.stage, strerror(-result), result);
+        char detail[768];
+        if (!installer_update_activity_format(&out->activity, detail, sizeof(detail)) && *detail) {
+            fprintf(stderr, "[installer-update] %s\n", detail);
+            if (run.log) fprintf(run.log, "[installer-update] %s\n", detail);
+        }
     } else if (applying) report(&run, 100, N_("System update completed successfully"));
     if (run.log && fclose(run.log) && !result) {
         result = -errno;
@@ -411,8 +491,11 @@ int installer_update_apply(const struct installer_update_info *expected, unsigne
 
 static void worker_progress(void *context, unsigned progress, const char *message)
 {
-    (void)context;
     printf("progress\t%u\t%s\n", progress, message);
+    const struct installer_update_info *info = context;
+    char activity[512];
+    if (info && info->activity.step && !installer_update_activity_encode(&info->activity, activity, sizeof(activity)))
+        puts(activity);
     fflush(stdout);
 }
 
@@ -434,9 +517,9 @@ int installer_update_worker(int argc, char **argv)
     int result;
     setenv("PATH", "/usr/sbin:/usr/bin:/sbin:/bin", 1);
     if (argc == 4 && !strcmp(argv[2], "check")) {
-        result = installer_update_check(argv[3], &info, worker_progress, NULL);
+        result = installer_update_check(argv[3], &info, worker_progress, &info);
     } else if (argc == 6 && !strcmp(argv[2], "check")) {
-        result = installer_update_check_target(argv[3], argv[4], argv[5], &info, worker_progress, NULL);
+        result = installer_update_check_target(argv[3], argv[4], argv[5], &info, worker_progress, &info);
     } else if (argc == 10 && !strcmp(argv[2], "apply")) {
         struct installer_update_info expected = {0};
         if (strlen(argv[3]) >= sizeof(expected.disk) || strlen(argv[4]) != 36 || strlen(argv[5]) != 36 ||
@@ -445,7 +528,7 @@ int installer_update_worker(int argc, char **argv)
         strcpy(expected.disk, argv[3]); strcpy(expected.root_uuid, argv[4]); strcpy(expected.esp_uuid, argv[5]);
         strcpy(expected.index_sha256, argv[6]); strcpy(expected.database_sha256, argv[7]);
         strcpy(expected.world_sha256, argv[8]);
-        result = installer_update_apply(&expected, (unsigned)(*argv[9] - '0'), &info, worker_progress, NULL);
+        result = installer_update_apply(&expected, (unsigned)(*argv[9] - '0'), &info, worker_progress, &info);
     } else return 2;
     worker_info(&info);
     if (result) printf("error\t%d\t%s\n", -result, info.failure[0] ? info.failure : N_("Update worker failed"));

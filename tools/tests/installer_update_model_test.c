@@ -75,6 +75,45 @@ int main(int argc, char **argv)
     assert(installer_update_decode(&info, &progress, message, sizeof(message),
                                    "info\tfree_bytes\t18446744073709551616") == -EINVAL);
 
+    assert(installer_update_decode(&info, &progress, message, sizeof(message),
+        "activity\tcache\treused\treliefos-test-1.apk\t1\t2\t1048576\t2097152\t1048576\t0") == 4);
+    assert(info.activity.bytes_done == 1048576 && info.activity.bytes_reused == 1048576);
+    assert(installer_update_activity_percent(&info.activity, 1) == 68);
+    char encoded[512], detail[768];
+    assert(!installer_update_activity_encode(&info.activity, encoded, sizeof(encoded)));
+    struct installer_update_activity original = info.activity, decoded = {0};
+    assert(installer_update_activity_decode(&decoded, encoded) == 1);
+    assert(!memcmp(&original, &decoded, sizeof(original)));
+    assert(!installer_update_activity_format(&decoded, detail, sizeof(detail)));
+    assert(strstr(detail, "reliefos-test-1.apk") && strstr(detail, "1.0/2.0 MiB"));
+    assert(installer_update_activity_format(&decoded, detail, 1) == -EOVERFLOW);
+    const char *const malformed[] = {
+        "activity\tcache\treused\t../escape.apk\t1\t2\t1\t2\t1\t0",
+        "activity\tunknown\treused\tp.apk\t1\t2\t1\t2\t1\t0",
+        "activity\tcache\tunknown\tp.apk\t1\t2\t1\t2\t1\t0",
+        "activity\tcache\treused\tp.apk\t3\t2\t1\t2\t1\t0",
+        "activity\tcache\treused\tp.apk\t1\t2\t3\t2\t1\t0",
+        "activity\tcache\treused\tp.apk\t1\t2\t1\t2\t2\t0",
+        "activity\tcache\tfailed\tp.apk\t1\t2\t1\t2\t1\t0",
+        "activity\tcache\treused\tp.apk\t1\t2\t1\t2\t1\t1",
+        "activity\tcache\treused\tp.apk\t1\t2\t1\t18446744073709551616\t1\t0",
+        "activity\tcache\treused\tp.apk\t1\t2\t1\t2\t1\t0\textra",
+    };
+    for (size_t i = 0; i < sizeof(malformed) / sizeof(malformed[0]); ++i) {
+        decoded = original;
+        assert(installer_update_activity_decode(&decoded, malformed[i]) == -EINVAL);
+        assert(!memcmp(&original, &decoded, sizeof(original)));
+    }
+    decoded = (struct installer_update_activity){.step = UPDATE_STEP_UPGRADE};
+    assert(installer_update_activity_apk(&decoded, "(2/3) Upgrading reliefos-fixture (1 -> 2)") == 1);
+    assert(decoded.files_done == 1 && decoded.files_total == 3);
+    assert(!strcmp(decoded.package, "reliefos-fixture"));
+    assert(!installer_update_activity_apk(&decoded, "(4/3) Upgrading reliefos-fixture (1 -> 2)"));
+    assert(!installer_update_activity_apk(&decoded, "(1/3) NOTICE reliefos-fixture"));
+    assert(installer_update_decode(&info, &progress, message, sizeof(message),
+                                   "progress\t78\tSynchronizing") == 2);
+    assert(!info.activity.step);
+
     struct installer_update_checkpoint state = {
         .phase = "packages", .root_uuid = "8ab5d176-6479-4ec8-b382-531fca6ea662",
         .index_sha256 = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
