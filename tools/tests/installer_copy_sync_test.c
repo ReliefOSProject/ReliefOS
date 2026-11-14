@@ -37,10 +37,12 @@ static int fixture_syncfs(int fd)
     return 0;
 }
 /** @brief Assert that publication cannot precede a successful filesystem barrier. */
-int reliefos_boot_install_at_root(const struct reliefos_boot_install_options *options, const char *root)
+int reliefos_boot_install_instance_at_root(const struct reliefos_boot_install_options *options,
+    const char *root, const char *esp)
 {
     (void)options;
     assert(root && *root);
+    assert(esp && !strcmp(esp, INSTALL_ESP_VOLUME));
     assert(filesystem_sync_calls && !fail_filesystem_sync);
     ++publish_calls;
     return 0;

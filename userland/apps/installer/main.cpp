@@ -41,6 +41,7 @@ extern "C" {
 #include "installer_capacity.h"
 #include "installer_partitions.h"
 #include "installer_tty.h"
+#include "installer_tui.h"
 #include "installer_update.h"
 #include "../reliefapk/process.h"
 #include "model.h"
@@ -1401,7 +1402,8 @@ static int app_event_handler(int event)
 
 extern "C" void refresh_ui(void)
 {
-    if (installer_tty_mode || !main_window) return;
+    if (installer_tty_mode) { installer_tui_publish_progress(); return; }
+    if (!main_window) return;
     refresh_status_widgets();
     update_footer();
     Fl::check();
@@ -1483,17 +1485,18 @@ int main(int argc, char **argv)
     }
     struct installer_tty_context tty_context;
     int graphical = argc == 2 && strcmp(argv[1], "--graphical") == 0;
+    int text_mode = argc == 2 && strcmp(argv[1], "--text") == 0;
 
     setlocale(LC_ALL, "");
     bindtextdomain("installer", RELIEFOS_LAYOUT_LOCALE);
     bind_textdomain_codeset("installer", "UTF-8");
     textdomain("installer");
     setvbuf(stdout, NULL, _IOLBF, 0);
-    if (argc != 1 && !graphical) {
-        fputs("usage: installer [--graphical]\n", stderr);
+    if (argc != 1 && !graphical && !text_mode) {
+        fputs("usage: installer [--graphical|--text]\n", stderr);
         return 2;
     }
-    if (!graphical && isatty(STDIN_FILENO)) {
+    if (text_mode || (!graphical && isatty(STDIN_FILENO))) {
         installer_tty_mode = 1;
         tty_context.setup = &setup;
         tty_context.disks = disks;

@@ -774,6 +774,7 @@ static void show_progress(uint32_t value, const char *status,
             tty_last_progress = value;
             copy_text(tty_last_status, sizeof(tty_last_status), status_text);
         }
+        refresh_ui();
         return;
     }
     set_status(status, detail);
@@ -1400,9 +1401,8 @@ static void finish_install(int ret,
             puts(T("\nInstallation completed successfully."));
             puts(T("Remove the installation media before rebooting."));
         }
-    } else {
-        refresh_ui();
     }
+    refresh_ui();
 }
 
 void perform_install(void)
