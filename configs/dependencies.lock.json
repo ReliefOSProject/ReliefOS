@@ -391,6 +391,19 @@
       "license_in_source": ".PKGINFO"
     },
     {
+      "id": "x11-dev-ncurses",
+      "kind": "apk",
+      "version": "6.6_p20260516-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/ncurses-dev-6.6_p20260516-r0.apk",
+      "sha256": "f619c185ae571d0cc78b2f78e578f560a243a4153ae849de0c25564e73b98023",
+      "directory": "ncurses-dev-6.6_p20260516-r0",
+      "script": "tools/build/x11-development.sh",
+      "target": "x11-development",
+      "feature": "xorg",
+      "note": "Alpine v3.24 build-only ncursesw headers matching alpine-libncursesw. X11 license; embedded APK signature is verified by apk-tools",
+      "license_in_source": ".PKGINFO"
+    },
+    {
       "id": "x11-dev-libx11",
       "kind": "apk",
       "version": "1.8.14-r0",

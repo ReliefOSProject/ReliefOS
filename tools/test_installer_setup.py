@@ -111,16 +111,10 @@ class InstallerSetupTests(unittest.TestCase):
             self.assertEqual(list(outside.iterdir()), [])
 
     def test_tty_input(self):
+        from test_installer_swap_tty import compile_fixture
         with tempfile.TemporaryDirectory(prefix="reliefos-login-input-") as temporary:
             executable = Path(temporary) / "login-input"
-            subprocess.run([
-                "cc", "-std=c11", "-D_GNU_SOURCE", "-O1", "-g",
-                "-fsanitize=address,undefined", "-fno-omit-frame-pointer",
-                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-Wl,--wrap=read,--wrap=write,--wrap=tcgetattr,--wrap=tcsetattr",
-                "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-                "tools/tests/installer_tty_input_test.c", "userland/apps/installer/installer_capacity.c", "-o", str(executable),
-            ], cwd=ROOT, check=True)
+            compile_fixture(executable)
             subprocess.run([str(executable)], check=True, timeout=10)
 
     def test_setup_validation(self):

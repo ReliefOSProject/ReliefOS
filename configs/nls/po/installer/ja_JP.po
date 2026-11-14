@@ -1,32 +1,37 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: ReliefOS\n"
+"Project-Id-Version:  ReliefOS\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-11-14 17:31+0800\n"
 "PO-Revision-Date: 2026-11-13 00:00+0000\n"
 "Last-Translator: ReliefOS NLS\n"
-"Language-Team: Japanese\n"
 "Language: ja_JP\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: Japanese\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
 
-#: userland/apps/installer/main.cpp:1184
-msgid "A previous update is incomplete. This attempt will verify the system and recover the pending update stages."
+#: userland/apps/installer/installer_tty.c:173
+msgid ""
+"A previous update is incomplete. This attempt will verify the system and recover the pending "
+"update stages."
 msgstr "前回の更新が完了していません。今回はシステムを検証し、保留中の更新段階を復旧します。"
 
-#: userland/apps/installer/installer_tty.c:430
-msgid "Account setup cancelled or input exceeds the transport buffer."
-msgstr "アカウントの設定がキャンセルされたか、入力が転送バッファーの上限を超えました。"
+#: configs/nls/messages/installer.c:18
+msgid "Account and system options"
+msgstr "アカウントとシステム設定"
 
-#: userland/apps/installer/install_ops.c:1209
+#: userland/apps/installer/install_ops.c:1210
 msgid "Account setup failed"
 msgstr "アカウントの設定に失敗しました"
 
-#: userland/apps/installer/main.cpp:156
+#: userland/apps/installer/main.cpp:157
 msgid "Accounts"
 msgstr "アカウント"
 
-#: userland/apps/installer/installer_tty.c:406
+#: userland/apps/installer/installer_tty.c:172
 msgid "Accounts, personal files, installed software and local configuration are preserved."
 msgstr "アカウント、個人ファイル、インストール済みソフトウェア、ローカル設定は保持されます。"
 
@@ -34,11 +39,11 @@ msgstr "アカウント、個人ファイル、インストール済みソフト
 msgid "Add to Favorites"
 msgstr "お気に入りに追加"
 
-#: userland/apps/installer/installer_update_engine.c:328
+#: userland/apps/installer/installer_update_engine.c:349
 msgid "Administrator privileges are required"
 msgstr "管理者権限が必要です"
 
-#: userland/apps/installer/main.cpp:1051
+#: userland/apps/installer/main.cpp:1052
 msgid "Administrator: root"
 msgstr "管理者: root"
 
@@ -46,7 +51,15 @@ msgstr "管理者: root"
 msgid "All Files (*)"
 msgstr "すべてのファイル (*)"
 
-#: userland/apps/installer/installer_update_engine.c:395
+#: userland/apps/installer/installer_tui.c:559
+msgid "Apply"
+msgstr "適用"
+
+#: userland/apps/installer/installer_tty.c:154
+msgid "Apply automatic layout now"
+msgstr "自動パーティション構成を今すぐ適用"
+
+#: userland/apps/installer/installer_update_engine.c:416
 msgid "Applying signed system packages"
 msgstr "署名済みシステムパッケージを適用しています"
 
@@ -54,55 +67,69 @@ msgstr "署名済みシステムパッケージを適用しています"
 msgid "Attach a disk and click Refresh."
 msgstr "ディスクを接続し、「更新」をクリックしてください。"
 
-#: userland/apps/installer/installer_tty.c:438
-msgid "Automatic installation erases the selected disk."
-msgstr "自動インストールでは選択したディスクが消去されます。"
+#: userland/apps/installer/installer_tty.c:266
+msgid "Automatic"
+msgstr "自動"
 
-#: userland/apps/installer/installer_tty.c:278
-msgid "Automatic layout failed."
-msgstr "自動構成に失敗しました。"
+#: userland/apps/installer/installer_tty.c:147
+msgid "Automatic layout"
+msgstr "自動構成"
 
 #: userland/apps/installer/install_ops.c:266
 msgid "Automatic mode replaces its partition table; manual mode can preserve other partitions."
 msgstr "自動モードではパーティションテーブルが置き換えられます。手動モードでは他のパーティションを保持できます。"
 
-#: userland/apps/installer/main.cpp:1115
+#: userland/apps/installer/main.cpp:1116
 msgid "Automatic partitioning creates a FAT32 ESP and an ext4 root. No BIOS Boot partition is needed."
 msgstr "自動パーティション設定では FAT32 の ESP と ext4 のルートを作成します。BIOS Boot パーティションは不要です。"
 
-#: userland/apps/installer/main.cpp:1116
-msgid "Automatic partitioning creates an unformatted BIOS Boot partition, a FAT32 ESP and an ext4 root. BIOS also uses the FAT32 partition for boot files."
+#: userland/apps/installer/main.cpp:1117
+msgid ""
+"Automatic partitioning creates an unformatted BIOS Boot partition, a FAT32 ESP and an ext4 root. "
+"BIOS also uses the FAT32 partition for boot files."
 msgstr "自動パーティション設定では未フォーマットの BIOS Boot パーティション、FAT32 の ESP、ext4 のルートを作成します。BIOS も起動ファイルに FAT32 パーティションを使用します。"
 
-#: userland/apps/installer/main.cpp:709
-msgid "Automatic plan: BIOS Boot 1 MiB; ESP 128 MiB FAT32; root %llu MiB ext4.\nThe list shows current partitions. The plan is applied only after confirmation."
+#: userland/apps/installer/main.cpp:710
+msgid ""
+"Automatic plan: BIOS Boot 1 MiB; ESP 128 MiB FAT32; root %llu MiB ext4.\n"
+"The list shows current partitions. The plan is applied only after confirmation."
 msgstr "自動設定: BIOS Boot 1 MiB、ESP 128 MiB FAT32、ルート %llu MiB ext4。\n一覧には現在のパーティションが表示されます。設定は確認後にのみ適用されます。"
 
-#: userland/apps/installer/main.cpp:708
-msgid "Automatic plan: ESP 128 MiB FAT32; root %llu MiB ext4.\nThe list shows current partitions. The plan is applied only after confirmation."
+#: userland/apps/installer/main.cpp:709
+msgid ""
+"Automatic plan: ESP 128 MiB FAT32; root %llu MiB ext4.\n"
+"The list shows current partitions. The plan is applied only after confirmation."
 msgstr "自動設定: ESP 128 MiB FAT32、ルート %llu MiB ext4。\n一覧には現在のパーティションが表示されます。設定は確認後にのみ適用されます。"
 
-#: userland/apps/installer/main.cpp:612
+#: userland/apps/installer/installer_tty.c:121
 msgid "Automatically identify a single ReliefOS installation"
 msgstr "単一の ReliefOS インストールを自動識別"
 
-#: userland/apps/installer/main.cpp:676
+#: userland/apps/installer/main.cpp:677
 msgid "Available disks"
 msgstr "利用可能なディスク"
+
+#: userland/apps/installer/installer_tui.c:261
+msgid "B BIOS  E ESP  R /  D Data  . Free"
+msgstr "B BIOS  E ESP  R /  D データ  . 空き"
+
+#: userland/apps/installer/installer_tui.c:480
+msgid "Back"
+msgstr "戻る"
 
 #: userland/apps/installer/install_ops.c:1447
 msgid "Boot installation checks failed"
 msgstr "ブートローダーのインストール確認に失敗しました"
 
-#: userland/apps/installer/installer_tty.c:402
+#: userland/apps/installer/installer_tty.c:129
 msgid "Boot partition"
 msgstr "ブートパーティション"
 
-#: userland/apps/installer/main.cpp:154
+#: configs/nls/messages/installer.c:16
 msgid "Bootloaders"
 msgstr "ブートローダー"
 
-#: userland/apps/installer/main.cpp:1237
+#: userland/apps/installer/main.cpp:1238
 msgid "Bootloaders:"
 msgstr "ブートローダー:"
 
@@ -114,31 +141,55 @@ msgstr "オフラインのパッケージ処理を計算しています"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: userland/apps/installer/main.cpp:374
+#: userland/apps/installer/installer_tty.c:348
+msgid "Cancel installation"
+msgstr "インストールを中止"
+
+#: userland/apps/installer/installer_tty.c:153
+msgid "Cannot display this partition layout."
+msgstr "パーティション構成を表示できません。"
+
+#: userland/apps/installer/main.cpp:375
 msgid "Cannot identify the selected partitions"
 msgstr "選択したパーティションを識別できません"
 
-#: userland/apps/installer/main.cpp:362
+#: userland/apps/installer/installer_tty.c:215
+msgid "Cannot initialize the terminal or installer log"
+msgstr "端末またはインストールログを初期化できません"
+
+#: userland/apps/installer/installer_tui.c:595
+msgid "Cannot read installer log"
+msgstr "インストールログを読み取れません"
+
+#: userland/apps/installer/installer_tty.c:134
+msgid "Cannot read partition identity"
+msgstr "パーティション識別情報を読み取れません"
+
+#: userland/apps/installer/installer_tty.c:328
+msgid "Cannot select the requested locale."
+msgstr "選択したロケールに切り替えられません。"
+
+#: userland/apps/installer/main.cpp:363
 msgid "Cannot start the update worker"
 msgstr "更新ワーカーを起動できません"
 
-#: userland/apps/installer/main.cpp:171
+#: userland/apps/installer/main.cpp:172
 msgid "Check Again"
 msgstr "再確認"
 
-#: userland/apps/installer/main.cpp:176
+#: userland/apps/installer/main.cpp:177
 msgid "Check Update"
 msgstr "更新を確認"
 
-#: userland/apps/installer/installer_tty.c:73
+#: userland/apps/installer/installer_tty.c:420
 msgid "Check username and matching passwords (1-32 characters, no spaces)."
 msgstr "ユーザー名とパスワードの一致を確認してください (1～32 文字、スペース不可)。"
 
-#: userland/apps/installer/installer_update_engine.c:370
+#: userland/apps/installer/installer_update_engine.c:391
 msgid "Checking bootloader compatibility"
 msgstr "ブートローダーの互換性を確認しています"
 
-#: userland/apps/installer/installer_update_engine.c:346
+#: userland/apps/installer/installer_update_engine.c:367
 msgid "Checking installation media and free space"
 msgstr "インストールメディアと空き容量を確認しています"
 
@@ -146,39 +197,39 @@ msgstr "インストールメディアと空き容量を確認しています"
 msgid "Checking signed repository and package archives"
 msgstr "署名付きリポジトリとパッケージを確認しています"
 
-#: userland/apps/installer/main.cpp:1261
+#: userland/apps/installer/main.cpp:1262
 msgid "Checking system update"
 msgstr "システム更新を確認しています"
 
-#: userland/apps/installer/main.cpp:393
+#: userland/apps/installer/main.cpp:394
 msgid "Checking the selected system"
 msgstr "選択したシステムを確認しています"
 
-#: userland/apps/installer/installer_update_engine.c:324
+#: userland/apps/installer/installer_update_engine.c:345
 msgid "Checking update target"
 msgstr "更新対象を確認しています"
 
-#: userland/apps/installer/main.cpp:577
+#: userland/apps/installer/main.cpp:578
 msgid "Choose Setup Mode"
 msgstr "セットアップモードを選択"
 
-#: userland/apps/installer/main.cpp:1132
+#: userland/apps/installer/main.cpp:1133
 msgid "Choose bootloaders"
 msgstr "ブートローダーを選択"
 
-#: userland/apps/installer/main.cpp:672
+#: userland/apps/installer/main.cpp:673
 msgid "Choose the disk that already contains ReliefOS."
 msgstr "ReliefOS が既にインストールされているディスクを選択してください。"
 
-#: userland/apps/installer/main.cpp:673
+#: userland/apps/installer/main.cpp:674
 msgid "Choose the disk that will receive ReliefOS."
 msgstr "ReliefOS をインストールするディスクを選択してください。"
 
-#: userland/apps/installer/main.cpp:525
+#: userland/apps/installer/main.cpp:526
 msgid "Choose the language for Setup and the installed system."
 msgstr "セットアップとインストール後のシステムで使用する言語を選択してください。"
 
-#: userland/apps/installer/main.cpp:594
+#: userland/apps/installer/main.cpp:595
 msgid "Choose the target disk, configure its partitions, then replace boot, system and EFI files."
 msgstr "対象ディスクを選択し、パーティションを設定してから、起動、システム、および EFI のファイルを置き換えます。"
 
@@ -186,51 +237,43 @@ msgstr "対象ディスクを選択し、パーティションを設定してか
 msgid "Close"
 msgstr "閉じる"
 
-#: userland/apps/installer/installer_tty.c:463
-msgid "Command [reboot/shutdown/exit]: "
-msgstr "コマンド [reboot/shutdown/exit]: "
-
-#: userland/apps/installer/installer_tty.c:258
-msgid "Commands: auto, init, create SIZE FS NAME, resize SIZE, rename NAME,"
-msgstr "コマンド: auto, init, create SIZE FS NAME, resize SIZE, rename NAME,"
-
-#: userland/apps/installer/installer_update_progress.c:137
+#: userland/apps/installer/installer_update_progress.c:138
 msgid "Comparing contents"
 msgstr "内容を比較中"
 
-#: userland/apps/installer/installer_update_progress.c:140
+#: userland/apps/installer/installer_update_progress.c:141
 msgid "Completed"
 msgstr "完了"
 
-#: userland/apps/installer/main.cpp:947
+#: configs/nls/messages/installer.c:17
 msgid "Configure partitions"
 msgstr "パーティションを設定"
 
-#: userland/apps/installer/main.cpp:157
+#: userland/apps/installer/main.cpp:158
 msgid "Confirm"
 msgstr "確認"
 
-#: userland/apps/installer/main.cpp:1193
+#: userland/apps/installer/main.cpp:1194
 msgid "Confirm Installation"
 msgstr "インストールの確認"
 
-#: configs/nls/messages/installer.c:11
+#: userland/apps/installer/installer_tty.c:108
+msgid "Confirm partition operation"
+msgstr "パーティション操作の確認"
+
+#: configs/nls/messages/installer.c:22
 msgid "Confirm password"
 msgstr "パスワードの確認"
 
-#: userland/apps/installer/installer_tty.c:69
-msgid "Confirm password: "
-msgstr "パスワードの確認: "
+#: userland/apps/installer/installer_tty.c:285
+msgid "Confirm root password"
+msgstr "root パスワードの確認"
 
-#: userland/apps/installer/installer_tty.c:71
-msgid "Confirm root password: "
-msgstr "root パスワードの確認: "
-
-#: userland/apps/installer/main.cpp:1165
+#: userland/apps/installer/installer_tty.c:202
 msgid "Console"
 msgstr "コンソール"
 
-#: userland/apps/installer/main.cpp:855
+#: userland/apps/installer/installer_tui.c:545
 msgid "Continue"
 msgstr "続行"
 
@@ -238,15 +281,15 @@ msgstr "続行"
 msgid "Copy failed"
 msgstr "コピーに失敗しました"
 
-#: userland/apps/installer/install_ops.c:1077
+#: userland/apps/installer/install_ops.c:1078
 msgid "Copy path is too long"
 msgstr "コピー元またはコピー先のパスが長すぎます"
 
-#: userland/apps/installer/installer_update_progress.c:138
+#: userland/apps/installer/installer_update_progress.c:139
 msgid "Copying"
 msgstr "コピー中"
 
-#: userland/apps/installer/install_ops.c:802
+#: userland/apps/installer/install_ops.c:803
 msgid "Copying system files"
 msgstr "システムファイルをコピーしています"
 
@@ -262,51 +305,63 @@ msgstr "ディスク一覧を取得できませんでした"
 msgid "Could not save installed preferences"
 msgstr "インストール後の設定を保存できませんでした"
 
+#: userland/apps/installer/installer_tty.c:155
+msgid "Create"
+msgstr "作成"
+
 #: userland/apps/fltk_support.h:38
 msgid "Create a new directory"
 msgstr "新しいフォルダーを作成"
 
-#: userland/apps/installer/installer_tty.c:136
-msgid "Create a swapfile? [y/N]: "
-msgstr "スワップファイルを作成しますか？ [y/N]: "
+#: userland/apps/installer/installer_tty.c:287
+msgid "Create a swapfile"
+msgstr "スワップファイルを作成"
 
-#: userland/apps/installer/installer_tty.c:289
-msgid "Create failed."
-msgstr "作成に失敗しました。"
+#: userland/apps/installer/installer_tty.c:77
+msgid "Create partition"
+msgstr "パーティションを作成"
 
-#: userland/apps/installer/main.cpp:980
+#: userland/apps/installer/main.cpp:981
 msgid "Create: size in MiB, filesystem, name. Resize only changes the trailing edge."
 msgstr "作成: サイズを MiB で指定し、ファイルシステムと名前を入力します。サイズ変更では末尾のみが変更されます。"
 
-#: userland/apps/installer/install_ops.c:1193
+#: userland/apps/installer/install_ops.c:1194
 msgid "Creating swapfile"
 msgstr "スワップファイルを作成しています"
+
+#: userland/apps/installer/installer_tui.c:263
+msgid "Current disk layout"
+msgstr "現在のディスク構成"
 
 #: userland/apps/fltk_support.h:31
 msgid "Custom Filter"
 msgstr "カスタムフィルター"
 
-#: userland/apps/installer/main.cpp:971
+#: userland/apps/installer/installer_tty.c:95
+msgid "Data partition"
+msgstr "データパーティション"
+
+#: userland/apps/installer/main.cpp:972
 msgid "Data type"
 msgstr "データの種類"
 
-#: configs/nls/messages/installer.c:12
+#: configs/nls/messages/installer.c:23
 msgid "Delete"
 msgstr "削除"
 
-#: userland/apps/installer/installer_tty.c:303
-msgid "Delete failed."
-msgstr "削除に失敗しました。"
+#: userland/apps/installer/installer_tty.c:202
+msgid "Desktop"
+msgstr "デスクトップ環境"
 
-#: userland/apps/installer/main.cpp:1164
+#: userland/apps/installer/main.cpp:1165
 msgid "Desktop environment"
 msgstr "デスクトップ環境"
 
-#: userland/apps/installer/installer_tty.c:434
-msgid "Desktop selection cancelled."
-msgstr "デスクトップの選択がキャンセルされました。"
+#: userland/apps/installer/installer_tty.c:203
+msgid "Disabled"
+msgstr "無効"
 
-#: userland/apps/installer/main.cpp:153
+#: userland/apps/installer/main.cpp:154
 msgid "Disk"
 msgstr "ディスク"
 
@@ -314,47 +369,59 @@ msgstr "ディスク"
 msgid "Disk "
 msgstr "ディスク "
 
-#: userland/apps/installer/main.cpp:1262
+#: userland/apps/installer/installer_tui_job.c:177
+msgid "Disk operations are running. Please wait for completion."
+msgstr "ディスク操作を実行しています。完了までお待ちください。"
+
+#: userland/apps/installer/main.cpp:1263
 msgid "Do not turn off this machine."
 msgstr "このコンピューターの電源を切らないでください。"
 
-#: userland/apps/installer/main.cpp:686
+#: userland/apps/installer/main.cpp:687
 msgid "EFI system partition"
 msgstr "EFI システムパーティション"
 
-#: userland/apps/installer/installer_tty.c:384
-msgid "ESP partition number (blank: use fstab): "
-msgstr "ESP パーティション番号 (空欄: fstab を使用): "
+#: userland/apps/installer/installer_tty.c:51
+msgid "Enter a positive whole number of MiB."
+msgstr "MiB 単位の正の整数を入力してください。"
 
-#: userland/apps/installer/installer_tty.c:151
+#: userland/apps/installer/installer_tty.c:424
 msgid "Enter a valid swap size in MiB."
 msgstr "有効なスワップサイズを MiB 単位で入力してください。"
 
-#: userland/apps/installer/main.cpp:830
+#: userland/apps/installer/main.cpp:831
 msgid "Enter a value:"
 msgstr "値を入力:"
 
-#: userland/apps/installer/main.cpp:826
+#: userland/apps/installer/main.cpp:827
 msgid "Enter filesystem and label (for example: ext4 RELIEFOS_DATA):"
 msgstr "ファイルシステムとラベルを入力してください (例: ext4 RELIEFOS_DATA):"
 
-#: userland/apps/installer/installer_tty.c:367
-msgid "Enter install or update."
-msgstr "install または update を入力してください。"
-
-#: userland/apps/installer/main.cpp:820
+#: userland/apps/installer/main.cpp:821
 msgid "Enter size_MiB filesystem name (ext4/ext2/fat32/exfat/raw):"
 msgstr "size_MiB filesystem name を入力してください (ext4/ext2/fat32/exfat/raw):"
 
-#: userland/apps/installer/main.cpp:824
+#: userland/apps/installer/main.cpp:825
 msgid "Enter the GPT partition name:"
 msgstr "GPT パーティション名を入力してください:"
 
-#: userland/apps/installer/main.cpp:822
+#: userland/apps/installer/main.cpp:823
 msgid "Enter the new partition size in MiB:"
 msgstr "新しいパーティションのサイズを MiB 単位で入力してください:"
 
-#: userland/apps/installer/installer_update_progress.c:141
+#: userland/apps/installer/installer_tty.c:183
+msgid "Erase disk: BIOS Boot %llu MiB, ESP %llu MiB, ext4 root %llu MiB"
+msgstr "ディスクを消去：BIOS Boot %llu MiB、ESP %llu MiB、ext4 ルート %llu MiB"
+
+#: userland/apps/installer/installer_tty.c:316
+msgid "Exit"
+msgstr "終了"
+
+#: userland/apps/installer/installer_tty.c:348
+msgid "Exit the installer?"
+msgstr "インストーラーを終了しますか？"
+
+#: userland/apps/installer/installer_update_progress.c:142
 msgid "Failed"
 msgstr "失敗"
 
@@ -370,57 +437,61 @@ msgstr "ファイルシステム"
 msgid "File name:"
 msgstr "ファイル名:"
 
-#: userland/apps/installer/main.cpp:983
+#: userland/apps/installer/installer_tty.c:78
+msgid "Filesystem"
+msgstr "ファイルシステム"
+
+#: userland/apps/installer/installer_tty.c:83
+msgid "Filesystem label"
+msgstr "ファイルシステムラベル"
+
+#: userland/apps/installer/main.cpp:984
 msgid "Final confirmation formats a FAT32 ESP and ext4 root on the selected disk."
 msgstr "最終確認後、選択したディスクに FAT32 の ESP と ext4 のルートがフォーマットされます。"
 
-#: userland/apps/installer/main.cpp:159
+#: userland/apps/installer/main.cpp:160
 msgid "Finish"
 msgstr "完了"
 
-#: userland/apps/installer/installer_update_engine.c:414
+#: userland/apps/installer/installer_update_engine.c:435
 msgid "Finishing the system update"
 msgstr "システム更新を完了しています"
 
-#: configs/nls/messages/installer.c:13
+#: configs/nls/messages/installer.c:24
 msgid "Format"
 msgstr "フォーマット"
 
-#: userland/apps/installer/installer_tty.c:301
-msgid "Format failed."
-msgstr "フォーマットに失敗しました。"
+#: userland/apps/installer/installer_tty.c:82
+msgid "Format partition"
+msgstr "パーティションをフォーマット"
 
-#: userland/apps/installer/main.cpp:988
+#: userland/apps/installer/installer_tty.c:157
 msgid "Format selected ESP (erase all EFI boot files on it)"
 msgstr "選択した ESP をフォーマット (その上のすべての EFI 起動ファイルを消去)"
 
-#: userland/apps/installer/main.cpp:856
+#: userland/apps/installer/main.cpp:857
 msgid "Formatting destroys all files on the selected partition."
 msgstr "フォーマットすると選択したパーティション上のすべてのファイルが消去されます。"
 
-#: userland/apps/installer/installer_tty.c:403
+#: userland/apps/installer/installer_tty.c:168
 msgid "Free / required space"
 msgstr "空き容量 / 必要容量"
 
-#: userland/apps/installer/main.cpp:581
+#: userland/apps/installer/main.cpp:582
 msgid "Fresh Install"
 msgstr "新規インストール"
 
-#: userland/apps/installer/installer_tty.c:354
-msgid "Fresh install defaults to automatic partitioning; manual GPT editing is available."
-msgstr "新規インストールは既定で自動パーティション設定を使用します。GPT を手動で編集することもできます。"
-
-#: userland/apps/installer/main.cpp:578
+#: userland/apps/installer/main.cpp:579
 msgid "Fresh install erases the disk. Update keeps existing users and extra programs."
 msgstr "新規インストールではディスクが消去されます。更新では既存のユーザーと追加プログラムが保持されます。"
 
-#: userland/apps/installer/installer_tty.c:280
-msgid "GPT initialization failed."
-msgstr "GPT の初期化に失敗しました。"
-
-#: userland/apps/installer/installer_update_engine.c:339
+#: userland/apps/installer/installer_update_engine.c:360
 msgid "Identifying the installed system"
 msgstr "インストール済みシステムを識別しています"
+
+#: userland/apps/installer/installer_tty.c:154
+msgid "Initialize GPT"
+msgstr "GPT を初期化"
 
 #: userland/apps/fltk_files.h:23
 msgid "Input is too long"
@@ -430,99 +501,103 @@ msgstr "入力が長すぎます"
 msgid "Install"
 msgstr "インストール"
 
-#: userland/apps/installer/main.cpp:516
+#: userland/apps/installer/main.cpp:517
 msgid "Install ReliefOS"
 msgstr "ReliefOS をインストール"
 
-#: userland/apps/installer/main.cpp:1217
+#: userland/apps/installer/installer_tty.c:286
 msgid "Install Xorg desktop environment"
 msgstr "Xorg デスクトップ環境をインストール"
 
-#: userland/apps/installer/installer_tty.c:106
-msgid "Install Xorg desktop environment? [Y/n]: "
-msgstr "Xorg デスクトップ環境をインストールしますか？ [Y/n]: "
+#: userland/apps/installer/installer_tty.c:254
+msgid "Install a new system"
+msgstr "システムを新規インストール"
 
-#: userland/apps/installer/main.cpp:555
+#: userland/apps/installer/installer_tty.c:249
 msgid "Install a new system or update an existing ReliefOS disk."
 msgstr "新しいシステムをインストールするか、既存の ReliefOS ディスクを更新します。"
 
-#: userland/apps/installer/install_ops.c:1398
+#: userland/apps/installer/install_ops.c:1399
 msgid "Install failed"
 msgstr "インストールに失敗しました"
 
-#: userland/apps/installer/main.cpp:1136
+#: userland/apps/installer/installer_tty.c:174
 msgid "Install or update BIOS bootloader"
 msgstr "BIOS ブートローダーをインストールまたは更新"
 
-#: userland/apps/installer/installer_tty.c:183
-msgid "Install or update BIOS bootloader?"
-msgstr "BIOS ブートローダーをインストールまたは更新しますか？"
-
-#: userland/apps/installer/main.cpp:1141
+#: userland/apps/installer/installer_tty.c:175
 msgid "Install or update UEFI bootloader"
 msgstr "UEFI ブートローダーをインストールまたは更新"
 
-#: userland/apps/installer/installer_tty.c:184
-msgid "Install or update UEFI bootloader?"
-msgstr "UEFI ブートローダーをインストールまたは更新しますか？"
-
-#: userland/apps/installer/main.cpp:1289
+#: userland/apps/installer/main.cpp:1290
 msgid "Installation Complete"
 msgstr "インストール完了"
 
-#: userland/apps/installer/main.cpp:1315
+#: userland/apps/installer/main.cpp:1316
 msgid "Installation Failed"
 msgstr "インストール失敗"
 
-#: userland/apps/installer/install_ops.c:1393
+#: userland/apps/installer/install_ops.c:1394
 msgid "Installation completed successfully"
 msgstr "インストールが正常に完了しました"
+
+#: userland/apps/installer/installer_tty.c:294
+msgid "Installation completed successfully."
+msgstr "インストールが正常に完了しました。"
 
 #: userland/apps/installer/install_ops.c:226
 msgid "Installation failed"
 msgstr "インストールに失敗しました"
 
-#: userland/apps/installer/installer_tty.c:461
-msgid "Installation finished."
-msgstr "インストールが終了しました。"
+#: configs/nls/messages/installer.c:21
+msgid "Installation finished"
+msgstr "インストール完了"
 
-#: userland/apps/installer/install_ops.c:1298
+#: userland/apps/installer/install_ops.c:1299
 msgid "Installation media is incomplete"
 msgstr "インストールメディアが不完全です"
 
-#: userland/apps/installer/installer_update_engine.c:233
+#: userland/apps/installer/installer_update_engine.c:254
 msgid "Installation media is older than the installed system"
 msgstr "インストールメディアはインストール済みシステムより古いバージョンです"
 
-#: userland/apps/installer/installer_tty.c:443
-msgid "Installation not confirmed. Installation cancelled."
-msgstr "インストールが確認されませんでした。インストールをキャンセルしました。"
+#: configs/nls/messages/installer.c:14
+msgid "Installation mode"
+msgstr "インストールモード"
 
-#: userland/apps/installer/main.cpp:1154
+#: configs/nls/messages/installer.c:20
+msgid "Installation progress"
+msgstr "インストールの進行状況"
+
+#: userland/apps/installer/main.cpp:1155
 msgid "Installed version"
 msgstr "インストール済みバージョン"
+
+#: userland/apps/installer/installer_tty.c:344
+msgid "Installer log"
+msgstr "インストールログ"
 
 #: userland/apps/installer/install_ops.c:256
 msgid "Installing ReliefOS"
 msgstr "ReliefOS をインストールしています"
 
-#: userland/apps/installer/installer_tty.c:227
-msgid "Invalid disk selection."
-msgstr "ディスクの選択が無効です。"
-
 #: userland/apps/installer/install_ops.c:1412
 msgid "Invalid installation settings"
 msgstr "インストール設定が無効です"
+
+#: userland/apps/installer/installer_tty.c:51
+msgid "Invalid size"
+msgstr "無効なサイズ"
 
 #: userland/apps/installer/install_ops.c:1436
 msgid "Invalid swap size"
 msgstr "スワップサイズが無効です"
 
-#: userland/apps/installer/main.cpp:149
+#: configs/nls/messages/installer.c:11
 msgid "Language"
 msgstr "言語"
 
-#: userland/apps/installer/main.cpp:150
+#: configs/nls/messages/installer.c:12
 msgid "License"
 msgstr "ライセンス"
 
@@ -530,25 +605,27 @@ msgstr "ライセンス"
 msgid "Manage Favorites"
 msgstr "お気に入りの管理"
 
-#: userland/apps/installer/main.cpp:717
+#: userland/apps/installer/main.cpp:718
 msgid "Manual layout: assign BIOS Boot, ESP and root roles. BIOS Boot stays unformatted."
 msgstr "手動構成: BIOS Boot、ESP、ルートの役割を割り当てます。BIOS Boot はフォーマットされません。"
 
-#: userland/apps/installer/main.cpp:716
-msgid "Manual layout: assign a FAT32 ESP and an ext4 root. BIOS Boot is not required for the selected bootloaders."
+#: userland/apps/installer/main.cpp:717
+msgid ""
+"Manual layout: assign a FAT32 ESP and an ext4 root. BIOS Boot is not required for the selected "
+"bootloaders."
 msgstr "手動構成: FAT32 の ESP と ext4 のルートを割り当てます。選択したブートローダーでは BIOS Boot は不要です。"
 
-#: userland/apps/installer/main.cpp:1156
+#: userland/apps/installer/installer_tty.c:148
+msgid "Manual partitioning"
+msgstr "手動構成"
+
+#: userland/apps/installer/main.cpp:1157
 msgid "Media version"
 msgstr "メディアのバージョン"
 
-#: userland/apps/installer/main.cpp:152
+#: userland/apps/installer/main.cpp:153
 msgid "Mode"
 msgstr "モード"
-
-#: userland/apps/installer/installer_tty.c:356
-msgid "Mode [install/update]: "
-msgstr "モード [install/update]: "
 
 #: configs/nls/messages/installer.c:6
 msgid "Mount failed"
@@ -558,11 +635,15 @@ msgstr "マウントに失敗しました"
 msgid "Mounting target filesystems"
 msgstr "対象ファイルシステムをマウントしています"
 
+#: userland/apps/installer/installer_tui.c:267
+msgid "Name"
+msgstr "名前"
+
 #: userland/apps/fltk_support.h:37
 msgid "New Directory?"
 msgstr "新しいフォルダーを作成しますか?"
 
-#: userland/apps/installer/main.cpp:176
+#: userland/apps/installer/installer_tty.c:316
 msgid "Next"
 msgstr "次へ"
 
@@ -570,19 +651,15 @@ msgstr "次へ"
 msgid "No"
 msgstr "いいえ"
 
-#: userland/apps/installer/installer_tty.c:186
+#: userland/apps/installer/installer_tty.c:207
 msgid "No bootloader selected. A new installation will need a separately configured bootloader."
 msgstr "ブートローダーが選択されていません。新規インストールでは別途設定したブートローダーが必要です。"
-
-#: userland/apps/installer/installer_tty.c:372
-msgid "No disk selected. Installation cancelled."
-msgstr "ディスクが選択されませんでした。インストールをキャンセルしました。"
 
 #: userland/apps/installer/install_ops.c:747
 msgid "No disks were found"
 msgstr "ディスクが見つかりませんでした"
 
-#: userland/apps/installer/main.cpp:1318
+#: userland/apps/installer/main.cpp:1319
 msgid "No writes will continue after this error."
 msgstr "このエラーの後、書き込みは続行されません。"
 
@@ -590,51 +667,68 @@ msgstr "このエラーの後、書き込みは続行されません。"
 msgid "OK"
 msgstr "OK"
 
-#: userland/apps/installer/installer_tty.c:440
+#: userland/apps/installer/installer_tty.c:198
 msgid "Only the selected root is formatted; existing ESP files are preserved."
 msgstr "選択したルートのみをフォーマットします。既存の ESP ファイルは保持されます。"
 
-#: userland/apps/installer/main.cpp:1206
+#: userland/apps/installer/main.cpp:1207
 msgid "Only the selected root will be formatted. Existing ESP files and other partitions are preserved."
 msgstr "選択したルートのみをフォーマットします。既存の ESP ファイルと他のパーティションは保持されます。"
 
-#: userland/apps/installer/installer_update_progress.c:135
+#: userland/apps/installer/installer_tty.c:34
+msgid "Operation failed"
+msgstr "操作に失敗しました"
+
+#: userland/apps/installer/installer_tui_job.c:170
+msgid "Operation in progress"
+msgstr "操作を実行中"
+
+#: userland/apps/installer/installer_update_progress.c:136
 msgid "Package"
 msgstr "パッケージ"
 
+#: userland/apps/installer/installer_tui.c:267
+msgid "Partition"
+msgstr "パーティション"
+
 #: userland/apps/installer/install_ops.c:346
+#, python-format
 msgid "Partition %u  %s  %llu MiB  %s  %s%s"
 msgstr "パーティション %u  %s  %llu MiB  %s  %s%s"
 
-#: userland/apps/installer/main.cpp:746
+#: userland/apps/installer/main.cpp:747
 msgid "Partition layout updated"
 msgstr "パーティション構成を更新しました"
 
-#: userland/apps/installer/main.cpp:744
+#: userland/apps/installer/installer_tty.c:83
+msgid "Partition name"
+msgstr "パーティション名"
+
+#: userland/apps/installer/installer_tty.c:112
 msgid "Partition operation failed"
 msgstr "パーティション操作に失敗しました"
 
-#: userland/apps/installer/main.cpp:925
+#: userland/apps/installer/installer_tty.c:98
+msgid "Partition role"
+msgstr "パーティションの用途"
+
+#: userland/apps/installer/main.cpp:926
 msgid "Partition role updated."
 msgstr "パーティションの役割を更新しました。"
 
-#: userland/apps/installer/installer_tty.c:426
-msgid "Partition setup cancelled."
-msgstr "パーティションの設定がキャンセルされました。"
-
-#: userland/apps/installer/main.cpp:155
+#: userland/apps/installer/main.cpp:156
 msgid "Partitions"
 msgstr "パーティション"
 
-#: configs/nls/messages/installer.c:14
+#: userland/apps/installer/installer_tty.c:282
+msgid "Password"
+msgstr "パスワード"
+
+#: configs/nls/messages/installer.c:25
 msgid "Password:"
 msgstr "パスワード:"
 
-#: userland/apps/installer/installer_tty.c:68
-msgid "Password: "
-msgstr "パスワード: "
-
-#: userland/apps/installer/main.cpp:1066
+#: userland/apps/installer/main.cpp:1067
 msgid "Passwords: 1-32 characters, no spaces; confirmations must match"
 msgstr "パスワード: 1～32 文字、スペース不可。確認用入力は一致する必要があります"
 
@@ -642,7 +736,7 @@ msgstr "パスワード: 1～32 文字、スペース不可。確認用入力は
 msgid "Payload check failed"
 msgstr "ペイロードの確認に失敗しました"
 
-#: userland/apps/installer/install_ops.c:845
+#: userland/apps/installer/install_ops.c:846
 msgid "Payload path is too long"
 msgstr "ペイロードのパスが長すぎます"
 
@@ -650,27 +744,35 @@ msgstr "ペイロードのパスが長すぎます"
 msgid "Payload scan failed"
 msgstr "ペイロードのスキャンに失敗しました"
 
-#: userland/apps/installer/installer_tty.c:109
-msgid "Please answer yes or no."
-msgstr "y または n (yes または no) で答えてください。"
+#: userland/apps/installer/installer_tui.c:263
+msgid "Pending layout - written only after INSTALL confirmation."
+msgstr "適用予定の構成です。INSTALL の最終確認後に書き込みます。"
 
 #: userland/apps/fltk_support.h:32
 msgid "Please choose an existing file!"
 msgstr "既存のファイルを選択してください。"
 
-#: userland/apps/installer/main.cpp:592
+#: userland/apps/installer/installer_tty.c:354
+msgid "Power operation failed"
+msgstr "電源操作に失敗しました"
+
+#: userland/apps/installer/main.cpp:593
 msgid "Prepare a clean ReliefOS system with automatic or manual disk partitioning."
 msgstr "自動または手動のパーティション設定で、新しい ReliefOS システムを準備します。"
+
+#: userland/apps/installer/installer_tui_job.c:139
+msgid "Preparing operation"
+msgstr "操作を準備しています"
 
 #: userland/apps/installer/install_ops.c:1449
 msgid "Preparing target disk"
 msgstr "対象ディスクを準備しています"
 
-#: userland/apps/installer/installer_update_engine.c:387
+#: userland/apps/installer/installer_update_engine.c:408
 msgid "Preparing the installed system for update"
 msgstr "インストール済みシステムの更新を準備しています"
 
-#: userland/apps/installer/main.cpp:393
+#: userland/apps/installer/main.cpp:394
 msgid "Preparing the system update"
 msgstr "システム更新を準備しています"
 
@@ -682,7 +784,7 @@ msgstr "検証済みパッケージを準備しています"
 msgid "Preserving the installed kernel and configuration"
 msgstr "インストール済みのカーネルと設定を保存しています"
 
-#: userland/apps/installer/install_ops.c:1394
+#: userland/apps/installer/install_ops.c:1395
 msgid "Press Restart to boot from the installed disk."
 msgstr "「再起動」を押すと、インストールしたディスクから起動します。"
 
@@ -690,15 +792,11 @@ msgstr "「再起動」を押すと、インストールしたディスクから
 msgid "Preview"
 msgstr "プレビュー"
 
-#: userland/apps/installer/main.cpp:517
+#: userland/apps/installer/main.cpp:518
 msgid "Previous Step"
 msgstr "前の手順"
 
-#: userland/apps/installer/installer_tty.c:410
-msgid "Proceed with system update? [y/N]: "
-msgstr "システム更新を続行しますか？ [y/N]: "
-
-#: userland/apps/installer/installer_update_engine.c:406
+#: userland/apps/installer/installer_update_engine.c:427
 msgid "Publishing kernel and bootloader files"
 msgstr "カーネルとブートローダーのファイルを配置しています"
 
@@ -706,55 +804,47 @@ msgstr "カーネルとブートローダーのファイルを配置していま
 msgid "Publishing the offline package cache"
 msgstr "オフラインパッケージのキャッシュを反映しています"
 
-#: configs/nls/messages/installer.c:15
+#: configs/nls/messages/installer.c:26
 msgid "Ready"
 msgstr "準備完了"
 
-#: userland/apps/installer/main.cpp:324
+#: userland/apps/installer/main.cpp:325
 msgid "Ready to update"
 msgstr "更新の準備完了"
 
-#: userland/apps/installer/installer_tty.c:456
-msgid "Reboot now? [Y/n]: "
-msgstr "今すぐ再起動しますか？ [Y/n]: "
-
-#: userland/apps/installer/installer_update_engine.c:289
+#: userland/apps/installer/installer_update_engine.c:310
 msgid "Recovering the previous update attempt"
 msgstr "前回の更新処理を復旧しています"
 
-#: userland/apps/installer/main.cpp:675
+#: userland/apps/installer/installer_tty.c:154
 msgid "Refresh"
 msgstr "更新"
 
-#: userland/apps/installer/main.cpp:554
+#: userland/apps/installer/main.cpp:555
 msgid "ReliefOS Setup"
 msgstr "ReliefOS セットアップ"
 
-#: userland/apps/installer/installer_tty.c:352
-msgid "ReliefOS installer (TTY)"
-msgstr "ReliefOS インストーラー (TTY)"
-
-#: userland/apps/installer/installer_tty.c:385
-msgid "ReliefOS root partition number (blank: auto): "
-msgstr "ReliefOS ルートパーティション番号 (空欄: 自動): "
-
-#: userland/apps/installer/main.cpp:684
+#: userland/apps/installer/main.cpp:685
 msgid "ReliefOS system partition"
 msgstr "ReliefOS システムパーティション"
 
-#: userland/apps/installer/main.cpp:1292
+#: userland/apps/installer/main.cpp:1293
 msgid "ReliefOS was installed to the selected disk."
 msgstr "選択したディスクに ReliefOS をインストールしました。"
 
-#: userland/apps/installer/main.cpp:1291
+#: userland/apps/installer/main.cpp:1292
 msgid "ReliefOS was updated on the selected disk."
 msgstr "選択したディスクの ReliefOS を更新しました。"
 
-#: userland/apps/installer/install_ops.c:1401
+#: userland/apps/installer/installer_tty.c:352
+msgid "Remove the installation media before continuing."
+msgstr "続行する前にインストールメディアを取り外してください。"
+
+#: userland/apps/installer/install_ops.c:1402
 msgid "Remove the installation media before rebooting."
 msgstr "再起動する前にインストールメディアを取り外してください。"
 
-#: userland/apps/installer/main.cpp:329
+#: userland/apps/installer/main.cpp:330
 msgid "Remove the installation media, then restart."
 msgstr "インストールメディアを取り外してから再起動してください。"
 
@@ -762,27 +852,39 @@ msgstr "インストールメディアを取り外してから再起動してく
 msgid "Removing retired package archives"
 msgstr "廃止されたパッケージを削除しています"
 
-#: configs/nls/messages/installer.c:16
+#: configs/nls/messages/installer.c:27
 msgid "Rename"
 msgstr "名前の変更"
 
-#: userland/apps/installer/installer_tty.c:295
-msgid "Rename failed."
-msgstr "名前の変更に失敗しました。"
+#: userland/apps/installer/installer_tty.c:93
+msgid "Rename partition"
+msgstr "パーティション名を変更"
 
 #: userland/apps/installer/installer_update_progress.c:19
 msgid "Repairing signed system packages"
 msgstr "署名付きシステムパッケージを修復しています"
 
-#: userland/apps/installer/installer_tty.c:293
-msgid "Resize failed."
-msgstr "サイズ変更に失敗しました。"
+#: userland/apps/installer/installer_tty.c:155
+msgid "Resize"
+msgstr "サイズ変更"
 
-#: userland/apps/installer/main.cpp:172
+#: userland/apps/installer/installer_tty.c:106
+msgid "Resize only changes the trailing edge. Check the filesystem size before applying."
+msgstr "サイズ変更はパーティションの末尾を移動します。適用前にファイルシステムのサイズを確認してください。"
+
+#: userland/apps/installer/installer_tty.c:88
+msgid "Resize partition"
+msgstr "パーティションのサイズを変更"
+
+#: userland/apps/installer/installer_tui.c:365
+msgid "Resize the terminal to at least 60 columns and 20 rows."
+msgstr "端末のサイズを 60 列、20 行以上にしてください。"
+
+#: userland/apps/installer/installer_tty.c:307
 msgid "Restart"
 msgstr "再起動"
 
-#: userland/apps/installer/installer_tty.c:458
+#: userland/apps/installer/main.cpp:1309
 msgid "Restart failed"
 msgstr "再起動に失敗しました"
 
@@ -790,27 +892,43 @@ msgstr "再起動に失敗しました"
 msgid "Restoring retained kernel files"
 msgstr "保存したカーネルファイルを復元しています"
 
-#: userland/apps/installer/installer_update_engine.c:406
+#: userland/apps/installer/installer_update_engine.c:427
 msgid "Resuming bootloader publication"
 msgstr "ブートローダーの配置を再開しています"
 
-#: userland/apps/installer/installer_update_progress.c:139
+#: userland/apps/installer/installer_tty.c:316
+msgid "Retry"
+msgstr "再試行"
+
+#: userland/apps/installer/installer_update_progress.c:140
 msgid "Reused"
 msgstr "再利用済み"
 
-#: userland/apps/installer/main.cpp:1153
+#: configs/nls/messages/installer.c:19
+msgid "Review installation"
+msgstr "インストール設定の確認"
+
+#: userland/apps/installer/main.cpp:1154
 msgid "Review system update"
 msgstr "システム更新を確認"
 
-#: userland/apps/installer/main.cpp:1317
+#: userland/apps/installer/main.cpp:1318
 msgid "Review the details, then check the update again to retry."
 msgstr "詳細を確認し、再試行するには更新をもう一度確認してください。"
 
-#: userland/apps/installer/main.cpp:324
+#: userland/apps/installer/main.cpp:325
 msgid "Review the detected system and start the update."
 msgstr "検出されたシステムを確認し、更新を開始してください。"
 
-#: userland/apps/installer/main.cpp:905
+#: userland/apps/installer/installer_tty.c:250
+msgid "Review the disk model, size and partitions before applying changes."
+msgstr "変更を適用する前にディスクのモデル、容量、既存のパーティションを確認してください。"
+
+#: userland/apps/installer/installer_tty.c:415
+msgid "Review the required BIOS Boot, ESP and root partitions."
+msgstr "必要な BIOS Boot、ESP、ルートパーティションを確認してください。"
+
+#: userland/apps/installer/main.cpp:906
 msgid "Review the selected ESP and root before continuing."
 msgstr "続行する前に、選択した ESP とルートを確認してください。"
 
@@ -826,7 +944,7 @@ msgstr "ルート: /target (ext4)、ESP: /target/boot (FAT32)"
 msgid "Root: /target; boot partition: /target/boot"
 msgstr "ルート: /target; ブートパーティション: /target/boot"
 
-#: userland/apps/installer/main.cpp:561
+#: userland/apps/installer/main.cpp:562
 msgid "SATA/AHCI and IDE/PATA target disks are supported."
 msgstr "SATA/AHCI および IDE/PATA の対象ディスクに対応しています。"
 
@@ -838,39 +956,39 @@ msgstr "保存"
 msgid "Scanning installation payload"
 msgstr "インストールペイロードをスキャンしています"
 
-#: userland/apps/installer/main.cpp:670
+#: userland/apps/installer/main.cpp:671
 msgid "Select Disk to Update"
 msgstr "更新するディスクを選択"
 
-#: userland/apps/installer/installer_tty.c:273
-msgid "Select ESP and root partitions, or use auto."
-msgstr "ESP とルートのパーティションを選択するか、自動を使用してください。"
-
-#: userland/apps/installer/main.cpp:670
+#: userland/apps/installer/main.cpp:671
 msgid "Select Installation Disk"
 msgstr "インストール先のディスクを選択"
 
-#: userland/apps/installer/main.cpp:524
+#: userland/apps/installer/main.cpp:525
 msgid "Select Language"
 msgstr "言語を選択"
 
-#: userland/apps/installer/installer_tty.c:313
-msgid "Select a partition number first."
-msgstr "先にパーティション番号を選択してください。"
+#: userland/apps/installer/installer_tty.c:366
+msgid "Select a disk first."
+msgstr "先にディスクを選択してください。"
 
-#: userland/apps/installer/installer_tty.c:274
-msgid "Select an unformatted BIOS Boot partition, ESP and root partitions, or use auto."
-msgstr "未フォーマットの BIOS Boot パーティションと、ESP およびルートのパーティションを選択するか、自動を使用してください。"
+#: userland/apps/installer/installer_tty.c:63
+msgid "Select a partition first."
+msgstr "先にパーティションを選択してください。"
 
-#: userland/apps/installer/installer_tty.c:208
-msgid "Select disk number (r to refresh, q to quit): "
-msgstr "ディスク番号を選択してください (r: 更新、q: 終了): "
+#: userland/apps/installer/installer_tty.c:269
+msgid "Select boot partition"
+msgstr "ブートパーティションを選択"
+
+#: userland/apps/installer/installer_tty.c:268
+msgid "Select system partition"
+msgstr "システムパーティションを選択"
 
 #: userland/apps/installer/install_ops.c:262
 msgid "Select the disk to update"
 msgstr "更新するディスクを選択"
 
-#: userland/apps/installer/main.cpp:1133
+#: userland/apps/installer/main.cpp:1134
 msgid "Select the firmware used to start this disk. You can select both BIOS and UEFI."
 msgstr "このディスクの起動に使用するファームウェアを選択してください。BIOS と UEFI の両方を選択できます。"
 
@@ -882,33 +1000,33 @@ msgstr "対象ディスクを選択"
 msgid "Selected system does not support swap"
 msgstr "選択したシステムはスワップに対応していません"
 
-#: userland/apps/installer/installer_tty.c:224
-msgid "Selected: %s\n"
-msgstr "選択: %s\n"
-
-#: userland/apps/installer/main.cpp:974
+#: userland/apps/installer/main.cpp:975
 msgid "Set BIOS Boot"
 msgstr "BIOS Boot を設定"
 
-#: userland/apps/installer/main.cpp:965
+#: userland/apps/installer/main.cpp:966
 msgid "Set ESP"
 msgstr "ESP を設定"
 
-#: userland/apps/installer/main.cpp:968
+#: userland/apps/installer/main.cpp:969
 msgid "Set root"
 msgstr "ルートを設定"
 
-#: userland/apps/installer/main.cpp:206
+#: userland/apps/installer/main.cpp:207
 msgid "Setup"
 msgstr "セットアップ"
 
-#: userland/apps/installer/main.cpp:557
+#: userland/apps/installer/main.cpp:558
 msgid "Setup can copy the full normal system payload"
 msgstr "セットアップは通常システムの完全なペイロードをコピーできます"
 
 #: userland/apps/installer/install_ops.c:263
 msgid "Setup will check for an existing ReliefOS system."
 msgstr "セットアップは既存の ReliefOS システムを確認します。"
+
+#: userland/apps/installer/installer_tui_job.c:179
+msgid "Show / hide log (F4)"
+msgstr "ログを表示／非表示（F4）"
 
 #: userland/apps/fltk_support.h:42
 msgid "Show hidden files"
@@ -918,15 +1036,25 @@ msgstr "隠しファイルを表示"
 msgid "Show:"
 msgstr "表示:"
 
-#: userland/apps/installer/installer_tty.c:469
-msgid "Shutdown failed"
-msgstr "シャットダウンに失敗しました"
+#: userland/apps/installer/installer_tty.c:308
+msgid "Shut down"
+msgstr "シャットダウン"
 
-#: userland/apps/installer/main.cpp:1187
-msgid "Signed packages are checked before changes. Boot files are published after the package transaction succeeds."
+#: userland/apps/installer/main.cpp:1188
+msgid ""
+"Signed packages are checked before changes. Boot files are published after the package "
+"transaction succeeds."
 msgstr "変更前に署名済みパッケージを確認します。パッケージトランザクションの成功後に起動ファイルを配置します。"
 
-#: userland/apps/installer/main.cpp:1238
+#: userland/apps/installer/installer_tui.c:267
+msgid "Size"
+msgstr "容量"
+
+#: userland/apps/installer/installer_tty.c:43
+msgid "Size in MiB"
+msgstr "サイズ（MiB）"
+
+#: userland/apps/installer/main.cpp:1239
 msgid "Skip"
 msgstr "スキップ"
 
@@ -934,11 +1062,11 @@ msgstr "スキップ"
 msgid "Swap requires an AHCI disk"
 msgstr "スワップには AHCI ディスクが必要です"
 
-#: userland/apps/installer/installer_tty.c:147
-msgid "Swap size in MiB [%llu]: "
-msgstr "スワップサイズ (MiB) [%llu]: "
+#: userland/apps/installer/installer_tty.c:203
+msgid "Swap size in MiB"
+msgstr "スワップサイズ（MiB）"
 
-#: userland/apps/installer/main.cpp:1226
+#: userland/apps/installer/main.cpp:1227
 msgid "Swapfile (MiB)"
 msgstr "スワップファイル (MiB)"
 
@@ -946,23 +1074,31 @@ msgstr "スワップファイル (MiB)"
 msgid "Synchronizing the offline package cache"
 msgstr "オフラインパッケージのキャッシュを同期しています"
 
-#: userland/apps/installer/installer_update_engine.c:401
+#: userland/apps/installer/installer_update_engine.c:422
 msgid "Synchronizing the updated root filesystem"
 msgstr "更新したルートファイルシステムを同期しています"
 
-#: userland/apps/installer/installer_tty.c:401
+#: userland/apps/installer/installer_tty.c:129
 msgid "System partition"
 msgstr "システムパーティション"
 
-#: userland/apps/installer/installer_update_engine.c:430
+#: userland/apps/installer/installer_tty.c:95
+msgid "System root"
+msgstr "システムルート"
+
+#: userland/apps/installer/installer_update_engine.c:451
 msgid "System update completed successfully"
 msgstr "システム更新が正常に完了しました"
 
-#: userland/apps/installer/installer_tty.c:400
+#: userland/apps/installer/installer_tty.c:167
 msgid "System version"
 msgstr "システムバージョン"
 
-#: userland/apps/installer/installer_tty.c:401
+#: userland/apps/installer/installer_tui.c:479
+msgid "Tab / arrows: select   Space: toggle   PgUp/PgDn: scroll"
+msgstr "Tab／矢印キーで選択  Space で切替  PgUp／PgDn でスクロール"
+
+#: configs/nls/messages/installer.c:15
 msgid "Target disk"
 msgstr "対象ディスク"
 
@@ -970,127 +1106,139 @@ msgstr "対象ディスク"
 msgid "Target disk is ready."
 msgstr "対象ディスクの準備ができました。"
 
-#: userland/apps/installer/installer_update_engine.c:359
+#: userland/apps/installer/installer_update_engine.c:380
 msgid "Target or media changed. Check the update again."
 msgstr "対象またはメディアが変更されました。更新をもう一度確認してください。"
 
-#: userland/apps/installer/main.cpp:1200
+#: userland/apps/installer/main.cpp:1201
 msgid "Target:"
 msgstr "対象:"
 
-#: userland/apps/installer/main.cpp:714
+#: userland/apps/installer/installer_tty.c:152
 msgid "The automatic layout does not fit this disk. Select another disk or configure partitions manually."
 msgstr "自動構成はこのディスクに収まりません。別のディスクを選択するか、パーティションを手動で設定してください。"
 
-#: userland/apps/installer/main.cpp:743
+#: userland/apps/installer/installer_tty.c:430
+msgid "The confirmation word does not match."
+msgstr "確認の文字列が一致しません。"
+
+#: userland/apps/installer/main.cpp:744
 msgid "The disk may have been changed"
 msgstr "ディスクが変更された可能性があります"
 
-#: userland/apps/installer/main.cpp:535
+#: userland/apps/installer/main.cpp:536
 msgid "The installed system will use the same language."
 msgstr "インストール後のシステムでも同じ言語が使用されます。"
 
-#: userland/apps/installer/main.cpp:1203
+#: userland/apps/installer/main.cpp:1204
 msgid "The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root."
 msgstr "選択したディスクを消去し、FAT32 の ESP と ext4 のシステムルートをフォーマットします。"
 
-#: userland/apps/installer/installer_tty.c:439
+#: userland/apps/installer/installer_tty.c:197
 msgid "The selected root and ESP will be formatted."
 msgstr "選択したルートと ESP がフォーマットされます。"
 
-#: userland/apps/installer/main.cpp:1205
+#: userland/apps/installer/main.cpp:1206
 msgid "The selected root and ESP will be formatted. All EFI boot files on that ESP will be erased."
 msgstr "選択したルートと ESP がフォーマットされます。その ESP 上のすべての EFI 起動ファイルが消去されます。"
 
-#: userland/apps/installer/main.cpp:984
+#: userland/apps/installer/main.cpp:985
 msgid "The selected root is formatted. An existing FAT32 ESP is preserved by default."
 msgstr "選択したルートがフォーマットされます。既存の FAT32 ESP は既定で保持されます。"
 
-#: userland/apps/installer/installer_tty.c:353
-msgid "This installer uses the same disk formatter and payload as the graphical installer."
-msgstr "このインストーラーはグラフィカルインストーラーと同じディスクフォーマッターとペイロードを使用します。"
+#: userland/apps/installer/installer_tui_job.c:182
+msgid "The terminal requested exit. Waiting for the disk operation to finish."
+msgstr "端末から終了が要求されました。ディスク操作の完了を待っています。"
 
-#: userland/apps/installer/main.cpp:1194
+#: userland/apps/installer/installer_tty.c:107
+msgid "This operation changes the selected disk or partition immediately and can destroy its data."
+msgstr "この操作は選択したディスクまたはパーティションを即座に変更し、データを消去する可能性があります。"
+
+#: userland/apps/installer/main.cpp:1195
 msgid "This operation is destructive."
 msgstr "この操作によりデータが失われます。"
 
-#: userland/apps/installer/main.cpp:816
+#: userland/apps/installer/main.cpp:817
 msgid "Type AUTO to erase the disk and create BIOS Boot, ESP and root partitions:"
 msgstr "ディスクを消去して BIOS Boot、ESP、ルートのパーティションを作成するには AUTO と入力してください:"
 
-#: userland/apps/installer/main.cpp:815
+#: userland/apps/installer/main.cpp:816
 msgid "Type AUTO to erase the disk and create ESP and root partitions:"
 msgstr "ディスクを消去して ESP とルートのパーティションを作成するには AUTO と入力してください:"
 
-#: userland/apps/installer/main.cpp:828
+#: userland/apps/installer/main.cpp:829
 msgid "Type DELETE to remove the selected partition:"
 msgstr "選択したパーティションを削除するには DELETE と入力してください:"
 
-#: userland/apps/installer/main.cpp:818
+#: userland/apps/installer/main.cpp:819
 msgid "Type INITIALIZE to replace the partition table:"
 msgstr "パーティションテーブルを置き換えるには INITIALIZE と入力してください:"
 
-#: userland/apps/installer/installer_tty.c:441
-msgid "Type INSTALL to confirm the partition layout and installation: "
-msgstr "パーティション構成とインストールを確認するには INSTALL と入力してください: "
+#: userland/apps/installer/installer_tty.c:205
+msgid "Type INSTALL to confirm installation"
+msgstr "INSTALL と入力してインストールを確認"
 
-#: userland/apps/installer/main.cpp:1208
+#: userland/apps/installer/main.cpp:1209
 msgid "Type INSTALL to enable the Install button."
 msgstr "「インストール」ボタンを有効にするには INSTALL と入力してください。"
 
-#: userland/apps/installer/main.cpp:1302
+#: userland/apps/installer/installer_tui.c:544
+msgid "Type the confirmation word"
+msgstr "確認の文字列を入力"
+
+#: userland/apps/installer/main.cpp:1303
 msgid "UEFI boot file (add it in firmware if no automatic entry appears):"
 msgstr "UEFI 起動ファイル (自動エントリが表示されない場合はファームウェアに追加):"
 
-#: userland/apps/installer/installer_tty.c:473
-msgid "Unknown command. Use reboot, shutdown, or exit."
-msgstr "不明なコマンドです。reboot、shutdown、または exit を使用してください。"
-
-#: userland/apps/installer/installer_tty.c:319
-msgid "Unknown partition command."
-msgstr "不明なパーティションコマンドです。"
+#: userland/apps/installer/installer_tui.c:293
+msgid "Unallocated"
+msgstr "未割り当て"
 
 #: userland/apps/installer/install_ops.c:348
 msgid "Unnamed"
 msgstr "名前なし"
 
+#: userland/apps/installer/installer_tui.c:478
+msgid "Up/Down: partition   PgUp/PgDn: page   Home/End: first/last   Tab: actions"
+msgstr "上下で選択  PgUp/PgDn でページ切替  Home/End で先頭/末尾  Tab で操作"
+
 #: userland/apps/installer/install_ops.c:250
 msgid "Update"
 msgstr "更新"
 
-#: userland/apps/installer/main.cpp:1289
+#: userland/apps/installer/main.cpp:1290
 msgid "Update Complete"
 msgstr "更新完了"
 
-#: userland/apps/installer/main.cpp:583
+#: userland/apps/installer/main.cpp:584
 msgid "Update Existing System"
 msgstr "既存システムを更新"
 
-#: userland/apps/installer/main.cpp:1315
+#: userland/apps/installer/main.cpp:1316
 msgid "Update Failed"
 msgstr "更新失敗"
 
-#: userland/apps/installer/main.cpp:1172
+#: userland/apps/installer/installer_tty.c:255
+msgid "Update an existing system"
+msgstr "既存のシステムを更新"
+
+#: userland/apps/installer/main.cpp:1173
 msgid "Update bootloader software"
 msgstr "ブートローダーソフトウェアを更新"
 
-#: userland/apps/installer/installer_update_engine.c:379
+#: userland/apps/installer/installer_update_engine.c:400
 msgid "Update checks completed"
 msgstr "更新の確認が完了しました"
 
-#: userland/apps/installer/install_ops.c:1392
+#: userland/apps/installer/install_ops.c:1393
 msgid "Update completed successfully"
 msgstr "更新が正常に完了しました"
 
-#: userland/apps/installer/main.cpp:1246
+#: userland/apps/installer/main.cpp:1247
 msgid "Update details"
 msgstr "更新の詳細"
 
-#: userland/apps/installer/installer_tty.c:412
-msgid "Update not confirmed. Installation cancelled."
-msgstr "更新が確認されませんでした。インストールをキャンセルしました。"
-
-#: userland/apps/installer/installer_update_engine.c:513
+#: userland/apps/installer/installer_update_engine.c:534
 msgid "Update worker failed"
 msgstr "更新ワーカーが失敗しました"
 
@@ -1102,31 +1250,47 @@ msgstr "ReliefOS を更新しています"
 msgid "Updating shell configuration"
 msgstr "シェルの設定を更新しています"
 
-#: userland/apps/installer/main.cpp:613
+#: userland/apps/installer/installer_tui.c:267
+msgid "Use"
+msgstr "用途"
+
+#: userland/apps/installer/installer_tty.c:251
+msgid "Use Tab and the arrow keys to select controls. F3 continues and F2 returns to the previous step."
+msgstr "Tab と矢印キーで項目を選択します。F3 で次へ進み、F2 で前の手順に戻ります。"
+
+#: userland/apps/installer/installer_tty.c:266
+msgid "Use fstab"
+msgstr "fstab を使用"
+
+#: userland/apps/installer/installer_tty.c:121
 msgid "Use the selected installation's fstab"
 msgstr "選択したインストールの fstab を使用"
 
-#: userland/apps/installer/installer_tty.c:67
-msgid "Username: "
-msgstr "ユーザー名: "
+#: userland/apps/installer/installer_tty.c:201
+msgid "Username"
+msgstr "ユーザー名"
 
 #: userland/apps/installer/installer_update_progress.c:16
 msgid "Verifying package signatures"
 msgstr "パッケージの署名を検証しています"
 
-#: userland/apps/installer/installer_update_engine.c:375
+#: userland/apps/installer/installer_update_engine.c:396
 msgid "Verifying signed packages and dependencies"
 msgstr "署名済みパッケージと依存関係を検証しています"
 
-#: userland/apps/installer/main.cpp:151
+#: userland/apps/installer/installer_tty.c:299
+msgid "View log"
+msgstr "ログを表示"
+
+#: configs/nls/messages/installer.c:13
 msgid "Welcome"
 msgstr "ようこそ"
 
-#: userland/apps/installer/install_ops.c:1193
+#: userland/apps/installer/install_ops.c:1194
 msgid "Writing allocated space"
 msgstr "割り当てた領域を書き込んでいます"
 
-#: userland/apps/installer/installer_update_engine.c:336
+#: userland/apps/installer/installer_update_engine.c:357
 msgid "Writing the update log"
 msgstr "更新ログを書き込んでいます"
 
@@ -1134,58 +1298,54 @@ msgstr "更新ログを書き込んでいます"
 msgid "Yes"
 msgstr "はい"
 
-#: userland/apps/installer/install_ops.c:1398
-msgid "\n%s (error %d)\n"
+#: userland/apps/installer/install_ops.c:1399
+#, python-format
+msgid ""
+"\n"
+"%s (error %d)\n"
 msgstr "\n%s (エラー %d)\n"
 
-#: userland/apps/installer/installer_update_progress.c:149
-msgid "\n%u/%u files; %.1f/%.1f MiB processed; %.1f MiB reused"
+#: userland/apps/installer/installer_update_progress.c:150
+#, python-format
+msgid ""
+"\n"
+"%u/%u files; %.1f/%.1f MiB processed; %.1f MiB reused"
 msgstr "\nファイル %u/%u、処理済み %.1f/%.1f MiB、再利用 %.1f MiB"
 
-#: userland/apps/installer/installer_update_progress.c:155
-msgid "\n%u/%u packages processed"
+#: userland/apps/installer/installer_update_progress.c:156
+#, python-format
+msgid ""
+"\n"
+"%u/%u packages processed"
 msgstr "\n処理済みパッケージ %u/%u"
 
-#: userland/apps/installer/installer_tty.c:193
-msgid "\nAvailable disks:"
-msgstr "\n利用可能なディスク:"
-
-#: userland/apps/installer/installer_update_progress.c:161
-msgid "\nCommand exit status: %u"
+#: userland/apps/installer/installer_update_progress.c:162
+#, python-format
+msgid ""
+"\n"
+"Command exit status: %u"
 msgstr "\nコマンドの終了ステータス: %u"
 
-#: userland/apps/installer/install_ops.c:1400
-msgid "\nInstallation completed successfully."
+#: userland/apps/installer/install_ops.c:1401
+msgid ""
+"\n"
+"Installation completed successfully."
 msgstr "\nインストールが正常に完了しました。"
 
-#: userland/apps/installer/installer_tty.c:244
-msgid "\nPartitions:"
-msgstr "\nパーティション:"
-
-#: userland/apps/installer/installer_tty.c:260
-msgid "format (erase EFI files)"
-msgstr "フォーマット (EFI ファイルを消去)"
-
-#: userland/apps/installer/installer_tty.c:259
-msgid "format FS LABEL, format-esp yes|no, bios, esp, root, data, delete, refresh, done. FS raw creates an unformatted partition."
-msgstr "format FS LABEL, format-esp yes|no, bios, esp, root, data, delete, refresh, done。FS に raw を指定すると未フォーマットのパーティションを作成します。"
-
-#: configs/nls/messages/installer.c:17
+#: configs/nls/messages/installer.c:28
 msgid "none"
 msgstr "なし"
 
-#: userland/apps/installer/main.cpp:559
+#: userland/apps/installer/main.cpp:560
 msgid "or replace the boot/reliefos and system files on an existing installation."
 msgstr "または既存のインストールの boot/reliefos とシステムファイルを置き換えることができます。"
 
-#: userland/apps/installer/installer_tty.c:261
-msgid "partition> "
-msgstr "パーティション> "
+#: userland/apps/installer/installer_tty.c:284
+msgid "root password"
+msgstr "root パスワード"
 
-#: userland/apps/installer/installer_tty.c:260
-msgid "preserve existing FAT32 files"
-msgstr "既存の FAT32 ファイルを保持"
+#~ msgid "Automatic partition plan (applied after final confirmation)"
+#~ msgstr "自動パーティション構成（最終確認後に適用）"
 
-#: userland/apps/installer/installer_tty.c:70
-msgid "root password: "
-msgstr "root パスワード: "
+#~ msgid "Manual partition selection"
+#~ msgstr "パーティションを手動で選択"

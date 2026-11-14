@@ -8,6 +8,17 @@ static const char *const installer_progress_messages[] = {
 
 /* Strings supplied by shared code and dynamic application labels. */
 static const char *const installer_indirect_messages[] = {
+    N_("Language"),
+    N_("License"),
+    N_("Welcome"),
+    N_("Installation mode"),
+    N_("Target disk"),
+    N_("Bootloaders"),
+    N_("Configure partitions"),
+    N_("Account and system options"),
+    N_("Review installation"),
+    N_("Installation progress"),
+    N_("Installation finished"),
     N_("Confirm password"),
     N_("Delete"),
     N_("Format"),

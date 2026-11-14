@@ -1,476 +1,461 @@
-#include <reliefos/stdio.h>
-#include <reliefos/syscall.h>
-#include <reliefos/system.h>
-
-#include <stdlib.h>
+/* ncursesw frontend over the shared FLTK wizard model and disk operations. */
 #include <errno.h>
-#include <stdio.h>
-#include <termios.h>
-#include <string.h>
 #include <libintl.h>
-
-#include "installer_tty.h"
-#include "installer_update.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <reliefos/system.h>
+#include "installer_tui.h"
+#include "installer_partitions.h"
 #include "installer_capacity.h"
-#include "model.h"
+#include "install_ops.h"
+#include "../locale_settings.h"
 
 #define T(s) gettext(s)
+extern const char installer_license_text[];
+enum page_action {
+    REFRESH = 10, AUTO_NOW, INIT_GPT, CREATE, RESIZE, RENAME, FORMAT, DELETE_PART,
+    SET_ROLE, PICK_ROOT, PICK_ESP, REBOOT, SHUTDOWN
+};
 
-static int tty_read_line(const char *prompt, char *buffer, uint32_t capacity)
+static const char *page_title(unsigned current)
 {
-    uint32_t length = 0;
-    int overflow = 0;
-    char input;
-    if (!buffer || capacity < 2U) {
-        return 0;
-    }
-    buffer[0] = 0;
-    if (prompt) {
-        write(1, prompt, strlen(prompt));
-    }
-    for (;;) {
-        ssize_t result = read(0, &input, 1);
-        if (result < 0 && errno == EINTR) continue;
-        if (result <= 0) break;
-        if (input == '\r') {
-            continue;
-        }
-        if (input == '\n') {
-            buffer[length] = 0;
-            if (overflow) { errno = EOVERFLOW; return 0; }
+    static const char *const titles[] = {
+        "Language", "License", "Welcome", "Installation mode", "Target disk",
+        "Bootloaders", "Configure partitions", "Account and system options",
+        "Review installation", "Installation progress", "Installation finished"
+    };
+    return current < INSTALLER_PAGE_COUNT ? T(titles[current]) : "ReliefOS";
+}
+
+static void error_message(int error, const char *detail)
+{
+    char message[1024];
+    snprintf(message, sizeof(message), "%s\n%s (%d)", detail && *detail ? detail : T("Operation failed"),
+        strerror(error < 0 ? -error : error), error);
+    tui_message(T("Operation failed"), message);
+}
+
+static int ask_size(const char *title, uint32_t *size)
+{
+    char text[32];
+    snprintf(text, sizeof(text), "%u", *size ? *size : 1024);
+    while (tui_edit(title, T("Size in MiB"), text, sizeof(text))) {
+        char *end;
+        errno = 0;
+        unsigned long value = strtoul(text, &end, 10);
+        if (*text >= '0' && *text <= '9' && !errno && !*end && value && value <= UINT32_MAX) {
+            *size = (uint32_t)value;
             return 1;
         }
-        if ((uint8_t)input >= 32U && length + 1U < capacity) {
-            buffer[length++] = input;
-            buffer[length] = 0;
-        } else if ((uint8_t)input >= 32U) overflow = 1;
+        tui_message(T("Invalid size"), T("Enter a positive whole number of MiB."));
     }
     return 0;
 }
 
-static int tty_secret(const char *prompt, char *buffer, uint32_t capacity)
+static void partition_action(const struct installer_tty_context *context, int action)
 {
-    struct termios saved, secret;
-    if (tcgetattr(0, &saved) < 0) return 0;
-    secret = saved;
-    secret.c_lflag &= ~(ECHO | ECHONL);
-    if (tcsetattr(0, TCSANOW, &secret) < 0) return 0;
-    int result = tty_read_line(prompt, buffer, capacity);
-    if (tcsetattr(0, TCSANOW, &saved) < 0) result = 0;
-    puts("");
-    return result;
-}
-
-static int tty_setup(struct installer_setup *setup)
-{
-    for (;;) {
-        if (!tty_read_line(T("Username: "), setup->username, sizeof(setup->username)) ||
-            !tty_secret(T("Password: "), setup->password, sizeof(setup->password)) ||
-            !tty_secret(T("Confirm password: "), setup->password_confirm, sizeof(setup->password_confirm)) ||
-            !tty_secret(T("root password: "), setup->root_password, sizeof(setup->root_password)) ||
-            !tty_secret(T("Confirm root password: "), setup->root_password_confirm, sizeof(setup->root_password_confirm))) return 0;
-        if (installer_setup_valid(setup)) return 1;
-        puts(T("Check username and matching passwords (1-32 characters, no spaces)."));
+    struct tui_job job = {0};
+    if (action == REFRESH) { context->refresh_partitions(); return; }
+    int needs_partition = action != AUTO_NOW && action != INIT_GPT && action != CREATE;
+    if (needs_partition && (*context->selected_partition < 0 ||
+        (uint32_t)*context->selected_partition >= *context->partition_count)) {
+        tui_message(T("Configure partitions"), T("Select a partition first."));
+        return;
     }
-}
-
-static int tty_line_is(const char *line, const char *expected)
-{
-    uint32_t i = 0;
-    if (!line || !expected) {
-        return 0;
+    char identity[512];
+    if (needs_partition) context->format_partition_line(identity, sizeof(identity), &context->partitions[*context->selected_partition]);
+    else context->format_disk_line(identity, sizeof(identity), &context->disks[*context->selected_disk]);
+    const char *confirmation = NULL;
+    if (action == AUTO_NOW) { job.kind = TUI_JOB_AUTO; confirmation = "AUTO"; }
+    else if (action == INIT_GPT) { job.kind = TUI_JOB_INIT; confirmation = "INITIALIZE"; }
+    else if (action == DELETE_PART) { job.kind = TUI_JOB_DELETE; confirmation = "DELETE"; }
+    else if (action == CREATE || action == FORMAT) {
+        static const char *const filesystems[] = {"ext4", "ext2", "FAT32", "exFAT", "raw"};
+        static const unsigned values[] = {RELIEFOS_BLOCK_FILESYSTEM_EXT4, RELIEFOS_BLOCK_FILESYSTEM_EXT2,
+            RELIEFOS_BLOCK_FILESYSTEM_FAT32, RELIEFOS_BLOCK_FILESYSTEM_EXFAT, RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN};
+        if (action == CREATE && !ask_size(T("Create partition"), &job.size)) return;
+        int chosen = tui_pick(T("Filesystem"), filesystems, action == CREATE ? 5 : 4, 0);
+        if (chosen < 0) return;
+        job.filesystem = values[chosen];
+        snprintf(job.name, sizeof(job.name), "%s", action == CREATE ? "ReliefOS Data" : "RELIEFOS_DATA");
+        if (!tui_edit(action == CREATE ? T("Create partition") : T("Format partition"),
+            action == CREATE ? T("Partition name") : T("Filesystem label"), job.name, sizeof(job.name))) return;
+        job.kind = action == CREATE ? TUI_JOB_CREATE : TUI_JOB_FORMAT;
+        if (action == FORMAT) confirmation = "FORMAT";
+    } else if (action == RESIZE) {
+        job.kind = TUI_JOB_RESIZE;
+        if (!ask_size(T("Resize partition"), &job.size)) return;
+        confirmation = "RESIZE";
+    } else if (action == RENAME) {
+        job.kind = TUI_JOB_RENAME;
+        snprintf(job.name, sizeof(job.name), "%s", context->partitions[*context->selected_partition].name);
+        if (!tui_edit(T("Rename partition"), T("Partition name"), job.name, sizeof(job.name))) return;
+    } else if (action == SET_ROLE) {
+        const char *roles[] = {T("System root"), "ESP", "BIOS Boot", T("Data partition")};
+        const unsigned values[] = {RELIEFOS_BLOCK_GPT_LINUX, RELIEFOS_BLOCK_GPT_ESP,
+            RELIEFOS_BLOCK_GPT_BIOS_BOOT, RELIEFOS_BLOCK_GPT_BASIC_DATA};
+        int chosen = tui_pick(T("Partition role"), roles, 4, 0);
+        if (chosen < 0) return;
+        job.kind = TUI_JOB_ROLE;
+        job.role = values[chosen];
+    } else return;
+    if (confirmation) {
+        char message[1024];
+        snprintf(message, sizeof(message), "%s\n\n%s", identity,
+            action == RESIZE ? T("Resize only changes the trailing edge. Check the filesystem size before applying.")
+                             : T("This operation changes the selected disk or partition immediately and can destroy its data."));
+        if (!tui_confirm(T("Confirm partition operation"), message, confirmation)) return;
     }
-    while (line[i] && expected[i]) {
-        char a = line[i];
-        char b = expected[i];
-        if (a >= 'a' && a <= 'z') {
-            a = (char)(a - 'a' + 'A');
-        }
-        if (b >= 'a' && b <= 'z') {
-            b = (char)(b - 'a' + 'A');
-        }
-        if (a != b) {
-            return 0;
-        }
-        ++i;
-    }
-    return line[i] == 0 && expected[i] == 0;
+    int result = tui_run_job(context, &job);
+    context->refresh_partitions();
+    if (result) error_message(result, T("Partition operation failed"));
 }
 
-static int tty_install_xorg(struct installer_setup *setup)
+static void select_update_partition(const struct installer_tty_context *context, int esp, char uuid[37])
 {
-    char input[16];
-    if (!setup) return 0;
-    for (;;) {
-        errno = 0;
-        if (!tty_read_line(T("Install Xorg desktop environment? [Y/n]: "),
-                           input, sizeof(input))) {
-            if (errno == EOVERFLOW) {
-                puts(T("Please answer yes or no."));
-                continue;
-            }
-            return 0;
-        }
-        if (!input[0] || tty_line_is(input, "y") || tty_line_is(input, "yes")) {
-            setup->skip_xorg = 0;
-            return 1;
-        }
-        if (tty_line_is(input, "n") || tty_line_is(input, "no")) {
-            setup->skip_xorg = 1;
-            return 1;
-        }
-        puts(T("Please answer yes or no."));
-    }
-}
-
-/** @brief Read a default-off swap choice and an explicitly validated MiB size.
- * @param setup Mutable shared wizard settings. @return One on success or zero
- * for EOF, input error, or a null setup; invalid entries are prompted again.
- */
-int installer_tty_select_swap(struct installer_setup *setup)
-{
-    if (!setup) return 0;
-    char input[32],prompt[128];
-    for (;;) {
-        errno=0;
-        if (!tty_read_line(T("Create a swapfile? [y/N]: "),input,sizeof(input))) {
-            if (errno==EOVERFLOW) continue;
-            return 0;
-        }
-        if (!input[0] || tty_line_is(input,"n") || tty_line_is(input,"no")) {
-            setup->swap_enabled=false;return 1;
-        }
-        if (tty_line_is(input,"y") || tty_line_is(input,"yes")) break;
-        puts(T("Please answer yes or no."));
-    }
-    uint64_t suggested=setup->swap_size_mib ? setup->swap_size_mib : installer_swap_recommend_system();
-    snprintf(prompt,sizeof(prompt),T("Swap size in MiB [%llu]: "),(unsigned long long)suggested);
-    for (;;) {
-        errno=0;
-        if (!tty_read_line(prompt,input,sizeof(input))) {
-            if (errno==EOVERFLOW) {puts(T("Enter a valid swap size in MiB."));continue;}
-            return 0;
-        }
-        uint64_t value=suggested;
-        if (!input[0] || !installer_swap_parse_mib(input,&value)) {
-            setup->swap_size_mib=value;setup->swap_enabled=true;return 1;
-        }
-        puts(T("Enter a valid swap size in MiB."));
-    }
-}
-
-/** @brief Preserve the detected/default mode on Enter; accept explicit yes/no. */
-static int tty_select_loader(const char *name, uint8_t *skip)
-{
-    char input[16], prompt[160];
-    snprintf(prompt, sizeof(prompt), "%s %s: ", name, *skip ? "[y/N]" : "[Y/n]");
-    for (;;) {
-        errno = 0;
-        if (!tty_read_line(prompt, input, sizeof(input))) {
-            if (errno == EOVERFLOW) continue;
-            return 0;
-        }
-        if (!input[0]) return 1;
-        if (tty_line_is(input, "yes") || tty_line_is(input, "y")) { *skip = 0; return 1; }
-        if (tty_line_is(input, "no") || tty_line_is(input, "n")) { *skip = 1; return 1; }
-        puts(T("Please answer yes or no."));
-    }
-}
-
-/** @brief Present independent firmware choices before partition planning. */
-static int tty_bootloaders(struct installer_setup *setup)
-{
-    if (!tty_select_loader(T("Install or update BIOS bootloader?"), &setup->skip_bios) ||
-        !tty_select_loader(T("Install or update UEFI bootloader?"), &setup->skip_uefi)) return 0;
-    if (setup->skip_bios && setup->skip_uefi)
-        puts(T("No bootloader selected. A new installation will need a separately configured bootloader."));
-    return 1;
-}
-
-static void tty_print_disks(const struct installer_tty_context *context)
-{
-    char line[160];
-    puts(T("\nAvailable disks:"));
-    for (uint32_t i = 0; i < *context->disk_count; ++i) {
-        context->format_disk_line(line, sizeof(line), &context->disks[i]);
-        printf("  [%u] %s\n", i, line);
-    }
-}
-
-static int tty_choose_disk(const struct installer_tty_context *context)
-{
-    char input[24];
-    char line[160];
-    char *end;
-    unsigned long value;
-    for (;;) {
-        tty_print_disks(context);
-        if (!tty_read_line(T("Select disk number (r to refresh, q to quit): "),
-                           input, sizeof(input))) {
-            return 0;
-        }
-        if (tty_line_is(input, "q")) {
-            return 0;
-        }
-        if (tty_line_is(input, "r")) {
-            context->refresh_disks();
-            continue;
-        }
-        value = strtoul(input, &end, 10);
-        if (end != input && *end == 0 && value < *context->disk_count) {
-            *context->selected_disk = (int32_t)value;
-            context->format_disk_line(line, sizeof(line),
-                                      &context->disks[*context->selected_disk]);
-            printf(T("Selected: %s\n"), line);
-            return 1;
-        }
-        puts(T("Invalid disk selection."));
-    }
-}
-
-static int tty_fs(const char *name)
-{
-    if (tty_line_is(name, "fat32") || tty_line_is(name, "fat"))
-        return RELIEFOS_BLOCK_FILESYSTEM_FAT32;
-    if (tty_line_is(name, "ext2")) return RELIEFOS_BLOCK_FILESYSTEM_EXT2;
-    if (tty_line_is(name, "ext4")) return RELIEFOS_BLOCK_FILESYSTEM_EXT4;
-    if (tty_line_is(name, "exfat")) return RELIEFOS_BLOCK_FILESYSTEM_EXFAT;
-    return RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
-}
-
-static void tty_print_partitions(const struct installer_tty_context *context)
-{
-    char line[256];
-    puts(T("\nPartitions:"));
+    const char *options[RELIEFOS_BLOCK_MAX_PARTITIONS + 1];
+    char labels[RELIEFOS_BLOCK_MAX_PARTITIONS][256];
+    uint32_t mapping[RELIEFOS_BLOCK_MAX_PARTITIONS];
+    int count = 1;
+    options[0] = esp ? T("Use the selected installation's fstab") : T("Automatically identify a single ReliefOS installation");
     for (uint32_t i = 0; i < *context->partition_count; ++i) {
-        context->format_partition_line(line, sizeof(line), &context->partitions[i]);
-        printf("  [%u] %s\n", i, line);
+        if (context->partitions[i].gpt_type != (esp ? RELIEFOS_BLOCK_GPT_ESP : RELIEFOS_BLOCK_GPT_LINUX)) continue;
+        context->format_partition_line(labels[count - 1], sizeof(labels[0]), &context->partitions[i]);
+        mapping[count - 1] = context->partitions[i].index;
+        options[count] = labels[count - 1];
+        ++count;
+    }
+    int chosen = tui_pick(esp ? T("Boot partition") : T("System partition"), options, count, 0);
+    if (chosen < 0) return;
+    uuid[0] = 0;
+    if (chosen) {
+        int result = reliefos_block_partition_uuid(context->disks[*context->selected_disk].path, mapping[chosen - 1], uuid);
+        if (result) error_message(result, T("Cannot read partition identity"));
     }
 }
 
-static int tty_partition_menu(const struct installer_tty_context *context)
+/** @brief Assemble the visual partition workspace over the shared disk operations.
+ * @param view Caller-owned ncurses page. @param context Borrowed installer state.
+ * @param table Persistent read-only snapshot and keyboard viewport.
+ * @param scheme Automatic/manual choice. @param chosen Actual partition-array selection.
+ * @param format_esp Explicit destructive ESP-format preference.
+ */
+static void partition_page(struct tui_view *view, const struct installer_tty_context *context,
+                           struct tui_partition_table *table, int *scheme, int *chosen, int *format_esp)
 {
-    char input[160], fs_name[16], partition_name[80], label[80];
-    unsigned long value;
-    char *end;
-    for (;;) {
-        tty_print_partitions(context);
-        puts(T("Commands: auto, init, create SIZE FS NAME, resize SIZE, rename NAME,"));
-        puts(T("format FS LABEL, format-esp yes|no, bios, esp, root, data, delete, refresh, done. FS raw creates an unformatted partition."));
-        printf("ESP: %s\n", context->setup->format_esp ? T("format (erase EFI files)") : T("preserve existing FAT32 files"));
-        if (!tty_read_line(T("partition> "), input, sizeof(input))) return 0;
-        if (tty_line_is(input, "format-esp yes")) {
-            context->setup->format_esp = 1;
-            continue;
-        }
-        if (tty_line_is(input, "format-esp no")) {
-            context->setup->format_esp = 0;
-            continue;
-        }
-        if (tty_line_is(input, "done")) {
-            if (context->partition_plan_valid()) return 1;
-            puts(context->setup->skip_bios
-                ? T("Select ESP and root partitions, or use auto.")
-                : T("Select an unformatted BIOS Boot partition, ESP and root partitions, or use auto."));
-            continue;
-        }
-        if (tty_line_is(input, "auto")) {
-            if (context->partition_auto_layout() < 0) puts(T("Automatic layout failed."));
-        } else if (tty_line_is(input, "init")) {
-            if (context->partition_initialize() < 0) puts(T("GPT initialization failed."));
-        } else if (tty_line_is(input, "refresh")) {
-            context->refresh_partitions();
-        } else if (!strncmp(input, "create ", 7) &&
-                   sscanf(input + 7, "%lu %15s %79[^\n]", &value, fs_name, partition_name) == 3) {
-            int filesystem = tty_fs(fs_name);
-            if (value > 0xffffffffUL || (filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN && strcmp(fs_name, "raw")) ||
-                context->partition_create((uint32_t)filesystem, (uint32_t)value,
-                                          partition_name) < 0)
-                puts(T("Create failed."));
-        } else if (!strncmp(input, "resize ", 7) &&
-                   sscanf(input + 7, "%lu", &value) == 1) {
-            if (value > 0xffffffffUL || context->partition_resize((uint32_t)value) < 0)
-                puts(T("Resize failed."));
-        } else if (!strncmp(input, "rename ", 7)) {
-            if (context->partition_rename(input + 7) < 0) puts(T("Rename failed."));
-        } else if (!strncmp(input, "format ", 7) &&
-                   sscanf(input + 7, "%15s %79s", fs_name, label) == 2) {
-            int filesystem = tty_fs(fs_name);
-            if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN ||
-                context->partition_format((uint32_t)filesystem, label) < 0)
-                puts(T("Format failed."));
-        } else if (tty_line_is(input, "delete")) {
-            if (context->partition_delete() < 0) puts(T("Delete failed."));
-        } else if (tty_line_is(input, "esp") || tty_line_is(input, "root") ||
-                   tty_line_is(input, "data") || tty_line_is(input, "bios")) {
-            uint32_t type = tty_line_is(input, "esp") ? RELIEFOS_BLOCK_GPT_ESP :
-                            tty_line_is(input, "root") ? RELIEFOS_BLOCK_GPT_LINUX :
-                            tty_line_is(input, "bios") ? RELIEFOS_BLOCK_GPT_BIOS_BOOT :
-                            RELIEFOS_BLOCK_GPT_BASIC_DATA;
-            if (*context->selected_partition < 0 ||
-                (uint32_t)*context->selected_partition >= *context->partition_count ||
-                context->partition_set_type(type) < 0) {
-                puts(T("Select a partition number first."));
+    tui_compact_radio(view, T("Automatic layout"), scheme, 0);
+    tui_compact_radio(view, T("Manual partitioning"), scheme, 1);
+    int result = tui_partition_table_update(table, context, !*scheme, chosen);
+    tui_partitions(view, table);
+    if (result) tui_text(view, !*scheme
+        ? T("The automatic layout does not fit this disk. Select another disk or configure partitions manually.")
+        : T("Cannot display this partition layout."));
+    const char *labels[] = {T("Refresh"), T("Apply automatic layout now"), T("Initialize GPT"),
+        T("Create"), T("Resize"), T("Rename"), T("Format"), T("Delete"), T("Partition role")};
+    for (int i = 0; i < (*scheme ? 9 : 3); ++i) tui_compact_button(view, labels[i], REFRESH + i);
+    if (*scheme) tui_check(view, T("Format selected ESP (erase all EFI boot files on it)"), format_esp);
+}
+
+static void review_page(struct tui_view *view, const struct installer_tty_context *context,
+                        const struct installer_update_info *update, int *bios, int *uefi,
+                        const char *swap_size)
+{
+    char text[768];
+    if (*context->install_mode == INSTALLER_MODE_UPDATE) {
+        snprintf(text, sizeof(text), "%s\n%s -> %s\n\n%s\n%s\n%s\n\n%s: %llu MiB / %llu MiB",
+            T("System version"), update->installed_version, update->media_version,
+            update->disk, update->root_device, update->esp_device, T("Free / required space"),
+            (unsigned long long)(update->free_bytes / (1024 * 1024)),
+            (unsigned long long)((update->required_bytes + 1024 * 1024 - 1) / (1024 * 1024)));
+        tui_text(view, text);
+        tui_text(view, T("Accounts, personal files, installed software and local configuration are preserved."));
+        if (*update->pending) tui_text(view, T("A previous update is incomplete. This attempt will verify the system and recover the pending update stages."));
+        tui_check(view, T("Install or update BIOS bootloader"), bios);
+        tui_check(view, T("Install or update UEFI bootloader"), uefi);
+    } else {
+        context->format_disk_line(text, sizeof(text), &context->disks[*context->selected_disk]);
+        tui_text(view, text);
+        if (*context->partition_auto) {
+            struct installer_partition_plan plan;
+            if (!installer_partition_plan_default(&context->disks[*context->selected_disk],
+                (*bios ? 1u : 0) | (*uefi ? 2u : 0), &plan)) {
+                snprintf(text, sizeof(text), T("Erase disk: BIOS Boot %llu MiB, ESP %llu MiB, ext4 root %llu MiB"),
+                    (unsigned long long)(plan.bios.sector_count / 2048),
+                    (unsigned long long)(plan.esp.sector_count / 2048),
+                    (unsigned long long)(plan.root.sector_count / 2048));
+                tui_text(view, text);
             }
         } else {
-            value = strtoul(input, &end, 10);
-            if (end != input && *end == 0 && value < *context->partition_count)
-                *context->selected_partition = (int32_t)value;
-            else puts(T("Unknown partition command."));
+            for (uint32_t i = 0; i < *context->partition_count; ++i) {
+                const struct reliefos_block_partition *part = &context->partitions[i];
+                if ((int32_t)part->index == *context->root_partition || (int32_t)part->index == *context->esp_partition) {
+                    context->format_partition_line(text, sizeof(text), part);
+                    tui_text(view, text);
+                }
+            }
+            tui_text(view, context->setup->format_esp ? T("The selected root and ESP will be formatted.")
+                : T("Only the selected root is formatted; existing ESP files are preserved."));
         }
-        context->refresh_partitions();
+        snprintf(text, sizeof(text), "%s: %s\nBIOS: %s   UEFI: %s\n%s: %s\n%s: %s",
+            T("Username"), context->setup->username, *bios ? T("Yes") : T("No"), *uefi ? T("Yes") : T("No"),
+            T("Desktop"), context->setup->skip_xorg ? T("Console") : "Xorg / IceWM",
+            T("Swap size in MiB"), context->setup->swap_enabled ? swap_size : T("Disabled"));
+        tui_text(view, text);
+        tui_input(view, T("Type INSTALL to confirm installation"), confirm_text, sizeof(confirm_text), 0);
     }
-}
-
-static void tty_update_progress(void *context, unsigned progress, const char *message)
-{
-    printf("[%3u%%] %s\n", progress, T(message));
-    const struct installer_update_info *info = context;
-    char detail[768];
-    if (info && !installer_update_activity_format(&info->activity, detail, sizeof(detail)) && *detail)
-        puts(detail);
+    if (!*bios && !*uefi) tui_text(view, T("No bootloader selected. A new installation will need a separately configured bootloader."));
 }
 
 int installer_tty_main(const struct installer_tty_context *context)
 {
-    char input[32];
-    if (!context || !context->setup || !context->disks || !context->disk_count ||
-        !context->partitions || !context->partition_count || !context->selected_partition ||
-        !context->root_partition || !context->esp_partition || !context->partition_auto ||
-        !context->selected_disk || !context->install_mode ||
-        !context->install_success || !context->page ||
-        !context->refresh_disks || !context->format_disk_line || !context->refresh_partitions ||
-        !context->format_partition_line || !context->partition_plan_valid ||
-        !context->partition_auto_layout || !context->partition_initialize ||
-        !context->partition_create || !context->partition_resize ||
-        !context->partition_rename || !context->partition_set_type ||
-        !context->partition_delete || !context->partition_format ||
-        !context->perform_install) {
+    if (!context || !context->setup || !context->selected_disk || !context->disk_count ||
+        !context->partitions || !context->partition_count || !context->perform_install) return 1;
+    if (tui_open() < 0) {
+        fprintf(stderr, "installer: %s: %s\n", T("Cannot initialize the terminal or installer log"), strerror(errno));
         return 1;
     }
-
-    puts(T("ReliefOS installer (TTY)"));
-    puts(T("This installer uses the same disk formatter and payload as the graphical installer."));
-    puts(T("Fresh install defaults to automatic partitioning; manual GPT editing is available."));
-    for (;;) {
-        if (!tty_read_line(T("Mode [install/update]: "), input, sizeof(input))) {
-            return 1;
-        }
-        if (tty_line_is(input, "install") || tty_line_is(input, "i")) {
-            *context->install_mode = INSTALLER_TTY_MODE_INSTALL;
-            break;
-        }
-        if (tty_line_is(input, "update") || tty_line_is(input, "u")) {
-            *context->install_mode = INSTALLER_TTY_MODE_UPDATE;
-            break;
-        }
-        puts(T("Enter install or update."));
-    }
-
+    struct tui_view view = {.previous_focus = -1};
+    struct installer_update_info inspected = {0};
+    unsigned current = INSTALLER_PAGE_LANGUAGE;
+    int language = language_selection(), mode = *context->install_mode;
+    int previous_mode = mode;
+    int bios = !context->setup->skip_bios, uefi = !context->setup->skip_uefi;
+    int xorg = !context->setup->skip_xorg, swap = context->setup->swap_enabled;
+    int scheme = !*context->partition_auto, chosen = *context->selected_partition;
+    struct tui_partition_table partition_table = {0};
+    int format_esp = context->setup->format_esp, previous_disk = -1, update_checked = 0;
+    int disk_choice = *context->selected_disk;
+    char root_uuid[37] = "", esp_uuid[37] = "", swap_text[32];
+    snprintf(swap_text, sizeof(swap_text), "%llu", (unsigned long long)(context->setup->swap_size_mib
+        ? context->setup->swap_size_mib : installer_swap_recommend_system()));
+    int exit_code = 1, finished = 0;
     context->refresh_disks();
-    if (!*context->disk_count || !tty_choose_disk(context)) {
-        puts(T("No disk selected. Installation cancelled."));
-        return 1;
+    disk_choice = *context->selected_disk;
+    while (!finished) {
+        if (installer_tui_signal) break;
+        *context->page = current;
+        tui_begin(&view, page_title(current));
+        char text[768];
+        switch (current) {
+        case INSTALLER_PAGE_LANGUAGE:
+            for (unsigned i = 0; i < sizeof(language_options) / sizeof(language_options[0]); ++i)
+                tui_radio(&view, language_options[i].name, &language, i);
+            break;
+        case INSTALLER_PAGE_LICENSE:
+            tui_document(&view, installer_license_text);
+            break;
+        case INSTALLER_PAGE_WELCOME:
+            tui_text(&view, T("Install a new system or update an existing ReliefOS disk."));
+            tui_text(&view, T("Review the disk model, size and partitions before applying changes."));
+            tui_text(&view, T("Use Tab and the arrow keys to select controls. F3 continues and F2 returns to the previous step."));
+            break;
+        case INSTALLER_PAGE_MODE:
+            tui_radio(&view, T("Install a new system"), &mode, INSTALLER_MODE_FRESH);
+            tui_radio(&view, T("Update an existing system"), &mode, INSTALLER_MODE_UPDATE);
+            break;
+        case INSTALLER_PAGE_DISK:
+            if (!*context->disk_count) tui_text(&view, T("No disks were found"));
+            for (uint32_t i = 0; i < *context->disk_count; ++i) {
+                context->format_disk_line(text, sizeof(text), &context->disks[i]);
+                tui_radio(&view, text, &disk_choice, i);
+            }
+            tui_button(&view, T("Refresh"), REFRESH);
+            if (mode == INSTALLER_MODE_UPDATE) {
+                snprintf(text, sizeof(text), "%s: %s\nESP: %s", T("System partition"),
+                    root_uuid[0] ? root_uuid : T("Automatic"), esp_uuid[0] ? esp_uuid : T("Use fstab"));
+                tui_text(&view, text);
+                tui_button(&view, T("Select system partition"), PICK_ROOT);
+                tui_button(&view, T("Select boot partition"), PICK_ESP);
+            }
+            break;
+        case INSTALLER_PAGE_BOOTLOADERS:
+            tui_check(&view, T("Install or update BIOS bootloader"), &bios);
+            tui_check(&view, T("Install or update UEFI bootloader"), &uefi);
+            if (!bios && !uefi) tui_text(&view, T("No bootloader selected. A new installation will need a separately configured bootloader."));
+            break;
+        case INSTALLER_PAGE_PARTITIONS:
+            partition_page(&view, context, &partition_table, &scheme, &chosen, &format_esp);
+            break;
+        case INSTALLER_PAGE_ACCOUNTS:
+            tui_input(&view, T("Username"), context->setup->username, sizeof(context->setup->username), 0);
+            tui_input(&view, T("Password"), context->setup->password, sizeof(context->setup->password), 1);
+            tui_input(&view, T("Confirm password"), context->setup->password_confirm, sizeof(context->setup->password_confirm), 1);
+            tui_input(&view, T("root password"), context->setup->root_password, sizeof(context->setup->root_password), 1);
+            tui_input(&view, T("Confirm root password"), context->setup->root_password_confirm, sizeof(context->setup->root_password_confirm), 1);
+            tui_check(&view, T("Install Xorg desktop environment"), &xorg);
+            tui_check(&view, T("Create a swapfile"), &swap);
+            if (swap) tui_input(&view, T("Swap size in MiB"), swap_text, sizeof(swap_text), 0);
+            break;
+        case INSTALLER_PAGE_CONFIRM:
+            review_page(&view, context, &inspected, &bios, &uefi, swap_text);
+            break;
+        case INSTALLER_PAGE_FINISH:
+            tui_text(&view, *context->install_success ? T("Installation completed successfully.") : T("Operation failed"));
+            tui_text(&view, status_text);
+            tui_text(&view, detail_text);
+            if (*inspected.failure) tui_text(&view, T(inspected.failure));
+            tui_text(&view, mode == INSTALLER_MODE_UPDATE ? "/var/log/installer-update.log" : "/var/log/installer.log");
+            tui_button(&view, T("View log"), TUI_LOG);
+            if (*context->install_success) {
+                tui_text(&view, T("Remove the installation media before rebooting."));
+                char entry[128] = "";
+                int has_entry = *inspected.boot_file != 0;
+                if (has_entry) snprintf(entry, sizeof(entry), "%s", inspected.boot_file);
+                else if (context->boot_entry_path) has_entry = !context->boot_entry_path(entry, sizeof(entry));
+                if (!context->setup->skip_uefi && has_entry) tui_text(&view, entry);
+                tui_button(&view, T("Restart"), REBOOT);
+                tui_button(&view, T("Shut down"), SHUTDOWN);
+            }
+            break;
+        default:
+            finished = 1;
+            continue;
+        }
+        const char *primary = current == INSTALLER_PAGE_CONFIRM ? (mode == INSTALLER_MODE_UPDATE ? T("Update") : T("Install"))
+            : current == INSTALLER_PAGE_FINISH ? (*context->install_success ? T("Exit") : T("Retry")) : T("Next");
+        int action = tui_step(&view, primary, installer_model_can_go_back(current, *context->install_success),
+            installer_model_can_cancel(current, *context->install_success), 200);
+        context->setup->skip_bios = !bios;
+        context->setup->skip_uefi = !uefi;
+        context->setup->skip_xorg = !xorg;
+        context->setup->swap_enabled = swap;
+        context->setup->format_esp = format_esp;
+        *context->partition_auto = !scheme;
+        *context->selected_partition = chosen;
+        *context->install_mode = mode;
+        if (current == INSTALLER_PAGE_LANGUAGE && language != (int)language_selection()) {
+            if (!setlocale(LC_ALL, language_options[language].locale)) tui_message(T("Language"), T("Cannot select the requested locale."));
+        }
+        if (current == INSTALLER_PAGE_DISK && disk_choice != previous_disk && disk_choice >= 0 && (uint32_t)disk_choice < *context->disk_count) {
+            *context->selected_disk = disk_choice;
+            previous_disk = disk_choice;
+            context->refresh_partitions();
+            chosen = *context->selected_partition;
+            format_esp = context->setup->format_esp;
+            root_uuid[0] = esp_uuid[0] = 0;
+            update_checked = 0;
+            inspected = (struct installer_update_info){0};
+        }
+        if (action == TUI_NONE) continue;
+        if (action == TUI_LOG) {
+            char log[16384];
+            tui_read_log(mode == INSTALLER_MODE_UPDATE ? "/var/log/installer-update.log" : "/var/log/installer.log", log, sizeof(log));
+            tui_message(T("Installer log"), log);
+            continue;
+        }
+        if (action == TUI_CANCEL) {
+            if (installer_tui_signal || tui_confirm(T("Cancel installation"), T("Exit the installer?"), NULL)) finished = 1;
+            continue;
+        }
+        if (action == REBOOT || action == SHUTDOWN) {
+            if (!tui_confirm(action == REBOOT ? T("Restart") : T("Shut down"), T("Remove the installation media before continuing."), NULL)) continue;
+            int result = action == REBOOT ? reliefos_system_reboot() : reliefos_system_shutdown();
+            if (result < 0) error_message(errno ? -errno : result, T("Power operation failed"));
+            continue;
+        }
+        if (current == INSTALLER_PAGE_DISK && action == REFRESH) {
+            context->refresh_disks();
+            disk_choice = *context->selected_disk;
+            previous_disk = -1;
+            root_uuid[0] = esp_uuid[0] = 0;
+            update_checked = 0;
+            continue;
+        }
+        if (current == INSTALLER_PAGE_DISK && (action == PICK_ROOT || action == PICK_ESP)) {
+            if (*context->selected_disk < 0 || (uint32_t)*context->selected_disk >= *context->disk_count) tui_message(T("Target disk"), T("Select a disk first."));
+            else select_update_partition(context, action == PICK_ESP, action == PICK_ESP ? esp_uuid : root_uuid);
+            update_checked = 0;
+            continue;
+        }
+        if (current == INSTALLER_PAGE_PARTITIONS && action >= REFRESH && action <= SET_ROLE) {
+            partition_action(context, action);
+            scheme = !*context->partition_auto;
+            chosen = *context->selected_partition;
+            format_esp = context->setup->format_esp;
+            continue;
+        }
+        if (action == TUI_BACK) {
+            current = installer_model_prev(current, mode);
+            reset_confirm();
+            view.focus = view.scroll = 0;
+            view.previous_focus = -1;
+            view.status[0] = 0;
+            continue;
+        }
+        if (action != TUI_NEXT) continue;
+        view.status[0] = 0;
+        if (current == INSTALLER_PAGE_MODE) {
+            update_checked = 0;
+            inspected = (struct installer_update_info){0};
+            if (previous_mode != mode) {
+                bios = uefi = 1;
+                context->setup->skip_bios = context->setup->skip_uefi = 0;
+                previous_mode = mode;
+            }
+        }
+        if (current == INSTALLER_PAGE_DISK) {
+            if (disk_choice < 0 || (uint32_t)disk_choice >= *context->disk_count) {
+                snprintf(view.status, sizeof(view.status), "%s", T("Select a disk first."));
+                continue;
+            }
+            if (mode == INSTALLER_MODE_UPDATE) {
+                struct tui_job job = {.kind = TUI_JOB_CHECK};
+                snprintf(job.root_uuid, sizeof(job.root_uuid), "%s", root_uuid);
+                snprintf(job.esp_uuid, sizeof(job.esp_uuid), "%s", esp_uuid);
+                int result = tui_run_job(context, &job);
+                inspected = job.info;
+                if (result) { error_message(result, T(inspected.failure)); continue; }
+                update_checked = 1;
+                bios = !!(inspected.boot_modes & 1);
+                uefi = !!(inspected.boot_modes & 2);
+            }
+        }
+        if (current == INSTALLER_PAGE_PARTITIONS && !context->partition_plan_valid()) {
+            snprintf(view.status, sizeof(view.status), "%s", T("Review the required BIOS Boot, ESP and root partitions."));
+            continue;
+        }
+        if (current == INSTALLER_PAGE_ACCOUNTS) {
+            if (!installer_setup_valid(context->setup)) {
+                snprintf(view.status, sizeof(view.status), "%s", T("Check username and matching passwords (1-32 characters, no spaces)."));
+                continue;
+            }
+            if (swap && installer_swap_parse_mib(swap_text, &context->setup->swap_size_mib)) {
+                snprintf(view.status, sizeof(view.status), "%s", T("Enter a valid swap size in MiB."));
+                continue;
+            }
+        }
+        if (current == INSTALLER_PAGE_CONFIRM) {
+            if (mode == INSTALLER_MODE_FRESH && !confirmation_ok()) {
+                snprintf(view.status, sizeof(view.status), "%s", T("The confirmation word does not match."));
+                continue;
+            }
+            if (mode == INSTALLER_MODE_UPDATE && !update_checked) { current = INSTALLER_PAGE_DISK; continue; }
+            struct tui_job job = {.kind = mode == INSTALLER_MODE_UPDATE ? TUI_JOB_UPDATE : TUI_JOB_INSTALL};
+            job.info = inspected;
+            int result = tui_run_job(context, &job);
+            inspected = job.info;
+            *context->install_success = result == 0;
+            if (result && !*status_text) snprintf(status_text, sizeof(status_text), "%s", strerror(-result));
+            current = INSTALLER_PAGE_FINISH;
+        } else if (current == INSTALLER_PAGE_FINISH) {
+            if (*context->install_success) { exit_code = 0; finished = 1; }
+            else {
+                current = INSTALLER_PAGE_DISK;
+                update_checked = 0;
+                context->refresh_disks();
+                disk_choice = *context->selected_disk;
+                previous_disk = -1;
+            }
+        } else current = installer_model_next(current, mode);
+        reset_confirm();
+        view.focus = view.scroll = 0;
+        view.previous_focus = -1;
     }
-
-    if (*context->install_mode == INSTALLER_TTY_MODE_UPDATE) {
-        struct installer_update_info inspected, result;
-        const char *disk = context->disks[*context->selected_disk].path;
-        char root_uuid[37] = {0}, esp_uuid[37] = {0};
-        context->refresh_partitions();
-        tty_print_partitions(context);
-        char *end;
-        for (int role = 0; role < 2; ++role) {
-            if (!tty_read_line(role ? T("ESP partition number (blank: use fstab): ")
-                                    : T("ReliefOS root partition number (blank: auto): "), input, sizeof(input))) return 1;
-            if (!input[0]) continue;
-            errno = 0;
-            unsigned long index = strtoul(input, &end, 10);
-            if (errno || *end || index >= *context->partition_count) return 1;
-            const struct reliefos_block_partition *part = &context->partitions[index];
-            if (part->gpt_type != (role ? RELIEFOS_BLOCK_GPT_ESP : RELIEFOS_BLOCK_GPT_LINUX)) return 1;
-            if (reliefos_block_partition_uuid(disk, part->index, role ? esp_uuid : root_uuid)) return 1;
-        }
-        int error = installer_update_check_target(disk, root_uuid, esp_uuid, &inspected, tty_update_progress, &inspected);
-        if (error) {
-            fprintf(stderr, "%s: %s\n", T(inspected.failure), strerror(-error));
-            return 1;
-        }
-        printf("\n%s: %s -> %s\n%s: %s\n%s: %s\n%s: %s\n",
-               T("System version"), inspected.installed_version, inspected.media_version,
-               T("Target disk"), inspected.disk, T("System partition"), inspected.root_device,
-               T("Boot partition"), inspected.esp_device);
-        printf("%s: %llu MiB / %llu MiB\n", T("Free / required space"),
-               (unsigned long long)(inspected.free_bytes / (1024u * 1024u)),
-               (unsigned long long)((inspected.required_bytes + 1024u * 1024u - 1) / (1024u * 1024u)));
-        puts(T("Accounts, personal files, installed software and local configuration are preserved."));
-        context->setup->skip_bios = !(inspected.boot_modes & 1u);
-        context->setup->skip_uefi = !(inspected.boot_modes & 2u);
-        if (!tty_bootloaders(context->setup)) return 1;
-        if (!tty_read_line(T("Proceed with system update? [y/N]: "), input, sizeof(input)) ||
-            (!tty_line_is(input, "y") && !tty_line_is(input, "Y") && !tty_line_is(input, "yes"))) {
-            puts(T("Update not confirmed. Installation cancelled."));
-            return 1;
-        }
-        error = installer_update_apply(&inspected,
-            (context->setup->skip_bios ? 0u : 1u) | (context->setup->skip_uefi ? 0u : 2u),
-            &result, tty_update_progress, &result);
-        if (!error && !context->setup->skip_uefi) printf("UEFI: %s\n", result.boot_file);
-        *context->install_success = error == 0;
-        *context->page = INSTALLER_PAGE_FINISH;
-        if (error) fprintf(stderr, "%s: %s\n", T(result.failure), strerror(-error));
-    } else {
-        if (!tty_bootloaders(context->setup)) return 1;
-        context->refresh_partitions();
-        if (!tty_partition_menu(context)) {
-            puts(T("Partition setup cancelled."));
-            return 1;
-        }
-        if (!tty_setup(context->setup)) {
-            puts(T("Account setup cancelled or input exceeds the transport buffer."));
-            return 1;
-        }
-        if (!tty_install_xorg(context->setup)) {
-            puts(T("Desktop selection cancelled."));
-            return 1;
-        }
-        if (!installer_tty_select_swap(context->setup)) return 1;
-        puts(*context->partition_auto ? T("Automatic installation erases the selected disk.") :
-             context->setup->format_esp ? T("The selected root and ESP will be formatted.") :
-             T("Only the selected root is formatted; existing ESP files are preserved."));
-        if (!tty_read_line(T("Type INSTALL to confirm the partition layout and installation: "),
-                           input, sizeof(input)) || !tty_line_is(input, "INSTALL")) {
-            puts(T("Installation not confirmed. Installation cancelled."));
-            return 1;
-        }
-        context->perform_install();
-        if (*context->install_success && !context->setup->skip_uefi && context->boot_entry_path) {
-            char entry[128];
-            if (!context->boot_entry_path(entry, sizeof(entry))) printf("UEFI: %s\n", entry);
-        }
-    }
-
-    if (!*context->install_success) {
-        return 1;
-    }
-    if (tty_read_line(T("Reboot now? [Y/n]: "), input, sizeof(input)) &&
-        input[0] != 'n' && input[0] != 'N') {
-        if (reliefos_system_reboot() < 0) perror(T("Restart failed"));
-    }
-
-    puts(T("Installation finished."));
-    for (;;) {
-        if (!tty_read_line(T("Command [reboot/shutdown/exit]: "), input, sizeof(input))) {
-            return 0;
-        }
-        if (tty_line_is(input, "reboot") || tty_line_is(input, "r")) {
-            if (reliefos_system_reboot() < 0) perror(T("Restart failed"));
-        } else if (tty_line_is(input, "shutdown") || tty_line_is(input, "poweroff")) {
-            if (reliefos_system_shutdown() < 0) perror(T("Shutdown failed"));
-        } else if (tty_line_is(input, "exit") || tty_line_is(input, "q")) {
-            return 0;
-        } else {
-            puts(T("Unknown command. Use reboot, shutdown, or exit."));
-        }
-    }
+    explicit_bzero(context->setup->password, sizeof(context->setup->password));
+    explicit_bzero(context->setup->password_confirm, sizeof(context->setup->password_confirm));
+    explicit_bzero(context->setup->root_password, sizeof(context->setup->root_password));
+    explicit_bzero(context->setup->root_password_confirm, sizeof(context->setup->root_password_confirm));
+    tui_close();
+    return installer_tui_signal ? 128 + installer_tui_signal : exit_code;
 }

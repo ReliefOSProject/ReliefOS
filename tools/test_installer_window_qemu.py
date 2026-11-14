@@ -213,43 +213,10 @@ def main():
                 time.sleep(0.1)
             probe = Probe(qmp, out)
             if args.case == "tty":
-                time.sleep(4)
-                probe.frame("grub")
-                probe.key("down")
-                probe.key("ret")
-                wait_log(serial, "Mode [install/update]:", process)
-                probe.text("install")
-                probe.key("ret")
-                time.sleep(3)
-                probe.frame("tty-after-install")
-                wait_log(serial, "Select disk number", process, 10)
-                probe.text("0")
-                probe.key("ret")
-                for prompt, answer in (
-                    ("Install or update BIOS bootloader?", ""),
-                    ("Install or update UEFI bootloader?", ""),
-                    ("partition> ", "done"),
-                    ("Username: ", "alice"), ("Password: ", "password"),
-                    ("Confirm password: ", "password"),
-                    ("root password: ", "rootpass"),
-                    ("Confirm root password: ", "rootpass"),
-                    ("Install Xorg desktop environment?", ""),
-                    ("Create a swapfile? [y/N]: ", ""),
-                ):
-                    wait_log(serial, prompt, process, 30)
-                    probe.text(answer)
-                    probe.key("ret")
-                wait_log(serial, "Type INSTALL", process, 10)
-                probe.text("INSTALL" if args.install else "no")
-                probe.key("ret")
-                if args.install:
-                    wait_log(serial, "Reboot now?", process, 900)
-                    probe.frame("tty-installed")
-                    probe.text("n")
-                    probe.key("ret")
-                    wait_log(serial, "Installation finished.", process, 10)
-                else:
-                    wait_log(serial, "Installation not confirmed", process, 10)
+                from test_installer_accounts_qemu import install_tty
+                probe.disk = disk
+                install_tty(probe, serial, process, confirm_install=args.install)
+                probe.frame("tui-installed" if args.install else "tui-confirmation-required")
             elif args.case == "installer":
                 wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
                 wait_for_installer_language(probe, process, timeout=90)
