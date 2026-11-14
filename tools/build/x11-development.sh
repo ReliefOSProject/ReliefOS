@@ -35,7 +35,7 @@ cleanup() {
 }
 trap cleanup EXIT
 trap 'exit 130' HUP INT TERM
-for id in x11-dev-fltk x11-dev-libx11 x11-dev-xorgproto alpine-libfltk alpine-libstdc++ alpine-libgcc alpine-libx11; do
+for id in x11-dev-fltk x11-dev-libx11 x11-dev-xorgproto x11-dev-glib alpine-libfltk alpine-libstdc++ alpine-libgcc alpine-libx11 alpine-glib; do
     url=$("$deps" --lock "$lock" --id "$id" --print url)
     digest=$("$deps" --lock "$lock" --id "$id" --print sha256)
     archive=$cache/${url##*/}
@@ -47,7 +47,7 @@ for id in x11-dev-fltk x11-dev-libx11 x11-dev-xorgproto alpine-libfltk alpine-li
     while IFS= read -r member; do
         case $member in */) continue;; esac
         case $member in
-            usr/include/*|usr/lib/libfltk.so*|usr/lib/libstdc++.so*|usr/lib/libgcc_s.so*|usr/lib/libX11.so*)
+            usr/include/*|usr/lib/glib-2.0/include/*|usr/lib/libfltk.so*|usr/lib/libstdc++.so*|usr/lib/libgcc_s.so*|usr/lib/libX11.so*|usr/lib/libgio-2.0.so*|usr/lib/libgobject-2.0.so*|usr/lib/libglib-2.0.so*)
                 case $member in *../*|*/../*|*'\'*) printf 'unsafe archive member\n' >&2; exit 1;; esac
                 printf '%s\n' "$member" >>"$stage/selected"
                 ;;
@@ -65,6 +65,12 @@ test -f "$stage/usr/lib/libstdc++.so.6"
 test -f "$stage/usr/lib/libgcc_s.so.1"
 test -f "$stage/usr/lib/libX11.so"
 test -f "$stage/usr/lib/libX11.so.6"
+test -f "$stage/usr/include/glib-2.0/glib.h"
+test -f "$stage/usr/include/gio-unix-2.0/gio/gdesktopappinfo.h"
+test -f "$stage/usr/lib/glib-2.0/include/glibconfig.h"
+test -f "$stage/usr/lib/libgio-2.0.so"
+test -f "$stage/usr/lib/libgobject-2.0.so"
+test -f "$stage/usr/lib/libglib-2.0.so"
 touch "$stage/.complete"
 
 if [ -e "$root" ]; then

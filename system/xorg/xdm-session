@@ -81,11 +81,12 @@ event 'PAM authentication accepted'
 icewm_pid=
 st_pid=
 clipboard_pid=
+autostart_pid=
 cleanup() {
-    for pid in $st_pid $icewm_pid $clipboard_pid; do
+    for pid in $st_pid $icewm_pid $clipboard_pid $autostart_pid; do
         kill "$pid" 2>/dev/null || :
     done
-    for pid in $st_pid $icewm_pid $clipboard_pid; do
+    for pid in $st_pid $icewm_pid $clipboard_pid $autostart_pid; do
         wait "$pid" 2>/dev/null || :
     done
 }
@@ -107,6 +108,9 @@ if test -x /usr/bin/reliefsettings; then
     /usr/bin/reliefsettings --apply-session || event 'Some personal desktop settings could not be applied'
 fi
 
+# freedesktop Desktop Entry names are case-sensitive.
+export XDG_CURRENT_DESKTOP=ICEWM
+
 # IceWM's native session supervisor starts icewmbg, which reads background
 # preferences from the selected theme and follows subsequent theme changes.
 start_child icewm /usr/bin/icewm-session || exit 1
@@ -125,6 +129,13 @@ fi
 if test -x /bin/busybox; then
     /bin/busybox renice 0 -p "$$" >/dev/null 2>&1 ||
         event 'terminal scheduling priority unchanged'
+fi
+
+if test -x /usr/bin/taskmgr; then
+    if start_child autostart /usr/bin/taskmgr --run-autostart; then
+        autostart_pid=$child_pid
+        event 'XDG autostart started'
+    fi
 fi
 
 # Keep st's default palette and start the user's login shell.

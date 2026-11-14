@@ -2,139 +2,231 @@ msgid ""
 msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 
-#: userland/apps/taskmgr/main.cpp:1042
+#: userland/apps/taskmgr/main.cpp:816
 msgid "About"
 msgstr ""
 
-#: userland/apps/fltk_support.h:48
+#: userland/apps/taskmgr/startup_page.cpp:93
+msgid "Add startup application"
+msgstr ""
+
+#: userland/apps/fltk_support.h:29
 msgid "Add to Favorites"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:188
+#: userland/apps/taskmgr/startup_page.cpp:330
+msgid "Add…"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:173
 msgid "Admin"
 msgstr ""
 
-#: userland/apps/fltk_support.h:49
+#: userland/apps/fltk_support.h:30
 msgid "All Files (*)"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/startup_page.cpp:96
+msgid "Browse…"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:840
 msgid "CPU"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:560
+#: userland/apps/taskmgr/main.cpp:412
 msgid "CPU Usage"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:755
+#: userland/apps/taskmgr/main.cpp:607
 msgid "CPU time:"
 msgstr ""
 
-#: userland/apps/fltk_support.h:44
+#: userland/apps/fltk_support.h:25
 msgid "Cancel"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:710
+#: configs/nls/messages/taskmgr.c:5
+msgid "Cannot allocate a startup filename."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:6
+msgid "Cannot create the personal autostart directory."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:562
 msgid "Cannot end protected or non-user task"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1106
-msgid "Choose which user's startup entries to manage."
+#: configs/nls/messages/taskmgr.c:7
+msgid "Cannot lock the personal autostart directory."
 msgstr ""
 
-#: userland/apps/fltk_support.h:45
+#: configs/nls/messages/taskmgr.c:8
+msgid "Cannot open the personal autostart directory."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:9
+msgid "Cannot read an autostart directory."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:10
+msgid "Cannot read startup entry."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:11
+msgid "Cannot remove the personal startup entry."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:12
+msgid "Cannot save the personal startup entry."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:13
+msgid "Cannot switch to the selected account."
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:122
+msgid "Changes apply at the next login."
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:100
+msgid "Choose executable"
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:114
+msgid "Choose working folder"
+msgstr ""
+
+#: userland/apps/fltk_support.h:26
 msgid "Close"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:774
-msgid "Could not change startup app"
+#: userland/apps/taskmgr/startup_page.cpp:95
+msgid "Command"
 msgstr ""
 
 #: userland/apps/fltk_png_app.h:46
 msgid "Could not decode image"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:795
-msgid "Could not remove startup app"
+#: userland/apps/taskmgr/startup_page.cpp:245
+msgid "Could not read startup settings."
 msgstr ""
 
-#: userland/apps/fltk_support.h:57
+#: userland/apps/taskmgr/startup_page.cpp:258
+msgid "Could not start the settings worker."
+msgstr ""
+
+#: userland/apps/fltk_support.h:38
 msgid "Create a new directory"
 msgstr ""
 
-#: userland/apps/fltk_support.h:50
+#: userland/apps/fltk_support.h:31
 msgid "Custom Filter"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1041
+#: userland/apps/taskmgr/startup_page.cpp:203
+msgid "D-Bus activation"
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:108
+msgid "Description"
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:107
+msgid "Desktop Entry Exec syntax. Quote paths with spaces using double quotes."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:815
 msgid "Details"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:233
+#: userland/apps/taskmgr/startup_page.cpp:186
 msgid "Disable"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:409
+#: userland/apps/taskmgr/startup_page.cpp:50
 msgid "Disabled"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:187
+#: userland/apps/taskmgr/startup_page.cpp:348
+msgid "Double-click or press Enter to edit. Delete removes personal entries or restores a system default."
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:93
+msgid "Edit startup application"
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:332
+msgid "Edit…"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:172
 msgid "Elevated"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:233
+#: userland/apps/taskmgr/startup_page.cpp:186
 msgid "Enable"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1111
-msgid "Enable or disable the selected startup entry."
-msgstr ""
-
-#: userland/apps/taskmgr/main.cpp:409
+#: userland/apps/taskmgr/startup_page.cpp:49
 msgid "Enabled"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:716
+#: userland/apps/taskmgr/main.cpp:568
 msgid "End Task"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:720
+#: userland/apps/taskmgr/main.cpp:572
 msgid "End Task failed"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:715
+#: userland/apps/taskmgr/main.cpp:567
 msgid "End task %s (PID %u)?"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1063
+#: userland/apps/taskmgr/main.cpp:837
 msgid "End the selected task after confirmation."
 msgstr ""
 
-#: userland/apps/fltk_support.h:52
+#: configs/nls/messages/taskmgr.c:14
+msgid "Enter a command and valid arguments."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:15
+msgid "Enter a valid UTF-8 command."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:16
+msgid "Enter a valid UTF-8 name."
+msgstr ""
+
+#: userland/apps/fltk_support.h:33
 msgid "Favorites"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1039
+#: userland/apps/taskmgr/main.cpp:813
 msgid "File"
 msgstr ""
 
-#: userland/apps/fltk_support.h:54
+#: userland/apps/fltk_support.h:35
 msgid "File Systems"
 msgstr ""
 
-#: userland/apps/fltk_support.h:53
+#: userland/apps/fltk_support.h:34
 msgid "File name:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:621
+#: userland/apps/taskmgr/main.cpp:473
 msgid "Free memory:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:574
+#: userland/apps/taskmgr/main.cpp:426
 msgid "GPU (est.)"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:574
+#: userland/apps/taskmgr/main.cpp:426
 msgid "GPU (estimated)"
 msgstr ""
 
@@ -142,270 +234,390 @@ msgstr ""
 msgid "Input is too long"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1053
+#: userland/apps/taskmgr/main.cpp:827
 msgid "Inspect running tasks and open details or end a task."
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:752
+#: userland/apps/taskmgr/startup_page.cpp:53
+msgid "Invalid entry"
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:17
+msgid "Invalid startup filename."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:604
 msgid "Kind:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1092
+#: userland/apps/taskmgr/main.cpp:866
 msgid "Live CPU, memory, and estimated GPU history with per-core usage."
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:807
+#: userland/apps/taskmgr/main.cpp:618
 msgid "Live task and performance snapshot from the system."
 msgstr ""
 
-#: userland/apps/fltk_support.h:55
+#: userland/apps/fltk_support.h:36
 msgid "Manage Favorites"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1100
-msgid "Manage startup entries for the selected user."
-msgstr ""
-
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/main.cpp:840
 msgid "Memory"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:567
+#: userland/apps/taskmgr/main.cpp:419
 msgid "Memory Usage"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:756
+#: userland/apps/taskmgr/main.cpp:608
 msgid "Memory:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:748
+#: configs/nls/messages/taskmgr.c:18
+msgid "Multi-argument field codes must be separate arguments."
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:94
+msgid "Name"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:600
 msgid "Name:"
 msgstr ""
 
-#: userland/apps/fltk_support.h:56
+#: userland/apps/fltk_support.h:37
 msgid "New Directory?"
 msgstr ""
 
-#: userland/apps/fltk_support.h:47
+#: userland/apps/fltk_support.h:28
 msgid "No"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:769
-msgid "No startup app selected"
+#: userland/apps/taskmgr/startup_page.cpp:216
+msgid "No startup applications. Use Add to start a program at login."
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:706
+#: userland/apps/taskmgr/main.cpp:558
 msgid "No task selected"
 msgstr ""
 
-#: userland/apps/fltk_support.h:43
+#: configs/nls/messages/taskmgr.c:19
+msgid "Not enough memory."
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:203
+msgid "Not specified"
+msgstr ""
+
+#: userland/apps/fltk_support.h:24
 msgid "OK"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1043
+#: configs/nls/messages/taskmgr.c:20
+msgid "Only root can manage another user's startup entries."
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:119
+msgid "Optional TryExec. Start only when this executable is available."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:817
 msgid "Options"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/startup_page.cpp:51
+msgid "Other desktop"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:840
 msgid "PID"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:750
+#: userland/apps/taskmgr/main.cpp:602
 msgid "Parent PID:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:583
+#: userland/apps/taskmgr/main.cpp:435
 msgid "Per-core usage"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1044
+#: userland/apps/taskmgr/main.cpp:818
 msgid "Performance"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:438
+#: userland/apps/taskmgr/main.cpp:290
 msgid "Performance data unavailable"
 msgstr ""
 
-#: userland/apps/fltk_support.h:51
+#: userland/apps/taskmgr/startup_page.cpp:206
+msgid "Personal"
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:206
+msgid "Personal override"
+msgstr ""
+
+#: userland/apps/fltk_support.h:32
 msgid "Please choose an existing file!"
 msgstr ""
 
-#: userland/apps/fltk_support.h:58
+#: userland/apps/fltk_support.h:39
 msgid "Preview"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/main.cpp:840
 msgid "Privileges"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:754
+#: userland/apps/taskmgr/main.cpp:606
 msgid "Privileges:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/main.cpp:840
 msgid "Process"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1043
+#: userland/apps/taskmgr/main.cpp:817
 msgid "Processes"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1048
+#: userland/apps/taskmgr/startup_page.cpp:52
+msgid "Program unavailable"
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:21
+msgid "Quote special characters with double quotes."
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:292
+msgid "Reading startup settings…"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:822
 msgid "Ready"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:632
+#: userland/apps/taskmgr/main.cpp:484
 msgid "Ready "
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1039
+#: userland/apps/taskmgr/main.cpp:813
 msgid "Refresh"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1057
+#: userland/apps/taskmgr/main.cpp:831
 msgid "Refresh task and performance data now."
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1112
+#: userland/apps/taskmgr/startup_page.cpp:187
 msgid "Remove"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:793
-msgid "Remove Startup App"
+#: userland/apps/taskmgr/startup_page.cpp:424
+msgid "Remove the personal override and restore the system startup entry? This may enable it again."
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:793
-msgid "Remove the selected startup app?"
+#: userland/apps/taskmgr/startup_page.cpp:424
+msgid "Remove the selected personal startup application?"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1115
-msgid "Remove the selected startup entry after confirmation."
+#: userland/apps/taskmgr/startup_page.cpp:118
+msgid "Required program"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:631
+#: userland/apps/taskmgr/startup_page.cpp:187
+msgid "Restore default"
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:121
+msgid "Run in terminal"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:483
 msgid "Running "
 msgstr ""
 
-#: userland/apps/fltk_support.h:59
+#: userland/apps/fltk_support.h:40
 msgid "Save"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1089
+#: userland/apps/taskmgr/main.cpp:863
 msgid "Scroll to see per-core CPU usage and memory totals."
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1078
+#: userland/apps/taskmgr/main.cpp:852
 msgid "Select a row; press Enter for details or Delete to end the task."
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1120
-msgid "Select a startup entry before using Enable, Disable, or Remove."
-msgstr ""
-
-#: userland/apps/taskmgr/main.cpp:1060
+#: userland/apps/taskmgr/main.cpp:834
 msgid "Show details for the selected task."
 msgstr ""
 
-#: userland/apps/fltk_support.h:61
+#: userland/apps/fltk_support.h:42
 msgid "Show hidden files"
 msgstr ""
 
-#: userland/apps/fltk_support.h:60
+#: userland/apps/fltk_support.h:41
 msgid "Show:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:633
+#: userland/apps/taskmgr/main.cpp:485
 msgid "Sleeping "
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:189
+#: userland/apps/taskmgr/startup_page.cpp:340
+msgid "Source"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:174
 msgid "Standard"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:777
-msgid "Startup app disabled"
+#: userland/apps/taskmgr/startup_page.cpp:120
+msgid "Start at login"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:777
-msgid "Startup app enabled"
-msgstr ""
-
-#: userland/apps/taskmgr/main.cpp:799
-msgid "Startup app removed"
-msgstr ""
-
-#: userland/apps/taskmgr/main.cpp:1045
+#: userland/apps/taskmgr/main.cpp:819
 msgid "Startup applications"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: configs/nls/messages/taskmgr.c:22
+msgid "Startup entries exceed the memory limit."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:23
+msgid "Startup entry exceeds 1 MiB."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:24
+msgid "Startup entry is not a regular file or exceeds 1 MiB."
+msgstr ""
+
+#: userland/apps/taskmgr/startup_page.cpp:252
+msgid "Startup settings refreshed"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:840
 msgid "State"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:751
+#: userland/apps/taskmgr/main.cpp:603
 msgid "State:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:181
+#: userland/apps/taskmgr/startup_page.cpp:340
+msgid "Status"
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:166
 msgid "System"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:759
+#: userland/apps/taskmgr/startup_page.cpp:359
+msgid "System entries are changed through personal overrides. Changes apply at the next login."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:611
 msgid "Task Details"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:806
+#: userland/apps/taskmgr/main.cpp:617
 msgid "Task Manager"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:723
+#: userland/apps/taskmgr/main.cpp:575
 msgid "Task ended"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:630
+#: userland/apps/taskmgr/main.cpp:482
 msgid "Tasks "
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:613
+#: configs/nls/messages/taskmgr.c:25
+msgid "The account has no absolute home directory."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:26
+msgid "The change was applied, but directory synchronization failed."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:27
+msgid "The command has an unfinished quote or escape."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:28
+msgid "The command has an unsupported field code."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:29
+msgid "The selected account has no home directory."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:30
+msgid "The startup entry cannot be parsed. Remove it and add a new entry."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:31
+msgid "This entry changed. Refresh and try again."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:32
+msgid "Too many startup entries (maximum 2048)."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:465
 msgid "Total memory:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:373
-msgid "Unavailable"
+#: configs/nls/messages/taskmgr.c:33
+msgid "TryExec must be an absolute path or a program name."
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:181
+#: userland/apps/taskmgr/main.cpp:166
 msgid "Unknown"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:625
+#: userland/apps/taskmgr/main.cpp:477
 msgid "Uptime:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:617
+#: configs/nls/messages/taskmgr.c:34
+msgid "Use Disable to override a system startup entry."
+msgstr ""
+
+#: configs/nls/messages/taskmgr.c:35
+msgid "Use only one file or URL field code."
+msgstr ""
+
+#: userland/apps/taskmgr/main.cpp:469
 msgid "Used memory:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/main.cpp:840
 msgid "User"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:753
+#: userland/apps/taskmgr/main.cpp:605
 msgid "User:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:1084
+#: userland/apps/taskmgr/main.cpp:858
 msgid "View live CPU, memory, and estimated GPU usage."
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:757
+#: userland/apps/taskmgr/main.cpp:609
 msgid "Wake tick:"
 msgstr ""
 
-#: userland/apps/fltk_support.h:46
+#: userland/apps/taskmgr/startup_page.cpp:109
+msgid "Working folder"
+msgstr ""
+
+#: userland/apps/fltk_support.h:27
 msgid "Yes"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:743
+#: userland/apps/taskmgr/main.cpp:595
 msgid "ticks"
 msgstr ""

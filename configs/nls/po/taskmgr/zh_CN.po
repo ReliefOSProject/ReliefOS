@@ -10,139 +10,231 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: userland/apps/taskmgr/main.cpp:1042
+#: userland/apps/taskmgr/main.cpp:816
 msgid "About"
 msgstr "关于"
 
-#: userland/apps/fltk_support.h:48
+#: userland/apps/taskmgr/startup_page.cpp:93
+msgid "Add startup application"
+msgstr "添加启动程序"
+
+#: userland/apps/fltk_support.h:29
 msgid "Add to Favorites"
 msgstr "添加到收藏夹"
 
-#: userland/apps/taskmgr/main.cpp:188
+#: userland/apps/taskmgr/startup_page.cpp:330
+msgid "Add…"
+msgstr "添加…"
+
+#: userland/apps/taskmgr/main.cpp:173
 msgid "Admin"
 msgstr "管理员"
 
-#: userland/apps/fltk_support.h:49
+#: userland/apps/fltk_support.h:30
 msgid "All Files (*)"
 msgstr "所有文件 (*)"
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/startup_page.cpp:96
+msgid "Browse…"
+msgstr "浏览…"
+
+#: userland/apps/taskmgr/main.cpp:840
 msgid "CPU"
 msgstr "CPU"
 
-#: userland/apps/taskmgr/main.cpp:560
+#: userland/apps/taskmgr/main.cpp:412
 msgid "CPU Usage"
 msgstr "CPU 占用"
 
-#: userland/apps/taskmgr/main.cpp:755
+#: userland/apps/taskmgr/main.cpp:607
 msgid "CPU time:"
 msgstr "CPU 时间:"
 
-#: userland/apps/fltk_support.h:44
+#: userland/apps/fltk_support.h:25
 msgid "Cancel"
 msgstr "取消"
 
-#: userland/apps/taskmgr/main.cpp:710
+#: configs/nls/messages/taskmgr.c:5
+msgid "Cannot allocate a startup filename."
+msgstr "无法分配启动配置文件名。"
+
+#: configs/nls/messages/taskmgr.c:6
+msgid "Cannot create the personal autostart directory."
+msgstr "无法创建个人自启动目录。"
+
+#: userland/apps/taskmgr/main.cpp:562
 msgid "Cannot end protected or non-user task"
 msgstr "无法结束受保护或非用户任务"
 
-#: userland/apps/taskmgr/main.cpp:1106
-msgid "Choose which user's startup entries to manage."
-msgstr "选择要管理启动项的用户。"
+#: configs/nls/messages/taskmgr.c:7
+msgid "Cannot lock the personal autostart directory."
+msgstr "无法锁定个人自启动目录。"
 
-#: userland/apps/fltk_support.h:45
+#: configs/nls/messages/taskmgr.c:8
+msgid "Cannot open the personal autostart directory."
+msgstr "无法打开个人自启动目录。"
+
+#: configs/nls/messages/taskmgr.c:9
+msgid "Cannot read an autostart directory."
+msgstr "无法读取自启动目录。"
+
+#: configs/nls/messages/taskmgr.c:10
+msgid "Cannot read startup entry."
+msgstr "无法读取启动项。"
+
+#: configs/nls/messages/taskmgr.c:11
+msgid "Cannot remove the personal startup entry."
+msgstr "无法删除个人启动项。"
+
+#: configs/nls/messages/taskmgr.c:12
+msgid "Cannot save the personal startup entry."
+msgstr "无法保存个人启动项。"
+
+#: configs/nls/messages/taskmgr.c:13
+msgid "Cannot switch to the selected account."
+msgstr "无法切换到所选账户。"
+
+#: userland/apps/taskmgr/startup_page.cpp:122
+msgid "Changes apply at the next login."
+msgstr "更改将在下次登录时生效。"
+
+#: userland/apps/taskmgr/startup_page.cpp:100
+msgid "Choose executable"
+msgstr "选择可执行程序"
+
+#: userland/apps/taskmgr/startup_page.cpp:114
+msgid "Choose working folder"
+msgstr "选择工作文件夹"
+
+#: userland/apps/fltk_support.h:26
 msgid "Close"
 msgstr "关闭"
 
-#: userland/apps/taskmgr/main.cpp:774
-msgid "Could not change startup app"
-msgstr "无法更改启动应用"
+#: userland/apps/taskmgr/startup_page.cpp:95
+msgid "Command"
+msgstr "命令"
 
 #: userland/apps/fltk_png_app.h:46
 msgid "Could not decode image"
 msgstr "无法解码图像"
 
-#: userland/apps/taskmgr/main.cpp:795
-msgid "Could not remove startup app"
-msgstr "无法删除启动应用"
+#: userland/apps/taskmgr/startup_page.cpp:245
+msgid "Could not read startup settings."
+msgstr "无法读取启动设置。"
 
-#: userland/apps/fltk_support.h:57
+#: userland/apps/taskmgr/startup_page.cpp:258
+msgid "Could not start the settings worker."
+msgstr "无法启动设置后台进程。"
+
+#: userland/apps/fltk_support.h:38
 msgid "Create a new directory"
 msgstr "创建新目录"
 
-#: userland/apps/fltk_support.h:50
+#: userland/apps/fltk_support.h:31
 msgid "Custom Filter"
 msgstr "自定义筛选器"
 
-#: userland/apps/taskmgr/main.cpp:1041
+#: userland/apps/taskmgr/startup_page.cpp:203
+msgid "D-Bus activation"
+msgstr "D-Bus 激活"
+
+#: userland/apps/taskmgr/startup_page.cpp:108
+msgid "Description"
+msgstr "描述"
+
+#: userland/apps/taskmgr/startup_page.cpp:107
+msgid "Desktop Entry Exec syntax. Quote paths with spaces using double quotes."
+msgstr "使用 Desktop Entry 的 Exec 语法。含空格的路径请加双引号。"
+
+#: userland/apps/taskmgr/main.cpp:815
 msgid "Details"
 msgstr "详细信息"
 
-#: userland/apps/taskmgr/main.cpp:233
+#: userland/apps/taskmgr/startup_page.cpp:186
 msgid "Disable"
 msgstr "禁用"
 
-#: userland/apps/taskmgr/main.cpp:409
+#: userland/apps/taskmgr/startup_page.cpp:50
 msgid "Disabled"
 msgstr "已禁用"
 
-#: userland/apps/taskmgr/main.cpp:187
+#: userland/apps/taskmgr/startup_page.cpp:348
+msgid "Double-click or press Enter to edit. Delete removes personal entries or restores a system default."
+msgstr "双击或按 Enter 编辑。Delete 可删除个人项或恢复系统默认。"
+
+#: userland/apps/taskmgr/startup_page.cpp:93
+msgid "Edit startup application"
+msgstr "编辑启动程序"
+
+#: userland/apps/taskmgr/startup_page.cpp:332
+msgid "Edit…"
+msgstr "编辑…"
+
+#: userland/apps/taskmgr/main.cpp:172
 msgid "Elevated"
 msgstr "已提升"
 
-#: userland/apps/taskmgr/main.cpp:233
+#: userland/apps/taskmgr/startup_page.cpp:186
 msgid "Enable"
 msgstr "启用"
 
-#: userland/apps/taskmgr/main.cpp:1111
-msgid "Enable or disable the selected startup entry."
-msgstr "启用或禁用所选启动项。"
-
-#: userland/apps/taskmgr/main.cpp:409
+#: userland/apps/taskmgr/startup_page.cpp:49
 msgid "Enabled"
 msgstr "已启用"
 
-#: userland/apps/taskmgr/main.cpp:716
+#: userland/apps/taskmgr/main.cpp:568
 msgid "End Task"
 msgstr "结束任务"
 
-#: userland/apps/taskmgr/main.cpp:720
+#: userland/apps/taskmgr/main.cpp:572
 msgid "End Task failed"
 msgstr "结束任务失败"
 
-#: userland/apps/taskmgr/main.cpp:715
+#: userland/apps/taskmgr/main.cpp:567
 msgid "End task %s (PID %u)?"
 msgstr "结束任务 %s（PID %u）？"
 
-#: userland/apps/taskmgr/main.cpp:1063
+#: userland/apps/taskmgr/main.cpp:837
 msgid "End the selected task after confirmation."
 msgstr "确认后结束所选任务。"
 
-#: userland/apps/fltk_support.h:52
+#: configs/nls/messages/taskmgr.c:14
+msgid "Enter a command and valid arguments."
+msgstr "请输入命令和有效参数。"
+
+#: configs/nls/messages/taskmgr.c:15
+msgid "Enter a valid UTF-8 command."
+msgstr "请输入有效的 UTF-8 命令。"
+
+#: configs/nls/messages/taskmgr.c:16
+msgid "Enter a valid UTF-8 name."
+msgstr "请输入有效的 UTF-8 名称。"
+
+#: userland/apps/fltk_support.h:33
 msgid "Favorites"
 msgstr "收藏夹"
 
-#: userland/apps/taskmgr/main.cpp:1039
+#: userland/apps/taskmgr/main.cpp:813
 msgid "File"
 msgstr "文件"
 
-#: userland/apps/fltk_support.h:54
+#: userland/apps/fltk_support.h:35
 msgid "File Systems"
 msgstr "文件系统"
 
-#: userland/apps/fltk_support.h:53
+#: userland/apps/fltk_support.h:34
 msgid "File name:"
 msgstr "文件名："
 
-#: userland/apps/taskmgr/main.cpp:621
+#: userland/apps/taskmgr/main.cpp:473
 msgid "Free memory:"
 msgstr "可用内存:"
 
-#: userland/apps/taskmgr/main.cpp:574
+#: userland/apps/taskmgr/main.cpp:426
 msgid "GPU (est.)"
 msgstr "GPU (估算)"
 
-#: userland/apps/taskmgr/main.cpp:574
+#: userland/apps/taskmgr/main.cpp:426
 msgid "GPU (estimated)"
 msgstr "GPU (估算)"
 
@@ -150,270 +242,435 @@ msgstr "GPU (估算)"
 msgid "Input is too long"
 msgstr "输入内容过长"
 
-#: userland/apps/taskmgr/main.cpp:1053
+#: userland/apps/taskmgr/main.cpp:827
 msgid "Inspect running tasks and open details or end a task."
 msgstr "查看运行中的进程、详细信息或结束任务。"
 
-#: userland/apps/taskmgr/main.cpp:752
+#: userland/apps/taskmgr/startup_page.cpp:53
+msgid "Invalid entry"
+msgstr "配置无效"
+
+#: configs/nls/messages/taskmgr.c:17
+msgid "Invalid startup filename."
+msgstr "启动配置文件名无效。"
+
+#: userland/apps/taskmgr/main.cpp:604
 msgid "Kind:"
 msgstr "类型:"
 
-#: userland/apps/taskmgr/main.cpp:1092
+#: userland/apps/taskmgr/main.cpp:866
 msgid "Live CPU, memory, and estimated GPU history with per-core usage."
 msgstr "实时 CPU、内存与 GPU 估算历史，以及各核心使用情况。"
 
-#: userland/apps/taskmgr/main.cpp:807
+#: userland/apps/taskmgr/main.cpp:618
 msgid "Live task and performance snapshot from the system."
 msgstr "实时显示系统任务与性能信息。"
 
-#: userland/apps/fltk_support.h:55
+#: userland/apps/fltk_support.h:36
 msgid "Manage Favorites"
 msgstr "管理收藏夹"
 
-#: userland/apps/taskmgr/main.cpp:1100
-msgid "Manage startup entries for the selected user."
-msgstr "管理所选用户的启动项。"
-
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/main.cpp:840
 msgid "Memory"
 msgstr "内存"
 
-#: userland/apps/taskmgr/main.cpp:567
+#: userland/apps/taskmgr/main.cpp:419
 msgid "Memory Usage"
 msgstr "内存占用"
 
-#: userland/apps/taskmgr/main.cpp:756
+#: userland/apps/taskmgr/main.cpp:608
 msgid "Memory:"
 msgstr "内存:"
 
-#: userland/apps/taskmgr/main.cpp:748
+#: configs/nls/messages/taskmgr.c:18
+msgid "Multi-argument field codes must be separate arguments."
+msgstr "多参数字段代码必须单独作为一个参数。"
+
+#: userland/apps/taskmgr/startup_page.cpp:94
+msgid "Name"
+msgstr "名称"
+
+#: userland/apps/taskmgr/main.cpp:600
 msgid "Name:"
 msgstr "名称:"
 
-#: userland/apps/fltk_support.h:56
+#: userland/apps/fltk_support.h:37
 msgid "New Directory?"
 msgstr "新建目录？"
 
-#: userland/apps/fltk_support.h:47
+#: userland/apps/fltk_support.h:28
 msgid "No"
 msgstr "否"
 
-#: userland/apps/taskmgr/main.cpp:769
-msgid "No startup app selected"
-msgstr "未选择启动应用"
+#: userland/apps/taskmgr/startup_page.cpp:216
+msgid "No startup applications. Use Add to start a program at login."
+msgstr "没有启动项。点击“添加”设置登录时运行的程序。"
 
-#: userland/apps/taskmgr/main.cpp:706
+#: userland/apps/taskmgr/main.cpp:558
 msgid "No task selected"
 msgstr "未选择任务"
 
-#: userland/apps/fltk_support.h:43
+#: configs/nls/messages/taskmgr.c:19
+msgid "Not enough memory."
+msgstr "内存不足。"
+
+#: userland/apps/taskmgr/startup_page.cpp:203
+msgid "Not specified"
+msgstr "未指定"
+
+#: userland/apps/fltk_support.h:24
 msgid "OK"
 msgstr "确定"
 
-#: userland/apps/taskmgr/main.cpp:1043
+#: configs/nls/messages/taskmgr.c:20
+msgid "Only root can manage another user's startup entries."
+msgstr "只有 root 可以管理其他用户的启动项。"
+
+#: userland/apps/taskmgr/startup_page.cpp:119
+msgid "Optional TryExec. Start only when this executable is available."
+msgstr "可选的 TryExec，仅在指定可执行程序可用时启动。"
+
+#: userland/apps/taskmgr/main.cpp:817
 msgid "Options"
 msgstr "选项"
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/startup_page.cpp:51
+msgid "Other desktop"
+msgstr "其他桌面专用"
+
+#: userland/apps/taskmgr/main.cpp:840
 msgid "PID"
 msgstr "PID"
 
-#: userland/apps/taskmgr/main.cpp:750
+#: userland/apps/taskmgr/main.cpp:602
 msgid "Parent PID:"
 msgstr "父 PID:"
 
-#: userland/apps/taskmgr/main.cpp:583
+#: userland/apps/taskmgr/main.cpp:435
 msgid "Per-core usage"
 msgstr "每核占用"
 
-#: userland/apps/taskmgr/main.cpp:1044
+#: userland/apps/taskmgr/main.cpp:818
 msgid "Performance"
 msgstr "性能"
 
-#: userland/apps/taskmgr/main.cpp:438
+#: userland/apps/taskmgr/main.cpp:290
 msgid "Performance data unavailable"
 msgstr "性能数据不可用"
 
-#: userland/apps/fltk_support.h:51
+#: userland/apps/taskmgr/startup_page.cpp:206
+msgid "Personal"
+msgstr "个人"
+
+#: userland/apps/taskmgr/startup_page.cpp:206
+msgid "Personal override"
+msgstr "个人覆盖"
+
+#: userland/apps/fltk_support.h:32
 msgid "Please choose an existing file!"
 msgstr "请选择已存在的文件！"
 
-#: userland/apps/fltk_support.h:58
+#: userland/apps/fltk_support.h:39
 msgid "Preview"
 msgstr "预览"
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/main.cpp:840
 msgid "Privileges"
 msgstr "权限"
 
-#: userland/apps/taskmgr/main.cpp:754
+#: userland/apps/taskmgr/main.cpp:606
 msgid "Privileges:"
 msgstr "权限:"
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/main.cpp:840
 msgid "Process"
 msgstr "进程"
 
-#: userland/apps/taskmgr/main.cpp:1043
+#: userland/apps/taskmgr/main.cpp:817
 msgid "Processes"
 msgstr "进程"
 
-#: userland/apps/taskmgr/main.cpp:1048
+#: userland/apps/taskmgr/startup_page.cpp:52
+msgid "Program unavailable"
+msgstr "程序不可用"
+
+#: configs/nls/messages/taskmgr.c:21
+msgid "Quote special characters with double quotes."
+msgstr "请用双引号括起特殊字符。"
+
+#: userland/apps/taskmgr/startup_page.cpp:292
+msgid "Reading startup settings…"
+msgstr "正在读取启动设置…"
+
+#: userland/apps/taskmgr/main.cpp:822
 msgid "Ready"
 msgstr "就绪"
 
-#: userland/apps/taskmgr/main.cpp:632
+#: userland/apps/taskmgr/main.cpp:484
 msgid "Ready "
 msgstr "就绪 "
 
-#: userland/apps/taskmgr/main.cpp:1039
+#: userland/apps/taskmgr/main.cpp:813
 msgid "Refresh"
 msgstr "刷新"
 
-#: userland/apps/taskmgr/main.cpp:1057
+#: userland/apps/taskmgr/main.cpp:831
 msgid "Refresh task and performance data now."
 msgstr "立即刷新进程和性能数据。"
 
-#: userland/apps/taskmgr/main.cpp:1112
+#: userland/apps/taskmgr/startup_page.cpp:187
 msgid "Remove"
 msgstr "删除"
 
-#: userland/apps/taskmgr/main.cpp:793
-msgid "Remove Startup App"
-msgstr "删除启动应用"
+#: userland/apps/taskmgr/startup_page.cpp:424
+msgid "Remove the personal override and restore the system startup entry? This may enable it again."
+msgstr "删除个人覆盖并恢复系统启动项？这可能使该程序重新启用。"
 
-#: userland/apps/taskmgr/main.cpp:793
-msgid "Remove the selected startup app?"
-msgstr "删除选中的启动应用？"
+#: userland/apps/taskmgr/startup_page.cpp:424
+msgid "Remove the selected personal startup application?"
+msgstr "删除所选个人启动程序？"
 
-#: userland/apps/taskmgr/main.cpp:1115
-msgid "Remove the selected startup entry after confirmation."
-msgstr "确认后移除所选启动项。"
+#: userland/apps/taskmgr/startup_page.cpp:118
+msgid "Required program"
+msgstr "依赖程序"
 
-#: userland/apps/taskmgr/main.cpp:631
+#: userland/apps/taskmgr/startup_page.cpp:187
+msgid "Restore default"
+msgstr "恢复默认"
+
+#: userland/apps/taskmgr/startup_page.cpp:121
+msgid "Run in terminal"
+msgstr "在终端中运行"
+
+#: userland/apps/taskmgr/main.cpp:483
 msgid "Running "
 msgstr "运行 "
 
-#: userland/apps/fltk_support.h:59
+#: userland/apps/fltk_support.h:40
 msgid "Save"
 msgstr "保存"
 
-#: userland/apps/taskmgr/main.cpp:1089
+#: userland/apps/taskmgr/main.cpp:863
 msgid "Scroll to see per-core CPU usage and memory totals."
 msgstr "向下滚动可查看各核心使用率和内存统计。"
 
-#: userland/apps/taskmgr/main.cpp:1078
+#: userland/apps/taskmgr/main.cpp:852
 msgid "Select a row; press Enter for details or Delete to end the task."
 msgstr "选择一行，按 Enter 查看详情，按 Delete 结束任务。"
 
-#: userland/apps/taskmgr/main.cpp:1120
-msgid "Select a startup entry before using Enable, Disable, or Remove."
-msgstr "先选择启动项，再使用启用、禁用或移除。"
-
-#: userland/apps/taskmgr/main.cpp:1060
+#: userland/apps/taskmgr/main.cpp:834
 msgid "Show details for the selected task."
 msgstr "查看所选任务的详细信息。"
 
-#: userland/apps/fltk_support.h:61
+#: userland/apps/fltk_support.h:42
 msgid "Show hidden files"
 msgstr "显示隐藏文件"
 
-#: userland/apps/fltk_support.h:60
+#: userland/apps/fltk_support.h:41
 msgid "Show:"
 msgstr "显示："
 
-#: userland/apps/taskmgr/main.cpp:633
+#: userland/apps/taskmgr/main.cpp:485
 msgid "Sleeping "
 msgstr "休眠 "
 
-#: userland/apps/taskmgr/main.cpp:189
+#: userland/apps/taskmgr/startup_page.cpp:340
+msgid "Source"
+msgstr "来源"
+
+#: userland/apps/taskmgr/main.cpp:174
 msgid "Standard"
 msgstr "标准"
 
-#: userland/apps/taskmgr/main.cpp:777
-msgid "Startup app disabled"
-msgstr "启动应用已禁用"
+#: userland/apps/taskmgr/startup_page.cpp:120
+msgid "Start at login"
+msgstr "登录时启动"
 
-#: userland/apps/taskmgr/main.cpp:777
-msgid "Startup app enabled"
-msgstr "启动应用已启用"
-
-#: userland/apps/taskmgr/main.cpp:799
-msgid "Startup app removed"
-msgstr "启动应用已删除"
-
-#: userland/apps/taskmgr/main.cpp:1045
+#: userland/apps/taskmgr/main.cpp:819
 msgid "Startup applications"
 msgstr "启动应用程序"
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: configs/nls/messages/taskmgr.c:22
+msgid "Startup entries exceed the memory limit."
+msgstr "启动项数据超出内存限制。"
+
+#: configs/nls/messages/taskmgr.c:23
+msgid "Startup entry exceeds 1 MiB."
+msgstr "启动项数据超过 1 MiB。"
+
+#: configs/nls/messages/taskmgr.c:24
+msgid "Startup entry is not a regular file or exceeds 1 MiB."
+msgstr "启动项不是普通文件或超过 1 MiB。"
+
+#: userland/apps/taskmgr/startup_page.cpp:252
+msgid "Startup settings refreshed"
+msgstr "启动设置已刷新"
+
+#: userland/apps/taskmgr/main.cpp:840
 msgid "State"
 msgstr "状态"
 
-#: userland/apps/taskmgr/main.cpp:751
+#: userland/apps/taskmgr/main.cpp:603
 msgid "State:"
 msgstr "状态:"
 
-#: userland/apps/taskmgr/main.cpp:181
+#: userland/apps/taskmgr/startup_page.cpp:340
+msgid "Status"
+msgstr "状态"
+
+#: userland/apps/taskmgr/main.cpp:166
 msgid "System"
 msgstr "系统"
 
-#: userland/apps/taskmgr/main.cpp:759
+#: userland/apps/taskmgr/startup_page.cpp:359
+msgid "System entries are changed through personal overrides. Changes apply at the next login."
+msgstr "系统启动项通过个人配置覆盖。更改将在下次登录时生效。"
+
+#: userland/apps/taskmgr/main.cpp:611
 msgid "Task Details"
 msgstr "任务详细信息"
 
-#: userland/apps/taskmgr/main.cpp:806
+#: userland/apps/taskmgr/main.cpp:617
 msgid "Task Manager"
 msgstr "任务管理器"
 
-#: userland/apps/taskmgr/main.cpp:723
+#: userland/apps/taskmgr/main.cpp:575
 msgid "Task ended"
 msgstr "任务已结束"
 
-#: userland/apps/taskmgr/main.cpp:630
+#: userland/apps/taskmgr/main.cpp:482
 msgid "Tasks "
 msgstr "任务 "
 
-#: userland/apps/taskmgr/main.cpp:613
+#: configs/nls/messages/taskmgr.c:25
+msgid "The account has no absolute home directory."
+msgstr "账户未设置有效的绝对主目录路径。"
+
+#: configs/nls/messages/taskmgr.c:26
+msgid "The change was applied, but directory synchronization failed."
+msgstr "更改已应用，但目录同步失败。"
+
+#: configs/nls/messages/taskmgr.c:27
+msgid "The command has an unfinished quote or escape."
+msgstr "命令的引号或转义未结束。"
+
+#: configs/nls/messages/taskmgr.c:28
+msgid "The command has an unsupported field code."
+msgstr "命令包含不支持的字段代码。"
+
+#: configs/nls/messages/taskmgr.c:29
+msgid "The selected account has no home directory."
+msgstr "所选账户没有主目录。"
+
+#: configs/nls/messages/taskmgr.c:30
+msgid "The startup entry cannot be parsed. Remove it and add a new entry."
+msgstr "无法解析启动项。请删除后重新添加。"
+
+#: configs/nls/messages/taskmgr.c:31
+msgid "This entry changed. Refresh and try again."
+msgstr "启动项已被其他操作修改。请刷新后重试。"
+
+#: configs/nls/messages/taskmgr.c:32
+msgid "Too many startup entries (maximum 2048)."
+msgstr "启动项过多（最多 2048 项）。"
+
+#: userland/apps/taskmgr/main.cpp:465
 msgid "Total memory:"
 msgstr "总内存:"
 
-#: userland/apps/taskmgr/main.cpp:373
-msgid "Unavailable"
-msgstr "不可用"
+#: configs/nls/messages/taskmgr.c:33
+msgid "TryExec must be an absolute path or a program name."
+msgstr "TryExec 必须是绝对路径或程序名称。"
 
-#: userland/apps/taskmgr/main.cpp:181
+#: userland/apps/taskmgr/main.cpp:166
 msgid "Unknown"
 msgstr "未知"
 
-#: userland/apps/taskmgr/main.cpp:625
+#: userland/apps/taskmgr/main.cpp:477
 msgid "Uptime:"
 msgstr "运行时间:"
 
-#: userland/apps/taskmgr/main.cpp:617
+#: configs/nls/messages/taskmgr.c:34
+msgid "Use Disable to override a system startup entry."
+msgstr "请使用“禁用”覆盖系统启动项。"
+
+#: configs/nls/messages/taskmgr.c:35
+msgid "Use only one file or URL field code."
+msgstr "只能使用一个文件或 URL 字段代码。"
+
+#: userland/apps/taskmgr/main.cpp:469
 msgid "Used memory:"
 msgstr "已用内存:"
 
-#: userland/apps/taskmgr/main.cpp:1066
+#: userland/apps/taskmgr/main.cpp:840
 msgid "User"
 msgstr "用户"
 
-#: userland/apps/taskmgr/main.cpp:753
+#: userland/apps/taskmgr/main.cpp:605
 msgid "User:"
 msgstr "用户:"
 
-#: userland/apps/taskmgr/main.cpp:1084
+#: userland/apps/taskmgr/main.cpp:858
 msgid "View live CPU, memory, and estimated GPU usage."
 msgstr "查看实时 CPU、内存与 GPU 估算使用情况。"
 
-#: userland/apps/taskmgr/main.cpp:757
+#: userland/apps/taskmgr/main.cpp:609
 msgid "Wake tick:"
 msgstr "唤醒 tick:"
 
-#: userland/apps/fltk_support.h:46
+#: userland/apps/taskmgr/startup_page.cpp:109
+msgid "Working folder"
+msgstr "工作文件夹"
+
+#: userland/apps/fltk_support.h:27
 msgid "Yes"
 msgstr "是"
 
-#: userland/apps/taskmgr/main.cpp:743
+#: userland/apps/taskmgr/main.cpp:595
 msgid "ticks"
 msgstr "时钟节拍"
+
+#~ msgid "The working directory must be an absolute path."
+#~ msgstr "工作文件夹必须使用绝对路径。"
+
+#~ msgid "Choose which user's startup entries to manage."
+#~ msgstr "选择要管理启动项的用户。"
+
+#~ msgid "Could not change startup app"
+#~ msgstr "无法更改启动应用"
+
+#~ msgid "Could not remove startup app"
+#~ msgstr "无法删除启动应用"
+
+#~ msgid "Enable or disable the selected startup entry."
+#~ msgstr "启用或禁用所选启动项。"
+
+#~ msgid "Manage startup entries for the selected user."
+#~ msgstr "管理所选用户的启动项。"
+
+#~ msgid "No startup app selected"
+#~ msgstr "未选择启动应用"
+
+#~ msgid "Remove Startup App"
+#~ msgstr "删除启动应用"
+
+#~ msgid "Remove the selected startup app?"
+#~ msgstr "删除选中的启动应用？"
+
+#~ msgid "Remove the selected startup entry after confirmation."
+#~ msgstr "确认后移除所选启动项。"
+
+#~ msgid "Select a startup entry before using Enable, Disable, or Remove."
+#~ msgstr "先选择启动项，再使用启用、禁用或移除。"
+
+#~ msgid "Startup app disabled"
+#~ msgstr "启动应用已禁用"
+
+#~ msgid "Startup app enabled"
+#~ msgstr "启动应用已启用"
+
+#~ msgid "Startup app removed"
+#~ msgstr "启动应用已删除"
+
+#~ msgid "Unavailable"
+#~ msgstr "不可用"
