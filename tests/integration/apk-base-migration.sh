@@ -4,7 +4,7 @@
 set -eu
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 export PATH
-for package in libbsd libbsd-doc dosfstools dosfstools-doc e2fsprogs e2fsprogs-extra e2fsprogs-libs libcom_err e2fsprogs-doc ca-certificates-bundle; do
+for package in libmd libmd-doc libbsd libbsd-doc dosfstools dosfstools-doc e2fsprogs e2fsprogs-extra e2fsprogs-libs libcom_err e2fsprogs-doc ca-certificates-bundle; do
     apk info -e "$package"
 done
 test -s /etc/ssl/certs/ca-certificates.crt
@@ -14,6 +14,15 @@ for entry in sbin/mkfs.ext4:e2fsprogs sbin/fsck.ext2:e2fsprogs sbin/mkfs.fat:dos
     apk info --who-owns "/$path" | grep -F "owned by $owner-"
 done
 apk info --who-owns /lib/libmd.so.0 | grep -F 'owned by reliefos-auth-support-libraries-'
+apk info --who-owns /usr/lib/libmd.so.0 | grep -F 'owned by libmd-'
+apk info --who-owns /usr/share/licenses/libmd/COPYING | grep -F 'owned by libmd-doc-'
+test "$(readlink /lib/libmd.so.0)" = ../usr/lib/libmd.so.0
+for library in libmd.so libmd.so.0.3.0; do
+    test "$(readlink "/lib/$library")" = libmd.so.0
+done
+test ! -e /lib/libmd.a
+test ! -e /usr/lib/libmd.a
+test ! -e /usr/include/md5.h
 apk info --who-owns /usr/lib/libblkid.so.1 | grep -F 'owned by libblkid-'
 apk info --who-owns /usr/lib/libuuid.so.1 | grep -F 'owned by libuuid-'
 test ! -e /lib/libbsd.so.0

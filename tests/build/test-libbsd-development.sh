@@ -33,12 +33,15 @@ case $4 in
     alpine-libbsd) name=libbsd;;
     runtime-dev-libbsd-dev) name=libbsd-dev;;
     runtime-dev-libbsd-static) name=libbsd-static;;
+    alpine-libmd) name=libmd;;
+    runtime-dev-libmd-dev) name=libmd-dev;;
     *) exit 2;;
 esac
+case $name in libmd*) version=1.3.0-r0; channel=edge;; *) version=0.12.2-r0; channel=v3.24;; esac
 case $6 in
     url)
         if [ "${BAD_URL:-0}" = 1 ]; then printf 'https://fixture.invalid/../bad.apk\n'; exit; fi
-        printf 'https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/%s-0.12.2-r0.apk\n' "$name";;
+        printf 'https://dl-cdn.alpinelinux.org/alpine/%s/main/x86_64/%s-%s.apk\n' "$channel" "$name" "$version";;
     sha256)
         if [ "${BAD_DIGEST:-0}" = 1 ]; then printf 'bad-digest\n'; exit; fi
         cat "$FIXTURE_WORK/digests/$name";;
@@ -78,15 +81,15 @@ exec "$FIXTURE_FIND" "$@"
 DATA
 chmod +x "$work/bin/"*
 
-# The static BSD fixture deliberately needs libmd from a separate local stage.
+# The BSD fixture needs libmd from a separately verified official APK.
 cc=${CC:-cc}
 printf 'int fixture_md(void) { return 17; }\n' >"$work/md.c"
 printf 'extern int fixture_md(void); int fixture_bsd(void) { return fixture_md(); }\n' >"$work/bsd.c"
 "$cc" -fPIC -c "$work/md.c" -o "$work/md.o"
 "$cc" -fPIC -c "$work/bsd.c" -o "$work/bsd.o"
 ar rcs "$work/md/lib/libmd.a" "$work/md.o"
-"$cc" -shared -Wl,-soname,libmd.so.0 "$work/md.o" -o "$work/md/lib/libmd.so.0.0.0"
-ln -s libmd.so.0.0.0 "$work/md/lib/libmd.so.0"
+"$cc" -shared -Wl,-soname,libmd.so.0 "$work/md.o" -o "$work/md/lib/libmd.so.0.3.0"
+ln -s libmd.so.0.3.0 "$work/md/lib/libmd.so.0"
 ln -s libmd.so.0 "$work/md/lib/libmd.so"
 "$cc" -shared -Wl,-soname,libbsd.so.0 "$work/bsd.o" -L"$work/md/lib" -lmd -o "$work/libbsd.so.0.12.2"
 ar rcs "$work/libbsd.a" "$work/bsd.o"
@@ -144,12 +147,35 @@ for name in ('libbsd', 'libbsd-dev', 'libbsd-static'):
     with tarfile.open(work / 'good' / f'{name}-0.12.2-r0.apk', 'w:gz', format=tarfile.USTAR_FORMAT) as archive:
         for info, data in members:
             archive.addfile(info, io.BytesIO(data) if info.isreg() else None)
+# The adapter must obtain MD bytes from their own signed package inputs,
+# ignoring the similarly named unrelated archive in the BSD development APK.
+for name in ('libmd', 'libmd-dev'):
+    members = [regular('.PKGINFO', f'pkgname = {name}\npkgver = 1.3.0-r0\narch = x86_64\n'.encode())]
+    if name == 'libmd':
+        members.append(regular('usr/lib/libmd.so.0.3.0', (work / 'md/lib/libmd.so.0.3.0').read_bytes()))
+        link = tarfile.TarInfo('usr/lib/libmd.so.0')
+        link.type, link.linkname = tarfile.SYMTYPE, 'libmd.so.0.3.0'
+        members.append((link, b''))
+    else:
+        for header in ('md5.h', 'sha1.h', 'sha256.h', 'sha512.h'):
+            members.append(regular('usr/include/' + header, b'int fixture_md(void);\n'))
+        members.append(regular('usr/lib/libmd.a', (work / 'md/lib/libmd.a').read_bytes()))
+        md_pc = pc.replace(b'libbsd', b'libmd').replace(b'0.12.2', b'1.3.0').replace(b'Libs.private: -pthread -lmd\n', b'')
+        members.append(regular('usr/lib/pkgconfig/libmd.pc', md_pc))
+        link = tarfile.TarInfo('usr/lib/libmd.so')
+        link.type, link.linkname = tarfile.SYMTYPE, 'libmd.so.0.3.0'
+        members.append((link, b''))
+        members.append(regular('usr/include/linux/foreign.h', b'not an MD header\n'))
+    with tarfile.open(work / 'good' / f'{name}-1.3.0-r0.apk', 'w:gz', format=tarfile.USTAR_FORMAT) as archive:
+        for info, data in members:
+            archive.addfile(info, io.BytesIO(data) if info.isreg() else None)
 PY
 python3 "$work/packages.py" "$work"
 
 reseal() {
-    for name in libbsd libbsd-dev libbsd-static; do
-        sum=$(sha256sum "$cache/$name-0.12.2-r0.apk")
+    for name in libbsd libbsd-dev libbsd-static libmd libmd-dev; do
+        case $name in libmd*) version=1.3.0-r0;; *) version=0.12.2-r0;; esac
+        sum=$(sha256sum "$cache/$name-$version.apk")
         printf '%s\n' "${sum%% *}" >"$work/digests/$name"
     done
 }
@@ -180,15 +206,21 @@ expect_failure() {
 
 reset_cache
 invoke
-[ "$(wc -l <"$work/verifications" | tr -d ' ')" = 3 ] || fail 'did not verify every package'
+[ "$(wc -l <"$work/verifications" | tr -d ' ')" = 5 ] || fail 'did not verify every package'
 cmp "$src/resources/licenses/libbsd-LICENSE" "$output/usr/share/licenses/libbsd/LICENSE"
 for library in libbsd.so libbsd.so.0 libbsd.so.0.12.2 libbsd.a; do
     [ "$(readlink "$output/lib/$library")" = "../usr/lib/$library" ] || fail "bad compatibility link: $library"
     test -s "$output/lib/$library"
 done
 [ "$(readlink "$output/usr/lib/libbsd.so.0")" = libbsd.so.0.12.2 ] || fail 'bad SONAME link'
+for library in libmd.so libmd.so.0 libmd.so.0.3.0 libmd.a; do
+    [ "$(readlink "$output/lib/$library")" = "../usr/lib/$library" ] || fail "bad MD link: $library"
+    test -s "$output/lib/$library"
+done
+cmp "$work/md/lib/libmd.a" "$output/usr/lib/libmd.a"
+test -s "$output/usr/include/sha1.h"
 [ ! -e "$output/lib/libbsd-ctor.a" ] || fail 'invented a ctor archive'
-for path in usr/include/stdlib.h usr/include/sys/cdefs.h usr/include/linux/types.h usr/lib/libc.so usr/lib/libmd.a usr/lib/libbsd.la; do
+for path in usr/include/stdlib.h usr/include/sys/cdefs.h usr/include/linux/types.h usr/include/linux/foreign.h usr/lib/libc.so usr/lib/libbsd.la; do
     [ ! -e "$output/$path" ] || fail "selected unrelated input: $path"
 done
 (cd "$output" && "$real_find" . ! -type d -print | sed 's@^./@@' | sort) >"$work/expected.files"
@@ -197,12 +229,11 @@ grep -Fxq 'usr/include/bsd/nested/extra.h' "$output.files"
 grep -Fxq '.complete' "$output.files"
 if grep -F '/usr/lib/libbsd.so.0.12.2' "$output/usr/lib/libbsd.so"; then fail 'absolute linker-script path'; fi
 
-# Copy into shadow-style deps, merge the local libmd stage and move the tree.
+# Relocate the combined shadow development root without any local MD stage.
 combined=$work/deps\ before\ moving
 relocated=$work/relocated
 mkdir -p "$combined"
 cp -a "$output/." "$combined/"
-cp -a "$work/md/." "$combined/"
 mv "$combined" "$relocated"
 cat >"$work/consumer.c" <<'DATA'
 #include <bsd/stdlib.h>
@@ -216,9 +247,9 @@ LD_LIBRARY_PATH="$relocated/lib:$relocated/usr/lib" "$work/dynamic"
 "$work/static"
 if "$cc" -I"$relocated/usr/include" "$work/consumer.c" -L"$relocated/lib" -L"$relocated/usr/lib" \
     -Wl,-Bstatic -lbsd -Wl,-Bdynamic -o "$work/no-md" >"$work/no-md.log" 2>&1; then
-    fail 'static fixture did not require local libmd.a'
+    fail 'static fixture did not require official libmd.a'
 fi
-for package in libbsd libbsd-overlay; do
+for package in libbsd libbsd-overlay libmd; do
     pc_flags=$(PKG_CONFIG_PATH='' PKG_CONFIG_LIBDIR="$relocated/usr/lib/pkgconfig" \
         PKG_CONFIG_SYSROOT_DIR="$relocated" pkg-config --cflags --libs --static "$package")
     case $pc_flags in *"$relocated/usr/"*) ;; *) fail 'pkg-config lost relocated prefix';; esac
@@ -232,7 +263,7 @@ printf 'corruption\n' >>"$cache/libbsd-0.12.2-r0.apk"
 expect_failure 'checksum mismatch'
 [ ! -s "$work/verifications" ] || fail 'verification ran before checksum validation'
 reset_cache
-FAIL_VERIFY_AFTER=3 expect_failure 'invalid signature in final package'
+FAIL_VERIFY_AFTER=5 expect_failure 'invalid signature in final package'
 reset_cache
 rm "$cache/libbsd-static-0.12.2-r0.apk"
 expect_failure 'missing offline cache'
@@ -351,4 +382,4 @@ cmp "$work/before.files" "$output.files"
 # Also exercise invocation entirely through relative arguments.
 (cd "$work" && PATH="$work/bin:$PATH" sh "$adapter" source bin/deps lock cache bin/apk relative-root)
 test -s "$work/relative-root/lib/libbsd.so.0"
-printf 'libbsd development: relocation, local-libmd linking, inventory recovery and failure safety passed\n'
+printf 'BSD development: official libmd linking, relocation, inventory recovery and failure safety passed\n'

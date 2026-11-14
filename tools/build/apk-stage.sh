@@ -409,10 +409,10 @@ while IFS= read -r group; do
         reliefos-apk-tools) dependencies="$dependencies reliefos-busybox" ;;
         reliefos-busybox) dependencies="$dependencies reliefos-coreutils" ;;
         reliefos-coreutils) dependencies="$dependencies !coreutils !coreutils-single" ;;
-        # These local groups retain libmd/exFAT and compatibility aliases.
+        # These local groups retain exFAT and compatibility aliases.
         # Their real dependencies pull the migrated tools into older systems
         # in the same signed transaction that upgrades the former file owner.
-        reliefos-auth-support-libraries) dependencies="$dependencies libbsd libbsd-doc" ;;
+        reliefos-auth-support-libraries) dependencies="$dependencies libbsd libbsd-doc libmd libmd-doc" ;;
         reliefos-authentication) dependencies="$dependencies util-linux-login" ;;
         reliefos-storage-util-linux) dependencies="$dependencies util-linux util-linux-misc util-linux-login runuser blkid lsblk sfdisk mount umount libblkid libfdisk libmount libsmartcols libuuid util-linux-doc util-linux-login-doc" ;;
         reliefos-storage-filesystems) dependencies="$dependencies e2fsprogs e2fsprogs-extra e2fsprogs-libs libcom_err e2fsprogs-doc dosfstools dosfstools-doc" ;;

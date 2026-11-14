@@ -78,6 +78,8 @@ class UpdatePreflight(unittest.TestCase):
     def package(cls, name, version, repository, dependencies=(), payload=None, symlinks=None,
                 replaces=(), modes=None):
         files = cls.work / (name + "-" + version)
+        if files.exists():
+            shutil.rmtree(files)
         (files / "usr/share" / name).mkdir(parents=True, exist_ok=True)
         (files / "usr/share" / name / "version").write_text(version + "\n")
         for relative, text in (payload or {}).items():
@@ -303,6 +305,51 @@ class UpdatePreflight(unittest.TestCase):
         self.assertEqual((target / "bin/su").read_text(), "upgraded official su\n")
         self.assertEqual((target / "bin/su").stat().st_mode & 0o7777, 0o4755)
         self.assertEqual((target / "etc/pam.d/su-l").read_text(), "administrator policy\n")
+
+    def test_libmd_transfer_removes_old_development_files_and_keeps_legacy_links(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        self.package("reliefos-auth-support-libraries", "6.0-r0", old, payload={
+            "lib/libmd.so.0.3.0": "old local library\n", "lib/libmd.a": "old archive\n",
+            "usr/share/licenses/libmd/COPYING": "old license\n"},
+            symlinks={"lib/libmd.so": "libmd.so.0.3.0", "lib/libmd.so.0": "libmd.so.0.3.0"})
+        self.package("reliefos-base", "6.0-r0", old, payload={
+            "usr/include/md5.h": "old header\n", "lib/pkgconfig/libmd.pc": "old build flags\n"})
+        self.package("libmd", "1.3.0-r0", new,
+                     payload={"usr/lib/libmd.so.0.3.0": "official library\n"},
+                     symlinks={"usr/lib/libmd.so.0": "libmd.so.0.3.0"})
+        self.package("libmd-doc", "1.3.0-r0", new,
+                     payload={"usr/share/licenses/libmd/COPYING": "official license\n"})
+        self.package("reliefos-auth-support-libraries", "7.0-r0", new, ["libmd", "libmd-doc"],
+                     symlinks={"lib/libmd.so.0": "../usr/lib/libmd.so.0",
+                               "lib/libmd.so": "libmd.so.0", "lib/libmd.so.0.3.0": "libmd.so.0"})
+        self.package("reliefos-base", "7.0-r0", new)
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories, "--no-network",
+                 "--no-scripts", "add", "reliefos-base", "reliefos-auth-support-libraries")
+        protected = {name: (target / name).read_bytes() for name in (
+            "etc/apk/world", "etc/reliefos/local.conf", "home/test/document.txt")}
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            for name, content in protected.items():
+                self.assertEqual((target / name).read_bytes(), content, name)
+            for path in ("lib/libmd.a", "usr/include/md5.h", "lib/pkgconfig/libmd.pc"):
+                self.assertFalse((target / path).exists(), path)
+            self.assertEqual(os.readlink(target / "lib/libmd.so.0"), "../usr/lib/libmd.so.0")
+            for name in ("libmd.so", "libmd.so.0.3.0"):
+                self.assertEqual(os.readlink(target / "lib" / name), "libmd.so.0")
+                self.assertEqual((target / "lib" / name).read_text(), "official library\n")
+            for path, package in (("usr/lib/libmd.so.0", "libmd"),
+                                  ("usr/share/licenses/libmd/COPYING", "libmd-doc"),
+                                  ("lib/libmd.so.0", "reliefos-auth-support-libraries")):
+                owner = self.apk("--root", target, "info", "--who-owns", "/" + path).stdout
+                self.assertIn("owned by " + package + "-", owner)
 
     def test_old_console_ca_placeholder_is_replaced_by_real_bundle(self):
         old, new = self.runner / "oldrepo", self.runner / "newrepo"

@@ -212,10 +212,9 @@
     "auth-support-libraries": {
       "destination": "alpine-after-validation",
       "components": [],
-      "library_stems": ["lib/libmd"],
-      "paths": ["usr/share/licenses/libmd"],
-      "alpine_candidates": ["libmd"],
-      "reason": "Local libmd 1.3.0 supplies the real libmd.so.0 ABI. Official libbsd owns its runtime; its development files are isolated for building shadow."
+      "paths": ["lib/libmd.so", "lib/libmd.so.0", "lib/libmd.so.0.3.0"],
+      "alpine_candidates": [],
+      "reason": "Legacy /lib libmd entry points forward to the official runtime SONAME. Original libmd/libbsd runtime and documentation APKs retain ownership; their development inputs are isolated for building shadow."
     },
     "storage-util-linux": {
       "destination": "alpine-after-validation",

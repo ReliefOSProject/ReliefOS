@@ -1,5 +1,5 @@
 #!/bin/sh
-# Offline, build-only libbsd root. Never overlay this root on the guest/sysroot.
+# Offline libbsd/libmd inputs for shadow. Never overlay on the guest/sysroot.
 set -eu
 LC_ALL=C
 export LC_ALL
@@ -61,15 +61,22 @@ trap cleanup 0
 trap 'exit 130' HUP INT TERM
 mkdir -p "$stage/usr/share/reliefos/sdk/apk"
 
-for id in alpine-libbsd runtime-dev-libbsd-dev runtime-dev-libbsd-static; do
+for id in alpine-libbsd runtime-dev-libbsd-dev runtime-dev-libbsd-static \
+    alpine-libmd runtime-dev-libmd-dev; do
     case $id in
         alpine-libbsd) package=libbsd;;
         runtime-dev-libbsd-dev) package=libbsd-dev;;
         runtime-dev-libbsd-static) package=libbsd-static;;
+        alpine-libmd) package=libmd;;
+        runtime-dev-libmd-dev) package=libmd-dev;;
+    esac
+    case $package in
+        libmd*) channel=edge; version=1.3.0-r0;;
+        *) channel=v3.24; version=0.12.2-r0;;
     esac
     url=$("$deps" --lock "$lock" --id "$id" --print url)
     digest=$("$deps" --lock "$lock" --id "$id" --print sha256)
-    [ "$url" = "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/$package-0.12.2-r0.apk" ] || die "unexpected locked URL for $id"
+    [ "$url" = "https://dl-cdn.alpinelinux.org/alpine/$channel/main/x86_64/$package-$version.apk" ] || die "unexpected locked URL for $id"
     [ "${#digest}" = 64 ] || die "invalid locked digest for $id"
     case $digest in *[!0-9a-f]*) die "invalid locked digest for $id";; esac
     archive=$cache/${url##*/}
@@ -114,13 +121,26 @@ for id in alpine-libbsd runtime-dev-libbsd-dev runtime-dev-libbsd-static; do
             alpine-libbsd:usr/lib/libbsd.so.0|alpine-libbsd:usr/lib/libbsd.so.0.12.2|\
             runtime-dev-libbsd-dev:usr/include/bsd/*|runtime-dev-libbsd-dev:usr/lib/libbsd.so|\
             runtime-dev-libbsd-dev:usr/lib/pkgconfig/libbsd.pc|runtime-dev-libbsd-dev:usr/lib/pkgconfig/libbsd-overlay.pc|\
-            runtime-dev-libbsd-static:usr/lib/libbsd.a) selected=yes; destination=$member;;
+            runtime-dev-libbsd-static:usr/lib/libbsd.a|\
+            alpine-libmd:usr/lib/libmd.so.0|alpine-libmd:usr/lib/libmd.so.0.3.0|\
+            runtime-dev-libmd-dev:usr/include/md[245].h|runtime-dev-libmd-dev:usr/include/ripemd.h|\
+            runtime-dev-libmd-dev:usr/include/rmd160.h|runtime-dev-libmd-dev:usr/include/sha.h|\
+            runtime-dev-libmd-dev:usr/include/sha1.h|runtime-dev-libmd-dev:usr/include/sha2.h|\
+            runtime-dev-libmd-dev:usr/include/sha256.h|runtime-dev-libmd-dev:usr/include/sha3.h|\
+            runtime-dev-libmd-dev:usr/include/sha512.h|runtime-dev-libmd-dev:usr/lib/libmd.a|\
+            runtime-dev-libmd-dev:usr/lib/libmd.so|runtime-dev-libmd-dev:usr/lib/pkgconfig/libmd.pc)
+                selected=yes; destination=$member;;
         esac
         [ "$selected" = yes ] || continue
         [ ! -e "$stage/$destination" ] && [ ! -L "$stage/$destination" ] || die "duplicate product: $destination"
         mkdir -p "$stage/$(dirname "$destination")"
         if [ "$type" = l ]; then
-            [ "$id:$member:$target" = 'alpine-libbsd:usr/lib/libbsd.so.0:libbsd.so.0.12.2' ] || die "unexpected product symlink: $member"
+            case $id:$member:$target in
+                alpine-libbsd:usr/lib/libbsd.so.0:libbsd.so.0.12.2|\
+                alpine-libmd:usr/lib/libmd.so.0:libmd.so.0.3.0|\
+                runtime-dev-libmd-dev:usr/lib/libmd.so:libmd.so.0.3.0) ;;
+                *) die "unexpected product symlink: $member";;
+            esac
             ln -s "$target" "$stage/$destination"
         else
             # Stdout extraction cannot follow archive links or apply owners,
@@ -129,10 +149,10 @@ for id in alpine-libbsd runtime-dev-libbsd-dev runtime-dev-libbsd-static; do
                 -xOzf "$archive" -- "$member" >"$stage/$destination"
         fi
     done <"$transaction/members"
-    awk -v package="$package" '
+    awk -v package="$package" -v expected_version="$version" '
         $0=="pkgname = "package {name++}
         /^pkgname = / {names++}
-        $0=="pkgver = 0.12.2-r0" {version++}
+        $0=="pkgver = "expected_version {version++}
         /^pkgver = / {versions++}
         $0=="arch = x86_64" {arch++}
         /^arch = / {arches++}
@@ -142,7 +162,9 @@ done
 
 for product in usr/include/bsd/stdlib.h usr/include/bsd/string.h usr/include/bsd/unistd.h \
     usr/include/bsd/sys/queue.h usr/lib/libbsd.so.0 usr/lib/libbsd.so.0.12.2 \
-    usr/lib/libbsd.so usr/lib/libbsd.a usr/lib/pkgconfig/libbsd.pc usr/lib/pkgconfig/libbsd-overlay.pc; do
+    usr/lib/libbsd.so usr/lib/libbsd.a usr/lib/pkgconfig/libbsd.pc usr/lib/pkgconfig/libbsd-overlay.pc \
+    usr/include/md5.h usr/include/sha256.h usr/include/sha512.h usr/lib/libmd.so.0 \
+    usr/lib/libmd.so.0.3.0 usr/lib/libmd.so usr/lib/libmd.a usr/lib/pkgconfig/libmd.pc; do
     [ -s "$stage/$product" ] || die "missing product: $product"
 done
 [ -L "$stage/usr/lib/libbsd.so.0" ] || die 'missing runtime SONAME symlink'
@@ -157,7 +179,7 @@ GROUP(/usr/lib/libbsd.so.0.12.2 AS_NEEDED(-lmd))
 DATA
 cmp -s "$transaction/linker-script" "$stage/usr/lib/libbsd.so" || die 'unexpected libbsd linker script'
 sed 's@GROUP(/usr/lib/@GROUP(@' "$transaction/linker-script" >"$stage/usr/lib/libbsd.so"
-for pc in libbsd libbsd-overlay; do
+for pc in libbsd libbsd-overlay libmd; do
     [ "$(sed -n '/^prefix=/p' "$stage/usr/lib/pkgconfig/$pc.pc")" = 'prefix=/usr' ] || die "unexpected $pc.pc prefix"
     # Keep pcfiledir literal: pkg-config expands it at the relocated destination.
     # shellcheck disable=SC2016
@@ -166,14 +188,15 @@ for pc in libbsd libbsd-overlay; do
 done
 
 # Consumers search both deps/lib and deps/usr/lib. All aliases stay within this
-# build root, including after it is copied beside the local libmd 1.3.0 stage.
+# build root, including after relocation with the official libmd inputs.
 # Alpine does not ship libbsd-ctor.a; do not invent an empty archive for it.
 mkdir -p "$stage/lib" "$stage/usr/share/licenses/libbsd"
-for library in libbsd.so libbsd.so.0 libbsd.so.0.12.2 libbsd.a; do
+for library in libbsd.so libbsd.so.0 libbsd.so.0.12.2 libbsd.a \
+    libmd.so libmd.so.0 libmd.so.0.3.0 libmd.a; do
     ln -s "../usr/lib/$library" "$stage/lib/$library"
 done
 cp "$src/resources/licenses/libbsd-LICENSE" "$stage/usr/share/licenses/libbsd/LICENSE"
-printf '%s\n' 'libbsd 0.12.2-r0 build-only' >"$stage/.complete"
+printf '%s\n' 'official libbsd 0.12.2-r0 / libmd 1.3.0-r0 build-only' >"$stage/.complete"
 (cd "$stage" && find . ! -type d -print) >"$transaction/paths"
 sed 's@^./@@' "$transaction/paths" >"$transaction/relative-paths"
 sort "$transaction/relative-paths" >"$transaction/root.files"

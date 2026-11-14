@@ -42,7 +42,6 @@ LIBS= PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR="$auth/lib/pkgconfig:$auth/usr/lib/pkgc
 export CC AR RANLIB STRIP BUILD_CC CFLAGS CPPFLAGS LDFLAGS LIBS PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PKG_CONFIG_SYSROOT_DIR
 set -- --host="$target" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib
 case $pkg in
-libmd) set -- "$@" --libdir=/lib ;;
 sudo) set -- "$@" --with-pam --with-pam-login --with-secure-path=/usr/sbin:/usr/bin:/sbin:/bin --with-rundir=/run/sudo --with-vardir=/var/lib/sudo --libexecdir=/usr/lib ;;
 shadow) set -- "$@" --bindir=/bin --sbindir=/sbin --with-libpam --with-yescrypt --without-su --disable-logind ;;
 exfatprogs)
@@ -91,7 +90,6 @@ if [ "$pkg" = alsa-lib ]; then
     rm "$tmp/usr/lib/libasound.la" "$tmp/usr/lib/libatopology.la"
 fi
 case $pkg in
-libmd) rm "$tmp/lib/libmd.la" ;;
 coreutils)
     sh "$source/build-aux/gen-lists-of-programs.sh" --list-progs > "$work/upstream-programs"
     sh "$src/tools/build/coreutils-check.sh" "$tmp" \

@@ -8,7 +8,7 @@ out=$(CDPATH= cd -- "$out" && pwd)
 work=$(mktemp -d "$out/meta/upstream-incremental.XXXXXX")
 trap 'rm -rf "$work"' EXIT
 snapshot() {
- for pkg in libmd libbsd util-linux sudo shadow exfatprogs; do
+ for pkg in libbsd util-linux sudo shadow exfatprogs; do
   find "$out/upstream/$pkg/root" -type f -printf '%p %T@ %s\n'
  done
  find "$out/upstream/apk" "$out/upstream/runtime-development" -type f -printf '%p %T@ %s\n'
@@ -37,5 +37,11 @@ test -s "$secondary"
 expected=$(sha256sum "$secondary")
 rm "$secondary"
 make -C "$src" O="$make_out" util-linux-development -j8 > "$work/restore-util-linux.log" 2>&1 || { cat "$work/restore-util-linux.log" >&2; exit 1; }
+test "$(sha256sum "$secondary")" = "$expected"
+secondary=$out/upstream/libbsd/root/usr/include/sha1.h
+test -s "$secondary"
+expected=$(sha256sum "$secondary")
+rm "$secondary"
+make -C "$src" O="$make_out" upstream-libmd -j8 > "$work/restore-libmd.log" 2>&1 || { cat "$work/restore-libmd.log" >&2; exit 1; }
 test "$(sha256sum "$secondary")" = "$expected"
 printf '%s\n' 'upstream no-op mtimes and secondary-output restoration: PASS'

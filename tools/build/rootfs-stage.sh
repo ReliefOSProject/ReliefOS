@@ -19,7 +19,7 @@ link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
 # Every enabled upstream root is passed by the build graph. The default keeps
 # standalone callers compatible with the complete product package set.
-rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd sudo shadow exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg'}
+rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'sudo shadow exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg'}
 for package in $rootfs_upstream_packages; do
     if [ "$package" = ffmpeg ]; then
         if enabled reliefplayer; then
@@ -35,7 +35,7 @@ for package in $rootfs_upstream_packages; do
         continue
     fi
     case $package in
-        libbsd|e2fsprogs|dosfstools|util-linux)
+        libmd|libbsd|e2fsprogs|dosfstools|util-linux)
             echo "rootfs-stage: $package is supplied by official APKs; remove its local overlay" >&2
             exit 1
             ;;
@@ -257,6 +257,11 @@ for library in zlib libpng mbedtls3; do
     file "$src/resources/licenses/$library-LICENSE" "usr/share/licenses/reliefos-runtime-dependencies/$library-LICENSE"
 done
 file "$src/resources/licenses/libbsd-LICENSE" usr/share/licenses/libbsd/COPYING
+# Official libmd lives in /usr/lib. Keep the former runtime entry points
+# forwarding to its stable SONAME, including the historical full basename.
+link lib/libmd.so.0 ../usr/lib/libmd.so.0 authentication-support
+link lib/libmd.so libmd.so.0 authentication-support
+link lib/libmd.so.0.3.0 libmd.so.0 authentication-support
 file "$src/resources/licenses/e2fsprogs-NOTICE" usr/share/licenses/e2fsprogs/NOTICE
 file "$src/resources/licenses/util-linux-README.licensing" usr/share/licenses/util-linux/README.licensing
 file "$src/resources/licenses/libeconf-LICENSE" usr/share/licenses/libeconf/LICENSE

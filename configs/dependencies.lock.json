@@ -2665,7 +2665,7 @@
       "script": "tools/build/upstream-apk.sh",
       "target": "apk-root",
       "feature": "base",
-      "note": "Official Alpine v3.24 main x86_64 package; aports recipe commit 02365e78d654a7beb23fd35d7d69f4a649009ede; .PKGINFO license = BSD-3-Clause; archive SHA-256 computed from downloaded bytes; embedded APK signature verified by apk-tools with the official Alpine keys; libmd.so.0 remains provided by local libmd 1.3.0",
+      "note": "Official Alpine v3.24 main x86_64 package; aports recipe commit 02365e78d654a7beb23fd35d7d69f4a649009ede; .PKGINFO license = BSD-3-Clause; archive SHA-256 computed from downloaded bytes; embedded APK signature verified by apk-tools with the official Alpine keys; libmd.so.0 is provided by the official libmd 1.3.0-r0 APK",
       "license_in_source": ".PKGINFO"
     },
     {
@@ -2682,16 +2682,30 @@
       "license_in_source": ".PKGINFO"
     },
     {
-      "id": "libmd",
-      "kind": "tarball",
-      "version": "1.3.0",
-      "url": "https://libbsd.freedesktop.org/releases/libmd-1.3.0.tar.xz",
-      "sha256": "fc0f1eb6b6766470326f2c014693809190e67dba84274a6fbae9d4912d066706",
-      "directory": "libmd-1.3.0",
-      "license_in_source": "COPYING",
-      "checksum_source": "https://archive.hadrons.org/software/libmd/libmd-1.3.0.announce",
-      "script": "tools/build/upstream.sh",
-      "target": "auth-upstream"
+      "id": "alpine-libmd-doc",
+      "kind": "apk",
+      "version": "1.3.0-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/edge/main/x86_64/libmd-doc-1.3.0-r0.apk",
+      "sha256": "f9f81d1cb8719bed024edc972e4af1d5bcdff8877891f53c49f35e6c3d5db3dd",
+      "directory": "libmd-doc-1.3.0-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "base",
+      "note": "Official Alpine edge main x86_64 APK; recipe commit b9f624c71024df38a4cd84bc84b51fc3498f15a7; .PKGINFO license = BSD-3-Clause AND BSD-2-Clause AND ISC AND Beerware AND Public Domain; SHA-256 and embedded official signature verified",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "alpine-libmd",
+      "kind": "apk",
+      "version": "1.3.0-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/edge/main/x86_64/libmd-1.3.0-r0.apk",
+      "sha256": "0d49d6bb91fafb818fccd9df25927ed51a308c944df2ffdbb505b364c9042df8",
+      "directory": "libmd-1.3.0-r0",
+      "script": "tools/build/upstream-apk.sh",
+      "target": "apk-root",
+      "feature": "base",
+      "note": "Official Alpine edge main x86_64 APK; recipe commit b9f624c71024df38a4cd84bc84b51fc3498f15a7; .PKGINFO license = BSD-3-Clause AND BSD-2-Clause AND ISC AND Beerware AND Public Domain; SHA-256 and embedded official signature verified",
+      "license_in_source": ".PKGINFO"
     },
     {
       "id": "libxcrypt",
@@ -3324,7 +3338,7 @@
       "script": "tools/build/libbsd-development.sh",
       "target": "libbsd-development",
       "feature": "base",
-      "note": "Official Alpine v3.24 main x86_64 package; aports recipe commit 02365e78d654a7beb23fd35d7d69f4a649009ede; .PKGINFO license = BSD-3-Clause; archive SHA-256 computed from downloaded bytes; embedded APK signature verified by apk-tools with the official Alpine keys; build-only headers, linker script and pkg-config files; never a rootfs overlay; use local libmd 1.3.0 development files",
+      "note": "Official Alpine v3.24 main x86_64 package; aports recipe commit 02365e78d654a7beb23fd35d7d69f4a649009ede; .PKGINFO license = BSD-3-Clause; archive SHA-256 computed from downloaded bytes; embedded APK signature verified by apk-tools with the official Alpine keys; build-only headers, linker script and pkg-config files; never a rootfs overlay; use the official libmd-dev 1.3.0-r0 APK for MD development inputs",
       "license_in_source": ".PKGINFO"
     },
     {
@@ -3338,6 +3352,19 @@
       "target": "libbsd-development",
       "feature": "base",
       "note": "Official Alpine v3.24 main x86_64 package; aports recipe commit 02365e78d654a7beb23fd35d7d69f4a649009ede; .PKGINFO license = BSD-3-Clause; archive SHA-256 computed from downloaded bytes; embedded APK signature verified by apk-tools with the official Alpine keys; build-only libbsd.a; never a rootfs overlay",
+      "license_in_source": ".PKGINFO"
+    },
+    {
+      "id": "runtime-dev-libmd-dev",
+      "kind": "apk",
+      "version": "1.3.0-r0",
+      "url": "https://dl-cdn.alpinelinux.org/alpine/edge/main/x86_64/libmd-dev-1.3.0-r0.apk",
+      "sha256": "3e8e607e41d45bc385aaa4dfaf28fe888c9316e2f6b188866cfd8037b8a13dd0",
+      "directory": "libmd-dev-1.3.0-r0",
+      "script": "tools/build/libbsd-development.sh",
+      "target": "libbsd-development",
+      "feature": "base",
+      "note": "Official Alpine edge main x86_64 APK; recipe commit b9f624c71024df38a4cd84bc84b51fc3498f15a7; .PKGINFO license = BSD-3-Clause AND BSD-2-Clause AND ISC AND Beerware AND Public Domain; SHA-256 and embedded official signature verified; build-only shadow dependency, never a runtime overlay",
       "license_in_source": ".PKGINFO"
     },
     {

@@ -7,18 +7,19 @@ $(UPSTREAM_APK) $(UPSTREAM_APK_ROOT)/.complete &: $(RELIEFOS_SRC)/tools/build/up
 .PHONY: upstream-apk
 upstream-apk: $(UPSTREAM_APK) $(UPSTREAM_APK_ROOT)/.complete
 
-# Shadow consumes official libbsd headers and libraries in an isolated build
+# Shadow consumes official libbsd/libmd headers and libraries in an isolated build
 # root. Do not add this root to the guest overlay or the public musl sysroot.
 LIBBSD_DEVELOPMENT_ROOT := $(UPSTREAM_ROOT)/libbsd/root
 upstream_libbsd_products := $(addprefix $(LIBBSD_DEVELOPMENT_ROOT)/,usr/include/bsd/stdlib.h usr/include/bsd/sys/queue.h usr/lib/libbsd.so usr/lib/libbsd.so.0 usr/lib/libbsd.so.0.12.2 usr/lib/libbsd.a usr/lib/pkgconfig/libbsd.pc usr/lib/pkgconfig/libbsd-overlay.pc lib/libbsd.so lib/libbsd.so.0 lib/libbsd.a)
+upstream_libbsd_products += $(addprefix $(LIBBSD_DEVELOPMENT_ROOT)/,usr/include/md5.h usr/include/sha256.h usr/include/sha512.h usr/lib/libmd.so usr/lib/libmd.so.0 usr/lib/libmd.so.0.3.0 usr/lib/libmd.a usr/lib/pkgconfig/libmd.pc lib/libmd.so lib/libmd.so.0 lib/libmd.a)
 $(LIBBSD_DEVELOPMENT_ROOT)/.complete $(upstream_libbsd_products) &: $(RELIEFOS_SRC)/tools/build/libbsd-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK) $(RELIEFOS_SRC)/resources/licenses/libbsd-LICENSE
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/libbsd-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(LIBBSD_DEVELOPMENT_ROOT))
 	$(Q)touch $(upstream_libbsd_products)
 $(O_META)/libbsd-development-present.parameters: FORCE $(RELIEFOS_SRC)/tools/build/upstream-verify.sh
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/upstream-verify.sh $(LIBBSD_DEVELOPMENT_ROOT) $(LIBBSD_DEVELOPMENT_ROOT).files $@
 $(LIBBSD_DEVELOPMENT_ROOT)/.complete $(upstream_libbsd_products): $(O_META)/libbsd-development-present.parameters
-.PHONY: upstream-libbsd libbsd-development
-upstream-libbsd libbsd-development: $(LIBBSD_DEVELOPMENT_ROOT)/.complete $(upstream_libbsd_products)
+.PHONY: upstream-libbsd upstream-libmd libbsd-development libmd-development
+upstream-libbsd upstream-libmd libbsd-development libmd-development: $(LIBBSD_DEVELOPMENT_ROOT)/.complete $(upstream_libbsd_products)
 
 UTIL_LINUX_DEVELOPMENT_ROOT := $(UPSTREAM_ROOT)/util-linux/root
 upstream_util-linux_products := $(addprefix $(UTIL_LINUX_DEVELOPMENT_ROOT)/,usr/include/blkid/blkid.h usr/include/uuid/uuid.h usr/include/libeconf.h usr/lib/libblkid.a usr/lib/libuuid.a usr/lib/libeconf.a usr/lib/libblkid.so usr/lib/libuuid.so usr/lib/libeconf.so usr/lib/pkgconfig/blkid.pc usr/lib/pkgconfig/uuid.pc usr/lib/pkgconfig/libeconf.pc)

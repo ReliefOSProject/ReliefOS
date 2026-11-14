@@ -8,10 +8,10 @@ APK_REPOSITORY := $(APK_WORK)/repository
 APK_MANIFEST := $(APK_WORK)/manifest.json
 APK_OWNERSHIP := $(APK_WORK)/ownership.tsv
 APK_SIGNING_KEY ?= $(HOME)/.local/share/leonos/apk-signing/key.pem
-# Generation 6 transfers the util-linux suite to official Alpine owners.
-# This sorts after generation 5 even for development builds at the same commit.
+# Generation 7 transfers libmd and its development inputs to official APKs.
+# This sorts after generation 6 even for development builds at the same commit.
 # Published releases must still use an increasing SOURCE_DATE_EPOCH.
-APK_BUILD_VERSION ?= 6.$(SOURCE_DATE_EPOCH)-r0
+APK_BUILD_VERSION ?= 7.$(SOURCE_DATE_EPOCH)-r0
 APK_STAGE_SCRIPT := $(RELIEFOS_SRC)/tools/build/apk-stage.sh
 APK_STAGE_INPUTS := $(RELIEFOS_SRC)/tools/build/apk-layout.sh $(RELIEFOS_LAYOUT_TOOL) $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL)
 BUILD_LOG_INPUTS := $(RELIEFOS_SHELL_LOG) $(RELIEFOS_SRC)/tools/build/run-logged.sh $(RELIEFOS_SRC)/tools/build/format-log.awk
