@@ -620,7 +620,7 @@ void open_with_path_ui(const char *path, uint8_t set_default_only)
     copy_text(program, sizeof(program), fileman_x11_default_app(path));
     if (!program[0]) copy_text(program, sizeof(program), "/usr/bin/nedit");
     if (!input_dialog(set_default_only ? T("Default Program") : T("Open With"),
-            T("X11 executable path (NEdit: /usr/bin/nedit, Dillo: /usr/bin/dillo):"),
+            T("X11 executable path (NEdit: /usr/bin/nedit, NetSurf: /usr/bin/netsurf):"),
             program, sizeof(program))) {
         set_status(T("Open With canceled"));
         return;

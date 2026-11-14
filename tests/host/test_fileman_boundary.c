@@ -27,7 +27,7 @@ int main(void)
     assert(fileman_join_path(path, 8, "/tmp", "abcd") < 0);
     assert(path[0] == 0);
     assert(fileman_join_path(path, sizeof(path), "/tmp", "../escape") < 0);
-    assert(!strcmp(fileman_x11_default_app("/tmp/Hello.HTML"), "/usr/bin/dillo"));
+    assert(!strcmp(fileman_x11_default_app("/tmp/Hello.HTML"), "/usr/bin/netsurf"));
     assert(!strcmp(fileman_x11_default_app("/tmp/budget.rexl"), "/usr/bin/reliefexcel"));
     assert(!strcmp(fileman_x11_default_app("/tmp/export.CSV"), "/usr/bin/reliefexcel"));
     assert(!strcmp(fileman_x11_default_app("/tmp/report.RWORD"), "/usr/bin/reliefword"));

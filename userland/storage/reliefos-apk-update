@@ -67,10 +67,11 @@ plan=$temporary/root
 /bin/busybox cp "$target/lib/apk/db/installed" "$plan/lib/apk/db/installed"
 /bin/busybox cp "$target/lib/apk/db/installed" "$temporary/installed-before"
 /bin/busybox cp -p "$target/etc/apk/world" "$temporary/world-before"
-# Retired local commands are selected directly from their official packages.
+# Retired ReliefOS command wrappers map to their official packages; the old
+# Dillo request maps to NetSurf and its split common-data request is dropped.
 # Local generation/version constraints cannot describe upstream versions. Keep
-# existing upstream requests (including their tags/pins) and all unrelated
-# world entries, using an inherited tag only when adding a missing request.
+# existing upstream requests (including their tags/pins) and unrelated world
+# entries, using an inherited tag only when adding a missing request.
 # Editing the private plan lets APK remove the old owners in the same signed
 # transaction that installs their replacements; --check never edits the target.
 : > "$temporary/upstream-packages"
@@ -94,7 +95,6 @@ plan=$temporary/root
     {
         request = canonical($0)
         name = package_name(request)
-        if (name !~ /^reliefos-(sl|ncurses|sqlite)$/) { emit(request); next }
         tag = ""
         if (index(request, "@")) {
             tag = request
@@ -102,6 +102,9 @@ plan=$temporary/root
             sub(/[<>=~].*$/, "", tag)
             tag = "@" tag
         }
+        if (name == "dillo") { upstream("netsurf", tag); next }
+        if (name == "dillo-common") next
+        if (name !~ /^reliefos-(sl|ncurses|sqlite)$/) { emit(request); next }
         if (name == "reliefos-sl") upstream("sl", tag)
         if (name == "reliefos-ncurses") {
             upstream("ncurses", tag)

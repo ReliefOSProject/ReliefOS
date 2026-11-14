@@ -21,12 +21,13 @@ EVENTS = [
 def source_check():
     errors = []
     required = {
-        "Documentation/admin-guide/desktop.rst": ["IceWM", "make fetch", "Dillo", "QEMU",
+        "Documentation/admin-guide/desktop.rst": ["IceWM", "make fetch", "NetSurf", "QEMU",
                                                   "feature=xorg", "xdm", "v3.24"],
         "system/xorg/xdm-Xservers": ["/usr/lib/reliefos/xorg-tty-wrapper", "vt1", "-keeptty"],
         "system/xorg/xdm-session": ["/usr/bin/icewm", "/usr/bin/st",
                                     "xdg-user-dirs-update"],
-        "system/xorg/icewm/menu": ["fileman", "calc", "dillo", "nedit"],
+        "system/xorg/icewm/menu": ["menu-pinned.sh"],
+        "system/xorg/icewm/menu-pinned.sh": ["fileman", "calc", "netsurf", "nedit"],
         "system/xorg/icewm/theme": ["Theme="],
     }
     for relative, needles in required.items():
@@ -66,6 +67,10 @@ def source_check():
             errors.append("alpine-pcmanfm must stay out of the fetch lock")
         if "alpine-icewm" not in ids:
             errors.append("configs/dependencies.lock.json: missing alpine-icewm")
+        if "alpine-netsurf" not in ids:
+            errors.append("configs/dependencies.lock.json: missing alpine-netsurf")
+        if ids.intersection({"alpine-dillo", "alpine-dillo-common"}):
+            errors.append("Dillo packages must stay out of the fetch lock")
         if "alpine-twm" in ids:
             errors.append("alpine-twm must stay out of the fetch lock")
         if "coreutils" not in ids:
