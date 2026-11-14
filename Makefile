@@ -198,7 +198,7 @@ endif
 ifneq ($(filter doctor,$(MAKECMDGOALS)),)
 include $(RELIEFOS_SRC)/scripts/reliefos/Makefile.toolchain
 endif
-.PHONY: help doctor clean distclean htmldocs __kbuild
+.PHONY: help doctor clean distclean htmldocs gettext gettext-check __kbuild
 help:
 	@V='$(V)' O='$(O)' ARCH='$(ARCH)' PROFILE='$(PROFILE)' CPUS='$(CPUS)' \
 	TOOLCHAIN='$(TOOLCHAIN)' SRC='$(RELIEFOS_SRC)' CACHE='$(RELIEFOS_CACHE)' \
@@ -222,16 +222,25 @@ distclean:
 
 SPHINXBUILD ?= sphinx-build
 SPHINXOPTS ?=
+DOCS_PYTHON ?=
+RELIEFOS_DOCS_I18N_INPUTS := $(RELIEFOS_SRC)/scripts/docs-python.sh \
+	$(RELIEFOS_SRC)/scripts/update-doc-translations.py \
+	$(RELIEFOS_SRC)/Documentation/locale/identical.json
 $(RELIEFOS_O_MARKER):
 	$(Q)mkdir -p $(O)
 	$(Q)printf 'reliefos-build-out version=1 root=%s\n' '$(RELIEFOS_SRC)' > $@.tmp
 	$(Q)mv -f $@.tmp $@
 
-htmldocs: $(RELIEFOS_O_MARKER)
-	$(Q)SPHINXBUILD='$(SPHINXBUILD)' SPHINXOPTS='$(SPHINXOPTS)' \
+htmldocs: $(RELIEFOS_O_MARKER) $(RELIEFOS_SRC)/scripts/build-docs.sh $(RELIEFOS_DOCS_I18N_INPUTS)
+	$(Q)SPHINXBUILD='$(SPHINXBUILD)' SPHINXOPTS='$(SPHINXOPTS)' DOCS_PYTHON='$(DOCS_PYTHON)' \
 	    sh $(RELIEFOS_SRC)/scripts/build-docs.sh $(RELIEFOS_SRC)/Documentation $(O)/Documentation/html
 
-reliefos_goals := $(filter-out help doctor clean distclean htmldocs,$(MAKECMDGOALS))
+gettext gettext-check: $(RELIEFOS_O_MARKER) $(RELIEFOS_DOCS_I18N_INPUTS)
+	$(Q)SPHINXBUILD='$(SPHINXBUILD)' SPHINXOPTS='$(SPHINXOPTS)' DOCS_PYTHON='$(DOCS_PYTHON)' \
+	    sh $(RELIEFOS_SRC)/scripts/docs-python.sh $(RELIEFOS_SRC)/scripts/update-doc-translations.py \
+	    --output $(O)/Documentation/gettext $(if $(filter gettext-check,$@),--check)
+
+reliefos_goals := $(filter-out help doctor clean distclean htmldocs gettext gettext-check,$(MAKECMDGOALS))
 reliefos_kbuild_goals := $(patsubst $(reliefos_O_absolute)/%,%,$(patsubst $(O)/%,%,$(reliefos_goals)))
 ifneq ($(strip $(reliefos_goals)),)
 .PHONY: $(reliefos_goals)

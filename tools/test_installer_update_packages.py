@@ -109,9 +109,13 @@ class UpdatePreflight(unittest.TestCase):
         return {str(path.relative_to(target)): hashlib.sha256(path.read_bytes()).hexdigest()
                 for path in target.rglob("*") if path.is_file() and not path.is_symlink()}
 
-    def transaction(self, mode="--check", expected=None):
+    def transaction(self, mode="--check", expected=None, cache_readonly=False):
         readonly = ('mount --bind "$1/target" "$1/target"; '
                     'mount -o remount,bind,ro "$1/target"; ') if mode == "--check" else ""
+        if cache_readonly:
+            readonly += ('mount --bind "$1/target/usr/share/reliefos/apk/repository" '
+                         '"$1/target/usr/share/reliefos/apk/repository"; '
+                         'mount -o remount,bind,ro "$1/target/usr/share/reliefos/apk/repository"; ')
         result = subprocess.run([
             "unshare", "-Urmp", "--fork", "sh", "-eu", "-c",
             'mount --make-rprivate /; mount --bind "$1" "$1"; '
@@ -169,6 +173,84 @@ class UpdatePreflight(unittest.TestCase):
             self.assertEqual((repository / "packages.adb").stat().st_mode & 0o777, 0o644)
             self.assertEqual((target / "usr/share/reliefos-fixture/version").read_text(), "2.0-r0\n")
             self.assertFalse((target / "run/reliefos-kernel-activation.defer").exists())
+
+    def cache_events(self, result):
+        events = []
+        for line in result.stdout.splitlines():
+            fields = line.split("\t")
+            if fields[:2] != ["activity", "cache"]:
+                continue
+            self.assertEqual(len(fields), 10, line)
+            events.append({"action": fields[2], "package": fields[3],
+                           **dict(zip(("done", "total", "bytes", "size", "reused", "status"),
+                                      map(int, fields[4:])))})
+        return events
+
+    def test_identical_offline_cache_is_reused_without_replacing_files(self):
+        first = self.transaction("--apply")
+        self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+        cache = self.runner / "target/usr/share/reliefos/apk/repository"
+        before = {p.name: (p.stat().st_ino, p.stat().st_mtime_ns, p.read_bytes()) for p in cache.iterdir()}
+        again = self.transaction("--apply")
+        self.assertEqual(again.returncode, 0, again.stdout + again.stderr)
+        self.assertEqual(before, {p.name: (p.stat().st_ino, p.stat().st_mtime_ns, p.read_bytes()) for p in cache.iterdir()})
+        events = self.cache_events(again)
+        final = events[-1]
+        self.assertEqual(final["done"], len(before))
+        self.assertEqual(final["total"], len(before))
+        self.assertEqual(final["bytes"], sum(len(value[2]) for value in before.values()))
+        self.assertEqual(final["bytes"], final["size"])
+        self.assertEqual(final["reused"], final["size"])
+        self.assertNotIn("copying", [event["action"] for event in events])
+        self.assertEqual([event["bytes"] for event in events], sorted(event["bytes"] for event in events))
+
+    def test_different_cache_bytes_are_replaced_even_with_matching_size(self):
+        first = self.transaction("--apply")
+        self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+        cache = self.runner / "target/usr/share/reliefos/apk/repository"
+        archive = cache / "reliefos-fixture-2.0-r0.apk"
+        expected = archive.read_bytes()
+        archive.write_bytes(bytes([expected[0] ^ 1]) + expected[1:])
+        result = self.transaction("--apply")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(archive.read_bytes(), expected)
+        self.assertTrue(any(event["action"] == "copying" and event["package"] == archive.name
+                            for event in self.cache_events(result)))
+        self.assertFalse(list(cache.glob(".update-cache.*")))
+
+    def test_cache_failure_identifies_the_file_and_preserves_old_bytes(self):
+        first = self.transaction("--apply")
+        self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+        cache = self.runner / "target/usr/share/reliefos/apk/repository"
+        archive = cache / "reliefos-fixture-2.0-r0.apk"
+        archive.write_bytes(b"old archive must survive a failed publication")
+        result = self.transaction("--apply", cache_readonly=True)
+        self.assertNotEqual(result.returncode, 0)
+        failure = self.cache_events(result)[-1]
+        self.assertEqual(failure["action"], "failed")
+        self.assertEqual(failure["package"], archive.name)
+        self.assertGreater(failure["status"], 0)
+        self.assertIn("failed step=cache operation=copying", result.stderr)
+        self.assertEqual(archive.read_bytes(), b"old archive must survive a failed publication")
+        self.assertFalse(list(cache.glob(".update-cache.*")))
+        self.assertFalse((self.runner / "target/run/reliefos-kernel-activation.defer").exists())
+
+    def test_cache_links_are_refused_and_old_temporary_links_are_not_followed(self):
+        cache = self.runner / "target/usr/share/reliefos/apk/repository"
+        cache.mkdir(parents=True)
+        outside = self.runner / "outside"
+        outside.write_bytes(b"unrelated data")
+        name = "reliefos-fixture-2.0-r0.apk"
+        (cache / (name + ".new")).symlink_to("/outside")
+        result = self.transaction("--apply")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(outside.read_bytes(), b"unrelated data")
+        (cache / name).unlink()
+        (cache / name).symlink_to("/outside")
+        result = self.transaction("--apply")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(outside.read_bytes(), b"unrelated data")
+        self.assertEqual(self.cache_events(result)[-1]["action"], "failed")
 
     def test_changed_index_is_rejected_before_apply(self):
         before = self.target_snapshot()

@@ -1,0 +1,96 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-11-14 00:00+0000\n"
+"Last-Translator: ReliefOS translators\n"
+"Language-Team: ja\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "目标与输出"
+msgstr "ターゲットと出力"
+
+msgid "产品"
+msgstr "製品"
+
+msgid "输出均相对于 O："
+msgstr "出力先はすべて O からの相対パスです。"
+
+msgid "``kernel``：generated/system 内核与独立调试符号。"
+msgstr "``kernel``：generated/system のカーネルと独立したデバッグシンボル。"
+
+msgid "``runtime`` / ``userland``：公共运行库与所选应用。"
+msgstr "``runtime`` / ``userland``：共通のランタイムライブラリと選択したアプリケーション。"
+
+msgid "``sdk``：packages/reliefos-musl-sdk.tar.gz。"
+msgstr "``sdk``：packages/reliefos-musl-sdk.tar.gz。"
+
+msgid "``apk-repo``：packages/apk/repository。"
+msgstr "``apk-repo``：packages/apk/repository。"
+
+msgid "``rootfs``：rootfs/managed 与 manifest.json。"
+msgstr "``rootfs``：rootfs/managed と manifest.json。"
+
+msgid "``image-vmdk``：images/reliefos.raw 与 images/reliefos.vmdk。"
+msgstr "``image-vmdk``：images/reliefos.raw と images/reliefos.vmdk。"
+
+msgid "``iso``：images/reliefos-live.iso。"
+msgstr "``iso``：images/reliefos-live.iso。"
+
+msgid "``installer``：images/reliefos-installer.iso。"
+msgstr "``installer``：images/reliefos-installer.iso。"
+
+msgid "``rpr-pages``：独立 RPR 机器接口和人类页面。"
+msgstr "``rpr-pages``：独立した RPR のマシン向けインターフェースと閲覧用ページ。"
+
+msgid "``pages``：pages/ 网站，包括下载、RPR 与 Sphinx 文档。"
+msgstr "``pages``：ダウンロード、RPR、Sphinx ドキュメントを含む pages/ のウェブサイト。"
+
+msgid "``htmldocs``：Documentation/html/，只构建手册，不构建镜像。"
+msgstr "``htmldocs``：Documentation/html/。マニュアルだけをビルドし、イメージはビルドしません。"
+
+msgid "all 包含 SDK 和三类镜像；release 再包含网站，均不自动上传。 文档与 Pages 的 Sphinx 依赖不影响单独构建内核和用户态。"
+msgstr ""
+"all は SDK と 3 種類のイメージを含み、release はさらにウェブサイトを含みます。いずれも自動アップロードは行いません。ドキュメントと Pages の Sphinx "
+"依存関係は、カーネルやユーザー空間を単独でビルドする際には影響しません。"
+
+msgid "运行与发布"
+msgstr "実行と公開"
+
+msgid ""
+"``make run``、run-iso、run-installer 启动对应介质。 默认 ``QEMU_BOOT=uefi`` 使用 OVMF；``QEMU_BOOT=bios`` 使用 "
+"SeaBIOS。 可覆盖 CPUS、MEMORY 和 QEMU 变量；无 KVM 的宿主用 ``QEMU_KVM=0``。"
+msgstr ""
+"``make run``、run-iso、run-installer はそれぞれ対応するメディアを起動します。既定の ``QEMU_BOOT=uefi`` は OVMF "
+"を使用し、``QEMU_BOOT=bios`` は SeaBIOS を使用します。CPUS、MEMORY、QEMU の各変数は上書きできます。KVM のないホストでは ``QEMU_KVM=0``"
+" を使います。"
+
+msgid ""
+"RPR、下载页与文档组装为一个 Pages 输出；RPR 签名、APK 索引和内核摘要保持 机器契约，不因文档主题更换而改变。发布目标要求内核 clean 且等于主仓 gitlink。 "
+"真实版本发布见 :doc:`../process/releasing`。"
+msgstr ""
+"RPR、ダウンロードページ、ドキュメントは 1 つの Pages 出力にまとめます。RPR 署名、APK "
+"インデックス、カーネルダイジェストのマシン向け契約は、ドキュメントテーマの変更では変わりません。公開ターゲットには、clean で本リポジトリの gitlink "
+"と一致するカーネルが必要です。実際のバージョン公開は :doc:`../process/releasing` を参照してください。"
+
+msgid "文档与 RPR"
+msgstr "ドキュメントと RPR"
+
+msgid ""
+"完整 Pages 网站分别从主仓 Documentation/ 和所选 ReliefNT 仓库的 Documentation/ 读取源文档，生成 docs/reliefos/ 与 "
+"docs/reliefnt/，docs/index.html 是产品入口。 两份手册使用各自的 Sphinx 配置和版本，不把内核源文档复制到主仓维护。 RPR "
+"首页及内核下载页链接到相应手册，APK 索引、公钥、health 与内核发布元数据 路径保持原协议。独立 rpr-pages 仍只装配包和内核子树，可供 RPR 客户端使用； "
+"页面中的站点导航和文档链接依赖完整 Pages 父目录，预览完整网站应使用 pages。 完整手册由 pages 发布。 任一手册构建失败时，保留上次完整网站，不发布部分文档。"
+msgstr ""
+"完全な Pages サイトは、本リポジトリの Documentation/ と選択した ReliefNT リポジトリの Documentation/ "
+"からそれぞれソースを読み、docs/reliefos/ と docs/reliefnt/ を生成します。docs/index.html が製品の入口です。2 つのマニュアルはそれぞれ独自の "
+"Sphinx 設定とバージョンを使用し、カーネルのソースドキュメントを本リポジトリへコピーして管理しません。RPR "
+"のトップページとカーネルのダウンロードページは対応するマニュアルへリンクし、APK インデックス、公開鍵、health、カーネル公開メタデータのパスは既存のプロトコルを維持します。独立した "
+"rpr-pages は引き続きパッケージとカーネルのサブツリーだけを組み立て、RPR クライアントで使用できます。そのページのサイトナビゲーションとドキュメントリンクは、完全な Pages "
+"の親ディレクトリに依存するため、サイト全体のプレビューには pages を使用してください。完全なマニュアルは pages "
+"で公開します。どちらかのマニュアルのビルドに失敗した場合、前回の完全なサイトを保持し、不完全なドキュメントは公開しません。"

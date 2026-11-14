@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
-{% block title %}查阅手册{% endblock %}
+{% set labels = {
+  'zh-CN': ('查阅手册', '本手册无需 JavaScript。请从', '文档目录', '选择主题，或使用浏览器的页内查找（Ctrl+F）。'),
+  'en': ('Read the manual', 'This manual works without JavaScript. Choose a topic from the', 'contents', 'or use your browser’s find command (Ctrl+F).'),
+  'ja': ('マニュアルを読む', 'このマニュアルは JavaScript なしで読めます。', '目次', 'から項目を選ぶか、ブラウザーのページ内検索（Ctrl+F）を使ってください。')
+}[language] %}
+{% block htmltitle %}<title>{{ labels[0] }}{{ titlesuffix }}</title>{% endblock %}
 {% block body %}
-<h1>查阅手册</h1>
-<p>本手册无需 JavaScript。请从<a href="{{ pathto('index') }}">文档目录</a>选择主题，或使用浏览器的页内查找（Ctrl+F）。</p>
+<h1>{{ labels[0] }}</h1>
+<p>{{ labels[1] }} <a href="{{ pathto('index') }}">{{ labels[2] }}</a> {{ labels[3] }}</p>
 {% endblock %}

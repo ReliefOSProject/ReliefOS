@@ -215,6 +215,8 @@ int installer_update_decode(struct installer_update_info *info, unsigned *progre
                             char *message, size_t capacity, const char *line)
 {
     if (!info || !progress || !message || !capacity || !line) return -EINVAL;
+    int activity = installer_update_activity_decode(&info->activity, line);
+    if (activity) return activity < 0 ? activity : 4;
     if (!strncmp(line, "error\t", 6)) {
         char *end;
         errno = 0;
@@ -247,6 +249,7 @@ int installer_update_decode(struct installer_update_info *info, unsigned *progre
         result = copy_field(message, capacity, tab + 1);
         if (result) return result;
         *progress = (unsigned)value;
+        memset(&info->activity, 0, sizeof(info->activity));
         return 2;
     }
     if (strncmp(line, "info\t", 5)) return 0;

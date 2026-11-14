@@ -90,6 +90,8 @@ static Fl_Box *account_hint;
 static Fl_Box *status_box;
 static Fl_Box *detail_box;
 static Fl_Box *progress_text_box;
+static Fl_Box *update_activity_box;
+static char update_activity_text[768];
 static Fl_Box *progress_percent_box;
 static Fl_Progress *progress_bar;
 static int ui_busy;
@@ -235,6 +237,7 @@ static void refresh_status_widgets(void)
     if (status_box) status_box->copy_label(status_text);
     if (detail_box) detail_box->copy_label(detail_text);
     if (progress_text_box) progress_text_box->copy_label(progress_text);
+    if (update_activity_box) update_activity_box->copy_label(update_activity_text);
     if (progress_bar) {
         char percent[16];
         uint32_t value = progress_value > 100 ? 100 : progress_value;
@@ -282,6 +285,11 @@ static void update_pump(void *)
                 progress_value = value;
                 copy_text(progress_text, sizeof(progress_text), T(update_message));
                 copy_text(status_text, sizeof(status_text), T(update_message));
+            }
+            if (result == 2 || result == 3 || result == 4) {
+                if (installer_update_activity_format(&update_info.activity, update_activity_text,
+                                                     sizeof(update_activity_text)))
+                    update_protocol_error = 1;
             }
         }
         update_stdout_offset += bytes + 1;
@@ -340,6 +348,8 @@ static void start_update_job(int applying)
     if (!applying) memset(&update_info, 0, sizeof(update_info));
     update_checked = 0;
     update_protocol_error = 0;
+    memset(&update_info.activity, 0, sizeof(update_info.activity));
+    update_activity_text[0] = 0;
     update_stdout_offset = update_stderr_offset = 0;
     if (!update_log_buffer) update_log_buffer = new Fl_Text_Buffer();
     update_log_buffer->text("");
@@ -1265,7 +1275,10 @@ static void build_progress_page(void)
     snprintf(percent, sizeof(percent), "%u%%", (unsigned)value);
     progress_percent_box = make_label(percent, CONTENT_X + CONTENT_W - 98,
                                       162, 72, 30, 14, 0);
-    if (install_mode == INSTALLER_MODE_UPDATE) build_update_log(222, 290);
+    if (install_mode == INSTALLER_MODE_UPDATE) {
+        update_activity_box = make_label(update_activity_text, CONTENT_X, 202, CONTENT_W, 82, 13, 1);
+        build_update_log(294, 218);
+    }
 }
 
 static void build_finish_page(void)
@@ -1305,9 +1318,15 @@ static void build_finish_page(void)
                        : T("No writes will continue after this error."),
                    CONTENT_X, 62, CONTENT_W, 32, 15, 1);
         make_label(status_text, CONTENT_X, 108, CONTENT_W, 42, 14, 1);
-        make_label(detail_text, CONTENT_X, 154, CONTENT_W, 60, 14, 1);
+        make_label(detail_text, CONTENT_X, 154, CONTENT_W,
+                   install_mode == INSTALLER_MODE_UPDATE ? 40 : 60, 14, 1);
+        if (install_mode == INSTALLER_MODE_UPDATE && *update_activity_text)
+            update_activity_box = make_label(update_activity_text, CONTENT_X, 200, CONTENT_W, 86, 13, 1);
     }
-    if (install_mode == INSTALLER_MODE_UPDATE) build_update_log(reboot_error ? 290 : 236, reboot_error ? 210 : 264);
+    if (install_mode == INSTALLER_MODE_UPDATE) {
+        int activity = !install_success && *update_activity_text;
+        build_update_log(activity ? 300 : reboot_error ? 290 : 236, activity ? 200 : reboot_error ? 210 : 264);
+    }
 }
 
 static void clear_page_widgets(void)
@@ -1325,6 +1344,7 @@ static void clear_page_widgets(void)
     status_box = NULL;
     detail_box = NULL;
     progress_text_box = NULL;
+    update_activity_box = NULL;
     progress_percent_box = NULL;
     progress_bar = NULL;
     update_log_display = NULL;

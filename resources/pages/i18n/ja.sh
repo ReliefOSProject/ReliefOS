@@ -1,0 +1,60 @@
+# Plain text only. Keep keys in sync with zh-CN.sh and en.sh.
+site_message() {
+    case $1 in
+        home) printf '%s' 'ホーム' ;;
+        download) printf '%s' 'ダウンロード' ;;
+        docs) printf '%s' 'ドキュメント' ;;
+        navigation) printf '%s' 'メインナビゲーション' ;;
+        language) printf '%s' '言語' ;;
+        footer) printf '%s' 'ReliefOS プロジェクト — 自由でオープンなオペレーティングシステム。' ;;
+        tagline) printf '%s' '自由でオープンなオペレーティングシステム。' ;;
+        latest_version) printf '%s' '最新バージョン' ;;
+        version) printf '%s' 'バージョン' ;;
+        latest_release) printf '%s' '最新リリース' ;;
+        get_started) printf '%s' 'はじめに' ;;
+        packages) printf '%s' 'パッケージ' ;;
+        rpr_summary) printf '%s' 'リモートパッケージリポジトリ。' ;;
+        download_summary) printf '%s' 'インストール ISO とチェックサム。' ;;
+        source) printf '%s' 'ソースコード' ;;
+        source_summary) printf '%s' 'プロジェクトのソースリポジトリ。' ;;
+        docs_summary) printf '%s' 'ソースツリーから生成したガイド。' ;;
+        download_title) printf '%s' 'ReliefOS ダウンロード' ;;
+        installer_iso) printf '%s' 'インストール ISO' ;;
+        file) printf '%s' 'ファイル' ;;
+        architecture) printf '%s' 'アーキテクチャ' ;;
+        size) printf '%s' 'サイズ' ;;
+        checksum_help) printf '%s' 'イメージとチェックサムファイルを同じディレクトリにダウンロードし、その中で次を実行してください：' ;;
+        rpr_title) printf '%s' 'ReliefOS リモートパッケージリポジトリ' ;;
+        packages_description) printf '%s' 'このリポジトリで公開されている署名済み APK パッケージを参照できます。一覧は ReliefOS ビルドシステムが実際のリポジトリの内容から生成します。' ;;
+        browse_packages) printf '%s' 'パッケージを参照' ;;
+        apk_repository) printf '%s' 'APK リポジトリ' ;;
+        kernel) printf '%s' 'カーネル' ;;
+        kernel_description) printf '%s' '対応するカーネル、initramfs、モジュール一覧を、署名済み APK パッケージで提供します。' ;;
+        kernel_information) printf '%s' 'カーネル情報' ;;
+        manuals_description) printf '%s' '各製品のソースリポジトリで個別に保守、ビルドされるマニュアルです。' ;;
+        os_manual) printf '%s' 'ReliefOS システムとアプリケーションのマニュアル' ;;
+        nt_manual) printf '%s' 'ReliefNT カーネルマニュアル' ;;
+        repository_metadata) printf '%s' 'リポジトリのメタデータ' ;;
+        metadata_description) printf '%s' '以下は ReliefOS パッケージツールが使用する機械可読インターフェースです。内容はプロトコルファイルです。' ;;
+        signed_index) printf '%s' '署名済みインデックス' ;;
+        legacy_alias) printf '%s' '旧バージョン互換の別名' ;;
+        apk_title) printf '%s' 'ReliefOS APK リポジトリ' ;;
+        downloadable_files) printf '%s' 'ダウンロード可能なファイル' ;;
+        apk_description) printf '%s' '署名済みパッケージインデックス、署名公開鍵、チェックサムです。以下のディレクトリは、次の設定ファイルに指定する APK リポジトリのルートです：' ;;
+        packages_title) printf '%s' 'ReliefOS パッケージ' ;;
+        available_packages) printf '%s' '利用可能なパッケージ' ;;
+        packages_caption) printf '%s' 'このリリースで公開されている APK パッケージ' ;;
+        package) printf '%s' 'パッケージ' ;;
+        download_apk) printf '%s' '.apk をダウンロード' ;;
+        back_packages) printf '%s' 'パッケージ一覧に戻る' ;;
+        kernel_title) printf '%s' 'ReliefNT カーネル' ;;
+        kernel_files) printf '%s' 'カーネルファイル' ;;
+        kernel_release) printf '%s' 'カーネルリリース' ;;
+        module_abi) printf '%s' 'モジュール ABI' ;;
+        download_kernel) printf '%s' '署名済みカーネルパッケージをダウンロード' ;;
+        module_inventory) printf '%s' 'モジュールとファイルの一覧' ;;
+        release_metadata) printf '%s' '機械可読リリースメタデータ' ;;
+        strict_protocol) printf '%s' '厳密なクライアントプロトコル' ;;
+        *) printf 'unknown site message: %s\n' "$1" >&2; return 1 ;;
+    esac
+}

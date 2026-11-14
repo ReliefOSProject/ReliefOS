@@ -10,5 +10,6 @@ ${HOSTCC:-cc} -std=c11 -D_GNU_SOURCE -Wall -Wextra -Werror \
     -I"$src/userland/apps/installer" \
     "$src/tools/tests/installer_update_model_test.c" \
     "$src/userland/apps/installer/installer_update_model.c" \
+    "$src/userland/apps/installer/installer_update_progress.c" \
     "$src/userland/apps/installer/installer_update_journal.c" -o "$work/test"
 ASAN_OPTIONS=detect_leaks=1 UBSAN_OPTIONS=halt_on_error=1 "$work/test" "$work/root"

@@ -14,26 +14,29 @@ printf '%s\n' "$version" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || { echo 'invali
 # shellcheck source=/dev/null
 . "$(dirname "$0")/site-common.sh"
 
-mkdir -p "$output"
-{
-    site_page_begin "$(site_css_href 0)" "$(site_home_href 0)" \
-        "ReliefOS" "ReliefOS"
-    printf '<p class="subtitle">A free and open operating system. &middot; Latest version %s</p>\n' \
-        "$(printf '%s' "$version" | site_html_escape)"
-    cat <<'HTML'
+for language in zh-CN en ja; do
+    site_use_language "$language"
+    page=$output/$(site_page_path "$language" index.html)
+    mkdir -p "$(dirname "$page")"
+    {
+    site_page_begin index.html ReliefOS ReliefOS
+    printf '<p class="subtitle">%s &middot; %s %s</p>\n' \
+        "$(site_text tagline)" "$(site_text latest_version)" "$(printf '%s' "$version" | site_html_escape)"
+    cat <<HTML
 <section>
-<h2>Get started</h2>
+<h2>$(site_text get_started)</h2>
 <p>
-<a class="button" href="download/index.html">Download</a>
-<a class="button" href="rpr/packages/index.html">Packages</a>
+<a class="button" href="$(site_ui_href download/index.html)">$(site_text download)</a>
+<a class="button" href="$(site_ui_href rpr/packages/index.html)">$(site_text packages)</a>
 </p>
 <ul>
-<li><a href="rpr/index.html">RPR</a> &mdash; the Remote Package Repository.</li>
-<li><a href="download/index.html">Download</a> &mdash; installer ISO with checksums.</li>
-<li><a href="https://github.com/ReliefOSProject/ReliefOS">Source</a> &mdash; project repository.</li>
-<li><a href="docs/index.html">Documentation</a> &mdash; guides generated from the source tree.</li>
+<li><a href="$(site_ui_href rpr/index.html)">RPR</a> &mdash; $(site_text rpr_summary)</li>
+<li><a href="$(site_ui_href download/index.html)">$(site_text download)</a> &mdash; $(site_text download_summary)</li>
+<li><a href="https://github.com/ReliefOSProject/ReliefOS">$(site_text source)</a> &mdash; $(site_text source_summary)</li>
+<li><a href="$(site_docs_href)">$(site_text docs)</a> &mdash; $(site_text docs_summary)</li>
 </ul>
 </section>
 HTML
     site_page_end
-} > "$output/index.html"
+    } > "$page"
+done

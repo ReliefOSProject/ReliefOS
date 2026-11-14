@@ -1,0 +1,85 @@
+# ja translation of the ReliefOS documentation.
+# Copyright (C) 2021-2026, ReliefOS contributors
+# Distributed under the same license as ReliefOS.
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 5.3.2\n"
+"PO-Revision-Date: 2026-11-14 00:00+0800\n"
+"Last-Translator: ReliefOS translation contributors\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "支持范围与已知限制"
+msgstr "サポート範囲と既知の制限"
+
+msgid "验证层次"
+msgstr "検証の段階"
+
+msgid ""
+"必须分别报告源码检查、编译、镜像打包、实际运行。历史单项成功不代表 本次源码、全部应用或完整安装升级路径成功。VMware 验证未完成；物理硬件未验证。"
+" 本次文档重组不修改这些运行状态，也不等于新一轮硬件验收。"
+msgstr ""
+"ソース確認、コンパイル、イメージ作成、実際の実行は別々に報告する必要があります。過去の個別の成功は、今回のソース、全アプリケーション、完全なインストール・更新経路の成功を示しません。VMware"
+" の検証は未完了で、物理ハードウェアは未検証です。今回の文書再編はこれらの動作状況を変更せず、新たなハードウェア受け入れテストを意味しません。"
+
+msgid "运行限制"
+msgstr "動作上の制限"
+
+msgid ""
+"PCI BAR 使用独立设备映射窗口；物理地址位宽、RAM 重叠和缓存别名仍会 限制设备可用性，不能将一种 OVMF 拓扑推广到所有硬件。NVMe "
+"当前不提供 已准入的 swap 后端；swap 存储仅支持经审计的 AHCI SATA。"
+msgstr ""
+"PCI BAR は独立したデバイスマッピングウィンドウを使用します。物理アドレス幅、RAM "
+"との重複、キャッシュエイリアスは引き続きデバイスの利用を制限するため、一つの OVMF トポロジーを全ハードウェアに一般化できません。NVMe "
+"は現在、利用を認められた swap バックエンドを提供せず、swap ストレージは監査済み AHCI SATA のみをサポートします。"
+
+msgid "64 TiB 是内核直映射窗口的设计上限，不是已验证的物理 RAM 容量。实际 使用量还受固件拓扑、早期页表和内存元数据约束。"
+msgstr ""
+"64 TiB はカーネルの直接マッピングウィンドウの設計上限で、検証済みの物理 RAM "
+"容量ではありません。実際の使用量はファームウェアのトポロジー、初期ページテーブル、メモリメタデータにも制約されます。"
+
+msgid "强制关机后的 Xorg 锁文件可能阻止桌面恢复。"
+msgstr "強制電源断後に残った Xorg のロックファイルがデスクトップの復帰を妨げる場合があります。"
+
+msgid "编译压力下 IceWM 拖动与延迟问题尚无完整修复验收证据。"
+msgstr "コンパイル負荷中の IceWM のドラッグと遅延の問題には、完全な修正受け入れ検証の証拠がまだありません。"
+
+msgid "ReliefMath 曾在关窗时退出 139，尚未完成根因修复和最终复验。"
+msgstr "ReliefMath はウィンドウを閉じる際に終了コード 139 で終了したことがあり、根本原因の修正と最終再検証は未完了です。"
+
+msgid ""
+"图形接口受实际 SVGA-II/VGPU9 能力限制，不承诺所有 GPU、Mesa 功能、 跨设备 DMA-BUF、atomic modesetting"
+" 或硬件 vblank。"
+msgstr ""
+"グラフィックスインターフェースは実際の SVGA-II/VGPU9 機能に制限されます。すべての GPU、Mesa 機能、デバイス間 DMA-"
+"BUF、atomic modesetting、ハードウェア vblank の対応は保証しません。"
+
+msgid ""
+"可加载 ``.ko`` 必须针对匹配的 ReliefNT ABI 编译，不支持直接加载 Linux 原版二进制模块或任意 Linux 内部 "
+"API。实际配置与管理见 :doc:`kernel-modules`。"
+msgstr ""
+"ロード可能な ``.ko`` は一致する ReliefNT ABI 向けにコンパイルする必要があり、Linux "
+"本来のバイナリモジュールの直接ロードや任意の Linux 内部 API には対応しません。実際の設定と管理は :doc:`kernel-modules`"
+" を参照してください。"
+
+msgid "测试基线"
+msgstr "テストの基準"
+
+msgid ""
+"历史 soundctl APK 归属缺失已在当前策略中补齐；APK 归属测试同时覆盖 Python 3.10 与严格宿主 umask 的场景。驱动 "
+"ABI 保留 168 字节原始前缀， 版本 2 的 17 个追加服务字段通过单独夹具校验，总长为 304 字节； 原始 golden "
+"未重生成，旧版本驱动描述符在 init 前拒绝。 音频支持清单检查验证声明的前提、证据和范围，不再固定要求所有运行标志 "
+"为未验证。音频产品检查仍需要实际构建产物；部分旧 fixture 及完整系统的 既有问题仍须单独复验，不宣称公开总测试全部通过。 Linux/POSIX"
+" 定向测试通过不能视为全量兼容认证；完整本机自举也未完成。 报告失败时保留原始命令、配置、返回码和日志，不能放宽断言后宣称通过。"
+msgstr ""
+"過去に欠けていた soundctl の APK 所有関係は現在の方針で補われ、APK 所有関係テストは Python 3.10 と厳格なホスト "
+"umask のケースも対象としています。ドライバー ABI は元の 168 バイトのプレフィックスを保持し、バージョン 2 で追加された 17 "
+"個のサービスフィールドを別の fixture で検証して、合計 304 バイトとなります。元の golden "
+"は再生成せず、旧バージョンのドライバー記述子は init "
+"前に拒否します。音声サポート一覧の検査は、記載された前提条件、証拠、範囲を検証し、すべての動作フラグを未検証に固定することは要求しなくなりました。音声製品の検査には引き続き実際のビルド成果物が必要です。一部の古い"
+" fixture と完全なシステムの既存問題には個別の再検証が必要で、公開テスト全体が合格したとは主張しません。Linux/POSIX "
+"の個別テスト合格は全体の互換性認証とはみなせず、完全なネイティブ自力ビルドも未完了です。失敗報告には元のコマンド、設定、戻り値、ログを残し、アサーションを緩めて合格と主張してはいけません。"
