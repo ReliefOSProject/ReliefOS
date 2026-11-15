@@ -26,7 +26,7 @@ def patch_kernel(disk, kernel):
 
 
 def login_case(output, disk, wrong_password=False):
-    # One vCPU exercises asynchronous AHCI; storage disables async on SMP boots.
+    # One vCPU also covers serialized AHCI continuation without another CPU.
     with boot(output, disk, smp=1) as (probe, serial, process):
         probe.__class__ = Probe
         wait_log(serial, "[login.elf] starting login UI", process, timeout=60)
