@@ -42,14 +42,27 @@ def echo_peers():
                     continue
                 if not data:
                     break
-                client.sendall(data)
-                with counter_lock:
-                    counts[key] += len(data)
-        except OSError:
+                # A saturated guest may temporarily close its TCP window.
+                # Preserve the exact unsent suffix across timeout/short writes;
+                # the short socket timeout exists to observe shutdown, not to
+                # abort an otherwise healthy stream under backpressure.
+                pending = memoryview(data)
+                while pending and not stop.is_set():
+                    try:
+                        sent = client.send(pending)
+                    except socket.timeout:
+                        continue
+                    if not sent:
+                        raise ConnectionError("TCP echo peer stopped accepting data")
+                    pending = pending[sent:]
+                    with counter_lock:
+                        counts[key] += sent
+        except OSError as error:
             if not stop.is_set():
                 with counter_lock:
                     counts.setdefault("client_errors", 0)
                     counts["client_errors"] += 1
+                    counts["client_last_error"] = repr(error)
         finally:
             client.close()
 
