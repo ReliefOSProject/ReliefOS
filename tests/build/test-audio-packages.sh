@@ -2,7 +2,7 @@
 # Inspect real target products; execute only the SDK compiler, never target ELFs.
 set -eu
 repo=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-audio_out=${AUDIO_OUT:-"$repo/out/audio-hda"}
+audio_out=${AUDIO_OUT:-${RELIEFOS_TEST_BUILD_ROOT:-"$repo/out/x86_64/release"}}
 require() { test -s "$1" || { echo "FAIL missing audio product: $1" >&2; exit 1; }; }
 require "$audio_out/system/lib/libreliefos-audio.so.1"
 require "$audio_out/userland/soundctl.elf"
@@ -50,6 +50,7 @@ sdk="$audio_out/sdk/reliefos-musl-sdk"
 for f in bin/reliefos-musl-cc include/alsa/asoundlib.h include/opl3.h include/reliefos/audio_control.h lib/libreliefos-audio.so.1 lib/libasound.so.2 \
  lib/libasound.a lib/libopl3.so.1 share/alsa/pcm/dmix.conf share/licenses/alsa-lib/COPYING \
  share/licenses/nuked-opl3/LICENSE; do require "$sdk/$f"; done
+mkdir -p "$audio_out/qa"
 work=$(mktemp -d "$audio_out/qa/audio-sdk.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
 mkdir "$work/sdk path"

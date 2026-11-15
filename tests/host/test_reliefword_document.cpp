@@ -1,4 +1,5 @@
 #include "document.h"
+#include "file_stamp_fixture.h"
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
@@ -482,7 +483,6 @@ static void test_atomic_save_conflict_cancel_symlink_and_progress() {
     struct stat original_stat;
     assert(stat(target, &original_stat) == 0);
     assert(rw::file_stamp(target, stamp, error) && stamp.exists);
-    write_bytes("same-stamp.rword", after, sizeof(after) - 1);
     struct timespec times[2];
 #if defined(__APPLE__)
     times[0] = original_stat.st_atimespec;
@@ -491,7 +491,10 @@ static void test_atomic_save_conflict_cancel_symlink_and_progress() {
     times[0] = original_stat.st_atim;
     times[1] = original_stat.st_mtim;
 #endif
-    assert(utimensat(AT_FDCWD, target, times, 0) == 0);
+    change_file_metadata(target, [&] {
+        write_bytes("same-stamp.rword", after, sizeof(after) - 1);
+        assert(utimensat(AT_FDCWD, target, times, 0) == 0);
+    });
     assert(!rw::save_document(target, document, rw::FileFormat::Native, error, &stamp));
     assert(same_file("same-stamp.rword", after, sizeof(after) - 1));
 

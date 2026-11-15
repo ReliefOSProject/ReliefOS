@@ -4,6 +4,7 @@
 # may not depend on the interpreter it is auditing (plan section 2).
 
 export RELIEFOS_TEST_DEP_ROOT := $(abspath $(HOST_RUNTIME_DEVELOPMENT_ROOT))
+export RELIEFOS_TEST_BUILD_ROOT := $(abspath $(O))
 
 RELIEFOS_TEST_TMP := $(if $(TMPDIR),$(TMPDIR),/tmp)/reliefos-tests-$(shell id -u)
 
@@ -56,14 +57,14 @@ define RELIEFOS_RUN_CONTRACT_TESTS
 	set -eu; for contract_test in $(1); do \
 	    $(call RELIEFOS_LOG_SHELL,RUN,$$contract_test); \
 	    report=$$(mktemp); \
-	    if RELIEFOS_DEPS='$(RELIEFOS_DEPS_TOOL)' \
-	       LEONOS_DEPS='$(RELIEFOS_DEPS_TOOL)' \
+	    if RELIEFOS_DEPS='$(abspath $(RELIEFOS_DEPS_TOOL))' \
+	       LEONOS_DEPS='$(abspath $(RELIEFOS_DEPS_TOOL))' \
 	       RELIEFOS_LOCK='$(RELIEFOS_SRC)/configs/dependencies.lock.json' \
 	       LEONOS_LOCK='$(RELIEFOS_SRC)/configs/dependencies.lock.json' \
 	       GRUB_HOST_ROOT='$(GRUB_HOST_ROOT)' \
 	       GRUB_EFI_DIR='$(GRUB_EFI_DIR)' \
-	       RELIEFOS_EMIT='$(RELIEFOS_EMIT)' \
-	       LEONOS_EMIT='$(RELIEFOS_EMIT)' \
+	       RELIEFOS_EMIT='$(abspath $(RELIEFOS_EMIT))' \
+	       LEONOS_EMIT='$(abspath $(RELIEFOS_EMIT))' \
 	       RELIEFOS_TEST_BUSYBOX='$(abspath $(INITRAMFS_BUSYBOX_ELF))' \
 	       RELIEFOS_KERNEL_TOOLS='$(abspath $(RELIEFOS_KERNEL_TOOLS))' \
 	       RELIEFOS_TEST_RECOVERY='$(abspath $(RELIEFOS_KERNEL_RECOVERY))' \

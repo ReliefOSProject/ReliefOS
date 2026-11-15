@@ -97,8 +97,8 @@ void test_compound_formula_families(rm::FontBook &fonts) {
         "\\begin{cases}x & x>0 \\\\ -x & x\\le0\\end{cases}",
         "\\begin{aligned}a &= b+c \\\\ d &= e+f\\end{aligned}",
         "\\begin{gathered}a=b \\\\ c=d\\end{gathered}",
-        "\\text{中文公式}+\\mathrm{d}x+\\mathbf{v}+\\mathit{x}"
-        "+\\mathbb{R}+\\mathcal{F}",
+        ("\\text{中文公式}+\\mathrm{d}x+\\mathbf{v}+\\mathit{x}"
+         "+\\mathbb{R}+\\mathcal{F}"),
         "\\vec{x}+\\hat{y}+\\bar{z}+\\overline{AB}+\\underline{CD}",
     };
     for (size_t i = 0; i < sizeof(formulas) / sizeof(formulas[0]); ++i)

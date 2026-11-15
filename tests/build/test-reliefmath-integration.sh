@@ -19,7 +19,7 @@ awk -F '\t' '$1=="reliefmath" && $2=="program-app" && $3==1 && $4==1 && $5==1 &&
     exit 1
 }
 grep -q '^RELIEFOS_COMPONENT_APPS :=.* reliefmath ' "$work/components.mk"
-awk '/^config RELIEFOS_COMPONENT_APP_RELIEFMATH_BUILD$/{found=1;next} found && /default y/{ok=1;exit} found && /^config /{exit} END{exit !ok}' "$src/Kconfig.components" || {
+awk '/^(menu)?config RELIEFOS_COMPONENT_APP_RELIEFMATH_BUILD$/{found=1;next} found && /default y/{ok=1;exit} found && /^(menu)?config /{exit} END{exit !ok}' "$src/Kconfig.components" || {
     echo 'Kconfig.components does not default ReliefMath on' >&2
     exit 1
 }

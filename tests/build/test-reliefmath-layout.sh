@@ -1,8 +1,11 @@
 #!/bin/sh
 set -eu
 
-if [ "$#" -ne 2 ]; then
-    echo "usage: sh tests/build/test-reliefmath-layout.sh MATH_FONT TEXT_FONT" >&2
+repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
+if [ "$#" -eq 0 ]; then
+    set -- "$repo_root/resources/reliefmath/STIXTwoMath-Regular.otf" "$repo_root/system/fonts/simsun.ttc"
+elif [ "$#" -ne 2 ]; then
+    echo "usage: sh tests/build/test-reliefmath-layout.sh [MATH_FONT TEXT_FONT]" >&2
     exit 2
 fi
 math_font=$1
@@ -12,7 +15,6 @@ if [ -z "$host_cxx" ]; then
     host_cxx=c++
 fi
 
-repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 work_root=$(printenv TMPDIR 2>/dev/null || true)
 if [ -z "$work_root" ]; then
     work_root=/tmp

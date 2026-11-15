@@ -17,7 +17,7 @@ grub_fixture_efi() {
     fixture_efi=$1
     mkdir -p "$fixture_efi"
     printf 'int grub_fixture_input;\n' | ${HOSTCC:-cc} -m64 -ffreestanding -x c -c -o "$fixture_efi/input.o" -
-    for fixture_name in part_gpt fat iso9660 multiboot2 normal cmp search search_fs_file regexp configfile echo serial terminal video video_bochs video_cirrus efi_gop all_video font gfxterm gfxmenu hashsum gcry_sha256 crypto loadenv test; do
+    for fixture_name in part_gpt part_msdos ext2 chain ntfs linux gzio reboot search_fs_uuid search_label fat iso9660 multiboot2 normal cmp search search_fs_file regexp configfile echo serial terminal video video_bochs video_cirrus efi_gop all_video font gfxterm gfxmenu hashsum gcry_sha256 crypto loadenv test; do
         cp "$fixture_efi/input.o" "$fixture_efi/$fixture_name.mod"
     done
     printf 'fixture EFI kernel\n' > "$fixture_efi/kernel.img"

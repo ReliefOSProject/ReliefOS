@@ -1,13 +1,14 @@
 #!/bin/sh
 set -eu
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
-target="$src/out/xorg-vmware-debug"
+target=${RELIEFOS_TEST_BUILD_ROOT:-$src/out/x86_64/release}
 sdk="$target/sdk/reliefos-musl-sdk"
 fltk="$target/upstream/x11-development/usr"
-binary="$src/build/reliefmail-dev/task8a-fixround2/detail-widget/reliefmail-detail-widget"
-mkdir -p "$(dirname "$binary")"
-fontconfig="$src/build/reliefmail-dev/task8a-fixround2/detail-widget/fontconfig.xml"
-fontconfig_path="$src/build/reliefmail-dev/task8a-fixround2/detail-widget/fontconfig"
+work=$(mktemp -d "${TMPDIR:-/tmp}/reliefmail-detail-widget.XXXXXX")
+trap 'rm -rf "$work"' EXIT HUP INT TERM
+binary="$work/reliefmail-detail-widget"
+fontconfig="$work/fontconfig.xml"
+fontconfig_path="$work/fontconfig"
 widget_source="${RELIEFMAIL_WIDGET_SOURCE:-$src/userland/apps/reliefmail/ui_widgets.cpp}"
 mkdir -p "$fontconfig_path"
 cat >"$fontconfig" <<'EOF'

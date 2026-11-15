@@ -36,7 +36,11 @@ FILE *__wrap_setmntent(const char *path, const char *mode)
 {
     if (!virtual_image) return __real_setmntent(path, mode);
     static char table[] = "/dev/sda1 /already-mounted ext4 rw 0 0\n";
-    return fmemopen(table, !strcmp(scenario, "bios-mounted") ? strlen(table) : 0, "r");
+    /* A blank table also works with sanitizers that bind the older fmemopen
+     * ABI, where opening a zero-length buffer fails with EINVAL. */
+    static char empty[] = "\n";
+    char *contents = !strcmp(scenario, "bios-mounted") ? table : empty;
+    return fmemopen(contents, strlen(contents), "r");
 }
 
 /** @brief Model Linux block metadata while the successful installer runs real GRUB. */

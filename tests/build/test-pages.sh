@@ -95,38 +95,8 @@ sum_names=$(awk '{print $2}' "$tmp/pages/download/SHA256SUMS")
     && ok 'SHA256SUMS names the published installer ISO' \
     || bad "SHA256SUMS names the wrong download: $sum_names"
 
-# The installer workflow must validate and upload the same canonical image
-# paths. Extract the relevant YAML step bodies so a path in an unrelated
-# comment or summary cannot satisfy the contract.
-workflow="$src/.github/workflows/build-installer.yml"
-verify_step="$tmp/ci-verify-step"
-upload_step="$tmp/ci-upload-step"
-awk '/^      - name: Verify generated images$/ { active=1; next }
-     active && /^      - name:/ { exit }
-     active { print }' "$workflow" > "$verify_step"
-awk '/^      - name: Upload ReliefOS artifacts$/ { active=1; next }
-     active && /^      - name:/ { exit }
-     active { print }' "$workflow" > "$upload_step"
-for image in reliefos.vmdk reliefos-live.iso reliefos-installer.iso; do
-    grep -Fq "test -s out/x86_64/release/images/$image" "$verify_step" \
-        && grep -Fq "out/x86_64/release/images/$image" "$upload_step" \
-        && ok "CI validates and uploads $image" \
-        || bad "CI does not validate and upload the same path for $image"
-done
-pages_workflow="$src/.github/workflows/build-pages.yml"
-pages_verify="$tmp/pages-ci-verify-step"
-pages_upload="$tmp/pages-ci-upload-step"
-awk '/^      - name: Verify Pages tree$/ { active=1; next }
-     active && /^      - name:/ { exit }
-     active { print }' "$pages_workflow" > "$pages_verify"
-awk '/^      - name: Upload GitHub Pages artifact$/ { active=1; next }
-     active && /^      - name:/ { exit }
-     active { print }' "$pages_workflow" > "$pages_upload"
-grep -Fq 'sh tools/build/verify-pages.sh out/x86_64/release/pages' "$pages_verify" \
-    && grep -Fq 'python3 tools/test_documentation.py --site out/x86_64/release/pages/docs' "$pages_verify" \
-    && grep -Fq 'path: out/x86_64/release/pages' "$pages_upload" \
-    && ok 'Pages CI verifies and uploads the same assembled tree' \
-    || bad 'Pages CI does not verify and upload the same assembled tree'
+# Artifact identity and cross-job handoff are checked by test-ci.sh using
+# actual files, including corruption and a mismatched published installer.
 
 # 2. The assembled tree must pass verification.
 if sh "$src/tools/build/verify-pages.sh" "$tmp/pages" >"$tmp/verify-good.log" 2>&1; then

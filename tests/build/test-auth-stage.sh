@@ -112,7 +112,9 @@ if [ "$before" = "$after" ]; then
     pass 'repeating the stage produces identical bytes'
 else
     fail 'repeating the stage produces identical bytes'
-    diff <(printf '%s\n' "$before") <(printf '%s\n' "$after") | sed 's/^/       | /'
+    printf '%s\n' "$before" >"$work/checksums-first"
+    printf '%s\n' "$after" >"$work/checksums-second"
+    diff "$work/checksums-first" "$work/checksums-second" | sed 's/^/       | /'
 fi
 # The recipe re-runs by design (the stamp is promoted through a signature that
 # FORCE re-checks), so "does no work" has to mean what it measures: upstream make

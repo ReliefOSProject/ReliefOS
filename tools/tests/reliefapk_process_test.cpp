@@ -586,16 +586,19 @@ void test_su_stderr_prompt_uses_real_pty_echo_state()
     check(helper_survived && terminal_result == 'A',
         "authenticated helper stays alive after the stderr ready marker");
     if (!helper_survived) kill(helper, SIGKILL);
-    if (state.pty_master >= 0) ra::close_fd(state.pty_master);
-    if (state.pty_slave >= 0) ra::close_fd(state.pty_slave);
-    ra::wipe_password(&state);
-    free(state.output_data);
-    free(state.errors_data);
+    // Keep the controlling terminal alive until the helper has exited. Closing
+    // its master after the final marker can otherwise race with _exit and send
+    // SIGHUP from the fixture itself.
     int status = 0;
     pid_t waited;
     do { waited = waitpid(helper, &status, 0); } while (waited < 0 && errno == EINTR);
     check(waited == helper && WIFEXITED(status) && WEXITSTATUS(status) == 0,
         "stderr/PTY authentication helper exits cleanly");
+    if (state.pty_master >= 0) ra::close_fd(state.pty_master);
+    if (state.pty_slave >= 0) ra::close_fd(state.pty_slave);
+    ra::wipe_password(&state);
+    free(state.output_data);
+    free(state.errors_data);
     close(errors_pipe[0]);
     close(result_pipe[0]);
     close(echo_toggle_pipe[1]);

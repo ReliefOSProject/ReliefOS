@@ -23,6 +23,12 @@ class TestDelegation(unittest.TestCase):
     def test_sdk_reference_does_not_claim_kernel_unit_pass(self):
         with tempfile.TemporaryDirectory(prefix="ioctl-evidence-") as temporary:
             work = Path(temporary)
+            # Evidence records a real source revision; the fixture needs its
+            # own repository when ROOT is redirected away from the checkout.
+            subprocess.run(["git", "init", "-q", str(work)], check=True)
+            subprocess.run(["git", "-C", str(work), "-c", "user.name=CI fixture",
+                            "-c", "user.email=ci@example.invalid", "commit", "-q",
+                            "--allow-empty", "-m", "fixture"], check=True)
             probe = work / "build/ioctl-cloexec/linux-ioctl-cloexec.elf"
             probe.parent.mkdir(parents=True)
             probe.write_bytes(b"fixture probe")
