@@ -106,11 +106,14 @@ fi
 expect_output_is 'a submodule reports its pinned commit' 9fa28ece75d8a2191de7c5bb53bed224c5947417 \
     "$deps" --lock "$lock" --id musl --print commit
 expect_output_is 'a tarball reports its digest' \
-    fc0f1eb6b6766470326f2c014693809190e67dba84274a6fbae9d4912d066706 \
-    "$deps" --lock "$lock" --id libmd --print sha256
+    102bbdfd934776c12c6d83743a31ec648f8c2f1ddfa1832b6e13b6efd09412cb \
+    "$deps" --lock "$lock" --id exfatprogs --print sha256
 expect_output_is 'a tarball reports its download url' \
-    https://libbsd.freedesktop.org/releases/libmd-1.3.0.tar.xz \
-    "$deps" --lock "$lock" --id libmd --print url
+    https://github.com/exfatprogs/exfatprogs/releases/download/1.4.4/exfatprogs-1.4.4.tar.xz \
+    "$deps" --lock "$lock" --id exfatprogs --print url
+expect_output_is 'official libmd reports its pinned APK digest' \
+    0d49d6bb91fafb818fccd9df25927ed51a308c944df2ffdbb505b364c9042df8 \
+    "$deps" --lock "$lock" --id alpine-libmd --print sha256
 expect_failure 'an unknown id fails rather than printing nothing' \
     "$deps" --lock "$lock" --id does-not-exist --print commit
 expect_failure 'an unknown field fails rather than printing nothing' \
@@ -128,7 +131,7 @@ else
     printf 'ok   - submodules are excluded from the fetch list\n'
 fi
 checks=$((checks + 1))
-if printf '%s\n' "$fetch_list" | grep -q 'libmd-1.3.0.tar.xz'; then
+if printf '%s\n' "$fetch_list" | grep -q 'exfatprogs-1.4.4.tar.xz'; then
     printf 'ok   - downloaded tarballs appear in the fetch list\n'
 else
     printf 'FAIL - downloaded tarballs must appear in the fetch list\n'

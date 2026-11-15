@@ -107,6 +107,7 @@ menuentry "ReliefOS PAM runtime probe" {
     artifacts += sorted((stage / "lib").glob("libcrypt.so*"))
     artifacts += sorted((stage / "lib").glob("libbsd.so*"))
     artifacts += sorted((stage / "lib").glob("libmd.so*"))
+    artifacts += sorted((stage / "usr/lib").glob("libmd.so*"))
     artifacts += [stage / "sbin" / helper.name for helper in sorted((auth / "root/sbin").iterdir())
                   if helper.is_file()]
     artifacts += [tests / "gcc-probe.elf", stage / "reliefos/kernel.sys",

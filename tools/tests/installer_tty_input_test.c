@@ -47,7 +47,7 @@ int installer_setup_valid(const struct installer_setup *value)
         *value->root_password && !strcmp(value->root_password, value->root_password_confirm);
 }
 
-static int abnormal_worker, update_failure;
+static int abnormal_worker, update_failure, install_failure;
 static void record_settings(void)
 {
     const char *path = getenv("INSTALLER_TEST_RESULT");
@@ -59,15 +59,22 @@ static void record_settings(void)
         (unsigned long long)setup.swap_size_mib);
     fclose(file);
 }
-static void fixture_install(void)
+static int fixture_install(void)
 {
     if (abnormal_worker) _exit(7);
+    if (install_failure) {
+        install_success = 0;
+        strcpy(status_text, "Installation failed");
+        strcpy(detail_text, "Copy failed ret=-30");
+        return -EROFS;
+    }
     progress_value = 50;
     strcpy(status_text, "Copying fixture files");
     refresh_ui();
     record_settings();
     install_success = 1;
     page = INSTALLER_PAGE_FINISH;
+    return 0;
 }
 static void fixture_disks(void)
 {
@@ -269,6 +276,12 @@ static void screen_tests(void)
     update_failure = 0;
     job.kind = TUI_JOB_INSTALL;
     assert(tui_run_job(&fixture_context, &job) == 0 && install_success);
+    install_failure = 1;
+    assert(tui_run_job(&fixture_context, &job) == -EROFS && !install_success);
+    assert(!strcmp(status_text, "Installation failed"));
+    assert(strstr(detail_text, strerror(EROFS)));
+    assert(strstr(detail_text, "Copy failed ret=-30"));
+    install_failure = 0;
     abnormal_worker = 1;
     assert(tui_run_job(&fixture_context, &job) == -EIO);
     assert(!strcmp(status_text, "Operation failed"));

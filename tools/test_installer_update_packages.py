@@ -75,16 +75,31 @@ class UpdatePreflight(unittest.TestCase):
                               check=True, capture_output=True, text=True)
 
     @classmethod
-    def package(cls, name, version, repository, dependencies=()):
+    def package(cls, name, version, repository, dependencies=(), payload=None, symlinks=None,
+                replaces=(), modes=None):
         files = cls.work / (name + "-" + version)
+        if files.exists():
+            shutil.rmtree(files)
         (files / "usr/share" / name).mkdir(parents=True, exist_ok=True)
         (files / "usr/share" / name / "version").write_text(version + "\n")
+        for relative, text in (payload or {}).items():
+            path = files / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(text)
+        for relative, destination in (symlinks or {}).items():
+            path = files / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.symlink_to(destination)
+        for relative, mode in (modes or {}).items():
+            (files / relative).chmod(mode)
         arguments = ["mkpkg", "--files", files, "--output",
                      cls.base / repository / (name + "-" + version + ".apk"),
                      "--info", "name:" + name, "--info", "version:" + version,
                      "--info", "arch:x86_64", "--sign-key", cls.key]
-        for dependency in dependencies:
-            arguments.extend(["--info", "depends:" + dependency])
+        if dependencies:
+            arguments.extend(["--info", "depends:" + " ".join(dependencies)])
+        if replaces:
+            arguments.extend(["--info", "replaces:" + " ".join(replaces)])
         cls.apk(*arguments)
 
     @classmethod
@@ -173,6 +188,243 @@ class UpdatePreflight(unittest.TestCase):
             self.assertEqual((repository / "packages.adb").stat().st_mode & 0o777, 0o644)
             self.assertEqual((target / "usr/share/reliefos-fixture/version").read_text(), "2.0-r0\n")
             self.assertFalse((target / "run/reliefos-kernel-activation.defer").exists())
+
+    def test_sudo_prompt_cleanup_removes_duplicate_catalogs_and_preserves_pam(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        old_config = "Path askpass /usr/lib/reliefos/apps/sudod/sudod.elf\n"
+        new_config = (ROOT / "system/rootfs/etc/sudo.conf").read_text()
+        remaining_catalogs = {
+            f"usr/share/locale/{language}/LC_MESSAGES/reliefaskpass.mo": "dialog labels\n"
+            for language in ("zh_CN", "ja_JP")}
+        retired_catalogs = {
+            f"usr/share/locale/{language}/LC_MESSAGES/sudod.mo": "duplicate prompt\n"
+            for language in ("zh_CN", "ja_JP")}
+        authentication = {
+            "usr/bin/sudo": "PAM sudo\n",
+            "etc/pam.d/sudo": (ROOT / "system/rootfs/etc/pam.d/sudo").read_text(),
+            "etc/pam.d/sudo-i": (ROOT / "system/rootfs/etc/pam.d/sudo-i").read_text(),
+            **{f"usr/share/locale/{language}/LC_MESSAGES/{domain}.mo": "upstream translation\n"
+               for language in ("zh_CN", "ja_JP") for domain in ("sudo", "sudoers")}}
+        self.package("reliefos-nls", "7.0-r0", old,
+                     payload={**remaining_catalogs, **retired_catalogs})
+        self.package("reliefos-nls", "8.0-r0", new, payload=remaining_catalogs)
+        self.package("reliefos-authentication", "7.0-r0", old,
+                     payload={**authentication, "etc/sudo.conf": old_config},
+                     modes={"usr/bin/sudo": 0o4755})
+        self.package("reliefos-authentication", "8.0-r0", new,
+                     payload={**authentication, "etc/sudo.conf": new_config},
+                     modes={"usr/bin/sudo": 0o4755})
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "add", "reliefos-nls",
+                 "reliefos-authentication")
+        administrator_config = old_config + "# administrator configuration\n"
+        (target / "etc/sudo.conf").write_text(administrator_config)
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            for path in retired_catalogs:
+                self.assertFalse((target / path).exists(), path)
+            for path, text in {**remaining_catalogs, **authentication}.items():
+                self.assertEqual((target / path).read_text(), text, path)
+            self.assertEqual((target / "etc/sudo.conf").read_text(), administrator_config)
+            self.assertEqual((target / "etc/sudo.conf.apk-new").read_text(), new_config)
+            self.assertEqual((target / "usr/bin/sudo").stat().st_mode & 0o7777, 0o4755)
+
+    def test_filesystem_and_bsd_split_transfers_owners_and_preserves_configuration(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        self.package("reliefos-auth-support-libraries", "4.0-r0", old, payload={
+            "lib/libbsd.so.0": "old BSD library\n", "lib/libmd.so.0": "local MD library\n"})
+        self.package("reliefos-storage-filesystems", "4.0-r0", old, payload={
+            "usr/sbin/mkfs.ext4": "old formatter\n", "usr/sbin/mkfs.exfat": "local exFAT\n"},
+            symlinks={"sbin/mkfs.ext4": "../usr/sbin/mkfs.ext4"})
+        # Older rootfs fallback ownership also put configuration and extra
+        # tools in base; all old owners must join the same normal upgrade.
+        self.package("reliefos-base", "4.0-r0", old, payload={
+            "usr/lib/libext2fs.so.2": "old ext library\n", "etc/mke2fs.conf": "old defaults\n"})
+        self.package("reliefos-base", "5.0-r0", new)
+        self.package("libbsd", "0.12.2-r0", new, payload={"usr/lib/libbsd.so.0": "official BSD library\n"})
+        self.package("e2fsprogs", "1.47.4-r0", new, payload={
+            "sbin/mkfs.ext4": "official formatter\n", "usr/lib/libext2fs.so.2": "official ext library\n",
+            "etc/mke2fs.conf": "new defaults\n"})
+        self.package("reliefos-auth-support-libraries", "5.0-r0", new, ["libbsd"],
+                     payload={"lib/libmd.so.0": "local MD library\n"})
+        self.package("reliefos-storage-filesystems", "5.0-r0", new, ["e2fsprogs"],
+                     payload={"usr/sbin/mkfs.exfat": "local exFAT\n"},
+                     symlinks={"usr/sbin/mkfs.ext4": "../../sbin/mkfs.ext4"})
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "add", "reliefos-auth-support-libraries",
+                 "reliefos-storage-filesystems", "reliefos-base")
+        (target / "etc/mke2fs.conf").write_text("administrator defaults\n")
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertFalse((target / "lib/libbsd.so.0").exists())
+            self.assertEqual((target / "sbin/mkfs.ext4").read_text(), "official formatter\n")
+            self.assertFalse((target / "sbin/mkfs.ext4").is_symlink())
+            self.assertEqual(os.readlink(target / "usr/sbin/mkfs.ext4"), "../../sbin/mkfs.ext4")
+            self.assertEqual((target / "etc/mke2fs.conf").read_text(), "administrator defaults\n")
+            self.assertEqual((target / "lib/libmd.so.0").read_text(), "local MD library\n")
+            self.assertEqual((target / "usr/sbin/mkfs.exfat").read_text(), "local exFAT\n")
+            for path, owner in (("sbin/mkfs.ext4", "e2fsprogs"),
+                                ("usr/lib/libext2fs.so.2", "e2fsprogs"),
+                                ("usr/lib/libbsd.so.0", "libbsd")):
+                output = self.apk("--root", target, "info", "--who-owns", "/" + path).stdout
+                self.assertIn("owned by " + owner + "-", output)
+
+    def test_util_linux_transfer_retains_shadow_pam_and_official_su_modes(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        shadow = {"bin/login": "shadow login\n", "usr/bin/newgrp": "shadow newgrp\n",
+                  "sbin/nologin": "shadow nologin\n"}
+        self.package("reliefos-base", "5.0-r0", old, payload=shadow)
+        self.package("reliefos-authentication", "5.0-r0", old, payload={
+            "bin/su": "local su\n", "etc/pam.d/su-l": "product policy\n"})
+        self.package("reliefos-storage-util-linux", "5.0-r0", old, payload={
+            "usr/sbin/fdisk": "local fdisk\n", "usr/lib/libblkid.so.1": "local blkid\n"},
+            symlinks={"sbin/fdisk": "../usr/sbin/fdisk"})
+        self.package("reliefos-base", "6.0-r0", new)
+        self.package("util-linux-login", "2.42.4-r3", new, payload={
+            **{name: "official overlapping tool\n" for name in shadow},
+            "bin/su": "official su\n", "etc/pam.d/su-l": "upstream policy\n"},
+            modes={"bin/su": 0o4755})
+        self.package("util-linux-misc", "2.42.4-r3", new,
+                     payload={"sbin/fdisk": "official fdisk\n"})
+        self.package("libblkid", "2.42.4-r3", new,
+                     payload={"usr/lib/libblkid.so.1": "official blkid\n"})
+        self.package("reliefos-authentication", "6.0-r0", new, ["util-linux-login"],
+                     payload={**shadow, "etc/pam.d/su-l": "product policy\n"},
+                     replaces=["util-linux-login"])
+        self.package("reliefos-storage-util-linux", "6.0-r0", new,
+                     ["util-linux-misc", "libblkid"],
+                     symlinks={"usr/sbin/fdisk": "../../sbin/fdisk"})
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "add", "reliefos-base",
+                 "reliefos-authentication", "reliefos-storage-util-linux")
+        (target / "etc/pam.d/su-l").write_text("administrator policy\n")
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            for name, text in shadow.items():
+                self.assertEqual((target / name).read_text(), text)
+                owner = self.apk("--root", target, "info", "--who-owns", "/" + name).stdout
+                self.assertIn("owned by reliefos-authentication-", owner)
+            self.assertEqual((target / "etc/pam.d/su-l").read_text(), "administrator policy\n")
+            self.assertEqual((target / "bin/su").stat().st_mode & 0o7777, 0o4755)
+            self.assertEqual((target / "bin/su").read_text(), "official su\n")
+            self.assertEqual(os.readlink(target / "usr/sbin/fdisk"), "../../sbin/fdisk")
+            self.assertFalse((target / "sbin/fdisk").is_symlink())
+            for path, package in (("bin/su", "util-linux-login"),
+                                  ("sbin/fdisk", "util-linux-misc"),
+                                  ("usr/lib/libblkid.so.1", "libblkid")):
+                owner = self.apk("--root", target, "info", "--who-owns", "/" + path).stdout
+                self.assertIn("owned by " + package + "-", owner)
+        # A later upstream-only upgrade must still honor the already installed
+        # local replacement, without reinstalling/changing authentication.
+        self.package("util-linux-login", "2.42.5-r0", new, payload={
+            **{name: "new upstream overlap\n" for name in shadow},
+            "bin/su": "upgraded official su\n", "etc/pam.d/su-l": "new upstream policy\n"},
+            modes={"bin/su": 0o4755})
+        self.index(new)
+        repositories.write_text("ndx " + str(new / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "upgrade", "util-linux-login")
+        for name, text in shadow.items():
+            self.assertEqual((target / name).read_text(), text)
+        self.assertEqual((target / "bin/su").read_text(), "upgraded official su\n")
+        self.assertEqual((target / "bin/su").stat().st_mode & 0o7777, 0o4755)
+        self.assertEqual((target / "etc/pam.d/su-l").read_text(), "administrator policy\n")
+
+    def test_libmd_transfer_removes_old_development_files_and_keeps_legacy_links(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        self.package("reliefos-auth-support-libraries", "6.0-r0", old, payload={
+            "lib/libmd.so.0.3.0": "old local library\n", "lib/libmd.a": "old archive\n",
+            "usr/share/licenses/libmd/COPYING": "old license\n"},
+            symlinks={"lib/libmd.so": "libmd.so.0.3.0", "lib/libmd.so.0": "libmd.so.0.3.0"})
+        self.package("reliefos-base", "6.0-r0", old, payload={
+            "usr/include/md5.h": "old header\n", "lib/pkgconfig/libmd.pc": "old build flags\n"})
+        self.package("libmd", "1.3.0-r0", new,
+                     payload={"usr/lib/libmd.so.0.3.0": "official library\n"},
+                     symlinks={"usr/lib/libmd.so.0": "libmd.so.0.3.0"})
+        self.package("libmd-doc", "1.3.0-r0", new,
+                     payload={"usr/share/licenses/libmd/COPYING": "official license\n"})
+        self.package("reliefos-auth-support-libraries", "7.0-r0", new, ["libmd", "libmd-doc"],
+                     symlinks={"lib/libmd.so.0": "../usr/lib/libmd.so.0",
+                               "lib/libmd.so": "libmd.so.0", "lib/libmd.so.0.3.0": "libmd.so.0"})
+        self.package("reliefos-base", "7.0-r0", new)
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories, "--no-network",
+                 "--no-scripts", "add", "reliefos-base", "reliefos-auth-support-libraries")
+        protected = {name: (target / name).read_bytes() for name in (
+            "etc/apk/world", "etc/reliefos/local.conf", "home/test/document.txt")}
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            for name, content in protected.items():
+                self.assertEqual((target / name).read_bytes(), content, name)
+            for path in ("lib/libmd.a", "usr/include/md5.h", "lib/pkgconfig/libmd.pc"):
+                self.assertFalse((target / path).exists(), path)
+            self.assertEqual(os.readlink(target / "lib/libmd.so.0"), "../usr/lib/libmd.so.0")
+            for name in ("libmd.so", "libmd.so.0.3.0"):
+                self.assertEqual(os.readlink(target / "lib" / name), "libmd.so.0")
+                self.assertEqual((target / "lib" / name).read_text(), "official library\n")
+            for path, package in (("usr/lib/libmd.so.0", "libmd"),
+                                  ("usr/share/licenses/libmd/COPYING", "libmd-doc"),
+                                  ("lib/libmd.so.0", "reliefos-auth-support-libraries")):
+                owner = self.apk("--root", target, "info", "--who-owns", "/" + path).stdout
+                self.assertIn("owned by " + package + "-", owner)
+
+    def test_old_console_ca_placeholder_is_replaced_by_real_bundle(self):
+        old, new = self.runner / "oldrepo", self.runner / "newrepo"
+        target = self.runner / "target"
+        self.package("ca-certificates-bundle", "4.0-r0", old)
+        self.package("reliefos-trust", "4.0-r0", old, ["ca-certificates-bundle"])
+        self.package("ca-certificates-bundle", "20261020-r0", new, payload={
+            "etc/ssl/certs/ca-certificates.crt": "official bundle fixture\n"})
+        self.package("reliefos-trust", "5.0-r0", new,
+                     ["ca-certificates-bundle>=20261020-r0"])
+        self.index(old)
+        self.index(new)
+        repositories = self.runner / "old.repositories"
+        repositories.write_text("ndx " + str(old / "packages.adb") + "\n")
+        self.apk("--root", target, "--repositories-file", repositories,
+                 "--no-network", "--no-scripts", "add", "reliefos-trust")
+        self.assertFalse((target / "etc/ssl/certs/ca-certificates.crt").exists())
+        checked = self.check()
+        self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)
+        for _ in range(2):
+            result = self.transaction("--apply")
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual((target / "etc/ssl/certs/ca-certificates.crt").read_text(),
+                             "official bundle fixture\n")
+            owner = self.apk("--root", target, "info", "--who-owns",
+                             "/etc/ssl/certs/ca-certificates.crt").stdout
+            self.assertIn("owned by ca-certificates-bundle-20261020-r0", owner)
 
     def test_kernel_activation_recognizes_both_offline_publication_markers(self):
         target = self.runner / "target"

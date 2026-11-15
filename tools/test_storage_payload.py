@@ -15,7 +15,7 @@ class BootPayloadTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="storage-stage-") as temporary:
             source, target = Path(temporary) / "source", Path(temporary) / "stage"
             (source / "usr/sbin").mkdir(parents=True)
-            for fs in ("ext2", "fat", "exfat"):
+            for fs in ("ext2", "ext4", "fat", "exfat"):
                 for verb in ("mkfs", "fsck"):
                     (source / "usr/sbin" / f"{verb}.{fs}").write_bytes(b"official fixture")
             archive = source / "usr/lib/libext2fs.a"

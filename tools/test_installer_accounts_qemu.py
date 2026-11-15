@@ -65,7 +65,7 @@ class Probe(WindowProbe):
 
     def text(self, text):
         punctuation = {";": "semicolon", "(": "shift-9", ")": "shift-0",
-                       ">": "shift-dot", "$": "shift-4", "?": "shift-slash",
+                       "<": "shift-comma", ">": "shift-dot", "$": "shift-4", "?": "shift-slash",
                        "'": "apostrophe", '"': "shift-apostrophe", "!": "shift-1"}
         for character in text:
             self.key(punctuation.get(character, text_keys(character)[0]))

@@ -1419,15 +1419,19 @@ static void finish_install(int ret,
     refresh_ui();
 }
 
-void perform_install(void)
+/** @brief Run the confirmed installation and update progress/completion state.
+ * @return Zero on success, or the original negative errno on failure.
+ */
+int perform_install(void)
 {
     int ret;
     if (!installer_setup_valid(&setup)) {
         finish_install(-EINVAL, T("Invalid installation settings"));
-        return;
+        return -EINVAL;
     }
     if (selected_disk < 0 || (uint32_t)selected_disk >= disk_count) {
-        return;
+        finish_install(-ENODEV, T("Invalid installation settings"));
+        return -ENODEV;
     }
     install_running = 1;
     install_success = 0;
@@ -1442,34 +1446,34 @@ void perform_install(void)
     ret = check_install_payload_required();
     if (ret < 0) {
         finish_install(ret, T("Payload check failed"));
-        return;
+        return ret;
     }
 
     if (setup.swap_enabled) {
         if (!installer_swap_size_valid(setup.swap_size_mib)) {
-            finish_install(-EINVAL,T("Invalid swap size"));return;
+            finish_install(-EINVAL,T("Invalid swap size"));return -EINVAL;
         }
         ret=installer_swap_bundle_supported(fresh_root_payload());
-        if (ret) {finish_install(ret,T("Selected system does not support swap"));return;}
+        if (ret) {finish_install(ret,T("Selected system does not support swap"));return ret;}
         ret=installer_swap_storage_supported(disks[selected_disk].path);
-        if (ret) {finish_install(ret,T("Swap requires an AHCI disk"));return;}
+        if (ret) {finish_install(ret,T("Swap requires an AHCI disk"));return ret;}
     }
 
     struct reliefos_boot_install_options boot = installer_boot_options();
     ret = reliefos_boot_validate_payload(&boot);
     if (!ret) ret = reliefos_boot_validate_disk(&boot, !installer_partition_auto);
-    if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return; }
+    if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return ret; }
 
     show_progress(2, T("Preparing target disk"), "");
     show_progress(22, T("Mounting target filesystems"), T("Root and boot partitions"));
     ret = installer_mount_targets(disks[selected_disk].path);
     if (ret < 0) {
         finish_install(ret, T("Mount failed"));
-        return;
+        return ret;
     }
 
     ret = reliefos_boot_validate_target(&boot);
-    if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return; }
+    if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return ret; }
 
     show_progress(30, T("Scanning installation payload"), T("Root and boot partitions"));
     ret = count_files_recursive(fresh_root_payload(), &copy_total);
@@ -1478,7 +1482,7 @@ void perform_install(void)
     }
     if (ret < 0) {
         finish_install(ret, T("Payload scan failed"));
-        return;
+        return ret;
     }
 
     show_progress(35, T("Copying system files"),
@@ -1486,7 +1490,7 @@ void perform_install(void)
     ret = copy_payload_ordered();
     if (ret < 0) {
         finish_install(ret, T("Copy failed"));
-        return;
+        return ret;
     }
 
     explicit_bzero(setup.password, sizeof(setup.password));
@@ -1497,9 +1501,10 @@ void perform_install(void)
     if (!ret) ret = sync_target_root(INSTALL_ROOT_MOUNT);
     if (ret < 0) {
         finish_install(ret, T("Could not save installed preferences"));
-        return;
+        return ret;
     }
 
     show_progress(100, T("Installation completed successfully"), T("Target disk is ready."));
     finish_install(0, "");
+    return 0;
 }
