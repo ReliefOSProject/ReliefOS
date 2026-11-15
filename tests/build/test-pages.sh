@@ -256,7 +256,7 @@ done
 cat > "$fixture/Makefile" <<EOF
 RELIEFOS_SRC := $fixture/os
 RELIEFNT_DIR := $fixture/nt
-O := $fixture/out
+override O := $fixture/out
 RPR_PAGES := $fixture/rpr
 INSTALLER_ISO := $fixture/installer.iso
 BUILD_INFO_HEADER := $fixture/build_info.h

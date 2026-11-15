@@ -5,9 +5,8 @@ flowchart TD
     A[PR / main push / manual run] --> B[Select checks]
     A --> C[Workflow and orchestration checks]
     B --> D[Documentation: Sphinx 5 / 7 / 9]
-    B --> E[Build images and Pages once]
-    C --> E
-    D --> E
+    B --> L[Restore verified downloads and compiler cache]
+    L --> E[Build images and Pages once]
     E --> F[Host and build regressions]
     F --> G[Record commit and SHA-256 / upload products]
     G --> H[BIOS: disk / live / installer]
@@ -47,6 +46,29 @@ staging tree without transferring the entire compiler output between jobs.
 Common runner dependencies live in `scripts/ci/install.sh` and the local setup
 action. The build checkout includes full Git history for kernel rollback
 regressions. Host development packages include FFmpeg, Cairo, GLib and Xvfb.
+
+Builds start alongside workflow checks and the documentation matrix; the final
+gate still requires all selected stages. `make -j"$(nproc)" test` passes the
+jobserver through the contract runner to nested Make processes. Suites remain
+sequential because some temporarily probe shared source files. Each suite logs
+its elapsed seconds, and a dry run never executes its scripts.
+
+The download cache covers both repositories' `cache/downloads`, keyed by both
+dependency locks and runner platform. A fallback can supply unchanged archives
+after a lock update, but `make fetch` still verifies their hashes and replaces
+stale bytes before a build. Verified downloads are saved before compilation,
+so a later test failure does not throw them away. ReliefNT fetch is already
+delegated by the parent and is not repeated.
+
+`ccache` wraps the standard compiler names for the build and its nested tests.
+Its cache is limited to 1 GiB, checks compiler contents, and retains the default
+header, flag and working-directory checks. Path rewriting stays disabled so
+Kbuild source/dependency records retain their native paths. Each run saves a new cache, even
+after a test failure, and reports hits/misses in the run summary. No output
+tree, signed APK, image or private key is restored from a build cache. GitHub's
+cache ref scope separates PR caches from the default branch. The pinned
+actionlint binary has a separate platform/version cache; warm runs avoid
+installing Go just to rebuild the linter.
 
 Publishing builds use `RELIEFOS_APK_SIGNING_KEY_B64`, with the existing
 legacy secret fallback. PRs and validation-only manual runs use

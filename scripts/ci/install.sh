@@ -4,7 +4,7 @@ set -euo pipefail
 case "${1:-}" in
   build)
     packages=(
-      build-essential clang libclang-rt-dev llvm lld bison flex gperf gettext
+      build-essential clang libclang-rt-dev llvm lld ccache bison flex gperf gettext
       grub-efi-amd64-bin grub-pc-bin grub-common xorriso mtools dosfstools
       e2fsprogs libext2fs-dev fdisk zip openssl fakeroot gdisk qemu-utils
       git make perl libncurses-dev bc pkg-config autoconf automake libtool

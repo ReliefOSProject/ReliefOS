@@ -30,7 +30,7 @@ cat > "$work/inspect.mk" <<'MAKE'
 RELIEFOS_SRC := $(ROOT)
 RELIEFOS_PASSIVE := 1
 RELIEFOS_COMPONENT_APPS := reliefmath
-O := $(WORK)/out
+override O := $(WORK)/out
 TARGET_CC := cc
 include $(ROOT)/scripts/reliefos/Makefile.userland
 .PHONY: inspect

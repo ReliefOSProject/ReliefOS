@@ -10,8 +10,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def run(args, cwd):
+    # This fixture chooses its own parallelism and compiler settings. Inherited
+    # jobserver options would otherwise print warnings even for a real no-op.
+    environment = {key: value for key, value in os.environ.items()
+                   if key not in {'MAKEFLAGS', 'MFLAGS', 'MAKELEVEL', 'MAKEOVERRIDES'}}
     result = subprocess.run(args, cwd=cwd, text=True, stdout=subprocess.PIPE,
-                            stderr=subprocess.STDOUT, timeout=180)
+                            stderr=subprocess.STDOUT, timeout=180, env=environment)
     assert result.returncode == 0, result.stdout
     return result.stdout
 
@@ -86,7 +90,8 @@ targets += one two
             assert 'api.h' in command, 'C++ fixdep lost a real include'
         original = stamps()
         binaries = {n: (out / n).stat().st_mtime_ns for n in ('one', 'two')}
-        assert not build().strip(), 'native application no-op ran an action'
+        noop = build()
+        assert not noop.strip(), f'native application no-op ran an action:\n{noop}'
         assert stamps() == original
         assert binaries == {n: (out / n).stat().st_mtime_ns for n in binaries}
         build('-DFIXTURE_CXX_TOGGLE=1')

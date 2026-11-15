@@ -24,3 +24,13 @@ runs:
           fi
         done
         unshare -Ur true
+    - name: Enable compiler cache
+      if: inputs.profile == 'build'
+      shell: bash
+      run: |
+        sudo update-ccache-symlinks
+        for compiler in cc c++ clang clang++; do
+          test -L "/usr/lib/ccache/$compiler"
+        done
+        # Preserve the toolchain's compiler names, including nested test builds.
+        echo /usr/lib/ccache >> "$GITHUB_PATH"

@@ -1,11 +1,15 @@
 #!/bin/sh
 set -eu
-src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
+src=$(CDPATH='' cd -- "$(dirname "$0")/../.." && pwd)
 . "$src/tests/lib/runtime-dependencies.sh"
-tmp="$src/out/tmp"
-export TMPDIR="$tmp"
+tmp=${TMPDIR:-$src/out/tmp}
 mkdir -p "$tmp"
+tmp=$(CDPATH='' cd -- "$tmp" && pwd)
 work=$(mktemp -d "$tmp/reliefmail-tests.XXXXXX")
+export TMPDIR="$work"
+# Keep every fixture independent of the caller's working directory, including
+# the out-of-tree Kbuild runner. No repository-relative out/tmp exists here.
+cd "$work"
 fixture_pid=
 cleanup() {
     if [ -n "$fixture_pid" ]; then

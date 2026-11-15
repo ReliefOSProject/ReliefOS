@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 root=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd -P)
+# Exercise selector precedence without command-line assignments forwarded from
+# the parent test runner. These probes only inspect help and dry-run targets.
+unset MAKEFLAGS MFLAGS MAKEOVERRIDES
 w=$(mktemp -d)
 trap 'rm -rf "$w"' EXIT HUP INT TERM
 

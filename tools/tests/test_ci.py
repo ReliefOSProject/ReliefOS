@@ -195,6 +195,46 @@ class GateTests(unittest.TestCase):
             self.assertFalse(ci.summary(needs)[0])
 
 
+class BuildHarnessTests(unittest.TestCase):
+    def test_contract_submakes_keep_jobserver_and_dry_runs_execute_nothing(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = Path(__file__).parents[2]
+            script = root / "contract.sh"
+            observed = root / "observed"
+            child = root / "child.mk"
+            child.write_text(f"check:\n\t@printf '%s\\n' '$(MAKEFLAGS)' > {observed}\n")
+            script.write_text(f"#!/bin/sh\nset -eu\nmake --no-print-directory -f {child} check\n")
+            makefile = root / "Makefile"
+            makefile.write_text(
+                f"RELIEFOS_SRC := {source}\nO := {root}/out\nO_HOST := $(O)/host\n"
+                "RELIEFOS_LOG_SHELL = :\n"
+                f"include {source}/scripts/reliefos/Makefile.tests\n"
+                f"RELIEFOS_LONG_TESTS := {script}\n"
+                "grub-host grub-efi: ;\n")
+
+            def run(*arguments, check=True):
+                return subprocess.run(["make", "--no-print-directory", "-f", str(makefile),
+                                       "-j2", *arguments, "test-long"], cwd=root,
+                                      env={key: value for key, value in os.environ.items()
+                                           if key not in {"MAKEFLAGS", "MFLAGS", "MAKELEVEL", "MAKEOVERRIDES"}},
+                                      capture_output=True, text=True, check=check)
+
+            run("-n")
+            self.assertFalse(observed.exists(), "make -n must not run contract scripts")
+            run("-q", check=False)
+            self.assertFalse(observed.exists(), "make -q must not run contract scripts")
+            run("-t")
+            self.assertFalse(observed.exists(), "make -t must not run contract scripts")
+            result = run()
+            self.assertNotIn("jobserver unavailable", result.stderr)
+            self.assertRegex(observed.read_text(), r"(?:^| )-j2(?: |$)")
+            self.assertIn("TIME - contract.sh:", result.stdout)
+            # A suite that prints a failure but exits zero still fails the gate.
+            script.write_text("#!/bin/sh\nprintf 'FAIL - counted failure\\n'\n")
+            self.assertNotEqual(run(check=False).returncode, 0)
+
+
 class MirrorTests(unittest.TestCase):
     def test_local_mirror_forces_updates_prunes_branches_and_keeps_tags(self):
         with tempfile.TemporaryDirectory() as temporary:

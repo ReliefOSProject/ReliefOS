@@ -11,7 +11,7 @@ git submodule status --recursive
 test -f third_party/musl/configure
 test -f third_party/busybox/Makefile
 make fetch
-make -C kernel/reliefnt fetch
+# The parent fetch delegates to ReliefNT and verifies both restored caches.
 make defconfig
 config=out/x86_64/release/.config
 sed -i '/^CONFIG_INSTALLER_ROOT_SIZE_MIB=/d;/^# CONFIG_INSTALLER_ROOT_SIZE_MIB is not set$/d' "$config"
