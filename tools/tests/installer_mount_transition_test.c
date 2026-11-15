@@ -41,8 +41,9 @@ int __wrap_open(const char *path, int flags, ...)
 }
 
 static int root_mounted, esp_mounted, esp_volume_mounted, busy_root, busy_esp, mutations;
-static int manual_layout, manual_bad_role, format_calls, type_calls, gpt_index;
+static int manual_layout, manual_bad_role, manual_ext3, format_calls, type_calls, gpt_index;
 static char formatted_esp[64];
+static char root_type[16], root_options[32];
 static uint64_t capacity_bytes, capacity_inodes;
 int fake_stat(const char *path, struct stat *status)
 {
@@ -128,6 +129,10 @@ int fake_mount(const char *source, const char *target, const char *type,
     int *mounted = !strcmp(target, INSTALL_ESP_MOUNT) ? &esp_mounted :
         !strcmp(target, INSTALL_ESP_VOLUME) ? &esp_volume_mounted : &root_mounted;
     assert(!*mounted);
+    if (!strcmp(target, INSTALL_ROOT_MOUNT)) {
+        snprintf(root_type,sizeof(root_type),"%s",type);
+        snprintf(root_options,sizeof(root_options),"%s",data ? (const char *)data : "");
+    }
     *mounted = 1;
     return 0;
 }
@@ -176,6 +181,7 @@ int reliefos_block_list_partitions(const char *path, struct reliefos_block_parti
         strcpy(parts[0].path, "/dev/sda6");
         strcpy(parts[1].path, "/dev/sda4");
         parts[1].filesystem = RELIEFOS_BLOCK_FILESYSTEM_FAT32;
+        if (manual_ext3) parts[2].filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT3;
         strcpy(parts[2].path, "/dev/sda9");
         *count = 3;
         return 0;
@@ -241,6 +247,14 @@ int main(void)
     assert(installer_mount_targets("/dev/sda") == 0);
     assert(!strcmp(spawn_args[spawn_argc - 1], "/dev/sda9"));
     assert(mutations == 2); /* A manual install never replaces the GPT. */
+    manual_ext3 = 1;
+    int saved_spawns = spawn_calls, saved_format_count = format_calls;
+    assert(installer_mount_targets("/dev/sda") == 0);
+    assert(spawn_calls == saved_spawns && format_calls == saved_format_count + 1);
+    assert(!strcmp(formatted_esp,"/dev/sda9"));
+    assert(!strcmp(root_type,"ext3") && !strcmp(root_options,"data=ordered"));
+    assert(installer_root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3);
+    manual_ext3 = 0;
     manual_bad_role = 1;
     int unchanged_formats = format_calls;
     assert(installer_mount_targets("/dev/sda") == -EINVAL);

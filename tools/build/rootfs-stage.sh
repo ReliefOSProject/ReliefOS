@@ -263,7 +263,7 @@ for app in leonmmcoset xiaobai; do
 done
 # Compatibility links are explicit overrides of upstream aliases.
 link usr/bin/su ../../bin/su authentication override
-for command in fdisk sfdisk runuser fsck blkid mkfs.ext4 fsck.ext4 mkfs.ext2 fsck.ext2 mkfs.fat fsck.fat mkfs.exfat fsck.exfat leonos-grub-installer; do link "sbin/$command" "../usr/sbin/$command" storage override; done
+for command in fdisk sfdisk runuser fsck blkid mke2fs mkfs.ext4 fsck.ext4 mkfs.ext3 fsck.ext3 mkfs.ext2 fsck.ext2 mkfs.fat fsck.fat mkfs.exfat fsck.exfat leonos-grub-installer; do link "sbin/$command" "../usr/sbin/$command" storage override; done
 link sbin/umount ../bin/umount storage override
 for verb in mkfs fsck; do
     for suffix in vfat fat32; do

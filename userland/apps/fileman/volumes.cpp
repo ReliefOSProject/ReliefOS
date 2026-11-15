@@ -235,6 +235,7 @@ int mount_volume(const Volume &target, int fd, Text &path)
     const char *type = filesystem == RELIEFOS_BLOCK_FILESYSTEM_FAT32 ? "vfat" :
                        filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXFAT ? "exfat" :
                        filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT2 ? "ext2" :
+                       filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ? "ext3" :
                        filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4 ? "ext4" : nullptr;
     if (!type) return -EOPNOTSUPP;
     uint64_t gid = 0;
@@ -246,7 +247,8 @@ int mount_volume(const Volume &target, int fd, Text &path)
     unsigned long flags = MS_NOSUID | MS_NODEV;
     if (target.readonly) flags |= MS_RDONLY;
     const char *data = filesystem == RELIEFOS_BLOCK_FILESYSTEM_FAT32 ||
-                       filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXFAT ? options : nullptr;
+                       filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXFAT ? options :
+                       filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ? "data=ordered" : nullptr;
     if (mount(source, point, type, flags, data) < 0) return -errno;
     if (!path.set(point)) {
         (void)umount2(point, UMOUNT_NOFOLLOW);

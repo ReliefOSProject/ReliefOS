@@ -99,7 +99,7 @@ echo MULTINIC_QEMU_PASS
 '''
 
 
-def prepare(args, port):
+def prepare(args, port, script_factory=guest_script, root_hook=None):
     work = args.output
     root = work / "root"
     for name in ("bin", "dev", "proc", "sys", "tmp", "run", "etc"):
@@ -124,7 +124,7 @@ def prepare(args, port):
     module_path = Path(manifest["module_directory"])
     shutil.copytree(args.install / module_path, root / module_path)
     subprocess.run([str(args.busybox), "depmod", "-b", str(root), manifest["release"]], check=True)
-    (root / "init").write_text(guest_script(port, args.modular))
+    (root / "init").write_text(script_factory(port, args.modular))
     (root / "init").chmod(0o755)
     hook = root / "dhcp-script"
     hook.write_text('''#!/bin/sh
@@ -137,6 +137,8 @@ case "$1" in
 esac
 ''')
     hook.chmod(0o755)
+    if root_hook:
+        root_hook(root)
     archive = work / "initramfs.cpio"
     names = ["."] + sorted(str(path.relative_to(root)) for path in root.rglob("*"))
     with archive.open("wb") as output:

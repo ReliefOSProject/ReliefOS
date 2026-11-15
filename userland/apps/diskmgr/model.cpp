@@ -45,6 +45,7 @@ bool Confirmation::accept(Action action, const char *text)
 bool valid_filesystem(uint32_t filesystem)
 {
     return filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4 ||
+           filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ||
            filesystem == RELIEFOS_BLOCK_FILESYSTEM_FAT32 ||
            filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXFAT;
 }

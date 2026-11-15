@@ -62,7 +62,8 @@ root_device=$resolved
 if [ -z "$rootfstype" ]; then
     identity=$(blkid "$root_device") || fail "probe $root_device"
     case " $identity " in
-        *' TYPE="ext4" '*|*' TYPE="ext3" '*) rootfstype=ext4 ;;
+        *' TYPE="ext4" '*) rootfstype=ext4 ;;
+        *' TYPE="ext3" '*) rootfstype=ext3 ;;
         *' TYPE="ext2" '*) rootfstype=ext2 ;;
         *' TYPE="vfat" '*) rootfstype=vfat ;;
         *' TYPE="exfat" '*) rootfstype=exfat ;;

@@ -10,7 +10,7 @@ msgstr ""
 msgid "Account and system options"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1210
+#: userland/apps/installer/install_ops.c:1223
 msgid "Account setup failed"
 msgstr ""
 
@@ -30,7 +30,7 @@ msgstr ""
 msgid "Administrator privileges are required"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1052
+#: userland/apps/installer/main.cpp:1053
 msgid "Administrator: root"
 msgstr ""
 
@@ -38,7 +38,7 @@ msgstr ""
 msgid "All Files (*)"
 msgstr ""
 
-#: userland/apps/installer/installer_tui.c:559
+#: userland/apps/installer/installer_tui.c:560
 msgid "Apply"
 msgstr ""
 
@@ -50,7 +50,7 @@ msgstr ""
 msgid "Applying signed system packages"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:747
+#: userland/apps/installer/install_ops.c:760
 msgid "Attach a disk and click Refresh."
 msgstr ""
 
@@ -62,15 +62,15 @@ msgstr ""
 msgid "Automatic layout"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:266
+#: userland/apps/installer/install_ops.c:267
 msgid "Automatic mode replaces its partition table; manual mode can preserve other partitions."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1116
+#: userland/apps/installer/main.cpp:1117
 msgid "Automatic partitioning creates a FAT32 ESP and an ext4 root. No BIOS Boot partition is needed."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1117
+#: userland/apps/installer/main.cpp:1118
 msgid "Automatic partitioning creates an unformatted BIOS Boot partition, a FAT32 ESP and an ext4 root. BIOS also uses the FAT32 partition for boot files."
 msgstr ""
 
@@ -94,11 +94,11 @@ msgstr ""
 msgid "B BIOS  E ESP  R /  D Data  . Free"
 msgstr ""
 
-#: userland/apps/installer/installer_tui.c:480
+#: userland/apps/installer/installer_tui.c:481
 msgid "Back"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1447
+#: userland/apps/installer/install_ops.c:1461
 msgid "Boot installation checks failed"
 msgstr ""
 
@@ -110,7 +110,7 @@ msgstr ""
 msgid "Bootloaders"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1238
+#: userland/apps/installer/main.cpp:1239
 msgid "Bootloaders:"
 msgstr ""
 
@@ -138,7 +138,7 @@ msgstr ""
 msgid "Cannot initialize the terminal or installer log"
 msgstr ""
 
-#: userland/apps/installer/installer_tui.c:595
+#: userland/apps/installer/installer_tui.c:596
 msgid "Cannot read installer log"
 msgstr ""
 
@@ -178,7 +178,7 @@ msgstr ""
 msgid "Checking signed repository and package archives"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1262
+#: userland/apps/installer/main.cpp:1263
 msgid "Checking system update"
 msgstr ""
 
@@ -194,7 +194,7 @@ msgstr ""
 msgid "Choose Setup Mode"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1133
+#: userland/apps/installer/main.cpp:1134
 msgid "Choose bootloaders"
 msgstr ""
 
@@ -234,7 +234,7 @@ msgstr ""
 msgid "Confirm"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1194
+#: userland/apps/installer/main.cpp:1195
 msgid "Confirm Installation"
 msgstr ""
 
@@ -254,15 +254,15 @@ msgstr ""
 msgid "Console"
 msgstr ""
 
-#: userland/apps/installer/installer_tui.c:545
+#: userland/apps/installer/installer_tui.c:546
 msgid "Continue"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1474
+#: userland/apps/installer/install_ops.c:1488
 msgid "Copy failed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1078
+#: userland/apps/installer/install_ops.c:1091
 msgid "Copy path is too long"
 msgstr ""
 
@@ -270,7 +270,7 @@ msgstr ""
 msgid "Copying"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:803
+#: userland/apps/installer/install_ops.c:816
 msgid "Copying system files"
 msgstr ""
 
@@ -278,11 +278,11 @@ msgstr ""
 msgid "Could not decode image"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:740
+#: userland/apps/installer/install_ops.c:753
 msgid "Could not list disks"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1485
+#: userland/apps/installer/install_ops.c:1499
 msgid "Could not save installed preferences"
 msgstr ""
 
@@ -302,11 +302,11 @@ msgstr ""
 msgid "Create partition"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:981
+#: userland/apps/installer/main.cpp:982
 msgid "Create: size in MiB, filesystem, name. Resize only changes the trailing edge."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1194
+#: userland/apps/installer/install_ops.c:1207
 msgid "Creating swapfile"
 msgstr ""
 
@@ -322,7 +322,7 @@ msgstr ""
 msgid "Data partition"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:972
+#: userland/apps/installer/main.cpp:973
 msgid "Data type"
 msgstr ""
 
@@ -334,7 +334,7 @@ msgstr ""
 msgid "Desktop"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1165
+#: userland/apps/installer/main.cpp:1166
 msgid "Desktop environment"
 msgstr ""
 
@@ -354,7 +354,7 @@ msgstr ""
 msgid "Disk operations are running. Please wait for completion."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1263
+#: userland/apps/installer/main.cpp:1264
 msgid "Do not turn off this machine."
 msgstr ""
 
@@ -370,23 +370,23 @@ msgstr ""
 msgid "Enter a valid swap size in MiB."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:831
+#: userland/apps/installer/main.cpp:832
 msgid "Enter a value:"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:827
+#: userland/apps/installer/main.cpp:828
 msgid "Enter filesystem and label (for example: ext4 RELIEFOS_DATA):"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:821
-msgid "Enter size_MiB filesystem name (ext4/ext2/fat32/exfat/raw):"
+#: userland/apps/installer/main.cpp:822
+msgid "Enter size_MiB filesystem name (ext4/ext3/ext2/fat32/exfat/raw):"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:825
+#: userland/apps/installer/main.cpp:826
 msgid "Enter the GPT partition name:"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:823
+#: userland/apps/installer/main.cpp:824
 msgid "Enter the new partition size in MiB:"
 msgstr ""
 
@@ -426,7 +426,7 @@ msgstr ""
 msgid "Filesystem label"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:984
+#: userland/apps/installer/main.cpp:985
 msgid "Final confirmation formats a FAT32 ESP and ext4 root on the selected disk."
 msgstr ""
 
@@ -450,7 +450,7 @@ msgstr ""
 msgid "Format selected ESP (erase all EFI boot files on it)"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:857
+#: userland/apps/installer/main.cpp:858
 msgid "Formatting destroys all files on the selected partition."
 msgstr ""
 
@@ -478,7 +478,7 @@ msgstr ""
 msgid "Input is too long"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:250
+#: userland/apps/installer/install_ops.c:251
 msgid "Install"
 msgstr ""
 
@@ -498,7 +498,7 @@ msgstr ""
 msgid "Install a new system or update an existing ReliefOS disk."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1399
+#: userland/apps/installer/install_ops.c:1413
 msgid "Install failed"
 msgstr ""
 
@@ -510,15 +510,15 @@ msgstr ""
 msgid "Install or update UEFI bootloader"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1290
+#: userland/apps/installer/main.cpp:1291
 msgid "Installation Complete"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1316
+#: userland/apps/installer/main.cpp:1317
 msgid "Installation Failed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1394
+#: userland/apps/installer/install_ops.c:1408
 msgid "Installation completed successfully"
 msgstr ""
 
@@ -526,7 +526,7 @@ msgstr ""
 msgid "Installation completed successfully."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:226
+#: userland/apps/installer/install_ops.c:227
 msgid "Installation failed"
 msgstr ""
 
@@ -534,7 +534,7 @@ msgstr ""
 msgid "Installation finished"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1299
+#: userland/apps/installer/install_ops.c:1313
 msgid "Installation media is incomplete"
 msgstr ""
 
@@ -550,7 +550,7 @@ msgstr ""
 msgid "Installation progress"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1155
+#: userland/apps/installer/main.cpp:1156
 msgid "Installed version"
 msgstr ""
 
@@ -558,11 +558,11 @@ msgstr ""
 msgid "Installer log"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:256
+#: userland/apps/installer/install_ops.c:257
 msgid "Installing ReliefOS"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1412
+#: userland/apps/installer/install_ops.c:1426
 msgid "Invalid installation settings"
 msgstr ""
 
@@ -570,7 +570,7 @@ msgstr ""
 msgid "Invalid size"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1436
+#: userland/apps/installer/install_ops.c:1450
 msgid "Invalid swap size"
 msgstr ""
 
@@ -591,14 +591,14 @@ msgid "Manual layout: assign BIOS Boot, ESP and root roles. BIOS Boot stays unfo
 msgstr ""
 
 #: userland/apps/installer/main.cpp:717
-msgid "Manual layout: assign a FAT32 ESP and an ext4 root. BIOS Boot is not required for the selected bootloaders."
+msgid "Manual layout: assign a FAT32 ESP and an ext4 or ext3 root. BIOS Boot is not required for the selected bootloaders."
 msgstr ""
 
 #: userland/apps/installer/installer_tty.c:148
 msgid "Manual partitioning"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1157
+#: userland/apps/installer/main.cpp:1158
 msgid "Media version"
 msgstr ""
 
@@ -634,11 +634,11 @@ msgstr ""
 msgid "No bootloader selected. A new installation will need a separately configured bootloader."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:747
+#: userland/apps/installer/install_ops.c:760
 msgid "No disks were found"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1319
+#: userland/apps/installer/main.cpp:1320
 msgid "No writes will continue after this error."
 msgstr ""
 
@@ -650,7 +650,7 @@ msgstr ""
 msgid "Only the selected root is formatted; existing ESP files are preserved."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1207
+#: userland/apps/installer/main.cpp:1208
 msgid "Only the selected root will be formatted. Existing ESP files and other partitions are preserved."
 msgstr ""
 
@@ -670,7 +670,7 @@ msgstr ""
 msgid "Partition"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:346
+#: userland/apps/installer/install_ops.c:347
 msgid "Partition %u  %s  %llu MiB  %s  %s%s"
 msgstr ""
 
@@ -690,7 +690,7 @@ msgstr ""
 msgid "Partition role"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:926
+#: userland/apps/installer/main.cpp:927
 msgid "Partition role updated."
 msgstr ""
 
@@ -706,19 +706,19 @@ msgstr ""
 msgid "Password:"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1067
+#: userland/apps/installer/main.cpp:1068
 msgid "Passwords: 1-32 characters, no spaces; confirmations must match"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1430
+#: userland/apps/installer/install_ops.c:1444
 msgid "Payload check failed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:846
+#: userland/apps/installer/install_ops.c:859
 msgid "Payload path is too long"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1466
+#: userland/apps/installer/install_ops.c:1480
 msgid "Payload scan failed"
 msgstr ""
 
@@ -742,7 +742,7 @@ msgstr ""
 msgid "Preparing operation"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1449
+#: userland/apps/installer/install_ops.c:1463
 msgid "Preparing target disk"
 msgstr ""
 
@@ -762,7 +762,7 @@ msgstr ""
 msgid "Preserving the installed kernel and configuration"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1395
+#: userland/apps/installer/install_ops.c:1409
 msgid "Press Restart to boot from the installed disk."
 msgstr ""
 
@@ -806,11 +806,11 @@ msgstr ""
 msgid "ReliefOS system partition"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1293
+#: userland/apps/installer/main.cpp:1294
 msgid "ReliefOS was installed to the selected disk."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1292
+#: userland/apps/installer/main.cpp:1293
 msgid "ReliefOS was updated on the selected disk."
 msgstr ""
 
@@ -818,7 +818,7 @@ msgstr ""
 msgid "Remove the installation media before continuing."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1402
+#: userland/apps/installer/install_ops.c:1416
 msgid "Remove the installation media before rebooting."
 msgstr ""
 
@@ -854,7 +854,7 @@ msgstr ""
 msgid "Resize partition"
 msgstr ""
 
-#: userland/apps/installer/installer_tui.c:365
+#: userland/apps/installer/installer_tui.c:366
 msgid "Resize the terminal to at least 60 columns and 20 rows."
 msgstr ""
 
@@ -862,7 +862,7 @@ msgstr ""
 msgid "Restart"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1309
+#: userland/apps/installer/main.cpp:1310
 msgid "Restart failed"
 msgstr ""
 
@@ -886,11 +886,11 @@ msgstr ""
 msgid "Review installation"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1154
+#: userland/apps/installer/main.cpp:1155
 msgid "Review system update"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1318
+#: userland/apps/installer/main.cpp:1319
 msgid "Review the details, then check the update again to retry."
 msgstr ""
 
@@ -906,19 +906,15 @@ msgstr ""
 msgid "Review the required BIOS Boot, ESP and root partitions."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:906
+#: userland/apps/installer/main.cpp:907
 msgid "Review the selected ESP and root before continuing."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1460
+#: userland/apps/installer/install_ops.c:1464
 msgid "Root and boot partitions"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1450
-msgid "Root: /target (ext4), ESP: /target/boot (FAT32)"
-msgstr ""
-
-#: userland/apps/installer/install_ops.c:1471
+#: userland/apps/installer/install_ops.c:1485
 msgid "Root: /target; boot partition: /target/boot"
 msgstr ""
 
@@ -930,7 +926,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1460
+#: userland/apps/installer/install_ops.c:1474
 msgid "Scanning installation payload"
 msgstr ""
 
@@ -962,31 +958,31 @@ msgstr ""
 msgid "Select system partition"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:262
+#: userland/apps/installer/install_ops.c:263
 msgid "Select the disk to update"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1134
+#: userland/apps/installer/main.cpp:1135
 msgid "Select the firmware used to start this disk. You can select both BIOS and UEFI."
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:265
+#: userland/apps/installer/install_ops.c:266
 msgid "Select the target disk"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1439
+#: userland/apps/installer/install_ops.c:1453
 msgid "Selected system does not support swap"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:975
+#: userland/apps/installer/main.cpp:976
 msgid "Set BIOS Boot"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:966
+#: userland/apps/installer/main.cpp:967
 msgid "Set ESP"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:969
+#: userland/apps/installer/main.cpp:970
 msgid "Set root"
 msgstr ""
 
@@ -998,7 +994,7 @@ msgstr ""
 msgid "Setup can copy the full normal system payload"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:263
+#: userland/apps/installer/install_ops.c:264
 msgid "Setup will check for an existing ReliefOS system."
 msgstr ""
 
@@ -1018,7 +1014,7 @@ msgstr ""
 msgid "Shut down"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1188
+#: userland/apps/installer/main.cpp:1189
 msgid "Signed packages are checked before changes. Boot files are published after the package transaction succeeds."
 msgstr ""
 
@@ -1030,11 +1026,11 @@ msgstr ""
 msgid "Size in MiB"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1239
+#: userland/apps/installer/main.cpp:1240
 msgid "Skip"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1441
+#: userland/apps/installer/install_ops.c:1455
 msgid "Swap requires an AHCI disk"
 msgstr ""
 
@@ -1042,7 +1038,7 @@ msgstr ""
 msgid "Swap size in MiB"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1227
+#: userland/apps/installer/main.cpp:1228
 msgid "Swapfile (MiB)"
 msgstr ""
 
@@ -1070,7 +1066,7 @@ msgstr ""
 msgid "System version"
 msgstr ""
 
-#: userland/apps/installer/installer_tui.c:479
+#: userland/apps/installer/installer_tui.c:480
 msgid "Tab / arrows: select   Space: toggle   PgUp/PgDn: scroll"
 msgstr ""
 
@@ -1078,7 +1074,7 @@ msgstr ""
 msgid "Target disk"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1489
+#: userland/apps/installer/install_ops.c:1503
 msgid "Target disk is ready."
 msgstr ""
 
@@ -1086,7 +1082,7 @@ msgstr ""
 msgid "Target or media changed. Check the update again."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1201
+#: userland/apps/installer/main.cpp:1202
 msgid "Target:"
 msgstr ""
 
@@ -1106,7 +1102,7 @@ msgstr ""
 msgid "The installed system will use the same language."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1204
+#: userland/apps/installer/main.cpp:1205
 msgid "The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root."
 msgstr ""
 
@@ -1114,11 +1110,11 @@ msgstr ""
 msgid "The selected root and ESP will be formatted."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1206
+#: userland/apps/installer/main.cpp:1207
 msgid "The selected root and ESP will be formatted. All EFI boot files on that ESP will be erased."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:985
+#: userland/apps/installer/main.cpp:986
 msgid "The selected root is formatted. An existing FAT32 ESP is preserved by default."
 msgstr ""
 
@@ -1130,23 +1126,23 @@ msgstr ""
 msgid "This operation changes the selected disk or partition immediately and can destroy its data."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1195
+#: userland/apps/installer/main.cpp:1196
 msgid "This operation is destructive."
 msgstr ""
 
-#: userland/apps/installer/main.cpp:817
+#: userland/apps/installer/main.cpp:818
 msgid "Type AUTO to erase the disk and create BIOS Boot, ESP and root partitions:"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:816
+#: userland/apps/installer/main.cpp:817
 msgid "Type AUTO to erase the disk and create ESP and root partitions:"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:829
+#: userland/apps/installer/main.cpp:830
 msgid "Type DELETE to remove the selected partition:"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:819
+#: userland/apps/installer/main.cpp:820
 msgid "Type INITIALIZE to replace the partition table:"
 msgstr ""
 
@@ -1154,35 +1150,35 @@ msgstr ""
 msgid "Type INSTALL to confirm installation"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1209
+#: userland/apps/installer/main.cpp:1210
 msgid "Type INSTALL to enable the Install button."
 msgstr ""
 
-#: userland/apps/installer/installer_tui.c:544
+#: userland/apps/installer/installer_tui.c:545
 msgid "Type the confirmation word"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1303
+#: userland/apps/installer/main.cpp:1304
 msgid "UEFI boot file (add it in firmware if no automatic entry appears):"
 msgstr ""
 
-#: userland/apps/installer/installer_tui.c:293
+#: userland/apps/installer/installer_tui.c:294
 msgid "Unallocated"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:348
+#: userland/apps/installer/install_ops.c:349
 msgid "Unnamed"
 msgstr ""
 
-#: userland/apps/installer/installer_tui.c:478
+#: userland/apps/installer/installer_tui.c:479
 msgid "Up/Down: partition   PgUp/PgDn: page   Home/End: first/last   Tab: actions"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:250
+#: userland/apps/installer/install_ops.c:251
 msgid "Update"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1290
+#: userland/apps/installer/main.cpp:1291
 msgid "Update Complete"
 msgstr ""
 
@@ -1190,7 +1186,7 @@ msgstr ""
 msgid "Update Existing System"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1316
+#: userland/apps/installer/main.cpp:1317
 msgid "Update Failed"
 msgstr ""
 
@@ -1198,7 +1194,7 @@ msgstr ""
 msgid "Update an existing system"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1173
+#: userland/apps/installer/main.cpp:1174
 msgid "Update bootloader software"
 msgstr ""
 
@@ -1206,11 +1202,11 @@ msgstr ""
 msgid "Update checks completed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1393
+#: userland/apps/installer/install_ops.c:1407
 msgid "Update completed successfully"
 msgstr ""
 
-#: userland/apps/installer/main.cpp:1247
+#: userland/apps/installer/main.cpp:1248
 msgid "Update details"
 msgstr ""
 
@@ -1218,7 +1214,7 @@ msgstr ""
 msgid "Update worker failed"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:255
+#: userland/apps/installer/install_ops.c:256
 msgid "Updating ReliefOS"
 msgstr ""
 
@@ -1262,7 +1258,7 @@ msgstr ""
 msgid "Welcome"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1194
+#: userland/apps/installer/install_ops.c:1207
 msgid "Writing allocated space"
 msgstr ""
 
@@ -1274,7 +1270,7 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1399
+#: userland/apps/installer/install_ops.c:1413
 msgid "\n%s (error %d)\n"
 msgstr ""
 
@@ -1290,7 +1286,7 @@ msgstr ""
 msgid "\nCommand exit status: %u"
 msgstr ""
 
-#: userland/apps/installer/install_ops.c:1401
+#: userland/apps/installer/install_ops.c:1415
 msgid "\nInstallation completed successfully."
 msgstr ""
 
