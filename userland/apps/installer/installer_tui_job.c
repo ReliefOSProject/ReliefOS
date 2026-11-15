@@ -68,8 +68,7 @@ static int execute(const struct installer_tty_context *context, struct tui_job *
 {
     switch (job->kind) {
     case TUI_JOB_INSTALL:
-        context->perform_install();
-        return *context->install_success ? 0 : -EIO;
+        return context->perform_install();
     case TUI_JOB_CHECK:
         return installer_update_check_target(context->disks[*context->selected_disk].path,
             job->root_uuid, job->esp_uuid, result, update_progress, result);
