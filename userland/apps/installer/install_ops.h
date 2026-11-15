@@ -118,8 +118,10 @@ int installer_partition_set_type(uint32_t type);
 int installer_partition_delete(void);
 int installer_partition_format(uint32_t filesystem, const char *label);
 
-/* Long-running operations; they drive `page` to PROGRESS then FINISH. */
-void perform_install(void);
+/** @brief Run the confirmed installation and update progress/completion state.
+ * @return Zero on success, or the original negative errno on failure.
+ */
+int perform_install(void);
 
 #ifdef __cplusplus
 }

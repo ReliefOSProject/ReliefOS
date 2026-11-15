@@ -33,7 +33,7 @@ if [ "$pkg" = coreutils ]; then
 fi
 resource=$("$cc" -print-resource-dir)
 CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -isystem $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib"
-case $pkg in libbsd|shadow) CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -idirafter $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib" ;; esac
+case $pkg in shadow) CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -idirafter $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib" ;; esac
 AR=llvm-ar RANLIB=llvm-ranlib STRIP=llvm-strip BUILD_CC=cc
 CFLAGS='-O2 -std=gnu17 -mno-avx -mno-avx2'
 CPPFLAGS="-I$auth/usr/include -I$pam/usr/include"
@@ -42,23 +42,15 @@ LIBS= PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR="$auth/lib/pkgconfig:$auth/usr/lib/pkgc
 export CC AR RANLIB STRIP BUILD_CC CFLAGS CPPFLAGS LDFLAGS LIBS PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PKG_CONFIG_SYSROOT_DIR
 set -- --host="$target" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib
 case $pkg in
-libmd|libbsd) set -- "$@" --libdir=/lib ;;
 sudo) set -- "$@" --with-pam --with-pam-login --with-secure-path=/usr/sbin:/usr/bin:/sbin:/bin --with-rundir=/run/sudo --with-vardir=/var/lib/sudo --libexecdir=/usr/lib ;;
 shadow) set -- "$@" --bindir=/bin --sbindir=/sbin --with-libpam --with-yescrypt --without-su --disable-logind ;;
-util-linux) CPPFLAGS="$CPPFLAGS -include linux/openat2.h"; export CPPFLAGS
- # Without libudev, lsblk probes the device directly. Upstream's flags omit
- # VERSION even though -f requests FSVER; request it from the real superblock.
- awk '
- /BLKID_SUBLKS_TYPE\);/ {sub(/BLKID_SUBLKS_TYPE\);/, "BLKID_SUBLKS_TYPE | BLKID_SUBLKS_VERSION);"); changed++}
- {print}
- END {if (changed != 1) exit 1}
- ' "$source/misc-utils/lsblk-properties.c" > "$source/misc-utils/lsblk-properties.c.new"
- mv "$source/misc-utils/lsblk-properties.c.new" "$source/misc-utils/lsblk-properties.c"
- set -- "$@" --sbindir=/usr/sbin --disable-all-programs --enable-su --enable-runuser --enable-libuuid --enable-libfdisk --enable-libsmartcols --enable-fdisks=check --enable-libblkid --enable-libmount --enable-mount --enable-blkid --enable-lsblk --enable-fsck --without-python --without-systemd --without-systemdsystemunitdir --disable-makeinstall-chown ;;
-e2fsprogs) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS
- set -- "$@" --sbindir=/usr/sbin --with-root-prefix=/usr --disable-libuuid --disable-libblkid --disable-elf-shlibs --disable-fsck --disable-uuidd --disable-nls --disable-fuse2fs --without-libarchive --with-udev-rules-dir=no --with-systemd-unit-dir=no --with-crond-dir=no ;;
-dosfstools) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS; set -- "$@" --sbindir=/usr/sbin --enable-compat-symlinks ;;
-exfatprogs) LDFLAGS="-static -L$auth/usr/lib"; export LDFLAGS; set -- "$@" --sbindir=/usr/sbin --disable-shared --enable-static ;;
+exfatprogs)
+    LDFLAGS="-static -L$auth/usr/lib"
+    # Alpine's static blkid archive uses libeconf. Request the real private
+    # dependency explicitly; its blkid.pc does not list libeconf.
+    BLKID_LIBS=$(pkg-config --static --libs blkid libeconf)
+    export LDFLAGS BLKID_LIBS
+    set -- "$@" --sbindir=/usr/sbin --disable-shared --enable-static ;;
 coreutils)
     # The optional dispatched CRC backend pulls compiler-rt's precompiled
     # cpu_model constructor into every single-binary invocation. Its host ISA
@@ -79,7 +71,7 @@ tmp=$(mktemp -d "$stage.new.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT
 cd "$work/build"
 "$source/configure" "$@"
-if [ "$pkg" = exfatprogs ]; then make "LDFLAGS=$LDFLAGS -all-static" "BLKID_LIBS=$auth/usr/lib/libblkid.a"; else make; fi
+if [ "$pkg" = exfatprogs ]; then make "LDFLAGS=$LDFLAGS -all-static" "BLKID_LIBS=$BLKID_LIBS"; else make; fi
 if [ "$pkg" = sudo ]; then make install "DESTDIR=$tmp" INSTALL_OWNER=; else make install "DESTDIR=$tmp"; fi
 # alsa-lib 1.2.14 forbids shared/static in one configure (upstream INSTALL).
 # Use two private builds of the same verified source; publish just the static
@@ -98,8 +90,6 @@ if [ "$pkg" = alsa-lib ]; then
     rm "$tmp/usr/lib/libasound.la" "$tmp/usr/lib/libatopology.la"
 fi
 case $pkg in
-libbsd) sed 's@GROUP(/lib/@GROUP(@' "$tmp/lib/libbsd.so" > "$tmp/lib/libbsd.so.new"; mv "$tmp/lib/libbsd.so.new" "$tmp/lib/libbsd.so"; rm "$tmp/lib/libbsd.la" ;;
-libmd) rm "$tmp/lib/libmd.la" ;;
 coreutils)
     sh "$source/build-aux/gen-lists-of-programs.sh" --list-progs > "$work/upstream-programs"
     sh "$src/tools/build/coreutils-check.sh" "$tmp" \

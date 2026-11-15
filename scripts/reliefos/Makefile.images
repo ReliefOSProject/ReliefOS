@@ -79,13 +79,13 @@ LIVE_ISO := $(O_IMAGES)/reliefos-live.iso
 INSTALLER_ISO := $(O_IMAGES)/reliefos-installer.iso
 $(LIVE_ISO) $(INSTALLER_ISO): $(BUILD_LOG_INPUTS)
 $(INSTALLER_STAGE_STAMP): $(USERLAND_DIR)/installer.elf
-$(ROOT_EXT2): $(O_STAGE)/live-root.complete $(RELIEFOS_EXT2_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(O_META)/images.parameters
+$(ROOT_EXT2): $(O_STAGE)/live-root.complete $(RELIEFOS_EXT2_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
 	$(Q)RELIEFOS_EXT2_TIME=$(RELIEFOS_EXT2_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext2 $(LIVE_ROOT_STAGE) $@ $(SOURCE_DATE_EPOCH) $(LIVE_ROOT_UUID)
-$(DISK_ROOT_EXT2): $(O_STAGE)/disk-root.complete $(RELIEFOS_EXT2_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(O_META)/images.parameters
+$(DISK_ROOT_EXT2): $(O_STAGE)/disk-root.complete $(RELIEFOS_EXT2_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
 	$(Q)RELIEFOS_EXT2_TIME=$(RELIEFOS_EXT2_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext2 $(DISK_ROOT_STAGE) $@ $(SOURCE_DATE_EPOCH) $(DISK_ROOT_UUID)
-$(ROOT_EXT4): $(O_STAGE)/live-root.complete $(RELIEFOS_EXT4_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(O_META)/images.parameters
+$(ROOT_EXT4): $(O_STAGE)/live-root.complete $(RELIEFOS_EXT4_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
 	$(Q)RELIEFOS_EXT4_TIME=$(RELIEFOS_EXT4_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext4 $(LIVE_ROOT_STAGE) $@ $(SOURCE_DATE_EPOCH) $(LIVE_ROOT_UUID)
-$(DISK_ROOT_EXT4): $(O_STAGE)/disk-root.complete $(RELIEFOS_EXT4_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(O_META)/images.parameters
+$(DISK_ROOT_EXT4): $(O_STAGE)/disk-root.complete $(RELIEFOS_EXT4_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
 	$(Q)RELIEFOS_EXT4_TIME=$(RELIEFOS_EXT4_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext4 $(DISK_ROOT_STAGE) $@ $(SOURCE_DATE_EPOCH) $(DISK_ROOT_UUID)
 RELIEFOS_DEDUP_TOOL := $(RELIEFOS_HOST_BIN)/reliefos-dedup
 tools: $(RELIEFOS_DEDUP_TOOL)
@@ -95,9 +95,9 @@ $(INSTALLER_STAGE_STAMP): $(ROOTFS_RAW_STAMP) $(ESP_STAMP) $(USERLAND_DIR)/insta
 	$(Q)APK_TOOL=$(abspath $(UPSTREAM_APK)) APK_UPSTREAM=$(abspath $(UPSTREAM_APK_ROOT)) APK_OWN_TOOL=$(abspath $(RELIEFOS_APK_OWN)) APK_KEY='$(APK_SIGNING_KEY)' APK_VERSION='$(APK_BUILD_VERSION)' sh $(RELIEFOS_SRC)/tools/build/run-logged.sh $(O_LOGS)/installer-stage.log sh $(RELIEFOS_SRC)/tools/build/installer-stage.sh $(RELIEFOS_SRC) $(abspath $(O)) $(abspath $(ROOTFS_RAW)) $(abspath $(ESP_STAGE)) $(abspath $(INSTALLER_ROOT)) $(SOURCE_DATE_EPOCH)
 	$(Q)touch $@
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/stage-inventory.sh write $(INSTALLER_ROOT) $(O_META)/installer.files
-$(INSTALLER_EXT2): $(INSTALLER_STAGE_STAMP) $(RELIEFOS_EXT2_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(O_META)/images.parameters
+$(INSTALLER_EXT2): $(INSTALLER_STAGE_STAMP) $(RELIEFOS_EXT2_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
 	$(Q)IMAGE_MIN_MIB=$(or $(CONFIG_INSTALLER_ROOT_SIZE_MIB),400) RELIEFOS_EXT2_TIME=$(RELIEFOS_EXT2_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext2 $(INSTALLER_ROOT) $@ $(SOURCE_DATE_EPOCH) 9e1f6d46-3f41-42d2-9917-9a21a2134401
-$(INSTALLER_EXT4): $(INSTALLER_STAGE_STAMP) $(RELIEFOS_EXT4_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(O_META)/images.parameters
+$(INSTALLER_EXT4): $(INSTALLER_STAGE_STAMP) $(RELIEFOS_EXT4_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
 	$(Q)IMAGE_MIN_MIB=$(or $(CONFIG_INSTALLER_ROOT_SIZE_MIB),400) RELIEFOS_EXT4_TIME=$(RELIEFOS_EXT4_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext4 $(INSTALLER_ROOT) $@ $(SOURCE_DATE_EPOCH) 9e1f6d46-3f41-42d2-9917-9a21a2134401
 $(DISK_RAW) $(DISK_VMDK) &: $(DISK_ROOT_EXT4) $(ESP_STAMP) $(RELIEFOS_SRC)/tools/build/disk.sh $(RELIEFOS_IMAGE_IDENTITY) $(RELIEFOS_SRC)/boot/grub/bios-modules.list $(GRUB_BIOS_INPUTS) $(GRUB_BIOS_REQUIRED_INPUTS) $(GRUB_HOST_TOOLS) $(O_META)/images.parameters
 	$(Q)RELIEFOS_IMAGE_INSTANCE=$(RELIEFOS_IMAGE_INSTANCE_QUOTED) IMAGE_MIN_MIB=$(or $(CONFIG_IMAGE_SIZE_MIB),1024) sh $(RELIEFOS_SRC)/tools/build/disk.sh $(ESP_STAGE) $(DISK_ROOT_EXT4) $(DISK_RAW) $(DISK_VMDK) $(SOURCE_DATE_EPOCH) $(GRUB_BIOS_DIR) $(GRUB_MKIMAGE) $(GRUB_BIOS_SETUP)

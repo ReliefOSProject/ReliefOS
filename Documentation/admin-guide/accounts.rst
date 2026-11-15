@@ -38,3 +38,9 @@ wheel/video 补充组）、 ``root/root``，以及锁定的 nobody。
 已有文件的属组仍按普通 Linux DAC 语义处理。sudo 的图形提示由普通用户运行的
 FLTK 辅助程序提供，密码仅经标准输出管道交给 sudo；控制台 PAM 兼容会话使用
 上游 libpam_misc 的终端会话实现。
+
+sudo 保留 PAM 认证及其账户、会话检查，支持现有 yescrypt 密码。
+密码提示及其翻译由上游 sudo/PAM 提供，ReliefOS 的图形辅助程序原样显示提示，
+不替换为自定义的“密码：”。默认 askpass 路径为
+``/usr/lib/reliefos/apps/reliefaskpass/reliefaskpass.elf``；旧配置中指向
+``sudod`` 的路径仍可原样转发提示，升级不会覆盖管理员修改过的配置。

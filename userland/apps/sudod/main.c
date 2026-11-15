@@ -7,10 +7,6 @@
 #include <fcntl.h>
 #include <reliefos/sudo.h>
 #include <reliefos/auth.h>
-#include <libintl.h>
-#define T(s) gettext(s)
-#include <locale.h>
-#include <reliefos/layout.h>
 #include <reliefos/fs.h>
 #include <reliefos/stdio.h>
 #include <reliefos/syscall.h>
@@ -281,8 +277,8 @@ static int sudod_finish(int32_t status)
 
 static int askpass(const char *prompt)
 {
-    if (!prompt || !strcmp(prompt, "Password:") || !strcmp(prompt, "Password: "))
-        prompt = T("Password:");
+    /* Preserve administrator sudo.conf entries using the former helper path.
+     * The prompt belongs to sudo/PAM and must be passed through unchanged. */
     execl("/usr/lib/reliefos/apps/reliefaskpass/reliefaskpass.elf",
           "reliefaskpass", prompt, (char *)0);
     perror("Start authentication prompt");
@@ -291,9 +287,6 @@ static int askpass(const char *prompt)
 
 int main(int argc, char **argv)
 {
-    setlocale(LC_ALL, "");
-    bindtextdomain("sudod", RELIEFOS_LAYOUT_LOCALE);
-    textdomain("sudod");
     struct sudod_request request;
     struct sudod_path dir;
     const char *confirm;

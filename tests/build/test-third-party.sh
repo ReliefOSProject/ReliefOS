@@ -81,8 +81,8 @@ locked_patches=$("$deps" --lock "$lock" --id musl --list-patches 2>/dev/null)
 
 # --- an unmet dependency stops the build without going online -----------------
 expect_failure 'a missing download is refused by name, not fetched on demand' \
-    'libmd' \
-    sh "$fetch" --deps "$deps" --lock "$lock" --cache "$work/empty" --verify-only
+    'exfatprogs' \
+    sh "$fetch" --deps "$deps" --lock "$lock" --cache "$work/empty" --verify-only --only exfatprogs
 
 # A cache that already holds the right bytes must not need the network at all.
 # The fixture digest is computed from the fixture file, so this proves the

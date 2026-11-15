@@ -175,7 +175,7 @@ sdk = false
 api = false
 
 [[components]]
-# Fixed worker and askpass UI launched through upstream sudo.
+# Fixed file-operation worker launched through upstream sudo.
 id = "sudod"
 symbol = "APP_SUDOD"
 label = "Privileged file-operation worker"

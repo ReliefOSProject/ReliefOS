@@ -1,20 +1,4 @@
 {
-  "libmd": {
-    "version": "1.2.0",
-    "url": "https://libbsd.freedesktop.org/releases/libmd-1.2.0.tar.xz",
-    "sha256": "ac15ffb8430502fbaccdec66c5a82ee0eab0b0f36220df56710feadfeb13d0a0",
-    "directory": "libmd-1.2.0",
-    "license_file": "COPYING",
-    "checksum_source": "https://lists.freedesktop.org/archives/libbsd/2026-May/000509.html"
-  },
-  "libbsd": {
-    "version": "0.12.2",
-    "url": "https://libbsd.freedesktop.org/releases/libbsd-0.12.2.tar.xz",
-    "sha256": "b88cc9163d0c652aaf39a99991d974ddba1c3a9711db8f1b5838af2a14731014",
-    "directory": "libbsd-0.12.2",
-    "license_file": "COPYING",
-    "checksum_source": "https://lists.freedesktop.org/archives/libbsd/2024-March/000455.html"
-  },
   "shadow": {
     "version": "4.20.2",
     "url": "https://github.com/shadow-maint/shadow/releases/download/4.20.2/shadow-4.20.2.tar.xz",
@@ -46,13 +30,5 @@
     "directory": "Linux-PAM-1.7.2",
     "license_file": "Copyright",
     "checksum_source": "https://api.github.com/repos/linux-pam/linux-pam/releases/tags/v1.7.2"
-  },
-  "util-linux": {
-    "version": "2.41.6",
-    "url": "https://www.kernel.org/pub/linux/utils/util-linux/v2.41/util-linux-2.41.6.tar.xz",
-    "sha256": "e596083744e746be7d2823b62b43f4418dd7bf56303b4dc09e6fe8112fe3d7ed",
-    "directory": "util-linux-2.41.6",
-    "license_file": "README.licensing",
-    "checksum_source": "https://www.kernel.org/pub/linux/utils/util-linux/v2.41/sha256sums.asc"
   }
 }

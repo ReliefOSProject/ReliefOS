@@ -19,7 +19,7 @@ link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
 # Every enabled upstream root is passed by the build graph. The default keeps
 # standalone callers compatible with the complete product package set.
-rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'libmd libbsd util-linux sudo shadow e2fsprogs dosfstools exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg'}
+rootfs_upstream_packages=${ROOTFS_UPSTREAM_PACKAGES:-'sudo shadow exfatprogs coreutils alsa-lib alsa-utils nuked-opl3 ffmpeg'}
 for package in $rootfs_upstream_packages; do
     if [ "$package" = ffmpeg ]; then
         if enabled reliefplayer; then
@@ -35,6 +35,10 @@ for package in $rootfs_upstream_packages; do
         continue
     fi
     case $package in
+        libmd|libbsd|e2fsprogs|dosfstools|util-linux)
+            echo "rootfs-stage: $package is supplied by official APKs; remove its local overlay" >&2
+            exit 1
+            ;;
         ''|*[!A-Za-z0-9._-]*)
             echo "rootfs-stage: invalid upstream package id: $package" >&2
             exit 2
@@ -100,7 +104,7 @@ done
 for name in shadow gshadow; do file "$src/system/rootfs/etc/$name" "etc/$name" 0600 product-policy override; done
 file "$src/system/rootfs/etc/sudoers" etc/sudoers 0440 product-policy override
 # Regular program modes remain explicit even when copied from a tool's stage.
-for spec in 'sudo usr/bin/sudo' 'shadow usr/bin/passwd' 'util-linux bin/su'; do
+for spec in 'sudo usr/bin/sudo' 'shadow usr/bin/passwd'; do
     set -- $spec; file "$out/upstream/$1/root/$2" "$2" 4755 authentication override
 done
 file "$out/pam/root/sbin/unix_chkpwd" sbin/unix_chkpwd 4755 authentication override
@@ -253,6 +257,16 @@ file "$work/data/apk-components" etc/reliefos/apk-components
 for library in zlib libpng mbedtls3; do
     file "$src/resources/licenses/$library-LICENSE" "usr/share/licenses/reliefos-runtime-dependencies/$library-LICENSE"
 done
+file "$src/resources/licenses/libbsd-LICENSE" usr/share/licenses/libbsd/COPYING
+# Official libmd lives in /usr/lib. Keep the former runtime entry points
+# forwarding to its stable SONAME, including the historical full basename.
+link lib/libmd.so.0 ../usr/lib/libmd.so.0 authentication-support
+link lib/libmd.so libmd.so.0 authentication-support
+link lib/libmd.so.0.3.0 libmd.so.0 authentication-support
+file "$src/resources/licenses/e2fsprogs-NOTICE" usr/share/licenses/e2fsprogs/NOTICE
+file "$src/resources/licenses/util-linux-README.licensing" usr/share/licenses/util-linux/README.licensing
+file "$src/resources/licenses/libeconf-LICENSE" usr/share/licenses/libeconf/LICENSE
+file "$src/resources/licenses/utmps-COPYING" usr/share/licenses/utmps/COPYING
 
 for name in simsun.ttc system.psf; do file "$src/system/fonts/$name" "usr/share/fonts/reliefos/$name"; done
 file "$src/system/fonts/times.ttf" usr/share/fonts/reliefos/times-new-roman.ttf
@@ -263,13 +277,22 @@ for app in leonmmcoset xiaobai; do
 done
 # Compatibility links are explicit overrides of upstream aliases.
 link usr/bin/su ../../bin/su authentication override
-for command in fdisk sfdisk runuser fsck blkid mke2fs mkfs.ext4 fsck.ext4 mkfs.ext3 fsck.ext3 mkfs.ext2 fsck.ext2 mkfs.fat fsck.fat mkfs.exfat fsck.exfat leonos-grub-installer; do link "sbin/$command" "../usr/sbin/$command" storage override; done
+for command in mkfs.exfat fsck.exfat leonos-grub-installer; do link "sbin/$command" "../usr/sbin/$command" storage override; done
+for command in fdisk sfdisk runuser fsck blkid; do link "usr/sbin/$command" "../../sbin/$command" storage; done
+for command in mount umount lsblk; do link "usr/bin/$command" "../../bin/$command" storage; done
 link sbin/umount ../bin/umount storage override
+# Official filesystem APKs own /sbin. Preserve older /usr/sbin callers with
+# one-way aliases, without replacing the official executables or their links.
+for command in e2fsck mke2fs dosfsck dosfslabel fatlabel mkdosfs; do
+    link "usr/sbin/$command" "../../sbin/$command" storage
+done
+for command in chattr lsattr; do link "usr/bin/$command" "../../bin/$command" storage; done
 for verb in mkfs fsck; do
-    for suffix in vfat fat32; do
-        link "usr/sbin/$verb.$suffix" "$verb.fat" storage override
-        link "sbin/$verb.$suffix" "../usr/sbin/$verb.$suffix" storage override
+    for suffix in ext2 ext3 ext4 fat vfat msdos; do
+        link "usr/sbin/$verb.$suffix" "../../sbin/$verb.$suffix" storage
     done
+    link "sbin/$verb.fat32" "$verb.fat" storage
+    link "usr/sbin/$verb.fat32" "../../sbin/$verb.fat32" storage
 done
 if enabled busybox; then
     file "$out/userland/busybox.elf" bin/busybox 0755 busybox
