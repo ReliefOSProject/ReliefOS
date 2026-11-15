@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import time
@@ -82,7 +83,7 @@ wait "$second"
 wait "$third"
 echo VMXNET3_CONCURRENT_PASS
 {lifecycle}
-cat /proc/net/dev
+cat /proc/net/dev /proc/interrupts
 ip addr show
 echo VMXNET3_QEMU_PASS
 '''
@@ -144,12 +145,18 @@ def main():
                         raise AssertionError("missing guest result " + marker)
                 if "MULTINIC_FAIL" in text or "Kernel Panic" in text or process.returncode:
                     raise AssertionError("guest failed")
+                if text.count("irq=msix") < 2:
+                    raise AssertionError("both VMXNET3 controllers must negotiate MSI-X")
+                messages = re.findall(r"(?m)^8[01]:\s+(\d+)\s+(\d+)\s+.*PCI-MSI", text)
+                if len(messages) < 2 or any(sum(map(int, row)) == 0 for row in messages):
+                    raise AssertionError("missing real MSI-X interrupts for both VMXNET3 controllers")
                 expected_counts = ({"tcp4": 266240, "tcp6": 73728, "udp4": 24, "udp6": 24}
                                    if args.modular else
                                    {"tcp4": 36864, "tcp6": 36864, "udp4": 12, "udp6": 12})
                 if any(counts[key] != value for key, value in expected_counts.items()):
                     raise AssertionError(f"host echo counts differ: {counts}")
-                result.update(passed=True, returncode=process.returncode, echoes=dict(counts))
+                result.update(passed=True, returncode=process.returncode, echoes=dict(counts),
+                              msix_messages=[sum(map(int, row)) for row in messages])
             except Exception as error:
                 result["error"] = repr(error)
                 raise
