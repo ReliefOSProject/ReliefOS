@@ -176,6 +176,7 @@ int installer_update_target_open(struct installer_update_target *target,
     if (mkdir(target->root, 0700) < 0) return -errno;
     for (uint32_t i = 0; i < count; ++i) {
         const char *filesystem = parts[i].filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4 ? "ext4"
+            : parts[i].filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ? "ext3"
             : parts[i].filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT2 ? "ext2" : NULL;
         if (!filesystem || parts[i].gpt_type != RELIEFOS_BLOCK_GPT_LINUX) continue;
         char uuid[37];
@@ -184,7 +185,8 @@ int installer_update_target_open(struct installer_update_target *target,
         if (expected_root && *expected_root && strcmp(expected_root, uuid)) continue;
         result = mounted_elsewhere(parts[i].path);
         if (result) return result;
-        if (mount(parts[i].path, target->root, filesystem, MS_RDONLY | MS_NOSUID | MS_NODEV, NULL) < 0)
+        if (mount(parts[i].path, target->root, filesystem, MS_RDONLY | MS_NOSUID | MS_NODEV,
+                  !strcmp(filesystem,"ext3") ? "data=ordered" : NULL) < 0)
             return -errno;
         target->root_mounted = 1;
         struct installer_update_info candidate = {0};
@@ -204,7 +206,8 @@ int installer_update_target_open(struct installer_update_target *target,
     if (found < 0) return -ENODEV;
     strcpy(target->info.disk, disk);
     snprintf(target->info.root_device, sizeof(target->info.root_device), "%s", parts[found].path);
-    if (mount(target->info.root_device, target->root, target->filesystem, MS_RDONLY | MS_NOSUID | MS_NODEV, NULL) < 0)
+    if (mount(target->info.root_device, target->root, target->filesystem, MS_RDONLY | MS_NOSUID | MS_NODEV,
+              !strcmp(target->filesystem,"ext3") ? "data=ordered" : NULL) < 0)
         return -errno;
     target->root_mounted = 1;
     char source[128] = {0};
@@ -252,7 +255,8 @@ int installer_update_target_writable(struct installer_update_target *target)
     }
     if (umount2(target->root, 0) < 0) return -errno;
     target->root_mounted = 0;
-    if (mount(target->info.root_device, target->root, target->filesystem, 0, NULL) < 0) return -errno;
+    if (mount(target->info.root_device, target->root, target->filesystem, 0,
+              !strcmp(target->filesystem,"ext3") ? "data=ordered" : NULL) < 0) return -errno;
     target->root_mounted = 1;
     return mount_boot(target, MS_NOSUID | MS_NODEV);
 }

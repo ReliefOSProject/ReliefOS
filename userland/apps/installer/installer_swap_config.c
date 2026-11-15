@@ -164,24 +164,27 @@ static bool fstab_has_no_entries(int dir)
 
 /** @brief Publish fstab and optional target-only OpenRC ordering and health policy.
  * @param root Absolute freshly formatted target. @param root_uuid Root GPT UUID.
- * @param esp_uuid Boot GPT UUID. @param enabled Include the prepared swapfile.
+ * @param esp_uuid Boot GPT UUID. @param filesystem Root type, ext3 or ext4.
+ * @param enabled Include the prepared swapfile.
  * @param retain_file Receives true after publication or if reference/rollback
  * durability is uncertain following an error. @return Zero or negative errno;
  * rollback is best effort and uncertain fstab state retains the swapfile.
  */
-int installer_swap_configure(const char *root,const char *root_uuid,const char *esp_uuid,
-                             bool enabled,bool *retain_file)
+int installer_swap_configure_fs(const char *root,const char *root_uuid,const char *esp_uuid,
+                                const char *filesystem,bool enabled,bool *retain_file)
 {
     if (retain_file) *retain_file=enabled;
     if (!root || root[0]!='/' || !strcmp(root,"/") || !root_uuid || !*root_uuid ||
-        !esp_uuid || !*esp_uuid || !retain_file) return -EINVAL;
+        !esp_uuid || !*esp_uuid || !filesystem ||
+        (strcmp(filesystem,"ext3") && strcmp(filesystem,"ext4")) || !retain_file) return -EINVAL;
     char fstab[512];
     int n=snprintf(fstab,sizeof(fstab),
         "# <source> <mountpoint> <type> <options> <dump> <pass>\n"
-        "/dev/disk/by-partuuid/%s / ext4 defaults 0 1\n"
+        "/dev/disk/by-partuuid/%s / %s %s 0 1\n"
         "/dev/disk/by-partuuid/%s /efi vfat defaults 0 2\n"
         "/efi/reliefos/instances/%s /boot none bind 0 0\n%s",
-        root_uuid,esp_uuid,root_uuid,enabled ? "/swapfile none swap sw 0 0\n" : "");
+        root_uuid,filesystem,!strcmp(filesystem,"ext3") ? "data=ordered" : "defaults",
+        esp_uuid,root_uuid,enabled ? "/swapfile none swap sw 0 0\n" : "");
     if (n<0 || (size_t)n>=sizeof(fstab)) return -EOVERFLOW;
     int rootfd=-1,etc=-1,conf=-1,levels=-1,run=-1,rc=0;
     bool published=false;
@@ -254,3 +257,12 @@ out:
     }
     return rc;
 }
+
+/** @brief Preserve the existing ext4 default for fresh-target configuration.
+ * @param root Fresh target. @param root_uuid Root UUID. @param esp_uuid Boot UUID.
+ * @param enabled Include swap. @param retain_file Receives publication state.
+ * @return Zero or negative errno.
+ */
+int installer_swap_configure(const char *root,const char *root_uuid,const char *esp_uuid,
+                             bool enabled,bool *retain_file)
+{ return installer_swap_configure_fs(root,root_uuid,esp_uuid,"ext4",enabled,retain_file); }

@@ -71,11 +71,11 @@ static void partition_action(const struct installer_tty_context *context, int ac
     else if (action == INIT_GPT) { job.kind = TUI_JOB_INIT; confirmation = "INITIALIZE"; }
     else if (action == DELETE_PART) { job.kind = TUI_JOB_DELETE; confirmation = "DELETE"; }
     else if (action == CREATE || action == FORMAT) {
-        static const char *const filesystems[] = {"ext4", "ext2", "FAT32", "exFAT", "raw"};
-        static const unsigned values[] = {RELIEFOS_BLOCK_FILESYSTEM_EXT4, RELIEFOS_BLOCK_FILESYSTEM_EXT2,
+        static const char *const filesystems[] = {"ext4", "ext3", "ext2", "FAT32", "exFAT", "raw"};
+        static const unsigned values[] = {RELIEFOS_BLOCK_FILESYSTEM_EXT4, RELIEFOS_BLOCK_FILESYSTEM_EXT3, RELIEFOS_BLOCK_FILESYSTEM_EXT2,
             RELIEFOS_BLOCK_FILESYSTEM_FAT32, RELIEFOS_BLOCK_FILESYSTEM_EXFAT, RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN};
         if (action == CREATE && !ask_size(T("Create partition"), &job.size)) return;
-        int chosen = tui_pick(T("Filesystem"), filesystems, action == CREATE ? 5 : 4, 0);
+        int chosen = tui_pick(T("Filesystem"), filesystems, action == CREATE ? 6 : 5, 0);
         if (chosen < 0) return;
         job.filesystem = values[chosen];
         snprintf(job.name, sizeof(job.name), "%s", action == CREATE ? "ReliefOS Data" : "RELIEFOS_DATA");

@@ -231,10 +231,10 @@ void dialog_apply(Fl_Widget *, void *data)
         dialog->hint->copy_label(T("The partition name is too long.")); dialog->confirmation.reset(); return;
     }
     if (dialog->filesystem) {
-        const uint32_t choices[] = {RELIEFOS_BLOCK_FILESYSTEM_EXT4, RELIEFOS_BLOCK_FILESYSTEM_FAT32,
+        const uint32_t choices[] = {RELIEFOS_BLOCK_FILESYSTEM_EXT4, RELIEFOS_BLOCK_FILESYSTEM_EXT3, RELIEFOS_BLOCK_FILESYSTEM_FAT32,
                                     RELIEFOS_BLOCK_FILESYSTEM_EXFAT};
         int index = dialog->filesystem->value();
-        if (index < 0 || index > 2) { dialog->confirmation.reset(); return; }
+        if (index < 0 || index > 3) { dialog->confirmation.reset(); return; }
         dialog->request.filesystem = choices[index];
     }
     if (!dialog->confirmation.accept(dialog->request.action, dialog->word->value())) {
@@ -273,9 +273,10 @@ bool confirm_action(dm::Request &request)
     }
     if (request.action != Action::Delete) {
         dialog.filesystem = new Fl_Choice(150, y, 220, 30, T("Filesystem:"));
-        dialog.filesystem->add("ext4|FAT32|exFAT");
-        dialog.filesystem->value(request.filesystem == RELIEFOS_BLOCK_FILESYSTEM_FAT32 ? 1 :
-                                 request.filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXFAT ? 2 : 0);
+        dialog.filesystem->add("ext4|ext3|FAT32|exFAT");
+        dialog.filesystem->value(request.filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ? 1 :
+                                 request.filesystem == RELIEFOS_BLOCK_FILESYSTEM_FAT32 ? 2 :
+                                 request.filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXFAT ? 3 : 0);
         dialog.filesystem->callback(dialog_edit, &dialog); y += 42;
     }
     char prompt[128]; snprintf(prompt, sizeof(prompt), T("Type %s to confirm:"), dm::confirmation_word(request.action));

@@ -714,7 +714,7 @@ static void refresh_partition_list(void)
             partition_hint->copy_label(installer_partition_auto
                 ? T("The automatic layout does not fit this disk. Select another disk or configure partitions manually.")
                 : setup.skip_bios
-                    ? T("Manual layout: assign a FAT32 ESP and an ext4 root. BIOS Boot is not required for the selected bootloaders.")
+                    ? T("Manual layout: assign a FAT32 ESP and an ext4 or ext3 root. BIOS Boot is not required for the selected bootloaders.")
                     : T("Manual layout: assign BIOS Boot, ESP and root roles. BIOS Boot stays unformatted."));
         }
     }
@@ -755,6 +755,7 @@ static uint32_t partition_filesystem(const char *text)
     if (text_eq(text, "fat32") || text_eq(text, "fat"))
         return RELIEFOS_BLOCK_FILESYSTEM_FAT32;
     if (text_eq(text, "ext2")) return RELIEFOS_BLOCK_FILESYSTEM_EXT2;
+    if (text_eq(text, "ext3")) return RELIEFOS_BLOCK_FILESYSTEM_EXT3;
     if (text_eq(text, "ext4")) return RELIEFOS_BLOCK_FILESYSTEM_EXT4;
     if (text_eq(text, "exfat")) return RELIEFOS_BLOCK_FILESYSTEM_EXFAT;
     return RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
@@ -818,7 +819,7 @@ static const char *partition_prompt_text(enum partition_prompt_action action)
     case PARTITION_PROMPT_INITIALIZE:
         return T("Type INITIALIZE to replace the partition table:");
     case PARTITION_PROMPT_CREATE:
-        return T("Enter size_MiB filesystem name (ext4/ext2/fat32/exfat/raw):");
+        return T("Enter size_MiB filesystem name (ext4/ext3/ext2/fat32/exfat/raw):");
     case PARTITION_PROMPT_RESIZE:
         return T("Enter the new partition size in MiB:");
     case PARTITION_PROMPT_RENAME:

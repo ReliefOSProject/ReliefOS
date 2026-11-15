@@ -1,3 +1,6 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
 /* Block-device helpers for ReliefOS userland tools.
  *
  * This module deliberately uses only POSIX file descriptors, Linux block
@@ -8,6 +11,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/wait.h>
 #include <linux/fs.h>
 #include <mntent.h>
 #include <stdint.h>
@@ -394,6 +398,7 @@ const char *reliefos_block_filesystem_name(uint32_t filesystem)
     switch (filesystem) {
     case RELIEFOS_BLOCK_FILESYSTEM_FAT32: return "fat32";
     case RELIEFOS_BLOCK_FILESYSTEM_EXT2: return "ext2";
+    case RELIEFOS_BLOCK_FILESYSTEM_EXT3: return "ext3";
     case RELIEFOS_BLOCK_FILESYSTEM_EXT4: return "ext4";
     case RELIEFOS_BLOCK_FILESYSTEM_ISO9660: return "iso9660";
     case RELIEFOS_BLOCK_FILESYSTEM_EXFAT: return "exfat";
@@ -826,10 +831,20 @@ static int block_partition_probe_fd(int fd, uint32_t *out_filesystem)
     else {
         ret = block_io(fd, 1024, sector, sizeof(sector), 0);
         if (ret < 0) return ret;
-        if (*(uint16_t *)(void *)(sector + 56) == EXT2_SUPER_MAGIC) {
-            uint32_t incompat = *(uint32_t *)(void *)(sector + 96);
-            *out_filesystem = (incompat & 0x40u) ?
-                RELIEFOS_BLOCK_FILESYSTEM_EXT4 : RELIEFOS_BLOCK_FILESYSTEM_EXT2;
+        uint16_t magic;
+        memcpy(&magic, sector + 56, sizeof(magic));
+        if (magic == EXT2_SUPER_MAGIC) {
+            uint32_t compat, incompat, ro_compat;
+            memcpy(&compat, sector + 92, sizeof(compat));
+            memcpy(&incompat, sector + 96, sizeof(incompat));
+            memcpy(&ro_compat, sector + 100, sizeof(ro_compat));
+            /* Match the kernel's conservative ext-family feature classification. */
+            if ((compat & ~0x3fu) || (incompat & ~0x6u) || (ro_compat & ~0x7u))
+                *out_filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT4;
+            else if (compat & 4u)
+                *out_filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT3;
+            else
+                *out_filesystem = (incompat & 4u) ? RELIEFOS_BLOCK_FILESYSTEM_EXT4 : RELIEFOS_BLOCK_FILESYSTEM_EXT2;
         }
     }
     return 0;
@@ -956,6 +971,7 @@ static int block_create_entry(struct block_gpt_table *table, void *context)
             memset(&table->entries[free_index], 0, sizeof(table->entries[free_index]));
             block_set_guid(table->entries[free_index].type_guid,
                            (request->filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT2 ||
+                            request->filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ||
                             request->filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4) ?
                            RELIEFOS_BLOCK_GPT_LINUX : RELIEFOS_BLOCK_GPT_BASIC_DATA);
             int result = block_guid_make(table->entries[free_index].unique_guid);
@@ -987,6 +1003,7 @@ int reliefos_block_gpt_create(const char *disk_path, uint32_t filesystem,
     if (filesystem != RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN &&
         filesystem != RELIEFOS_BLOCK_FILESYSTEM_FAT32 &&
         filesystem != RELIEFOS_BLOCK_FILESYSTEM_EXT2 &&
+        filesystem != RELIEFOS_BLOCK_FILESYSTEM_EXT3 &&
         filesystem != RELIEFOS_BLOCK_FILESYSTEM_EXT4 &&
         filesystem != RELIEFOS_BLOCK_FILESYSTEM_EXFAT) return -BLOCK_EINVAL;
     ret = block_gpt_update(disk_path, block_create_entry, &request);
@@ -1262,6 +1279,69 @@ static int block_format_ext4(int fd, uint64_t sectors, const char *label)
     return block_format_ext_family(fd, sectors, label, 1);
 }
 
+/** @brief Format an already opened, unmounted block device using e2fsprogs.
+ * @param fd Owned writable device descriptor retained until the formatter exits.
+ * @param label Optional filesystem label, at most 16 bytes.
+ * @return Zero or negative errno; formatter exit failures are reported as EIO.
+ * The child inherits the pinned descriptor and never invokes a shell.
+ */
+static int block_format_ext3(int fd, const char *label)
+{
+    if (label && strlen(label) > 16) return -EINVAL;
+    char path[48];
+    int n = snprintf(path, sizeof(path), "/proc/self/fd/%d", fd);
+    if (n < 0 || (size_t)n >= sizeof(path)) return -EOVERFLOW;
+    char *args[24]; unsigned at=0;
+    args[at++]=(char *)"mke2fs"; args[at++]=(char *)"-q";
+    args[at++]=(char *)"-F"; args[at++]=(char *)"-t"; args[at++]=(char *)"ext3";
+    args[at++]=(char *)"-b"; args[at++]=(char *)"4096";
+    args[at++]=(char *)"-I"; args[at++]=(char *)"128";
+    args[at++]=(char *)"-i"; args[at++]=(char *)"16384";
+    args[at++]=(char *)"-O";
+    args[at++]=(char *)"none,filetype,sparse_super,large_file,has_journal";
+    args[at++]=(char *)"-m"; args[at++]=(char *)"0";
+    args[at++]=(char *)"-E"; args[at++]=(char *)"lazy_itable_init=0,lazy_journal_init=0";
+    if (label && *label) { args[at++]=(char *)"-L"; args[at++]=(char *)label; }
+    args[at++]=path; args[at]=NULL;
+    int errors[2];
+    if (pipe2(errors,O_CLOEXEC)<0) return -errno;
+    pid_t child=fork();
+    if (child<0) {
+        int error=errno; (void)close(errors[0]); (void)close(errors[1]); return -error;
+    }
+    if (!child) {
+        (void)close(errors[0]);
+        int flags=fcntl(fd,F_GETFD), error=0;
+        if (flags<0 || fcntl(fd,F_SETFD,flags&~FD_CLOEXEC)<0) error=errno;
+        if (!error) { execv("/usr/sbin/mke2fs",args); error=errno; }
+        const uint8_t *p=(const uint8_t *)&error; size_t left=sizeof(error);
+        while (left) {
+            ssize_t written=write(errors[1],p,left);
+            if (written<0 && errno==EINTR) continue;
+            if (written<=0) break;
+            p+=(size_t)written; left-=(size_t)written;
+        }
+        _exit(127);
+    }
+    (void)close(errors[1]);
+    int child_error=0, read_error=0; size_t received=0;
+    while (received<sizeof(child_error)) {
+        ssize_t got=read(errors[0],(uint8_t *)&child_error+received,sizeof(child_error)-received);
+        if (got<0 && errno==EINTR) continue;
+        if (got<0) { read_error=errno; break; }
+        if (!got) break;
+        received+=(size_t)got;
+    }
+    (void)close(errors[0]);
+    int status=0; pid_t waited;
+    do { waited=waitpid(child,&status,0); } while (waited<0 && errno==EINTR);
+    if (waited<0) return -errno;
+    if (read_error) return -read_error;
+    if (received) return received==sizeof(child_error) && child_error>0 ? -child_error : -EIO;
+    if (!WIFEXITED(status) || WEXITSTATUS(status)) return -EIO;
+    return fsync(fd)<0 ? -errno : 0;
+}
+
 #include "blockdev_exfat_upcase.inc"
 
 static uint32_t block_exfat_boot_checksum(const uint8_t boot[BLOCK_SECTOR_SIZE])
@@ -1377,6 +1457,7 @@ int reliefos_block_format(const char *partition_path, uint32_t filesystem, const
     if (ret < 0) return ret;
     if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_FAT32) ret = block_format_fat32(fd, sectors, label);
     else if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT2) ret = block_format_ext2(fd, sectors, label);
+    else if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3) ret = block_format_ext3(fd, label);
     else if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4) ret = block_format_ext4(fd, sectors, label);
     else if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXFAT) ret = block_format_exfat(fd, sectors, label);
     else ret = -BLOCK_EINVAL;
