@@ -101,6 +101,11 @@ def main() -> None:
         wrapper.chmod(0o755)
         arguments = ["make", "--no-print-directory", "-C", str(ROOT), f"O={out}",
                      f"RELIEFNT_DIR={source}", f"AR={wrapper}", "SOURCE_DATE_EPOCH=1700000000", "-j6"]
+        # make test exports native tool identities relative to its output tree.
+        # Exercise the same inherited context when this suite runs directly:
+        # the identity appears after the first build, but must never displace
+        # the explicit archiver when the product root selects its toolchain.
+        environment = dict(os.environ, RELIEFOS_AR_ID="./meta/target-ar.identity", TARGET_AR="llvm-ar")
         step = 0
         logs = ROOT / "out/kbuild-migration" / work.name
         logs.mkdir(parents=True, exist_ok=True)
@@ -110,7 +115,7 @@ def main() -> None:
             nonlocal step
             step += 1
             result = subprocess.run(arguments + list(extra) + ["kernel", "runtime"],
-                                    text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                                    env=environment, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             (logs / f"step-{step}.log").write_text(result.stdout)
             if result.returncode:
                 raise AssertionError(f"build {step} failed ({result.returncode}):\n" + "\n".join(result.stdout.splitlines()[-35:]))
@@ -143,6 +148,8 @@ def main() -> None:
                     if data[0].is_relative_to(ROOT / "userland")}
 
         build()
+        require((out / "meta/target-ar.identity").read_text().splitlines()[0] == f"tool={wrapper}",
+                "explicit archiver wins over inherited native tool identities")
         check_runtime_elf(out)
         baseline = objects()
         require(len(baseline) > 200, "production kernel and runtime first-party objects built")

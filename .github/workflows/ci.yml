@@ -164,6 +164,7 @@ jobs:
           path: |
             out/x86_64/release/logs
             out/x86_64/release/ci
+            out/kbuild-migration
           if-no-files-found: warn
           retention-days: 7
 

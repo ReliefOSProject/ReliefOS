@@ -16,9 +16,14 @@ override c_flags = -Wp,-MMD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE) \
 # but do not add a built-in.a prerequisite here: this adapter is included ahead
 # of Makefile.build, so that rule would become the native default target and
 # would leak a product-output dependency into host-only builds.
+# Only wrap directory builds. The product root selects TARGET_AR from the
+# command-line AR origin; an identity inherited from an outer make must not
+# turn that explicit choice into an override before toolchain selection.
+ifneq ($(filter-out .,$(obj)),)
 ifneq ($(wildcard $(RELIEFOS_AR_ID)),)
 RELIEFOS_NATIVE_AR_ID = $(shell sha256sum '$(RELIEFOS_AR_ID)' 2>/dev/null | cut -d' ' -f1)
 override AR = env RELIEFOS_AR_ID=$(RELIEFOS_NATIVE_AR_ID) $(TARGET_AR)
+endif
 endif
 
 # Upstream normally creates object directories while parsing. Inspection must
