@@ -86,7 +86,8 @@ extern int reboot_error;
 extern uint8_t installer_tty_mode;
 
 /* Implemented by the frontend: repaint from the shared state.  Long-running
- * install operations call this between stages; the TTY frontend no-ops it. */
+ * install operations call this between stages; the ncurses worker publishes
+ * progress to its parent process without drawing on the terminal. */
 void refresh_ui(void);
 
 int text_eq(const char *a, const char *b);

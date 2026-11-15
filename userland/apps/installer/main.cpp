@@ -41,6 +41,7 @@ extern "C" {
 #include "installer_capacity.h"
 #include "installer_partitions.h"
 #include "installer_tty.h"
+#include "installer_tui.h"
 #include "installer_update.h"
 #include "../reliefapk/process.h"
 #include "model.h"
@@ -713,7 +714,7 @@ static void refresh_partition_list(void)
             partition_hint->copy_label(installer_partition_auto
                 ? T("The automatic layout does not fit this disk. Select another disk or configure partitions manually.")
                 : setup.skip_bios
-                    ? T("Manual layout: assign a FAT32 ESP and an ext4 root. BIOS Boot is not required for the selected bootloaders.")
+                    ? T("Manual layout: assign a FAT32 ESP and an ext4 or ext3 root. BIOS Boot is not required for the selected bootloaders.")
                     : T("Manual layout: assign BIOS Boot, ESP and root roles. BIOS Boot stays unformatted."));
         }
     }
@@ -754,6 +755,7 @@ static uint32_t partition_filesystem(const char *text)
     if (text_eq(text, "fat32") || text_eq(text, "fat"))
         return RELIEFOS_BLOCK_FILESYSTEM_FAT32;
     if (text_eq(text, "ext2")) return RELIEFOS_BLOCK_FILESYSTEM_EXT2;
+    if (text_eq(text, "ext3")) return RELIEFOS_BLOCK_FILESYSTEM_EXT3;
     if (text_eq(text, "ext4")) return RELIEFOS_BLOCK_FILESYSTEM_EXT4;
     if (text_eq(text, "exfat")) return RELIEFOS_BLOCK_FILESYSTEM_EXFAT;
     return RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
@@ -817,7 +819,7 @@ static const char *partition_prompt_text(enum partition_prompt_action action)
     case PARTITION_PROMPT_INITIALIZE:
         return T("Type INITIALIZE to replace the partition table:");
     case PARTITION_PROMPT_CREATE:
-        return T("Enter size_MiB filesystem name (ext4/ext2/fat32/exfat/raw):");
+        return T("Enter size_MiB filesystem name (ext4/ext3/ext2/fat32/exfat/raw):");
     case PARTITION_PROMPT_RESIZE:
         return T("Enter the new partition size in MiB:");
     case PARTITION_PROMPT_RENAME:
@@ -1401,7 +1403,8 @@ static int app_event_handler(int event)
 
 extern "C" void refresh_ui(void)
 {
-    if (installer_tty_mode || !main_window) return;
+    if (installer_tty_mode) { installer_tui_publish_progress(); return; }
+    if (!main_window) return;
     refresh_status_widgets();
     update_footer();
     Fl::check();
@@ -1483,17 +1486,18 @@ int main(int argc, char **argv)
     }
     struct installer_tty_context tty_context;
     int graphical = argc == 2 && strcmp(argv[1], "--graphical") == 0;
+    int text_mode = argc == 2 && strcmp(argv[1], "--text") == 0;
 
     setlocale(LC_ALL, "");
     bindtextdomain("installer", RELIEFOS_LAYOUT_LOCALE);
     bind_textdomain_codeset("installer", "UTF-8");
     textdomain("installer");
     setvbuf(stdout, NULL, _IOLBF, 0);
-    if (argc != 1 && !graphical) {
-        fputs("usage: installer [--graphical]\n", stderr);
+    if (argc != 1 && !graphical && !text_mode) {
+        fputs("usage: installer [--graphical|--text]\n", stderr);
         return 2;
     }
-    if (!graphical && isatty(STDIN_FILENO)) {
+    if (text_mode || (!graphical && isatty(STDIN_FILENO))) {
         installer_tty_mode = 1;
         tty_context.setup = &setup;
         tty_context.disks = disks;

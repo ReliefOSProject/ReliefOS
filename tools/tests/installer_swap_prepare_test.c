@@ -5,15 +5,16 @@
 #include <stdio.h>
 #include <string.h>
 static int create_calls,configure_calls,remove_calls,mode;
+static const char *expected_filesystem="ext4";
 int installer_swap_create_owned(const char *root,uint64_t bytes,installer_swap_progress_fn cb,
                                 void *context,struct installer_swap_identity *id)
 {
     assert(!strcmp(root,"/target") && bytes==512ULL*1024*1024 && !cb && !context);
     ++create_calls;id->file_ino=42;return mode==1 ? -ENOSPC : 0;
 }
-int installer_swap_configure(const char *root,const char *ru,const char *eu,bool enabled,bool *retain_file)
+int installer_swap_configure_fs(const char *root,const char *ru,const char *eu,const char *filesystem,bool enabled,bool *retain_file)
 {
-    assert(!strcmp(root,"/target") && !strcmp(ru,"root") && !strcmp(eu,"esp"));
+    assert(!strcmp(root,"/target") && !strcmp(ru,"root") && !strcmp(eu,"esp") && !strcmp(filesystem,expected_filesystem));
     ++configure_calls;assert(enabled==(mode!=4));*retain_file=mode==3;
     return mode==2 || mode==3 ? -EIO : 0;
 }
@@ -28,5 +29,10 @@ int main(void)
         assert(create_calls==(mode!=4));assert(configure_calls==(mode!=1));
         assert(remove_calls==(mode==2));
     }
+    mode=4; create_calls=configure_calls=remove_calls=0; expected_filesystem="ext3";
+    assert(!installer_swap_prepare_fs("/target","root","esp","ext3",0,NULL,NULL));
+    assert(!create_calls && configure_calls==1 && !remove_calls);
+    assert(installer_swap_prepare_fs("/target","root","esp","other",0,NULL,NULL)==-EINVAL);
+    assert(configure_calls==1);
     puts("PASS: swap preparation orders creation, configuration and identity-checked rollback");return 0;
 }

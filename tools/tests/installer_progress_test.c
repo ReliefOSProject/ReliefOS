@@ -42,7 +42,7 @@ int main(void)
             show_copy_progress("/target/file");
         }
         assert(output_calls <= 2);
-        assert(refresh_calls == (tty ? 0u : 1u));
+        assert(refresh_calls == 1u);
         unsigned before = output_calls;
         test_time += COPY_PRESENT_INTERVAL_MS;
         show_copy_progress("/target/next-file");

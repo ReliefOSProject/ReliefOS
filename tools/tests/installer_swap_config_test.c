@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 extern int installer_swap_configure(const char *,const char *,const char *,bool,bool *) __attribute__((weak));
+extern int installer_swap_configure_fs(const char *,const char *,const char *,const char *,bool,bool *) __attribute__((weak));
 int __real_renameat(int,const char *,int,const char *);
 int __real_fsync(int);
 int __real_symlinkat(const char *,int,const char *);
@@ -97,14 +98,19 @@ int main(int argc,char **argv)
 {
     assert(argc==3);which=argv[1];
     if (!installer_swap_configure) {fputs("FAIL: fresh swap configuration transaction absent\n",stderr);return 1;}
+    bool ext3=!strcmp(which,"ext3");
+    if (ext3 && !installer_swap_configure_fs) { fputs("FAIL: ext3 fstab configuration absent\n",stderr); return 1; }
     bool enabled=strcmp(which,"disabled")!=0, committed=false;
-    int rc=installer_swap_configure(argv[2],"root-id","esp-id",enabled,&committed);
+    int rc=ext3 ? installer_swap_configure_fs(argv[2],"root-id","esp-id","ext3",enabled,&committed)
+                : installer_swap_configure(argv[2],"root-id","esp-id",enabled,&committed);
     char path[1024];
     snprintf(path,sizeof(path),"%s/etc/fstab",argv[2]);
-    bool success=!strcmp(which,"enabled") || !strcmp(which,"disabled");
+    bool success=!strcmp(which,"enabled") || !strcmp(which,"disabled") || ext3;
     bool published=success || !strcmp(which,"backup-unlink") || !strcmp(which,"dir-close");
     if (published) {
         assert(committed && (success ? !rc : rc<0 && faulted));contents(path,"/dev/disk/by-partuuid/root-id");
+        contents(path,ext3 ? "/dev/disk/by-partuuid/root-id / ext3 data=ordered 0 1"
+                           : "/dev/disk/by-partuuid/root-id / ext4 defaults 0 1");
         contents(path,"/dev/disk/by-partuuid/esp-id /efi vfat defaults 0 2");
         contents(path,"/efi/reliefos/instances/root-id /boot none bind 0 0");
         if (enabled) contents(path,"/swapfile none swap sw 0 0");

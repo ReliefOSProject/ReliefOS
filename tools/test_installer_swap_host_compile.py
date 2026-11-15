@@ -20,7 +20,8 @@ def main():
     compat.write_text('#include <linux/mount.h>\n#undef MNT_FORCE\n#undef MNT_DETACH\n'
                       '#undef MNT_EXPIRE\n#undef UMOUNT_NOFOLLOW\n')
     sources=['install_ops.c','installer_capacity.c','installer_swap.c','installer_swap_bundle.c',
-             'installer_swap_config.c','installer_swap_prepare.c','installer_swap_storage.c','installer_tty.c']
+             'installer_swap_config.c','installer_swap_prepare.c','installer_swap_storage.c','installer_tty.c',
+             'installer_tui.c','installer_tui_job.c']
     for name in sources:
         selected_headers=base_headers if name=='installer_swap_storage.c' else headers
         cmd=[cc,'-std=gnu11','-O1','-Wall','-Wextra',*selected_headers,'-include',str(compat),'-c',

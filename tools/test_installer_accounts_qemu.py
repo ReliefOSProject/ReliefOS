@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Install onto an exclusive scratch disk, then verify actual login credentials."""
 import argparse
+from difflib import SequenceMatcher
 from collections import Counter
 from contextlib import contextmanager
 from pathlib import Path
@@ -236,6 +237,8 @@ def assert_desktop_profile(image, skip_xorg):
     package_names = {line[2:] for line in installed.splitlines() if line.startswith("P:")}
     xorg_packages = xorg_apk_packages()
     assert xorg_packages, "dependency lock contains no Xorg APK packages"
+    # The trust package also requires these certificates in console installations.
+    xorg_packages.discard("ca-certificates-bundle")
     if skip_xorg:
         present = sorted(xorg_packages & package_names)
         assert not present, f"Console image includes Xorg APK records: {present}"
@@ -252,13 +255,13 @@ def assert_desktop_profile(image, skip_xorg):
         assert not unexpected_apps, f"Console image includes Xorg applications: {unexpected_apps}"
 
 
-def installer_finish_log(probe, serial, process):
+def installer_finish_log(probe, serial, process, log_path="/var/log/installer-session.log"):
     """Read a bounded live log suffix and this request's status via the rescue TTY."""
     start = serial.stat().st_size
     token = "INSTALLER_LOG_READ_DONE_" + uuid.uuid4().hex
     probe.key("ctrl-alt-f2")
     time.sleep(1)
-    probe.text("tail -c 16384 /var/log/installer-session.log > /dev/ttyS0; "
+    probe.text(f"tail -c 16384 {log_path} > /dev/ttyS0; "
                f"echo {token}:$? > /dev/ttyS0")
     probe.key("ret")
     deadline = time.monotonic() + 60
@@ -289,15 +292,18 @@ def wait_install(probe, serial, process, *, tty=False, timeout=2400):
             raise AssertionError("Installer failed; see serial.log and last-frame.png")
         if process.poll() is not None:
             raise RuntimeError("QEMU exited during installation")
-        completed = "[installer.elf] installation completed successfully" in log
         frame = probe.frame("tty-install-progress" if tty else "progress")
-        finished = "Reboot now?" in log if tty else probe.visible_page(frame) == 10
-        if finished and not tty:
-            current = installer_finish_log(probe, serial, process)
+        if tty:
+            finished = any(SequenceMatcher(None, "installationfinished", text).ratio() >= .78
+                           for text in tui_ocr(frame, header="Installation finished").splitlines())
+            if finished:
+                assert "successfully" in tui_ocr(frame), "TUI reported installation failure"
+        else:
+            finished = probe.visible_page(frame) == 10
+        if finished:
+            current = installer_finish_log(probe, serial, process,
+                "/var/log/installer.log" if tty else "/var/log/installer-session.log")
             assert "[installer.elf] installation completed successfully" in current, current[-10000:]
-            probe.frame("installed")
-            return
-        if completed and finished:
             probe.frame("installed")
             return
         time.sleep(5)
@@ -429,14 +435,52 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False,
     wait_install(probe, serial, process, timeout=install_timeout)
 
 
+def tui_ocr(frame, *, header=None):
+    from PIL import ImageOps
+    from test_vt_qemu import ocr
+    # The framebuffer console uses 8x16 cells. Match the bounded ncurses
+    # viewport while retaining the original, full-resolution evidence file.
+    columns, rows = frame.width // 8, frame.height // 16
+    width, height = min(columns, 110), min(rows, 36)
+    left, top = (columns - width) // 2 * 8, (rows - height) // 2 * 16
+    if header:
+        image = frame.crop((left + 16, top, left + 16 + len(header) * 8, top + 16))
+    else:
+        image = frame.crop((left, top, left + width * 8, top + height * 16))
+    image = ImageOps.autocontrast(image.convert("L"))
+    mode = 7 if header else 6
+    text = ocr(image, psm=mode) + ocr(ImageOps.invert(image), psm=mode)
+    return "\n".join("".join(line.lower().split()) for line in text.splitlines() if line.strip())
+
+
+def wait_tui_page(probe, process, title, timeout=90):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        frame = probe.frame("tui-" + title.lower().replace(" ", "-"))
+        expected = "".join(title.lower().split())
+        candidates = tui_ocr(frame, header=title).splitlines()
+        # The fixed console font makes OCR occasionally read W as two l's.
+        # Titles remain distinct at this threshold. Completion also requires
+        # the live backend success marker and the visible success message.
+        if any(SequenceMatcher(None, expected, text).ratio() >= .78 for text in candidates):
+            return frame
+        if process is not None and process.poll() is not None:
+            raise RuntimeError("QEMU exited before TUI page " + title)
+        time.sleep(.5)
+    raise AssertionError("TUI page did not appear: " + title)
+
+
 def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
                 install_bios=True, install_uefi=True, select_entry=True, install_timeout=2400,
-                swap_mib=None, partition_commands=None):
-    """Answer the real TTY installer, including both independent loader choices."""
+                swap_mib=None, partition_roles=None, confirm_install=True):
+    """Operate ncurses controls; partition_roles addresses physical table rows."""
+    if swap_mib is not None and (not isinstance(swap_mib, int) or not 1 <= swap_mib <= 16777216):
+        raise ValueError("swap_mib must be a valid positive MiB count")
+    if partition_roles and any(role not in ("esp", "root", "bios", "data") or
+                               not isinstance(row, int) or row < 0 for role, row in partition_roles.items()):
+        raise ValueError("invalid partition role or row")
     if select_entry:
         from test_vt_qemu import ocr
-        # Stop the five-second menu timer before OCR can consume that window.
-        # Up preserves entry zero and is harmless during firmware startup.
         deadline = time.monotonic() + 45
         while time.monotonic() < deadline:
             probe.key("up")
@@ -447,30 +491,65 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
         probe.key("down")
         probe.key("ret")
         wait_log(serial, "path=/bin/bash", process)
-        # Preserve the real keyboard TTY as stdin; tee mirrors visible prompts
-        # to serial for exact, bounded assertions without OCR transcription.
-        probe.text("installer 2>/var/log/installer-session.log | tee /dev/ttyS0")
+        probe.text("installer --text")
         probe.key("ret")
-    if swap_mib is not None and (not isinstance(swap_mib, int) or not 1 <= swap_mib <= 16777216):
-        raise ValueError("swap_mib must be a valid positive MiB count")
-    answers = [("Mode [install/update]: ", "install"),
-               ("Select disk number (r to refresh, q to quit): ", "0"),
-               ("Install or update BIOS bootloader? [Y/n]: ", "" if install_bios else "n"),
-               ("Install or update UEFI bootloader? [Y/n]: ", "" if install_uefi else "n"),
-               *[("partition> ", command) for command in (partition_commands or ("auto", "done"))],
-               ("Username: ", "alice"), ("Password: ", USER_PASSWORD),
-               ("Confirm password: ", USER_PASSWORD), ("root password: ", ROOT_PASSWORD),
-               ("Confirm root password: ", ROOT_PASSWORD),
-               ("Install Xorg desktop environment? [Y/n]: ", "n" if skip_xorg else ""),
-               ("Create a swapfile? [y/N]: ", "y" if swap_mib is not None else "")]
+    # The first radio always offers English, regardless of the boot locale.
+    time.sleep(2)
+    probe.key("spc")
+    wait_tui_page(probe, process, "Language")
+    for title in ("License", "Welcome", "Installation mode", "Target disk", "Bootloaders"):
+        probe.key("f3")
+        wait_tui_page(probe, process, title)
+    if not install_bios:
+        probe.key("spc")
+    probe.key("tab")
+    if not install_uefi:
+        probe.key("spc")
+    probe.key("f3")
+    wait_tui_page(probe, process, "Configure partitions")
+    if partition_roles:
+        probe.key("tab")
+        probe.key("spc")  # manual scheme
+        for role, row in partition_roles.items():
+            probe.key("f2")
+            probe.key("f3")  # reset control focus, retaining the manual scheme
+            for _ in range(2):
+                probe.key("tab")
+            probe.key("home")
+            for _ in range(row):
+                probe.key("down")
+            for _ in range(9):
+                probe.key("tab")  # the final action is Partition role
+            probe.key("ret")
+            wait_tui_page(probe, process, "Partition role")
+            for _ in range({"root": 0, "esp": 1, "bios": 2, "data": 3}[role]):
+                probe.key("tab")
+            probe.key("spc")
+            probe.key("f3")
+            wait_tui_page(probe, process, "Configure partitions")
+    probe.key("f3")
+    wait_tui_page(probe, process, "Account and system options")
+    for value in ("alice", USER_PASSWORD, USER_PASSWORD, ROOT_PASSWORD, ROOT_PASSWORD):
+        probe.text(value)
+        probe.key("tab")
+    if skip_xorg:
+        probe.key("spc")
+    probe.key("tab")
     if swap_mib is not None:
-        answers.append(("Swap size in MiB [", str(swap_mib)))
-    answers += [
-               ("Type INSTALL to confirm the partition layout and installation: ", "INSTALL")]
-    for prompt, answer in answers:
-        wait_log(serial, prompt, process, timeout=120)
-        probe.text(answer)
-        probe.key("ret")
+        probe.key("spc")
+        probe.key("tab")
+        probe.key("ctrl-u")
+        probe.text(str(swap_mib))
+    probe.key("f3")
+    wait_tui_page(probe, process, "Review installation")
+    probe.frame("tui-review")
+    if not confirm_install:
+        probe.text("NO")
+        probe.key("f3")
+        wait_tui_page(probe, process, "Review installation")
+        return
+    probe.text("INSTALL")
+    probe.key("f3")
     wait_install(probe, serial, process, tty=True, timeout=install_timeout)
 
 

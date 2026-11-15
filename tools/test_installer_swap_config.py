@@ -36,7 +36,7 @@ def main():
     result=run(command)
     if result:return result
     failures=0
-    for case in ('enabled','disabled','file-sync','file-close','link-fail','fstab-rename',
+    for case in ('enabled','disabled','ext3','file-sync','file-close','link-fail','fstab-rename',
                  'dir-sync','backup-unlink','dir-close','sync-close'):
         root=args.output/case
         for d in ('etc/conf.d','etc/runlevels/default','etc/init.d'):(root/d).mkdir(parents=True,exist_ok=True)

@@ -15,6 +15,7 @@ enum reliefos_block_filesystem {
     RELIEFOS_BLOCK_FILESYSTEM_ISO9660 = 3,
     RELIEFOS_BLOCK_FILESYSTEM_EXFAT = 4,
     RELIEFOS_BLOCK_FILESYSTEM_EXT4 = 5,
+    RELIEFOS_BLOCK_FILESYSTEM_EXT3 = 6,
 };
 
 enum reliefos_block_gpt_type {

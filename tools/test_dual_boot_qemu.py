@@ -408,9 +408,10 @@ def self_test():
     class FinishProbe:
         """Keep UI and success-channel assertions independent of real guest I/O."""
         def frame(self, name):
-            return name
+            from PIL import Image
+            return Image.new("RGB", (80, 24), "blue")
         def visible_page(self, frame):
-            return 9
+            return 10
     class Process:
         def poll(self):
             return None
@@ -418,15 +419,16 @@ def self_test():
         serial = Path(directory) / "serial.log"
         for text, success in (
                 ("GNU GRUB 2.12", False),
-                ("Reboot now?", False),
+                ("Installation finished", False),
                 ("[installer.elf] copy failed ret=-5", False),
-                ("[installer.elf] installation completed successfully\nReboot now?", True)):
+                ("[installer.elf] installation completed successfully\nInstallation finished", True)):
             serial.write_text(text)
             for tty in (True, False):
                 try:
                     with patch("test_installer_accounts_qemu.time.monotonic", side_effect=(0, 0, 2401)), \
                          patch("test_installer_accounts_qemu.time.sleep"), \
-                         patch("test_installer_accounts_qemu.installer_finish_log", return_value=text):
+                         patch("test_installer_accounts_qemu.installer_finish_log", return_value=text), \
+                         patch("test_vt_qemu.ocr", return_value="Installation finished\nInstallation completed successfully"):
                         wait_install(FinishProbe(), serial, Process(), tty=tty)
                 except AssertionError:
                     assert not success, (text, tty)

@@ -1,201 +1,285 @@
+/* The real ncurses widgets and fork/pipe transport run on the host. Storage
+ * callbacks represent a disposable disk, so keyboard tests cannot erase one. */
+#define _XOPEN_SOURCE_EXTENDED 1
+#include <ncurses.h>
 #include <assert.h>
-#include <errno.h>
-#include <string.h>
-#include "../../userland/apps/installer/installer_tty.c"
+#include <stdarg.h>
+#include <wchar.h>
+#include <locale.h>
+#include <linux/mount.h>
+#undef MNT_FORCE
+#undef MNT_DETACH
+#undef MNT_EXPIRE
+#undef UMOUNT_NOFOLLOW
+#include "../../userland/apps/installer/install_ops.c"
+#include "../../userland/apps/installer/installer_tui.h"
 
-static const char *input_text;
-static size_t input_position;
-static int interrupt_read, restore_error, termios_calls;
-
-ssize_t __wrap_read(int fd, void *buffer, size_t length)
+int __real_open(const char *, int, ...);
+int __wrap_open(const char *path, int flags, ...)
 {
-    assert(fd == 0 && length == 1);
-    if (interrupt_read) { interrupt_read = 0; errno = EINTR; return -1; }
-    if (!input_text[input_position]) return 0;
-    *(char *)buffer = input_text[input_position++];
-    return 1;
+    mode_t mode = 0;
+    if (flags & O_CREAT) { va_list args; va_start(args, flags); mode = va_arg(args, int); va_end(args); }
+    if (!strcmp(path, "/var/log/installer.log") && getenv("INSTALLER_TEST_LOG")) path = getenv("INSTALLER_TEST_LOG");
+    return __real_open(path, flags, mode);
 }
 
-ssize_t __wrap_write(int fd, const void *buffer, size_t length)
+void refresh_ui(void) { installer_tui_publish_progress(); }
+unsigned long reliefos_uptime_ms(void) { return 1000; }
+int reliefos_system_reboot(void) { errno = EPERM; return -1; }
+int reliefos_system_shutdown(void) { errno = EPERM; return -1; }
+int reliefos_block_partition_uuid(const char *disk, uint32_t index, char uuid[37])
+{ (void)disk; (void)index; strcpy(uuid, "00000000-0000-0000-0000-000000000001"); return 0; }
+int reliefos_block_partition_path(const char *disk, uint32_t index, char *path, uint32_t capacity)
 {
-    assert(fd == 1);
-    (void)buffer;
-    return (ssize_t)length;
+    int result = snprintf(path, capacity, "%s%u", disk, index + 1);
+    return result < 0 || (unsigned)result >= capacity ? -ENAMETOOLONG : 0;
+}
+const char *reliefos_block_gpt_type_name(uint32_t type) { (void)type; return "fixture"; }
+const char *reliefos_block_filesystem_name(uint32_t filesystem)
+{
+    if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_FAT32) return "FAT32";
+    if (filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4) return "ext4";
+    return "unknown";
+}
+int installer_setup_valid(const struct installer_setup *value)
+{
+    return *value->username && *value->password && !strcmp(value->password, value->password_confirm) &&
+        *value->root_password && !strcmp(value->root_password, value->root_password_confirm);
 }
 
-int __wrap_tcgetattr(int fd, struct termios *attributes)
+static int abnormal_worker, update_failure;
+static void record_settings(void)
 {
-    assert(fd == 0);
-    memset(attributes, 0, sizeof(*attributes));
-    attributes->c_lflag = ECHO | ECHONL | ICANON;
+    const char *path = getenv("INSTALLER_TEST_RESULT");
+    if (!path) return;
+    FILE *file = fopen(path, "w");
+    assert(file);
+    fprintf(file, "user=%s xorg=%u bios=%u uefi=%u swap=%u size=%llu\n", setup.username,
+        !setup.skip_xorg, !setup.skip_bios, !setup.skip_uefi, setup.swap_enabled,
+        (unsigned long long)setup.swap_size_mib);
+    fclose(file);
+}
+static void fixture_install(void)
+{
+    if (abnormal_worker) _exit(7);
+    progress_value = 50;
+    strcpy(status_text, "Copying fixture files");
+    refresh_ui();
+    record_settings();
+    install_success = 1;
+    page = INSTALLER_PAGE_FINISH;
+}
+static void fixture_disks(void)
+{
+    disk_count = 1;
+    strcpy(disks[0].path, "/dev/fixture");
+    strcpy(disks[0].name, "Disposable test disk");
+    disks[0].sector_count = 16777216;
+    disks[0].sector_size = 512;
+    selected_disk = 0;
+}
+static void fixture_partitions(void)
+{
+    partition_count = 0; selected_partition = -1;
+    if (!getenv("INSTALLER_TEST_PARTITIONS")) return;
+    /* Deliberately unordered GPT slots, with a 512 MiB gap before root. */
+    partitions[0] = (struct reliefos_block_partition){
+        .index = 7, .filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT4,
+        .gpt_type = RELIEFOS_BLOCK_GPT_LINUX, .first_lba = 1314816,
+        .sector_count = 15460352, .path = "/dev/fixture8", .name = "中文系统分区"};
+    partitions[1] = (struct reliefos_block_partition){
+        .index = 1, .gpt_type = RELIEFOS_BLOCK_GPT_BIOS_BOOT,
+        .first_lba = 2048, .sector_count = 2048, .path = "/dev/fixture2", .name = "BIOS"};
+    partitions[2] = (struct reliefos_block_partition){
+        .index = 4, .filesystem = RELIEFOS_BLOCK_FILESYSTEM_FAT32,
+        .gpt_type = RELIEFOS_BLOCK_GPT_ESP, .first_lba = 4096,
+        .sector_count = 262144, .path = "/dev/fixture5", .name = "EFI"};
+    partition_count = 3; selected_partition = 0;
+    installer_root_partition = 7; installer_esp_partition = 4;
+}
+static int fixture_valid(void) { return installer_partition_auto; }
+static int fixture_noop(void) { return 0; }
+static int fixture_create(uint32_t filesystem, uint32_t size, const char *name)
+{ (void)filesystem; (void)size; (void)name; return 0; }
+static int fixture_size(uint32_t size) { (void)size; return 0; }
+static int fixture_name(const char *name) { (void)name; return 0; }
+/** @brief Record which real GPT slot receives a keyboard-selected operation.
+ * @param name Borrowed proposed partition name. @return Zero on success.
+ */
+static int fixture_rename(const char *name)
+{
+    const char *path = getenv("INSTALLER_TEST_OPERATION");
+    if (!path) return fixture_name(name);
+    assert(selected_partition >= 0 && (uint32_t)selected_partition < partition_count);
+    FILE *file = fopen(path, "w");
+    assert(file);
+    fprintf(file, "slot=%u name=%s\n", partitions[selected_partition].index, name);
+    assert(!fclose(file));
     return 0;
 }
+static int fixture_format(uint32_t filesystem, const char *name) { (void)filesystem; (void)name; return 0; }
+static struct installer_tty_context fixture_context = {
+    &setup, disks, &disk_count, partitions, &partition_count, &selected_partition,
+    &installer_root_partition, &installer_esp_partition, &installer_partition_auto,
+    &selected_disk, &install_mode, &install_success, &page, fixture_disks,
+    format_disk_line, fixture_partitions, format_partition_line, fixture_valid,
+    fixture_noop, fixture_noop, fixture_create, fixture_size, fixture_rename,
+    fixture_size, fixture_noop, fixture_format, fixture_install, installer_boot_entry_path
+};
 
-int __wrap_tcsetattr(int fd, int action, const struct termios *attributes)
+int __real_doupdate(void);
+/** @brief Capture the real ncurses screen for externally driven PTY assertions.
+ * @return The underlying ncurses refresh result.
+ */
+int __wrap_doupdate(void)
 {
-    assert(fd == 0 && action == TCSANOW);
-    ++termios_calls;
-    if (termios_calls & 1) assert(!(attributes->c_lflag & (ECHO | ECHONL)));
-    else {
-        assert(attributes->c_lflag & ECHO);
-        if (restore_error) { errno = EIO; return -1; }
+    int result = __real_doupdate();
+    const char *path = getenv("INSTALLER_TEST_SCREEN");
+    if (!path) return result;
+    char temporary[4096];
+    assert(snprintf(temporary, sizeof(temporary), "%s.tmp", path) < (int)sizeof(temporary));
+    FILE *file = fopen(temporary, "w");
+    assert(file);
+    for (int row = 0; row < LINES; ++row) {
+        for (int column = 0; column < COLS; ++column) {
+            cchar_t cell;
+            wchar_t characters[CCHARW_MAX];
+            attr_t attributes;
+            short color;
+            assert(mvwin_wch(curscr, row, column, &cell) != ERR);
+            assert(getcchar(&cell, characters, &attributes, &color, NULL) != ERR);
+            fprintf(file, "%ls", characters);
+            if (wcwidth(characters[0]) == 2) ++column;
+        }
+        fputc('\n', file);
     }
-    return 0;
+    assert(!fclose(file));
+    assert(!rename(temporary, path));
+    return result;
 }
-
-static void feed(const char *text)
+int installer_update_check_target(const char *disk, const char *root, const char *esp,
+    struct installer_update_info *info, installer_update_observer observer, void *context)
 {
-    input_text = text;
-    input_position = 0;
-    termios_calls = 0;
-}
-
-/* Drive the complete TTY parser with real answers; storage callbacks assert
- * that firmware selection already happened before any partition operation. */
-static struct installer_setup flow_setup;
-static unsigned flow_modes;
-static int flow_stage;
-static void flow_choices(void)
-{
-    assert(flow_setup.skip_bios == !(flow_modes & 1));
-    assert(flow_setup.skip_uefi == !(flow_modes & 2));
-}
-static void flow_disks(void) { flow_stage = 1; }
-static void flow_disk_line(char *s, uint32_t n, const struct reliefos_block_disk_info *d)
-{ (void)d; snprintf(s, n, "fixture disk"); }
-static void flow_parts(void)
-{ assert(flow_stage == 1 || flow_stage == 3); flow_choices(); if (flow_stage == 1) flow_stage = 2; }
-static void flow_part_line(char *s, uint32_t n, const struct reliefos_block_partition *p)
-{ (void)p; snprintf(s, n, "fixture partition"); }
-static int flow_auto(void) { assert(flow_stage == 2); flow_choices(); flow_stage = 3; return 0; }
-static int flow_valid(void) { return flow_stage == 3; }
-static int flow_unused(void) { assert(0); return -1; }
-static int flow_create(uint32_t f, uint32_t n, const char *s)
-{ (void)f; (void)n; (void)s; return flow_unused(); }
-static int flow_number(uint32_t n) { (void)n; return flow_unused(); }
-static int flow_name(const char *s) { (void)s; return flow_unused(); }
-static int flow_format(uint32_t f, const char *s) { (void)f; (void)s; return flow_unused(); }
-int installer_update_check(const char *disk, struct installer_update_info *info,
-                           installer_update_observer observer, void *context)
-{
-    assert(flow_stage == 1 && !strcmp(disk, "/dev/sda"));
+    (void)root; (void)esp;
     memset(info, 0, sizeof(*info));
-    strcpy(info->disk, "/dev/sda");
-    strcpy(info->root_uuid, "8ab5d176-6479-4ec8-b382-531fca6ea662");
-    strcpy(info->installed_version, "5.3.0");
-    strcpy(info->media_version, "5.3.1");
+    snprintf(info->disk, sizeof(info->disk), "%s", disk);
+    strcpy(info->root_device, "/dev/fixture2");
+    strcpy(info->esp_device, "/dev/fixture1");
+    strcpy(info->installed_version, "5.3.1");
+    strcpy(info->media_version, "5.3.2");
+    strcpy(info->root_uuid, "00000000-0000-0000-0000-000000000001");
+    strcpy(info->index_sha256, "verified-fixture-index");
     info->boot_modes = 3;
     observer(context, 100, "Update checks completed");
-    flow_stage = 2;
     return 0;
 }
-static void flow_install(void)
-{ assert(flow_stage == 3 && flow_setup.skip_xorg); flow_choices(); flow_stage = 4; }
 int installer_update_apply(const struct installer_update_info *expected, unsigned modes,
-                           struct installer_update_info *result,
-                           installer_update_observer observer, void *context)
+    struct installer_update_info *result, installer_update_observer observer, void *context)
 {
-    assert(flow_stage == 2 && modes == flow_modes);
-    assert(!strcmp(expected->root_uuid, "8ab5d176-6479-4ec8-b382-531fca6ea662"));
-    flow_choices();
-    flow_stage = 4;
-    memset(result, 0, sizeof(*result));
-    strcpy(result->failure, "Fixture stops before reboot");
-    observer(context, 40, "Applying signed system packages");
-    return -EIO;
-}
-int installer_setup_valid(const struct installer_setup *s)
-{ return !strcmp(s->username, "alice") && !strcmp(s->password, "p") &&
-         !strcmp(s->password_confirm, "p") && !strcmp(s->root_password, "r") &&
-         !strcmp(s->root_password_confirm, "r"); }
-int reliefos_system_reboot(void) { assert(0); return -1; }
-int reliefos_system_shutdown(void) { assert(0); return -1; }
-
-static void test_tty_flow(int update, unsigned modes)
-{
-    struct reliefos_block_disk_info disk = {0};
-    struct reliefos_block_partition part = {0};
-    uint32_t disk_count = 1, part_count = 0;
-    int32_t selected = -1, root = -1, esp = -1, selected_disk = -1;
-    uint8_t automatic = 1, mode = 0, success = 0, page = 0;
-    struct installer_tty_context context = {
-        &flow_setup, &disk, &disk_count, &part, &part_count, &selected, &root, &esp,
-        &automatic, &selected_disk, &mode, &success, &page,
-        flow_disks, flow_disk_line, flow_parts, flow_part_line, flow_valid, flow_auto,
-        flow_unused, flow_create, flow_number, flow_name, flow_number, flow_unused,
-        flow_format, flow_install,
-    };
-    char answers[192];
-    memset(&flow_setup, 0, sizeof(flow_setup));
-    strcpy(disk.path, "/dev/sda");
-    flow_modes = modes;
-    snprintf(answers, sizeof(answers), "%s\n0\n%s\n%s\n%s",
-        update ? "update" : "install", modes & 1 ? "y" : "n", modes & 2 ? "y" : "n",
-        update ? "y\n" : "auto\ndone\nalice\np\np\nr\nr\nn\nn\nINSTALL\n");
-    feed(answers);
-    /* Leave success false to return immediately after the execution callback. */
-    assert(installer_tty_main(&context) == 1 && flow_stage == 4);
-    assert(input_position == strlen(answers) && selected_disk == 0);
+    if (strcmp(expected->index_sha256, "verified-fixture-index")) return -ESTALE;
+    *result = *expected;
+    observer(context, 50, "Applying signed system packages");
+    if (update_failure) {
+        strcpy(result->failure, "Applying signed system packages");
+        result->error_number = EPROTO;
+        return -EPROTO;
+    }
+    setup.skip_bios = !(modes & 1); setup.skip_uefi = !(modes & 2);
+    record_settings();
+    return 0;
 }
 
-int main(void)
+/** @brief Reject an invalid snapshot without retaining a hidden operation target. */
+static void partition_snapshot_tests(void)
 {
-    char output[RELIEFOS_AUTH_PASSWORD_LEN], overlong[140];
-    struct installer_setup setup = {0};
-    feed("U!lower\n");
-    interrupt_read = 1;
-    assert(tty_secret(NULL, output, sizeof(output)) == 1);
-    assert(!strcmp(output, "U!lower") && termios_calls == 2);
-    for (unsigned i = 0; i < 32; ++i) memcpy(overlong + i * 4, "\xf0\x9f\x94\x91", 4);
-    strcpy(overlong + 128, "x\nnext\n");
-    feed(overlong);
-    assert(tty_secret(NULL, output, sizeof(output)) == 0 && errno == EOVERFLOW);
-    assert(tty_read_line(NULL, output, sizeof(output)) == 1);
-    assert(!strcmp(output, "next"));
-    feed("r\n");
-    restore_error = 1;
-    assert(tty_secret(NULL, output, sizeof(output)) == 0 && errno == EIO);
-    restore_error = 0;
+    fixture_disks();
+    partition_count = 1;
+    partitions[0] = (struct reliefos_block_partition){.index = 0,
+        .first_lba = 2048, .sector_count = 2048, .path = "/dev/fixture1"};
+    int chosen = 0;
+    struct tui_partition_table table = {0};
+    assert(tui_partition_table_update(&table, &fixture_context, 0, &chosen) == 0);
+    assert(chosen == 0);
+    partitions[0].sector_count = UINT64_MAX;
+    assert(tui_partition_table_update(&table, &fixture_context, 0, &chosen) == -EINVAL);
+    assert(table.count == 0 && chosen == -1);
+    partition_count = 0;
+}
 
-    feed("\n");
-    setup.skip_xorg = 1;
-    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 0);
-    feed("YeS\n");
-    setup.skip_xorg = 1;
-    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 0);
-    feed("nO\n");
-    setup.skip_xorg = 0;
-    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 1);
-    feed("maybe\nno\n");
-    setup.skip_xorg = 0;
-    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 1);
-    feed("0123456789abcdefghijklmnop\nyes\n");
-    setup.skip_xorg = 1;
-    assert(tty_install_xorg(&setup) == 1 && setup.skip_xorg == 0);
-    feed("");
-    setup.skip_xorg = 0;
-    assert(tty_install_xorg(&setup) == 0 && setup.skip_xorg == 0);
-    for (unsigned modes = 0; modes < 4; ++modes) {
-        setup.skip_bios = modes & 1;
-        setup.skip_uefi = (modes >> 1) & 1;
-        feed("\n\n");
-        assert(tty_bootloaders(&setup) == 1);
-        assert(setup.skip_bios == (modes & 1) && setup.skip_uefi == ((modes >> 1) & 1));
-    }
-    feed("invalid\nYeS\nnO\n");
-    assert(tty_bootloaders(&setup) == 1 && !setup.skip_bios && setup.skip_uefi);
-    feed("\n");setup.swap_enabled=false;
-    assert(installer_tty_select_swap(&setup)==1 && !setup.swap_enabled);
-    feed("yes\n2049\n");
-    assert(installer_tty_select_swap(&setup)==1 && setup.swap_enabled && setup.swap_size_mib==2049);
-    feed("yes\n0\n18446744073709551616\n512\n");
-    assert(installer_tty_select_swap(&setup)==1 && setup.swap_enabled && setup.swap_size_mib==512);
-    feed("no\n");
-    assert(installer_tty_select_swap(&setup)==1 && !setup.swap_enabled);
-    for (unsigned modes = 0; modes < 4; ++modes) {
-        test_tty_flow(0, modes);
-        test_tty_flow(1, modes);
-    }
-    puts("installer input: line handling, Xorg/BIOS/UEFI choices and terminal restoration PASS");
+static void edit_tests(void)
+{
+    char value[160] = "";
+    int cursor = 0;
+    assert(tui_edit_value(value, sizeof(value), &cursor, L'中', 0, 0));
+    assert(tui_edit_value(value, sizeof(value), &cursor, L'a', 0, 0));
+    assert(tui_edit_value(value, sizeof(value), &cursor, L'文', 0, 0));
+    assert(!strcmp(value, "中a文") && cursor == 7);
+    assert(tui_edit_value(value, sizeof(value), &cursor, KEY_LEFT, 1, 0));
+    assert(tui_edit_value(value, sizeof(value), &cursor, KEY_BACKSPACE, 1, 0));
+    assert(!strcmp(value, "中文") && cursor == 3);
+    assert(tui_edit_value(value, sizeof(value), &cursor, KEY_DC, 1, 0));
+    assert(!strcmp(value, "中"));
+    assert(tui_edit_value(value, sizeof(value), &cursor, 21, 0, 1));
+    for (int i = 0; i < 32; ++i) assert(tui_edit_value(value, sizeof(value), &cursor, L'日', 0, 1));
+    assert(!tui_edit_value(value, sizeof(value), &cursor, L'x', 0, 1));
+    assert(!tui_edit_value(value, sizeof(value), &cursor, L' ', 0, 1));
+    assert(tui_edit_value(value, sizeof(value), &cursor, KEY_BACKSPACE, 1, 1));
+    assert(cursor == 93 && strlen(value) == 93);
+    char small[4] = ""; cursor = 0;
+    assert(tui_edit_value(small, sizeof(small), &cursor, L'中', 0, 0));
+    assert(!tui_edit_value(small, sizeof(small), &cursor, L'x', 0, 0));
+    assert(!strcmp(small, "中"));
+}
+
+static void screen_tests(void)
+{
+    FILE *input = fopen("/dev/null", "r"), *output = fopen("/dev/null", "w");
+    assert(input && output);
+    SCREEN *screen = newterm("xterm", output, input);
+    assert(screen);
+    noecho(); keypad(stdscr, TRUE); start_color();
+    assert(resizeterm(24, 80) != ERR);
+    struct tui_view view = {.previous_focus = -1};
+    char secret[160] = "fixture-secret";
+    tui_begin(&view, "Account");
+    tui_input(&view, "Password", secret, sizeof(secret), 1);
+    unget_wch(L'中');
+    assert(tui_step(&view, "Next", 1, 1, 0) == TUI_NONE);
+    assert(!strcmp(secret, "fixture-secret中"));
+    /* The screen contains masking characters, while the buffer retains UTF-8. */
+    assert((mvwinch(curscr, 3, 3) & A_CHARTEXT) == '*');
+    ungetch(KEY_F(2));
+    assert(tui_step(&view, "Next", 1, 1, 0) == TUI_BACK);
+    ungetch(KEY_F(3));
+    assert(tui_step(&view, "Next", 1, 1, 0) == TUI_NEXT);
+    assert(resizeterm(18, 50) != ERR);
+    ungetch(KEY_F(3));
+    assert(tui_step(&view, "Next", 1, 1, 0) == TUI_NONE);
+    assert(resizeterm(24, 80) != ERR);
+    struct tui_job job = {.kind = TUI_JOB_CHECK};
+    fixture_disks();
+    assert(tui_run_job(&fixture_context, &job) == 0);
+    assert(!strcmp(job.info.index_sha256, "verified-fixture-index"));
+    job.kind = TUI_JOB_UPDATE;
+    assert(tui_run_job(&fixture_context, &job) == 0);
+    assert(!strcmp(status_text, "Applying signed system packages"));
+    update_failure = 1;
+    assert(tui_run_job(&fixture_context, &job) == -EPROTO);
+    assert(strstr(detail_text, strerror(EPROTO)));
+    update_failure = 0;
+    job.kind = TUI_JOB_INSTALL;
+    assert(tui_run_job(&fixture_context, &job) == 0 && install_success);
+    abnormal_worker = 1;
+    assert(tui_run_job(&fixture_context, &job) == -EIO);
+    assert(!strcmp(status_text, "Operation failed"));
+    endwin(); delscreen(screen); fclose(input); fclose(output);
+}
+
+int main(int argc, char **argv)
+{
+    assert(setlocale(LC_ALL, "C.UTF-8"));
+    if (argc == 2 && !strcmp(argv[1], "--interactive")) return installer_tty_main(&fixture_context);
+    partition_snapshot_tests(); edit_tests(); screen_tests();
+    puts("PASS ncurses UTF-8 editing, password masking, navigation, resize and worker result/abnormal exit");
     return 0;
 }

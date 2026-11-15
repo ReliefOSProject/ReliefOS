@@ -71,6 +71,7 @@ static uint8_t copy_buf[COPY_BUF_SIZE];
 static uint8_t copy_defer_sync;
 static uint8_t copy_fresh_root;
 static char installer_root_uuid[37], installer_esp_uuid[37];
+static uint32_t installer_root_filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT4;
 int installer_boot_entry_path(char *path, uint32_t capacity)
 {
     if (!path || !capacity || !installer_root_uuid[0]) return -EINVAL;
@@ -444,6 +445,11 @@ int installer_partition_create(uint32_t filesystem, uint32_t size_mib,
     int ret = installer_manual_partition_disk();
     if (!ret) ret = reliefos_block_gpt_create(disks[selected_disk].path, filesystem,
                                                size_mib, name, &index);
+    if (!ret && filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3) {
+        char path[RELIEFOS_BLOCK_PATH_LEN];
+        ret = reliefos_block_partition_path(disks[selected_disk].path, index, path, sizeof(path));
+        if (!ret) ret = reliefos_block_format(path, filesystem, NULL);
+    }
     if (!ret) {
         refresh_partitions();
         for (uint32_t i = 0; i < partition_count; ++i)
@@ -621,8 +627,11 @@ static int installer_fresh_partitions(const char *disk_path,
         ret = reliefos_block_format(esp_path, RELIEFOS_BLOCK_FILESYSTEM_FAT32, "RELIEFOS");
         if (ret < 0) return ret;
     } else if (parts[esp].filesystem != RELIEFOS_BLOCK_FILESYSTEM_FAT32) return -EINVAL;
-    *root_filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT4;
-    ret = installer_format_ext4(root_path);
+    *root_filesystem = parts[root].filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3
+                     ? RELIEFOS_BLOCK_FILESYSTEM_EXT3 : RELIEFOS_BLOCK_FILESYSTEM_EXT4;
+    ret = *root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3
+        ? reliefos_block_format(root_path, RELIEFOS_BLOCK_FILESYSTEM_EXT3, "RELIEFOS")
+        : installer_format_ext4(root_path);
     if (!ret) ret = reliefos_block_partition_uuid(disk_path, parts[root].index,
                                                    installer_root_uuid);
     if (!ret) ret = reliefos_block_partition_uuid(disk_path, parts[esp].index,
@@ -674,15 +683,19 @@ static int installer_mount_targets(const char *disk_path)
            disk_path ? disk_path : "?", root_path, esp_path, root_filesystem);
     if (root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4) {
         root_fs_name = "ext4";
+    } else if (root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3) {
+        root_fs_name = "ext3";
     } else {
         /* An unknown root filesystem must not reach mount() with a null type. */
         printf("[installer.elf] unsupported root filesystem fs=%u\n", root_filesystem);
         return -ENODEV;
     }
-    if (mount(root_path, INSTALL_ROOT_MOUNT, root_fs_name, 0, NULL) < 0) {
+    if (mount(root_path, INSTALL_ROOT_MOUNT, root_fs_name, 0,
+              root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ? "data=ordered" : NULL) < 0) {
         printf("[installer.elf] mount root failed path=%s errno=%d\n", root_path, errno);
         return -errno;
     }
+    installer_root_filesystem = root_filesystem;
     if ((mkdir(INSTALL_ESP_MOUNT, 0755) < 0 && errno != EEXIST) ||
         (mkdir(INSTALL_ESP_VOLUME, 0755) < 0 && errno != EEXIST)) {
         ret = -errno;
@@ -774,6 +787,7 @@ static void show_progress(uint32_t value, const char *status,
             tty_last_progress = value;
             copy_text(tty_last_status, sizeof(tty_last_status), status_text);
         }
+        refresh_ui();
         return;
     }
     set_status(status, detail);
@@ -1210,9 +1224,10 @@ static int copy_payload_ordered(void)
     }
     if (!ret) {
         unsigned long last=0;
-        ret=installer_swap_prepare(INSTALL_ROOT_MOUNT,installer_root_uuid,installer_esp_uuid,
-                                   setup.swap_enabled ? setup.swap_size_mib : 0,
-                                   installer_swap_progress,&last);
+        ret=installer_swap_prepare_fs(INSTALL_ROOT_MOUNT,installer_root_uuid,installer_esp_uuid,
+                                      installer_root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ? "ext3" : "ext4",
+                                      setup.swap_enabled ? setup.swap_size_mib : 0,
+                                      installer_swap_progress,&last);
     }
     if (ret < 0) {
         printf("[installer.elf] root payload copy failed src=%s dst=%s ret=%d\n",
@@ -1400,9 +1415,8 @@ static void finish_install(int ret,
             puts(T("\nInstallation completed successfully."));
             puts(T("Remove the installation media before rebooting."));
         }
-    } else {
-        refresh_ui();
     }
+    refresh_ui();
 }
 
 void perform_install(void)
@@ -1447,7 +1461,7 @@ void perform_install(void)
     if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return; }
 
     show_progress(2, T("Preparing target disk"), "");
-    show_progress(22, T("Mounting target filesystems"), T("Root: /target (ext4), ESP: /target/boot (FAT32)"));
+    show_progress(22, T("Mounting target filesystems"), T("Root and boot partitions"));
     ret = installer_mount_targets(disks[selected_disk].path);
     if (ret < 0) {
         finish_install(ret, T("Mount failed"));

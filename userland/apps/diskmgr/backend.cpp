@@ -181,8 +181,10 @@ static int mount_partition(const Disk &disk, const Partition &part)
     if (result) return result;
     const char *type = part.info.filesystem == RELIEFOS_BLOCK_FILESYSTEM_FAT32 ? "vfat" :
                        part.info.filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXFAT ? "exfat" :
-                       part.info.filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT2 ? "ext2" : "ext4";
-    return mount(part.info.path, path, type, disk.read_only || part.read_only ? MS_RDONLY : 0, nullptr) < 0
+                       part.info.filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT2 ? "ext2" :
+                       part.info.filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ? "ext3" : "ext4";
+    const char *options = part.info.filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ? "data=ordered" : nullptr;
+    return mount(part.info.path, path, type, disk.read_only || part.read_only ? MS_RDONLY : 0, options) < 0
                ? -errno : 0;
 }
 

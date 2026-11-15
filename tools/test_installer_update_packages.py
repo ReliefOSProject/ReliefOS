@@ -426,6 +426,35 @@ class UpdatePreflight(unittest.TestCase):
                              "/etc/ssl/certs/ca-certificates.crt").stdout
             self.assertIn("owned by ca-certificates-bundle-20261020-r0", owner)
 
+    def test_kernel_activation_recognizes_both_offline_publication_markers(self):
+        target = self.runner / "target"
+        for directory in ("run", "sbin", "usr/libexec/reliefos"):
+            (target / directory).mkdir(parents=True, exist_ok=True)
+        uname = target / "bin/uname"
+        uname.write_text("#!/bin/sh\nprintf 'ReliefNT\\n'\n")
+        uname.chmod(0o755)
+        (target / "bin/cat").symlink_to("busybox")
+        publisher = target / "usr/libexec/reliefos/kernel-bundle"
+        publisher.write_text("#!/bin/sh\n: > /published\n")
+        publisher.chmod(0o755)
+        script = target / "sbin/kernel-activate-test"
+        shutil.copy2(ROOT / "userland/storage/kernel-package-activate", script)
+        marker = target / "run/reliefos-kernel-activation.defer"
+        for text in ("ReliefOS offline installer boot publication pending",
+                     "ReliefOS installer package transaction"):
+            marker.write_text(text + "\n")
+            result = subprocess.run(["unshare", "-Ur", "chroot", str(target),
+                                     "/bin/sh", "/sbin/kernel-activate-test"],
+                                    env={**os.environ, "PATH": "/usr/sbin:/usr/bin:/sbin:/bin"},
+                                    capture_output=True, text=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertFalse((target / "published").exists(), text)
+        marker.write_text("unrecognized marker\n")
+        subprocess.run(["unshare", "-Ur", "chroot", str(target), "/bin/sh",
+                        "/sbin/kernel-activate-test"], check=True, timeout=10,
+                       env={**os.environ, "PATH": "/usr/sbin:/usr/bin:/sbin:/bin"})
+        self.assertTrue((target / "published").exists())
+
     def cache_events(self, result):
         events = []
         for line in result.stdout.splitlines():

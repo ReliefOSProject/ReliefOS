@@ -62,6 +62,13 @@ int installer_swap_bundle_supported(const char *payload);
  */
 int installer_swap_configure(const char *root,const char *root_uuid,const char *esp_uuid,
                              bool enabled,bool *retain_file);
+/** @brief Publish fresh fstab and optional swap policy for a selected root filesystem.
+ * @param root Fresh target. @param root_uuid Root UUID. @param esp_uuid Boot UUID.
+ * @param filesystem Root filesystem, either ext3 or ext4. @param enabled Include swap.
+ * @param retain_file Receives publication/rollback state. @return Zero or negative errno.
+ */
+int installer_swap_configure_fs(const char *root,const char *root_uuid,const char *esp_uuid,
+                                const char *filesystem,bool enabled,bool *retain_file);
 /** @brief Prepare optional swap then publish fresh fstab and activation policy.
  * @param root Fresh target. @param root_uuid Root partition UUID. @param esp_uuid
  * Boot partition UUID. @param mib Zero disables swap; otherwise the selected
@@ -70,6 +77,15 @@ int installer_swap_configure(const char *root,const char *root_uuid,const char *
  */
 int installer_swap_prepare(const char *root,const char *root_uuid,const char *esp_uuid,
                            uint64_t mib,installer_swap_progress_fn progress,void *context);
+/** @brief Prepare optional swap and publish fstab for the selected root filesystem.
+ * @param root Fresh target. @param root_uuid Root UUID. @param esp_uuid Boot UUID.
+ * @param filesystem Root filesystem, either ext3 or ext4. @param mib Swap MiB or zero.
+ * @param progress Optional callback. @param context Borrowed callback context.
+ * @return Zero or negative errno, with cleanup errors reported separately.
+ */
+int installer_swap_prepare_fs(const char *root,const char *root_uuid,const char *esp_uuid,
+                              const char *filesystem,uint64_t mib,
+                              installer_swap_progress_fn progress,void *context);
 #ifdef __cplusplus
 }
 #endif

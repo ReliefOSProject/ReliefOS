@@ -6,7 +6,7 @@
 ==========
 
 来宾使用 Unix 根目录语义，源码路径不是来宾路径。默认 root 为 ext4，
-ESP 独立使用 FAT32；数据分区还可使用已实现的 ext2、FAT32、exFAT 等路径。
+ESP 独立使用 FAT32；数据分区还可使用已实现的 ext2、ext3、FAT32、exFAT 等路径。
 支持格式不代表所有 POSIX 权限、崩溃恢复或第三方工具组合均已认证。
 GPT 分区名使用 UTF-16，界面文本使用 UTF-8。
 具体磁盘管理限制见 :doc:`../applications/diskmgr`。

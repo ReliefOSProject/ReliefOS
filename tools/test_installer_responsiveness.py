@@ -158,6 +158,8 @@ class InstallerProbe:
                         for x in sample_xs)
             if count >= total * 0.8:
                 return page
+        # An early partial redraw can otherwise retain incomplete pane bounds.
+        self._reset_installer_geometry()
         return None
 
     def _require_installer_geometry(self):

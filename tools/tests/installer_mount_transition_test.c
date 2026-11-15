@@ -13,6 +13,8 @@
 #define umount2 fake_umount2
 #define posix_spawnp fake_posix_spawnp
 #define waitpid fake_waitpid
+#define stat(path, status) fake_stat(path, status)
+#define statvfs(path, status) fake_statvfs(path, status)
 #include "../../userland/apps/installer/install_ops.c"
 #undef posix_spawnp
 #undef waitpid
@@ -38,10 +40,27 @@ int __wrap_open(const char *path, int flags, ...)
     return __real_open(path, flags, mode);
 }
 
-static int root_mounted, esp_mounted, busy_root, busy_esp, mutations;
-static int manual_layout, manual_bad_role, format_calls, type_calls, gpt_index;
+static int root_mounted, esp_mounted, esp_volume_mounted, busy_root, busy_esp, mutations;
+static int manual_layout, manual_bad_role, manual_ext3, format_calls, type_calls, gpt_index;
 static char formatted_esp[64];
+static char root_type[16], root_options[32];
 static uint64_t capacity_bytes, capacity_inodes;
+int fake_stat(const char *path, struct stat *status)
+{
+    assert(!strcmp(path, INSTALL_ESP_PAYLOAD "/EFI/BOOT/BOOTX64.EFI"));
+    memset(status, 0, sizeof(*status));
+    status->st_mode = S_IFREG | 0644;
+    status->st_size = 4096;
+    return 0;
+}
+int fake_statvfs(const char *path, struct statvfs *status)
+{
+    assert(!strcmp(path, INSTALL_ESP_MOUNT));
+    memset(status, 0, sizeof(*status));
+    status->f_frsize = status->f_bsize = 4096;
+    status->f_bavail = 65536;
+    return 0;
+}
 int fake_capacity_measure(const char *root, const char *boot, int bios, int uefi,
                           struct installer_capacity *out)
 {
@@ -94,8 +113,9 @@ int fake_lstat(const char *path, struct stat *st)
 int fake_umount2(const char *path, int flags)
 {
     int esp = !strcmp(path, INSTALL_ESP_MOUNT);
-    int *mounted = esp ? &esp_mounted : &root_mounted;
-    if ((esp ? busy_esp : busy_root) || (!esp && esp_mounted)) {
+    int volume = !strcmp(path, INSTALL_ESP_VOLUME);
+    int *mounted = esp ? &esp_mounted : volume ? &esp_volume_mounted : &root_mounted;
+    if ((esp && busy_esp) || (!esp && !volume && (busy_root || esp_mounted || esp_volume_mounted))) {
         errno = EBUSY;
         return -1;
     }
@@ -106,10 +126,21 @@ int fake_umount2(const char *path, int flags)
 int fake_mount(const char *source, const char *target, const char *type,
                unsigned long flags, const void *data)
 {
-    int *mounted = !strcmp(target, INSTALL_ESP_MOUNT) ? &esp_mounted : &root_mounted;
+    int *mounted = !strcmp(target, INSTALL_ESP_MOUNT) ? &esp_mounted :
+        !strcmp(target, INSTALL_ESP_VOLUME) ? &esp_volume_mounted : &root_mounted;
     assert(!*mounted);
+    if (!strcmp(target, INSTALL_ROOT_MOUNT)) {
+        snprintf(root_type,sizeof(root_type),"%s",type);
+        snprintf(root_options,sizeof(root_options),"%s",data ? (const char *)data : "");
+    }
     *mounted = 1;
     return 0;
+}
+int reliefos_boot_prepare_instance(const char *esp, const char *uuid, char *path, unsigned capacity)
+{
+    assert(!strcmp(esp, INSTALL_ESP_VOLUME) && uuid && *uuid);
+    int length = snprintf(path, capacity, "%s/reliefos/instances/%s", esp, uuid);
+    return length < 0 || (unsigned)length >= capacity ? -ENAMETOOLONG : 0;
 }
 int reliefos_block_get_info(const char *path, struct reliefos_block_disk_info *out)
 {
@@ -149,6 +180,8 @@ int reliefos_block_list_partitions(const char *path, struct reliefos_block_parti
         parts[1].sector_count = parts[2].sector_count = 128 * 2048;
         strcpy(parts[0].path, "/dev/sda6");
         strcpy(parts[1].path, "/dev/sda4");
+        parts[1].filesystem = RELIEFOS_BLOCK_FILESYSTEM_FAT32;
+        if (manual_ext3) parts[2].filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT3;
         strcpy(parts[2].path, "/dev/sda9");
         *count = 3;
         return 0;
@@ -214,6 +247,14 @@ int main(void)
     assert(installer_mount_targets("/dev/sda") == 0);
     assert(!strcmp(spawn_args[spawn_argc - 1], "/dev/sda9"));
     assert(mutations == 2); /* A manual install never replaces the GPT. */
+    manual_ext3 = 1;
+    int saved_spawns = spawn_calls, saved_format_count = format_calls;
+    assert(installer_mount_targets("/dev/sda") == 0);
+    assert(spawn_calls == saved_spawns && format_calls == saved_format_count + 1);
+    assert(!strcmp(formatted_esp,"/dev/sda9"));
+    assert(!strcmp(root_type,"ext3") && !strcmp(root_options,"data=ordered"));
+    assert(installer_root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3);
+    manual_ext3 = 0;
     manual_bad_role = 1;
     int unchanged_formats = format_calls;
     assert(installer_mount_targets("/dev/sda") == -EINVAL);

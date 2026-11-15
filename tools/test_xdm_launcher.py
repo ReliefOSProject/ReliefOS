@@ -347,6 +347,23 @@ class XdmLauncherTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertFalse((self.sandbox / "run/xwallpaper.calls").exists())
 
+    def test_xsession_owns_xdg_autostart_and_sets_desktop(self):
+        self.install_session_stubs()
+        self.install_xdm(0)
+        write_stub(self.sandbox / "usr/bin/taskmgr",
+                   'printf \'%s\\n\' "$@" > /run/autostart.argv\n'
+                   'printf \'%s\\n\' "$XDG_CURRENT_DESKTOP" > /run/autostart.desktop\n'
+                   'trap \'echo stopped > /run/autostart.stopped; exit 0\' TERM\n'
+                   'while :; do sleep 1; done\n')
+        result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.sandbox / "run/autostart.argv").read_text().splitlines(),
+                         ["--run-autostart"])
+        self.assertEqual((self.sandbox / "run/autostart.desktop").read_text().strip(), "ICEWM")
+        self.assertTrue((self.sandbox / "run/autostart.stopped").exists())
+        self.assertLess(self.log().index("icewm started"), self.log().index("XDG autostart started"))
+        self.assertLess(self.log().index("XDG autostart started"), self.log().index("st started"))
+
     def test_xsetup_is_a_noop_for_wallpaper(self):
         self.install_wallpaper_probe()
 

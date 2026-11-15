@@ -241,7 +241,7 @@ def main():
         with boot(output / f"install-{name}", "bios", disk=disk,
                   iso=args.images.resolve() / "reliefos-installer.iso") as session:
             install_tty(*session, skip_xorg=True, install_timeout=args.install_timeout,
-                        partition_commands=("1", "esp", str(row), "root", "done"))
+                        partition_roles={"esp": 1, "root": row})
             if name == "second":
                 check_update_selection(*session, identities, args.install_timeout)
         assert_foreign(disk, esp)

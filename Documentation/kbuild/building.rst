@@ -20,6 +20,7 @@ HTML 文档另需 Sphinx，见 :doc:`../process/documentation`。Sphinx 仅服�
 ``make test-build`` 中的播放器宿主检查另需 ``ffmpeg``、``libavformat-dev``、
 ``libavcodec-dev``、``libavutil-dev``、``libswresample-dev`` 和 ``libswscale-dev``。
 这些是宿主检查依赖；生产播放器使用锁定源码构建的 musl 库。
+自启动的宿主检查另需 ``libglib2.0-dev``；生产程序使用锁定 APK 提供的目标 GIO 库和头文件。
 可通过 ``PLAYER_TARGET_BUILD=/绝对路径/out/x86_64/release sh tests/build/test-reliefplayer-mp4.sh``
 在 Linux 宿主上同时运行实际精简库和 musl 版本的解码/控制检查；这不等于来宾播放验证。
 

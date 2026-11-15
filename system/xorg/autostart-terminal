@@ -1,0 +1,3 @@
+#!/bin/sh
+# GIO's private Terminal=true adapter receives an already expanded command argv.
+exec /usr/bin/st -e "$@"
