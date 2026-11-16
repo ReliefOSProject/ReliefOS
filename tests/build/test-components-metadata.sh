@@ -10,6 +10,7 @@ awk -F '\t' '$1=="installer" {if($3!=1)exit 1;found=1} END{if(!found)exit 1}' "$
 awk -F '\t' '$1=="reliefmath" {if($3!=1 || $4!=1 || $5!=1 || $8!="ReliefMath" || $9!="Office applications" || $10!=".rmath" || $11!=1)exit 1;found=1} END{if(!found)exit 1}' "$w/tsv"
 awk -F '\t' '$1=="reliefmathpp" {if($3!=1 || $4!=1 || $5!=1 || $8!="ReliefMath++" || $9!="Office applications" || $10!=".rmathpp" || $11!=1)exit 1;found=1} END{if(!found)exit 1}' "$w/tsv"
 grep -q '"schema_version":1' "$w/json"
+awk -F '\t' '$1=="linuxuname" {if($3!=1 || $4!=1 || $5!=0)exit 1;found=1} END{if(!found)exit 1}' "$w/tsv"
 awk -F '\t' '$1=="reliefdiagram" {if($3!=1 || $4!=1 || $5!=1 || $8!="ReliefDiagram" || $9!="Office applications" || $10!=".rdiagram" || $11!=1)exit 1;found=1} END{if(!found)exit 1}' "$w/tsv"
 printf 'component metadata: independent image selection and required policy passed\n'
 printf '# CONFIG_RELIEFOS_COMPONENT_APP_RELIEFDIAGRAM_IMAGE is not set\n' > "$w/diagram-config"

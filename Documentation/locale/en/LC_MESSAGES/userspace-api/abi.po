@@ -182,3 +182,12 @@ msgstr ""
 "interfaces. Programs relying on these implementation details must recompile with matching SDK "
 "headers; SQLite uses standard ``libsqlite3.so.0`` POSIX VFS. Historical ABI snapshots stay "
 "unchanged, and compatibility checks continue covering first-party interfaces."
+
+msgid "按任务选择 uname 系统名"
+msgstr "Selecting the uname system name per task"
+
+msgid "导出头 ``<reliefos/prctl.h>`` 定义 ``RELIEFOS_PR_SET_UNAME_LINUX`` （``0x52550001``）和 ``RELIEFOS_PR_GET_UNAME_LINUX``（``0x52550002``）。 使用 libc 的 ``prctl`` 调用，无需额外用户态包装或特权。 SET 的第二个参数为 ``0UL``（原生）或 ``1UL``（Linux），其余参数必须 为零；GET 的四个参数必须为零，返回当前的 0 或 1。 非法值或非零保留参数返回 ``EINVAL``，不更改状态。"
+msgstr "The exported header ``<reliefos/prctl.h>`` defines ``RELIEFOS_PR_SET_UNAME_LINUX`` (``0x52550001``) and ``RELIEFOS_PR_GET_UNAME_LINUX`` (``0x52550002``). Use libc's ``prctl`` without an extra userspace wrapper or privileges. SET takes ``0UL`` (native) or ``1UL`` (Linux) as its second argument; all remaining arguments must be zero. GET requires four zero arguments and returns the current 0 or 1 selection. Invalid values or nonzero reserved arguments return ``EINVAL`` without changing state."
+
+msgid "该选择针对调用任务，随 fork/clone 复制并跨 exec 保留；修改某任务的选择 不会影响已存在的其他任务。默认关闭，仅改变 ``uname(2)`` 的 ``sysname``，保留其他字段和全局内核信息。SDK 的 headers_install 白名单同时导出此头；使用方式见 :doc:`../admin-guide/linuxuname`。"
+msgstr "The selection belongs to the calling task, is copied by fork/clone, and survives exec. Changing one task never affects other existing tasks. It is disabled by default and changes only ``uname(2)``'s ``sysname``, preserving the other fields and global kernel information. The SDK headers_install allowlist also exports this header. See :doc:`../admin-guide/linuxuname` for usage."

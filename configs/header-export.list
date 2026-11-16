@@ -10,6 +10,7 @@ include/uapi/reliefos/gpu_abi.h
 include/uapi/reliefos/inputm_abi.h
 include/uapi/reliefos/net_abi.h
 include/uapi/reliefos/net_control.h
+include/uapi/reliefos/prctl.h
 include/uapi/reliefos/pty_abi.h
 include/uapi/reliefos/rootfs.h
 include/uapi/reliefos/signal_abi.h

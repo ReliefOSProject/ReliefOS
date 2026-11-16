@@ -151,3 +151,12 @@ msgstr ""
 "別名は保持し、使用するサードパーティーライブラリは明示的にリンクしてください。旧拡張ライブラリが偶発的に公開したベンダー内部シンボル、旧独自 mbedTLS 設定、``sqlite.so.3`` "
 "VFS は安定した互換 API ではありません。実装詳細に依存するプログラムは SDK の対応ヘッダーで再コンパイルする必要があります。SQLite は標準 ``libsqlite3.so.0``"
 " の POSIX VFS を使います。過去の ABI スナップショットは保持し、互換性検査は引き続き第一者の API を対象にします。"
+
+msgid "按任务选择 uname 系统名"
+msgstr "タスクごとの uname システム名の選択"
+
+msgid "导出头 ``<reliefos/prctl.h>`` 定义 ``RELIEFOS_PR_SET_UNAME_LINUX`` （``0x52550001``）和 ``RELIEFOS_PR_GET_UNAME_LINUX``（``0x52550002``）。 使用 libc 的 ``prctl`` 调用，无需额外用户态包装或特权。 SET 的第二个参数为 ``0UL``（原生）或 ``1UL``（Linux），其余参数必须 为零；GET 的四个参数必须为零，返回当前的 0 或 1。 非法值或非零保留参数返回 ``EINVAL``，不更改状态。"
+msgstr "公開ヘッダー ``<reliefos/prctl.h>`` は ``RELIEFOS_PR_SET_UNAME_LINUX``（``0x52550001``）と ``RELIEFOS_PR_GET_UNAME_LINUX``（``0x52550002``）を定義します。追加のユーザー空間ラッパーや特権は不要で、libc の ``prctl`` を使用します。SET の第 2 引数は ``0UL``（ネイティブ）または ``1UL``（Linux）とし、残りの引数はすべてゼロにします。GET の 4 引数はすべてゼロとし、現在の選択 0 または 1 を返します。不正な値やゼロ以外の予約引数には、状態を変更せず ``EINVAL`` を返します。"
+
+msgid "该选择针对调用任务，随 fork/clone 复制并跨 exec 保留；修改某任务的选择 不会影响已存在的其他任务。默认关闭，仅改变 ``uname(2)`` 的 ``sysname``，保留其他字段和全局内核信息。SDK 的 headers_install 白名单同时导出此头；使用方式见 :doc:`../admin-guide/linuxuname`。"
+msgstr "選択は呼び出しタスクに属し、fork/clone でコピーされ、exec 後も保持されます。あるタスクの変更は既存の別タスクに影響しません。既定では無効で、``uname(2)`` の ``sysname`` だけを変更し、他のフィールドとグローバルなカーネル情報を保持します。SDK の headers_install 許可リストもこのヘッダーを公開します。使用方法は :doc:`../admin-guide/linuxuname` を参照してください。"

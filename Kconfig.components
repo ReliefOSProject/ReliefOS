@@ -681,6 +681,24 @@ config RELIEFOS_COMPONENT_APP_DRIVERINFO_ENTRY
     default y
     depends on RELIEFOS_COMPONENT_APP_DRIVERINFO_IMAGE
 
+menuconfig RELIEFOS_COMPONENT_APP_LINUXUNAME_BUILD
+    bool "Linux uname launcher"
+    default y
+    help
+      Enable Linux uname launcher (linuxuname). Dependencies may enable it
+      automatically. Libraries may also be built when another product
+      needs them; image membership is controlled separately below.
+
+config RELIEFOS_COMPONENT_APP_LINUXUNAME_IMAGE
+    bool "Include in system images"
+    default y
+    depends on RELIEFOS_COMPONENT_APP_LINUXUNAME_BUILD
+
+config RELIEFOS_COMPONENT_APP_LINUXUNAME_ENTRY
+    bool "Enable the legacy application-registry entry"
+    default n
+    depends on RELIEFOS_COMPONENT_APP_LINUXUNAME_IMAGE
+
 menuconfig RELIEFOS_COMPONENT_APP_NETWORK_CONTROLLER_BUILD
     bool "Network Controller"
     default y
