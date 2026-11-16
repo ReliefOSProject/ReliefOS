@@ -48,10 +48,10 @@ struct WorkerProfileFixture {
     ProfilePaths paths;
 
     WorkerProfileFixture() {
-        char current[PATH_MAX];
-        assert(getcwd(current, sizeof(current)));
-        const int count = snprintf(root, sizeof(root), "%s/out/tmp/reliefmail-worker-%ld-XXXXXX",
-            current, static_cast<long>(getpid()));
+        const char *temporary = getenv("TMPDIR");
+        if (!temporary || !*temporary) temporary = "/tmp";
+        const int count = snprintf(root, sizeof(root), "%s/reliefmail-worker-%ld-XXXXXX",
+            temporary, static_cast<long>(getpid()));
         assert(count > 0 && static_cast<size_t>(count) < sizeof(root));
         assert(mkdtemp(root));
         Text error;

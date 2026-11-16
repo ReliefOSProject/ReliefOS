@@ -1,8 +1,35 @@
 # ReliefOS task 11 reviewed old-name allowlist.
 # scope<TAB>category<TAB>path<TAB>reason; exact tracked path, no blanket migration exemptions.
 # Rules: Documentation/userspace-api/abi.rst.
-main	compatibility	.github/workflows/build-installer.yml	上传既有 leonos.conf 配置文件名
-main	external-url	.github/workflows/build-pages.yml	GitHub Secret 旧名回退；优先新 RELIEFOS Secret，不改外部配置
+main	external-url	.github/workflows/ci.yml	GitHub Secret 旧名回退；优先新 RELIEFOS Secret，不改外部配置
+main	compatibility	Documentation/locale/en/LC_MESSAGES/kbuild/third-party.po	第三方端口路径与旧标识的英文翻译，与原手册同一兼容边界
+main	history	Documentation/locale/en/LC_MESSAGES/releases/5.3.3.po	5.3.3 迁移说明的英文翻译，说明已退役的共享翻译域
+main	compatibility	Documentation/locale/en/LC_MESSAGES/userspace-api/abi.po	冻结 ABI 别名与兼容路径的英文翻译
+main	compatibility	Documentation/locale/ja/LC_MESSAGES/kbuild/third-party.po	第三方端口路径与旧标识的日文翻译，与原手册同一兼容边界
+main	history	Documentation/locale/ja/LC_MESSAGES/releases/5.3.3.po	5.3.3 迁移说明的日文翻译，说明已退役的共享翻译域
+main	compatibility	Documentation/locale/ja/LC_MESSAGES/userspace-api/abi.po	冻结 ABI 别名与兼容路径的日文翻译
+main	history	Documentation/releases/5.3.3.rst	历史发布说明需要说明旧共享翻译域的迁移
+main	compatibility	scripts/reliefos/Makefile.environment	保留 LEONOS_CACHE 输入回退与旧 ntclks fetch 目标别名
+main	external-url	system/rootfs/etc/motd.ja_JP	日语 MOTD 中仍在使用的真实 SourceHut 地址
+main	compatibility	tests/build/test-grub-kbuild-inputs.sh	夹具消费既有 leonos-unicode.pf2 字体产物名
+main	compatibility	tests/build/test-site-i18n.py	验证冻结的 RPR 公钥别名和健康检查协议字节不变
+main	compatibility	tests/host/test_bootloader_uefi.c	验证旧 ESP 目录被保留且不会破坏现有系统
+main	compatibility	tools/build/rpr-human-pages.sh	展示并保留冻结的 RPR 公钥别名
+main	compatibility	tools/host/modules/payload_stage.c	向兼容 ESP 目录发布同一完整引导载荷
+main	compatibility	tools/test_boot_logo_qemu.py	接受旧内核日志前缀，仍要求真实 PID 1 启动证据
+main	compatibility	tools/test_build_incremental.py	检查公开运行库的旧 SONAME 别名增量重建
+main	compatibility	tools/test_diskmgr_qemu.py	旧磁盘布局测试向兼容 ESP 路径注入载荷
+main	compatibility	tools/test_installer_accounts_qemu.py	接受旧安装介质模块名并验证实际账户与安装行为
+main	compatibility	tools/test_installer_swap_storage.py	旧块设备 sysfs 路径的存储夹具
+main	compatibility	tools/test_kernel_update.py	测试既有内核更新工具名与旧锁文件兼容
+main	compatibility	tools/test_multisystem_boot_qemu.py	多系统测试检查旧 ESP 目录的保留
+main	compatibility	tools/test_musl_mutex_protocol.py	测试旧 musl staging 标记失效与重建
+main	compatibility	tools/test_smp_latency_qemu.py	性能夹具同步更新新旧 ESP 引导别名
+main	compatibility	tools/test_smp_latency_qemu_unit.py	验证新旧 ESP 引导别名来自相同产物
+main	compatibility	tools/test_smp_latency_repair_unit.py	修复路径夹具检查新旧 ESP 引导别名一致
+main	compatibility	userland/pam/Kbuild	沿用既有 PAM 模块对象文件名
+main	compatibility	userland/runtime/src/desktop_entry.c	公开快捷方式 API 的旧 ABI 符号别名
+main	compatibility	userland/runtime/src/fs_directory.c	公开目录 API 的旧 ABI 符号别名
 main	external-url	.github/workflows/sourcehut-sync.yml	real old remote addresses, switch only after new targets verified
 main	compatibility	.gitignore	忽略旧依赖测试创建的 leonos-deps-contract.* 工作目录，避免旧产物进入 Git
 main	external-url	.gitmodules	real old remote addresses, switch only after new targets verified

@@ -95,6 +95,7 @@ Babel；可用 ``DOCS_PYTHON=/path/to/python`` 显式覆盖。直接运行 Pytho
 JavaScript 及源文档泄漏。只检查现有文档入口可传 ``--site 路径``。
 外部网站链接不在此离线检查范围内。
 
-``Check documentation`` 工作流在推送和 PR 时独立检查文档，覆盖 Sphinx 5.3、
-Pages 当前使用的 7.2.6 和 9.x，并检查两套手册的完整翻译。Pages 发布工作流也会先运行文档检查，再构建
-系统镜像；两处均保留严格警告检查，不以关闭警告绕过失败。
+``ReliefOS CI`` 根据 PR 变更范围调用 ``Check documentation``，覆盖 Sphinx 5.3、
+7.2.6 和 9.x，并检查两套手册的完整翻译。主分支推送和手动运行执行全部检查；
+Pages 仅在同次构建的回归测试和 BIOS/UEFI 启动验收通过后发布。
+文档始终保留严格警告检查，不以关闭警告绕过失败。

@@ -120,9 +120,9 @@ struct ProfileFixture {
     ProfilePaths paths;
 
     explicit ProfileFixture(const char *tag) {
-        char current[PATH_MAX];
-        assert(getcwd(current, sizeof(current)));
-        const int count = snprintf(root, sizeof(root), "%s/out/tmp/reliefmail-%s-XXXXXX", current, tag);
+        const char *temporary = getenv("TMPDIR");
+        if (!temporary || !*temporary) temporary = "/tmp";
+        const int count = snprintf(root, sizeof(root), "%s/reliefmail-%s-XXXXXX", temporary, tag);
         assert(count > 0 && static_cast<size_t>(count) < sizeof(root));
         assert(mkdtemp(root));
         Text error;

@@ -86,9 +86,9 @@ struct VaultFixture {
     Vault vault;
 
     VaultFixture() {
-        char current[PATH_MAX];
-        assert(getcwd(current, sizeof(current)));
-        const int count = snprintf(root, sizeof(root), "%s/out/tmp/reliefmail-vault-XXXXXX", current);
+        const char *temporary = getenv("TMPDIR");
+        if (!temporary || !*temporary) temporary = "/tmp";
+        const int count = snprintf(root, sizeof(root), "%s/reliefmail-vault-XXXXXX", temporary);
         assert(count > 0 && static_cast<size_t>(count) < sizeof(root));
         assert(mkdtemp(root));
         Text error;

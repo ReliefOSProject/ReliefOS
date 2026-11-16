@@ -8,7 +8,7 @@
 从主仓根目录执行；临时文件放在项目输出目录::
 
     mkdir -p out/tmp
-    TMPDIR="$PWD/out/tmp" make test
+    TMPDIR="$PWD/out/tmp" make -j"$(nproc)" test
     TMPDIR="$PWD/out/tmp" make test-long
     TMPDIR="$PWD/out/tmp" make test-legacy
     TMPDIR="$PWD/out/tmp" make test-smoke
@@ -17,6 +17,13 @@ test 为宿主/构建契约，test-long 包括长流程与恢复，test-legacy �
 非生产 OS 测试，test-smoke 顺序检查三类介质的 BIOS/UEFI 启动。
 test-build 包含 Pages 文档回归，宿主需要 Sphinx；普通内核和用户态编译不因此依赖它。
 按风险选择定向检查；通过已有失败之前的步骤不能称为全套通过。
+
+构建契约套件顺序运行，套件内部的递归 Make 共享上层 jobserver，避免
+每个临时构建退化为单线程；日志中的 ``TIME`` 行记录每套耗时。
+``make -n test`` 不执行测试脚本。ReliefMail 的宿主夹具在独立工作目录中
+运行，并使用 ``TMPDIR`` 创建私有目录，不依赖调用方位于源码根目录。
+CI 的下载缓存仍由依赖锁逐个校验；编译缓存只复用编译结果，镜像与签名
+产物每次构建。具体缓存范围和最终检查见仓库 ``.github/README.md``。
 
 APK 归属测试和组件 Kconfig 维护脚本支持 Python 3.10+；3.10 另需 TOML 解析包
 ``tomli``（Debian/Ubuntu 的 ``python3-tomli``），3.11+ 使用标准库

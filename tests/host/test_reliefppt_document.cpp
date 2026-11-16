@@ -1,4 +1,5 @@
 #include "document.h"
+#include "file_stamp_fixture.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -417,7 +418,10 @@ void test_file_stamp_atomic_write_conflicts_and_type_rejection(const char *root)
 
     FileStamp external_before_metadata;
     assert(file_stamp(target, external_before_metadata, error));
-    assert(chmod(target, 0640) == 0);
+    change_file_metadata(target, [&] {
+        assert(chmod(target, 0600) == 0);
+        assert(chmod(target, 0640) == 0);
+    });
     assert(!atomic_write(target, "lost metadata update", 20, error, &external_before_metadata));
     assert(read_file(target) == "external edit");
 
@@ -460,10 +464,34 @@ void test_file_stamp_atomic_write_conflicts_and_type_rejection(const char *root)
     assert(fd >= 0);
     write_all(fd, "keep original", 13);
     assert(close(fd) == 0);
+    const bool as_root = geteuid() == 0;
+    if (as_root) {
+        assert(chown(locked_dir, 65534, 65534) == 0);
+        assert(chown(locked_file, 65534, 65534) == 0);
+    }
     FileStamp locked_stamp;
     assert(file_stamp(locked_file, locked_stamp, error));
     assert(chmod(locked_dir, 0500) == 0);
-    assert(!atomic_write(locked_file, "new bytes", 9, error, &locked_stamp));
+    // Test actual directory permissions even under a root-run test harness.
+    // Enter before dropping privileges so unrelated parent paths are irrelevant.
+    pid_t child = fork();
+    assert(child >= 0);
+    if (child == 0) {
+        assert(chdir(locked_dir) == 0);
+        if (as_root) {
+            assert(setgid(65534) == 0);
+            assert(setuid(65534) == 0);
+        }
+        FileStamp readable_stamp;
+        assert(file_stamp("original", readable_stamp, error));
+        assert(same_stamp(locked_stamp, readable_stamp));
+        assert(!atomic_write("original", "new bytes", 9, error, &locked_stamp));
+        _exit(0);
+    }
+    int status = 0;
+    pid_t waited;
+    do { waited = waitpid(child, &status, 0); } while (waited < 0 && errno == EINTR);
+    assert(waited == child && WIFEXITED(status) && WEXITSTATUS(status) == 0);
     assert(read_file(locked_file) == "keep original");
     assert(chmod(locked_dir, 0700) == 0);
     assert(unlink(locked_file) == 0 && rmdir(locked_dir) == 0);

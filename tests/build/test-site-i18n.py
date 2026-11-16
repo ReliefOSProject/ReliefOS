@@ -264,7 +264,7 @@ class SiteI18n(unittest.TestCase):
             makefile = fixture_root / "Makefile"
             makefile.write_text(f"""RELIEFOS_SRC := {source}
 RELIEFNT_DIR := {fixture_root}/nt
-O := {fixture_root}/out
+override O := {fixture_root}/out
 O_META := {fixture_root}/meta
 USERLAND_DIR := {fixture_root}/userland
 BUILD_INFO_HEADER := {fixture_root}/build_info.h

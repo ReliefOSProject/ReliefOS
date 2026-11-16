@@ -56,10 +56,18 @@ make_package x11-dev-fltk \
 make_package x11-dev-libx11 \
     usr/include/X11/Xlib.h usr/include/X11/X.h usr/lib/libX11.so
 make_package x11-dev-xorgproto usr/include/X11/extensions/Xproto.h
+make_package x11-dev-glib \
+    usr/include/glib-2.0/glib.h usr/include/gio-unix-2.0/gio/gdesktopappinfo.h \
+    usr/lib/glib-2.0/include/glibconfig.h \
+    usr/lib/libgio-2.0.so usr/lib/libgobject-2.0.so usr/lib/libglib-2.0.so
+make_package x11-dev-ncurses usr/include/ncurses.h usr/lib/libncursesw.so
 make_package alpine-libfltk usr/lib/libfltk.so.1.3
 make_package alpine-libstdc++ usr/lib/libstdc++.so.6
 make_package alpine-libgcc usr/lib/libgcc_s.so.1
 make_package alpine-libx11 usr/lib/libX11.so.6.4.0
+make_package alpine-glib \
+    usr/lib/libgio-2.0.so.0 usr/lib/libgobject-2.0.so.0 usr/lib/libglib-2.0.so.0
+make_package alpine-libncursesw usr/lib/libncursesw.so.6
 ln -sf libX11.so.6.4.0 "$package_root/x11-dev-libx11/usr/lib/libX11.so"
 (cd "$package_root/x11-dev-libx11" && tar -czf "$cache/x11-dev-libx11.apk" usr)
 ln -s libX11.so.6.4.0 "$package_root/alpine-libx11/usr/lib/libX11.so.6"
@@ -94,6 +102,16 @@ test -f "$stage/usr/lib/libstdc++.so.6"
 test -f "$stage/usr/lib/libgcc_s.so.1"
 test -f "$stage/usr/lib/libX11.so"
 test -f "$stage/usr/lib/libX11.so.6"
+test -f "$stage/usr/include/glib-2.0/glib.h"
+test -f "$stage/usr/include/gio-unix-2.0/gio/gdesktopappinfo.h"
+test -f "$stage/usr/lib/glib-2.0/include/glibconfig.h"
+for library in gio-2.0 gobject-2.0 glib-2.0; do
+    test -f "$stage/usr/lib/lib$library.so"
+    test -f "$stage/usr/lib/lib$library.so.0"
+done
+test -f "$stage/usr/include/ncurses.h"
+test -f "$stage/usr/lib/libncursesw.so"
+test -f "$stage/usr/lib/libncursesw.so.6"
 test ! -e "$stage/usr/include/Xm/Xm.h"
 test ! -e "$stage/usr/lib/libXm.so"
 printf 'x11-development staging replacement tests passed\n'

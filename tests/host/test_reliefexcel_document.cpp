@@ -1,5 +1,6 @@
 #include "document.h"
 #include "formula.h"
+#include "file_stamp_fixture.h"
 #include <assert.h>
 #include <dirent.h>
 #include <errno.h>
@@ -85,14 +86,16 @@ static bool cancel_during_csv_parse(void *context, unsigned completed, unsigned 
 static bool edit_csv_target_after_stamp_check(void *context, unsigned completed, unsigned total) {
     CsvConflictState *state = static_cast<CsvConflictState *>(context);
     if (!state->changed && completed == 0 && total > 1) {
-        int fd = open(state->path, O_WRONLY | O_CLOEXEC);
-        if (fd < 0) return false;
-        const char external[] = "external edit";
-        bool ok = write(fd, external, sizeof(external) - 1) == (ssize_t)(sizeof(external) - 1) &&
-            ftruncate(fd, (off_t)(sizeof(external) - 1)) == 0 && fsync(fd) == 0;
-        int close_result = close(fd);
-        if (ok && close_result == 0) state->changed = true;
-        else return false;
+        change_file_metadata(state->path, [&] {
+            int fd = open(state->path, O_WRONLY | O_CLOEXEC);
+            assert(fd >= 0);
+            const char external[] = "external edit";
+            assert(write(fd, external, sizeof(external) - 1) == (ssize_t)(sizeof(external) - 1));
+            assert(ftruncate(fd, (off_t)(sizeof(external) - 1)) == 0);
+            assert(fsync(fd) == 0);
+            assert(close(fd) == 0);
+        });
+        state->changed = true;
     }
     return true;
 }
@@ -484,12 +487,6 @@ static void test_external_edit_with_restored_mtime_is_a_conflict() {
     rx::FileStamp expected;
     rx::Text error;
     assert(rx::file_stamp(target, expected, error) && expected.exists);
-    int fd = open(target, O_WRONLY | O_CLOEXEC);
-    assert(fd >= 0);
-    assert(write(fd, external, sizeof(external) - 1) == (ssize_t)(sizeof(external) - 1));
-    assert(fsync(fd) == 0);
-    assert(close(fd) == 0);
-
     struct timespec times[2];
 #if defined(__APPLE__)
     times[0] = original_stat.st_atimespec;
@@ -498,7 +495,14 @@ static void test_external_edit_with_restored_mtime_is_a_conflict() {
     times[0] = original_stat.st_atim;
     times[1] = original_stat.st_mtim;
 #endif
-    assert(utimensat(AT_FDCWD, target, times, 0) == 0);
+    change_file_metadata(target, [&] {
+        int fd = open(target, O_WRONLY | O_CLOEXEC);
+        assert(fd >= 0);
+        assert(write(fd, external, sizeof(external) - 1) == (ssize_t)(sizeof(external) - 1));
+        assert(fsync(fd) == 0);
+        assert(close(fd) == 0);
+        assert(utimensat(AT_FDCWD, target, times, 0) == 0);
+    });
 
     rx::Workbook book;
     assert(book.init());

@@ -33,7 +33,7 @@ RELIEFOS_PASSIVE := 1
 TARGET_CC := cc
 TARGET_LD := ld
 TARGET_CXX := c++
-O := $(WORK)/out
+override O := $(WORK)/out
 RELIEFOS_COMPONENT_APPS := calc osver fileman taskmgr minesweeper leonmmcoset xiaobai paint imageview doom doomlauncher installer reliefexcel
 include $(ROOT)/scripts/reliefos/Makefile.userland
 .PHONY: sources

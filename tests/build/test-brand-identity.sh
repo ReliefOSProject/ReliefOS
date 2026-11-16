@@ -144,10 +144,10 @@ userland/apps/shell/main.c
     else
         fail 'browser home URI must use about:reliefos'
     fi
-    if grep -Fq 'ReliefOS GRUB payload installed' "$root/userland/busybox/block_storage.c"; then
-        ok 'BusyBox GRUB installer reports ReliefOS'
+    if grep -Fq 'ReliefOS instance v1' "$root/userland/runtime/src/bootloader.c"; then
+        ok 'shared GRUB installer records the ReliefOS identity'
     else
-        fail 'BusyBox GRUB installer must report ReliefOS'
+        fail 'shared GRUB installer must record the ReliefOS identity'
     fi
     if ! grep -Fq 'leonos_api_install_with_progress' \
             "$root/userland/apps/apiapp/main.c" &&

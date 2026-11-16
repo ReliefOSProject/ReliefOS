@@ -31,9 +31,14 @@ for tool in sh grep sed awk find sort cmp mv ln mkdir rm printf date tr head \
             gzip sha256sum timeout perl autoconf automake libtoolize gperf bison flex pkg-config msgfmt makeinfo; do
     check_tool "$tool"
 done
-reliefos_log HOSTCC "${HOSTCC:-cc}"
-if ! command -v "${HOSTCC:-cc}" >/dev/null 2>&1; then
-    missing "HOSTCC=${HOSTCC:-cc}"
+# Like Kbuild, accept a compiler command with wrapper/driver words. Nested
+# Make invocations inherit the compiler fingerprint through an env wrapper.
+hostcc=${HOSTCC:-cc}
+reliefos_log HOSTCC "$hostcc"
+# shellcheck disable=SC2086
+set -- $hostcc
+if [ "$#" -eq 0 ] || ! command -v "$1" >/dev/null 2>&1; then
+    missing "HOSTCC=$hostcc"
 fi
 
 group 'GRUB BIOS freestanding compiler'
@@ -112,8 +117,10 @@ for tool in mke2fs e2fsck mkfs.fat mformat mcopy xorriso qemu-img qemu-system-x8
     check_tool "$tool"
 done
 image_probe=$(mktemp -d)
+# HOSTCC uses the same whitespace-separated command convention as Kbuild.
+# shellcheck disable=SC2086
 if printf '#include <sys/types.h>\n#include <ext2fs/ext2fs.h>\nint main(void){ext2_filsys fs=0; ext2fs_close(fs); return 0;}\n' | \
-        "${HOSTCC:-cc}" -x c - -lext2fs -lcom_err -o "$image_probe/probe" >/dev/null 2>&1; then
+        $hostcc -x c - -lext2fs -lcom_err -o "$image_probe/probe" >/dev/null 2>&1; then
     present 'libext2fs development headers and library' 'host link verified'
 else
     missing 'libext2fs development headers/library (Debian: libext2fs-dev; Alpine: e2fsprogs-dev)'

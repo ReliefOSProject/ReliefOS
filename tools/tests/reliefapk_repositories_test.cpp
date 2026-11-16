@@ -47,7 +47,10 @@ int main() {
     assert(!stat("/", &root_st));
     if (root_st.st_uid == 0 && !(root_st.st_mode & 0022))
         assert(ra::secure_cache_directory("/", error));
+    // Make the negative fixture unsafe even when the tests run as root.
+    assert(!chmod(dir, 0777));
     assert(!ra::secure_cache_directory(dir, error));
+    assert(!chmod(dir, 0700));
     put(path, source);
     assert(!chmod(path, 0640));
     assert(ra::save_repository_file(path, source, "https://example.org/new\n", error));

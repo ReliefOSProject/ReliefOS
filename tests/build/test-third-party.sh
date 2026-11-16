@@ -77,7 +77,7 @@ check 'the shipped lock file validates against the checked-out tree' \
 # The adapter must not carry its own pins: read them back out of the lock file
 # and compare with what the built sysroot recorded.
 locked_musl=$("$deps" --lock "$lock" --id musl --print commit 2>/dev/null)
-locked_patch=$("$deps" --lock "$lock" --id musl --list-patches 2>/dev/null | cut -f1)
+locked_patches=$("$deps" --lock "$lock" --id musl --list-patches 2>/dev/null)
 
 # --- an unmet dependency stops the build without going online -----------------
 expect_failure 'a missing download is refused by name, not fetched on demand' \
@@ -185,13 +185,13 @@ else
     printf 'FAIL - sysroot records %s, the lock pins %s\n' "$stamp_musl" "$locked_musl"
     failures=$((failures + 1))
 fi
-stamp_patch=$(sed -n 's/.*"sha256": "\([0-9a-f]*\)".*/\1/p' "$stamp")
+stamp_patches=$(sed -n 's/.*"path": "\([^"]*\)", "sha256": "\([0-9a-f]*\)".*/\2\t\1/p' "$stamp")
 checks=$((checks + 1))
-if [ -n "$locked_patch" ] && [ "$stamp_patch" = "$locked_patch" ]; then
-    printf 'ok   - the sysroot records every applied patch digest in order\n'
+if [ "$stamp_patches" = "$locked_patches" ]; then
+    printf 'ok   - the sysroot records every applied patch path and digest\n'
 else
-    printf 'FAIL - sysroot patch digest %s does not match the lock (%s)\n' \
-        "$stamp_patch" "$locked_patch"
+    printf 'FAIL - sysroot patch records %s do not match the lock (%s)\n' \
+        "$stamp_patches" "$locked_patches"
     failures=$((failures + 1))
 fi
 

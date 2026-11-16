@@ -1,0 +1,36 @@
+name: Prepare ReliefOS runner
+description: Install the shared build or boot-test environment on Ubuntu 24.04.
+inputs:
+  profile:
+    description: Runner profile (build or smoke)
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Install dependencies
+      shell: bash
+      env:
+        SETUP_PROFILE: ${{ inputs.profile }}
+      run: bash scripts/ci/install.sh "$SETUP_PROFILE"
+    - name: Enable APK staging namespaces
+      if: inputs.profile == 'build'
+      shell: bash
+      run: |
+        for setting in kernel.apparmor_restrict_unprivileged_userns kernel.unprivileged_userns_clone; do
+          if sysctl "$setting" >/dev/null 2>&1; then
+            value=1
+            [[ "$setting" != kernel.apparmor_restrict_unprivileged_userns ]] || value=0
+            sudo sysctl -w "$setting=$value"
+          fi
+        done
+        unshare -Ur true
+    - name: Enable compiler cache
+      if: inputs.profile == 'build'
+      shell: bash
+      run: |
+        sudo update-ccache-symlinks
+        for compiler in cc c++ clang clang++; do
+          test -L "/usr/lib/ccache/$compiler"
+        done
+        # Preserve the toolchain's compiler names, including nested test builds.
+        echo /usr/lib/ccache >> "$GITHUB_PATH"

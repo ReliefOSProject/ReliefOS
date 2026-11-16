@@ -2,7 +2,7 @@
 # Verify actual configured kernel products and their complete staged bundle.
 set -eu
 repo=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-audio_out=${AUDIO_OUT:-"$repo/out/audio-hda"}
+audio_out=${AUDIO_OUT:-${RELIEFOS_TEST_BUILD_ROOT:-"$repo/out/x86_64/release"}}
 audio_root="$audio_out/rootfs/raw"
 for name in kernel.sys kernel.debug; do
     for product in "$audio_out/generated/system/$name" "$audio_out/kernel-install/$name"; do

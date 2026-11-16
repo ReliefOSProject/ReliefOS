@@ -65,7 +65,14 @@ else
     fail "nested kernel build dependencies are initialized at the rollback SHA" \
         "see $work/sub-update.log" "$(tail -n 5 "$work/sub-update.log")"
 fi
-if make -s -C "$reliefnt" O="$work/out/reliefnt" fetch >"$work/fetch.log" 2>&1; then
+if (
+    . "$repo_root/tools/build/upstream-make-environment.sh"
+    reliefos_upstream_make_environment
+    # The historical Autotools front end selects yacc-compatible output names.
+    # Native Kbuild exports YACC=bison, which changes y.tab.c to yconf.tab.c.
+    unset YACC LEX
+    make -s -C "$reliefnt" O="$work/out/reliefnt" fetch
+) >"$work/fetch.log" 2>&1; then
     pass "locked kernel build dependencies are available at the rollback SHA"
 else
     fail "locked kernel build dependencies are available at the rollback SHA" \

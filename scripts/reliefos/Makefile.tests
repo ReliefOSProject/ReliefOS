@@ -4,6 +4,7 @@
 # may not depend on the interpreter it is auditing (plan section 2).
 
 export RELIEFOS_TEST_DEP_ROOT := $(abspath $(HOST_RUNTIME_DEVELOPMENT_ROOT))
+export RELIEFOS_TEST_BUILD_ROOT := $(abspath $(O))
 
 RELIEFOS_TEST_TMP := $(if $(TMPDIR),$(TMPDIR),/tmp)/reliefos-tests-$(shell id -u)
 
@@ -52,24 +53,29 @@ reliefos-test-tools-sanitised: $(RELIEFOS_HOST_TEST_SANITISED)
 # status *and* any `FAIL - ` line in the captured report.
 #
 # $(call RELIEFOS_RUN_CONTRACT_TESTS,tests...)
+# The recursive recipe prefix keeps jobserver descriptors open for the scripts'
+# submakes. Stop before creating fixtures under dry-run, query or touch mode.
 define RELIEFOS_RUN_CONTRACT_TESTS
-	set -eu; for contract_test in $(1); do \
+	set -eu; case "$${MAKEFLAGS%% *}" in *[nqt]*) exit 0;; esac; \
+	for contract_test in $(1); do \
 	    $(call RELIEFOS_LOG_SHELL,RUN,$$contract_test); \
+	    started=$$(date +%s); \
 	    report=$$(mktemp); \
-	    if RELIEFOS_DEPS='$(RELIEFOS_DEPS_TOOL)' \
-	       LEONOS_DEPS='$(RELIEFOS_DEPS_TOOL)' \
+	    if RELIEFOS_DEPS='$(abspath $(RELIEFOS_DEPS_TOOL))' \
+	       LEONOS_DEPS='$(abspath $(RELIEFOS_DEPS_TOOL))' \
 	       RELIEFOS_LOCK='$(RELIEFOS_SRC)/configs/dependencies.lock.json' \
 	       LEONOS_LOCK='$(RELIEFOS_SRC)/configs/dependencies.lock.json' \
 	       GRUB_HOST_ROOT='$(GRUB_HOST_ROOT)' \
 	       GRUB_EFI_DIR='$(GRUB_EFI_DIR)' \
-	       RELIEFOS_EMIT='$(RELIEFOS_EMIT)' \
-	       LEONOS_EMIT='$(RELIEFOS_EMIT)' \
+	       RELIEFOS_EMIT='$(abspath $(RELIEFOS_EMIT))' \
+	       LEONOS_EMIT='$(abspath $(RELIEFOS_EMIT))' \
 	       RELIEFOS_TEST_BUSYBOX='$(abspath $(INITRAMFS_BUSYBOX_ELF))' \
 	       RELIEFOS_KERNEL_TOOLS='$(abspath $(RELIEFOS_KERNEL_TOOLS))' \
 	       RELIEFOS_TEST_RECOVERY='$(abspath $(RELIEFOS_KERNEL_RECOVERY))' \
 	       RELIEFOS_TEST_HEADERS='$(abspath $(HEADER_EXPORT_INCLUDE))' \
 	       sh $$contract_test >$$report 2>&1; then status=0; else status=1; fi; \
 	    cat $$report; \
+	    printf 'TIME - %s: %ss\n' "$${contract_test##*/}" "$$(($$(date +%s) - started))"; \
 	    if grep -q 'FAIL - ' $$report; then status=1; fi; \
 	    rm -f $$report; \
 	    if [ $$status -ne 0 ]; then \
@@ -83,11 +89,11 @@ leonos-test-tools-plain: reliefos-test-tools-plain
 leonos-test-tools-sanitised: reliefos-test-tools-sanitised
 
 test-build: $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS) test-tools $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY) $(HEADER_EXPORT_MANIFEST)
-	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_BUILD_TESTS))
+	+@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_BUILD_TESTS))
 	@$(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_xorg_qemu.py --source-only
 
 test-long: $(RELIEFOS_HOST_TOOLS) grub-host grub-efi
-	@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_LONG_TESTS))
+	+@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_LONG_TESTS))
 
 # Audio userland is an explicit host gate because it needs the staged ALSA and
 # Nuked OPL3 products.  Keep it separate from the generic shell suite so a
