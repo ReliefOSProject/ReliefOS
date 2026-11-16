@@ -8,12 +8,41 @@ Xorg、XDM 与 IceWM
 默认图形链为内核、PID 1、Xorg、XDM、IceWM。XDM 完成 PAM 登录后，
 IceWM 和应用使用普通用户身份运行；不要用 root 桌面代替正常授权。
 终端为 st，默认浏览器为 NetSurf。图形载荷使用锁文件中 ``feature=xorg`` 的依赖；
-当前 Alpine 基线为 ``v3.24``。从源码准备依赖使用 ``make fetch``。
+当前 Alpine 基线为 ``v3.24``，Mesa 26.3.0 与 LLVM 23 图形运行库使用
+锁定 SHA 和签名的官方 edge APK，以提供未修改的 VirGL 驱动。
+准备依赖使用 ``make fetch``。
 首次配置及真实运行测试必须区分 QEMU 与 VMware。
 
 Xorg 自动探测设备。在具备已实现 DRM 能力时使用 modesetting/glamor，
-否则保留 framebuffer 回退；默认软件光标与关闭 page flip 的策略不能被误读为
-关闭全部 DRI3/Present。检查实际 Xorg/Mesa 日志与绘制结果，不能只看显卡名称。
+否则保留 framebuffer 回退。VMware 保留软件光标与关闭 page flip 的默认值；
+VirtIO-GPU 由 XDM 的 Xorg wrapper 生成 ``/run/X11/xorg-virtio.conf``，
+开启硬件光标和 page flip。显式指定 ``-config`` 或 ``-configdir`` 时尊重
+管理员配置。检查实际 Xorg/Mesa 日志与绘制结果，不能只看显卡名称。
+
+VirtIO-GPU 运行
+====================
+
+QEMU/KVM 可在原生入口选择 2D 或 VirGL；不指定时仍使用原来的 VGA::
+
+    make run QEMU_GPU=virtio QEMU_BOOT=bios
+    make run QEMU_GPU=virgl QEMU_BOOT=uefi
+
+VirGL 默认使用 ``gtk,gl=on``，需要宿主支持 OpenGL 的 QEMU、virglrenderer
+和可访问的 render node。可以通过 ``QEMU_DISPLAY`` 指定 EGL-headless 等
+显示后端。``QEMU_GPU=vmware`` 仍可用于原有 QEMU SVGA 路径。
+
+检查 Xorg 日志中的 ``glamor initialized``、``virgl`` 和 DRI2/DRI3 状态。
+内核未协商 VirGL 时不提供 render node，不能将软件 renderer 当成硬件加速。
+Linux VirtGPU ioctl、legacy KMS、同设备 PRIME 和 sync_file 已实现；
+atomic KMS、跨设备共享、syncobj、blob 及 Venus/Vulkan 不在当前支持范围。
+
+``tools/test_virtgpu_qemu.py`` 使用新建的私有测试目录启动真实来宾，可检查
+2D、VirGL、BIOS/UEFI、Xorg/IceWM/Fileman、控制台恢复、panic 及模块重载。
+用匹配内核的 ``--module-root`` 指向 modules_install 根目录验证 drm.ko。
+EGL 探针通过 ``sh tools/build-virtgpu-egl-probe.sh ROOT OUTPUT`` 编译，
+ROOT 须含完整来宾运行库；宿主只提供 EGL/GLES2/GBM 头文件，链接使用来宾库。
+探针检查实际 renderer、着色器、三角形像素与销毁；打印的 64×64 离屏 draw
+速率属于观察值，不能作为桌面 FPS。VMware 验证未完成。
 
 主题与菜单
 ==========

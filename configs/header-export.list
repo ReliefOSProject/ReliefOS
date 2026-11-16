@@ -63,6 +63,7 @@ include/uapi/sound/tlv.h
 include/uapi/linux/statfs.h
 include/uapi/linux/stat.h
 include/uapi/linux/syscall.h
+include/uapi/linux/sync_file.h
 include/uapi/linux/sysinfo.h
 include/uapi/linux/termios.h
 include/uapi/linux/time.h
@@ -91,3 +92,5 @@ include/uapi/asm-generic/hugetlb_encode.h
 include/uapi/drm/drm.h
 include/uapi/drm/drm_mode.h
 include/uapi/drm/vmwgfx_drm.h
+include/uapi/drm/virtgpu_drm.h
+include/uapi/linux/virtio_gpu.h
