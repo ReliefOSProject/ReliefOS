@@ -23,7 +23,7 @@ test-build 包含 Pages 文档回归，宿主需要 Sphinx；普通内核和用�
 ``make -n test`` 不执行测试脚本。ReliefMail 的宿主夹具在独立工作目录中
 运行，并使用 ``TMPDIR`` 创建私有目录，不依赖调用方位于源码根目录。
 CI 的下载缓存仍由依赖锁逐个校验；编译缓存只复用编译结果，镜像与签名
-产物每次构建。具体缓存范围和最终检查见仓库 ``.github/README.md``。
+产物每次构建。具体缓存范围和最终检查见仓库 ``.github/CI.md``。
 
 APK 归属测试和组件 Kconfig 维护脚本支持 Python 3.10+；3.10 另需 TOML 解析包
 ``tomli``（Debian/Ubuntu 的 ``python3-tomli``），3.11+ 使用标准库

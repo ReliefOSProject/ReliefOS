@@ -43,7 +43,7 @@ def select_checks(paths, *, event, ref, deploy=False):
     for path in paths:
         docs = docs or matches(path, DOC_INPUTS)
         if (path.startswith("Documentation/") or path.startswith("README") or
-                path in {"LICENSE", "NOTICE", ".github/README.md", ".github/PULL_REQUEST_TEMPLATE.md"} or
+                path in {"LICENSE", "NOTICE", ".github/CI.md", ".github/PULL_REQUEST_TEMPLATE.md"} or
                 path.startswith(".github/ISSUE_TEMPLATE/") or
                 path in {".github/workflows/check-docs.yml", ".github/workflows/code-count.yml",
                          ".github/workflows/sourcehut-sync.yml"}):
