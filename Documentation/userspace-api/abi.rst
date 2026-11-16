@@ -42,6 +42,21 @@ vDSO 提供已实现的时间接口，失败或不支持的时钟保留 syscall 
 
 X11 应用通过 Xorg 通信。未知或旧兼容路径不能当作新的公开接口。
 
+按任务选择 uname 系统名
+========================
+
+导出头 ``<reliefos/prctl.h>`` 定义 ``RELIEFOS_PR_SET_UNAME_LINUX``
+（``0x52550001``）和 ``RELIEFOS_PR_GET_UNAME_LINUX``（``0x52550002``）。
+使用 libc 的 ``prctl`` 调用，无需额外用户态包装或特权。
+SET 的第二个参数为 ``0UL``（原生）或 ``1UL``（Linux），其余参数必须
+为零；GET 的四个参数必须为零，返回当前的 0 或 1。
+非法值或非零保留参数返回 ``EINVAL``，不更改状态。
+
+该选择针对调用任务，随 fork/clone 复制并跨 exec 保留；修改某任务的选择
+不会影响已存在的其他任务。默认关闭，仅改变 ``uname(2)`` 的
+``sysname``，保留其他字段和全局内核信息。SDK 的 headers_install
+白名单同时导出此头；使用方式见 :doc:`../admin-guide/linuxuname`。
+
 兼容名称分类
 ============
 

@@ -83,6 +83,19 @@ sdk = false
 api = false
 
 [[components]]
+id = "linuxuname"
+symbol = "APP_LINUXUNAME"
+label = "Linux uname launcher"
+category = "System applications"
+kind = "system-app"
+default = true
+required = false
+stage = true
+entry = false
+sdk = false
+api = false
+
+[[components]]
 id = "fileman"
 symbol = "APP_FILEMAN"
 label = "File manager"

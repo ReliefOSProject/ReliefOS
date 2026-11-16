@@ -13,6 +13,7 @@
    reliefsettings
    packages
    coreutils
+   linuxuname
    network-controller
    ipv6
    kernel-modules

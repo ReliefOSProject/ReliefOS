@@ -1,0 +1,35 @@
+# Translations for ReliefOS.
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Linux 系统名兼容启动命令"
+msgstr "Linux システム名の互換起動コマンド"
+
+msgid "``linuxuname 程序 [参数…]`` 启动指定程序，让该程序调用 ``uname(2)`` 时 得到 ``Linux`` 系统名。例如::"
+msgstr "``linuxuname プログラム [引数…]`` は、``uname(2)`` がシステム名として ``Linux`` を返すように指定したプログラムを起動します。例::"
+
+msgid "命令按 ``PATH`` 查找程序，也接受绝对路径、相对路径及脚本。 程序参数、环境变量和工作目录原样保留；命令用 ``execvp`` 替换自身， 程序的退出码和信号直接传递给调用者。``--`` 可用于结束命令本身的解析::"
+msgstr "コマンドは ``PATH`` を検索し、絶対パス、相対パス、スクリプトも受け付けます。引数、環境変数、作業ディレクトリをそのまま引き継ぎ、``execvp`` で自身を置き換えるため、プログラムの終了コードとシグナルは呼び出し元に直接伝わります。起動コマンド自体の解析を終了するには ``--`` を指定します::"
+
+msgid "作用范围"
+msgstr "適用範囲"
+
+msgid "该选择由内核为调用任务保存，经过 ``fork``、``vfork``、``clone`` 和 ``exec`` 继承，因此目标程序创建的线程及子进程也会看到 ``Linux``。 启动它的终端和其他已存在的进程仍看到 ``ReliefNT``。 动态链接、静态链接和直接发起 ``uname`` 系统调用的程序均适用。"
+msgstr "この選択は呼び出しタスクに対してカーネルが保存し、``fork``、``vfork``、``clone``、``exec`` を通じて継承されます。対象プログラムが作成するスレッドと子プロセスにも ``Linux`` が表示されます。起動元の端末と既存の別プロセスには引き続き ``ReliefNT`` が表示されます。動的リンク、静的リンク、システムコールの直接呼び出しに対応します。"
+
+msgid "仅 ``utsname.sysname`` 改变；内核版本、构建信息、架构、主机名和域名 保持原值。``/proc`` 中的全局内核信息不变。此命令可通过仅检查系统名的 兼容性判断，缺失的系统调用、驱动或其他 Linux 功能仍需实际实现。 普通用户可使用，不要求 root 权限。"
+msgstr "変更するのは ``utsname.sysname`` のみです。カーネルのバージョン、ビルド情報、アーキテクチャ、ホスト名、ドメイン名は元の値を保ち、``/proc`` のグローバルなカーネル情報も変更しません。システム名だけを調べる互換性判定には対応できますが、未実装のシステムコール、ドライバー、その他の Linux 機能は別途実装が必要です。一般ユーザーが root 権限なしで使用できます。"
+
+msgid "错误处理"
+msgstr "エラー処理"
+
+msgid "``linuxuname --help`` 显示用法。没有指定程序或内核不支持该选择时返回 125；程序无法执行时返回 126；程序不存在时返回 127。"
+msgstr "``linuxuname --help`` は使用方法を表示します。プログラムの指定がない場合やカーネルがこの選択に対応しない場合は 125、プログラムを実行できない場合は 126、存在しない場合は 127 を返します。"
+
+msgid "组件默认构建并随系统镜像安装，在 Menuconfig 的 System applications 中可关闭 Linux uname launcher；安装后的命令入口为 ``/usr/bin/linuxuname``。"
+msgstr "このコンポーネントは既定でビルドされ、システムイメージに含まれます。省略するには Menuconfig の System applications にある Linux uname launcher を無効にします。インストール後のコマンドは ``/usr/bin/linuxuname`` です。"
