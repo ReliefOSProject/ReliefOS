@@ -11,6 +11,11 @@ cp -a "$sysroot/include" "$sysroot/lib" "$sysroot/share" "$tmp/"
 # UAPI comes from the kernel header export (headers_install), never from the
 # kernel-owned source tree: the SDK must consume installed ABI, not sources.
 cp -a "$export/." "$tmp/include/"
+: "${KERNEL_UAPI_NOTICE_ROOT:?kernel UAPI license source required}"
+mkdir -p "$tmp/share/licenses/reliefnt"
+cp "$KERNEL_UAPI_NOTICE_ROOT/NOTICE" "$tmp/share/licenses/reliefnt/"
+cp "$KERNEL_UAPI_NOTICE_ROOT/LICENSES/preferred/GPL-2.0" "$tmp/share/licenses/reliefnt/"
+cp "$KERNEL_UAPI_NOTICE_ROOT/LICENSES/exceptions/Linux-syscall-note" "$tmp/share/licenses/reliefnt/"
 mkdir -p "$tmp/include/leonos" "$tmp/include/reliefos" "$tmp/bin"
 cp -a "$src/include/leonos/." "$src/userland/runtime/include/leonos/." "$tmp/include/leonos/"
 cp -a "$src/include/reliefos/." "$src/userland/runtime/include/reliefos/." "$tmp/include/reliefos/"

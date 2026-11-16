@@ -85,9 +85,9 @@ def source_check():
         gallium = next((item for item in lock["dependencies"]
                         if item.get("id") == "alpine-mesa-dri-gallium"), None)
         expected_gallium = {
-            "version": "26.1.6-r0",
-            "url": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main/x86_64/mesa-dri-gallium-26.1.6-r0.apk",
-            "sha256": "91a8c6d8186a0f855e545cd7d7fedeb6265e90b0d74fda2538652665941d1de5",
+            "version": "26.3.0-r0",
+            "url": "https://dl-cdn.alpinelinux.org/alpine/edge/main/x86_64/mesa-dri-gallium-26.3.0-r0.apk",
+            "sha256": "28ef328a0ee70b65a5f7ecff8678a49bcb382f31fe38b9ab447f3fb58702059b",
             "feature": "xorg",
         }
         if gallium is None:

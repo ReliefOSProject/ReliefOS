@@ -70,6 +70,12 @@ Runtime, libraries, and applications
 * Vim (vim, vim-common, xxd): Vim License. Installed from signed Alpine APKs;
   versions and archive hashes are recorded in configs/dependencies.lock.json.
 * ncurses 6.6: MIT-style license. See resources/licenses/ncurses-LICENSE.
+* Mesa 26.3.0 and LLVM 23 runtime libraries: original signed Alpine edge APKs
+  pinned in configs/dependencies.lock.json. Mesa uses MIT and file-specific
+  terms; LLVM uses Apache-2.0 WITH LLVM-exception and file-specific terms.
+  Original package license metadata and recipe identities are retained.
+  These packages provide unmodified VirGL/OpenGL userspace drivers; they
+  do not change the license of the independent ReliefNT driver.
 * Dyne musl 2.2.0 native toolchain: GCC 15.1.0 and GNU binutils 2.44
   (GPL-3.0-or-later), musl (MIT), and the upstream bundled static libraries.
   GCC runtime libraries use the GCC Runtime Library Exception where applicable.
@@ -129,6 +135,12 @@ covered by their own GPL-2.0 terms, with texts in LICENSES/preferred/GPL-2.0
 and LICENSES/kbuild/COPYING. Project compiler-policy adapters are separate
 files. These build-tool terms do not relabel the ReliefOS-owned application
 or operating-system source.
+
+The SDK's Linux VirtGPU and sync_file headers come from ReliefNT's installed
+UAPI. Their original notices remain in the headers. The SDK also includes
+ReliefNT's NOTICE, GPL version 2 text and Linux-syscall-note exception in
+share/licenses/reliefnt/. See kernel/reliefnt/NOTICE for the pinned upstream
+revision and the BSD, MIT and GPL-1.0-or-later WITH Linux-syscall-note terms.
 
 Binary dependencies sl, ncurses, zlib, libpng, SQLite and mbedtls3 are distributed
 as unmodified signed Alpine v3.24 APKs. Exact versions, archive URLs, SHA256 and

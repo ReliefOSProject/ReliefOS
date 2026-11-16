@@ -18,4 +18,27 @@ exec <"$tty" >"$tty" 2>&1
 if test ! -c /dev/dri/card0 && test -c /dev/fb0; then
     /usr/sbin/fbset -fb /dev/fb0 -depth 32 || :
 fi
+# Keep the conservative VMware defaults in the system configuration. VirtIO
+# has cursorq and fenced page flips, so publish a normal runtime Xorg config
+# enabling them. An explicitly selected administrator configuration wins.
+explicit_config=false
+for argument do
+    case "$argument" in -config|-configdir) explicit_config=true ;; esac
+done
+vendor= device=
+if test -r /sys/class/drm/card0/device/vendor; then
+    read -r vendor </sys/class/drm/card0/device/vendor || :
+    read -r device </sys/class/drm/card0/device/device || :
+fi
+if test "$explicit_config" = false && test "$vendor:$device" = 0x1af4:0x1050; then
+    mkdir -p /run/X11
+    temporary=$(mktemp /run/X11/xorg-virtio.XXXXXX)
+    if sed -e 's/Option "SWcursor" "true"/Option "SWcursor" "false"/' -e 's/Option "PageFlip" "false"/Option "PageFlip" "true"/' /etc/X11/xorg.conf >"$temporary"; then
+        mv -f "$temporary" /run/X11/xorg-virtio.conf
+        set -- -config /run/X11/xorg-virtio.conf "$@"
+    else
+        rm -f "$temporary"
+        exit 1
+    fi
+fi
 exec /usr/bin/Xorg "$@"

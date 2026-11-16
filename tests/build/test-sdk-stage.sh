@@ -5,6 +5,7 @@ w=$(mktemp -d)
 trap 'rm -rf "$w"' EXIT
 
 mkdir -p "$w/src/include/uapi" "$w/src/include/leonos" "$w/src/include/reliefos" \
+    "$w/uapi-licenses/LICENSES/preferred" "$w/uapi-licenses/LICENSES/exceptions" \
     "$w/src/userland/runtime/include/leonos" "$w/src/userland/runtime/include/reliefos" "$w/runtime-deps/usr/include" \
     "$w/runtime-deps/usr/lib" "$w/runtime-deps/usr/share/licenses" "$w/runtime-deps/usr/share/reliefos/sdk/apk" "$w/sysroot/include" "$w/sysroot/lib" \
     "$w/sysroot/share/licenses/musl" "$w/pam/usr/include/security" \
@@ -12,6 +13,10 @@ mkdir -p "$w/src/include/uapi" "$w/src/include/leonos" "$w/src/include/reliefos"
     "$w/auth/usr/include" "$w/auth/lib" "$w/auth/share/licenses/libxcrypt" \
     "$w/export/linux"
 printf 'stdio fixture\n' > "$w/sysroot/include/stdio.h"
+printf 'UAPI attribution fixture\n' > "$w/uapi-licenses/NOTICE"
+printf 'GPL fixture\n' > "$w/uapi-licenses/LICENSES/preferred/GPL-2.0"
+printf 'syscall exception fixture\n' > "$w/uapi-licenses/LICENSES/exceptions/Linux-syscall-note"
+export KERNEL_UAPI_NOTICE_ROOT=$w/uapi-licenses
 printf 'crt fixture\n' > "$w/sysroot/lib/crt1.o"
 for f in libc.so libc.a libmimalloc.so.3 mimalloc.o Scrt1.o crti.o crtn.o rcrt1.o libssp_nonshared.a; do
     printf '%s\n' "$f" > "$w/sysroot/lib/$f"
@@ -54,6 +59,9 @@ RUNTIME_BUILTINS="$w/builtins.a" RUNTIME_DEVELOPMENT_ROOT="$w/runtime-deps" \
     "$w/leonos-runtime.so" "$w/leonos-runtime.a" "$w/pam" "$w/auth" "$w/driver" \
     "$w/musl-sdk" 1234 "$w/export"
 cmp "$w/export/linux/types.h" "$w/musl-sdk/include/linux/types.h"
+cmp "$w/uapi-licenses/NOTICE" "$w/musl-sdk/share/licenses/reliefnt/NOTICE"
+cmp "$w/uapi-licenses/LICENSES/preferred/GPL-2.0" "$w/musl-sdk/share/licenses/reliefnt/GPL-2.0"
+cmp "$w/uapi-licenses/LICENSES/exceptions/Linux-syscall-note" "$w/musl-sdk/share/licenses/reliefnt/Linux-syscall-note"
 cmp "$w/sysroot/include/stdio.h" "$w/musl-sdk/include/stdio.h"
 cmp "$w/sysroot/lib/crt1.o" "$w/musl-sdk/lib/crt1.o"
 cmp "$w/src/include/reliefos/api.h" "$w/musl-sdk/include/reliefos/api.h"
