@@ -111,7 +111,10 @@ os.execv(os.environ['PACKAGING_REAL_APK'], [os.environ['PACKAGING_REAL_APK'], *a
             target.mkdir()
             common = [apk, '--root', target, '--arch', 'x86_64', '--keys-dir', keys,
                       '--repositories-file', '/dev/null', '--no-scripts']
-            run([*common, '--initdb', 'add', old_archive])
+            initdb = [*common, '--initdb']
+            if os.geteuid() != 0:
+                initdb.append('--usermode')
+            run([*initdb, 'add', old_archive])
             (target / 'etc/reliefos/rpr.conf').write_text(old_config)
             # Local archive installs pin their version; image assembly records
             # ordinary package names in world so repository upgrades can move.
