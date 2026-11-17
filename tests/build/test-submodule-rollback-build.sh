@@ -71,6 +71,26 @@ if (
     # The historical Autotools front end selects yacc-compatible output names.
     # Native Kbuild exports YACC=bison, which changes y.tab.c to yconf.tab.c.
     unset YACC LEX
+    # Historical pins still name the old Unifont mirror. Seed only the exact
+    # same artifact from GNU's archive; leave the historical lock untouched.
+    # Other versions continue to use their own fetch rules. The old fetch and
+    # build both verify the seeded bytes against the historical SHA256 again.
+    deps=${RELIEFOS_DEPS:-$work/out/host/bin/reliefos-deps}
+    if [ ! -x "$deps" ]; then
+        make -s O="$work/out" "$deps" || exit 1
+    fi
+    rollback_lock=$reliefnt/configs/dependencies.lock.json
+    archive_lock=$repo_root/tests/fixtures/rollback/dependencies.lock.json
+    "$deps" --lock "$archive_lock" --root "$reliefnt" --check || exit 1
+    pinned_digest=$("$deps" --lock "$rollback_lock" --id unifont --print sha256) || exit 1
+    archive_digest=$("$deps" --lock "$archive_lock" --id unifont --print sha256) || exit 1
+    if [ "$pinned_digest" = "$archive_digest" ]; then
+        pinned_name=$("$deps" --lock "$rollback_lock" --id unifont --print directory) || exit 1
+        archive_name=$("$deps" --lock "$archive_lock" --id unifont --print directory) || exit 1
+        [ "$pinned_name" = "$archive_name" ] || exit 1
+        sh "$repo_root/tools/build/fetch.sh" --deps "$deps" --lock "$archive_lock" \
+            --cache "$reliefnt/cache/downloads" --only unifont || exit 1
+    fi
     make -s -C "$reliefnt" O="$work/out/reliefnt" fetch
 ) >"$work/fetch.log" 2>&1; then
     pass "locked kernel build dependencies are available at the rollback SHA"
