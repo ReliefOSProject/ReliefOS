@@ -75,7 +75,7 @@ if (
     # same artifact from GNU's archive; leave the historical lock untouched.
     # Other versions continue to use their own fetch rules. The old fetch and
     # build both verify the seeded bytes against the historical SHA256 again.
-    deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:-$work/out/host/bin/reliefos-deps}}
+    deps=${RELIEFOS_DEPS:-$work/out/host/bin/reliefos-deps}
     if [ ! -x "$deps" ]; then
         make -s O="$work/out" "$deps" || exit 1
     fi
