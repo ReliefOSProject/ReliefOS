@@ -54,7 +54,9 @@ void menu_action(Fl_Widget *widget, void *data) {
                   T("Search by package name or description. Select one or more packages, choose an "
                     "operation, then review the pending changes.\n\nPreview runs apk --simulate. Apply "
                     "executes the changes in the displayed order. Each operation is checked again before "
-                    "execution.\n\nRefresh indexes after changing repositories or when available packages "
+                    "execution. System upgrades use the native ReliefOS updater to prepare a verified "
+                    "plan, then apply that exact plan. Review system upgrades separately from other "
+                    "package operations.\n\nRefresh indexes after changing repositories or when available packages "
                     "are missing. Installed packages remain available offline.\n\nAdministrator operations "
                     "use your system sudo or root authentication policy. Passwords are never "
                     "saved.\n\nCtrl+F: search    F5: refresh list    Ctrl+Enter: preview changes"));
@@ -733,6 +735,12 @@ void App::queue_target(Action a, const char *target) {
         fl_alert("%s", T("Finish or close the current operation first."));
         return;
     }
+    for (size_t i = 0; i < queue.size(); ++i) {
+        if ((a == Action::UpgradeAll) != (queue[i].action == Action::UpgradeAll)) {
+            fl_alert("%s", T("Review system upgrades separately from other pending package operations."));
+            return;
+        }
+    }
     if (a != Action::UpgradeAll &&
         !(valid_constraint(target) || (a == Action::Install && valid_constraint(target, true)))) {
         fl_alert("%s", T("Invalid package name, constraint or APK path."));
@@ -837,6 +845,15 @@ void App::preview_queue() {
         fl_alert("%s", T("There are no pending changes."));
         return;
     }
+    bool system_update = false;
+    for (size_t i = 0; i < queue.size(); ++i)
+        if (queue[i].action == Action::UpgradeAll) system_update = true;
+    if (system_update && queue.size() != 1) {
+        fl_alert("%s", T("Review system upgrades separately from other pending package operations."));
+        return;
+    }
+    system_update_plan.clear();
+    system_update_reboot = false;
     groups.clear();
     Action order[] = {Action::RepairCa, Action::Install, Action::Upgrade, Action::Reinstall,
                       Action::Fix,     Action::Remove,  Action::UpgradeAll};
@@ -849,8 +866,11 @@ void App::preview_queue() {
     if (queue_window)
         queue_window->hide();
     show_operation(T("Review package changes"));
-    op_buffer.text(T("Operations run in the order shown. Separate apk transactions are checked again before "
-                     "execution.\n\n"));
+    op_buffer.text(system_update ?
+        T("Preparing a verified system update plan. Administrator authentication permits downloading and "
+          "saving the plan; installed packages are changed only after you apply it.\n\n") :
+        T("Operations run in the order shown. Separate apk transactions are checked again before "
+          "execution.\n\n"));
     current_group = 0;
     op_error = false;
     mode = OperationMode::Preview;
@@ -866,7 +886,10 @@ void App::start_group(bool simulate) {
             targets.push(queue[i].target);
     Command c;
     Text error;
-    if (!make_command(groups[current_group], targets, settings, simulate, c, error)) {
+    const bool system_apply = groups[current_group] == Action::UpgradeAll && !simulate;
+    const bool command_okay = system_apply ? system_update_apply_command(system_update_plan, c, error) :
+        make_command(groups[current_group], targets, settings, simulate, c, error);
+    if (!command_okay) {
         const char *message = T(error.c_str());
         append_log(message, strlen(message));
         mode = OperationMode::Done;
@@ -876,7 +899,8 @@ void App::start_group(bool simulate) {
     }
     op_buffer.append("\n");
     op_buffer.append(action_name(groups[current_group]));
-    op_buffer.append(simulate ? T(" — simulation\n") : T(" — executing\n"));
+    op_buffer.append(groups[current_group] == Action::UpgradeAll && simulate ? T(" — preparing update plan\n") :
+        simulate ? T(" — simulation\n") : T(" — executing\n"));
     launch(c, mode);
 }
 bool App::launch(Command &c, OperationMode next) {
@@ -918,9 +942,12 @@ bool App::launch(Command &c, OperationMode next) {
     else
         cancel_button->deactivate();
     progress->value(0);
-    op_status->value(next == OperationMode::Preview || next == OperationMode::Recheck
-                         ? T("Simulating changes...")
-                         : T("Running apk..."));
+    const bool system_update = (next == OperationMode::Preview || next == OperationMode::Execute) &&
+        current_group < groups.size() && groups[current_group] == Action::UpgradeAll;
+    op_status->value(system_update ? (next == OperationMode::Preview ? T("Preparing system update...") :
+        T("Applying the reviewed system update...")) :
+        next == OperationMode::Preview || next == OperationMode::Recheck ? T("Simulating changes...") :
+        T("Running apk..."));
     if (!operation.start(args, c.privileged, auth_mode, c.cancelable)) {
         op_buffer.append(T("\nCannot start the requested operation.\n"));
         mode = OperationMode::Done;
@@ -1032,17 +1059,36 @@ void App::finish_operation() {
         answer_auth(false);
     }
     int exit = operation.exit_code();
+    const bool system_update = (mode == OperationMode::Preview || mode == OperationMode::Execute) &&
+        current_group < groups.size() && groups[current_group] == Action::UpgradeAll;
     char line[120];
     snprintf(line, sizeof(line), T("\nExit status: %d\n"), exit);
     op_buffer.append(line);
     printf("RELIEFAPK_OPERATION mode=%d exit=%d\n", static_cast<int>(mode), exit);
     fflush(stdout);
-    if (exit || operation.truncated()) {
+    bool invalid_update_response = false;
+    if (system_update && !exit && !operation.truncated()) {
+        SystemUpdateReport report;
+        Text error;
+        invalid_update_response = !parse_system_update_report(operation.output(), operation.output_size(), report, error);
+        if (!invalid_update_response && mode == OperationMode::Preview) {
+            invalid_update_response = report.plan_id.empty() || (report.has_result && !report.success);
+            if (!invalid_update_response) system_update_plan = static_cast<Text &&>(report.plan_id);
+        } else if (!invalid_update_response) {
+            invalid_update_response = !report.has_result || !report.success || !report.has_reboot;
+            if (!invalid_update_response) system_update_reboot = report.reboot_required;
+        }
+        if (invalid_update_response)
+            op_buffer.append(T("\nThe native updater returned an incomplete or invalid response. Review its status before retrying.\n"));
+    }
+    if (exit || operation.truncated() || invalid_update_response) {
         if (mode == OperationMode::Save)
             repository_finished(repositories, false);
         op_error = true;
         mode = OperationMode::Done;
-        op_status->value(T("Operation failed. Review the output below."));
+        op_status->value(system_update ?
+            T("System update needs attention. Review the output and run reliefos-update status.") :
+            T("Operation failed. Review the output below."));
         apply_button->deactivate();
         cancel_button->copy_label(T("Close"));
         cancel_button->activate();
@@ -1058,7 +1104,9 @@ void App::finish_operation() {
         }
         mode = OperationMode::Await;
         clear_button->deactivate();
-        op_status->value(groups.size() == 1 && groups[0] == Action::RepairCa ?
+        op_status->value(system_update ?
+            T("Verified update plan ready. Review the changes, then apply.") :
+            groups.size() == 1 && groups[0] == Action::RepairCa ?
             T("Certificate recovery checked. Review the recovery plan and package output, then apply.") :
             T("Simulation completed. Review the output, then apply."));
         progress->value(100);
@@ -1086,7 +1134,9 @@ void App::finish_operation() {
     }
     bool saved = mode == OperationMode::Save;
     mode = OperationMode::Done;
-    op_status->value(T("Completed successfully."));
+    op_status->value(system_update && system_update_reboot ?
+        T("System update completed. Restart to activate the updated kernel.") :
+        T("Completed successfully."));
     progress->value(100);
     cancel_button->copy_label(T("Close"));
     cancel_button->activate();
@@ -1102,6 +1152,12 @@ void App::apply_changes() {
     if (mode != OperationMode::Await)
         return;
     current_group = 0;
+    if (groups.size() == 1 && groups[0] == Action::UpgradeAll) {
+        mode = OperationMode::Execute;
+        op_buffer.append(T("\nApplying the verified system update plan...\n"));
+        start_group(false);
+        return;
+    }
     mode = OperationMode::Recheck;
     op_buffer.append(T("\nApplying the reviewed operations...\n"));
     start_group(true);
@@ -1119,7 +1175,7 @@ void App::close_operation() {
                 auth_window->hide();
             op_status->value(T("Canceling..."));
         } else
-            fl_message("%s", T("apk is applying changes. Wait for it to finish before closing."));
+            fl_message("%s", T("The update is applying changes. Wait for it to finish before closing."));
         return;
     }
     if (op_window)

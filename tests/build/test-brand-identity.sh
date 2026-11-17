@@ -109,6 +109,11 @@ userland/apps/oshlp/main.c
 userland/apps/notepad/main.c
 userland/apps/terminal/main.c
 userland/apps/shell/main.c
+userland/apps/systemupdate/main.c
+userland/apps/systemupdate/engine.c
+userland/apps/systemupdate/io.c
+userland/apps/systemupdate/manifest.c
+userland/apps/systemupdate/apk.c
 '
     for domain in $(cat "$root/configs/nls/DOMAINS"); do
         ui_files="$ui_files configs/nls/po/$domain/$domain.pot"
@@ -157,11 +162,12 @@ userland/apps/shell/main.c
     else
         fail 'application diagnostics must display ReliefOS API names'
     fi
-    if grep -Fq 'Checking installed ReliefOS APKs' "$root/userland/storage/leonos-check-update" &&
-       grep -Fq 'ReliefOS RPR reachable' "$root/userland/storage/leonos-rpr-ping"; then
-        ok 'storage update tools report ReliefOS'
+    if grep -Fq 'Usage: reliefos-update' "$root/userland/apps/systemupdate/main.c" &&
+       grep -Fq '[reliefos-update]' "$root/userland/apps/systemupdate/io.c" &&
+       grep -Fq 'usr/sbin/reliefos-update' "$root/tools/build/rootfs-stage.sh"; then
+        ok 'native system update command and diagnostics use ReliefOS'
     else
-        fail 'storage update tools must report ReliefOS'
+        fail 'native system update command and diagnostics must use ReliefOS'
     fi
     if grep -Fq 'Project-Id-Version: ReliefOS musl locale' \
             "$root/configs/locale/zh_CN.po"; then

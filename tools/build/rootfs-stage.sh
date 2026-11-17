@@ -58,6 +58,7 @@ tree "$out/upstream/grub/root/usr/lib/grub" usr/lib/grub grub
 tree "$out/upstream/grub/root/usr/share/licenses/grub" usr/share/licenses/grub grub
 file "$out/userland/bootinstall.elf" usr/sbin/reliefos-boot-install 0755 reliefos-boot-tools
 file "$out/userland/initramfs/kernel-bundle.elf" usr/libexec/reliefos/kernel-bundle 0755 reliefos-boot-tools
+file "$out/userland/systemupdate.elf" usr/sbin/reliefos-update 0755 reliefos-system-update
 for spec in auth pam; do
     for directory in lib usr etc sbin bin; do
         input=$out/$spec/root/$directory
@@ -66,6 +67,9 @@ for spec in auth pam; do
 done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
+file "$src/system/rootfs/etc/init.d/reliefos-boot-confirm" etc/init.d/reliefos-boot-confirm 0755 reliefos-boot-tools override
+link etc/runlevels/default/reliefos-boot-confirm ../../init.d/reliefos-boot-confirm reliefos-boot-tools
+link lib/apk/commit_hooks.d/reliefos-update /usr/sbin/reliefos-update reliefos-system-update
 # The source lives in the product rootfs tree, but ReliefMath owns its package
 # and must only contribute it when the application component is selected.
 record x - /usr/share/mime/packages/reliefmath.xml 0000 product-policy override
@@ -151,7 +155,7 @@ while read -r app entry; do
         # Hidden graphical entries (installer/easter eggs) need window icons.
         file "$src/resources/build-art/app-icons/$app.bmp" "usr/lib/reliefos/apps/$app/$app.bmp" 0644 "$app"
     fi
-    case $app in sudo|su) continue ;; esac
+    case $app in sudo|su|systemupdate) continue ;; esac
     gid=0
     file "$out/userland/$app.elf" "usr/lib/reliefos/apps/$app/$app.elf" 0755 "$app" unique "$gid"
     file "$work/manifests/$app.ini" "usr/lib/reliefos/apps/$app/manifest.ini" 0644 "$app"
@@ -210,12 +214,14 @@ for spec in 'busybox third_party/busybox/LICENSE' 'pleditor third_party/pl_edito
     set -- $spec
     if enabled "$1"; then file "$src/$2" "usr/share/licenses/$1/${2##*/}" 0644 "$1" override; fi
 done
-for name in leonos-rpr-apkcheck leonos-rpr-ping leonos-kernel-update leonos-check-update leonos-grub-installer; do file "$src/userland/storage/$name" "usr/sbin/$name" 0755 reliefos-apps; done
-for spec in 'reliefos-rpr-apkcheck leonos-rpr-apkcheck' 'reliefos-rpr-ping leonos-rpr-ping' 'reliefos-kernel-update leonos-kernel-update' 'reliefos-check-update leonos-check-update'; do
-    set -- $spec; link "usr/sbin/$1" "$2" reliefos-apps
+file "$src/userland/storage/leonos-grub-installer" usr/sbin/leonos-grub-installer 0755 reliefos-boot-tools
+for prefix in reliefos leonos; do
+    for name in kernel-update check-update rpr-apkcheck rpr-ping; do
+        link "usr/sbin/$prefix-$name" reliefos-update reliefos-system-update
+    done
 done
 sh "$src/tools/build/rpr-config.sh" "$config" > "$work/data/rpr.conf"
-file "$work/data/rpr.conf" etc/reliefos/rpr.conf
+file "$work/data/rpr.conf" etc/reliefos/rpr.conf 0644 reliefos-system-update
 file "$config" etc/reliefos/leonos.conf
 for source in "$src/system/config"/*; do
     [ "${source##*/}" = display.conf ] || file "$source" "etc/reliefos/${source##*/}" 0644 product-policy override

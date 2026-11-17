@@ -33,6 +33,9 @@ pleditor)
  cp -R "$source/src" "$work/generated/src"
  awk '
  /#include <stdlib.h>/ {print; print "#include <stdint.h>"; next}
+ # Clang 14 does not yet accept a declaration immediately after a case label,
+ # even in C2x mode. An empty statement preserves upstream switch semantics.
+ /^[[:space:]]*case OP_DELETE_CHAR:[[:space:]]*$/ {print; print "            ;"; labels++; next}
  /    size_t buffer_size = \(size_t\)\(state->screen_rows \+ 2\) \*/ {
    print "    size_t rows = (size_t)state->screen_rows;"
    print "    size_t cols = (size_t)state->screen_cols;"
@@ -45,7 +48,7 @@ pleditor)
    getline; getline; changed++; next
  }
  {print}
- END {if (changed != 1) exit 1}
+ END {if (changed != 1 || labels != 2) exit 1}
  ' "$source/src/pleditor.c" > "$work/generated/src/pleditor.c"
  rm -rf "$output/pleditor-generated"
  mkdir -p "$output/pleditor-generated/src"

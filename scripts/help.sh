@@ -53,8 +53,10 @@ ReliefOS build system (Linux Kbuild / Kconfig)
   make test-vdso       delegate vDSO ELF, timekeeper and mapping/auxv checks
   make test-kernel-host run standalone ReliefNT host regression suites
   make test-kernel-ownership check standalone ReliefNT test ownership
-  make test-kernel-update signed APK/RPR kernel-bundle transaction regressions
-  make test            test-tools plus test-build
+  make test-system-update signed package and offline repair regressions
+  make test-kernel-update signed kernel update, package repair and A/B preflight regressions
+  make test-boot-health real GRUB BIOS/UEFI trial, confirmation and fallback checks
+  make test            core build, system-update, kernel-update and boot-health gates
   make test-long       repeated -j1/-j8 comparisons and interrupt recovery
   make test-smoke      BIOS + UEFI QEMU checks for all three media (sequential)
   make test-legacy     kernel legacy group plus OS userspace regressions

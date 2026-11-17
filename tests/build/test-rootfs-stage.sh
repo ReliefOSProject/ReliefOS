@@ -47,6 +47,18 @@ mkdir "$work/gid-root"
 "$work/stage" "$work/gid-plan" "$work/gid-root" "$work/gid.json"
 grep -q '"path":"/usr/share/fixture/data","mode":"0755","uid":0,"gid":1234' "$work/gid.json"
 [ "$(stat -c %a "$work/gid-root/usr/share/fixture/data")" = 755 ]
+# A private host umask must not make implicit guest parents inaccessible to
+# ordinary users. Explicit private directory permissions remain authoritative.
+mkdir "$work/umask-root"
+printf 'f\t%s\t/usr/lib/X11/xdm/Xsession\t0755\tfixture\tunique\nd\t-\t/var/private\t0700\tfixture\tunique\nf\t%s\t/var/private/data\t0600\tfixture\tunique\n' \
+    "$work/gid-input" "$work/gid-input" > "$work/umask-plan"
+(umask 077; "$work/stage" "$work/umask-plan" "$work/umask-root" "$work/umask.json")
+for parent in usr usr/lib usr/lib/X11 usr/lib/X11/xdm; do
+    [ "$(stat -c %a "$work/umask-root/$parent")" = 755 ]
+done
+[ "$(stat -c %a "$work/umask-root/usr/lib/X11/xdm/Xsession")" = 755 ]
+[ "$(stat -c %a "$work/umask-root/var/private")" = 700 ]
+[ "$(stat -c %a "$work/umask-root/var/private/data")" = 600 ]
 # An absent, empty or non-decimal gid column is refused before staging.
 for bad in '' 'bogus' '-1' '99999999999'; do
     printf 'f\t%s\t/bad\t0644\tservice\tunique\t%s\n' "$work/gid-input" "$bad" > "$work/bad-gid"

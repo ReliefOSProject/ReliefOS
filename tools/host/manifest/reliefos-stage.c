@@ -224,7 +224,7 @@ static void parent_dirs(const char *path) {
             *s = 0;
             struct stat st;
             if (lstat(p, &st)) {
-                if (errno != ENOENT || mkdir(p, 0755))
+                if (errno != ENOENT || mkdir(p, 0755) || chmod(p, 0755))
                     die("mkdir %s: %s", p, strerror(errno));
             } else if (!S_ISDIR(st.st_mode))
                 die("non-directory parent: %s", p);

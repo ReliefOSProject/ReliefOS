@@ -250,11 +250,19 @@ if "$cc" -I"$relocated/usr/include" "$work/consumer.c" -L"$relocated/lib" -L"$re
     fail 'static fixture did not require official libmd.a'
 fi
 for package in libbsd libbsd-overlay libmd; do
+    # These .pc files locate their own relocated root. Consumers must avoid
+    # applying PKG_CONFIG_SYSROOT_DIR a second time (GNU pkg-config does so).
     pc_flags=$(PKG_CONFIG_PATH='' PKG_CONFIG_LIBDIR="$relocated/usr/lib/pkgconfig" \
-        PKG_CONFIG_SYSROOT_DIR="$relocated" pkg-config --cflags --libs --static "$package")
+        PKG_CONFIG_SYSROOT_DIR='' pkg-config --cflags --libs --static "$package")
     case $pc_flags in *"$relocated/usr/"*) ;; *) fail 'pkg-config lost relocated prefix';; esac
     case $pc_flags in *"$output"*|*"$combined"*) fail 'pkg-config retained an old path';; esac
 done
+pc_flags=$(PKG_CONFIG_PATH='' PKG_CONFIG_LIBDIR="$relocated/usr/lib/pkgconfig" \
+    PKG_CONFIG_SYSROOT_DIR='' pkg-config --cflags --libs --static libbsd)
+# Intentional splitting of pkg-config's argv on this whitespace-free fixture.
+# A doubled sysroot used to pass the substring assertions but fails to compile.
+"$cc" "$work/consumer.c" $pc_flags -Wl,-rpath-link,"$relocated/lib" -o "$work/pkg-config-consumer"
+LD_LIBRARY_PATH="$relocated/lib:$relocated/usr/lib" "$work/pkg-config-consumer"
 
 snapshot >"$work/before"
 cp "$output.files" "$work/before.files"

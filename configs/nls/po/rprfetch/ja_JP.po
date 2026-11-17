@@ -10,22 +10,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: userland/apps/rprfetch/main.c:23
-msgid "Usage: %s HTTPS_URL OUTPUT\n"
-msgstr "使用法: %s HTTPS_URL OUTPUT\n"
+#: userland/apps/rprfetch/main.c:27
+msgid "Usage: %s HTTPS_URL OUTPUT [MAX_BYTES]\n"
+msgstr "使用法: %s HTTPS_URL OUTPUT [MAX_BYTES]\n"
 
-#: userland/apps/rprfetch/main.c:40
+#: userland/apps/rprfetch/main.c:54
 msgid "rprfetch: OUTPUT must be a file path\n"
 msgstr "rprfetch: OUTPUT にはファイルパスを指定してください\n"
 
-#: userland/apps/rprfetch/main.c:47
+#: userland/apps/rprfetch/main.c:69
 msgid "rprfetch: download failed (network status %u, HTTP %u)\n"
 msgstr "rprfetch: ダウンロードに失敗しました (ネットワーク状態 %u、HTTP %u)\n"
 
-#: userland/apps/rprfetch/main.c:36
+#: userland/apps/rprfetch/main.c:50
 msgid "rprfetch: refusing non-HTTPS URL\n"
 msgstr "rprfetch: HTTPS 以外の URL は使用できません\n"
 
-#: userland/apps/rprfetch/main.c:53
+#: userland/apps/rprfetch/main.c:75
 msgid "rprfetch: server returned HTTP %u\n"
 msgstr "rprfetch: サーバーが HTTP %u を返しました\n"

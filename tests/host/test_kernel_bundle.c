@@ -119,6 +119,20 @@ int __wrap_renameat(int from, const char *old, int to, const char *new_name)
 
 int main(int argc, char **argv)
 {
+    if (argc == 3 && !strcmp(argv[1], "boot-status")) {
+        struct reliefos_kernel_boot_status status;
+        int result = reliefos_kernel_bundle_boot_status(argv[2], &status);
+        if (!result) printf("PROTOCOL=%u LATEST=%c/%u/%u/%u CONFIRMED=%c/%u\n", status.protocol,
+            status.latest_name, status.latest.generation, status.health.confirmed, status.health.remaining,
+            status.confirmed_name, status.confirmed.generation);
+        return result ? 1 : 0;
+    }
+    if (argc == 8 && !strcmp(argv[1], "confirm")) {
+        int result = reliefos_kernel_bundle_confirm(argv[2], argv[3], argv[4][0],
+            (uint32_t)strtoul(argv[5], NULL, 10), argv[6], argv[7]);
+        printf("RESULT=%d\n", result);
+        return result ? 1 : 0;
+    }
     if (argc == 4 && (!strcmp(argv[1], "retain") || !strcmp(argv[1], "restore"))) {
         int result = !strcmp(argv[1], "retain") ? reliefos_kernel_bundle_retain(argv[2], argv[3]) :
                                                  reliefos_kernel_bundle_restore(argv[2], argv[3]);
@@ -137,6 +151,15 @@ int main(int argc, char **argv)
         if (root < 0) return 1;
         struct reliefos_kernel_slot selected; char name;
         int result = kernel_bundle_select(root, &selected, &name);
+        close(root);
+        if (!result) printf("%c %u %s\n", name, selected.generation, selected.release);
+        return result ? 1 : 0;
+    }
+    if (argc == 3 && !strcmp(argv[1], "confirmed")) {
+        int root = boot_open_directory(argv[2]);
+        if (root < 0) return 1;
+        struct reliefos_kernel_slot selected; char name;
+        int result = kernel_bundle_select_confirmed(root, &selected, &name);
         close(root);
         if (!result) printf("%c %u %s\n", name, selected.generation, selected.release);
         return result ? 1 : 0;

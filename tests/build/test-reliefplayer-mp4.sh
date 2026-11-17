@@ -8,7 +8,21 @@ ffmpeg -v error -nostdin -f lavfi -i testsrc2=size=320x180:rate=12:duration=2 \
   -c:v libx264 -threads 1 -g 24 -bf 2 -pix_fmt yuv420p -c:a aac -ac 2 "$work/video.mp4"
 ffmpeg -v error -nostdin -i "$work/video.mp4" -an -c:v copy -movflags +faststart "$work/silent.mp4"
 ffmpeg -v error -nostdin -i "$work/video.mp4" -c:v copy -c:a alac "$work/unsupported.mp4"
-ffmpeg -v error -nostdin -display_rotation 90 -i "$work/silent.mp4" -c copy "$work/rotated.mp4"
+# New FFmpeg releases use an input display-matrix option; older releases
+# encode the same matrix from output rotation metadata.
+ffmpeg -hide_banner -h full > "$work/ffmpeg-help.txt" 2>&1
+if grep -q -- '-display_rotation ' "$work/ffmpeg-help.txt"; then
+  ffmpeg -v error -nostdin -display_rotation 90 -i "$work/silent.mp4" -c copy "$work/rotated.mp4"
+else
+  ffmpeg -v error -nostdin -i "$work/silent.mp4" -c copy -metadata:s:v:0 rotate=90 "$work/rotated.mp4"
+fi
+ffprobe -v error -select_streams v:0 -show_streams \
+  -of default=noprint_wrappers=1 "$work/rotated.mp4" > "$work/rotated-stream.txt"
+rotation=$(sed -n 's/^rotation=//p' "$work/rotated-stream.txt")
+case "$rotation" in
+  90|-90) ;;
+  *) printf 'MP4 fixture lacks a quarter-turn display matrix: %s\n' "$rotation" >&2; exit 1 ;;
+esac
 ffmpeg -v error -nostdin -i "$work/silent.mp4" -c:v libx265 -x265-params pools=none:frame-threads=1:log-level=error -t 0.5 "$work/hevc.mp4"
 ffmpeg -v error -nostdin -i "$work/silent.mp4" -c:v mpeg4 -t 0.5 "$work/mpeg4.mp4"
 head -c 100 "$work/video.mp4" > "$work/truncated.mp4"

@@ -1,0 +1,12 @@
+#!/sbin/openrc-run
+# SPDX-License-Identifier: Apache-2.0
+description="Confirm the exact ReliefOS kernel boot trial"
+depend() {
+    need reliefos-runtime reliefos-modules
+    after localmount reliefos-device reliefos-audio reliefos-dhcp reliefos-swap-check xdm
+}
+start() {
+    ebegin "Confirming the running kernel and early userspace"
+    /usr/libexec/reliefos/kernel-bundle --confirm-running / /boot
+    eend $?
+}

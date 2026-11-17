@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -148,6 +149,77 @@ static int inspect(const char *root, const char *release)
     return size < 0 || fflush(stdout) ? -EIO : 0;
 }
 
+/** @brief Emit stable scalar boot state for the system updater and recovery UI.
+ * @param boot Absolute mounted ESP. @return Zero or negative validation/I/O errno.
+ */
+static int boot_status(const char *boot)
+{
+    struct reliefos_kernel_boot_status status;
+    int result = reliefos_kernel_bundle_boot_status(boot, &status);
+    if (result) return result;
+    int size = printf("format_version=1\nboot_protocol=%u\nlatest_slot=%c\nlatest_generation=%u\n"
+        "latest_release=%s\nlatest_initramfs=%s\nlatest_confirmed=%u\nlatest_remaining=%u\n"
+        "confirmed_slot=%c\nconfirmed_generation=%u\nconfirmed_release=%s\nconfirmed_initramfs=%s\n",
+        status.protocol, status.latest_name, status.latest.generation, status.latest.release,
+        status.latest.initramfs_sha256, status.health.confirmed, status.health.remaining,
+        status.confirmed_name, status.confirmed.generation, status.confirmed.release,
+        status.confirmed.initramfs_sha256);
+    return size < 0 || fflush(stdout) ? -EIO : 0;
+}
+
+/** @brief Confirm only the exact GRUB-selected pair after the boot service is ready.
+ * @param root Final ReliefNT root. @param boot Its mounted ESP namespace.
+ * @return Zero for successful confirmation or a manual/legacy boot with no trial
+ * identity; negative errno for partial, duplicate or mismatched boot arguments.
+ */
+static int confirm_running(const char *root, const char *boot)
+{
+    struct utsname system;
+    if (uname(&system) || strcmp(system.sysname, "ReliefNT")) return -EPERM;
+    char path[1024]; int result = path_join(path, root, "proc/cmdline");
+    if (result) return result;
+    int fd = open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+    if (fd < 0) return -errno;
+    char line[4097]; size_t used = 0;
+    while (used < sizeof(line) - 1) {
+        ssize_t count = read(fd, line + used, sizeof(line) - 1 - used);
+        if (count < 0 && errno == EINTR) continue;
+        if (count < 0) { result = -errno; break; }
+        if (!count) break;
+        used += (size_t)count;
+    }
+    close(fd);
+    if (result) return result;
+    if (used == sizeof(line) - 1 || memchr(line, 0, used)) return -E2BIG;
+    line[used] = 0;
+    char slot = 0, initramfs[65] = {0}; uint32_t generation = 0; unsigned fields = 0;
+    char *save, *token = strtok_r(line, " \t\r\n", &save);
+    while (token) {
+        const char *value;
+        if (!strncmp(token, "reliefos.boot_slot=", sizeof("reliefos.boot_slot=") - 1)) {
+            value = token + sizeof("reliefos.boot_slot=") - 1;
+            if ((fields & 1) || strlen(value) != 1 || (*value != 'A' && *value != 'B')) return -EINVAL;
+            fields |= 1; slot = *value;
+        } else if (!strncmp(token, "reliefos.boot_generation=", sizeof("reliefos.boot_generation=") - 1)) {
+            value = token + sizeof("reliefos.boot_generation=") - 1;
+            if ((fields & 2) || !*value || *value == '0') return -EINVAL;
+            for (; *value; ++value) {
+                if (*value < '0' || *value > '9' || generation > (RELIEFOS_KERNEL_SLOT_GENERATION_MAX - (unsigned)(*value - '0')) / 10) return -EINVAL;
+                generation = generation * 10 + (unsigned)(*value - '0');
+            }
+            fields |= 2;
+        } else if (!strncmp(token, "reliefos.boot_initramfs=", sizeof("reliefos.boot_initramfs=") - 1)) {
+            value = token + sizeof("reliefos.boot_initramfs=") - 1;
+            if ((fields & 4) || strlen(value) != 64 || strspn(value, "0123456789abcdef") != 64) return -EINVAL;
+            memcpy(initramfs, value, 65); fields |= 4;
+        }
+        token = strtok_r(NULL, " \t\r\n", &save);
+    }
+    if (!fields) return 0; /* Explicit recovery/manual legacy boots cannot confirm a trial. */
+    if (fields != 7) return -EINVAL;
+    return reliefos_kernel_bundle_confirm(root, boot, slot, generation, system.release, initramfs);
+}
+
 /** @brief Operate on explicit staging roots or the admitted ReliefNT running root.
  * @return Zero on completion, 2 for usage, 77 for host-root refusal or 1 for an
  * observed validation/I/O failure. This static binary also runs from initramfs
@@ -158,11 +230,11 @@ int main(int argc, char **argv)
     if (argc < 3 || argc > 4 || argv[2][0] != '/') {
         fputs("Usage: kernel-bundle --retain|--restore|--inspect ROOT RELEASE\n"
               "       kernel-bundle --retain-installed|--restore-all|--recover-running ROOT\n"
-              "       kernel-bundle --publish-installed ROOT BOOT\n", stderr);
+              "       kernel-bundle --publish-installed|--confirm-running|--boot-status ROOT BOOT\n", stderr);
         return 2;
     }
     struct utsname system;
-    if (strcmp(argv[1], "--inspect") && !strcmp(argv[2], "/") && (uname(&system) || strcmp(system.sysname, "ReliefNT"))) {
+    if (strcmp(argv[1], "--inspect") && strcmp(argv[1], "--boot-status") && !strcmp(argv[2], "/") && (uname(&system) || strcmp(system.sysname, "ReliefNT"))) {
         fputs("kernel-bundle: refusing mutations of a non-ReliefNT host root\n", stderr);
         return 77;
     }
@@ -171,6 +243,8 @@ int main(int argc, char **argv)
     else if (argc == 4 && !strcmp(argv[1], "--retain")) result = reliefos_kernel_bundle_retain(argv[2], argv[3]);
     else if (argc == 4 && !strcmp(argv[1], "--restore")) result = reliefos_kernel_bundle_restore(argv[2], argv[3]);
     else if (argc == 4 && !strcmp(argv[1], "--publish-installed")) result = publish_installed(argv[2], argv[3]);
+    else if (argc == 4 && !strcmp(argv[1], "--confirm-running")) result = confirm_running(argv[2], argv[3]);
+    else if (argc == 4 && !strcmp(argv[1], "--boot-status")) result = boot_status(argv[3]);
     else if (argc == 3 && !strcmp(argv[1], "--retain-installed")) result = retain_installed(argv[2]);
     else if (argc == 3 && !strcmp(argv[1], "--restore-all")) result = restore_all(argv[2]);
     else if (argc == 3 && !strcmp(argv[1], "--recover-running")) result = recover_running(argv[2]);

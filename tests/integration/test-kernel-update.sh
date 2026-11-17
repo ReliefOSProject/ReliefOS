@@ -1,6 +1,6 @@
 #!/bin/sh
-# Actual signed APK and native-bundle preflight in disposable namespaces.
-# Firmware activation/recovery/reboot is a separate ReliefNT guest matrix.
+# Actual signed APK/kernel updates and native-bundle preflight in disposable
+# namespaces. Firmware activation/recovery/reboot is covered by the GRUB test.
 set -eu
 [ "$#" -le 1 ] || { echo 'usage: test-kernel-update.sh [OUTPUT_DIR]' >&2; exit 2; }
 src=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd -P)

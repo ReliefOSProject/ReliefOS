@@ -1,6 +1,9 @@
 #!/bin/sh
 # Build signed local packages and install them with the verified upstream apk.
 set -eu
+# APK keeps modes on pre-existing destination parents. Build guest directories
+# with public traversal independently of a maintainer's private host umask.
+umask 022
 . "$(CDPATH= cd -- "$(dirname "$0")/../../scripts" && pwd)/logging.sh"
 
 if [ "$#" -ne 12 ]; then
@@ -270,6 +273,9 @@ pub_name=reliefos-$(printf %.16s "$pub_digest").rsa.pub
 legacy_pub_name=leonos-$(printf %.16s "$pub_digest").rsa.pub
 cp "$scratch/public.pem" "$tree/etc/apk/keys/$pub_name"
 cp "$scratch/public.pem" "$tree/etc/apk/keys/$legacy_pub_name"
+# These are public verification keys consumed by ordinary package queries.
+chmod 0755 "$tree/etc/apk/keys"
+chmod 0644 "$tree/etc/apk/keys/"*.pub
 
 if [ -n "${SOURCE_DATE_EPOCH:-}" ]; then
     case $SOURCE_DATE_EPOCH in *[!0-9]*|'') echo 'SOURCE_DATE_EPOCH must be an integer' >&2; exit 2;; esac
@@ -407,6 +413,10 @@ while IFS= read -r group; do
         reliefos-base) dependencies="$dependencies bash bash-completion bash-doc" ;;
         reliefos-musl-dev) dependencies="$dependencies reliefos-musl=$version"; provides="$provides musl-dev=$version libc-dev=$version" ;;
         reliefos-apk-tools) dependencies="$dependencies reliefos-busybox" ;;
+        reliefos-system-update) dependencies="$dependencies reliefos-apk-tools reliefos-grub" ;;
+        # Existing installations already request reliefos-apps. Pull the new
+        # native owner into the same transaction that retires its shell files.
+        reliefos-apps) dependencies="$dependencies reliefos-system-update" ;;
         reliefos-busybox) dependencies="$dependencies reliefos-coreutils" ;;
         reliefos-coreutils) dependencies="$dependencies !coreutils !coreutils-single" ;;
         # These local groups retain exFAT and compatibility aliases.
@@ -442,6 +452,7 @@ while IFS= read -r group; do
     # APK must hand those paths to GNU in the same transaction that upgrades
     # BusyBox; an overwrite/force flag would conceal a packaging conflict.
     [ "$package" != reliefos-coreutils ] || replaces="$replaces reliefos-busybox leonos-busybox"
+    [ "$package" != reliefos-system-update ] || replaces="$replaces reliefos-apps leonos-apps"
     set -- mkpkg --files "$payload" --output "$repository/$package-$version.apk" \
         --info "name:$package" --info "version:$version" --info arch:x86_64 \
         --info "origin:$package" --info "description:ReliefOS build payload $package" \

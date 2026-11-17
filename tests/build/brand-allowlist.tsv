@@ -318,11 +318,7 @@ main	compatibility	tools/test_linux_ioctl_cloexec.py	旧 GRUB module tag、marke
 main	compatibility	tools/test_storage_upstream_runtime.py	LEONOS_UPSTREAM_TREE 接受旧测试输入环境；不存在的私有设备名已 canonical
 main	compatibility	tools/test_upstream_tools_images.py	检查 legacy ESP 内核字节与旧 grub 安装命令兼容入口；输出镜像名已 canonical
 main	history	tools/tests/oobe_auth_boot_test.c	已退役 authd/OOBE 架构测试夹具，引用已删除 authd 源；旧 marker 与保留的历史实现对应，未宣称当前回归通过
-main	compatibility	userland/storage/leonos-check-update	保留旧命令源文件名与 leonos-* 包升级识别；当前帮助/临时文件名已 canonical
 main	compatibility	userland/storage/leonos-grub-installer	旧命令源文件名及 legacy ESP 回滚保留、旧布局残留清理路径；帮助已 canonical
-main	compatibility	userland/storage/leonos-kernel-update	旧命令源文件名、legacy ESP 与共享旧更新锁防止并发旧客户端；当前帮助/临时名已 canonical
-main	compatibility	userland/storage/leonos-rpr-apkcheck	旧命令源文件名为既有构建输入与兼容入口；当前帮助/私有 key 临时名已 canonical
-main	compatibility	userland/storage/leonos-rpr-ping	旧命令源文件名与外部服务冻结 leonos-rpr-ok 响应；当前帮助/临时名已 canonical
 main	compatibility	tests/build/test-fetch-check.sh	旧 LEONOS_* 环境/命令行输入别名，与各 tests/build 契约同款回退；fetch-check 及内核 fetch-check 代理目标回归
 main	compatibility	userland/apps/installer/install_ops.h	旧 ESP 启动载荷路径 TARGET_ESP_KERNEL_LEGACY，旧载荷保留回滚契约
 main	compatibility	userland/apps/installer/install_ops.c	安装器升级时清理旧 ESP 遗留载荷文件与 /etc/leonos 等旧目录、libleonos.so.2 兼容库路径清单
@@ -341,3 +337,7 @@ main	compatibility	userland/runtime/src/fb.c	既有 fbdev ELF 别名移出已删
 main	compatibility	userland/apps/network-controller/worker.cpp	迁移前读取已发布的 udhcpc DNS 数据文件，不执行其中内容
 main	compatibility	system/rootfs/usr/lib/reliefos/network-profile	保留已发布的 udhcpc DNS 数据文件与旧 DNS-only 配置兼容
 main	compatibility	tests/build/test-network-profile.sh	在私有 chroot 验证已发布的 udhcpc DNS 配置兼容
+main	compatibility	userland/apps/systemupdate/apk.c	原生更新器验证已发布 RPR health.txt 的冻结 leonos-rpr-ok 响应；命令和诊断均使用 ReliefOS。
+main	compatibility	tools/test_system_update.py	原生更新器验证既有 RPR health.txt 响应的兼容夹具，不作为用户界面品牌。
+main	compatibility	tools/tests/test_system_update_packaging.py	真实签名 APK 回归验证旧 leonos-apps 文件所有权及已发布 leonos-* 命令别名迁移。
+main	compatibility	tests/build/test-desktop-backend.sh	桌面载荷回归验证已发布 leonos-* 更新命令别名统一指向原生更新核心，不保留旧脚本实现。

@@ -119,6 +119,13 @@ class KernelBundle(unittest.TestCase):
                         "-I", str(ROOT / "userland/runtime/include"),
                         str(ROOT / "tests/host/test_kernel_bundle.c"), *map(str, sources),
                         *crypto_flags(), "-o", str(cls.binary)], check=True)
+        cls.cli = work / "kernel-bundle"
+        subprocess.run(["cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
+                        "-fsanitize=address,undefined", "-fno-sanitize-recover=all", "-Wl,--wrap=uname",
+                        "-I", str(ROOT / "userland/runtime/include"),
+                        str(ROOT / "userland/apps/kernelbundle/main.c"),
+                        str(ROOT / "tests/host/kernel_bundle_cli_environment.c"), *map(str, sources),
+                        *crypto_flags(), "-o", str(cls.cli)], check=True)
 
     def setUp(self):
         fixture = fixtures.ModulesStage("test_real_metadata_dependency_closure_and_stale_output")
@@ -270,6 +277,158 @@ class KernelBundle(unittest.TestCase):
         result = subprocess.run([str(self.binary), "publish", str(self.payload), str(target), fixtures.RELEASE], capture_output=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual((state / "kernel-A.env").read_bytes(), b"unrelated state")
+
+    def alternate_early_payload(self, name):
+        """Build a new legitimate pair sharing the kernel release and ABI."""
+        self.archive.write_bytes(self.archive.read_bytes() + bytes(512))
+        metadata = self.archive.with_name(self.archive.name + ".json")
+        manifest = json.loads(metadata.read_bytes())
+        digest = hashlib.sha256(self.archive.read_bytes()).hexdigest()
+        manifest["initramfs_sha256"] = digest
+        metadata.write_text(json.dumps(manifest))
+        payload = self.fixture.work / name
+        subprocess.run([str(fixtures.KERNEL_TOOLS), "kernel-payload", str(self.fixture.install), str(self.fixture.output),
+                        str(self.archive), str(payload)], check=True)
+        return payload, digest
+
+    def test_trial_confirmation_binds_pair_and_preserves_last_good_slot(self):
+        esp = self.fixture.work / "health-esp"
+        esp.mkdir()
+        publish = lambda payload: subprocess.run([str(self.binary), "publish", str(payload), str(esp), fixtures.RELEASE],
+                                                  text=True, capture_output=True)
+        status = lambda: subprocess.check_output([str(self.binary), "boot-status", str(esp)], text=True).strip()
+        self.assertEqual(publish(self.payload).returncode, 0)
+        self.assertEqual(status(), "PROTOCOL=1 LATEST=A/1/1/0 CONFIRMED=A/1")
+        new, digest = self.alternate_early_payload("health-new")
+        self.assertEqual(publish(new).returncode, 0)
+        self.assertEqual(status(), "PROTOCOL=1 LATEST=B/2/0/1 CONFIRMED=A/1")
+        health = esp / "reliefos/state/kernel-B.health"
+        pending = health.read_bytes()
+        command = [str(self.binary), "confirm", str(new), str(esp), "B", "2", fixtures.RELEASE, digest]
+        # Guessing uname is insufficient: the trial must have been consumed,
+        # and the full installed pair must match that exact boot generation.
+        self.assertNotEqual(subprocess.run(command, capture_output=True).returncode, 0)
+        self.assertEqual(health.read_bytes(), pending)
+        health.write_bytes(pending.replace(b"reliefos_boot_remaining=1", b"reliefos_boot_remaining=0"))
+        for index, value in ((2, str(self.payload)), (5, "1"), (7, "0" * 64)):
+            wrong = command.copy()
+            wrong[index] = value
+            self.assertNotEqual(subprocess.run(wrong, capture_output=True).returncode, 0)
+            self.assertIn(b"reliefos_boot_confirmed=0", health.read_bytes())
+        result = subprocess.run(command, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(status(), "PROTOCOL=1 LATEST=B/2/1/0 CONFIRMED=B/2")
+        self.assertEqual(subprocess.run(command, capture_output=True).returncode, 0)
+        good = {name: (esp / "reliefos/state" / name).read_bytes()
+                for name in ("kernel-B.env", "kernel-B.sha256", "kernel-B.health")}
+        third, _ = self.alternate_early_payload("health-third")
+        self.assertEqual(publish(third).returncode, 0)
+        self.assertEqual(status(), "PROTOCOL=1 LATEST=A/3/0/1 CONFIRMED=B/2")
+        fourth, _ = self.alternate_early_payload("health-fourth")
+        self.assertEqual(publish(fourth).returncode, 0)
+        self.assertEqual(status(), "PROTOCOL=1 LATEST=A/4/0/1 CONFIRMED=B/2")
+        for name, contents in good.items():
+            self.assertEqual((esp / "reliefos/state" / name).read_bytes(), contents)
+
+    def test_migrated_missing_corrupt_or_stale_health_cannot_be_confirmed(self):
+        esp = self.fixture.work / "health-refusal-esp"
+        esp.mkdir()
+        subprocess.run([str(self.binary), "publish", str(self.payload), str(esp), fixtures.RELEASE], check=True, capture_output=True)
+        new, _ = self.alternate_early_payload("health-refusal-new")
+        subprocess.run([str(self.binary), "publish", str(new), str(esp), fixtures.RELEASE], check=True, capture_output=True)
+        health = esp / "reliefos/state/kernel-B.health"
+        record = health.read_bytes()
+        for contents in (None, b"corrupt", record.replace(b"generation=2", b"generation=3")):
+            if contents is None:
+                health.unlink()
+            else:
+                health.write_bytes(contents)
+            result = subprocess.run([str(self.binary), "boot-status", str(esp)], capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(subprocess.check_output([str(self.binary), "confirmed", str(esp)], text=True).strip(),
+                             "A 1 " + fixtures.RELEASE)
+        health.write_bytes(record)
+
+    def test_boot_confirmation_cli_rejects_partial_duplicate_and_stale_cmdline(self):
+        esp = self.fixture.work / "confirm-cli-esp"
+        esp.mkdir()
+        subprocess.run([str(self.binary), "publish", str(self.payload), str(esp), fixtures.RELEASE], check=True, capture_output=True)
+        new, digest = self.alternate_early_payload("confirm-cli-new")
+        subprocess.run([str(self.binary), "publish", str(new), str(esp), fixtures.RELEASE], check=True, capture_output=True)
+        health = esp / "reliefos/state/kernel-B.health"
+        health.write_bytes(health.read_bytes().replace(b"reliefos_boot_remaining=1", b"reliefos_boot_remaining=0"))
+        pending = health.read_bytes()
+        proc = new / "proc"
+        proc.mkdir()
+        arguments = f"reliefos.boot_slot=B reliefos.boot_generation=2 reliefos.boot_initramfs={digest}"
+        environment = {**os.environ, "RELIEFOS_TEST_UNAME_RELEASE": fixtures.RELEASE}
+        command = [str(self.cli), "--confirm-running", str(new), str(esp)]
+        for invalid in ("reliefos.boot_slot=B", arguments + " reliefos.boot_slot=B",
+                        arguments.replace("generation=2", "generation=1"),
+                        arguments.replace(digest, "a" * 63), arguments.replace("slot=B", "slot=A")):
+            (proc / "cmdline").write_text("root=PARTUUID=fixture " + invalid + "\n")
+            result = subprocess.run(command, text=True, capture_output=True, env=environment)
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertEqual(health.read_bytes(), pending)
+        (proc / "cmdline").write_text("root=PARTUUID=fixture manual-recovery\n")
+        self.assertEqual(subprocess.run(command, capture_output=True, env=environment).returncode, 0)
+        self.assertEqual(health.read_bytes(), pending)
+        (proc / "cmdline").write_text("root=PARTUUID=fixture " + arguments + "\n")
+        stale = {**environment, "RELIEFOS_TEST_UNAME_RELEASE": "5.3.3-ko1-fedcba987654"}
+        self.assertNotEqual(subprocess.run(command, capture_output=True, env=stale).returncode, 0)
+        self.assertEqual(health.read_bytes(), pending)
+        result = subprocess.run(command, text=True, capture_output=True, env=environment)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn(b"reliefos_boot_confirmed=1\n", health.read_bytes())
+        result = subprocess.run([str(self.cli), "--boot-status", str(new), str(esp)], text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("boot_protocol=1\n", result.stdout)
+        self.assertIn("latest_confirmed=1\n", result.stdout)
+
+    def test_legacy_confirmed_slot_migrates_before_pending_publication(self):
+        esp = self.fixture.work / "legacy-health-esp"
+        esp.mkdir()
+        subprocess.run([str(self.binary), "publish", str(self.payload), str(esp), fixtures.RELEASE], check=True, capture_output=True)
+        state = esp / "reliefos/state"
+        (state / "boot-health-v1").unlink()
+        health = state / "kernel-A.health"
+        original = health.read_bytes()
+        health.unlink()
+        status = subprocess.check_output([str(self.binary), "boot-status", str(esp)], text=True).strip()
+        self.assertEqual(status, "PROTOCOL=0 LATEST=A/1/1/0 CONFIRMED=A/1")
+        # A cut during the legacy record's first store leaves compatible bytes;
+        # the marker must remain absent until the complete record is synced.
+        health.write_bytes(original[:70] + bytes(len(original) - 70))
+        new, _ = self.alternate_early_payload("legacy-health-new")
+        result = subprocess.run([str(self.binary), "publish", str(new), str(esp), fixtures.RELEASE],
+                                text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(health.read_bytes(), original)
+        status = subprocess.check_output([str(self.binary), "boot-status", str(esp)], text=True).strip()
+        self.assertEqual(status, "PROTOCOL=1 LATEST=B/2/0/1 CONFIRMED=A/1")
+
+    def test_legacy_boot_confirmation_creates_lock_without_inventing_health(self):
+        esp = self.fixture.work / "legacy-confirm-esp"
+        esp.mkdir()
+        subprocess.run([str(self.binary), "publish", str(self.payload), str(esp), fixtures.RELEASE],
+                       check=True, capture_output=True)
+        state = esp / "reliefos/state"
+        (state / "boot-health-v1").unlink()
+        (state / "kernel-A.health").unlink()
+        (state / ".update.lock").unlink()
+        slot = json.loads(subprocess.check_output([str(fixtures.KERNEL_TOOLS), "slot-select", str(esp)], text=True))
+        command = [str(self.binary), "confirm", str(self.payload), str(esp), "A", "1",
+                   fixtures.RELEASE, slot["initramfs_sha256"]]
+        wrong = command.copy()
+        wrong[5] = "2"
+        self.assertNotEqual(subprocess.run(wrong, capture_output=True).returncode, 0)
+        result = subprocess.run(command, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((state / ".update.lock").is_file())
+        self.assertFalse((state / "boot-health-v1").exists())
+        self.assertFalse((state / "kernel-A.health").exists())
+        self.assertEqual(subprocess.check_output([str(self.binary), "boot-status", str(esp)], text=True).strip(),
+                         "PROTOCOL=0 LATEST=A/1/1/0 CONFIRMED=A/1")
 
     def test_retained_root_package_restores_removed_apk_members_and_keeps_user_files(self):
         command = [str(self.binary), "retain", str(self.payload), fixtures.RELEASE]

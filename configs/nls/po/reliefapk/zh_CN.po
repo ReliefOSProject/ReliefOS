@@ -10,406 +10,494 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: userland/apps/reliefapk/window.cpp:531
+#: userland/apps/reliefapk/window.cpp:536
 msgid " · Offline"
 msgstr " · 离线"
 
-#: userland/apps/reliefapk/window.cpp:859
+#: userland/apps/reliefapk/window.cpp:903
 msgid " — executing\n"
 msgstr " — 正在执行\n"
 
-#: userland/apps/reliefapk/window.cpp:859
+#: userland/apps/reliefapk/window.cpp:902
+msgid " — preparing update plan\n"
+msgstr " — 准备更新计划\n"
+
+#: userland/apps/reliefapk/window.cpp:903
 msgid " — simulation\n"
 msgstr " — 模拟\n"
 
-#: userland/apps/reliefapk/window.cpp:530
+#: userland/apps/reliefapk/window.cpp:535
 #, c-format
 msgid "%zu packages shown · %zu total%s"
 msgstr "已显示 %zu 个软件包 · 共 %zu 个%s"
 
-#: userland/apps/reliefapk/window.cpp:768
+#: userland/apps/reliefapk/window.cpp:795
 #, c-format
 msgid "%zu pending changes. Review before applying."
 msgstr "有 %zu 项待处理更改。应用前请先检查。"
 
-#: userland/apps/reliefapk/window.cpp:313
+#: userland/apps/reliefapk/window.cpp:318
 msgid "&Help/About ReliefAPK"
 msgstr "&帮助/关于 ReliefAPK"
 
-#: userland/apps/reliefapk/window.cpp:312
+#: userland/apps/reliefapk/window.cpp:317
 msgid "&Help/How to use ReliefAPK"
 msgstr "&帮助/如何使用 ReliefAPK"
 
-#: userland/apps/reliefapk/window.cpp:291
+#: userland/apps/reliefapk/window.cpp:296
 msgid "&Package/Install"
 msgstr "&软件包/安装"
 
-#: userland/apps/reliefapk/window.cpp:296
+#: userland/apps/reliefapk/window.cpp:301
 msgid "&Package/Install by name or version..."
 msgstr "&软件包/按名称或版本安装..."
 
-#: userland/apps/reliefapk/window.cpp:297
+#: userland/apps/reliefapk/window.cpp:302
 msgid "&Package/Install local APK..."
 msgstr "&软件包/安装本地 APK..."
 
-#: userland/apps/reliefapk/window.cpp:298
+#: userland/apps/reliefapk/window.cpp:303
 msgid "&Package/Pending changes..."
 msgstr "&软件包/待处理更改..."
 
-#: userland/apps/reliefapk/window.cpp:299
+#: userland/apps/reliefapk/window.cpp:304
 msgid "&Package/Quit"
 msgstr "&软件包/退出"
 
-#: userland/apps/reliefapk/window.cpp:294
+#: userland/apps/reliefapk/window.cpp:299
 msgid "&Package/Reinstall"
 msgstr "&软件包/重新安装"
 
-#: userland/apps/reliefapk/window.cpp:292
+#: userland/apps/reliefapk/window.cpp:297
 msgid "&Package/Remove"
 msgstr "&软件包/删除"
 
-#: userland/apps/reliefapk/window.cpp:295
+#: userland/apps/reliefapk/window.cpp:300
 msgid "&Package/Repair"
 msgstr "&软件包/修复"
 
-#: userland/apps/reliefapk/window.cpp:293
+#: userland/apps/reliefapk/window.cpp:298
 msgid "&Package/Upgrade selected"
 msgstr "&软件包/升级所选"
 
-#: userland/apps/reliefapk/window.cpp:304
+#: userland/apps/reliefapk/window.cpp:309
 msgid "&Tools/Audit system files"
 msgstr "&工具/审计系统文件"
 
-#: userland/apps/reliefapk/window.cpp:306
+#: userland/apps/reliefapk/window.cpp:311
 msgid "&Tools/Clean cache..."
 msgstr "&工具/清理缓存..."
 
-#: userland/apps/reliefapk/window.cpp:305
+#: userland/apps/reliefapk/window.cpp:310
 msgid "&Tools/Compare versions..."
 msgstr "&工具/比较版本..."
 
-#: userland/apps/reliefapk/window.cpp:305
+#: userland/apps/reliefapk/window.cpp:310
 msgid "&Tools/Dependency graph (DOT)"
 msgstr "&工具/依赖关系图（DOT）"
 
-#: userland/apps/reliefapk/window.cpp:306
+#: userland/apps/reliefapk/window.cpp:311
 msgid "&Tools/Download cache..."
 msgstr "&工具/下载缓存..."
 
-#: userland/apps/reliefapk/window.cpp:303
+#: userland/apps/reliefapk/window.cpp:308
 msgid "&Tools/Download packages..."
 msgstr "&工具/下载软件包..."
 
-#: userland/apps/reliefapk/window.cpp:303
+#: userland/apps/reliefapk/window.cpp:308
 msgid "&Tools/Find file owner..."
 msgstr "&工具/查找文件所属软件包..."
 
-#: userland/apps/reliefapk/window.cpp:305
+#: userland/apps/reliefapk/window.cpp:310
 msgid "&Tools/Package checksums"
 msgstr "&工具/软件包校验和"
 
-#: userland/apps/reliefapk/window.cpp:304
+#: userland/apps/reliefapk/window.cpp:309
 msgid "&Tools/Package statistics"
 msgstr "&工具/软件包统计"
 
-#: userland/apps/reliefapk/window.cpp:301
+#: userland/apps/reliefapk/window.cpp:306
 msgid "&Tools/Preferences..."
 msgstr "&工具/首选项..."
 
-#: userland/apps/reliefapk/window.cpp:300
+#: userland/apps/reliefapk/window.cpp:305
 msgid "&Tools/Repositories..."
 msgstr "&工具/仓库..."
 
-#: userland/apps/reliefapk/window.cpp:306
+#: userland/apps/reliefapk/window.cpp:311
 msgid "&Tools/Trusted keys"
 msgstr "&工具/受信任的密钥"
 
-#: userland/apps/reliefapk/window.cpp:303
+#: userland/apps/reliefapk/window.cpp:308
 msgid "&Tools/Verify APK file..."
 msgstr "&工具/验证 APK 文件..."
 
-#: userland/apps/reliefapk/window.cpp:304
+#: userland/apps/reliefapk/window.cpp:309
 msgid "&Tools/World constraints"
 msgstr "&工具/world 约束"
 
-#: userland/apps/reliefapk/dialogs.cpp:364
+#: userland/apps/reliefapk/certificate_display.h:23
+msgid "A trusted OS recovery CA bundle is unavailable. Update the ReliefOS trust package or image."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:31
+msgid "APK left an updated CA bundle as .apk-new. Check the protected-path policy before treating this as an updated trust store."
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:384
 msgid "APK repositories"
 msgstr "APK 仓库"
 
-#: userland/apps/reliefapk/window.cpp:68
+#: userland/apps/reliefapk/certificate_display.h:34
+msgid "APK repository diagnostic redacted; check configured sources and TLS."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:35
+msgid "APK skipped an unavailable package or its output was incomplete; certificate repair failed."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:73
 msgid "About ReliefAPK"
 msgstr "关于 ReliefAPK"
 
-#: userland/apps/reliefapk/dialogs.cpp:197
+#: userland/apps/reliefapk/dialogs.cpp:217
 msgid "Absolute path of the file:"
 msgstr "文件的绝对路径："
 
-#: userland/apps/reliefapk/dialogs.cpp:402
+#: userland/apps/reliefapk/dialogs.cpp:422
 msgid "Add"
 msgstr "添加"
 
-#: userland/apps/fltk_support.h:48
+#: userland/apps/fltk_support.h:29
 msgid "Add to Favorites"
 msgstr "添加到收藏夹"
 
-#: userland/apps/reliefapk/dialogs.cpp:397
+#: userland/apps/reliefapk/dialogs.cpp:417
 msgid "Address:"
 msgstr "地址："
 
-#: userland/apps/reliefapk/dialogs.cpp:77
+#: userland/apps/reliefapk/dialogs.cpp:97
 msgid "Administrator authentication"
 msgstr "管理员身份验证"
 
-#: userland/apps/reliefapk/dialogs.cpp:298
+#: userland/apps/reliefapk/dialogs.cpp:318
 msgid "Administrator authentication:"
 msgstr "管理员身份验证："
 
-#: userland/apps/fltk_support.h:49
+#: userland/apps/fltk_support.h:30
 msgid "All Files (*)"
 msgstr "所有文件 (*)"
 
-#: userland/apps/reliefapk/window.cpp:340
+#: userland/apps/reliefapk/window.cpp:345
 msgid "All packages"
 msgstr "全部软件包"
 
-#: userland/apps/reliefapk/window.cpp:1115
+#: userland/apps/reliefapk/window.cpp:1196
 msgid "An operation is still running. Finish or cancel it in the operation window."
 msgstr "操作仍在运行。请在操作窗口中完成或取消。"
 
-#: userland/apps/reliefapk/window.cpp:864
+#: userland/apps/reliefapk/window.cpp:908
 msgid "Another operation is running."
 msgstr "另一个操作正在运行。"
 
-#: userland/apps/reliefapk/window.cpp:948
+#: userland/apps/reliefapk/window.cpp:1000
 msgid "Apply changes"
 msgstr "应用更改"
 
-#: userland/apps/reliefapk/window.cpp:683
+#: userland/apps/reliefapk/window.cpp:948
+msgid "Applying the reviewed system update..."
+msgstr "正在应用已审阅的系统更新…"
+
+#: userland/apps/reliefapk/window.cpp:688
 msgid "Architecture"
 msgstr "架构"
 
-#: userland/apps/reliefapk/window.cpp:164
+#: userland/apps/reliefapk/window.cpp:169
 msgid "Audit system files"
 msgstr "审计系统文件"
 
-#: userland/apps/reliefapk/dialogs.cpp:85
+#: userland/apps/reliefapk/dialogs.cpp:105
 msgid "Authenticate"
 msgstr "验证身份"
 
-#: userland/apps/reliefapk/window.cpp:268
+#: userland/apps/reliefapk/window.cpp:273
 msgid "Available"
 msgstr "可用"
 
-#: userland/apps/reliefapk/window.cpp:234
+#: userland/apps/reliefapk/window.cpp:239
 msgid "Available version"
 msgstr "可用版本"
 
-#: userland/apps/reliefapk/dialogs.cpp:301
+#: userland/apps/reliefapk/certificate_display.h:24
+msgid "CA RECOVERY PLAN: the system CA file is unusable. Apply will first restore the trusted OS CA bundle, preserving the old regular file in a private backup."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:51
+msgid "CA bundle changed during recovery; retry after checking the system state"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:38
+msgid "CA directory ownership or permissions are unsafe"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:37
+msgid "CA parent directories must be root-owned and not group/other writable or symlinks"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:41
+msgid "CA recovery directory ownership or permissions are unsafe"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:40
+msgid "CA trust file must be an owned regular file, not group/other writable, and at most 4 MiB"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:321
 msgid "Cache directory:"
 msgstr "缓存目录："
 
-#: userland/apps/fltk_support.h:44
+#: userland/apps/reliefapk/dialogs.cpp:103
 msgid "Cancel"
 msgstr "取消"
 
-#: userland/apps/reliefapk/window.cpp:1095
+#: userland/apps/reliefapk/window.cpp:1176
 msgid "Canceling..."
 msgstr "正在取消..."
 
-#: userland/apps/reliefapk/window.cpp:608
+#: userland/apps/reliefapk/certificate_display.h:44
+msgid "Cannot inspect the current CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:39
+msgid "Cannot inspect the current CA trust path"
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:613
 msgid "Cannot read package information."
 msgstr "无法读取软件包信息。"
 
-#: userland/apps/reliefapk/dialogs.cpp:148
+#: userland/apps/reliefapk/dialogs.cpp:168
 msgid "Cannot read world constraints."
 msgstr "无法读取 world 约束。"
 
-#: userland/apps/reliefapk/window.cpp:933
+#: userland/apps/reliefapk/window.cpp:985
 msgid "Cannot save the log."
 msgstr "无法保存日志。"
 
-#: userland/apps/reliefapk/dialogs.cpp:113
+#: userland/apps/reliefapk/dialogs.cpp:133
 msgid "Cannot send the password to the system authentication service."
 msgstr "无法将密码发送到系统身份验证服务。"
 
-#: userland/apps/reliefapk/window.cpp:596
+#: userland/apps/reliefapk/window.cpp:601
 msgid "Cannot start apk."
 msgstr "无法启动 apk。"
 
-#: userland/apps/reliefapk/window.cpp:505
+#: userland/apps/reliefapk/window.cpp:510
 msgid "Cannot start apk. Check that /sbin/apk is installed."
 msgstr "无法启动 apk。请检查是否已安装 /sbin/apk。"
 
-#: userland/apps/reliefapk/dialogs.cpp:590
+#: userland/apps/reliefapk/dialogs.cpp:611
 msgid "Cannot start the requested operation."
 msgstr "无法启动请求的操作。"
 
-#: userland/apps/reliefapk/window.cpp:1037
+#: userland/apps/reliefapk/window.cpp:1110
 msgid "Certificate recovery checked. Review the recovery plan and package output, then apply."
 msgstr "证书恢复检查完成。请查看恢复计划和软件包输出，然后应用。"
 
-#: userland/apps/reliefapk/dialogs.cpp:335
+#: userland/apps/reliefapk/dialogs.cpp:355
 msgid "Choose an absolute cache directory, or leave it empty."
 msgstr "请选择绝对路径的缓存目录，或留空。"
 
-#: userland/apps/reliefapk/window.cpp:156
+#: userland/apps/reliefapk/window.cpp:161
 msgid "Clean cache"
 msgstr "清理缓存"
 
-#: userland/apps/reliefapk/dialogs.cpp:228
+#: userland/apps/reliefapk/dialogs.cpp:248
 msgid "Clean unused apk cache entries?"
 msgstr "清理 apk 缓存中的未使用条目吗？"
 
-#: userland/apps/reliefapk/window.cpp:789
+#: userland/apps/reliefapk/window.cpp:816
 msgid "Clear all"
 msgstr "全部清除"
 
-#: userland/apps/reliefapk/window.cpp:946
+#: userland/apps/reliefapk/window.cpp:998
 msgid "Clear log"
 msgstr "清除日志"
 
-#: userland/apps/fltk_support.h:45
+#: userland/apps/reliefapk/dialogs.cpp:48
 msgid "Close"
 msgstr "关闭"
 
-#: userland/apps/reliefapk/window.cpp:180
+#: userland/apps/reliefapk/window.cpp:185
 msgid "Compare versions"
 msgstr "比较版本"
 
-#: userland/apps/reliefapk/window.cpp:1064
+#: userland/apps/reliefapk/window.cpp:1139
 msgid "Completed successfully."
 msgstr "已成功完成。"
 
-#: userland/apps/reliefapk/dialogs.cpp:365
+#: userland/apps/reliefapk/dialogs.cpp:385
 msgid "Config file:"
 msgstr "配置文件："
 
-#: userland/apps/reliefapk/dialogs.cpp:227
+#: userland/apps/reliefapk/dialogs.cpp:247
 msgid "Continue"
 msgstr "继续"
+
+#: userland/apps/reliefapk/certificate_display.h:52
+msgid "Could not atomically install the OS recovery CA bundle"
+msgstr ""
 
 #: userland/apps/fltk_png_app.h:46
 msgid "Could not decode image"
 msgstr "无法解码图像"
 
-#: userland/apps/fltk_support.h:57
+#: userland/apps/reliefapk/certificate_display.h:27
+msgid "Could not determine whether the system CA package is installed"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:46
+msgid "Could not prepare the complete OS recovery CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:48
+msgid "Could not preserve the complete previous CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:47
+msgid "Could not preserve the previous CA bundle"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:50
+msgid "Could not sync CA recovery files"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:49
+msgid "Could not sync the previous CA bundle backup"
+msgstr ""
+
+#: userland/apps/fltk_support.h:38
 msgid "Create a new directory"
 msgstr "创建新目录"
 
-#: userland/apps/fltk_support.h:50
+#: userland/apps/fltk_support.h:31
 msgid "Custom Filter"
 msgstr "自定义筛选器"
 
-#: userland/apps/reliefapk/window.cpp:172
+#: userland/apps/reliefapk/window.cpp:177
 msgid "Dependencies"
 msgstr "依赖项"
 
-#: userland/apps/reliefapk/window.cpp:182
+#: userland/apps/reliefapk/window.cpp:187
 msgid "Dependency graph (DOT)"
 msgstr "依赖关系图（DOT）"
 
-#: userland/apps/reliefapk/window.cpp:235
+#: userland/apps/reliefapk/window.cpp:240
 msgid "Description"
 msgstr "说明"
 
-#: userland/apps/reliefapk/window.cpp:355
+#: userland/apps/reliefapk/window.cpp:360
 msgid "Details"
 msgstr "详细信息"
 
-#: userland/apps/reliefapk/dialogs.cpp:155
+#: userland/apps/reliefapk/dialogs.cpp:175
 msgid "Directory"
 msgstr "目录"
 
-#: userland/apps/reliefapk/dialogs.cpp:383
+#: userland/apps/reliefapk/dialogs.cpp:403
 msgid "Discard changes"
 msgstr "放弃更改"
 
-#: userland/apps/reliefapk/dialogs.cpp:384
+#: userland/apps/reliefapk/dialogs.cpp:404
 msgid "Discard the unsaved repository changes?"
 msgstr "放弃未保存的仓库更改吗？"
 
-#: userland/apps/reliefapk/dialogs.cpp:446
+#: userland/apps/reliefapk/dialogs.cpp:466
 msgid "Down"
 msgstr "下移"
 
-#: userland/apps/reliefapk/window.cpp:158
+#: userland/apps/reliefapk/window.cpp:163
 msgid "Download cache"
 msgstr "下载缓存"
 
-#: userland/apps/reliefapk/dialogs.cpp:229
+#: userland/apps/reliefapk/dialogs.cpp:249
 msgid "Download missing packages into the apk cache?"
 msgstr "将缺少的软件包下载到 apk 缓存吗？"
 
-#: userland/apps/reliefapk/dialogs.cpp:190
+#: userland/apps/reliefapk/dialogs.cpp:210
 msgid "Download package dependencies as well?"
 msgstr "同时下载软件包的依赖项吗？"
 
-#: userland/apps/reliefapk/window.cpp:160
+#: userland/apps/reliefapk/window.cpp:165
 msgid "Download packages"
 msgstr "下载软件包"
 
-#: userland/apps/reliefapk/dialogs.cpp:179
+#: userland/apps/reliefapk/dialogs.cpp:199
 msgid "Download packages to"
 msgstr "下载软件包到"
 
-#: userland/apps/reliefapk/dialogs.cpp:400
+#: userland/apps/reliefapk/dialogs.cpp:420
 msgid "Enabled"
 msgstr "已启用"
 
-#: userland/apps/reliefapk/dialogs.cpp:95
+#: userland/apps/reliefapk/dialogs.cpp:115
 msgid "Enter the root password to authorize this operation."
 msgstr "输入 root 密码以授权此操作。"
 
-#: userland/apps/reliefapk/dialogs.cpp:96
+#: userland/apps/reliefapk/dialogs.cpp:116
 #, c-format
 msgid "Enter the sudo password for %s."
 msgstr "请输入用户 %s 的 sudo 密码。"
 
-#: userland/apps/fltk_support.h:52
+#: userland/apps/reliefapk/certificate_display.h:45
+msgid "Existing CA bundle must be an owned regular file of at most 4 MiB"
+msgstr ""
+
+#: userland/apps/fltk_support.h:33
 msgid "Favorites"
 msgstr "收藏夹"
 
-#: userland/apps/fltk_support.h:54
+#: userland/apps/fltk_support.h:35
 msgid "File Systems"
 msgstr "文件系统"
 
-#: userland/apps/fltk_support.h:53
+#: userland/apps/fltk_support.h:34
 msgid "File name:"
 msgstr "文件名："
 
-#: userland/apps/reliefapk/window.cpp:170
+#: userland/apps/reliefapk/window.cpp:175
 msgid "Files"
 msgstr "文件"
 
-#: userland/apps/reliefapk/window.cpp:328
+#: userland/apps/reliefapk/window.cpp:333
 msgid "Filter package names and descriptions (Ctrl+F)"
 msgstr "按软件包名称和说明筛选（Ctrl+F）"
 
-#: userland/apps/reliefapk/window.cpp:176
+#: userland/apps/reliefapk/window.cpp:181
 msgid "Find file owner"
 msgstr "查找文件所属软件包"
 
-#: userland/apps/reliefapk/dialogs.cpp:129
+#: userland/apps/reliefapk/dialogs.cpp:149
 msgid "Finish or close the current operation first."
 msgstr "请先完成或关闭当前操作。"
 
-#: userland/apps/reliefapk/dialogs.cpp:202
+#: userland/apps/reliefapk/dialogs.cpp:222
 msgid "First version:"
 msgstr "第一个版本："
 
-#: userland/apps/reliefapk/window.cpp:685
+#: userland/apps/reliefapk/window.cpp:690
 msgid "Home page"
 msgstr "主页"
 
-#: userland/apps/reliefapk/dialogs.cpp:189
+#: userland/apps/reliefapk/dialogs.cpp:209
 msgid "Include dependencies"
 msgstr "包含依赖项"
 
-#: userland/apps/reliefapk/dialogs.cpp:297
+#: userland/apps/reliefapk/dialogs.cpp:317
 msgid "Index cache age (minutes):"
 msgstr "索引缓存有效期（分钟）："
 
-#: userland/apps/reliefapk/dialogs.cpp:329
+#: userland/apps/reliefapk/dialogs.cpp:349
 msgid "Index cache age must be between 0 and 10080 minutes."
 msgstr "索引缓存有效期必须在 0 至 10080 分钟之间。"
 
@@ -417,483 +505,45 @@ msgstr "索引缓存有效期必须在 0 至 10080 分钟之间。"
 msgid "Input is too long"
 msgstr "输入内容过长"
 
-#: userland/apps/reliefapk/window.cpp:142
+#: userland/apps/reliefapk/window.cpp:147
 msgid "Install"
 msgstr "安装"
 
-#: userland/apps/reliefapk/window.cpp:322
+#: userland/apps/reliefapk/window.cpp:327
 msgid "Install local APK"
 msgstr "安装本地 APK"
 
-#: userland/apps/reliefapk/window.cpp:268
+#: userland/apps/reliefapk/window.cpp:273
 msgid "Installed"
 msgstr "已安装"
 
-#: userland/apps/reliefapk/window.cpp:688
+#: userland/apps/reliefapk/window.cpp:693
 msgid "Installed size"
 msgstr "已安装大小"
 
-#: userland/apps/reliefapk/window.cpp:234
+#: userland/apps/reliefapk/window.cpp:239
 msgid "Installed version"
 msgstr "已安装版本"
 
-#: userland/apps/reliefapk/dialogs.cpp:340
+#: userland/apps/reliefapk/dialogs.cpp:360
 msgid "Invalid cache directory."
 msgstr "缓存目录无效。"
 
-#: userland/apps/reliefapk/window.cpp:719
+#: userland/apps/reliefapk/window.cpp:746
 msgid "Invalid package name, constraint or APK path."
 msgstr "软件包名称、约束或 APK 路径无效。"
 
-#: userland/apps/reliefapk/dialogs.cpp:407
-msgid "Invalid repository address or tag."
-msgstr "仓库地址或标签无效。"
-
-#: userland/apps/reliefapk/dialogs.cpp:302
-msgid "Leave empty to use the system apk cache."
-msgstr "留空则使用系统 apk 缓存。"
-
-#: userland/apps/reliefapk/window.cpp:684
-msgid "License"
-msgstr "许可证"
-
-#: userland/apps/reliefapk/window.cpp:402
-msgid "Loading installed packages..."
-msgstr "正在加载已安装的软件包..."
-
-#: userland/apps/fltk_support.h:55
-msgid "Manage Favorites"
-msgstr "管理收藏夹"
-
-#: userland/apps/reliefapk/dialogs.cpp:296
-msgid "Network timeout (seconds):"
-msgstr "网络超时（秒）："
-
-#: userland/apps/reliefapk/dialogs.cpp:324
-msgid "Network timeout must be between 1 and 600 seconds."
-msgstr "网络超时必须在 1 至 600 秒之间。"
-
-#: userland/apps/fltk_support.h:56
-msgid "New Directory?"
-msgstr "新建目录？"
-
-#: userland/apps/fltk_support.h:47
-msgid "No"
-msgstr "否"
-
-#: userland/apps/reliefapk/window.cpp:652
-msgid "No package details available."
-msgstr "没有可用的软件包详情。"
-
-#: userland/apps/reliefapk/window.cpp:193
-msgid "None"
-msgstr "无"
-
-#: userland/apps/fltk_support.h:43
-msgid "OK"
-msgstr "确定"
-
-#: userland/apps/reliefapk/dialogs.cpp:295
-msgid "Offline: use installed packages and cached indexes only"
-msgstr "离线：仅使用已安装的软件包和缓存的索引"
-
-#: userland/apps/reliefapk/dialogs.cpp:189
-msgid "Only selected"
-msgstr "仅下载所选软件包"
-
-#: userland/apps/reliefapk/window.cpp:1020
-msgid "Operation failed. Review the output below."
-msgstr "操作失败。请查看下方输出。"
-
-#: userland/apps/reliefapk/window.cpp:1025
-msgid "Operation failed; remaining changes were not executed."
-msgstr "操作失败；其余更改未执行。"
-
-#: userland/apps/reliefapk/window.cpp:833
-msgid ""
-"Operations run in the order shown. Separate apk transactions are checked again before execution.\n"
-"\n"
+#: userland/apps/reliefapk/certificate_display.h:22
+msgid "Invalid privileged apk request"
 msgstr ""
-"操作将按所示顺序执行。每个独立的 apk 事务都会在执行前再次检查。\n"
-"\n"
-
-#: userland/apps/reliefapk/dialogs.cpp:399
-msgid "Optional repository tag, without @"
-msgstr "可选仓库标签，不含 @"
-
-#: userland/apps/reliefapk/window.cpp:341
-msgid "Orphaned"
-msgstr "孤立软件包"
-
-#: userland/apps/reliefapk/window.cpp:498
-msgid "Out of memory"
-msgstr "内存不足"
-
-#: userland/apps/reliefapk/window.cpp:234
-msgid "Package"
-msgstr "软件包"
-
-#: userland/apps/reliefapk/window.cpp:184
-msgid "Package checksums"
-msgstr "软件包校验和"
-
-#: userland/apps/reliefapk/window.cpp:60
-msgid "Package name, version constraint or repository tag:"
-msgstr "软件包名称、版本约束或仓库标签："
-
-#: userland/apps/reliefapk/dialogs.cpp:214
-msgid "Package name:"
-msgstr "软件包名称："
-
-#: userland/apps/reliefapk/dialogs.cpp:183
-msgid "Package names or version constraints, separated by spaces:"
-msgstr "软件包名称或版本约束，多个条目以空格分隔："
-
-#: userland/apps/reliefapk/window.cpp:607
-msgid "Package query"
-msgstr "软件包查询"
-
-#: userland/apps/reliefapk/window.cpp:605
-msgid "Package query failed. Refresh indexes or check the operation log."
-msgstr "软件包查询失败。请刷新索引或查看操作日志。"
-
-#: userland/apps/reliefapk/window.cpp:166
-msgid "Package statistics"
-msgstr "软件包统计"
-
-#: userland/apps/reliefapk/dialogs.cpp:82
-msgid "Password:"
-msgstr "密码："
-
-#: userland/apps/reliefapk/window.cpp:773
-msgid "Pending changes"
-msgstr "待处理更改"
-
-#: userland/apps/reliefapk/window.cpp:757
-#, c-format
-msgid "Pending changes (%zu)"
-msgstr "待处理更改（%zu）"
-
-#: userland/apps/reliefapk/window.cpp:324
-msgid "Pending changes (0)"
-msgstr "待处理更改（0）"
-
-#: userland/apps/fltk_support.h:51
-msgid "Please choose an existing file!"
-msgstr "请选择已存在的文件！"
-
-#: userland/apps/reliefapk/window.cpp:890
-msgid "Please wait"
-msgstr "请稍候"
-
-#: userland/apps/reliefapk/window.cpp:355
-msgid "Policy"
-msgstr "策略"
-
-#: userland/apps/fltk_support.h:58
-msgid "Preview"
-msgstr "预览"
-
-#: userland/apps/reliefapk/window.cpp:799
-msgid "Preview changes"
-msgstr "预览更改"
-
-#: userland/apps/reliefapk/window.cpp:692
-msgid "Provides"
-msgstr "提供项"
-
-#: userland/apps/reliefapk/window.cpp:594
-msgid "Reading package details..."
-msgstr "正在读取软件包详情..."
-
-#: userland/apps/reliefapk/window.cpp:508
-msgid "Reading packages..."
-msgstr "正在读取软件包..."
-
-#: userland/apps/reliefapk/window.cpp:314
-msgid "Refresh"
-msgstr "刷新"
-
-#: userland/apps/reliefapk/window.cpp:154
-msgid "Refresh indexes"
-msgstr "刷新索引"
-
-#: userland/apps/reliefapk/window.cpp:315
-msgid "Refresh the displayed package list (F5)"
-msgstr "刷新显示的软件包列表（F5）"
-
-#: userland/apps/reliefapk/window.cpp:148
-msgid "Reinstall"
-msgstr "重新安装"
-
-#: userland/apps/reliefapk/window.cpp:50
-msgid "ReliefAPK help"
-msgstr "ReliefAPK 帮助"
-
-#: userland/apps/reliefapk/dialogs.cpp:293
-msgid "ReliefAPK preferences"
-msgstr "ReliefAPK 首选项"
-
-#: userland/apps/reliefapk/window.cpp:69
-msgid ""
-"ReliefAPK\n"
-"Graphical front end for Alpine Package Keeper\n"
-"\n"
-"C++ / FLTK — ReliefOS\n"
-"Package queries and transactions are performed by the system apk command."
-msgstr ""
-"ReliefAPK\n"
-"Alpine Package Keeper 图形前端\n"
-"\n"
-"C++ / FLTK — ReliefOS\n"
-"软件包查询和事务均由系统 apk 命令执行。"
-
-#: userland/apps/reliefapk/dialogs.cpp:457
-msgid "Reload"
-msgstr "重新加载"
-
-#: userland/apps/reliefapk/dialogs.cpp:432
-msgid "Remove"
-msgstr "删除"
-
-#: userland/apps/reliefapk/window.cpp:777
-msgid "Remove selected"
-msgstr "删除所选"
-
-#: userland/apps/reliefapk/window.cpp:150
-msgid "Repair"
-msgstr "修复"
-
-#: userland/apps/reliefapk/window.cpp:140
-msgid "Repair/update system certificates"
-msgstr "修复或更新系统证书"
-
-#: userland/apps/reliefapk/window.cpp:686
-msgid "Repository"
-msgstr "仓库"
-
-#: userland/apps/reliefapk/dialogs.cpp:561
-msgid "Repository configuration is too large."
-msgstr "仓库配置过大。"
-
-#: userland/apps/reliefapk/window.cpp:168
-msgid "Repository policy"
-msgstr "仓库策略"
-
-#: userland/apps/reliefapk/window.cpp:174
-msgid "Reverse dependencies"
-msgstr "反向依赖项"
-
-#: userland/apps/reliefapk/window.cpp:832
-msgid "Review package changes"
-msgstr "检查软件包更改"
-
-#: userland/apps/reliefapk/window.cpp:898
-msgid "Running apk..."
-msgstr "正在运行 apk..."
-
-#: userland/apps/fltk_support.h:59
-msgid "Save"
-msgstr "保存"
-
-#: userland/apps/reliefapk/dialogs.cpp:466
-msgid "Save changes"
-msgstr "保存更改"
-
-#: userland/apps/reliefapk/window.cpp:924
-msgid "Save log..."
-msgstr "保存日志..."
-
-#: userland/apps/reliefapk/window.cpp:928
-msgid "Save operation log"
-msgstr "保存操作日志"
-
-#: userland/apps/reliefapk/dialogs.cpp:573
-msgid "Save repositories"
-msgstr "保存仓库"
-
-#: userland/apps/reliefapk/dialogs.cpp:586
-msgid "Saving repositories..."
-msgstr "正在保存仓库..."
-
-#: userland/apps/reliefapk/dialogs.cpp:574
-msgid "Saving repository configuration. The previous file is kept as .reliefapk.bak.\n"
-msgstr "正在保存仓库配置。原文件会保留为 .reliefapk.bak。\n"
-
-#: userland/apps/reliefapk/window.cpp:51
-msgid ""
-"Search by package name or description. Select one or more packages, choose an operation, then review the pending changes.\n"
-"\n"
-"Preview runs apk --simulate. Apply executes the changes in the displayed order. Each operation is checked again before execution.\n"
-"\n"
-"Refresh indexes after changing repositories or when available packages are missing. Installed packages remain available offline.\n"
-"\n"
-"Administrator operations use your system sudo or root authentication policy. Passwords are never saved.\n"
-"\n"
-"Ctrl+F: search    F5: refresh list    Ctrl+Enter: preview changes"
-msgstr ""
-"按软件包名称或说明搜索。选择一个或多个软件包，选择操作，然后查看待处理的更改。\n"
-"\n"
-"预览会运行 apk --simulate。应用会按显示的顺序执行更改。每项操作在执行前都会再次检查。\n"
-"\n"
-"更改仓库后，或找不到可用软件包时，请刷新索引。已安装的软件包仍可离线使用。\n"
-"\n"
-"需要管理员权限的操作会遵循系统的 sudo 或 root 身份验证策略。密码不会保存。\n"
-"\n"
-"Ctrl+F：搜索    F5：刷新列表    Ctrl+Enter：预览更改"
-
-#: userland/apps/reliefapk/window.cpp:326
-msgid "Search:"
-msgstr "搜索："
-
-#: userland/apps/reliefapk/dialogs.cpp:206
-msgid "Second version:"
-msgstr "第二个版本："
-
-#: userland/apps/reliefapk/dialogs.cpp:192
-msgid "Select APK package"
-msgstr "选择 APK 软件包"
-
-#: userland/apps/reliefapk/window.cpp:552
-msgid "Select a package to view its details."
-msgstr "选择一个软件包以查看详情。"
-
-#: userland/apps/reliefapk/window.cpp:742
-msgid "Select one or more packages first."
-msgstr "请先选择一个或多个软件包。"
-
-#: userland/apps/fltk_support.h:61
-msgid "Show hidden files"
-msgstr "显示隐藏文件"
-
-#: userland/apps/fltk_support.h:60
-msgid "Show:"
-msgstr "显示："
-
-#: userland/apps/reliefapk/window.cpp:897
-msgid "Simulating changes..."
-msgstr "正在模拟更改..."
-
-#: userland/apps/reliefapk/window.cpp:1038
-msgid "Simulation completed. Review the output, then apply."
-msgstr "模拟已完成。请查看输出后再应用。"
-
-#: userland/apps/reliefapk/window.cpp:235
-msgid "Size"
-msgstr "大小"
-
-#: userland/apps/reliefapk/window.cpp:639
-msgid "Some repository indexes are unavailable. Refresh indexes to see all packages."
-msgstr "部分仓库索引不可用。请刷新索引以查看全部软件包。"
-
-#: userland/apps/reliefapk/window.cpp:234
-msgid "Status"
-msgstr "状态"
-
-#: userland/apps/reliefapk/dialogs.cpp:398
-msgid "Tag:"
-msgstr "标签："
-
-#: userland/apps/reliefapk/window.cpp:818
-msgid "There are no pending changes."
-msgstr "没有待处理的更改。"
-
-#: userland/apps/reliefapk/window.cpp:872
-msgid "Too many packages in one operation."
-msgstr "单次操作中的软件包过多。"
-
-#: userland/apps/reliefapk/window.cpp:186
-msgid "Trusted keys"
-msgstr "受信任的密钥"
-
-#: userland/apps/reliefapk/dialogs.cpp:444
-msgid "Up"
-msgstr "上级"
-
-#: userland/apps/reliefapk/dialogs.cpp:415
-msgid "Update entry"
-msgstr "更新条目"
-
-#: userland/apps/reliefapk/window.cpp:340
-msgid "Upgradable"
-msgstr "可升级"
-
-#: userland/apps/reliefapk/window.cpp:146
-msgid "Upgrade selected"
-msgstr "升级所选"
-
-#: userland/apps/reliefapk/window.cpp:152
-msgid "Upgrade system"
-msgstr "升级系统"
-
-#: userland/apps/reliefapk/window.cpp:162
-msgid "Verify APK file"
-msgstr "验证 APK 文件"
-
-#: userland/apps/reliefapk/window.cpp:681
-msgid "Version"
-msgstr "版本"
-
-#: userland/apps/reliefapk/dialogs.cpp:448
-msgid "View source"
-msgstr "查看源文件"
-
-#: userland/apps/reliefapk/dialogs.cpp:102
-msgid "Waiting for administrator authentication..."
-msgstr "正在等待管理员身份验证..."
-
-#: userland/apps/reliefapk/dialogs.cpp:146
-msgid "World constraints"
-msgstr "world 约束"
-
-#: userland/apps/reliefapk/window.cpp:340
-msgid "World packages and dependencies"
-msgstr "world 包及依赖"
-
-#: userland/apps/fltk_support.h:46
-msgid "Yes"
-msgstr "是"
-
-#: userland/apps/reliefapk/window.cpp:1081
-msgid ""
-"\n"
-"Applying the reviewed operations...\n"
-msgstr ""
-"\n"
-"正在应用已检查的操作...\n"
-
-#: userland/apps/reliefapk/window.cpp:900
-msgid ""
-"\n"
-"Cannot start the requested operation.\n"
-msgstr ""
-"\n"
-"无法启动请求的操作。\n"
-
-#: userland/apps/reliefapk/window.cpp:1011
-#, c-format
-msgid ""
-"\n"
-"Exit status: %d\n"
-msgstr ""
-"\n"
-"退出状态：%d\n"
-
-#: userland/apps/reliefapk/window.cpp:1097
-msgid "apk is applying changes. Wait for it to finish before closing."
-msgstr "apk 正在应用更改。请等待其完成后再关闭。"
-
-#: userland/apps/reliefapk/dialogs.cpp:300
-msgid "su — root password"
-msgstr "su — root 密码"
-
-#: userland/apps/reliefapk/dialogs.cpp:299
-msgid "sudo — current user's password"
-msgstr "sudo — 当前用户密码"
 
 #: configs/nls/messages/reliefapk.c:5
 msgid "Invalid repository address or tag"
 msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:427
+msgid "Invalid repository address or tag."
+msgstr "仓库地址或标签无效。"
 
 #: configs/nls/messages/reliefapk.c:6
 msgid "Invalid repository file"
@@ -907,6 +557,82 @@ msgstr ""
 msgid "JSON package object exceeds depth limit"
 msgstr ""
 
+#: userland/apps/reliefapk/dialogs.cpp:322
+msgid "Leave empty to use the system apk cache."
+msgstr "留空则使用系统 apk 缓存。"
+
+#: userland/apps/reliefapk/window.cpp:689
+msgid "License"
+msgstr "许可证"
+
+#: userland/apps/reliefapk/window.cpp:407
+msgid "Loading installed packages..."
+msgstr "正在加载已安装的软件包..."
+
+#: userland/apps/fltk_support.h:36
+msgid "Manage Favorites"
+msgstr "管理收藏夹"
+
+#: userland/apps/reliefapk/dialogs.cpp:316
+msgid "Network timeout (seconds):"
+msgstr "网络超时（秒）："
+
+#: userland/apps/reliefapk/dialogs.cpp:344
+msgid "Network timeout must be between 1 and 600 seconds."
+msgstr "网络超时必须在 1 至 600 秒之间。"
+
+#: userland/apps/fltk_support.h:37
+msgid "New Directory?"
+msgstr "新建目录？"
+
+#: userland/apps/fltk_support.h:28
+msgid "No"
+msgstr "否"
+
+#: userland/apps/reliefapk/window.cpp:657
+msgid "No package details available."
+msgstr "没有可用的软件包详情。"
+
+#: userland/apps/reliefapk/window.cpp:198
+msgid "None"
+msgstr "无"
+
+#: userland/apps/fltk_support.h:24
+msgid "OK"
+msgstr "确定"
+
+#: userland/apps/reliefapk/certificate_display.h:69
+msgid "OS CA baseline restored atomically; previous file backup: "
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:53
+msgid "OS CA bundle was restored, but directory synchronization failed"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:68
+msgid "OS CA recovery failed: "
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:43
+msgid "OS recovery CA bundle has no usable certificates"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:42
+msgid "OS recovery CA bundle is empty or too large"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:315
+msgid "Offline: use installed packages and cached indexes only"
+msgstr "离线：仅使用已安装的软件包和缓存的索引"
+
+#: userland/apps/reliefapk/certificate_display.h:26
+msgid "Online package simulation is deferred until trust is restored. The authenticated worker will then check signed repositories, simulate and repair ca-certificates and ca-certificates-bundle together."
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:209
+msgid "Only selected"
+msgstr "仅下载所选软件包"
+
 #: configs/nls/messages/reliefapk.c:9
 msgid "Open cache directory"
 msgstr ""
@@ -915,9 +641,192 @@ msgstr ""
 msgid "Open repositories"
 msgstr ""
 
+#: userland/apps/reliefapk/window.cpp:1091
+msgid "Operation failed. Review the output below."
+msgstr "操作失败。请查看下方输出。"
+
+#: userland/apps/reliefapk/window.cpp:1096
+msgid "Operation failed; remaining changes were not executed."
+msgstr "操作失败；其余更改未执行。"
+
+#: userland/apps/reliefapk/window.cpp:872
+msgid ""
+"Operations run in the order shown. Separate apk transactions are checked again before execution.\n"
+"\n"
+msgstr ""
+"操作将按所示顺序执行。每个独立的 apk 事务都会在执行前再次检查。\n"
+"\n"
+
+#: userland/apps/reliefapk/dialogs.cpp:419
+msgid "Optional repository tag, without @"
+msgstr "可选仓库标签，不含 @"
+
+#: userland/apps/reliefapk/window.cpp:346
+msgid "Orphaned"
+msgstr "孤立软件包"
+
+#: userland/apps/reliefapk/window.cpp:503
+msgid "Out of memory"
+msgstr "内存不足"
+
+#: userland/apps/reliefapk/window.cpp:239
+msgid "Package"
+msgstr "软件包"
+
+#: userland/apps/reliefapk/window.cpp:189
+msgid "Package checksums"
+msgstr "软件包校验和"
+
+#: userland/apps/reliefapk/window.cpp:65
+msgid "Package name, version constraint or repository tag:"
+msgstr "软件包名称、版本约束或仓库标签："
+
+#: userland/apps/reliefapk/dialogs.cpp:234
+msgid "Package name:"
+msgstr "软件包名称："
+
+#: userland/apps/reliefapk/dialogs.cpp:203
+msgid "Package names or version constraints, separated by spaces:"
+msgstr "软件包名称或版本约束，多个条目以空格分隔："
+
+#: userland/apps/reliefapk/window.cpp:612
+msgid "Package query"
+msgstr "软件包查询"
+
+#: userland/apps/reliefapk/window.cpp:610
+msgid "Package query failed. Refresh indexes or check the operation log."
+msgstr "软件包查询失败。请刷新索引或查看操作日志。"
+
+#: userland/apps/reliefapk/window.cpp:171
+msgid "Package statistics"
+msgstr "软件包统计"
+
+#: userland/apps/reliefapk/dialogs.cpp:102
+msgid "Password:"
+msgstr "密码："
+
+#: userland/apps/reliefapk/window.cpp:800
+msgid "Pending changes"
+msgstr "待处理更改"
+
+#: userland/apps/reliefapk/window.cpp:784
+#, c-format
+msgid "Pending changes (%zu)"
+msgstr "待处理更改（%zu）"
+
+#: userland/apps/reliefapk/window.cpp:329
+msgid "Pending changes (0)"
+msgstr "待处理更改（0）"
+
+#: userland/apps/fltk_support.h:32
+msgid "Please choose an existing file!"
+msgstr "请选择已存在的文件！"
+
+#: userland/apps/reliefapk/window.cpp:939
+msgid "Please wait"
+msgstr "请稍候"
+
+#: userland/apps/reliefapk/window.cpp:360
+msgid "Policy"
+msgstr "策略"
+
+#: userland/apps/reliefapk/window.cpp:870
+msgid "Preparing a verified system update plan. Administrator authentication permits downloading and saving the plan; installed packages are changed only after you apply it.\n\n"
+msgstr "正在准备经过验证的系统更新计划。管理员认证仅授权下载并保存计划；点击应用后才会更改已安装的软件包。\n\n"
+
+#: userland/apps/reliefapk/window.cpp:947
+msgid "Preparing system update..."
+msgstr "正在准备系统更新…"
+
+#: userland/apps/fltk_support.h:39
+msgid "Preview"
+msgstr "预览"
+
+#: userland/apps/reliefapk/window.cpp:826
+msgid "Preview changes"
+msgstr "预览更改"
+
+#: userland/apps/reliefapk/window.cpp:697
+msgid "Provides"
+msgstr "提供项"
+
 #: configs/nls/messages/reliefapk.c:11
 msgid "Read repositories"
 msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:599
+msgid "Reading package details..."
+msgstr "正在读取软件包详情..."
+
+#: userland/apps/reliefapk/window.cpp:513
+msgid "Reading packages..."
+msgstr "正在读取软件包..."
+
+#: userland/apps/reliefapk/window.cpp:319
+msgid "Refresh"
+msgstr "刷新"
+
+#: userland/apps/reliefapk/window.cpp:159
+msgid "Refresh indexes"
+msgstr "刷新索引"
+
+#: userland/apps/reliefapk/window.cpp:320
+msgid "Refresh the displayed package list (F5)"
+msgstr "刷新显示的软件包列表（F5）"
+
+#: userland/apps/reliefapk/certificate_display.h:29
+msgid "Refresh the two world requests as plain package names without version/tag constraints, then reinstall both so source certificates and generated output agree. Other world requests are preserved."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:153
+msgid "Reinstall"
+msgstr "重新安装"
+
+#: userland/apps/reliefapk/window.cpp:53
+msgid "ReliefAPK help"
+msgstr "ReliefAPK 帮助"
+
+#: userland/apps/reliefapk/dialogs.cpp:313
+msgid "ReliefAPK preferences"
+msgstr "ReliefAPK 首选项"
+
+#: userland/apps/reliefapk/window.cpp:74
+msgid ""
+"ReliefAPK\n"
+"Graphical front end for Alpine Package Keeper\n"
+"\n"
+"C++ / FLTK — ReliefOS\n"
+"Package queries and transactions are performed by the system apk command."
+msgstr ""
+"ReliefAPK\n"
+"Alpine Package Keeper 图形前端\n"
+"\n"
+"C++ / FLTK — ReliefOS\n"
+"软件包查询和事务均由系统 apk 命令执行。"
+
+#: userland/apps/reliefapk/dialogs.cpp:477
+msgid "Reload"
+msgstr "重新加载"
+
+#: userland/apps/reliefapk/dialogs.cpp:452
+msgid "Remove"
+msgstr "删除"
+
+#: userland/apps/reliefapk/window.cpp:804
+msgid "Remove selected"
+msgstr "删除所选"
+
+#: userland/apps/reliefapk/window.cpp:155
+msgid "Repair"
+msgstr "修复"
+
+#: userland/apps/reliefapk/certificate_display.h:28
+msgid "Repair targets: ca-certificates and ca-certificates-bundle (package signatures and TLS verification required)."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:145
+msgid "Repair/update system certificates"
+msgstr "修复或更新系统证书"
 
 #: configs/nls/messages/reliefapk.c:12
 msgid "Replace repositories"
@@ -927,21 +836,153 @@ msgstr ""
 msgid "Repositories changed outside ReliefAPK. Reload before saving."
 msgstr ""
 
+#: userland/apps/reliefapk/window.cpp:691
+msgid "Repository"
+msgstr "仓库"
+
 #: configs/nls/messages/reliefapk.c:14
 msgid "Repository configuration is too large"
 msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:582
+msgid "Repository configuration is too large."
+msgstr "仓库配置过大。"
 
 #: configs/nls/messages/reliefapk.c:15
 msgid "Repository path too long"
 msgstr ""
 
+#: userland/apps/reliefapk/window.cpp:173
+msgid "Repository policy"
+msgstr "仓库策略"
+
+#: userland/apps/reliefapk/window.cpp:179
+msgid "Reverse dependencies"
+msgstr "反向依赖项"
+
+#: userland/apps/reliefapk/window.cpp:868
+msgid "Review package changes"
+msgstr "检查软件包更改"
+
+#: userland/apps/reliefapk/window.cpp:740
+msgid "Review system upgrades separately from other pending package operations."
+msgstr "请将系统升级与其他待处理的软件包操作分别审阅。"
+
+#: userland/apps/reliefapk/certificate_display.h:21
+msgid "Root authentication required"
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:20
+msgid "Root authentication required for certificate repair"
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:950
+msgid "Running apk..."
+msgstr "正在运行 apk..."
+
+#: userland/apps/reliefapk/dialogs.cpp:325
+msgid "Save"
+msgstr "保存"
+
 #: configs/nls/messages/reliefapk.c:16
 msgid "Save backup"
 msgstr ""
 
+#: userland/apps/reliefapk/dialogs.cpp:486
+msgid "Save changes"
+msgstr "保存更改"
+
+#: userland/apps/reliefapk/window.cpp:976
+msgid "Save log..."
+msgstr "保存日志..."
+
+#: userland/apps/reliefapk/window.cpp:980
+msgid "Save operation log"
+msgstr "保存操作日志"
+
+#: userland/apps/reliefapk/dialogs.cpp:594
+msgid "Save repositories"
+msgstr "保存仓库"
+
+#: userland/apps/reliefapk/dialogs.cpp:607
+msgid "Saving repositories..."
+msgstr "正在保存仓库..."
+
+#: userland/apps/reliefapk/dialogs.cpp:595
+msgid "Saving repository configuration. The previous file is kept as .reliefapk.bak.\n"
+msgstr "正在保存仓库配置。原文件会保留为 .reliefapk.bak。\n"
+
+#: userland/apps/reliefapk/window.cpp:54
+msgid "Search by package name or description. Select one or more packages, choose an operation, then review the pending changes.\n\nPreview runs apk --simulate. Apply executes the changes in the displayed order. Each operation is checked again before execution. System upgrades use the native ReliefOS updater to prepare a verified plan, then apply that exact plan. Review system upgrades separately from other package operations.\n\nRefresh indexes after changing repositories or when available packages are missing. Installed packages remain available offline.\n\nAdministrator operations use your system sudo or root authentication policy. Passwords are never saved.\n\nCtrl+F: search    F5: refresh list    Ctrl+Enter: preview changes"
+msgstr "按软件包名称或描述搜索。选择一个或多个软件包及其操作，然后审阅待处理更改。\n\n预览使用 apk --simulate。应用时按显示的顺序执行更改，每项操作执行前会再次检查。系统升级由 ReliefOS 原生更新器准备经过验证的计划，再应用同一份计划。请将系统升级与其他软件包操作分别审阅。\n\n更改软件源或缺少可用软件包时，请刷新索引。离线时仍可查看已安装的软件包。\n\n管理员操作使用系统的 sudo 或 root 认证策略，不会保存密码。\n\nCtrl+F：搜索    F5：刷新列表    Ctrl+Enter：预览更改"
+
+#: userland/apps/reliefapk/window.cpp:331
+msgid "Search:"
+msgstr "搜索："
+
+#: userland/apps/reliefapk/dialogs.cpp:226
+msgid "Second version:"
+msgstr "第二个版本："
+
+#: userland/apps/reliefapk/dialogs.cpp:212
+msgid "Select APK package"
+msgstr "选择 APK 软件包"
+
+#: userland/apps/reliefapk/window.cpp:557
+msgid "Select a package to view its details."
+msgstr "选择一个软件包以查看详情。"
+
+#: userland/apps/reliefapk/window.cpp:769
+msgid "Select one or more packages first."
+msgstr "请先选择一个或多个软件包。"
+
+#: userland/apps/fltk_support.h:42
+msgid "Show hidden files"
+msgstr "显示隐藏文件"
+
+#: userland/apps/fltk_support.h:41
+msgid "Show:"
+msgstr "显示："
+
+#: userland/apps/reliefapk/window.cpp:949
+msgid "Simulating changes..."
+msgstr "正在模拟更改..."
+
+#: userland/apps/reliefapk/window.cpp:1111
+msgid "Simulation completed. Review the output, then apply."
+msgstr "模拟已完成。请查看输出后再应用。"
+
+#: userland/apps/reliefapk/window.cpp:240
+msgid "Size"
+msgstr "大小"
+
+#: userland/apps/reliefapk/window.cpp:644
+msgid "Some repository indexes are unavailable. Refresh indexes to see all packages."
+msgstr "部分仓库索引不可用。请刷新索引以查看全部软件包。"
+
+#: userland/apps/reliefapk/window.cpp:239
+msgid "Status"
+msgstr "状态"
+
 #: configs/nls/messages/reliefapk.c:17
 msgid "Sync repositories directory"
 msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:33
+msgid "System CA bundle installed and parsed successfully"
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:1138
+msgid "System update completed. Restart to activate the updated kernel."
+msgstr "系统更新完成。请重启以启用更新后的内核。"
+
+#: userland/apps/reliefapk/window.cpp:1090
+msgid "System update needs attention. Review the output and run reliefos-update status."
+msgstr "系统更新需要处理。请查看输出并运行 reliefos-update status。"
+
+#: userland/apps/reliefapk/dialogs.cpp:418
+msgid "Tag:"
+msgstr "标签："
 
 #: configs/nls/messages/reliefapk.c:18
 msgid "The administrator cache and its parent directories must exist, be root-owned, and not be writable by other users."
@@ -950,6 +991,123 @@ msgstr ""
 #: configs/nls/messages/reliefapk.c:19
 msgid "The administrator cache must be an absolute directory."
 msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:32
+msgid "The installed CA bundle is still unusable. Check the APK protected-path policy and .apk-new files; update the ReliefOS trust package/configuration."
+msgstr ""
+
+#: userland/apps/reliefapk/certificate_display.h:25
+msgid "The two CA world requests will be refreshed as plain package names (without version or tag constraints); all other world requests are preserved."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:1178
+msgid "The update is applying changes. Wait for it to finish before closing."
+msgstr "正在应用更改。请等待完成后再关闭。"
+
+#: userland/apps/reliefapk/window.cpp:845
+msgid "There are no pending changes."
+msgstr "没有待处理的更改。"
+
+#: userland/apps/reliefapk/window.cpp:916
+msgid "Too many packages in one operation."
+msgstr "单次操作中的软件包过多。"
+
+#: userland/apps/reliefapk/window.cpp:191
+msgid "Trusted keys"
+msgstr "受信任的密钥"
+
+#: userland/apps/reliefapk/certificate_display.h:67
+msgid "Unsafe system CA trust path; no online operation started: "
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:464
+msgid "Up"
+msgstr "上级"
+
+#: userland/apps/reliefapk/dialogs.cpp:435
+msgid "Update entry"
+msgstr "更新条目"
+
+#: userland/apps/reliefapk/window.cpp:345
+msgid "Upgradable"
+msgstr "可升级"
+
+#: userland/apps/reliefapk/window.cpp:151
+msgid "Upgrade selected"
+msgstr "升级所选"
+
+#: userland/apps/reliefapk/window.cpp:157
+msgid "Upgrade system"
+msgstr "升级系统"
+
+#: userland/apps/reliefapk/certificate_display.h:30
+msgid "Verified CA package metadata is unavailable. Check HTTPS, repository signatures, keys and sources. The restored OS CA bundle, if any, has been retained."
+msgstr ""
+
+#: userland/apps/reliefapk/window.cpp:1108
+msgid "Verified update plan ready. Review the changes, then apply."
+msgstr "经过验证的更新计划已就绪。请审阅更改后应用。"
+
+#: userland/apps/reliefapk/window.cpp:167
+msgid "Verify APK file"
+msgstr "验证 APK 文件"
+
+#: userland/apps/reliefapk/window.cpp:686
+msgid "Version"
+msgstr "版本"
+
+#: userland/apps/reliefapk/dialogs.cpp:468
+msgid "View source"
+msgstr "查看源文件"
+
+#: userland/apps/reliefapk/dialogs.cpp:122
+msgid "Waiting for administrator authentication..."
+msgstr "正在等待管理员身份验证..."
+
+#: userland/apps/reliefapk/dialogs.cpp:166
+msgid "World constraints"
+msgstr "world 约束"
+
+#: userland/apps/reliefapk/window.cpp:345
+msgid "World packages and dependencies"
+msgstr "world 包及依赖"
+
+#: userland/apps/fltk_support.h:27
+msgid "Yes"
+msgstr "是"
+
+#: userland/apps/reliefapk/window.cpp:1162
+msgid ""
+"\n"
+"Applying the reviewed operations...\n"
+msgstr ""
+"\n"
+"正在应用已检查的操作...\n"
+
+#: userland/apps/reliefapk/window.cpp:1157
+msgid "\nApplying the verified system update plan...\n"
+msgstr "\n正在应用经过验证的系统更新计划…\n"
+
+#: userland/apps/reliefapk/window.cpp:952
+msgid ""
+"\n"
+"Cannot start the requested operation.\n"
+msgstr ""
+"\n"
+"无法启动请求的操作。\n"
+
+#: userland/apps/reliefapk/window.cpp:1065
+#, c-format
+msgid ""
+"\n"
+"Exit status: %d\n"
+msgstr ""
+"\n"
+"退出状态：%d\n"
+
+#: userland/apps/reliefapk/window.cpp:1082
+msgid "\nThe native updater returned an incomplete or invalid response. Review its status before retrying.\n"
+msgstr "\n原生更新器返回了不完整或无效的响应。请先检查更新状态再重试。\n"
 
 #: configs/nls/messages/reliefapk.c:20
 msgid "action does not take targets"
@@ -975,7 +1133,7 @@ msgstr ""
 msgid "could not build command arguments"
 msgstr ""
 
-#: configs/nls/messages/reliefapk.c:26
+#: userland/apps/reliefapk/certificate_display.h:36
 msgid "could not prepare the certificate package operation"
 msgstr ""
 
@@ -1004,225 +1162,125 @@ msgid "invalid apk settings"
 msgstr ""
 
 #: configs/nls/messages/reliefapk.c:33
+msgid "invalid native updater response"
+msgstr "原生更新器响应无效"
+
+#: configs/nls/messages/reliefapk.c:34
 msgid "invalid package constraint"
 msgstr ""
 
-#: configs/nls/messages/reliefapk.c:34
+#: configs/nls/messages/reliefapk.c:35
 msgid "invalid package object"
 msgstr ""
 
-#: configs/nls/messages/reliefapk.c:35
+#: configs/nls/messages/reliefapk.c:36
 msgid "key management is handled by the GUI"
 msgstr ""
 
-#: configs/nls/messages/reliefapk.c:36
-msgid "metadata requires a package name"
-msgstr ""
-
 #: configs/nls/messages/reliefapk.c:37
-msgid "out of memory"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:38
-msgid "out of memory while building package catalog"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:39
-msgid "owner requires one absolute file path"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:40
-msgid "package catalog exceeds limit"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:41
-msgid "package object exceeds limit"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:42
-msgid "simulation is not supported for this action"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:43
-msgid "trailing comma in package array"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:44
-msgid "trailing data after JSON array"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:45
-msgid "truncated JSON package array"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:46
-msgid "truncated JSON package object"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:47
-msgid "unknown package query filter"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:48
-msgid "upgrade all does not take package targets"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:49
-msgid "verify requires absolute .apk paths"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:50
-msgid "verify requires local package files"
-msgstr ""
-
-#: configs/nls/messages/reliefapk.c:51
-msgid "version comparison requires two version strings"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:23
-msgid "A trusted OS recovery CA bundle is unavailable. Update the ReliefOS trust package or image."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:31
-msgid "APK left an updated CA bundle as .apk-new. Check the protected-path policy before treating this as an updated trust store."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:34
-msgid "APK repository diagnostic redacted; check configured sources and TLS."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:35
-msgid "APK skipped an unavailable package or its output was incomplete; certificate repair failed."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:24
-msgid "CA RECOVERY PLAN: the system CA file is unusable. Apply will first restore the trusted OS CA bundle, preserving the old regular file in a private backup."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:51
-msgid "CA bundle changed during recovery; retry after checking the system state"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:38
-msgid "CA directory ownership or permissions are unsafe"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:37
-msgid "CA parent directories must be root-owned and not group/other writable or symlinks"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:41
-msgid "CA recovery directory ownership or permissions are unsafe"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:40
-msgid "CA trust file must be an owned regular file, not group/other writable, and at most 4 MiB"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:44
-msgid "Cannot inspect the current CA bundle"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:39
-msgid "Cannot inspect the current CA trust path"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:52
-msgid "Could not atomically install the OS recovery CA bundle"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:27
-msgid "Could not determine whether the system CA package is installed"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:46
-msgid "Could not prepare the complete OS recovery CA bundle"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:48
-msgid "Could not preserve the complete previous CA bundle"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:47
-msgid "Could not preserve the previous CA bundle"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:50
-msgid "Could not sync CA recovery files"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:49
-msgid "Could not sync the previous CA bundle backup"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:45
-msgid "Existing CA bundle must be an owned regular file of at most 4 MiB"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:22
-msgid "Invalid privileged apk request"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:69
-msgid "OS CA baseline restored atomically; previous file backup: "
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:53
-msgid "OS CA bundle was restored, but directory synchronization failed"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:68
-msgid "OS CA recovery failed: "
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:43
-msgid "OS recovery CA bundle has no usable certificates"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:42
-msgid "OS recovery CA bundle is empty or too large"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:26
-msgid "Online package simulation is deferred until trust is restored. The authenticated worker will then check signed repositories, simulate and repair ca-certificates and ca-certificates-bundle together."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:29
-msgid "Refresh the two world requests as plain package names without version/tag constraints, then reinstall both so source certificates and generated output agree. Other world requests are preserved."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:28
-msgid "Repair targets: ca-certificates and ca-certificates-bundle (package signatures and TLS verification required)."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:21
-msgid "Root authentication required"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:20
-msgid "Root authentication required for certificate repair"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:33
-msgid "System CA bundle installed and parsed successfully"
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:32
-msgid "The installed CA bundle is still unusable. Check the APK protected-path policy and .apk-new files; update the ReliefOS trust package/configuration."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:25
-msgid "The two CA world requests will be refreshed as plain package names (without version or tag constraints); all other world requests are preserved."
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:67
-msgid "Unsafe system CA trust path; no online operation started: "
-msgstr ""
-
-#: userland/apps/reliefapk/certificate_display.h:30
-msgid "Verified CA package metadata is unavailable. Check HTTPS, repository signatures, keys and sources. The restored OS CA bundle, if any, has been retained."
+msgid "metadata requires a package name"
 msgstr ""
 
 #: userland/apps/reliefapk/certificate_display.h:54
 msgid "none (file was missing)"
 msgstr ""
+
+#: configs/nls/messages/reliefapk.c:38
+msgid "out of memory"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:39
+msgid "out of memory while building package catalog"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:40
+msgid "owner requires one absolute file path"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:41
+msgid "package catalog exceeds limit"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:42
+msgid "package object exceeds limit"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:43
+msgid "simulation is not supported for this action"
+msgstr ""
+
+#: userland/apps/reliefapk/dialogs.cpp:320
+msgid "su — root password"
+msgstr "su — root 密码"
+
+#: userland/apps/reliefapk/dialogs.cpp:319
+msgid "sudo — current user's password"
+msgstr "sudo — 当前用户密码"
+
+#: configs/nls/messages/reliefapk.c:44
+msgid "system update requires a reviewed update plan"
+msgstr "系统更新需要经过审阅的更新计划"
+
+#: configs/nls/messages/reliefapk.c:45
+msgid "system updates require online mode"
+msgstr "系统更新需要联网模式"
+
+#: configs/nls/messages/reliefapk.c:46
+msgid "trailing comma in package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:47
+msgid "trailing data after JSON array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:48
+msgid "truncated JSON package array"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:49
+msgid "truncated JSON package object"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:50
+msgid "unknown package query filter"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:51
+msgid "upgrade all does not take package targets"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:52
+msgid "verify requires absolute .apk paths"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:53
+msgid "verify requires local package files"
+msgstr ""
+
+#: configs/nls/messages/reliefapk.c:54
+msgid "version comparison requires two version strings"
+msgstr ""
+
+#~ msgid ""
+#~ "Search by package name or description. Select one or more packages, choose an operation, then review the pending changes.\n"
+#~ "\n"
+#~ "Preview runs apk --simulate. Apply executes the changes in the displayed order. Each operation is checked again before execution.\n"
+#~ "\n"
+#~ "Refresh indexes after changing repositories or when available packages are missing. Installed packages remain available offline.\n"
+#~ "\n"
+#~ "Administrator operations use your system sudo or root authentication policy. Passwords are never saved.\n"
+#~ "\n"
+#~ "Ctrl+F: search    F5: refresh list    Ctrl+Enter: preview changes"
+#~ msgstr ""
+#~ "按软件包名称或说明搜索。选择一个或多个软件包，选择操作，然后查看待处理的更改。\n"
+#~ "\n"
+#~ "预览会运行 apk --simulate。应用会按显示的顺序执行更改。每项操作在执行前都会再次检查。\n"
+#~ "\n"
+#~ "更改仓库后，或找不到可用软件包时，请刷新索引。已安装的软件包仍可离线使用。\n"
+#~ "\n"
+#~ "需要管理员权限的操作会遵循系统的 sudo 或 root 身份验证策略。密码不会保存。\n"
+#~ "\n"
+#~ "Ctrl+F：搜索    F5：刷新列表    Ctrl+Enter：预览更改"
+
+#~ msgid "apk is applying changes. Wait for it to finish before closing."
+#~ msgstr "apk 正在应用更改。请等待其完成后再关闭。"

@@ -233,6 +233,48 @@ static int initial_state(int state, const struct reliefos_kernel_slot *identity)
     return result;
 }
 
+/** @brief Store one generation-bound trial state before exposing its slot.
+ * @param state Locked ESP state directory. @param name Literal A/B slot.
+ * @param health Complete pending or confirmed record.
+ * @return Zero after fixed-file write, fsync and exact readback; negative errno.
+ */
+static int store_health(int state, char name, const struct reliefos_kernel_boot_state *health)
+{
+    unsigned char record[RELIEFOS_KERNEL_SLOT_SIZE]; char file[32];
+    int result = reliefos_kernel_boot_state_encode(health, record);
+    snprintf(file, sizeof(file), "kernel-%c.health", name);
+    if (!result) result = preallocate(state, file, sizeof(record), 1);
+    if (!result) result = store_fixed(state, file, record, sizeof(record));
+    return result;
+}
+
+/** @brief Migrate legacy accepted slots before atomically enabling health checks.
+ * @param root Held ESP root. @param state Locked state directory.
+ * @return Zero only after every existing complete slot has a durable confirmed
+ * record and the immutable marker is published; old selectors keep functioning.
+ */
+static int migrate_health(int root, int state)
+{
+    static const char marker[] = "ReliefOS boot health v1\n";
+    char bytes[sizeof(marker) - 1];
+    int result = kernel_bundle_read_fixed(root, "reliefos/state/boot-health-v1", bytes, sizeof(bytes));
+    if (!result) return memcmp(bytes, marker, sizeof(bytes)) ? -EINVAL : 0;
+    if (result != -ENOENT) return result;
+    for (char name = 'A'; name <= 'B'; ++name) {
+        struct reliefos_kernel_slot slot;
+        if (kernel_bundle_validate_slot(root, name, &slot)) continue;
+        struct reliefos_kernel_boot_state health = {slot.generation, 1, 0};
+        unsigned char record[RELIEFOS_KERNEL_SLOT_SIZE]; char file[32];
+        result = reliefos_kernel_boot_state_encode(&health, record);
+        snprintf(file, sizeof(file), "kernel-%c.health", name);
+        if (!result) result = initial_record(state, file, record, sizeof(record));
+        if (!result) result = store_health(state, name, &health);
+        if (result) return result;
+    }
+    if (fsync(state)) return -errno;
+    return immutable_record(root, "reliefos/state/boot-health-v1", marker, sizeof(marker) - 1);
+}
+
 int reliefos_kernel_bundle_publish(const char *root_path, const char *boot, const char *release)
 {
     const char *stage = "validate installed package";
@@ -287,12 +329,21 @@ int reliefos_kernel_bundle_publish(const char *root_path, const char *boot, cons
         bundle.identity.generation = 1;
         result = initial_state(state, &bundle.identity);
         if (result) goto out;
+        result = migrate_health(root, state);
+        if (result) goto out;
     } else if (result) goto out;
     else {
+        result = migrate_health(root, state);
+        if (result) goto out;
         bundle.identity.generation = previous.generation;
         if (reliefos_kernel_slot_equal(&previous, &bundle.identity)) { result = 0; goto out; }
         if (previous.generation == RELIEFOS_KERNEL_SLOT_GENERATION_MAX) { result = -EOVERFLOW; goto out; }
         bundle.identity.generation = previous.generation + 1;
+        /* A failed/unconfirmed newer slot may be replaced, but the last
+         * confirmed slot must remain untouched until its replacement boots. */
+        stage = "select last confirmed boot version";
+        result = kernel_bundle_select_confirmed(root, &previous, &current);
+        if (result) goto out;
     }
     stage = "publish immutable boot version";
     result = publish_version(&bundle, root);
@@ -308,6 +359,10 @@ int reliefos_kernel_bundle_publish(const char *root_path, const char *boot, cons
     stage = "synchronize boot record directories";
     if (fsync(state) || sync_parent(root, "reliefos/entry") || fsync(root)) { result = -EIO; goto out; }
     char inactive = current == 'A' ? 'B' : 'A';
+    struct reliefos_kernel_boot_state health = {bundle.identity.generation, current ? 0u : 1u, current ? 1u : 0u};
+    stage = "prepare generation-bound boot trial";
+    result = store_health(state, inactive, &health);
+    if (result) goto out;
     unsigned char record[RELIEFOS_KERNEL_SLOT_SIZE];
     result = reliefos_kernel_slot_encode(&bundle.identity, record);
     char record_name[32], checksum_name[32], checksum[80], digest[65];
@@ -331,5 +386,47 @@ out:
     if (state >= 0) close(state);
     if (root >= 0) close(root);
     kernel_bundle_check_close(&bundle);
+    return result;
+}
+
+int reliefos_kernel_bundle_confirm(const char *root_path, const char *boot, char name,
+                                   uint32_t generation, const char *release, const char *initramfs)
+{
+    if ((name != 'A' && name != 'B') || !generation || !release || !initramfs) return -EINVAL;
+    int root = boot_open_directory(boot);
+    if (root < 0) return root;
+    char leaf[256]; int state = boot_open_parent(root, "reliefos/state/.update.lock", 0, leaf);
+    /* Legacy image staging predates the publisher's lock file. Creating only
+     * the coordination inode is safe; slot and health validation below still
+     * decide whether this exact running identity may be acknowledged. */
+    int lock_fd = state < 0 ? -1 : openat(state, leaf, O_RDWR | O_CREAT | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC, 0600);
+    int result = state < 0 ? state : lock_fd < 0 ? -errno : 0;
+    struct stat status;
+    if (!result && (fstat(lock_fd, &status) || !S_ISREG(status.st_mode))) result = -EINVAL;
+    struct flock lock = {.l_type = F_WRLCK, .l_whence = SEEK_SET};
+    if (!result && fcntl(lock_fd, F_SETLK, &lock)) result = errno == EACCES || errno == EAGAIN ? -EBUSY : -errno;
+    struct reliefos_kernel_slot slot; struct reliefos_kernel_boot_state health;
+    if (!result) result = kernel_bundle_validate_slot(root, name, &slot);
+    if (!result && (slot.generation != generation || strcmp(slot.release, release) || strcmp(slot.initramfs_sha256, initramfs))) result = -ESTALE;
+    if (!result) result = kernel_bundle_boot_state(root, name, &slot, &health);
+    if (!result && !health.confirmed) {
+        /* A pending record is confirmed only after GRUB consumed its attempt,
+         * and only while the final root still owns that exact complete pair. */
+        if (health.remaining) result = -EPERM;
+        struct reliefos_kernel_slot installed;
+        if (!result) result = reliefos_kernel_bundle_describe(root_path, release, &installed);
+        installed.generation = generation;
+        if (!result && !reliefos_kernel_slot_equal(&slot, &installed)) result = -ESTALE;
+        struct reliefos_kernel_slot newest; char newest_name;
+        if (!result) result = kernel_bundle_select(root, &newest, &newest_name);
+        if (!result && (newest_name != name || !reliefos_kernel_slot_equal(&slot, &newest))) result = -ESTALE;
+        if (!result) {
+            health.confirmed = 1;
+            result = store_health(state, name, &health);
+        }
+    }
+    if (lock_fd >= 0) close(lock_fd);
+    if (state >= 0) close(state);
+    close(root);
     return result;
 }

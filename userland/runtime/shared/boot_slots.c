@@ -109,3 +109,43 @@ int reliefos_kernel_boot_directory(const struct reliefos_kernel_slot *slot, char
     int size = snprintf(output, capacity, "reliefos/versions/%s/%s", slot->release, slot->initramfs_sha256);
     return size < 0 || (size_t)size >= capacity ? -ENAMETOOLONG : 0;
 }
+
+int reliefos_kernel_boot_state_encode(const struct reliefos_kernel_boot_state *state,
+                                      unsigned char output[RELIEFOS_KERNEL_SLOT_SIZE])
+{
+    if (!state || !output || !state->generation || state->generation > RELIEFOS_KERNEL_SLOT_GENERATION_MAX ||
+        state->confirmed > 1 || state->remaining > 1 || (state->confirmed && state->remaining)) return -EINVAL;
+    char record[192];
+    int size = snprintf(record, sizeof(record), "# GRUB Environment Block\n"
+        "reliefos_boot_generation=%u\nreliefos_boot_confirmed=%u\nreliefos_boot_remaining=%u\n",
+        state->generation, state->confirmed, state->remaining);
+    if (size < 0 || (size_t)size >= sizeof(record)) return -EINVAL;
+    memset(output, '#', RELIEFOS_KERNEL_SLOT_SIZE);
+    memcpy(output, record, (size_t)size);
+    return 0;
+}
+
+int reliefos_kernel_boot_state_decode(const void *input, size_t length,
+                                      struct reliefos_kernel_boot_state *state)
+{
+    static const char header[] = "# GRUB Environment Block\n";
+    if (!input || !state || length != RELIEFOS_KERNEL_SLOT_SIZE || memcmp(input, header, sizeof(header) - 1)) return -EINVAL;
+    const unsigned char *cursor = (const unsigned char *)input + sizeof(header) - 1;
+    const unsigned char *end = (const unsigned char *)input + length;
+    char generation[16], confirmed[2], remaining[2];
+    if (field(&cursor, end, "reliefos_boot_generation=", generation, sizeof(generation)) ||
+        field(&cursor, end, "reliefos_boot_confirmed=", confirmed, sizeof(confirmed)) ||
+        field(&cursor, end, "reliefos_boot_remaining=", remaining, sizeof(remaining)) ||
+        !*generation || generation[0] == '0' || (strcmp(confirmed, "0") && strcmp(confirmed, "1")) ||
+        (strcmp(remaining, "0") && strcmp(remaining, "1"))) return -EINVAL;
+    uint32_t number = 0;
+    for (const char *at = generation; *at; ++at) {
+        if (*at < '0' || *at > '9' || number > (RELIEFOS_KERNEL_SLOT_GENERATION_MAX - (unsigned)(*at - '0')) / 10) return -EINVAL;
+        number = number * 10 + (unsigned)(*at - '0');
+    }
+    struct reliefos_kernel_boot_state parsed = {number, (unsigned)(confirmed[0] - '0'), (unsigned)(remaining[0] - '0')};
+    unsigned char canonical[RELIEFOS_KERNEL_SLOT_SIZE];
+    if (reliefos_kernel_boot_state_encode(&parsed, canonical) || memcmp(input, canonical, length)) return -EINVAL;
+    *state = parsed;
+    return 0;
+}

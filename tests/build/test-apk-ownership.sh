@@ -11,7 +11,7 @@ python3 - "$src/configs/apk-ownership.json" <<'PY'
 import json, sys
 policy = json.load(open(sys.argv[1], encoding="utf-8"))
 groups = policy["groups"]
-required = {"reliefos-nls", "reliefos-apps", "reliefos-fastfetch", "reliefos-xdm-config", "reliefos-reliefmath",
+required = {"reliefos-nls", "reliefos-apps", "reliefos-system-update", "reliefos-fastfetch", "reliefos-xdm-config", "reliefos-reliefmath",
             "reliefos-mimalloc", "reliefos-musl-dev", "reliefos-apk-tools", "reliefos-base"}
 missing = sorted(required - groups.keys())
 legacy = sorted(name for name in groups if name.startswith("leonos-"))
@@ -142,6 +142,50 @@ for path in required:
         raise SystemExit(f"ReliefMath payload has inconsistent ownership: {path} -> {rows.get(path)}")
 if rows.get("usr/share/fonts/reliefos/simsun.ttc") != "reliefos-apps":
     raise SystemExit("shared SimSun font must remain in shared app-font ownership")
+PY
+
+# Installed updates transfer the former shell paths and RPR configuration out
+# of the broad application owner. Check both classifiers with real symlinks so
+# neither a prefix rule nor link-following silently changes the package owner.
+mkdir -p "$tmp/updateroot/usr/sbin" "$tmp/updateroot/etc/reliefos" \
+    "$tmp/updateroot/lib/apk/commit_hooks.d" "$tmp/updateroot/etc/init.d" \
+    "$tmp/updateroot/etc/runlevels/default"
+printf 'native updater\n' > "$tmp/updateroot/usr/sbin/reliefos-update"
+chmod 755 "$tmp/updateroot/usr/sbin/reliefos-update"
+printf 'RPR_BASE_URL=https://fixture.invalid/rpr\n' > "$tmp/updateroot/etc/reliefos/rpr.conf"
+printf 'boot confirmation service\n' > "$tmp/updateroot/etc/init.d/reliefos-boot-confirm"
+chmod 755 "$tmp/updateroot/etc/init.d/reliefos-boot-confirm"
+ln -s ../../init.d/reliefos-boot-confirm "$tmp/updateroot/etc/runlevels/default/reliefos-boot-confirm"
+ln -s /usr/sbin/reliefos-update "$tmp/updateroot/lib/apk/commit_hooks.d/reliefos-update"
+for prefix in reliefos leonos; do
+    for command in kernel-update check-update rpr-apkcheck rpr-ping; do
+        ln -s reliefos-update "$tmp/updateroot/usr/sbin/$prefix-$command"
+    done
+done
+"$tmp/reliefos-apk-own" --policy "$src/configs/apk-ownership.json" \
+    --root "$tmp/updateroot" --output "$tmp/update-list"
+PYTHONDONTWRITEBYTECODE=1 python3 - "$src" "$tmp" <<'PY'
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(sys.argv[1]) / "tools"))
+import apk_ownership
+root = Path(sys.argv[2])
+_, rules = apk_ownership.load_policy(Path(sys.argv[1]) / "configs/apk-ownership.json", Path(sys.argv[1]) / "configs/components.toml")
+rows = {row[3]: row for row in (line.split("\t") for line in (root / "update-list").read_text().splitlines())}
+expected = {
+    "usr/sbin/reliefos-update": ("reliefos-system-update", "file", "0755", "-"),
+    "etc/reliefos/rpr.conf": ("reliefos-system-update", "file", "0644", "-"),
+    "lib/apk/commit_hooks.d/reliefos-update": ("reliefos-system-update", "symlink", "0777", "/usr/sbin/reliefos-update"),
+    "etc/init.d/reliefos-boot-confirm": ("reliefos-grub", "file", "0755", "-"),
+    "etc/runlevels/default/reliefos-boot-confirm": ("reliefos-grub", "symlink", "0777", "../../init.d/reliefos-boot-confirm"),
+}
+for prefix in ("reliefos", "leonos"):
+    for command in ("kernel-update", "check-update", "rpr-apkcheck", "rpr-ping"):
+        expected[f"usr/sbin/{prefix}-{command}"] = ("reliefos-system-update", "symlink", "0777", "reliefos-update")
+for path, (owner, kind, mode, target) in expected.items():
+    row = rows.get(path)
+    if row != [owner, kind, mode, path, target] or apk_ownership.classify(path, rules)[0] != owner:
+        raise SystemExit(f"online update payload has inconsistent ownership: {path} -> {row}")
 PY
 awk -F '\t' '$1=="reliefos-demo" && $2=="file" && $3=="0644" && $4=="usr/lib/reliefos/apps/demo/demo.elf" && $5=="-" { ok=1 } END { exit !ok }' "$tmp/list"
 awk -F '\t' '$1=="reliefos-apps" && $2=="file" && $4=="usr/lib/reliefos/libreliefos.so.2" && $5=="-" { ok=1 } END { exit !ok }' "$tmp/list"

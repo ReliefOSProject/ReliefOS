@@ -12,6 +12,7 @@
    desktop
    reliefsettings
    packages
+   system-updates
    coreutils
    linuxuname
    network-controller

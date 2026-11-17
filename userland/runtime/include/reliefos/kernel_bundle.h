@@ -13,6 +13,19 @@ struct reliefos_kernel_slot {
     char release[32], module_abi[65], kernel_sha256[65], initramfs_sha256[65];
 };
 
+/* Mutable GRUB trial record; its generation binds it to one immutable slot. */
+struct reliefos_kernel_boot_state {
+    uint32_t generation;
+    unsigned confirmed, remaining;
+};
+
+struct reliefos_kernel_boot_status {
+    unsigned protocol;
+    char latest_name, confirmed_name;
+    struct reliefos_kernel_slot latest, confirmed;
+    struct reliefos_kernel_boot_state health;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -45,6 +58,36 @@ int reliefos_kernel_slot_equal(const struct reliefos_kernel_slot *a, const struc
  * release; /lib/modules continues to use the kernel's unchanged release ABI.
  */
 int reliefos_kernel_boot_directory(const struct reliefos_kernel_slot *slot, char *output, size_t capacity);
+/** @brief Encode the fixed, preallocated GRUB trial/confirmation environment.
+ * @param state Complete generation-bound state; remaining is zero or one.
+ * @param output Caller-owned RELIEFOS_KERNEL_SLOT_SIZE-byte output.
+ * @return Zero or negative EINVAL; confirmed states cannot retain an attempt.
+ */
+int reliefos_kernel_boot_state_encode(const struct reliefos_kernel_boot_state *state,
+                                      unsigned char output[RELIEFOS_KERNEL_SLOT_SIZE]);
+/** @brief Parse a bounded trial record also writable by upstream GRUB save_env.
+ * @param input Borrowed exact environment block. @param length Exact byte count.
+ * @param state Caller-owned output, assigned only for a complete canonical record.
+ * @return Zero or negative EINVAL for malformed, duplicate or out-of-range fields.
+ */
+int reliefos_kernel_boot_state_decode(const void *input, size_t length,
+                                      struct reliefos_kernel_boot_state *state);
+/** @brief Read newest immutable and last confirmed boot identities without writing.
+ * @param boot Absolute ESP directory. @param status Caller-owned validated output.
+ * @return Zero for a valid newest slot and confirmed fallback, or negative errno.
+ * protocol is zero for a legacy installation and one after durable migration.
+ */
+int reliefos_kernel_bundle_boot_status(const char *boot, struct reliefos_kernel_boot_status *status);
+/** @brief Confirm the exact running trial after normal system startup.
+ * @param root Absolute final root; its complete new bundle must match the trial.
+ * @param boot Mounted ESP directory. @param name Explicit A/B boot command-line slot.
+ * @param generation Explicit boot command-line publication generation.
+ * @param release Running uname release. @param initramfs Exact command-line digest.
+ * @return Zero after durable confirmation; negative errno on stale or mismatched identity.
+ * Caller authenticates the running command line and serializes with APK updates.
+ */
+int reliefos_kernel_bundle_confirm(const char *root, const char *boot, char name,
+                                   uint32_t generation, const char *release, const char *initramfs);
 /** @brief Check the installed package's complete version identity without writing.
  * @param root Absolute final root containing the versioned kernel and module tree.
  * @param release Expected ABI-bound release.
