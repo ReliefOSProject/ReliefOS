@@ -98,8 +98,9 @@ int worker(int argc, char **argv) {
         fflush(stderr);
         return save_config(argc - 1, argv + 1);
     }
-    if (!valid_apk_worker(argc, argv)) {
-        fputs("Invalid privileged apk request\n", stderr);
+    const bool system_update = ra::valid_system_update_worker_request(argc, argv);
+    if (!system_update && !valid_apk_worker(argc, argv)) {
+        fputs("Invalid privileged package or system update request\n", stderr);
         return 126;
     }
     fputs("__RELIEFAPK_WORKER_READY__\n", stderr);
@@ -110,8 +111,9 @@ int worker(int argc, char **argv) {
     setenv("LANG", "C", 1);
     unsetenv("LD_PRELOAD");
     unsetenv("LD_LIBRARY_PATH");
-    execv("/sbin/apk", argv);
-    fprintf(stderr, "Cannot execute /sbin/apk: %s\n", strerror(errno));
+    const char *program = system_update ? ra::SystemUpdatePath : "/sbin/apk";
+    execv(program, argv);
+    fprintf(stderr, "Cannot execute %s: %s\n", program, strerror(errno));
     return 127;
 }
 void ready(void *data) {

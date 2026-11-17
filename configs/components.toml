@@ -483,6 +483,19 @@ sdk = false
 api = false
 
 [[components]]
+id = "systemupdate"
+symbol = "APP_SYSTEMUPDATE"
+label = "System update client"
+category = "System services"
+kind = "system-app"
+default = true
+required = true
+stage = true
+entry = false
+sdk = false
+api = false
+
+[[components]]
 id = "rprfetch"
 symbol = "APP_RPRFETCH"
 label = "RPR HTTPS fetch helper"

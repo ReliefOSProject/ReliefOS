@@ -133,6 +133,40 @@ static void remove_old_package(const char *release)
     require(directory >= 0 && !fsync(directory) && !close(directory), "flush removed checksum list directory");
 }
 
+/** @brief Prepare and apply one frozen native update plan in this owned guest. */
+static void run_system_update(void)
+{
+    int channel[2]; require(!pipe(channel), "create native plan output pipe");
+    pid_t child = fork(); require(child >= 0, "fork native update preparation");
+    if (!child) {
+        close(channel[0]);
+        if (dup2(channel[1], STDOUT_FILENO) < 0) _exit(126);
+        close(channel[1]);
+        execl("/usr/sbin/reliefos-update", "reliefos-update", "prepare", "--machine", (char *)NULL);
+        _exit(127);
+    }
+    close(channel[1]);
+    FILE *stream = fdopen(channel[0], "r"); require(stream != NULL, "open native plan output");
+    char line[256], plan[65] = {0}; unsigned found = 0;
+    while (fgets(line, sizeof(line), stream)) {
+        fputs(line, stdout);
+        if (strncmp(line, "plan_id=", 8)) continue;
+        require(strlen(line) == 73 && line[72] == '\n' &&
+                strspn(line + 8, "0123456789abcdef") == 64 && !found++, "one canonical native plan ID");
+        memcpy(plan, line + 8, 64);
+    }
+    require(!ferror(stream) && !fclose(stream), "read complete native preparation output");
+    int status; require(waitpid(child, &status, 0) == child && WIFEXITED(status) &&
+                        !WEXITSTATUS(status) && found == 1, "native update preparation succeeded");
+    child = fork(); require(child >= 0, "fork native frozen plan application");
+    if (!child) {
+        execl("/usr/sbin/reliefos-update", "reliefos-update", "apply", "--plan", plan, "--machine", (char *)NULL);
+        _exit(127);
+    }
+    require(waitpid(child, &status, 0) == child && WIFEXITED(status) && !WEXITSTATUS(status),
+            "native frozen plan application succeeded");
+}
+
 /** @brief Exercise real signed APK upgrade hooks only on an explicit owned image.
  * The fixture has a real installed A database, a signed B repository and its
  * private trusted QA public key. No network or trust bypass is permitted.
@@ -154,15 +188,17 @@ static void maybe_upgrade_apk(void)
     int rpr = rpr_size >= 0;
     require(rpr ? rpr_size == sizeof(rpr_expected) - 1 && !memcmp(rpr_marker, rpr_expected, sizeof(rpr_expected) - 1)
                 : errno == ENOENT, "explicit RPR client upgrade opt-in");
-    pid_t child = fork(); require(child >= 0, "fork real upstream APK");
-    if (!child) {
-        if (rpr) execl("/usr/sbin/reliefos-kernel-update", "reliefos-kernel-update", (char *)NULL);
-        else execl("/sbin/apk", "apk", "--repositories-file", "/qa-repositories", "--no-network",
+    if (rpr) run_system_update();
+    else {
+        pid_t child = fork(); require(child >= 0, "fork real upstream APK");
+        if (!child) {
+            execl("/sbin/apk", "apk", "--repositories-file", "/qa-repositories", "--no-network",
               "upgrade", "reliefos-kernel", (char *)NULL);
-        _exit(127);
+            _exit(127);
+        }
+        int status; require(waitpid(child, &status, 0) == child && WIFEXITED(status) && !WEXITSTATUS(status),
+                            "real signed APK upgrade, retention hooks and package activation");
     }
-    int status; require(waitpid(child, &status, 0) == child && WIFEXITED(status) && !WEXITSTATUS(status),
-                        "real signed APK upgrade, retention hooks and package activation");
     FILE *world = fopen("/etc/apk/world", "r"); require(world != NULL, "read actual APK world");
     char *line = NULL; size_t capacity = 0; unsigned found = 0;
     while (getline(&line, &capacity, world) >= 0) {

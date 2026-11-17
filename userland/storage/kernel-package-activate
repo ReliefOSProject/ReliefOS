@@ -10,7 +10,7 @@ fi
 marker=/run/reliefos-kernel-activation.defer
 if [ -f "$marker" ] && [ ! -L "$marker" ]; then
     case "$(cat "$marker")" in
-        'ReliefOS offline installer boot publication pending'|'ReliefOS installer package transaction')
+        'ReliefOS offline installer boot publication pending'|'ReliefOS installer package transaction'|'ReliefOS online update transaction')
             echo 'Kernel activation deferred to the offline installer root sync and selected bootloader transaction.'
             exit 0
             ;;

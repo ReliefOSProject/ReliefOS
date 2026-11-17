@@ -105,6 +105,9 @@ int kernel_slots_initialize(int root, const char *release, const char *abi,
     strcpy(slot.kernel_sha256, kernel_hash); strcpy(slot.initramfs_sha256, archive_hash);
     unsigned char record[RELIEFOS_KERNEL_SLOT_SIZE];
     if (reliefos_kernel_slot_encode(&slot, record)) return -1;
+    struct reliefos_kernel_boot_state health = {.generation = 1, .confirmed = 1, .remaining = 0};
+    unsigned char health_record[RELIEFOS_KERNEL_SLOT_SIZE];
+    if (reliefos_kernel_boot_state_encode(&health, health_record)) return -1;
     struct stat status;
     if (!fstatat(root, "reliefos/state", &status, AT_SYMLINK_NOFOLLOW) || errno != ENOENT) {
         fputs("kernel-tools: slot initialization requires a fresh private ESP tree\n", stderr); return -1;
@@ -116,8 +119,18 @@ int kernel_slots_initialize(int root, const char *release, const char *abi,
         int length = snprintf(sums, sizeof(sums), "%s  kernel-%c.env\n", hash, name);
         snprintf(path, sizeof(path), "reliefos/state/kernel-%c.sha256", name);
         if (kernel_stage_write(root, path, sums, (size_t)length, 0644)) return -1;
+        snprintf(path, sizeof(path), "reliefos/state/kernel-%c.health", name);
+        if (kernel_stage_write(root, path, health_record, sizeof(health_record), 0644)) return -1;
     }
-    return 0;
+    if (kernel_stage_write(root, "reliefos/state/.update.lock", "", 0, 0600)) return -1;
+    int state = openat(root, "reliefos/state", O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+    if (state < 0) return -1;
+    int result = fsync(state);
+    static const char marker[] = "ReliefOS boot health v1\n";
+    if (!result) result = kernel_stage_write(root, "reliefos/state/boot-health-v1", marker, sizeof(marker) - 1, 0644);
+    if (!result) result = fsync(state);
+    if (close(state)) result = -1;
+    return result ? -1 : 0;
 }
 
 int kernel_slot_template(int root, const char *path, const char *release,

@@ -5,6 +5,7 @@
 
 export RELIEFOS_TEST_DEP_ROOT := $(abspath $(HOST_RUNTIME_DEVELOPMENT_ROOT))
 export RELIEFOS_TEST_BUILD_ROOT := $(abspath $(O))
+RELIEFOS_TEST_PYTHON ?= python3
 
 RELIEFOS_TEST_TMP := $(if $(TMPDIR),$(TMPDIR),/tmp)/reliefos-tests-$(shell id -u)
 
@@ -88,7 +89,7 @@ endef
 leonos-test-tools-plain: reliefos-test-tools-plain
 leonos-test-tools-sanitised: reliefos-test-tools-sanitised
 
-test-build: $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS) test-tools $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY) $(HEADER_EXPORT_MANIFEST)
+test-build: sdk rootfs-raw $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS) test-tools $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY) $(HEADER_EXPORT_MANIFEST)
 	+@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_BUILD_TESTS))
 	@$(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_xorg_qemu.py --source-only
 
@@ -103,7 +104,7 @@ test-long: $(RELIEFOS_HOST_TOOLS) grub-host grub-efi
 test-audio:
 	@python3 $(RELIEFOS_SRC)/tools/test_audio_userland.py controls settings doom-output doom-mixer doom-music
 
-test: test-tools test-build
+test: test-tools test-build test-system-update test-kernel-update test-boot-health
 
 .PHONY: test-directory-api
 test-directory-api:
@@ -159,11 +160,29 @@ test-reliefapk:
 test-reliefapk-apk: $(UPSTREAM_APK)
 	$(Q)TMPDIR='$(abspath $(O))/tmp' python3 $(RELIEFOS_SRC)/tools/tests/test_reliefapk_apk.py --apk $(abspath $(UPSTREAM_APK))
 
+.PHONY: test-system-update
+test-system-update: $(USERLAND_DIR)/systemupdate.elf $(INITRAMFS_BUSYBOX_ELF) $(UPSTREAM_APK) $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS)
+	$(Q)mkdir -p '$(abspath $(O))/tmp'
+	$(Q)TMPDIR='$(abspath $(O))/tmp' RELIEFOS_TEST_SYSTEM_UPDATE='$(abspath $(USERLAND_DIR))/systemupdate.elf' \
+	 RELIEFOS_TEST_BUSYBOX='$(abspath $(INITRAMFS_BUSYBOX_ELF))' RELIEFOS_TEST_APK='$(abspath $(UPSTREAM_APK))' \
+	 $(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_system_update.py
+	$(Q)TMPDIR='$(abspath $(O))/tmp' $(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/tests/test_system_update_packaging.py --apk '$(abspath $(UPSTREAM_APK))'
+	$(Q)TMPDIR='$(abspath $(O))/tmp' RELIEFOS_TEST_BUSYBOX='$(abspath $(INITRAMFS_BUSYBOX_ELF))' \
+	 RELIEFOS_TEST_APK='$(abspath $(UPSTREAM_APK))' $(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_system_update_sanitizers.py
+
 .PHONY: test-kernel-update
-test-kernel-update: $(RELIEFOS_KERNEL_TOOLS) $(RELIEFOS_KERNEL_RECOVERY) $(USERLAND_DIR)/bootinstall.elf $(INITRAMFS_BUSYBOX_ELF) $(UPSTREAM_APK)
+test-kernel-update: $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS) $(RELIEFOS_KERNEL_TOOLS) $(RELIEFOS_KERNEL_RECOVERY) $(USERLAND_DIR)/bootinstall.elf $(USERLAND_DIR)/systemupdate.elf $(USERLAND_DIR)/rprfetch.elf $(INITRAMFS_BUSYBOX_ELF) $(UPSTREAM_APK)
 	$(Q)mkdir -p '$(abspath $(O))/tmp'
 	$(Q)TMPDIR='$(abspath $(O))/tmp' RELIEFOS_KERNEL_TOOLS='$(abspath $(RELIEFOS_KERNEL_TOOLS))' \
 	 RELIEFOS_TEST_RECOVERY='$(abspath $(RELIEFOS_KERNEL_RECOVERY))' \
 	 RELIEFOS_TEST_BOOTINSTALL='$(abspath $(USERLAND_DIR))/bootinstall.elf' \
+	 RELIEFOS_TEST_SYSTEM_UPDATE='$(abspath $(USERLAND_DIR))/systemupdate.elf' \
 	 RELIEFOS_TEST_BUSYBOX='$(abspath $(INITRAMFS_BUSYBOX_ELF))' RELIEFOS_TEST_APK='$(abspath $(UPSTREAM_APK))' \
-	 python3 $(RELIEFOS_SRC)/tools/test_kernel_update.py
+	 $(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_kernel_update.py
+
+.PHONY: test-boot-health
+test-boot-health: grub-host grub-efi
+	$(Q)mkdir -p '$(abspath $(O))/tmp'
+	$(Q)set -eu; output=$$(mktemp -d '$(abspath $(O))/tmp/boot-health.XXXXXX'); rmdir "$$output"; \
+	 $(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_boot_health_qemu.py --output "$$output" \
+	 --grub-host '$(abspath $(GRUB_HOST_ROOT))' --grub-efi '$(abspath $(GRUB_EFI_DIR))'

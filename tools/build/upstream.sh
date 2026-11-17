@@ -36,6 +36,7 @@ CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=l
 case $pkg in shadow) CC="$cc --target=$target --sysroot=$musl --gcc-toolchain=/nonexistent -fuse-ld=lld --rtlib=compiler-rt --unwindlib=none -nostdinc -idirafter $musl/include -isystem $resource/include -idirafter $auth/usr/include -L$musl/lib" ;; esac
 AR=llvm-ar RANLIB=llvm-ranlib STRIP=llvm-strip BUILD_CC=cc
 CFLAGS='-O2 -std=gnu17 -mno-avx -mno-avx2'
+[ "$pkg" != shadow ] || CFLAGS='-O2 -std=gnu2x -mno-avx -mno-avx2'
 CPPFLAGS="-I$auth/usr/include -I$pam/usr/include"
 LDFLAGS="-Wl,-z,relro,-z,now -L$auth/lib -L$auth/usr/lib -L$pam/lib -Wl,-rpath-link,$auth/lib -Wl,-rpath-link,$pam/lib"
 LIBS= PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR="$auth/lib/pkgconfig:$auth/usr/lib/pkgconfig:$pam/lib/pkgconfig" PKG_CONFIG_SYSROOT_DIR="$auth"
@@ -43,11 +44,20 @@ export CC AR RANLIB STRIP BUILD_CC CFLAGS CPPFLAGS LDFLAGS LIBS PKG_CONFIG_PATH 
 set -- --host="$target" --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib
 case $pkg in
 sudo) set -- "$@" --with-pam --with-pam-login --with-secure-path=/usr/sbin:/usr/bin:/sbin:/bin --with-rundir=/run/sudo --with-vardir=/var/lib/sudo --libexecdir=/usr/lib ;;
-shadow) set -- "$@" --bindir=/bin --sbindir=/sbin --with-libpam --with-yescrypt --without-su --disable-logind ;;
+shadow)
+    # The staged BSD .pc files resolve their prefix through pcfiledir. GNU
+    # pkg-config otherwise prepends the sysroot to that already rooted path.
+    LIBBSD_CFLAGS=$(PKG_CONFIG_SYSROOT_DIR= pkg-config --cflags libbsd-overlay)
+    LIBBSD_LIBS=$(PKG_CONFIG_SYSROOT_DIR= pkg-config --libs libbsd-overlay)
+    export LIBBSD_CFLAGS LIBBSD_LIBS
+    set -- "$@" --bindir=/bin --sbindir=/sbin --with-libpam --with-yescrypt --without-su --disable-logind
+    ;;
 exfatprogs)
     LDFLAGS="-static -L$auth/usr/lib"
-    # Alpine's static blkid archive uses libeconf. Request the real private
-    # dependency explicitly; its blkid.pc does not list libeconf.
+    # The relocated .pc files use pcfiledir and cannot be sysroot-prefixed a
+    # second time by GNU pkg-config. libeconf is blkid's private link input.
+    PKG_CONFIG_SYSROOT_DIR=
+    export PKG_CONFIG_SYSROOT_DIR
     BLKID_LIBS=$(pkg-config --static --libs blkid libeconf)
     export LDFLAGS BLKID_LIBS
     set -- "$@" --sbindir=/usr/sbin --disable-shared --enable-static ;;

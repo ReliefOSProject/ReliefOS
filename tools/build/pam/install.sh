@@ -1,6 +1,7 @@
 #!/bin/sh
 # Install only the PAM-owned files into the caller's unpublished staging tree.
 set -eu
+umask 022
 if [ "${1:-}" = --help ]; then
     echo "usage: install.sh SOURCE BUILD DESTDIR"
     exit 0
@@ -12,6 +13,7 @@ mkdir -p "$dest/lib/security/pam_filter" "$dest/sbin" "$dest/usr/include/securit
     "$dest/usr/lib/systemd/system"
 cp -P "$build"/lib/libpam*.so* "$dest/lib/"
 cp "$build"/modules/*.so "$dest/lib/security/"
+chmod 0755 "$dest"/lib/libpam*.so* "$dest"/lib/security/*.so
 for helper in faillock mkhomedir_helper pwhistory_helper pam_timestamp_check unix_chkpwd; do
     install -m 0755 "$build/bin/$helper" "$dest/sbin/$helper"
 done

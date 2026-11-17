@@ -426,14 +426,13 @@ static void test_action_mapping_and_size_format() {
 
     targets.clear();
     CHECK(make_command(Action::UpgradeAll, targets, settings, true, command, error));
-    bool upgrade_all = false, available = false, simulated = false;
-    for (size_t i = 0; i < command.args.size(); ++i) {
-        if (arg_is(command, i, "upgrade")) upgrade_all = true;
-        if (arg_is(command, i, "--available")) available = true;
-        if (arg_is(command, i, "--simulate")) simulated = true;
-    }
-    CHECK(upgrade_all && !available && simulated && !command.mutating &&
-          !command.privileged && command.cancelable);
+    CHECK(command.args.size() == 3);
+    CHECK(arg_is(command, 0, SystemUpdatePath));
+    CHECK(arg_is(command, 1, "prepare"));
+    CHECK(arg_is(command, 2, "--machine"));
+    CHECK(command.mutating && command.privileged && command.cancelable);
+    CHECK(!make_command(Action::UpgradeAll, targets, settings, false, command, error));
+    CHECK(command.args.empty());
 
     targets.clear();
     CHECK(targets.push(text("relief-addon")));
@@ -453,6 +452,98 @@ static void test_action_mapping_and_size_format() {
     CHECK(equals(format_size(0), "0 B"));
     CHECK(equals(format_size(1024), "1.0 KiB"));
     CHECK(equals(format_size(1536), "1.5 KiB"));
+}
+
+static void test_system_update_plan_binding_and_worker_policy() {
+    const char id[] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+    Command command;
+    Text error, plan_id = text(id);
+    CHECK(system_update_apply_command(plan_id, command, error));
+    CHECK(command.args.size() == 5);
+    CHECK(arg_is(command, 0, SystemUpdatePath));
+    CHECK(arg_is(command, 1, "apply"));
+    CHECK(arg_is(command, 2, "--plan"));
+    CHECK(arg_is(command, 3, id));
+    CHECK(arg_is(command, 4, "--machine"));
+    CHECK(command.privileged && command.mutating && !command.cancelable);
+
+    const char *prepare[] = {SystemUpdatePath, "prepare", "--machine"};
+    const char *apply[] = {SystemUpdatePath, "apply", "--plan", id, "--machine"};
+    const char *unbound[] = {SystemUpdatePath, "apply", "--machine"};
+    const char *unexpected[] = {SystemUpdatePath, "apply", "--plan", id, "--root"};
+    const char *hostile_program[] = {"/tmp/reliefos-update", "prepare", "--machine"};
+    const char *extra[] = {SystemUpdatePath, "prepare", "--machine", "--root", "/tmp"};
+    const char *missing[] = {SystemUpdatePath, "prepare", nullptr};
+    CHECK(valid_system_update_worker_request(3, prepare));
+    CHECK(valid_system_update_worker_request(5, apply));
+    CHECK(!valid_system_update_worker_request(3, unbound));
+    CHECK(!valid_system_update_worker_request(5, unexpected));
+    CHECK(!valid_system_update_worker_request(3, hostile_program));
+    CHECK(!valid_system_update_worker_request(5, extra));
+    CHECK(!valid_system_update_worker_request(3, missing));
+    CHECK(!valid_system_update_worker_request(3, nullptr));
+
+    const char *invalid_ids[] = {"", "../active", "--root", "$(id)", "0",
+        "0123456789ABCDEF0123456789abcdef0123456789abcdef0123456789abcdef",
+        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdefx"};
+    for (const char *invalid : invalid_ids) {
+        CHECK(!system_update_apply_command(text(invalid), command, error));
+        CHECK(command.args.empty());
+        const char *request[] = {SystemUpdatePath, "apply", "--plan", invalid, "--machine"};
+        CHECK(!valid_system_update_worker_request(5, request));
+    }
+    char hidden_id[65];
+    memcpy(hidden_id, id, 64);
+    hidden_id[20] = 0;
+    hidden_id[64] = 0;
+    Text hidden;
+    CHECK(hidden.set(hidden_id, 64));
+    CHECK(!system_update_apply_command(hidden, command, error));
+
+    Settings settings;
+    Array<Text> targets;
+    CHECK(targets.push(text("busybox")));
+    CHECK(!make_command(Action::UpgradeAll, targets, settings, true, command, error));
+    settings.offline = true;
+    targets.clear();
+    CHECK(!make_command(Action::UpgradeAll, targets, settings, true, command, error));
+    CHECK(command.args.empty());
+}
+
+static void test_system_update_machine_response() {
+    const char prepared[] = "phase=verified\nplan_id=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n";
+    SystemUpdateReport report;
+    Text error;
+    CHECK(parse_system_update_report(prepared, sizeof(prepared) - 1, report, error));
+    CHECK(report.plan_id == "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef");
+    CHECK(!report.has_result && !report.has_reboot);
+    const char complete[] = "phase=done\nreboot_required=1\nresult=success\n";
+    CHECK(parse_system_update_report(complete, sizeof(complete) - 1, report, error));
+    CHECK(report.plan_id.empty());
+    CHECK(report.has_result && report.success && report.has_reboot && report.reboot_required);
+    const char no_reboot[] = "result=success\nreboot_required=0\n";
+    CHECK(parse_system_update_report(no_reboot, sizeof(no_reboot) - 1, report, error));
+    CHECK(report.has_result && report.success && report.has_reboot && !report.reboot_required);
+    const char failed[] = "result=failed\n";
+    CHECK(parse_system_update_report(failed, sizeof(failed) - 1, report, error));
+    CHECK(report.has_result && !report.success && !report.has_reboot);
+    const char *invalid[] = {
+        "plan_id=../active\n", "plan_id=\n", "plan_id=abc\n", "result=success",
+        "result=success\nresult=success\n", "result=success\nresult=failed\n",
+        "reboot_required=1\nreboot_required=0\n", "reboot_required=10\n",
+        "reboot_required=\n", "reboot_required=1\r\n", "result=unknown\n",
+        "plan_id=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n"
+        "plan_id=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef\n"
+    };
+    for (const char *response : invalid) {
+        CHECK(!parse_system_update_report(response, strlen(response), report, error));
+        CHECK(!error.empty());
+        CHECK(report.plan_id.empty() && !report.has_result && !report.has_reboot);
+    }
+    const char binary[] = "result=success\n\0reboot_required=0\n";
+    CHECK(!parse_system_update_report(binary, sizeof(binary) - 1, report, error));
+    CHECK(!parse_system_update_report(nullptr, 0, report, error));
+    CHECK(!parse_system_update_report("", 64u * 1024u * 1024u + 1u, report, error));
 }
 
 static void test_settings_local_paths_and_fetch() {
@@ -554,6 +645,8 @@ int main() {
     test_constraints();
     test_command_argv_and_policy();
     test_action_mapping_and_size_format();
+    test_system_update_plan_binding_and_worker_policy();
+    test_system_update_machine_response();
     test_settings_local_paths_and_fetch();
     test_fixed_certificate_repair_request();
     if (failures) {

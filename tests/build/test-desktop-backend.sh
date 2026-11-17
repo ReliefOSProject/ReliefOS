@@ -62,6 +62,7 @@ mkdir -p "$work/out/userland/initramfs"
 printf 'kernel bundle tool fixture\n' > "$work/out/userland/initramfs/kernel-bundle.elf"
 printf '%s\n' fixture > "$work/out/userland/motd.elf"
 printf '%s\n' fixture > "$work/out/userland/bootinstall.elf"
+printf 'native update core fixture\n' > "$work/out/userland/systemupdate.elf"
 for command in sbin/grub-install sbin/grub-bios-setup sbin/grub-probe bin/grub-mkimage; do
     mkdir -p "$work/out/upstream/grub/root/usr/${command%/*}"
     printf '%s\n' fixture > "$work/out/upstream/grub/root/usr/$command"
@@ -139,6 +140,14 @@ sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
     "$work/rootfs.config" "$work/metadata" "$work/stage" "$work/layout" \
     "$work/root" "$work/manifest.json" 1700000000
 xorg_root=$work/root
+cmp "$work/out/userland/systemupdate.elf" "$xorg_root/usr/sbin/reliefos-update"
+test -x "$xorg_root/usr/sbin/reliefos-update"
+test "$(readlink "$xorg_root/lib/apk/commit_hooks.d/reliefos-update")" = /usr/sbin/reliefos-update
+for prefix in reliefos leonos; do
+    for command in kernel-update check-update rpr-apkcheck rpr-ping; do
+        test "$(readlink "$xorg_root/usr/sbin/$prefix-$command")" = reliefos-update
+    done
+done
 for locale in $(cat configs/nls/LINGUAS); do
     for domain in $(cat configs/nls/DOMAINS); do
         cmp "$work/out/generated/nls/$locale/LC_MESSAGES/$domain.mo" \

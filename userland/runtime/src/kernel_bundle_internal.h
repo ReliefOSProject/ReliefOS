@@ -64,4 +64,11 @@ int kernel_bundle_sync_root(const struct kernel_bundle_checked *bundle);
  * @return Zero, ENOENT if neither is complete, EUCLEAN on equal-generation conflict, or negative errno.
  */
 int kernel_bundle_select(int root, struct reliefos_kernel_slot *selected, char *name);
+/** @brief Validate one immutable A/B slot and the referenced complete boot pair. */
+int kernel_bundle_validate_slot(int root, char name, struct reliefos_kernel_slot *slot);
+/** @brief Read generation-bound health; legacy slots are accepted only before migration. */
+int kernel_bundle_boot_state(int root, char name, const struct reliefos_kernel_slot *slot,
+                             struct reliefos_kernel_boot_state *state);
+/** @brief Select the newest complete confirmed slot, preserving it during publication. */
+int kernel_bundle_select_confirmed(int root, struct reliefos_kernel_slot *selected, char *name);
 #endif

@@ -876,6 +876,21 @@ bool make_command(Action action, const Array<Text> &targets, const Settings &set
                   bool simulate, Command &command, Text &error) {
     clear_command(command);
     error.clear();
+    if (action == Action::UpgradeAll) {
+        if (!settings_valid(settings) || settings.offline)
+            return command_error(command, error, "system updates require online mode");
+        if (!targets.empty())
+            return command_error(command, error, "upgrade all does not take package targets");
+        if (!simulate)
+            return command_error(command, error, "system update requires a reviewed update plan");
+        Array<Text> args;
+        if (!append_arg(args, SystemUpdatePath) || !append_arg(args, "prepare") ||
+            !append_arg(args, "--machine"))
+            return command_error(command, error, "out of memory");
+        // Preparation changes only the updater's private cache and plan state.
+        // It needs root authentication, and is cancellable before APK commits.
+        return complete_command(command, args, true, true, true);
+    }
     if (action == Action::RepairCa) {
         if (!settings_valid(settings) || settings.offline || targets.size() != 1 ||
             !exact_c_string(targets[0]) || !(targets[0] == CertificatePackage))
@@ -895,8 +910,6 @@ bool make_command(Action action, const Array<Text> &targets, const Settings &set
 
     if (package_action(action) && !all_constraints(targets, 0, action == Action::Install))
         return command_error(command, error, "invalid package constraint");
-    if (action == Action::UpgradeAll && targets.size())
-        return command_error(command, error, "upgrade all does not take package targets");
     if (action == Action::Fix && !all_constraints(targets, 0, false))
         return command_error(command, error, "invalid package constraint");
     if (action == Action::CacheDownload && !all_constraints(targets, 0, false))
@@ -944,7 +957,7 @@ bool make_command(Action action, const Array<Text> &targets, const Settings &set
     case Action::Upgrade: name = "fix"; privileged = mutating = true; break;
     case Action::Reinstall: name = "fix"; privileged = mutating = true; break;
     case Action::Fix: name = "fix"; privileged = mutating = true; break;
-    case Action::UpgradeAll: name = "upgrade"; privileged = mutating = true; break;
+    case Action::UpgradeAll: return command_error(command, error, "system update requires a reviewed update plan");
     case Action::Update: name = "update"; privileged = mutating = true; break;
     case Action::CacheClean: name = "cache"; privileged = mutating = true; break;
     case Action::CacheDownload: name = "cache"; privileged = mutating = true; break;
@@ -1045,6 +1058,79 @@ bool make_command(Action action, const Array<Text> &targets, const Settings &set
     bool cancelable = !mutating || action == Action::Fetch || action == Action::CacheDownload ||
         action == Action::Update;
     return complete_command(command, args, privileged, mutating, cancelable);
+}
+
+/** @brief Admit only the native updater's exact opaque SHA-256 plan identity. */
+static bool valid_update_plan_id(const Text &plan_id) {
+    if (plan_id.size() != 64) return false;
+    for (size_t i = 0; i < plan_id.size(); ++i) {
+        const char c = plan_id.c_str()[i];
+        if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'))) return false;
+    }
+    return true;
+}
+
+bool system_update_apply_command(const Text &plan_id, Command &command, Text &error) {
+    clear_command(command);
+    error.clear();
+    if (!valid_update_plan_id(plan_id))
+        return command_error(command, error, "system update requires a reviewed update plan");
+    Array<Text> args;
+    if (!append_arg(args, SystemUpdatePath) || !append_arg(args, "apply") ||
+        !append_arg(args, "--plan") || !args.push(plan_id) || !append_arg(args, "--machine"))
+        return command_error(command, error, "out of memory");
+    return complete_command(command, args, true, true, false);
+}
+
+bool valid_system_update_worker_request(int argc, const char *const argv[]) {
+    if (!argv || argc < 3 || !argv[0] || strcmp(argv[0], SystemUpdatePath)) return false;
+    for (int i = 1; i < argc; ++i) if (!argv[i]) return false;
+    if (argc == 3)
+        return !strcmp(argv[1], "prepare") && !strcmp(argv[2], "--machine");
+    if (argc != 5 || strcmp(argv[1], "apply") || strcmp(argv[2], "--plan") ||
+        strcmp(argv[4], "--machine")) return false;
+    Text plan_id;
+    return strlen(argv[3]) == 64 && plan_id.set(argv[3], 64) && valid_update_plan_id(plan_id);
+}
+
+bool parse_system_update_report(const char *bytes, size_t size, SystemUpdateReport &report, Text &error) {
+    report = SystemUpdateReport();
+    error.clear();
+    if (!bytes || size > MaxJsonBytes || memchr(bytes, 0, size)) {
+        error.set("invalid native updater response");
+        return false;
+    }
+    SystemUpdateReport parsed;
+    size_t at = 0;
+    while (at < size) {
+        const char *line = bytes + at;
+        const char *end = static_cast<const char *>(memchr(line, '\n', size - at));
+        const size_t length = end ? static_cast<size_t>(end - line) : size - at;
+        // Machine records must be complete lines. Other human diagnostics may
+        // contain arbitrary printable text and cannot substitute for a record.
+        bool valid = true;
+        if (length >= 8 && !memcmp(line, "plan_id=", 8)) {
+            valid = end && parsed.plan_id.empty() && parsed.plan_id.set(line + 8, length - 8) &&
+                valid_update_plan_id(parsed.plan_id);
+        } else if (length >= 7 && !memcmp(line, "result=", 7)) {
+            valid = end && !parsed.has_result &&
+                ((length == 14 && !memcmp(line + 7, "success", 7)) ||
+                 (length == 13 && !memcmp(line + 7, "failed", 6)));
+            parsed.has_result = true;
+            parsed.success = valid && length == 14;
+        } else if (length >= 16 && !memcmp(line, "reboot_required=", 16)) {
+            valid = end && !parsed.has_reboot && length == 17 && (line[16] == '0' || line[16] == '1');
+            parsed.has_reboot = true;
+            parsed.reboot_required = valid && line[16] == '1';
+        }
+        if (!valid) {
+            error.set("invalid native updater response");
+            return false;
+        }
+        at += length + (end ? 1u : 0u);
+    }
+    report = static_cast<SystemUpdateReport &&>(parsed);
+    return true;
 }
 
 bool certificate_apk_command(bool reinstall, bool simulate, Command &command, Text &error) {

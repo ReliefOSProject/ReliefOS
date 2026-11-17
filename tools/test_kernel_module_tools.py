@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Validate installed kernel bundles through the native production host tool."""
 import hashlib
+import fcntl
 import json
 import os
 from pathlib import Path
@@ -264,6 +265,20 @@ class NativeBundle(unittest.TestCase):
         self.assertEqual((esp / f"reliefos/versions/{RELEASE}/{hashlib.sha256(archive.read_bytes()).hexdigest()}/initramfs.cpio").read_bytes(), archive.read_bytes())
         selected = json.loads(subprocess.check_output([str(self.binary), "slot-select", str(esp)]))
         self.assertEqual((selected["release"], selected["generation"]), (RELEASE, 1))
+        state = esp / "reliefos/state"
+        self.assertEqual((state / "boot-health-v1").read_bytes(), b"ReliefOS boot health v1\n")
+        for name in ("A", "B"):
+            health = (state / ("kernel-" + name + ".health")).read_bytes()
+            self.assertEqual(len(health), 1024)
+            self.assertEqual(dict(line.decode().split("=", 1) for line in health.splitlines()
+                                  if line.startswith(b"reliefos_")),
+                             {"reliefos_boot_generation": "1", "reliefos_boot_confirmed": "1",
+                              "reliefos_boot_remaining": "0"})
+        # Fresh media must be usable by the first real OpenRC confirmation;
+        # it cannot depend on an online update having created the ESP lock.
+        with (state / ".update.lock").open("r+b") as lock:
+            fcntl.lockf(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.assertEqual(os.fstat(lock.fileno()).st_size, 0)
         original_kernel = (esp / "reliefos/kernel.sys").read_bytes()
         self_copy = [str(self.binary), "boot-payload", str(esp / "reliefos/kernel.sys"), str(archive), str(esp)]
         self.assertNotEqual(subprocess.run(self_copy, capture_output=True).returncode, 0)

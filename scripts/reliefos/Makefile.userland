@@ -14,7 +14,7 @@ endif
 endif
 
 USERLAND_EXTERNAL_APPS := fastfetch pleditor
-USERLAND_APPS := $(filter-out $(USERLAND_EXTERNAL_APPS),$(RELIEFOS_COMPONENT_APPS))
+USERLAND_APPS := $(filter-out $(USERLAND_EXTERNAL_APPS) systemupdate,$(RELIEFOS_COMPONENT_APPS))
 USERLAND_DIR := $(O)/userland
 USERLAND_FLAGS := $(RUNTIME_FLAGS) -fPIE -nostdinc -isystem $(if $(RELIEFOS_PASSIVE),deferred,$(shell $(TARGET_CC) -print-resource-dir 2>/dev/null))/include -D_POSIX_C_SOURCE=200809L
 USERLAND_CFLAGS ?=
@@ -79,7 +79,7 @@ USERLAND_APP_FLAGS_pleditor := --target=$(TRIPLE_USER) $(RELIEFOS_OPTIMIZATION_F
 
 USERLAND_DOOM_EXCLUDE := doomgeneric_allegro.c doomgeneric_emscripten.c doomgeneric_linuxvt.c doomgeneric_sdl.c doomgeneric_soso.c doomgeneric_sosox.c doomgeneric_win.c doomgeneric_xlib.c i_allegromusic.c i_allegrosound.c i_sdlsound.c i_sdlmusic.c i_cdmus.c mus2mid.c
 
-USERLAND_KBUILD_APPS := $(sort $(USERLAND_APPS) pleditor gptinit motd bootinstall kernelbundle)
+USERLAND_KBUILD_APPS := $(sort $(USERLAND_APPS) pleditor gptinit motd bootinstall kernelbundle systemupdate)
 define RELIEFOS_APP_KBUILD_CAPTURE
 RELIEFOS_APP_OBJECTS :=
 RELIEFOS_APP_C_OBJECTS :=
@@ -137,6 +137,7 @@ app-$(1): $(2)
 endef
 $(eval $(call RELIEFOS_STATIC_RUNTIME_APP,kernelbundle,$(RELIEFOS_KERNEL_RECOVERY)))
 $(eval $(call RELIEFOS_STATIC_RUNTIME_APP,bootinstall,$(USERLAND_DIR)/bootinstall.elf))
+$(eval $(call RELIEFOS_STATIC_RUNTIME_APP,systemupdate,$(USERLAND_DIR)/systemupdate.elf))
 
 # Only manifest-owned disabled ELF outputs may be removed; arbitrary files in
 # this directory and old build/ images are outside this rule's ownership.

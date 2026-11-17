@@ -38,14 +38,25 @@ enum class Action {
     ReverseDepends, Owner, World, Version, Dot, Manifest, Keys, RepairCa
 };
 constexpr const char *WorkerPath = "/usr/lib/reliefos/apps/reliefapk/reliefapk.elf";
+constexpr const char *SystemUpdatePath = "/usr/sbin/reliefos-update";
 constexpr const char *CertificatePackage = "ca-certificates-bundle";
 constexpr const char *CertificateSourcesPackage = "ca-certificates";
 constexpr const char *BootstrapCaBundle = "/usr/share/reliefos/certs/ca-certificates.crt";
 struct Command { Array<Text> args; bool privileged = false, mutating = false, cancelable = true; };
 
+/** A native updater response is accepted only after its process exits cleanly. */
+struct SystemUpdateReport {
+    Text plan_id;
+    bool has_result = false, success = false;
+    bool has_reboot = false, reboot_required = false;
+};
+
 bool make_command(Action action, const Array<Text> &targets, const Settings &settings,
                   bool simulate, Command &command, Text &error);
 bool certificate_apk_command(bool reinstall, bool simulate, Command &command, Text &error);
+bool system_update_apply_command(const Text &plan_id, Command &command, Text &error);
+bool valid_system_update_worker_request(int argc, const char *const argv[]);
+bool parse_system_update_report(const char *bytes, size_t size, SystemUpdateReport &report, Text &error);
 bool query_command(int filter, const Settings &settings, Command &command, Text &error);
 bool metadata_command(const char *name, const Settings &settings, Command &command, Text &error);
 bool valid_constraint(const char *value, bool local = false);
