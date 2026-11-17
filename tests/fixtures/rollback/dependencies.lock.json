@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "dependencies": [
+    {
+      "id": "unifont",
+      "kind": "binary",
+      "version": "16.0.04",
+      "url": "https://ftp.gnu.org/gnu/unifont/unifont-16.0.04/unifont_all-16.0.04.hex.gz",
+      "sha256": "20e8b505f602488697979eefc69857f7f6106bceab702f5ac559f4f84e0e7494",
+      "directory": "unifont_all-16.0.04.hex.gz",
+      "script": "tests/build/test-submodule-rollback-build.sh",
+      "target": "kernel",
+      "license": "resources/licenses/unifont-LICENSE"
+    }
+  ]
+}
