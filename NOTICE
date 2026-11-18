@@ -90,8 +90,6 @@ Runtime, libraries, and applications
 * StardustUI: MIT. See third_party/stardustui/LICENSE.
 * PL Editor (LeonOS fork): MIT. See third_party/pl_editor/LICENSE.
 * sl: permissive upstream license. See resources/licenses/sl-LICENSE.
-* litehtml: BSD-3-Clause. See third_party/litehtml/LICENSE.
-* Gumbo HTML Parser: Apache-2.0. See third_party/litehtml/src/gumbo/LICENSE.
 * ab_glyph_rasterizer 0.1.10: Apache-2.0. See the nested StardustUI
   dependency at third_party/stardustui/third_party/ab_glyph_rasterizer/upstream.
 * minimp3: CC0-1.0/public-domain dedication. See

@@ -116,14 +116,6 @@ DIRECT_RULES = (
         "kernel/reliefnt/kernel/exec/userland.c:417",
     ),
     Rule(
-        "DYNLINK-MISSING", "错误", "动态链接",
-        r"^\[dynlinkerror\.elf\] unable to start .*: missing ",
-        "动态链接库缺失",
-        "静态链接的恢复程序已确认应用缺少必需共享库。",
-        "从匹配系统镜像恢复该 .so 文件到 /usr/lib/reliefos、兼容目录 /usr/lib/leonos 或 /usr/lib，或重新打包应用私有库。",
-        "userland/apps/dynlinkerror/main.c:52",
-    ),
-    Rule(
         "DYNLINK-RUNTIME", "错误", "动态链接",
         r"(?:shared object not found|shared object cannot be opened|unresolved dynamic symbol|dynamic application must depend on libleonos\.so\.1)",
         "动态运行时无法解析应用依赖",

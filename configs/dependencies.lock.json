@@ -2783,13 +2783,6 @@
       ]
     },
     {
-      "id": "litehtml",
-      "kind": "submodule",
-      "commit": "b9e89f0b9494ff9a5f008800af35503efabddf59",
-      "directory": "third_party/litehtml",
-      "license": "third_party/litehtml/LICENSE"
-    },
-    {
       "id": "ltp",
       "kind": "tarball",
       "version": "2279d708c817db657611a30c427c7d06c4360049",

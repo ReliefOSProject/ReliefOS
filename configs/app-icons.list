@@ -1,30 +1,15 @@
-# ReliefOS-authored graphical applications only, including legacy GUI assets.
+# ReliefOS-authored X11 graphical applications only.
 # Console commands, services, and third-party applications do not get artwork.
-apiapp
-browser
-bugtest
 calc
 openrc-controller
-cjktest
-devmgr
 diskmgr
 doomlauncher
-downloadmgr
-drvmgr
 fileman
-guitest
-hello
-helloworld
-httpget
 imageview
 installer
 leonmmcoset
 minesweeper
-mp3play
-netctl
 network-controller
-notepad
-oshlp
 osver
 paint
 reliefapk
@@ -39,11 +24,5 @@ reliefsettings
 relieftodo
 reliefword
 reliefppt
-run
-servicemgr
-settings
-sysconfdialog
 taskmgr
-terminal
-uidemo
 xiaobai

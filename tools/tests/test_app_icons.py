@@ -76,11 +76,8 @@ class AppIcons(unittest.TestCase):
             with self.subTest(app=app):
                 pixels = icons.draw_icon(app)
                 rgba = bytes(channel for row in pixels for pixel in row for channel in pixel)
-                # Audio settings and the system settings frontend deliberately
-                # share the settings glyph; other applications remain distinct.
                 if rgba in seen:
-                    self.assertEqual({app, seen[rgba]}, {'settings', 'reliefsettings'},
-                                     f'{app} shares artwork with {seen.get(rgba)}')
+                    self.fail(f'{app} shares artwork with {seen.get(rgba)}')
                 seen[rgba] = app
                 self.assertIn(0, rgba[3::4])
                 self.assertIn(255, rgba[3::4])

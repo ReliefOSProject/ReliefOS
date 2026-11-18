@@ -62,8 +62,10 @@ def login_case(output, disk, wrong_password=False):
         time.sleep(1)
         probe.text("terminal")
         probe.key("ret")
-        wait_log(serial, "terminal: PTY ready", process, timeout=30)
-        time.sleep(2)
+        time.sleep(3)
+        probe.text("echo PAM_SWITCH_ST_READY >/dev/ttyS0")
+        probe.key("ret")
+        wait_log(serial, "PAM_SWITCH_ST_READY", process, timeout=30)
         command = ("grep -E '^(Uid|Gid):' /proc/self/status > /tmp/login-switch-identity; "
                    "printf 'Groups: ' >> /tmp/login-switch-identity; "
                    "id -G >> /tmp/login-switch-identity; "

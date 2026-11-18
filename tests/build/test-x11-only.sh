@@ -16,16 +16,27 @@ for path in userland/apps/desktop userland/apps/windowd \
         exit 1
     fi
 done
-# Applications are source archives until a supported frontend is available.
-for app in settings terminal run netctl servicemgr devmgr drvmgr sysconfdialog \
-    apiapp hello uidemo cjktest notepad bugtest httpget downloadmgr browser \
-    mp3play oshlp helloworld guitest glxgears dynlinkerror; do
-    test -f "$src/userland/apps/$app/main.c"
+# Legacy windowd clients must not return to the X11 product tree.
+for app in apiapp browser bugtest cjktest devmgr downloadmgr drvmgr dynlinkerror \
+    glxgears guitest hello helloworld httpget mp3play netctl notepad oshlp run \
+    servicemgr settings sysconfdialog terminal uidemo; do
+    if test -e "$src/userland/apps/$app"; then
+        echo "FAIL - legacy windowd application source remains: $app" >&2
+        exit 1
+    fi
     if grep -qx "id = \"$app\"" "$src/configs/components.toml"; then
-        echo "FAIL - unavailable application is still selectable: $app" >&2
+        echo "FAIL - removed application is still selectable: $app" >&2
+        exit 1
+    fi
+    if grep -qx "$app" "$src/configs/nls/DOMAINS" "$src/configs/app-icons.list"; then
+        echo "FAIL - removed application still has translation/icon metadata: $app" >&2
         exit 1
     fi
 done
+if test -e "$src/third_party/litehtml" || grep -q 'litehtml' "$src/.gitmodules" "$src/configs/dependencies.lock.json"; then
+    echo 'FAIL - removed browser dependency remains registered' >&2
+    exit 1
+fi
 if grep -Eq 'APP_(DESKTOP|WINDOWD)_' "$src/Kconfig.components"; then
     echo 'FAIL - removed configuration is still present' >&2
     exit 1
@@ -38,4 +49,4 @@ for app in calc fileman taskmgr reliefapk reliefmail reliefword reliefexcel \
     reliefppt reliefmath reliefmathpp relieftodo reliefdiagram reliefcapture reliefplayer; do
     grep -qx "id = \"$app\"" "$src/configs/components.toml"
 done
-printf 'ok - X11 product excludes the removed stack and preserves application sources\n'
+printf 'ok - X11 product excludes legacy windowd applications and preserves X11 applications\n'

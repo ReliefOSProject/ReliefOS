@@ -29,8 +29,8 @@ class InstallerSetupTests(unittest.TestCase):
             (root / "etc/skel").mkdir(parents=True)
             for name in (".bash_profile", ".bashrc", ".inputrc"):
                 (root / "etc/skel" / name).write_text("# shell defaults\n")
-            # The X11 payload supplies st and the ported apps, but no longer
-            # contains the private Desktop's terminal/settings/run programs.
+            # The X11 payload supplies st and the ported apps without the
+            # retired private windowd application set.
             for program in ("usr/bin/st", "usr/lib/reliefos/apps/fileman/fileman.elf",
                             "usr/lib/reliefos/apps/taskmgr/taskmgr.elf"):
                 path = root / program

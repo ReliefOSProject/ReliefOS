@@ -155,9 +155,7 @@ for pair in \
     'var/lib/leonos/accounts.db var/lib/reliefos/accounts.db' \
     'var/lib/leonos/startup.db var/lib/reliefos/startup.db' \
     'var/lib/leonos/startup-denials.db var/lib/reliefos/startup-denials.db' \
-    'var/lib/leonos/oobe.done var/lib/reliefos/oobe.done' \
-    'var/lib/leonos/browser/cookies.txt var/lib/reliefos/browser/cookies.txt' \
-    'var/lib/leonos/browser/bookmarks.txt var/lib/reliefos/browser/bookmarks.txt'; do
+    'var/lib/leonos/oobe.done var/lib/reliefos/oobe.done'; do
     set -- $pair
     if ! migrate_file "$1" "$2"; then failed=1; fi
 done
