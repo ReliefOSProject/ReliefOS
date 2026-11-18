@@ -99,7 +99,7 @@ int main(void)
     run_fastfetch(1);
     pid_t terminal = fork();
     if (!terminal) {
-        execl("/usr/lib/reliefos/apps/terminal/terminal.elf", "terminal", "--run", "/bin/sh", "-c",
+        execl("/usr/bin/st", "st", "-e", "/bin/sh", "-c",
               "/usr/bin/fastfetch --format json --structure "
               "OS:Host:Kernel:Uptime:CPU:Memory:Swap:Disk:Display:GPU:Shell:Terminal --pipe > "
               "/tmp/fastfetch-terminal.json; echo $? > /tmp/fastfetch-terminal.done",

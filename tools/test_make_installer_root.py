@@ -49,7 +49,13 @@ class InstallerLayoutTests(unittest.TestCase):
             self.assertEqual((root / "usr/lib/leonos/libleonos.so.2").read_bytes(),
                              (source / "usr/lib/leonos/libleonos.so.2").read_bytes())
             self.assertFalse((root / "usr/lib/reliefos/libleonos.so.2").exists())
-            for stale in ("windowd", "desktop", "imd", "sessiond", "dynlinkerror"):
+            for stale in (
+                "windowd", "desktop", "imd", "sessiond", "apiapp", "browser",
+                "bugtest", "cjktest", "devmgr", "downloadmgr", "drvmgr",
+                "dynlinkerror", "glxgears", "guitest", "hello", "helloworld",
+                "httpget", "mp3play", "netctl", "notepad", "oshlp", "run",
+                "servicemgr", "settings", "sysconfdialog", "terminal", "uidemo",
+            ):
                 self.assertFalse((root / "usr/lib/reliefos/apps" / stale).exists(), stale)
             stage_installed_payloads(source, work / "stage")
             for namespace in ("reliefos", "leonos"):

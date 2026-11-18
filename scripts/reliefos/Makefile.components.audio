@@ -24,5 +24,3 @@ AUDIO_SDK_PRODUCTS += $(AUDIO_CONTROL_SO)
 USERLAND_EXTRA_soundctl = -I$(AUDIO_ALSA_ROOT)/usr/include
 USERLAND_LIBS_soundctl = $(AUDIO_CONTROL_SO) $(AUDIO_ALSA_ROOT)/usr/lib/libasound.so.2 $(RUNTIME_BUILTINS)
 USERLAND_DEPS_soundctl = $(upstream_alsa-lib_products)
-USERLAND_LIBS_settings = $(AUDIO_CONTROL_SO) $(AUDIO_ALSA_ROOT)/usr/lib/libasound.so.2 $(RUNTIME_BUILTINS)
-USERLAND_DEPS_settings = $(upstream_alsa-lib_products)

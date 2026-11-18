@@ -96,7 +96,7 @@ def type_password(probe, serial, process, marker, password, timeout=120):
 
 
 def login_desktop_terminal(probe, serial, process):
-    """Reach a Terminal with a real PTY as the ordinary user."""
+    """Reach an X11 st window with a real PTY as the ordinary user."""
     wait_log(serial, "[login.elf] starting login UI", process)
     time.sleep(5)
     probe.frame("login")
@@ -109,11 +109,9 @@ def login_desktop_terminal(probe, serial, process):
     time.sleep(1.5)
     probe.text("terminal")
     probe.key("ret")
-    wait_log(serial, "terminal: PTY ready", process)
-    # The window must be mapped and the shell must have bound the PTY before
-    # keystrokes reach it; the sibling window test waits 15s here for the same
-    # reason.
-    time.sleep(15)
+    time.sleep(3)
+    type_line(probe, "echo ST_PTY_READY >/dev/ttyS0", settle=0.5)
+    wait_log(serial, "ST_PTY_READY", process)
     probe.frame("terminal-ready")
 
 

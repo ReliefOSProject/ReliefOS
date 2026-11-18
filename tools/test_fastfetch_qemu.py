@@ -131,7 +131,7 @@ def guest(args):
         assert (display['width'],display['height']) in modes,modules['Display']
         if label=='terminal-json':
             assert modules['Shell']['result']['exeName']=='sh',modules['Shell']
-            assert modules['Terminal']['result']['exePath']=='/usr/lib/reliefos/apps/terminal/terminal.elf',modules['Terminal']
+            assert modules['Terminal']['result']['exePath']=='/usr/bin/st',modules['Terminal']
     (WORK/'evidence.txt').write_text(inventory_evidence(digest, enabled_cpus, iso))
     print(f'PASS unmodified Fastfetch; evidence: {WORK}')
 

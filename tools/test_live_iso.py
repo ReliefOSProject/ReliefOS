@@ -22,7 +22,7 @@ class LiveRootTests(unittest.TestCase):
                 "grub/grub.cfg": b"set root=(hd0,gpt1)",
                 "reliefos/kernel.sys": b"kernel",
                 "usr/bin/icewm": b"desktop",
-                "usr/lib/reliefos/apps/terminal/terminal.elf": b"terminal",
+                "usr/bin/st": b"X11 terminal",
                 "bin/busybox": b"shell",
                 "usr/bin/vim": b"unmodified Linux executable",
                 "usr/lib/reliefos/apps/vim/vim.elf": b"unmodified Linux executable",
@@ -46,7 +46,7 @@ class LiveRootTests(unittest.TestCase):
             self.assertTrue((output / "bin/sh").is_symlink())
             self.assertTrue((output / "usr/share/vim/vim91/defaults.vim").is_file())
             self.assertEqual((output / "usr/share/terminfo/x/xterm").read_bytes(), b"terminfo")
-            self.assertTrue((output / "usr/lib/reliefos/apps/terminal/terminal.elf").is_file())
+            self.assertTrue((output / "usr/bin/st").is_file())
             self.assertFalse((output / "EFI").exists())
             self.assertFalse((output / "reliefos").exists())
             self.assertFalse((output / "leonos").exists())

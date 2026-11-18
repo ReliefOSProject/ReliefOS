@@ -8,7 +8,7 @@ cc=${HOSTCC:-cc}
 $cc -std=c11 -Wall -Wextra -Wpedantic -Werror -I"$root" \
     "$root/tools/host/assets/reliefos-gbk.c" \
     "$root/tools/host/common/io.c" "$root/tools/host/common/buffer.c" -o "$work/gen"
-"$work/gen" "$root/third_party/litehtml/src/encodings.cpp" "$work/table.h"
+"$work/gen" "$root/third_party/musl/src/locale/gb18030.h" "$work/table.h"
 cat > "$work/check.c" <<'EOF'
 #include <assert.h>
 #include "table.h"
@@ -35,7 +35,7 @@ EOF
 $cc -std=c11 -Wall -Werror "$work/check.c" -o "$work/check"
 "$work/check"
 before=$(stat -c '%y' "$work/table.h")
-"$work/gen" "$root/third_party/litehtml/src/encodings.cpp" "$work/table.h"
+"$work/gen" "$root/third_party/musl/src/locale/gb18030.h" "$work/table.h"
 [ "$before" = "$(stat -c '%y' "$work/table.h")" ]
 cp "$work/table.h" "$work/expected"
 for invalid in 'garbage' 'int gb18030_decoder::m_index[] = { 1, null };' \

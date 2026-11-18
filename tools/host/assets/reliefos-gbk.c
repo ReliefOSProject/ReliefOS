@@ -1,4 +1,4 @@
-/* Convert litehtml's pinned GB18030 index into the ReliefOS GBK lookup tables. */
+/* Convert musl's GB18030 double-byte table into the ReliefOS GBK lookup tables. */
 #define _POSIX_C_SOURCE 200809L
 #include <ctype.h>
 #include <errno.h>
@@ -20,35 +20,24 @@ static int compare_entries(const void *left, const void *right)
 
 static int parse_table(char *text, uint32_t *values)
 {
-    char *p = strstr(text, "gb18030_decoder::m_index[]");
-    if (!p) return -1;
-    p += strlen("gb18030_decoder::m_index[]");
-    while (isspace((unsigned char)*p)) ++p;
-    if (*p++ != '=') return -1;
-    while (isspace((unsigned char)*p)) ++p;
-    if (*p++ != '{') return -1;
+    char *p = text;
     size_t count = 0;
-    for (;;) {
+    while (*p) {
         while (isspace((unsigned char)*p)) ++p;
-        if (*p == '}') break;
+        if (!*p) break;
+        if (*p == ',') { ++p; continue; }
         uint32_t value;
-        if (!strncmp(p, "null", 4)) { value = 0; p += 4; }
-        else {
-            if (!isdigit((unsigned char)*p)) return -1;
-            errno = 0;
-            char *end;
-            unsigned long parsed = strtoul(p, &end, 10);
-            if (errno || parsed > 0x10ffffUL) return -1;
-            value = (uint32_t)parsed;
-            p = end;
-        }
-        if (count < POINTER_COUNT) values[count] = value;
+        if (!isdigit((unsigned char)*p)) return -1;
+        errno = 0;
+        char *end;
+        unsigned long parsed = strtoul(p, &end, 10);
+        if (errno || parsed > 0xffffUL || count >= POINTER_COUNT) return -1;
+        value = (uint32_t)parsed;
+        values[count] = value;
         ++count;
-        while (isspace((unsigned char)*p)) ++p;
-        if (*p == ',') ++p;
-        else if (*p != '}') return -1;
+        p = end;
     }
-    return count >= POINTER_COUNT ? 0 : -1;
+    return count == POINTER_COUNT ? 0 : -1;
 }
 
 static int render(FILE *out, const uint32_t *values)
@@ -76,9 +65,9 @@ static int render(FILE *out, const uint32_t *values)
 int main(int argc, char **argv)
 {
     if (argc == 2 && !strcmp(argv[1], "--help")) {
-        puts("usage: reliefos-gbk SOURCE OUTPUT"); return 0;
+        puts("usage: reliefos-gbk TABLE OUTPUT"); return 0;
     }
-    if (argc != 3) { fputs("usage: reliefos-gbk SOURCE OUTPUT\n", stderr); return 2; }
+    if (argc != 3) { fputs("usage: reliefos-gbk TABLE OUTPUT\n", stderr); return 2; }
     struct byte_buffer source = {0};
     uint32_t values[POINTER_COUNT];
     char *rendered = NULL;
@@ -88,7 +77,8 @@ int main(int argc, char **argv)
         buffer_reserve(&source, source.len + 1) < 0) goto done;
     source.data[source.len] = 0;
     if (memchr(source.data, 0, source.len) || parse_table((char *)source.data, values)) {
-        fprintf(stderr, "reliefos-gbk: invalid or incomplete GB18030 index in %s\n", argv[1]);
+        fprintf(stderr, "reliefos-gbk: expected exactly %u GB18030 table entries in %s\n",
+                POINTER_COUNT, argv[1]);
         goto done;
     }
     FILE *out = open_memstream(&rendered, &length);

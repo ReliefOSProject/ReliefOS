@@ -21,7 +21,7 @@ ROOT_PASSWORD = "r"
 XORG_EXCLUDED_APPS = (
     "calc", "doom", "doomlauncher", "fileman", "imageview", "installer",
     "leonmmcoset", "minesweeper", "osver", "paint", "taskmgr", "xiaobai",
-    "glxgears", "portablegl",
+    "portablegl",
 )
 XORG_COMMANDS = ("Xorg", "icewm", "xdm")
 
@@ -685,7 +685,10 @@ def login_desktop(probe, serial, process):
     time.sleep(1)
     probe.text("terminal")
     probe.key("ret")
-    wait_log(serial, "path=/usr/lib/reliefos/apps/terminal/terminal.elf", process)
+    time.sleep(3)
+    probe.text("echo INSTALLER_ST_READY >/dev/ttyS0")
+    probe.key("ret")
+    wait_log(serial, "INSTALLER_ST_READY", process)
     probe.text("fastfetch --format json --structure OS:Kernel")
     probe.key("ret")
     time.sleep(3)
@@ -696,8 +699,7 @@ def login_desktop(probe, serial, process):
     time.sleep(3)
     probe.frame("terminal-identity")
     log = serial.read_text(errors="replace")
-    assert "name=terminal.elf code=127" not in log, "Terminal shell failed to execute"
-    assert "name=terminal.elf code=126" not in log, "Terminal shell failed to drop credentials"
+    assert "INSTALLER_ST_READY" in log, "X11 st shell did not become interactive"
 
 
 def main():

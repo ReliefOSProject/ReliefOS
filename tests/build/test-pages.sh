@@ -59,7 +59,7 @@ chmod 600 "$tmp/key"
 mkdir -p "$tmp/repository" "$tmp/apps"
 printf aaa > "$tmp/repository/reliefos-musl-4.9.1-r5.apk"
 printf kernel-package-fixture > "$tmp/repository/reliefos-kernel-4.9.1-r5.apk"
-printf bb  > "$tmp/apps/reliefos-helloworld-4.9.1-r5.apk"
+printf bb  > "$tmp/apps/reliefos-demo-4.9.1-r5.apk"
 
 # 1. Build the RPR subtree, then assemble the full Pages tree.
 sh "$src/tools/build/rpr-pages.sh" "$tmp/repository" "$tmp/apps" \

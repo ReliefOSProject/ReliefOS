@@ -126,14 +126,6 @@ def icon_fileman(c: list[list[tuple[int, int, int, int]]]) -> None:
     rect(c, 2, 5, 12, 8, rgba(150, 104, 28))
 
 
-def icon_terminal(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 2, 3, 12, 10, BLACK)
-    rect(c, 2, 3, 12, 10, MID)
-    line(c, 4, 6, 6, 8, GREEN)
-    line(c, 6, 8, 4, 10, GREEN)
-    fill(c, 8, 10, 4, 1, GREEN)
-
-
 def icon_taskmgr(c: list[list[tuple[int, int, int, int]]]) -> None:
     fill(c, 2, 3, 12, 10, WHITE)
     rect(c, 2, 3, 12, 10, DARK)
@@ -169,85 +161,13 @@ def icon_minesweeper(c: list[list[tuple[int, int, int, int]]]) -> None:
     put(c, 11, 4, RED)
 
 
-def icon_glxgears(c: list[list[tuple[int, int, int, int]]]) -> None:
-    """Small three-gear mark for the PortableGL renderer demo."""
-    for cx, cy, color in ((5, 6, RED), (10, 6, GREEN), (8, 11, BLUE)):
-        fill(c, cx - 2, cy - 1, 5, 3, color)
-        fill(c, cx - 1, cy - 2, 3, 5, color)
-        put(c, cx, cy, WHITE)
-
-
-def icon_run(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 3, 4, 10, 8, BLUE)
-    rect(c, 3, 4, 10, 8, DARK)
-    line(c, 6, 6, 6, 10, WHITE)
-    line(c, 7, 7, 9, 8, WHITE)
-    line(c, 9, 8, 7, 9, WHITE)
-
-
-def icon_desktop(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 2, 3, 12, 8, CYAN)
-    rect(c, 2, 3, 12, 8, DARK)
-    fill(c, 5, 12, 6, 1, MID)
-    fill(c, 4, 13, 8, 1, DARK)
-
-
-def icon_hello(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 3, 4, 10, 7, WHITE)
-    rect(c, 3, 4, 10, 7, BLUE)
-    put(c, 5, 11, WHITE)
-    put(c, 6, 12, BLUE)
-    put(c, 6, 7, BLUE)
-    put(c, 9, 7, BLUE)
-    fill(c, 6, 9, 4, 1, GREEN)
-
-
-def icon_uidemo(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 2, 3, 12, 10, WHITE)
-    rect(c, 2, 3, 12, 10, DARK)
-    fill(c, 3, 4, 10, 2, BLUE)
-    fill(c, 4, 8, 3, 2, GREEN)
-    fill(c, 9, 8, 3, 2, ORANGE)
-    fill(c, 4, 11, 8, 1, MID)
-
-
-def icon_cjktest(c: list[list[tuple[int, int, int, int]]]) -> None:
-    draw_document(c, RED)
-    rect(c, 6, 6, 5, 5, RED)
-    line(c, 8, 6, 8, 10, RED)
-    line(c, 6, 8, 10, 8, RED)
-
-
-def icon_shell(c: list[list[tuple[int, int, int, int]]]) -> None:
-    icon_terminal(c)
-    text3(c, 4, 5, "$", rgba(130, 255, 130))
-    fill(c, 9, 10, 3, 1, CYAN)
-
-
 def icon_osver(c: list[list[tuple[int, int, int, int]]]) -> None:
     fill(c, 4, 3, 8, 10, BLUE)
     rect(c, 4, 3, 8, 10, DARK)
     text3(c, 6, 6, "I", WHITE)
 
 
-def icon_memtest(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 3, 4, 10, 8, GREEN)
-    rect(c, 3, 4, 10, 8, DARK)
-    for x in range(4, 13, 2):
-        put(c, x, 3, MID)
-        put(c, x, 12, MID)
-    fill(c, 5, 6, 6, 4, rgba(120, 220, 140))
-
-
-def icon_bugtest(c: list[list[tuple[int, int, int, int]]]) -> None:
-    line(c, 8, 2, 2, 13, YELLOW)
-    line(c, 8, 2, 14, 13, YELLOW)
-    line(c, 2, 13, 14, 13, YELLOW)
-    fill(c, 6, 12, 5, 1, YELLOW)
-    text3(c, 7, 7, "!", BLACK)
-
-
-def icon_netctl(c: list[list[tuple[int, int, int, int]]]) -> None:
+def icon_network(c: list[list[tuple[int, int, int, int]]]) -> None:
     fill(c, 2, 3, 12, 10, WHITE)
     rect(c, 2, 3, 12, 10, DARK)
     fill(c, 3, 4, 10, 2, BLUE)
@@ -260,7 +180,7 @@ def icon_netctl(c: list[list[tuple[int, int, int, int]]]) -> None:
     put(c, 9, 12, ORANGE)
 
 
-def icon_servicemgr(c: list[list[tuple[int, int, int, int]]]) -> None:
+def icon_services(c: list[list[tuple[int, int, int, int]]]) -> None:
     fill(c, 3, 2, 10, 12, WHITE)
     rect(c, 3, 2, 10, 12, DARK)
     for y in (4, 7, 10):
@@ -269,34 +189,6 @@ def icon_servicemgr(c: list[list[tuple[int, int, int, int]]]) -> None:
     line(c, 5, 5, 6, 6, GREEN)
     line(c, 6, 6, 8, 4, GREEN)
     put(c, 11, 11, ORANGE)
-
-
-def icon_httpget(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 2, 4, 12, 8, WHITE)
-    rect(c, 2, 4, 12, 8, DARK)
-    fill(c, 3, 5, 10, 2, CYAN)
-    text3(c, 4, 8, "GET", BLUE)
-    put(c, 12, 11, GREEN)
-
-
-def icon_downloadmgr(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 3, 10, 10, 3, LIGHT)
-    rect(c, 3, 10, 10, 3, DARK)
-    fill(c, 7, 2, 2, 7, BLUE)
-    line(c, 4, 7, 8, 11, BLUE)
-    line(c, 12, 7, 8, 11, BLUE)
-    fill(c, 5, 13, 6, 1, GREEN)
-
-
-def icon_browser(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 2, 3, 12, 10, WHITE)
-    rect(c, 2, 3, 12, 10, DARK)
-    fill(c, 3, 4, 10, 2, BLUE)
-    fill(c, 4, 8, 8, 1, CYAN)
-    fill(c, 4, 10, 5, 1, CYAN)
-    line(c, 10, 9, 13, 12, ORANGE)
-    line(c, 13, 12, 12, 13, ORANGE)
-    put(c, 11, 10, ORANGE)
 
 
 def icon_imageview(c: list[list[tuple[int, int, int, int]]]) -> None:
@@ -321,16 +213,6 @@ def icon_paint(c: list[list[tuple[int, int, int, int]]]) -> None:
     put(c, 8, 7, BLUE)
 
 
-def icon_wavplay(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 3, 6, 4, 5, BLUE)
-    fill(c, 6, 4, 3, 9, BLUE)
-    line(c, 9, 6, 12, 4, CYAN)
-    line(c, 9, 10, 12, 12, CYAN)
-    put(c, 4, 12, DARK)
-    put(c, 11, 7, GREEN)
-    put(c, 12, 8, GREEN)
-
-
 def icon_diskmgr(c: list[list[tuple[int, int, int, int]]]) -> None:
     fill(c, 3, 4, 10, 2, LIGHT)
     rect(c, 3, 4, 10, 2, DARK)
@@ -343,40 +225,6 @@ def icon_diskmgr(c: list[list[tuple[int, int, int, int]]]) -> None:
     put(c, 11, 10, GREEN)
 
 
-def icon_devmgr(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 4, 4, 8, 8, PURPLE)
-    rect(c, 4, 4, 8, 8, DARK)
-    for p in range(5, 12, 2):
-        put(c, p, 3, MID)
-        put(c, p, 12, MID)
-        put(c, 3, p, MID)
-        put(c, 12, p, MID)
-    fill(c, 6, 6, 4, 4, rgba(190, 170, 230))
-
-
-def icon_drvmgr(c: list[list[tuple[int, int, int, int]]]) -> None:
-    icon_devmgr(c)
-    fill(c, 6, 6, 4, 4, BLUE)
-    text3(c, 6, 6, "D", WHITE)
-
-
-def icon_oobe(c: list[list[tuple[int, int, int, int]]]) -> None:
-    fill(c, 4, 3, 8, 10, WHITE)
-    rect(c, 4, 3, 8, 10, DARK)
-    put(c, 6, 6, GREEN)
-    line(c, 7, 7, 10, 5, GREEN)
-    put(c, 6, 10, GREEN)
-    line(c, 7, 11, 10, 9, GREEN)
-
-
-def icon_login(c: list[list[tuple[int, int, int, int]]]) -> None:
-    rect(c, 5, 3, 6, 6, BLUE)
-    fill(c, 4, 8, 8, 6, BLUE)
-    rect(c, 4, 8, 8, 6, DARK)
-    put(c, 8, 10, WHITE)
-    fill(c, 8, 11, 1, 2, WHITE)
-
-
 def icon_installer(c: list[list[tuple[int, int, int, int]]]) -> None:
     fill(c, 3, 7, 10, 6, ORANGE)
     rect(c, 3, 7, 10, 6, DARK)
@@ -386,23 +234,8 @@ def icon_installer(c: list[list[tuple[int, int, int, int]]]) -> None:
 
 
 def icon_extra(c, name):
-    """Additional artwork for ReliefOS-authored graphical applications."""
-    if name == "sysconfdialog":
-        fill(c, 2, 3, 12, 10, WHITE); rect(c, 2, 3, 12, 10, DARK)
-        for y, x in ((6, 5), (10, 10)):
-            fill(c, 4, y, 8, 1, MID); fill(c, x, y-1, 2, 3, BLUE)
-    elif name == "apiapp":
-        line(c, 4, 4, 11, 11, DARK); line(c, 11, 4, 4, 11, DARK)
-        for x, y, color in ((2,2,BLUE), (9,2,GREEN), (2,9,ORANGE), (9,9,PURPLE)):
-            fill(c, x, y, 5, 5, color); rect(c, x, y, 5, 5, DARK)
-    elif name == "mp3play":
-        fill(c, 6, 3, 2, 9, ORANGE); fill(c, 11, 2, 2, 9, ORANGE)
-        line(c, 6, 3, 12, 2, ORANGE); fill(c, 3, 10, 4, 3, ORANGE); fill(c, 8, 9, 4, 3, ORANGE)
-    elif name in {"helloworld", "guitest"}:
-        icon_hello(c) if name == "helloworld" else icon_uidemo(c)
-        if name == "helloworld": fill(c, 2, 1, 4, 2, YELLOW)
-        else: line(c, 8, 11, 10, 13, GREEN); line(c, 10, 13, 14, 8, GREEN)
-    elif name == "leonmmcoset":
+    """Additional artwork for ReliefOS-authored X11 applications."""
+    if name == "leonmmcoset":
         color = rgba(229,109,158)
         fill(c, 2, 3, 5, 5, color); fill(c, 9, 3, 5, 5, color)
         fill(c, 3, 6, 10, 4, color)
@@ -503,86 +336,36 @@ def draw_icon(name: str) -> list[list[tuple[int, int, int, int]]]:
         pass
     elif name == "fileman":
         icon_fileman(c)
-    elif name == "terminal":
-        icon_terminal(c)
-    elif name == "notepad":
-        draw_document(c, BLUE)
-    elif name in {"settings", "reliefsettings"}:
+    elif name == "reliefsettings":
         icon_settings(c)
     elif name == "calc":
         icon_calc(c)
     elif name == "minesweeper":
         icon_minesweeper(c)
-    elif name == "glxgears":
-        icon_glxgears(c)
     elif name == "taskmgr":
         icon_taskmgr(c)
-    elif name == "run":
-        icon_run(c)
-    elif name == "desktop":
-        icon_desktop(c)
-    elif name == "init":
-        icon_oobe(c)
-        put(c, 12, 2, GREEN)
-    elif name == "hello":
-        icon_hello(c)
-    elif name == "uidemo":
-        icon_uidemo(c)
-    elif name == "cjktest":
-        icon_cjktest(c)
-    elif name == "shell":
-        icon_shell(c)
     elif name == "osver":
         icon_osver(c)
-    elif name == "memtest":
-        icon_memtest(c)
-    elif name == "bugtest":
-        icon_bugtest(c)
-    elif name == "netctl":
-        icon_netctl(c)
     elif name == "network-controller":
-        icon_netctl(c)
+        icon_network(c)
         fill(c, 9, 8, 6, 6, WHITE)
         rect(c, 9, 8, 6, 6, DARK)
         line(c, 10, 11, 13, 11, GREEN)
         line(c, 11, 10, 13, 12, GREEN)
         line(c, 11, 12, 13, 10, GREEN)
-    elif name in {"sessiond", "device-agent"}:
-        icon_servicemgr(c)
-    elif name == "servicemgr":
-        icon_servicemgr(c)
     elif name == "openrc-controller":
-        icon_servicemgr(c)
+        icon_services(c)
         fill(c, 9, 8, 6, 6, WHITE)
         rect(c, 9, 8, 6, 6, DARK)
         line(c, 11, 10, 13, 11, GREEN)
         line(c, 13, 11, 11, 12, GREEN)
         line(c, 11, 12, 11, 10, GREEN)
-    elif name == "httpget":
-        icon_httpget(c)
-    elif name == "downloadmgr":
-        icon_downloadmgr(c)
-    elif name == "browser":
-        icon_browser(c)
     elif name == "imageview":
         icon_imageview(c)
     elif name == "paint":
         icon_paint(c)
-    elif name == "wavplay":
-        icon_wavplay(c)
-    elif name == "oshlp":
-        draw_document(c, CYAN)
-        text3(c, 6, 6, "!", BLUE)
     elif name == "diskmgr":
         icon_diskmgr(c)
-    elif name == "devmgr":
-        icon_devmgr(c)
-    elif name == "drvmgr":
-        icon_drvmgr(c)
-    elif name == "oobe":
-        icon_oobe(c)
-    elif name == "login":
-        icon_login(c)
     elif name == "installer":
         icon_installer(c)
     else:

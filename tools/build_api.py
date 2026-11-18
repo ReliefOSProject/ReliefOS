@@ -249,7 +249,6 @@ settings_app={input_method_settings_app}
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("legacy", nargs="*", help=argparse.SUPPRESS)
     parser.add_argument("--name")
     parser.add_argument("--id", dest="app_id", default="")
     parser.add_argument("--version")
@@ -267,7 +266,7 @@ def main():
     parser.add_argument("--input-method-settings-app", default="")
     parser.add_argument("--launch-after-install", action="store_true")
     parser.add_argument("--virtual-terminal", action="store_true",
-                        help="run the installed main executable through Terminal")
+                        help="run the installed main executable through the system X11 terminal")
     parser.add_argument("--hidden", action="store_true")
     parser.add_argument("--open-with", action="store_true")
     parser.add_argument("--commands", default="")
@@ -277,68 +276,38 @@ def main():
     parser.add_argument("--output")
     args = parser.parse_args()
 
-    if args.legacy:
-        if len(args.legacy) != 2 or any((args.name, args.version,
-                                         args.main_exe, args.default_path,
-                                         args.output, args.files, args.virtual_terminal)):
-            parser.error("use either the legacy ELF/output form or named options")
-        name = "Hello World"
-        version = "1.0.0"
-        main_exe = "files/helloworld.elf"
-        default_path = "/usr/lib/reliefos/apps/helloworld"
-        files = [(args.legacy[0], main_exe)]
-        output = args.legacy[1]
-        requires_admin = True
-        desktop_shortcut = True
-        icon = ""
-    else:
-        required = {
-            "--name": args.name,
-            "--version": args.version,
-            "--main-exe": args.main_exe,
-            "--default-path": args.default_path,
-            "--output": args.output,
-        }
-        missing = [label for label, value in required.items() if not value]
-        if missing or not args.files:
-            parser.error("missing required options: " + ", ".join(missing or ["--file"]))
-        name = args.name
-        version = args.version
-        main_exe = args.main_exe
-        default_path = args.default_path
-        files = [(local, archive) for local, archive in args.files]
-        output = args.output
-        requires_admin = args.requires_admin
-        desktop_shortcut = args.desktop_shortcut
-        icon = args.icon
-        input_method_id = args.input_method_id
-        input_method_abbreviation = args.input_method_abbreviation
-        input_method_startup = args.input_method_startup
-        input_method_settings = args.input_method_settings
-        input_method_settings_app = args.input_method_settings_app
-        launch_after_install = args.launch_after_install
-        virtual_terminal = args.virtual_terminal
-        app_id = args.app_id
-        category = args.category
-        commands = args.commands
-        extensions = args.extensions
-        hidden = args.hidden
-        open_with = args.open_with
-
-    if args.legacy:
-        input_method_id = ""
-        input_method_abbreviation = ""
-        input_method_startup = "manual"
-        input_method_settings = ""
-        input_method_settings_app = ""
-        launch_after_install = False
-        virtual_terminal = False
-        app_id = ""
-        category = "Applications"
-        commands = ""
-        extensions = ""
-        hidden = False
-        open_with = False
+    required = {
+        "--name": args.name,
+        "--version": args.version,
+        "--main-exe": args.main_exe,
+        "--default-path": args.default_path,
+        "--output": args.output,
+    }
+    missing = [label for label, value in required.items() if not value]
+    if missing or not args.files:
+        parser.error("missing required options: " + ", ".join(missing or ["--file"]))
+    name = args.name
+    version = args.version
+    main_exe = args.main_exe
+    default_path = args.default_path
+    files = [(local, archive) for local, archive in args.files]
+    output = args.output
+    requires_admin = args.requires_admin
+    desktop_shortcut = args.desktop_shortcut
+    icon = args.icon
+    input_method_id = args.input_method_id
+    input_method_abbreviation = args.input_method_abbreviation
+    input_method_startup = args.input_method_startup
+    input_method_settings = args.input_method_settings
+    input_method_settings_app = args.input_method_settings_app
+    launch_after_install = args.launch_after_install
+    virtual_terminal = args.virtual_terminal
+    app_id = args.app_id
+    category = args.category
+    commands = args.commands
+    extensions = args.extensions
+    hidden = args.hidden
+    open_with = args.open_with
 
     build_api_file(
         name=name,
