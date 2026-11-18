@@ -83,19 +83,8 @@ userland/apps/installer/main.cpp
 userland/apps/installer/installer_tty.c
 userland/apps/login/main.c
 userland/apps/osver/main.cpp
-userland/apps/settings/main.c
-userland/apps/run/main.c
 userland/apps/fileman/main.cpp
-userland/apps/browser/main.c
-userland/apps/browser/input.c
-userland/apps/browser/navigation.c
-userland/apps/browser/state.c
-userland/apps/browser/view.c
-userland/apps/guitest/main.c
-userland/apps/hello/main.c
-userland/apps/cjktest/main.c
 userland/apps/oschinpt/main.c
-userland/apps/uidemo/main.c
 userland/apps/minesweeper/main.cpp
 userland/apps/calc/main.cpp
 userland/apps/taskmgr/main.cpp
@@ -105,9 +94,6 @@ userland/apps/paint/main.cpp
 userland/apps/imageview/main.cpp
 userland/apps/doomlauncher/main.cpp
 userland/apps/doom/main.cpp
-userland/apps/oshlp/main.c
-userland/apps/notepad/main.c
-userland/apps/terminal/main.c
 userland/apps/shell/main.c
 userland/apps/systemupdate/main.c
 userland/apps/systemupdate/engine.c
@@ -143,24 +129,10 @@ userland/apps/systemupdate/apk.c
     else
         fail 'BusyBox uname must identify the ReliefOS userland'
     fi
-    if grep -Fq 'const char *initial = "about:reliefos"' \
-            "$root/userland/apps/browser/main.c"; then
-        ok 'browser opens its ReliefOS home URI by default'
-    else
-        fail 'browser home URI must use about:reliefos'
-    fi
     if grep -Fq 'ReliefOS instance v1' "$root/userland/runtime/src/bootloader.c"; then
         ok 'shared GRUB installer records the ReliefOS identity'
     else
         fail 'shared GRUB installer must record the ReliefOS identity'
-    fi
-    if ! grep -Fq 'leonos_api_install_with_progress' \
-            "$root/userland/apps/apiapp/main.c" &&
-       ! grep -Fq 'leonos_stat_legacy()' "$root/userland/apps/bugtest/main.c" &&
-       ! grep -Fq 'leonos_ui_text_width(' "$root/userland/apps/cjktest/main.c"; then
-        ok 'application diagnostics display canonical ReliefOS API names'
-    else
-        fail 'application diagnostics must display ReliefOS API names'
     fi
     if grep -Fq 'Usage: reliefos-update' "$root/userland/apps/systemupdate/main.c" &&
        grep -Fq '[reliefos-update]' "$root/userland/apps/systemupdate/io.c" &&

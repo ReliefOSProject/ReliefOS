@@ -11,7 +11,7 @@ ${HOSTCC:-cc} -std=c11 -O2 -Wall -Wextra -Werror -I"$src" \
     "$src/tools/host/manifest/reliefos-components.c" \
     "$src/tools/host/common/io.c" "$src/tools/host/common/buffer.c" \
     -o "$work/components"
-printf 'CONFIG_RELIEFOS_COMPONENT_APP_HELLO_BUILD=y\n' > "$work/config"
+: > "$work/config"
 "$work/components" --input "$src/configs/components.toml" --config "$work/config" \
     --output "$work/components.mk" --metadata "$work/components.tsv"
 awk -F '\t' '$1=="reliefmath" && $2=="program-app" && $3==1 && $4==1 && $5==1 && $8=="ReliefMath" && $9=="Office applications" && $10==".rmath" && $11==1 {ok=1} END{exit !ok}' "$work/components.tsv" || {

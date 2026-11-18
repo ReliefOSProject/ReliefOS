@@ -81,8 +81,10 @@ def main():
             time.sleep(1)
             probe.text("terminal")
             probe.key("ret")
-            wait_log(serial, "terminal: PTY ready", process, timeout=30)
-            time.sleep(4)
+            time.sleep(3)
+            probe.text("echo PAM_DESKTOP_ST_READY >/dev/ttyS0")
+            probe.key("ret")
+            wait_log(serial, "PAM_DESKTOP_ST_READY", process, timeout=30)
             name = "core-probe" if args.core else "flock-probe"
             probe.text(f"grep Uid /proc/self/status > /tmp/pam-uid; /bin/{name} > /tmp/flock-result 2>&1; echo PAM_DESKTOP_OK")
             probe.key("ret")

@@ -24,7 +24,6 @@ from typing import Iterable, Sequence
 
 # The first existing candidate is accepted.
 SUBMODULE_LICENSES: dict[str, tuple[str, ...]] = {
-    "litehtml": ("LICENSE",),
     "musl": ("COPYRIGHT",),
     "mimalloc": ("LICENSE",),
     "busybox": ("LICENSE",),

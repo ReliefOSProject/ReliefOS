@@ -5,7 +5,6 @@ Defaults timestamp_timeout=5
 Defaults logfile="/var/log/sudo.log"
 Defaults!/usr/lib/reliefos/apps/sudod/sudod.elf !use_pty
 # The API installation worker returns binary progress records over stdout.
-Defaults!/usr/lib/reliefos/apps/apiapp/apiapp.elf !use_pty
 # OpenRC Controller uses a framed stdin/stdout session after authentication.
 # Keep EOF and binary framing intact; this grants no additional sudo rights.
 Defaults!/usr/lib/reliefos/apps/openrc-controller/openrc-controller.elf !use_pty

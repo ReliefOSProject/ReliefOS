@@ -117,7 +117,7 @@ file "$out/sysroot/musl/lib/libc.so" lib/libc.so 0755 musl
 file "$out/sysroot/musl/lib/libmimalloc.so.3" lib/libmimalloc.so.3 0755 reliefos-mimalloc
 file "$out/system/lib/libreliefos.so.2" usr/lib/reliefos/libreliefos.so.2 0755 reliefos-apps
 file "$out/system/lib/libleonos.so.2" usr/lib/leonos/libleonos.so.2 0755 reliefos-apps
-if enabled settings || enabled soundctl; then
+if enabled soundctl; then
     file "$out/system/lib/libreliefos-audio.so.1" usr/lib/libreliefos-audio.so.1 0755 reliefos-audio
 fi
 for package in musl mimalloc; do tree "$out/sysroot/musl/share/licenses/$package" "usr/share/licenses/$package" "$package"; done

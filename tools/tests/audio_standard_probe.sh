@@ -30,7 +30,7 @@ abi)
     amixer -c 0 contents
     soundctl cards
     soundctl controls
-    test -x /usr/lib/reliefos/apps/settings/settings.elf
+    test -x /usr/lib/reliefos/apps/soundctl/soundctl.elf
     test -x /usr/lib/reliefos/apps/doom/doom.elf
     test -s /usr/lib/reliefos/apps/doom/freedoom1.wad
     printf '%s\n' 'PASS standard-enumeration settings-doom-payload'

@@ -56,9 +56,9 @@ userland/runtime/src userland/auth: \
 	$(AUTOCONF_H) $(GBK_TABLE) $(PNG_CONFIG) $(MUSL_STAMP) $(RUNTIME_HEADERS) \
 	$(HEADER_EXPORT_MANIFEST) $(RELIEFOS_CC_ID) $(RELIEFOS_AR_ID)
 
-$(GBK_TABLE): $(RELIEFOS_GBK_TOOL) $(RELIEFOS_SRC)/third_party/litehtml/src/encodings.cpp
+$(GBK_TABLE): $(RELIEFOS_GBK_TOOL) $(RELIEFOS_SRC)/third_party/musl/src/locale/gb18030.h
 	$(Q)mkdir -p $(dir $@)
-	$(Q)$(RELIEFOS_GBK_TOOL) $(RELIEFOS_SRC)/third_party/litehtml/src/encodings.cpp $@
+	$(Q)$(RELIEFOS_GBK_TOOL) $(RELIEFOS_SRC)/third_party/musl/src/locale/gb18030.h $@
 
 quiet_cmd_reliefos_runtime_shared = LD      $@
       cmd_reliefos_runtime_shared = test -f '$(RUNTIME_BUILTINS)' || { echo 'missing compiler-rt builtins; select a complete Clang toolchain' >&2; exit 1; }; $(TARGET_LD) -shared --no-undefined --hash-style=both -soname $(notdir $@) -o $@.tmp $(RUNTIME_OBJECTS) -L$(MUSL_SYSROOT)/lib -l:libmimalloc.so.3 $(RUNTIME_AUTH_LIBS) $(RUNTIME_DEP_SHARED) -lc $(RUNTIME_BUILTINS); mv $@.tmp $@

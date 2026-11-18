@@ -49,7 +49,7 @@ class ProcfsTaskmgrTests(unittest.TestCase):
     def test_taskmgr_service_manager_entry_uses_openrc_manager(self):
         source = (ROOT / "userland/apps/taskmgr/main.cpp").read_text()
         self.assertIn('T("Service Manager")', source)
-        self.assertIn('reliefos_launch_builtin_path("servicemgr")', source)
+        self.assertIn('reliefos_launch_builtin_path("openrc-controller")', source)
         self.assertIn('reliefos_launch_argv(args)', source)
         self.assertNotIn('T("Startup Apps")', source)
 
