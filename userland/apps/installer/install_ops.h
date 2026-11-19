@@ -29,6 +29,7 @@ extern "C" {
 #define COPY_PRESENT_INTERVAL_MS 50U
 #define INSTALL_ROOT_PAYLOAD "/install/root"
 #define INSTALL_CONSOLE_ROOT_PAYLOAD "/install/root-console"
+#define INSTALL_XFCE_ROOT_PAYLOAD "/install/root-xfce"
 #define INSTALL_ESP_PAYLOAD "/install/esp"
 #define INSTALL_ROOT_MOUNT "/target"
 #define INSTALL_ESP_MOUNT "/target/boot"

@@ -9,6 +9,8 @@ extern "C" {
 /** @brief Conservative allocated-byte and inode requirements of selected payloads. */
 struct installer_capacity {
     uint64_t root_bytes, root_inodes, boot_bytes;
+    /* Unrounded sizes for copy progress, excluding generated files and swap. */
+    uint64_t root_data_bytes;
 };
 
 /** @brief Recommend RAM-sized swap in MiB, clamped to 512 through 2048 MiB.

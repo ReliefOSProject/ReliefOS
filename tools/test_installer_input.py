@@ -8,6 +8,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallerInputTests(unittest.TestCase):
+    def test_worker_progress_does_not_block_copying(self):
+        with tempfile.TemporaryDirectory(prefix="installer-worker-") as tmp:
+            executable = str(Path(tmp) / "worker")
+            subprocess.run([
+                "cc", "-std=gnu11", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
+                "-fsanitize=address,undefined", "tools/tests/installer_job_test.c",
+                "userland/apps/installer/installer_job.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable], check=True, timeout=10)
+
     def test_fresh_copy_metadata_and_failure_safety(self):
         """Exercise real copy metadata and publication on an owned host tree."""
         with tempfile.TemporaryDirectory(prefix="installer-fresh-copy-") as tmp:

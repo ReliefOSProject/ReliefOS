@@ -32,6 +32,7 @@ printf '%s\t%s\t%s\n' "$lock" "$id" "$field" >> "$FAKE_DEPS_LOG"
 case $field:$id in
     feature:alpine-openrc|feature:alpine-xorg-fonts) printf 'base\n' ;;
     feature:alpine-xorg-server|feature:alpine-xterm|feature:alpine-icewm|feature:alpine-mesa-dri-gallium) printf 'xorg\n' ;;
+    feature:alpine-xfce4) printf 'xfce\n' ;;
     feature:alpine-sl) printf 'component:sl\n' ;;
     feature:alpine-ncurses) printf 'component:ncurses\n' ;;
     feature:alpine-sqlite-libs) printf 'component:sqlite\n' ;;
@@ -132,6 +133,7 @@ build_archive "$w/upstream/packages" openrc 0.1 etc/fixture-openrc.conf etc/open
 build_archive "$w/upstream/packages" xorg-fonts 0.1 usr/share/fonts/xorg-fonts.fixture
 build_archive "$w/upstream/packages" xorg-server 0.1 usr/bin/xorg-server usr/lib/xorg/modules/raw-overlay-probe
 build_archive "$w/upstream/packages" xterm 0.1 usr/bin/xterm
+build_archive "$w/upstream/packages" xfce4 0.1 usr/bin/startxfce4
 # apk-stage.sh's xorg path verifies the pinned IceWM ships bundled themes, so
 # the xorg fixture needs an icewm archive carrying one (feature xorg + url).
 build_archive "$w/upstream/packages" icewm 0.1 usr/share/icewm/themes/default/default.theme
@@ -189,6 +191,7 @@ expect_absent "$s/repository/icewm-0.1.apk"
 expect_absent "$s/repository/xorg-server-0.1.apk"
 expect_absent "$s/repository/xterm-0.1.apk"
 expect_absent "$s/repository/mesa-dri-gallium-0.1.apk"
+expect_absent "$s/repository/xfce4-0.1.apk"
 expect_present "$s/managed/usr/share/reliefos/apk/repository/openrc-0.1.apk"
 expect_absent "$s/managed/usr/share/reliefos/apk/repository/xorg-server-0.1.apk"
 expect_absent "$s/managed/usr/share/reliefos/apk/repository/xterm-0.1.apk"
@@ -232,6 +235,7 @@ expect_absent "$s/repository/icewm-0.1.apk"
 expect_absent "$s/repository/xorg-server-0.1.apk"
 expect_absent "$s/repository/xterm-0.1.apk"
 expect_absent "$s/repository/mesa-dri-gallium-0.1.apk"
+expect_absent "$s/repository/xfce4-0.1.apk"
 expect_present "$s/managed/usr/share/fonts/xorg-fonts.fixture"
 expect_present "$s/managed/etc/openrc-extra.conf"
 expect_present "$s/managed/usr/bin/keep-me.txt"
@@ -257,6 +261,9 @@ set_marker "xorg
 "
 stage xorg
 s=$w/xorg
+expect_absent "$s/repository/xfce4-0.1.apk"
+expect_absent "$s/managed/usr/bin/startxfce4"
+expect_no_grep "$s/apk.log" 'xfce4'
 for archive in icewm-0.1.apk mesa-dri-gallium-0.1.apk openrc-0.1.apk xorg-fonts-0.1.apk xorg-server-0.1.apk xterm-0.1.apk; do
     expect_present "$s/repository/$archive"
     expect_present "$s/managed/usr/share/reliefos/apk/repository/$archive"

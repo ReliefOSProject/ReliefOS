@@ -55,7 +55,7 @@ static void record_settings(void)
     FILE *file = fopen(path, "w");
     assert(file);
     fprintf(file, "user=%s xorg=%u bios=%u uefi=%u swap=%u size=%llu\n", setup.username,
-        !setup.skip_xorg, !setup.skip_bios, !setup.skip_uefi, setup.swap_enabled,
+        setup.desktop != INSTALLER_DESKTOP_CONSOLE, !setup.skip_bios, !setup.skip_uefi, setup.swap_enabled,
         (unsigned long long)setup.swap_size_mib);
     fclose(file);
 }

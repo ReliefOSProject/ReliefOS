@@ -4,13 +4,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+enum installer_desktop {
+    INSTALLER_DESKTOP_ICEWM = 0,
+    INSTALLER_DESKTOP_XFCE,
+    INSTALLER_DESKTOP_CONSOLE,
+};
+
 struct installer_setup {
     char username[RELIEFOS_AUTH_USERNAME_LEN];
     char password[RELIEFOS_AUTH_PASSWORD_LEN];
     char password_confirm[RELIEFOS_AUTH_PASSWORD_LEN];
     char root_password[RELIEFOS_AUTH_PASSWORD_LEN];
     char root_password_confirm[RELIEFOS_AUTH_PASSWORD_LEN];
-    uint8_t skip_xorg;
+    uint8_t desktop;
     uint8_t skip_bios;
     uint8_t skip_uefi;
     uint8_t format_esp;

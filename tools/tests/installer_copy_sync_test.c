@@ -30,6 +30,7 @@ static int fixture_fsync(int fd)
 }
 static int fixture_syncfs(int fd)
 {
+    assert(!strcmp(status_text, "Synchronizing target filesystem"));
     struct stat st;
     assert(fstat(fd, &st) == 0 && S_ISDIR(st.st_mode));
     ++filesystem_sync_calls;
@@ -41,6 +42,7 @@ int reliefos_boot_install_instance_at_root(const struct reliefos_boot_install_op
     const char *root, const char *esp)
 {
     (void)options;
+    assert(!strcmp(status_text, "Installing bootloaders"));
     assert(root && *root);
     assert(esp && !strcmp(esp, INSTALL_ESP_VOLUME));
     assert(filesystem_sync_calls && !fail_filesystem_sync);

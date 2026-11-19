@@ -23,6 +23,8 @@ printf '[Desktop Entry]\n' > "$w/src/userland/apps/installer/installer.desktop"
 cp "$src/system/xorg/installer-session" "$w/src/system/xorg/installer-session"
 ln -s "$src/resources" "$w/src/resources"
 printf 'canonical runtime\n' > "$w/raw/usr/lib/reliefos/libreliefos.so.2"
+cp "$w/raw/usr/lib/reliefos/libreliefos.so.2" "$w/raw/usr/lib/reliefos/independent-file"
+ln "$w/raw/usr/lib/reliefos/independent-file" "$w/raw/usr/lib/reliefos/original-hardlink"
 printf 'compat runtime\n' > "$w/raw/usr/lib/leonos/libleonos.so.2"
 printf 'sound controls\n' > "$w/raw/usr/lib/reliefos/apps/soundctl/soundctl.elf"
 printf 'xorg\n' > "$w/raw/etc/reliefos/desktop-backend"
@@ -90,6 +92,16 @@ cp -a "$2" "$3"
 mkdir -p "$3/lib/apk/db"
 printf 'fixture package database\n' > "$3/lib/apk/db/installed"
 ADAPTER
+cat > "$w/src/tools/build/installer-xfce-profile.sh" <<'ADAPTER'
+#!/bin/sh
+set -eu
+[ "$#" = 7 ] && [ "$5" = fixture ] && [ "$7" = fixture-deps ]
+cp -a "$2" "$3"
+mkdir -p "$3/etc/X11"
+printf '#!/bin/sh\nexec /usr/bin/startxfce4\n' > "$3/etc/X11/Xsession"
+chmod +x "$3/etc/X11/Xsession"
+printf 'XFCE fixture package database\n' > "$3/lib/apk/db/installed"
+ADAPTER
 cp "$src/tools/build/installer-console-profile.sh" "$w/src/tools/build/installer-console-profile.sh"
 APK_TOOL=fixture APK_UPSTREAM=fixture APK_DEPS_TOOL=fixture-deps APK_LOCK=fixture-lock \
  APK_OWN_TOOL=fixture APK_KEY=fixture APK_VERSION=fixture \
@@ -122,7 +134,10 @@ done
 [ "$(cat "$w/stage/etc/reliefos/desktop-backend")" = xorg ]
 [ "$(cat "$w/stage/install/root/etc/reliefos/desktop-backend")" = xorg ]
 [ "$(cat "$w/stage/install/root-console/etc/reliefos/desktop-backend")" = console ]
-for profile in "$w/stage" "$w/stage/install/root" "$w/stage/install/root-console"; do
+[ "$(cat "$w/stage/install/root-xfce/etc/reliefos/desktop-backend")" = xorg ]
+[ -x "$w/stage/install/root-xfce/etc/X11/Xsession" ]
+[ ! -e "$w/stage/install/root/etc/X11/Xsession" ]
+for profile in "$w/stage" "$w/stage/install/root" "$w/stage/install/root-console" "$w/stage/install/root-xfce"; do
     for path in usr/sbin/reliefos-boot-install usr/sbin/grub-install \
         usr/sbin/grub-bios-setup usr/sbin/grub-probe usr/bin/grub-mkimage \
         usr/lib/grub/i386-pc/boot.img; do
@@ -204,14 +219,22 @@ inode() { stat -c '%d:%i' "$1"; }
 library=$w/stage/usr/lib/reliefos/libreliefos.so.2
 installed_library=$w/stage/install/root/usr/lib/reliefos/libreliefos.so.2
 console_library=$w/stage/install/root-console/usr/lib/reliefos/libreliefos.so.2
+xfce_library=$w/stage/install/root-xfce/usr/lib/reliefos/libreliefos.so.2
 [ "$(inode "$library")" = "$(inode "$installed_library")" ]
 [ "$(inode "$library")" = "$(inode "$console_library")" ]
+[ "$(inode "$library")" = "$(inode "$xfce_library")" ]
+# A future install from any one tree must retain separate package files.
+for tree in "$w/stage" "$w/stage/install/root" "$w/stage/install/root-console" "$w/stage/install/root-xfce"; do
+    [ "$(inode "$tree/usr/lib/reliefos/libreliefos.so.2")" != "$(inode "$tree/usr/lib/reliefos/independent-file")" ]
+    [ "$(inode "$tree/usr/lib/reliefos/independent-file")" = "$(inode "$tree/usr/lib/reliefos/original-hardlink")" ]
+done
 runtime_db=$w/stage/lib/apk/db/installed
 installed_db=$w/stage/install/root/lib/apk/db/installed
 console_db=$w/stage/install/root-console/lib/apk/db/installed
 [ "$(inode "$runtime_db")" != "$(inode "$installed_db")" ]
 [ "$(inode "$runtime_db")" != "$(inode "$console_db")" ]
 [ "$(inode "$installed_db")" != "$(inode "$console_db")" ]
+[ "$(inode "$installed_db")" != "$(inode "$w/stage/install/root-xfce/lib/apk/db/installed")" ]
 runtime_marker=$w/stage/etc/reliefos/desktop-backend
 installed_marker=$w/stage/install/root/etc/reliefos/desktop-backend
 console_marker=$w/stage/install/root-console/etc/reliefos/desktop-backend

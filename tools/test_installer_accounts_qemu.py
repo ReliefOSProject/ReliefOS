@@ -211,7 +211,7 @@ def installer_log(probe, serial):
                                   "filename": str(memory)})
     finally:
         probe.command("cont")
-    subprocess.run(["debugfs", "-R", f"dump /var/log/installer-session.log {log_path}",
+    subprocess.run(["debugfs", "-R", f"dump /var/log/installer.log {log_path}",
                     str(memory)], check=True)
     return log_path.read_text()
 
@@ -255,7 +255,7 @@ def assert_desktop_profile(image, skip_xorg):
         assert not unexpected_apps, f"Console image includes Xorg applications: {unexpected_apps}"
 
 
-def installer_finish_log(probe, serial, process, log_path="/var/log/installer-session.log"):
+def installer_finish_log(probe, serial, process, log_path="/var/log/installer.log"):
     """Read a bounded live log suffix and this request's status via the rescue TTY."""
     start = serial.stat().st_size
     token = "INSTALLER_LOG_READ_DONE_" + uuid.uuid4().hex
@@ -301,8 +301,7 @@ def wait_install(probe, serial, process, *, tty=False, timeout=2400):
         else:
             finished = probe.visible_page(frame) == 10
         if finished:
-            current = installer_finish_log(probe, serial, process,
-                "/var/log/installer.log" if tty else "/var/log/installer-session.log")
+            current = installer_finish_log(probe, serial, process)
             assert "[installer.elf] installation completed successfully" in current, current[-10000:]
             probe.frame("installed")
             return
@@ -343,7 +342,7 @@ def xorg_checkbox_checked(indicator):
 
 def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False,
                 install_bios=True, install_uefi=True, install_timeout=2400,
-                swap_mib=None):
+                swap_mib=None, desktop="icewm"):
     """Complete the real GUI, optionally selecting Chinese before account setup."""
     probe.enable_installer_geometry()
     wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
@@ -380,35 +379,53 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False,
     next_page(probe, 8)
     probe.frame("confirmation")
 
-    # Exercise the Xorg choice across a real page rebuild. The screenshot of
-    # the initial state is also retained for checking the default selection.
-    checkbox_x, checkbox_y = probe.xorg_indicator_point()
+    # Exercise selection and retention through a real page rebuild.
     confirm_x, confirm_y = probe.confirm_field_point()
     probe.click(confirm_x, confirm_y)
     probe.text("INSTALL")
-    default_xorg = xorg_checkbox_crop(probe, "confirmation-xorg-default")
-    assert xorg_checkbox_checked(default_xorg), "Xorg option is not checked by default"
-    probe.click(checkbox_x, checkbox_y)
-    probe.click(confirm_x, confirm_y)
-    changed_xorg = xorg_checkbox_crop(probe, "confirmation-xorg-toggled")
-    assert not xorg_checkbox_checked(changed_xorg), "Xorg checkbox did not clear when clicked"
+
+    def choose_desktop(index):
+        probe.click(probe.content_left + 160, probe.sidebar_top + 355)
+        # FLTK opens on the current selection, and Up stops at the first item.
+        for _ in range(2):
+            probe.key("up")
+        for _ in range(index):
+            probe.key("down")
+        probe.key("ret")
+        probe.move(probe.width - 10, 10)
+
+    def desktop_crop(name):
+        frame = probe.frame(name)
+        x, y = probe.content_left, probe.sidebar_top + 338
+        # Restrict the comparison to the label, away from the dotted focus
+        # outline and the pointer location used to open the menu.
+        return frame.crop((x + 5, y + 8, x + 208, y + 27))
+
+    def verify_desktop(crop, index):
+        if chinese and index != 1:
+            return
+        from test_vt_qemu import ocr
+        text = ocr(crop, psm=7).lower()
+        expected = "xfce" if chinese else ("default", "experimental", "only")[index]
+        assert expected in text, f"Expected {expected} desktop option, saw {text.strip()!r}"
+
+    default_desktop = desktop_crop("confirmation-desktop-default")
+    verify_desktop(default_desktop, 0)
+    choose_desktop(2)
+    changed_desktop = desktop_crop("confirmation-desktop-console")
+    verify_desktop(changed_desktop, 2)
     previous_page(probe, 7)
-    probe.frame("accounts-xorg-back")
     next_page(probe, 8)
-    probe.click(confirm_x, confirm_y)
-    retained_xorg = xorg_checkbox_crop(probe, "confirmation-xorg-retained")
-    assert not xorg_checkbox_checked(retained_xorg), "Xorg choice was lost when returning to Confirm"
-    assert retained_xorg.tobytes() == changed_xorg.tobytes(), "Xorg indicator changed after returning to Confirm"
-    if not skip_xorg:
-        probe.click(checkbox_x, checkbox_y)
-        probe.click(confirm_x, confirm_y)
-        enabled_xorg = xorg_checkbox_crop(probe, "confirmation-xorg-enabled")
-        assert xorg_checkbox_checked(enabled_xorg), "Xorg checkbox did not return to enabled state"
-        assert enabled_xorg.tobytes() == default_xorg.tobytes(), "Xorg indicator did not return to its initial state"
+    retained_desktop = desktop_crop("confirmation-desktop-retained")
+    verify_desktop(retained_desktop, 2)
+    selected_index = 2 if skip_xorg else 1 if desktop == "xfce" else 0
+    choose_desktop(selected_index)
+    selected_desktop = desktop_crop("confirmation-desktop-selected")
+    verify_desktop(selected_desktop, selected_index)
 
     # The optional swap checkbox is default-off. Coordinates share the same
     # content origin as xorg_indicator_point; keep a real frame for review.
-    swap_x, swap_y = probe.content_left + 398, probe.sidebar_top + 334
+    swap_x, swap_y = probe.content_left + 398, probe.sidebar_top + 354
     probe.move(probe.width - 10, 10)
     frame = probe.frame("confirmation-swap-default")
     indicator = frame.crop((swap_x - 9, swap_y - 9, swap_x + 10, swap_y + 10))
@@ -472,7 +489,7 @@ def wait_tui_page(probe, process, title, timeout=90):
 
 def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
                 install_bios=True, install_uefi=True, select_entry=True, install_timeout=2400,
-                swap_mib=None, partition_roles=None, confirm_install=True):
+                swap_mib=None, partition_roles=None, confirm_install=True, desktop="icewm"):
     """Operate ncurses controls; partition_roles addresses physical table rows."""
     if swap_mib is not None and (not isinstance(swap_mib, int) or not 1 <= swap_mib <= 16777216):
         raise ValueError("swap_mib must be a valid positive MiB count")
@@ -532,9 +549,13 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
     for value in ("alice", USER_PASSWORD, USER_PASSWORD, ROOT_PASSWORD, ROOT_PASSWORD):
         probe.text(value)
         probe.key("tab")
-    if skip_xorg:
+    desktop_index = 2 if skip_xorg else 1 if desktop == "xfce" else 0
+    for _ in range(desktop_index):
+        probe.key("tab")
+    if desktop_index:
         probe.key("spc")
-    probe.key("tab")
+    for _ in range(3 - desktop_index):
+        probe.key("tab")
     if swap_mib is not None:
         probe.key("spc")
         probe.key("tab")
