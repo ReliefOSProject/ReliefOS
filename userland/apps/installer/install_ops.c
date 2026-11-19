@@ -32,6 +32,7 @@
 #include <sys/stat.h>
 #include <sys/statvfs.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 unsigned long reliefos_uptime_ms(void);
@@ -61,8 +62,8 @@ uint8_t install_success;
 int reboot_error;
 uint8_t install_running;
 uint8_t installer_tty_mode;
-static uint32_t copy_total;
-static uint32_t copy_done;
+static uint64_t copy_total;
+static uint64_t copy_done;
 static uint64_t copy_total_bytes;
 static uint64_t copy_done_bytes;
 static uint32_t tty_last_progress = 0xffffffffu;
@@ -70,6 +71,7 @@ static char tty_last_status[128];
 static uint8_t copy_buf[COPY_BUF_SIZE];
 static uint8_t copy_defer_sync;
 static uint8_t copy_fresh_root;
+static void show_progress(uint32_t value, const char *status, const char *detail);
 static char installer_root_uuid[37], installer_esp_uuid[37];
 static uint32_t installer_root_filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT4;
 int installer_boot_entry_path(char *path, uint32_t capacity)
@@ -106,7 +108,11 @@ static struct reliefos_boot_install_options installer_boot_options(void)
 
 static const char *fresh_root_payload(void)
 {
-    return setup.skip_xorg ? INSTALL_CONSOLE_ROOT_PAYLOAD : INSTALL_ROOT_PAYLOAD;
+    switch (setup.desktop) {
+    case INSTALLER_DESKTOP_XFCE: return INSTALL_XFCE_ROOT_PAYLOAD;
+    case INSTALLER_DESKTOP_CONSOLE: return INSTALL_CONSOLE_ROOT_PAYLOAD;
+    default: return INSTALL_ROOT_PAYLOAD;
+    }
 }
 
 int text_eq(const char *a, const char *b)
@@ -550,44 +556,64 @@ void reset_confirm(void)
     "none,filetype,extents,dir_index,metadata_csum,64bit,flex_bg," \
     "has_journal,large_file,huge_file,extra_isize"
 
-static int installer_format_ext4(const char *path)
+/** @brief Populate a fresh, unmounted ext4 partition before publishing boot files. */
+static int installer_populate_ext4(const char *device, const char *payload)
 {
+    /* The signed APK trees supply POSIX ownership and modes. The old copy did
+     * not copy extended attributes, and the live kernel lacks listxattr. */
     char *const argv[] = { (char *)"mkfs.ext4", (char *)"-F",
                            (char *)"-b", (char *)"4096",
                            (char *)"-I", (char *)"256",
                            (char *)"-i", (char *)"16384",
                            (char *)"-O", (char *)INSTALLER_MKFS_EXT4_FEATURES,
-                           (char *)path, NULL };
+                           (char *)"-E", (char *)"no_copy_xattrs",
+                           (char *)"-d", (char *)payload, (char *)device, NULL };
     pid_t child;
     int status;
+    unsigned long start = reliefos_uptime_ms();
+    show_progress(35, T("Writing system files to disk"), device);
     int ret = posix_spawnp(&child, "mkfs.ext4", NULL, NULL, argv, environ);
     if (ret) return -ret;
-    while (waitpid(child, &status, 0) < 0 && errno == EINTR) {}
-    if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) return -EIO;
+    for (;;) {
+        pid_t finished = waitpid(child, &status, WNOHANG);
+        if (finished == child) break;
+        if (finished < 0) {
+            if (errno == EINTR) continue;
+            return -errno;
+        }
+        char detail[96];
+        snprintf(detail, sizeof(detail), T("Elapsed time: %lu s"),
+                 (reliefos_uptime_ms() - start) / 1000);
+        show_progress(35, T("Writing system files to disk"), detail);
+        nanosleep(&(struct timespec){.tv_sec = 1}, NULL);
+    }
+    if (!WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+        fprintf(stderr, "[installer.elf] mkfs.ext4 failed for %s (wait status %#x)\n",
+                device, (unsigned)status);
+        return -EIO;
+    }
+    fprintf(stderr, "[installer.elf] ext4 payload written src=%s device=%s elapsed_ms=%lu\n",
+            payload, device, reliefos_uptime_ms() - start);
     return 0;
 }
 
 static int installer_fresh_partitions(const char *disk_path,
                                       char *esp_path, uint32_t esp_cap,
                                       char *root_path, uint32_t root_cap,
-                                      uint32_t *root_filesystem)
+                                      uint32_t *root_filesystem,
+                                      const struct installer_capacity *capacity)
 {
     struct reliefos_block_partition parts[RELIEFOS_BLOCK_MAX_PARTITIONS];
     uint32_t count = 0, esp = UINT32_MAX, root = UINT32_MAX;
     int ret;
     if (!disk_path || !esp_path || !root_path || !root_filesystem) return -EINVAL;
-    struct installer_capacity capacity = {0};
-    ret = installer_capacity_measure(fresh_root_payload(), INSTALL_ESP_PAYLOAD,
-                                    !setup.skip_bios, !setup.skip_uefi, &capacity);
-    if (!ret && setup.swap_enabled) ret = installer_capacity_add_swap(&capacity, setup.swap_size_mib);
-    if (ret) return ret;
     *root_filesystem = RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
     if (installer_partition_auto) {
         struct reliefos_block_disk_info info;
         struct installer_partition_plan plan;
         ret = reliefos_block_get_info(disk_path, &info);
         if (!ret) ret = installer_partition_plan_default(&info, installer_boot_modes(), &plan);
-        if (!ret) ret = installer_capacity_check(&capacity, plan.root.sector_count, plan.esp.sector_count);
+        if (!ret) ret = installer_capacity_check(capacity, plan.root.sector_count, plan.esp.sector_count);
         if (!ret) ret = installer_partition_apply_default(disk_path, &plan);
         if (ret < 0) return ret;
         esp = plan.esp.index;
@@ -600,7 +626,7 @@ static int installer_fresh_partitions(const char *disk_path,
         ret = reliefos_block_format(esp_path, RELIEFOS_BLOCK_FILESYSTEM_FAT32, "RELIEFOS");
         if (ret < 0) return ret;
         *root_filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT4;
-        ret = installer_format_ext4(root_path);
+        ret = installer_populate_ext4(root_path, fresh_root_payload());
         if (!ret) ret = reliefos_block_partition_uuid(disk_path, root, installer_root_uuid);
         if (!ret) ret = reliefos_block_partition_uuid(disk_path, esp, installer_esp_uuid);
         return ret;
@@ -619,7 +645,7 @@ static int installer_fresh_partitions(const char *disk_path,
         parts[root].gpt_type != RELIEFOS_BLOCK_GPT_LINUX) return -EINVAL;
     if (parts[esp].sector_count < 2048u ||
         parts[root].sector_count < 128ULL * 2048ULL) return -ENOSPC;
-    ret = installer_capacity_check(&capacity, parts[root].sector_count, parts[esp].sector_count);
+    ret = installer_capacity_check(capacity, parts[root].sector_count, parts[esp].sector_count);
     if (ret) return ret;
     copy_text(esp_path, esp_cap, parts[esp].path);
     copy_text(root_path, root_cap, parts[root].path);
@@ -631,7 +657,7 @@ static int installer_fresh_partitions(const char *disk_path,
                      ? RELIEFOS_BLOCK_FILESYSTEM_EXT3 : RELIEFOS_BLOCK_FILESYSTEM_EXT4;
     ret = *root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3
         ? reliefos_block_format(root_path, RELIEFOS_BLOCK_FILESYSTEM_EXT3, "RELIEFOS")
-        : installer_format_ext4(root_path);
+        : installer_populate_ext4(root_path, fresh_root_payload());
     if (!ret) ret = reliefos_block_partition_uuid(disk_path, parts[root].index,
                                                    installer_root_uuid);
     if (!ret) ret = reliefos_block_partition_uuid(disk_path, parts[esp].index,
@@ -639,7 +665,8 @@ static int installer_fresh_partitions(const char *disk_path,
     return ret;
 }
 
-static int installer_mount_targets(const char *disk_path)
+static int installer_mount_targets(const char *disk_path,
+                                    const struct installer_capacity *capacity)
 {
     char esp_path[RELIEFOS_BLOCK_PATH_LEN], root_path[RELIEFOS_BLOCK_PATH_LEN];
     uint32_t root_filesystem = RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
@@ -673,12 +700,14 @@ static int installer_mount_targets(const char *disk_path)
     }
     ret = installer_fresh_partitions(disk_path, esp_path, sizeof(esp_path),
                                           root_path, sizeof(root_path),
-                                          &root_filesystem);
+                                          &root_filesystem, capacity);
     if (ret < 0) {
         printf("[installer.elf] mount target partitions failed ret=%d disk=%s\n",
                ret, disk_path ? disk_path : "?");
         return ret;
     }
+    show_progress(root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4 ? 89 : 22,
+                  T("Mounting target filesystems"), T("Root and boot partitions"));
     printf("[installer.elf] mount targets disk=%s root=%s esp=%s root_fs=%u\n",
            disk_path ? disk_path : "?", root_path, esp_path, root_filesystem);
     if (root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT4) {
@@ -718,11 +747,8 @@ static int installer_mount_targets(const char *disk_path)
         (void)umount2(INSTALL_ROOT_MOUNT, 0);
         return ret;
     }
-    struct installer_capacity needed = {0};
     struct statvfs available;
-    ret = installer_capacity_measure(fresh_root_payload(), INSTALL_ESP_PAYLOAD,
-                                    !setup.skip_bios, !setup.skip_uefi, &needed);
-    if (!ret && statvfs(INSTALL_ESP_MOUNT, &available) < 0) ret = -errno;
+    if (statvfs(INSTALL_ESP_MOUNT, &available) < 0) ret = -errno;
     if (!ret) {
         uint64_t extra = 8u * 1024u * 1024u;
         if (!setup.skip_uefi) {
@@ -732,7 +758,7 @@ static int installer_mount_targets(const char *disk_path)
         }
         uint64_t unit = available.f_frsize ? available.f_frsize : available.f_bsize;
         if (!ret && (!unit || (uint64_t)available.f_bavail > UINT64_MAX / unit)) ret = -EOVERFLOW;
-        if (!ret && (uint64_t)available.f_bavail * unit < needed.boot_bytes + extra) ret = -ENOSPC;
+        if (!ret && (uint64_t)available.f_bavail * unit < capacity->boot_bytes + extra) ret = -ENOSPC;
     }
     if (ret) return ret;
     return 0;
@@ -796,24 +822,26 @@ static void show_progress(uint32_t value, const char *status,
 
 static uint32_t copy_progress_percent(void)
 {
-    if (copy_total_bytes == 0) {
-        return copy_total ? 35 + (copy_done * 60U) / copy_total : 35;
-    }
-    if (copy_done_bytes > copy_total_bytes) {
-        copy_done_bytes = copy_total_bytes;
-    }
-    return 35 + (uint32_t)((copy_done_bytes * 60ULL) / copy_total_bytes);
+    /* A tree of small files and links can spend much of its time on metadata.
+     * Weight that work alongside bytes so either kind of progress is visible. */
+    double entries = copy_total ? (double)copy_done / copy_total : 0;
+    double bytes = copy_total_bytes ? (double)copy_done_bytes / copy_total_bytes : entries;
+    if (entries > 1) entries = 1;
+    if (bytes > 1) bytes = 1;
+    return 35 + (uint32_t)(20 * entries + 35 * bytes);
 }
 
 /** @brief Coalesce copy presentation for both GUI and TTY, leaving I/O unchanged. */
-static void show_copy_progress(const char *detail)
+static void show_copy_progress(const char *path)
 {
     static unsigned long last_present_ms;
     unsigned long now = reliefos_uptime_ms();
     if (now - last_present_ms < COPY_PRESENT_INTERVAL_MS) return;
     last_present_ms = now;
-    show_progress(copy_progress_percent(),
-                  T("Copying system files"), detail);
+    char detail[sizeof(detail_text)];
+    snprintf(detail, sizeof(detail), "%llu/%llu  %s", (unsigned long long)copy_done,
+             (unsigned long long)copy_total, path);
+    show_progress(copy_progress_percent(), T("Copying system files"), detail);
 }
 
 /* mkdir(3) follows the POSIX convention and returns -1 on failure, while
@@ -839,51 +867,6 @@ static int installer_mkdir(const char *path)
         if (!S_ISDIR(status.st_mode)) return -ENOTDIR;
     }
     return ret < 0 ? (int)ret : 0;
-}
-
-static int count_files_recursive(const char *src, uint32_t *out_count)
-{
-    struct reliefos_dir_entry *entries = NULL;
-    uint32_t count = 0;
-    int ret;
-    ret = installer_list_dir(src, &entries, &count);
-    if (ret < 0) {
-        goto out;
-    }
-    for (uint32_t i = 0; i < count; ++i) {
-        char child[RELIEFOS_FS_PATH_LEN];
-        if (name_is_dot(entries[i].name)) {
-            continue;
-        }
-        if (path_join(child, sizeof(child), src, entries[i].name) < 0) {
-            set_status(T("Installation failed"), T("Payload path is too long"));
-            ret = -1;
-            goto out;
-        }
-        if (entries[i].type == RELIEFOS_FS_TYPE_FILE) {
-            struct reliefos_stat st;
-            if (reliefos_stat_legacy(child, &st) == 0 && st.type == RELIEFOS_FS_TYPE_FILE) {
-                copy_total_bytes += st.size;
-            }
-            ++*out_count;
-            continue;
-        }
-        if (entries[i].type == RELIEFOS_FS_TYPE_SYMLINK) {
-            /* Symlink recreation is a metadata-sized work item. */
-            ++*out_count;
-            continue;
-        }
-        if (entries[i].type == RELIEFOS_FS_TYPE_DIR) {
-            ret = count_files_recursive(child, out_count);
-            if (ret < 0) {
-                goto out;
-            }
-        }
-    }
-    ret = 0;
-out:
-    free(entries);
-    return ret;
 }
 
 static int path_has_type(const char *path, uint32_t type)
@@ -979,9 +962,6 @@ static int copy_file_path(const char *src, const char *dst)
     if (out_fd < 0) {
         error = errno;
         goto done;
-    }
-    if (!installer_tty_mode) {
-        printf("[installer.elf] copying %s -> %s\n", src, dst);
     }
     show_copy_progress(dst);
     for (;;) {
@@ -1122,14 +1102,14 @@ static int copy_dir_recursive(const char *src, const char *dst)
                 printf("[installer.elf] copy %s -> %s ret=%d\n", src_child, dst_child, ret);
                 goto out;
             }
-            ++copy_done;
-            show_copy_progress(dst_child);
         } else if (entries[i].type == RELIEFOS_FS_TYPE_SYMLINK) {
             ret = copy_symlink_path(src_child, dst_child);
             if (ret < 0) {
                 printf("[installer.elf] symlink %s -> %s ret=%d\n", src_child, dst_child, ret);
                 goto out;
             }
+        }
+        if (entries[i].type != RELIEFOS_FS_TYPE_DIR) {
             ++copy_done;
             show_copy_progress(dst_child);
         }
@@ -1152,6 +1132,8 @@ static int copy_dir_recursive(const char *src, const char *dst)
         (set_mode && chmod(dst, directory_mode.st_mode & 07777) < 0)) {
         ret = -errno;
     } else {
+        ++copy_done;
+        show_copy_progress(dst);
         ret = 0;
     }
 out:
@@ -1189,9 +1171,11 @@ static int sync_target_root(const char *root)
 static int install_boot_after_root_sync(const char *root,
                                        const struct reliefos_boot_install_options *boot)
 {
+    show_progress(95, T("Synchronizing target filesystem"), root);
     int result = sync_target_root(root);
     if (result) return result;
     fprintf(stderr, "[installer.elf] root filesystem synchronized before boot publication\n");
+    show_progress(96, T("Installing bootloaders"), INSTALL_ESP_MOUNT);
     return reliefos_boot_install_instance_at_root(boot, root, INSTALL_ESP_VOLUME);
 }
 
@@ -1204,27 +1188,31 @@ static void installer_swap_progress(uint64_t done,uint64_t total,void *context)
     unsigned long *last=context,now=reliefos_uptime_ms();
     if (now-*last<COPY_PRESENT_INTERVAL_MS && done<total) return;
     *last=now;
-    show_progress(95+(uint32_t)(done*3u/total),T("Creating swapfile"),T("Writing allocated space"));
+    show_progress(91 + (uint32_t)(done * 3u / total), T("Creating swapfile"), T("Writing allocated space"));
 }
 
-/** @brief Copy a newly formatted root, synchronize it, then publish selected loaders. */
-static int copy_payload_ordered(void)
+/** @brief Complete the new root, synchronize it, then publish selected loaders. */
+static int finish_payload_ordered(void)
 {
     const char *root = fresh_root_payload();
-    /* This target was freshly formatted: no previous installation is being
-     * replaced. Skip only already-correct directory metadata; all files keep
-     * private temporary names and atomic replacement. All I/O/metadata/close
-     * errors remain checked. Batch file sync only here; syncfs below remains
-     * mandatory before either bootloader is published. */
-    int ret = copy_root_payload(root, INSTALL_ROOT_MOUNT,
-                                install_mode == INSTALLER_MODE_FRESH);
-    if (!ret && installer_setup_write(&setup, INSTALL_ROOT_MOUNT) < 0) {
-        ret = -errno;
-        set_status(T("Account setup failed"), strerror(errno));
+    int ret = 0;
+    /* The formatter has already populated ext4. The native ext3 formatter
+     * creates an empty filesystem and still needs the mounted copy. */
+    if (installer_root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3) {
+        show_progress(35, T("Copying system files"), INSTALL_ROOT_MOUNT);
+        ret = copy_root_payload(root, INSTALL_ROOT_MOUNT, 1);
     }
     if (!ret) {
-        unsigned long last=0;
-        ret=installer_swap_prepare_fs(INSTALL_ROOT_MOUNT,installer_root_uuid,installer_esp_uuid,
+        show_progress(90, T("Configuring installed system"), INSTALL_ROOT_MOUNT);
+        if (installer_setup_write(&setup, INSTALL_ROOT_MOUNT) < 0) {
+            ret = -errno;
+            set_status(T("Account setup failed"), strerror(errno));
+        }
+    }
+    if (!ret) {
+        unsigned long last = 0;
+        if (setup.swap_enabled) show_progress(91, T("Creating swapfile"), INSTALL_ROOT_MOUNT);
+        ret = installer_swap_prepare_fs(INSTALL_ROOT_MOUNT,installer_root_uuid,installer_esp_uuid,
                                       installer_root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3 ? "ext3" : "ext4",
                                       setup.swap_enabled ? setup.swap_size_mib : 0,
                                       installer_swap_progress,&last);
@@ -1350,7 +1338,7 @@ static int check_payload_required(const char *root)
     return ret;
 }
 
-static int check_profile_payload_required(const char *root, int skip_xorg)
+static int check_profile_payload_required(const char *root, int console)
 {
     static const char *const package_files[] = {
         "/lib/apk/db/installed", "/etc/apk/world",
@@ -1359,7 +1347,7 @@ static int check_profile_payload_required(const char *root, int skip_xorg)
     int ret = check_payload_required(root);
     if (!ret) ret = check_payload_paths(root, package_files,
         sizeof(package_files) / sizeof(package_files[0]), RELIEFOS_FS_TYPE_FILE);
-    if (!ret && desktop_profile(root) != (skip_xorg ? 1 : 0)) {
+    if (!ret && desktop_profile(root) != (console ? 1 : 0)) {
         set_status(T("Installation media is incomplete"), root);
         ret = -EINVAL;
     }
@@ -1368,7 +1356,16 @@ static int check_profile_payload_required(const char *root, int skip_xorg)
 
 static int check_install_payload_required(void)
 {
-    return check_profile_payload_required(fresh_root_payload(), setup.skip_xorg);
+    const char *root = fresh_root_payload();
+    int ret = check_profile_payload_required(root, setup.desktop == INSTALLER_DESKTOP_CONSOLE);
+    if (!ret && setup.desktop == INSTALLER_DESKTOP_XFCE) {
+        static const char *const files[] = {
+            "/usr/bin/startxfce4", "/usr/bin/xfce4-session", "/usr/bin/xfce4-terminal",
+            "/usr/bin/dbus-run-session", "/etc/X11/Xsession",
+        };
+        ret = check_payload_paths(root, files, sizeof(files) / sizeof(files[0]), RELIEFOS_FS_TYPE_FILE);
+    }
+    return ret;
 }
 static int write_target_locale(void)
 {
@@ -1448,6 +1445,12 @@ int perform_install(void)
         finish_install(ret, T("Payload check failed"));
         return ret;
     }
+    if (reliefos_account_seed_check(fresh_root_payload(), setup.username) < 0) {
+        ret = -errno;
+        finish_install(ret, ret == -EEXIST ? T("User name or ID conflicts with a system account")
+                                         : T("Account setup failed"));
+        return ret;
+    }
 
     if (setup.swap_enabled) {
         if (!installer_swap_size_valid(setup.swap_size_mib)) {
@@ -1464,30 +1467,33 @@ int perform_install(void)
     if (!ret) ret = reliefos_boot_validate_disk(&boot, !installer_partition_auto);
     if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return ret; }
 
-    show_progress(2, T("Preparing target disk"), "");
-    show_progress(22, T("Mounting target filesystems"), T("Root and boot partitions"));
-    ret = installer_mount_targets(disks[selected_disk].path);
+    show_progress(2, T("Scanning installation payload"), T("Root and boot partitions"));
+    struct installer_capacity capacity;
+    ret = installer_capacity_measure(fresh_root_payload(), INSTALL_ESP_PAYLOAD,
+                                     !setup.skip_bios, !setup.skip_uefi, &capacity);
     if (ret < 0) {
-        finish_install(ret, T("Mount failed"));
+        finish_install(ret, T("Payload scan failed"));
+        return ret;
+    }
+    copy_total = capacity.root_inodes;
+    copy_total_bytes = capacity.root_data_bytes;
+    if (setup.swap_enabled) ret = installer_capacity_add_swap(&capacity, setup.swap_size_mib);
+    if (ret < 0) {
+        finish_install(ret, T("Invalid swap size"));
+        return ret;
+    }
+
+    show_progress(10, T("Preparing target disk"), disks[selected_disk].path);
+    ret = installer_mount_targets(disks[selected_disk].path, &capacity);
+    if (ret < 0) {
+        finish_install(ret, T("Could not prepare target filesystems"));
         return ret;
     }
 
     ret = reliefos_boot_validate_target(&boot);
     if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return ret; }
 
-    show_progress(30, T("Scanning installation payload"), T("Root and boot partitions"));
-    ret = count_files_recursive(fresh_root_payload(), &copy_total);
-    if (ret >= 0) {
-        ret = count_files_recursive(INSTALL_ESP_PAYLOAD, &copy_total);
-    }
-    if (ret < 0) {
-        finish_install(ret, T("Payload scan failed"));
-        return ret;
-    }
-
-    show_progress(35, T("Copying system files"),
-                  T("Root: /target; boot partition: /target/boot"));
-    ret = copy_payload_ordered();
+    ret = finish_payload_ordered();
     if (ret < 0) {
         finish_install(ret, T("Copy failed"));
         return ret;
@@ -1497,8 +1503,12 @@ int perform_install(void)
     explicit_bzero(setup.password_confirm, sizeof(setup.password_confirm));
     explicit_bzero(setup.root_password, sizeof(setup.root_password));
     explicit_bzero(setup.root_password_confirm, sizeof(setup.root_password_confirm));
+    show_progress(98, T("Saving installed preferences"), INSTALL_ROOT_MOUNT);
     ret = write_target_preferences();
-    if (!ret) ret = sync_target_root(INSTALL_ROOT_MOUNT);
+    if (!ret) {
+        show_progress(99, T("Synchronizing target filesystem"), INSTALL_ROOT_MOUNT);
+        ret = sync_target_root(INSTALL_ROOT_MOUNT);
+    }
     if (ret < 0) {
         finish_install(ret, T("Could not save installed preferences"));
         return ret;

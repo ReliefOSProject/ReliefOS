@@ -109,6 +109,10 @@ static int measure(const char *base, const char *relative, unsigned depth,
     if (!boot) {
         if (need->root_inodes == UINT64_MAX) return -EOVERFLOW;
         ++need->root_inodes;
+        if (S_ISREG(st.st_mode)) {
+            if (need->root_data_bytes > UINT64_MAX - size) return -EOVERFLOW;
+            need->root_data_bytes += size;
+        }
     }
     if (!S_ISDIR(st.st_mode)) return 0;
     DIR *dir = opendir(path);

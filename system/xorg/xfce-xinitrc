@@ -1,0 +1,6 @@
+#!/bin/sh
+# XFCE owns its window manager, desktop, panel and XDG autostart lifecycle.
+export XDG_CURRENT_DESKTOP=XFCE
+export XDG_SESSION_DESKTOP=xfce
+export DESKTOP_SESSION=xfce
+exec /usr/bin/dbus-run-session -- /usr/bin/startxfce4

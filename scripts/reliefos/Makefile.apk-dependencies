@@ -37,7 +37,7 @@ RUNTIME_DEVELOPMENT_ROOT := $(UPSTREAM_ROOT)/runtime-development
 RUNTIME_DEP_LIBDIR := $(RUNTIME_DEVELOPMENT_ROOT)/usr/lib
 RUNTIME_DEP_SHARED := $(addprefix $(RUNTIME_DEP_LIBDIR)/,libpng.so libz.so libmbedtls.so libmbedx509.so libmbedcrypto.so)
 RUNTIME_DEP_STATIC := $(addprefix $(RUNTIME_DEP_LIBDIR)/,libpng.a libz.a libmbedtls.a libmbedx509.a libmbedcrypto.a)
-RUNTIME_DEVELOPMENT_PRODUCTS := $(addprefix $(RUNTIME_DEVELOPMENT_ROOT)/usr/include/,zlib.h zconf.h png.h pngconf.h pnglibconf.h sqlite3.h mbedtls/ssl.h mbedtls/mbedtls_config.h) $(RUNTIME_DEP_SHARED) $(RUNTIME_DEP_STATIC) $(RUNTIME_DEP_LIBDIR)/libsqlite3.so $(RUNTIME_DEP_LIBDIR)/libsqlite3.a
+RUNTIME_DEVELOPMENT_PRODUCTS := $(addprefix $(RUNTIME_DEVELOPMENT_ROOT)/usr/include/,zlib.h zconf.h png.h pngconf.h pnglibconf.h sqlite3.h mbedtls/ssl.h mbedtls/sha256.h mbedtls/mbedtls_config.h) $(RUNTIME_DEP_SHARED) $(RUNTIME_DEP_STATIC) $(RUNTIME_DEP_LIBDIR)/libsqlite3.so $(RUNTIME_DEP_LIBDIR)/libsqlite3.a
 $(RUNTIME_DEVELOPMENT_ROOT)/.complete $(RUNTIME_DEVELOPMENT_PRODUCTS) &: $(RELIEFOS_SRC)/tools/build/runtime-development.sh $(RELIEFOS_LOCK) $(RELIEFOS_DEPS_TOOL) $(UPSTREAM_APK) $(addprefix $(RELIEFOS_SRC)/resources/licenses/,zlib-LICENSE libpng-LICENSE sqlite-LICENSE mbedtls3-LICENSE)
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/runtime-development.sh $(RELIEFOS_SRC) $(abspath $(RELIEFOS_DEPS_TOOL)) $(RELIEFOS_LOCK) $(RELIEFOS_CACHE) $(abspath $(UPSTREAM_APK)) $(abspath $(RUNTIME_DEVELOPMENT_ROOT))
 	$(Q)touch $(RUNTIME_DEVELOPMENT_PRODUCTS)

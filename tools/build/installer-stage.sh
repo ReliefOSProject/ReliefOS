@@ -26,6 +26,10 @@ package_root() {
         "$src/configs/apk-ownership.json" "$APK_OWN_TOOL" "$APK_KEY" "$APK_VERSION"
 }
 package_root "$work/installed-raw" "$work/installed" "$out/packages/apk-installed"
+reliefos_log APK 'optional XFCE desktop payload'
+sh "$src/tools/build/installer-xfce-profile.sh" "$src" "$work/installed" \
+    "$work/xfce-installed" "$out/packages/apk-xfce" "$APK_TOOL" "$APK_UPSTREAM" \
+    "${APK_DEPS_TOOL:-$out/host/bin/reliefos-deps}"
 cp -a "$work/installed-raw" "$work/console-raw"
 sh "$src/tools/build/installer-console-profile.sh" "$work/console-raw"
 package_root "$work/console-raw" "$work/console-installed" "$out/packages/apk-console"
@@ -80,6 +84,7 @@ mkdir -p "$work/runtime/install"
 reliefos_log STAGE 'installer payload and ESP'
 mv "$work/installed" "$work/runtime/install/root"
 mv "$work/console-installed" "$work/runtime/install/root-console"
+mv "$work/xfce-installed" "$work/runtime/install/root-xfce"
 cp -a "$esp" "$work/runtime/install/esp"
 "${INSTALLER_DEDUP_TOOL:-$out/host/bin/reliefos-dedup}" "$work/runtime"
 find "$work/runtime" -exec touch -h -d "@$epoch" {} +

@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def compile_fixture(binary):
-    sources = ["installer_tui.c", "installer_tui_job.c", "installer_tui_partitions.c", "installer_tty.c", "model.c",
+    sources = ["installer_tui.c", "installer_tui_job.c", "installer_job.c", "installer_tui_partitions.c", "installer_tty.c", "model.c",
                "installer_capacity.c", "installer_partitions.c", "installer_update_progress.c", "apache_license.S"]
     subprocess.run([
         "cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
@@ -94,7 +94,7 @@ def wizard_tests(binary, output):
         fresh.next()  # automatic plan -> account options
         for value in (b"alice", b"user-secret", b"user-secret", b"root-secret", b"root-secret"):
             fresh.key(value + b"\t")
-        fresh.key(b" ")  # console-only
+        fresh.key(b"\t\t ")  # select the third desktop option: console-only
         fresh.key(b"\t ")  # enable swap
         fresh.key(b"\t\x152049")  # replace suggestion
         fresh.next()

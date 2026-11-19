@@ -21,13 +21,17 @@ def main():
                       '#undef MNT_EXPIRE\n#undef UMOUNT_NOFOLLOW\n')
     sources=['install_ops.c','installer_capacity.c','installer_swap.c','installer_swap_bundle.c',
              'installer_swap_config.c','installer_swap_prepare.c','installer_swap_storage.c','installer_tty.c',
-             'installer_tui.c','installer_tui_job.c']
+             'installer_tui.c','installer_tui_job.c','installer_job.c']
     for name in sources:
         selected_headers=base_headers if name=='installer_swap_storage.c' else headers
-        cmd=[cc,'-std=gnu11','-O1','-Wall','-Wextra',*selected_headers,'-include',str(compat),'-c',
+        # glibc must see the XSI feature level before the forced include.
+        feature_flags=['-D_XOPEN_SOURCE=700'] if name=='installer_tui.c' else []
+        cmd=[cc,'-std=gnu11','-O1','-Wall','-Wextra',*feature_flags,*selected_headers,'-include',str(compat),'-c',
              'userland/apps/installer/'+name,'-o',str((a.output/name.replace('.c','.o')).resolve())]
         if run(cmd):return 1
-    cmd=[cxx,'-std=gnu++17','-O1','-Wall','-Wextra','-isystem',str(a.fltk_include.resolve()),*headers,
+    # Keep the host libc's linux/limits.h ahead of ReliefNT's UAPI headers.
+    cxx_headers=base_headers+['-Ikernel/reliefnt/include','-idirafter','kernel/reliefnt/include/uapi']
+    cmd=[cxx,'-std=gnu++17','-O1','-Wall','-Wextra','-isystem',str(a.fltk_include.resolve()),*cxx_headers,
          '-c','userland/apps/installer/main.cpp','-o',str((a.output/'main.o').resolve())]
     if run(cmd):return 1
     print('PASS changed console/backend and FLTK source units compiled as host objects')

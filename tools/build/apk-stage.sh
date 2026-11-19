@@ -74,12 +74,16 @@ for archive in "$upstream"/packages/*.apk; do
         { echo "invalid APK metadata: $archive" >&2; exit 1; }
     upstream_name=$(sed -n 's/^pkgname = //p' "$scratch/upstream-pkginfo")
     [ -n "$upstream_name" ] || { echo "invalid APK metadata: $archive" >&2; exit 1; }
-    if ! feature=$("$deps" --lock "$lock" --id "alpine-$upstream_name" --print feature); then
+    upstream_id=$(printf '%s' "$upstream_name" | LC_ALL=C tr '[:upper:]' '[:lower:]')
+    if ! feature=$("$deps" --lock "$lock" --id "alpine-$upstream_id" --print feature); then
         echo "dependency lock entry is missing for APK package: $upstream_name (lock: $lock)" >&2
         exit 1
     fi
     case $feature in
         base) ;;
+        # XFCE belongs to the optional installer payload. Ordinary images and
+        # the live installer continue to use IceWM.
+        xfce) continue ;;
         component:sl|component:ncurses|component:sqlite)
             [ -f "$raw/etc/reliefos/apk-components" ] && [ ! -L "$raw/etc/reliefos/apk-components" ] || {
                 echo 'missing APK component selection' >&2; exit 1;
@@ -448,10 +452,11 @@ while IFS= read -r group; do
     # util-linux bundles su with shadow-owned login/newgrp/nologin and su-l
     # policy. The official su and runuser payloads keep their original owners.
     [ "$package" != reliefos-authentication ] || replaces="$replaces util-linux-login"
-    # Old images recorded the transferred command paths as BusyBox files.
-    # APK must hand those paths to GNU in the same transaction that upgrades
-    # BusyBox; an overwrite/force flag would conceal a packaging conflict.
-    [ "$package" != reliefos-coreutils ] || replaces="$replaces reliefos-busybox leonos-busybox"
+    # Keep the system's BusyBox applets and GNU uptime when the signed XFCE
+    # packages pull in procps-ng. APK retains other files from procps-ng.
+    [ "$package" != reliefos-busybox ] || replaces="$replaces procps-ng"
+    # Older images recorded the paths now owned by GNU as BusyBox files.
+    [ "$package" != reliefos-coreutils ] || replaces="$replaces reliefos-busybox leonos-busybox procps-ng"
     [ "$package" != reliefos-system-update ] || replaces="$replaces reliefos-apps leonos-apps"
     set -- mkpkg --files "$payload" --output "$repository/$package-$version.apk" \
         --info "name:$package" --info "version:$version" --info arch:x86_64 \

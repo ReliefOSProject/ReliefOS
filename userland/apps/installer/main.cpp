@@ -43,6 +43,7 @@ extern "C" {
 #include "installer_tty.h"
 #include "installer_tui.h"
 #include "installer_update.h"
+#include "installer_job.h"
 #include "../reliefapk/process.h"
 #include "model.h"
 
@@ -80,7 +81,7 @@ static Fl_Hold_Browser *partition_browser;
 static Fl_Choice *update_root_choice, *update_esp_choice;
 static Fl_Check_Button *format_esp_checkbox;
 static Fl_Input *confirm_input;
-static Fl_Check_Button *xorg_checkbox;
+static Fl_Choice *desktop_choice;
 static Fl_Input *swap_size_input;
 static char swap_size_text[32];
 static int swap_size_initialized, swap_size_invalid;
@@ -108,6 +109,8 @@ static Fl_Text_Display *update_log_display;
 static size_t update_stdout_offset, update_stderr_offset;
 static int update_job, update_checked, update_protocol_error;
 static char update_message[256];
+static struct installer_job install_job;
+static char installed_boot_file[128];
 
 /* Embedded verbatim from the repository LICENSE by apache_license.S. */
 extern "C" const char installer_license_text[];
@@ -263,6 +266,73 @@ static void schedule_render(void)
     if (render_pending) return;
     render_pending = 1;
     Fl::add_timeout(0.0, render_deferred);
+}
+
+static int run_install_worker(void *, struct installer_job_packet *packet)
+{
+    int result = perform_install();
+    packet->progress = progress_value;
+    packet->success = install_success;
+    packet->selected = selected_partition;
+    packet->root = installer_root_partition;
+    packet->esp = installer_esp_partition;
+    packet->automatic = installer_partition_auto;
+    packet->replaced = installer_partition_table_replaced;
+    packet->format_esp = setup.format_esp;
+    copy_text(packet->message, sizeof(packet->message), status_text);
+    copy_text(packet->detail, sizeof(packet->detail), detail_text);
+    if (!result) installer_boot_entry_path(packet->info.boot_file, sizeof(packet->info.boot_file));
+    return result;
+}
+
+static void install_pump(void *)
+{
+    int result = installer_job_step(&install_job);
+    const struct installer_job_packet *packet = result == 0 ? &install_job.final : &install_job.latest;
+    progress_value = packet->progress;
+    copy_text(status_text, sizeof(status_text), packet->message);
+    copy_text(detail_text, sizeof(detail_text), packet->detail);
+    snprintf(progress_text, sizeof(progress_text), "%s - %.120s", status_text, detail_text);
+    refresh_status_widgets();
+    if (result > 0) { Fl::repeat_timeout(0.08, install_pump); return; }
+    ui_busy = install_running = 0;
+    install_success = result == 0 && packet->result == 0 && packet->success;
+    if (result < 0) set_error_status(T("Installation worker failed"), result);
+    if (result == 0) {
+        selected_partition = packet->selected;
+        installer_root_partition = packet->root;
+        installer_esp_partition = packet->esp;
+        installer_partition_auto = packet->automatic;
+        installer_partition_table_replaced = packet->replaced;
+        setup.format_esp = packet->format_esp;
+        copy_text(installed_boot_file, sizeof(installed_boot_file), packet->info.boot_file);
+    }
+    explicit_bzero(setup.password, sizeof(setup.password));
+    explicit_bzero(setup.password_confirm, sizeof(setup.password_confirm));
+    explicit_bzero(setup.root_password, sizeof(setup.root_password));
+    explicit_bzero(setup.root_password_confirm, sizeof(setup.root_password_confirm));
+    page = INSTALLER_PAGE_FINISH;
+    show_page();
+}
+
+static void start_install_job(void)
+{
+    int error = installer_job_start(&install_job, run_install_worker, NULL, "/var/log/installer.log");
+    if (error) {
+        install_success = 0;
+        page = INSTALLER_PAGE_FINISH;
+        set_error_status(T("Cannot start the installation worker"), error);
+        show_page();
+        return;
+    }
+    ui_busy = install_running = 1;
+    install_success = 0;
+    progress_value = 0;
+    installed_boot_file[0] = 0;
+    page = INSTALLER_PAGE_PROGRESS;
+    copy_text(progress_text, sizeof(progress_text), T("Preparing operation"));
+    show_page();
+    Fl::add_timeout(0.0, install_pump);
 }
 
 static void update_pump(void *)
@@ -445,13 +515,7 @@ static void go_primary_now(void *)
                                    (enum installer_mode)install_mode,
                                    install_success)) {
     case INSTALLER_ACTION_INSTALL:
-        ui_busy = 1;
-        page = INSTALLER_PAGE_PROGRESS;
-        show_page();
-        Fl::flush();
-        perform_install();
-        ui_busy = 0;
-        show_page();
+        start_install_job();
         return;
     case INSTALLER_ACTION_UPDATE:
         start_update_job(1);
@@ -1081,9 +1145,9 @@ static void confirm_changed(Fl_Widget *widget, void *)
         go_primary();
 }
 
-static void xorg_install_changed(Fl_Widget *widget, void *)
+static void desktop_install_changed(Fl_Widget *widget, void *)
 {
-    setup.skip_xorg = static_cast<Fl_Check_Button *>(widget)->value() ? 0 : 1;
+    setup.desktop = static_cast<Fl_Choice *>(widget)->value();
 }
 
 /** @brief Retain a checked editable MiB value across page rebuilds. */
@@ -1164,7 +1228,7 @@ static void build_confirm_page(void)
         make_label(T("Boot partition"), CONTENT_X, 188, 200, 26, 14, 0);
         make_label(update_info.esp_device, CONTENT_X + 215, 188, 560, 26, 14, 0);
         make_label(T("Desktop environment"), CONTENT_X, 226, 200, 26, 14, 0);
-        make_label(!strcmp(update_info.profile, "console") ? T("Console") : "Xorg / IceWM",
+        make_label(!strcmp(update_info.profile, "console") ? T("Console") : "Xorg",
                    CONTENT_X + 215, 226, 560, 26, 14, 0);
         make_label(T("Free / required space"), CONTENT_X, 264, 200, 26, 14, 0);
         snprintf(text, sizeof(text), "%llu MiB / %llu MiB",
@@ -1215,21 +1279,24 @@ static void build_confirm_page(void)
     confirm_input->when(FL_WHEN_CHANGED | FL_WHEN_ENTER_KEY_ALWAYS);
     confirm_input->callback(confirm_changed);
     reliefos_fltk::style(confirm_input);
-    xorg_checkbox = new Fl_Check_Button(CONTENT_X, 318, 375, 32,
-                                         T("Install Xorg desktop environment"));
-    xorg_checkbox->value(setup.skip_xorg ? 0 : 1);
-    xorg_checkbox->callback(xorg_install_changed);
-    reliefos_fltk::style(xorg_checkbox);
+    make_label(T("Desktop environment"), CONTENT_X, 304, 360, 26, 14, 0);
+    desktop_choice = new Fl_Choice(CONTENT_X, 338, 365, 34);
+    desktop_choice->add(T("IceWM (default)"));
+    desktop_choice->add(T("XFCE (experimental)"));
+    desktop_choice->add(T("Console only"));
+    desktop_choice->value(setup.desktop);
+    desktop_choice->callback(desktop_install_changed);
+    reliefos_fltk::style(desktop_choice);
     if (!swap_size_initialized) {
         if (!setup.swap_size_mib) setup.swap_size_mib=installer_swap_recommend_system();
         snprintf(swap_size_text,sizeof(swap_size_text),"%llu",(unsigned long long)setup.swap_size_mib);
         swap_size_initialized=1;
     }
-    Fl_Check_Button *swap=new Fl_Check_Button(CONTENT_X+390,318,220,32,T("Swapfile (MiB)"));
+    Fl_Check_Button *swap=new Fl_Check_Button(CONTENT_X+390,338,220,32,T("Swapfile (MiB)"));
     swap->value(setup.swap_enabled ? 1 : 0);
     swap->callback(swap_install_changed);
     reliefos_fltk::style(swap);
-    swap_size_input=new Fl_Input(CONTENT_X+615,318,130,32);
+    swap_size_input=new Fl_Input(CONTENT_X+615,338,130,32);
     swap_size_input->value(swap_size_text);
     swap_size_input->maximum_size(20);
     swap_size_input->when(FL_WHEN_CHANGED);
@@ -1239,8 +1306,8 @@ static void build_confirm_page(void)
     snprintf(line, sizeof(line), "%s BIOS: %s    UEFI: %s", T("Bootloaders:"),
              setup.skip_bios ? T("Skip") : T("Install"),
              setup.skip_uefi ? T("Skip") : T("Install"));
-    make_label(line, CONTENT_X, 366, CONTENT_W, 36, 14, 1);
-    make_label(bootloader_description(), CONTENT_X, 414, CONTENT_W, 100, 13, 1);
+    make_label(line, CONTENT_X, 388, CONTENT_W, 36, 14, 1);
+    make_label(bootloader_description(), CONTENT_X, 436, CONTENT_W, 100, 13, 1);
 }
 
 static void build_update_log(int y, int height)
@@ -1299,7 +1366,7 @@ static void build_finish_page(void)
             char entry[128];
             int error = install_mode == INSTALLER_MODE_UPDATE
                 ? (snprintf(entry, sizeof(entry), "%s", update_info.boot_file), 0)
-                : installer_boot_entry_path(entry, sizeof(entry));
+                : (snprintf(entry, sizeof(entry), "%s", installed_boot_file), !*installed_boot_file);
             if (!error) {
                 make_label(T("UEFI boot file (add it in firmware if no automatic entry appears):"),
                            CONTENT_X, 148, CONTENT_W, 28, 13, 1);
@@ -1338,7 +1405,7 @@ static void clear_page_widgets(void)
     format_esp_checkbox = NULL;
     partition_browser = NULL;
     confirm_input = NULL;
-    xorg_checkbox = NULL;
+    desktop_choice = NULL;
     swap_size_input = NULL;
     bootloader_hint = NULL;
     partition_hint = NULL;
@@ -1403,7 +1470,8 @@ static int app_event_handler(int event)
 
 extern "C" void refresh_ui(void)
 {
-    if (installer_tty_mode) { installer_tui_publish_progress(); return; }
+    if (installer_job_is_worker()) { installer_tui_publish_progress(); return; }
+    if (installer_tty_mode) return;
     if (!main_window) return;
     refresh_status_widgets();
     update_footer();

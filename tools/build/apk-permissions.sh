@@ -7,7 +7,7 @@ root=$(CDPATH='' cd -- "$1" && pwd -P)
 work=$(mktemp -d)
 trap 'rm -rf "$work"' 0
 trap 'exit 130' HUP INT TERM
-for tree in "$root" "$root/install/root" "$root/install/root-console"; do
+for tree in "$root" "$root/install/root" "$root/install/root-console" "$root/install/root-xfce"; do
     database=$tree/lib/apk/db/installed
     [ -f "$database" ] || continue
     [ ! -L "$database" ] || { echo 'symlink APK database' >&2; exit 1; }

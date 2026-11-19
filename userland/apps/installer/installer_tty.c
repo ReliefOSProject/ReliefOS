@@ -199,7 +199,8 @@ static void review_page(struct tui_view *view, const struct installer_tty_contex
         }
         snprintf(text, sizeof(text), "%s: %s\nBIOS: %s   UEFI: %s\n%s: %s\n%s: %s",
             T("Username"), context->setup->username, *bios ? T("Yes") : T("No"), *uefi ? T("Yes") : T("No"),
-            T("Desktop"), context->setup->skip_xorg ? T("Console") : "Xorg / IceWM",
+            T("Desktop"), context->setup->desktop == INSTALLER_DESKTOP_CONSOLE ? T("Console only") :
+                context->setup->desktop == INSTALLER_DESKTOP_XFCE ? T("XFCE (experimental)") : T("IceWM (default)"),
             T("Swap size in MiB"), context->setup->swap_enabled ? swap_size : T("Disabled"));
         tui_text(view, text);
         tui_input(view, T("Type INSTALL to confirm installation"), confirm_text, sizeof(confirm_text), 0);
@@ -221,7 +222,7 @@ int installer_tty_main(const struct installer_tty_context *context)
     int language = language_selection(), mode = *context->install_mode;
     int previous_mode = mode;
     int bios = !context->setup->skip_bios, uefi = !context->setup->skip_uefi;
-    int xorg = !context->setup->skip_xorg, swap = context->setup->swap_enabled;
+    int desktop = context->setup->desktop, swap = context->setup->swap_enabled;
     int scheme = !*context->partition_auto, chosen = *context->selected_partition;
     struct tui_partition_table partition_table = {0};
     int format_esp = context->setup->format_esp, previous_disk = -1, update_checked = 0;
@@ -283,7 +284,10 @@ int installer_tty_main(const struct installer_tty_context *context)
             tui_input(&view, T("Confirm password"), context->setup->password_confirm, sizeof(context->setup->password_confirm), 1);
             tui_input(&view, T("root password"), context->setup->root_password, sizeof(context->setup->root_password), 1);
             tui_input(&view, T("Confirm root password"), context->setup->root_password_confirm, sizeof(context->setup->root_password_confirm), 1);
-            tui_check(&view, T("Install Xorg desktop environment"), &xorg);
+            tui_text(&view, T("Desktop environment"));
+            tui_compact_radio(&view, T("IceWM (default)"), &desktop, INSTALLER_DESKTOP_ICEWM);
+            tui_compact_radio(&view, T("XFCE (experimental)"), &desktop, INSTALLER_DESKTOP_XFCE);
+            tui_compact_radio(&view, T("Console only"), &desktop, INSTALLER_DESKTOP_CONSOLE);
             tui_check(&view, T("Create a swapfile"), &swap);
             if (swap) tui_input(&view, T("Swap size in MiB"), swap_text, sizeof(swap_text), 0);
             break;
@@ -318,7 +322,7 @@ int installer_tty_main(const struct installer_tty_context *context)
             installer_model_can_cancel(current, *context->install_success), 200);
         context->setup->skip_bios = !bios;
         context->setup->skip_uefi = !uefi;
-        context->setup->skip_xorg = !xorg;
+        context->setup->desktop = desktop;
         context->setup->swap_enabled = swap;
         context->setup->format_esp = format_esp;
         *context->partition_auto = !scheme;

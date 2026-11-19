@@ -61,6 +61,9 @@ int main(int argc, char **argv)
     assert(!installer_update_read_packages(root, &packages));
     assert(packages.installed_bytes == 300 && packages.largest_package == 200);
     assert(!strcmp(packages.kernel_version, "5.3.1-r2"));
+    assert(!packages.has_xfce_session);
+    write_file(root, "lib/apk/db/installed", "P:xfce4-session\nV:4.20.2-r0\nI:44032\n");
+    assert(!installer_update_read_packages(root, &packages) && packages.has_xfce_session);
 
     unsigned progress = 0;
     char message[128] = "";

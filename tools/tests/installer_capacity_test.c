@@ -29,6 +29,7 @@ int main(int argc, char **argv)
     struct installer_capacity none, both, bios, uefi;
     assert(!installer_capacity_measure("root", "boot", 0, 0, &none));
     assert(none.root_inodes == 3 && none.root_bytes == 16384);
+    assert(none.root_data_bytes == 4097);
     assert(!installer_capacity_measure("root", "boot", 1, 1, &both));
     assert(!installer_capacity_measure("root", "boot", 1, 0, &bios));
     assert(!installer_capacity_measure("root", "boot", 0, 1, &uefi));

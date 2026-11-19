@@ -23,11 +23,11 @@ msgstr "上一次更新尚未完成。本次将重新校验系统，并恢复待
 msgid "Account and system options"
 msgstr "账户和系统选项"
 
-#: userland/apps/installer/install_ops.c:1223
+#: userland/apps/installer/install_ops.c:1227
 msgid "Account setup failed"
 msgstr "账户创建失败"
 
-#: userland/apps/installer/main.cpp:157
+#: userland/apps/installer/main.cpp:160
 msgid "Accounts"
 msgstr "账户"
 
@@ -43,7 +43,7 @@ msgstr "添加到收藏夹"
 msgid "Administrator privileges are required"
 msgstr "需要管理员权限"
 
-#: userland/apps/installer/main.cpp:1053
+#: userland/apps/installer/main.cpp:1117
 msgid "Administrator: root"
 msgstr "管理员：root"
 
@@ -59,15 +59,15 @@ msgstr "应用"
 msgid "Apply automatic layout now"
 msgstr "立即应用自动分区方案"
 
-#: userland/apps/installer/installer_update_engine.c:416
+#: userland/apps/installer/installer_update_engine.c:420
 msgid "Applying signed system packages"
 msgstr "正在更新已签名的系统软件包"
 
-#: userland/apps/installer/install_ops.c:760
+#: userland/apps/installer/install_ops.c:764
 msgid "Attach a disk and click Refresh."
 msgstr "连接硬盘后点击刷新。"
 
-#: userland/apps/installer/installer_tty.c:266
+#: userland/apps/installer/installer_tty.c:267
 msgid "Automatic"
 msgstr "自动"
 
@@ -75,27 +75,27 @@ msgstr "自动"
 msgid "Automatic layout"
 msgstr "自动分区"
 
-#: userland/apps/installer/install_ops.c:267
+#: userland/apps/installer/install_ops.c:271
 msgid "Automatic mode replaces its partition table; manual mode can preserve other partitions."
 msgstr "自动模式会替换分区表；手动模式可以保留其他分区。"
 
-#: userland/apps/installer/main.cpp:1117
+#: userland/apps/installer/main.cpp:1181
 msgid "Automatic partitioning creates a FAT32 ESP and an ext4 root. No BIOS Boot partition is needed."
 msgstr "自动分区将创建 FAT32 ESP 和 ext4 根分区，无需 BIOS Boot 分区。"
 
-#: userland/apps/installer/main.cpp:1118
+#: userland/apps/installer/main.cpp:1182
 msgid ""
 "Automatic partitioning creates an unformatted BIOS Boot partition, a FAT32 ESP and an ext4 root. "
 "BIOS also uses the FAT32 partition for boot files."
 msgstr "自动分区将创建未格式化的 BIOS Boot 分区、FAT32 ESP 和 ext4 根分区。BIOS 也使用 FAT32 分区存放启动文件。"
 
-#: userland/apps/installer/main.cpp:710
+#: userland/apps/installer/main.cpp:774
 msgid ""
 "Automatic plan: BIOS Boot 1 MiB; ESP 128 MiB FAT32; root %llu MiB ext4.\n"
 "The list shows current partitions. The plan is applied only after confirmation."
 msgstr "自动方案：BIOS Boot 为 1 MiB，ESP 为 128 MiB FAT32，根分区为 %llu MiB ext4。\n列表显示当前分区，自动方案经确认后才写入磁盘。"
 
-#: userland/apps/installer/main.cpp:709
+#: userland/apps/installer/main.cpp:773
 msgid ""
 "Automatic plan: ESP 128 MiB FAT32; root %llu MiB ext4.\n"
 "The list shows current partitions. The plan is applied only after confirmation."
@@ -105,7 +105,7 @@ msgstr "自动方案：ESP 为 128 MiB FAT32，根分区为 %llu MiB ext4。\n�
 msgid "Automatically identify a single ReliefOS installation"
 msgstr "自动识别唯一的 ReliefOS 安装"
 
-#: userland/apps/installer/main.cpp:677
+#: userland/apps/installer/main.cpp:741
 msgid "Available disks"
 msgstr "可用硬盘"
 
@@ -117,7 +117,7 @@ msgstr "B BIOS  E ESP  R /  D 数据  . 空闲"
 msgid "Back"
 msgstr "上一步"
 
-#: userland/apps/installer/install_ops.c:1461
+#: userland/apps/installer/install_ops.c:1478
 msgid "Boot installation checks failed"
 msgstr "引导安装预检查失败"
 
@@ -129,7 +129,7 @@ msgstr "引导分区"
 msgid "Bootloaders"
 msgstr "引导方式"
 
-#: userland/apps/installer/main.cpp:1239
+#: userland/apps/installer/main.cpp:1306
 msgid "Bootloaders:"
 msgstr "引导器："
 
@@ -141,7 +141,7 @@ msgstr "正在计算离线软件包事务"
 msgid "Cancel"
 msgstr "取消"
 
-#: userland/apps/installer/installer_tty.c:348
+#: userland/apps/installer/installer_tty.c:352
 msgid "Cancel installation"
 msgstr "取消安装"
 
@@ -149,11 +149,11 @@ msgstr "取消安装"
 msgid "Cannot display this partition layout."
 msgstr "无法显示此磁盘分区布局。"
 
-#: userland/apps/installer/main.cpp:375
+#: userland/apps/installer/main.cpp:445
 msgid "Cannot identify the selected partitions"
 msgstr "无法识别所选分区"
 
-#: userland/apps/installer/installer_tty.c:215
+#: userland/apps/installer/installer_tty.c:216
 msgid "Cannot initialize the terminal or installer log"
 msgstr "无法初始化终端或安装日志"
 
@@ -165,31 +165,35 @@ msgstr "无法读取安装日志"
 msgid "Cannot read partition identity"
 msgstr "无法读取分区标识"
 
-#: userland/apps/installer/installer_tty.c:328
+#: userland/apps/installer/installer_tty.c:332
 msgid "Cannot select the requested locale."
 msgstr "无法切换到所选语言。"
 
-#: userland/apps/installer/main.cpp:363
+#: userland/apps/installer/main.cpp:324
+msgid "Cannot start the installation worker"
+msgstr "无法启动安装后台进程"
+
+#: userland/apps/installer/main.cpp:433
 msgid "Cannot start the update worker"
 msgstr "无法启动后台更新进程"
 
-#: userland/apps/installer/main.cpp:172
+#: userland/apps/installer/main.cpp:175
 msgid "Check Again"
 msgstr "重新检查"
 
-#: userland/apps/installer/main.cpp:177
+#: userland/apps/installer/main.cpp:180
 msgid "Check Update"
 msgstr "检查更新"
 
-#: userland/apps/installer/installer_tty.c:420
+#: userland/apps/installer/installer_tty.c:424
 msgid "Check username and matching passwords (1-32 characters, no spaces)."
 msgstr "请检查用户名和两次密码（1–32 个字符，不含空格）。"
 
-#: userland/apps/installer/installer_update_engine.c:391
+#: userland/apps/installer/installer_update_engine.c:395
 msgid "Checking bootloader compatibility"
 msgstr "正在检查引导器兼容性"
 
-#: userland/apps/installer/installer_update_engine.c:367
+#: userland/apps/installer/installer_update_engine.c:371
 msgid "Checking installation media and free space"
 msgstr "正在检查安装介质与可用空间"
 
@@ -197,11 +201,11 @@ msgstr "正在检查安装介质与可用空间"
 msgid "Checking signed repository and package archives"
 msgstr "正在检查签名仓库和软件包归档"
 
-#: userland/apps/installer/main.cpp:1263
+#: userland/apps/installer/main.cpp:1330
 msgid "Checking system update"
 msgstr "正在检查系统更新"
 
-#: userland/apps/installer/main.cpp:394
+#: userland/apps/installer/main.cpp:464
 msgid "Checking the selected system"
 msgstr "正在检查所选系统"
 
@@ -209,27 +213,27 @@ msgstr "正在检查所选系统"
 msgid "Checking update target"
 msgstr "正在检查更新目标"
 
-#: userland/apps/installer/main.cpp:578
+#: userland/apps/installer/main.cpp:642
 msgid "Choose Setup Mode"
 msgstr "选择安装模式"
 
-#: userland/apps/installer/main.cpp:1134
+#: userland/apps/installer/main.cpp:1198
 msgid "Choose bootloaders"
 msgstr "选择引导方式"
 
-#: userland/apps/installer/main.cpp:673
+#: userland/apps/installer/main.cpp:737
 msgid "Choose the disk that already contains ReliefOS."
 msgstr "选择已经包含 ReliefOS 的硬盘。"
 
-#: userland/apps/installer/main.cpp:674
+#: userland/apps/installer/main.cpp:738
 msgid "Choose the disk that will receive ReliefOS."
 msgstr "选择用于安装 ReliefOS 的硬盘。"
 
-#: userland/apps/installer/main.cpp:526
+#: userland/apps/installer/main.cpp:590
 msgid "Choose the language for Setup and the installed system."
 msgstr "选择安装程序和安装后系统使用的语言。"
 
-#: userland/apps/installer/main.cpp:595
+#: userland/apps/installer/main.cpp:659
 msgid "Choose the target disk, configure its partitions, then replace boot, system and EFI files."
 msgstr "选择目标磁盘并配置分区，然后替换引导、系统和 EFI 文件。"
 
@@ -249,11 +253,11 @@ msgstr "已完成"
 msgid "Configure partitions"
 msgstr "配置分区"
 
-#: userland/apps/installer/main.cpp:158
+#: userland/apps/installer/main.cpp:161
 msgid "Confirm"
 msgstr "确认"
 
-#: userland/apps/installer/main.cpp:1195
+#: userland/apps/installer/main.cpp:1259
 msgid "Confirm Installation"
 msgstr "确认安装"
 
@@ -265,23 +269,27 @@ msgstr "确认分区操作"
 msgid "Confirm password"
 msgstr "确认密码"
 
-#: userland/apps/installer/installer_tty.c:285
+#: userland/apps/installer/installer_tty.c:286
 msgid "Confirm root password"
 msgstr "确认 root 密码"
 
-#: userland/apps/installer/installer_tty.c:202
+#: userland/apps/installer/main.cpp:1231
 msgid "Console"
 msgstr "控制台"
+
+#: userland/apps/installer/installer_tty.c:202
+msgid "Console only"
+msgstr "仅控制台"
 
 #: userland/apps/installer/installer_tui.c:546
 msgid "Continue"
 msgstr "继续"
 
-#: userland/apps/installer/install_ops.c:1488
+#: userland/apps/installer/install_ops.c:1505
 msgid "Copy failed"
 msgstr "复制失败"
 
-#: userland/apps/installer/install_ops.c:1091
+#: userland/apps/installer/install_ops.c:1095
 msgid "Copy path is too long"
 msgstr "复制路径过长"
 
@@ -289,19 +297,31 @@ msgstr "复制路径过长"
 msgid "Copying"
 msgstr "正在复制"
 
-#: userland/apps/installer/install_ops.c:816
+#: userland/apps/installer/install_ops.c:820
 msgid "Copying system files"
 msgstr "正在复制系统文件"
+
+msgid "Configuring installed system"
+msgstr "正在配置已安装的系统"
+
+msgid "Synchronizing target filesystem"
+msgstr "正在同步目标文件系统"
+
+msgid "Installing bootloaders"
+msgstr "正在安装引导程序"
+
+msgid "Saving installed preferences"
+msgstr "正在保存系统设置"
 
 #: userland/apps/fltk_png_app.h:46
 msgid "Could not decode image"
 msgstr "无法解码图像"
 
-#: userland/apps/installer/install_ops.c:753
+#: userland/apps/installer/install_ops.c:757
 msgid "Could not list disks"
 msgstr "无法列出磁盘"
 
-#: userland/apps/installer/install_ops.c:1499
+#: userland/apps/installer/install_ops.c:1516
 msgid "Could not save installed preferences"
 msgstr "无法保存安装后偏好设置"
 
@@ -313,7 +333,7 @@ msgstr "创建"
 msgid "Create a new directory"
 msgstr "创建新目录"
 
-#: userland/apps/installer/installer_tty.c:287
+#: userland/apps/installer/installer_tty.c:291
 msgid "Create a swapfile"
 msgstr "创建交换文件"
 
@@ -321,11 +341,11 @@ msgstr "创建交换文件"
 msgid "Create partition"
 msgstr "创建分区"
 
-#: userland/apps/installer/main.cpp:982
+#: userland/apps/installer/main.cpp:1046
 msgid "Create: size in MiB, filesystem, name. Resize only changes the trailing edge."
 msgstr "创建：依次输入大小（MiB）、文件系统和名称。调整大小只移动分区末端。"
 
-#: userland/apps/installer/install_ops.c:1207
+#: userland/apps/installer/install_ops.c:1211
 msgid "Creating swapfile"
 msgstr "正在创建交换文件"
 
@@ -341,7 +361,7 @@ msgstr "自定义筛选器"
 msgid "Data partition"
 msgstr "数据分区"
 
-#: userland/apps/installer/main.cpp:973
+#: userland/apps/installer/main.cpp:1037
 msgid "Data type"
 msgstr "数据分区类型"
 
@@ -353,15 +373,15 @@ msgstr "删除"
 msgid "Desktop"
 msgstr "桌面环境"
 
-#: userland/apps/installer/main.cpp:1166
+#: userland/apps/installer/installer_tty.c:287
 msgid "Desktop environment"
 msgstr "桌面环境"
 
-#: userland/apps/installer/installer_tty.c:203
+#: userland/apps/installer/installer_tty.c:204
 msgid "Disabled"
 msgstr "已禁用"
 
-#: userland/apps/installer/main.cpp:154
+#: userland/apps/installer/main.cpp:157
 msgid "Disk"
 msgstr "硬盘"
 
@@ -369,15 +389,15 @@ msgstr "硬盘"
 msgid "Disk "
 msgstr "磁盘 "
 
-#: userland/apps/installer/installer_tui_job.c:177
+#: userland/apps/installer/installer_tui_job.c:113
 msgid "Disk operations are running. Please wait for completion."
 msgstr "正在执行磁盘操作，请等待完成。"
 
-#: userland/apps/installer/main.cpp:1264
+#: userland/apps/installer/main.cpp:1331
 msgid "Do not turn off this machine."
 msgstr "请勿关闭此计算机。"
 
-#: userland/apps/installer/main.cpp:687
+#: userland/apps/installer/main.cpp:751
 msgid "EFI system partition"
 msgstr "EFI 系统分区"
 
@@ -385,27 +405,27 @@ msgstr "EFI 系统分区"
 msgid "Enter a positive whole number of MiB."
 msgstr "请输入大于零的整数 MiB。"
 
-#: userland/apps/installer/installer_tty.c:424
+#: userland/apps/installer/installer_tty.c:428
 msgid "Enter a valid swap size in MiB."
 msgstr "请输入有效的交换文件大小（MiB）。"
 
-#: userland/apps/installer/main.cpp:832
+#: userland/apps/installer/main.cpp:896
 msgid "Enter a value:"
 msgstr "请输入："
 
-#: userland/apps/installer/main.cpp:828
+#: userland/apps/installer/main.cpp:892
 msgid "Enter filesystem and label (for example: ext4 RELIEFOS_DATA):"
 msgstr "输入文件系统和卷标（例如：ext4 RELIEFOS_DATA）："
 
-#: userland/apps/installer/main.cpp:822
+#: userland/apps/installer/main.cpp:886
 msgid "Enter size_MiB filesystem name (ext4/ext3/ext2/fat32/exfat/raw):"
 msgstr "输入 容量MiB 文件系统 名称（ext4/ext3/ext2/fat32/exfat/raw）："
 
-#: userland/apps/installer/main.cpp:826
+#: userland/apps/installer/main.cpp:890
 msgid "Enter the GPT partition name:"
 msgstr "输入 GPT 分区名称："
 
-#: userland/apps/installer/main.cpp:824
+#: userland/apps/installer/main.cpp:888
 msgid "Enter the new partition size in MiB:"
 msgstr "输入新的分区大小（MiB）："
 
@@ -413,11 +433,11 @@ msgstr "输入新的分区大小（MiB）："
 msgid "Erase disk: BIOS Boot %llu MiB, ESP %llu MiB, ext4 root %llu MiB"
 msgstr "擦除磁盘：BIOS Boot %llu MiB，ESP %llu MiB，ext4 根分区 %llu MiB"
 
-#: userland/apps/installer/installer_tty.c:316
+#: userland/apps/installer/installer_tty.c:320
 msgid "Exit"
 msgstr "退出"
 
-#: userland/apps/installer/installer_tty.c:348
+#: userland/apps/installer/installer_tty.c:352
 msgid "Exit the installer?"
 msgstr "退出安装器？"
 
@@ -445,15 +465,15 @@ msgstr "文件系统"
 msgid "Filesystem label"
 msgstr "文件系统卷标"
 
-#: userland/apps/installer/main.cpp:985
+#: userland/apps/installer/main.cpp:1049
 msgid "Final confirmation formats a FAT32 ESP and ext4 root on the selected disk."
 msgstr "最终确认后，会在所选磁盘上格式化 FAT32 EFI 系统分区和 ext4 根分区。"
 
-#: userland/apps/installer/main.cpp:160
+#: userland/apps/installer/main.cpp:163
 msgid "Finish"
 msgstr "完成"
 
-#: userland/apps/installer/installer_update_engine.c:435
+#: userland/apps/installer/installer_update_engine.c:439
 msgid "Finishing the system update"
 msgstr "正在完成系统更新"
 
@@ -469,7 +489,7 @@ msgstr "格式化分区"
 msgid "Format selected ESP (erase all EFI boot files on it)"
 msgstr "格式化所选 ESP（擦除其中所有 EFI 引导文件）"
 
-#: userland/apps/installer/main.cpp:858
+#: userland/apps/installer/main.cpp:922
 msgid "Formatting destroys all files on the selected partition."
 msgstr "格式化会删除所选分区中的全部文件。"
 
@@ -477,13 +497,17 @@ msgstr "格式化会删除所选分区中的全部文件。"
 msgid "Free / required space"
 msgstr "可用／所需空间"
 
-#: userland/apps/installer/main.cpp:582
+#: userland/apps/installer/main.cpp:646
 msgid "Fresh Install"
 msgstr "全新安装"
 
-#: userland/apps/installer/main.cpp:579
+#: userland/apps/installer/main.cpp:643
 msgid "Fresh install erases the disk. Update keeps existing users and extra programs."
 msgstr "全新安装会清空硬盘；更新会保留用户和额外程序。"
+
+#: userland/apps/installer/installer_tty.c:203
+msgid "IceWM (default)"
+msgstr "IceWM（默认）"
 
 #: userland/apps/installer/installer_update_engine.c:360
 msgid "Identifying the installed system"
@@ -497,27 +521,23 @@ msgstr "初始化 GPT"
 msgid "Input is too long"
 msgstr "输入内容过长"
 
-#: userland/apps/installer/install_ops.c:251
+#: userland/apps/installer/install_ops.c:255
 msgid "Install"
 msgstr "安装"
 
-#: userland/apps/installer/main.cpp:517
+#: userland/apps/installer/main.cpp:581
 msgid "Install ReliefOS"
 msgstr "安装 ReliefOS"
 
-#: userland/apps/installer/installer_tty.c:286
-msgid "Install Xorg desktop environment"
-msgstr "安装 Xorg 桌面环境"
-
-#: userland/apps/installer/installer_tty.c:254
+#: userland/apps/installer/installer_tty.c:255
 msgid "Install a new system"
 msgstr "全新安装系统"
 
-#: userland/apps/installer/installer_tty.c:249
+#: userland/apps/installer/installer_tty.c:250
 msgid "Install a new system or update an existing ReliefOS disk."
 msgstr "全新安装系统，或更新现有 ReliefOS 硬盘。"
 
-#: userland/apps/installer/install_ops.c:1413
+#: userland/apps/installer/install_ops.c:1426
 msgid "Install failed"
 msgstr "安装失败"
 
@@ -529,23 +549,23 @@ msgstr "安装或更新 BIOS 引导程序"
 msgid "Install or update UEFI bootloader"
 msgstr "安装或更新 UEFI 引导程序"
 
-#: userland/apps/installer/main.cpp:1291
+#: userland/apps/installer/main.cpp:1358
 msgid "Installation Complete"
 msgstr "安装完成"
 
-#: userland/apps/installer/main.cpp:1317
+#: userland/apps/installer/main.cpp:1384
 msgid "Installation Failed"
 msgstr "安装失败"
 
-#: userland/apps/installer/install_ops.c:1408
+#: userland/apps/installer/install_ops.c:1421
 msgid "Installation completed successfully"
 msgstr "安装成功完成"
 
-#: userland/apps/installer/installer_tty.c:294
+#: userland/apps/installer/installer_tty.c:298
 msgid "Installation completed successfully."
 msgstr "安装已成功完成。"
 
-#: userland/apps/installer/install_ops.c:227
+#: userland/apps/installer/install_ops.c:231
 msgid "Installation failed"
 msgstr "安装失败"
 
@@ -553,7 +573,7 @@ msgstr "安装失败"
 msgid "Installation finished"
 msgstr "安装完成"
 
-#: userland/apps/installer/install_ops.c:1313
+#: userland/apps/installer/install_ops.c:1317
 msgid "Installation media is incomplete"
 msgstr "安装介质不完整"
 
@@ -569,19 +589,23 @@ msgstr "安装模式"
 msgid "Installation progress"
 msgstr "安装进度"
 
-#: userland/apps/installer/main.cpp:1156
+#: userland/apps/installer/main.cpp:300
+msgid "Installation worker failed"
+msgstr "安装后台进程失败"
+
+#: userland/apps/installer/main.cpp:1220
 msgid "Installed version"
 msgstr "已安装版本"
 
-#: userland/apps/installer/installer_tty.c:344
+#: userland/apps/installer/installer_tty.c:348
 msgid "Installer log"
 msgstr "安装日志"
 
-#: userland/apps/installer/install_ops.c:257
+#: userland/apps/installer/install_ops.c:261
 msgid "Installing ReliefOS"
 msgstr "正在安装 ReliefOS"
 
-#: userland/apps/installer/install_ops.c:1426
+#: userland/apps/installer/install_ops.c:1442
 msgid "Invalid installation settings"
 msgstr "安装设置无效"
 
@@ -589,7 +613,7 @@ msgstr "安装设置无效"
 msgid "Invalid size"
 msgstr "大小无效"
 
-#: userland/apps/installer/install_ops.c:1450
+#: userland/apps/installer/install_ops.c:1467
 msgid "Invalid swap size"
 msgstr "交换文件大小无效"
 
@@ -605,11 +629,11 @@ msgstr "许可证"
 msgid "Manage Favorites"
 msgstr "管理收藏夹"
 
-#: userland/apps/installer/main.cpp:718
+#: userland/apps/installer/main.cpp:782
 msgid "Manual layout: assign BIOS Boot, ESP and root roles. BIOS Boot stays unformatted."
 msgstr "手动布局：指定 BIOS 引导分区、ESP 和根分区。BIOS 引导分区不格式化。"
 
-#: userland/apps/installer/main.cpp:717
+#: userland/apps/installer/main.cpp:781
 msgid "Manual layout: assign a FAT32 ESP and an ext4 or ext3 root. BIOS Boot is not required for the selected bootloaders."
 msgstr "手动布局：指定 FAT32 ESP 和 ext4 或 ext3 根分区。当前引导选择不需要 BIOS Boot 分区。"
 
@@ -617,11 +641,11 @@ msgstr "手动布局：指定 FAT32 ESP 和 ext4 或 ext3 根分区。当前引�
 msgid "Manual partitioning"
 msgstr "手动分区"
 
-#: userland/apps/installer/main.cpp:1158
+#: userland/apps/installer/main.cpp:1222
 msgid "Media version"
 msgstr "安装介质版本"
 
-#: userland/apps/installer/main.cpp:153
+#: userland/apps/installer/main.cpp:156
 msgid "Mode"
 msgstr "模式"
 
@@ -641,7 +665,7 @@ msgstr "名称"
 msgid "New Directory?"
 msgstr "新建目录？"
 
-#: userland/apps/installer/installer_tty.c:316
+#: userland/apps/installer/installer_tty.c:320
 msgid "Next"
 msgstr "下一步"
 
@@ -649,15 +673,15 @@ msgstr "下一步"
 msgid "No"
 msgstr "否"
 
-#: userland/apps/installer/installer_tty.c:207
+#: userland/apps/installer/installer_tty.c:208
 msgid "No bootloader selected. A new installation will need a separately configured bootloader."
 msgstr "未选择引导程序。新安装的系统需要另行配置引导程序才能启动。"
 
-#: userland/apps/installer/install_ops.c:760
+#: userland/apps/installer/install_ops.c:764
 msgid "No disks were found"
 msgstr "未找到硬盘"
 
-#: userland/apps/installer/main.cpp:1320
+#: userland/apps/installer/main.cpp:1387
 msgid "No writes will continue after this error."
 msgstr "出现此错误后不会继续写入。"
 
@@ -669,7 +693,7 @@ msgstr "确定"
 msgid "Only the selected root is formatted; existing ESP files are preserved."
 msgstr "仅格式化所选根分区；保留现有 ESP 文件。"
 
-#: userland/apps/installer/main.cpp:1208
+#: userland/apps/installer/main.cpp:1272
 msgid "Only the selected root will be formatted. Existing ESP files and other partitions are preserved."
 msgstr "仅格式化所选根分区。保留现有 ESP 文件和其他分区。"
 
@@ -677,7 +701,7 @@ msgstr "仅格式化所选根分区。保留现有 ESP 文件和其他分区。"
 msgid "Operation failed"
 msgstr "操作失败"
 
-#: userland/apps/installer/installer_tui_job.c:170
+#: userland/apps/installer/installer_tui_job.c:104
 msgid "Operation in progress"
 msgstr "正在执行操作"
 
@@ -689,12 +713,12 @@ msgstr "软件包"
 msgid "Partition"
 msgstr "分区"
 
-#: userland/apps/installer/install_ops.c:347
+#: userland/apps/installer/install_ops.c:351
 #, python-format
 msgid "Partition %u  %s  %llu MiB  %s  %s%s"
 msgstr "分区 %u  %s  %llu MiB  %s  %s%s"
 
-#: userland/apps/installer/main.cpp:747
+#: userland/apps/installer/main.cpp:811
 msgid "Partition layout updated"
 msgstr "已更新分区布局"
 
@@ -710,15 +734,15 @@ msgstr "分区操作失败"
 msgid "Partition role"
 msgstr "分区用途"
 
-#: userland/apps/installer/main.cpp:927
+#: userland/apps/installer/main.cpp:991
 msgid "Partition role updated."
 msgstr "已更新分区用途。"
 
-#: userland/apps/installer/main.cpp:156
+#: userland/apps/installer/main.cpp:159
 msgid "Partitions"
 msgstr "分区"
 
-#: userland/apps/installer/installer_tty.c:282
+#: userland/apps/installer/installer_tty.c:283
 msgid "Password"
 msgstr "密码"
 
@@ -726,19 +750,19 @@ msgstr "密码"
 msgid "Password:"
 msgstr "密码："
 
-#: userland/apps/installer/main.cpp:1068
+#: userland/apps/installer/main.cpp:1132
 msgid "Passwords: 1-32 characters, no spaces; confirmations must match"
 msgstr "密码为 1 至 32 个字符，不含空格，两次输入需一致；请检查用户名"
 
-#: userland/apps/installer/install_ops.c:1444
+#: userland/apps/installer/install_ops.c:1461
 msgid "Payload check failed"
 msgstr "负载检测失败"
 
-#: userland/apps/installer/install_ops.c:859
+#: userland/apps/installer/install_ops.c:863
 msgid "Payload path is too long"
 msgstr "负载路径过长"
 
-#: userland/apps/installer/install_ops.c:1480
+#: userland/apps/installer/install_ops.c:1497
 msgid "Payload scan failed"
 msgstr "扫描安装负载失败"
 
@@ -750,27 +774,27 @@ msgstr "待应用方案，最终确认安装后才会写入磁盘。"
 msgid "Please choose an existing file!"
 msgstr "请选择已存在的文件！"
 
-#: userland/apps/installer/installer_tty.c:354
+#: userland/apps/installer/installer_tty.c:358
 msgid "Power operation failed"
 msgstr "电源操作失败"
 
-#: userland/apps/installer/main.cpp:593
+#: userland/apps/installer/main.cpp:657
 msgid "Prepare a clean ReliefOS system with automatic or manual disk partitioning."
 msgstr "通过自动或手动分区安装全新的 ReliefOS 系统。"
 
-#: userland/apps/installer/installer_tui_job.c:139
+#: userland/apps/installer/installer_tui_job.c:111
 msgid "Preparing operation"
 msgstr "正在准备操作"
 
-#: userland/apps/installer/install_ops.c:1463
+#: userland/apps/installer/install_ops.c:1480
 msgid "Preparing target disk"
 msgstr "正在准备目标磁盘"
 
-#: userland/apps/installer/installer_update_engine.c:408
+#: userland/apps/installer/installer_update_engine.c:412
 msgid "Preparing the installed system for update"
 msgstr "正在准备更新已安装的系统"
 
-#: userland/apps/installer/main.cpp:394
+#: userland/apps/installer/main.cpp:464
 msgid "Preparing the system update"
 msgstr "正在准备系统更新"
 
@@ -782,7 +806,7 @@ msgstr "正在准备已验证的软件包归档"
 msgid "Preserving the installed kernel and configuration"
 msgstr "正在保留已安装的内核和配置"
 
-#: userland/apps/installer/install_ops.c:1409
+#: userland/apps/installer/install_ops.c:1422
 msgid "Press Restart to boot from the installed disk."
 msgstr "点击重启从已安装硬盘启动。"
 
@@ -790,11 +814,11 @@ msgstr "点击重启从已安装硬盘启动。"
 msgid "Preview"
 msgstr "预览"
 
-#: userland/apps/installer/main.cpp:518
+#: userland/apps/installer/main.cpp:582
 msgid "Previous Step"
 msgstr "上一步"
 
-#: userland/apps/installer/installer_update_engine.c:427
+#: userland/apps/installer/installer_update_engine.c:431
 msgid "Publishing kernel and bootloader files"
 msgstr "正在提交内核与引导文件"
 
@@ -806,7 +830,7 @@ msgstr "正在发布离线软件包缓存"
 msgid "Ready"
 msgstr "就绪"
 
-#: userland/apps/installer/main.cpp:325
+#: userland/apps/installer/main.cpp:395
 msgid "Ready to update"
 msgstr "可以开始更新"
 
@@ -818,31 +842,31 @@ msgstr "正在恢复上一次未完成的更新"
 msgid "Refresh"
 msgstr "刷新"
 
-#: userland/apps/installer/main.cpp:555
+#: userland/apps/installer/main.cpp:619
 msgid "ReliefOS Setup"
 msgstr "ReliefOS 安装程序"
 
-#: userland/apps/installer/main.cpp:685
+#: userland/apps/installer/main.cpp:749
 msgid "ReliefOS system partition"
 msgstr "ReliefOS 系统分区"
 
-#: userland/apps/installer/main.cpp:1294
+#: userland/apps/installer/main.cpp:1361
 msgid "ReliefOS was installed to the selected disk."
 msgstr "ReliefOS 已安装到所选硬盘。"
 
-#: userland/apps/installer/main.cpp:1293
+#: userland/apps/installer/main.cpp:1360
 msgid "ReliefOS was updated on the selected disk."
 msgstr "所选硬盘上的 ReliefOS 已更新。"
 
-#: userland/apps/installer/installer_tty.c:352
+#: userland/apps/installer/installer_tty.c:356
 msgid "Remove the installation media before continuing."
 msgstr "继续前请移除安装介质。"
 
-#: userland/apps/installer/install_ops.c:1416
+#: userland/apps/installer/install_ops.c:1429
 msgid "Remove the installation media before rebooting."
 msgstr "重启前请移除安装介质。"
 
-#: userland/apps/installer/main.cpp:330
+#: userland/apps/installer/main.cpp:400
 msgid "Remove the installation media, then restart."
 msgstr "移除安装介质，然后重启。"
 
@@ -878,11 +902,11 @@ msgstr "调整分区大小"
 msgid "Resize the terminal to at least 60 columns and 20 rows."
 msgstr "请将终端调整到至少 60 列、20 行。"
 
-#: userland/apps/installer/installer_tty.c:307
+#: userland/apps/installer/installer_tty.c:311
 msgid "Restart"
 msgstr "重启"
 
-#: userland/apps/installer/main.cpp:1310
+#: userland/apps/installer/main.cpp:1377
 msgid "Restart failed"
 msgstr "重启失败"
 
@@ -890,11 +914,11 @@ msgstr "重启失败"
 msgid "Restoring retained kernel files"
 msgstr "正在恢复已保留的内核文件"
 
-#: userland/apps/installer/installer_update_engine.c:427
+#: userland/apps/installer/installer_update_engine.c:431
 msgid "Resuming bootloader publication"
 msgstr "正在继续提交引导文件"
 
-#: userland/apps/installer/installer_tty.c:316
+#: userland/apps/installer/installer_tty.c:320
 msgid "Retry"
 msgstr "重试"
 
@@ -906,39 +930,39 @@ msgstr "已复用"
 msgid "Review installation"
 msgstr "核对安装设置"
 
-#: userland/apps/installer/main.cpp:1155
+#: userland/apps/installer/main.cpp:1219
 msgid "Review system update"
 msgstr "确认系统更新"
 
-#: userland/apps/installer/main.cpp:1319
+#: userland/apps/installer/main.cpp:1386
 msgid "Review the details, then check the update again to retry."
 msgstr "请查看详细日志，然后重新检查更新以重试。"
 
-#: userland/apps/installer/main.cpp:325
+#: userland/apps/installer/main.cpp:395
 msgid "Review the detected system and start the update."
 msgstr "请核对识别到的系统信息，然后开始更新。"
 
-#: userland/apps/installer/installer_tty.c:250
+#: userland/apps/installer/installer_tty.c:251
 msgid "Review the disk model, size and partitions before applying changes."
 msgstr "应用更改前，请核对磁盘型号、容量和现有分区。"
 
-#: userland/apps/installer/installer_tty.c:415
+#: userland/apps/installer/installer_tty.c:419
 msgid "Review the required BIOS Boot, ESP and root partitions."
 msgstr "请核对所需的 BIOS Boot、ESP 和根分区。"
 
-#: userland/apps/installer/main.cpp:907
+#: userland/apps/installer/main.cpp:971
 msgid "Review the selected ESP and root before continuing."
 msgstr "继续之前，请核对选中的 EFI 系统分区和根分区。"
 
-#: userland/apps/installer/install_ops.c:1464
+#: userland/apps/installer/install_ops.c:1481
 msgid "Root and boot partitions"
 msgstr "根分区和引导分区"
 
-#: userland/apps/installer/install_ops.c:1485
+#: userland/apps/installer/install_ops.c:1502
 msgid "Root: /target; boot partition: /target/boot"
 msgstr "根分区：/target；启动分区：/target/boot"
 
-#: userland/apps/installer/main.cpp:562
+#: userland/apps/installer/main.cpp:626
 msgid "SATA/AHCI and IDE/PATA target disks are supported."
 msgstr "支持 SATA/AHCI 和 IDE/PATA 目标硬盘。"
 
@@ -946,23 +970,23 @@ msgstr "支持 SATA/AHCI 和 IDE/PATA 目标硬盘。"
 msgid "Save"
 msgstr "保存"
 
-#: userland/apps/installer/install_ops.c:1474
+#: userland/apps/installer/install_ops.c:1491
 msgid "Scanning installation payload"
 msgstr "正在扫描安装载荷"
 
-#: userland/apps/installer/main.cpp:671
+#: userland/apps/installer/main.cpp:735
 msgid "Select Disk to Update"
 msgstr "选择要更新的硬盘"
 
-#: userland/apps/installer/main.cpp:671
+#: userland/apps/installer/main.cpp:735
 msgid "Select Installation Disk"
 msgstr "选择安装硬盘"
 
-#: userland/apps/installer/main.cpp:525
+#: userland/apps/installer/main.cpp:589
 msgid "Select Language"
 msgstr "选择语言"
 
-#: userland/apps/installer/installer_tty.c:366
+#: userland/apps/installer/installer_tty.c:370
 msgid "Select a disk first."
 msgstr "请先选择磁盘。"
 
@@ -970,55 +994,55 @@ msgstr "请先选择磁盘。"
 msgid "Select a partition first."
 msgstr "请先选择分区。"
 
-#: userland/apps/installer/installer_tty.c:269
+#: userland/apps/installer/installer_tty.c:270
 msgid "Select boot partition"
 msgstr "选择引导分区"
 
-#: userland/apps/installer/installer_tty.c:268
+#: userland/apps/installer/installer_tty.c:269
 msgid "Select system partition"
 msgstr "选择系统分区"
 
-#: userland/apps/installer/install_ops.c:263
+#: userland/apps/installer/install_ops.c:267
 msgid "Select the disk to update"
 msgstr "请选择要更新的硬盘"
 
-#: userland/apps/installer/main.cpp:1135
+#: userland/apps/installer/main.cpp:1199
 msgid "Select the firmware used to start this disk. You can select both BIOS and UEFI."
 msgstr "选择用于启动此磁盘的固件类型。可以同时选择 BIOS 和 UEFI。"
 
-#: userland/apps/installer/install_ops.c:266
+#: userland/apps/installer/install_ops.c:270
 msgid "Select the target disk"
 msgstr "请选择目标硬盘"
 
-#: userland/apps/installer/install_ops.c:1453
+#: userland/apps/installer/install_ops.c:1470
 msgid "Selected system does not support swap"
 msgstr "所选系统不支持交换空间"
 
-#: userland/apps/installer/main.cpp:976
+#: userland/apps/installer/main.cpp:1040
 msgid "Set BIOS Boot"
 msgstr "设为 BIOS 引导分区"
 
-#: userland/apps/installer/main.cpp:967
+#: userland/apps/installer/main.cpp:1031
 msgid "Set ESP"
 msgstr "设为 EFI 系统分区"
 
-#: userland/apps/installer/main.cpp:970
+#: userland/apps/installer/main.cpp:1034
 msgid "Set root"
 msgstr "设为根分区"
 
-#: userland/apps/installer/main.cpp:207
+#: userland/apps/installer/main.cpp:210
 msgid "Setup"
 msgstr "安装"
 
-#: userland/apps/installer/main.cpp:558
+#: userland/apps/installer/main.cpp:622
 msgid "Setup can copy the full normal system payload"
 msgstr "安装程序可以复制完整的普通系统文件"
 
-#: userland/apps/installer/install_ops.c:264
+#: userland/apps/installer/install_ops.c:268
 msgid "Setup will check for an existing ReliefOS system."
 msgstr "安装程序会检测现有 ReliefOS 系统。"
 
-#: userland/apps/installer/installer_tui_job.c:179
+#: userland/apps/installer/installer_tui_job.c:115
 msgid "Show / hide log (F4)"
 msgstr "显示／隐藏日志（F4）"
 
@@ -1030,11 +1054,11 @@ msgstr "显示隐藏文件"
 msgid "Show:"
 msgstr "显示："
 
-#: userland/apps/installer/installer_tty.c:308
+#: userland/apps/installer/installer_tty.c:312
 msgid "Shut down"
 msgstr "关机"
 
-#: userland/apps/installer/main.cpp:1189
+#: userland/apps/installer/main.cpp:1253
 msgid ""
 "Signed packages are checked before changes. Boot files are published after the package "
 "transaction succeeds."
@@ -1048,19 +1072,19 @@ msgstr "容量"
 msgid "Size in MiB"
 msgstr "大小（MiB）"
 
-#: userland/apps/installer/main.cpp:1240
+#: userland/apps/installer/main.cpp:1307
 msgid "Skip"
 msgstr "跳过"
 
-#: userland/apps/installer/install_ops.c:1455
+#: userland/apps/installer/install_ops.c:1472
 msgid "Swap requires an AHCI disk"
 msgstr "交换文件需要 AHCI 磁盘"
 
-#: userland/apps/installer/installer_tty.c:203
+#: userland/apps/installer/installer_tty.c:204
 msgid "Swap size in MiB"
 msgstr "交换文件大小（MiB）"
 
-#: userland/apps/installer/main.cpp:1228
+#: userland/apps/installer/main.cpp:1295
 msgid "Swapfile (MiB)"
 msgstr "交换文件 (MiB)"
 
@@ -1068,7 +1092,7 @@ msgstr "交换文件 (MiB)"
 msgid "Synchronizing the offline package cache"
 msgstr "正在同步离线软件包缓存"
 
-#: userland/apps/installer/installer_update_engine.c:422
+#: userland/apps/installer/installer_update_engine.c:426
 msgid "Synchronizing the updated root filesystem"
 msgstr "正在同步更新后的根文件系统"
 
@@ -1080,7 +1104,7 @@ msgstr "系统分区"
 msgid "System root"
 msgstr "系统根分区"
 
-#: userland/apps/installer/installer_update_engine.c:451
+#: userland/apps/installer/installer_update_engine.c:455
 msgid "System update completed successfully"
 msgstr "系统更新成功"
 
@@ -1096,15 +1120,15 @@ msgstr "Tab／方向键选择  空格切换  PgUp／PgDn 翻页"
 msgid "Target disk"
 msgstr "目标磁盘"
 
-#: userland/apps/installer/install_ops.c:1503
+#: userland/apps/installer/install_ops.c:1520
 msgid "Target disk is ready."
 msgstr "目标硬盘已准备就绪。"
 
-#: userland/apps/installer/installer_update_engine.c:380
+#: userland/apps/installer/installer_update_engine.c:384
 msgid "Target or media changed. Check the update again."
 msgstr "目标系统或安装介质已变化，请重新检查更新。"
 
-#: userland/apps/installer/main.cpp:1202
+#: userland/apps/installer/main.cpp:1266
 msgid "Target:"
 msgstr "目标:"
 
@@ -1112,19 +1136,19 @@ msgstr "目标:"
 msgid "The automatic layout does not fit this disk. Select another disk or configure partitions manually."
 msgstr "此磁盘无法容纳自动方案。请选择其他磁盘或手动配置分区。"
 
-#: userland/apps/installer/installer_tty.c:430
+#: userland/apps/installer/installer_tty.c:434
 msgid "The confirmation word does not match."
 msgstr "确认文字不匹配。"
 
-#: userland/apps/installer/main.cpp:744
+#: userland/apps/installer/main.cpp:808
 msgid "The disk may have been changed"
 msgstr "磁盘内容可能已更改"
 
-#: userland/apps/installer/main.cpp:536
+#: userland/apps/installer/main.cpp:600
 msgid "The installed system will use the same language."
 msgstr "安装后的操作系统将使用相同语言。"
 
-#: userland/apps/installer/main.cpp:1205
+#: userland/apps/installer/main.cpp:1269
 msgid "The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root."
 msgstr "所选磁盘将被清空，并创建、格式化 FAT32 EFI 系统分区和 ext4 系统根分区。"
 
@@ -1132,15 +1156,15 @@ msgstr "所选磁盘将被清空，并创建、格式化 FAT32 EFI 系统分区�
 msgid "The selected root and ESP will be formatted."
 msgstr "将格式化所选根分区和 ESP。"
 
-#: userland/apps/installer/main.cpp:1207
+#: userland/apps/installer/main.cpp:1271
 msgid "The selected root and ESP will be formatted. All EFI boot files on that ESP will be erased."
 msgstr "将格式化所选根分区和 ESP，擦除该 ESP 上的所有 EFI 引导文件。"
 
-#: userland/apps/installer/main.cpp:986
+#: userland/apps/installer/main.cpp:1050
 msgid "The selected root is formatted. An existing FAT32 ESP is preserved by default."
 msgstr "将格式化所选根分区。默认保留现有 FAT32 ESP。"
 
-#: userland/apps/installer/installer_tui_job.c:182
+#: userland/apps/installer/installer_tui_job.c:118
 msgid "The terminal requested exit. Waiting for the disk operation to finish."
 msgstr "终端已请求退出，正在等待磁盘操作完成。"
 
@@ -1148,31 +1172,31 @@ msgstr "终端已请求退出，正在等待磁盘操作完成。"
 msgid "This operation changes the selected disk or partition immediately and can destroy its data."
 msgstr "此操作会立即更改所选磁盘或分区，并可能清除其中的数据。"
 
-#: userland/apps/installer/main.cpp:1196
+#: userland/apps/installer/main.cpp:1260
 msgid "This operation is destructive."
 msgstr "此操作会清空目标硬盘。"
 
-#: userland/apps/installer/main.cpp:818
+#: userland/apps/installer/main.cpp:882
 msgid "Type AUTO to erase the disk and create BIOS Boot, ESP and root partitions:"
 msgstr "输入 AUTO 以清空磁盘并创建 BIOS 引导分区、EFI 系统分区和根分区："
 
-#: userland/apps/installer/main.cpp:817
+#: userland/apps/installer/main.cpp:881
 msgid "Type AUTO to erase the disk and create ESP and root partitions:"
 msgstr "输入 AUTO 擦除此磁盘，并创建 ESP 和根分区："
 
-#: userland/apps/installer/main.cpp:830
+#: userland/apps/installer/main.cpp:894
 msgid "Type DELETE to remove the selected partition:"
 msgstr "输入 DELETE 以删除所选分区："
 
-#: userland/apps/installer/main.cpp:820
+#: userland/apps/installer/main.cpp:884
 msgid "Type INITIALIZE to replace the partition table:"
 msgstr "输入 INITIALIZE 以替换分区表："
 
-#: userland/apps/installer/installer_tty.c:205
+#: userland/apps/installer/installer_tty.c:206
 msgid "Type INSTALL to confirm installation"
 msgstr "输入 INSTALL 确认安装"
 
-#: userland/apps/installer/main.cpp:1210
+#: userland/apps/installer/main.cpp:1274
 msgid "Type INSTALL to enable the Install button."
 msgstr "输入 INSTALL 以启用安装按钮。"
 
@@ -1180,7 +1204,7 @@ msgstr "输入 INSTALL 以启用安装按钮。"
 msgid "Type the confirmation word"
 msgstr "输入确认文字"
 
-#: userland/apps/installer/main.cpp:1304
+#: userland/apps/installer/main.cpp:1371
 msgid "UEFI boot file (add it in firmware if no automatic entry appears):"
 msgstr "UEFI 引导文件（若未自动出现入口，请在固件中添加）："
 
@@ -1188,7 +1212,7 @@ msgstr "UEFI 引导文件（若未自动出现入口，请在固件中添加）�
 msgid "Unallocated"
 msgstr "未分配空间"
 
-#: userland/apps/installer/install_ops.c:349
+#: userland/apps/installer/install_ops.c:353
 msgid "Unnamed"
 msgstr "未命名"
 
@@ -1196,47 +1220,47 @@ msgstr "未命名"
 msgid "Up/Down: partition   PgUp/PgDn: page   Home/End: first/last   Tab: actions"
 msgstr "上下键选择分区  PgUp/PgDn 翻页  Home/End 首尾  Tab 操作栏"
 
-#: userland/apps/installer/install_ops.c:251
+#: userland/apps/installer/install_ops.c:255
 msgid "Update"
 msgstr "更新"
 
-#: userland/apps/installer/main.cpp:1291
+#: userland/apps/installer/main.cpp:1358
 msgid "Update Complete"
 msgstr "更新完成"
 
-#: userland/apps/installer/main.cpp:584
+#: userland/apps/installer/main.cpp:648
 msgid "Update Existing System"
 msgstr "更新现有系统"
 
-#: userland/apps/installer/main.cpp:1317
+#: userland/apps/installer/main.cpp:1384
 msgid "Update Failed"
 msgstr "更新失败"
 
-#: userland/apps/installer/installer_tty.c:255
+#: userland/apps/installer/installer_tty.c:256
 msgid "Update an existing system"
 msgstr "更新已有系统"
 
-#: userland/apps/installer/main.cpp:1174
+#: userland/apps/installer/main.cpp:1238
 msgid "Update bootloader software"
 msgstr "更新引导器程序"
 
-#: userland/apps/installer/installer_update_engine.c:400
+#: userland/apps/installer/installer_update_engine.c:404
 msgid "Update checks completed"
 msgstr "更新检查完成"
 
-#: userland/apps/installer/install_ops.c:1407
+#: userland/apps/installer/install_ops.c:1420
 msgid "Update completed successfully"
 msgstr "更新成功完成"
 
-#: userland/apps/installer/main.cpp:1248
+#: userland/apps/installer/main.cpp:1315
 msgid "Update details"
 msgstr "更新详情"
 
-#: userland/apps/installer/installer_update_engine.c:534
+#: userland/apps/installer/installer_update_engine.c:538
 msgid "Update worker failed"
 msgstr "后台更新进程执行失败"
 
-#: userland/apps/installer/install_ops.c:256
+#: userland/apps/installer/install_ops.c:260
 msgid "Updating ReliefOS"
 msgstr "正在更新 ReliefOS"
 
@@ -1248,11 +1272,11 @@ msgstr "正在更新 Shell 配置"
 msgid "Use"
 msgstr "用途"
 
-#: userland/apps/installer/installer_tty.c:251
+#: userland/apps/installer/installer_tty.c:252
 msgid "Use Tab and the arrow keys to select controls. F3 continues and F2 returns to the previous step."
 msgstr "使用 Tab 和方向键选择控件，F3 继续，F2 返回上一步。"
 
-#: userland/apps/installer/installer_tty.c:266
+#: userland/apps/installer/installer_tty.c:267
 msgid "Use fstab"
 msgstr "使用 fstab"
 
@@ -1264,15 +1288,19 @@ msgstr "使用所选安装的 fstab"
 msgid "Username"
 msgstr "用户名"
 
+#: userland/apps/installer/install_ops.c:1469
+msgid "User name or ID conflicts with a system account"
+msgstr "用户名或 ID 与系统账户冲突"
+
 #: userland/apps/installer/installer_update_progress.c:16
 msgid "Verifying package signatures"
 msgstr "正在验证软件包签名"
 
-#: userland/apps/installer/installer_update_engine.c:396
+#: userland/apps/installer/installer_update_engine.c:400
 msgid "Verifying signed packages and dependencies"
 msgstr "正在校验软件包签名与依赖"
 
-#: userland/apps/installer/installer_tty.c:299
+#: userland/apps/installer/installer_tty.c:303
 msgid "View log"
 msgstr "查看日志"
 
@@ -1280,7 +1308,7 @@ msgstr "查看日志"
 msgid "Welcome"
 msgstr "欢迎"
 
-#: userland/apps/installer/install_ops.c:1207
+#: userland/apps/installer/install_ops.c:1211
 msgid "Writing allocated space"
 msgstr "正在写入分配的空间"
 
@@ -1288,11 +1316,15 @@ msgstr "正在写入分配的空间"
 msgid "Writing the update log"
 msgstr "正在写入更新日志"
 
+#: userland/apps/installer/installer_tty.c:203
+msgid "XFCE (experimental)"
+msgstr "XFCE（实验性）"
+
 #: userland/apps/fltk_support.h:27
 msgid "Yes"
 msgstr "是"
 
-#: userland/apps/installer/install_ops.c:1413
+#: userland/apps/installer/install_ops.c:1426
 #, python-format
 msgid ""
 "\n"
@@ -1320,7 +1352,7 @@ msgid ""
 "Command exit status: %u"
 msgstr "\n命令退出状态：%u"
 
-#: userland/apps/installer/install_ops.c:1415
+#: userland/apps/installer/install_ops.c:1428
 msgid ""
 "\n"
 "Installation completed successfully."
@@ -1330,13 +1362,16 @@ msgstr "\n安装已成功完成。"
 msgid "none"
 msgstr "无"
 
-#: userland/apps/installer/main.cpp:560
+#: userland/apps/installer/main.cpp:624
 msgid "or replace the boot/reliefos and system files on an existing installation."
 msgstr "也可以替换现有安装中的启动和系统文件。"
 
-#: userland/apps/installer/installer_tty.c:284
+#: userland/apps/installer/installer_tty.c:285
 msgid "root password"
 msgstr "root 密码"
+
+#~ msgid "Install Xorg desktop environment"
+#~ msgstr "安装 Xorg 桌面环境"
 
 #~ msgid "Enter size_MiB filesystem name (ext4/ext2/fat32/exfat/raw):"
 #~ msgstr "输入大小（MiB）、文件系统和名称（ext4/ext2/fat32/exfat/raw）；raw 表示不格式化："
@@ -1354,3 +1389,15 @@ msgstr "root 密码"
 
 #~ msgid "Manual partition selection"
 #~ msgstr "手动选择分区"
+
+
+msgid "Writing system files to disk"
+msgstr "正在向磁盘写入系统文件"
+
+#, c-format
+msgid "Elapsed time: %lu s"
+msgstr "已用时间：%lu 秒"
+
+
+msgid "Could not prepare target filesystems"
+msgstr "无法准备目标文件系统"

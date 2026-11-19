@@ -44,6 +44,7 @@ struct installer_update_info {
 struct installer_update_packages {
     uint64_t installed_bytes, largest_package;
     char kernel_version[96];
+    int has_xfce_session;
 };
 
 struct installer_update_checkpoint {
