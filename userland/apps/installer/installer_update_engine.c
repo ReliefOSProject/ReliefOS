@@ -232,12 +232,15 @@ static int repository_bytes(const char *repository, uint64_t *bytes)
 }
 
 static int check_media(struct update_run *run, struct installer_update_target *target,
-                       const char *media, char repository[PATH_MAX])
+                       char repository[PATH_MAX])
 {
     struct installer_update_info source = {0};
     struct installer_update_packages installed, incoming;
-    int result = installer_update_read_media(media, target->info.profile, &source);
-    if (!result) result = installer_update_read_packages(target->root, &installed);
+    int result = installer_update_read_packages(target->root, &installed);
+    if (result) return result;
+    const char *media = !strcmp(target->info.profile, "console") ? "/install/root-console" :
+        installed.has_xfce_session ? "/install/root-xfce" : "/install/root";
+    result = installer_update_read_media(media, target->info.profile, &source);
     if (!result) result = installer_update_read_packages(media, &incoming);
     if (result) return result;
     if (!incoming.kernel_version[0]) return -ENOENT;
@@ -362,10 +365,9 @@ static int execute(const char *disk, const struct installer_update_info *expecte
                                               expected ? expected->esp_uuid : esp_uuid);
     if (result) goto done;
     if (reliefos_account_legacy_check(target.root) < 0) { result = -errno; goto done; }
-    const char *media = !strcmp(target.info.profile, "console") ? "/install/root-console" : "/install/root";
     char repository[PATH_MAX];
     report(&run, 10, N_("Checking installation media and free space"));
-    result = check_media(&run, &target, media, repository);
+    result = check_media(&run, &target, repository);
     if (result) goto done;
     result = installer_update_read_checkpoint(target.root, &checkpoint);
     if (result) goto done;

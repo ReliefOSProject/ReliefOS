@@ -138,6 +138,7 @@ endef
 $(eval $(call RELIEFOS_STATIC_RUNTIME_APP,kernelbundle,$(RELIEFOS_KERNEL_RECOVERY)))
 $(eval $(call RELIEFOS_STATIC_RUNTIME_APP,bootinstall,$(USERLAND_DIR)/bootinstall.elf))
 $(eval $(call RELIEFOS_STATIC_RUNTIME_APP,systemupdate,$(USERLAND_DIR)/systemupdate.elf))
+userland/apps/systemupdate: $(RUNTIME_DEVELOPMENT_ROOT)/usr/include/mbedtls/sha256.h
 
 # Only manifest-owned disabled ELF outputs may be removed; arbitrary files in
 # this directory and old build/ images are outside this rule's ownership.

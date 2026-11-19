@@ -173,6 +173,7 @@ int installer_update_read_media(const char *root, const char *profile, struct in
 static int package_record(struct installer_update_packages *out, const char *name,
                           const char *version, uint64_t bytes)
 {
+    if (!strcmp(name, "xfce4-session")) out->has_xfce_session = 1;
     if (strncmp(name, "reliefos-", 9) && strncmp(name, "leonos-", 7)) return 0;
     if (UINT64_MAX - out->installed_bytes < bytes) return -EOVERFLOW;
     out->installed_bytes += bytes;

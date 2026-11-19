@@ -60,12 +60,26 @@ int main(void)
         show_copy_progress(name);
     }
     assert(output_calls <= 2);
-    assert(!strcmp(detail_text, "/target/terminfo/file-99"));
+    assert(strstr(detail_text, "/target/terminfo/file-99"));
     unsigned before = output_calls;
     copy_done_bytes = copy_total_bytes / 2;
     test_time += COPY_PRESENT_INTERVAL_MS;
     show_copy_progress("/target/big-file");
     assert(output_calls > before);
-    puts("PASS installer progress: bounded GUI/TTY output across short I/O slices, next update after interval");
+    /* Links and empty files take work even with zero newly copied bytes. */
+    copy_total = 100;
+    copy_done = 50;
+    copy_done_bytes = 0;
+    test_time += COPY_PRESENT_INTERVAL_MS;
+    show_copy_progress("/target/lib/link.so");
+    assert(progress_value > 35 && progress_value < 90);
+    assert(strstr(detail_text, "50/100"));
+    assert(strstr(detail_text, "/target/lib/link.so"));
+    copy_done_bytes = copy_total_bytes;
+    copy_done = copy_total;
+    test_time += COPY_PRESENT_INTERVAL_MS;
+    show_copy_progress("/target");
+    assert(progress_value == 90);
+    puts("PASS installer progress: bounded output and advances on metadata-only work");
     return 0;
 }

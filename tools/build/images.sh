@@ -50,14 +50,19 @@ ext4)
     trap 'rm -rf "$work"' EXIT HUP INT TERM
     cp -a "$stage" "$work/root"
     find "$work/root" -print0 | xargs -0 touch -h -d "@$epoch"
-    count=$(find "$work/root" -printf '.\n' | wc -l)
+    find "$work/root" -printf '%i\n' > "$work/inodes"
+    read -r count unique <<EOF
+$(awk '!seen[$0]++ { ++unique } END { print NR, unique }' "$work/inodes")
+EOF
     bytes=$(du -sb "$work/root" | cut -f1)
-    mib=$(( (bytes + count * 8192 + 67108864 + 33554431) / 33554432 * 32 ))
+    # du counts shared file data once. Reserve per-inode allocation overhead
+    # once as well, and still account for every name in the directory tree.
+    mib=$(( (bytes + unique * 8192 + (count - unique) * 512 + 67108864 + 33554431) / 33554432 * 32 ))
     [ "$mib" -ge 128 ] || mib=128
     minimum=${IMAGE_MIN_MIB:-0}
     case $minimum in ''|*[!0-9]*) echo 'IMAGE_MIN_MIB must be an integer' >&2; exit 2;; esac
     [ "$mib" -ge "$minimum" ] || mib=$minimum
-    inodes=$((count * 2)); [ "$inodes" -ge 8192 ] || inodes=8192
+    inodes=$((unique * 2)); [ "$inodes" -ge 8192 ] || inodes=8192
     truncate -s "${mib}M" "$work/root.ext4"
     E2FSPROGS_FAKE_TIME="$epoch" FAKEROOTDONTTRYCHOWN=1 fakeroot -- sh -eu -c '
         find "$1" -exec chown -h 0:0 {} +

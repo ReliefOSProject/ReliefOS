@@ -108,6 +108,17 @@ if test -x /usr/bin/reliefsettings; then
     /usr/bin/reliefsettings --apply-session || event 'Some personal desktop settings could not be applied'
 fi
 
+# Honour the conventional per-user and system X session entry points. The
+# installer supplies a site Xsession for the selected XFCE session.
+if test -x "$HOME/.xsession"; then
+    event 'starting user X session'
+    exec "$HOME/.xsession"
+fi
+if test -x /etc/X11/Xsession; then
+    event 'starting system X session'
+    exec /etc/X11/Xsession
+fi
+
 # freedesktop Desktop Entry names are case-sensitive.
 export XDG_CURRENT_DESKTOP=ICEWM
 

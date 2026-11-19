@@ -223,10 +223,11 @@ static int validate_entry(const json_value *entry, const char *root_dir, int ind
         if (feature != NULL && (feature->type != JSON_STRING
                 || (strcmp(feature->text, "base") != 0
                     && strcmp(feature->text, "xorg") != 0
+                    && strcmp(feature->text, "xfce") != 0
                     && strcmp(feature->text, "component:sl") != 0
                     && strcmp(feature->text, "component:ncurses") != 0
                     && strcmp(feature->text, "component:sqlite") != 0))) {
-            return report("%s: \"feature\" must be base, xorg or component:sl/ncurses/sqlite", id);
+            return report("%s: \"feature\" must be base, xorg, xfce or component:sl/ncurses/sqlite", id);
         }
     }
     if (is_downloaded(kind)) {

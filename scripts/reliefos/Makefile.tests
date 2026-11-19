@@ -66,6 +66,7 @@ define RELIEFOS_RUN_CONTRACT_TESTS
 	       LEONOS_DEPS='$(abspath $(RELIEFOS_DEPS_TOOL))' \
 	       RELIEFOS_LOCK='$(RELIEFOS_SRC)/configs/dependencies.lock.json' \
 	       LEONOS_LOCK='$(RELIEFOS_SRC)/configs/dependencies.lock.json' \
+	       RELIEFOS_CACHE='$(abspath $(RELIEFOS_CACHE))' \
 	       GRUB_HOST_ROOT='$(GRUB_HOST_ROOT)' \
 	       GRUB_EFI_DIR='$(GRUB_EFI_DIR)' \
 	       RELIEFOS_EMIT='$(abspath $(RELIEFOS_EMIT))' \

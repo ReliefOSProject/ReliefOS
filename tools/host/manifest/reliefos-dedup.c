@@ -1,6 +1,6 @@
 #define _XOPEN_SOURCE 700
-/* Deduplicate private installer payloads only. Hashes select candidates;
- * byte comparison and metadata equality decide whether sharing is safe. */
+/* Share an identical file at the same path in separate installer trees.
+ * A single installed tree must never acquire new hard-link aliases. */
 #include <errno.h>
 #include <ftw.h>
 #include <stdint.h>
@@ -13,8 +13,8 @@
 #define BUCKETS 4096
 struct entry {
     char *path;
+    const char *relative;
     struct stat st;
-    uint64_t hash;
     struct entry *next;
 };
 static struct entry *buckets[BUCKETS];
@@ -49,10 +49,12 @@ static int examine(const char *path, const struct stat *st, int type,
     static const char *const embedded_roots[] = {
         "install/root/",
         "install/root-console/",
+        "install/root-xfce/",
     };
     (void)walk;
     if (type == FTW_NS || type == FTW_DNR) return -1;
-    if (type != FTW_F || !S_ISREG(st->st_mode)) return 0;
+    /* A hard link supplied by a package already has intentional aliases. */
+    if (type != FTW_F || !S_ISREG(st->st_mode) || st->st_nlink != 1) return 0;
     const char *relative = path + root_length;
     if (*relative == '/') relative++;
     for (size_t i = 0; i < sizeof embedded_roots / sizeof embedded_roots[0]; i++) {
@@ -64,22 +66,15 @@ static int examine(const char *path, const struct stat *st, int type,
     }
     if (strncmp(relative, "usr/", 4) && strncmp(relative, "bin/", 4) &&
         strncmp(relative, "sbin/", 5) && strncmp(relative, "opt/", 4)) return 0;
-    FILE *input = fopen(path, "rb");
-    if (!input) return -1;
-    unsigned char bytes[65536];
     uint64_t hash = UINT64_C(14695981039346656037);
-    size_t n;
-    while ((n = fread(bytes, 1, sizeof bytes, input)))
-        for (size_t i = 0; i < n; i++) hash = (hash ^ bytes[i]) * UINT64_C(1099511628211);
-    int bad = ferror(input);
-    if (fclose(input)) bad = 1;
-    if (bad) return -1;
+    for (const unsigned char *byte = (const unsigned char *)relative; *byte; ++byte)
+        hash = (hash ^ *byte) * UINT64_C(1099511628211);
     size_t bucket = hash % BUCKETS;
+    int bad;
     for (struct entry *e = buckets[bucket]; e; e = e->next) {
-        if (e->hash != hash || e->st.st_size != st->st_size ||
+        if (strcmp(e->relative, relative) || e->st.st_size != st->st_size ||
             e->st.st_mode != st->st_mode || e->st.st_uid != st->st_uid ||
             e->st.st_gid != st->st_gid || e->st.st_dev != st->st_dev) continue;
-        if (e->st.st_ino == st->st_ino) return 0;
         int same = same_bytes(e->path, path);
         if (same < 0) return -1;
         if (!same) continue;
@@ -105,7 +100,7 @@ static int examine(const char *path, const struct stat *st, int type,
     e->path = strdup(path);
     if (!e->path) { free(e); return -1; }
     e->st = *st;
-    e->hash = hash;
+    e->relative = e->path + (relative - path);
     e->next = buckets[bucket];
     buckets[bucket] = e;
     return 0;

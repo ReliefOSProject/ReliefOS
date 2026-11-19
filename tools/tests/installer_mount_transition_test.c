@@ -6,7 +6,6 @@
 #undef MNT_DETACH
 #undef MNT_EXPIRE
 #undef UMOUNT_NOFOLLOW
-#define installer_capacity_measure fake_capacity_measure
 #define mkdir fake_mkdir
 #define lstat fake_lstat
 #define mount fake_mount
@@ -61,14 +60,6 @@ int fake_statvfs(const char *path, struct statvfs *status)
     status->f_bavail = 65536;
     return 0;
 }
-int fake_capacity_measure(const char *root, const char *boot, int bios, int uefi,
-                          struct installer_capacity *out)
-{
-    (void)root; (void)boot; (void)bios; (void)uefi;
-    *out = (struct installer_capacity){.root_bytes = capacity_bytes, .root_inodes = capacity_inodes};
-    return 0;
-}
-
 /* The format step is the reason this test exists: capture the spelling of the
  * mkfs.ext4 invocation so a silently-degrading default (the mke2fs revision-0
  * fallback) cannot creep back in unnoticed. */
@@ -76,6 +67,7 @@ static char spawn_file[64];
 static char spawn_args[16][128];
 static int spawn_argc;
 static int spawn_calls;
+static int mkfs_status, mkfs_wait_error;
 
 int fake_posix_spawnp(pid_t *pid, const char *file,
                       const posix_spawn_file_actions_t *actions,
@@ -85,6 +77,7 @@ int fake_posix_spawnp(pid_t *pid, const char *file,
     (void)actions;
     (void)attr;
     (void)envp;
+    assert(!root_mounted && !esp_mounted && !esp_volume_mounted);
     ++spawn_calls;
     snprintf(spawn_file, sizeof(spawn_file), "%s", file);
     spawn_argc = 0;
@@ -99,7 +92,11 @@ int fake_posix_spawnp(pid_t *pid, const char *file,
 pid_t fake_waitpid(pid_t pid, int *status, int options)
 {
     (void)options;
-    if (status) *status = 0;
+    if (mkfs_wait_error) {
+        errno = mkfs_wait_error;
+        return -1;
+    }
+    if (status) *status = mkfs_status;
     return pid;
 }
 
@@ -201,16 +198,18 @@ int reliefos_block_list_partitions(const char *path, struct reliefos_block_parti
 /* The fresh path must hand mkfs.ext4 an explicit ext4 profile: an inherited
  * default can degrade to revision 0 (ext2) whenever uname() reports a release
  * the tool considers pre-2.2, which is exactly the mount EINVAL this guards. */
-static void assert_format_args(void)
+static void assert_format_args(const char *payload)
 {
-    assert(spawn_calls == 1);
     assert(!strcmp(spawn_file, "mkfs.ext4"));
-    int seen_f = 0, seen_b = 0, seen_i = 0, seen_o = 0;
+    int seen_f = 0, seen_b = 0, seen_i = 0, seen_o = 0, seen_d = 0;
     for (int i = 1; i < spawn_argc; ++i) {
         if (!strcmp(spawn_args[i], "-F")) seen_f = 1;
         else if (!strcmp(spawn_args[i], "-b")) { seen_b = 1; assert(!strcmp(spawn_args[i + 1], "4096")); }
         else if (!strcmp(spawn_args[i], "-I")) { seen_i = 1; assert(!strcmp(spawn_args[i + 1], "256")); }
-        else if (!strcmp(spawn_args[i], "-O")) {
+        else if (!strcmp(spawn_args[i], "-d")) {
+            seen_d = 1;
+            assert(!strcmp(spawn_args[i + 1], payload));
+        } else if (!strcmp(spawn_args[i], "-O")) {
             seen_o = 1;
             const char *features = spawn_args[i + 1];
             assert(strstr(features, "extents"));
@@ -219,37 +218,51 @@ static void assert_format_args(void)
             assert(strstr(features, "has_journal"));
         }
     }
-    assert(seen_f && seen_b && seen_i && seen_o);
+    assert(seen_f && seen_b && seen_i && seen_o && seen_d);
     /* The device is the last argument. Check it is a partition of the target
      * disk rather than pinning this test to the stub's naming scheme. */
     assert(!strncmp(spawn_args[spawn_argc - 1], "/dev/sda", 8));
 }
 
+/* Preflight happens in perform_install before the first destructive operation. */
+static int prepare_target(void)
+{
+    struct installer_capacity need = {.root_bytes = capacity_bytes, .root_inodes = capacity_inodes};
+    if (setup.swap_enabled) assert(!installer_capacity_add_swap(&need, setup.swap_size_mib));
+    return installer_mount_targets("/dev/sda", &need);
+}
+
+void refresh_ui(void) {}
+unsigned long reliefos_uptime_ms(void) { return 0; }
+
 int main(void)
 {
-    assert(installer_mount_targets("/dev/sda") == 0);
+    assert(prepare_target() == 0);
     assert(root_mounted && esp_mounted && mutations == 1);
-    assert_format_args();
+    assert(spawn_calls == 1);
+    assert_format_args(INSTALL_ROOT_PAYLOAD);
     busy_esp = 1;
-    assert(installer_mount_targets("/dev/sda") == -EBUSY);
+    assert(prepare_target() == -EBUSY);
     assert(root_mounted && esp_mounted && mutations == 1);
     busy_esp = 0;
     busy_root = 1;
-    assert(installer_mount_targets("/dev/sda") == -EBUSY);
+    assert(prepare_target() == -EBUSY);
     assert(root_mounted && !esp_mounted && mutations == 1);
     busy_root = 0;
-    assert(installer_mount_targets("/dev/sda") == 0);
+    assert(prepare_target() == 0);
     assert(root_mounted && esp_mounted && mutations == 2);
     manual_layout = 1;
     installer_partition_auto = 0;
     installer_root_partition = 8;
     installer_esp_partition = 3;
-    assert(installer_mount_targets("/dev/sda") == 0);
+    setup.desktop = INSTALLER_DESKTOP_XFCE;
+    assert(prepare_target() == 0);
+    assert_format_args(INSTALL_XFCE_ROOT_PAYLOAD);
     assert(!strcmp(spawn_args[spawn_argc - 1], "/dev/sda9"));
     assert(mutations == 2); /* A manual install never replaces the GPT. */
     manual_ext3 = 1;
     int saved_spawns = spawn_calls, saved_format_count = format_calls;
-    assert(installer_mount_targets("/dev/sda") == 0);
+    assert(prepare_target() == 0);
     assert(spawn_calls == saved_spawns && format_calls == saved_format_count + 1);
     assert(!strcmp(formatted_esp,"/dev/sda9"));
     assert(!strcmp(root_type,"ext3") && !strcmp(root_options,"data=ordered"));
@@ -257,7 +270,7 @@ int main(void)
     manual_ext3 = 0;
     manual_bad_role = 1;
     int unchanged_formats = format_calls;
-    assert(installer_mount_targets("/dev/sda") == -EINVAL);
+    assert(prepare_target() == -EINVAL);
     assert(format_calls == unchanged_formats && mutations == 2);
     selected_partition = 0;
     partition_count = 1;
@@ -273,20 +286,20 @@ int main(void)
     assert(type_calls == previous_types);
     manual_bad_role = 0;
     capacity_bytes = 256ULL * 1024 * 1024;
-    assert(installer_mount_targets("/dev/sda") == -ENOSPC);
+    assert(prepare_target() == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
     installer_partition_auto = 1;
     capacity_bytes = UINT64_MAX;
-    assert(installer_mount_targets("/dev/sda") < 0);
+    assert(prepare_target() < 0);
     assert(format_calls == previous_formats && mutations == 2);
     capacity_bytes = 0; capacity_inodes = 10000000;
-    assert(installer_mount_targets("/dev/sda") == -ENOSPC);
+    assert(prepare_target() == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
     capacity_inodes = 0;setup.swap_enabled = true;setup.swap_size_mib = 4096;
-    assert(installer_mount_targets("/dev/sda") == -ENOSPC);
+    assert(prepare_target() == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
     installer_partition_auto = 0;setup.swap_size_mib = 512;
-    assert(installer_mount_targets("/dev/sda") == -ENOSPC);
+    assert(prepare_target() == -ENOSPC);
     assert(format_calls == previous_formats && mutations == 2);
     setup.swap_enabled = false;
     installer_partition_auto = 1;
@@ -294,10 +307,19 @@ int main(void)
         setup.skip_bios = !(modes & RELIEFOS_BOOT_BIOS);
         setup.skip_uefi = !(modes & RELIEFOS_BOOT_UEFI);
         assert(installer_boot_modes() == modes);
-        assert(installer_mount_targets("/dev/sda") == 0);
+        assert(prepare_target() == 0);
         assert(!strcmp(formatted_esp, (modes & RELIEFOS_BOOT_BIOS) ? "/dev/sdap2" : "/dev/sdap1"));
         assert(!strcmp(spawn_args[spawn_argc - 1], (modes & RELIEFOS_BOOT_BIOS) ? "/dev/sdap3" : "/dev/sdap2"));
     }
+    /* A failed fill must not be mounted as a usable root or ESP. */
+    mkfs_status = 1 << 8;
+    assert(prepare_target() == -EIO);
+    assert(!root_mounted && !esp_mounted && !esp_volume_mounted);
+    mkfs_status = 0;
+    mkfs_wait_error = ECHILD;
+    assert(prepare_target() == -ECHILD);
+    assert(!root_mounted && !esp_mounted && !esp_volume_mounted);
+    mkfs_wait_error = 0;
     /* Navigating back to firmware selection changes validation, never GPT or
      * formatting. A two-part UEFI layout cannot silently become BIOS-ready. */
     int saved_mutations = mutations, saved_formats = format_calls;

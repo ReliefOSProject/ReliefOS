@@ -1,4 +1,9 @@
 #define _GNU_SOURCE
+#include <linux/mount.h>
+#undef MNT_FORCE
+#undef MNT_DETACH
+#undef MNT_EXPIRE
+#undef UMOUNT_NOFOLLOW
 #include <sys/mount.h>
 #define lstat fixture_lstat
 #define fopen fixture_fopen
@@ -48,10 +53,13 @@ int main(int argc, char **argv)
     fixture_root = argv[1];
     int result;
     if (argc == 3 && !strcmp(argv[2], "fresh-xorg")) {
-        setup.skip_xorg = 0;
+        setup.desktop = INSTALLER_DESKTOP_ICEWM;
         result = check_install_payload_required();
     } else if (argc == 3 && !strcmp(argv[2], "fresh-console")) {
-        setup.skip_xorg = 1;
+        setup.desktop = INSTALLER_DESKTOP_CONSOLE;
+        result = check_install_payload_required();
+    } else if (argc == 3 && !strcmp(argv[2], "fresh-xfce")) {
+        setup.desktop = INSTALLER_DESKTOP_XFCE;
         result = check_install_payload_required();
     } else if (argc == 3 && !strcmp(argv[2], "update")) {
         struct installer_update_info target = {0}, media = {0};

@@ -6,7 +6,7 @@
 int main(void)
 {
     struct installer_setup setup = {0};
-    assert(setup.skip_xorg == 0);
+    assert(setup.desktop == INSTALLER_DESKTOP_ICEWM);
     assert(setup.skip_bios == 0 && setup.skip_uefi == 0);
     strcpy(setup.username, "alice");
     strcpy(setup.password, "user!");
@@ -14,6 +14,13 @@ int main(void)
     strcpy(setup.root_password, "root!");
     strcpy(setup.root_password_confirm, "root!");
     assert(installer_setup_valid(&setup));
+    setup.desktop = INSTALLER_DESKTOP_XFCE;
+    assert(installer_setup_valid(&setup));
+    setup.desktop = INSTALLER_DESKTOP_CONSOLE;
+    assert(installer_setup_valid(&setup));
+    setup.desktop = 255;
+    assert(!installer_setup_valid(&setup));
+    setup.desktop = INSTALLER_DESKTOP_ICEWM;
     for (unsigned modes = 0; modes < 4; ++modes) {
         setup.skip_bios = modes & 1;
         setup.skip_uefi = (modes >> 1) & 1;
