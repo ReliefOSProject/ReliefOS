@@ -17,6 +17,8 @@ deps=${RELIEFOS_DEPS:-${LEONOS_DEPS:-$repo_root/tools/host/gen/reliefos-deps}}
 [ -x "$deps" ] || deps=$(find "$repo_root/out" -path '*/host/bin/reliefos-deps' -type f | head -n 1)
 lock=$repo_root/configs/dependencies.lock.json
 auth_script=$repo_root/tools/build/auth-upstream.sh
+cache=${RELIEFOS_CACHE:-${LEONOS_CACHE:-$repo_root/cache/downloads}}
+cache=$(CDPATH= cd -- "$cache" && pwd -P) || exit 1
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/reliefos-auth.XXXXXX") || exit 1
 O="$work/out"
@@ -157,34 +159,32 @@ for lib in libcrypt.so.2.0.0 libcrypt.a; do
 done
 
 printf '\n=== the stage refuses inputs it cannot honour ===\n'
-# A tampered archive must be refused, not silently unpacked. The cache is a
-# private copy: the archives are symlinked in, then the one under test is
-# replaced by a real file before a byte is appended, so the shared
-# cache/downloads tree is never written to.
+# Copy only the archive under test so the shared cache stays untouched.
 fake="$work/cache"
-mkdir -p "$fake"
-for id in linux-headers libxcrypt; do
-    url=$("$deps" --lock "$lock" --id "$id" --print url)
-    ln -s "$repo_root/cache/downloads/${url##*/}" "$fake/${url##*/}"
-done
-cp "$fake/libxcrypt-4.5.2.tar.xz" "$fake/tampered"
-mv "$fake/tampered" "$fake/libxcrypt-4.5.2.tar.xz"
-printf 'x' >>"$fake/libxcrypt-4.5.2.tar.xz"
-make -s O="$work/tampered" LEONOS_CACHE="$fake" leonos-auth >"$work/tampered.log" 2>&1
+headers_url=$("$deps" --lock "$lock" --id linux-headers --print url) || exit 1
+crypt_url=$("$deps" --lock "$lock" --id libxcrypt --print url) || exit 1
+crypt_archive=${crypt_url##*/}
+mkdir -p "$fake" || exit 1
+ln -s "$cache/${headers_url##*/}" "$fake/${headers_url##*/}" || exit 1
+cp "$cache/$crypt_archive" "$fake/$crypt_archive" || exit 1
+printf 'x' >>"$fake/$crypt_archive" || exit 1
+# The test runner supplies RELIEFOS_CACHE, which takes precedence over the old alias.
+make -s O="$work/tampered" RELIEFOS_CACHE="$fake" leonos-auth >"$work/tampered.log" 2>&1
 tampered_status=$?
-if [ "$tampered_status" -ne 0 ] && grep -q 'digest mismatch' "$work/tampered.log"; then
+if [ "$tampered_status" -ne 0 ] &&
+        grep -Fq "$fake/$crypt_archive digest mismatch:" "$work/tampered.log"; then
     pass 'a cache archive whose bytes changed is refused before unpacking'
 else
     fail 'a cache archive whose bytes changed is refused before unpacking' \
         "status $tampered_status: $(tail -c 200 "$work/tampered.log")"
 fi
-if [ -f "$repo_root/cache/downloads/libxcrypt-4.5.2.tar.xz" ] &&
-        [ "$(sha256sum "$repo_root/cache/downloads/libxcrypt-4.5.2.tar.xz" |
+if [ -f "$cache/$crypt_archive" ] &&
+        [ "$(sha256sum "$cache/$crypt_archive" |
                 cut -d' ' -f1)" = "$("$deps" --lock "$lock" --id libxcrypt --print sha256)" ]; then
     pass 'the shared download cache is untouched by the tampered run'
 else
     fail 'the shared download cache is untouched by the tampered run' \
-        'cache/downloads no longer matches the lock file'
+        "$cache/$crypt_archive no longer matches the lock file"
 fi
 
 printf '\n=== the stage leaves the output tree as the layout declares ===\n'
