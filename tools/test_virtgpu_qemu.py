@@ -189,7 +189,8 @@ def main():
         (root/directory).mkdir(parents=True,exist_ok=True)
     shutil.copy2(args.busybox,root/"bin/busybox")
     for applet in subprocess.check_output([str(args.busybox),"--list"],text=True).splitlines():
-        (root/"bin"/applet).symlink_to("busybox")
+        if applet != "busybox":
+            (root/"bin"/applet).symlink_to("busybox")
     (root/"sbin").symlink_to("bin")
     shutil.copy2(args.probe,root/"probe")
     modules_before=modules_after=""

@@ -779,7 +779,7 @@ def boot(prepared: dict, args, out: Path) -> dict:
             cpu = "host" if accelerator == "kvm" else "max"
             command = ["qemu-system-x86_64", "-machine", "q35", "-accel", accelerator,
                        "-cpu", cpu, "-m", "4096", "-smp", str(args.cpus), "-display", "none",
-                       "-serial", f"file:{serial}", "-vga", "vmware", "-nic", "none",
+                       "-serial", f"file:{serial}", "-vga", "std", "-nic", "none",
                        "-drive", f"file={raw},format=raw,if=none,id=osdisk,snapshot=on",
                        "-device", "nvme,drive=osdisk,serial=smp-latency,bootindex=1",
                        "-qmp", f"unix:{qmp},server=on,wait=off", "-no-reboot", "-no-shutdown",

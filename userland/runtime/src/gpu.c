@@ -1,64 +1,30 @@
-/* Legacy leonos_gpu_* compatibility entry points. All requests target the
- * /dev/gpu device node; fd 3 is no longer special. */
-#include <reliefos/device.h>
-#include <reliefos/gpu.h>
-#include <reliefos/syscall.h>
+/* Legacy GPU ABI exports retain their null-argument error convention. */
+#include <reliefos/gpu_sdk.h>
 #include <errno.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-static int gpu_fd(void)
-{
-    static int fd = -1;
-    if (fd < 0) fd = open(RELIEFOS_DEV_GPU, RELIEFOS_O_RDWR, 0);
-    return fd;
-}
-
-static int gpu_ioctl(unsigned long request, void *arg)
-{
-    long result = syscall3(SYS_ioctl, gpu_fd(), (long)request, (long)arg);
-    if (result < 0) { errno = (int)-result; return -1; }
-    return (int)result;
-}
 
 int reliefos_gpu_diagnostics(struct reliefos_gpu_diagnostics *diagnostic)
 {
-    if (!diagnostic) return -22;
-    diagnostic->size = sizeof(*diagnostic);
-    diagnostic->version = RELIEFOS_GPU_ABI_VERSION;
-    return gpu_ioctl(RELIEFOS_IOCTL_GPU_DIAGNOSTICS, diagnostic);
+    return diagnostic ? gpu_sdk_diagnostics(diagnostic) : -EINVAL;
 }
 
 int reliefos_gpu_info(struct reliefos_gpu_info *info)
 {
-    if (!info) return -22;
-    info->size = sizeof(*info);
-    info->version = RELIEFOS_GPU_ABI_VERSION;
-    return gpu_ioctl(RELIEFOS_IOCTL_GPU_INFO, info);
+    return info ? gpu_sdk_info(info) : -EINVAL;
 }
 
 int reliefos_gpu_create(struct reliefos_gpu_context *context)
 {
-    if (!context) return -22;
-    context->size = sizeof(*context);
-    context->version = RELIEFOS_GPU_ABI_VERSION;
-    return gpu_ioctl(RELIEFOS_IOCTL_GPU_CREATE, context);
+    return context ? gpu_sdk_create(context) : -EINVAL;
 }
 
 int reliefos_gpu_render(const struct reliefos_gpu_frame *frame)
 {
-    struct reliefos_gpu_frame request;
-    if (!frame) return -22;
-    request = *frame;
-    request.size = sizeof(request);
-    request.version = RELIEFOS_GPU_ABI_VERSION;
-    return gpu_ioctl(RELIEFOS_IOCTL_GPU_RENDER, &request);
+    return frame ? gpu_sdk_render(frame) : -EINVAL;
 }
 
 int reliefos_gpu_destroy(uint64_t handle)
 {
-    struct reliefos_gpu_destroy request = {sizeof(request), RELIEFOS_GPU_ABI_VERSION, handle};
-    return gpu_ioctl(RELIEFOS_IOCTL_GPU_DESTROY, &request);
+    return gpu_sdk_destroy(handle);
 }
 /* Published libleonos.so.2 aliases; keep these in the defining translation unit. */
 extern __typeof__(reliefos_gpu_create) leonos_gpu_create __attribute__((alias("reliefos_gpu_create")));

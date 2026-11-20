@@ -19,7 +19,7 @@ ${HOSTCXX:-c++} -std=c++17 -Wall -Wextra -Werror -nostdinc++ -fno-exceptions -fn
     "$src/userland/apps/network-controller/config.cpp" -o "$work/config"
 mkdir "$work/etc"
 "$work/config" "$work/etc"
-headers=${RELIEFOS_TEST_HEADERS:-$src/out/xorg-vmware-debug/kernel-export/include}
+headers=${RELIEFOS_TEST_HEADERS:-$src/out/xorg-debug/kernel-export/include}
 test -f "$headers/reliefos/net_control.h" || { echo 'Build exported headers with make headers_install or set RELIEFOS_TEST_HEADERS' >&2; exit 1; }
 ${HOSTCXX:-c++} -std=c++17 -Wall -Wextra -Werror -nostdinc++ -fno-exceptions -fno-rtti \
     -I"$src/userland/apps/network-controller" -idirafter "$headers" \

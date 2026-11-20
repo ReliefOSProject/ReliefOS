@@ -14,8 +14,8 @@ IceWM 和应用使用普通用户身份运行；不要用 root 桌面代替正�
 首次配置及真实运行测试必须区分 QEMU 与 VMware。
 
 Xorg 自动探测设备。在具备已实现 DRM 能力时使用 modesetting/glamor，
-否则保留 framebuffer 回退。VMware 保留软件光标与关闭 page flip 的默认值；
-VirtIO-GPU 由 XDM 的 Xorg wrapper 生成 ``/run/X11/xorg-virtio.conf``，
+否则使用 framebuffer。XDM 的 Xorg wrapper 为 VirtIO-GPU 生成
+``/run/X11/xorg-virtio.conf``，
 开启硬件光标和 page flip。显式指定 ``-config`` 或 ``-configdir`` 时尊重
 管理员配置。检查实际 Xorg/Mesa 日志与绘制结果，不能只看显卡名称。
 
@@ -29,7 +29,7 @@ QEMU/KVM 可在原生入口选择 2D 或 VirGL；不指定时仍使用原来的 
 
 VirGL 默认使用 ``gtk,gl=on``，需要宿主支持 OpenGL 的 QEMU、virglrenderer
 和可访问的 render node。可以通过 ``QEMU_DISPLAY`` 指定 EGL-headless 等
-显示后端。``QEMU_GPU=vmware`` 仍可用于原有 QEMU SVGA 路径。
+显示后端。
 
 检查 Xorg 日志中的 ``glamor initialized``、``virgl`` 和 DRI2/DRI3 状态。
 内核未协商 VirGL 时不提供 render node，不能将软件 renderer 当成硬件加速。

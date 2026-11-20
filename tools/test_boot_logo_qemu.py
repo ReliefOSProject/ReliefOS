@@ -78,7 +78,7 @@ def main():
     kernel=build/'generated/system/kernel.sys'
     symbols=build/'reliefnt/generated/system/kernel.unstripped'
     source_sha=digest(source)
-    metadata={'platform':'QEMU/KVM q35, VMware SVGA II, UEFI',
+    metadata={'platform':'QEMU/KVM q35, standard VGA, UEFI',
               'cpus':args.cpus,'source_image':str(source),'source_sha256':source_sha,
               'kernel_sha256':digest(kernel),'vmware_verified':False,
               'observation':'GDB hardware breakpoint before/after normal removal; no kernel delay'}
@@ -96,7 +96,7 @@ def main():
     serial,qmp,gdb=output/'serial.log',output/'qmp.sock',output/'gdb.sock'
     command=['qemu-system-x86_64','-enable-kvm','-cpu','host','-machine','q35',
              '-m','4096','-smp',str(args.cpus),'-bios','/usr/share/edk2/x64/OVMF.4m.fd',
-             '-display','none','-serial',f'file:{serial}','-vga','vmware',
+             '-display','none','-serial',f'file:{serial}','-vga','std',
              '-device','qemu-xhci','-device','usb-tablet',
              '-netdev','user,id=net0','-device','e1000,netdev=net0',
              '-drive',f'file={raw},format=raw,if=ide,snapshot=on',
@@ -118,7 +118,7 @@ def main():
         script=output/'observe.gdb'
         script.write_text('\n'.join([
             'set pagination off','set confirm off',f'target remote {gdb}',
-            'hbreak svga3d_init','continue',
+            'hbreak smp_start_aps','continue',
             f'monitor screendump {before}','delete breakpoints',
             'hbreak console_boot_complete','continue',
             f'monitor screendump {late}','finish',

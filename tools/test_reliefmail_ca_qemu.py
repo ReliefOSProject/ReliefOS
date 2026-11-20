@@ -34,7 +34,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / 'tests'))
 import reliefmail_protocol_server as protocol
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / 'out/xorg-vmware-debug'
+OUT = ROOT / 'out/xorg-debug'
 CA_VERSION = '99999999.0-r0'  # Higher than date-based upstream versions, e.g. 20260909-r0.
 
 

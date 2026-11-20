@@ -128,23 +128,20 @@ int main(void)
         uint32_t slot;
         taskmgr_perf_history_init(&history);
         assert(history.head == 0 && history.count == 0);
-        slot = taskmgr_perf_history_push(&history, 42, 0, 0);
+        slot = taskmgr_perf_history_push(&history, 42);
         assert(slot == 0 && history.head == 1 && history.count == 1);
         assert(history.memory[0] == 42);
-        assert(history.gpu[0] == TASKMGR_PERF_MISSING);
-        slot = taskmgr_perf_history_push(&history, 250, 55, 1);
-        assert(slot == 1 && history.memory[1] == 100 && history.gpu[1] == 55);
+        slot = taskmgr_perf_history_push(&history, 250);
+        assert(slot == 1 && history.memory[1] == 100);
         history.core[0][slot] = 77;
         assert(history.core[0][1] == 77);
         for (uint32_t i = history.count; i < TASKMGR_PERF_HISTORY; ++i)
-            taskmgr_perf_history_push(&history, i, 0, 0);
+            taskmgr_perf_history_push(&history, i);
         assert(history.count == TASKMGR_PERF_HISTORY);
         assert(history.head == 0);
-        slot = taskmgr_perf_history_push(&history, 5, 9, 1);
+        slot = taskmgr_perf_history_push(&history, 5);
         assert(slot == 0 && history.count == TASKMGR_PERF_HISTORY);
-        taskmgr_perf_history_clear_gpu(&history);
-        assert(history.gpu[0] == TASKMGR_PERF_MISSING &&
-               history.gpu[TASKMGR_PERF_HISTORY - 1] == TASKMGR_PERF_MISSING);
+        assert(history.memory[0] == 5 && history.core[0][1] == 77);
     }
 
     {

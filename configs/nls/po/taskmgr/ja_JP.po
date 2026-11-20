@@ -258,9 +258,9 @@ msgstr "自動起動のファイル名が無効です。"
 msgid "Kind:"
 msgstr "種類:"
 
-#: userland/apps/taskmgr/main.cpp:866
-msgid "Live CPU, memory, and estimated GPU history with per-core usage."
-msgstr "CPU、メモリ、GPU 使用率の推定履歴とコア別の使用率をリアルタイムで表示します。"
+#: userland/apps/taskmgr/main.cpp:853
+msgid "Live CPU and memory history with per-core usage."
+msgstr "CPU とメモリの使用履歴、およびコア別の使用率をリアルタイムで表示します。"
 
 #: userland/apps/taskmgr/main.cpp:618
 msgid "Live task and performance snapshot from the system."
@@ -610,9 +610,9 @@ msgstr "ユーザー"
 msgid "User:"
 msgstr "ユーザー:"
 
-#: userland/apps/taskmgr/main.cpp:858
-msgid "View live CPU, memory, and estimated GPU usage."
-msgstr "CPU、メモリ、および GPU 使用率の推定値をリアルタイムで表示します。"
+#: userland/apps/taskmgr/main.cpp:845
+msgid "View live CPU and memory usage."
+msgstr "CPU とメモリの使用率をリアルタイムで表示します。"
 
 #: userland/apps/taskmgr/main.cpp:609
 msgid "Wake tick:"

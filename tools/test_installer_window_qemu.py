@@ -72,8 +72,8 @@ def wait_for_installer_language(probe, process, timeout=90):
 
 
 def vga_arguments(profile):
-    if profile == "vmware":
-        return ["-vga", "vmware"]
+    if profile == "virtio":
+        return ["-vga", "none", "-device", "virtio-vga"]
     if profile == "std":
         return ["-device", "VGA,xres=1280,yres=720"]
     raise ValueError(f"Unsupported VGA profile: {profile}")
@@ -172,7 +172,7 @@ def main():
     parser.add_argument("case", choices=("tty", "installer", "desktop", "installed"))
     parser.add_argument("--output", type=Path, default=ROOT / "build/ui-regressions")
     parser.add_argument("--iso", type=Path)
-    parser.add_argument("--vga", choices=("std", "vmware"), default="std",
+    parser.add_argument("--vga", choices=("std", "virtio"), default="std",
                         help="QEMU display device (std preserves the legacy 1280x720 VGA device)")
     parser.add_argument("--install", action="store_true", help="Install onto this test's disposable scratch disk")
     parser.add_argument("--disk", type=Path, help="Previously installed test disk to boot without the ISO")

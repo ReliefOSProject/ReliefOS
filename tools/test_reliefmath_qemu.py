@@ -17,7 +17,7 @@ from test_reliefexcel_qemu import Session as BaseSession
 from test_installer_window_qemu import wait_log
 
 ROOT=Path(__file__).resolve().parents[1]
-OUT=ROOT/'out/xorg-vmware-debug'
+OUT=ROOT/'out/xorg-debug'
 
 def prepare(image,kernel,output):
     output.mkdir(parents=True,exist_ok=False)

@@ -2,9 +2,9 @@
 #define RELIEFOS_GPU_H
 
 /*
- * Userland GPU API. The wire types and constants moved to the kernel UAPI
- * (<reliefos/gpu_abi.h>); this header re-exports them so existing
- * `#include <reliefos/gpu.h>` callers keep working.
+ * Compatibility entry points for the retired GPU API. Calls return -1 with
+ * errno set to ENODEV and leave caller buffers untouched. Legacy calls with
+ * a null pointer return -EINVAL directly.
  */
 #include <reliefos/gpu_abi.h>
 #include <stdint.h>

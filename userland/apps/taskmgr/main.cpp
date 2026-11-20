@@ -1,6 +1,5 @@
 extern "C" {
 #include "model.h"
-#include "gpu_sample.h"
 #include <reliefos/auth.h>
 #include <reliefos/system.h>
 #include <reliefos/launch.h>
@@ -90,7 +89,6 @@ uint64_t last_cpu_idle[RELIEFOS_PERF_MAX_CPUS];
 uint32_t cpu_percent_by_core[RELIEFOS_PERF_MAX_CPUS];
 uint32_t cpu_percent, mem_percent;
 int cpu_snapshot_valid, perf_valid;
-struct taskmgr_gpu_sample gpu_sample;
 
 int active_tab = TASKMGR_TAB_PROCESSES;
 int updating;
@@ -279,12 +277,6 @@ void refresh_startup()
 void refresh_performance()
 {
     struct reliefos_perf_info next = {};
-    gpu_sdk_info_t next_gpu = {};
-    next_gpu.size = sizeof(gpu_sdk_info_t);
-    next_gpu.version = GPU_SDK_ABI_VERSION;
-    int gpu_result = gpu_sdk_info(&next_gpu);
-    if (taskmgr_gpu_sample_update(&gpu_sample, gpu_result < 0 ? NULL : &next_gpu))
-        taskmgr_perf_history_clear_gpu(&history);
     if (reliefos_perf_info(&next) < 0) {
         perf_valid = 0;
         set_status(T("Performance data unavailable"));
@@ -295,8 +287,7 @@ void refresh_performance()
                                        next.busy_ticks, next.idle_ticks,
                                        cpu_snapshot_valid, cpu_percent);
     mem_percent = taskmgr_mem_percent(next.total_memory_kib, next.free_memory_kib);
-    uint32_t slot = taskmgr_perf_history_push(&history, mem_percent,
-                                              gpu_sample.percent, gpu_sample.valid);
+    uint32_t slot = taskmgr_perf_history_push(&history, mem_percent);
     uint32_t cpu_count = next.cpu_count;
     if (cpu_count > RELIEFOS_PERF_MAX_CPUS) cpu_count = RELIEFOS_PERF_MAX_CPUS;
     for (uint32_t i = 0; i < RELIEFOS_PERF_MAX_CPUS; ++i) {
@@ -419,13 +410,9 @@ void draw_performance(int x, int y, int width, int height)
             draw_graph(gx, gy, graph_w, graph_h, T("Memory Usage"), current,
                        history.memory, FL_SELECTION_COLOR);
         } else {
-            if (gpu_sample.valid)
-                taskmgr_format_percent(current, sizeof(current), gpu_sample.percent);
-            else snprintf(current, sizeof(current), "%s", "N/A");
             draw_graph(gx, gy, graph_w, graph_h,
                        graph_w < 210 ? T("GPU (est.)") : T("GPU (estimated)"),
-                       current, gpu_sample.available ? history.gpu : NULL,
-                       fl_rgb_color(59, 98, 166));
+                       "N/A", NULL, fl_rgb_color(59, 98, 166));
         }
     }
     uint32_t cpu_count = perf_info.cpu_count > RELIEFOS_PERF_MAX_CPUS
@@ -855,7 +842,7 @@ void build_ui()
     page_processes->end();
 
     page_performance = new Fl_Group(12, 56, 976, 564, T("Performance"));
-    page_performance->tooltip(T("View live CPU, memory, and estimated GPU usage."));
+    page_performance->tooltip(T("View live CPU and memory usage."));
     page_performance->begin();
     performance_scroll = new Fl_Scroll(20, 66, 960, 546);
     performance_scroll->type(Fl_Scroll::VERTICAL);
@@ -863,7 +850,7 @@ void build_ui()
     performance_scroll->tooltip(T("Scroll to see per-core CPU usage and memory totals."));
     performance_scroll->begin();
     PerformanceView *perf = new PerformanceView(20, 66, 942, 546);
-    perf->tooltip(T("Live CPU, memory, and estimated GPU history with per-core usage."));
+    perf->tooltip(T("Live CPU and memory history with per-core usage."));
     performance_view = perf;
     performance_widget = perf;
     performance_scroll->end();

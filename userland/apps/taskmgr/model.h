@@ -14,7 +14,6 @@
 
 struct taskmgr_perf_history {
     uint8_t memory[TASKMGR_PERF_HISTORY];
-    uint8_t gpu[TASKMGR_PERF_HISTORY];
     uint8_t core[TASKMGR_MAX_CORES][TASKMGR_PERF_HISTORY];
     uint32_t head;
     uint32_t count;
@@ -46,9 +45,7 @@ int taskmgr_task_killable(uint32_t pid, uint32_t self_pid, uint32_t kind,
 
 void taskmgr_perf_history_init(struct taskmgr_perf_history *history);
 uint32_t taskmgr_perf_history_push(struct taskmgr_perf_history *history,
-                                   uint32_t memory_percent,
-                                   uint32_t gpu_percent, int gpu_valid);
-void taskmgr_perf_history_clear_gpu(struct taskmgr_perf_history *history);
+                                   uint32_t memory_percent);
 
 uint32_t taskmgr_tree_order(const uint32_t *pids, const uint32_t *parents,
                             uint32_t count, struct taskmgr_tree_row *rows,

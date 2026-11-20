@@ -85,7 +85,7 @@ def drag(probe, process, name, before, dx, dy, *, alt=False, resize=False,
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--image", type=Path, default=ROOT / "out/xorg-vmware-debug/images/reliefos.raw")
+    parser.add_argument("--image", type=Path, default=ROOT / "out/xorg-debug/images/reliefos.raw")
     parser.add_argument("--kernel", type=Path)
     parser.add_argument("--motion-interval", type=float, default=.025,
                         help="seconds between QMP pointer samples (default: 40 Hz)")

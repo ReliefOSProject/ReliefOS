@@ -92,8 +92,8 @@ CA 包中部分证书无法解析时，只要有可用根证书，程序会继�
     TMPDIR="$PWD/out/tmp" sh tests/build/test-reliefapk-certificates.sh
     TMPDIR="$PWD/out/tmp" sh tests/build/test-reliefapk-process.sh
     TMPDIR="$PWD/out/tmp" python3 tools/tests/test_reliefapk_apk.py \
-      --apk out/xorg-vmware-debug/upstream/apk/apk.static
-    TMPDIR="$PWD/out/tmp" make O=out/xorg-vmware-debug PROFILE=debug -j4 \
+      --apk out/xorg-debug/upstream/apk/apk.static
+    TMPDIR="$PWD/out/tmp" make O=out/xorg-debug PROFILE=debug -j4 \
       app-reliefmail app-reliefapk nls image-vmdk
 
 QEMU 工具 ``tools/test_reliefmail_ca_qemu.py`` 使用独立磁盘副本及临时签名仓库，

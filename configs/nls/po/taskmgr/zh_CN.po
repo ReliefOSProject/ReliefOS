@@ -258,9 +258,9 @@ msgstr "启动配置文件名无效。"
 msgid "Kind:"
 msgstr "类型:"
 
-#: userland/apps/taskmgr/main.cpp:866
-msgid "Live CPU, memory, and estimated GPU history with per-core usage."
-msgstr "实时 CPU、内存与 GPU 估算历史，以及各核心使用情况。"
+#: userland/apps/taskmgr/main.cpp:853
+msgid "Live CPU and memory history with per-core usage."
+msgstr "实时 CPU 和内存使用历史，以及各核心使用情况。"
 
 #: userland/apps/taskmgr/main.cpp:618
 msgid "Live task and performance snapshot from the system."
@@ -610,9 +610,9 @@ msgstr "用户"
 msgid "User:"
 msgstr "用户:"
 
-#: userland/apps/taskmgr/main.cpp:858
-msgid "View live CPU, memory, and estimated GPU usage."
-msgstr "查看实时 CPU、内存与 GPU 估算使用情况。"
+#: userland/apps/taskmgr/main.cpp:845
+msgid "View live CPU and memory usage."
+msgstr "查看实时 CPU 和内存使用情况。"
 
 #: userland/apps/taskmgr/main.cpp:609
 msgid "Wake tick:"

@@ -20,7 +20,7 @@ from test_reliefmath_qemu import Session as CommonSession, resize, wait_focus
 from qmp_terminal_smoke import text_keys
 
 ROOT=Path(__file__).resolve().parents[1]
-OUT=ROOT/'out/xorg-vmware-debug'
+OUT=ROOT/'out/xorg-debug'
 
 def prepare(image,kernel,output):
     output.mkdir(parents=True,exist_ok=False)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Boot the Xorg image on the VMware SVGA device and verify the tty1 session.
+"""Boot the Xorg image on QEMU standard VGA and verify the tty1 session.
 
 The scenario is the acceptance walk-through from the desktop task: tty1 runs the
 XDM/Xorg/IceWM graphical session, tty2-tty6 stay text logins that accept typed
@@ -22,18 +22,18 @@ from run_gcc_probe_qemu import qmp_quit
 
 ROOT = Path(__file__).resolve().parents[1]
 IMAGE = Path(os.environ.get("XORG_IMAGE",
-                            ROOT / "out/xorg-vmware-debug/images/reliefos.raw"))
+                            ROOT / "out/xorg-debug/images/reliefos.raw"))
 OUTPUT = Path(os.environ.get("XORG_OUTPUT", ROOT / "build/xorg-vm"))
 
 
 def boot(process_args, disk, output):
-    """Like test_installer_accounts_qemu.boot, but on the VMware SVGA device."""
+    """Like test_installer_accounts_qemu.boot, but on QEMU standard VGA."""
     output.mkdir(parents=True, exist_ok=True)
     serial, qmp = output / "serial.log", output / "qmp.sock"
     command = ["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-machine", "q35",
                "-m", "4096", "-smp", "2", "-bios", "/usr/share/edk2/x64/OVMF.4m.fd",
                "-display", "none", "-serial", f"file:{serial}",
-               "-vga", "vmware",
+               "-vga", "std",
                "-device", "qemu-xhci", "-device", "usb-tablet",
                "-netdev", "user,id=net0", "-device", "e1000,netdev=net0",
                "-drive", f"file={disk},format=raw,if=ide,snapshot=on",

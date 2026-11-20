@@ -18,7 +18,7 @@ exec <"$tty" >"$tty" 2>&1
 if test ! -c /dev/dri/card0 && test -c /dev/fb0; then
     /usr/sbin/fbset -fb /dev/fb0 -depth 32 || :
 fi
-# Keep the conservative VMware defaults in the system configuration. VirtIO
+# Keep the conservative fbdev defaults in the system configuration. VirtIO
 # has cursorq and fenced page flips, so publish a normal runtime Xorg config
 # enabling them. An explicitly selected administrator configuration wins.
 explicit_config=false

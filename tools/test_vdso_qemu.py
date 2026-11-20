@@ -18,7 +18,7 @@ import time
 from run_gcc_probe_qemu import qmp_quit
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_IMAGE = ROOT / "out/xorg-vmware-debug/images/reliefos.vmdk"
+DEFAULT_IMAGE = ROOT / "out/xorg-debug/images/reliefos.vmdk"
 OVMF = Path("/usr/share/edk2/x64/OVMF.4m.fd")
 PROBE_SOURCE = ROOT / "kernel/reliefnt/tools/tests/vdso_guest_test.c"
 SERVICE_PATH = "/etc/init.d/reliefos-vdso-guest"

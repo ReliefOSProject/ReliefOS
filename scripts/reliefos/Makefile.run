@@ -20,10 +20,8 @@ QEMU_GPU_FLAGS := -vga none -device virtio-vga-gl
 ifeq ($(origin QEMU_DISPLAY),file)
 QEMU_DISPLAY := gtk,gl=on
 endif
-else ifeq ($(QEMU_GPU),vmware)
-QEMU_GPU_FLAGS := -vga vmware
 else
-$(error QEMU_GPU must be vga, virtio, virgl or vmware)
+$(error QEMU_GPU must be vga, virtio or virgl)
 endif
 QEMU_SERIAL ?= stdio
 QEMU_AUDIO ?= sdl

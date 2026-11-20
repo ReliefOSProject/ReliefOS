@@ -101,8 +101,7 @@ GPU 吞吐量。计时只用于诊断，返回零也不表示达到了某个性�
 比较性能时使用相同探针、桌面配置、分辨率、vCPU 和内存，等待 IceWM
 就绪后重复采样，顺序运行各台 VM。软件对照使用 modesetting 的
 ``AccelMethod none``，加速对照使用 ``AccelMethod glamor``；从 Xorg 日志
-分别确认 ``glamor disabled`` 和 ``glamor X acceleration enabled on SVGA3D``，
-并记录 VMware host renderer。记录内核和探针摘要、完整串口、返回码与每轮
+确认 glamor 状态，并记录实际 renderer。记录内核和探针摘要、完整串口、返回码与每轮
 耗时；不能把启动期间加载字体/库的耗时直接当作稳定渲染性能。
 
 全量 syscall-trace 会向串口输出大量日志，显著扰动测试，应仅用于定性
