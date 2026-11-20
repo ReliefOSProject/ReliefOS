@@ -65,6 +65,22 @@ class Policy(unittest.TestCase):
         self.assertIn("need reliefos-runtime", service)
         self.assertIn("before reliefos-device reliefos-audio reliefos-dhcp", service)
 
+    def test_dhcp_is_ordered_after_but_not_blocked_by_module_coldplug(self):
+        service = ROOT / "system/rootfs/etc/init.d/reliefos-dhcp"
+        script = (
+            'need() { printf "need:%s\\n" "$@"; }; '
+            'after() { printf "after:%s\\n" "$@"; }; '
+            'provide() { printf "provide:%s\\n" "$@"; }; '
+            '. "$1"; depend'
+        )
+        dependencies = subprocess.check_output(
+            ["sh", "-c", script, "policy", str(service)], text=True
+        ).splitlines()
+        self.assertIn("need:reliefos-runtime", dependencies)
+        self.assertIn("after:reliefos-modules", dependencies)
+        self.assertIn("provide:net", dependencies)
+        self.assertNotIn("need:reliefos-modules", dependencies)
+
     def test_openrc_virtual_providers_do_not_shadow_real_hwdrivers(self):
         # Alpine OpenRC ships a real hwdrivers service. The native module
         # loader has its own explicit dependency name; claiming that real name

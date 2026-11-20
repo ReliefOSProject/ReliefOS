@@ -1,6 +1,6 @@
 #!/sbin/openrc-run
 description="Ethernet configuration and BusyBox DHCP clients"
-depend() { need reliefos-runtime reliefos-modules; provide net; }
+depend() { need reliefos-runtime; after reliefos-modules; provide net; }
 
 start() {
     local iface started interfaces
