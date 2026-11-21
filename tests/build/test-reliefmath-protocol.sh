@@ -35,7 +35,7 @@ if [ "$suite" = all ] || [ "$suite" = process ]; then
         "$repo_root/userland/apps/reliefmath/render_types.cpp" \
         "$repo_root/userland/apps/reliefmath/model.cpp" \
         -o "$build_dir/test_reliefmath_process"
-    "$build_dir/test_reliefmath_process"
+    "$build_dir/test_reliefmath_process" "$build_dir/worker.pid"
 fi
 
 if [ "$suite" = all ] || [ "$suite" = worker ]; then

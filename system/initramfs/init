@@ -74,6 +74,19 @@ mkdir -p /newroot || fail 'create real-root mountpoint'
 options=$root_access
 [ -z "$rootflags" ] || options=$rootflags,$root_access
 mount -t "$rootfstype" -o "$options" "$root_device" /newroot || fail "mount $root_device ($rootfstype)"
+if [ "$mode" = installer ] && [ "$installer_payload" = squashfs ]; then
+    [ -b /dev/ram1 ] || fail 'installer SquashFS payload device /dev/ram1 is missing'
+    mkdir -p /newroot/install || fail 'create installer payload mountpoint'
+    mount -t squashfs -o ro,nosuid,nodev /dev/ram1 /newroot/install || \
+        fail 'mount read-only installer SquashFS payload'
+    for profile in root-console root-xfce; do
+        [ -d "/newroot/install/$profile" ] || fail "installer SquashFS payload is missing $profile"
+    done
+fi
+if [ "$mode" = installer ]; then
+    [ -d /newroot/install/root ] && [ -d /newroot/install/esp ] || \
+        fail 'installation medium is missing its system or boot payload'
+fi
 # Recover an interrupted APK removal before relying on any final-root library,
 # normal module database or service. The static tool is part of this initramfs.
 case $mode in installer|live) ;;

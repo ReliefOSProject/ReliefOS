@@ -23,6 +23,12 @@ fi
 hostcc=${HOSTCC:-cc}
 mkdir -p "$work/src/system" "$work/out"
 cp -a system/rootfs "$work/src/system/rootfs"
+# A restrictive checkout must not turn public guest policy into root-only
+# files. Preserve the Git executable bit while constraining every other bit.
+find "$work/src/system/rootfs" -type d -exec chmod 0700 {} +
+find "$work/src/system/rootfs" -type f ! -perm /111 -exec chmod 0600 {} +
+printf 'private policy fixture\n' > "$work/src/system/rootfs/etc/private-fixture"
+chmod 0600 "$work/src/system/rootfs/etc/private-fixture"
 for name in certs config docs fonts resources test-accounts xorg; do
     ln -s "$repo_root/system/$name" "$work/src/system/$name"
 done
@@ -135,11 +141,137 @@ cat > "$work/rootfs.config" <<CONFIG
 CONFIG_RPR_BASE_URL="https://example.invalid/rpr"
 CONFIG_VMDK_DEFAULT_LANG="zh_CN.UTF-8"
 CONFIG
+(umask 077
 ROOTFS_UPSTREAM_PACKAGES='sudo shadow fixture-provider ffmpeg netsurf' \
 sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
     "$work/rootfs.config" "$work/metadata" "$work/stage" "$work/layout" \
-    "$work/root" "$work/manifest.json" 1700000000
+    "$work/root" "$work/manifest.json" 1700000000)
 xorg_root=$work/root
+# Verify the resulting policy rather than the host fixture owner's ability to
+# read files. This also checks public ancestors and unchanged sensitive modes.
+python3 - "$xorg_root" "$work/manifest.json" <<'PY'
+import json
+from pathlib import Path
+import stat
+import sys
+root = Path(sys.argv[1])
+entries = {entry['path']: entry for entry in json.loads(Path(sys.argv[2]).read_text())['entries']}
+public = ('etc/profile', 'etc/profile.d/reliefos-locale.sh', 'etc/bash/reliefos.sh',
+          'etc/bash/colors.sh', 'etc/skel/.bashrc', 'etc/skel/.bash_profile',
+          'etc/skel/.inputrc', 'etc/passwd', 'etc/group', 'etc/hosts',
+          'etc/nsswitch.conf', 'etc/services', 'etc/protocols', 'etc/os-release',
+          'etc/motd', 'etc/pam.d/login', 'etc/security/limits.conf',
+          'etc/gtk-3.0/settings.ini', 'etc/reliefos/icewm/preferences',
+          'etc/reliefos/icewm/themes/light/default.theme',
+          'usr/share/licenses/netbase/copyright')
+for relative in public:
+    path = root / relative
+    assert stat.S_IMODE(path.stat().st_mode) == 0o644, relative
+    assert entries['/' + relative]['mode'] == '0644', relative
+    parent = path.parent
+    while parent != root:
+        assert stat.S_IMODE(parent.stat().st_mode) == 0o755, parent
+        parent = parent.parent
+for relative in ('etc/init.d/reliefos-dhcp', 'usr/lib/reliefos/console-session',
+                 'etc/reliefos/icewm/terminal.sh'):
+    assert stat.S_IMODE((root / relative).stat().st_mode) == 0o755, relative
+for relative, mode in (('etc/shadow', 0o600), ('etc/gshadow', 0o600),
+                       ('etc/sudoers', 0o440), ('etc/private-fixture', 0o600),
+                       ('root', 0o700), ('etc/sudoers.d', 0o750)):
+    assert stat.S_IMODE((root / relative).stat().st_mode) == mode, relative
+print('PASS public shell/desktop policy under umask0077 and source0600; sensitive policy preserved')
+PY
+# The legacy nine-argument caller still selects the default payload directory.
+cmp "$work/out/stage/kernel-payload/lib/modules/desktop-fixture/config" \
+    "$xorg_root/lib/modules/desktop-fixture/config"
+cmp "$work/out/stage/kernel-payload/usr/lib/reliefos/kernel/desktop-fixture/kernel.sys" \
+    "$xorg_root/usr/lib/reliefos/kernel/desktop-fixture/kernel.sys"
+
+# Exercise the real rootfs recipe and Kbuild parameter invalidation in this
+# disposable host stage. An older alternate payload must replace the default
+# one when O_STAGE changes, and an unchanged selection must remain a no-op.
+alternate_stage=$work/alternate-stage
+mkdir -p "$alternate_stage/kernel-payload/lib/modules/alternate-fixture" \
+    "$alternate_stage/kernel-payload/usr/lib/reliefos/kernel/alternate-fixture"
+printf '{"schema":1,"release":"alternate-fixture"}\n' > "$alternate_stage/kernel-payload/kernel-payload.json"
+printf 'alternate module fixture\n' > "$alternate_stage/kernel-payload/lib/modules/alternate-fixture/config"
+printf 'alternate kernel fixture\n' > "$alternate_stage/kernel-payload/usr/lib/reliefos/kernel/alternate-fixture/kernel.sys"
+# Both manifests predate every raw stage, so dependency timestamps alone cannot
+# hide a missing selected-path parameter in either direction.
+touch -d @1 "$work/out/stage/kernel-payload/kernel-payload.json" \
+    "$alternate_stage/kernel-payload/kernel-payload.json"
+mkdir -p "$work/host-bin" "$work/out/meta"
+ln -s "$work/stage" "$work/host-bin/reliefos-stage"
+ln -s "$work/layout" "$work/host-bin/reliefos-layout"
+for package in sudo shadow fixture-provider ffmpeg netsurf grub; do
+    touch "$work/out/upstream/$package/root/.complete"
+done
+cat > "$work/rootfs.mk" <<'MAKE'
+include $(FIXTURE_REPO)/scripts/Kbuild.include
+include $(FIXTURE_REPO)/scripts/reliefos/Makefile.parameters
+RELIEFOS_SRC := $(FIXTURE_SRC)
+O := $(FIXTURE_OUT)
+O_META := $(O)/meta
+RELIEFOS_HOST_BIN := $(FIXTURE_HOST_BIN)
+RELIEFOS_CONFIG_FILE := $(FIXTURE_CONFIG)
+COMPONENT_METADATA := $(FIXTURE_METADATA)
+USERLAND_DIR := $(O)/userland
+UPSTREAM_ROOT := $(O)/upstream
+UPSTREAM_PACKAGES := sudo shadow fixture-provider ffmpeg netsurf
+GRUB_GUEST_ROOT := $(UPSTREAM_ROOT)/grub/root
+RELIEFOS_KERNEL_PAYLOAD := $(O_STAGE)/kernel-payload
+RELIEFOS_KERNEL_PAYLOAD_MANIFEST := $(RELIEFOS_KERNEL_PAYLOAD)/kernel-payload.json
+SOURCE_DATE_EPOCH := 1700000000
+Q := @
+quiet := quiet_
+PHONY := FORCE
+.PHONY: FORCE
+FORCE:
+include $(FIXTURE_REPO)/scripts/reliefos/Makefile.rootfs
+# Limit source hashing to a stable fixture input; the real recipe, dependencies
+# and saved-command comparison remain unchanged.
+ROOTFS_SOURCE_DIRS := $(RELIEFOS_CONFIG_FILE)
+-include $(wildcard $(O_META)/.*.cmd)
+MAKE
+stage_rootfs() (
+    unset MAKEFLAGS MFLAGS MAKELEVEL MAKEOVERRIDES
+    make --no-print-directory -rR -f "$work/rootfs.mk" \
+        "FIXTURE_REPO=$repo_root" "FIXTURE_SRC=$work/src" \
+        "FIXTURE_OUT=$work/out" "FIXTURE_HOST_BIN=$work/host-bin" \
+        "FIXTURE_CONFIG=$work/rootfs.config" "FIXTURE_METADATA=$work/metadata" \
+        "O_STAGE=$1" rootfs-raw
+)
+stage_rootfs "$work/out/stage"
+raw_stamp=$(stat -c %y "$work/out/rootfs/raw.complete")
+parameter_stamp=$(stat -c %y "$work/out/meta/rootfs.parameters")
+stage_rootfs "$work/out/stage"
+test "$raw_stamp" = "$(stat -c %y "$work/out/rootfs/raw.complete")"
+test "$parameter_stamp" = "$(stat -c %y "$work/out/meta/rootfs.parameters")"
+stage_rootfs "$alternate_stage"
+cmp "$alternate_stage/kernel-payload/lib/modules/alternate-fixture/config" \
+    "$work/out/rootfs/raw/lib/modules/alternate-fixture/config"
+cmp "$alternate_stage/kernel-payload/usr/lib/reliefos/kernel/alternate-fixture/kernel.sys" \
+    "$work/out/rootfs/raw/usr/lib/reliefos/kernel/alternate-fixture/kernel.sys"
+test ! -e "$work/out/rootfs/raw/lib/modules/desktop-fixture"
+test ! -e "$work/out/rootfs/raw/usr/lib/reliefos/kernel/desktop-fixture"
+grep -Fq "kernel-payload=$alternate_stage/kernel-payload" "$work/out/meta/rootfs.parameters"
+stage_rootfs "$work/out/stage"
+test -f "$work/out/rootfs/raw/lib/modules/desktop-fixture/config"
+test ! -e "$work/out/rootfs/raw/lib/modules/alternate-fixture"
+# An explicit missing payload must fail instead of using the existing default.
+if ROOTFS_UPSTREAM_PACKAGES='sudo shadow fixture-provider ffmpeg netsurf' \
+    sh "$repo_root/tools/build/rootfs-stage.sh" "$work/src" "$work/out" \
+    "$work/rootfs.config" "$work/metadata" "$work/stage" "$work/layout" \
+    "$work/root-missing-payload" "$work/missing-manifest.json" 1700000000 \
+    "$work/missing-kernel-payload" > "$work/missing-payload.log" 2>&1; then
+    echo 'FAIL - explicit missing kernel payload silently used default' >&2
+    exit 1
+fi
+grep -Fq "matching kernel payload is missing: $work/missing-kernel-payload" "$work/missing-payload.log"
+test ! -e "$work/root-missing-payload"
+test ! -e "$work/missing-manifest.json"
+printf '%s\n' 'ok - selected kernel payload, legacy default and O_STAGE invalidation'
+
 cmp "$work/out/userland/systemupdate.elf" "$xorg_root/usr/sbin/reliefos-update"
 test -x "$xorg_root/usr/sbin/reliefos-update"
 test "$(readlink "$xorg_root/lib/apk/commit_hooks.d/reliefos-update")" = /usr/sbin/reliefos-update

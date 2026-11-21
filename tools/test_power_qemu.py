@@ -123,17 +123,15 @@ def desktop_power(probe, serial, process, action):
 
 
 def installer_power(probe, serial, process):
+    from test_installer_accounts_qemu import next_page
     wait_log(serial, "name=installer.elf", process)
     time.sleep(8)
     assert probe.visible_page(probe.frame("installer-language")) == 0
-    for expected in (1, 2, 3, 4, 5, 6):
-        probe.click(*probe.footer_point())
-        time.sleep(0.8)
-        assert probe.visible_page(probe.frame(f"installer-page-{expected}")) == expected
-    probe.click(*probe.partition_selection_point())
-    probe.click(*probe.footer_point())
-    time.sleep(0.8)
-    assert probe.visible_page(probe.frame("installer-accounts")) == 7
+    for expected in (1, 3, 4):
+        next_page(probe, expected)
+    probe.click(*probe.disk_selection_point())
+    for expected in (5, 6, 11, 7):
+        next_page(probe, expected)
     for index, value in enumerate(("alice", "password", "password", "rootpass", "rootpass")):
         probe.click(*probe.account_field_point(index))
         probe.text(value)

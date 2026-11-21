@@ -2,9 +2,13 @@
 # Dual El Torito live/installer ISO; upstream tools own all disk formats.
 set -eu
 . "$(CDPATH= cd -- "$(dirname "$0")/../../scripts" && pwd)/logging.sh"
-[ "$#" = 10 ] || { echo 'usage: iso SRC EFI_MODULES ESP ROOT CONFIG OUTPUT EPOCH VOLUME BIOS_MODULES GRUB_MKIMAGE' >&2; exit 2; }
+[ "$#" = 10 ] || [ "$#" = 11 ] || {
+    echo 'usage: iso SRC EFI_MODULES ESP ROOT CONFIG OUTPUT EPOCH VOLUME BIOS_MODULES GRUB_MKIMAGE [INSTALLER_PAYLOAD]' >&2
+    exit 2
+}
 src=$1 modules=$2 esp=$3 root=$4 config=$5 output=$6 epoch=$7 volume=$8
 bios=$9 mkimage=${10}
+payload=${11:-}
 export SOURCE_DATE_EPOCH=$epoch TZ=UTC LC_ALL=C
 [ ! -L "$output" ] && { [ ! -e "$output" ] || [ -f "$output" ]; } || {
     echo "refusing unsafe ISO output: $output" >&2; exit 1;
@@ -15,6 +19,12 @@ trap 'rm -rf "$work"' EXIT HUP INT TERM
 cp -a "$esp" "$work/tree"
 mkdir -p "$work/tree/install" "$work/tree/boot/grub" "$work/efi/EFI/BOOT"
 case $volume in RELIEFOSLIVE|RELIEFOSINST) ;; *) echo 'unsupported ISO identity' >&2; exit 2 ;; esac
+if [ -n "$payload" ]; then
+    [ "$volume" = RELIEFOSINST ] && [ -s "$payload" ] || {
+        echo 'installer payload is only valid for an installer ISO and must be non-empty' >&2
+        exit 2
+    }
+fi
 marker=reliefos-$volume.marker
 sed "s/@RELIEFOS_ISO_MARKER@/$marker/g" "$src/boot/grub/installer_embedded.cfg" > "$work/embedded.cfg"
 "${GRUB_MKSTANDALONE:-grub-mkstandalone}" -d "$modules" -O x86_64-efi -o "$work/efi/EFI/BOOT/BOOTX64.EFI" \
@@ -25,6 +35,7 @@ sed "s/@RELIEFOS_ISO_MARKER@/$marker/g" "$src/boot/grub/installer_embedded.cfg" 
     $(cat "$src/boot/grub/bios-modules.list")
 cp "$work/efi/EFI/BOOT/BOOTX64.EFI" "$work/tree/EFI/BOOT/BOOTX64.EFI"
 cp "$root" "$work/tree/install/root.fat"
+if [ -n "$payload" ]; then cp "$payload" "$work/tree/install/payload.squashfs"; fi
 cp "$config" "$work/tree/grub/grub.cfg"
 printf 'ReliefOS %s volume\n' "$volume" > "$work/tree/$marker"
 find "$work/efi" "$work/tree" -exec touch -h -d "@$epoch" {} +

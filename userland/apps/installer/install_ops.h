@@ -104,6 +104,15 @@ void reset_confirm(void);
 int confirmation_ok(void);
 void refresh_disks(void);
 void refresh_partitions(void);
+/* Draft edits never write media. Reset explicitly discards the pending plan;
+ * refresh preserves it and checks that disk metadata still matches. */
+void installer_partition_reset(void);
+int installer_partition_select_disk(int32_t index);
+int installer_partition_select_mode(uint8_t mode);
+int installer_partition_error(void);
+/* Target I/O failures, excluding a partition table that can be replaced. */
+int installer_partition_disk_error(void);
+int installer_partition_changes(char *out, uint32_t capacity);
 void format_partition_line(char *buf, uint32_t cap,
                            const struct reliefos_block_partition *partition);
 int installer_partition_plan_valid(void);

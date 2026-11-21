@@ -8,7 +8,7 @@ partuuid_device() {
 }
 
 parse_cmdline() {
-    root= rootfstype= rootflags= mode= final_init=/sbin/init root_access=rw
+    root= rootfstype= rootflags= mode= installer_payload= final_init=/sbin/init root_access=rw
     set -f
     for argument in $1; do
         case $argument in
@@ -17,12 +17,17 @@ parse_cmdline() {
             rootflags=*) rootflags=${argument#rootflags=} ;;
             init=*) final_init=${argument#init=} ;;
             mode=*) mode=${argument#mode=} ;;
+            reliefos.installer_payload=*) installer_payload=${argument#reliefos.installer_payload=} ;;
             ro|rw) root_access=$argument ;;
         esac
     done
     set +f
     case $final_init in /*) ;; *) return 1 ;; esac
     case $mode in installer|live) root=/dev/ram0 ;; esac
+    case $mode in
+        installer) case $installer_payload in ''|squashfs) ;; *) return 1 ;; esac ;;
+        *) installer_payload= ;;
+    esac
     case $root in '"'*'"') root=${root#\"}; root=${root%\"} ;; esac
     case $root in /dev/*|PARTUUID=*|UUID=*|LABEL=*) ;;
         *) return 1 ;;

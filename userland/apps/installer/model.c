@@ -68,87 +68,89 @@ int installer_model_edit_secret(char *secret, uint32_t cap, uint32_t start,
     return 1;
 }
 
-enum installer_page installer_model_next(enum installer_page page,
-                                         enum installer_mode mode)
+static const enum installer_page fresh_steps[] = {
+    INSTALLER_PAGE_LANGUAGE, INSTALLER_PAGE_LICENSE, INSTALLER_PAGE_MODE,
+    INSTALLER_PAGE_DISK, INSTALLER_PAGE_BOOTLOADERS, INSTALLER_PAGE_PARTITIONS,
+    INSTALLER_PAGE_SYSTEM, INSTALLER_PAGE_ACCOUNTS, INSTALLER_PAGE_CONFIRM,
+    INSTALLER_PAGE_PROGRESS, INSTALLER_PAGE_FINISH
+};
+static const enum installer_page update_steps[] = {
+    INSTALLER_PAGE_LANGUAGE, INSTALLER_PAGE_LICENSE, INSTALLER_PAGE_MODE,
+    INSTALLER_PAGE_DISK, INSTALLER_PAGE_CONFIRM, INSTALLER_PAGE_PROGRESS,
+    INSTALLER_PAGE_FINISH
+};
+
+int installer_model_steps(enum installer_mode mode, enum installer_page *out, int cap)
 {
-    switch (page) {
-    case INSTALLER_PAGE_LANGUAGE:
-        return INSTALLER_PAGE_LICENSE;
-    case INSTALLER_PAGE_LICENSE:
-        return INSTALLER_PAGE_WELCOME;
-    case INSTALLER_PAGE_WELCOME:
-        return INSTALLER_PAGE_MODE;
-    case INSTALLER_PAGE_MODE:
-        return INSTALLER_PAGE_DISK;
-    case INSTALLER_PAGE_DISK:
-        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_CONFIRM
-                                             : INSTALLER_PAGE_BOOTLOADERS;
-    case INSTALLER_PAGE_BOOTLOADERS:
-        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_CONFIRM
-                                             : INSTALLER_PAGE_PARTITIONS;
-    case INSTALLER_PAGE_PARTITIONS:
-        return INSTALLER_PAGE_ACCOUNTS;
-    case INSTALLER_PAGE_ACCOUNTS:
-        return INSTALLER_PAGE_CONFIRM;
-    case INSTALLER_PAGE_CONFIRM:
-        return INSTALLER_PAGE_PROGRESS;
-    default:
-        return page;
-    }
+    const enum installer_page *steps = mode == INSTALLER_MODE_UPDATE ? update_steps : fresh_steps;
+    int count = mode == INSTALLER_MODE_UPDATE
+        ? (int)(sizeof(update_steps) / sizeof(update_steps[0]))
+        : (int)(sizeof(fresh_steps) / sizeof(fresh_steps[0]));
+    if (out && cap > 0)
+        for (int i = 0; i < count && i < cap; ++i) out[i] = steps[i];
+    return count;
 }
 
-enum installer_page installer_model_prev(enum installer_page page,
-                                         enum installer_mode mode)
+int installer_model_step_index(enum installer_page page, enum installer_mode mode)
 {
-    switch (page) {
-    case INSTALLER_PAGE_LICENSE:
-        return INSTALLER_PAGE_LANGUAGE;
-    case INSTALLER_PAGE_WELCOME:
-        return INSTALLER_PAGE_LICENSE;
-    case INSTALLER_PAGE_MODE:
-        return INSTALLER_PAGE_WELCOME;
-    case INSTALLER_PAGE_DISK:
-        return INSTALLER_PAGE_MODE;
-    case INSTALLER_PAGE_PARTITIONS:
-        return INSTALLER_PAGE_BOOTLOADERS;
-    case INSTALLER_PAGE_BOOTLOADERS:
-        return INSTALLER_PAGE_DISK;
-    case INSTALLER_PAGE_CONFIRM:
-        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_PAGE_DISK
-                                             : INSTALLER_PAGE_ACCOUNTS;
-    case INSTALLER_PAGE_ACCOUNTS:
-        return INSTALLER_PAGE_PARTITIONS;
-    case INSTALLER_PAGE_FINISH:
-        return INSTALLER_PAGE_DISK;
-    default:
-        return page;
-    }
+    enum installer_page steps[INSTALLER_PAGE_COUNT];
+    int count = installer_model_steps(mode, steps, INSTALLER_PAGE_COUNT);
+    for (int i = 0; i < count; ++i) if (steps[i] == page) return i;
+    return -1;
+}
+
+enum installer_page installer_model_next(enum installer_page page, enum installer_mode mode)
+{
+    if (page == INSTALLER_PAGE_WELCOME) return INSTALLER_PAGE_MODE;
+    if (page == INSTALLER_PAGE_PROGRESS || page == INSTALLER_PAGE_FINISH) return page;
+    enum installer_page steps[INSTALLER_PAGE_COUNT];
+    int count = installer_model_steps(mode, steps, INSTALLER_PAGE_COUNT);
+    int index = installer_model_step_index(page, mode);
+    return index >= 0 && index + 1 < count ? steps[index + 1] : page;
+}
+
+enum installer_page installer_model_prev(enum installer_page page, enum installer_mode mode)
+{
+    if (page == INSTALLER_PAGE_WELCOME) return INSTALLER_PAGE_LICENSE;
+    if (page == INSTALLER_PAGE_FINISH) return INSTALLER_PAGE_DISK;
+    if (page == INSTALLER_PAGE_PROGRESS) return page;
+    enum installer_page steps[INSTALLER_PAGE_COUNT];
+    installer_model_steps(mode, steps, INSTALLER_PAGE_COUNT);
+    int index = installer_model_step_index(page, mode);
+    return index > 0 ? steps[index - 1] : page;
 }
 
 int installer_model_can_go_back(enum installer_page page, int install_success)
 {
-    return !(page == INSTALLER_PAGE_LANGUAGE || page == INSTALLER_PAGE_PROGRESS ||
-             (page == INSTALLER_PAGE_FINISH && install_success));
+    return page >= 0 && page < INSTALLER_PAGE_COUNT &&
+        !(page == INSTALLER_PAGE_LANGUAGE || page == INSTALLER_PAGE_PROGRESS ||
+          (page == INSTALLER_PAGE_FINISH && install_success));
 }
 
 int installer_model_can_cancel(enum installer_page page, int install_success)
 {
-    return !(page == INSTALLER_PAGE_PROGRESS ||
-             (page == INSTALLER_PAGE_FINISH && install_success));
+    return page >= 0 && page < INSTALLER_PAGE_COUNT &&
+        !(page == INSTALLER_PAGE_PROGRESS ||
+          (page == INSTALLER_PAGE_FINISH && install_success));
 }
 
-enum installer_action installer_model_action(enum installer_page page,
-                                             enum installer_mode mode,
+int installer_model_can_visit(enum installer_page current, enum installer_page target,
+                              enum installer_mode mode, int install_success)
+{
+    int source = installer_model_step_index(current, mode);
+    int destination = installer_model_step_index(target, mode);
+    int confirm = installer_model_step_index(INSTALLER_PAGE_CONFIRM, mode);
+    return source >= 0 && destination >= 0 && destination < source && destination <= confirm &&
+        current != INSTALLER_PAGE_PROGRESS && !(current == INSTALLER_PAGE_FINISH && install_success);
+}
+
+enum installer_action installer_model_action(enum installer_page page, enum installer_mode mode,
                                              int install_success)
 {
-    if (page == INSTALLER_PAGE_CONFIRM) {
-        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_ACTION_UPDATE
-                                             : INSTALLER_ACTION_INSTALL;
-    }
-    if (page == INSTALLER_PAGE_FINISH) {
-        if (!install_success && mode == INSTALLER_MODE_UPDATE) return INSTALLER_ACTION_RETRY;
-        return install_success ? INSTALLER_ACTION_RESTART : INSTALLER_ACTION_CLOSE;
-    }
+    if (page == INSTALLER_PAGE_CONFIRM)
+        return mode == INSTALLER_MODE_UPDATE ? INSTALLER_ACTION_UPDATE : INSTALLER_ACTION_INSTALL;
+    if (page == INSTALLER_PAGE_FINISH)
+        return install_success ? INSTALLER_ACTION_RESTART : INSTALLER_ACTION_RETRY;
     return INSTALLER_ACTION_NEXT;
 }
 
@@ -157,21 +159,24 @@ const char *installer_model_confirm_word(enum installer_mode mode)
     return mode == INSTALLER_MODE_UPDATE ? "" : "INSTALL";
 }
 
-int installer_model_steps(enum installer_mode mode, enum installer_page *out,
-                          int cap)
+const char *installer_model_page_title(enum installer_page page, enum installer_mode mode)
 {
-    int count = 0;
-    enum installer_page page;
-    for (page = INSTALLER_PAGE_LANGUAGE; page < INSTALLER_PAGE_COUNT; ++page) {
-        if ((page == INSTALLER_PAGE_ACCOUNTS || page == INSTALLER_PAGE_PARTITIONS ||
-             page == INSTALLER_PAGE_BOOTLOADERS) &&
-            mode == INSTALLER_MODE_UPDATE)
-            continue;
-        if (count < cap)
-            out[count] = page;
-        ++count;
+    switch (page) {
+    case INSTALLER_PAGE_LANGUAGE: return gettext("Language");
+    case INSTALLER_PAGE_LICENSE: return gettext("License");
+    case INSTALLER_PAGE_MODE: case INSTALLER_PAGE_WELCOME: return gettext("Installation mode");
+    case INSTALLER_PAGE_DISK: return gettext("Target disk");
+    case INSTALLER_PAGE_BOOTLOADERS: return gettext("Bootloaders");
+    case INSTALLER_PAGE_PARTITIONS: return gettext("Partition layout");
+    case INSTALLER_PAGE_SYSTEM: return gettext("System options");
+    case INSTALLER_PAGE_ACCOUNTS: return gettext("Accounts");
+    case INSTALLER_PAGE_CONFIRM:
+        return mode == INSTALLER_MODE_UPDATE ? gettext("Review system update") : gettext("Review installation");
+    case INSTALLER_PAGE_PROGRESS:
+        return mode == INSTALLER_MODE_UPDATE ? gettext("Updating system") : gettext("Installing system");
+    case INSTALLER_PAGE_FINISH: return gettext("Installation result");
+    default: return gettext("Installation");
     }
-    return count;
 }
 
 static void append_text(char *buf, uint32_t cap, uint32_t *pos, const char *text)

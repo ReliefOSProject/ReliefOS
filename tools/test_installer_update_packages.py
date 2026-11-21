@@ -30,7 +30,7 @@ class UpdatePreflight(unittest.TestCase):
                        check=True, capture_output=True)
         cls.key.chmod(0o600)
         cls.base = cls.work / "base"
-        for name in ("bin", "usr/sbin", "usr/lib/reliefos", "usr/libexec/reliefos", "sbin", "tmp", "dev", "oldrepo", "newrepo",
+        for name in ("bin", "usr/sbin", "usr/lib/reliefos", "usr/libexec/reliefos", "sbin", "tmp", "dev", "proc", "oldrepo", "newrepo",
                      "target/etc/apk/keys", "target/lib/apk/db", "target/etc/reliefos",
                      "target/home/test", "target/usr/share/external", "target/bin",
                      "target/usr/lib/reliefos", "target/var/lib/reliefos"):
@@ -134,6 +134,10 @@ class UpdatePreflight(unittest.TestCase):
         result = subprocess.run([
             "unshare", "-Urmp", "--fork", "sh", "-eu", "-c",
             'mount --make-rprivate /; mount --bind "$1" "$1"; '
+            # musl falls back to /proc/self/fd for fchmodat(AT_SYMLINK_NOFOLLOW)
+            # on hosts without fchmodat2. Match the live guest's proc mount so
+            # APK can restore setuid modes inside this private namespace.
+            'mount -t proc proc "$1/proc"; '
             + readonly +
             'cd "$1"; mkdir -p .oldroot; pivot_root . .oldroot; '
             'shift; exec /bin/sh /sbin/update "$@"',

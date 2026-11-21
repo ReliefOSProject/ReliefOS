@@ -15,6 +15,11 @@ mkdir -p "$fixture"
 modules=$fixture/efi-modules
 grub_fixture_efi "$modules"
 grub_fixture_bios "$work/bios-modules"
+# GRUB emits empty indexes when a platform has no matching modules. Both
+# firmware trees must retain these valid files while validating image inputs.
+: > "$modules/fdt.lst"
+: > "$work/bios-modules/fdt.lst"
+find "$modules" "$work/bios-modules" -type f -exec touch -d @1700000000 {} +
 test -s "$modules/normal.mod"
 test "$(LC_ALL=C file -b "$modules/normal.mod" | cut -d' ' -f1)" = ELF
 
@@ -73,12 +78,17 @@ prepare_output() {
     printf 'theme=metro\nwallpaper.mode=fill\n' > "$target_out/generated/config/display.conf"
     printf '#!/bin/sh\nexit 0\n' > "$target_out/host/bin/reliefos-emit"
     chmod +x "$target_out/host/bin/reliefos-emit"
+    # Existing external inputs only run their validation recipe when their
+    # producer is newer. Force that real path without rebuilding any GRUB.
+    printf 'fixture GRUB producer\n' > "$target_out/grub-validation.stamp"
+    touch -d @1700000001 "$target_out/grub-validation.stamp"
 }
 
 run_esp() {
     target_out=$1
     module_dir=$2
     stub_log=$3
+    bios_dir=${4:-$work/bios-modules}
     PATH="$fixture/fake-bin:$PATH" GRUB_STUB_LOG="$stub_log" \
         GRUB_EXPECTED_MODULES="$module_dir" \
         CONFIG_SHELL=/bin/sh AWK=awk srctree="$src" objtree=. VPATH="$src" \
@@ -94,7 +104,9 @@ run_esp() {
             RELIEFOS_INITRAMFS="$target_out/generated/system/initramfs.cpio" \
             RELIEFOS_INITRAMFS_MANIFEST="$target_out/generated/system/initramfs.cpio.json" \
             GRUB_FONT="$target_out/generated/grub/leonos-unicode.pf2" \
-            GRUB_BIOS_DIR="$work/bios-modules" GRUB_MKSTANDALONE=grub-mkstandalone \
+            GRUB_BIOS_DIR="$bios_dir" GRUB_MKSTANDALONE=grub-mkstandalone \
+            GRUB_EFI_STAMP="$target_out/grub-validation.stamp" \
+            GRUB_HOST_TOOLS="$target_out/grub-validation.stamp" \
             GRUB_EFI_DIR="$module_dir" SOURCE_DATE_EPOCH=1700000000 esp
 }
 
@@ -110,6 +122,10 @@ if ! run_esp "$work/output" "$modules" "$work/grub-stub.log" > "$work/first.log"
     echo 'FAIL - native ESP target fixture did not build' >&2
     exit 1
 fi
+test -f "$modules/fdt.lst" && test ! -s "$modules/fdt.lst"
+test -f "$work/bios-modules/fdt.lst" && test ! -s "$work/bios-modules/fdt.lst"
+test -f "$work/output/stage/esp/grub/i386-pc/fdt.lst"
+test ! -s "$work/output/stage/esp/grub/i386-pc/fdt.lst"
 if ! hash_modules "$modules" > "$work/modules.after-first" ||
     ! cmp -s "$work/modules.before" "$work/modules.after-first"; then
     diff -u "$work/modules.before" "$work/modules.after-first" > "$work/modules.diff" || :
@@ -154,6 +170,40 @@ test ! -e "$work/missing-stub.log" || {
     exit 1
 }
 
+# An empty payload is invalid even when it exists. Test both platforms and
+# firmware images as well as modules, keeping valid empty indexes alongside.
+for platform in efi bios; do
+    for name in normal.mod kernel.img; do
+        empty_modules=$work/empty-$platform-$name
+        if [ "$platform" = efi ]; then
+            cp -a "$modules" "$empty_modules"
+            empty_efi=$empty_modules
+            empty_bios=$work/bios-modules
+            expected_error='missing required GRUB EFI module input'
+        else
+            cp -a "$work/bios-modules" "$empty_modules"
+            empty_efi=$modules
+            empty_bios=$empty_modules
+            expected_error='missing required GRUB BIOS input'
+        fi
+        : > "$empty_modules/$name"
+        touch -d @1700000000 "$empty_modules/$name"
+        empty_output=$work/empty-$platform-$name-output
+        prepare_output "$empty_output"
+        if run_esp "$empty_output" "$empty_efi" "$empty_output/stub.log" "$empty_bios" \
+            > "$empty_output/validation.log" 2>&1; then
+            echo "FAIL - ESP target accepted empty $platform input $name" >&2
+            exit 1
+        fi
+        grep -Fq "$expected_error" "$empty_output/validation.log" || {
+            cat "$empty_output/validation.log" >&2
+            echo "FAIL - empty $platform input did not fail external validation: $name" >&2
+            exit 1
+        }
+        test ! -e "$empty_output/stub.log"
+    done
+done
+
 # BIOS .mod files are equally protected; absent generated inputs must not
 # become Kbuild's plain-text module lists.
 rm "$work/bios-modules/biosdisk.mod"
@@ -165,4 +215,4 @@ fi
 grep -Fq 'missing required GRUB BIOS input' "$work/missing-bios.log"
 test ! -e "$work/bios-modules/biosdisk.mod"
 test ! -e "$work/missing-bios-stub.log"
-printf 'GRUB Kbuild input regression passed: EFI/BIOS ELF inputs preserved, no-op repeat stable, missing required sources rejected\n'
+printf 'GRUB Kbuild input regression passed: EFI/BIOS ELF inputs and empty indexes preserved, no-op repeat stable, missing and empty payloads rejected\n'

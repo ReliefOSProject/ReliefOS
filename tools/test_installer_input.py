@@ -4,10 +4,45 @@ import subprocess
 import tempfile
 import unittest
 
+from runtime_test_dependencies import INSTALLER_HOST_INCLUDES
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class InstallerInputTests(unittest.TestCase):
+    def test_wrapped_labels_preserve_words_utf8_and_reflow(self):
+        """Keep all label text visible as width, language and font metrics change."""
+        import os
+        with tempfile.TemporaryDirectory(prefix="installer-label-wrap-") as tmp:
+            executable = Path(tmp) / "label-wrap"
+            subprocess.run([
+                "cc", "-std=c11", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
+                "-fsanitize=address,undefined", "-fno-sanitize-recover=all",
+                "-fno-omit-frame-pointer", "-fno-pie", "-no-pie",
+                "tools/tests/installer_label_wrap_test.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable], cwd=ROOT, check=True, timeout=10,
+                           env={**os.environ, "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1",
+                                "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"})
+
+    def test_boot_preflight_allows_only_explicit_structural_gpt_replacement(self):
+        """Exercise real GPT/boot checks without writing during fresh preflight."""
+        with tempfile.TemporaryDirectory(prefix="installer-boot-preflight-") as tmp:
+            executable = Path(tmp) / "preflight"
+            image = Path(tmp) / "disk.raw"
+            with image.open("xb") as stream:
+                stream.truncate(768 * 1024**2)
+            subprocess.run([
+                "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
+                "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
+                "-Wl,--wrap=open,--wrap=ioctl,--wrap=stat,--wrap=lstat,--wrap=setmntent",
+                *INSTALLER_HOST_INCLUDES,
+                "tools/tests/installer_boot_preflight_test.c",
+                "userland/apps/installer/installer_plan.c",
+                "userland/runtime/src/bootloader.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable, image], cwd=ROOT, check=True, timeout=15)
+
     def test_worker_progress_does_not_block_copying(self):
         with tempfile.TemporaryDirectory(prefix="installer-worker-") as tmp:
             executable = str(Path(tmp) / "worker")
@@ -25,8 +60,7 @@ class InstallerInputTests(unittest.TestCase):
             subprocess.run([
                 "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-idirafter", "userland/runtime/include", "-idirafter", "include",
-                "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
+                *INSTALLER_HOST_INCLUDES,
                 "tools/tests/installer_fresh_copy_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable, tmp], cwd=ROOT, check=True, timeout=20)
@@ -50,8 +84,7 @@ class InstallerInputTests(unittest.TestCase):
             subprocess.run([
                 "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-idirafter", "userland/runtime/include", "-idirafter", "include",
-                "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
+                *INSTALLER_HOST_INCLUDES,
                 "tools/tests/installer_copy_sync_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable, tmp], cwd=ROOT, check=True, timeout=20)
@@ -64,8 +97,7 @@ class InstallerInputTests(unittest.TestCase):
             subprocess.run([
                 "cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-                "-idirafter", "userland/runtime/include", "-idirafter", "include",
-                "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi",
+                *INSTALLER_HOST_INCLUDES,
                 "tools/tests/installer_progress_test.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
@@ -76,8 +108,8 @@ class InstallerInputTests(unittest.TestCase):
             subprocess.run([
                 "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
                 "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections", "-Wl,--wrap=open",
-                "-idirafter", "include", "-Ikernel/reliefnt/include", "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
-                "tools/tests/installer_mount_transition_test.c", "userland/apps/installer/installer_partitions.c", "userland/apps/installer/installer_capacity.c", "-o", executable,
+                *INSTALLER_HOST_INCLUDES,
+                "tools/tests/installer_mount_transition_test.c", "userland/apps/installer/installer_partitions.c", "userland/apps/installer/installer_capacity.c", "userland/apps/installer/installer_plan.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=10)
 

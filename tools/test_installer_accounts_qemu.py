@@ -11,7 +11,9 @@ import json
 import time
 import uuid
 
-from test_installer_window_qemu import Probe as WindowProbe, wait_log
+from test_installer_window_qemu import (
+    Probe as WindowProbe, firmware_arguments, qemu_acceleration, wait_log,
+)
 from qmp_terminal_smoke import text_keys
 from run_gcc_probe_qemu import qmp_quit
 
@@ -74,15 +76,13 @@ class Probe(WindowProbe):
 
 
 @contextmanager
-def boot(output, disk, iso=None, *, smp=2, firmware="uefi"):
+def boot(output, disk, iso=None, *, smp=2, firmware="uefi", accel="auto", firmware_image=None):
     output.mkdir(parents=True, exist_ok=True)
     serial = output / "serial.log"
     qmp = ROOT.parent / f".reliefos-inst-{uuid.uuid4().hex[:12]}.sock"
-    if firmware not in ("bios", "uefi"):
-        raise ValueError(f"Unknown firmware: {firmware}")
-    command = ["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-machine", "q35",
+    command = ["qemu-system-x86_64", *qemu_acceleration(accel), "-machine", "q35",
                "-m", "4096", "-smp", str(smp),
-               *(["-bios", "/usr/share/edk2/x64/OVMF.4m.fd"] if firmware == "uefi" else []),
+               *firmware_arguments(firmware, firmware_image),
                "-display", "none", "-serial", f"file:{serial}",
                "-vga", "std", "-device", "qemu-xhci", "-device", "usb-tablet",
                "-netdev", "user,id=net0", "-device", "e1000,netdev=net0",
@@ -93,15 +93,24 @@ def boot(output, disk, iso=None, *, smp=2, firmware="uefi"):
     command += (["-drive", f"file={iso},format=raw,media=cdrom,if=none,id=installer-cd",
                  "-device", "ide-cd,drive=installer-cd,bootindex=1", "-boot", "d"]
                 if iso else ["-boot", "c"])
+    (output / "command.json").write_text(json.dumps(command, indent=2) + "\n")
     with (output / "qemu.log").open("w") as errors:
         process = subprocess.Popen(command, stdout=errors, stderr=errors, cwd=ROOT)
         probe = None
         try:
             deadline = time.monotonic() + 15
-            while not qmp.exists() and time.monotonic() < deadline:
-                if process.poll() is not None: raise RuntimeError("QEMU failed to start")
-                time.sleep(.1)
-            probe = Probe(qmp, output)
+            while time.monotonic() < deadline:
+                if process.poll() is not None:
+                    raise RuntimeError("QEMU failed to start; see " + str(output / "qemu.log"))
+                try:
+                    probe = Probe(qmp, output)
+                    break
+                except (FileNotFoundError, ConnectionRefusedError):
+                    # A Unix socket pathname may precede listen(). Require a
+                    # successful handshake, bounded by process state/deadline.
+                    time.sleep(.1)
+            if probe is None:
+                raise TimeoutError("QEMU QMP did not become ready within 15 seconds")
             probe.disk = disk
             yield probe, serial, process
         finally:
@@ -124,6 +133,9 @@ def next_page(probe, expected_page=None):
     before = probe.visible_page(probe.frame("before-next"))
     if before is None:
         raise AssertionError("Installer page is not visible before clicking Next")
+    if before == 1 and not getattr(probe, "license_accepted", False):
+        probe.click(*probe.license_indicator_point())
+        probe.license_accepted = True
     probe.click(*probe.footer_point())
     deadline = time.monotonic() + 5
     while time.monotonic() < deadline:
@@ -139,6 +151,12 @@ def next_page(probe, expected_page=None):
     if expected_page is None:
         raise AssertionError(f"Next left the installer on page {before}")
     raise AssertionError(f"Next left the installer on page {before}; expected {expected_page}")
+
+
+def select_installation_mode(probe, *, update):
+    """Select the actual radio, then decode the sidebar using that route."""
+    probe.click(*probe.mode_option_point(update=update))
+    probe.installer_update_mode = update
 
 
 def previous_page(probe, expected_page=None):
@@ -294,8 +312,8 @@ def wait_install(probe, serial, process, *, tty=False, timeout=2400):
             raise RuntimeError("QEMU exited during installation")
         frame = probe.frame("tty-install-progress" if tty else "progress")
         if tty:
-            finished = any(SequenceMatcher(None, "installationfinished", text).ratio() >= .78
-                           for text in tui_ocr(frame, header="Installation finished").splitlines())
+            finished = any(SequenceMatcher(None, "installationresult", text).ratio() >= .78
+                           for text in tui_ocr(frame, header="Installation result").splitlines())
             if finished:
                 assert "successfully" in tui_ocr(frame), "TUI reported installation failure"
         else:
@@ -342,51 +360,32 @@ def xorg_checkbox_checked(indicator):
 
 def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False,
                 install_bios=True, install_uefi=True, install_timeout=2400,
-                swap_mib=None, desktop="icewm"):
-    """Complete the real GUI, optionally selecting Chinese before account setup."""
+                swap_mib=None, desktop="icewm", confirm_install=True):
+    """Exercise the real wizard, retained choices, and final write boundary."""
     probe.enable_installer_geometry()
-    wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process)
-    frame = wait_installer_sidebar(probe, process, "language")
+    wait_log(serial, "path=/usr/lib/reliefos/apps/installer/installer.elf", process, timeout=300)
+    frame = wait_installer_sidebar(probe, process, "language", timeout=300)
     assert probe.visible_page(frame) == 0, "Installer did not start at the language page"
-    if probe.sidebar_bottom - probe.sidebar_top < 680:
-        probe.key("alt-f10")
-        time.sleep(.8)
-        probe.clear_installer_geometry()
-        frame = wait_installer_sidebar(probe, process, "language-maximized")
-        assert probe.visible_page(frame) == 0, "Installer left the language page while maximizing"
-    if probe.sidebar_bottom - probe.sidebar_top < 680:
-        raise AssertionError("Installer FLTK footer remains clipped after maximizing")
-    next_x, next_y = probe.footer_point()
-    if not (0 <= next_x < probe.width and 0 <= next_y < probe.height):
-        raise AssertionError("Installer FLTK Next button is outside the visible screen")
     if chinese:
-        probe.click(probe.content_left + 30, probe.sidebar_top + 191)
+        probe.click(*probe.language_option_point(chinese=True))
         probe.frame("language-chinese")
-    for expected_page in range(1, 8):
-        next_page(probe, expected_page)
-        if expected_page == 5:
-            if not install_bios:
-                probe.click(*probe.bootloader_indicator_point(bios=True))
-            if not install_uefi:
-                probe.click(*probe.bootloader_indicator_point(bios=False))
-            probe.frame("bootloaders")
-        if expected_page == 6:
-            probe.frame("partitions-planned")
-    for index, text in enumerate(("alice", USER_PASSWORD, USER_PASSWORD, ROOT_PASSWORD, ROOT_PASSWORD)):
-        probe.click(*probe.account_field_point(index))
-        probe.text(text)
-    probe.frame("accounts")
-    next_page(probe, 8)
-    probe.frame("confirmation")
-
-    # Exercise selection and retention through a real page rebuild.
-    confirm_x, confirm_y = probe.confirm_field_point()
-    probe.click(confirm_x, confirm_y)
-    probe.text("INSTALL")
+    for page in (1, 3, 4):
+        next_page(probe, page)
+    # Target selection requires an explicit user choice, including on a VM
+    # with only one eligible disk.
+    probe.click(*probe.disk_selection_point())
+    next_page(probe, 5)
+    if not install_bios:
+        probe.click(*probe.bootloader_indicator_point(bios=True))
+    if not install_uefi:
+        probe.click(*probe.bootloader_indicator_point(bios=False))
+    probe.frame("bootloaders")
+    next_page(probe, 6)
+    probe.frame("partitions-planned")
+    next_page(probe, 11)
 
     def choose_desktop(index):
-        probe.click(probe.content_left + 160, probe.sidebar_top + 355)
-        # FLTK opens on the current selection, and Up stops at the first item.
+        probe.click(*probe.desktop_option_point())
         for _ in range(2):
             probe.key("up")
         for _ in range(index):
@@ -396,10 +395,8 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False,
 
     def desktop_crop(name):
         frame = probe.frame(name)
-        x, y = probe.content_left, probe.sidebar_top + 338
-        # Restrict the comparison to the label, away from the dotted focus
-        # outline and the pointer location used to open the menu.
-        return frame.crop((x + 5, y + 8, x + 208, y + 27))
+        x, y = probe.content_left, probe.sidebar_top + 152
+        return frame.crop((x + 5, y + 8, x + min(420, probe.content_width - 5), y + 29))
 
     def verify_desktop(crop, index):
         if chinese and index != 1:
@@ -409,44 +406,52 @@ def install_gui(probe, serial, process, *, skip_xorg=False, chinese=False,
         expected = "xfce" if chinese else ("default", "experimental", "only")[index]
         assert expected in text, f"Expected {expected} desktop option, saw {text.strip()!r}"
 
-    default_desktop = desktop_crop("confirmation-desktop-default")
-    verify_desktop(default_desktop, 0)
+    verify_desktop(desktop_crop("system-desktop-default"), 0)
     choose_desktop(2)
-    changed_desktop = desktop_crop("confirmation-desktop-console")
-    verify_desktop(changed_desktop, 2)
-    previous_page(probe, 7)
-    next_page(probe, 8)
-    retained_desktop = desktop_crop("confirmation-desktop-retained")
-    verify_desktop(retained_desktop, 2)
-    selected_index = 2 if skip_xorg else 1 if desktop == "xfce" else 0
-    choose_desktop(selected_index)
-    selected_desktop = desktop_crop("confirmation-desktop-selected")
-    verify_desktop(selected_desktop, selected_index)
+    verify_desktop(desktop_crop("system-desktop-console"), 2)
+    previous_page(probe, 6)
+    next_page(probe, 11)
+    verify_desktop(desktop_crop("system-desktop-retained"), 2)
+    selected = 2 if skip_xorg else 1 if desktop == "xfce" else 0
+    choose_desktop(selected)
+    verify_desktop(desktop_crop("system-desktop-selected"), selected)
 
-    # The optional swap checkbox is default-off. Coordinates share the same
-    # content origin as xorg_indicator_point; keep a real frame for review.
-    swap_x, swap_y = probe.content_left + 398, probe.sidebar_top + 354
+    swap_x, swap_y = probe.swap_indicator_point()
     probe.move(probe.width - 10, 10)
-    frame = probe.frame("confirmation-swap-default")
+    frame = probe.frame("system-swap-default")
     indicator = frame.crop((swap_x - 9, swap_y - 9, swap_x + 10, swap_y + 10))
     assert not xorg_checkbox_checked(indicator), "Swap option is not unchecked by default"
     if swap_mib is not None:
         if not isinstance(swap_mib, int) or not 1 <= swap_mib <= 16777216:
             raise ValueError("swap_mib must be a valid positive MiB count")
         probe.click(swap_x, swap_y)
-        probe.click(probe.content_left + 680, swap_y)
+        probe.click(*probe.swap_size_point())
         probe.key("home")
         probe.key("shift-end")
         probe.text(str(swap_mib))
         probe.move(probe.width - 10, 10)
-        frame = probe.frame("confirmation-swap-enabled")
+        frame = probe.frame("system-swap-enabled")
         indicator = frame.crop((swap_x - 9, swap_y - 9, swap_x + 10, swap_y + 10))
         assert xorg_checkbox_checked(indicator), "Swap option did not become checked"
 
-    # Returning from Accounts rebuilds Confirm and clears its validation field.
-    probe.click(confirm_x, confirm_y)
+    next_page(probe, 7)
+    for index, text in enumerate(("alice", USER_PASSWORD, USER_PASSWORD, ROOT_PASSWORD, ROOT_PASSWORD)):
+        probe.click(*probe.account_field_point(index))
+        probe.text(text)
+    probe.frame("accounts")
+    next_page(probe, 8)
+    probe.frame("confirmation")
+    # Invalid acknowledgement must leave the read-only review in place.
+    probe.click(*probe.confirm_field_point())
+    probe.text("NO")
+    probe.click(*probe.footer_point())
+    assert probe.visible_page(probe.frame("confirmation-invalid")) == 8
+    if not confirm_install:
+        return
+    probe.click(*probe.confirm_field_point())
+    probe.key("home")
+    probe.key("shift-end")
     probe.text("INSTALL")
-    probe.click(confirm_x, confirm_y)
     probe.frame("confirmation-ready")
     next_page(probe, 9)
     wait_install(probe, serial, process, timeout=install_timeout)
@@ -514,16 +519,19 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
     time.sleep(2)
     probe.key("spc")
     wait_tui_page(probe, process, "Language")
-    for title in ("License", "Welcome", "Installation mode", "Target disk", "Bootloaders"):
+    for title in ("License", "Installation mode", "Target disk"):
         probe.key("f3")
         wait_tui_page(probe, process, title)
+    probe.key("spc")  # explicitly select the first target disk
+    probe.key("f3")
+    wait_tui_page(probe, process, "Bootloaders")
     if not install_bios:
         probe.key("spc")
     probe.key("tab")
     if not install_uefi:
         probe.key("spc")
     probe.key("f3")
-    wait_tui_page(probe, process, "Configure partitions")
+    wait_tui_page(probe, process, "Partition layout")
     if partition_roles:
         probe.key("tab")
         probe.key("spc")  # manual scheme
@@ -543,12 +551,9 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
                 probe.key("tab")
             probe.key("spc")
             probe.key("f3")
-            wait_tui_page(probe, process, "Configure partitions")
+            wait_tui_page(probe, process, "Partition layout")
     probe.key("f3")
-    wait_tui_page(probe, process, "Account and system options")
-    for value in ("alice", USER_PASSWORD, USER_PASSWORD, ROOT_PASSWORD, ROOT_PASSWORD):
-        probe.text(value)
-        probe.key("tab")
+    wait_tui_page(probe, process, "System options")
     desktop_index = 2 if skip_xorg else 1 if desktop == "xfce" else 0
     for _ in range(desktop_index):
         probe.key("tab")
@@ -561,6 +566,11 @@ def install_tty(probe, serial, process, components="none", *, skip_xorg=False,
         probe.key("tab")
         probe.key("ctrl-u")
         probe.text(str(swap_mib))
+    probe.key("f3")
+    wait_tui_page(probe, process, "Accounts")
+    for value in ("alice", USER_PASSWORD, USER_PASSWORD, ROOT_PASSWORD, ROOT_PASSWORD):
+        probe.text(value)
+        probe.key("tab")
     probe.key("f3")
     wait_tui_page(probe, process, "Review installation")
     probe.frame("tui-review")
@@ -728,6 +738,9 @@ def main():
     parser.add_argument("--iso", type=Path, default=ROOT / "out/x86_64/release/images/reliefos-installer.iso")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--installer", choices=("gui", "tty"), default="gui")
+    parser.add_argument("--accel", choices=("auto", "kvm", "tcg"), default="auto")
+    parser.add_argument("--firmware", choices=("bios", "uefi"), default="uefi")
+    parser.add_argument("--firmware-image", type=Path, help="Read-only OVMF firmware override")
     parser.add_argument("--without-xorg", action="store_true",
                         help="Skip the optional Xorg desktop during a fresh install")
     parser.add_argument("--swap-mib", type=int, help="Enable a swapfile with this explicit MiB size")
@@ -742,28 +755,30 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     disk = output / "scratch.raw"
+    guest_options = {"accel": args.accel, "firmware": args.firmware,
+                     "firmware_image": args.firmware_image}
     if args.desktop_only:
         if not disk.is_file(): parser.error("--desktop-only requires an existing scratch disk")
-        with boot(output / "desktop", disk) as session:
+        with boot(output / "desktop", disk, **guest_options) as session:
             login_desktop(*session)
         return
     if args.login_only:
         if not disk.is_file(): parser.error("--login-only requires an existing scratch disk")
     else:
         with disk.open("xb") as file: file.truncate(8 * 1024**3)
-        with boot(output / "install", disk, args.iso.resolve()) as session:
+        with boot(output / "install", disk, args.iso.resolve(), **guest_options) as session:
             if args.installer == "gui":
                 install_gui(*session, skip_xorg=args.without_xorg, swap_mib=args.swap_mib)
             else:
                 install_tty(*session, skip_xorg=args.without_xorg, swap_mib=args.swap_mib)
-    with boot(output / "root", disk) as session:
+    with boot(output / "root", disk, **guest_options) as session:
         login_tty(*session, True, skip_xorg=args.without_xorg)
         shutdown_after_login(session[0], session[2], root=True)
-    with boot(output / "user", disk) as session:
+    with boot(output / "user", disk, **guest_options) as session:
         login_tty(*session, False, skip_xorg=args.without_xorg)
         shutdown_after_login(session[0], session[2], root=False)
     if args.desktop:
-        with boot(output / "desktop", disk) as session:
+        with boot(output / "desktop", disk, **guest_options) as session:
             login_desktop(*session)
     print(f"PASS: installer, ordinary/root credentials: {output}")
 

@@ -113,6 +113,16 @@ test-directory-api:
 
 test: test-directory-api
 
+# Installer navigation and deferred partition editing must stay in the normal
+# host gate: these exercise real GPT images without touching host devices.
+.PHONY: test-installer-flow
+test-installer-flow: $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS)
+	$(Q)PYTHONDONTWRITEBYTECODE=1 $(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_installer_plan.py
+	$(Q)PYTHONDONTWRITEBYTECODE=1 $(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_installer_setup.py
+	$(Q)PYTHONDONTWRITEBYTECODE=1 $(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_installer_input.py
+
+test: test-installer-flow
+
 # Kernel implementation tests are owned and selected by ReliefNT. The parent
 # preserves convenient Make goals and delegates; it owns no kernel suite list.
 RELIEFOS_KERNEL_TEST_GOALS := test-vdso test-smp-time test-page-cache-growth \

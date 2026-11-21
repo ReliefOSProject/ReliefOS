@@ -42,8 +42,10 @@ extern "C" {
 #include "installer_partitions.h"
 #include "installer_tty.h"
 #include "installer_tui.h"
+#include "installer_tui_partitions.h"
 #include "installer_update.h"
 #include "installer_job.h"
+#include "installer_label_wrap.h"
 #include "../reliefapk/process.h"
 #include "model.h"
 
@@ -61,7 +63,8 @@ static const int WINDOW_W = 1024;
 static const int WINDOW_H = 700;
 static const int SIDEBAR_W = 188;
 static const int CONTENT_X = 212;
-static const int CONTENT_W = 790;
+static int CONTENT_W = WINDOW_W - CONTENT_X - 24;
+static int CONTENT_H = WINDOW_H - 80;
 /* Initialize FLTK colors only after choosing the graphical path.  The TTY
  * frontend must not run toolkit initialization before main selects it. */
 static Fl_Color COLOR_BG;
@@ -72,12 +75,17 @@ static Fl_Color COLOR_ACTIVE;
 static Fl_Window *main_window;
 static Fl_Group *content_group;
 static Fl_Box *brand_setup;
-static Fl_Box *sidebar_rows[INSTALLER_PAGE_COUNT];
+static Fl_Button *sidebar_rows[INSTALLER_PAGE_COUNT];
 static Fl_Button *back_button;
 static Fl_Return_Button *primary_button;
 static Fl_Button *cancel_button;
 static Fl_Hold_Browser *disk_browser;
 static Fl_Hold_Browser *partition_browser;
+static tui_partition_table partition_table{};
+static int partition_view_error;
+static Fl_Button *partition_edit_buttons[4];
+static Fl_Choice *partition_role_choice;
+static Fl_Button *partition_role_button;
 static Fl_Choice *update_root_choice, *update_esp_choice;
 static Fl_Check_Button *format_esp_checkbox;
 static Fl_Input *confirm_input;
@@ -97,11 +105,13 @@ static char update_activity_text[768];
 static Fl_Box *progress_percent_box;
 static Fl_Progress *progress_bar;
 static int ui_busy;
+static int license_accepted;
 static int primary_pending;
 static int back_pending;
 static int render_pending;
 static int account_input_overflow[5];
 static int confirm_input_overflow;
+static int review_plan_error;
 static ra::Process update_process;
 static struct installer_update_info update_info;
 static Fl_Text_Buffer *update_log_buffer;
@@ -115,10 +125,46 @@ static char installed_boot_file[128];
 /* Embedded verbatim from the repository LICENSE by apache_license.S. */
 extern "C" const char installer_license_text[];
 
+/* FLTK 1.3 wraps only at ASCII spaces. Keep its native label drawing while
+ * providing display-only line breaks for unspaced CJK and long path names. */
+class InstallerWrappedLabel : public Fl_Box {
+    static double measure(const char *text, size_t length, void *)
+    {
+        return fl_width(text, (int)length);
+    }
+
+    void draw() override
+    {
+        draw_box();
+        int left = x() + Fl::box_dx(box());
+        int width = w() - Fl::box_dw(box());
+        /* Match Fl_Widget::draw_label's native horizontal inset. */
+        if (width > 11 && (align() & (FL_ALIGN_LEFT | FL_ALIGN_RIGHT))) {
+            left += 3;
+            width -= 6;
+        }
+        if (width <= 0) return;
+        fl_font(labelfont(), labelsize());
+        char *wrapped = installer_label_wrap(label(), width, measure, nullptr);
+        Fl_Align alignment = (align() & ~FL_ALIGN_WRAP) | FL_ALIGN_CLIP;
+        Fl_Label rendered = {wrapped ? wrapped : label(), image(), deimage(), labelfont(),
+            labelsize(), active_r() ? labelcolor() : fl_inactive(labelcolor()),
+            alignment, (unsigned char)labeltype()};
+        if (!active_r() && rendered.deimage) rendered.image = rendered.deimage;
+        rendered.draw(left, y() + Fl::box_dy(box()), width,
+            h() - Fl::box_dh(box()), alignment);
+        free(wrapped);
+    }
+
+public:
+    InstallerWrappedLabel(int x, int y, int width, int height, const char *text = nullptr)
+        : Fl_Box(x, y, width, height, text) {}
+};
+
 static Fl_Box *make_label(const char *text, int x, int y, int w, int h,
                           int size, int wrap)
 {
-    Fl_Box *box = new Fl_Box(x, y, w, h);
+    Fl_Box *box = wrap ? new InstallerWrappedLabel(x, y, w, h) : new Fl_Box(x, y, w, h);
     box->copy_label(text ? text : "");
     box->box(FL_NO_BOX);
     box->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE |
@@ -132,7 +178,7 @@ static Fl_Box *make_label(const char *text, int x, int y, int w, int h,
 
 static Fl_Box *make_heading(const char *text, int y)
 {
-    Fl_Box *box = make_label(text, CONTENT_X, y, CONTENT_W, 36, 23, 0);
+    Fl_Box *box = make_label(text, CONTENT_X, y, CONTENT_W, 32, 23, 0);
     box->labelfont(FL_HELVETICA_BOLD);
     return box;
 }
@@ -149,19 +195,25 @@ static Fl_Button *make_button(const char *text, int x, int y, int w, int h,
 
 static const char *page_label(enum installer_page target)
 {
+    return installer_model_page_title(target, (enum installer_mode)install_mode);
+}
+
+static const char *sidebar_label(enum installer_page target)
+{
     switch (target) {
     case INSTALLER_PAGE_LANGUAGE: return T("Language");
     case INSTALLER_PAGE_LICENSE: return T("License");
-    case INSTALLER_PAGE_WELCOME: return T("Welcome");
     case INSTALLER_PAGE_MODE: return T("Mode");
     case INSTALLER_PAGE_DISK: return T("Disk");
     case INSTALLER_PAGE_BOOTLOADERS: return T("Bootloaders");
     case INSTALLER_PAGE_PARTITIONS: return T("Partitions");
+    case INSTALLER_PAGE_SYSTEM: return T("System");
     case INSTALLER_PAGE_ACCOUNTS: return T("Accounts");
     case INSTALLER_PAGE_CONFIRM: return T("Confirm");
-    case INSTALLER_PAGE_PROGRESS: return mode_action_text();
+    case INSTALLER_PAGE_PROGRESS:
+        return install_mode == INSTALLER_MODE_UPDATE ? T("Update") : T("Install");
     case INSTALLER_PAGE_FINISH: return T("Finish");
-    default: return "";
+    default: return page_label(target);
     }
 }
 
@@ -172,12 +224,13 @@ static const char *primary_label(void)
                                    install_success)) {
     case INSTALLER_ACTION_INSTALL: return T("Install");
     case INSTALLER_ACTION_UPDATE: return T("Update");
-    case INSTALLER_ACTION_RETRY: return T("Check Again");
+    case INSTALLER_ACTION_RETRY:
+        return install_mode == INSTALLER_MODE_UPDATE ? T("Check Again") : T("Review settings");
     case INSTALLER_ACTION_RESTART: return T("Restart");
     case INSTALLER_ACTION_CLOSE: return T("Close");
     case INSTALLER_ACTION_NEXT:
         return page == INSTALLER_PAGE_DISK && install_mode == INSTALLER_MODE_UPDATE
-            ? T("Check Update") : T("Next");
+            ? (update_checked ? T("Review update") : T("Check Update")) : T("Next");
     }
     return T("Next");
 }
@@ -185,19 +238,24 @@ static const char *primary_label(void)
 static int primary_disabled(void)
 {
     if (ui_busy || install_running || page == INSTALLER_PAGE_PROGRESS) return 1;
+    if (page == INSTALLER_PAGE_LICENSE) return !license_accepted;
+    if (page == INSTALLER_PAGE_SYSTEM)
+        return setup.swap_enabled && swap_size_invalid;
     if (page == INSTALLER_PAGE_ACCOUNTS) {
         for (int i = 0; i < 5; ++i)
             if (account_input_overflow[i]) return 1;
         return !installer_setup_valid(&setup);
     }
     if (page == INSTALLER_PAGE_DISK)
-        return selected_disk < 0 || (uint32_t)selected_disk >= disk_count;
+        return selected_disk < 0 || (uint32_t)selected_disk >= disk_count ||
+            (install_mode == INSTALLER_MODE_FRESH && installer_partition_disk_error());
     if (page == INSTALLER_PAGE_PARTITIONS)
-        return !installer_partition_plan_valid();
+        return partition_view_error || !installer_partition_plan_valid();
     if (page == INSTALLER_PAGE_CONFIRM && install_mode == INSTALLER_MODE_UPDATE)
         return !update_checked;
     if (page == INSTALLER_PAGE_CONFIRM)
-        return confirm_input_overflow || !confirmation_ok() ||
+        return review_plan_error || !installer_partition_plan_valid() || !installer_setup_valid(&setup) ||
+               confirm_input_overflow || !confirmation_ok() ||
                (install_mode==INSTALLER_MODE_FRESH && setup.swap_enabled && swap_size_invalid);
     return 0;
 }
@@ -209,12 +267,18 @@ static void update_sidebar(void)
                                       steps, INSTALLER_PAGE_COUNT);
     if (brand_setup) brand_setup->copy_label(T("Setup"));
     for (int i = 0; i < INSTALLER_PAGE_COUNT; ++i) {
-        Fl_Box *row = sidebar_rows[i];
+        Fl_Button *row = sidebar_rows[i];
         if (i < count) {
             int active = steps[i] == (enum installer_page)page;
-            row->copy_label(page_label(steps[i]));
+            row->copy_label(sidebar_label(steps[i]));
+            row->labelsize(15);
+            row->user_data((void *)(uintptr_t)steps[i]);
             row->color(active ? COLOR_ACTIVE : COLOR_SIDEBAR);
             row->labelcolor(active ? COLOR_TEXT : FL_WHITE);
+            // Output widgets retain their normal colors while skipping input.
+            if (!ui_busy && installer_model_can_visit((enum installer_page)page,
+                steps[i], (enum installer_mode)install_mode, install_success)) row->clear_output();
+            else row->set_output();
             row->show();
         } else {
             row->hide();
@@ -307,10 +371,15 @@ static void install_pump(void *)
         setup.format_esp = packet->format_esp;
         copy_text(installed_boot_file, sizeof(installed_boot_file), packet->info.boot_file);
     }
-    explicit_bzero(setup.password, sizeof(setup.password));
-    explicit_bzero(setup.password_confirm, sizeof(setup.password_confirm));
-    explicit_bzero(setup.root_password, sizeof(setup.root_password));
-    explicit_bzero(setup.root_password_confirm, sizeof(setup.root_password_confirm));
+    uint8_t previous_layout = installer_partition_auto;
+    installer_partition_reset();
+    installer_partition_auto = previous_layout;
+    if (install_success) {
+        explicit_bzero(setup.password, sizeof(setup.password));
+        explicit_bzero(setup.password_confirm, sizeof(setup.password_confirm));
+        explicit_bzero(setup.root_password, sizeof(setup.root_password));
+        explicit_bzero(setup.root_password_confirm, sizeof(setup.root_password_confirm));
+    }
     page = INSTALLER_PAGE_FINISH;
     show_page();
 }
@@ -389,10 +458,11 @@ static void update_pump(void *)
     if (update_process.exit_code() == 0 && !update_protocol_error && !update_info.error_number) {
         if (checking) {
             update_checked = 1;
+            fprintf(stderr, "[installer.elf] inspection complete\n");
             setup.skip_bios = !(update_info.boot_modes & 1u);
             setup.skip_uefi = !(update_info.boot_modes & 2u);
-            page = INSTALLER_PAGE_CONFIRM;
-            set_status(T("Ready to update"), T("Review the detected system and start the update."));
+            page = INSTALLER_PAGE_DISK;
+            set_status(T("Ready to update"), T("Review the detected system and boot options, then continue to the summary."));
         } else {
             page = INSTALLER_PAGE_FINISH;
             install_success = 1;
@@ -442,7 +512,11 @@ static void start_update_job(int applying)
             error = reliefos_block_partition_uuid(disks[selected_disk].path, installer_root_partition, root_uuid);
         if (!error && installer_esp_partition >= 0)
             error = reliefos_block_partition_uuid(disks[selected_disk].path, installer_esp_partition, esp_uuid);
-        if (error) { set_error_status(T("Cannot identify the selected partitions"), error); return; }
+        if (error) {
+            set_error_status(T("Cannot identify the selected partitions"), error);
+            schedule_render();
+            return;
+        }
     }
     const char *check[] = {executable, "--update-worker", "check", disks[selected_disk].path, root_uuid, esp_uuid, NULL};
     const char *apply[] = {executable, "--update-worker", "apply", update_info.disk,
@@ -468,14 +542,20 @@ static void start_update_job(int applying)
 
 static void close_now(void)
 {
+    explicit_bzero(setup.password, sizeof(setup.password));
+    explicit_bzero(setup.password_confirm, sizeof(setup.password_confirm));
+    explicit_bzero(setup.root_password, sizeof(setup.root_password));
+    explicit_bzero(setup.root_password_confirm, sizeof(setup.root_password_confirm));
     exit(0);
 }
 
 static void cancel_setup(Fl_Widget *, void *)
 {
-    if (!ui_busy && installer_model_can_cancel((enum installer_page)page,
-                                                install_success))
-        close_now();
+    if (ui_busy || !installer_model_can_cancel((enum installer_page)page, install_success)) return;
+    if (page != INSTALLER_PAGE_FINISH &&
+        fl_choice("%s", T("Keep configuring"), T("Exit installer"), NULL,
+            T("Exit the installer? Unapplied disk changes and setup choices will be discarded.")) != 1) return;
+    close_now();
 }
 
 static void window_close(Fl_Widget *, void *)
@@ -497,6 +577,7 @@ static void go_back_now(void *)
         ui_busy = 0;
     }
     if (page == INSTALLER_PAGE_PARTITIONS) refresh_partitions();
+    reset_confirm();
     show_page();
 }
 
@@ -521,7 +602,12 @@ static void go_primary_now(void *)
         start_update_job(1);
         return;
     case INSTALLER_ACTION_RETRY:
-        start_update_job(0);
+        if (install_mode == INSTALLER_MODE_UPDATE) start_update_job(0);
+        else {
+            reset_confirm();
+            page = INSTALLER_PAGE_DISK;
+            show_page();
+        }
         return;
     case INSTALLER_ACTION_RESTART:
         fprintf(stderr, "[installer.elf] restart requested from completion page\n");
@@ -539,7 +625,7 @@ static void go_primary_now(void *)
         break;
     }
 
-    if (page == INSTALLER_PAGE_DISK && install_mode == INSTALLER_MODE_UPDATE) {
+    if (page == INSTALLER_PAGE_DISK && install_mode == INSTALLER_MODE_UPDATE && !update_checked) {
         start_update_job(0);
         return;
     }
@@ -588,7 +674,7 @@ static void build_language_page(void)
 {
     make_heading(T("Select Language"), 20);
     make_label(T("Choose the language for Setup and the installed system."),
-               CONTENT_X, 62, CONTENT_W, 30, 15, 1);
+               CONTENT_X, 62, CONTENT_W, 44, 15, 1);
     for (unsigned i = 0; i < sizeof(language_options) / sizeof(language_options[0]); ++i) {
         Fl_Round_Button *option = new Fl_Round_Button(CONTENT_X + 20, 126 + (int)i * 48,
                                                      360, 34, language_options[i].name);
@@ -597,34 +683,31 @@ static void build_language_page(void)
         option->callback(language_selected, (void *)(uintptr_t)i);
         reliefos_fltk::style(option);
     }
-    make_label(T("The installed system will use the same language."),
-               CONTENT_X, 286, CONTENT_W, 32, 15, 1);
+}
+
+static void license_changed(Fl_Widget *widget, void *)
+{
+    license_accepted = static_cast<Fl_Check_Button *>(widget)->value();
+    update_footer();
 }
 
 static void build_license_page(void)
 {
-    make_heading("Apache License 2.0", 20);
+    make_heading(T("License agreement"), 20);
+    make_label("Apache License 2.0", CONTENT_X, 60, CONTENT_W, 28, 15, 0);
     static Fl_Text_Buffer license_buffer;
     if (!license_buffer.length()) license_buffer.text(installer_license_text);
-    Fl_Text_Display *text = new Fl_Text_Display(CONTENT_X, 62, CONTENT_W, 536);
+    Fl_Text_Display *text = new Fl_Text_Display(CONTENT_X, 104, CONTENT_W, CONTENT_H - 168);
     text->buffer(license_buffer);
     text->textfont(FL_COURIER);
     text->textsize(13);
     text->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
     reliefos_fltk::style(text);
-}
-
-static void build_welcome_page(void)
-{
-    make_heading(T("ReliefOS Setup"), 20);
-    make_label(T("Install a new system or update an existing ReliefOS disk."),
-               CONTENT_X, 62, CONTENT_W, 34, 15, 1);
-    make_label(T("Setup can copy the full normal system payload"),
-               CONTENT_X, 116, CONTENT_W, 30, 15, 1);
-    make_label(T("or replace the boot/reliefos and system files on an existing installation."),
-               CONTENT_X, 150, CONTENT_W, 44, 15, 1);
-    make_label(T("SATA/AHCI and IDE/PATA target disks are supported."),
-               CONTENT_X, 218, CONTENT_W, 32, 15, 1);
+    auto *accept = new Fl_Check_Button(CONTENT_X, CONTENT_H - 48, CONTENT_W, 34,
+        T("I accept the license terms"));
+    accept->value(license_accepted);
+    accept->callback(license_changed);
+    reliefos_fltk::style(accept);
 }
 
 /** @brief Start a fresh mode with both firmware defaults after leaving update mode. */
@@ -633,18 +716,24 @@ static void mode_selected(Fl_Widget *widget, void *data)
     if (!static_cast<Fl_Round_Button *>(widget)->value()) return;
     if ((uint8_t)(uintptr_t)data == INSTALLER_MODE_FRESH && install_mode != INSTALLER_MODE_FRESH)
         setup.skip_bios = setup.skip_uefi = 0;
-    install_mode = (uint8_t)(uintptr_t)data;
+    if (install_mode != (uint8_t)(uintptr_t)data) {
+        installer_partition_select_mode((uint8_t)(uintptr_t)data);
+        partition_table = tui_partition_table{};
+        partition_view_error = 0;
+        update_checked = 0;
+        reset_confirm();
+    }
     schedule_render();
 }
 
 static void build_mode_page(void)
 {
-    make_heading(T("Choose Setup Mode"), 20);
-    make_label(T("Fresh install erases the disk. Update keeps existing users and extra programs."),
+    make_heading(T("Installation type"), 20);
+    make_label(T("Choose a new installation or update an existing ReliefOS system."),
                CONTENT_X, 62, CONTENT_W, 44, 15, 1);
-    Fl_Round_Button *fresh = new Fl_Round_Button(CONTENT_X + 20, 124, 600, 36,
+    Fl_Round_Button *fresh = new Fl_Round_Button(CONTENT_X + 20, 124, CONTENT_W - 20, 36,
                                                   T("Fresh Install"));
-    Fl_Round_Button *update = new Fl_Round_Button(CONTENT_X + 20, 170, 600, 36,
+    Fl_Round_Button *update = new Fl_Round_Button(CONTENT_X + 20, 242, CONTENT_W - 20, 36,
                                                    T("Update Existing System"));
     fresh->type(FL_RADIO_BUTTON);
     update->type(FL_RADIO_BUTTON);
@@ -655,9 +744,9 @@ static void build_mode_page(void)
     reliefos_fltk::style(fresh);
     reliefos_fltk::style(update);
     make_label(T("Prepare a clean ReliefOS system with automatic or manual disk partitioning."),
-               CONTENT_X, 228, CONTENT_W, 40, 15, 1);
-    make_label(T("Choose the target disk, configure its partitions, then replace boot, system and EFI files."),
-               CONTENT_X, 278, CONTENT_W, 42, 15, 1);
+               CONTENT_X + 20, 164, CONTENT_W - 20, 56, 15, 1);
+    make_label(T("Update preserves users, personal files, installed software and local configuration."),
+               CONTENT_X + 20, 282, CONTENT_W - 20, 68, 15, 1);
 }
 
 static void update_partition_selected(Fl_Widget *widget, void *)
@@ -667,6 +756,7 @@ static void update_partition_selected(Fl_Widget *widget, void *)
     if (widget == update_root_choice) installer_root_partition = index;
     else installer_esp_partition = index;
     update_checked = 0;
+    schedule_render();
 }
 
 static void refresh_update_partitions(void)
@@ -696,11 +786,18 @@ static void refresh_update_partitions(void)
 
 static void select_disk(Fl_Widget *, void *)
 {
-    if (disk_browser && disk_browser->value() > 0)
-        selected_disk = disk_browser->value() - 1;
-    setup.format_esp = 0;
+    if (!disk_browser || disk_browser->value() <= 0) return;
+    int target = disk_browser->value() - 1;
+    if (target == selected_disk) return;
+    partition_table = tui_partition_table{};
+    partition_view_error = 0;
+    int result = installer_partition_select_disk(target);
+    if (result < 0 && install_mode == INSTALLER_MODE_FRESH)
+        set_error_status(T("Cannot read the selected disk"), result);
+    update_checked = 0;
+    reset_confirm();
     refresh_update_partitions();
-    update_footer();
+    schedule_render();
 }
 
 static void refresh_disk_list(void)
@@ -722,41 +819,90 @@ static void refresh_disk_list(void)
 static void refresh_pressed(Fl_Widget *, void *)
 {
     if (ui_busy) return;
+    update_checked = 0;
+    reset_confirm();
     ui_busy = 1;
     refresh_disks();
     refresh_disk_list();
     ui_busy = 0;
-    update_footer();
+    schedule_render();
 }
+
+static void bootloader_install_changed(Fl_Widget *, void *);
 
 static void build_disk_page(void)
 {
     make_heading(install_mode == INSTALLER_MODE_UPDATE
-                     ? T("Select Disk to Update") : T("Select Installation Disk"), 20);
+        ? T("Select Disk to Update") : T("Select Installation Disk"), 20);
     make_label(install_mode == INSTALLER_MODE_UPDATE
-                   ? T("Choose the disk that already contains ReliefOS.")
-                   : T("Choose the disk that will receive ReliefOS."),
-               CONTENT_X, 62, 600, 32, 15, 1);
-    make_button(T("Refresh"), CONTENT_X + 650, 22, 130, 34, refresh_pressed, NULL);
-    make_label(T("Available disks"), CONTENT_X, 102, CONTENT_W, 26, 14, 0);
-    disk_browser = new Fl_Hold_Browser(CONTENT_X, 132, CONTENT_W,
-                                     install_mode == INSTALLER_MODE_UPDATE ? 190 : 330);
+        ? T("Select a disk and check its existing installation before continuing.")
+        : T("Select the target. The disk layout is configured in the following steps."),
+        CONTENT_X, 62, CONTENT_W, 48, 14, 1);
+    make_button(T("Refresh"), CONTENT_X + CONTENT_W - 130, 112, 130, 30, refresh_pressed, nullptr);
+    disk_browser = new Fl_Hold_Browser(CONTENT_X, 154, CONTENT_W,
+        CONTENT_H - (install_mode == INSTALLER_MODE_UPDATE ? 370 : 248));
     disk_browser->callback(select_disk);
     disk_browser->textsize(14);
     disk_browser->selection_color(COLOR_SIDEBAR);
     reliefos_fltk::style(disk_browser);
     if (install_mode == INSTALLER_MODE_UPDATE) {
-        make_label(T("ReliefOS system partition"), CONTENT_X, 330, CONTENT_W, 24, 14, 0);
-        update_root_choice = new Fl_Choice(CONTENT_X, 356, CONTENT_W, 32);
-        make_label(T("EFI system partition"), CONTENT_X, 396, CONTENT_W, 24, 14, 0);
-        update_esp_choice = new Fl_Choice(CONTENT_X, 422, CONTENT_W, 32);
+        const int column = (CONTENT_W - 16) / 2;
+        make_label(T("ReliefOS system partition"), CONTENT_X, CONTENT_H - 208, column, 24, 14, 0);
+        update_root_choice = new Fl_Choice(CONTENT_X, CONTENT_H - 180, column, 32);
+        make_label(T("EFI system partition"), CONTENT_X + column + 16, CONTENT_H - 208, column, 24, 14, 0);
+        update_esp_choice = new Fl_Choice(CONTENT_X + column + 16, CONTENT_H - 180, column, 32);
         update_root_choice->callback(update_partition_selected);
         update_esp_choice->callback(update_partition_selected);
         reliefos_fltk::style(update_root_choice); reliefos_fltk::style(update_esp_choice);
+        if (update_checked) {
+            char detected[512];
+            snprintf(detected, sizeof(detected), "%s: %s → %s\n%s: %s", T("Version"),
+                update_info.installed_version, update_info.media_version, T("System partition"), update_info.root_device);
+            make_label(detected, CONTENT_X, CONTENT_H - 144, CONTENT_W, 48, 13, 1);
+            make_label(T("Update bootloader software"), CONTENT_X, CONTENT_H - 92, CONTENT_W - 200, 30, 14, 1);
+            auto *bios = new Fl_Check_Button(CONTENT_X + CONTENT_W - 188, CONTENT_H - 92, 86, 30, "BIOS");
+            bios->value(!setup.skip_bios);
+            bios->callback(bootloader_install_changed, (void *)(uintptr_t)1);
+            auto *uefi = new Fl_Check_Button(CONTENT_X + CONTENT_W - 94, CONTENT_H - 92, 86, 30, "UEFI");
+            uefi->value(!setup.skip_uefi);
+            uefi->callback(bootloader_install_changed, (void *)(uintptr_t)2);
+            reliefos_fltk::style(bios); reliefos_fltk::style(uefi);
+        }
     }
-    status_box = make_label(status_text, CONTENT_X, 478, CONTENT_W, 34, 14, 1);
-    detail_box = make_label(detail_text, CONTENT_X, 516, CONTENT_W, 48, 14, 1);
+    status_box = make_label(status_text, CONTENT_X, CONTENT_H - 60, CONTENT_W, 24, 14, 1);
+    detail_box = make_label(detail_text, CONTENT_X, CONTENT_H - 34, CONTENT_W, 30, 13, 1);
     refresh_disk_list();
+}
+
+static void refresh_partition_actions(void)
+{
+    bool has_selection = !partition_view_error && !installer_partition_auto && selected_partition >= 0 && (uint32_t)selected_partition < partition_count;
+    for (int i = 0; i < 4; ++i) {
+        if (partition_edit_buttons[i]) {
+            if (has_selection) partition_edit_buttons[i]->activate();
+            else partition_edit_buttons[i]->deactivate();
+        }
+    }
+    if (partition_role_choice) {
+        if (has_selection) {
+            uint32_t type = partitions[selected_partition].gpt_type;
+            partition_role_choice->value(type == RELIEFOS_BLOCK_GPT_ESP ? 0 :
+                type == RELIEFOS_BLOCK_GPT_LINUX ? 1 :
+                type == RELIEFOS_BLOCK_GPT_BIOS_BOOT ? 3 : 2);
+            partition_role_choice->activate();
+        } else {
+            partition_role_choice->value(-1);
+            partition_role_choice->deactivate();
+        }
+    }
+    if (partition_role_button) {
+        if (has_selection) partition_role_button->activate();
+        else partition_role_button->deactivate();
+    }
+    if (format_esp_checkbox) {
+        if (installer_esp_partition >= 0) format_esp_checkbox->activate();
+        else format_esp_checkbox->deactivate();
+    }
 }
 
 static void refresh_partition_list(void)
@@ -770,8 +916,8 @@ static void refresh_partition_list(void)
             (uint32_t)selected_disk < disk_count &&
             !installer_partition_plan_default(&disks[selected_disk], installer_boot_modes(), &plan)) {
             snprintf(line, sizeof(line), setup.skip_bios
-                ? T("Automatic plan: ESP 128 MiB FAT32; root %llu MiB ext4.\nThe list shows current partitions. The plan is applied only after confirmation.")
-                : T("Automatic plan: BIOS Boot 1 MiB; ESP 128 MiB FAT32; root %llu MiB ext4.\nThe list shows current partitions. The plan is applied only after confirmation."),
+                ? T("Automatic plan: ESP 128 MiB FAT32; root %llu MiB ext4.\nThis replaces all existing partitions only after confirmation.")
+                : T("Automatic plan: BIOS Boot 1 MiB; ESP 128 MiB FAT32; root %llu MiB ext4.\nThis replaces all existing partitions only after confirmation."),
                 (unsigned long long)(plan.root.sector_count / 2048u));
             partition_hint->copy_label(line);
         } else {
@@ -783,20 +929,52 @@ static void refresh_partition_list(void)
         }
     }
     partition_browser->clear();
-    for (uint32_t i = 0; i < partition_count; ++i) {
-        format_partition_line(line, sizeof(line), &partitions[i]);
-        partition_browser->add(line);
+    installer_tty_context context{};
+    context.setup = &setup;
+    context.disks = disks;
+    context.disk_count = &disk_count;
+    context.partitions = partitions;
+    context.partition_count = &partition_count;
+    context.selected_disk = &selected_disk;
+    context.root_partition = &installer_root_partition;
+    context.esp_partition = &installer_esp_partition;
+    auto &table = partition_table;
+    int selected = selected_partition;
+    int error = tui_partition_table_update(&table, &context, installer_partition_auto, &selected);
+    table.selection = nullptr;
+    partition_view_error = error;
+    if (!installer_partition_auto) selected_partition = selected;
+    if (error) {
+        selected_partition = -1;
+        set_error_status(T("Cannot read the partition layout"), error);
+    } else for (int i = 0; i < table.count; ++i) {
+        const auto &row = table.rows[i];
+        if (row.source >= 0) format_partition_line(line, sizeof(line), &partitions[row.source]);
+        else if (installer_partition_auto) {
+            char capacity[32];
+            tui_partition_size(capacity, sizeof(capacity), row.sector_count, table.sector_size);
+            snprintf(line, sizeof(line), "%s  %s  %s", row.name, capacity,
+                row.type == RELIEFOS_BLOCK_GPT_BIOS_BOOT ? T("Unformatted") : reliefos_block_filesystem_name(row.filesystem));
+        } else {
+            char capacity[32];
+            tui_partition_size(capacity, sizeof(capacity), row.sector_count, table.sector_size);
+            snprintf(line, sizeof(line), "%s  %s", T("Unallocated"), capacity);
+        }
+        partition_browser->add(line, (void *)(intptr_t)(row.source + 1));
+        if (!installer_partition_auto && i == table.cursor) partition_browser->value(i + 1);
     }
-    if (selected_partition >= 0 && (uint32_t)selected_partition < partition_count)
-        partition_browser->value(selected_partition + 1);
+    refresh_partition_actions();
     refresh_status_widgets();
     update_footer();
 }
 
 static void select_partition(Fl_Widget *, void *)
 {
-    if (partition_browser && partition_browser->value() > 0)
-        selected_partition = partition_browser->value() - 1;
+    if (!installer_partition_auto && partition_browser && partition_browser->value() > 0) {
+        partition_table.cursor = partition_browser->value() - 1;
+        selected_partition = (int)(intptr_t)partition_browser->data(partition_browser->value()) - 1;
+    }
+    refresh_partition_actions();
     update_footer();
 }
 
@@ -804,190 +982,146 @@ static void partition_result(int ret, const char *success)
 {
     char detail[128];
     if (ret < 0) {
-        snprintf(detail, sizeof(detail), "%s ret=%d",
-                 T("The disk may have been changed"), ret);
-        set_status(T("Partition operation failed"), detail);
+        snprintf(detail, sizeof(detail), "%s (%d)", strerror(-ret), -ret);
+        set_status(T("Cannot update the partition plan"), detail);
     } else {
-        set_status(T("Partition layout updated"), success);
+        set_status(T("Partition plan updated"), success);
     }
     refresh_partitions();
     refresh_partition_list();
 }
 
-static uint32_t partition_filesystem(const char *text)
-{
-    if (text_eq(text, "fat32") || text_eq(text, "fat"))
-        return RELIEFOS_BLOCK_FILESYSTEM_FAT32;
-    if (text_eq(text, "ext2")) return RELIEFOS_BLOCK_FILESYSTEM_EXT2;
-    if (text_eq(text, "ext3")) return RELIEFOS_BLOCK_FILESYSTEM_EXT3;
-    if (text_eq(text, "ext4")) return RELIEFOS_BLOCK_FILESYSTEM_EXT4;
-    if (text_eq(text, "exfat")) return RELIEFOS_BLOCK_FILESYSTEM_EXFAT;
-    return RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
-}
-
-static char *partition_next_word(char **cursor)
-{
-    char *word;
-    if (!cursor || !*cursor) return NULL;
-    while (**cursor == ' ' || **cursor == '\t') ++*cursor;
-    if (!**cursor) return NULL;
-    word = *cursor;
-    while (**cursor && **cursor != ' ' && **cursor != '\t') ++*cursor;
-    if (**cursor) *(*cursor)++ = 0;
-    return word;
-}
-
-static int partition_collect_name(char *out, uint32_t capacity,
-                                 const char *first, char **cursor)
-{
-    char *remainder;
-    size_t length;
-    if (!out || !capacity || !first || !first[0]) return -EINVAL;
-    length = strlen(first);
-    remainder = cursor ? *cursor : NULL;
-    while (remainder && (*remainder == ' ' || *remainder == '\t')) ++remainder;
-    if (length >= capacity) return -ENAMETOOLONG;
-    memcpy(out, first, length);
-    if (remainder && *remainder) {
-        size_t remaining = strlen(remainder);
-        if (length + 1 + remaining >= capacity) return -ENAMETOOLONG;
-        out[length++] = ' ';
-        memcpy(out + length, remainder, remaining + 1);
-    } else {
-        out[length] = 0;
-    }
-    if (cursor) *cursor = remainder;
-    return 0;
-}
-
-static int partition_number(const char *text, uint32_t *value)
-{
-    char *end;
-    unsigned long parsed;
-    if (!text || !text[0] || !value) return -EINVAL;
-    errno = 0;
-    parsed = strtoul(text, &end, 10);
-    if (errno || end == text || *end || parsed > 0xffffffffUL || !parsed)
-        return -EINVAL;
-    *value = (uint32_t)parsed;
-    return 0;
-}
-
-static const char *partition_prompt_text(enum partition_prompt_action action)
-{
-    switch (action) {
-    case PARTITION_PROMPT_AUTO:
-        return setup.skip_bios
-            ? T("Type AUTO to erase the disk and create ESP and root partitions:")
-            : T("Type AUTO to erase the disk and create BIOS Boot, ESP and root partitions:");
-    case PARTITION_PROMPT_INITIALIZE:
-        return T("Type INITIALIZE to replace the partition table:");
-    case PARTITION_PROMPT_CREATE:
-        return T("Enter size_MiB filesystem name (ext4/ext3/ext2/fat32/exfat/raw):");
-    case PARTITION_PROMPT_RESIZE:
-        return T("Enter the new partition size in MiB:");
-    case PARTITION_PROMPT_RENAME:
-        return T("Enter the GPT partition name:");
-    case PARTITION_PROMPT_FORMAT:
-        return T("Enter filesystem and label (for example: ext4 RELIEFOS_DATA):");
-    case PARTITION_PROMPT_DELETE:
-        return T("Type DELETE to remove the selected partition:");
-    }
-    return T("Enter a value:");
-}
-
-static const char *partition_prompt_default(enum partition_prompt_action action)
-{
-    switch (action) {
-    case PARTITION_PROMPT_AUTO: return "AUTO";
-    case PARTITION_PROMPT_INITIALIZE: return "INITIALIZE";
-    case PARTITION_PROMPT_CREATE: return "1024 ext4 ReliefOS Data";
-    case PARTITION_PROMPT_RESIZE: return "1024";
-    case PARTITION_PROMPT_RENAME: return "ReliefOS Data";
-    case PARTITION_PROMPT_FORMAT: return "ext4 RELIEFOS_DATA";
-    case PARTITION_PROMPT_DELETE: return "DELETE";
-    }
-    return "";
-}
-
+/* Partition edits are drafts. This dialog collects typed fields instead of a
+ * command string; the shared planner validates them before changing the draft. */
 static void partition_prompt_pressed(Fl_Widget *, void *data)
 {
-    enum partition_prompt_action action =
-        (enum partition_prompt_action)(uintptr_t)data;
+    auto action = (enum partition_prompt_action)(uintptr_t)data;
     if (ui_busy) return;
-
-    if (action == PARTITION_PROMPT_FORMAT) {
-        int choice = fl_choice(
-            "%s", T("Cancel"), T("Continue"), NULL,
-            T("Formatting destroys all files on the selected partition."));
-        if (choice != 1) return;
-    }
-
-    const char *entered = fl_input("%s", partition_prompt_default(action),
-                                   partition_prompt_text(action));
-    if (!entered) return;
-    char value[256];
-    if (!reliefos_fltk::copy_input(value, sizeof(value), entered)) {
-        partition_result(-ENAMETOOLONG, "");
+    if (action == PARTITION_PROMPT_INITIALIZE) {
+        if (fl_choice("%s", T("Cancel"), T("Plan new table"), NULL,
+            T("Replace this disk's partition table in the installation plan? All existing partitions will be removed when you install.")) == 1)
+            partition_result(installer_partition_initialize(), T("New partition table added to the plan."));
         return;
     }
-
-    char *cursor = value;
-    char *word = partition_next_word(&cursor);
-    uint32_t number = 0, filesystem = RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
-    char name[RELIEFOS_BLOCK_NAME_LEN];
-    name[0] = 0;
-    int ret = -EINVAL;
-
-    if (action == PARTITION_PROMPT_AUTO) {
-        if (text_eq(entered, "AUTO")) ret = installer_partition_auto_layout();
-    } else if (action == PARTITION_PROMPT_INITIALIZE) {
-        if (text_eq(entered, "INITIALIZE")) ret = installer_partition_initialize();
-    } else if (action == PARTITION_PROMPT_CREATE) {
-        char *filesystem_name = partition_next_word(&cursor);
-        const char *name_word = partition_next_word(&cursor);
-        filesystem = partition_filesystem(filesystem_name);
-        if (!name_word) name_word = "ReliefOS Data";
-        if (partition_collect_name(name, sizeof(name), name_word, &cursor) < 0)
-            name[0] = 0;
-        if (!partition_number(word, &number) &&
-            (filesystem != RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN || text_eq(filesystem_name, "raw")) && name[0])
-            ret = installer_partition_create(filesystem, number, name);
-    } else if (action == PARTITION_PROMPT_RESIZE) {
-        if (!partition_number(word, &number))
-            ret = installer_partition_resize(number);
-    } else if (action == PARTITION_PROMPT_RENAME) {
-        if (word && !partition_collect_name(name, sizeof(name), word, &cursor))
-            ret = installer_partition_rename(name);
-    } else if (action == PARTITION_PROMPT_FORMAT) {
-        const char *label = partition_next_word(&cursor);
-        filesystem = partition_filesystem(word);
-        if (!label) label = "RELIEFOS_DATA";
-        if (filesystem != RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN)
-            ret = installer_partition_format(filesystem, label);
-    } else if (action == PARTITION_PROMPT_DELETE) {
-        if (text_eq(entered, "DELETE")) ret = installer_partition_delete();
+    if (action == PARTITION_PROMPT_DELETE) {
+        if (selected_partition < 0 || (uint32_t)selected_partition >= partition_count) return;
+        if (fl_choice("%s", T("Cancel"), T("Plan deletion"), NULL,
+            T("Remove the selected partition when the installation is confirmed?")) == 1)
+            partition_result(installer_partition_delete(), T("Partition deletion added to the plan."));
+        return;
     }
-    partition_result(ret, T("Review the selected ESP and root before continuing."));
+    const char *title = action == PARTITION_PROMPT_CREATE ? T("Create partition") :
+        action == PARTITION_PROMPT_RESIZE ? T("Resize partition") :
+        action == PARTITION_PROMPT_RENAME ? T("Rename partition") : T("Format partition");
+    if (action != PARTITION_PROMPT_CREATE &&
+        (selected_partition < 0 || (uint32_t)selected_partition >= partition_count)) return;
+    Fl_Window dialog(510, 330, title);
+    dialog.set_modal();
+    auto *hint = new InstallerWrappedLabel(20, 16, 470, 48,
+        action == PARTITION_PROMPT_RESIZE ? T("Resizing changes the partition boundary. Existing filesystems cannot be shrunk here.") :
+        T("This change is added to the plan. Nothing is written until installation is confirmed."));
+    hint->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+    bool size_needed = action == PARTITION_PROMPT_CREATE || action == PARTITION_PROMPT_RESIZE;
+    bool fs_needed = action == PARTITION_PROMPT_CREATE || action == PARTITION_PROMPT_FORMAT;
+    Fl_Input *size = nullptr, *name = nullptr;
+    Fl_Choice *filesystem = nullptr;
+    int y = 84;
+    if (size_needed) {
+        auto *label = new Fl_Box(20, y, 150, 32, T("Size (MiB)"));
+        label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+        size = new Fl_Input(184, y, 300, 32);
+        size->value("1024");
+        size->maximum_size(10);
+        if (action == PARTITION_PROMPT_RESIZE) {
+            char initial[32];
+            uint64_t bytes = partitions[selected_partition].sector_count * (uint64_t)disks[selected_disk].sector_size;
+            snprintf(initial, sizeof(initial), "%llu", (unsigned long long)(bytes / (1024u * 1024u)));
+            size->value(initial);
+        }
+        y += 52;
+    }
+    if (fs_needed) {
+        auto *label = new Fl_Box(20, y, 150, 32, T("Filesystem"));
+        label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+        filesystem = new Fl_Choice(184, y, 300, 32);
+        filesystem->add("ext4|ext3|ext2|FAT32|exFAT");
+        if (action == PARTITION_PROMPT_CREATE) filesystem->add(T("Unformatted"));
+        filesystem->value(0);
+        y += 52;
+    }
+    if (action != PARTITION_PROMPT_RESIZE) {
+        auto *label = new Fl_Box(20, y, 150, 32, action == PARTITION_PROMPT_FORMAT ? T("Volume label") : T("Partition name"));
+        label->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
+        name = new Fl_Input(184, y, 300, 32);
+        name->maximum_size(RELIEFOS_BLOCK_NAME_LEN - 1);
+        name->value(action == PARTITION_PROMPT_RENAME ? partitions[selected_partition].name : "ReliefOS");
+    }
+    int accepted = 0;
+    auto *cancel = new Fl_Button(214, 278, 126, 34, T("Cancel"));
+    cancel->callback([](Fl_Widget *w, void *) { w->window()->hide(); });
+    auto *apply = new Fl_Return_Button(354, 278, 130, 34, T("Add to plan"));
+    apply->callback([](Fl_Widget *w, void *value) { *static_cast<int *>(value) = 1; w->window()->hide(); }, &accepted);
+    dialog.callback([](Fl_Widget *w, void *) { w->hide(); });
+    dialog.end();
+    reliefos_fltk::style(&dialog);
+    dialog.show();
+    while (dialog.shown()) Fl::wait();
+    if (!accepted) return;
+    uint32_t number = 0;
+    if (size) {
+        char *end = nullptr;
+        errno = 0;
+        unsigned long parsed = strtoul(size->value(), &end, 10);
+        if (errno || end == size->value() || *end || !parsed || parsed > UINT32_MAX || size->value()[0] == '-') {
+            partition_result(-EINVAL, "");
+            return;
+        }
+        number = (uint32_t)parsed;
+    }
+    static const uint32_t filesystems[] = {
+        RELIEFOS_BLOCK_FILESYSTEM_EXT4, RELIEFOS_BLOCK_FILESYSTEM_EXT3,
+        RELIEFOS_BLOCK_FILESYSTEM_EXT2, RELIEFOS_BLOCK_FILESYSTEM_FAT32,
+        RELIEFOS_BLOCK_FILESYSTEM_EXFAT, RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN
+    };
+    uint32_t fs = filesystem ? filesystems[filesystem->value()] : 0;
+    int result = action == PARTITION_PROMPT_CREATE ? installer_partition_create(fs, number, name->value()) :
+        action == PARTITION_PROMPT_RESIZE ? installer_partition_resize(number) :
+        action == PARTITION_PROMPT_RENAME ? installer_partition_rename(name->value()) :
+        installer_partition_format(fs, name->value());
+    partition_result(result, T("Change added to the installation plan."));
 }
 
-static void partition_refresh_pressed(Fl_Widget *, void *)
+static void partition_method_changed(Fl_Widget *widget, void *data)
 {
-    refresh_partitions();
-    refresh_partition_list();
+    if (!static_cast<Fl_Round_Button *>(widget)->value()) return;
+    installer_partition_auto = (uintptr_t)data != 0;
+    reset_confirm();
+    schedule_render();
 }
 
-static void partition_role_pressed(Fl_Widget *, void *data)
+static void partition_discard_pressed(Fl_Widget *, void *)
 {
-    uint32_t type = (uint32_t)(uintptr_t)data;
+    if (fl_choice("%s", T("Keep changes"), T("Discard changes"), NULL,
+        T("Discard pending partition edits and reload the disk?")) != 1) return;
+    uint8_t previous_layout = installer_partition_auto;
+    installer_partition_reset();
+    installer_partition_auto = previous_layout;
+    schedule_render();
+}
+
+static void partition_role_pressed(Fl_Widget *, void *)
+{
+    static const uint32_t types[] = {RELIEFOS_BLOCK_GPT_ESP, RELIEFOS_BLOCK_GPT_LINUX,
+        RELIEFOS_BLOCK_GPT_BASIC_DATA, RELIEFOS_BLOCK_GPT_BIOS_BOOT};
     int ret;
     if (ui_busy) return;
-    if (selected_partition < 0 ||
+    if (!partition_role_choice || partition_role_choice->value() < 0 ||
+        partition_role_choice->value() >= 4 || selected_partition < 0 ||
         (uint32_t)selected_partition >= partition_count) {
         partition_result(-EINVAL, "");
         return;
     }
-    ret = installer_partition_set_type(type);
+    ret = installer_partition_set_type(types[partition_role_choice->value()]);
     partition_result(ret, T("Partition role updated."));
 }
 
@@ -999,64 +1133,53 @@ static void format_esp_changed(Fl_Widget *widget, void *)
 
 static void build_partition_page(void)
 {
-    static const char *const labels[] = {
-        "Refresh", "Automatic", "Initialize GPT", "Create",
-        "Resize", "Rename", "Format", "Delete"
-    };
-    static const enum partition_prompt_action actions[] = {
-        PARTITION_PROMPT_AUTO, PARTITION_PROMPT_INITIALIZE,
-        PARTITION_PROMPT_CREATE, PARTITION_PROMPT_RESIZE,
-        PARTITION_PROMPT_RENAME, PARTITION_PROMPT_FORMAT,
-        PARTITION_PROMPT_DELETE
-    };
-
-    make_heading(T("Configure partitions"), 16);
-    partition_hint = make_label("", CONTENT_X, 52, CONTENT_W, 68, 14, 1);
-    partition_browser = new Fl_Hold_Browser(CONTENT_X, 128, CONTENT_W, 248);
+    make_heading(T("Disk layout"), 8);
+    auto *automatic = new Fl_Round_Button(CONTENT_X, 50, CONTENT_W, 28, T("Erase disk and install automatically"));
+    auto *manual = new Fl_Round_Button(CONTENT_X, 82, CONTENT_W, 28, T("Manual partitioning / keep other systems"));
+    automatic->type(FL_RADIO_BUTTON); manual->type(FL_RADIO_BUTTON);
+    automatic->value(installer_partition_auto); manual->value(!installer_partition_auto);
+    automatic->callback(partition_method_changed, (void *)(uintptr_t)1);
+    manual->callback(partition_method_changed, nullptr);
+    reliefos_fltk::style(automatic); reliefos_fltk::style(manual);
+    partition_hint = make_label("", CONTENT_X, 116, CONTENT_W, 44, 13, 1);
+    partition_browser = new Fl_Hold_Browser(CONTENT_X, 164, CONTENT_W,
+        CONTENT_H - (installer_partition_auto ? 264 : 376));
     partition_browser->callback(select_partition);
     partition_browser->textsize(13);
     partition_browser->selection_color(COLOR_SIDEBAR);
     reliefos_fltk::style(partition_browser);
-
-    int button_w = 94;
-    int gap = 5;
-    for (int i = 0; i < 8; ++i) {
-        int x = CONTENT_X + i * (button_w + gap);
-        Fl_Button *button = make_button(T(labels[i]), x, 388, button_w, 36,
-                                        i == 0 ? partition_refresh_pressed
-                                               : partition_prompt_pressed,
-                                        i == 0 ? NULL : (void *)(uintptr_t)actions[i - 1]);
-        button->labelsize(12);
-    }
-    make_button(T("Set ESP"), CONTENT_X, 432, 150, 36,
-                partition_role_pressed,
-                (void *)(uintptr_t)RELIEFOS_BLOCK_GPT_ESP);
-    make_button(T("Set root"), CONTENT_X + 160, 432, 150, 36,
-                partition_role_pressed,
-                (void *)(uintptr_t)RELIEFOS_BLOCK_GPT_LINUX);
-    make_button(T("Data type"), CONTENT_X + 320, 432, 150, 36,
-                partition_role_pressed,
-                (void *)(uintptr_t)RELIEFOS_BLOCK_GPT_BASIC_DATA);
-    make_button(T("Set BIOS Boot"), CONTENT_X + 480, 432, 170, 36,
-                partition_role_pressed,
-                (void *)(uintptr_t)RELIEFOS_BLOCK_GPT_BIOS_BOOT);
-
-    status_box = make_label(status_text, CONTENT_X, 480, CONTENT_W, 30, 13, 1);
-    detail_box = make_label(detail_text, CONTENT_X, 512, CONTENT_W, 38, 13, 1);
-    make_label(T("Create: size in MiB, filesystem, name. Resize only changes the trailing edge."),
-               CONTENT_X, 552, CONTENT_W, 26, 12, 1);
-    make_label(installer_partition_auto
-                   ? T("Final confirmation formats a FAT32 ESP and ext4 root on the selected disk.")
-                   : T("The selected root is formatted. An existing FAT32 ESP is preserved by default."),
-               CONTENT_X, 578, CONTENT_W, 32, 12, 1);
     if (!installer_partition_auto) {
-        auto *format = new Fl_Check_Button(CONTENT_X, 613, CONTENT_W, 28,
+        const char *labels[] = {T("Create"), T("Resize"), T("Rename"), T("Format"), T("Delete"), T("New GPT")};
+        const partition_prompt_action actions[] = {PARTITION_PROMPT_CREATE, PARTITION_PROMPT_RESIZE,
+            PARTITION_PROMPT_RENAME, PARTITION_PROMPT_FORMAT, PARTITION_PROMPT_DELETE, PARTITION_PROMPT_INITIALIZE};
+        const int button_width = (CONTENT_W - 40) / 6;
+        for (int i = 0; i < 6; ++i) {
+            auto *button = make_button(labels[i], CONTENT_X + i * (button_width + 8), CONTENT_H - 204, button_width, 28,
+                partition_prompt_pressed, (void *)(uintptr_t)actions[i]);
+            button->labelsize(button_width < 96 ? 12 : 13);
+            if (i >= 1 && i <= 4) partition_edit_buttons[i - 1] = button;
+        }
+        const char *roles[] = {T("Use as ESP"), T("Use as root"), T("Data partition"), T("BIOS Boot")};
+        const int role_label_width = CONTENT_W / 4;
+        make_label(T("Partition role"), CONTENT_X, CONTENT_H - 168, role_label_width, 30,
+            role_label_width < 150 ? 12 : 14, 1);
+        partition_role_choice = new Fl_Choice(CONTENT_X + role_label_width + 12, CONTENT_H - 168,
+            CONTENT_W - role_label_width - 112, 30);
+        for (const char *role : roles) partition_role_choice->add(role);
+        reliefos_fltk::style(partition_role_choice);
+        partition_role_button = make_button(T("Use"), CONTENT_X + CONTENT_W - 88, CONTENT_H - 168, 88, 30,
+            partition_role_pressed, nullptr);
+        format_esp_checkbox = new Fl_Check_Button(CONTENT_X, CONTENT_H - 132, CONTENT_W, 36,
             T("Format selected ESP (erase all EFI boot files on it)"));
-        format->value(setup.format_esp);
-        format_esp_checkbox = format;
-        format->callback(format_esp_changed);
-        reliefos_fltk::style(format);
+        format_esp_checkbox->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE | FL_ALIGN_WRAP);
+        format_esp_checkbox->value(setup.format_esp);
+        format_esp_checkbox->callback(format_esp_changed);
+        reliefos_fltk::style(format_esp_checkbox);
+        make_button(T("Discard edits"), CONTENT_X, CONTENT_H - 90, CONTENT_W / 3, 28,
+            partition_discard_pressed, nullptr);
     }
+    status_box = make_label(status_text, CONTENT_X, CONTENT_H - 56, CONTENT_W, 20, 13, 1);
+    detail_box = make_label(detail_text, CONTENT_X, CONTENT_H - 34, CONTENT_W, 30, 13, 1);
     refresh_partition_list();
 }
 
@@ -1072,9 +1195,11 @@ static void account_changed(Fl_Widget *widget, void *)
                                      setup.root_password_confirm;
         uint32_t capacity = i == 0 ? sizeof(setup.username) :
                                      sizeof(setup.password);
-        if (widget == account_inputs[i])
+        if (widget == account_inputs[i]) {
             account_input_overflow[i] =
                 !reliefos_fltk::copy_input(destination, capacity, value);
+            if (account_input_overflow[i]) explicit_bzero(destination, capacity);
+        }
     }
     if (account_hint) {
         int overflow = 0;
@@ -1113,12 +1238,17 @@ static void build_accounts_page(void)
         setup.root_password, setup.root_password_confirm
     };
     for (int i = 0; i < 5; ++i) account_input_overflow[i] = 0;
-    make_heading(T("Accounts"), 16);
-    make_label(T("Administrator: root"), CONTENT_X, 52, CONTENT_W, 28, 14, 1);
+    make_heading(T("Accounts"), 20);
+    const int column_width = (CONTENT_W - 24) / 2;
+    make_label(T("User"), CONTENT_X, 164, column_width, 26, 15, 0)->labelfont(FL_HELVETICA_BOLD);
+    make_label(T("Administrator: root"), CONTENT_X + column_width + 24, 164,
+        column_width, 26, 15, 0)->labelfont(FL_HELVETICA_BOLD);
     for (int i = 0; i < 5; ++i) {
-        int y = 92 + i * 82;
-        make_label(T(labels[i]), CONTENT_X, y, CONTENT_W, 25, 14, 0);
-        account_inputs[i] = new Fl_Input(CONTENT_X, y + 28, 610, 34);
+        const int x = CONTENT_X + (i >= 3 ? column_width + 24 : 0);
+        const int y = i == 0 ? 72 : (i == 1 || i == 3) ? 192 : 272;
+        const int width = i == 0 ? CONTENT_W : column_width;
+        make_label(T(labels[i]), x, y, width, 24, 14, 0);
+        account_inputs[i] = new Fl_Input(x, y + 28, width, 34);
         account_inputs[i]->value(values[i]);
         account_inputs[i]->maximum_size(i == 0
             ? (int)sizeof(setup.username) - 1
@@ -1129,8 +1259,8 @@ static void build_accounts_page(void)
         reliefos_fltk::style(account_inputs[i]);
     }
     account_hint = make_label(
-        T("Passwords: 1-32 characters, no spaces; confirmations must match"),
-        CONTENT_X, 516, CONTENT_W, 32, 13, 1);
+        T("Check username and matching passwords (1-32 characters, no spaces)."),
+        CONTENT_X, 358, CONTENT_W, 48, 13, 1);
     if (!setup.username[0] || installer_setup_valid(&setup))
         account_hint->hide();
 }
@@ -1212,109 +1342,126 @@ static void build_bootloader_page(void)
                                  CONTENT_X, 244, CONTENT_W, 100, 14, 1);
 }
 
-static void build_confirm_page(void)
+static const char *desktop_label(void)
 {
-    if (install_mode == INSTALLER_MODE_UPDATE) {
-        char text[256];
-        make_heading(T("Review system update"), 16);
-        make_label(T("Installed version"), CONTENT_X, 66, 200, 26, 14, 0);
-        make_label(update_info.installed_version, CONTENT_X + 215, 66, 220, 26, 14, 0);
-        make_label(T("Media version"), CONTENT_X + 445, 66, 170, 26, 14, 0);
-        make_label(update_info.media_version, CONTENT_X + 620, 66, 160, 26, 14, 0);
-        make_label(T("Target disk"), CONTENT_X, 112, 200, 26, 14, 0);
-        make_label(update_info.disk, CONTENT_X + 215, 112, 560, 26, 14, 0);
-        make_label(T("System partition"), CONTENT_X, 150, 200, 26, 14, 0);
-        make_label(update_info.root_device, CONTENT_X + 215, 150, 560, 26, 14, 0);
-        make_label(T("Boot partition"), CONTENT_X, 188, 200, 26, 14, 0);
-        make_label(update_info.esp_device, CONTENT_X + 215, 188, 560, 26, 14, 0);
-        make_label(T("Desktop environment"), CONTENT_X, 226, 200, 26, 14, 0);
-        make_label(!strcmp(update_info.profile, "console") ? T("Console") : "Xorg",
-                   CONTENT_X + 215, 226, 560, 26, 14, 0);
-        make_label(T("Free / required space"), CONTENT_X, 264, 200, 26, 14, 0);
-        snprintf(text, sizeof(text), "%llu MiB / %llu MiB",
-                 (unsigned long long)(update_info.free_bytes / (1024u * 1024u)),
-                 (unsigned long long)((update_info.required_bytes + 1024u * 1024u - 1) / (1024u * 1024u)));
-        make_label(text, CONTENT_X + 215, 264, 560, 26, 14, 0);
-        make_label(T("Update bootloader software"), CONTENT_X, 310, CONTENT_W, 26, 14, 0);
-        Fl_Check_Button *bios = new Fl_Check_Button(CONTENT_X, 346, 175, 30, "BIOS");
-        bios->value(!setup.skip_bios);
-        bios->callback(bootloader_install_changed, (void *)(uintptr_t)1);
-        reliefos_fltk::style(bios);
-        Fl_Check_Button *uefi = new Fl_Check_Button(CONTENT_X + 190, 346, 175, 30, "UEFI");
-        uefi->value(!setup.skip_uefi);
-        uefi->callback(bootloader_install_changed, (void *)(uintptr_t)2);
-        reliefos_fltk::style(uefi);
-        make_label(T("Accounts, personal files, installed software and local configuration are preserved."),
-                   CONTENT_X, 398, CONTENT_W, 46, 14, 1);
-        if (update_info.pending[0])
-            make_label(T("A previous update is incomplete. This attempt will verify the system and recover the pending update stages."),
-                       CONTENT_X, 464, CONTENT_W, 60, 14, 1);
-        else
-            make_label(T("Signed packages are checked before changes. Boot files are published after the package transaction succeeds."),
-                       CONTENT_X, 464, CONTENT_W, 60, 14, 1);
-        return;
-    }
-    char line[160];
-    char target[192];
-    make_heading(T("Confirm Installation"), 16);
-    make_label(T("This operation is destructive."),
-               CONTENT_X, 54, CONTENT_W, 32, 15, 1);
-    if (selected_disk >= 0 && (uint32_t)selected_disk < disk_count)
-        format_disk_line(line, sizeof(line), &disks[selected_disk]);
-    else
-        line[0] = 0;
-    snprintf(target, sizeof(target), "%s %s", T("Target:"), line);
-    make_label(target, CONTENT_X, 98, CONTENT_W, 34, 14, 1);
-    make_label(installer_partition_auto
-                       ? T("The selected disk will be erased and formatted with a FAT32 ESP and ext4 system root.")
-                       : setup.format_esp
-                           ? T("The selected root and ESP will be formatted. All EFI boot files on that ESP will be erased.")
-                           : T("Only the selected root will be formatted. Existing ESP files and other partitions are preserved."),
-               CONTENT_X, 142, CONTENT_W, 64, 14, 1);
-    make_label(T("Type INSTALL to enable the Install button."),
-               CONTENT_X, 224, CONTENT_W, 30, 14, 1);
-    confirm_input = new Fl_Input(CONTENT_X, 260, 330, 36);
-    confirm_input->value(confirm_text);
-    confirm_input->maximum_size((int)sizeof(confirm_text) - 1);
-    confirm_input->when(FL_WHEN_CHANGED | FL_WHEN_ENTER_KEY_ALWAYS);
-    confirm_input->callback(confirm_changed);
-    reliefos_fltk::style(confirm_input);
-    make_label(T("Desktop environment"), CONTENT_X, 304, 360, 26, 14, 0);
-    desktop_choice = new Fl_Choice(CONTENT_X, 338, 365, 34);
+    return setup.desktop == INSTALLER_DESKTOP_XFCE ? T("XFCE (experimental)")
+        : setup.desktop == INSTALLER_DESKTOP_CONSOLE ? T("Console only") : T("IceWM (default)");
+}
+
+static void build_system_page(void)
+{
+    make_heading(T("System options"), 20);
+    make_label(T("Choose the desktop and additional disk space for virtual memory."),
+        CONTENT_X, 62, CONTENT_W, 42, 15, 1);
+    make_label(T("Desktop environment"), CONTENT_X, 120, CONTENT_W, 24, 14, 0);
+    desktop_choice = new Fl_Choice(CONTENT_X, 152, CONTENT_W, 34);
     desktop_choice->add(T("IceWM (default)"));
     desktop_choice->add(T("XFCE (experimental)"));
     desktop_choice->add(T("Console only"));
     desktop_choice->value(setup.desktop);
     desktop_choice->callback(desktop_install_changed);
     reliefos_fltk::style(desktop_choice);
+    make_label(T("Console only installs without a graphical login. XFCE is an experimental desktop option."),
+        CONTENT_X, 198, CONTENT_W, 48, 14, 1);
     if (!swap_size_initialized) {
-        if (!setup.swap_size_mib) setup.swap_size_mib=installer_swap_recommend_system();
-        snprintf(swap_size_text,sizeof(swap_size_text),"%llu",(unsigned long long)setup.swap_size_mib);
-        swap_size_initialized=1;
+        if (!setup.swap_size_mib) setup.swap_size_mib = installer_swap_recommend_system();
+        snprintf(swap_size_text, sizeof(swap_size_text), "%llu", (unsigned long long)setup.swap_size_mib);
+        swap_size_initialized = 1;
     }
-    Fl_Check_Button *swap=new Fl_Check_Button(CONTENT_X+390,338,220,32,T("Swapfile (MiB)"));
-    swap->value(setup.swap_enabled ? 1 : 0);
+    auto *swap = new Fl_Check_Button(CONTENT_X, 268, CONTENT_W, 32, T("Create a swapfile"));
+    swap->value(setup.swap_enabled);
     swap->callback(swap_install_changed);
     reliefos_fltk::style(swap);
-    swap_size_input=new Fl_Input(CONTENT_X+615,338,130,32);
+    make_label(T("Swap size (MiB)"), CONTENT_X, 318, CONTENT_W, 24, 14, 0);
+    swap_size_input = new Fl_Input(CONTENT_X, 350, CONTENT_W / 2, 34);
     swap_size_input->value(swap_size_text);
     swap_size_input->maximum_size(20);
     swap_size_input->when(FL_WHEN_CHANGED);
     swap_size_input->callback(swap_size_changed);
     if (!setup.swap_enabled) swap_size_input->deactivate();
     reliefos_fltk::style(swap_size_input);
-    snprintf(line, sizeof(line), "%s BIOS: %s    UEFI: %s", T("Bootloaders:"),
-             setup.skip_bios ? T("Skip") : T("Install"),
-             setup.skip_uefi ? T("Skip") : T("Install"));
-    make_label(line, CONTENT_X, 388, CONTENT_W, 36, 14, 1);
-    make_label(bootloader_description(), CONTENT_X, 436, CONTENT_W, 100, 13, 1);
+    make_label(T("Swap uses space on the system partition and currently requires an AHCI disk. Enter a valid whole number of MiB."),
+        CONTENT_X, 398, CONTENT_W, 54, 14, 1);
 }
 
-static void build_update_log(int y, int height)
+static void summary_row(const char *label, const char *value, int y, int height = 40)
 {
-    make_label(T("Update details"), CONTENT_X, y, CONTENT_W, 26, 14, 0);
+    const int label_width = CONTENT_W / 3;
+    make_label(label, CONTENT_X, y, label_width, height, 14, 1)->labelfont(FL_HELVETICA_BOLD);
+    make_label(value, CONTENT_X + label_width + 12, y, CONTENT_W - label_width - 12,
+        height, 14, 1);
+}
+
+static void build_confirm_page(void)
+{
+    make_heading(install_mode == INSTALLER_MODE_UPDATE ? T("Review system update") : T("Review installation"), 8);
+    make_label(T("Check the target and planned changes. Use Back or the sidebar to change your choices."),
+        CONTENT_X, 46, CONTENT_W, 44, 14, 1);
+    char text[512];
+    if (install_mode == INSTALLER_MODE_UPDATE) {
+        summary_row(T("Target disk"), update_info.disk, 96, 30);
+        summary_row(T("System partition"), update_info.root_device, 130, 30);
+        summary_row(T("Boot partition"), update_info.esp_device, 164, 30);
+        snprintf(text, sizeof(text), "%s  →  %s", update_info.installed_version, update_info.media_version);
+        summary_row(T("Version"), text, 198, 52);
+        snprintf(text, sizeof(text), "BIOS: %s    UEFI: %s", setup.skip_bios ? T("Skip") : T("Install"),
+            setup.skip_uefi ? T("Skip") : T("Install"));
+        summary_row(T("Bootloaders"), text, 254, 30);
+        snprintf(text, sizeof(text), "%llu MiB / %llu MiB",
+            (unsigned long long)(update_info.free_bytes / (1024u * 1024u)),
+            (unsigned long long)((update_info.required_bytes + 1024u * 1024u - 1) / (1024u * 1024u)));
+        summary_row(T("Free / required space"), text, 288, 30);
+        make_label(T("Accounts, personal files, installed software and local configuration are preserved."),
+            CONTENT_X, 328, CONTENT_W, 48, 14, 1);
+        make_label(update_info.pending[0]
+            ? T("A previous update is incomplete. This attempt will verify the system and recover the pending update stages.")
+            : T("Signed packages are checked before changes. Boot files are published after the package transaction succeeds."),
+            CONTENT_X, 384, CONTENT_W, 68, 14, 1);
+        return;
+    }
+    if (selected_disk >= 0 && (uint32_t)selected_disk < disk_count) {
+        snprintf(text, sizeof(text), "%s\n", disks[selected_disk].path);
+        size_t used = strlen(text);
+        format_disk_line(text + used, sizeof(text) - used, &disks[selected_disk]);
+    } else text[0] = 0;
+    summary_row(T("Target disk"), text, 96, 48);
+    snprintf(text, sizeof(text), "%s    %s: %s", desktop_label(), T("User"), setup.username);
+    summary_row(T("System"), text, 148, 40);
+    snprintf(text, sizeof(text), "BIOS: %s    UEFI: %s",
+        setup.skip_bios ? T("Skip") : T("Install"), setup.skip_uefi ? T("Skip") : T("Install"));
+    summary_row(T("Bootloaders"), text, 192, 28);
+    if (setup.swap_enabled)
+        snprintf(text, sizeof(text), "%llu MiB", (unsigned long long)setup.swap_size_mib);
+    else copy_text(text, sizeof(text), T("Disabled"));
+    summary_row(T("Swap"), text, 224, 28);
+    make_label(T("Disk changes to apply"), CONTENT_X, 258, CONTENT_W, 22, 14, 0)->labelfont(FL_HELVETICA_BOLD);
+    static Fl_Text_Buffer plan_buffer;
+    static char changes[128u * 1024u];
+    review_plan_error = installer_partition_changes(changes, sizeof(changes)) < 0;
+    if (review_plan_error)
+        copy_text(changes, sizeof(changes), T("The disk plan could not be read. Return to Disk layout and review the target."));
+    plan_buffer.text(changes);
+    auto *changes_view = new Fl_Text_Display(CONTENT_X, 284, CONTENT_W, CONTENT_H - 384);
+    changes_view->buffer(plan_buffer);
+    changes_view->textfont(FL_HELVETICA);
+    changes_view->textsize(14);
+    changes_view->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+    reliefos_fltk::style(changes_view);
+    make_label(T("These disk changes cannot be undone. Type INSTALL to confirm."),
+        CONTENT_X, CONTENT_H - 92, CONTENT_W, 36, 14, 1);
+    confirm_input = new Fl_Input(CONTENT_X, CONTENT_H - 48, CONTENT_W / 2, 32);
+    confirm_input->value(confirm_text);
+    confirm_input->maximum_size((int)sizeof(confirm_text) - 1);
+    confirm_input->when(FL_WHEN_CHANGED | FL_WHEN_ENTER_KEY_ALWAYS);
+    confirm_input->callback(confirm_changed);
+    reliefos_fltk::style(confirm_input);
+}
+
+static void build_update_log(int y)
+{
+    make_label(T("Update details"), CONTENT_X, y, CONTENT_W, 22, 14, 0);
     if (!update_log_buffer) update_log_buffer = new Fl_Text_Buffer();
-    update_log_display = new Fl_Text_Display(CONTENT_X, y + 32, CONTENT_W, height);
+    update_log_display = new Fl_Text_Display(CONTENT_X, y + 28, CONTENT_W, CONTENT_H - y - 60);
     update_log_display->buffer(update_log_buffer);
     update_log_display->textfont(FL_HELVETICA);
     update_log_display->textsize(13);
@@ -1322,7 +1469,7 @@ static void build_update_log(int y, int height)
     reliefos_fltk::style(update_log_display);
     update_log_display->insert_position(update_log_buffer->length());
     update_log_display->show_insert_position();
-    make_label("/var/log/installer-update.log", CONTENT_X, y + height + 40, CONTENT_W, 22, 12, 0);
+    make_label("/var/log/installer-update.log", CONTENT_X, CONTENT_H - 26, CONTENT_W, 20, 12, 0);
 }
 
 static void build_progress_page(void)
@@ -1346,7 +1493,7 @@ static void build_progress_page(void)
                                       162, 72, 30, 14, 0);
     if (install_mode == INSTALLER_MODE_UPDATE) {
         update_activity_box = make_label(update_activity_text, CONTENT_X, 202, CONTENT_W, 82, 13, 1);
-        build_update_log(294, 218);
+        build_update_log(294);
     }
 }
 
@@ -1394,7 +1541,7 @@ static void build_finish_page(void)
     }
     if (install_mode == INSTALLER_MODE_UPDATE) {
         int activity = !install_success && *update_activity_text;
-        build_update_log(activity ? 300 : reboot_error ? 290 : 236, activity ? 200 : reboot_error ? 210 : 264);
+        build_update_log(activity ? 300 : reboot_error ? 290 : 236);
     }
 }
 
@@ -1404,6 +1551,9 @@ static void clear_page_widgets(void)
     update_root_choice = update_esp_choice = NULL;
     format_esp_checkbox = NULL;
     partition_browser = NULL;
+    for (int i = 0; i < 4; ++i) partition_edit_buttons[i] = nullptr;
+    partition_role_choice = nullptr;
+    partition_role_button = nullptr;
     confirm_input = NULL;
     desktop_choice = NULL;
     swap_size_input = NULL;
@@ -1424,16 +1574,21 @@ static void show_page(void)
 {
     if (!content_group) return;
     content_group->clear();
+    // clear() restores resizable(this); each page explicitly assigns the
+    // available space to its lists and text views, keeping every control visible.
+    content_group->resizable(nullptr);
+    content_group->resize(SIDEBAR_W, 0, main_window->w() - SIDEBAR_W, CONTENT_H);
     clear_page_widgets();
     content_group->begin();
     switch ((enum installer_page)page) {
     case INSTALLER_PAGE_LANGUAGE: build_language_page(); break;
     case INSTALLER_PAGE_LICENSE: build_license_page(); break;
-    case INSTALLER_PAGE_WELCOME: build_welcome_page(); break;
+    case INSTALLER_PAGE_WELCOME: build_mode_page(); break;
     case INSTALLER_PAGE_MODE: build_mode_page(); break;
     case INSTALLER_PAGE_DISK: build_disk_page(); break;
     case INSTALLER_PAGE_BOOTLOADERS: build_bootloader_page(); break;
     case INSTALLER_PAGE_PARTITIONS: build_partition_page(); break;
+    case INSTALLER_PAGE_SYSTEM: build_system_page(); break;
     case INSTALLER_PAGE_ACCOUNTS: build_accounts_page(); break;
     case INSTALLER_PAGE_CONFIRM: build_confirm_page(); break;
     case INSTALLER_PAGE_PROGRESS: build_progress_page(); break;
@@ -1441,6 +1596,7 @@ static void show_page(void)
     default: break;
     }
     content_group->end();
+    fprintf(stderr, "[installer.elf] page=%u mode=%u\n", (unsigned)page, (unsigned)install_mode);
     update_sidebar();
     update_footer();
     refresh_status_widgets();
@@ -1451,19 +1607,9 @@ static int app_event_handler(int event)
 {
     if (Fl::modal()) return 0;
     if (event == FL_SHORTCUT && Fl::event_key() == FL_Escape) {
-        cancel_setup(NULL, NULL);
+        if (installer_model_can_go_back((enum installer_page)page, install_success)) go_back(nullptr, nullptr);
+        else cancel_setup(nullptr, nullptr);
         return 1;
-    }
-    if (event == FL_KEYDOWN &&
-        (Fl::event_key() == FL_Enter || Fl::event_key() == FL_KP_Enter)) {
-        Fl_Widget *focus = Fl::focus();
-        int text_field = focus == confirm_input;
-        for (int i = 0; i < 5; ++i)
-            if (focus == account_inputs[i]) text_field = 1;
-        if (!text_field) {
-            go_primary();
-            return 1;
-        }
     }
     return 0;
 }
@@ -1479,68 +1625,104 @@ extern "C" void refresh_ui(void)
     Fl::flush();
 }
 
+static void sidebar_pressed(Fl_Widget *, void *data)
+{
+    auto target = (enum installer_page)(uintptr_t)data;
+    if (ui_busy || !installer_model_can_visit((enum installer_page)page, target,
+        (enum installer_mode)install_mode, install_success)) return;
+    reset_confirm();
+    page = target;
+    if (page == INSTALLER_PAGE_PARTITIONS) refresh_partitions();
+    schedule_render();
+}
+
+/* Reflow every page into the visible body. Only lists and document views scroll;
+ * navigation and form controls stay visible at the minimum window size. */
+class InstallerWindow : public Fl_Window {
+public:
+    Fl_Group *sidebar = nullptr;
+    Fl_Group *footer = nullptr;
+    InstallerWindow(int w, int h) : Fl_Window(w, h, T("Install ReliefOS")) {}
+    void resize(int x, int y, int w, int h) override {
+        int previous_width = this->w(), previous_height = this->h();
+        Fl_Window::resize(x, y, w, h);
+        if (!footer || !sidebar) return;
+        sidebar->resize(0, 0, SIDEBAR_W, h);
+        content_group->resize(SIDEBAR_W, 0, w - SIDEBAR_W, h - 80);
+        footer->resize(SIDEBAR_W, h - 80, w - SIDEBAR_W, 80);
+        back_button->resize(CONTENT_X, h - 56, 136, 38);
+        primary_button->resize(CONTENT_X + 154, h - 56, 148, 38);
+        cancel_button->resize(w - 160, h - 56, 136, 38);
+        CONTENT_W = w - CONTENT_X - 24;
+        CONTENT_H = h - 80;
+        if (w != previous_width || h != previous_height) schedule_render();
+    }
+};
+
 static int run_graphical(void)
 {
     COLOR_BG = fl_rgb_color(236, 238, 244);
     COLOR_TEXT = fl_rgb_color(34, 36, 46);
     COLOR_SIDEBAR = fl_rgb_color(59, 98, 166);
-    COLOR_ACTIVE = fl_rgb_color(255, 255, 255);
+    COLOR_ACTIVE = FL_WHITE;
     reliefos_fltk::init("installer");
-    main_window = new Fl_Window(WINDOW_W, WINDOW_H, T("Install ReliefOS"));
+    int width = Fl::w() < WINDOW_W + 24 ? Fl::w() - 24 : WINDOW_W;
+    int height = Fl::h() < WINDOW_H + 48 ? Fl::h() - 48 : WINDOW_H;
+    if (width < 768) width = 768;
+    if (height < 540) height = 540;
+    CONTENT_W = width - CONTENT_X - 24;
+    CONTENT_H = height - 80;
+    auto *window = new InstallerWindow(width, height);
+    main_window = window;
     main_window->color(COLOR_BG);
     main_window->callback(window_close);
-
-    Fl_Group *sidebar = new Fl_Group(0, 0, SIDEBAR_W, WINDOW_H);
+    window->sidebar = new Fl_Group(0, 0, SIDEBAR_W, height);
+    auto *sidebar = window->sidebar;
     sidebar->box(FL_FLAT_BOX);
     sidebar->color(COLOR_SIDEBAR);
-    sidebar->begin();
-    Fl_Box *brand = new Fl_Box(16, 18, SIDEBAR_W - 30, 30, "ReliefOS");
-    brand->box(FL_NO_BOX);
+    sidebar->resizable(nullptr);
+    auto *brand = new Fl_Box(16, 18, SIDEBAR_W - 30, 30, "ReliefOS");
     brand->labelfont(FL_HELVETICA_BOLD);
-    brand->labelsize(23);
+    brand->labelsize(22);
     brand->labelcolor(FL_WHITE);
     reliefos_fltk::style(brand);
     brand_setup = new Fl_Box(16, 48, SIDEBAR_W - 30, 24, T("Setup"));
-    brand_setup->box(FL_NO_BOX);
     brand_setup->labelsize(14);
     brand_setup->labelcolor(FL_WHITE);
     reliefos_fltk::style(brand_setup);
     for (int i = 0; i < INSTALLER_PAGE_COUNT; ++i) {
-        sidebar_rows[i] = new Fl_Box(12, 100 + i * 34, SIDEBAR_W - 24, 30, "");
+        sidebar_rows[i] = new Fl_Button(12, 100 + i * 34, SIDEBAR_W - 24, 30, "");
         sidebar_rows[i]->box(FL_FLAT_BOX);
+        sidebar_rows[i]->down_box(FL_FLAT_BOX);
         sidebar_rows[i]->align(FL_ALIGN_LEFT | FL_ALIGN_INSIDE);
-        sidebar_rows[i]->labelsize(14);
+        sidebar_rows[i]->labelsize(15);
         sidebar_rows[i]->labelcolor(FL_WHITE);
+        sidebar_rows[i]->callback(sidebar_pressed);
         reliefos_fltk::style(sidebar_rows[i]);
     }
     sidebar->end();
-
-    content_group = new Fl_Group(SIDEBAR_W, 0,
-                                 WINDOW_W - SIDEBAR_W, 620);
+    content_group = new Fl_Group(SIDEBAR_W, 0, width - SIDEBAR_W, height - 80);
     content_group->box(FL_FLAT_BOX);
     content_group->color(COLOR_BG);
+    content_group->resizable(nullptr);
     content_group->end();
-
-    Fl_Group *footer = new Fl_Group(SIDEBAR_W, 620,
-                                    WINDOW_W - SIDEBAR_W, WINDOW_H - 620);
-    footer->box(FL_FLAT_BOX);
-    footer->color(COLOR_BG);
-    footer->begin();
-    back_button = make_button(T("Previous Step"), CONTENT_X, 644, 136, 38,
-                              go_back, NULL);
-    primary_button = new Fl_Return_Button(CONTENT_X + 154, 644, 148, 38,
-                                          T("Next"));
+    window->footer = new Fl_Group(SIDEBAR_W, height - 80, width - SIDEBAR_W, 80);
+    window->footer->resizable(nullptr);
+    window->footer->box(FL_FLAT_BOX);
+    window->footer->color(COLOR_BG);
+    back_button = make_button(T("Previous Step"), CONTENT_X, height - 56, 136, 38, go_back, nullptr);
+    primary_button = new Fl_Return_Button(CONTENT_X + 154, height - 56, 148, 38, T("Next"));
     primary_button->callback(go_next);
     primary_button->labelsize(14);
     reliefos_fltk::style(primary_button);
-    cancel_button = make_button(T("Cancel"), WINDOW_W - 160, 644, 136, 38,
-                                cancel_setup, NULL);
-    footer->end();
-
-    main_window->end();
+    cancel_button = make_button(T("Cancel"), width - 160, height - 56, 136, 38, cancel_setup, nullptr);
+    window->footer->end();
+    window->resizable(content_group);
+    window->size_range(768, 540);
+    window->end();
     Fl::add_handler(app_event_handler);
     show_page();
-    main_window->show();
+    window->show();
     puts("[installer.elf] FLTK installer ready");
     fflush(stdout);
     return Fl::run();

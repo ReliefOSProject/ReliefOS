@@ -5,6 +5,27 @@ set -eu
 mode=$1; shift
 build_dir=$(CDPATH='' cd -- "$(dirname "$0")" && pwd -P)
 case $mode in
+squashfs)
+    [ "$#" = 3 ] || exit 2
+    stage=$1 output=$2 epoch=$3
+    [ -d "$stage" ] && [ -n "$output" ]
+    mkdir -p "$(dirname "$output")"
+    work=$(mktemp -d "$output.work.XXXXXX")
+    trap 'rm -rf "$work"' EXIT HUP INT TERM
+    cp -a "$stage" "$work/root"
+    find "$work/root" -print0 | xargs -0 touch -h -d "@$epoch"
+    # Preserve the same APK mode/owner restoration used by the old ext4 payload.
+    FAKEROOTDONTTRYCHOWN=1 fakeroot -- sh -eu -c '
+        find "$1" -exec chown -h 0:0 {} +
+        for profile in root root-console root-xfce; do
+            [ ! -d "$1/$profile" ] || sh "$4" "$1/$profile"
+        done
+        SOURCE_DATE_EPOCH="$3" mksquashfs "$1" "$2" -noappend -comp gzip -b 131072 \
+            -no-fragments -no-xattrs -no-exports -no-progress -processors 1
+    ' sh "$work/root" "$work/installer-payload.squashfs" "$epoch" "$build_dir/apk-permissions.sh"
+    touch -d "@$epoch" "$work/installer-payload.squashfs"
+    mv "$work/installer-payload.squashfs" "$output"
+    ;;
 ext2)
     [ "$#" = 4 ] || exit 2
     stage=$1 output=$2 epoch=$3 uuid=$4
@@ -18,7 +39,9 @@ ext2)
     count=$(find "$work/root" -printf '.\n' | wc -l)
     bytes=$(du -sb "$work/root" | cut -f1)
     mib=$(( (bytes + count * 8192 + 67108864 + 33554431) / 33554432 * 32 ))
-    [ "$mib" -ge 128 ] || mib=128
+    floor=${IMAGE_FLOOR_MIB:-128}
+    case $floor in ''|*[!0-9]*) echo 'IMAGE_FLOOR_MIB must be an integer' >&2; exit 2;; esac
+    [ "$mib" -ge "$floor" ] || mib=$floor
     minimum=${IMAGE_MIN_MIB:-0}
     case $minimum in ''|*[!0-9]*) echo 'IMAGE_MIN_MIB must be an integer' >&2; exit 2;; esac
     [ "$mib" -ge "$minimum" ] || mib=$minimum
@@ -45,6 +68,8 @@ ext4)
     [ "$#" = 4 ] || exit 2
     stage=$1 output=$2 epoch=$3 uuid=$4
     [ -d "$stage" ] && [ -n "$output" ] && [ -n "$uuid" ]
+    ram_root=${IMAGE_RAM_ROOT:-0}
+    case $ram_root in 0|1) ;; *) echo 'IMAGE_RAM_ROOT must be 0 or 1' >&2; exit 2;; esac
     mkdir -p "$(dirname "$output")"
     work=$(mktemp -d "$output.work.XXXXXX")
     trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -57,8 +82,15 @@ EOF
     bytes=$(du -sb "$work/root" | cut -f1)
     # du counts shared file data once. Reserve per-inode allocation overhead
     # once as well, and still account for every name in the directory tree.
-    mib=$(( (bytes + unique * 8192 + (count - unique) * 512 + 67108864 + 33554431) / 33554432 * 32 ))
-    [ "$mib" -ge 128 ] || mib=128
+    # The installer module must fit a contiguous firmware RAM allocation.
+    # Its smaller reserve covers a 4 KiB tail block, two 256-byte inodes and
+    # another 512 bytes of metadata; actual free space is checked before publish.
+    inode_reserve=8192
+    [ "$ram_root" = 0 ] || inode_reserve=5120
+    mib=$(( (bytes + unique * inode_reserve + (count - unique) * 512 + 67108864 + 33554431) / 33554432 * 32 ))
+    floor=${IMAGE_FLOOR_MIB:-128}
+    case $floor in ''|*[!0-9]*) echo 'IMAGE_FLOOR_MIB must be an integer' >&2; exit 2;; esac
+    [ "$mib" -ge "$floor" ] || mib=$floor
     minimum=${IMAGE_MIN_MIB:-0}
     case $minimum in ''|*[!0-9]*) echo 'IMAGE_MIN_MIB must be an integer' >&2; exit 2;; esac
     [ "$mib" -ge "$minimum" ] || mib=$minimum
@@ -78,6 +110,21 @@ EOF
     : "${reliefos_ext4_time:?ext4 timestamp tool required}"
     "$reliefos_ext4_time" "$work/root.ext4" "$epoch"
     e2fsck -f -n "$work/root.ext4"
+    if [ "$ram_root" = 1 ]; then
+        LC_ALL=C dumpe2fs -h "$work/root.ext4" > "$work/ext4-info"
+        free_bytes=$(awk '
+            $1 == "Free" && $2 == "blocks:" { blocks = $3; have_blocks = 1 }
+            $1 == "Block" && $2 == "size:" { size = $3; have_size = 1 }
+            END {
+                if (!have_blocks || !have_size || blocks < 0 || size <= 0) exit 1
+                printf "%.0f\n", blocks * size
+            }
+        ' "$work/ext4-info")
+        [ "$free_bytes" -ge 67108864 ] || {
+            echo "IMAGE_RAM_ROOT requires at least 64 MiB free (found $free_bytes bytes)" >&2
+            exit 1
+        }
+    fi
     mv "$work/root.ext4" "$output"
     ;;
 *) echo "unknown image operation: $mode" >&2; exit 2 ;;

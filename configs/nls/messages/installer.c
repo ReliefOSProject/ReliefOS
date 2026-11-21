@@ -26,4 +26,9 @@ static const char *const installer_indirect_messages[] = {
     N_("Ready"),
     N_("Rename"),
     N_("none"),
+    N_("Use as ESP"),
+    N_("Use as root"),
+    N_("New GPT"),
+    N_("Standard user name"),
+    N_("Standard user password"),
 };

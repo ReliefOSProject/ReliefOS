@@ -31,7 +31,7 @@ config DISK_INSTANCE_ID
 config INSTALLER_ROOT_SIZE_MIB
     int "Minimum installer runtime root size in MiB"
     range 32 4096
-    default 400
+    default 32
     help
       GRUB loads the complete installer root as a Multiboot module. It consumes
       guest RAM before userspace starts; the image builder may enlarge it to

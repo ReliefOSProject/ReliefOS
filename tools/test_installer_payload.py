@@ -6,6 +6,8 @@ import subprocess
 import tempfile
 import unittest
 
+from runtime_test_dependencies import INSTALLER_HOST_INCLUDES
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -25,8 +27,7 @@ class InstallerPayloadTests(unittest.TestCase):
         subprocess.run([
             "cc", "-std=gnu11", "-O1", "-g", "-fsanitize=address,undefined",
             "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections",
-            "-idirafter", "include", "-Ikernel/reliefnt/include",
-            "-Ikernel/reliefnt/include/uapi", "-idirafter", "userland/runtime/include",
+            *INSTALLER_HOST_INCLUDES,
             "tools/tests/installer_payload_test.c", model,
             "-o", str(cls.executable),
         ], cwd=ROOT, check=True)
