@@ -106,6 +106,21 @@ cp "$src/tools/build/installer-console-profile.sh" "$w/src/tools/build/installer
 APK_TOOL=fixture APK_UPSTREAM=fixture APK_DEPS_TOOL=fixture-deps APK_LOCK=fixture-lock \
  APK_OWN_TOOL=fixture APK_KEY=fixture APK_VERSION=fixture \
  sh "$src/tools/build/installer-stage.sh" "$w/src" "$w/out" "$w/raw" "$w/esp" "$w/stage" 1700000000
+APK_TOOL=fixture APK_UPSTREAM=fixture APK_DEPS_TOOL=fixture-deps APK_LOCK=fixture-lock \
+ APK_OWN_TOOL=fixture APK_KEY=fixture APK_VERSION=fixture \
+ sh "$src/tools/build/installer-stage.sh" "$w/src" "$w/out" "$w/raw" "$w/esp" "$w/stage-split" 1700000000 "$w/payload"
+for root in root root-console root-xfce; do
+    [ -d "$w/payload/$root" ] || {
+        echo "installer payload is missing $root" >&2
+        exit 1
+    }
+done
+[ -f "$w/payload/esp/reliefos/kernel.sys" ]
+[ -f "$w/payload/esp/grub/grub.cfg" ]
+[ ! -e "$w/stage-split/install" ] || {
+    echo 'installer payload was duplicated into the runtime root' >&2
+    exit 1
+}
 program=usr/lib/reliefos/apps/installer/installer.elf
 [ -x "$w/stage/$program" ] || { echo 'FAIL - installer executable missing from runtime package'; exit 1; }
 cmp "$w/out/userland/installer.elf" "$w/stage/$program"

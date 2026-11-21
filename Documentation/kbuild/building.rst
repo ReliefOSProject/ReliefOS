@@ -11,7 +11,7 @@ Clang 必须包含 x86_64 compiler-rt builtins。典型 Debian/Ubuntu 依赖为:
     sudo apt install build-essential clang lld llvm libclang-rt-dev \
         autoconf automake libtool libtool-bin pkg-config bison flex gperf gettext \
         texinfo libncurses-dev grub-common grub-efi-amd64-bin grub-pc-bin \
-        xorriso mtools dosfstools e2fsprogs libext2fs-dev fakeroot fdisk \
+        xorriso mtools dosfstools e2fsprogs squashfs-tools libext2fs-dev fakeroot fdisk \
         qemu-utils qemu-system-x86 ovmf zip curl xz-utils patch git
 
 HTML 文档另需 Sphinx，见 :doc:`../process/documentation`。Sphinx 仅服务文档；
@@ -40,6 +40,12 @@ HTML 文档另需 Sphinx，见 :doc:`../process/documentation`。Sphinx 仅服�
 根 Makefile 是受支持入口。fetch 是显式联网阶段，按锁文件校验摘要；
 内核缓存独立。普通构建缺缓存应报错，不暗中下载。第三方保留自己的上游构建系统。
 源码与公开头从各自所有者导出，不从历史 build 目录补齐。
+
+``make installer`` 使用 ``mksquashfs`` 生成 ``O/images/installer-payload.squashfs``，
+以 gzip 压缩并与可写的 ``installer-root.ext4`` 一起打入原路径的
+``O/images/reliefos-installer.iso``。此目标要求 ReliefNT 配置中保留默认的
+``CONFIG_SQUASHFS=y``。``CONFIG_INSTALLER_ROOT_SIZE_MIB`` 仅设置运行时 ext4 的容量
+下限，默认 32 MiB；构建仍根据运行时文件及预留空间自动增大该镜像。
 
 配置内核
 ========

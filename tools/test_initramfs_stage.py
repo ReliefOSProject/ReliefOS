@@ -53,18 +53,27 @@ class Initramfs(fixtures.ModulesStage):
         self.assertEqual(subprocess.run(["sh", str(ROOT / "system/initramfs/init")], capture_output=True).returncode, 77)
 
     def test_boot_command_policy(self):
-        script = '. "$1"; parse_cmdline "$2" || exit 3; printf "%s\\n" "$root" "$final_init" "$root_access" "$rootflags"'
+        script = ('. "$1"; parse_cmdline "$2" || exit 3; printf "%s\\n" '
+                  '"$root" "$final_init" "$root_access" "$rootflags" "payload=$installer_payload"')
         def parse(text):
             return subprocess.run(["sh", "-c", script, "policy", str(ROOT / "system/initramfs/functions"), text],
                                   text=True, capture_output=True)
         result = parse('root=PARTUUID=1234 init=/sbin/custom ro rootflags=noatime')
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout.splitlines(), ["PARTUUID=1234", "/sbin/custom", "ro", "noatime"])
+        self.assertEqual(result.stdout.splitlines(), ["PARTUUID=1234", "/sbin/custom", "ro", "noatime", "payload="])
         result = parse('root=/ mode=installer rdinit=/bin/sh init=/sbin/init rw')
         self.assertEqual(result.stdout.splitlines()[0], "/dev/ram0")
+        self.assertEqual(result.stdout.splitlines()[-1], "payload=")
+        result = parse('root=/ mode=installer reliefos.installer_payload=squashfs')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.splitlines()[-1], "payload=squashfs")
+        result = parse('root=/ mode=live reliefos.installer_payload=squashfs')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.splitlines()[-1], "payload=")
         self.assertEqual(parse('root="UUID=1234"').stdout.splitlines()[0], "UUID=1234")
         self.assertEqual(parse('root=/dev/sda3 root=/dev/nvme0n1p3 rw ro').stdout.splitlines()[2], "ro")
-        for invalid in ('root=PARTUUID=ok init=relative', 'root=../../dev/sda', 'root=/'):
+        for invalid in ('root=PARTUUID=ok init=relative', 'root=../../dev/sda', 'root=/',
+                        'mode=installer reliefos.installer_payload=unknown'):
             self.assertNotEqual(parse(invalid).returncode, 0)
 
     def test_partuuid_root_uses_canonical_hexadecimal_device_identity(self):

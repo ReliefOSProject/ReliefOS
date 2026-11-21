@@ -5,6 +5,27 @@ set -eu
 mode=$1; shift
 build_dir=$(CDPATH='' cd -- "$(dirname "$0")" && pwd -P)
 case $mode in
+squashfs)
+    [ "$#" = 3 ] || exit 2
+    stage=$1 output=$2 epoch=$3
+    [ -d "$stage" ] && [ -n "$output" ]
+    mkdir -p "$(dirname "$output")"
+    work=$(mktemp -d "$output.work.XXXXXX")
+    trap 'rm -rf "$work"' EXIT HUP INT TERM
+    cp -a "$stage" "$work/root"
+    find "$work/root" -print0 | xargs -0 touch -h -d "@$epoch"
+    # Preserve the same APK mode/owner restoration used by the old ext4 payload.
+    FAKEROOTDONTTRYCHOWN=1 fakeroot -- sh -eu -c '
+        find "$1" -exec chown -h 0:0 {} +
+        for profile in root root-console root-xfce; do
+            [ ! -d "$1/$profile" ] || sh "$4" "$1/$profile"
+        done
+        SOURCE_DATE_EPOCH="$3" mksquashfs "$1" "$2" -noappend -comp gzip -b 131072 \
+            -no-fragments -no-xattrs -no-exports -no-progress -processors 1
+    ' sh "$work/root" "$work/installer-payload.squashfs" "$epoch" "$build_dir/apk-permissions.sh"
+    touch -d "@$epoch" "$work/installer-payload.squashfs"
+    mv "$work/installer-payload.squashfs" "$output"
+    ;;
 ext2)
     [ "$#" = 4 ] || exit 2
     stage=$1 output=$2 epoch=$3 uuid=$4
@@ -18,7 +39,9 @@ ext2)
     count=$(find "$work/root" -printf '.\n' | wc -l)
     bytes=$(du -sb "$work/root" | cut -f1)
     mib=$(( (bytes + count * 8192 + 67108864 + 33554431) / 33554432 * 32 ))
-    [ "$mib" -ge 128 ] || mib=128
+    floor=${IMAGE_FLOOR_MIB:-128}
+    case $floor in ''|*[!0-9]*) echo 'IMAGE_FLOOR_MIB must be an integer' >&2; exit 2;; esac
+    [ "$mib" -ge "$floor" ] || mib=$floor
     minimum=${IMAGE_MIN_MIB:-0}
     case $minimum in ''|*[!0-9]*) echo 'IMAGE_MIN_MIB must be an integer' >&2; exit 2;; esac
     [ "$mib" -ge "$minimum" ] || mib=$minimum
@@ -58,7 +81,9 @@ EOF
     # du counts shared file data once. Reserve per-inode allocation overhead
     # once as well, and still account for every name in the directory tree.
     mib=$(( (bytes + unique * 8192 + (count - unique) * 512 + 67108864 + 33554431) / 33554432 * 32 ))
-    [ "$mib" -ge 128 ] || mib=128
+    floor=${IMAGE_FLOOR_MIB:-128}
+    case $floor in ''|*[!0-9]*) echo 'IMAGE_FLOOR_MIB must be an integer' >&2; exit 2;; esac
+    [ "$mib" -ge "$floor" ] || mib=$floor
     minimum=${IMAGE_MIN_MIB:-0}
     case $minimum in ''|*[!0-9]*) echo 'IMAGE_MIN_MIB must be an integer' >&2; exit 2;; esac
     [ "$mib" -ge "$minimum" ] || mib=$minimum

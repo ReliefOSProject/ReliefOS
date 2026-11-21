@@ -113,7 +113,7 @@ fi
 
 group ''
 group 'image and run tools (needed by the image and run phases)'
-for tool in mke2fs e2fsck mkfs.fat mformat mcopy xorriso qemu-img qemu-system-x86_64 grub-mkfont sfdisk fakeroot openssl zip; do
+for tool in mke2fs e2fsck mksquashfs mkfs.fat mformat mcopy xorriso qemu-img qemu-system-x86_64 grub-mkfont sfdisk fakeroot openssl zip; do
     check_tool "$tool"
 done
 image_probe=$(mktemp -d)

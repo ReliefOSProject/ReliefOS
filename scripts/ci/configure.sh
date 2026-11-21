@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-size=${INSTALLER_ROOT_SIZE_MIB:-400}
+size=${INSTALLER_ROOT_SIZE_MIB:-32}
 if ! [[ "$size" =~ ^[0-9]{1,4}$ ]] || (( 10#$size < 32 || 10#$size > 4096 )); then
   echo 'installer_root_size_mib must be an integer from 32 to 4096' >&2
   exit 2
