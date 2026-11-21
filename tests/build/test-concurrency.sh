@@ -19,8 +19,8 @@ failures=0
 checks=0
 
 cleanup() {
+    kill $held_pids 2>/dev/null
     if [ -z "${KEEP_WORK:-}" ]; then
-        kill $held_pids 2>/dev/null
         rm -rf "$work"
     fi
 }
@@ -42,18 +42,48 @@ expect_ok() {
     if [ "$1" -eq 0 ]; then pass "$2"; else fail "$2" "exit status $1"; fi
 }
 
-# A build that starts `hold` seconds before `contend` on the same output
-# directory. The older make is the one that must win, so the two roles are never
-# interchangeable in the assertions below.
+# The older make must already own the output directory when the contender and
+# read-only invocations start. A fixture prerequisite holds it at an observable
+# ready point until all three read-only checks have finished.
 same_o="$work/same"
 other_a="$work/different-a"
 other_b="$work/different-b"
 
 printf '=== A09: two top-level makes on one output directory ===\n'
-make -s O="$same_o" kernel >"$work/owner.log" 2>&1 &
+# Inspection requires an initialized configuration. Slow host-tool compilation
+# must not turn this lock test into an unrelated missing-.config failure.
+if make -s O="$same_o" defconfig >"$work/setup.log" 2>&1; then
+    pass 'the shared output configuration is ready for inspection'
+else
+    fail 'the shared output configuration is ready for inspection'
+    tail -n 15 "$work/setup.log" | sed 's/^/       | /'
+    exit 1
+fi
+
+mkfifo "$work/owner-release" || exit 1
+# Opening both ends prevents the release write from blocking if the owner
+# exits unexpectedly; the ready wait below still reports that as a failure.
+exec 3<>"$work/owner-release"
+cat >"$work/owner-gate.mk" <<MAKE
+.PHONY: fixture-owner-ready
+__kbuild: fixture-owner-ready
+fixture-owner-ready:
+	@touch '$work/owner-ready'
+	@read release < '$work/owner-release'
+MAKE
+make -s -f "$repo_root/Makefile" -f "$work/owner-gate.mk" O="$same_o" kernel >"$work/owner.log" 2>&1 &
 owner_pid=$!
 held_pids="$held_pids $owner_pid"
-sleep 3
+ready_polls=0
+while [ ! -f "$work/owner-ready" ]; do
+    ready_polls=$((ready_polls + 1))
+    if ! kill -0 "$owner_pid" 2>/dev/null || [ "$ready_polls" -ge 600 ]; then
+        fail 'the older make reaches its ready point while holding the lock'
+        tail -n 15 "$work/owner.log" | sed 's/^/       | /'
+        exit 1
+    fi
+    sleep .05
+done
 
 make -s O="$same_o" kernel >"$work/contender.log" 2>&1 &
 contender_pid=$!
@@ -67,8 +97,10 @@ help_status=$?
 make -s O="$same_o" doctor >"$work/doctor.log" 2>&1
 doctor_status=$?
 
-wait "$owner_pid"; owner_status=$?
 wait "$contender_pid"; contender_status=$?
+printf 'release\n' >&3
+exec 3>&-
+wait "$owner_pid"; owner_status=$?
 
 if [ "$owner_status" -eq 0 ]; then
     pass 'the older make completes the build'

@@ -309,8 +309,11 @@ def test_guest_iso(args: argparse.Namespace) -> None:
 
 
 def digest(path: Path) -> str:
+    digestor = hashlib.sha256()
     with path.open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digestor.update(chunk)
+    return digestor.hexdigest()
 
 
 GUEST_BEGIN = "--- guest evidence (recorded by the last --guest run"

@@ -25,6 +25,9 @@ int installer_partition_plan_default(const struct reliefos_block_disk_info *disk
 /** @brief Revalidate geometry and replace the selected unmounted disk's GPT. */
 int installer_partition_apply_default(const char *disk_path,
                                       const struct installer_partition_plan *plan);
+/* Clear the confirmed, unformatted BIOS Boot extent after table publication. */
+int installer_partition_clear_bios(const char *disk_path,
+                                    const struct installer_partition_extent *bios);
 #ifdef __cplusplus
 }
 #endif

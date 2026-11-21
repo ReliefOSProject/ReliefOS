@@ -6,8 +6,12 @@
 # selected by console-session and started by system/xorg/installer-session.
 set -eu
 . "$(CDPATH= cd -- "$(dirname "$0")/../../scripts" && pwd)/logging.sh"
-[ "$#" = 6 ] || { echo 'usage: installer-stage SRC O RAW_ROOT ESP OUTPUT EPOCH' >&2; exit 2; }
+[ "$#" = 6 ] || [ "$#" = 7 ] || {
+    echo 'usage: installer-stage SRC O RAW_ROOT ESP OUTPUT EPOCH [PAYLOAD_STAGE]' >&2
+    exit 2
+}
 src=$1 out=$2 raw=$3 esp=$4 output=$5 epoch=$6
+payload=${7:-}
 : "${APK_TOOL:?}" "${APK_UPSTREAM:?}" "${APK_OWN_TOOL:?}" "${APK_KEY:?}" "${APK_VERSION:?}"
 for path in usr/sbin/reliefos-boot-install usr/sbin/grub-install \
     usr/sbin/grub-bios-setup usr/sbin/grub-probe usr/bin/grub-mkimage \
@@ -80,12 +84,23 @@ package_root "$work/runtime-raw" "$work/runtime" "$out/packages/apk-installer-ru
     echo 'installer runtime package is missing installer.elf' >&2
     exit 1
 }
-mkdir -p "$work/runtime/install"
+if [ -n "$payload" ]; then
+    mkdir -p "$work/payload"
+else
+    mkdir -p "$work/runtime/install"
+fi
 reliefos_log STAGE 'installer payload and ESP'
-mv "$work/installed" "$work/runtime/install/root"
-mv "$work/console-installed" "$work/runtime/install/root-console"
-mv "$work/xfce-installed" "$work/runtime/install/root-xfce"
-cp -a "$esp" "$work/runtime/install/esp"
+if [ -n "$payload" ]; then
+    mv "$work/installed" "$work/payload/root"
+    mv "$work/console-installed" "$work/payload/root-console"
+    mv "$work/xfce-installed" "$work/payload/root-xfce"
+    cp -a "$esp" "$work/payload/esp"
+else
+    mv "$work/installed" "$work/runtime/install/root"
+    mv "$work/console-installed" "$work/runtime/install/root-console"
+    mv "$work/xfce-installed" "$work/runtime/install/root-xfce"
+    cp -a "$esp" "$work/runtime/install/esp"
+fi
 "${INSTALLER_DEDUP_TOOL:-$out/host/bin/reliefos-dedup}" "$work/runtime"
 find "$work/runtime" -exec touch -h -d "@$epoch" {} +
 if [ -d "$output.previous" ] && [ ! -e "$output" ]; then mv "$output.previous" "$output"; fi
@@ -93,3 +108,14 @@ rm -rf "$output.previous"
 if [ -e "$output" ]; then mv "$output" "$output.previous"; fi
 mv "$work/runtime" "$output"
 rm -rf "$output.previous"
+if [ -n "$payload" ]; then
+    mkdir -p "$(dirname "$payload")"
+    find "$work/payload" -exec touch -h -d "@$epoch" {} +
+    if [ -d "$payload.previous" ] && [ ! -e "$payload" ]; then
+        mv "$payload.previous" "$payload"
+    fi
+    rm -rf "$payload.previous"
+    if [ -e "$payload" ]; then mv "$payload" "$payload.previous"; fi
+    mv "$work/payload" "$payload"
+    rm -rf "$payload.previous"
+fi

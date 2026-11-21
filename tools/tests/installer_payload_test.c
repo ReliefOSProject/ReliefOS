@@ -1,9 +1,4 @@
 #define _GNU_SOURCE
-#include <linux/mount.h>
-#undef MNT_FORCE
-#undef MNT_DETACH
-#undef MNT_EXPIRE
-#undef UMOUNT_NOFOLLOW
 #include <sys/mount.h>
 #define lstat fixture_lstat
 #define fopen fixture_fopen

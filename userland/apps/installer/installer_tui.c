@@ -88,7 +88,12 @@ int tui_open(void)
 
 void tui_close(void)
 {
-    if (terminal_screen) { endwin(); delscreen(terminal_screen); terminal_screen = NULL; }
+    if (terminal_screen) {
+        /* ncurses keeps a search tree for initialized color pairs. Release it
+         * before destroying the screen, as well as restoring terminal modes. */
+        if (has_colors()) reset_color_pairs();
+        endwin(); delscreen(terminal_screen); terminal_screen = NULL;
+    }
     while (signals_installed) {
         --signals_installed;
         sigaction(handled_signals[signals_installed], &old_signals[signals_installed], NULL);
@@ -260,7 +265,7 @@ static void partition_table(WINDOW *window, int row, int width, int height,
     partition_map(window, row + 1, width, table);
     clipped(window, row + 2, 0, width, T("B BIOS  E ESP  R /  D Data  . Free"));
     clipped(window, row + 3, 0, width, table->preview
-        ? T("Pending layout - written only after INSTALL confirmation.") : T("Current disk layout"));
+        ? T("Pending layout - written only after INSTALL confirmation.") : T("Installation layout - changes remain pending"));
     int widths[] = {width >= 80 ? 20 : width >= 65 ? 18 : 14,
         width >= 65 ? 11 : 9, 10, width >= 80 ? 14 : width >= 65 ? 12 : 9, 0};
     widths[4] = width - widths[0] - widths[1] - widths[2] - widths[3] - 4;

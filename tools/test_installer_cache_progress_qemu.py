@@ -8,7 +8,9 @@ import subprocess
 import time
 
 from test_dual_boot_qemu import boot, copy_disk, digest, wait_for
-from test_installer_accounts_qemu import next_page, wait_installer_sidebar
+from test_installer_accounts_qemu import (
+    next_page, select_installation_mode, wait_installer_sidebar,
+)
 from test_vt_qemu import ocr
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -77,14 +79,9 @@ def main():
         wait_for(serial, process, lambda text: "path=/usr/lib/reliefos/apps/installer/installer.elf" in text,
                  "native installer", 180)
         wait_installer_sidebar(probe, process, "language")
-        if probe.sidebar_bottom - probe.sidebar_top < 680:
-            probe.key("alt-f10")
-            time.sleep(1)
-            probe.clear_installer_geometry()
-            wait_installer_sidebar(probe, process, "language-maximized")
-        for page in (1, 2, 3):
+        for page in (1, 3):
             next_page(probe, page)
-        probe.click(*probe.mode_option_point(update=True))
+        select_installation_mode(probe, update=True)
         next_page(probe, 4)
         probe.click(*probe.disk_selection_point())
         probe.click(*probe.footer_point())
@@ -93,9 +90,10 @@ def main():
             assert process.poll() is None
             frame = probe.frame("checking")
             page = probe.visible_page(frame)
-            if page == 5:  # Update has a compact sidebar: confirmation follows disk.
+            if page == 4 and "ready to update" in ocr(frame).lower():
+                next_page(probe, 8)
                 break
-            if page == 7:
+            if page == 10:
                 raise AssertionError("Update checks failed: " + guest_log(probe, serial, process)[-6000:])
             time.sleep(2)
         else:
@@ -107,11 +105,10 @@ def main():
             assert process.poll() is None
             frame = probe.frame("update-progress")
             page = probe.visible_page(frame)
-            if page == 7:
+            if page == 10:
                 break
-            if page == 6:
-                details = frame.crop((probe.content_left, probe.sidebar_top + 202,
-                                      min(frame.width, probe.content_left + 790), probe.sidebar_top + 286))
+            if page == 9:
+                details = frame.crop(probe.update_activity_box())
                 text = ocr(details)
                 with (output / "activity-observations.txt").open("a") as stream:
                     stream.write(text + "\n---\n")

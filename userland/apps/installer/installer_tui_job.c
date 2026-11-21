@@ -50,16 +50,11 @@ static int execute(const struct installer_tty_context *context, struct tui_job *
         return installer_update_apply(&job->info,
             (context->setup->skip_bios ? 0 : 1u) | (context->setup->skip_uefi ? 0 : 2u),
             result, update_progress, result);
-    case TUI_JOB_AUTO: return context->partition_auto_layout();
-    case TUI_JOB_INIT: return context->partition_initialize();
-    case TUI_JOB_CREATE: return context->partition_create(job->filesystem, job->size, job->name);
-    case TUI_JOB_RESIZE: return context->partition_resize(job->size);
-    case TUI_JOB_RENAME: return context->partition_rename(job->name);
-    case TUI_JOB_FORMAT: return context->partition_format(job->filesystem, job->name);
-    case TUI_JOB_DELETE: return context->partition_delete();
-    case TUI_JOB_ROLE: return context->partition_set_type(job->role);
+    default:
+        /* Draft partition edits belong to the UI process. A worker would
+         * discard their memory when it exits, so refuse that misuse. */
+        return -EINVAL;
     }
-    return -EINVAL;
 }
 
 struct run_context {
@@ -103,7 +98,8 @@ int tui_run_job(const struct installer_tty_context *context, struct tui_job *job
     while ((result = installer_job_step(&state)) > 0) {
         const struct installer_job_packet *packet = &state.latest;
         unsigned progress = packet->progress > 100 ? 100 : packet->progress;
-        tui_begin(&view, T("Operation in progress"));
+        tui_begin(&view, job->kind == TUI_JOB_CHECK ? T("Checking installed system")
+            : installer_model_page_title(INSTALLER_PAGE_PROGRESS, *context->install_mode));
         char bar[96], fill[51];
         memset(fill, ' ', 50);
         memset(fill, '#', progress / 2);

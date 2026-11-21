@@ -90,7 +90,11 @@ static FILE *fixture_mounts(const char *path, const char *mode)
     (void)path; (void)mode;
     static char text[128];
     snprintf(text, sizeof(text), "%s /target ext4 rw 0 0\n", mount_source);
-    return fmemopen(text, mounted ? strlen(text) : 0, "r");
+    FILE *stream = tmpfile();
+    assert(stream);
+    if (mounted) assert(fputs(text, stream) >= 0);
+    rewind(stream);
+    return stream;
 }
 
 /** @brief Exercise the shared planner and production GPT writer on an owned image. */

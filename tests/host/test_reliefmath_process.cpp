@@ -6,6 +6,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -70,16 +71,27 @@ bool send_artifact(const rm::Frame &identity, rm::ArtifactType type,
     return send_frame(rm::Kind::ArtifactEnd, identity);
 }
 
+bool publish_worker_pid() {
+    const char *marker = getenv("RM_TEST_WORKER_PID_FILE");
+    if (!marker || !*marker) return false;
+
+    // The final path signals readiness, so publish it only after flushing the PID.
+    const std::string staging = std::string(marker) + ".tmp";
+    FILE *file = fopen(staging.c_str(), "w");
+    if (!file) return false;
+    const bool written = fprintf(file, "%ld\n", static_cast<long>(getpid())) > 0;
+    const bool closed = fclose(file) == 0;
+    if (written && closed && rename(staging.c_str(), marker) == 0) return true;
+    unlink(staging.c_str());
+    return false;
+}
+
 int fake_worker() {
     const char *mode_value = getenv("RM_TEST_WORKER_MODE");
     const char *mode = mode_value ? mode_value : "normal";
     if (strcmp(mode, "crash-immediate") == 0) return 17;
     if (strcmp(mode, "start-marker") == 0) {
-        const char *path = getenv("RM_TEST_WORKER_PID_FILE");
-        if (path) {
-            FILE *file = fopen(path, "w");
-            if (file) { fprintf(file, "%ld\n", static_cast<long>(getpid())); fclose(file); }
-        }
+        if (!publish_worker_pid()) return fake_failure(20);
         for (;;) pause();
     }
     if (strcmp(mode, "sleep-before-read") == 0) sleep(11);
@@ -132,11 +144,7 @@ int fake_worker() {
 
     if (strcmp(mode, "crash") == 0) return 23;
     if (strcmp(mode, "ignore-cancel") == 0) {
-        const char *path = getenv("RM_TEST_WORKER_PID_FILE");
-        if (path) {
-            FILE *file = fopen(path, "w");
-            if (file) { fprintf(file, "%ld\n", static_cast<long>(getpid())); fclose(file); }
-        }
+        if (!publish_worker_pid()) return fake_failure(20);
         for (;;) pause();
     }
 
@@ -230,6 +238,20 @@ void set_mode(const char *mode) {
     assert(setenv("RM_TEST_WORKER_MODE", mode, 1) == 0);
 }
 
+pid_t wait_for_worker_pid(const char *marker, rm::RenderClient *client = nullptr) {
+    for (unsigned i = 0; i < 1000 && access(marker, F_OK) != 0; ++i) {
+        if (client) client->pump();
+        usleep(1000);
+    }
+    FILE *file = fopen(marker, "r");
+    assert(file);
+    long child = 0;
+    assert(fscanf(file, "%ld", &child) == 1);
+    assert(fclose(file) == 0);
+    assert(child > 0);
+    return static_cast<pid_t>(child);
+}
+
 void test_large_source_and_maximum_rgba_chunks_survive_pipe_backpressure(const char *path) {
     set_mode("slow-read");
     rm::RenderClient client;
@@ -270,13 +292,8 @@ void test_svg_png_and_rgba_streams_are_reassembled_independently(const char *pat
     assert(rendered.raster.rgba.size() == 256u * 256u * 4u);
 }
 
-void test_busy_submit_replaces_old_snapshot_and_cancels_only_owned_worker(const char *path) {
-    char marker[] = "/tmp/reliefmath-worker-pid.XXXXXX";
-    int marker_fd = mkstemp(marker);
-    assert(marker_fd >= 0);
-    close(marker_fd);
-    unlink(marker);
-    assert(setenv("RM_TEST_WORKER_PID_FILE", marker, 1) == 0);
+void test_busy_submit_replaces_old_snapshot_and_cancels_only_owned_worker(
+    const char *path, const char *marker) {
     set_mode("ignore-cancel");
 
     rm::RenderClient client;
@@ -284,16 +301,7 @@ void test_busy_submit_replaces_old_snapshot_and_cancels_only_owned_worker(const 
     assert(client.start(path, error));
     rm::Snapshot stale = make_snapshot(10);
     assert(client.submit(stale, error));
-    for (unsigned i = 0; i < 1000 && access(marker, F_OK) != 0; ++i) {
-        client.pump();
-        usleep(1000);
-    }
-    assert(access(marker, F_OK) == 0);
-    FILE *file = fopen(marker, "r");
-    assert(file);
-    long child = 0;
-    assert(fscanf(file, "%ld", &child) == 1);
-    fclose(file);
+    const pid_t child = wait_for_worker_pid(marker, &client);
 
     set_mode("normal");
     rm::Snapshot latest = make_snapshot(11);
@@ -304,22 +312,16 @@ void test_busy_submit_replaces_old_snapshot_and_cancels_only_owned_worker(const 
     assert(rendered.request_id == latest.request_id);
     assert(rendered.snapshot.formula.source == latest.formula.source);
     for (unsigned i = 0; i < 1000; ++i) {
-        if (kill(static_cast<pid_t>(child), 0) < 0 && errno == ESRCH) break;
+        if (kill(child, 0) < 0 && errno == ESRCH) break;
         client.pump();
         usleep(1000);
     }
-    assert(kill(static_cast<pid_t>(child), 0) < 0 && errno == ESRCH);
-    unlink(marker);
-    unsetenv("RM_TEST_WORKER_PID_FILE");
+    assert(kill(child, 0) < 0 && errno == ESRCH);
+    assert(unlink(marker) == 0);
 }
 
-void test_explicit_cancel_reports_cancelled_and_reaps_only_its_worker(const char *path) {
-    char marker[] = "/tmp/reliefmath-worker-cancel.XXXXXX";
-    int marker_fd = mkstemp(marker);
-    assert(marker_fd >= 0);
-    close(marker_fd);
-    unlink(marker);
-    assert(setenv("RM_TEST_WORKER_PID_FILE", marker, 1) == 0);
+void test_explicit_cancel_reports_cancelled_and_reaps_only_its_worker(
+    const char *path, const char *marker) {
     set_mode("ignore-cancel");
 
     rm::RenderClient client;
@@ -327,16 +329,7 @@ void test_explicit_cancel_reports_cancelled_and_reaps_only_its_worker(const char
     assert(client.start(path, error));
     rm::Snapshot snapshot = make_snapshot(15);
     assert(client.submit(snapshot, error));
-    for (unsigned i = 0; i < 1000 && access(marker, F_OK) != 0; ++i) {
-        client.pump();
-        usleep(1000);
-    }
-    assert(access(marker, F_OK) == 0);
-    FILE *file = fopen(marker, "r");
-    assert(file);
-    long child = 0;
-    assert(fscanf(file, "%ld", &child) == 1);
-    fclose(file);
+    const pid_t child = wait_for_worker_pid(marker, &client);
 
     client.cancel();
     assert(!client.busy());
@@ -345,13 +338,12 @@ void test_explicit_cancel_reports_cancelled_and_reaps_only_its_worker(const char
     assert(error.code == rm::Code::Cancelled);
     assert(rendered.request_id == snapshot.request_id);
     for (unsigned i = 0; i < 1000; ++i) {
-        if (kill(static_cast<pid_t>(child), 0) < 0 && errno == ESRCH) break;
+        if (kill(child, 0) < 0 && errno == ESRCH) break;
         client.pump();
         usleep(1000);
     }
-    assert(kill(static_cast<pid_t>(child), 0) < 0 && errno == ESRCH);
-    unlink(marker);
-    unsetenv("RM_TEST_WORKER_PID_FILE");
+    assert(kill(child, 0) < 0 && errno == ESRCH);
+    assert(unlink(marker) == 0);
 }
 
 void test_crashing_worker_is_bounded_and_a_later_request_can_start(const char *path) {
@@ -481,46 +473,37 @@ void test_worker_stdio_survives_closed_parent_standard_fds(const char *path) {
     assert(WIFEXITED(status) && WEXITSTATUS(status) == 0);
 }
 
-void test_start_launches_worker_without_waiting(const char *path) {
-    char marker[] = "/tmp/reliefmath-worker-start.XXXXXX";
-    int marker_fd = mkstemp(marker);
-    assert(marker_fd >= 0);
-    close(marker_fd);
-    unlink(marker);
-    assert(setenv("RM_TEST_WORKER_PID_FILE", marker, 1) == 0);
+void test_start_launches_worker_without_waiting(const char *path, const char *marker) {
     set_mode("start-marker");
 
-    long child = 0;
+    pid_t child = -1;
     {
         rm::RenderClient client;
         rm::Error error;
         assert(client.start(path, error));
         assert(!client.busy());
-        for (unsigned i = 0; i < 1000 && access(marker, F_OK) != 0; ++i) usleep(1000);
-        assert(access(marker, F_OK) == 0);
-        FILE *file = fopen(marker, "r");
-        assert(file);
-        assert(fscanf(file, "%ld", &child) == 1);
-        fclose(file);
+        // Do not pump the client: the worker must start on its own.
+        child = wait_for_worker_pid(marker);
     }
-    assert(child > 0);
-    assert(kill(static_cast<pid_t>(child), 0) < 0 && errno == ESRCH);
-    unlink(marker);
-    unsetenv("RM_TEST_WORKER_PID_FILE");
+    assert(kill(child, 0) < 0 && errno == ESRCH);
+    assert(unlink(marker) == 0);
 }
 
 } // namespace
 
 int main(int argc, char **argv) {
     if (argc == 2 && strcmp(argv[1], "--render-worker") == 0) return fake_worker();
+    assert(argc == 2);
+    const char *marker = argv[1];
+    assert(setenv("RM_TEST_WORKER_PID_FILE", marker, 1) == 0);
     signal(SIGPIPE, SIG_DFL);
     char executable[4096];
     assert(realpath(argv[0], executable));
-    test_start_launches_worker_without_waiting(executable);
+    test_start_launches_worker_without_waiting(executable, marker);
     test_large_source_and_maximum_rgba_chunks_survive_pipe_backpressure(executable);
     test_svg_png_and_rgba_streams_are_reassembled_independently(executable);
-    test_explicit_cancel_reports_cancelled_and_reaps_only_its_worker(executable);
-    test_busy_submit_replaces_old_snapshot_and_cancels_only_owned_worker(executable);
+    test_explicit_cancel_reports_cancelled_and_reaps_only_its_worker(executable, marker);
+    test_busy_submit_replaces_old_snapshot_and_cancels_only_owned_worker(executable, marker);
     test_crashing_worker_is_bounded_and_a_later_request_can_start(executable);
     test_out_of_order_frames_fail_as_protocol_error(executable);
     test_mismatched_identity_is_rejected(executable);

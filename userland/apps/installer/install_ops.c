@@ -15,6 +15,7 @@
 #include "installer_directory.h"
 #include "installer_setup.h"
 #include "installer_partitions.h"
+#include "installer_plan.h"
 #include "installer_capacity.h"
 #include "installer_swap.h"
 #include "../../auth/standard_accounts.h"
@@ -51,7 +52,8 @@ int32_t installer_root_partition = -1;
 int32_t installer_esp_partition = -1;
 uint8_t installer_partition_auto = 1;
 uint8_t installer_partition_table_replaced;
-static char partition_disk_path[RELIEFOS_BLOCK_PATH_LEN];
+static struct installer_disk_plan partition_draft;
+static int partition_draft_error;
 char confirm_text[16];
 struct installer_setup setup;
 char status_text[128] = "Ready";
@@ -104,6 +106,44 @@ static struct reliefos_boot_install_options installer_boot_options(void)
         .progress_context = &boot_last_present,
         .root_partuuid = installer_root_uuid,
     };
+}
+
+/** @brief Preflight a confirmed fresh plan, including replacement of an invalid GPT.
+ * An invalid physical table is allowed only when the checked draft replaces it.
+ * The shared validator already checked whole-disk ownership, media and read-only
+ * state before rejecting that table. Inspect every possible partition node as
+ * well: the invalid GPT cannot supply the usual media-device ownership list.
+ */
+static int installer_boot_disk_preflight(const struct reliefos_boot_install_options *boot)
+{
+    int result = reliefos_boot_validate_disk(boot, 0);
+    if (result != -EINVAL || !partition_draft.loaded ||
+        (!installer_partition_auto &&
+         (!partition_draft.operation_count ||
+          partition_draft.operations[0].kind != INSTALLER_PLAN_INITIALIZE)))
+        return result;
+    struct reliefos_block_partition current[RELIEFOS_BLOCK_MAX_PARTITIONS];
+    uint32_t count = 0;
+    int table_error = reliefos_block_list_partitions(boot->disk_path, current,
+        RELIEFOS_BLOCK_MAX_PARTITIONS, &count);
+    if (table_error != -EINVAL) return table_error ? table_error : result;
+    result = installer_plan_check(&partition_draft);
+    if (result) return result;
+    struct stat source;
+    if (stat(boot->source, &source) < 0) return -errno;
+    for (uint32_t index = 0; index < RELIEFOS_BLOCK_MAX_PARTITIONS; ++index) {
+        char path[RELIEFOS_BLOCK_PATH_LEN];
+        result = reliefos_block_partition_path(boot->disk_path, index, path, sizeof(path));
+        if (result) return result;
+        struct stat partition;
+        if (lstat(path, &partition) < 0) {
+            if (errno == ENOENT) continue;
+            return -errno;
+        }
+        if (!S_ISBLK(partition.st_mode)) return -ENOTBLK;
+        if (source.st_dev == partition.st_rdev) return -EBUSY;
+    }
+    return 0;
 }
 
 static const char *fresh_root_payload(void)
@@ -293,51 +333,123 @@ static int partition_at_selection(struct reliefos_block_partition **out)
     return 0;
 }
 
-void refresh_partitions(void)
+static void publish_partition_draft(void)
 {
     int32_t previous_index = -1;
-    int disk_changed = selected_disk < 0 ||
-        (uint32_t)selected_disk >= disk_count ||
-        !text_eq(partition_disk_path, disks[selected_disk].path);
-    if (disk_changed) {
-        installer_partition_auto = 1;
-        selected_partition = -1;
-        installer_root_partition = -1;
-        installer_esp_partition = -1;
-        installer_partition_table_replaced = 0;
-        setup.format_esp = 0;
-        partition_disk_path[0] = 0;
-        if (selected_disk >= 0 && (uint32_t)selected_disk < disk_count)
-            copy_text(partition_disk_path, sizeof(partition_disk_path),
-                      disks[selected_disk].path);
-    } else if (selected_partition >= 0 && (uint32_t)selected_partition < partition_count) {
+    if (selected_partition >= 0 && (uint32_t)selected_partition < partition_count)
         previous_index = (int32_t)partitions[selected_partition].index;
-    }
-    partition_count = 0;
+    partition_count = partition_draft.loaded ? partition_draft.count : 0;
+    memcpy(partitions, partition_draft.parts, partition_count * sizeof(partitions[0]));
     selected_partition = -1;
+    int root_seen = 0, esp_seen = 0;
+    for (uint32_t i = 0; i < partition_count; ++i) {
+        if ((int32_t)partitions[i].index == previous_index) selected_partition = (int32_t)i;
+        if ((int32_t)partitions[i].index == installer_root_partition) root_seen = 1;
+        if ((int32_t)partitions[i].index == installer_esp_partition) esp_seen = 1;
+    }
+    if (!root_seen) installer_root_partition = -1;
+    if (!esp_seen) installer_esp_partition = -1;
+}
+
+void installer_partition_reset(void)
+{
+    installer_plan_dispose(&partition_draft);
+    partition_draft_error = 0;
+    partition_count = 0;
+    selected_partition = installer_root_partition = installer_esp_partition = -1;
+    installer_partition_auto = 1;
+    installer_partition_table_replaced = 0;
+    setup.format_esp = 0;
+    reset_confirm();
     if (selected_disk < 0 || (uint32_t)selected_disk >= disk_count) return;
-    if (reliefos_block_list_partitions(disks[selected_disk].path, partitions,
-                                       RELIEFOS_BLOCK_MAX_PARTITIONS,
-                                       &partition_count) < 0) {
-        partition_count = 0;
+    struct reliefos_block_disk_info info = {0};
+    partition_draft_error = reliefos_block_get_info(disks[selected_disk].path, &info);
+    if (!partition_draft_error) {
+        if (info.sector_size != disks[selected_disk].sector_size ||
+            info.sector_count != disks[selected_disk].sector_count ||
+            strcmp(info.name, disks[selected_disk].name)) partition_draft_error = -ESTALE;
+        else partition_draft_error = installer_plan_load(&partition_draft, &disks[selected_disk]);
     }
-    if (previous_index >= 0) {
-        for (uint32_t i = 0; i < partition_count; ++i) {
-            if ((int32_t)partitions[i].index == previous_index) {
-                selected_partition = (int32_t)i;
-                break;
-            }
+    publish_partition_draft();
+}
+
+int installer_partition_select_disk(int32_t index)
+{
+    if (index < -1 || (index >= 0 && (uint32_t)index >= disk_count) || install_running) return -EINVAL;
+    if (selected_disk == index && (index < 0 ||
+        (partition_draft.loaded && !strcmp(partition_draft.disk.path, disks[index].path))))
+        return partition_draft_error;
+    selected_disk = index;
+    installer_partition_reset();
+    return partition_draft_error;
+}
+
+int installer_partition_select_mode(uint8_t mode)
+{
+    if (mode > INSTALL_MODE_UPDATE || install_running) return -EINVAL;
+    if (mode != install_mode) {
+        install_mode = mode;
+        installer_partition_reset();
+    }
+    return partition_draft_error;
+}
+
+void refresh_partitions(void)
+{
+    if (selected_disk < 0 || (uint32_t)selected_disk >= disk_count) {
+        installer_partition_reset(); return;
+    }
+    if (!partition_draft.loaded || strcmp(partition_draft.disk.path, disks[selected_disk].path)) {
+        installer_partition_reset(); return;
+    }
+    partition_draft_error = installer_plan_check(&partition_draft);
+    publish_partition_draft();
+}
+
+int installer_partition_error(void)
+{
+    if (partition_draft_error) return partition_draft_error;
+    return !installer_partition_auto && partition_draft.loaded ? partition_draft.table_error : 0;
+}
+
+int installer_partition_disk_error(void)
+{
+    return partition_draft_error;
+}
+
+int installer_partition_changes(char *out, uint32_t capacity)
+{
+    if (!out || !capacity) return -EINVAL;
+    out[0] = 0;
+    if (selected_disk < 0 || (uint32_t)selected_disk >= disk_count) return -ENODEV;
+    if (installer_partition_auto) {
+        struct installer_partition_plan plan;
+        int ret = installer_partition_plan_default(&disks[selected_disk], installer_boot_modes(), &plan);
+        if (ret) return ret;
+        int n = snprintf(out, capacity,
+            plan.bios.sector_count
+                ? T("Erase all partitions on %s.\nCreate BIOS Boot: 1 MiB, unformatted.\nCreate ESP: 128 MiB, format FAT32.\nCreate system root: %llu MiB, format ext4.")
+                : T("Erase all partitions on %s.\nCreate ESP: 128 MiB, format FAT32.\nCreate system root: %llu MiB, format ext4."),
+            disks[selected_disk].path, (unsigned long long)(plan.root.sector_count / 2048u));
+        return n < 0 || (uint32_t)n >= capacity ? -ENOSPC : n;
+    }
+    int used = installer_plan_describe(&partition_draft, out, capacity);
+    if (used < 0) return used;
+    const char *root = NULL, *esp = NULL;
+    uint32_t root_fs = RELIEFOS_BLOCK_FILESYSTEM_EXT4;
+    for (uint32_t i = 0; i < partition_count; ++i) {
+        if ((int32_t)partitions[i].index == installer_root_partition) {
+            root = partitions[i].path;
+            if (partitions[i].filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3) root_fs = partitions[i].filesystem;
         }
+        if ((int32_t)partitions[i].index == installer_esp_partition) esp = partitions[i].path;
     }
-    if (installer_root_partition >= 0 || installer_esp_partition >= 0) {
-        int root_seen = 0, esp_seen = 0;
-        for (uint32_t i = 0; i < partition_count; ++i) {
-            if ((int32_t)partitions[i].index == installer_root_partition) root_seen = 1;
-            if ((int32_t)partitions[i].index == installer_esp_partition) esp_seen = 1;
-        }
-        if (!root_seen) installer_root_partition = -1;
-        if (!esp_seen) installer_esp_partition = -1;
-    }
+    int format_esp = setup.format_esp || (esp && installer_plan_requires_format(&partition_draft, (unsigned)installer_esp_partition));
+    int n = snprintf(out + used, capacity - (uint32_t)used,
+        T("System root: %s; format %s.\nESP: %s; %s.\nOther partitions are preserved except for the changes listed above."),
+        root ? root : T("Not selected"), reliefos_block_filesystem_name(root_fs),
+        esp ? esp : T("Not selected"), format_esp ? T("format FAT32 and erase existing files") : T("preserve existing FAT32 files"));
+    return n < 0 || (uint32_t)n >= capacity - (uint32_t)used ? -ENOSPC : used + n;
 }
 
 void format_partition_line(char *buf, uint32_t cap,
@@ -368,6 +480,7 @@ uint32_t installer_boot_modes(void)
 
 int installer_partition_plan_valid(void)
 {
+    if (installer_partition_error()) return 0;
     int root_seen = 0, esp_seen = 0, bios_seen = 0;
     if (installer_partition_auto) {
         struct installer_partition_plan plan;
@@ -408,56 +521,45 @@ static int installer_partition_disk(void)
 static int installer_manual_partition_disk(void)
 {
     int ret = installer_partition_disk();
-    if (!ret) installer_partition_auto = 0;
+    if (!ret && (install_mode != INSTALL_MODE_FRESH || install_running)) ret = -EPERM;
+    if (!ret && !partition_draft.loaded) ret = partition_draft_error ? partition_draft_error : -ENODEV;
+    if (!ret) ret = partition_draft_error;
     return ret;
 }
 
 int installer_partition_initialize(void)
 {
     int ret = installer_manual_partition_disk();
-    if (!ret) ret = reliefos_block_gpt_initialize(disks[selected_disk].path, 1);
+    if (!ret) ret = installer_plan_initialize(&partition_draft);
     if (!ret) {
+        installer_partition_auto = 0;
         installer_partition_table_replaced = 1;
         installer_root_partition = installer_esp_partition = -1;
-        refresh_partitions();
+        setup.format_esp = 0;
+        publish_partition_draft(); reset_confirm();
     }
     return ret;
 }
 
-/** @brief Apply the shared default plan after the UI has confirmed disk erasure. */
+/** @brief Select the pending default plan without changing physical media. */
 int installer_partition_auto_layout(void)
 {
-    struct reliefos_block_disk_info info;
-    struct installer_partition_plan plan;
-    int ret = installer_partition_disk();
-    if (!ret) ret = reliefos_block_get_info(disks[selected_disk].path, &info);
-    if (!ret) ret = installer_partition_plan_default(&info, installer_boot_modes(), &plan);
-    if (!ret) ret = installer_partition_apply_default(disks[selected_disk].path, &plan);
-    if (!ret) {
-        refresh_partitions();
-        installer_partition_auto = 0;
-        installer_partition_table_replaced = 1;
-        setup.format_esp = 1;
-        installer_root_partition = (int32_t)plan.root.index;
-        installer_esp_partition = (int32_t)plan.esp.index;
-    }
-    return ret;
+    int ret = installer_manual_partition_disk();
+    if (ret) return ret;
+    installer_partition_auto = 1;
+    reset_confirm();
+    return 0;
 }
 
 int installer_partition_create(uint32_t filesystem, uint32_t size_mib,
                                const char *name)
 {
-    uint32_t index;
+    unsigned index = 0;
     int ret = installer_manual_partition_disk();
-    if (!ret) ret = reliefos_block_gpt_create(disks[selected_disk].path, filesystem,
-                                               size_mib, name, &index);
-    if (!ret && filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3) {
-        char path[RELIEFOS_BLOCK_PATH_LEN];
-        ret = reliefos_block_partition_path(disks[selected_disk].path, index, path, sizeof(path));
-        if (!ret) ret = reliefos_block_format(path, filesystem, NULL);
-    }
+    if (!ret) ret = installer_plan_create(&partition_draft, filesystem, size_mib, name, &index);
     if (!ret) {
-        refresh_partitions();
+        installer_partition_auto = 0;
+        publish_partition_draft(); reset_confirm();
         for (uint32_t i = 0; i < partition_count; ++i)
             if (partitions[i].index == index) selected_partition = (int32_t)i;
     }
@@ -466,42 +568,38 @@ int installer_partition_create(uint32_t filesystem, uint32_t size_mib,
 
 int installer_partition_resize(uint32_t size_mib)
 {
-    struct reliefos_block_partition *partition;
-    int ret = partition_at_selection(&partition);
-    if (!ret) installer_partition_auto = 0;
-    if (!ret) ret = reliefos_block_gpt_resize(disks[selected_disk].path,
-                                               partition->index, size_mib);
-    if (!ret) refresh_partitions();
+    struct reliefos_block_partition *part;
+    int ret = partition_at_selection(&part);
+    if (!ret) ret = installer_manual_partition_disk();
+    if (!ret) ret = installer_plan_resize(&partition_draft, part->index, size_mib);
+    if (!ret) { installer_partition_auto = 0; publish_partition_draft(); reset_confirm(); }
     return ret;
 }
 
 int installer_partition_rename(const char *name)
 {
-    struct reliefos_block_partition *partition;
-    int ret = partition_at_selection(&partition);
-    if (!ret) installer_partition_auto = 0;
-    if (!ret) ret = reliefos_block_gpt_set_name(disks[selected_disk].path,
-                                                partition->index, name);
-    if (!ret) refresh_partitions();
+    struct reliefos_block_partition *part;
+    int ret = partition_at_selection(&part);
+    if (!ret) ret = installer_manual_partition_disk();
+    if (!ret) ret = installer_plan_rename(&partition_draft, part->index, name);
+    if (!ret) { installer_partition_auto = 0; publish_partition_draft(); reset_confirm(); }
     return ret;
 }
 
 int installer_partition_set_type(uint32_t type)
 {
-    struct reliefos_block_partition *partition;
-    int32_t index;
-    int ret = partition_at_selection(&partition);
+    struct reliefos_block_partition *part;
+    int ret = partition_at_selection(&part);
     if (!ret && type == RELIEFOS_BLOCK_GPT_BIOS_BOOT &&
-        partition->filesystem != RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN) return -EINVAL;
+        part->filesystem != RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN) return -EINVAL;
+    if (!ret) ret = installer_manual_partition_disk();
+    int32_t index = !ret ? (int32_t)part->index : -1;
+    if (!ret) ret = installer_plan_type(&partition_draft, (unsigned)index, type);
     if (!ret) {
         installer_partition_auto = 0;
-        index = (int32_t)partition->index;
-    }
-    if (!ret) ret = reliefos_block_gpt_set_type(disks[selected_disk].path,
-                                                partition->index, type);
-    if (!ret) {
         if (type == RELIEFOS_BLOCK_GPT_ESP) {
-            if (installer_esp_partition != index) setup.format_esp = 0;
+            if (installer_esp_partition != index)
+                setup.format_esp = installer_plan_requires_format(&partition_draft, (unsigned)index);
             installer_esp_partition = index;
             if (installer_root_partition == index) installer_root_partition = -1;
         } else if (type == RELIEFOS_BLOCK_GPT_LINUX) {
@@ -511,34 +609,33 @@ int installer_partition_set_type(uint32_t type)
             if (installer_root_partition == index) installer_root_partition = -1;
             if (installer_esp_partition == index) installer_esp_partition = -1;
         }
-        refresh_partitions();
+        publish_partition_draft(); reset_confirm();
     }
     return ret;
 }
 
 int installer_partition_delete(void)
 {
-    struct reliefos_block_partition *partition;
-    int ret = partition_at_selection(&partition);
-    if (!ret) installer_partition_auto = 0;
-    if (!ret) ret = reliefos_block_gpt_delete(disks[selected_disk].path,
-                                               partition->index);
-    if (!ret) {
-        if (installer_root_partition == (int32_t)partition->index) installer_root_partition = -1;
-        if (installer_esp_partition == (int32_t)partition->index) installer_esp_partition = -1;
-        refresh_partitions();
-    }
+    struct reliefos_block_partition *part;
+    int ret = partition_at_selection(&part);
+    if (!ret) ret = installer_manual_partition_disk();
+    if (!ret) ret = installer_plan_delete(&partition_draft, part->index);
+    if (!ret) { installer_partition_auto = 0; publish_partition_draft(); reset_confirm(); }
     return ret;
 }
 
 int installer_partition_format(uint32_t filesystem, const char *label)
 {
-    struct reliefos_block_partition *partition;
-    int ret = partition_at_selection(&partition);
-    if (!ret && partition->gpt_type == RELIEFOS_BLOCK_GPT_BIOS_BOOT) return -EPERM;
-    if (!ret) installer_partition_auto = 0;
-    if (!ret) ret = reliefos_block_format(partition->path, filesystem, label);
-    if (!ret) refresh_partitions();
+    struct reliefos_block_partition *part;
+    int ret = partition_at_selection(&part);
+    if (!ret && part->gpt_type == RELIEFOS_BLOCK_GPT_BIOS_BOOT) return -EPERM;
+    if (!ret) ret = installer_manual_partition_disk();
+    if (!ret) ret = installer_plan_format(&partition_draft, part->index, filesystem, label);
+    if (!ret) {
+        installer_partition_auto = 0;
+        if ((int32_t)part->index == installer_esp_partition) setup.format_esp = 1;
+        publish_partition_draft(); reset_confirm();
+    }
     return ret;
 }
 
@@ -614,6 +711,7 @@ static int installer_fresh_partitions(const char *disk_path,
         ret = reliefos_block_get_info(disk_path, &info);
         if (!ret) ret = installer_partition_plan_default(&info, installer_boot_modes(), &plan);
         if (!ret) ret = installer_capacity_check(capacity, plan.root.sector_count, plan.esp.sector_count);
+        if (!ret && partition_draft.loaded) ret = installer_plan_check(&partition_draft);
         if (!ret) ret = installer_partition_apply_default(disk_path, &plan);
         if (ret < 0) return ret;
         esp = plan.esp.index;
@@ -631,10 +729,37 @@ static int installer_fresh_partitions(const char *disk_path,
         if (!ret) ret = reliefos_block_partition_uuid(disk_path, esp, installer_esp_uuid);
         return ret;
     }
+    uint32_t planned_root_filesystem = RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
+    if (partition_draft.loaded) {
+        const struct reliefos_block_partition *planned_root = NULL, *planned_esp = NULL;
+        for (unsigned i = 0; i < partition_draft.count; ++i) {
+            const struct reliefos_block_partition *part = &partition_draft.parts[i];
+            if ((int32_t)part->index == installer_root_partition) planned_root = part;
+            if ((int32_t)part->index == installer_esp_partition) planned_esp = part;
+        }
+        if (!planned_root || !planned_esp || !installer_partition_plan_valid()) return -EINVAL;
+        ret = installer_capacity_check(capacity, planned_root->sector_count, planned_esp->sector_count);
+        if (ret) return ret;
+        planned_root_filesystem = planned_root->filesystem;
+        if (installer_plan_requires_format(&partition_draft, (unsigned)installer_esp_partition)) setup.format_esp = 1;
+        ret = installer_plan_apply(&partition_draft, installer_root_partition, installer_esp_partition);
+        if (ret) return ret;
+    }
     ret = reliefos_block_list_partitions(disk_path, parts, RELIEFOS_BLOCK_MAX_PARTITIONS, &count);
     printf("[installer.elf] block list partitions ret=%d count=%u disk=%s\n",
            ret, count, disk_path ? disk_path : "?");
     if (ret < 0) return ret;
+    if (partition_draft.loaded) {
+        if (count != partition_draft.count) return -ESTALE;
+        for (unsigned i = 0; i < partition_draft.count; ++i) {
+            const struct reliefos_block_partition *planned = &partition_draft.parts[i];
+            unsigned j;
+            for (j = 0; j < count; ++j) if (parts[j].index == planned->index) break;
+            if (j == count || parts[j].first_lba != planned->first_lba ||
+                parts[j].sector_count != planned->sector_count ||
+                parts[j].gpt_type != planned->gpt_type || strcmp(parts[j].name, planned->name)) return -ESTALE;
+        }
+    }
     if (installer_root_partition < 0 || installer_esp_partition < 0) return -EINVAL;
     for (uint32_t i = 0; i < count && i < RELIEFOS_BLOCK_MAX_PARTITIONS; ++i) {
         if ((int32_t)parts[i].index == installer_esp_partition) esp = i;
@@ -653,7 +778,8 @@ static int installer_fresh_partitions(const char *disk_path,
         ret = reliefos_block_format(esp_path, RELIEFOS_BLOCK_FILESYSTEM_FAT32, "RELIEFOS");
         if (ret < 0) return ret;
     } else if (parts[esp].filesystem != RELIEFOS_BLOCK_FILESYSTEM_FAT32) return -EINVAL;
-    *root_filesystem = parts[root].filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3
+    *root_filesystem = (partition_draft.loaded ? planned_root_filesystem : parts[root].filesystem)
+                         == RELIEFOS_BLOCK_FILESYSTEM_EXT3
                      ? RELIEFOS_BLOCK_FILESYSTEM_EXT3 : RELIEFOS_BLOCK_FILESYSTEM_EXT4;
     ret = *root_filesystem == RELIEFOS_BLOCK_FILESYSTEM_EXT3
         ? reliefos_block_format(root_path, RELIEFOS_BLOCK_FILESYSTEM_EXT3, "RELIEFOS")
@@ -771,25 +897,34 @@ int confirmation_ok(void)
 
 void refresh_disks(void)
 {
+    struct reliefos_block_disk_info previous = {0};
+    int had_selection = selected_disk >= 0 && (uint32_t)selected_disk < disk_count;
+    if (had_selection) previous = disks[selected_disk];
     uint32_t count = 0;
     int ret = reliefos_block_list_disks(disks, RELIEFOS_BLOCK_MAX_DISKS, &count);
     if (ret < 0) {
-        disk_count = 0;
-        selected_disk = -1;
+        disk_count = 0; selected_disk = -1;
+        installer_partition_reset();
         set_error_status(T("Could not list disks"), ret);
-        refresh_ui();
-        return;
+        refresh_ui(); return;
     }
     disk_count = count > RELIEFOS_BLOCK_MAX_DISKS ? RELIEFOS_BLOCK_MAX_DISKS : count;
-    if (disk_count == 0) {
-        selected_disk = -1;
-        set_status(T("No disks were found"), T("Attach a disk and click Refresh."));
-    } else {
-        if (selected_disk < 0 || (uint32_t)selected_disk >= disk_count) {
-            selected_disk = 0;
-        }
-        set_disk_select_status();
+    selected_disk = -1;
+    if (had_selection) {
+        for (uint32_t i = 0; i < disk_count; ++i)
+            if (!strcmp(previous.path, disks[i].path) && !strcmp(previous.name, disks[i].name) &&
+                previous.sector_size == disks[i].sector_size && previous.sector_count == disks[i].sector_count) {
+                selected_disk = (int32_t)i; break;
+            }
     }
+    if (!disk_count) set_status(T("No disks were found"), T("Attach a disk and click Refresh."));
+    else if (had_selection && selected_disk < 0)
+        set_status(T("The selected disk is no longer available"), T("Select a target disk and review its layout again."));
+    else set_disk_select_status();
+    /* Never silently select another device. The disk page requires an explicit
+     * choice, including after a disconnect or changed disk identity. */
+    if (selected_disk < 0) installer_partition_reset();
+    else refresh_partitions();
     refresh_ui();
 }
 
@@ -1422,6 +1557,19 @@ static void finish_install(int ret,
 int perform_install(void)
 {
     int ret;
+    if (install_mode != INSTALL_MODE_FRESH || !confirmation_ok()) {
+        finish_install(-EPERM, T("Installation has not been confirmed"));
+        return -EPERM;
+    }
+    if (!partition_draft.loaded || (ret = installer_plan_check(&partition_draft)) != 0) {
+        if (!partition_draft.loaded) ret = partition_draft_error ? partition_draft_error : -ENODEV;
+        finish_install(ret, T("Target disk changed; review the installation plan again"));
+        return ret;
+    }
+    if (!installer_partition_plan_valid()) {
+        finish_install(-EINVAL, T("Invalid partition plan"));
+        return -EINVAL;
+    }
     if (!installer_setup_valid(&setup)) {
         finish_install(-EINVAL, T("Invalid installation settings"));
         return -EINVAL;
@@ -1464,7 +1612,7 @@ int perform_install(void)
 
     struct reliefos_boot_install_options boot = installer_boot_options();
     ret = reliefos_boot_validate_payload(&boot);
-    if (!ret) ret = reliefos_boot_validate_disk(&boot, !installer_partition_auto);
+    if (!ret) ret = installer_boot_disk_preflight(&boot);
     if (ret < 0) { finish_install(ret, T("Boot installation checks failed")); return ret; }
 
     show_progress(2, T("Scanning installation payload"), T("Root and boot partitions"));

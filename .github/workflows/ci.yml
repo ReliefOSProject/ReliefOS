@@ -9,7 +9,7 @@ on:
     inputs:
       installer_root_size_mib:
         description: Installer runtime root size in MiB (32-4096)
-        default: '400'
+        default: '32'
         type: string
       deploy_pages:
         description: Publish the verified build to Pages (main only)
@@ -129,7 +129,7 @@ jobs:
         run: ccache --zero-stats
       - name: Prepare build configuration
         env:
-          INSTALLER_ROOT_SIZE_MIB: ${{ inputs.installer_root_size_mib || '400' }}
+          INSTALLER_ROOT_SIZE_MIB: ${{ inputs.installer_root_size_mib || '32' }}
         run: bash scripts/ci/configure.sh
       - name: Save verified dependency downloads
         if: steps.download-cache.outputs.cache-hit != 'true'

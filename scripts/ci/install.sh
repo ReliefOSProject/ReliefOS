@@ -6,7 +6,7 @@ case "${1:-}" in
     packages=(
       build-essential clang libclang-rt-dev llvm lld ccache bison flex gperf gettext
       grub-efi-amd64-bin grub-pc-bin grub-common xorriso mtools dosfstools
-      e2fsprogs libext2fs-dev fdisk zip openssl fakeroot gdisk qemu-utils
+      e2fsprogs squashfs-tools libext2fs-dev fdisk zip openssl fakeroot gdisk qemu-utils
       git make perl libncurses-dev bc pkg-config autoconf automake libtool
       file curl patch xz-utils iproute2
       libtool-bin gawk ncurses-bin texinfo exfatprogs python3-sphinx python3-pil
