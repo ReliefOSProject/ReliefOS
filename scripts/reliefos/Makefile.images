@@ -13,16 +13,19 @@ GRUB_EFI_PROTECTED_INPUTS := $(sort $(GRUB_EFI_INPUTS) $(GRUB_EFI_REQUIRED_INPUT
 # These are prebuilt image inputs, not Kbuild outputs. Explicit file rules with
 # a validation recipe shadow Linux's generic .mod-list rule for both the
 # default directory and an explicitly selected GRUB_EFI_DIR.
+# Platform metadata indexes such as fdt.lst may legitimately be empty. Keep
+# their presence check, and require module/image payloads and moddep.lst to
+# remain nonempty.
 GRUB_EFI_EXTERNAL_INPUTS := $(filter-out $(GRUB_EFI_PRODUCTS),$(GRUB_EFI_PROTECTED_INPUTS))
 $(GRUB_EFI_EXTERNAL_INPUTS): $(GRUB_EFI_STAMP)
-	$(Q)test -s "$@" || { printf 'missing required GRUB EFI module input: %s\n' "$@" >&2; exit 1; }
+	$(Q){ test -f "$@" && case "$@" in */moddep.lst) test -s "$@";; *.lst) :;; *) test -s "$@";; esac; } || { printf 'missing required GRUB EFI module input: %s\n' "$@" >&2; exit 1; }
 GRUB_BIOS_DIR ?= $(abspath $(O)/grub-host)/lib/grub/i386-pc
 GRUB_BIOS_INPUTS := $(wildcard $(GRUB_BIOS_DIR)/*)
 GRUB_BIOS_REQUIRED_MODULES := $(shell cat $(RELIEFOS_SRC)/boot/grub/bios-modules.list)
 GRUB_BIOS_REQUIRED_INPUTS := $(addprefix $(GRUB_BIOS_DIR)/,$(addsuffix .mod,$(GRUB_BIOS_REQUIRED_MODULES)) boot.img diskboot.img cdboot.img kernel.img moddep.lst)
 GRUB_BIOS_EXTERNAL_INPUTS := $(filter-out $(GRUB_HOST_PRODUCTS),$(sort $(GRUB_BIOS_INPUTS) $(GRUB_BIOS_REQUIRED_INPUTS)))
 $(GRUB_BIOS_EXTERNAL_INPUTS): $(GRUB_HOST_TOOLS)
-	$(Q)test -s "$@" || { printf 'missing required GRUB BIOS input: %s\n' "$@" >&2; exit 1; }
+	$(Q){ test -f "$@" && case "$@" in */moddep.lst) test -s "$@";; *.lst) :;; *) test -s "$@";; esac; } || { printf 'missing required GRUB BIOS input: %s\n' "$@" >&2; exit 1; }
 grub-host: $(GRUB_HOST_PRODUCTS) $(GRUB_BIOS_REQUIRED_INPUTS)
 grub-efi: $(GRUB_EFI_PRODUCTS) $(GRUB_EFI_REQUIRED_INPUTS)
 RELIEFOS_EXT2_TIME := $(RELIEFOS_HOST_BIN)/reliefos-ext2-time
@@ -39,7 +42,7 @@ $(IMAGE_DISPLAY): $(RELIEFOS_CONFIG_FILE) $(RELIEFOS_EMIT)
 	$(Q)mkdir -p $(@D)
 	$(Q)awk 'BEGIN{theme="metro"} /^CONFIG_VMDK_DEFAULT_THEME_WIN95=y$$/{theme="win95"} END{print "theme="theme}' $< | $(RELIEFOS_EMIT) --input - --output $@
 RELIEFOS_EXT4_FEATURES := none,filetype,extents,dir_index,metadata_csum,64bit,flex_bg,has_journal,large_file,huge_file,extra_isize
-RELIEFOS_PARAMETERS_images := instance=$(IMAGE_INSTANCE_ID)|epoch=$(SOURCE_DATE_EPOCH)|boot=gpt-bios-uefi|root-fs=ext4|installer-payload=squashfs-gzip-v4|ext4-features=$(RELIEFOS_EXT4_FEATURES)|grub=$(GRUB_EFI_DIR)|bios=$(GRUB_BIOS_DIR)|grub-tool=$(GRUB_MKSTANDALONE)|grub-mkimage=$(GRUB_MKIMAGE)|grub-bios-setup=$(GRUB_BIOS_SETUP)|mke2fs=$(shell mke2fs -V 2>&1 | head -n1)|mtools=$(shell mcopy -V 2>&1 | head -n1)|mksquashfs=$(shell mksquashfs -version 2>&1 | head -n1)|disk-size=$(CONFIG_IMAGE_SIZE_MIB)|installer-size=$(CONFIG_INSTALLER_ROOT_SIZE_MIB)|qemu-img=$(shell qemu-img --version 2>/dev/null | head -n1)|xorriso=$(shell xorriso -version 2>/dev/null | head -n1)|sfdisk=$(shell sfdisk --version 2>/dev/null)
+RELIEFOS_PARAMETERS_images := instance=$(IMAGE_INSTANCE_ID)|epoch=$(SOURCE_DATE_EPOCH)|boot=gpt-bios-uefi|root-fs=ext4|installer-payload=squashfs-gzip-v4|ext4-features=$(RELIEFOS_EXT4_FEATURES)|grub=$(GRUB_EFI_DIR)|bios=$(GRUB_BIOS_DIR)|grub-tool=$(GRUB_MKSTANDALONE)|grub-mkimage=$(GRUB_MKIMAGE)|grub-bios-setup=$(GRUB_BIOS_SETUP)|mke2fs=$(shell mke2fs -V 2>&1 | head -n1)|mtools=$(shell mcopy -V 2>&1 | head -n1)|mksquashfs=$(shell mksquashfs -version 2>&1 | head -n1)|disk-size=$(CONFIG_IMAGE_SIZE_MIB)|installer-size=$(CONFIG_INSTALLER_ROOT_SIZE_MIB)|installer-ram-root=1|installer-inode-reserve=5120|qemu-img=$(shell qemu-img --version 2>/dev/null | head -n1)|xorriso=$(shell xorriso -version 2>/dev/null | head -n1)|sfdisk=$(shell sfdisk --version 2>/dev/null)
 $(if $(RELIEFOS_PASSIVE),,$(eval $(call KBUILD_PARAMETERS,images)))
 $(ESP_STAMP): $(RELIEFOS_INITRAMFS) $(RELIEFOS_INITRAMFS_MANIFEST) $(RELIEFOS_KERNEL_TOOLS)
 $(ESP_STAMP): $(RELIEFOS_SRC)/boot/grub/kernel-slots.cfg
@@ -86,9 +89,9 @@ $(ROOT_EXT2): $(O_STAGE)/live-root.complete $(RELIEFOS_EXT2_TIME) $(RELIEFOS_SRC
 $(DISK_ROOT_EXT2): $(O_STAGE)/disk-root.complete $(RELIEFOS_EXT2_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
 	$(Q)RELIEFOS_EXT2_TIME=$(RELIEFOS_EXT2_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext2 $(DISK_ROOT_STAGE) $@ $(SOURCE_DATE_EPOCH) $(DISK_ROOT_UUID)
 $(ROOT_EXT4): $(O_STAGE)/live-root.complete $(RELIEFOS_EXT4_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
-	$(Q)RELIEFOS_EXT4_TIME=$(RELIEFOS_EXT4_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext4 $(LIVE_ROOT_STAGE) $@ $(SOURCE_DATE_EPOCH) $(LIVE_ROOT_UUID)
+	$(Q)IMAGE_RAM_ROOT=0 RELIEFOS_EXT4_TIME=$(RELIEFOS_EXT4_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext4 $(LIVE_ROOT_STAGE) $@ $(SOURCE_DATE_EPOCH) $(LIVE_ROOT_UUID)
 $(DISK_ROOT_EXT4): $(O_STAGE)/disk-root.complete $(RELIEFOS_EXT4_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
-	$(Q)RELIEFOS_EXT4_TIME=$(RELIEFOS_EXT4_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext4 $(DISK_ROOT_STAGE) $@ $(SOURCE_DATE_EPOCH) $(DISK_ROOT_UUID)
+	$(Q)IMAGE_RAM_ROOT=0 RELIEFOS_EXT4_TIME=$(RELIEFOS_EXT4_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext4 $(DISK_ROOT_STAGE) $@ $(SOURCE_DATE_EPOCH) $(DISK_ROOT_UUID)
 RELIEFOS_DEDUP_TOOL := $(RELIEFOS_HOST_BIN)/reliefos-dedup
 tools: $(RELIEFOS_DEDUP_TOOL)
 $(INSTALLER_STAGE_STAMP): $(RELIEFOS_DEDUP_TOOL) $(APK_STAGE_INPUTS) $(RELIEFOS_SRC)/tools/build/installer-xfce-profile.sh $(RELIEFOS_SRC)/system/xorg/xfce-xinitrc $(RELIEFOS_SRC)/system/xorg/xfce-xfwm4.xml
@@ -101,7 +104,7 @@ $(INSTALLER_STAGE_STAMP): $(ROOTFS_RAW_STAMP) $(ESP_STAMP) $(USERLAND_DIR)/insta
 $(INSTALLER_EXT2): $(INSTALLER_STAGE_STAMP) $(RELIEFOS_EXT2_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
 	$(Q)IMAGE_MIN_MIB=$(or $(CONFIG_INSTALLER_ROOT_SIZE_MIB),32) IMAGE_FLOOR_MIB=32 RELIEFOS_EXT2_TIME=$(RELIEFOS_EXT2_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext2 $(INSTALLER_ROOT) $@ $(SOURCE_DATE_EPOCH) 9e1f6d46-3f41-42d2-9917-9a21a2134401
 $(INSTALLER_EXT4): $(INSTALLER_STAGE_STAMP) $(RELIEFOS_EXT4_TIME) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
-	$(Q)IMAGE_MIN_MIB=$(or $(CONFIG_INSTALLER_ROOT_SIZE_MIB),32) IMAGE_FLOOR_MIB=32 RELIEFOS_EXT4_TIME=$(RELIEFOS_EXT4_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext4 $(INSTALLER_ROOT) $@ $(SOURCE_DATE_EPOCH) 9e1f6d46-3f41-42d2-9917-9a21a2134401
+	$(Q)IMAGE_RAM_ROOT=1 IMAGE_MIN_MIB=$(or $(CONFIG_INSTALLER_ROOT_SIZE_MIB),32) IMAGE_FLOOR_MIB=32 RELIEFOS_EXT4_TIME=$(RELIEFOS_EXT4_TIME) sh $(RELIEFOS_SRC)/tools/build/images.sh ext4 $(INSTALLER_ROOT) $@ $(SOURCE_DATE_EPOCH) 9e1f6d46-3f41-42d2-9917-9a21a2134401
 $(INSTALLER_SQUASHFS): $(INSTALLER_STAGE_STAMP) $(RELIEFOS_SRC)/tools/build/images.sh $(RELIEFOS_SRC)/tools/build/apk-permissions.sh $(O_META)/images.parameters
 	$(Q)sh $(RELIEFOS_SRC)/tools/build/images.sh squashfs $(INSTALLER_PAYLOAD_STAGE) $@ $(SOURCE_DATE_EPOCH)
 $(DISK_RAW) $(DISK_VMDK) &: $(DISK_ROOT_EXT4) $(ESP_STAMP) $(RELIEFOS_SRC)/tools/build/disk.sh $(RELIEFOS_IMAGE_IDENTITY) $(RELIEFOS_SRC)/boot/grub/bios-modules.list $(GRUB_BIOS_INPUTS) $(GRUB_BIOS_REQUIRED_INPUTS) $(GRUB_HOST_TOOLS) $(O_META)/images.parameters

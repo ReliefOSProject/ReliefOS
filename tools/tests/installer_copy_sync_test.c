@@ -6,11 +6,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <linux/mount.h>
-#undef MNT_FORCE
-#undef MNT_DETACH
-#undef MNT_EXPIRE
-#undef UMOUNT_NOFOLLOW
+#include <sys/mount.h>
 /** @brief Count file durability calls and inject a file-sync failure. */
 static int fixture_fsync(int fd);
 /** @brief Model the Linux filesystem barrier, refusing injected I/O failure. */

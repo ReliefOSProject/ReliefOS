@@ -110,12 +110,24 @@ class InstallerSetupTests(unittest.TestCase):
             self.assertIn(result.returncode, (errno.ELOOP, errno.ENOTDIR))
             self.assertEqual(list(outside.iterdir()), [])
 
+    def test_wizard_model(self):
+        """The GUI and TUI share the same explicit routes and navigation locks."""
+        with tempfile.TemporaryDirectory(prefix="reliefos-installer-model-") as temporary:
+            executable = Path(temporary) / "wizard-model"
+            subprocess.run([
+                "cc", "-std=c11", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
+                "-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-fno-pie", "-no-pie",
+                "tools/tests/installer_wizard_model_test.c", "userland/apps/installer/model.c",
+                "-o", str(executable),
+            ], cwd=ROOT, check=True)
+            subprocess.run([str(executable)], check=True, timeout=10)
+
     def test_tty_input(self):
-        from test_installer_swap_tty import compile_fixture
+        from test_installer_swap_tty import compile_fixture, fixture_environment
         with tempfile.TemporaryDirectory(prefix="reliefos-login-input-") as temporary:
             executable = Path(temporary) / "login-input"
             compile_fixture(executable)
-            subprocess.run([str(executable)], check=True, timeout=10)
+            subprocess.run([str(executable)], check=True, timeout=10, env=fixture_environment(temporary))
 
     def test_setup_validation(self):
         with tempfile.TemporaryDirectory(prefix="reliefos-components-test-") as temporary:

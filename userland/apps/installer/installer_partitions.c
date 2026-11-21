@@ -47,9 +47,11 @@ static int same_extent(const struct installer_partition_extent *a,
 }
 
 /** @brief Erase only the validated reserved extent after confirmed default disk erasure. */
-static int clear_default_bios(const char *disk_path,
-                              const struct installer_partition_extent *bios)
+int installer_partition_clear_bios(const char *disk_path,
+                                   const struct installer_partition_extent *bios)
 {
+    if (!disk_path || !bios || bios->first_lba > INT64_MAX / 512u ||
+        bios->sector_count > INT64_MAX / 512u - bios->first_lba) return -EINVAL;
     int fd = open(disk_path, O_WRONLY | O_EXCL | O_CLOEXEC | O_NOFOLLOW);
     if (fd < 0) return -errno;
     unsigned char zero[4096] = {0};
@@ -87,7 +89,7 @@ int installer_partition_apply_default(const char *disk_path,
         !same_extent(&plan->esp, &expected.esp) ||
         !same_extent(&plan->root, &expected.root)) return -EINVAL;
     result = reliefos_block_gpt_initialize(disk_path, 1);
-    if (!result && plan->bios.sector_count) result = clear_default_bios(disk_path, &plan->bios);
+    if (!result && plan->bios.sector_count) result = installer_partition_clear_bios(disk_path, &plan->bios);
     const struct installer_partition_extent *extents[] = {&plan->bios, &plan->esp, &plan->root};
     const uint32_t filesystems[] = {RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN,
         RELIEFOS_BLOCK_FILESYSTEM_FAT32, RELIEFOS_BLOCK_FILESYSTEM_EXT4};

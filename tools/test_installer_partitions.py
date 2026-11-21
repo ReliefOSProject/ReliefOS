@@ -10,6 +10,14 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def digest(path):
+    value = hashlib.sha256()
+    with path.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            value.update(block)
+    return value.hexdigest()
+
+
 def main():
     """Compile the real planner/writer, preserving all negative-case image bytes."""
     with tempfile.TemporaryDirectory(prefix="installer-gpt-") as directory:
@@ -39,7 +47,7 @@ def main():
                     target.write(source.read(1024**2))
                     target.seek(2 * 1024**2)
                     target.write(b"KEEP-BEYOND-BIOS-EXTENT")
-            before = hashlib.file_digest(image.open("rb"), "sha256").hexdigest()
+            before = digest(image)
             subprocess.run([executable, image, case], check=True,
                            env=dict(os.environ, UBSAN_OPTIONS="halt_on_error=1"))
             if case in ("clear-write-fail", "clear-sync-fail"):
@@ -49,7 +57,7 @@ def main():
                 assert table.get("partitions", []) == []
                 continue
             if case not in successful:
-                assert before == hashlib.file_digest(image.open("rb"), "sha256").hexdigest(), case
+                assert before == digest(image), case
                 continue
             if case == "old-fat":
                 with image.open("rb") as stream:

@@ -16,6 +16,8 @@ enum installer_page {
     INSTALLER_PAGE_CONFIRM,
     INSTALLER_PAGE_PROGRESS,
     INSTALLER_PAGE_FINISH,
+    /* Appended to preserve the previous page values consumed by fixtures. */
+    INSTALLER_PAGE_SYSTEM,
     INSTALLER_PAGE_COUNT,
 };
 
@@ -37,7 +39,7 @@ enum installer_action {
 extern "C" {
 #endif
 
-/* Fresh installs configure firmware, partitions and accounts. Updates inspect
+/* Fresh installs configure firmware, partitions, system options and accounts. Updates inspect
  * the selected system and show firmware choices inside their review page. */
 enum installer_page installer_model_next(enum installer_page page,
                                          enum installer_mode mode);
@@ -64,6 +66,17 @@ const char *installer_model_confirm_word(enum installer_mode mode);
  * returns the step count. At most INSTALLER_PAGE_COUNT entries are written. */
 int installer_model_steps(enum installer_mode mode,
                           enum installer_page *out, int cap);
+
+/* Index in the active route, or -1 when the page is absent. */
+int installer_model_step_index(enum installer_page page, enum installer_mode mode);
+
+/* Revisit only an earlier configuration page. Installation and successful
+ * completion lock navigation; a failed attempt requires configuration review. */
+int installer_model_can_visit(enum installer_page current, enum installer_page target,
+                              enum installer_mode mode, int install_success);
+
+/* Translated title shared by graphical and terminal navigation. */
+const char *installer_model_page_title(enum installer_page page, enum installer_mode mode);
 
 /* "Disk <id>  <name>  <size> GiB|MiB" for a disk list row. */
 void installer_model_format_disk_line(char *buf, uint32_t cap, uint32_t id,
