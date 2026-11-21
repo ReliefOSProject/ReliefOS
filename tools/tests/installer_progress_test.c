@@ -1,11 +1,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <linux/mount.h>
-#undef MNT_FORCE
-#undef MNT_DETACH
-#undef MNT_EXPIRE
-#undef UMOUNT_NOFOLLOW
+#include <sys/mount.h>
 
 /** @brief Count progress output without writing a real terminal or serial port. */
 static int progress_printf(const char *format, ...);

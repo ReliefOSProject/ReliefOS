@@ -8,11 +8,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <linux/mount.h>
-#undef MNT_FORCE
-#undef MNT_DETACH
-#undef MNT_EXPIRE
-#undef UMOUNT_NOFOLLOW
+#include <sys/mount.h>
 
 static int counted_fchown(int fd, uid_t uid, gid_t gid);
 static int counted_fstat(int fd, struct stat *st);

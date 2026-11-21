@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Exercise installer input and window geometry on the shipped ISOs."""
 import argparse
+import json
+import os
 from pathlib import Path
 import socket
 import subprocess
@@ -11,6 +13,48 @@ from run_gcc_probe_qemu import qmp_quit
 from test_installer_responsiveness import InstallerProbe
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def qemu_acceleration(requested="auto"):
+    """Select a usable accelerator, preserving explicit caller requirements."""
+    if requested not in ("auto", "kvm", "tcg"):
+        raise ValueError(f"Unknown QEMU accelerator: {requested}")
+    usable_kvm = os.access("/dev/kvm", os.R_OK | os.W_OK)
+    if requested == "kvm" and not usable_kvm:
+        raise RuntimeError("KVM was requested but /dev/kvm is unavailable")
+    selected = ("kvm" if usable_kvm else "tcg") if requested == "auto" else requested
+    return ["-accel", selected, "-cpu", "host" if selected == "kvm" else "max"]
+
+
+def firmware_arguments(firmware="uefi", image=None):
+    """Locate read-only UEFI code without modifying host firmware files."""
+    if firmware == "bios":
+        return []
+    if firmware != "uefi":
+        raise ValueError(f"Unknown firmware: {firmware}")
+    override = image or os.environ.get("QEMU_FIRMWARE")
+    candidates = ([Path(override)] if override else [
+        Path("/usr/share/edk2/x64/OVMF.4m.fd"),
+        Path("/usr/share/OVMF/OVMF_CODE_4M.fd"),
+        Path("/usr/share/OVMF/OVMF_CODE.fd"),
+        Path("/usr/share/edk2/ovmf/OVMF_CODE.fd"),
+    ])
+    selected = next((path for path in candidates if path.is_file()), None)
+    if selected is None:
+        raise FileNotFoundError("UEFI firmware unavailable; set QEMU_FIRMWARE or --firmware-image")
+    size = selected.stat().st_size
+    if size and size & (size - 1) == 0:
+        return ["-bios", str(selected.resolve())]
+    # Distribution CODE images omit their variable-storage flash bank and
+    # cannot be passed as a complete power-of-two PC BIOS. Keep code read-only
+    # and make variable writes private to this QEMU process's snapshot.
+    companions = [selected.with_name(selected.name.replace("CODE", "VARS")),
+                  selected.parent / ("OVMF_VARS_4M.fd" if "4M" in selected.name else "OVMF_VARS.fd")]
+    variables = next((path for path in companions if path != selected and path.is_file()), None)
+    if variables is None:
+        raise FileNotFoundError(f"Split UEFI firmware has no matching variable image: {selected}")
+    return ["-drive", f"if=pflash,format=raw,unit=0,readonly=on,file={selected.resolve()}",
+            "-drive", f"if=pflash,format=raw,unit=1,snapshot=on,file={variables.resolve()}"]
 
 
 class Probe(InstallerProbe):
@@ -88,7 +132,9 @@ def installer(probe):
     content_sample = (probe.content_left + 4, probe.sidebar_top + 400)
     assert frame.getpixel(sidebar_sample) != frame.getpixel(content_sample), \
         "Sidebar covers content"
-    for expected in (1, 2, 3):
+    for expected in (1, 3, 4):
+        if expected == 3:
+            probe.click(*probe.license_indicator_point())
         probe.click(*probe.footer_point())
         time.sleep(0.8)
         frame = probe.frame(f"installer-page-{expected}")
@@ -174,6 +220,9 @@ def main():
     parser.add_argument("--iso", type=Path)
     parser.add_argument("--vga", choices=("std", "vmware"), default="std",
                         help="QEMU display device (std preserves the legacy 1280x720 VGA device)")
+    parser.add_argument("--accel", choices=("auto", "kvm", "tcg"), default="auto")
+    parser.add_argument("--firmware", choices=("bios", "uefi"), default="uefi")
+    parser.add_argument("--firmware-image", type=Path, help="Read-only OVMF firmware override")
     parser.add_argument("--install", action="store_true", help="Install onto this test's disposable scratch disk")
     parser.add_argument("--disk", type=Path, help="Previously installed test disk to boot without the ISO")
     args = parser.parse_args()
@@ -184,15 +233,15 @@ def main():
     import uuid
     serial = out / "serial.log"
     qmp = ROOT.parent / f".reliefos-inst-win-{uuid.uuid4().hex[:12]}.sock"
-    iso = ROOT / "build/images" / ("reliefos-live.iso" if args.case == "desktop" else "reliefos-installer.iso")
+    iso = ROOT / "out/x86_64/release/images" / ("reliefos-live.iso" if args.case == "desktop" else "reliefos-installer.iso")
     if args.iso:
         iso = args.iso.resolve()
     disk = out / "scratch.raw"
     if args.case in ("tty", "installer"):
         with disk.open("xb") as file:
             file.truncate(2 * 1024**3)
-    command = ["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-machine", "q35",
-               "-m", "4096", "-smp", "2", "-bios", "/usr/share/edk2/x64/OVMF.4m.fd",
+    command = ["qemu-system-x86_64", *qemu_acceleration(args.accel), "-machine", "q35",
+               "-m", "4096", "-smp", "2", *firmware_arguments(args.firmware, args.firmware_image),
                "-display", "none", "-serial", f"file:{serial}",
                *vga_arguments(args.vga), "-device", "qemu-xhci", "-device", "usb-tablet",
                "-netdev", "user,id=net0", "-device", "e1000,netdev=net0",
@@ -204,6 +253,7 @@ def main():
         command += ["-cdrom", str(iso), "-boot", "d"]
     if args.case in ("tty", "installer"):
         command += ["-drive", f"file={disk},format=raw,if=ide"]
+    (out / "command.json").write_text(json.dumps(command, indent=2) + "\n")
     with (out / "qemu.log").open("w") as errors:
         process = subprocess.Popen(command, stdout=errors, stderr=errors, cwd=ROOT)
         probe = None

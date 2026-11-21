@@ -22,7 +22,7 @@ def compile_fixture(binary):
     subprocess.run([
         "cc", "-std=gnu11", "-D_GNU_SOURCE", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
         "-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-fno-pie", "-no-pie",
-        "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections,--wrap=open,--wrap=doupdate",
+        "-ffunction-sections", "-fdata-sections", "-Wl,--gc-sections,--wrap=open,--wrap=doupdate,--wrap=installer_partition_reset,--wrap=installer_partition_select_disk,--wrap=installer_partition_select_mode,--wrap=installer_partition_changes,--wrap=installer_partition_error,--wrap=installer_partition_disk_error",
         "-Ikernel/reliefnt/include", "-Iinclude", "-Ikernel/reliefnt/include/uapi",
         "-idirafter", "userland/runtime/include", "tools/tests/installer_tty_input_test.c",
         *[f"userland/apps/installer/{name}" for name in sources],
@@ -30,8 +30,19 @@ def compile_fixture(binary):
     ], cwd=ROOT, check=True)
 
 
+def fixture_environment(directory):
+    # ncurses/libtinfo retains two terminfo reallocations in _nc_doalloc after
+    # delscreen(). Suppress only that external cache; installer leaks remain
+    # checked by LSan, alongside all ASan/UBSan checks.
+    suppression = Path(directory).resolve() / "ncurses.lsan"
+    suppression.write_text("leak:_nc_doalloc\n")
+    options = os.environ.get("LSAN_OPTIONS", "")
+    return {**os.environ, "LSAN_OPTIONS":
+            options + (":" if options else "") + "suppressions=" + str(suppression)}
+
+
 class Session:
-    def __init__(self, binary, output, name, *, partitions=False):
+    def __init__(self, binary, output, name, *, partitions=False, fail_install=False, fail_summary=False):
         self.master, slave = pty.openpty()
         fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 24, 80, 0, 0))
         self.attributes = termios.tcgetattr(slave)
@@ -44,12 +55,14 @@ class Session:
         self.data = bytearray()
         self.process = subprocess.Popen(
             [binary, "--interactive"], stdin=slave, stdout=slave, stderr=slave,
-            env={**os.environ, "TERM": "xterm", "LANG": "C.UTF-8",
+            env={**fixture_environment(session_output), "TERM": "xterm", "LANG": "C.UTF-8",
                  "INSTALLER_TEST_LOG": str(self.log), "INSTALLER_TEST_RESULT": str(self.result),
                  "INSTALLER_TEST_SCREEN": str(self.screen),
                  "INSTALLER_TEST_OPERATION": str(self.operation),
                  **({"INSTALLER_TEST_PARTITIONS": "1"} if partitions else {}),
-                 "ASAN_OPTIONS": "detect_leaks=0"}, cwd=ROOT,
+                 **({"INSTALLER_TEST_INSTALL_FAILURE": "1"} if fail_install else {}),
+                 **({"INSTALLER_TEST_SUMMARY_FAILURE": "1"} if fail_summary else {}),
+                 }, cwd=ROOT,
         )
         self.drain()
 
@@ -89,18 +102,22 @@ class Session:
 def wizard_tests(binary, output):
     fresh = Session(binary, output, "fresh")
     try:
-        for _ in range(6):  # language, license, welcome, mode, disk, bootloaders
+        for _ in range(5):  # language, license, mode, disk, bootloaders
             fresh.next()
-        fresh.next()  # automatic plan -> account options
-        for value in (b"alice", b"user-secret", b"user-secret", b"root-secret", b"root-secret"):
-            fresh.key(value + b"\t")
+        fresh.next()  # automatic plan -> system options
         fresh.key(b"\t\t ")  # select the third desktop option: console-only
         fresh.key(b"\t ")  # enable swap
         fresh.key(b"\t\x152049")  # replace suggestion
+        fresh.next()  # system options -> accounts
+        for value in (b"alice", b"user-secret", b"user-secret", b"root-secret", b"root-secret"):
+            fresh.key(value + b"\t")
         fresh.next()
         fresh.next()  # missing confirmation must leave disk untouched
         assert not fresh.result.exists()
         fresh.back()  # account values survive returning from review
+        fresh.back()  # system choices also survive
+        assert "System options" in fresh.screen.read_text()
+        fresh.next()
         fresh.next()
         fresh.key(b"INSTALL")
         fresh.next()
@@ -116,14 +133,18 @@ def wizard_tests(binary, output):
 
     update = Session(binary, output, "update")
     try:
-        for _ in range(3):
+        for _ in range(2):
             update.next()
         update.key(b"\t ")
         update.next()  # update mode -> disk
-        update.next()  # inspect -> update review
+        update.next()  # inspect, then edit firmware on the target page
         update.drain(0.4)
         assert not update.result.exists()
-        update.key(b" ")  # disable BIOS, preserve UEFI
+        update.key(b"\t\t\t\t ")  # disk, refresh, root, ESP, BIOS; disable BIOS
+        update.next()  # read-only review
+        update.back()  # preserve checked target and edited firmware
+        assert "Check system" not in update.screen.read_text()
+        update.next()
         update.next()
         update.drain(0.4)
         assert "bios=0 uefi=1" in update.result.read_text()
@@ -135,11 +156,59 @@ def wizard_tests(binary, output):
     print("PASS PTY fresh install/update, confirmation, Back, desktop/swap/firmware choices and terminal restoration")
 
 
+def failed_install_test(binary, output):
+    """An error returns to reviewed configuration rather than replaying writes."""
+    session = Session(binary, output, "failed-install", fail_install=True)
+    try:
+        for _ in range(7):
+            session.next()  # through system options to accounts
+        for value in (b"alice", b"user-secret", b"user-secret", b"root-secret", b"root-secret"):
+            session.key(value + b"\t")
+        session.next()
+        session.key(b"INSTALL")
+        session.next()
+        session.drain(0.4)
+        assert "Review settings" in session.screen.read_text()
+        assert "Installation failed" in session.screen.read_text()
+        session.next()
+        assert "Target disk" in session.screen.read_text()
+        assert not session.result.exists()
+        for _ in range(4):
+            session.next()
+        assert "Accounts" in session.screen.read_text()
+        session.next()  # retained accounts -> review
+        session.next()  # INSTALL was cleared after failure
+        assert "Review installation" in session.screen.read_text()
+        assert not session.result.exists()
+    finally:
+        session.close()
+    print("PASS failed-install review, retained account values and renewed destructive confirmation")
+
+
+def incomplete_summary_test(binary, output):
+    """Never apply a plan whose complete destructive changes could not be shown."""
+    session = Session(binary, output, "incomplete-summary", fail_summary=True)
+    try:
+        for _ in range(7):
+            session.next()
+        for value in (b"alice", b"user-secret", b"user-secret", b"root-secret", b"root-secret"):
+            session.key(value + b"\t")
+        session.next()
+        assert "The disk plan could not be read." in session.screen.read_text()
+        session.key(b"INSTALL")
+        session.next()
+        assert "Review installation" in session.screen.read_text()
+        assert not session.result.exists()
+    finally:
+        session.close()
+    print("PASS incomplete plan summary blocks installation")
+
+
 def partition_table_tests(binary, output):
     """Catch missing columns, lost row-to-device mapping and accidental writes."""
     session = Session(binary, output, "partition-table", partitions=True)
     try:
-        for _ in range(6):
+        for _ in range(5):
             session.next()
         session.drain(0.3)
         automatic = session.screen.read_text()
@@ -151,7 +220,7 @@ def partition_table_tests(binary, output):
         session.key(b"\x1bOB")  # ESP, GPT slot 4
         session.key(b"\x1bOB")  # unallocated range must never select a partition
         session.key(b"\t")
-        # Refresh, Apply automatic layout, Initialize GPT, Create, Resize, Rename.
+        # Refresh, Discard changes, Initialize GPT, Create, Resize, Rename.
         for _ in range(5):
             session.key(b"\t")
         session.key(b"\r")
@@ -182,6 +251,12 @@ def partition_table_tests(binary, output):
         session.resize(36, 110)
         session.key(b"\x1bOH")
         assert "/dev/fixture2" in session.screen.read_text()
+        session.key(b"\t\t\r")  # table -> Refresh -> Discard changes
+        session.next()  # confirm discarding the draft
+        session.drain(0.3)
+        assert "Installation layout - changes remain pending" in session.screen.read_text()
+        assert "Pending layout - written only after" not in session.screen.read_text()
+        assert not session.result.exists()
     finally:
         session.close()
     print("PASS PTY partition table, preview, free-space selection, GPT-slot mapping and terminal resize")
@@ -196,8 +271,10 @@ def main():
     output = output.resolve()
     binary = output / "tui"
     compile_fixture(binary)
-    subprocess.run([binary], cwd=ROOT, check=True, timeout=20)
+    subprocess.run([binary], cwd=ROOT, check=True, timeout=20, env=fixture_environment(output))
     wizard_tests(binary, output)
+    failed_install_test(binary, output)
+    incomplete_summary_test(binary, output)
     partition_table_tests(binary, output)
     return 0
 

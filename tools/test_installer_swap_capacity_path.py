@@ -18,6 +18,7 @@ def main():
          '-idirafter','include','-Ikernel/reliefnt/include','-Ikernel/reliefnt/include/uapi',
          '-idirafter','userland/runtime/include','tools/tests/installer_mount_transition_test.c',
          'userland/apps/installer/installer_partitions.c','userland/apps/installer/installer_capacity.c',
+         'userland/apps/installer/installer_plan.c',
          '-o',str(a.output.resolve()/'test')]
     print('+ '+shlex.join(cmd),flush=True);ret=subprocess.run(cmd,cwd=ROOT,check=False).returncode
     print('exit='+str(ret),flush=True)

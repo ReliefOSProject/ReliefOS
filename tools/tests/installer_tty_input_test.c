@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <wchar.h>
 #include <locale.h>
-#include <linux/mount.h>
+#include <sys/mount.h>
 #undef MNT_FORCE
 #undef MNT_DETACH
 #undef MNT_EXPIRE
@@ -104,6 +104,30 @@ static void fixture_partitions(void)
     partition_count = 3; selected_partition = 0;
     installer_root_partition = 7; installer_esp_partition = 4;
 }
+void __wrap_installer_partition_reset(void) { installer_partition_auto = 1; fixture_partitions(); }
+int __wrap_installer_partition_error(void) { return 0; }
+int __wrap_installer_partition_disk_error(void) { return 0; }
+int __wrap_installer_partition_select_disk(int32_t choice)
+{
+    selected_disk = choice;
+    fixture_partitions();
+    return 0;
+}
+int __wrap_installer_partition_select_mode(uint8_t mode)
+{
+    if (install_mode != mode) {
+        install_mode = mode;
+        installer_partition_auto = 1;
+        fixture_partitions();
+    }
+    return 0;
+}
+int __wrap_installer_partition_changes(char *out, uint32_t capacity)
+{
+    if (capacity) snprintf(out, capacity, "Pending partition plan");
+    return getenv("INSTALLER_TEST_SUMMARY_FAILURE") ? -ENOSPC : 0;
+}
+
 static int fixture_valid(void) { return installer_partition_auto; }
 static int fixture_noop(void) { return 0; }
 static int fixture_create(uint32_t filesystem, uint32_t size, const char *name)
@@ -288,10 +312,14 @@ static void screen_tests(void)
     endwin(); delscreen(screen); fclose(input); fclose(output);
 }
 
+
 int main(int argc, char **argv)
 {
     assert(setlocale(LC_ALL, "C.UTF-8"));
-    if (argc == 2 && !strcmp(argv[1], "--interactive")) return installer_tty_main(&fixture_context);
+    if (argc == 2 && !strcmp(argv[1], "--interactive")) {
+        install_failure = getenv("INSTALLER_TEST_INSTALL_FAILURE") != NULL;
+        return installer_tty_main(&fixture_context);
+    }
     partition_snapshot_tests(); edit_tests(); screen_tests();
     puts("PASS ncurses UTF-8 editing, password masking, navigation, resize and worker result/abnormal exit");
     return 0;

@@ -1,11 +1,9 @@
 #define _GNU_SOURCE
 #include <assert.h>
 /* glibc declares these as enum members after including linux/mount.h. */
-#include <linux/mount.h>
-#undef MNT_FORCE
-#undef MNT_DETACH
-#undef MNT_EXPIRE
-#undef UMOUNT_NOFOLLOW
+#include <sys/mount.h>
+int fake_umount2(const char *, int);
+int fake_mount(const char *, const char *, const char *, unsigned long, const void *);
 #define mkdir fake_mkdir
 #define lstat fake_lstat
 #define mount fake_mount
@@ -156,6 +154,9 @@ int reliefos_block_gpt_create(const char *path, uint32_t fs, uint32_t size,
                             const char *name, uint32_t *index)
 { *index = gpt_index++; return 0; }
 int reliefos_block_gpt_set_type(const char *path, uint32_t index, uint32_t type) { ++type_calls; return 0; }
+int reliefos_block_gpt_resize(const char *path, uint32_t index, uint32_t size) { ++mutations; return 0; }
+int reliefos_block_gpt_set_name(const char *path, uint32_t index, const char *name) { ++mutations; return 0; }
+int reliefos_block_gpt_delete(const char *path, uint32_t index) { ++mutations; return 0; }
 int reliefos_block_partition_path(const char *path, uint32_t index, char *out, uint32_t cap)
 { snprintf(out, cap, "%sp%u", path, index + 1); return 0; }
 int reliefos_block_format(const char *path, uint32_t fs, const char *label)

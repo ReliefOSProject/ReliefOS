@@ -428,7 +428,7 @@ def self_test():
                     with patch("test_installer_accounts_qemu.time.monotonic", side_effect=(0, 0, 2401)), \
                          patch("test_installer_accounts_qemu.time.sleep"), \
                          patch("test_installer_accounts_qemu.installer_finish_log", return_value=text), \
-                         patch("test_vt_qemu.ocr", return_value="Installation finished\nInstallation completed successfully"):
+                         patch("test_vt_qemu.ocr", return_value="Installation result\nInstallation completed successfully"):
                         wait_install(FinishProbe(), serial, Process(), tty=tty)
                 except AssertionError:
                     assert not success, (text, tty)

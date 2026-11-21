@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include "installer_tty.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TUI_PARTITION_ROWS (RELIEFOS_BLOCK_MAX_PARTITIONS * 2u + 1u)
 
 /** @brief One physical extent; source is the original array index, or -1 for free space. */
@@ -49,5 +53,9 @@ void tui_partition_table_move(struct tui_partition_table *table, int movement);
  * @param sector_size Logical-sector bytes.
  */
 void tui_partition_size(char *out, size_t capacity, uint64_t sectors, uint32_t sector_size);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

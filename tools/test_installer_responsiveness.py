@@ -1,7 +1,7 @@
 """Check a running installer's redraw latency through an isolated QEMU QMP socket.
 
 Start the installer at its language page with no writable disk attached. This
-test visits only Language, License, Welcome, and Mode; it never starts a copy.
+test visits only Language, License, Installation mode, and Disk; it never starts a copy.
 Requires Pillow. Screenshots and measured response times are saved in --output.
 """
 
@@ -16,10 +16,12 @@ from PIL import Image
 
 SIDEBAR_BLUE = (0x3B, 0x62, 0xA6)
 SIDEBAR_ACTIVE = (0xFF, 0xFF, 0xFF)
+CONTENT_BACKGROUND = (236, 238, 244)
 SIDEBAR_ROW_TOP = 100
 SIDEBAR_ROW_PITCH = 34
 SIDEBAR_ROW_HEIGHT = 30
-SIDEBAR_PAGE_COUNT = 11
+SIDEBAR_PAGES = (0, 1, 3, 4, 5, 6, 11, 7, 8, 9, 10)
+UPDATE_SIDEBAR_PAGES = (0, 1, 3, 4, 8, 9, 10)
 
 
 class InstallerProbe:
@@ -77,28 +79,43 @@ class InstallerProbe:
         self.sidebar_bottom = None
         self.sidebar_right = None
         self.content_left = None
+        self.window_right = None
+        self.content_width = None
+        self.body_offset = 0
+        self._visible_installer_page = None
 
     def _detect_installer_sidebar(self, frame):
         cached = self._installer_sidebar
         if cached and cached[:2] == frame.size:
             _, _, left, top, right, bottom = cached
             if (0 <= left + 4 < frame.width and 0 <= top + 4 < frame.height and
-                    frame.getpixel((left + 4, top + 4)) == SIDEBAR_BLUE):
+                    frame.getpixel((left + 4, top + 4)) == SIDEBAR_BLUE and
+                    frame.getpixel((left + 4, bottom - 1)) == SIDEBAR_BLUE and
+                    (left == 0 or frame.getpixel((left - 1, top + 4)) != SIDEBAR_BLUE) and
+                    (top == 0 or frame.getpixel((left + 4, top - 1)) != SIDEBAR_BLUE) and
+                    (bottom == frame.height or frame.getpixel((left + 4, bottom)) != SIDEBAR_BLUE)):
+                self._detect_window_right(frame, left, top, bottom)
                 return left, top, right, bottom
 
         pixels = frame.load()
-        blue_columns = []
+        column_counts = []
         # The active white row and sidebar labels interrupt exact-color blue
         # runs inside otherwise full-height columns. A 45% column threshold
         # still distinguishes this tall pane from incidental blue controls.
-        column_threshold = int(frame.height * 0.45)
         for x in range(frame.width):
             count = 0
             for y in range(frame.height):
                 if pixels[x, y] == SIDEBAR_BLUE:
                     count += 1
-            if count >= column_threshold:
-                blue_columns.append((x, count))
+            column_counts.append((x, count))
+        maximum = max((count for _, count in column_counts), default=0)
+        if maximum < min(240, frame.height * .4):
+            return None
+        # A 700px installer can occupy only part of a 1080p/4K display. Use
+        # the observed pane height, including its thin uninterrupted margins,
+        # instead of requiring blue to cover 45% of the entire framebuffer.
+        column_threshold = int(maximum * .45)
+        blue_columns = [(x, count) for x, count in column_counts if count >= column_threshold]
 
         runs = []
         for x, count in blue_columns:
@@ -130,7 +147,17 @@ class InstallerProbe:
         self.sidebar_left, self.sidebar_top = left, top
         self.sidebar_right, self.sidebar_bottom = right, bottom
         self.content_left = right + 24
+        self._detect_window_right(frame, left, top, bottom)
         return left, top, right, bottom
+
+    def _detect_window_right(self, frame, left, top, bottom):
+        # A clear footer margin spans the window's full content width.
+        footer_y = max(top, bottom - 72)
+        edge = self.content_left
+        while edge < frame.width and frame.getpixel((edge, footer_y)) == CONTENT_BACKGROUND:
+            edge += 1
+        self.window_right = edge if edge > self.content_left + 450 else left + 1024
+        self.content_width = self.window_right - self.content_left - 24
 
     def visible_page(self, frame):
         geometry = self._detect_installer_sidebar(frame)
@@ -143,20 +170,27 @@ class InstallerProbe:
         sample_left = min(sample_left, frame.width - 1)
         sample_right = min(sample_right, frame.width)
         sample_xs = range(sample_left, sample_right)
-        total = len(sample_xs) * 7
+        sample_height = 4
+        total = len(sample_xs) * sample_height
         if total <= 0:
             return None
         pixels = frame.load()
-        for page in range(SIDEBAR_PAGE_COUNT):
-            row_top = top + SIDEBAR_ROW_TOP + page * SIDEBAR_ROW_PITCH
+        pages = UPDATE_SIDEBAR_PAGES if getattr(self, "installer_update_mode", False) else SIDEBAR_PAGES
+        for row, page in enumerate(pages):
+            row_top = top + SIDEBAR_ROW_TOP + row * SIDEBAR_ROW_PITCH
             row_bottom = row_top + SIDEBAR_ROW_HEIGHT
             if row_top < top or row_bottom > bottom or row_bottom > frame.height:
                 continue
-            y_start = row_top + (SIDEBAR_ROW_HEIGHT - 7) // 2
+            # Long labels reach the right edge; sample above their glyphs.
+            y_start = row_top + 2
             count = sum(pixels[x, y] == SIDEBAR_ACTIVE
-                        for y in range(y_start, y_start + 7)
+                        for y in range(y_start, y_start + sample_height)
                         for x in sample_xs)
             if count >= total * 0.8:
+                if self._visible_installer_page != page:
+                    # Every page shares the same fixed content origin.
+                    self.body_offset = 0
+                    self._visible_installer_page = page
                 return page
         # An early partial redraw can otherwise retain incomplete pane bounds.
         self._reset_installer_geometry()
@@ -185,25 +219,130 @@ class InstallerProbe:
         x1, y1, x2, y2 = self.footer_button_box(previous)
         return (x1 + x2) // 2, (y1 + y2) // 2
 
+    def body_viewport_height(self):
+        self._require_installer_geometry()
+        return self.sidebar_bottom - self.sidebar_top - 80
+
+    def scroll_body(self, *, bottom=False, content_height=None):
+        """Verify that wheel input over the page gutter cannot move the page.
+
+        Keep this entry point for existing QMP callers. Long documents and
+        lists may scroll inside their own controls; the surrounding page must
+        stay fixed, regardless of the direction or former content height.
+        """
+        self._require_installer_geometry()
+        assert self.body_offset == 0, "Installer page origin changed"
+        self.move(self.content_left - 12, self.sidebar_top + 48)
+        time.sleep(.1)
+        before = self.screenshot("body-before-scroll")
+        direction = "wheel-down" if bottom else "wheel-up"
+        for _ in range(2):
+            self.command("input-send-event", {"events": [
+                {"type": "btn", "data": {"button": direction, "down": down}}
+                for _ in range(4) for down in (True, False)
+            ]})
+            time.sleep(.05)
+        deadline = time.monotonic() + 8
+        while True:
+            time.sleep(.2)
+            after = self.screenshot("body-after-scroll")
+            try:
+                self._assert_body_stationary(before, after)
+                break
+            except AssertionError:
+                if time.monotonic() >= deadline:
+                    raise
+        assert self.body_offset == 0
+
+    def _body_fixed_bands(self, frame):
+        """Return fixed page areas around the native scrollable child.
+
+        FLTK may forward an unhandled gutter wheel event to a text display or
+        browser. Its contents may scroll, while its surrounding form must not.
+        Never exclude acceptance, confirmation or partition editing controls.
+        """
+        height = self.body_viewport_height()
+        page = self._visible_installer_page
+        update = getattr(self, "installer_update_mode", False)
+        scroll_top = scroll_bottom = None
+        if page == 1:
+            scroll_top, scroll_bottom = 104, height - 64
+        elif page == 4:
+            scroll_top, scroll_bottom = 154, height - (216 if update else 94)
+        elif page == 6:
+            # The manual browser is followed by an 8px clear gap and editing
+            # buttons. The automatic browser continues through that gap.
+            # Inspect the actual gap, rather than remembering previous clicks.
+            gap_y = self.sidebar_top + height - 208
+            manual = all(frame.getpixel((self.content_left + x, gap_y)) == CONTENT_BACKGROUND
+                         for x in (4, self.content_width // 2, self.content_width - 5))
+            scroll_top, scroll_bottom = 164, height - (212 if manual else 100)
+        elif page == 8 and not update:
+            scroll_top, scroll_bottom = 284, height - 100
+        if scroll_top is None or scroll_bottom <= scroll_top:
+            return [(0, height)]
+        return [(0, scroll_top), (scroll_bottom, height)]
+
+    def _assert_body_stationary(self, before, after):
+        left, right = self.content_left, self.content_left + self.content_width
+        top = self.sidebar_top
+        foreground_count = 0
+        for start, end in self._body_fixed_bands(before):
+            original = before.crop((left, top + start, right, top + end))
+            current = after.crop((left, top + start, right, top + end))
+            # Check each fixed area separately: a large unchanged header must
+            # not hide a moved acceptance checkbox or confirmation field.
+            # Allow a blinking caret, but require actual foreground evidence.
+            foreground = [(a, b) for a, b in zip(original.getdata(), current.getdata())
+                          if a != CONTENT_BACKGROUND or b != CONTENT_BACKGROUND]
+            foreground_count += len(foreground)
+            same = sum(a == b for a, b in foreground)
+            assert same >= len(foreground) * .98, \
+                (f"Installer page moved after gutter wheel input: fixed rows {start}:{end}, "
+                 f"{same}/{len(foreground)} foreground pixels match")
+        assert foreground_count >= 100, "Insufficient visible content to verify a fixed page"
+
+    def body_point(self, x, y, *, content_height=None, margin=18):
+        self._require_installer_geometry()
+        assert self.body_offset == 0, "Installer page origin changed"
+        viewport = self.body_viewport_height()
+        if not (0 <= x < self.content_width and 0 <= y < viewport):
+            raise AssertionError(f"Installer body point ({x}, {y}) is outside the visible page")
+        return self.content_left + x, self.sidebar_top + y
+
     def language_option_point(self, chinese=False):
         self._require_installer_geometry()
         return self.content_left + 200, self.sidebar_top + (191 if chinese else 143)
 
     def mode_option_point(self, update=False):
         self._require_installer_geometry()
-        return self.content_left + 200, self.sidebar_top + (188 if update else 142)
+        return self.content_left + 200, self.sidebar_top + (260 if update else 142)
 
     def disk_selection_point(self, index=0):
         if index != 0:
             raise ValueError("Only the first visible installer disk row is supported")
         self._require_installer_geometry()
-        return self.content_left + 100, self.sidebar_top + 144
+        return self.body_point(100, 166)
+
+    def partition_browser_box(self, *, manual=True):
+        """Bounds of the native browser, excluding the page's edit controls."""
+        return (0, 164, self.content_width,
+                self.body_viewport_height() - (212 if manual else 100))
+
+    def partition_method_point(self, *, manual=True):
+        return self.body_point(200, 96 if manual else 64)
+
+    def partition_format_indicator_point(self):
+        return self.body_point(8, self.body_viewport_height() - 114)
+
+    def update_activity_box(self):
+        return 0, 202, self.content_width, 284
 
     def partition_selection_point(self, index=0):
         if index != 0:
             raise ValueError("Only the first visible partition row is supported")
         self._require_installer_geometry()
-        return self.content_left + 100, self.sidebar_top + 140
+        return self.body_point(100, 176)
 
     def bootloader_indicator_point(self, bios=True):
         self._require_installer_geometry()
@@ -213,11 +352,31 @@ class InstallerProbe:
         if not 0 <= index < 5:
             raise IndexError("Installer account field index must be between 0 and 4")
         self._require_installer_geometry()
-        return self.content_left + 305, self.sidebar_top + 137 + index * 82
+        column = (self.content_width - 24) // 2
+        x = column + 24 + column // 2 if index >= 3 else \
+            self.content_width // 2 if index == 0 else column // 2
+        y = 117 if index == 0 else 237 if index in (1, 3) else 317
+        return self.body_point(x, y)
 
     def confirm_field_point(self):
         self._require_installer_geometry()
-        return self.content_left + 165, self.sidebar_top + 278
+        return self.body_point(self.content_width // 4, self.body_viewport_height() - 32)
+
+    def license_indicator_point(self):
+        self._require_installer_geometry()
+        return self.body_point(8, self.body_viewport_height() - 31)
+
+    def desktop_option_point(self):
+        self._require_installer_geometry()
+        return self.body_point(self.content_width // 2, 169)
+
+    def swap_indicator_point(self):
+        self._require_installer_geometry()
+        return self.body_point(8, 284)
+
+    def swap_size_point(self):
+        self._require_installer_geometry()
+        return self.body_point(self.content_width // 4, 367)
 
     def xorg_indicator_point(self):
         self._require_installer_geometry()
@@ -226,7 +385,13 @@ class InstallerProbe:
     def run(self, max_latency):
         results = []
         observed = set()
-        for expected in (1, 2, 3):
+        for expected in (1, 3, 4):
+            if expected == 3:
+                self.move(*self.license_indicator_point())
+                self.button(True)
+                time.sleep(0.06)
+                self.button(False)
+                time.sleep(0.1)
             next_x, next_y = self.footer_point()
             self.move(next_x, next_y)
             time.sleep(0.05)
@@ -267,7 +432,7 @@ class InstallerProbe:
             value for value in observed if value is not None), "final_page": final_page}
         (self.output / "results.json").write_text(json.dumps(report, indent=2) + "\n")
         print(json.dumps(report, indent=2), flush=True)
-        assert final_page == 3, "Click order/count changed"
+        assert final_page == 4, "Click order/count changed"
         assert all(item["latency_ms"] is not None and
                    item["latency_ms"] <= max_latency * 1000 for item in results), (
             "Installer deferred click feedback while mouse motion continued")
