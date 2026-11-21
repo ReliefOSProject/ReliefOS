@@ -39,9 +39,11 @@ echo 'squashfs adapter: deterministic gzip installer payload options are passed'
 # The compatibility CLI must resolve its default payload before replacing an
 # explicitly selected ESP stage. It must never consume inputs in that tree.
 output=$w/build
+font=$w/fixture-grub-font.pf2
+touch "$font"
 for file in images/installer-root.ext4 generated/system/kernel.sys \
     generated/system/initramfs.cpio generated/system/initramfs.cpio.json \
-    generated/grub/leonos-unicode.pf2 grub-efi/lib/grub/x86_64-efi/kernel.img \
+    grub-efi/lib/grub/x86_64-efi/kernel.img \
     grub-host/lib/grub/i386-pc/kernel.img grub-host/bin/grub-mkimage \
     grub-host/bin/grub-mkstandalone; do
     mkdir -p "$(dirname "$output/$file")"
@@ -49,7 +51,7 @@ for file in images/installer-root.ext4 generated/system/kernel.sys \
 done
 ln -s "$w/stage/root/etc/release" "$output/images/installer-payload.squashfs"
 if python3 "$src/tools/make_installer_iso.py" --build-output "$output" \
-    --stage "$w/stage" > "$w/iso.log" 2>&1; then
+    --grub-font "$font" --stage "$w/stage" > "$w/iso.log" 2>&1; then
     echo 'compatibility ISO CLI accepted its payload inside the ESP stage' >&2
     exit 1
 fi
