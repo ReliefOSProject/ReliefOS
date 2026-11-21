@@ -8,7 +8,7 @@ Xorg、XDM 与 IceWM
 默认图形链为内核、PID 1、Xorg、XDM、IceWM。XDM 完成 PAM 登录后，
 IceWM 和应用使用普通用户身份运行；不要用 root 桌面代替正常授权。
 终端为 st，默认浏览器为 NetSurf。图形载荷使用锁文件中 ``feature=xorg`` 的依赖；
-当前 Alpine 基线为 ``v3.24``，Mesa 26.3.0 与 LLVM 23 图形运行库使用
+当前 Alpine 基线为 ``v3.24``，Mesa 26.3.1 与 LLVM 23 图形运行库使用
 锁定 SHA 和签名的官方 edge APK，以提供未修改的 VirGL 驱动。
 准备依赖使用 ``make fetch``。
 首次配置及真实运行测试必须区分 QEMU 与 VMware。
