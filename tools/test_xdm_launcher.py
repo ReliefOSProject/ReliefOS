@@ -11,6 +11,7 @@ ever claiming an "append-only" file that the user could truncate.
 """
 from pathlib import Path
 import os
+import shlex
 import shutil
 import stat
 import subprocess
@@ -23,7 +24,7 @@ XORG = ROOT / "system/xorg"
 CONSOLE_SESSION = ROOT / "system/rootfs/usr/lib/reliefos/console-session"
 
 COMMANDS = ["sh", "bash", "env", "cp", "wc", "tr", "rm", "touch", "mkdir", "chmod",
-            "cat", "head", "sleep", "stat", "printf", "awk", "grep"]
+            "cat", "head", "sleep", "stat", "printf", "awk", "grep", "sha256sum"]
 
 
 def resolve(command: str) -> Path:
@@ -118,7 +119,8 @@ class XdmLauncherTests(unittest.TestCase):
                               env={**os.environ, "LC_ALL": "C"},
                               timeout=timeout)
 
-    def run_guest_with_fbdev(self, script: str, drm: bool = False) -> subprocess.CompletedProcess:
+    def run_guest_with_fbdev(self, script: str, drm: bool = False,
+                             pci_id: tuple[str, str] | None = None) -> subprocess.CompletedProcess:
         framebuffer = self.sandbox / "dev/fb0"
         framebuffer.touch()
         mounts = 'mount --bind /dev/zero "$1/dev/fb0"'
@@ -127,6 +129,11 @@ class XdmLauncherTests(unittest.TestCase):
             drm_node.parent.mkdir(parents=True, exist_ok=True)
             drm_node.touch()
             mounts += ' && mount --bind /dev/zero "$1/dev/dri/card0"'
+        if pci_id:
+            device = self.sandbox / "sys/class/drm/card0/device"
+            device.mkdir(parents=True, exist_ok=True)
+            for attr, value in zip(("vendor", "device"), pci_id):
+                (device / attr).write_text(value + "\n")
         command = ["unshare", "--user", "--map-root-user", "--mount", "sh", "-c",
                    mounts + ' && chroot "$1" /bin/sh -c "$2"',
                    "sh", str(self.sandbox), script]
@@ -448,6 +455,32 @@ class XdmLauncherTests(unittest.TestCase):
                          0o600)
         self.assertFalse((self.sandbox / "run/reliefos/xdm/events").exists())
 
+    def test_alpine_skeleton_without_xinitrc_uses_the_default_desktop(self):
+        self.install_session_stubs()
+        self.install_xdm(0)
+        # Alpine xinit 1.4.4-r0 /etc/skel/.xsession as copied to new homes.
+        write_stub(self.sandbox / "home/tester/.xsession",
+                   "\n#\n# ~/.xsession\n#\n# Executed by xdm/gdm/kdm at login\n#\n"
+                   "\n/bin/sh -l ~/.xinitrc\n\n")
+
+        result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
+
+        session_log = self.sandbox / "home/tester/.xsession-errors"
+        self.assertEqual(result.returncode, 0, session_log.read_text())
+        self.assertIn("icewm started for uid=1000", self.events())
+
+    def test_custom_xsession_is_selected_without_xinitrc(self):
+        self.install_session_stubs()
+        self.install_xdm(0)
+        write_stub(self.sandbox / "home/tester/.xsession",
+                   "echo custom-session > /run/custom-session\nexit 7\n")
+
+        result = self.run_guest("exec /usr/lib/reliefos/reliefos-xdm")
+
+        self.assertEqual(result.returncode, 7, result.stdout + result.stderr)
+        self.assertEqual((self.sandbox / "run/custom-session").read_text(), "custom-session\n")
+        self.assertNotIn("icewm started for uid=1000", self.events())
+
     def test_immediate_child_death_is_not_recorded_as_started(self):
         self.install_session_stubs(wm="exit 3\n")
         self.install_xdm(0)
@@ -597,6 +630,36 @@ class XdmLauncherTests(unittest.TestCase):
         self.assertEqual((self.sandbox / "tmp/xorg.argv").read_text().splitlines(),
                          ["<:0>", "<-config>", "</etc/X11/custom.conf>",
                           "<-nolisten>", "<tcp>", "<vt1>", "<-keeptty>"])
+
+
+    def test_drm_wrapper_selects_the_cursor_and_flip_policy_for_the_active_device(self):
+        for tool in ("mktemp", "mv", "sed"):
+            copy_with_libs(self.sandbox, resolve(tool))
+        shutil.copy2(XORG / "xorg.conf", self.sandbox / "etc/X11/xorg.conf")
+        write_stub(self.sandbox / "usr/bin/Xorg",
+                   'printf "<%s>\\n" "$@" > /tmp/xorg.argv\n')
+        # Exercise the command that the packaged greeter actually starts.
+        server = shlex.split((self.sandbox / 'etc/X11/xdm/Xservers').read_text())
+        command = shlex.join(['exec', *server[2:]])
+        for pci_id, backend, flip in ((('0x15ad', '0x0405'), 'svga', 'false'),
+                                      (('0x1af4', '0x1050'), 'virtio', 'true')):
+            with self.subTest(backend=backend):
+                result = self.run_guest_with_fbdev(command, drm=True, pci_id=pci_id)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                config = f'/run/X11/xorg-{backend}.conf'
+                self.assertEqual((self.sandbox / 'tmp/xorg.argv').read_text().splitlines(),
+                                 ['<-config>', f'<{config}>', '<:0>', '<-nolisten>', '<tcp>',
+                                  '<vt1>', '<-keeptty>'])
+                contents = (self.sandbox / config[1:]).read_text()
+                self.assertIn('Option "SWcursor" "false"', contents)
+                self.assertIn(f'Option "PageFlip" "{flip}"', contents)
+
+        explicit = ['-config', '/etc/X11/xorg.conf']
+        result = self.run_guest_with_fbdev(shlex.join(['exec', *server[2:], *explicit]),
+                                           drm=True, pci_id=('0x15ad', '0x0405'))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual((self.sandbox / 'tmp/xorg.argv').read_text().splitlines(),
+                         [f'<{arg}>' for arg in [*server[3:], *explicit]])
 
 
 if __name__ == "__main__":
