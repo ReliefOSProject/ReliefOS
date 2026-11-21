@@ -2,8 +2,11 @@
 # Compose one private root from an explicit plan; the C helper validates every
 # destination and publishes a complete JSON manifest, including overlay owners.
 set -eu
-[ "$#" = 9 ] || { echo 'usage: rootfs-stage SRC O CONFIG METADATA STAGE_TOOL LAYOUT_TOOL DEST MANIFEST EPOCH' >&2; exit 2; }
+[ "$#" = 9 ] || [ "$#" = 10 ] || { echo 'usage: rootfs-stage SRC O CONFIG METADATA STAGE_TOOL LAYOUT_TOOL DEST MANIFEST EPOCH [KERNEL_PAYLOAD]' >&2; exit 2; }
 src=$1 out=$2 config=$3 metadata=$4 stage_tool=$5 layout_tool=$6 dest=$7 manifest=$8 epoch=$9
+# The build graph can place O_STAGE outside O. Keep the original location only
+# for standalone callers that omit the explicitly selected payload directory.
+kernel_payload=${10:-$out/stage/kernel-payload}
 mkdir -p "$(dirname "$dest")"
 work=$(mktemp -d "$dest.new.XXXXXX")
 trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -15,6 +18,21 @@ plan=$work/plan
 record() { printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" "$5" "$6" "${7:-0}" >> "$plan"; }
 file() { record f "$1" "/$2" "${3:-0644}" "${4:-reliefos-base}" "${5:-unique}" "${6:-0}"; }
 tree() { record t "$1" "/$2" 0755 "$3" "${4:-unique}"; }
+# Git preserves executable bits, but not the checkout's other mode bits. Only
+# known public policy/resource trees use this contract; private account data
+# and unrelated configuration keep their separately declared permissions.
+public_tree_modes() {
+    find "$1" -type d -print | while IFS= read -r public_source; do
+        public_relative=${public_source#"$1"}
+        record d - "/$2$public_relative" 0755 "$3" override
+    done
+    find "$1" -type f -print | while IFS= read -r public_source; do
+        public_relative=${public_source#"$1"}
+        public_mode=0644
+        if [ -x "$public_source" ]; then public_mode=0755; fi
+        file "$public_source" "$2$public_relative" "$public_mode" "$3" override
+    done
+}
 link() { record l "$2" "/$1" 0777 "${3:-reliefos-base}" "${4:-unique}"; }
 enabled() { awk -F '\t' -v id="$1" '$1==id && $4==1 {found=1} END {exit !found}' "$metadata"; }
 # Every enabled upstream root is passed by the build graph. The default keeps
@@ -67,6 +85,19 @@ for spec in auth pam; do
 done
 # Product account/PAM policy intentionally overrides vendor example files.
 tree "$src/system/rootfs" '' product-policy override
+for directory in etc/apk etc/bash etc/default etc/fonts etc/gtk-3.0 \
+    etc/init.d etc/network etc/pam.d etc/profile.d etc/runlevels etc/skel \
+    lib/apk/commit_hooks.d usr; do
+    public_tree_modes "$src/system/rootfs/$directory" "$directory" product-policy
+done
+# These ordinary-user inputs are individual files, not a blanket /etc mode
+# change. shadow, gshadow and sudoers retain the explicit private policy below.
+for name in asound.conf fstab group hostname hosts inittab issue login.defs \
+    motd motd.ja_JP motd.zh_CN nsswitch.conf ntp.conf os-release passwd \
+    profile protocols resolv.conf services shells sudo.conf security/limits.conf; do
+    file "$src/system/rootfs/etc/$name" "etc/$name" 0644 product-policy override
+done
+record d - /etc/security 0755 product-policy override
 file "$src/system/rootfs/etc/init.d/reliefos-boot-confirm" etc/init.d/reliefos-boot-confirm 0755 reliefos-boot-tools override
 link etc/runlevels/default/reliefos-boot-confirm ../../init.d/reliefos-boot-confirm reliefos-boot-tools
 link lib/apk/commit_hooks.d/reliefos-update /usr/sbin/reliefos-update reliefos-system-update
@@ -93,6 +124,7 @@ file "$src/system/xorg/autostart-terminal" usr/libexec/reliefos/autostart/xdg-te
 file "$src/system/xorg/xdm-setup" usr/lib/X11/xdm/Xsetup_0 0755 product-policy override
 # IceWM reads these system defaults through its standard /etc/icewm path.
 tree "$src/system/xorg/icewm" etc/reliefos/icewm product-policy override
+public_tree_modes "$src/system/xorg/icewm" etc/reliefos/icewm product-policy
 link etc/icewm reliefos/icewm reliefos-apps
 file "$src/system/xorg/pam-xdm" etc/pam.d/xdm 0644 product-policy override
 legacy=$src/system/rootfs/var/lib/leonos/users.db
@@ -123,9 +155,9 @@ fi
 for package in musl mimalloc; do tree "$out/sysroot/musl/share/licenses/$package" "usr/share/licenses/$package" "$package"; done
 printf '/lib:/usr/local/lib:/usr/lib:/usr/lib/reliefos:/usr/lib/leonos\n' > "$work/data/ld.path"
 file "$work/data/ld.path" etc/ld-musl-x86_64.path 0644 musl
-[ -f "$out/stage/kernel-payload/kernel-payload.json" ] || { echo 'rootfs-stage: matching kernel payload is missing' >&2; exit 1; }
-tree "$out/stage/kernel-payload/lib/modules" lib/modules reliefos-kernel
-tree "$out/stage/kernel-payload/usr/lib/reliefos/kernel" usr/lib/reliefos/kernel reliefos-kernel
+[ -f "$kernel_payload/kernel-payload.json" ] || { echo "rootfs-stage: matching kernel payload is missing: $kernel_payload" >&2; exit 1; }
+tree "$kernel_payload/lib/modules" lib/modules reliefos-kernel
+tree "$kernel_payload/usr/lib/reliefos/kernel" usr/lib/reliefos/kernel reliefos-kernel
 file "$out/userland/motd.elf" usr/lib/reliefos/motd-status 0755 reliefos-base
 # awk reads TSV without collapsing empty label/extension fields. No data is
 # interpreted as a command; only validated component IDs are used in paths.

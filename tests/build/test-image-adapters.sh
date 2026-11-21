@@ -40,6 +40,88 @@ debugfs -R 'stat /home/test/file' "$w/a.ext2" 2>/dev/null | grep -Eq 'User: +100
 [ "$(stat -c %a "$w/root/tmp")" = 1777 ]
 printf 'image adapters: reproducible ext2, modes and symlinks passed\n'
 
+# Installer RAM roots reserve less per inode, while retaining every file and
+# hard link. Use enough small files to exercise sizing above the 128 MiB floor.
+cp -a "$w/root" "$w/dense-root"
+mkdir -p "$w/dense-root/files" "$w/dense-root/links"
+awk 'BEGIN { for (i = 0; i < 16384; ++i) printf "%03d %05d\n", int(i / 128), i }' |
+while read -r bucket name; do
+    if [ "${previous_bucket:-}" != "$bucket" ]; then
+        mkdir "$w/dense-root/files/$bucket"
+        previous_bucket=$bucket
+    fi
+    printf 'fixture inode %s\n' "$name" > "$w/dense-root/files/$bucket/$name"
+done
+# A file extending beyond one block exercises tail allocation, and many aliases
+# ensure shared data/inodes are counted once while every directory name survives.
+dd if=/dev/zero of="$w/dense-root/files/000/00000" bs=4097 count=1 2>/dev/null
+awk 'BEGIN { for (i = 0; i < 2048; ++i) printf "%05d\n", i }' |
+while read -r name; do
+    ln "$w/dense-root/files/000/00000" "$w/dense-root/links/$name"
+done
+(
+    unset IMAGE_RAM_ROOT
+    IMAGE_MIN_MIB=0 RELIEFOS_EXT4_TIME=$w/time \
+        sh "$src/tools/build/images.sh" ext4 "$w/dense-root" "$w/default.ext4" \
+        1700000000 5c13543b-732c-4f81-8652-621124484420 > "$w/default-ext4.log" 2>&1
+)
+IMAGE_RAM_ROOT=0 IMAGE_MIN_MIB=0 RELIEFOS_EXT4_TIME=$w/time \
+    sh "$src/tools/build/images.sh" ext4 "$w/dense-root" "$w/explicit-default.ext4" \
+    1700000000 5c13543b-732c-4f81-8652-621124484420 > "$w/explicit-default.log" 2>&1
+cmp "$w/default.ext4" "$w/explicit-default.ext4"
+IMAGE_RAM_ROOT=1 IMAGE_MIN_MIB=0 RELIEFOS_EXT4_TIME=$w/time \
+    sh "$src/tools/build/images.sh" ext4 "$w/dense-root" "$w/compact.ext4" \
+    1700000000 5c13543b-732c-4f81-8652-621124484420 > "$w/compact.log" 2>&1
+test "$(stat -c %s "$w/compact.ext4")" -lt "$(stat -c %s "$w/default.ext4")"
+IMAGE_RAM_ROOT=1 IMAGE_MIN_MIB=256 RELIEFOS_EXT4_TIME=$w/time \
+    sh "$src/tools/build/images.sh" ext4 "$w/dense-root" "$w/minimum.ext4" \
+    1700000000 5c13543b-732c-4f81-8652-621124484420 > "$w/minimum.log" 2>&1
+test "$(stat -c %s "$w/minimum.ext4")" -eq 268435456
+for name in default compact minimum; do
+    debugfs -R 'dump /files/000/00000 '"$w/dumped" "$w/$name.ext4" > /dev/null 2>&1
+    cmp "$w/dense-root/files/000/00000" "$w/dumped"
+    debugfs -R 'dump /files/127/16383 '"$w/dumped" "$w/$name.ext4" > /dev/null 2>&1
+    cmp "$w/dense-root/files/127/16383" "$w/dumped"
+    original_inode=$(debugfs -R 'stat /files/000/00000' "$w/$name.ext4" 2>/dev/null | awk '/^Inode:/ { print $2 }')
+    linked_inode=$(debugfs -R 'stat /links/02047' "$w/$name.ext4" 2>/dev/null | awk '/^Inode:/ { print $2 }')
+    test -n "$original_inode" && test "$original_inode" = "$linked_inode"
+    debugfs -R 'stat /files/000/00000' "$w/$name.ext4" 2>/dev/null | grep -Eq 'Links: +2049 '
+    debugfs -R 'stat /tmp' "$w/$name.ext4" 2>/dev/null | grep -q '1777'
+    debugfs -R 'stat /link' "$w/$name.ext4" 2>/dev/null | grep -q 'symlink'
+    debugfs -R 'stat /home/test/file' "$w/$name.ext4" 2>/dev/null | grep -Eq 'User: +1000 +Group: +1000'
+done
+# A dense 128 MiB image can be valid yet lack the required runtime room. Refuse
+# publication atomically, and let the configured image minimum supply more room.
+cp -al "$w/dense-root" "$w/crowded-root"
+awk 'BEGIN { for (i = 96; i < 128; ++i) printf "%03d\n", i }' |
+while read -r bucket; do rm -rf "$w/crowded-root/files/$bucket"; done
+printf 'previous image\n' > "$w/previous-image"
+cp "$w/previous-image" "$w/insufficient.ext4"
+if IMAGE_RAM_ROOT=1 IMAGE_MIN_MIB=0 RELIEFOS_EXT4_TIME=$w/time \
+    sh "$src/tools/build/images.sh" ext4 "$w/crowded-root" "$w/insufficient.ext4" \
+    1700000000 5c13543b-732c-4f81-8652-621124484420 > "$w/insufficient.log" 2>&1; then
+    echo 'FAIL - installer RAM root published with less than 64 MiB free' >&2
+    exit 1
+fi
+grep -q 'IMAGE_RAM_ROOT requires at least 64 MiB free' "$w/insufficient.log"
+cmp "$w/previous-image" "$w/insufficient.ext4"
+for flag in bad 2 -1 01; do
+    if IMAGE_RAM_ROOT=$flag RELIEFOS_EXT4_TIME=$w/time \
+        sh "$src/tools/build/images.sh" ext4 "$w/root" "$w/bad-flag.ext4" \
+        1700000000 5c13543b-732c-4f81-8652-621124484420 > "$w/bad-flag.log" 2>&1; then
+        echo 'FAIL - invalid IMAGE_RAM_ROOT accepted' >&2
+        exit 1
+    fi
+    grep -q 'IMAGE_RAM_ROOT must be 0 or 1' "$w/bad-flag.log"
+    test ! -e "$w/bad-flag.ext4"
+done
+# The build graph opts in only its installer ext4 module, and tracks the policy
+# in its image parameters. Live and disk roots explicitly keep the default.
+grep -Fq 'IMAGE_RAM_ROOT=1 IMAGE_MIN_MIB=$(or $(CONFIG_INSTALLER_ROOT_SIZE_MIB),400)' "$src/scripts/reliefos/Makefile.images"
+test "$(grep -c 'IMAGE_RAM_ROOT=0 RELIEFOS_EXT4_TIME=' "$src/scripts/reliefos/Makefile.images")" -eq 2
+grep -Fq '|installer-ram-root=1|installer-inode-reserve=5120|' "$src/scripts/reliefos/Makefile.images"
+printf 'image adapters: compact installer ext4, hard links, permissions, minimum and free-space guard passed\n'
+
 # Exercise the real ESP staging rule with only GRUB's file-producing command
 # mocked. The resulting tree is inspected by the disk and ISO rules.
 mkdir -p "$w/fake-bin" "$w/modules"

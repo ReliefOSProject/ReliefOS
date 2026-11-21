@@ -45,6 +45,8 @@ ext4)
     [ "$#" = 4 ] || exit 2
     stage=$1 output=$2 epoch=$3 uuid=$4
     [ -d "$stage" ] && [ -n "$output" ] && [ -n "$uuid" ]
+    ram_root=${IMAGE_RAM_ROOT:-0}
+    case $ram_root in 0|1) ;; *) echo 'IMAGE_RAM_ROOT must be 0 or 1' >&2; exit 2;; esac
     mkdir -p "$(dirname "$output")"
     work=$(mktemp -d "$output.work.XXXXXX")
     trap 'rm -rf "$work"' EXIT HUP INT TERM
@@ -57,7 +59,12 @@ EOF
     bytes=$(du -sb "$work/root" | cut -f1)
     # du counts shared file data once. Reserve per-inode allocation overhead
     # once as well, and still account for every name in the directory tree.
-    mib=$(( (bytes + unique * 8192 + (count - unique) * 512 + 67108864 + 33554431) / 33554432 * 32 ))
+    # The installer module must fit a contiguous firmware RAM allocation.
+    # Its smaller reserve covers a 4 KiB tail block, two 256-byte inodes and
+    # another 512 bytes of metadata; actual free space is checked before publish.
+    inode_reserve=8192
+    [ "$ram_root" = 0 ] || inode_reserve=5120
+    mib=$(( (bytes + unique * inode_reserve + (count - unique) * 512 + 67108864 + 33554431) / 33554432 * 32 ))
     [ "$mib" -ge 128 ] || mib=128
     minimum=${IMAGE_MIN_MIB:-0}
     case $minimum in ''|*[!0-9]*) echo 'IMAGE_MIN_MIB must be an integer' >&2; exit 2;; esac
@@ -78,6 +85,21 @@ EOF
     : "${reliefos_ext4_time:?ext4 timestamp tool required}"
     "$reliefos_ext4_time" "$work/root.ext4" "$epoch"
     e2fsck -f -n "$work/root.ext4"
+    if [ "$ram_root" = 1 ]; then
+        LC_ALL=C dumpe2fs -h "$work/root.ext4" > "$work/ext4-info"
+        free_bytes=$(awk '
+            $1 == "Free" && $2 == "blocks:" { blocks = $3; have_blocks = 1 }
+            $1 == "Block" && $2 == "size:" { size = $3; have_size = 1 }
+            END {
+                if (!have_blocks || !have_size || blocks < 0 || size <= 0) exit 1
+                printf "%.0f\n", blocks * size
+            }
+        ' "$work/ext4-info")
+        [ "$free_bytes" -ge 67108864 ] || {
+            echo "IMAGE_RAM_ROOT requires at least 64 MiB free (found $free_bytes bytes)" >&2
+            exit 1
+        }
+    fi
     mv "$work/root.ext4" "$output"
     ;;
 *) echo "unknown image operation: $mode" >&2; exit 2 ;;
