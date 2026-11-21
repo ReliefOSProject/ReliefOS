@@ -140,6 +140,13 @@ ReliefNT's NOTICE, GPL version 2 text and Linux-syscall-note exception in
 share/licenses/reliefnt/. See kernel/reliefnt/NOTICE for the pinned upstream
 revision and the BSD, MIT and GPL-1.0-or-later WITH Linux-syscall-note terms.
 
+The SDK also includes VMware's vmwgfx_drm.h under its MIT license option.
+ReliefNT's VMware SVGA II backend uses VMware's public SVGA protocol headers
+under their MIT option and adapts VMware host messaging and statistics code
+under MIT. The headers and sources retain VMware's copyright and permission
+notices. See kernel/reliefnt/NOTICE for the pinned upstream revision and file
+origins.
+
 Binary dependencies sl, ncurses, zlib, libpng, SQLite and mbedtls3 are distributed
 as unmodified signed Alpine v3.24 APKs. Exact versions, archive URLs, SHA256 and
 license metadata are recorded in configs/dependencies.lock.json. Source recipes

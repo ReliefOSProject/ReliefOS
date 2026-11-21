@@ -16,7 +16,7 @@ import test_xorg_vm_qemu as xorg
 from test_reliefmath_qemu import Session as MathSession, filename, resize, wait_focus
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / 'out/xorg-vmware-debug'
+OUT = ROOT / 'out/xorg-debug'
 
 
 def prepare(image, kernel, output):

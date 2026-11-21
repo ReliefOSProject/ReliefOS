@@ -113,7 +113,7 @@ def main():
     parser.add_argument('--image', type=Path, help='RAW base; defaults to build images/reliefos.raw')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--mode', choices=('tty', 'gui'), required=True)
-    parser.add_argument('--hold-display-locks', action='store_true', help='also simulate interrupted console/SVGA lock owners')
+    parser.add_argument('--hold-display-locks', action='store_true', help='also simulate interrupted console and framebuffer lock owners')
     args = parser.parse_args()
     build, output = args.build_dir.resolve(), args.output.resolve()
     source = args.image.resolve() if args.image else build/'images/reliefos.raw'
@@ -126,10 +126,10 @@ def main():
     kernel = build/'generated/system/kernel.sys'
     symbols = build/'reliefnt/generated/system/kernel.unstripped'
     source_hash = digest(source)
-    metadata = {'mode': args.mode, 'platform': 'QEMU/KVM q35 SVGA II, 2 CPUs, 4 GiB',
+    metadata = {'mode': args.mode, 'platform': 'QEMU/KVM q35 standard VGA, 2 CPUs, 4 GiB',
                 'kernel_sha256': digest(kernel), 'symbols_sha256': digest(symbols),
                 'source_image': str(source), 'source_sha256': source_hash,
-                'injection': 'GDB writes mov (%rax),%rax at console_display_tick; target chosen from a non-present current PML4 entry',
+                'injection': 'GDB writes mov (%rax),%rax at time_on_tick; target chosen from a non-present current PML4 entry',
                 'held_display_locks': args.hold_display_locks, 'vmware_verified': False}
     process = probe = None
     try:
@@ -137,7 +137,7 @@ def main():
         serial, qmp, gdb = (output/name for name in ('serial.log', 'qmp.sock', 'gdb.sock'))
         command = ['qemu-system-x86_64', '-enable-kvm', '-cpu', 'host', '-machine', 'q35',
                    '-m', '4096', '-smp', '2', '-bios', '/usr/share/edk2/x64/OVMF.4m.fd',
-                   '-display', 'none', '-serial', f'file:{serial}', '-vga', 'vmware',
+                   '-display', 'none', '-serial', f'file:{serial}', '-vga', 'std',
                    '-device', 'qemu-xhci', '-device', 'usb-tablet', '-netdev', 'user,id=net0',
                    '-device', 'e1000,netdev=net0', '-drive', f'file={raw},format=raw,if=ide,snapshot=on',
                    '-qmp', f'unix:{qmp},server=on,wait=off',
@@ -167,7 +167,7 @@ def main():
         metadata['normal_boot_and_display_ready'] = True
         script = output/'inject.gdb'
         gdb_commands = ['set pagination off', 'set confirm off', f'target remote {gdb}',
-                        'hbreak console_display_tick', 'continue',
+                        'hbreak time_on_tick', 'continue',
                         'printf "FAULT-INJECTION RIP=%#lx CS=%#lx RSP=%#lx\\n", $rip, $cs, $rsp',
                         'x/8bx $rip', 'delete breakpoints',
                         # Prove a canonical kernel address absent from the
@@ -190,10 +190,10 @@ def main():
                         'end']
         if args.hold_display_locks:
             gdb_commands += ['set {unsigned int} &console_log_owner = 0xfffffffe',
-                             'set {unsigned int} &device_lock = 1']
-        gdb_commands += ['set {unsigned char} (unsigned long)&console_display_tick = 0x48',
-                         'set {unsigned char} ((unsigned long)&console_display_tick+1) = 0x8b',
-                         'set {unsigned char} ((unsigned long)&console_display_tick+2) = 0x00',
+                             'set {unsigned int} &framebuffer_damage_lock = 1']
+        gdb_commands += ['set {unsigned char} (unsigned long)&time_on_tick = 0x48',
+                         'set {unsigned char} ((unsigned long)&time_on_tick+1) = 0x8b',
+                         'set {unsigned char} ((unsigned long)&time_on_tick+2) = 0x00',
                          'set $rax = $fault_target',
                          'hbreak console_panic_begin', 'continue',
                          f'monitor screendump {output}/frozen-display.ppm',

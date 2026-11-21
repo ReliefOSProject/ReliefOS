@@ -37,4 +37,4 @@ test "$(cat "$w/argv")" = "$(printf ':0\nvt1')"
 rm "$w/sys/class/drm/card0/device/vendor"
 sh "$w/wrapper" :0 vt1
 test "$(cat "$w/argv")" = "$(printf ':0\nvt1')"
-printf 'PASS Xorg wrapper: VirtIO cursor/flip, VMware/fbdev defaults, administrator overrides\n'
+printf 'PASS Xorg wrapper: VirtIO cursor/flip, fbdev defaults, administrator overrides\n'

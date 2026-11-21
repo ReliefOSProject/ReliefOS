@@ -84,7 +84,7 @@ def boot(output, disk, iso=None, *, smp=2, firmware="uefi", accel="auto", firmwa
                "-m", "4096", "-smp", str(smp),
                *firmware_arguments(firmware, firmware_image),
                "-display", "none", "-serial", f"file:{serial}",
-               "-vga", "vmware", "-device", "qemu-xhci", "-device", "usb-tablet",
+               "-vga", "std", "-device", "qemu-xhci", "-device", "usb-tablet",
                "-netdev", "user,id=net0", "-device", "e1000,netdev=net0",
                "-drive", f"file={disk},format=raw,if=ide",
                "-qmp", f"unix:{qmp},server=on,wait=off", "-no-reboot", "-no-shutdown"]

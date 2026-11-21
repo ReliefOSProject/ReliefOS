@@ -19,7 +19,7 @@ def default_dependencies() -> Path:
     if ((build_dependencies / "linux-pam-build.json").is_file() and
             has_staged_pam_tree(build_dependencies)):
         return build_dependencies
-    return ROOT / "out/xorg-vmware-debug/pam"
+    return ROOT / "out/xorg-debug/pam"
 
 
 def main():
@@ -29,13 +29,13 @@ def main():
     work.mkdir(parents=True, exist_ok=True)
     stage = dependencies / "root"
     recipe_path = dependencies / "linux-pam-build.json"
-    default_sdk = ROOT / "out/xorg-vmware-debug/sdk/reliefos-musl-sdk"
+    default_sdk = ROOT / "out/xorg-debug/sdk/reliefos-musl-sdk"
     sdk = Path(os.environ.get("RELIEFOS_MUSL_SDK", default_sdk)).resolve()
     if recipe_path.is_file():
         compiler = json.loads(recipe_path.read_text())["compiler"]
     else:
         compiler = [os.environ.get("RELIEFOS_MUSL_CC", str(sdk / "bin/reliefos-musl-cc"))]
-    default_auth_root = ROOT / "out/xorg-vmware-debug/auth/root"
+    default_auth_root = ROOT / "out/xorg-debug/auth/root"
     auth_root = Path(os.environ.get("RELIEFOS_AUTH_ROOT", default_auth_root)).resolve()
     binary = work / "pam-login-case.elf"
     subprocess.run([*compiler, "-g", "-O1", "-Wall", "-Wextra", "-Werror",
@@ -55,7 +55,7 @@ def main():
                "--ro-bind", str(ROOT / "system/test-accounts/group"), "/etc/group"]
     default_musl_sysroot = ROOT / "build/musl/sysroot"
     if not default_musl_sysroot.is_dir():
-        default_musl_sysroot = ROOT / "out/xorg-vmware-debug/sysroot/musl"
+        default_musl_sysroot = ROOT / "out/xorg-debug/sysroot/musl"
     musl_sysroot = Path(os.environ.get("RELIEFOS_MUSL_SYSROOT", default_musl_sysroot)).resolve()
     loader = musl_sysroot / "lib/libc.so"
     loader_target = str(Path("/lib/ld-musl-x86_64.so.1").resolve())

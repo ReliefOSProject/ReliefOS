@@ -1,9 +1,9 @@
 #ifndef RELIEFOS_GPU_SDK_H
 #define RELIEFOS_GPU_SDK_H
 
-/* Versioned GPU SDK client. Applications link these entry points; the
- * pre-migration reliefos_gpu_* fd-3 ioctl wrappers remain only in the libc
- * transition layer. The service node is /dev/gpu. */
+/* Compatibility entry points for the retired GPU SDK. Calls return -1 with
+ * errno set to ENODEV (EINVAL for a null pointer) and leave caller buffers
+ * untouched. */
 #include <reliefos/gpu.h>
 #include <stdint.h>
 

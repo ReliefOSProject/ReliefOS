@@ -13,7 +13,7 @@ import test_xorg_vm_qemu as xorg
 from test_reliefexcel_qemu import Session as BaseSession
 from apk_distribution import make_package
 ROOT=Path(__file__).resolve().parents[1]
-OUT=ROOT/'out/xorg-vmware-debug'
+OUT=ROOT/'out/xorg-debug'
 FIX='/usr/lib/reliefos/tests/reliefapk'
 ENV={**os.environ,'TMPDIR':str(ROOT/'out/tmp')}
 

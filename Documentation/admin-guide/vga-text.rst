@@ -19,9 +19,8 @@ VGA 模式，但仍保留图形设备信息供 Xorg 接管。不要用 ``gfxpayl
 ========
 
 该后端使用传统 VGA 端口和显存字符平面，固定为 80 列、25 行、8×16 字体
-（通常扫描输出为 720×400）。已实现 Bochs/QEMU Standard VGA 和 VMware
-SVGA II 的图形模式恢复接口；是否使用 UEFI 不是唯一判断条件，设备必须实际
-提供兼容 VGA 解码。纯 GOP、无 VGA 兼容平面或无法安全恢复图形模式的设备会
+（通常扫描输出为 720×400）。Bochs/QEMU Standard VGA 提供图形模式恢复接口。
+设备必须实际提供兼容 VGA 解码。纯 GOP、无 VGA 兼容平面或无法安全恢复图形模式的设备会
 输出警告并保留原控制台后端。没有 framebuffer 的 Legacy VGA 设备可用于
 纯文字控制台，但无法切换到 Xorg。
 

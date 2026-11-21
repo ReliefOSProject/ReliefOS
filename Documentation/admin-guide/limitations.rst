@@ -20,8 +20,8 @@
 * 强制关机后的 Xorg 锁文件可能阻止桌面恢复。
 * 编译压力下 IceWM 拖动与延迟问题尚无完整修复验收证据。
 * ReliefMath 曾在关窗时退出 139，尚未完成根因修复和最终复验。
-* 图形接口受实际 SVGA-II/VGPU9 能力限制，不承诺所有 GPU、Mesa 功能、
-  跨设备 DMA-BUF、atomic modesetting 或硬件 vblank。
+* 图形设备使用启动 framebuffer 或 VirtIO-GPU。3D 加速取决于设备是否提供 VirGL。
+  当前 DRM 接口不支持跨设备 DMA-BUF 或 atomic modesetting。
 * 可加载 ``.ko`` 必须针对匹配的 ReliefNT ABI 编译，不支持直接加载 Linux
   原版二进制模块或任意 Linux 内部 API。实际配置与管理见
   :doc:`kernel-modules`。

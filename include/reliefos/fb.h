@@ -6,6 +6,7 @@
 #define RELIEFOS_FB_CAP_MODE_SET 0x0001U
 #define RELIEFOS_FB_BACKEND_BOOT 0U
 #define RELIEFOS_FB_BACKEND_BOCHS_VBE 1U
+/* Reserved legacy backend identifier. */
 #define RELIEFOS_FB_BACKEND_VMWARE_SVGA 2U
 
 /* /dev/fb0 hardware limits; fbdev's visible geometry is not a mode limit. */

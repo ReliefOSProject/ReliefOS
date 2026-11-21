@@ -23,7 +23,7 @@ case $mode in
     "$work/probe" "$work/fonts" "$work/images"
     ;;
 --target)
-    target=$src/out/xorg-vmware-debug/tests/reliefmath-backend-probe.elf
+    target=$src/out/xorg-debug/tests/reliefmath-backend-probe.elf
     test -f "$target"
     readelf -h "$target" >"$work/target-header.txt"
     readelf -l -d "$target" >"$work/target-dynamic.txt"

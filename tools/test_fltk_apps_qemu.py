@@ -33,7 +33,7 @@ from run_gcc_probe_qemu import qmp_quit
 from fltk_taskmgr_gui import exercise_taskmgr
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "out/xorg-vmware-debug"
+OUT = ROOT / "out/xorg-debug"
 BASELINE_IMAGE = ROOT / "build/fltk-migration/baseline/xorg-test.raw"
 DEFAULT_IMAGE = BASELINE_IMAGE if BASELINE_IMAGE.is_file() else OUT / "images/reliefos.raw"
 DEFAULT_KERNEL = OUT / "generated/system/kernel.sys"
@@ -1901,7 +1901,7 @@ def run_one_app(app: str, probe, serial: Path, process, baseline,
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--image", type=Path, default=DEFAULT_IMAGE,
-                        help="old xorg-vmware-debug raw image; it is never modified")
+                        help="old xorg-debug raw image; it is never modified")
     parser.add_argument("--kernel", type=Path, default=DEFAULT_KERNEL,
                         help="current standalone kernel.sys injected into the private ESP")
     parser.add_argument("--sysroot", type=Path, default=DEFAULT_SYSROOT,

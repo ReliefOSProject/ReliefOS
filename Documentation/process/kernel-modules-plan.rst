@@ -185,7 +185,7 @@ O5：全链运行矩阵与文档
 * [x] 最关键门槛：根控制器=m、根 FS=m，最终出现真实桌面并可读写文件。
   不是只看到 GRUB、启动日志或 /init 探针就算成功。
 * [x] e1000 联网和数据校验；声卡 PCM 的 open/mmap/close；Xorg/IceWM 的
-  DRM/fbdev 路径；内置/模块行为一致。QEMU 无 SVGA3D 不能冒充 VMware 通过。
+  DRM/fbdev 路径；内置/模块行为一致。QEMU 与 VMware 的验证结果分别记录。
 * [x] 多层依赖装卸、内置 modprobe、重复加载、故意缺依赖/错版本文件的
   错误诊断、busy 卸载拒绝、空闲装卸循环、进程/映射/IRQ 并发持有。
 * [x] 以相同 release profile 记录 yes/dd、启动耗时与桌面操作延迟对比；

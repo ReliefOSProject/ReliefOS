@@ -564,7 +564,7 @@ def main():
     serial = output / 'serial.log'
     command = ['qemu-system-x86_64', '-machine', 'q35,i8042=off', '-accel', 'kvm', '-cpu', 'host',
                '-m', '4096', '-smp', '2', '-display', 'none', '-serial', 'file:' + str(serial),
-               '-vga', 'vmware', '-netdev', 'user,id=n', '-device', 'e1000,netdev=n',
+               '-vga', 'std', '-netdev', 'user,id=n', '-device', 'e1000,netdev=n',
                '-drive', f'file={image},format=raw,if=none,id=osdisk,snapshot=on',
                '-device', 'nvme,drive=osdisk,serial=usb2qa,bootindex=1',
                '-qmp', f'unix:{socket},server=on,wait=off', '-no-reboot', '-no-shutdown']

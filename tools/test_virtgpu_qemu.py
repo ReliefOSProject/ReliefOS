@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
-"""Boot an isolated VirtIO-GPU guest and capture its real KMS scanout."""
+"""Exercise DRM in QEMU or build a VMware SVGA II rendering probe ISO."""
 import argparse
 import json
 import os
@@ -165,22 +165,49 @@ def inject_panic(output,symbols,screenshot):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    for name in ("kernel","busybox","probe","output"):
+    for name in ("kernel","busybox","output"):
         parser.add_argument("--"+name,type=Path,required=True)
+    parser.add_argument("--probe", type=Path, help="KMS probe (optional with --svga3d)")
+    backend = parser.add_mutually_exclusive_group()
+    backend.add_argument("--svga2", action="store_true", help="run the basic VMware SVGA II probe in QEMU")
+    backend.add_argument("--svga3d", choices=("legacy", "gb", "dx"),
+                         help="build a VMware ISO for the selected Mesa SVGA3D path")
     parser.add_argument("--gl",action="store_true")
     parser.add_argument("--uefi",action="store_true")
     parser.add_argument("--desktop",action="store_true")
     parser.add_argument("--panic-mode",choices=("gui","tty"))
     parser.add_argument("--symbols",type=Path)
     parser.add_argument("--egl-probe",type=Path)
+    parser.add_argument("--bench-draws", type=int, default=1000,
+                        help="draw count for the offscreen EGL probe")
+    parser.add_argument("--vmware-console-hold", type=int, default=0, metavar="SECONDS",
+                        help="publish a text-console marker after KMS and wait for a host capture")
     parser.add_argument("--runtime-root",type=Path)
     parser.add_argument("--library-overlay",type=Path,action="append",default=[])
     parser.add_argument("--module-root",type=Path,help="modules_install root from the tested kernel build")
     parser.add_argument("--timeout",type=float,default=90)
     args=parser.parse_args()
+    if args.svga2 and (args.gl or args.desktop or args.egl_probe):
+        parser.error("SVGA II mode uses the basic 2D probe")
+    if args.vmware_console_hold and (not args.svga3d or not args.probe or
+                                     not 1 <= args.vmware_console_hold <= 60):
+        parser.error("--vmware-console-hold requires --svga3d/--probe and 1–60 seconds")
+    if args.svga3d:
+        if any((args.gl, args.uefi, args.desktop, args.panic_mode, args.module_root)):
+            parser.error("--svga3d prepares a VMware 3D image without QEMU options")
+        if not args.egl_probe or not args.runtime_root:
+            parser.error("--svga3d requires --egl-probe and --runtime-root")
+    elif not args.probe:
+        parser.error("QEMU verification requires --probe")
+    if args.egl_probe and (not args.runtime_root or not (args.gl or args.svga3d)):
+        parser.error("EGL probe requires --runtime-root and either --gl or --svga3d")
+    if not 1 <= args.bench_draws <= 1000000:
+        parser.error("--bench-draws must be in [1, 1000000]")
+    marker = "SVGA" if args.svga2 else "VIRTGPU"
+    done_pattern = re.compile(rf"^{marker}_QEMU_DONE:status=(\d+)\r?\n", re.MULTILINE)
     if args.panic_mode and (not args.desktop or not args.symbols):
         parser.error("panic verification requires --desktop and --symbols")
-    for name in ("kernel","busybox","probe","output"):
+    for name in ("kernel","busybox","output"):
         setattr(args,name,getattr(args,name).resolve())
     if args.output.exists() or not args.output.is_relative_to(ROOT/"out"):
         parser.error("output must be a new directory inside out")
@@ -189,9 +216,11 @@ def main():
         (root/directory).mkdir(parents=True,exist_ok=True)
     shutil.copy2(args.busybox,root/"bin/busybox")
     for applet in subprocess.check_output([str(args.busybox),"--list"],text=True).splitlines():
-        (root/"bin"/applet).symlink_to("busybox")
+        if applet != "busybox":
+            (root/"bin"/applet).symlink_to("busybox")
     (root/"sbin").symlink_to("bin")
-    shutil.copy2(args.probe,root/"probe")
+    if args.probe:
+        shutil.copy2(args.probe,root/"probe")
     modules_before=modules_after=""
     if args.module_root:
         module_tree=args.module_root.resolve()/"lib/modules"
@@ -212,12 +241,12 @@ rmmod drm || fatal
 echo VIRTGPU_MODULE_PASS load=pass unload=pass reload=pass
 """
     if args.egl_probe:
-        if not args.gl or not args.runtime_root:parser.error("EGL probe requires --gl and --runtime-root")
         shutil.copy2(args.egl_probe,root/"egl-probe")
+        dri = "vmwgfx_dri.so" if args.svga3d else "virtio_gpu_dri.so"
         copy_runtime(root,[p.resolve() for p in args.library_overlay]+[args.runtime_root.resolve()],
             ["libEGL.so.1","libGLESv2.so.2","libgbm.so.1","libdril_dri.so",
-             "virtio_gpu_dri.so","dri_gbm.so","ld-musl-x86_64.so.1"])
-    egl="/egl-probe\nstatus=$?\nif [ $status != 0 ]; then echo VIRTGPU_QEMU_DONE:status=$status; poweroff -f; fi\n" if args.egl_probe else ""
+             dri,"dri_gbm.so","ld-musl-x86_64.so.1"])
+    egl=f"GPU_PROBE_DRAWS={args.bench_draws} /egl-probe\nstatus=$?\nif [ $status != 0 ]; then echo VIRTGPU_QEMU_DONE:status=$status; poweroff -f; fi\n" if args.egl_probe else ""
     if args.desktop and not args.runtime_root:parser.error("desktop requires --runtime-root")
     desktop=copy_desktop(root,[p.resolve() for p in args.library_overlay]+[args.runtime_root.resolve()]) if args.desktop else ""
     (root/"init").write_text("""#!/bin/sh
@@ -231,6 +260,32 @@ cat /proc/interrupts
 poweroff -f
 while :; do sleep 1; done
 """)
+    if args.svga3d:
+        host_backed = int(args.svga3d == "legacy")
+        vgpu10 = int(args.svga3d == "dx")
+        kms = 'if [ "$status" = 0 ]; then /probe --vmware; status=$?; fi\n' if args.probe else ""
+        console = ""
+        if args.vmware_console_hold:
+            console = f"""if [ "$status" = 0 ]; then
+ echo SVGA CONSOLE RESTORED >/dev/tty1
+ echo SVGA_CONSOLE_CAPTURE_READY
+ sleep {args.vmware_console_hold}
+fi
+"""
+        (root/"init").write_text(f"""#!/bin/sh
+export PATH=/bin
+exec </dev/console >/dev/ttyS0 2>&1
+# Set the same winsys switches used by the upstream Mesa driver.
+export SVGA_FORCE_HOST_BACKED={host_backed} SVGA_VGPU10={vgpu10}
+GPU_PROBE_DRAWS={args.bench_draws} /egl-probe {args.svga3d}
+status=$?
+{kms}{console}echo SVGA3D_VMWARE_DONE:status=$status
+poweroff -f
+while :; do sleep 1; done
+""")
+    elif args.svga2:
+        init = root/"init"
+        init.write_text(init.read_text().replace("VIRTGPU_", "SVGA_"))
     (root/"init").chmod(0o755)
     boot=args.output/"iso/boot";(boot/"grub").mkdir(parents=True)
     names=["."]+sorted(str(path.relative_to(root)) for path in root.rglob("*"))
@@ -239,7 +294,8 @@ while :; do sleep 1; done
             input=("\0".join(names)+"\0").encode(),cwd=root,stdout=stream,check=True)
     shutil.copy2(args.kernel,boot/"kernel.sys")
     shutil.copy2("/usr/share/grub/unicode.pf2",boot/"grub/unicode.pf2")
-    (boot/"grub/grub.cfg").write_text("""set timeout=0
+    title = "VMware SVGA II" if args.svga2 or args.svga3d else "VirtIO-GPU"
+    (boot/"grub/grub.cfg").write_text(f"""set timeout=0
 serial --unit=0 --speed=115200
 terminal_output serial
 insmod all_video
@@ -247,18 +303,43 @@ insmod gfxterm
 loadfont /boot/grub/unicode.pf2
 set gfxmode=1024x768x32
 set gfxpayload=keep
-menuentry "ReliefOS VirtIO-GPU test" {
+menuentry "ReliefOS {title} test" {{
  multiboot2 /boot/kernel.sys root=/ log=serial,screen rdinit=/init drm.faildiag=1
  module2 /boot/initramfs.cpio initramfs
  boot
-}
+}}
 """)
     iso=args.output/"qa.iso"
     with (args.output/"iso.log").open("w") as log:
         subprocess.run(["grub-mkrescue","-o",str(iso),str(boot.parent)],stdout=log,stderr=log,check=True)
+    if args.svga3d:
+        vmx = args.output/"svga.vmx"
+        # Workstation exposes host-backed SVGA3D with hardware version 9.
+        hardware_version = 9 if args.svga3d == "legacy" else 20
+        vmx.write_text(f""".encoding = "UTF-8"
+config.version = "8"
+virtualHW.version = "{hardware_version}"
+displayName = "ReliefOS SVGA II {args.svga3d} test"
+guestOS = "other-64"
+firmware = "bios"
+memsize = "2048"
+numvcpus = "2"
+ide1:0.present = "TRUE"
+ide1:0.deviceType = "cdrom-image"
+ide1:0.fileName = "qa.iso"
+ide1:0.startConnected = "TRUE"
+serial0.present = "TRUE"
+serial0.fileType = "file"
+serial0.fileName = "serial.log"
+serial0.startConnected = "TRUE"
+mks.enable3d = "TRUE"
+ethernet0.present = "FALSE"
+""")
+        print(vmx)
+        return
     qmp_path=args.output/"qmp.sock";serial_path=args.output/"serial.sock"
     command=["qemu-system-x86_64","-machine","q35","-accel","kvm","-cpu","host","-m","4096" if args.desktop else "2048",
-        "-smp","4","-vga","none","-device","virtio-vga-gl" if args.gl else "virtio-vga",
+        "-smp","4","-vga","none","-device", "vmware-svga" if args.svga2 else ("virtio-vga-gl" if args.gl else "virtio-vga"),
         "-display","egl-headless,rendernode=/dev/dri/renderD128" if args.gl else "none",
         "-serial",f"unix:{serial_path},server=on,wait=on",
         "-qmp",f"unix:{qmp_path},server=on,wait=off","-nic","none","-cdrom",str(iso),
@@ -328,7 +409,7 @@ menuentry "ReliefOS VirtIO-GPU test" {
                         if args.panic_mode=="tty":
                             inject_panic(args.output,args.symbols,screenshot);injected=True
                         else:serial.sendall(b"\n")
-                    if "VIRTGPU_SCREENSHOT_READY" in output and not captured:
+                    if f"{marker}_SCREENSHOT_READY" in output and not captured:
                         if rfb:
                             result["capture_size"]=screenshot("kms.ppm")
                             result["capture_transport"]="rfb"
@@ -336,7 +417,7 @@ menuentry "ReliefOS VirtIO-GPU test" {
                             screenshot("kms.ppm")
                         captured=True
                         qmp_file.write(b'{"execute":"send-key","arguments":{"keys":[{"type":"qcode","data":"ret"}]}}\n')
-                    if "VIRTGPU_QEMU_DONE:status=0" in output or "VIRTGPU_QEMU_DONE:status=1" in output:break
+                    if done_pattern.search(output):break
                     if injected and "RESTART REQUIRED !!!" in output:
                         # The last fatal flush follows the serial text. Allow it
                         # to complete, then prove both visibility and stability.
@@ -368,11 +449,26 @@ menuentry "ReliefOS VirtIO-GPU test" {
                 (args.output/"panic-report.txt").write_text(report)
                 result.update(passed=True,panic_mode=args.panic_mode,stable_after_halt=True,screenshot="panic.png")
                 return
-            for marker in ("[virtio-gpu] ready","VIRTGPU_KMS_PASS","VIRTGPU_QEMU_DONE:status=0"):
-                if marker not in output:raise AssertionError("missing guest result "+marker)
+            done = done_pattern.search(output)
+            if not done or int(done.group(1)) != 0:
+                raise AssertionError(f"{marker} guest completion status: {done.group(1) if done else 'missing'}")
+            expected = [f"{marker}_KMS_PASS"]
+            if not args.svga2:
+                expected.append("[virtio-gpu] ready")
+            for text in expected:
+                if text not in output:
+                    raise AssertionError("missing guest result " + text)
+            if args.svga2:
+                from PIL import Image
+                if "SVGA_DAMAGE_PASS" not in output:raise AssertionError("atomic damage probe failed")
+                with Image.open(args.output/"kms.ppm") as frame:
+                    if (frame.size != (800, 600) or frame.getpixel((12, 12)) != (16, 208, 96)
+                        or frame.getpixel((40, 40)) != (224, 144, 32)
+                        or frame.getpixel((30, 30)) != (32, 96, 160)):
+                        raise AssertionError("SVGA dirty/atomic clips or pixels outside the damage are incorrect")
             if args.egl_probe and "VIRTGPU_GL_PASS" not in output:raise AssertionError("EGL probe failed")
-            if args.module_root and "VIRTGPU_MODULE_PASS" not in output:raise AssertionError("module reload failed")
-            if not captured or "VIRTGPU_FAIL" in output or "Kernel Panic" in output:
+            if args.module_root and f"{marker}_MODULE_PASS" not in output:raise AssertionError("module reload failed")
+            if not captured or f"{marker}_FAIL" in output or "Kernel Panic" in output:
                 raise AssertionError("GPU guest failed")
             result.update(passed=True,screenshot="kms.ppm")
             if rfb_stream:rfb_stream.close()

@@ -52,11 +52,11 @@ msgid "ReliefMath 曾在关窗时退出 139，尚未完成根因修复和最终�
 msgstr "ReliefMath はウィンドウを閉じる際に終了コード 139 で終了したことがあり、根本原因の修正と最終再検証は未完了です。"
 
 msgid ""
-"图形接口受实际 SVGA-II/VGPU9 能力限制，不承诺所有 GPU、Mesa 功能、 跨设备 DMA-BUF、atomic modesetting"
-" 或硬件 vblank。"
+"图形设备使用启动 framebuffer 或 VirtIO-GPU。3D 加速取决于设备是否提供 VirGL。 当前 DRM 接口不支持跨设备 "
+"DMA-BUF 或 atomic modesetting。"
 msgstr ""
-"グラフィックスインターフェースは実際の SVGA-II/VGPU9 機能に制限されます。すべての GPU、Mesa 機能、デバイス間 DMA-"
-"BUF、atomic modesetting、ハードウェア vblank の対応は保証しません。"
+"表示には起動時の framebuffer または VirtIO-GPU を使用します。3D アクセラレーションはデバイスの VirGL "
+"対応に依存します。現在の DRM インターフェースは、デバイス間の DMA-BUF と atomic modesetting に対応していません。"
 
 msgid ""
 "可加载 ``.ko`` 必须针对匹配的 ReliefNT ABI 编译，不支持直接加载 Linux 原版二进制模块或任意 Linux 内部 "

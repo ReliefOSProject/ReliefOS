@@ -182,7 +182,7 @@ kill "$watcher" 2>/dev/null
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--build-dir", type=Path, default=ROOT / "out/xorg-vmware-debug")
+    parser.add_argument("--build-dir", type=Path, default=ROOT / "out/xorg-debug")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument("--keep-running", action="store_true", help="Keep this private guest for manual UI checks")
@@ -199,7 +199,7 @@ def main():
     qmp = ROOT.parent / f".reliefos-openrc-{os.getpid()}.sock"
     command = ["qemu-system-x86_64", "-enable-kvm", "-cpu", "host", "-machine", "q35", "-m", "4096", "-smp", "1",
                "-bios", "/usr/share/edk2/x64/OVMF.4m.fd", "-display", "none", "-serial", f"file:{output / 'serial.log'}",
-               "-vga", "vmware", "-device", "qemu-xhci", "-device", "usb-tablet", "-netdev", "user,id=net0", "-device", "e1000,netdev=net0",
+               "-vga", "std", "-device", "qemu-xhci", "-device", "usb-tablet", "-netdev", "user,id=net0", "-device", "e1000,netdev=net0",
                "-drive", f"file={output / 'guest.raw'},format=raw,if=ide", "-qmp", f"unix:{qmp},server=on,wait=off", "-no-reboot", "-no-shutdown"]
     log = (output / "qemu.log").open("w")
     process = subprocess.Popen(command, stdout=log, stderr=log, cwd=ROOT, start_new_session=True)

@@ -195,7 +195,7 @@ def main():
     parser.add_argument("--transport", choices=("ide", "ahci", "nvme"), required=True)
     parser.add_argument("--cpus", type=int, choices=(1, 4), required=True)
     parser.add_argument("--accel", choices=("kvm", "tcg"), default="kvm")
-    parser.add_argument("--vga", choices=("std", "vmware"), default="vmware")
+    parser.add_argument("--vga", choices=("std", "virtio"), default="virtio")
     parser.add_argument("--timeout", type=int, default=180)
     parser.add_argument("--benchmark", action="store_true", help="measure a bounded 256-MiB yes/dd pipeline")
     args = parser.parse_args()

@@ -110,9 +110,20 @@ fi
 
 # Honour the conventional per-user and system X session entry points. The
 # installer supplies a site Xsession for the selected XFCE session.
-if test -x "$HOME/.xsession"; then
-    event 'starting user X session'
-    exec "$HOME/.xsession"
+user_session=$HOME/.xsession
+if test -x "$user_session"; then
+    # Alpine xinit 1.4.4-r0 installs a skeleton that runs ~/.xinitrc.
+    # Skip only the unchanged skeleton when its target is absent, including
+    # in homes seeded before this fix. A custom session owns its own exit.
+    skeleton_digest=da325bbad10c1e05b61ef250c6cdada784be0a08b9f48984e691ea9a5abc9dd8
+    session_digest=
+    if test ! -e "$HOME/.xinitrc" && test -f "$user_session"; then
+        session_digest=$(sha256sum < "$user_session" 2>/dev/null) || session_digest=
+    fi
+    if test "${session_digest%% *}" != "$skeleton_digest"; then
+        event 'starting user X session'
+        exec "$user_session"
+    fi
 fi
 if test -x /etc/X11/Xsession; then
     event 'starting system X session'

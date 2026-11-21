@@ -1,4 +1,4 @@
-"""Test the SDK header boundary and native task-manager GPU sampler."""
+"""Test the published GPU SDK compatibility boundary without a GPU device."""
 from pathlib import Path
 import subprocess
 import tempfile
@@ -15,14 +15,16 @@ class GpuAbiTests(unittest.TestCase):
         self.assertFalse((ROOT / "devtools/include/leonos").exists())
         self.assertFalse((ROOT / "devtools/include/linux").exists())
 
-    def test_taskmgr_sampling(self):
-        with tempfile.TemporaryDirectory(prefix="reliefos-gpu-sampler-") as tmp:
-            executable = str(Path(tmp) / "sampler")
+    def test_compatibility_calls_do_not_access_a_device(self):
+        with tempfile.TemporaryDirectory(prefix="reliefos-gpu-abi-") as tmp:
+            executable = str(Path(tmp) / "gpu_abi_unavailable_test")
             subprocess.run([
                 "cc", "-std=c11", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
-                "-fsanitize=address,undefined", "-fno-omit-frame-pointer", "-Iinclude",
-                "-Ikernel/reliefnt/include/uapi",
-                    "tools/tests/taskmgr_gpu_sample_test.c", "-o", executable,
+                "-Iinclude", "-Ikernel/reliefnt/include/uapi",
+                "-idirafter", "userland/runtime/include",
+                "tools/tests/gpu_abi_unavailable_test.c",
+                "userland/runtime/src/gpu.c", "userland/runtime/src/gpu_sdk.c",
+                "-Wl,--wrap=open", "-Wl,--wrap=syscall3", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], cwd=ROOT, check=True, timeout=30)
 

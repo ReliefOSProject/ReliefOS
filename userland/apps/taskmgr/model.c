@@ -216,10 +216,8 @@ void taskmgr_perf_history_init(struct taskmgr_perf_history *history)
     uint32_t i;
     uint32_t core;
     if (!history) return;
-    for (i = 0; i < TASKMGR_PERF_HISTORY; ++i) {
+    for (i = 0; i < TASKMGR_PERF_HISTORY; ++i)
         history->memory[i] = 0;
-        history->gpu[i] = TASKMGR_PERF_MISSING;
-    }
     for (core = 0; core < TASKMGR_MAX_CORES; ++core) {
         for (i = 0; i < TASKMGR_PERF_HISTORY; ++i) {
             history->core[core][i] = 0;
@@ -230,30 +228,17 @@ void taskmgr_perf_history_init(struct taskmgr_perf_history *history)
 }
 
 uint32_t taskmgr_perf_history_push(struct taskmgr_perf_history *history,
-                                   uint32_t memory_percent,
-                                   uint32_t gpu_percent, int gpu_valid)
+                                   uint32_t memory_percent)
 {
     uint32_t slot;
     if (!history) return 0;
     slot = history->head;
     history->memory[slot] = (uint8_t)(memory_percent > 100U ? 100U : memory_percent);
-    history->gpu[slot] = gpu_valid
-                             ? (uint8_t)(gpu_percent > 100U ? 100U : gpu_percent)
-                             : TASKMGR_PERF_MISSING;
     history->head = (slot + 1U) % TASKMGR_PERF_HISTORY;
     if (history->count < TASKMGR_PERF_HISTORY) {
         ++history->count;
     }
     return slot;
-}
-
-void taskmgr_perf_history_clear_gpu(struct taskmgr_perf_history *history)
-{
-    uint32_t i;
-    if (!history) return;
-    for (i = 0; i < TASKMGR_PERF_HISTORY; ++i) {
-        history->gpu[i] = TASKMGR_PERF_MISSING;
-    }
 }
 
 uint32_t taskmgr_tree_order(const uint32_t *pids, const uint32_t *parents,

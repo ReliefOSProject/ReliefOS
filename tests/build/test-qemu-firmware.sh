@@ -40,7 +40,7 @@ for mode in uefi unknown; do
     fi
     [ ! -e "$w/argv" ]
 done
-for gpu in vga virtio virgl vmware; do
+for gpu in vga virtio virgl; do
     QEMU_CAPTURE=$w/argv make --no-print-directory -f "$w/Kbuild" run \
         QEMU="$w/qemu" QEMU_BOOT=bios QEMU_GPU="$gpu" \
         DISK_VMDK=private.vmdk > "$w/run.log" 2>&1
@@ -51,16 +51,19 @@ for gpu in vga virtio virgl vmware; do
             grep -Fxq -- virtio-vga-gl "$w/argv"
             grep -Fxq -- gtk,gl=on "$w/argv"
             ;;
-        vmware) grep -Fxq -- vmware "$w/argv" ;;
     esac
 done
 QEMU_CAPTURE=$w/argv make --no-print-directory -f "$w/Kbuild" run \
     QEMU="$w/qemu" QEMU_BOOT=bios QEMU_GPU=virgl QEMU_DISPLAY=egl-headless \
     DISK_VMDK=private.vmdk > "$w/run.log" 2>&1
 grep -Fxq -- egl-headless "$w/argv"
-if QEMU_CAPTURE=$w/argv make --no-print-directory -f "$w/Kbuild" run \
-    QEMU="$w/qemu" QEMU_BOOT=bios QEMU_GPU=unknown > "$w/fail.log" 2>&1; then
-    echo 'FAIL - invalid GPU policy succeeded' >&2; exit 1
-fi
+for gpu in vmware unknown; do
+    rm -f "$w/argv"
+    if QEMU_CAPTURE=$w/argv make --no-print-directory -f "$w/Kbuild" run \
+        QEMU="$w/qemu" QEMU_BOOT=bios QEMU_GPU="$gpu" > "$w/fail.log" 2>&1; then
+        echo "FAIL - unsupported GPU policy $gpu succeeded" >&2; exit 1
+    fi
+    [ ! -e "$w/argv" ]
+done
 printf 'PASS QEMU firmware: BIOS has no OVMF dependency, UEFI requires firmware, all3 run targets and unknown-mode rejection\n'
-printf 'PASS QEMU GPU: VGA, VirtIO 2D, VirGL, VMware and explicit display override\n'
+printf 'PASS QEMU GPU: VGA, VirtIO 2D, VirGL and explicit display override\n'

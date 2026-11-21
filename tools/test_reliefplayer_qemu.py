@@ -19,7 +19,7 @@ from test_installer_accounts_qemu import Probe
 from qmp_terminal_smoke import text_keys
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / 'out/xorg-vmware-debug'
+OUT = ROOT / 'out/xorg-debug'
 
 
 def prepare(image, kernel, output, build_dir=OUT):
@@ -78,7 +78,7 @@ class Session(CommonSession):
         self.serial, self.qmp = output / 'serial.log', output / 'qmp.sock'
         command = ['qemu-system-x86_64', '-enable-kvm', '-cpu', 'host', '-machine', 'q35',
                    '-m', '4096', '-smp', '2', '-bios', '/usr/share/edk2/x64/OVMF.4m.fd',
-                   '-display', 'none', '-serial', f'file:{self.serial}', '-vga', 'vmware',
+                   '-display', 'none', '-serial', f'file:{self.serial}', '-vga', 'std',
                    '-device', 'qemu-xhci', '-device', 'usb-tablet', '-netdev', 'user,id=net0',
                    '-device', 'e1000,netdev=net0', '-drive', f'file={output}/guest-private.raw,format=raw,if=ide',
                    '-qmp', f'unix:{self.qmp},server=on,wait=off', '-no-reboot', '-no-shutdown',

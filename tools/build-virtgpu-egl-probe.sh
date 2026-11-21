@@ -13,9 +13,10 @@ headers=${3:-/usr/include}
 temporary=$(mktemp -d)
 trap 'rm -rf "$temporary"' EXIT HUP INT TERM
 # Copy only graphics API declarations so musl never consumes host glibc headers.
-cp -R "$headers/EGL" "$headers/GLES2" "$headers/KHR" "$headers/gbm.h" "$temporary/"
+cp -R "$headers/EGL" "$headers/GLES2" "$headers/GLES3" "$headers/KHR" "$headers/gbm.h" "$temporary/"
 mkdir -p "$(dirname "$output")"
 "${CC:-musl-gcc}" -std=c11 -O2 -Wall -Wextra -Werror -I"$temporary" \
+    -I"$src/kernel/reliefnt/include/uapi" \
     "$src/tools/tests/virtgpu_egl_probe.c" \
     -Wl,-rpath-link,"$runtime/usr/lib" -Wl,-rpath-link,"$runtime/lib" \
     "$runtime/usr/lib/libEGL.so.1" "$runtime/usr/lib/libGLESv2.so.2" \

@@ -250,8 +250,8 @@ msgstr ""
 msgid "Kind:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:866
-msgid "Live CPU, memory, and estimated GPU history with per-core usage."
+#: userland/apps/taskmgr/main.cpp:853
+msgid "Live CPU and memory history with per-core usage."
 msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:618
@@ -602,8 +602,8 @@ msgstr ""
 msgid "User:"
 msgstr ""
 
-#: userland/apps/taskmgr/main.cpp:858
-msgid "View live CPU, memory, and estimated GPU usage."
+#: userland/apps/taskmgr/main.cpp:845
+msgid "View live CPU and memory usage."
 msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:609

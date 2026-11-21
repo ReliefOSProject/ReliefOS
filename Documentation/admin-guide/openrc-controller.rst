@@ -68,8 +68,8 @@ OpenRC／启动／系统日志查看，以及诊断报告和文本导出。
 组件为 ``APP_OPENRC_CONTROLLER``，默认构建、打包和提供桌面入口。
 使用正常 Kbuild 入口::
 
-   TMPDIR="$PWD/out/tmp" make O=out/xorg-vmware-debug PROFILE=debug -j4 app-openrc-controller nls image-vmdk
-   TMPDIR="$PWD/out/tmp" make O=out/xorg-vmware-debug PROFILE=debug test-openrc-controller
+   TMPDIR="$PWD/out/tmp" make O=out/xorg-debug PROFILE=debug -j4 app-openrc-controller nls image-vmdk
+   TMPDIR="$PWD/out/tmp" make O=out/xorg-debug PROFILE=debug test-openrc-controller
 
 宿主测试在私有 user namespace 和 chroot 中运行测试命令，不操作宿主 OpenRC。
 完整系统验收脚本为 ``tools/test_openrc_controller_qemu.py``，使用私有镜像和服务夹具；

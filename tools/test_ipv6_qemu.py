@@ -213,7 +213,7 @@ def main():
         children.append(capture)
         errors = (output / 'qemu.log').open('w'); streams.append(errors)
         command = ['qemu-system-x86_64', '-accel', 'kvm', '-cpu', 'host', '-machine', 'q35',
-            '-m', '1024', '-smp', '2', '-vga', 'vmware', '-display', 'none',
+            '-m', '1024', '-smp', '2', '-vga', 'std', '-display', 'none',
             '-serial', 'file:' + str(serial), '-drive', f'file={raw},format=raw,if=ide',
             '-netdev', 'tap,id=net0,ifname=ipv6qa,script=no,downscript=no',
             '-device', 'e1000,netdev=net0', '-qmp', f'unix:{qmp},server=on,wait=off',

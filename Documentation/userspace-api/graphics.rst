@@ -5,10 +5,10 @@
 设备能力
 ========
 
-ReliefNT 提供 framebuffer、VT 与有限的 Linux DRM/vmwgfx 路线。
+ReliefNT 提供 framebuffer、VT 和 VirtIO-GPU 的 Linux DRM 接口。
 硬件和权限允许时提供 card/render 节点；必须处理缺设备、不支持的 ioctl、
 超时和中断。用户属于 video 组并不保证所有 GPU 功能可用。
-SVGA-II/VGPU9、同设备 PRIME 与通用跨设备 DMA-BUF 是不同范围。
+PRIME 共享限于同一 VirtIO-GPU 设备。
 
 应用集成
 ========

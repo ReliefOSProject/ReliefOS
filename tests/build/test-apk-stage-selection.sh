@@ -140,10 +140,10 @@ build_archive "$w/upstream/packages" icewm 0.1 usr/share/icewm/themes/default/de
 mesa=$w/pack.mesa-dri-gallium
 mkdir -p "$mesa/usr/lib/dri"
 printf 'fixture Mesa DRI loader\n' > "$mesa/usr/lib/dri/libdril_dri.so"
-ln -s libdril_dri.so "$mesa/usr/lib/dri/vmwgfx_dri.so"
+ln -s libdril_dri.so "$mesa/usr/lib/dri/virtio_gpu_dri.so"
 printf 'pkgname = mesa-dri-gallium\npkgver = 0.1\n' > "$mesa/.PKGINFO"
 (cd "$mesa" && tar --ignore-zeros -czf "$w/upstream/packages/mesa-dri-gallium-0.1.apk" \
-    .PKGINFO usr/lib/dri/libdril_dri.so usr/lib/dri/vmwgfx_dri.so)
+    .PKGINFO usr/lib/dri/libdril_dri.so usr/lib/dri/virtio_gpu_dri.so)
 
 printf 'raw openrc overlay\n' > "$w/raw/etc/fixture-openrc.conf"
 printf 'raw probe\n' > "$w/raw/usr/lib/xorg/modules/raw-overlay-probe"
@@ -203,14 +203,14 @@ expect_present "$s/managed/usr/share/fonts/xorg-fonts.fixture"
 expect_absent "$s/managed/usr/bin/xorg-server"
 expect_absent "$s/managed/usr/bin/xterm"
 expect_absent "$s/managed/usr/lib/dri/libdril_dri.so"
-expect_absent "$s/managed/usr/lib/dri/vmwgfx_dri.so"
+expect_absent "$s/managed/usr/lib/dri/virtio_gpu_dri.so"
 expect_grep "$s/own.log" 'usr/lib/xorg/modules/raw-overlay-probe'
 expect_grep "$s/own.log" 'usr/bin/keep-me.txt'
 expect_no_grep "$s/own.log" 'etc/fixture-openrc.conf'
 expect_no_grep "$s/own.log" 'usr/bin/xorg-server'
 expect_no_grep "$s/own.log" 'usr/bin/xterm'
 expect_no_grep "$s/own.log" 'usr/lib/dri/libdril_dri.so'
-expect_no_grep "$s/own.log" 'usr/lib/dri/vmwgfx_dri.so'
+expect_no_grep "$s/own.log" 'usr/lib/dri/virtio_gpu_dri.so'
 expect_no_grep "$s/own.log" 'etc/openrc-extra.conf'
 expect_no_grep "$s/apk.log" 'xorg-server'
 expect_no_grep "$s/apk.log" 'xterm'
@@ -224,7 +224,7 @@ expect_grep "$s/deps.log" "$w/lock.json"
 # fall through into local signed packages. A same-named base archive remains.
 mkdir -p "$w/raw/usr/lib/dri"
 printf 'raw Mesa loader overlay\n' > "$w/raw/usr/lib/dri/libdril_dri.so"
-ln -s libdril_dri.so "$w/raw/usr/lib/dri/vmwgfx_dri.so"
+ln -s libdril_dri.so "$w/raw/usr/lib/dri/virtio_gpu_dri.so"
 set_marker "console
 "
 stage console
@@ -243,13 +243,13 @@ expect_absent "$s/managed/usr/lib/xorg/modules/raw-overlay-probe"
 expect_absent "$s/managed/usr/bin/xorg-server"
 expect_absent "$s/managed/usr/bin/xterm"
 expect_absent "$s/managed/usr/lib/dri/libdril_dri.so"
-expect_absent "$s/managed/usr/lib/dri/vmwgfx_dri.so"
+expect_absent "$s/managed/usr/lib/dri/virtio_gpu_dri.so"
 expect_absent "$s/managed/usr/share/icewm/themes/default/default.theme"
 expect_no_grep "$s/own.log" 'usr/lib/xorg/modules/raw-overlay-probe'
 expect_no_grep "$s/own.log" 'usr/bin/xorg-server'
 expect_no_grep "$s/own.log" 'usr/bin/xterm'
 expect_no_grep "$s/own.log" 'usr/lib/dri/libdril_dri.so'
-expect_no_grep "$s/own.log" 'usr/lib/dri/vmwgfx_dri.so'
+expect_no_grep "$s/own.log" 'usr/lib/dri/virtio_gpu_dri.so'
 expect_no_grep "$s/apk.log" 'icewm'
 expect_no_grep "$s/apk.log" 'xorg-server'
 expect_no_grep "$s/apk.log" 'xterm'
@@ -271,8 +271,8 @@ done
 expect_present "$s/managed/usr/bin/xorg-server"
 expect_present "$s/managed/usr/bin/xterm"
 expect_present "$s/managed/usr/lib/dri/libdril_dri.so"
-expect_present "$s/managed/usr/lib/dri/vmwgfx_dri.so"
-test "$(readlink "$s/managed/usr/lib/dri/vmwgfx_dri.so")" = libdril_dri.so
+expect_present "$s/managed/usr/lib/dri/virtio_gpu_dri.so"
+test "$(readlink "$s/managed/usr/lib/dri/virtio_gpu_dri.so")" = libdril_dri.so
 expect_present "$s/managed/etc/openrc-extra.conf"
 expect_present "$s/managed/usr/share/fonts/xorg-fonts.fixture"
 expect_present "$s/managed/usr/bin/keep-me.txt"

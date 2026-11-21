@@ -119,7 +119,7 @@ def tcp_fixture(server,stop,counters):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
-    parser.add_argument('--build-dir',type=Path,default=ROOT/'out/xorg-vmware-debug')
+    parser.add_argument('--build-dir',type=Path,default=ROOT/'out/xorg-debug')
     args=parser.parse_args();out=args.output.resolve()
     if not out.is_relative_to(ROOT/'out') or out.exists():parser.error('output must be a new directory below out/')
     namespace=os.open('/proc/self/ns/net',os.O_RDONLY)
@@ -138,7 +138,7 @@ def main():
     def boot(index):
         qmp=ROOT.parent/f'.reliefos-network-{os.getpid()}-{index}.sock'
         serial=out/('serial.log' if index==0 else 'serial-reboot.log')
-        command=['qemu-system-x86_64','-enable-kvm','-cpu','host','-machine','q35','-m','4096','-smp','1','-bios','/usr/share/edk2/x64/OVMF.4m.fd','-display','none','-serial',f'file:{serial}','-vga','vmware','-device','qemu-xhci','-device','usb-tablet','-netdev','user,id=net0','-device','e1000,netdev=net0','-drive',f'file={out/"guest.raw"},format=raw,if=ide','-qmp',f'unix:{qmp},server=on,wait=off','-no-reboot','-no-shutdown']
+        command=['qemu-system-x86_64','-enable-kvm','-cpu','host','-machine','q35','-m','4096','-smp','1','-bios','/usr/share/edk2/x64/OVMF.4m.fd','-display','none','-serial',f'file:{serial}','-vga','std','-device','qemu-xhci','-device','usb-tablet','-netdev','user,id=net0','-device','e1000,netdev=net0','-drive',f'file={out/"guest.raw"},format=raw,if=ide','-qmp',f'unix:{qmp},server=on,wait=off','-no-reboot','-no-shutdown']
         log=(out/f'qemu-{index}.log').open('w');p=subprocess.Popen(command,stdout=log,stderr=log,cwd=ROOT,start_new_session=True)
         (out/'qemu.json').write_text(json.dumps({'pid':p.pid,'qmp':str(qmp),'serial':str(serial),'command':command},indent=2))
         deadline=time.monotonic()+15
