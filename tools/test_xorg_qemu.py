@@ -59,7 +59,8 @@ def source_check():
     lock_path = ROOT / "configs/dependencies.lock.json"
     try:
         lock = json.loads(lock_path.read_text())
-        ids = {item["id"] for item in lock["dependencies"]}
+        packages = {item["id"]: item for item in lock["dependencies"]}
+        ids = packages.keys()
     except (OSError, KeyError, json.JSONDecodeError):
         errors.append("configs/dependencies.lock.json: unreadable package lock")
     else:
@@ -69,7 +70,7 @@ def source_check():
             errors.append("configs/dependencies.lock.json: missing alpine-icewm")
         if "alpine-netsurf" not in ids:
             errors.append("configs/dependencies.lock.json: missing alpine-netsurf")
-        if ids.intersection({"alpine-dillo", "alpine-dillo-common"}):
+        if ids & {"alpine-dillo", "alpine-dillo-common"}:
             errors.append("Dillo packages must stay out of the fetch lock")
         if "alpine-twm" in ids:
             errors.append("alpine-twm must stay out of the fetch lock")
@@ -82,20 +83,27 @@ def source_check():
         for gid in ("alpine-glycin-image-rs", "alpine-glycin-svg", "alpine-xdg-user-dirs"):
             if gid not in ids:
                 errors.append(f"configs/dependencies.lock.json: missing {gid}")
-        gallium = next((item for item in lock["dependencies"]
-                        if item.get("id") == "alpine-mesa-dri-gallium"), None)
-        expected_gallium = {
-            "version": "26.3.0-r0",
-            "url": "https://dl-cdn.alpinelinux.org/alpine/edge/main/x86_64/mesa-dri-gallium-26.3.0-r0.apk",
-            "sha256": "28ef328a0ee70b65a5f7ecff8678a49bcb382f31fe38b9ab447f3fb58702059b",
-            "feature": "xorg",
-        }
+        # The lock owns the release pins. Gallium must track the main Mesa APK.
+        mesa = packages.get("alpine-mesa")
+        gallium = packages.get("alpine-mesa-dri-gallium")
+        if mesa is None:
+            errors.append("configs/dependencies.lock.json: missing alpine-mesa")
         if gallium is None:
             errors.append("configs/dependencies.lock.json: missing alpine-mesa-dri-gallium")
         else:
-            for field, value in expected_gallium.items():
-                if gallium.get(field) != value:
-                    errors.append(f"configs/dependencies.lock.json: alpine-mesa-dri-gallium {field} must be {value}")
+            entry = "configs/dependencies.lock.json: alpine-mesa-dri-gallium"
+            if gallium.get("kind") != "apk" or gallium.get("feature") != "xorg":
+                errors.append(f"{entry} must be an xorg APK")
+            version = gallium.get("version")
+            if not isinstance(version, str) or not version:
+                errors.append(f"{entry} requires a version")
+            else:
+                if mesa is not None and version != mesa.get("version"):
+                    errors.append(f"{entry} version must match alpine-mesa")
+                filename = f"mesa-dri-gallium-{version}.apk"
+                url = gallium.get("url")
+                if not isinstance(url, str) or url.rsplit("/", 1)[-1] != filename:
+                    errors.append(f"{entry} URL must name {filename}")
     session_path = ROOT / "system/xorg/xdm-session"
     if session_path.is_file() and "/var/log/" in session_path.read_text():
         errors.append("xdm-session must not write root-only logs")
