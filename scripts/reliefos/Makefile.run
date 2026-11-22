@@ -44,7 +44,8 @@ QEMU_MEMORY := $(or $(MEMORY),$(CONFIG_QEMU_MEMORY_MB),4096)
 QEMU_CPUS := $(or $(CPUS),$(CONFIG_QEMU_SMP_CPUS),4)
 comma := ,
 QEMU_NETWORK := $(subst ",,$(CONFIG_QEMU_NET_DEVICE))
-QEMU_FLAGS := -machine $(if $(filter 1 y yes true,$(RELIEFOS_QEMU_IDE)),pc,q35) $(if $(filter 1,$(QEMU_KVM)),-enable-kvm -cpu host,-cpu max) -m $(QEMU_MEMORY) -smp $(QEMU_CPUS) $(QEMU_FIRMWARE_FLAGS) -display $(QEMU_DISPLAY) -serial $(QEMU_SERIAL) $(QEMU_GPU_FLAGS) $(if $(QEMU_NETWORK),-netdev user,id=net0 -device $(QEMU_NETWORK)$(comma)netdev=net0) -audiodev $(QEMU_AUDIO),id=snd0 $(QEMU_SOUND_FLAGS)
+QEMU_NETWORK_FLAGS := $(if $(QEMU_NETWORK),-netdev user$(comma)id=net0 -device $(QEMU_NETWORK)$(comma)netdev=net0)
+QEMU_FLAGS := -machine $(if $(filter 1 y yes true,$(RELIEFOS_QEMU_IDE)),pc,q35) $(if $(filter 1,$(QEMU_KVM)),-enable-kvm -cpu host,-cpu max) -m $(QEMU_MEMORY) -smp $(QEMU_CPUS) $(QEMU_FIRMWARE_FLAGS) -display $(QEMU_DISPLAY) -serial $(QEMU_SERIAL) $(QEMU_GPU_FLAGS) $(QEMU_NETWORK_FLAGS) -audiodev $(QEMU_AUDIO),id=snd0 $(QEMU_SOUND_FLAGS)
 QEMU_DISK := -drive file=$(DISK_VMDK),if=none,id=disk0,format=vmdk
 ifneq ($(filter 1 y yes true,$(RELIEFOS_QEMU_NVME)),)
 QEMU_DISK += -device nvme,drive=disk0,serial=leonosnvme
