@@ -37,7 +37,7 @@
 
 只在需要时给通用 BO 增加后端私有数据和最终释放回调；GEM 句柄、映射授权和 `/dev/dri` 节点语义保留。私有 ioctl 号在各 DRM 驱动间重叠，外层必须先绑定文件设备、再按该驱动的描述表匹配，不能按号试跑两个实现。设备热路径仅在 KMS、提交、回收等阶段入口调用后端操作；每个 FIFO 字和每条命令不经由全局后端分派。
 
-新 Kconfig 项为 `DRM_VMWARE_SVGA`，随 `DRM=y/m` 链入同一 DRM provider，可单独关闭，不依赖 VirtIO。开发阶段默认关闭，验收通过后才考虑在 ReliefOS 镜像默认启用。两者都编入时，默认维持现有 VirtIO 优先；没有 VirtIO 时探测 SVGA II，缺卡走当前永久 framebuffer/控制台。只有显式启用该后端且匹配 PCI 功能才触碰其寄存器。探测返回「不存在 / 不适配」与「找到但失败」要区分，失败按回滚结果决定是否安全保留早期显示，不发布半初始化节点。不新增运行时切换 ABI。ReliefOS 只增补必要的 Kconfig、设备发现和用户态打包接入；现有 VirGL 构建、运行和测试配置不被替换。若安装的用户态缺少 `svga`/libdrm VMware 支持，纳入现有打包流程，以未修改的上游组件验收，不用私有 winsys 弥补内核 ABI 缺口。
+新 Kconfig 项为 `DRM_VMWARE_SVGA`，随 `DRM=y/m` 链入同一 DRM provider，可单独关闭，不依赖 VirtIO。ReliefNT 的 Kconfig 和 x86-64 默认配置均启用该后端，ReliefOS 默认构建继承该配置；选项仍标记为实验性，剩余验收见第 7 节。两者都编入时，默认维持现有 VirtIO 优先；没有 VirtIO 时探测 SVGA II，缺卡走当前永久 framebuffer/控制台。只有启用该后端且匹配 PCI 功能才触碰其寄存器。探测返回「不存在 / 不适配」与「找到但失败」要区分，失败按回滚结果决定是否安全保留早期显示，不发布半初始化节点。不新增运行时切换 ABI。ReliefOS 只增补必要的 Kconfig、设备发现和用户态打包接入；现有 VirGL 构建、运行和测试配置不被替换。若安装的用户态缺少 `svga`/libdrm VMware 支持，纳入现有打包流程，以未修改的上游组件验收，不用私有 winsys 弥补内核 ABI 缺口。
 
 ## 3. 设备、提交与同步契约
 
