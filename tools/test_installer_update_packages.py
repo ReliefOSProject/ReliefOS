@@ -30,7 +30,7 @@ class UpdatePreflight(unittest.TestCase):
                        check=True, capture_output=True)
         cls.key.chmod(0o600)
         cls.base = cls.work / "base"
-        for name in ("bin", "usr/sbin", "usr/lib/reliefos", "usr/libexec/reliefos", "sbin", "tmp", "dev", "proc", "oldrepo", "newrepo",
+        for name in ("bin", "usr/sbin", "usr/lib/reliefos", "usr/libexec/reliefos", "sbin", "tmp", "run", "dev", "proc", "oldrepo", "newrepo",
                      "target/etc/apk/keys", "target/lib/apk/db", "target/etc/reliefos",
                      "target/home/test", "target/usr/share/external", "target/bin",
                      "target/usr/lib/reliefos", "target/var/lib/reliefos"):
@@ -124,13 +124,16 @@ class UpdatePreflight(unittest.TestCase):
         return {str(path.relative_to(target)): hashlib.sha256(path.read_bytes()).hexdigest()
                 for path in target.rglob("*") if path.is_file() and not path.is_symlink()}
 
-    def transaction(self, mode="--check", expected=None, cache_readonly=False):
+    def transaction(self, mode="--check", expected=None, cache_readonly=False, readonly_tmp=False):
         readonly = ('mount --bind "$1/target" "$1/target"; '
                     'mount -o remount,bind,ro "$1/target"; ') if mode == "--check" else ""
         if cache_readonly:
             readonly += ('mount --bind "$1/target/usr/share/reliefos/apk/repository" '
                          '"$1/target/usr/share/reliefos/apk/repository"; '
                          'mount -o remount,bind,ro "$1/target/usr/share/reliefos/apk/repository"; ')
+        if readonly_tmp:
+            readonly += ('mount --bind "$1/tmp" "$1/tmp"; '
+                         'mount -o remount,bind,ro "$1/tmp"; ')
         result = subprocess.run([
             "unshare", "-Urmp", "--fork", "sh", "-eu", "-c",
             'mount --make-rprivate /; mount --bind "$1" "$1"; '
@@ -155,6 +158,13 @@ class UpdatePreflight(unittest.TestCase):
         result = self.check()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("reliefos-fixture", result.stdout)
+
+    def test_preflight_does_not_require_writable_runtime_tmp(self):
+        before = self.target_snapshot()
+        result = self.transaction(readonly_tmp=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.target_snapshot(), before)
+        self.assertFalse(list((self.runner / "run").glob("reliefos-update.*")))
 
     def test_unsigned_index_is_rejected_before_target_changes(self):
         self.index(self.runner / "newrepo", signed=False)
