@@ -28,7 +28,7 @@ RELIEFOS_CI_TEST_GROUP ?= all
 ifneq ($(words $(RELIEFOS_CI_TEST_GROUP)),1)
 $(error RELIEFOS_CI_TEST_GROUP must be all or core)
 endif
-ifeq ($(filter $(RELIEFOS_CI_TEST_GROUP),all core),)
+ifeq ($(filter all core,$(RELIEFOS_CI_TEST_GROUP)),)
 $(error RELIEFOS_CI_TEST_GROUP must be all or core; use test-ci-kernel/auth/pages for focused groups)
 endif
 RELIEFOS_CI_SELECTOR := $(RELIEFOS_SRC)/tools/ci_test_shards.py

@@ -122,7 +122,7 @@ class MakeShardTests(unittest.TestCase):
                 self.assertIn("all 10 build suites are assigned exactly once", result.stdout)
 
     def test_invalid_group_and_missing_suite_fail_before_running_any_suite(self):
-        for value in ("typo", "core extra", ""):
+        for value in ("typo", "core extra", "", "%"):
             with self.subTest(value=value):
                 result = self.run_make("RELIEFOS_CI_TEST_GROUP=" + value, "test-ci-kernel", check=False)
                 self.assertNotEqual(result.returncode, 0)
