@@ -249,7 +249,7 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
         with:
-          profile: build
+          profile: ${{ matrix.group }}
       - name: Restore locked dependency downloads
         id: download-cache
         uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3

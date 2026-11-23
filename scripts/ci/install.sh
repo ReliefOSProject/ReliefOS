@@ -16,10 +16,22 @@ case "${1:-}" in
       libswresample-dev libswscale-dev
     )
     ;;
+  kernel|auth|pages)
+    # Focused suites build native tools and disposable kernel/runtime fixtures;
+    # they do not launch guests or compile the desktop/media applications.
+    packages=(
+      build-essential clang libclang-rt-dev llvm lld ccache bison flex gperf gettext
+      git make perl libncurses-dev bc pkg-config autoconf automake libtool libtool-bin
+      gawk ncurses-bin texinfo curl file patch xz-utils openssl python3 libext2fs-dev
+    )
+    if [[ "$1" == pages ]]; then
+      packages+=(python3-sphinx python3-pil)
+    fi
+    ;;
   smoke)
     packages=(qemu-system-x86 qemu-utils ovmf python3-pil tesseract-ocr)
     ;;
-  *) echo 'Usage: install.sh build|smoke' >&2; exit 2 ;;
+  *) echo 'Usage: install.sh build|kernel|auth|pages|smoke' >&2; exit 2 ;;
 esac
 
 sudo apt-get update
