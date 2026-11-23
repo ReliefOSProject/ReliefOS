@@ -7,13 +7,15 @@ flowchart TD
     B --> D[Documentation: Sphinx 5 / 7 / 9]
     B --> L[Restore verified downloads and compiler cache]
     L --> E[Build images and Pages once]
-    E --> F[Host and build regressions]
+    E --> F[Product and core regressions]
+    B --> R[Isolated regressions: kernel / auth / pages]
     F --> G[Record commit and SHA-256 / upload products]
     G --> H[BIOS: disk / live / installer]
     G --> I[UEFI: disk / live / installer]
     B --> J[CI result]
     C --> J
     D --> J
+    R --> J
     H --> J
     I --> J
     J --> K[Deploy the verified Pages artifact on main]
@@ -40,18 +42,34 @@ filter's file-count limit. Manual runs default to validation only. Checking
 
 ## Products, signatures and deployment
 
-The build job runs `make all pages` and `make test` in one working tree. This
-lets product-dependent regressions consume the current SDK, libraries and
-staging tree without transferring the entire compiler output between jobs.
+The build job runs `make all pages` and then
+`make RELIEFOS_CI_TEST_GROUP=core test` in one working tree. This lets
+product-dependent regressions consume the current SDK, libraries and staging
+tree without transferring the entire compiler output between jobs.
 Common runner dependencies live in `scripts/ci/install.sh` and the local setup
 action. The build checkout includes full Git history for kernel rollback
 regressions. Host development packages include FFmpeg, Cairo, GLib and Xvfb.
 
-Builds start alongside workflow checks and the documentation matrix; the final
-gate still requires all selected stages. `make -j"$(nproc)" test` passes the
-jobserver through the contract runner to nested Make processes. Suites remain
-sequential because some temporarily probe shared source files. Each suite logs
-its elapsed seconds, and a dry run never executes its scripts.
+Three focused regression jobs start alongside the product build, workflow
+checks and documentation matrix. `test-ci-kernel` covers concurrent and
+incremental builds, the kernel adapter, header boundaries, reproducibility and
+submodule rollback; `test-ci-auth` covers authentication staging;
+`test-ci-pages` covers complete site assembly. Each job has its own checkout
+and output tree and builds only its group's prerequisites. The final gate
+requires the product build, every regression group and both boot jobs.
+Focused groups install the compiler, native tools and their specific test
+dependencies; they do not install the product build's FFmpeg and GUI stack.
+The kernel group also installs image and boot tools because its concurrency
+contract checks that the complete `make doctor` can run while a build holds
+the output lock.
+
+`tools/ci_test_shards.py` owns the test partition and supplies the workflow
+matrix. It checks that each focused suite exists and belongs to exactly one
+group; new suites join core automatically. Ordinary `make test` continues to
+run every suite. `make -j"$(nproc)"` passes the jobserver through the contract
+runner to nested Make processes. Suites within a group remain sequential
+because some temporarily probe shared source files. Each suite logs its
+elapsed seconds, and a dry run never executes its scripts.
 
 The download cache covers both repositories' `cache/downloads`, keyed by both
 dependency locks and runner platform. A fallback can supply unchanged archives
@@ -61,10 +79,16 @@ so a later test failure does not throw them away. ReliefNT fetch is already
 delegated by the parent and is not repeated.
 
 `ccache` wraps the standard compiler names for the build and its nested tests.
-Its cache is limited to 1 GiB, checks compiler contents, and retains the default
-header, flag and working-directory checks. Path rewriting stays disabled so
-Kbuild source/dependency records retain their native paths. Each run saves a new cache, even
-after a test failure, and reports hits/misses in the run summary. No output
+Compiler caches have separate keys for the product build (4G), kernel tests
+(2G), authentication tests (1G) and Pages tests (1G). They check compiler
+contents and retain the default header, flag and working-directory checks.
+Path rewriting stays disabled so Kbuild source/dependency records retain their
+native paths. Each run saves a new cache, even after a test failure, and reports
+hits/misses in the run summary. A main-only maintenance job retains at most two
+snapshots per role/platform/ref and applies an 8 GiB budget to the new compiler
+cache namespace, always preserving the latest main snapshot for each role and
+platform. It leaves download, legacy and unrelated caches alone. Only this
+maintenance job receives Actions write permission; PR checks do not. No output
 tree, signed APK, image or private key is restored from a build cache. GitHub's
 cache ref scope separates PR caches from the default branch. The pinned
 actionlint binary has a separate platform/version cache; warm runs avoid
@@ -78,7 +102,9 @@ directory and is removed before artifact upload, including on failure.
 
 `ci/manifest.json` records the source commit, kernel release, sizes and SHA-256
 of all three boot media, `.config` and `kernel-install/install.bundle.json`.
-The exact same installer must appear in Pages. The public Pages tree contains
+The exact same installer must appear in Pages. Image transfer uses ZIP
+compression level 1; the manifest continues to identify the uncompressed
+image bytes. The public Pages tree contains
 the manifest as `build-manifest.json`. Boot jobs verify all five files both
 before and after running; they call the existing acceptance runner directly
 and never invoke Make or rebuild an image.
@@ -101,6 +127,7 @@ superseded PR runs. GitHub Release publication remains a separate procedure.
 actionlint
 shellcheck scripts/ci/*.sh
 sh tests/build/test-ci.sh
+python3 tools/ci_test_shards.py --check
 ```
 
 The workflow pins third-party action commits and actionlint's version. Full

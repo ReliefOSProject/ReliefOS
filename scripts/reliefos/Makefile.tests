@@ -20,6 +20,31 @@ RELIEFOS_HOST_TEST_SANITISED += $(O_HOST)/tests-sanitised/test_locale_conf
 # test-brand-identity.sh is the ReliefOS/ReliefNT rename gate (plan task 1) and
 # is picked up by this wildcard on purpose: every test-build run audits names.
 RELIEFOS_BUILD_TESTS := $(sort $(wildcard $(RELIEFOS_SRC)/tests/build/test-*.sh))
+# Local `make test` keeps the complete inventory. CI runs its core in the image
+# build and the explicit heavy groups in independent runner/source checkouts.
+# The selector validates all shards before filtering, so a renamed/missing
+# offloaded suite fails before a partial test run can be reported as complete.
+RELIEFOS_CI_TEST_GROUP ?= all
+ifneq ($(words $(RELIEFOS_CI_TEST_GROUP)),1)
+$(error RELIEFOS_CI_TEST_GROUP must be all or core)
+endif
+ifeq ($(filter all core,$(RELIEFOS_CI_TEST_GROUP)),)
+$(error RELIEFOS_CI_TEST_GROUP must be all or core; use test-ci-kernel/auth/pages for focused groups)
+endif
+RELIEFOS_CI_SELECTOR := $(RELIEFOS_SRC)/tools/ci_test_shards.py
+define RELIEFOS_CI_SELECT_TESTS
+$(eval reliefos_ci_selected := $(shell $(RELIEFOS_TEST_PYTHON) '$(RELIEFOS_CI_SELECTOR)' --root '$(RELIEFOS_SRC)' --group $(1) || echo __CI_SHARD_ERROR__))$(if $(filter __CI_SHARD_ERROR__,$(reliefos_ci_selected)),$(error CI test shard validation failed),$(addprefix $(RELIEFOS_SRC)/tests/build/,$(reliefos_ci_selected)))
+endef
+RELIEFOS_SELECTED_BUILD_TESTS := $(RELIEFOS_BUILD_TESTS)
+ifeq ($(RELIEFOS_CI_TEST_GROUP),core)
+# Select only when the contract-test recipe needs the inventory. Other goals
+# may forward a guest/kernel Python path that is not a host interpreter.
+RELIEFOS_SELECTED_BUILD_TESTS = $(call RELIEFOS_CI_SELECT_TESTS,core)
+endif
+ifneq ($(filter test-ci-kernel test-ci-auth test-ci-pages test-ci-validate,$(MAKECMDGOALS)),)
+# Validate while parsing, before any expensive prerequisite can start.
+reliefos_ci_validated := $(call RELIEFOS_CI_SELECT_TESTS,all)
+endif
 # Suites that are too long to run on every change but must not be forgotten:
 # repeated -j1/-j8 comparisons and, later, guest boots. Plan section 13 forbids
 # presenting an unrun long test as a skipped pass, so they are a separate goal.
@@ -91,8 +116,21 @@ leonos-test-tools-plain: reliefos-test-tools-plain
 leonos-test-tools-sanitised: reliefos-test-tools-sanitised
 
 test-build: sdk rootfs-raw $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS) test-tools $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY) $(HEADER_EXPORT_MANIFEST)
-	+@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_BUILD_TESTS))
+	+@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_SELECTED_BUILD_TESTS))
 	@$(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_xorg_qemu.py --source-only
+
+.PHONY: test-ci-validate test-ci-kernel test-ci-auth test-ci-pages
+test-ci-validate:
+	@$(RELIEFOS_TEST_PYTHON) '$(RELIEFOS_CI_SELECTOR)' --root '$(RELIEFOS_SRC)' --check
+
+# These contracts build their own disposable outputs; staging the complete
+# SDK/rootfs first would duplicate the image build for every CI shard.
+test-ci-kernel test-ci-auth: test-ci-validate $(RELIEFOS_HOST_TOOLS)
+	+@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(call RELIEFOS_CI_SELECT_TESTS,$(patsubst test-ci-%,%,$@)))
+
+# Pages uses the real native module/initramfs producers and static verifier.
+test-ci-pages: test-ci-validate $(RELIEFOS_HOST_TOOLS) $(INITRAMFS_BUSYBOX_ELF) $(INITRAMFS_BUSYBOX_LINKS) $(RELIEFOS_KERNEL_RECOVERY)
+	+@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(call RELIEFOS_CI_SELECT_TESTS,pages))
 
 test-long: $(RELIEFOS_HOST_TOOLS) grub-host grub-efi
 	+@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_LONG_TESTS))

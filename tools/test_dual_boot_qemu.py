@@ -194,6 +194,23 @@ def wait_xdm(probe, process, name, timeout, expected="login"):
     raise AssertionError(f"Missing XDM {expected} state; observed {observed}")
 
 
+def wait_installer_language(probe, serial, process, timeout):
+    """Observe the actual wizard without depending on optional exec debug logs."""
+    deadline, stable = time.monotonic() + timeout, 0
+    while time.monotonic() < deadline:
+        if process.poll() is not None:
+            raise RuntimeError("QEMU exited before the installer language page")
+        text = serial.read_text(errors="replace") if serial.exists() else ""
+        if "KERNEL PANIC" in text or "Kernel Panic" in text:
+            raise AssertionError("Kernel panic before the installer language page")
+        page = probe.visible_page(probe.frame("installer"))
+        stable = stable + 1 if page == 0 else 0
+        if stable >= 2:
+            return
+        time.sleep(.5)
+    raise AssertionError("Installer language page did not appear")
+
+
 def boot_matrix(args, output):
     """Reach the kernel and corresponding user environment on each same media."""
     results = []
@@ -209,15 +226,7 @@ def boot_matrix(args, output):
                     wait_for(serial, process, lambda text: boot_evidence(text, firmware, args.expected_release, cpus=2),
                              f"{name} kernel/PID1", args.timeout)
                     if medium == "installer":
-                        wait_for(serial, process, lambda text: "path=/usr/lib/reliefos/apps/installer/installer.elf" in text,
-                                 "installer executable", args.timeout)
-                        deadline = time.monotonic() + args.timeout
-                        while time.monotonic() < deadline:
-                            if probe.visible_page(probe.frame("installer")) == 0:
-                                break
-                            time.sleep(.5)
-                        else:
-                            raise AssertionError("Installer language page did not appear")
+                        wait_installer_language(probe, serial, process, args.timeout)
                     else:
                         wait_for(serial, process, lambda text: "VT graphics vt=1 enabled=1" in text,
                                  "graphical login", args.timeout)

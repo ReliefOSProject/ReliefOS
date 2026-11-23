@@ -162,7 +162,7 @@ class GateTests(unittest.TestCase):
         result = {name: {"result": "success"} for name in ci.STAGES}
         result["changes"]["outputs"] = {"build": str(build).lower(), "docs": str(docs).lower(), "publish": "false"}
         if not build:
-            for name in ("build", "smoke"):
+            for name in ("build", "regressions", "smoke"):
                 result[name]["result"] = "skipped"
         if not docs:
             result["documentation"]["result"] = "skipped"
@@ -187,6 +187,16 @@ class GateTests(unittest.TestCase):
         needs = self.needs()
         needs["changes"]["outputs"]["build"] = ""
         self.assertFalse(ci.summary(needs)[0])
+
+    def test_product_success_does_not_replace_regression_results(self):
+        for result in ("failure", "cancelled", "skipped", "missing"):
+            with self.subTest(result=result):
+                needs = self.needs()
+                if result == "missing":
+                    del needs["regressions"]
+                else:
+                    needs["regressions"]["result"] = result
+                self.assertFalse(ci.summary(needs)[0])
 
     def test_publication_cannot_skip_product_or_documentation_checks(self):
         for build, docs in ((False, True), (True, False), (False, False)):
