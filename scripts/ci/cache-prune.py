@@ -83,6 +83,23 @@ def list_caches(repository, api=gh_api):
         page += 1
 
 
+def delete_cache(repository, id):
+    """A cache evicted after listing is already in the requested absent state."""
+    result = subprocess.run(
+        ["gh", "api", f"repos/{repository}/actions/caches/{id}",
+         "--method", "DELETE", "--include", "--silent"], capture_output=True, text=True)
+    if result.returncode == 0:
+        return
+    first_line = result.stdout.splitlines()[0] if result.stdout else ""
+    status = re.fullmatch(r"HTTP/\d+(?:\.\d+)? (\d{3})(?: .*)?", first_line)
+    if status is not None and status[1] == "404":
+        print(f"Cache {id} is already absent.")
+        return
+    if result.stderr:
+        print(result.stderr, file=sys.stderr, end="")
+    result.check_returncode()
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY"))
@@ -100,9 +117,7 @@ def main(argv=None):
     print(json.dumps(dict(result, apply=args.apply), sort_keys=True))
     if args.apply:
         for id in result["delete"]:
-            # The delete endpoint returns an empty 204 response.
-            subprocess.run(["gh", "api", f"repos/{args.repo}/actions/caches/{id}",
-                            "--method", "DELETE"], check=True)
+            delete_cache(args.repo, id)
     if result["remaining"] > args.budget_gib * GIB:
         print("Newest main snapshots exceed the budget; they remain protected.")
     return 0

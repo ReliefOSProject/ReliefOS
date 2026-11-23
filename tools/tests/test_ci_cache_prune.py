@@ -3,6 +3,7 @@
 import importlib.util
 import os
 from pathlib import Path
+import subprocess
 import unittest
 from unittest.mock import patch
 
@@ -94,7 +95,7 @@ class ApiTests(unittest.TestCase):
 
     def test_default_cli_is_dry_run_and_main_only_apply_is_explicit(self):
         with patch.object(prune, "list_caches", return_value=[cache(1), cache(2)]), \
-                patch.object(prune.subprocess, "run") as delete, \
+                patch.object(prune, "delete_cache") as delete, \
                 patch.dict(os.environ, {}, clear=True):
             self.assertEqual(prune.main(["--repo", "owner/repo", "--keep", "1"]), 0)
             delete.assert_not_called()
@@ -105,16 +106,52 @@ class ApiTests(unittest.TestCase):
         environment = {"GITHUB_REF": prune.MAIN, "GITHUB_EVENT_NAME": "push",
                        "GITHUB_REPOSITORY": "owner/repo"}
         with patch.object(prune, "list_caches", return_value=[cache(1), cache(2)]), \
-                patch.object(prune.subprocess, "run") as delete, \
+                patch.object(prune, "delete_cache") as delete, \
                 patch.dict(os.environ, environment, clear=True):
             self.assertEqual(prune.main(["--keep", "1", "--apply"]), 0)
-            delete.assert_called_once_with([
-                "gh", "api", "repos/owner/repo/actions/caches/1", "--method", "DELETE"], check=True)
+            delete.assert_called_once_with("owner/repo", 1)
             with self.assertRaises(ValueError):
                 prune.main(["--repo", "other/repo", "--apply"])
             os.environ["GITHUB_EVENT_NAME"] = "pull_request"
             with self.assertRaises(ValueError):
                 prune.main(["--apply"])
+
+
+class DeletionTests(unittest.TestCase):
+    def result(self, status, *, stderr=""):
+        return subprocess.CompletedProcess(
+            ["gh", "api"], 0 if status == 204 else 1,
+            stdout=f"HTTP/2.0 {status} Response\nContent-Length: 0\n\n", stderr=stderr)
+
+    def test_success_and_already_evicted_cache_both_succeed(self):
+        for status in (204, 404):
+            with self.subTest(status=status), \
+                    patch.object(prune.subprocess, "run", return_value=self.result(status)) as request:
+                prune.delete_cache("owner/repo", 1)
+                request.assert_called_once_with([
+                    "gh", "api", "repos/owner/repo/actions/caches/1", "--method", "DELETE",
+                    "--include", "--silent"], capture_output=True, text=True)
+
+    def test_auth_rate_limit_and_server_failures_are_preserved(self):
+        for status in (401, 403, 429, 500, 503):
+            with self.subTest(status=status), \
+                    patch.object(prune.subprocess, "run", return_value=self.result(status)), \
+                    self.assertRaises(subprocess.CalledProcessError) as error:
+                prune.delete_cache("owner/repo", 1)
+            self.assertIn(f"HTTP/2.0 {status}", error.exception.stdout)
+
+    def test_failure_classification_uses_response_headers_not_stderr(self):
+        response = self.result(403, stderr="gh: requested cache 404 was forbidden\n")
+        with patch.object(prune.subprocess, "run", return_value=response), \
+                patch.object(prune.sys.stderr, "write"), \
+                self.assertRaises(subprocess.CalledProcessError):
+            prune.delete_cache("owner/repo", 1)
+        for stdout in ("", "404 Not Found\n", '{"message":"HTTP/2.0 404 Not Found"}'):
+            response = subprocess.CompletedProcess(["gh", "api"], 1, stdout=stdout, stderr="")
+            with self.subTest(stdout=stdout), \
+                    patch.object(prune.subprocess, "run", return_value=response), \
+                    self.assertRaises(subprocess.CalledProcessError):
+                prune.delete_cache("owner/repo", 1)
 
 
 if __name__ == "__main__":
