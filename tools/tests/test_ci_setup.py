@@ -53,9 +53,16 @@ class SetupTests(unittest.TestCase):
                 packages = self.packages(profile)
                 self.assertTrue(required <= packages, required - packages)
                 self.assertTrue(packages.isdisjoint({"ffmpeg", "libavformat-dev", "libavcodec-dev",
-                                                     "qemu-system-x86", "qemu-utils", "ovmf",
-                                                     "grub-common", "grub-pc-bin", "grub-efi-amd64-bin",
+                                                     "grub-pc-bin", "grub-efi-amd64-bin",
                                                      "xvfb", "libx11-dev"}))
+
+    def test_kernel_profile_supports_the_full_doctor_contract(self):
+        image_tools = {"e2fsprogs", "squashfs-tools", "dosfstools", "mtools", "xorriso",
+                       "qemu-utils", "qemu-system-x86", "grub-common", "fdisk", "fakeroot",
+                       "zip", "ovmf"}
+        self.assertTrue(image_tools <= self.packages("kernel"))
+        for profile in ("auth", "pages"):
+            self.assertTrue(image_tools.isdisjoint(self.packages(profile)))
 
     def test_only_pages_focused_profile_needs_sphinx(self):
         self.assertTrue({"python3-sphinx", "python3-pil"} <= self.packages("pages"))

@@ -59,6 +59,9 @@ and output tree and builds only its group's prerequisites. The final gate
 requires the product build, every regression group and both boot jobs.
 Focused groups install the compiler, native tools and their specific test
 dependencies; they do not install the product build's FFmpeg and GUI stack.
+The kernel group also installs image and boot tools because its concurrency
+contract checks that the complete `make doctor` can run while a build holds
+the output lock.
 
 `tools/ci_test_shards.py` owns the test partition and supplies the workflow
 matrix. It checks that each focused suite exists and belongs to exactly one

@@ -26,6 +26,14 @@ case "${1:-}" in
     )
     if [[ "$1" == pages ]]; then
       packages+=(python3-sphinx python3-pil)
+    elif [[ "$1" == kernel ]]; then
+      # The concurrency suite verifies that the public, read-only `doctor`
+      # entry remains usable while another build owns the output directory.
+      # Its complete image/run checks need real tools even without guest boots.
+      packages+=(
+        e2fsprogs squashfs-tools dosfstools mtools xorriso qemu-utils qemu-system-x86
+        grub-common fdisk fakeroot zip ovmf
+      )
     fi
     ;;
   smoke)
