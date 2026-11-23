@@ -2,7 +2,6 @@
 """Exercise installer VT switching and optional installation on a new scratch disk."""
 import argparse
 from pathlib import Path
-import re
 import subprocess
 import time
 
@@ -65,16 +64,9 @@ def main():
             probe.text('echo TUI-EXIT-OK >/dev/ttyS0')
             probe.key('ret')
             wait_log(serial, 'TUI-EXIT-OK', process, 20)
-            before = serial.read_text().count(
-                'path=/usr/lib/reliefos/apps/login/login.elf')
-            probe.text('exit')
+            probe.text(r"printf '\033[2J\033[H'; exit")
             probe.key('ret')
-            deadline = time.monotonic() + 30
-            while serial.read_text().count(
-                    'path=/usr/lib/reliefos/apps/login/login.elf') <= before:
-                assert process.poll() is None and time.monotonic() < deadline, \
-                    'the installer shell did not respawn after exit'
-                time.sleep(.2)
+            wait_text(probe, process, 'installer-tui-respawn', 'built-in shell')
             probe.text('echo TUI-RESPAWN-OK >/dev/ttyS0')
             probe.key('ret')
             wait_log(serial, 'TUI-RESPAWN-OK', process, 20)
@@ -88,11 +80,7 @@ def main():
             # installer-media fallthrough in console-session).
             probe.key('ctrl-alt-f2')
             wait_text(probe, process, 'exit-recovery-shell', 'built-in shell')
-            match = re.search(
-                r'exec pid=(\d+) path=/usr/bin/Xorg',
-                serial.read_text())
-            assert match, 'graphical session pid not recorded'
-            probe.text(f'kill {match[1]}')
+            probe.text('kill $(pidof Xorg)')
             probe.key('ret')
             time.sleep(2)
             probe.frame('installer-session-killed')

@@ -2,7 +2,6 @@
 """Exercise PAM login and Terminal startup on a disposable copy of a raw disk."""
 import argparse
 import json
-import re
 from pathlib import Path
 import subprocess
 import time
@@ -90,38 +89,24 @@ def main():
             probe.key("ret")
             time.sleep(5)
             probe.frame("terminal-identity")
-            probe.text("cat /tmp/pam-uid /tmp/flock-result; sync")
+            probe.text("cat /tmp/pam-uid /tmp/flock-result; sync && echo PAM_DESKTOP_SYNCED >/dev/ttyS0")
             probe.key("ret")
-            wait_log(serial, "name=sync code=0", process, timeout=30)
+            wait_log(serial, "PAM_DESKTOP_SYNCED", process, timeout=30)
             time.sleep(1)
             probe.frame("terminal-results")
             if args.core:
-                sudo_offset = len(serial.read_text(errors="replace"))
-                probe.text("sudo -k; sudo -p CORE_PASSWORD /bin/su -c '/bin/core-probe --sudo-child' > /tmp/core-sudo 2>&1; echo CORE_EXIT=$? >> /tmp/core-sudo")
+                probe.text("sudo -k; sudo -p CORE_PASSWORD /bin/su -c '/bin/core-probe --sudo-child' "
+                           "> /tmp/core-sudo 2>&1; echo CORE_EXIT=$? >> /tmp/core-sudo; "
+                           "echo PAM_DESKTOP_SUDO_DONE >/dev/ttyS0")
                 probe.key("ret")
                 # The prompt is redirected to the guest file; allow sudo to open /dev/tty.
                 time.sleep(4)
                 probe.text(password)
                 probe.key("ret")
-                deadline = time.monotonic() + 45
-                while True:
-                    log = serial.read_text(errors="replace")[sudo_offset:]
-                    parents = re.findall(r"exec pid=(\d+) path=/usr/bin/sudo ", log)
-                    if len(parents) >= 2 and re.search(
-                            rf"scheduler wait reaped pid={parents[1]} by pid=\d+", log):
-                        break
-                    if process.poll() is not None or time.monotonic() >= deadline:
-                        raise AssertionError("sudo did not return to its calling shell")
-                    time.sleep(.2)
-                time.sleep(1)
-                sync_count = serial.read_text(errors="replace").count("name=sync code=0")
-                probe.text("cat /tmp/core-sudo; sync")
+                wait_log(serial, "PAM_DESKTOP_SUDO_DONE", process, timeout=45)
+                probe.text("cat /tmp/core-sudo; sync && echo PAM_DESKTOP_CORE_SYNCED >/dev/ttyS0")
                 probe.key("ret")
-                deadline = time.monotonic() + 30
-                while serial.read_text(errors="replace").count("name=sync code=0") <= sync_count:
-                    if process.poll() is not None or time.monotonic() >= deadline:
-                        raise AssertionError("sudo result sync did not complete")
-                    time.sleep(.2)
+                wait_log(serial, "PAM_DESKTOP_CORE_SYNCED", process, timeout=30)
                 time.sleep(1)
                 probe.frame("sudo-core-results")
         except Exception:

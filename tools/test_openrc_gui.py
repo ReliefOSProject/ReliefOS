@@ -11,6 +11,7 @@ import tempfile
 import time
 from test_sudo_e2e_qemu import Probe, type_line
 from test_installer_window_qemu import wait_log
+from test_xorg_vm_qemu import wait_greeter_stage
 from run_gcc_probe_qemu import qmp_quit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,9 +37,13 @@ def main():
             process = subprocess.Popen(command,stdout=log,stderr=subprocess.STDOUT)
             probe = None
             try:
-                wait_log(serial, 'path=/usr/lib/reliefos/apps/login/login.elf', process, timeout=90)
-                time.sleep(5)
+                deadline = time.monotonic() + 10
+                while not qmp.exists():
+                    if process.poll() is not None or time.monotonic() >= deadline:
+                        raise RuntimeError("QEMU QMP socket did not become ready")
+                    time.sleep(.05)
                 probe = Probe(qmp,work)
+                wait_greeter_stage(probe, process, 'login', 'login-ready', timeout=90)
                 probe.frame('login')
                 probe.key('down')
                 probe.text('test')

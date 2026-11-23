@@ -69,10 +69,11 @@ def login_case(output, disk, wrong_password=False):
         command = ("grep -E '^(Uid|Gid):' /proc/self/status > /tmp/login-switch-identity; "
                    "printf 'Groups: ' >> /tmp/login-switch-identity; "
                    "id -G >> /tmp/login-switch-identity; "
-                   "pwd >> /tmp/login-switch-identity; cat /tmp/login-switch-identity; sync")
+                   "pwd >> /tmp/login-switch-identity; cat /tmp/login-switch-identity; "
+                   "sync && echo PAM_SWITCH_SYNCED >/dev/ttyS0")
         probe.text(command)
         probe.key("ret")
-        wait_log(serial, "name=sync code=0", process, timeout=30)
+        wait_log(serial, "PAM_SWITCH_SYNCED", process, timeout=30)
         time.sleep(1)
         probe.frame("terminal-identity")
     filesystem = output / "root-check.ext2"
