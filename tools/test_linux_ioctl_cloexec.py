@@ -148,7 +148,7 @@ def build_iso(root: Path, output: Path, config: Path, work: Path) -> Path:
 
     kernel = artifact("build/system/kernel.sys", "out/x86_64/release/generated/system/kernel.sys")
     font = artifact("build/generated/grub/leonos-unicode.pf2", "out/x86_64/release/generated/grub/leonos-unicode.pf2")
-    config.write_text(GRUB_TEMPLATE, encoding="ascii")
+    config.write_text(GRUB_TEMPLATE.replace(" root=/", " root=/ loglevel=8", 1), encoding="ascii")
     assert "bootlog=1" not in config.read_text(encoding="ascii")
     run([
         sys.executable, "tools/make_installer_iso.py", "--out", str(output.relative_to(ROOT)),

@@ -704,8 +704,8 @@ def shutdown_after_login(probe, process, *, root):
 
 
 def login_desktop(probe, serial, process):
-    wait_log(serial, "path=/usr/lib/reliefos/apps/login/login.elf", process)
-    time.sleep(5)
+    from test_xorg_vm_qemu import wait_greeter_stage
+    wait_greeter_stage(probe, process, "login", "login-ready", timeout=90)
     probe.frame("login")
     probe.key("down")
     probe.text(USER_PASSWORD)

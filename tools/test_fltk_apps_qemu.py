@@ -469,7 +469,8 @@ def clone_private_raw(image: Path, output: Path) -> Path:
 
 
 def prepare_disk(image: Path, kernel: Path, output: Path,
-                 payload: list[tuple[Path, str, int]]) -> dict[str, object]:
+                 payload: list[tuple[Path, str, int]], *,
+                 trace_exec: bool = False) -> dict[str, object]:
     image_hash_before = sha256(image)
     raw = clone_private_raw(image, output)
     partitions = vdso.gpt_partitions(raw)
@@ -485,6 +486,17 @@ def prepare_disk(image: Path, kernel: Path, output: Path,
     injected = inject_payload(root_image, output, payload)
     vdso.put_root_back(raw, root_image, layout)
     kernel_hashes = vdso.install_private_kernel(raw, int(layout["esp_first"]), kernel, output)
+    if trace_exec:
+        # Process events are DEBUG. Enable them only in this private VM image.
+        esp_image = f"{raw}@@{int(layout['esp_first']) * vdso.PAGE_SIZE}"
+        grub = output / "probe-grub.cfg"
+        run(["mcopy", "-i", esp_image, "::/grub/grub.cfg", grub])
+        traced, count = re.subn(r"^([ \t]*multiboot2 [^\r\n]*\S)[ \t]*$",
+                                r"\1 loglevel=8", grub.read_text(), flags=re.MULTILINE)
+        if not count:
+            raise ValueError("private boot configuration has no multiboot2 entries")
+        grub.write_text(traced)
+        run(["mcopy", "-o", "-i", esp_image, grub, "::/grub/grub.cfg"])
     image_hash_after = sha256(image)
     if image_hash_before != image_hash_after:
         raise RuntimeError("source image changed while preparing private disk")
@@ -1969,7 +1981,7 @@ def main() -> int:
                             required_needed=("libfltk.so.1.3", "libstdc++.so.6",
                                              "libgcc_s.so.1"))
     payload = payload_files(output, probe)
-    disk = prepare_disk(image, kernel, output, payload)
+    disk = prepare_disk(image, kernel, output, payload, trace_exec="fileman" in args.apps)
     metadata: dict[str, object] = {
         "started_utc": datetime.now(timezone.utc).isoformat(),
         "input_image_sha256": source_image_hash, "disk": disk,

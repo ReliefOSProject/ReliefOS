@@ -204,7 +204,8 @@ echo "MAIL_CA_EXIT status=$status" >/dev/ttyS0
                 (runner, '/usr/bin/mailcatest', 0o100755),
                 (probe, fltk.PROBE_GUEST, 0o100755),
                 (output / 'tls-probe.elf', '/usr/lib/reliefos/tests/mail-tls-probe', 0o100755)]
-    metadata = fltk.prepare_disk(image, OUT / 'generated/system/kernel.sys', output, payload)
+    metadata = fltk.prepare_disk(image, OUT / 'generated/system/kernel.sys', output,
+                                 payload, trace_exec=True)
     (output / 'prepare.json').write_text(json.dumps(metadata, indent=2) + '\n')
     return metadata
 
