@@ -16,6 +16,12 @@ from test_installer_mode_switch_qemu import wait_page
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def assert_no_user_faults(serial):
+    faults = [line for line in serial.read_text(errors="replace").splitlines()
+              if "user page fault signal=" in line]
+    assert not faults, "User processes faulted during the installer update:\n" + "\n".join(faults)
+
+
 def installed_state(disk, directory):
     table = json.loads(subprocess.check_output(["sfdisk", "--json", str(disk)], text=True))["partitiontable"]
     partition = next(part for part in table["partitions"]
@@ -108,12 +114,14 @@ def main():
         try:
             probe.click(*probe.footer_point())
             wait_page(probe, process, "Review update", args.timeout)
+            assert_no_user_faults(serial)
             assert probe.visible_page(probe.frame("inspection-complete")) == 4
             next_page(probe, 8)
             wait_page(probe, process, "Review system update", args.timeout)
             probe.frame("confirmation")
             next_page(probe)
             wait_page(probe, process, "was updated on the selected disk", args.timeout)
+            assert_no_user_faults(serial)
             probe.frame("updated")
         finally:
             (output / "installer.log").write_text(installer_finish_log(
