@@ -240,6 +240,7 @@ gettext gettext-check: $(RELIEFOS_O_MARKER) $(RELIEFOS_DOCS_I18N_INPUTS)
 	    sh $(RELIEFOS_SRC)/scripts/docs-python.sh $(RELIEFOS_SRC)/scripts/update-doc-translations.py \
 	    --output $(O)/Documentation/gettext $(if $(filter gettext-check,$@),--check)
 
+reliefos_run_only_goals := run-only run-installer-only run-iso-only
 reliefos_goals := $(filter-out help doctor clean distclean htmldocs gettext gettext-check,$(MAKECMDGOALS))
 reliefos_kbuild_goals := $(patsubst $(reliefos_O_absolute)/%,%,$(patsubst $(O)/%,%,$(reliefos_goals)))
 ifneq ($(strip $(reliefos_goals)),)
@@ -249,7 +250,7 @@ endif
 
 # Inspection never creates O. Configuration-independent goals may inspect an
 # existing host-only tree without creating a .config as a side effect.
-reliefos_config_free_goals := tools fetch fetch-check reliefnt-fetch ntclks-fetch reliefnt-fetch-check ntclks-fetch-check headers_install defconfig olddefconfig menuconfig kernel-menuconfig kernel-olddefconfig kernel-allmodconfig migrate-config regen-component-kconfig
+reliefos_config_free_goals := tools fetch fetch-check reliefnt-fetch ntclks-fetch reliefnt-fetch-check ntclks-fetch-check headers_install defconfig olddefconfig menuconfig kernel-menuconfig kernel-olddefconfig kernel-allmodconfig migrate-config regen-component-kconfig $(reliefos_run_only_goals)
 ifneq ($(strip $(reliefos_lock_skip)),)
 ifneq ($(strip $(reliefos_goals)),)
 ifeq ($(wildcard $(reliefos_O_absolute)),)
@@ -291,6 +292,7 @@ reliefos_hostcc_fingerprint = $(shell sh $(RELIEFOS_SRC)/scripts/reliefos/hostcc
 reliefos_native_hostcc = env RELIEFOS_HOST_COMPILER_ID=$(reliefos_hostcc_fingerprint) $(reliefos_hostcc_command)
 
 __kbuild:
+ifneq ($(strip $(filter-out $(reliefos_run_only_goals),$(reliefos_kbuild_goals))),)
 	$(Q)mkdir -p '$(reliefos_O_absolute)'
 	$(Q)test -f '$(RELIEFOS_O_MARKER)' || printf 'reliefos-build-out version=1 root=%s\n' '$(RELIEFOS_SRC)' > '$(RELIEFOS_O_MARKER)'
 	+$(Q)CONFIG_SHELL=/bin/sh AWK=awk srctree='$(RELIEFOS_SRC)' objtree=. VPATH='$(RELIEFOS_SRC)' \
@@ -298,6 +300,7 @@ __kbuild:
 	    -f '$(RELIEFOS_SRC)/scripts/Makefile.port' -f '$(RELIEFOS_SRC)/scripts/Makefile.build' \
 	    obj=scripts/basic KBUILD_HOSTCFLAGS='-O2 -I$(RELIEFOS_SRC)/scripts/include' \
 	    HOSTCC='$(reliefos_native_hostcc)'
+endif
 	+$(Q)CONFIG_SHELL=/bin/sh AWK=awk srctree='$(RELIEFOS_SRC)' objtree=. VPATH='$(RELIEFOS_SRC)' \
 	    RELIEFOS_SRC='$(RELIEFOS_SRC)' ARCH='$(ARCH)' PROFILE='$(PROFILE)' \
 	    SOURCE_DATE_EPOCH='$(SOURCE_DATE_EPOCH)' TOOLCHAIN='$(TOOLCHAIN)' \
