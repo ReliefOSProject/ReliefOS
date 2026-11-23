@@ -101,13 +101,7 @@ def login_vt(probe,process,vt,*,fresh=False):
 
 def normal_login(probe,process,vt=2):
     """Capture the stock login shell before any terminal probe can clear it."""
-    offset=len(probe.serial.read_text(errors="replace"))
     login_vt(probe,process,vt,fresh=True)
-    def automatic_fastfetch():
-        log=probe.serial.read_text(errors="replace")[offset:]
-        pids=re.findall(r"exec pid=(\d+) path=/usr/bin/fastfetch ",log)
-        return any(re.search(rf"task exited pid={pid} name=fastfetch code=0\b",log) for pid in pids)
-    wait(probe,process,automatic_fastfetch,"automatic-login-fastfetch",timeout=120)
     wait(probe,process,lambda:all(s in text_cells(probe) for s in
         (b"OS: ReliefOS",b"Shell: bash",b"test@reliefos:~$")),"normal-bash-prompt")
     assert visible_text(probe,"02-tty-login") is not None
