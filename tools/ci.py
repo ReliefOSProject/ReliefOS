@@ -24,7 +24,7 @@ DOC_INPUTS = (
     "scripts/reliefos/Makefile.site", "tools/build/docs-page.sh", "tools/test_documentation.py",
     ".github/workflows/check-docs.yml", ".github/workflows/ci.yml", ".github/actions/",
 )
-STAGES = ("changes", "checks", "documentation", "build", "smoke")
+STAGES = ("changes", "checks", "documentation", "build", "regressions", "smoke")
 
 
 def matches(path, patterns):
@@ -146,7 +146,7 @@ def summary(needs):
     if outputs.get("docs") == "true":
         required.add("documentation")
     if outputs.get("build") == "true":
-        required.update(("build", "smoke"))
+        required.update(("build", "regressions", "smoke"))
     passed = valid_scope and set(needs) == set(STAGES)
     lines = ["## ReliefOS CI", "", "| Stage | Required | Result |", "| --- | --- | --- |"]
     for name in STAGES:

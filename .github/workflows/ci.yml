@@ -37,6 +37,7 @@ jobs:
       build: ${{ steps.scope.outputs.build }}
       docs: ${{ steps.scope.outputs.docs }}
       publish: ${{ steps.scope.outputs.publish }}
+      test-groups: ${{ steps.groups.outputs.groups }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -45,6 +46,11 @@ jobs:
       - name: Select checks for this commit
         id: scope
         run: python3 tools/ci.py changes
+      - name: Select every focused regression group
+        id: groups
+        run: |
+          groups=$(python3 tools/ci_test_shards.py --groups-json)
+          printf 'groups=%s\n' "$groups" >> "$GITHUB_OUTPUT"
 
   checks:
     name: Workflow and orchestration checks
@@ -77,7 +83,7 @@ jobs:
       - name: Check CI scripts
         run: |
           shellcheck scripts/ci/*.sh
-          python3 -m unittest discover -s tools/tests -p test_ci.py -v
+          python3 -m unittest discover -s tools/tests -p 'test_ci*.py' -v
 
   documentation:
     name: Documentation
@@ -96,7 +102,7 @@ jobs:
       # Kbuild's native source/dependency records retain their absolute paths.
       CCACHE_BASEDIR: ''
       CCACHE_COMPILERCHECK: content
-      CCACHE_MAXSIZE: 1G
+      CCACHE_MAXSIZE: 4G
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -122,8 +128,9 @@ jobs:
         uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           path: ${{ env.CCACHE_DIR }}
-          key: ccache-v1-${{ runner.os }}-${{ runner.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
+          key: ccache-v2-${{ runner.os }}-${{ runner.arch }}-build-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
+            ccache-v2-${{ runner.os }}-${{ runner.arch }}-build-
             ccache-v1-${{ runner.os }}-${{ runner.arch }}-
       - name: Reset compiler cache statistics
         run: ccache --zero-stats
@@ -161,11 +168,11 @@ jobs:
         run: |
           mkdir -p out/x86_64/release/ci
           make -j"$(nproc)" APK_SIGNING_KEY="$APK_SIGNING_KEY" all pages 2>&1 | tee out/x86_64/release/ci/build.log
-      - name: Run host and build regressions
+      - name: Run product and core regressions
         timeout-minutes: 60
         run: |
           mkdir -p out/tmp
-          TMPDIR="$PWD/out/tmp" make -j"$(nproc)" APK_SIGNING_KEY="$APK_SIGNING_KEY" test 2>&1 | tee out/x86_64/release/ci/regressions.log
+          TMPDIR="$PWD/out/tmp" make -j"$(nproc)" APK_SIGNING_KEY="$APK_SIGNING_KEY" RELIEFOS_CI_TEST_GROUP=core test 2>&1 | tee out/x86_64/release/ci/regressions.log
       - name: Verify products and record their identity
         run: |
           qemu-img info out/x86_64/release/images/reliefos.vmdk
@@ -198,7 +205,7 @@ jobs:
             out/x86_64/release/ci/manifest.json
           include-hidden-files: true
           if-no-files-found: error
-          compression-level: 0
+          compression-level: 1
           retention-days: 3
       - name: Upload verified Pages tree
         if: needs.changes.outputs.publish == 'true'
@@ -212,6 +219,91 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: build-diagnostics-${{ github.sha }}
+          path: |
+            out/x86_64/release/logs
+            out/x86_64/release/ci
+            out/kbuild-migration
+          if-no-files-found: warn
+          retention-days: 7
+
+  regressions:
+    name: Regressions (${{ matrix.group }})
+    needs: changes
+    if: needs.changes.outputs.build == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        group: ${{ fromJSON(needs.changes.outputs.test-groups) }}
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/cache/ccache
+      CCACHE_BASEDIR: ''
+      CCACHE_COMPILERCHECK: content
+      CCACHE_MAXSIZE: ${{ matrix.group == 'kernel' && '2G' || '1G' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          submodules: recursive
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+        with:
+          profile: build
+      - name: Restore locked dependency downloads
+        id: download-cache
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: |
+            cache/downloads
+            kernel/reliefnt/cache/downloads
+          key: downloads-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('configs/dependencies.lock.json', 'kernel/reliefnt/configs/dependencies.lock.json') }}
+          restore-keys: |
+            downloads-v1-${{ runner.os }}-${{ runner.arch }}-
+      - name: Restore compiler cache for this group
+        id: compiler-cache
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-v2-${{ runner.os }}-${{ runner.arch }}-${{ matrix.group }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ccache-v2-${{ runner.os }}-${{ runner.arch }}-${{ matrix.group }}-
+      - name: Prepare build configuration
+        env:
+          INSTALLER_ROOT_SIZE_MIB: ${{ inputs.installer_root_size_mib || '32' }}
+        run: bash scripts/ci/configure.sh
+      - name: Save verified dependency downloads
+        if: steps.download-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: |
+            cache/downloads
+            kernel/reliefnt/cache/downloads
+          key: ${{ steps.download-cache.outputs.cache-primary-key }}
+      - name: Validate the complete test partition
+        run: python3 tools/ci_test_shards.py --check
+      - name: Reset compiler cache statistics
+        run: ccache --zero-stats
+      - name: Run isolated regression group
+        env:
+          TEST_GROUP: ${{ matrix.group }}
+        run: |
+          mkdir -p out/tmp out/x86_64/release/ci
+          TMPDIR="$PWD/out/tmp" make -j"$(nproc)" "test-ci-$TEST_GROUP" 2>&1 | tee "out/x86_64/release/ci/regressions-$TEST_GROUP.log"
+      - name: Report compiler cache usage
+        if: ${{ !cancelled() && steps.compiler-cache.outcome == 'success' }}
+        run: ccache --show-stats | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Save compiler cache for this group
+        if: ${{ !cancelled() && steps.compiler-cache.outcome == 'success' }}
+        uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ steps.compiler-cache.outputs.cache-primary-key }}
+      - name: Preserve regression diagnostics
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: regression-diagnostics-${{ matrix.group }}-${{ github.sha }}
           path: |
             out/x86_64/release/logs
             out/x86_64/release/ci
@@ -262,7 +354,7 @@ jobs:
 
   ci:
     name: CI result
-    needs: [changes, checks, documentation, build, smoke]
+    needs: [changes, checks, documentation, build, regressions, smoke]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -274,6 +366,24 @@ jobs:
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
         run: python3 tools/ci.py summary
+
+  cache-maintenance:
+    name: Maintain compiler cache snapshots
+    needs: [build, regressions]
+    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Prune superseded compiler cache snapshots
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/ci/cache-prune.py --repo "$GITHUB_REPOSITORY" --apply
 
   deploy:
     name: Deploy verified Pages
