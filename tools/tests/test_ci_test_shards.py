@@ -96,6 +96,7 @@ class MakeShardTests(unittest.TestCase):
             "RELIEFOS_LOG_SHELL = :\n"
             f"include {ROOT}/scripts/reliefos/Makefile.tests\n"
             "sdk rootfs-raw:\n\t@echo unexpected full image prerequisite >&2; exit 77\n"
+            "unrelated:\n\t@echo unrelated goal passed\n"
             "selection:\n\t@printf '%s\\n' $(notdir $(RELIEFOS_SELECTED_BUILD_TESTS))\n")
         self.environment = {key: value for key, value in os.environ.items()
                             if key not in {"MAKEFLAGS", "MFLAGS", "MAKELEVEL", "MAKEOVERRIDES",
@@ -112,6 +113,12 @@ class MakeShardTests(unittest.TestCase):
         core = self.run_make("RELIEFOS_CI_TEST_GROUP=core", "selection").stdout.splitlines()
         self.assertEqual(set(default), {path.name for path in self.inventory.glob("test-*.sh")})
         self.assertEqual(core, ["test-core.sh"])
+
+    def test_core_selection_does_not_require_host_python_for_unrelated_goals(self):
+        result = self.run_make("RELIEFOS_CI_TEST_GROUP=core",
+                               "RELIEFOS_TEST_PYTHON=/selected/kernel-python", "unrelated")
+        self.assertIn("unrelated goal passed", result.stdout)
+        self.assertNotIn("not found", result.stderr)
 
     def test_focused_targets_execute_their_exact_group_without_full_image_prerequisites(self):
         for group in ("kernel", "auth", "pages"):

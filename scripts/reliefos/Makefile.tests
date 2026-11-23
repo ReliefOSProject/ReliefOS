@@ -37,7 +37,9 @@ $(eval reliefos_ci_selected := $(shell $(RELIEFOS_TEST_PYTHON) '$(RELIEFOS_CI_SE
 endef
 RELIEFOS_SELECTED_BUILD_TESTS := $(RELIEFOS_BUILD_TESTS)
 ifeq ($(RELIEFOS_CI_TEST_GROUP),core)
-RELIEFOS_SELECTED_BUILD_TESTS := $(call RELIEFOS_CI_SELECT_TESTS,core)
+# Select only when the contract-test recipe needs the inventory. Other goals
+# may forward a guest/kernel Python path that is not a host interpreter.
+RELIEFOS_SELECTED_BUILD_TESTS = $(call RELIEFOS_CI_SELECT_TESTS,core)
 endif
 ifneq ($(filter test-ci-kernel test-ci-auth test-ci-pages test-ci-validate,$(MAKECMDGOALS)),)
 # Validate while parsing, before any expensive prerequisite can start.
