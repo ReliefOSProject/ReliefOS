@@ -43,8 +43,16 @@ RELIEFOS_QEMU_NVME ?= $(LEONOS_QEMU_NVME)
 QEMU_MEMORY := $(or $(MEMORY),$(CONFIG_QEMU_MEMORY_MB),4096)
 QEMU_CPUS := $(or $(CPUS),$(CONFIG_QEMU_SMP_CPUS),4)
 comma := ,
+QEMU_INSTALLER_DISK ?=
+QEMU_INSTALLER_DISK_FORMAT ?= qcow2
 QEMU_NETWORK := $(subst ",,$(CONFIG_QEMU_NET_DEVICE))
-QEMU_FLAGS := -machine $(if $(filter 1 y yes true,$(RELIEFOS_QEMU_IDE)),pc,q35) $(if $(filter 1,$(QEMU_KVM)),-enable-kvm -cpu host,-cpu max) -m $(QEMU_MEMORY) -smp $(QEMU_CPUS) $(QEMU_FIRMWARE_FLAGS) -display $(QEMU_DISPLAY) -serial $(QEMU_SERIAL) $(QEMU_GPU_FLAGS) $(if $(QEMU_NETWORK),-netdev user,id=net0 -device $(QEMU_NETWORK)$(comma)netdev=net0) -audiodev $(QEMU_AUDIO),id=snd0 $(QEMU_SOUND_FLAGS)
+QEMU_NETWORK_FLAGS := $(if $(QEMU_NETWORK),-netdev user$(comma)id=net0 -device $(QEMU_NETWORK)$(comma)netdev=net0)
+ifneq ($(strip $(QEMU_INSTALLER_DISK)),)
+QEMU_INSTALLER_DISK_PATH := $(if $(filter /%,$(QEMU_INSTALLER_DISK)),$(QEMU_INSTALLER_DISK),$(RELIEFOS_SRC)/$(QEMU_INSTALLER_DISK))
+QEMU_INSTALLER_DISK_CHECK := test -f '$(QEMU_INSTALLER_DISK_PATH)' || { echo 'missing installer target disk: $(QEMU_INSTALLER_DISK_PATH)' >&2; exit 1; }
+QEMU_INSTALLER_DISK_FLAGS := -drive file=$(QEMU_INSTALLER_DISK_PATH)$(comma)if=none$(comma)id=installer-disk$(comma)format=$(QEMU_INSTALLER_DISK_FORMAT) -device ich9-ahci$(comma)id=installer-ahci -device ide-hd$(comma)drive=installer-disk$(comma)bus=installer-ahci.0
+endif
+QEMU_FLAGS := -machine $(if $(filter 1 y yes true,$(RELIEFOS_QEMU_IDE)),pc,q35) $(if $(filter 1,$(QEMU_KVM)),-enable-kvm -cpu host,-cpu max) -m $(QEMU_MEMORY) -smp $(QEMU_CPUS) $(QEMU_FIRMWARE_FLAGS) -display $(QEMU_DISPLAY) -serial $(QEMU_SERIAL) $(QEMU_GPU_FLAGS) $(QEMU_NETWORK_FLAGS) -audiodev $(QEMU_AUDIO),id=snd0 $(QEMU_SOUND_FLAGS)
 QEMU_DISK := -drive file=$(DISK_VMDK),if=none,id=disk0,format=vmdk
 ifneq ($(filter 1 y yes true,$(RELIEFOS_QEMU_NVME)),)
 QEMU_DISK += -device nvme,drive=disk0,serial=leonosnvme
@@ -53,7 +61,17 @@ QEMU_DISK += -device piix3-ide,id=ide -device ide-hd,drive=disk0,bus=ide.0,unit=
 else
 QEMU_DISK += -device ich9-ahci,id=ahci -device ide-hd,drive=disk0,bus=ahci.0
 endif
-.PHONY: run run-debug run-iso run-installer
+QEMU_RUN_DISK ?=
+QEMU_RUN_DISK_FORMAT ?= qcow2
+ifneq ($(strip $(QEMU_RUN_DISK)),)
+QEMU_RUN_DISK_PATH := $(if $(filter /%,$(QEMU_RUN_DISK)),$(QEMU_RUN_DISK),$(RELIEFOS_SRC)/$(QEMU_RUN_DISK))
+QEMU_RUN_DISK_CHECK := test -f '$(QEMU_RUN_DISK_PATH)' || { echo 'missing run disk: $(QEMU_RUN_DISK_PATH)' >&2; exit 1; }
+QEMU_RUN_DISK_FLAGS := -drive file=$(QEMU_RUN_DISK_PATH)$(comma)if=none$(comma)id=run-disk$(comma)format=$(QEMU_RUN_DISK_FORMAT) -device ich9-ahci$(comma)id=run-ahci -device ide-hd$(comma)drive=run-disk$(comma)bus=run-ahci.0
+else
+QEMU_RUN_DISK_CHECK := test -f '$(DISK_VMDK)' || { echo 'missing disk image: $(DISK_VMDK)' >&2; exit 1; }
+QEMU_RUN_DISK_FLAGS := $(QEMU_DISK)
+endif
+.PHONY: run run-debug run-iso run-installer run-only run-installer-only run-iso-only
 run run-debug: image-vmdk
 	$(Q)test '$(QEMU_BOOT)' = bios || test -f '$(QEMU_FIRMWARE)' || { echo 'set QEMU_FIRMWARE to an OVMF firmware image' >&2; exit 1; }
 	$(Q)$(QEMU) $(QEMU_FLAGS) $(QEMU_DISK) $(if $(filter run-debug,$@),-no-reboot -no-shutdown)
@@ -62,4 +80,22 @@ run-iso: iso
 	$(Q)$(QEMU) $(QEMU_FLAGS) -cdrom $(LIVE_ISO) -no-reboot -no-shutdown
 run-installer: installer
 	$(Q)test '$(QEMU_BOOT)' = bios || test -f '$(QEMU_FIRMWARE)'
-	$(Q)$(QEMU) $(QEMU_FLAGS) -cdrom $(INSTALLER_ISO) -no-reboot -no-shutdown
+	$(Q)$(QEMU) $(QEMU_FLAGS) $(QEMU_INSTALLER_DISK_FLAGS) -cdrom $(INSTALLER_ISO) -no-reboot -no-shutdown
+
+# These entry points consume existing images only; they deliberately have no
+# image-vmdk/iso/installer prerequisites.
+run-only:
+	$(Q)$(QEMU_RUN_DISK_CHECK)
+	$(Q)test '$(QEMU_BOOT)' = bios || test -f '$(QEMU_FIRMWARE)' || { echo 'set QEMU_FIRMWARE to an OVMF firmware image' >&2; exit 1; }
+	$(Q)$(QEMU) $(QEMU_FLAGS) $(QEMU_RUN_DISK_FLAGS)
+
+run-iso-only:
+	$(Q)test -f '$(LIVE_ISO)' || { echo 'missing live ISO: $(LIVE_ISO)' >&2; exit 1; }
+	$(Q)test '$(QEMU_BOOT)' = bios || test -f '$(QEMU_FIRMWARE)' || { echo 'set QEMU_FIRMWARE to an OVMF firmware image' >&2; exit 1; }
+	$(Q)$(QEMU) $(QEMU_FLAGS) -cdrom $(LIVE_ISO) -no-reboot -no-shutdown
+
+run-installer-only:
+	$(Q)test -f '$(INSTALLER_ISO)' || { echo 'missing installer ISO: $(INSTALLER_ISO)' >&2; exit 1; }
+	$(Q)$(QEMU_INSTALLER_DISK_CHECK)
+	$(Q)test '$(QEMU_BOOT)' = bios || test -f '$(QEMU_FIRMWARE)' || { echo 'set QEMU_FIRMWARE to an OVMF firmware image' >&2; exit 1; }
+	$(Q)$(QEMU) $(QEMU_FLAGS) $(QEMU_INSTALLER_DISK_FLAGS) -cdrom $(INSTALLER_ISO) -no-reboot -no-shutdown

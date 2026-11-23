@@ -47,6 +47,9 @@ ReliefOS build system (Linux Kbuild / Kconfig)
   make run             boot the VMDK in QEMU          (no root required)
   make run-iso         boot the live ISO in QEMU
   make run-installer   boot the installer ISO in QEMU
+  make run-only        boot the existing VMDK without rebuilding
+  make run-iso-only    boot the existing live ISO without rebuilding
+  make run-installer-only  boot the existing installer ISO without rebuilding
 
   make test-tools      C host tool tests, plain and under ASan/UBSan
   make test-build      shell contract tests for the build surface
@@ -72,6 +75,10 @@ Variables
   V=1                  echo the real command, its working directory and overrides
   QEMU_BOOT=uefi|bios   run firmware, default uefi
   QEMU_FIRMWARE=FILE   OVMF firmware for uefi; unused for bios
+  QEMU_INSTALLER_DISK=FILE  attach an optional target disk to installer QEMU (qcow2 by default)
+  QEMU_INSTALLER_DISK_FORMAT=FORMAT  qcow2, raw or vmdk disk image format
+  QEMU_RUN_DISK=FILE   select a disk image for run-only (qcow2 by default; relative to repo root)
+  QEMU_RUN_DISK_FORMAT=FORMAT  qcow2, raw or vmdk disk image format
   CPUS=n               override Kconfig guest CPU count
   MEMORY=4G            guest memory for the run targets
   TOOLCHAIN=FILE       toolchain description, default configs/toolchains/llvm-x86_64.mk
