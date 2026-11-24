@@ -29,7 +29,9 @@ index_sha=$(/bin/busybox sha256sum "$repository/packages.adb")
 index_sha=${index_sha%% *}
 [ -z "$expected_index" ] || [ "$index_sha" = "$expected_index" ] || die 'installation media changed after inspection; check the update again'
 
-temporary=$(/bin/busybox mktemp -d /tmp/reliefos-update.XXXXXX)
+# Early init mounts /run as tmpfs. The private database and verified archives
+# must not consume the installation medium's fixed-size runtime root.
+temporary=$(/bin/busybox mktemp -d /run/reliefos-update.XXXXXX)
 update_step=repository update_action=step update_package=- update_status=0
 files_done=0 files_total=0 bytes_done=0 bytes_total=0 bytes_reused=0
 cache_temporary=
