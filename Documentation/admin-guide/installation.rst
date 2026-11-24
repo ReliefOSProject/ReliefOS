@@ -14,6 +14,32 @@
 安装器运行时、Live 会话和安装后的系统是不同的根文件系统。
 只有实际安装并移除 ISO 后启动成功，才能证明安装后的系统可用。
 
+QEMU/KVM 的 VirtIO 磁盘
+-----------------------
+
+默认内核可以识别现代 VirtIO-Block PCI 磁盘，设备名为 ``/dev/vda``、
+``/dev/vdb`` 等，分区名例如 ``/dev/vda1``。使用 QEMU 时，可将目标镜像
+连接到 ``virtio-blk-pci``；显式指定 ``disable-legacy=on`` 可以创建只暴露
+现代接口的设备。项目的运行目标可用 ``RELIEFOS_QEMU_VIRTIO=1`` 选择
+此控制器；默认仍使用 AHCI。直接使用 QEMU 时，可用以下参数连接一个单独
+准备的 ``target.raw`` 镜像：
+
+.. code-block:: sh
+
+   -drive if=none,id=vblk0,format=raw,file=target.raw \
+   -device virtio-blk-pci,drive=vblk0,disable-legacy=on
+
+将 ``CONFIG_VIRTIO_BLK`` 设为 ``m`` 时，镜像构建会把匹配内核的
+``virtio_blk.ko`` 和所需依赖放入 initramfs，在查找和挂载真实根之前加载。
+可以用 ``root=PARTUUID=...``、``root=UUID=...`` 或 ``root=LABEL=...`` 指定根；
+不要用磁盘连接顺序代替持久身份。
+
+安装器新建或修改分区及格式化时仍要求目标磁盘的逻辑块为 512 字节。
+4Kn 磁盘支持现有 GPT 分区的查询和文件系统探测，可挂载预先准备好的
+ext4 分区；这不等同于安装器支持在 4Kn 磁盘上全新安装，也不等同于
+固件或引导器已从该磁盘启动。VirtIO-Block 当前不能作为 swap 后端。
+这不是 VMware PVSCSI；VMware 验证未完成。
+
 安装介质布局
 ============
 

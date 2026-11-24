@@ -14,6 +14,7 @@
 #include <sys/wait.h>
 #include <linux/fs.h>
 #include <mntent.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,6 +22,7 @@
 #include <unistd.h>
 
 #define BLOCK_SECTOR_SIZE 512u
+#define BLOCK_MAX_SECTOR_SIZE 4096u
 #define GPT_ENTRY_MAX 128u
 #define GPT_ENTRY_SIZE 128u
 #define GPT_DEFAULT_TABLE_BYTES (GPT_ENTRY_MAX * GPT_ENTRY_SIZE)
@@ -57,7 +59,8 @@ struct __attribute__((packed)) block_gpt_header {
     uint32_t partition_entries_crc32;
 };
 
-struct __attribute__((packed)) block_gpt_entry {
+/* The GPT entry layout also has natural alignment on x86-64. */
+struct block_gpt_entry {
     uint8_t type_guid[16];
     uint8_t unique_guid[16];
     uint64_t first_lba;
@@ -65,6 +68,8 @@ struct __attribute__((packed)) block_gpt_entry {
     uint64_t attrs;
     uint16_t name[36];
 };
+_Static_assert(sizeof(struct block_gpt_entry) == GPT_ENTRY_SIZE &&
+               offsetof(struct block_gpt_entry, name) == 56, "GPT entry layout");
 
 struct __attribute__((packed)) block_fat32_bpb {
     uint8_t jump[3];
@@ -296,9 +301,9 @@ static int block_check_unmounted(const char *path)
     return result;
 }
 
-/** @brief Open an owned descriptor with supported geometry and write prechecks. */
-static int block_open_info(const char *path, int writable, int *out_fd,
-                           uint64_t *out_sectors, uint32_t *out_sector_size)
+/** @brief Read native geometry; only passive inventory allows non-512-byte sectors. */
+static int block_open_geometry(const char *path, int writable, int native, int *out_fd,
+                               uint64_t *out_sectors, uint32_t *out_sector_size)
 {
     int fd;
     uint64_t bytes = 0;
@@ -319,11 +324,13 @@ static int block_open_info(const char *path, int writable, int *out_fd,
         (void)close(fd);
         return -error;
     }
-    if (sector_size != BLOCK_SECTOR_SIZE) {
+    if (native ? sector_size < (int)BLOCK_SECTOR_SIZE || sector_size > (int)BLOCK_MAX_SECTOR_SIZE ||
+                    (sector_size & (sector_size - 1))
+               : sector_size != BLOCK_SECTOR_SIZE) {
         (void)close(fd);
         return -BLOCK_ENOTSUP;
     }
-    if (!bytes || bytes % BLOCK_SECTOR_SIZE) {
+    if (!bytes || bytes % (uint32_t)sector_size) {
         (void)close(fd);
         return -BLOCK_EINVAL;
     }
@@ -335,9 +342,16 @@ static int block_open_info(const char *path, int writable, int *out_fd,
         if (ret < 0) { (void)close(fd); return (int)ret; }
     }
     *out_fd = fd;
-    *out_sectors = bytes / BLOCK_SECTOR_SIZE;
+    *out_sectors = bytes / (uint32_t)sector_size;
     *out_sector_size = (uint32_t)sector_size;
     return 0;
+}
+
+/* The built-in partition editor and formatters still generate 512-byte layouts. */
+static int block_open_info(const char *path, int writable, int *out_fd,
+                           uint64_t *out_sectors, uint32_t *out_sector_size)
+{
+    return block_open_geometry(path, writable, 0, out_fd, out_sectors, out_sector_size);
 }
 
 static int block_disk_index(const char *path, uint32_t *out_index)
@@ -346,11 +360,14 @@ static int block_disk_index(const char *path, uint32_t *out_index)
     uint32_t value = 0;
     if (!path || !out_index || strncmp(path, "/dev/", 5) != 0) return -BLOCK_EINVAL;
     p = path + 5;
-    if (p[0] == 's' && p[1] == 'd' && p[2] >= 'a' && p[2] <= 'z') {
+    if ((p[0] == 's' || p[0] == 'v') && p[1] == 'd' && p[2] >= 'a' && p[2] <= 'z') {
         uint32_t letters = 0;
+        p += 2;
         do {
             if (*p < 'a' || *p > 'z') return -BLOCK_EINVAL;
-            letters = letters * 26u + (uint32_t)(*p - 'a' + 1u);
+            uint32_t digit = (uint32_t)(*p - 'a' + 1u);
+            if (letters > (UINT32_MAX - digit) / 26u) return -BLOCK_EINVAL;
+            letters = letters * 26u + digit;
             ++p;
         } while (*p >= 'a' && *p <= 'z');
         if (*p) return -BLOCK_EINVAL;
@@ -520,7 +537,8 @@ static void block_name_get(char *text, uint32_t capacity, const uint16_t name[36
     text[written] = 0;
 }
 
-static int block_gpt_header_valid(const struct block_gpt_header *header, uint64_t sectors)
+static int block_gpt_header_valid(const struct block_gpt_header *header, uint64_t sectors,
+                                  uint32_t sector_size)
 {
     struct block_gpt_header copy;
     uint64_t table_bytes;
@@ -538,7 +556,7 @@ static int block_gpt_header_valid(const struct block_gpt_header *header, uint64_
         header->partition_entries_lba < 2u ||
         header->partition_entries_lba >= sectors) return -BLOCK_EINVAL;
     table_bytes = (uint64_t)header->partition_entry_count * header->partition_entry_size;
-    table_sectors = (table_bytes + BLOCK_SECTOR_SIZE - 1u) / BLOCK_SECTOR_SIZE;
+    table_sectors = (table_bytes + sector_size - 1u) / sector_size;
     if (table_bytes > GPT_DEFAULT_TABLE_BYTES || table_sectors == 0 ||
         table_sectors > sectors - header->partition_entries_lba) {
         return -BLOCK_EINVAL;
@@ -564,14 +582,10 @@ static void block_gpt_free(struct block_gpt_table *table)
 }
 
 static void block_gpt_rebuild_backup(const struct block_gpt_header *primary,
-                                     uint64_t sectors,
+                                     uint64_t sectors, uint32_t table_sectors,
                                      struct block_gpt_header *backup)
 {
-    uint64_t table_bytes;
-    uint64_t table_sectors;
     if (!primary || !backup) return;
-    table_bytes = (uint64_t)primary->partition_entry_count * primary->partition_entry_size;
-    table_sectors = (table_bytes + BLOCK_SECTOR_SIZE - 1u) / BLOCK_SECTOR_SIZE;
     if (!table_sectors || sectors <= table_sectors + 1u) return;
     *backup = *primary;
     backup->current_lba = sectors - 1u;
@@ -604,29 +618,30 @@ static int block_gpt_entries_valid(const struct block_gpt_table *table)
     return 0;
 }
 
-static int block_gpt_load_fd(int fd, uint64_t sectors, struct block_gpt_table *table)
+static int block_gpt_load_fd(int fd, uint64_t sectors, uint32_t sector_size,
+                             struct block_gpt_table *table)
 {
-    uint8_t sector[BLOCK_SECTOR_SIZE];
+    uint8_t sector[BLOCK_MAX_SECTOR_SIZE];
     uint32_t checksum;
     int ret;
     if (!table) return -BLOCK_EINVAL;
     memset(table, 0, sizeof(*table));
-    ret = block_io(fd, BLOCK_SECTOR_SIZE, sector, sizeof(sector), 0);
+    ret = block_io(fd, sector_size, sector, sector_size, 0);
     if (ret == 0) memcpy(&table->primary, sector, sizeof(table->primary));
     if (ret < 0) return ret;
     if (table->primary.signature != 0x5452415020494645ULL) return -BLOCK_ENOENT;
-    ret = block_gpt_header_valid(&table->primary, sectors);
+    ret = block_gpt_header_valid(&table->primary, sectors, sector_size);
     if (ret < 0 || table->primary.current_lba != 1u) {
         return ret < 0 ? ret : -BLOCK_EINVAL;
     }
     table->entry_bytes = table->primary.partition_entry_count *
                          table->primary.partition_entry_size;
-    table->entry_sectors = (table->entry_bytes + BLOCK_SECTOR_SIZE - 1u) /
-                           BLOCK_SECTOR_SIZE;
-    table->entries = calloc(table->entry_sectors, BLOCK_SECTOR_SIZE);
+    table->entry_sectors = (table->entry_bytes + sector_size - 1u) /
+                           sector_size;
+    table->entries = calloc(table->entry_sectors, sector_size);
     if (!table->entries) return -12;
-    ret = block_io(fd, table->primary.partition_entries_lba * BLOCK_SECTOR_SIZE,
-                   table->entries, table->entry_sectors * BLOCK_SECTOR_SIZE, 0);
+    ret = block_io(fd, table->primary.partition_entries_lba * sector_size,
+                   table->entries, table->entry_sectors * sector_size, 0);
     if (ret < 0) { block_gpt_free(table); return ret; }
     checksum = block_crc32(table->entries, table->entry_bytes);
     if (checksum != table->primary.partition_entries_crc32) {
@@ -642,10 +657,10 @@ static int block_gpt_load_fd(int fd, uint64_t sectors, struct block_gpt_table *t
      * backup header is optional here because older installers could leave it
      * stale after an interrupted write.  Rebuild its canonical location so
      * the next GPT update repairs both copies. */
-    ret = block_io(fd, table->primary.backup_lba * BLOCK_SECTOR_SIZE,
-                   sector, sizeof(sector), 0);
+    ret = block_io(fd, table->primary.backup_lba * sector_size,
+                   sector, sector_size, 0);
     if (ret == 0) memcpy(&table->backup, sector, sizeof(table->backup));
-    if (ret < 0 || block_gpt_header_valid(&table->backup, sectors) < 0 ||
+    if (ret < 0 || block_gpt_header_valid(&table->backup, sectors, sector_size) < 0 ||
         table->backup.current_lba != table->primary.backup_lba ||
         table->backup.backup_lba != 1u ||
         table->backup.partition_entries_lba != sectors - table->entry_sectors - 1u ||
@@ -656,7 +671,7 @@ static int block_gpt_load_fd(int fd, uint64_t sectors, struct block_gpt_table *t
         table->backup.first_usable_lba != table->primary.first_usable_lba ||
         table->backup.last_usable_lba != table->primary.last_usable_lba ||
         table->backup.partition_entries_crc32 != checksum) {
-        block_gpt_rebuild_backup(&table->primary, sectors, &table->backup);
+        block_gpt_rebuild_backup(&table->primary, sectors, table->entry_sectors, &table->backup);
     }
     table->backup.partition_entries_crc32 = checksum;
     return 0;
@@ -707,7 +722,7 @@ int reliefos_block_get_info(const char *path, struct reliefos_block_disk_info *o
     int ret;
     if (!out || !path) return -BLOCK_EINVAL;
     memset(out, 0, sizeof(*out));
-    ret = block_open_info(path, 0, &fd, &sectors, &sector_size);
+    ret = block_open_geometry(path, 0, 1, &fd, &sectors, &sector_size);
     if (ret < 0) return ret;
     out->sector_count = sectors;
     out->sector_size = sector_size;
@@ -724,20 +739,23 @@ int reliefos_block_list_disks(struct reliefos_block_disk_info *disks, uint32_t c
     uint32_t count = 0;
     int first_error = 0;
     if (!out_count || (capacity && !disks)) return -BLOCK_EINVAL;
-    for (uint32_t index = 0; index < RELIEFOS_BLOCK_MAX_DISKS; ++index) {
-        char path[RELIEFOS_BLOCK_PATH_LEN];
-        struct reliefos_block_disk_info info;
-        snprintf(path, sizeof(path), "/dev/sd%c", (char)('a' + index));
-        int ret = reliefos_block_get_info(path, &info);
-        if (ret < 0) {
-            if (ret != -BLOCK_ENOENT && !first_error) first_error = ret;
-            continue;
+    const char *prefixes[] = {"sd", "vd"};
+    for (unsigned family = 0; family < sizeof(prefixes) / sizeof(prefixes[0]); ++family) {
+        for (uint32_t index = 0; index < RELIEFOS_BLOCK_MAX_DISKS && count < RELIEFOS_BLOCK_MAX_DISKS; ++index) {
+            char path[RELIEFOS_BLOCK_PATH_LEN];
+            struct reliefos_block_disk_info info;
+            snprintf(path, sizeof(path), "/dev/%s%c", prefixes[family], (char)('a' + index));
+            int ret = reliefos_block_get_info(path, &info);
+            if (ret < 0) {
+                if (ret != -BLOCK_ENOENT && !first_error) first_error = ret;
+                continue;
+            }
+            info.id = count;
+            if (count < capacity) disks[count] = info;
+            ++count;
         }
-        info.id = index;
-        if (count < capacity) disks[count] = info;
-        ++count;
     }
-    for (uint32_t controller = 0; controller < RELIEFOS_BLOCK_MAX_DISKS; ++controller) {
+    for (uint32_t controller = 0; controller < RELIEFOS_BLOCK_MAX_DISKS && count < RELIEFOS_BLOCK_MAX_DISKS; ++controller) {
         for (uint32_t namespace_id = 1; namespace_id <= RELIEFOS_BLOCK_MAX_PARTITIONS / 16u;
              ++namespace_id) {
             char path[RELIEFOS_BLOCK_PATH_LEN];
@@ -771,7 +789,7 @@ int reliefos_block_gpt_initialize(const char *disk_path, int force)
     ret = block_open_info(disk_path, 1, &fd, &sectors, &sector_size);
     if (ret < 0) return ret;
     if (sectors < 655360ULL) { (void)close(fd); return -BLOCK_ENOSPC; }
-    if (block_gpt_load_fd(fd, sectors, &existing) == 0) {
+    if (block_gpt_load_fd(fd, sectors, sector_size, &existing) == 0) {
         block_gpt_free(&existing);
         if (!force) { (void)close(fd); return -BLOCK_EEXIST; }
     }
@@ -816,28 +834,37 @@ int reliefos_block_gpt_initialize(const char *disk_path, int force)
     return ret;
 }
 
-static int block_partition_probe_fd(int fd, uint32_t *out_filesystem)
+static int block_partition_probe_fd(int fd, uint64_t sectors, uint32_t sector_size,
+                                    uint32_t *out_filesystem)
 {
-    uint8_t sector[BLOCK_SECTOR_SIZE];
+    uint8_t sector[BLOCK_MAX_SECTOR_SIZE];
     int ret;
     if (!out_filesystem) return -BLOCK_EINVAL;
     *out_filesystem = RELIEFOS_BLOCK_FILESYSTEM_UNKNOWN;
-    ret = block_io(fd, 0, sector, sizeof(sector), 0);
+    ret = block_io(fd, 0, sector, sector_size, 0);
     if (ret < 0) return ret;
     if (sector[510] == 0x55 && sector[511] == 0xaa && memcmp(sector + 82, "FAT32   ", 8) == 0)
         *out_filesystem = RELIEFOS_BLOCK_FILESYSTEM_FAT32;
     else if (sector[510] == 0x55 && sector[511] == 0xaa && memcmp(sector + 3, "EXFAT   ", 8) == 0)
         *out_filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXFAT;
     else {
-        ret = block_io(fd, 1024, sector, sizeof(sector), 0);
-        if (ret < 0) return ret;
+        /* The ext superblock starts at byte 1024, irrespective of the
+         * device's logical sector size. On 4Kn it is already in sector 0. */
+        const uint8_t *super;
+        if (sector_size >= 2048u) super = sector + 1024;
+        else {
+            if (sectors <= 1024u / sector_size) return 0;
+            ret = block_io(fd, 1024, sector, sector_size, 0);
+            if (ret < 0) return ret;
+            super = sector;
+        }
         uint16_t magic;
-        memcpy(&magic, sector + 56, sizeof(magic));
+        memcpy(&magic, super + 56, sizeof(magic));
         if (magic == EXT2_SUPER_MAGIC) {
             uint32_t compat, incompat, ro_compat;
-            memcpy(&compat, sector + 92, sizeof(compat));
-            memcpy(&incompat, sector + 96, sizeof(incompat));
-            memcpy(&ro_compat, sector + 100, sizeof(ro_compat));
+            memcpy(&compat, super + 92, sizeof(compat));
+            memcpy(&incompat, super + 96, sizeof(incompat));
+            memcpy(&ro_compat, super + 100, sizeof(ro_compat));
             /* Match the kernel's conservative ext-family feature classification. */
             if ((compat & ~0x3fu) || (incompat & ~0x6u) || (ro_compat & ~0x7u))
                 *out_filesystem = RELIEFOS_BLOCK_FILESYSTEM_EXT4;
@@ -855,9 +882,9 @@ int reliefos_block_probe_filesystem(const char *partition_path, uint32_t *out_fi
     int fd;
     uint64_t sectors;
     uint32_t sector_size;
-    int ret = block_open_info(partition_path, 0, &fd, &sectors, &sector_size);
+    int ret = block_open_geometry(partition_path, 0, 1, &fd, &sectors, &sector_size);
     if (ret < 0) return ret;
-    ret = block_partition_probe_fd(fd, out_filesystem);
+    ret = block_partition_probe_fd(fd, sectors, sector_size, out_filesystem);
     (void)close(fd);
     return ret;
 }
@@ -874,9 +901,9 @@ int reliefos_block_list_partitions(const char *disk_path,
     int ret;
     if (!out_count || (capacity && !partitions)) return -BLOCK_EINVAL;
     *out_count = 0;
-    ret = block_open_info(disk_path, 0, &fd, &sectors, &sector_size);
+    ret = block_open_geometry(disk_path, 0, 1, &fd, &sectors, &sector_size);
     if (ret < 0) return ret;
-    ret = block_gpt_load_fd(fd, sectors, &table);
+    ret = block_gpt_load_fd(fd, sectors, sector_size, &table);
     (void)close(fd);
     if (ret == -BLOCK_ENOENT) {
         *out_count = 0;
@@ -911,9 +938,9 @@ int reliefos_block_partition_uuid(const char *disk_path, uint32_t index, char uu
     uint32_t sector_size;
     struct block_gpt_table table;
     if (!uuid) return -BLOCK_EINVAL;
-    int ret = block_open_info(disk_path, 0, &fd, &sectors, &sector_size);
+    int ret = block_open_geometry(disk_path, 0, 1, &fd, &sectors, &sector_size);
     if (ret < 0) return ret;
-    ret = block_gpt_load_fd(fd, sectors, &table);
+    ret = block_gpt_load_fd(fd, sectors, sector_size, &table);
     (void)close(fd);
     if (ret < 0) return ret;
     if (index >= table.primary.partition_entry_count ||
@@ -936,7 +963,7 @@ static int block_gpt_update(const char *disk_path,
     struct block_gpt_table table;
     int ret = block_open_info(disk_path, 1, &fd, &sectors, &sector_size);
     if (ret < 0) return ret;
-    ret = block_gpt_load_fd(fd, sectors, &table);
+    ret = block_gpt_load_fd(fd, sectors, sector_size, &table);
     if (ret == 0) ret = update(&table, context);
     if (ret == 0) ret = block_gpt_write_fd(fd, &table);
     if (ret == 0) ret = block_reread(fd);

@@ -40,6 +40,8 @@ endif
 QEMU_KVM ?= $(if $(filter y,$(CONFIG_QEMU_ENABLE_KVM)),1,0)
 RELIEFOS_QEMU_IDE ?= $(LEONOS_QEMU_IDE)
 RELIEFOS_QEMU_NVME ?= $(LEONOS_QEMU_NVME)
+RELIEFOS_QEMU_VIRTIO ?= 0
+QEMU_VIRTIO_BLK := $(filter 1 y yes true,$(RELIEFOS_QEMU_VIRTIO))
 QEMU_MEMORY := $(or $(MEMORY),$(CONFIG_QEMU_MEMORY_MB),4096)
 QEMU_CPUS := $(or $(CPUS),$(CONFIG_QEMU_SMP_CPUS),4)
 comma := ,
@@ -50,11 +52,18 @@ QEMU_NETWORK_FLAGS := $(if $(QEMU_NETWORK),-netdev user$(comma)id=net0 -device $
 ifneq ($(strip $(QEMU_INSTALLER_DISK)),)
 QEMU_INSTALLER_DISK_PATH := $(if $(filter /%,$(QEMU_INSTALLER_DISK)),$(QEMU_INSTALLER_DISK),$(RELIEFOS_SRC)/$(QEMU_INSTALLER_DISK))
 QEMU_INSTALLER_DISK_CHECK := test -f '$(QEMU_INSTALLER_DISK_PATH)' || { echo 'missing installer target disk: $(QEMU_INSTALLER_DISK_PATH)' >&2; exit 1; }
-QEMU_INSTALLER_DISK_FLAGS := -drive file=$(QEMU_INSTALLER_DISK_PATH)$(comma)if=none$(comma)id=installer-disk$(comma)format=$(QEMU_INSTALLER_DISK_FORMAT) -device ich9-ahci$(comma)id=installer-ahci -device ide-hd$(comma)drive=installer-disk$(comma)bus=installer-ahci.0
+QEMU_INSTALLER_DISK_FLAGS := -drive file=$(QEMU_INSTALLER_DISK_PATH),if=none,id=installer-disk,format=$(QEMU_INSTALLER_DISK_FORMAT)
+ifneq ($(QEMU_VIRTIO_BLK),)
+QEMU_INSTALLER_DISK_FLAGS += -device virtio-blk-pci,drive=installer-disk,disable-legacy=on
+else
+QEMU_INSTALLER_DISK_FLAGS += -device ich9-ahci,id=installer-ahci -device ide-hd,drive=installer-disk,bus=installer-ahci.0
+endif
 endif
 QEMU_FLAGS := -machine $(if $(filter 1 y yes true,$(RELIEFOS_QEMU_IDE)),pc,q35) $(if $(filter 1,$(QEMU_KVM)),-enable-kvm -cpu host,-cpu max) -m $(QEMU_MEMORY) -smp $(QEMU_CPUS) $(QEMU_FIRMWARE_FLAGS) -display $(QEMU_DISPLAY) -serial $(QEMU_SERIAL) $(QEMU_GPU_FLAGS) $(QEMU_NETWORK_FLAGS) -audiodev $(QEMU_AUDIO),id=snd0 $(QEMU_SOUND_FLAGS)
 QEMU_DISK := -drive file=$(DISK_VMDK),if=none,id=disk0,format=vmdk
-ifneq ($(filter 1 y yes true,$(RELIEFOS_QEMU_NVME)),)
+ifneq ($(QEMU_VIRTIO_BLK),)
+QEMU_DISK += -device virtio-blk-pci,drive=disk0,disable-legacy=on
+else ifneq ($(filter 1 y yes true,$(RELIEFOS_QEMU_NVME)),)
 QEMU_DISK += -device nvme,drive=disk0,serial=leonosnvme
 else ifneq ($(filter 1 y yes true,$(RELIEFOS_QEMU_IDE)),)
 QEMU_DISK += -device piix3-ide,id=ide -device ide-hd,drive=disk0,bus=ide.0,unit=0
@@ -66,7 +75,12 @@ QEMU_RUN_DISK_FORMAT ?= qcow2
 ifneq ($(strip $(QEMU_RUN_DISK)),)
 QEMU_RUN_DISK_PATH := $(if $(filter /%,$(QEMU_RUN_DISK)),$(QEMU_RUN_DISK),$(RELIEFOS_SRC)/$(QEMU_RUN_DISK))
 QEMU_RUN_DISK_CHECK := test -f '$(QEMU_RUN_DISK_PATH)' || { echo 'missing run disk: $(QEMU_RUN_DISK_PATH)' >&2; exit 1; }
-QEMU_RUN_DISK_FLAGS := -drive file=$(QEMU_RUN_DISK_PATH)$(comma)if=none$(comma)id=run-disk$(comma)format=$(QEMU_RUN_DISK_FORMAT) -device ich9-ahci$(comma)id=run-ahci -device ide-hd$(comma)drive=run-disk$(comma)bus=run-ahci.0
+QEMU_RUN_DISK_FLAGS := -drive file=$(QEMU_RUN_DISK_PATH),if=none,id=run-disk,format=$(QEMU_RUN_DISK_FORMAT)
+ifneq ($(QEMU_VIRTIO_BLK),)
+QEMU_RUN_DISK_FLAGS += -device virtio-blk-pci,drive=run-disk,disable-legacy=on
+else
+QEMU_RUN_DISK_FLAGS += -device ich9-ahci,id=run-ahci -device ide-hd,drive=run-disk,bus=run-ahci.0
+endif
 else
 QEMU_RUN_DISK_CHECK := test -f '$(DISK_VMDK)' || { echo 'missing disk image: $(DISK_VMDK)' >&2; exit 1; }
 QEMU_RUN_DISK_FLAGS := $(QEMU_DISK)
