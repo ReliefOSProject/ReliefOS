@@ -139,7 +139,7 @@ static int whole_disk(const char *path)
 {
     if (!path) return 0;
     const char *p;
-    if (!strncmp(path, "/dev/sd", 7)) {
+    if (!strncmp(path, "/dev/sd", 7) || !strncmp(path, "/dev/vd", 7)) {
         p = path + 7;
         if (*p < 'a' || *p > 'z') return 0;
         while (*p >= 'a' && *p <= 'z') ++p;

@@ -44,7 +44,7 @@ resolve_device() {
         PARTUUID=*) resolved=$(partuuid_device "$1") || return 1 ;;
         UUID=*|LABEL=*)
             key=${1%%=*}; value=${1#*=}; resolved=
-            for candidate in /dev/sd* /dev/nvme* /dev/ram* /dev/sr*; do
+            for candidate in /dev/sd* /dev/vd* /dev/nvme* /dev/ram* /dev/sr*; do
                 [ -b "$candidate" ] || continue
                 identity=$(blkid "$candidate") || continue
                 case " $identity " in *" $key=\"$value\" "*)

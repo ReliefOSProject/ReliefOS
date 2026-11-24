@@ -7,9 +7,9 @@ RELIEFOS_KERNEL_RECOVERY := $(O)/userland/initramfs/kernel-bundle.elf
 RELIEFOS_KERNEL_PAYLOAD := $(O_STAGE)/kernel-payload
 RELIEFOS_KERNEL_PAYLOAD_MANIFEST := $(RELIEFOS_KERNEL_PAYLOAD)/kernel-payload.json
 RELIEFOS_MODULE_TOOLS := $(RELIEFOS_KERNEL_TOOLS)
-# Images support all three currently offered virtual disk transports. Disabling
-# one explicitly rejects this portable profile instead of silently forcing y.
-RELIEFOS_BOOT_FEATURES ?= SATA_AHCI PATA_IDE BLK_DEV_NVME EXT4_FS FAT_FS ISO9660_FS
+# Portable images support the listed virtual disk transports. Disabling
+# one explicitly rejects this profile instead of silently forcing y.
+RELIEFOS_BOOT_FEATURES ?= SATA_AHCI PATA_IDE BLK_DEV_NVME VIRTIO_BLK EXT4_FS FAT_FS ISO9660_FS
 $(RELIEFOS_MODULES_MANIFEST): $(RELIEFNT_DEST)/install.bundle.json $(INITRAMFS_BUSYBOX_ELF) $(RELIEFOS_MODULE_TOOLS)
 	$(Q)$(RELIEFOS_KERNEL_TOOLS) modules-stage $(abspath $(RELIEFNT_DEST)) \
 	    $(abspath $(INITRAMFS_BUSYBOX_ELF)) $(abspath $(RELIEFOS_MODULES_STAGE)) $(RELIEFOS_BOOT_FEATURES)
