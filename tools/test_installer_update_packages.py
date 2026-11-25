@@ -145,9 +145,12 @@ class UpdatePreflight(unittest.TestCase):
         readonly += ('mount -t tmpfs -o size=' + str(runtime_limit or 16 * 1024**2)
                      + ' tmpfs "$1/run"; ')
         if owned_workspace:
-            readonly += ('mkdir -p "$1/run/owned-update"; mount -t tmpfs -o size='
-                         + str(runtime_limit or 16 * 1024**2)
-                         + ' tmpfs "$1/run/owned-update"; mount -o remount,ro "$1/run"; ')
+            # Remount the parent before adding its writable child mount. Some
+            # kernels reject changing the parent's superblock flags once it
+            # already has a nested mount.
+            readonly += ('mkdir -p "$1/run/owned-update"; mount -o remount,ro "$1/run"; '
+                         'mount -t tmpfs -o size=' + str(runtime_limit or 16 * 1024**2)
+                         + ' tmpfs "$1/run/owned-update"; ')
         readonly += 'mount -o remount,bind,ro "$1"; '
         result = subprocess.run([
             "unshare", "-Urmp", "--fork", "sh", "-eu", "-c",
