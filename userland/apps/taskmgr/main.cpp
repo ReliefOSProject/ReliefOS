@@ -3,7 +3,6 @@ extern "C" {
 #include <reliefos/auth.h>
 #include <reliefos/system.h>
 #include <reliefos/launch.h>
-#include <reliefos/system.h>
 }
 
 #include "fltk_support.h"
@@ -27,10 +26,15 @@ extern "C" {
 #include <FL/fl_ask.H>
 #include <FL/fl_draw.H>
 
+#include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 
 namespace {
@@ -72,6 +76,7 @@ PerformanceView *performance_view;
 Fl_Scroll *performance_scroll;
 
 struct reliefos_task_info tasks[RELIEFOS_TASK_MAX];
+int task_pidfds[RELIEFOS_TASK_MAX];
 struct reliefos_task_info previous_tasks[RELIEFOS_TASK_MAX];
 uint32_t task_cpu_percent[RELIEFOS_TASK_MAX];
 uint32_t previous_task_cpu_percent[RELIEFOS_TASK_MAX];
@@ -158,6 +163,26 @@ struct reliefos_task_info *selected_task()
     return index >= 0 ? &tasks[index] : NULL;
 }
 
+int selected_pidfd()
+{
+    int index = selected_pid ? task_index_by_pid(selected_pid) : -1;
+    return index >= 0 ? task_pidfds[index] : -1;
+}
+
+int pidfd_ready(int fd)
+{
+    struct pollfd check = {fd, POLLIN, 0};
+    int result;
+    do { result = poll(&check, 1, 0); } while (result < 0 && errno == EINTR);
+    return result;
+}
+
+void close_task_pidfds()
+{
+    for (uint32_t i = 0; i < task_count; ++i)
+        if (task_pidfds[i] >= 0) close(task_pidfds[i]);
+}
+
 const char *task_user_name(const struct reliefos_task_info *task)
 {
     if (task && task->username[0]) return task->username;
@@ -183,7 +208,7 @@ int selected_task_killable()
 void update_controls()
 {
     if (button_end_task) {
-        if (active_tab == TASKMGR_TAB_PROCESSES && selected_task_killable())
+        if (active_tab == TASKMGR_TAB_PROCESSES && selected_task_killable() && selected_pidfd() >= 0)
             button_end_task->activate();
         else button_end_task->deactivate();
     }
@@ -205,10 +230,24 @@ void refresh_tasks()
     uint64_t sample_total = perf_info.busy_ticks + perf_info.idle_ticks;
     uint64_t tick_delta = 0;
     int select_position = 0;
-    int count = reliefos_task_snapshot(tasks, RELIEFOS_TASK_MAX, &next_tick);
+    int next_fds[RELIEFOS_TASK_MAX];
+    int old_selection = selected_pidfd();
+    int count = reliefos_task_snapshot_pidfds(tasks, next_fds, RELIEFOS_TASK_MAX, &next_tick);
     (void)next_tick;
+    if (selected_pid) {
+        int new_selection = -1;
+        for (int i = 0; i < count; ++i) {
+            if (tasks[i].pid == selected_pid) { new_selection = next_fds[i]; break; }
+        }
+        // Check the old handle only after sampling the new row. If its PID
+        // was reused, the old handle must already be readable or hung up.
+        if ((old_selection >= 0 && (new_selection < 0 || pidfd_ready(old_selection) != 0)) ||
+            (old_selection < 0 && new_selection >= 0)) selected_pid = 0;
+    }
+    close_task_pidfds();
     task_count = count > 0 ? (uint32_t)count : 0;
     if (task_count > RELIEFOS_TASK_MAX) task_count = RELIEFOS_TASK_MAX;
+    for (uint32_t i = 0; i < task_count; ++i) task_pidfds[i] = next_fds[i];
     if (previous_sample_total && sample_total > previous_sample_total)
         tick_delta = sample_total - previous_sample_total;
     for (uint32_t i = 0; i < task_count; ++i) {
@@ -549,18 +588,35 @@ void kill_selected_task()
         set_status(T("Cannot end protected or non-user task"));
         return;
     }
-    const uint32_t pid = task->pid;
-    char prompt[RELIEFOS_TASK_NAME_LEN + 96];
-    snprintf(prompt, sizeof(prompt), T("End task %s (PID %u)?"), task->name, pid);
-    if (!confirm_dialog(T("End Task"), prompt)) return;
-    // The modal dialog runs the sampling timer; its next snapshot can
-    // replace tasks[]. Act on the PID named in the confirmation.
-    if (reliefos_task_kill(pid) < 0) {
+    int selected = selected_pidfd();
+    if (selected < 0) {
+        set_status(T("A stable handle for this process is unavailable."));
+        return;
+    }
+    // The modal dialog runs the sampling timer. Duplicate the original
+    // description before entering it; neither a refresh nor FD/PID reuse
+    // can change the target of this confirmation.
+    int handle = fcntl(selected, F_DUPFD_CLOEXEC, 0);
+    if (handle < 0) {
         set_status(T("End Task failed"));
         return;
     }
-    set_status(T("Task ended"));
+    const uint32_t pid = task->pid;
+    char prompt[RELIEFOS_TASK_NAME_LEN + 96];
+    snprintf(prompt, sizeof(prompt), T("End task %s (PID %u)?"), task->name, pid);
+    if (!confirm_dialog(T("End Task"), prompt)) {
+        close(handle);
+        return;
+    }
+    int ready = pidfd_ready(handle);
+    int error = ready > 0 ? ESRCH : ready < 0 ? errno : 0;
+    if (!error && syscall(SYS_pidfd_send_signal, (long)handle, (long)SIGTERM, 0L, 0L) < 0)
+        error = errno;
+    close(handle);
     refresh_all();
+    if (error == ESRCH) set_status(T("The selected process has already exited."));
+    else if (error) set_status(T("End Task failed"));
+    else set_status(T("Termination signal sent."));
 }
 
 void show_task_details()
@@ -896,5 +952,8 @@ int main(int argc, char **argv)
     puts("[taskmgr.elf] FLTK task manager ready");
     fflush(stdout);
     Fl::add_timeout(0.5, timer_callback);
-    return Fl::run();
+    int result = Fl::run();
+    Fl::remove_timeout(timer_callback);
+    close_task_pidfds();
+    return result;
 }

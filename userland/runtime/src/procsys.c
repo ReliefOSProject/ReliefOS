@@ -1,11 +1,13 @@
 /* procfs-backed system/task compatibility exports. */
-#ifndef _POSIX_C_SOURCE
-#define _POSIX_C_SOURCE 200809L
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
 #endif
 #include <reliefos/fs.h>
 #include <reliefos/syscall.h>
 #include <reliefos/system.h>
 #include <errno.h>
+#include <limits.h>
+#include <poll.h>
 #include <pwd.h>
 #include <sched.h>
 #include <signal.h>
@@ -26,9 +28,10 @@ static void ps_copy(char *dst, uint32_t capacity, const char *src)
     dst[i] = 0;
 }
 
-static int ps_read_file(const char *path, char *buffer, uint32_t capacity)
+static int ps_read_file_at(int dir, const char *path, char *buffer, uint32_t capacity)
 {
-    int fd = open(path, RELIEFOS_O_RDONLY, 0);
+    int fd = dir == AT_FDCWD ? open(path, O_RDONLY | O_CLOEXEC) :
+                              openat(dir, path, O_RDONLY | O_CLOEXEC);
     uint32_t len = 0;
     if (fd < 0) return -1;
     buffer[0] = 0;
@@ -41,6 +44,11 @@ static int ps_read_file(const char *path, char *buffer, uint32_t capacity)
     close(fd);
     buffer[len] = 0;
     return 0;
+}
+
+static int ps_read_file(const char *path, char *buffer, uint32_t capacity)
+{
+    return ps_read_file_at(AT_FDCWD, path, buffer, capacity);
 }
 
 static uint64_t ps_parse_number(const char *text, uint32_t *position)
@@ -189,11 +197,11 @@ int reliefos_machine_identity(struct reliefos_machine_identity *identity)
 
 /* Linux stat's comm may contain spaces and closing parentheses. The final
  * closing parenthesis delimits it; token positions after state are fixed. */
-static int ps_parse_stat(const char *path, struct reliefos_task_info *task)
+static int ps_parse_stat(int dir, const char *path, struct reliefos_task_info *task)
 {
     char text[1024];
     uint32_t pos = 0;
-    if (ps_read_file(path, text, sizeof(text)) < 0) return -1;
+    if (ps_read_file_at(dir, path, text, sizeof(text)) < 0) return -1;
     const char *start = strchr(text, '('), *end = strrchr(text, ')');
     if (!start || !end || end <= start || end[1] != ' ' || !end[2] || end[3] != ' ') return -1;
     memset(task, 0, sizeof(*task));
@@ -217,60 +225,95 @@ static int ps_parse_stat(const char *path, struct reliefos_task_info *task)
     return 0;
 }
 
-int reliefos_task_snapshot(struct reliefos_task_info *tasks, uint32_t capacity,
-                         uint64_t *tick)
+static void ps_read_task_status(int dir, const char *path, struct reliefos_task_info *task)
+{
+    char status[512], password_buffer[1024];
+    struct passwd record, *account = NULL;
+    /* Identity and ReliefOS-specific metadata are named status fields,
+     * never extra columns in the Linux stat ABI. */
+    if (ps_read_file_at(dir, path, status, sizeof(status)) == 0) {
+        const char *value = strstr(status, "\nVmRSS:\t");
+        if (value) { uint32_t pos = 8; task->memory_kib = (uint32_t)ps_parse_number(value, &pos); }
+        value = strstr(status, "\nUid:\t");
+        if (value) { uint32_t pos = 6; task->uid = (uint32_t)ps_parse_number(value, &pos); }
+        const char *keys[] = {"\nLeonOSRole:\t", "\nLeonOSFlags:\t"};
+        uint32_t *fields[] = {&task->role, &task->flags};
+        for (unsigned i = 0; i < 2; ++i) {
+            value = strstr(status, keys[i]);
+            if (value) { uint32_t pos = (uint32_t)strlen(keys[i]); *fields[i] = (uint32_t)ps_parse_number(value, &pos); }
+        }
+    }
+    if (task->uid != UINT32_MAX && getpwuid_r(task->uid, &record, password_buffer,
+                   sizeof(password_buffer), &account) == 0 && account && account->pw_name)
+        ps_copy(task->username, sizeof(task->username), account->pw_name);
+}
+
+static int ps_task_snapshot(struct reliefos_task_info *tasks, int *pidfds,
+                            uint32_t capacity, uint64_t *tick)
 {
     int fd;
     struct reliefos_dir_entry entry;
     uint32_t count = 0;
     if (tick) *tick = reliefos_uptime_ms();
     if (!tasks || !capacity) return 0;
-    fd = open("/proc", RELIEFOS_O_RDONLY, 0);
+    fd = open("/proc", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
     if (fd < 0) return -1;
-    while (reliefos_readdir(fd, &entry) > 0 && count < capacity) {
-        char path[RELIEFOS_FS_PATH_LEN];
+    int pidfds_supported = pidfds != NULL;
+    while (count < capacity && reliefos_readdir(fd, &entry) > 0) {
         if (entry.name[0] < '0' || entry.name[0] > '9') continue;
-        {
-            uint32_t pos = 0;
-            ps_copy(path, sizeof(path), "/proc/");
-            while (path[pos]) ++pos;
-            ps_copy(path + pos, sizeof(path) - pos, entry.name);
-            pos += (uint32_t)strlen(entry.name);
-            ps_copy(path + pos, sizeof(path) - pos, "/stat");
-        }
-        if (ps_parse_stat(path, &tasks[count]) == 0) {
-            char status[512], password_buffer[1024];
-            struct passwd record, *account = NULL;
-            /* Identity and ReliefOS-specific metadata are named status fields,
-             * never extra columns in the Linux stat ABI. */
-            char *suffix = strrchr(path, '/');
-            ps_copy(suffix + 1, (uint32_t)(sizeof(path) - (suffix + 1 - path)), "status");
-            if (ps_read_file(path, status, sizeof(status)) == 0) {
-                const char *value = strstr(status, "\nVmRSS:\t");
-                if (value) {
-                    uint32_t pos = 8;
-                    tasks[count].memory_kib = (uint32_t)ps_parse_number(value, &pos);
-                }
-                value = strstr(status, "\nUid:\t");
-                if (value) {
-                    uint32_t pos = 6;
-                    tasks[count].uid = (uint32_t)ps_parse_number(value, &pos);
-                }
-                const char *keys[] = {"\nLeonOSRole:\t", "\nLeonOSFlags:\t"};
-                uint32_t *fields[] = {&tasks[count].role, &tasks[count].flags};
-                for (unsigned i = 0; i < 2; ++i) {
-                    const char *value = strstr(status, keys[i]);
-                    if (value) { uint32_t pos = (uint32_t)strlen(keys[i]); *fields[i] = (uint32_t)ps_parse_number(value, &pos); }
-                }
-            }
-            if (tasks[count].uid != UINT32_MAX && getpwuid_r(tasks[count].uid, &record, password_buffer,
-                           sizeof(password_buffer), &account) == 0 && account && account->pw_name)
-                ps_copy(tasks[count].username, sizeof(tasks[count].username), account->pw_name);
+        uint32_t pos = 0;
+        uint64_t pid = ps_parse_number(entry.name, &pos);
+        if (entry.name[pos] || !pid || pid > INT_MAX) continue;
+        if (!pidfds) {
+            char path[RELIEFOS_FS_PATH_LEN];
+            snprintf(path, sizeof(path), "/proc/%u/stat", (unsigned)pid);
+            if (ps_parse_stat(AT_FDCWD, path, &tasks[count]) != 0) continue;
+            snprintf(path, sizeof(path), "/proc/%u/status", (unsigned)pid);
+            ps_read_task_status(AT_FDCWD, path, &tasks[count]);
             ++count;
+            continue;
         }
+        int handle = pidfds_supported ? (int)syscall(SYS_pidfd_open, (long)pid, 0L) : -1;
+        if (handle < 0 && pidfds_supported && errno == ENOSYS) pidfds_supported = 0;
+        /* Bind the directory after opening the handle and check its liveness
+         * after the last metadata read. A stale pidfd is always readable,
+         * including after reap, so a recycled /proc/PID cannot be paired
+         * with the old handle. Paths within the row use the pinned directory. */
+        int dir = openat(fd, entry.name, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+        if (dir < 0 || ps_parse_stat(dir, "stat", &tasks[count]) != 0 || tasks[count].pid != pid) {
+            if (dir >= 0) close(dir);
+            if (handle >= 0) close(handle);
+            continue;
+        }
+        ps_read_task_status(dir, "status", &tasks[count]);
+        close(dir);
+        if (handle >= 0) {
+            struct pollfd check = {handle, POLLIN, 0};
+            int ready;
+            do { ready = poll(&check, 1, 0); } while (ready < 0 && errno == EINTR);
+            if (ready != 0) {
+                close(handle);
+                if (ready > 0 && tasks[count].state != 3) continue;
+                handle = -1;
+            }
+        }
+        pidfds[count++] = handle;
     }
     close(fd);
     return (int)count;
+}
+
+int reliefos_task_snapshot(struct reliefos_task_info *tasks, uint32_t capacity,
+                         uint64_t *tick)
+{
+    return ps_task_snapshot(tasks, NULL, capacity, tick);
+}
+
+int reliefos_task_snapshot_pidfds(struct reliefos_task_info *tasks, int *pidfds,
+                                 uint32_t capacity, uint64_t *tick)
+{
+    if (!pidfds && tasks && capacity) { errno = EINVAL; return -1; }
+    return ps_task_snapshot(tasks, pidfds, capacity, tick);
 }
 /* Published libleonos.so.2 aliases; keep these in the defining translation unit. */
 extern __typeof__(reliefos_machine_identity) leonos_machine_identity __attribute__((alias("reliefos_machine_identity")));

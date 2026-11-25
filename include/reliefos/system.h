@@ -54,6 +54,10 @@ struct reliefos_task_snapshot {
 
 unsigned long reliefos_uptime_ms(void);
 int reliefos_task_snapshot(struct reliefos_task_info *tasks, uint32_t capacity, uint64_t *tick);
+/* Like task_snapshot, with one owned close-on-exec pidfd (or -1 when
+ * unavailable) per returned row. Caller closes every nonnegative entry. */
+int reliefos_task_snapshot_pidfds(struct reliefos_task_info *tasks, int *pidfds,
+                                 uint32_t capacity, uint64_t *tick);
 int reliefos_task_kill(uint32_t pid);
 
 #endif

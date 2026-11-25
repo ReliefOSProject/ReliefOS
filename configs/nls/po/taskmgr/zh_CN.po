@@ -535,8 +535,14 @@ msgid "Task Manager"
 msgstr "任务管理器"
 
 #: userland/apps/taskmgr/main.cpp:575
-msgid "Task ended"
-msgstr "任务已结束"
+msgid "Termination signal sent."
+msgstr "已发送终止信号。"
+
+msgid "A stable handle for this process is unavailable."
+msgstr "无法获取此进程的稳定句柄。"
+
+msgid "The selected process has already exited."
+msgstr "选中的进程已退出。"
 
 #: userland/apps/taskmgr/main.cpp:482
 msgid "Tasks "
