@@ -48,8 +48,22 @@ class InstallerInputTests(unittest.TestCase):
             executable = str(Path(tmp) / "worker")
             subprocess.run([
                 "cc", "-std=gnu11", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
+                "-DINSTALLER_JOB_FINISH_TIMEOUT_MS=100",
                 "-fsanitize=address,undefined", "tools/tests/installer_job_test.c",
                 "userland/apps/installer/installer_job.c", "-o", executable,
+            ], cwd=ROOT, check=True)
+            subprocess.run([executable], check=True, timeout=10)
+
+    def test_update_sessions_require_complete_metadata_and_terminal_result(self):
+        with tempfile.TemporaryDirectory(prefix="installer-update-session-") as tmp:
+            executable = str(Path(tmp) / "protocol")
+            subprocess.run([
+                "cc", "-std=gnu11", "-O1", "-g", "-Wall", "-Wextra", "-Werror",
+                "-fsanitize=address,undefined", "-ffunction-sections", "-fdata-sections",
+                "-Wl,--gc-sections", "tools/tests/installer_update_protocol_test.c",
+                "userland/apps/installer/installer_update_protocol.c",
+                "userland/apps/installer/installer_update_model.c",
+                "userland/apps/installer/installer_update_progress.c", "-o", executable,
             ], cwd=ROOT, check=True)
             subprocess.run([executable], check=True, timeout=10)
 

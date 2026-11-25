@@ -470,6 +470,10 @@ int installer_tty_main(const struct installer_tty_context *context)
                 snprintf(job.esp_uuid, sizeof(job.esp_uuid), "%s", esp_uuid);
                 int result = tui_run_job(context, &job);
                 inspected = job.info;
+                if (result == -ECANCELED) {
+                    snprintf(view.status, sizeof(view.status), "%s", T("Update check canceled. Run the checks again when ready."));
+                    continue;
+                }
                 if (result) { error_message(result, T(inspected.failure)); continue; }
                 update_checked = 1;
                 bios = !!(inspected.boot_modes & 1);

@@ -21,6 +21,7 @@ struct installer_job {
     pid_t pid;
     int fd, eof, exited, status, error, complete;
     size_t received;
+    uint64_t exited_ms;
     struct installer_job_packet incoming, latest, final;
 };
 
@@ -29,6 +30,9 @@ typedef int (*installer_job_fn)(void *, struct installer_job_packet *);
 int installer_job_start(struct installer_job *, installer_job_fn, void *, const char *log);
 /* Bounded nonblocking drain: 1 running, 0 complete, or negative errno. */
 int installer_job_step(struct installer_job *);
+/* Cooperatively stop a read-only check. The worker owns its resource cleanup;
+ * callers must keep pumping until its final result and exit arrive. */
+int installer_job_request_stop(struct installer_job *);
 /* Coalesce telemetry when the reader is slow; never wait in a copy callback. */
 void installer_job_publish(const struct installer_job_packet *);
 int installer_job_is_worker(void);

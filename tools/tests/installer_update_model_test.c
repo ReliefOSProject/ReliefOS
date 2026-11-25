@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
@@ -19,9 +20,100 @@ static void write_file(const char *root, const char *relative, const char *text)
     assert(!fclose(stream));
 }
 
+static void test_package_growth(const char *root)
+{
+    char media[PATH_MAX], path[PATH_MAX];
+    assert(snprintf(media, sizeof(media), "%s/growth-media", root) < (int)sizeof(media));
+    assert(!mkdir(media, 0755));
+    const char *const directories[] = {"lib", "lib/apk", "lib/apk/db"};
+    for (unsigned i = 0; i < sizeof(directories) / sizeof(directories[0]); ++i) {
+        assert(snprintf(path, sizeof(path), "%s/%s", media, directories[i]) < (int)sizeof(path));
+        assert(!mkdir(path, 0755));
+    }
+    /* Unchanged and shrinking packages, removed legacy wrappers and retained
+     * user packages cannot cancel the space needed by a new upstream library.
+     * Input order differs deliberately so matching requires package names. */
+    write_file(root, "lib/apk/db/installed",
+        "P:external-retained\nV:1\nI:4000000000\n\n"
+        "P:reliefos-sqlite\nV:1\nI:1000000\n\n"
+        "P:same-version\nV:2-r0\nI:500\n\n"
+        "P:shrinking\nV:1\nI:50000000\n\n"
+        "P:growing\nV:1\nI:100\n\n");
+    write_file(media, "lib/apk/db/installed",
+        "P:llvm22-libs\nV:22-r0\nI:190973792\n\n"
+        "P:shrinking\nV:2\nI:10\n\n"
+        "P:same-version\nV:2-r0\nI:500\n\n"
+        "P:sqlite-libs\nV:3\nI:1640464\n\n"
+        "P:growing\nV:2\nI:150\n");
+    uint64_t growth = 0, largest = 0;
+    assert(!installer_update_measure_growth(root, media, &growth, &largest));
+    assert(growth == UINT64_C(190973792) + UINT64_C(1640464) + 50);
+    assert(largest == UINT64_C(190973792));
+    /* Already committed packages remain affordable on a repair/retry rather
+     * than charging the entire installed system's bytes once again. */
+    assert(!installer_update_measure_growth(media, media, &growth, &largest));
+    assert(!growth && largest == UINT64_C(190973792));
+
+    write_file(root, "lib/apk/db/installed", "");
+    const char *const invalid[] = {
+        "P:missing-size\nV:1\n\n",
+        "P:duplicate-size\nV:1\nI:1\nI:2\n\n",
+        "P:../invalid-name\nV:1\nI:1\n\n",
+        "P:negative-size\nV:1\nI:-1\n\n",
+        "P:overflow-size\nV:1\nI:18446744073709551616\n\n",
+        "P:duplicate-name\nV:1\nI:1\n\nP:duplicate-name\nV:2\nI:2\n\n",
+    };
+    for (unsigned i = 0; i < sizeof(invalid) / sizeof(invalid[0]); ++i) {
+        write_file(media, "lib/apk/db/installed", invalid[i]);
+        growth = largest = 42;
+        assert(installer_update_measure_growth(root, media, &growth, &largest) == -EINVAL);
+        assert(!growth && !largest);
+    }
+    /* Duplicate names on the installed side are equally ambiguous. */
+    write_file(root, "lib/apk/db/installed", invalid[5]);
+    write_file(media, "lib/apk/db/installed", "P:new\nV:1\nI:1\n\n");
+    assert(installer_update_measure_growth(root, media, &growth, &largest) == -EINVAL);
+    assert(!growth && !largest);
+    write_file(root, "lib/apk/db/installed", "");
+    write_file(media, "lib/apk/db/installed",
+        "P:first\nV:1\nI:18446744073709551615\n\nP:second\nV:1\nI:1\n\n");
+    assert(installer_update_measure_growth(root, media, &growth, &largest) == -EOVERFLOW);
+    assert(!growth && !largest);
+
+    assert(snprintf(path, sizeof(path), "%s/lib/apk/db/installed", media) < (int)sizeof(path));
+    assert(!unlink(path));
+    assert(!mkfifo(path, 0600));
+    assert(installer_update_measure_growth(root, media, &growth, &largest) == -EINVAL);
+    assert(!growth && !largest);
+    assert(!unlink(path));
+    assert(!symlink("/etc/passwd", path));
+    assert(installer_update_measure_growth(root, media, &growth, &largest) == -ELOOP);
+    assert(!growth && !largest);
+    assert(!unlink(path));
+    FILE *stream = fopen(path, "w");
+    assert(stream);
+    assert(fwrite("P:hidden\0name\nV:1\nI:1\n", 1, 22, stream) == 22);
+    assert(!fclose(stream));
+    assert(installer_update_measure_growth(root, media, &growth, &largest) == -EINVAL);
+    assert(!growth && !largest);
+
+    stream = fopen(path, "w");
+    assert(stream);
+    for (unsigned i = 0; i < 8192; ++i) assert(fprintf(stream, "P:package-%u\nV:1\nI:1\n\n", i) > 0);
+    assert(!fclose(stream));
+    assert(!installer_update_measure_growth(root, media, &growth, &largest));
+    assert(growth == 8192 && largest == 1);
+    stream = fopen(path, "a");
+    assert(stream && fputs("P:one-too-many\nV:1\nI:1\n\n", stream) >= 0 && !fclose(stream));
+    assert(installer_update_measure_growth(root, media, &growth, &largest) == -EOVERFLOW);
+    assert(!growth && !largest);
+}
+
 int main(int argc, char **argv)
 {
     assert(argc == 2);
+    /* A FIFO regression must fail promptly rather than hanging the test job. */
+    alarm(10);
     const char *root = argv[1];
     const char *const directories[] = {
         "etc", "etc/apk", "etc/reliefos", "lib", "lib/apk", "lib/apk/db",
@@ -52,6 +144,19 @@ int main(int argc, char **argv)
     assert(!unlink(path));
     assert(!symlink("/etc/os-release", path));
     assert(installer_update_read_system(root, &info) == -EINVAL);
+    assert(!unlink(path));
+    assert(!mkfifo(path, 0600));
+    assert(installer_update_read_system(root, &info) == -EINVAL);
+    assert(!unlink(path));
+    write_file(root, "etc/os-release", "ID=reliefos\nVERSION_ID=5.3.1\nID=leonos\n");
+    assert(installer_update_read_system(root, &info) == -EINVAL);
+    write_file(root, "etc/os-release", "ID=reliefos\nVERSION_ID=5.3.1\n");
+    snprintf(path, sizeof(path), "%s/etc/reliefos/desktop-backend", root);
+    assert(!unlink(path));
+    assert(!mkfifo(path, 0600));
+    assert(installer_update_read_system(root, &info) == -EINVAL);
+    assert(!unlink(path));
+    write_file(root, "etc/reliefos/desktop-backend", "console\n");
 
     write_file(root, "lib/apk/db/installed",
                "P:external-fixture\nV:1.0-r0\nI:999999\n\n"
@@ -64,6 +169,17 @@ int main(int argc, char **argv)
     assert(!packages.has_xfce_session);
     write_file(root, "lib/apk/db/installed", "P:xfce4-session\nV:4.20.2-r0\nI:44032\n");
     assert(!installer_update_read_packages(root, &packages) && packages.has_xfce_session);
+    snprintf(path, sizeof(path), "%s/lib/apk/db/installed", root);
+    assert(!unlink(path));
+    assert(!mkfifo(path, 0600));
+    assert(installer_update_read_packages(root, &packages) == -EINVAL);
+    assert(!unlink(path));
+    int oversized = open(path, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    assert(oversized >= 0 && !ftruncate(oversized, 64u * 1024u * 1024u + 1u));
+    assert(!close(oversized));
+    assert(installer_update_read_packages(root, &packages) == -EOVERFLOW);
+    assert(!unlink(path));
+    write_file(root, "lib/apk/db/installed", "P:reliefos-kernel\nV:5.3.1-r2\nI:200\n\n");
 
     unsigned progress = 0;
     char message[128] = "";
@@ -135,6 +251,52 @@ int main(int argc, char **argv)
     assert(!installer_update_write_checkpoint(root, &state));
     assert(!installer_update_read_checkpoint(root, &restored));
     assert(!strcmp(restored.phase, "boot"));
-    puts("PASS installer update metadata, protocol and durable retry state");
+    strcpy(state.phase, "unknown");
+    assert(installer_update_write_checkpoint(root, &state) == -EINVAL);
+    assert(!installer_update_read_checkpoint(root, &restored));
+    assert(!strcmp(restored.phase, "boot"));
+    strcpy(state.phase, "boot");
+    state.index_sha256[0] = 'z';
+    assert(installer_update_write_checkpoint(root, &state) == -EINVAL);
+    state.index_sha256[0] = 'a';
+    strcpy(state.root_uuid, "00000000-0000-0000-0000-000000000000");
+    assert(installer_update_write_checkpoint(root, &state) == -EINVAL);
+    strcpy(state.root_uuid, "8ab5d176-6479-4ec8-b382-531fca6ea662");
+    snprintf(path, sizeof(path), "%s/var/lib/reliefos/installer-update/state", root);
+    assert(!unlink(path));
+    assert(!mkfifo(path, 0600));
+    assert(installer_update_read_checkpoint(root, &restored) == -EINVAL);
+    assert(!restored.phase[0]);
+    assert(!unlink(path));
+    assert(!symlink("/etc/passwd", path));
+    assert(installer_update_read_checkpoint(root, &restored) == -ELOOP);
+    assert(!unlink(path));
+    oversized = open(path, O_WRONLY | O_CREAT | O_EXCL, 0600);
+    assert(oversized >= 0 && !ftruncate(oversized, 1025));
+    assert(!close(oversized));
+    assert(installer_update_read_checkpoint(root, &restored) == -EOVERFLOW);
+    assert(!unlink(path));
+    char invalid[1024];
+    snprintf(invalid, sizeof(invalid),
+        "format=1\nphase=unknown\nroot_uuid=%s\nindex_sha256=%s\ndatabase_sha256=%s\nworld_sha256=%s\n",
+        state.root_uuid, state.index_sha256, state.database_sha256, state.world_sha256);
+    write_file(root, "var/lib/reliefos/installer-update/state", invalid);
+    assert(installer_update_read_checkpoint(root, &restored) == -EINVAL);
+    assert(!restored.phase[0]);
+    assert(!installer_update_write_checkpoint(root, &state));
+    FILE *duplicate = fopen(path, "a");
+    assert(duplicate && fputs("phase=done\n", duplicate) >= 0 && !fclose(duplicate));
+    assert(installer_update_read_checkpoint(root, &restored) == -EINVAL);
+    assert(!restored.phase[0]);
+    assert(!installer_update_write_checkpoint(root, &state));
+    assert(!installer_update_read_checkpoint(root, &restored));
+    assert(!strcmp(state.phase, restored.phase));
+    assert(!strcmp(state.root_uuid, restored.root_uuid));
+    assert(!strcmp(state.index_sha256, restored.index_sha256));
+    assert(!strcmp(state.database_sha256, restored.database_sha256));
+    assert(!strcmp(state.world_sha256, restored.world_sha256));
+    test_package_growth(root);
+    alarm(0);
+    puts("PASS installer update metadata, conservative per-package space, protocol and durable retry state");
     return 0;
 }

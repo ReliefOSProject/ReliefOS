@@ -51,6 +51,14 @@ struct installer_update_checkpoint {
     char phase[32], root_uuid[37], index_sha256[65], database_sha256[65], world_sha256[65];
 };
 
+/* A frontend accepts success only after a complete metadata snapshot and one
+ * terminal result. Protocol errors are sticky across later valid records. */
+struct installer_update_session {
+    uint32_t fields;
+    unsigned terminal, error;
+    int terminal_error;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -60,11 +68,18 @@ extern "C" {
 int installer_update_read_system(const char *root, struct installer_update_info *info);
 int installer_update_read_media(const char *root, const char *profile, struct installer_update_info *info);
 int installer_update_read_packages(const char *root, struct installer_update_packages *packages);
+/* Conservatively sum positive installed-size changes for every media package,
+ * including upstream dependencies. Removed/shrinking/external packages never
+ * provide credit; largest includes every media package. Outputs stay zero on
+ * error. Both databases are bounded to 8192 uniquely named package records. */
+int installer_update_measure_growth(const char *installed_root, const char *media_root,
+                                    uint64_t *growth, uint64_t *largest);
 int installer_update_read_checkpoint(const char *root, struct installer_update_checkpoint *checkpoint);
 int installer_update_write_checkpoint(const char *root, const struct installer_update_checkpoint *checkpoint);
 
 /* The result's activity field is live during callbacks. Other result metadata
- * becomes final only when check/apply returns; neither frontend runs disk I/O. */
+ * becomes final only when check/apply returns. Run these calls in a worker so
+ * the frontend can service input while the storage stages execute. */
 typedef void (*installer_update_observer)(void *context, unsigned progress, const char *message);
 int installer_update_activity_decode(struct installer_update_activity *activity, const char *line);
 int installer_update_activity_encode(const struct installer_update_activity *activity, char *line, size_t capacity);
@@ -77,6 +92,9 @@ int installer_update_check(const char *disk, struct installer_update_info *info,
 int installer_update_check_target(const char *disk, const char *root_uuid, const char *esp_uuid,
                                  struct installer_update_info *info,
                                  installer_update_observer observer, void *context);
+int installer_update_check_indices(const char *disk, int root_index, int esp_index,
+                                  struct installer_update_info *info,
+                                  installer_update_observer observer, void *context);
 int installer_update_apply(const struct installer_update_info *expected, unsigned boot_modes,
                            struct installer_update_info *result,
                            installer_update_observer observer, void *context);
@@ -85,6 +103,13 @@ int installer_update_apply(const struct installer_update_info *expected, unsigne
  * progress, 3 for failure, 4 for activity, 0 for an unrelated line, or a negative errno. */
 int installer_update_decode(struct installer_update_info *info, unsigned *progress,
                             char *message, size_t capacity, const char *line);
+/* Feed complete lines only; result records return 5. Finish returns the final
+ * worker errno or -EPROTO for incomplete, inconsistent or duplicate records. */
+int installer_update_session_line(struct installer_update_session *session,
+    struct installer_update_info *info, unsigned *progress,
+    char *message, size_t capacity, const char *line);
+int installer_update_session_finish(const struct installer_update_session *session,
+                                    const struct installer_update_info *info);
 
 /* Run the isolated native backend before any FLTK initialization. */
 int installer_update_worker(int argc, char **argv);
