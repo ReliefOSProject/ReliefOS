@@ -527,7 +527,13 @@ msgid "Task Manager"
 msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:575
-msgid "Task ended"
+msgid "Termination signal sent."
+msgstr ""
+
+msgid "A stable handle for this process is unavailable."
+msgstr ""
+
+msgid "The selected process has already exited."
 msgstr ""
 
 #: userland/apps/taskmgr/main.cpp:482
