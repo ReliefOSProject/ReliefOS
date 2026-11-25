@@ -341,3 +341,4 @@ main	compatibility	userland/apps/systemupdate/apk.c	原生更新器验证已发�
 main	compatibility	tools/test_system_update.py	原生更新器验证既有 RPR health.txt 响应的兼容夹具，不作为用户界面品牌。
 main	compatibility	tools/tests/test_system_update_packaging.py	真实签名 APK 回归验证旧 leonos-apps 文件所有权及已发布 leonos-* 命令别名迁移。
 main	compatibility	tests/build/test-desktop-backend.sh	桌面载荷回归验证已发布 leonos-* 更新命令别名统一指向原生更新核心，不保留旧脚本实现。
+main	compatibility	tools/tests/installer_update_model_test.c	Fixture verifies legacy os-release ID compatibility during update inspection.
