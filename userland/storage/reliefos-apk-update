@@ -1,6 +1,7 @@
 #!/bin/sh
-# Signed offline package transactions for the installer. Inspection uses a
-# private database and accepts a read-only installed root.
+# Signed offline package transactions for the installer. Only bounded planning
+# metadata lives in /run; signed archives are read directly from the medium.
+# Inspection never changes the installed system or materializes an APK cache.
 set -eu
 PATH=/usr/sbin:/usr/bin:/sbin:/bin
 LC_ALL=C
@@ -21,17 +22,36 @@ case "$target:$repository" in /*:/*) ;; *) die 'absolute target and repository p
 target=$(CDPATH= cd -- "$target" && pwd -P)
 repository=$(CDPATH= cd -- "$repository" && pwd -P)
 [ "$target" != / ] || die 'boot the installation media to update an offline system'
-for file in "$target/etc/apk/world" "$target/lib/apk/db/installed" "$repository/packages.adb"; do
-    [ -s "$file" ] && [ ! -L "$file" ] || die "missing or unsafe package metadata: $file"
+# Reject nonregular objects before any reader can block on a FIFO/device, and
+# put explicit bounds on data copied into the private planning database.
+regular_file() {
+    [ -f "$1" ] && [ ! -L "$1" ] || die "missing or unsafe package file: $1"
+    file_size=$(/bin/busybox stat -c %s "$1")
+    case "$file_size" in ''|*[!0-9]*) die "invalid package file size: $1" ;; esac
+    [ "$file_size" -gt 0 ] && [ "$file_size" -le "$2" ] || die "package file exceeds its size limit or is empty: $1"
+}
+regular_file "$target/etc/apk/world" 1048576
+regular_file "$target/lib/apk/db/installed" 67108864
+regular_file "$repository/packages.adb" 16777216
+for relative in etc etc/apk etc/apk/keys lib lib/apk lib/apk/db; do
+    [ -d "$target/$relative" ] && [ ! -L "$target/$relative" ] || die "unsafe installed package directory: $relative"
 done
-[ -d "$target/etc/apk/keys" ] && [ ! -L "$target/etc/apk/keys" ] || die 'installed package trust keys are missing'
+key_count=0
+for key in "$target/etc/apk/keys/"*.pub; do
+    [ -e "$key" ] || [ -L "$key" ] || continue
+    regular_file "$key" 65536
+    key_count=$((key_count + 1))
+    [ "$key_count" -le 64 ] || die 'too many installed package trust keys'
+done
+[ "$key_count" -gt 0 ] || die 'installed package trust keys are missing'
 index_sha=$(/bin/busybox sha256sum "$repository/packages.adb")
 index_sha=${index_sha%% *}
 [ -z "$expected_index" ] || [ "$index_sha" = "$expected_index" ] || die 'installation media changed after inspection; check the update again'
 
-# Early init mounts /run as tmpfs. The private database and verified archives
-# must not consume the installation medium's fixed-size runtime root.
-temporary=$(/bin/busybox mktemp -d /run/reliefos-update.XXXXXX)
+# The supervisor supplies an owned workspace so it can clean up after a killed
+# worker. Standalone callers use /run. Keep only bounded metadata here; package
+# payloads stay on the read-only installation medium until APK applies them.
+temporary=$(/bin/busybox mktemp -d "${TMPDIR:-/run}/reliefos-update.XXXXXX")
 update_step=repository update_action=step update_package=- update_status=0
 files_done=0 files_total=0 bytes_done=0 bytes_total=0 bytes_reused=0
 cache_temporary=
@@ -92,7 +112,7 @@ trap 'exit 130' INT
 trap 'exit 143' TERM
 
 plan=$temporary/root
-/bin/busybox mkdir -p "$plan/etc/apk" "$plan/lib/apk/db" "$plan/var/cache/apk" "$temporary/repository"
+/bin/busybox mkdir -p "$plan/etc/apk" "$plan/lib/apk/db" "$plan/var/cache/apk"
 /bin/busybox cp "$target/lib/apk/db/installed" "$plan/lib/apk/db/installed"
 /bin/busybox cp "$target/lib/apk/db/installed" "$temporary/installed-before"
 /bin/busybox cp -p "$target/etc/apk/world" "$temporary/world-before"
@@ -145,8 +165,8 @@ plan=$temporary/root
         }
     }
 ' "$temporary/world-before" "$temporary/world-before" > "$plan/etc/apk/world"
-if [ -f "$target/etc/apk/arch" ]; then
-    [ ! -L "$target/etc/apk/arch" ] || die 'unsafe installed architecture file'
+if [ -e "$target/etc/apk/arch" ] || [ -L "$target/etc/apk/arch" ]; then
+    regular_file "$target/etc/apk/arch" 128
     /bin/busybox cp "$target/etc/apk/arch" "$plan/etc/apk/arch"
 fi
 
@@ -175,12 +195,11 @@ write_repositories() {
     while IFS= read -r tag; do
         number=$((number + 1))
         tagged_repository=$tag_repositories/$number
-        /bin/busybox mkdir -p "$tagged_repository"
-        /bin/busybox cp "$source_repository/packages.adb" "$tagged_repository/packages.adb"
-        for archive in "$source_repository"/*.apk; do
-            [ -f "$archive" ] || continue
-            /bin/busybox ln -s "$archive" "$tagged_repository/${archive##*/}"
-        done
+        [ "$number" -le 64 ] || die 'too many installed repository tags'
+        /bin/busybox mkdir -p "$tag_repositories"
+        # APK distinguishes repository masks by URL. A private directory link
+        # gives each tag its own URL without copying indexes or archive data.
+        /bin/busybox ln -s "$source_repository" "$tagged_repository"
         # Distinct index URLs keep APK's default/tagged repository masks
         # separate, preserving the installed origin tag of retained extras.
         printf 'ndx @%s %s/packages.adb\n' "$tag" "$tagged_repository"
@@ -259,16 +278,61 @@ done
 # Replacement commands are world selections, no longer dependencies of local
 # wrappers. Include them in the verified archive set before the solver runs.
 upstream_packages=$(/bin/busybox sort -u "$temporary/upstream-packages")
-stage fetch
-apk --root "$plan" --keys-dir "$target/etc/apk/keys" \
-    --repositories-file "$configuration" --no-network fetch --recursive \
-    --output "$temporary/repository" $packages $repair_packages $upstream_packages
+# Verify regular local archives in place, one at a time. APK's verifier streams
+# their signatures/data; no archive, including a large dependency, is copied to
+# tmpfs. Validate all directory entries before asking APK to open any archive.
 stage verify
-apk --root "$plan" --keys-dir "$target/etc/apk/keys" --no-network \
-    verify "$temporary/repository/"*.apk
-/bin/busybox cp "$repository/packages.adb" "$temporary/repository/packages.adb"
-write_repositories "$temporary/repository" "$temporary/tagged-verified" > "$temporary/verified.repositories"
-configuration=$temporary/verified.repositories
+: > "$temporary/media-archives"
+for archive in "$repository"/*.apk; do
+    [ -e "$archive" ] || [ -L "$archive" ] || continue
+    update_package=${archive##*/}
+    case "$update_package" in ''|*[!a-zA-Z0-9+_.-]*) die 'unsafe package archive name' ;; esac
+    regular_file "$archive" 4294967296
+    files_total=$((files_total + 1))
+    [ "$files_total" -le 8192 ] || die 'too many package archives'
+    bytes_total=$((bytes_total + file_size))
+    printf '%s\t%s\n' "$file_size" "$update_package" >> "$temporary/media-archives"
+done
+[ "$files_total" -gt 0 ] || die 'the signed repository has no package archives'
+tab=$(printf '\t')
+while IFS="$tab" read -r size name; do
+    update_package=$name update_action=checking
+    activity
+    apk --root "$plan" --keys-dir "$target/etc/apk/keys" --no-network verify "$repository/$name"
+    files_done=$((files_done + 1)) bytes_done=$((bytes_done + size)) update_action=complete
+    activity
+done < "$temporary/media-archives"
+
+# Enumerate every signed-index entry, including unselected packages and older
+# versions: the complete index will be published in the installed offline
+# cache. Use an empty private cwd to avoid fetch's same-sized-file shortcut.
+# --from repositories excludes installed packages absent from the medium.
+stage fetch
+(
+    cd "$temporary"
+    apk --root "$plan" --keys-dir "$target/etc/apk/keys" \
+        --repositories-file "$configuration" --no-network fetch \
+        --from repositories --all-matches --simulate --url '*'
+) > "$temporary/selected-urls"
+: > "$temporary/selected-archives"
+while IFS= read -r archive || [ -n "$archive" ]; do
+    name=${archive##*/}
+    case "$name" in ''|*[!a-zA-Z0-9+_.-]*) die 'invalid selected package archive' ;; *.apk) ;; *) die 'invalid selected package archive' ;; esac
+    case "$archive" in "$repository/$name"|"$temporary/tagged-media/"*/"$name") ;; *) die 'selected archive is outside the installation repository' ;; esac
+    regular_file "$repository/$name" 4294967296
+    printf '%s\n' "$name" >> "$temporary/selected-archives"
+done < "$temporary/selected-urls"
+# APK verifies every archive's identity against the signed index while streaming
+# it to stdout. --stdout bypasses cwd's same-sized-file shortcut. Drain into
+# /dev/null: --url alone still downloads into cwd, and --simulate alone does not
+# perform this identity check. No package is staged.
+apk --root "$plan" --keys-dir "$target/etc/apk/keys" \
+    --repositories-file "$configuration" --no-network fetch \
+    --from repositories --all-matches --stdout '*' > /dev/null
+# Preserve the complete verified media repository, including equal-version
+# packages omitted from the solver's download set on retries. Unindexed files
+# never enter the cache, and all archive versions named by its index are kept.
+/bin/busybox sort -u "$temporary/selected-archives" > "$temporary/verified-archives"
 echo 'Calculating the offline package transaction'
 stage plan
 if [ -n "$repair_packages" ]; then
@@ -320,8 +384,10 @@ destination=$target/usr/share/reliefos/apk/repository
 # Comparisons avoid rewriting an unchanged cache on update retries. An I/O
 # error is not a content difference and must not be hidden by a replacement.
 : > "$temporary/cache-files"
-for package in "$temporary/repository"/*.apk "$temporary/repository/packages.adb"; do
-    name=${package##*/}
+/bin/busybox cp "$temporary/verified-archives" "$temporary/cache-names"
+printf '%s\n' packages.adb >> "$temporary/cache-names"
+while IFS= read -r name; do
+    package=$repository/$name
     update_package=$name
     case "$name" in ''|*[!a-zA-Z0-9+_.-]*) die 'unsafe verified archive name' ;; esac
     [ -f "$package" ] && [ ! -L "$package" ] || die "unsafe verified archive: $package"
@@ -330,7 +396,7 @@ for package in "$temporary/repository"/*.apk "$temporary/repository/packages.adb
     [ "$next" -ge "$bytes_total" ] || die 'offline cache size overflow'
     bytes_total=$next files_total=$((files_total + 1))
     printf '%s\t%s\n' "$size" "$name" >> "$temporary/cache-files"
-done
+done < "$temporary/cache-names"
 tab=$(printf '\t')
 while IFS="$tab" read -r size name; do
     update_package=$name update_action=checking
@@ -339,7 +405,7 @@ while IFS="$tab" read -r size name; do
     reuse=0
     if [ -e "$existing" ] || [ -L "$existing" ]; then
         [ -f "$existing" ] && [ ! -L "$existing" ] || die "unsafe cached archive: $existing"
-        if /bin/busybox cmp -s "$temporary/repository/$name" "$existing"; then reuse=1
+        if /bin/busybox cmp -s "$repository/$name" "$existing"; then reuse=1
         else
             compare_status=$?
             [ "$compare_status" -eq 1 ] || die "cannot compare cached archive: $existing"
@@ -353,8 +419,8 @@ while IFS="$tab" read -r size name; do
         update_action=copying
         activity
         cache_temporary=$(/bin/busybox mktemp "$destination/.update-cache.XXXXXX")
-        /bin/busybox cp "$temporary/repository/$name" "$cache_temporary"
-        /bin/busybox cmp -s "$temporary/repository/$name" "$cache_temporary" || die "cache copy verification failed: $name"
+        /bin/busybox cp "$repository/$name" "$cache_temporary"
+        /bin/busybox cmp -s "$repository/$name" "$cache_temporary" || die "cache copy verification failed: $name"
         /bin/busybox chmod 0644 "$cache_temporary"
         /bin/busybox mv "$cache_temporary" "$existing"
         cache_temporary= update_action=complete
@@ -376,4 +442,4 @@ for component in sl ncurses sqlite; do
     done
 done
 stage sync
-/bin/busybox sync
+/bin/busybox sync -f "$target"

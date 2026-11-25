@@ -22,12 +22,15 @@ const char *self_path = nullptr;
 int checks = 0;
 int failures = 0;
 volatile sig_atomic_t pty_helper_saw_hup = 0;
+volatile sig_atomic_t cooperative_stop = 0;
 constexpr size_t DualStreamPrebuffer = 4096;
 
 void pty_helper_sighup(int)
 {
     pty_helper_saw_hup = 1;
 }
+
+void cooperative_sigterm(int) { cooperative_stop = 1; }
 
 void check(bool condition, const char *message)
 {
@@ -123,6 +126,24 @@ int child_main(int argc, char **argv)
     }
     if (strcmp(argv[1], "--child-wait") == 0) {
         for (;;) pause();
+    }
+    if (strcmp(argv[1], "--child-cooperative-stop") == 0) {
+        struct sigaction action = {};
+        action.sa_handler = cooperative_sigterm;
+        sigemptyset(&action.sa_mask);
+        if (sigaction(SIGTERM, &action, nullptr) < 0) return 110;
+        if (!write_all(STDOUT_FILENO, "ready\n", 6)) return 111;
+        while (!cooperative_stop) sleep_ms(1);
+        sleep_ms(350);
+        return write_all(STDOUT_FILENO, "cleanup complete\n", 17) ? 0 : 112;
+    }
+    if (strcmp(argv[1], "--child-window-streams") == 0) {
+        char bytes[4096];
+        memset(bytes, 'w', sizeof(bytes));
+        for (unsigned i = 0; i < 512; ++i)
+            if (!write_all(STDOUT_FILENO, bytes, sizeof(bytes)) ||
+                !write_all(STDERR_FILENO, bytes, sizeof(bytes))) return 113;
+        return 0;
     }
     if (strcmp(argv[1], "--child-flood") == 0) {
         static char bytes[65536];
@@ -769,6 +790,41 @@ void test_repeated_start_and_root_direct_path()
     }
 }
 
+void test_cooperative_stop_and_consumed_streams()
+{
+    ra::Process process;
+    const char *stop[] = {self_path, "--child-cooperative-stop", nullptr};
+    check(process.start(stop), "start a worker with cooperative cleanup");
+    double started = now_seconds();
+    while (!process.output_size() && process.running() && now_seconds() - started < 2.0) {
+        process.step(8192);
+        sleep_ms(1);
+    }
+    check(process.output_size() == 6, "worker publishes readiness after installing its signal handler");
+    check(process.request_stop(), "request_stop signals the worker leader");
+    check(finish(process), "cooperative worker completes cleanup without forced escalation");
+    check(process.exit_code() == 0 && strstr(process.output(), "cleanup complete"),
+        "worker survives cleanup longer than the generic cancellation kill grace");
+    process.consume_output(6);
+    check(!strcmp(process.output(), "cleanup complete\n"), "consuming a prefix retains the following record");
+    process.consume_output(static_cast<size_t>(-1));
+    check(!process.output_size() && !*process.output(), "oversized consume empties the captured output safely");
+
+    const char *streams[] = {self_path, "--child-window-streams", nullptr};
+    check(process.start(streams), "start streaming worker for bounded capture windows");
+    size_t output = 0, errors = 0;
+    started = now_seconds();
+    while (process.running() && now_seconds() - started < 5.0) {
+        process.step(16384);
+        output += process.output_size(); errors += process.errors_size();
+        process.consume_output(process.output_size()); process.consume_errors(process.errors_size());
+        sleep_ms(1);
+    }
+    check(!process.running() && process.exit_code() == 0, "streaming worker exits while the consumer drains windows");
+    check(output == 2u * 1024u * 1024u && errors == 2u * 1024u * 1024u && !process.truncated(),
+        "consumed stderr beyond the capture limit preserves every newer byte");
+}
+
 } // namespace
 
 int main(int argc, char **argv)
@@ -795,6 +851,7 @@ int main(int argc, char **argv)
     test_orphan_pipe_holder_is_cleaned("--child-orphan", "open");
     test_orphan_pipe_holder_is_cleaned("--child-orphan-closed", "closed");
     test_repeated_start_and_root_direct_path();
+    test_cooperative_stop_and_consumed_streams();
 
     free(const_cast<char *>(self_path));
     if (failures) {

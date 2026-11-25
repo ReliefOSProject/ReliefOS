@@ -3,12 +3,13 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#define CHECKPOINT_MAX 1024
 
 static int state_directory(const char *root, int create)
 {
@@ -33,42 +34,75 @@ static int state_directory(const char *root, int create)
     return fd;
 }
 
-static int valid_field(const char *text, size_t capacity)
+static int phase_valid(const char *phase)
 {
-    return memchr(text, 0, capacity) && text[0] &&
-        strspn(text, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_") == strlen(text);
+    static const char *const phases[] = {
+        "packages", "packages-failed", "root-ready", "boot", "boot-failed", "done",
+    };
+    for (size_t i = 0; i < sizeof(phases) / sizeof(phases[0]); ++i)
+        if (!strcmp(phase, phases[i])) return 1;
+    return 0;
 }
 
+static int digest_valid(const char *digest)
+{
+    return strnlen(digest, 65) == 64 && strspn(digest, "0123456789abcdef") == 64;
+}
+
+static int uuid_valid(const char *uuid)
+{
+    if (strnlen(uuid, 37) != 36) return 0;
+    unsigned nonzero = 0;
+    for (unsigned i = 0; i < 36; ++i) {
+        if (i == 8 || i == 13 || i == 18 || i == 23) {
+            if (uuid[i] != '-') return 0;
+        } else {
+            if (!strchr("0123456789abcdef", uuid[i])) return 0;
+            nonzero |= uuid[i] != '0';
+        }
+    }
+    return nonzero != 0;
+}
+
+static int checkpoint_valid(const struct installer_update_checkpoint *state)
+{
+    return memchr(state->phase, 0, sizeof(state->phase)) && phase_valid(state->phase) &&
+        uuid_valid(state->root_uuid) && digest_valid(state->index_sha256) &&
+        digest_valid(state->database_sha256) && digest_valid(state->world_sha256);
+}
+
+/** @brief Publish a durable checkpoint relative to its held directory.
+ * The new record becomes visible only after its contents are fsynced. A
+ * directory fsync after rename makes that publication survive a power loss.
+ */
 int installer_update_write_checkpoint(const char *root, const struct installer_update_checkpoint *state)
 {
-    if (!root || !state || !valid_field(state->phase, sizeof(state->phase)) ||
-        !valid_field(state->root_uuid, sizeof(state->root_uuid)) ||
-        !valid_field(state->index_sha256, sizeof(state->index_sha256)) ||
-        !valid_field(state->database_sha256, sizeof(state->database_sha256)) ||
-        !valid_field(state->world_sha256, sizeof(state->world_sha256))) return -EINVAL;
+    if (!root || !state || !checkpoint_valid(state)) return -EINVAL;
+    char record[CHECKPOINT_MAX];
+    int length = snprintf(record, sizeof(record),
+        "format=1\nphase=%s\nroot_uuid=%s\nindex_sha256=%s\ndatabase_sha256=%s\nworld_sha256=%s\n",
+        state->phase, state->root_uuid, state->index_sha256, state->database_sha256, state->world_sha256);
+    if (length < 0 || (size_t)length >= sizeof(record)) return -EOVERFLOW;
     int directory = state_directory(root, 1);
     if (directory < 0) return directory;
-    char path[PATH_MAX];
-    int length = snprintf(path, sizeof(path), "%s/var/lib/reliefos/installer-update/.state-XXXXXX", root);
-    if (length < 0 || (size_t)length >= sizeof(path)) { close(directory); return -ENAMETOOLONG; }
-    int fd = mkstemp(path);
-    if (fd < 0) { int result = -errno; close(directory); return result; }
-    const char *temporary = strrchr(path, '/') + 1;
-    if (fcntl(fd, F_SETFD, FD_CLOEXEC) < 0) {
-        int result = -errno;
-        close(fd);
-        (void)unlinkat(directory, temporary, 0);
-        close(directory);
-        return result;
+    char temporary[64];
+    int fd = -1;
+    for (unsigned attempt = 0; attempt < 128; ++attempt) {
+        snprintf(temporary, sizeof(temporary), ".state-%ld-%u", (long)getpid(), attempt);
+        fd = openat(directory, temporary, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0600);
+        if (fd >= 0 || errno != EEXIST) break;
     }
-    FILE *stream = fdopen(fd, "w");
-    int result = stream ? 0 : -errno;
-    if (stream) {
-        if (fprintf(stream, "format=1\nphase=%s\nroot_uuid=%s\nindex_sha256=%s\ndatabase_sha256=%s\nworld_sha256=%s\n",
-                    state->phase, state->root_uuid, state->index_sha256, state->database_sha256, state->world_sha256) < 0 ||
-            fflush(stream) || fsync(fd)) result = -errno;
-        if (fclose(stream) && !result) result = -errno;
-    } else close(fd);
+    if (fd < 0) { int result = -errno; close(directory); return result; }
+    int result = 0;
+    size_t used = 0;
+    while (used < (size_t)length) {
+        ssize_t count = write(fd, record + used, (size_t)length - used);
+        if (count < 0 && errno == EINTR) continue;
+        if (count <= 0) { result = count < 0 ? -errno : -EIO; break; }
+        used += (size_t)count;
+    }
+    if (!result && fsync(fd) < 0) result = -errno;
+    if (close(fd) < 0 && !result) result = -errno;
     if (!result && renameat(directory, temporary, directory, "state") < 0) result = -errno;
     if (!result && fsync(directory) < 0) result = -errno;
     if (result) (void)unlinkat(directory, temporary, 0);
@@ -83,38 +117,53 @@ int installer_update_read_checkpoint(const char *root, struct installer_update_c
     int directory = state_directory(root, 0);
     if (directory == -ENOENT) return 0;
     if (directory < 0) return directory;
-    int fd = openat(directory, "state", O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+    int fd = openat(directory, "state", O_RDONLY | O_NONBLOCK | O_NOFOLLOW | O_CLOEXEC);
     int result = fd < 0 ? -errno : 0;
     close(directory);
     if (result) return result == -ENOENT ? 0 : result;
-    FILE *stream = fdopen(fd, "r");
-    if (!stream) { result = -errno; close(fd); return result; }
-    char line[160];
+    struct stat status;
+    if (fstat(fd, &status) < 0) result = -errno;
+    else if (!S_ISREG(status.st_mode) || status.st_size <= 0) result = -EINVAL;
+    else if (status.st_size > CHECKPOINT_MAX) result = -EOVERFLOW;
+    char record[CHECKPOINT_MAX + 1];
+    size_t used = 0;
+    while (!result && used < sizeof(record)) {
+        ssize_t count = read(fd, record + used, sizeof(record) - used);
+        if (count < 0 && errno == EINTR) continue;
+        if (count < 0) { result = -errno; break; }
+        if (!count) break;
+        used += (size_t)count;
+    }
+    if (close(fd) < 0 && !result) result = -errno;
+    if (!result && (used > CHECKPOINT_MAX || memchr(record, 0, used))) result = -EINVAL;
+    if (result) return result;
+    record[used] = 0;
+    struct installer_update_checkpoint candidate = {0};
     unsigned fields = 0;
-    while (fgets(line, sizeof(line), stream)) {
-        if (!strchr(line, '\n')) { result = -EINVAL; break; }
-        line[strcspn(line, "\n")] = 0;
+    char *line = record;
+    while (*line) {
+        char *end = strchr(line, '\n');
+        if (!end) return -EINVAL;
+        *end = 0;
         char *value = strchr(line, '=');
-        if (!value) { result = -EINVAL; break; }
+        if (!value) return -EINVAL;
         *value++ = 0;
         char *out = NULL;
         size_t capacity = 0;
         unsigned bit = 0;
         if (!strcmp(line, "format") && !strcmp(value, "1")) bit = 1;
-        else if (!strcmp(line, "phase")) { out = state->phase; capacity = sizeof(state->phase); bit = 2; }
-        else if (!strcmp(line, "root_uuid")) { out = state->root_uuid; capacity = sizeof(state->root_uuid); bit = 4; }
-        else if (!strcmp(line, "index_sha256")) { out = state->index_sha256; capacity = sizeof(state->index_sha256); bit = 8; }
-        else if (!strcmp(line, "database_sha256")) { out = state->database_sha256; capacity = sizeof(state->database_sha256); bit = 16; }
-        else if (!strcmp(line, "world_sha256")) { out = state->world_sha256; capacity = sizeof(state->world_sha256); bit = 32; }
-        else { result = -EINVAL; break; }
-        if ((fields & bit) || (out && (strlen(value) >= capacity || !valid_field(value, strlen(value) + 1)))) {
-            result = -EINVAL;
-            break;
-        }
+        else if (!strcmp(line, "phase")) { out = candidate.phase; capacity = sizeof(candidate.phase); bit = 2; }
+        else if (!strcmp(line, "root_uuid")) { out = candidate.root_uuid; capacity = sizeof(candidate.root_uuid); bit = 4; }
+        else if (!strcmp(line, "index_sha256")) { out = candidate.index_sha256; capacity = sizeof(candidate.index_sha256); bit = 8; }
+        else if (!strcmp(line, "database_sha256")) { out = candidate.database_sha256; capacity = sizeof(candidate.database_sha256); bit = 16; }
+        else if (!strcmp(line, "world_sha256")) { out = candidate.world_sha256; capacity = sizeof(candidate.world_sha256); bit = 32; }
+        else return -EINVAL;
+        if ((fields & bit) || (out && strlen(value) >= capacity)) return -EINVAL;
         if (out) strcpy(out, value);
         fields |= bit;
+        line = end + 1;
     }
-    if (!result && (fields != 63 || ferror(stream))) result = -EINVAL;
-    if (fclose(stream) && !result) result = -errno;
-    return result;
+    if (fields != 63 || !checkpoint_valid(&candidate)) return -EINVAL;
+    *state = candidate;
+    return 0;
 }

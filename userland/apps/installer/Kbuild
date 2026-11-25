@@ -6,6 +6,10 @@ RELIEFOS_APP_OBJECTS += installer_tui.o installer_tui_job.o installer_tui_partit
 RELIEFOS_APP_C_OBJECTS += installer_tui.o installer_tui_job.o installer_tui_partitions.o installer_job.o
 RELIEFOS_APP_OBJECTS += installer_plan.o
 RELIEFOS_APP_C_OBJECTS += installer_plan.o
+RELIEFOS_APP_OBJECTS += installer_update_protocol.o
+RELIEFOS_APP_C_OBJECTS += installer_update_protocol.o
+RELIEFOS_APP_OBJECTS += installer_update_supervisor.o
+RELIEFOS_APP_C_OBJECTS += installer_update_supervisor.o
 RELIEFOS_APP_ASM_OBJECTS := apache_license.o
 ifneq ($(RELIEFOS_CAPTURE_APP_KBUILD),1)
 include $(srctree)/scripts/reliefos/Makefile.app-kbuild

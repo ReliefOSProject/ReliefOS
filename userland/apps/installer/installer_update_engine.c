@@ -2,6 +2,8 @@
 #define _GNU_SOURCE 1
 #endif
 #include "installer_update_internal.h"
+#include "installer_update_supervisor.h"
+#include <reliefos/blockdev.h>
 #include "../../auth/standard_accounts.h"
 #include <reliefos/bootloader.h>
 
@@ -9,12 +11,15 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <poll.h>
+#include <stdarg.h>
 #include <signal.h>
 #include <spawn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <sys/statvfs.h>
 #include <sys/wait.h>
 #include <time.h>
@@ -22,10 +27,29 @@
 
 #define N_(text) (text)
 
+#ifndef UPDATE_ESP
 #define UPDATE_ESP "/install/esp"
+#endif
 #define UPDATE_PACKAGES "/usr/share/reliefos/apk/repository"
+#ifndef UPDATE_MEDIA_CONSOLE
+#define UPDATE_MEDIA_CONSOLE "/install/root-console"
+#define UPDATE_MEDIA_XFCE "/install/root-xfce"
+#define UPDATE_MEDIA_XORG "/install/root"
+#endif
+#ifndef UPDATE_HELPER
 #define UPDATE_HELPER "/usr/lib/reliefos/reliefos-apk-update"
+#endif
+#ifndef UPDATE_LOG
 #define UPDATE_LOG "/var/log/installer-update.log"
+#endif
+
+/* IPC contains no pointers. Only a stage child writes it; a sequence check
+ * prevents a pulse from consuming a partly published observation. */
+struct update_event {
+    unsigned sequence, progress;
+    char message[128];
+    struct installer_update_activity activity;
+};
 
 struct update_run {
     installer_update_observer observer;
@@ -33,11 +57,26 @@ struct update_run {
     FILE *log;
     unsigned progress;
     const char *stage;
-    struct timespec presented;
     struct installer_update_info *out;
+    struct update_event *event;
+    char message[128];
     struct installer_update_activity activity;
     int applying;
+    const char *workspace;
 };
+
+static void publish_event(struct update_run *run)
+{
+    if (run->event) {
+        unsigned sequence = __atomic_load_n(&run->event->sequence, __ATOMIC_RELAXED);
+        __atomic_store_n(&run->event->sequence, sequence + 1, __ATOMIC_SEQ_CST);
+        run->event->progress = run->progress;
+        snprintf(run->event->message, sizeof(run->event->message), "%s", run->stage);
+        run->event->activity = run->activity;
+        __atomic_store_n(&run->event->sequence, sequence + 2, __ATOMIC_RELEASE);
+    }
+    if (run->observer) run->observer(run->context, run->progress, run->stage);
+}
 
 static void report(struct update_run *run, unsigned progress, const char *stage)
 {
@@ -47,7 +86,7 @@ static void report(struct update_run *run, unsigned progress, const char *stage)
     if (run->out) run->out->activity = run->activity;
     fprintf(stderr, "[installer-update] %u%% %s\n", progress, stage);
     if (run->log) { fprintf(run->log, "[installer-update] %u%% %s\n", progress, stage); fflush(run->log); }
-    if (run->observer) run->observer(run->context, progress, stage);
+    publish_event(run);
 }
 
 /** @brief Present bounded helper telemetry while preserving monotonic progress. */
@@ -59,7 +98,7 @@ static void present_activity(struct update_run *run, const struct installer_upda
     run->stage = installer_update_activity_stage(activity->step);
     unsigned value = installer_update_activity_percent(activity, run->applying);
     if (value > run->progress) run->progress = value;
-    if (run->observer) run->observer(run->context, run->progress, run->stage);
+    publish_event(run);
 }
 
 /** @brief Decode complete helper lines only; ordinary command output stays data. */
@@ -98,7 +137,11 @@ static int command(struct update_run *run, const char *const arguments[], char *
     if (!result) result = posix_spawn_file_actions_adddup2(&actions, descriptors[1], STDOUT_FILENO);
     if (!result) result = posix_spawn_file_actions_adddup2(&actions, descriptors[1], STDERR_FILENO);
     if (!result) result = posix_spawn_file_actions_addclose(&actions, descriptors[1]);
-    char *const environment[] = {"PATH=/usr/sbin:/usr/bin:/sbin:/bin", "LC_ALL=C", "LANG=C", "HOME=/root", NULL};
+    char temporary_environment[PATH_MAX + 8];
+    snprintf(temporary_environment, sizeof(temporary_environment), "TMPDIR=%s",
+        run->workspace && run->workspace[0] ? run->workspace : "/run");
+    char *const environment[] = {"PATH=/usr/sbin:/usr/bin:/sbin:/bin", "LC_ALL=C", "LANG=C",
+        "HOME=/root", temporary_environment, NULL};
     pid_t child = -1;
     if (!result) result = posix_spawn(&child, arguments[0], &actions, NULL,
                                      (char *const *)arguments, environment);
@@ -238,8 +281,8 @@ static int check_media(struct update_run *run, struct installer_update_target *t
     struct installer_update_packages installed, incoming;
     int result = installer_update_read_packages(target->root, &installed);
     if (result) return result;
-    const char *media = !strcmp(target->info.profile, "console") ? "/install/root-console" :
-        installed.has_xfce_session ? "/install/root-xfce" : "/install/root";
+    const char *media = !strcmp(target->info.profile, "console") ? UPDATE_MEDIA_CONSOLE :
+        installed.has_xfce_session ? UPDATE_MEDIA_XFCE : UPDATE_MEDIA_XORG;
     result = installer_update_read_media(media, target->info.profile, &source);
     if (!result) result = installer_update_read_packages(media, &incoming);
     if (result) return result;
@@ -275,24 +318,14 @@ static int check_media(struct update_run *run, struct installer_update_target *t
     uint64_t archives;
     result = repository_bytes(repository, &archives);
     if (result) return result;
-    uint64_t growth = incoming.installed_bytes > installed.installed_bytes
-        ? incoming.installed_bytes - installed.installed_bytes : 0;
+    uint64_t growth, largest;
+    result = installer_update_measure_growth(target->root, media, &growth, &largest);
+    if (result) return result;
     uint64_t reserve = 64u * 1024u * 1024u;
     if (UINT64_MAX - reserve < archives || UINT64_MAX - reserve - archives < growth ||
-        UINT64_MAX - reserve - archives - growth < incoming.largest_package) return -EOVERFLOW;
-    target->info.required_bytes = reserve + archives + growth + incoming.largest_package;
-    return target->info.free_bytes < target->info.required_bytes ? -ENOSPC : 0;
-}
-
-static void boot_progress(void *context)
-{
-    struct update_run *run = context;
-    struct timespec now;
-    if (!clock_gettime(CLOCK_MONOTONIC, &now) &&
-        (now.tv_sec > run->presented.tv_sec || now.tv_nsec - run->presented.tv_nsec >= 500000000L)) {
-        run->presented = now;
-        if (run->observer) run->observer(run->context, run->progress, run->stage);
-    }
+        UINT64_MAX - reserve - archives - growth < largest) return -EOVERFLOW;
+    target->info.required_bytes = reserve + archives + growth + largest;
+    return 0;
 }
 
 static int save_checkpoint(struct installer_update_target *target, struct installer_update_checkpoint *state,
@@ -316,7 +349,7 @@ static int recover_pending(struct update_run *run, struct installer_update_targe
     if (result) return result;
     char path[PATH_MAX], text[96];
     snprintf(path, sizeof(path), "%s/run/reliefos-kernel-activation.defer", target->root);
-    int fd = open(path, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
+    int fd = open(path, O_RDONLY | O_NONBLOCK | O_NOFOLLOW | O_CLOEXEC);
     if (fd < 0) return errno == ENOENT ? 0 : -errno;
     struct stat status;
     if (fstat(fd, &status) < 0) { result = -errno; close(fd); return result; }
@@ -339,201 +372,413 @@ static int recover_pending(struct update_run *run, struct installer_update_targe
     return unlink(path) < 0 ? -errno : 0;
 }
 
-static int execute(const char *disk, const struct installer_update_info *expected, unsigned modes,
-                    struct installer_update_info *out, installer_update_observer observer, void *context,
-                    const char *root_uuid, const char *esp_uuid)
-{
-    struct installer_update_target target;
-    struct installer_update_checkpoint checkpoint = {0};
-    struct update_run run = {.observer = observer, .context = context, .stage = N_("Checking update target"),
-                             .out = out, .applying = expected != NULL};
-    int applying = expected != NULL;
-    memset(out, 0, sizeof(*out));
-    if (geteuid()) { out->error_number = EACCES; strcpy(out->failure, N_("Administrator privileges are required")); return -EACCES; }
-    int log_fd = open(UPDATE_LOG, O_WRONLY | O_APPEND | O_CREAT | O_NOFOLLOW | O_CLOEXEC, 0600);
-    if (log_fd >= 0) {
-        run.log = fdopen(log_fd, "a");
-        if (!run.log) { int saved = errno; close(log_fd); errno = saved; }
-    }
-    if (!run.log) {
-        out->error_number = errno;
-        strcpy(out->failure, N_("Writing the update log"));
-        return -out->error_number;
-    }
-    report(&run, 2, N_("Identifying the installed system"));
-    int result = installer_update_target_open(&target, disk, expected ? expected->root_uuid : root_uuid,
-                                              expected ? expected->esp_uuid : esp_uuid);
-    if (result) goto done;
-    if (reliefos_account_legacy_check(target.root) < 0) { result = -errno; goto done; }
-    char repository[PATH_MAX];
-    report(&run, 10, N_("Checking installation media and free space"));
-    result = check_media(&run, &target, repository);
-    if (result) goto done;
-    result = installer_update_read_checkpoint(target.root, &checkpoint);
-    if (result) goto done;
-    if (checkpoint.phase[0] && strcmp(checkpoint.phase, "done")) {
-        if (strcmp(checkpoint.root_uuid, target.info.root_uuid)) { result = -EXDEV; goto done; }
-        strcpy(target.info.pending, checkpoint.phase);
-    }
-    if (expected && (strcmp(expected->disk, target.info.disk) || strcmp(expected->esp_uuid, target.info.esp_uuid) ||
-        strcmp(expected->root_uuid, target.info.root_uuid) || strcmp(expected->index_sha256, target.info.index_sha256) ||
-        strcmp(expected->database_sha256, target.info.database_sha256) ||
-        strcmp(expected->world_sha256, target.info.world_sha256))) {
-        report(&run, run.progress, N_("Target or media changed. Check the update again."));
-        result = -ESTALE;
-        goto done;
-    }
-    struct reliefos_boot_install_options boot = {
-        .source = UPDATE_ESP, .boot_dir = target.boot, .disk_path = disk,
-        .install_bios = ((applying ? modes : target.info.boot_modes) & RELIEFOS_BOOT_BIOS) != 0,
-        .install_uefi = ((applying ? modes : target.info.boot_modes) & RELIEFOS_BOOT_UEFI) != 0,
-        .preserve_rollback = 1, .root_partuuid = target.info.root_uuid,
-        .progress = boot_progress, .progress_context = &run,
-    };
-    report(&run, 16, N_("Checking bootloader compatibility"));
-    result = target.namespaced ? reliefos_boot_validate_instance(&boot, target.esp) : 0;
-    if (!result) result = reliefos_boot_validate_payload(&boot);
-    if (!result) result = reliefos_boot_validate_target(&boot);
-    if (result) goto done;
-    report(&run, 22, N_("Verifying signed packages and dependencies"));
-    const char *const check[] = {"/bin/sh", UPDATE_HELPER, "--check", target.root, repository, NULL};
-    result = command(&run, check, NULL, 0);
-    if (result) goto done;
-    if (!applying) { report(&run, 100, N_("Update checks completed")); goto done; }
+enum update_phase {
+    PHASE_IDENTIFY, PHASE_MEDIA, PHASE_BOOT_SOURCE, PHASE_BOOT_TARGET,
+    PHASE_PLAN, PHASE_WRITABLE, PHASE_RECOVER, PHASE_PACKAGES,
+    PHASE_ROOT_READY, PHASE_BOOT, PHASE_DONE, PHASE_CLEANUP,
+};
 
-    int resume_boot = (!strcmp(checkpoint.phase, "root-ready") || !strcmp(checkpoint.phase, "boot") ||
-                       !strcmp(checkpoint.phase, "boot-failed")) &&
-        !strcmp(checkpoint.root_uuid, target.info.root_uuid) &&
-        !strcmp(checkpoint.index_sha256, target.info.index_sha256) &&
-        !strcmp(checkpoint.database_sha256, target.info.database_sha256) &&
-        !strcmp(checkpoint.world_sha256, target.info.world_sha256);
-    report(&run, 30, N_("Preparing the installed system for update"));
-    result = installer_update_target_writable(&target);
-    if (result) goto done;
-    result = recover_pending(&run, &target, &checkpoint);
-    if (result) goto done;
-    if (!resume_boot) {
-        result = save_checkpoint(&target, &checkpoint, "packages");
-        if (result) goto done;
-        report(&run, 38, N_("Applying signed system packages"));
-        const char *const apply[] = {"/bin/sh", UPDATE_HELPER, "--apply", target.root, repository, target.info.index_sha256, NULL};
-        result = command(&run, apply, NULL, 0);
-        if (result) { (void)save_checkpoint(&target, &checkpoint, "packages-failed"); goto done; }
-        result = package_state(&run, target.root, &target.info);
-        if (result) goto done;
-        report(&run, 78, N_("Synchronizing the updated root filesystem"));
-        result = sync_root(target.root);
-        if (!result) result = save_checkpoint(&target, &checkpoint, "root-ready");
-        if (result) goto done;
-    }
-    report(&run, 86, resume_boot ? N_("Resuming bootloader publication") : N_("Publishing kernel and bootloader files"));
-    result = save_checkpoint(&target, &checkpoint, "boot");
-    if (!result) result = target.namespaced
-        ? reliefos_boot_install_instance_at_root(&boot, target.root, target.esp)
-        : reliefos_boot_install_at_root(&boot, target.root);
-    if (result) { (void)save_checkpoint(&target, &checkpoint, "boot-failed"); goto done; }
-    result = sync_root(target.root);
-    if (!result) result = save_checkpoint(&target, &checkpoint, "done");
-    if (!result) report(&run, 98, N_("Finishing the system update"));
-done:
-    *out = target.info;
-    out->activity = run.activity;
-    int cleanup = installer_update_target_close(&target);
-    if (!result) result = cleanup;
-    if (result) {
-        out->error_number = -result;
-        snprintf(out->failure, sizeof(out->failure), "%s", run.stage);
-        fprintf(stderr, "[installer-update] %s failed with %s (%d)\n", run.stage, strerror(-result), result);
-        if (run.log) fprintf(run.log, "[installer-update] %s failed with %s (%d)\n", run.stage, strerror(-result), result);
-        char detail[768];
-        if (!installer_update_activity_format(&out->activity, detail, sizeof(detail)) && *detail) {
-            fprintf(stderr, "[installer-update] %s\n", detail);
-            if (run.log) fprintf(run.log, "[installer-update] %s\n", detail);
+struct update_transaction {
+    struct installer_update_target target;
+    struct installer_update_checkpoint checkpoint;
+    struct installer_update_info expected;
+    struct update_event event;
+    char disk[64], root_uuid[37], esp_uuid[37], repository[PATH_MAX];
+    int root_index, esp_index, use_indices, applying;
+    unsigned modes;
+    enum update_phase phase;
+    struct update_run *coordinator;
+};
+
+static int boot_can_resume(const struct update_transaction *transaction);
+static volatile sig_atomic_t update_cancelled;
+static void request_cancel(int number) { (void)number; update_cancelled = 1; }
+
+/* The stage's process group borrows the coordinator's mounts. All paths and
+ * mount flags live in shared memory so a fault cannot erase cleanup state. */
+static int transaction_task(void *context)
+{
+    struct update_transaction *transaction = context;
+    struct installer_update_target *target = &transaction->target;
+    struct update_run run = *transaction->coordinator;
+    run.observer = NULL;
+    run.out = &target->info;
+    run.event = &transaction->event;
+    /* Keep helper scratch below the owned workspace so a stage killed before
+     * its shell trap runs cannot leak planning databases into later checks. */
+    run.workspace = target->workspace;
+    struct reliefos_boot_install_options boot = {
+        .source = UPDATE_ESP, .boot_dir = target->boot, .disk_path = transaction->disk,
+        .install_bios = ((transaction->applying ? transaction->modes : target->info.boot_modes) & RELIEFOS_BOOT_BIOS) != 0,
+        .install_uefi = ((transaction->applying ? transaction->modes : target->info.boot_modes) & RELIEFOS_BOOT_UEFI) != 0,
+        .preserve_rollback = 1, .root_partuuid = target->info.root_uuid,
+    };
+    /* flock belongs to the shared open file description. Helpers inherit it
+     * across exec so a dead coordinator cannot unlock a surviving writer. */
+    if (target->lock_fd >= 0 && fcntl(target->lock_fd, F_SETFD, 0) < 0) return -errno;
+    int result = 0;
+    switch (transaction->phase) {
+    case PHASE_IDENTIFY:
+        if (transaction->use_indices) {
+            if (transaction->root_index >= 0)
+                result = reliefos_block_partition_uuid(transaction->disk,
+                    transaction->root_index, transaction->root_uuid);
+            if (!result && transaction->esp_index >= 0)
+                result = reliefos_block_partition_uuid(transaction->disk,
+                    transaction->esp_index, transaction->esp_uuid);
         }
-    } else if (applying) report(&run, 100, N_("System update completed successfully"));
-    if (run.log && fclose(run.log) && !result) {
-        result = -errno;
-        out->error_number = -result;
-        strcpy(out->failure, N_("Writing the update log"));
+        if (!result) result = installer_update_target_open(target, transaction->disk,
+            transaction->root_uuid, transaction->esp_uuid);
+        if (!result && reliefos_account_legacy_check(target->root) < 0) result = -errno;
+        break;
+    case PHASE_MEDIA:
+        result = check_media(&run, target, transaction->repository);
+        if (!result) result = installer_update_read_checkpoint(target->root, &transaction->checkpoint);
+        if (!result && transaction->checkpoint.phase[0] && strcmp(transaction->checkpoint.phase, "done")) {
+            if (strcmp(transaction->checkpoint.root_uuid, target->info.root_uuid)) result = -EXDEV;
+            else strcpy(target->info.pending, transaction->checkpoint.phase);
+        }
+        if (!result && !boot_can_resume(transaction) && target->info.free_bytes < target->info.required_bytes)
+            result = -ENOSPC;
+        if (!result && transaction->applying) {
+            const struct installer_update_info *expected = &transaction->expected;
+            if (strcmp(expected->disk, target->info.disk) || strcmp(expected->root_uuid, target->info.root_uuid) ||
+                strcmp(expected->esp_uuid, target->info.esp_uuid) || strcmp(expected->index_sha256, target->info.index_sha256) ||
+                strcmp(expected->database_sha256, target->info.database_sha256) ||
+                strcmp(expected->world_sha256, target->info.world_sha256)) result = -ESTALE;
+        }
+        break;
+    case PHASE_BOOT_SOURCE:
+        result = reliefos_boot_validate_payload(&boot);
+        break;
+    case PHASE_BOOT_TARGET:
+        if (target->namespaced) result = reliefos_boot_validate_instance(&boot, target->esp);
+        if (!result) result = reliefos_boot_validate_target(&boot);
+        break;
+    case PHASE_PLAN: {
+        const char *const arguments[] = {"/bin/sh", UPDATE_HELPER, "--check", target->root, transaction->repository, NULL};
+        result = command(&run, arguments, NULL, 0);
+        break;
+    }
+    case PHASE_WRITABLE:
+        result = installer_update_target_writable(target);
+        break;
+    case PHASE_RECOVER:
+        result = recover_pending(&run, target, &transaction->checkpoint);
+        break;
+    case PHASE_PACKAGES: {
+        result = save_checkpoint(target, &transaction->checkpoint, "packages");
+        const char *const arguments[] = {"/bin/sh", UPDATE_HELPER, "--apply", target->root,
+            transaction->repository, target->info.index_sha256, NULL};
+        if (!result) result = command(&run, arguments, NULL, 0);
+        if (result) (void)save_checkpoint(target, &transaction->checkpoint, "packages-failed");
+        break;
+    }
+    case PHASE_ROOT_READY:
+        result = package_state(&run, target->root, &target->info);
+        if (!result) result = sync_root(target->root);
+        if (!result) result = save_checkpoint(target, &transaction->checkpoint, "root-ready");
+        break;
+    case PHASE_BOOT:
+        result = save_checkpoint(target, &transaction->checkpoint, "boot");
+        if (!result) result = target->namespaced
+            ? reliefos_boot_install_instance_at_root(&boot, target->root, target->esp)
+            : reliefos_boot_install_at_root(&boot, target->root);
+        if (result) (void)save_checkpoint(target, &transaction->checkpoint, "boot-failed");
+        break;
+    case PHASE_DONE:
+        result = sync_root(target->root);
+        if (!result) result = save_checkpoint(target, &transaction->checkpoint, "done");
+        if (!result) target->info.pending[0] = 0;
+        break;
+    case PHASE_CLEANUP:
+        result = installer_update_target_unmount(target);
+        break;
     }
     return result;
 }
 
-int installer_update_check(const char *disk, struct installer_update_info *info,
-                           installer_update_observer observer, void *context)
+static void transaction_pulse(void *context, int stopping_reason)
 {
-    if (!disk || !info) {
-        if (info) { memset(info, 0, sizeof(*info)); info->error_number = EINVAL; }
-        return -EINVAL;
+    struct update_transaction *transaction = context;
+    struct update_run *run = transaction->coordinator;
+    struct update_event *event = &transaction->event;
+    unsigned sequence = __atomic_load_n(&event->sequence, __ATOMIC_ACQUIRE);
+    if (!(sequence & 1u)) {
+        unsigned progress = event->progress;
+        struct installer_update_activity activity = event->activity;
+        char message[sizeof(event->message)];
+        memcpy(message, event->message, sizeof(message));
+        if (sequence == __atomic_load_n(&event->sequence, __ATOMIC_ACQUIRE) && sequence && message[0]) {
+            run->activity = activity;
+            run->out->activity = activity;
+            if (progress > run->progress) run->progress = progress;
+            memcpy(run->message, message, sizeof(run->message));
+            run->message[sizeof(run->message) - 1] = 0;
+            run->stage = run->message;
+        }
     }
-    return execute(disk, NULL, 0, info, observer, context, NULL, NULL);
+    const char *message = stopping_reason == -ECANCELED ? N_("Stopping update check and cleaning up")
+        : stopping_reason == -ETIMEDOUT ? N_("Update stage timed out; stopping its processes")
+        : run->stage;
+    if (run->observer) run->observer(run->context, run->progress, message);
+}
+
+static int run_phase(struct update_transaction *transaction, enum update_phase phase,
+                      unsigned progress, const char *message, unsigned seconds, int cancelable)
+{
+    struct update_run *run = transaction->coordinator;
+    transaction->phase = phase;
+    memset(&transaction->event, 0, sizeof(transaction->event));
+    report(run, progress, message);
+    int result = installer_update_supervise(transaction_task, transaction, (uint64_t)seconds * 1000,
+        cancelable ? &update_cancelled : NULL, transaction_pulse, transaction);
+    transaction_pulse(transaction, 0);
+    fprintf(stderr, "[installer-update] phase=%u result=%d\n", (unsigned)phase, result);
+    if (run->log) {
+        fprintf(run->log, "[installer-update] phase=%u result=%d\n", (unsigned)phase, result);
+        fflush(run->log);
+    }
+    return result;
+}
+
+static int boot_can_resume(const struct update_transaction *transaction)
+{
+    const struct installer_update_checkpoint *state = &transaction->checkpoint;
+    const struct installer_update_info *info = &transaction->target.info;
+    return (!strcmp(state->phase, "root-ready") || !strcmp(state->phase, "boot") || !strcmp(state->phase, "boot-failed")) &&
+        !strcmp(state->root_uuid, info->root_uuid) && !strcmp(state->index_sha256, info->index_sha256) &&
+        !strcmp(state->database_sha256, info->database_sha256) && !strcmp(state->world_sha256, info->world_sha256);
+}
+
+/* One coordinator owns the update lock from discovery through unmount. Every
+ * blocking stage has a separate process group and hard deadline. Inspection
+ * never remounts writable and apply never reruns an independent --check. APK
+ * performs its own signature/solver preflight immediately before committing. */
+static int execute(const char *disk, const struct installer_update_info *expected, unsigned modes,
+    struct installer_update_info *out, installer_update_observer observer, void *context,
+    const char *root_uuid, const char *esp_uuid, int use_indices, int root_index, int esp_index)
+{
+    memset(out, 0, sizeof(*out));
+    if (geteuid()) { out->error_number = EACCES; strcpy(out->failure, N_("Administrator privileges are required")); return -EACCES; }
+    struct update_transaction *transaction = mmap(NULL, sizeof(*transaction), PROT_READ | PROT_WRITE,
+        MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+    if (transaction == MAP_FAILED) { out->error_number = errno; return -errno; }
+    memset(transaction, 0, sizeof(*transaction));
+    struct update_run run = {.observer = observer, .context = context, .stage = N_("Preparing update session"),
+        .out = out, .applying = expected != NULL};
+    transaction->coordinator = &run;
+    transaction->target.lock_fd = -1;
+    transaction->applying = expected != NULL;
+    transaction->modes = modes;
+    transaction->use_indices = use_indices;
+    transaction->root_index = root_index; transaction->esp_index = esp_index;
+    snprintf(transaction->disk, sizeof(transaction->disk), "%s", disk);
+    if (root_uuid) snprintf(transaction->root_uuid, sizeof(transaction->root_uuid), "%s", root_uuid);
+    if (esp_uuid) snprintf(transaction->esp_uuid, sizeof(transaction->esp_uuid), "%s", esp_uuid);
+    if (expected) {
+        transaction->expected = *expected;
+        strcpy(transaction->root_uuid, expected->root_uuid);
+        strcpy(transaction->esp_uuid, expected->esp_uuid);
+    }
+    int log_fd = open(UPDATE_LOG, O_WRONLY | O_APPEND | O_CREAT | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK, 0600);
+    struct stat log_status;
+    int result = 0;
+    if (log_fd < 0) result = -errno;
+    else if (fstat(log_fd, &log_status) < 0) result = -errno;
+    else if (!S_ISREG(log_status.st_mode) || log_status.st_uid || log_status.st_nlink != 1) result = -EINVAL;
+    if (!result) {
+        run.log = fdopen(log_fd, "a");
+        if (!run.log) result = -errno;
+    }
+    if (result) {
+        if (log_fd >= 0) close(log_fd);
+        strcpy(out->failure, N_("Writing the update log")); out->error_number = -result;
+        munmap(transaction, sizeof(*transaction)); return result;
+    }
+    update_cancelled = 0;
+    struct sigaction action = {.sa_handler = request_cancel}, old_term, old_int, old_hup;
+    sigemptyset(&action.sa_mask);
+    sigaction(SIGTERM, &action, &old_term); sigaction(SIGINT, &action, &old_int); sigaction(SIGHUP, &action, &old_hup);
+    result = installer_update_target_lock(&transaction->target);
+    if (result) goto finish;
+#define PHASE(id, pct, text, limit) do { \
+    result = run_phase(transaction, id, pct, text, limit, !transaction->applying); \
+    if (result) goto finish; \
+} while (0)
+    PHASE(PHASE_IDENTIFY, 2, N_("Identifying the installed system"), 120);
+    PHASE(PHASE_MEDIA, 10, N_("Checking installation media and free space"), 180);
+    PHASE(PHASE_BOOT_SOURCE, 16, N_("Checking bootloader files on the installation media"), 300);
+    PHASE(PHASE_BOOT_TARGET, 20, N_("Checking the installed bootloader layout"), 180);
+    if (!transaction->applying) {
+        if (!boot_can_resume(transaction)) PHASE(PHASE_PLAN, 24, N_("Verifying signed packages and dependencies"), 900);
+        goto finish;
+    }
+    /* Cancellation cannot interrupt a commit. Deadlines still terminate failed
+     * commands; the durable checkpoint then selects a repair or boot retry. */
+    int resume_boot = boot_can_resume(transaction);
+    PHASE(PHASE_WRITABLE, 30, N_("Preparing the installed system for update"), 120);
+    PHASE(PHASE_RECOVER, 32, N_("Recovering the previous update attempt"), 300);
+    if (!resume_boot) {
+        PHASE(PHASE_PACKAGES, 38, N_("Applying signed system packages"), 3600);
+        PHASE(PHASE_ROOT_READY, 78, N_("Synchronizing the updated root filesystem"), 300);
+    }
+    PHASE(PHASE_BOOT, 86, N_("Publishing kernel and bootloader files"), 600);
+    PHASE(PHASE_DONE, 98, N_("Finishing the system update"), 300);
+#undef PHASE
+finish:
+    *out = transaction->target.info;
+    out->activity = run.activity;
+    char failure[128];
+    snprintf(failure, sizeof(failure), "%s", run.stage);
+    /* Cleanup has its own deadline and cannot be cancelled by another click.
+     * The parent retains its inherited file lock until all writers are reaped. */
+    if (transaction->target.lock_fd >= 0) {
+        int cleanup = run_phase(transaction, PHASE_CLEANUP, run.progress, N_("Closing the update target"), 120, 0);
+        int unlock = installer_update_target_unlock(&transaction->target);
+        if (!result) { result = cleanup ? cleanup : unlock; if (result) snprintf(failure, sizeof(failure), "%s", run.stage); }
+        if (cleanup) fprintf(stderr, "[installer-update] cleanup failed: %s (%d)\n", strerror(-cleanup), cleanup);
+    }
+    if (result) {
+        out->error_number = -result;
+        snprintf(out->failure, sizeof(out->failure), "%s", result == -ECANCELED ? N_("Update check cancelled") : failure);
+        fprintf(stderr, "[installer-update] %s: %s (%d)\n", out->failure, strerror(-result), result);
+        fprintf(run.log, "[installer-update] %s: %s (%d)\n", out->failure, strerror(-result), result);
+    } else report(&run, 100, transaction->applying ? N_("System update completed successfully") : N_("Update checks completed"));
+    if (fclose(run.log) && !result) { result = -errno; out->error_number = -result; strcpy(out->failure, N_("Writing the update log")); }
+    sigaction(SIGTERM, &old_term, NULL); sigaction(SIGINT, &old_int, NULL); sigaction(SIGHUP, &old_hup, NULL);
+    munmap(transaction, sizeof(*transaction));
+    return result;
+}
+
+int installer_update_check(const char *disk, struct installer_update_info *info,
+    installer_update_observer observer, void *context)
+{
+    return installer_update_check_target(disk, NULL, NULL, info, observer, context);
 }
 
 int installer_update_check_target(const char *disk, const char *root_uuid, const char *esp_uuid,
-                                 struct installer_update_info *info,
-                                 installer_update_observer observer, void *context)
+    struct installer_update_info *info, installer_update_observer observer, void *context)
 {
-    if (!disk || !info || (root_uuid && *root_uuid && strlen(root_uuid) != 36) ||
-        (esp_uuid && *esp_uuid && strlen(esp_uuid) != 36)) return -EINVAL;
-    return execute(disk, NULL, 0, info, observer, context, root_uuid, esp_uuid);
+    if (!disk || !info || strlen(disk) >= sizeof(info->disk) ||
+        (root_uuid && *root_uuid && strlen(root_uuid) != 36) || (esp_uuid && *esp_uuid && strlen(esp_uuid) != 36)) return -EINVAL;
+    return execute(disk, NULL, 0, info, observer, context, root_uuid, esp_uuid, 0, -1, -1);
+}
+
+int installer_update_check_indices(const char *disk, int root_index, int esp_index,
+    struct installer_update_info *info, installer_update_observer observer, void *context)
+{
+    if (!disk || !info || strlen(disk) >= sizeof(info->disk) || root_index < -1 || esp_index < -1) return -EINVAL;
+    return execute(disk, NULL, 0, info, observer, context, NULL, NULL, 1, root_index, esp_index);
 }
 
 int installer_update_apply(const struct installer_update_info *expected, unsigned modes,
-                           struct installer_update_info *result,
-                           installer_update_observer observer, void *context)
+    struct installer_update_info *result, installer_update_observer observer, void *context)
 {
     if (!expected || !result || !expected->root_uuid[0] || !expected->esp_uuid[0] ||
-        strlen(expected->index_sha256) != 64 || strlen(expected->database_sha256) != 64 ||
-        strlen(expected->world_sha256) != 64 || modes > 3) {
+        !memchr(expected->disk, 0, sizeof(expected->disk)) ||
+        strnlen(expected->root_uuid, sizeof(expected->root_uuid)) != 36 ||
+        strnlen(expected->esp_uuid, sizeof(expected->esp_uuid)) != 36 ||
+        strnlen(expected->index_sha256, sizeof(expected->index_sha256)) != 64 ||
+        strnlen(expected->database_sha256, sizeof(expected->database_sha256)) != 64 ||
+        strnlen(expected->world_sha256, sizeof(expected->world_sha256)) != 64 || modes > 3) {
         if (result) { memset(result, 0, sizeof(*result)); result->error_number = EINVAL; }
         return -EINVAL;
     }
-    return execute(expected->disk, expected, modes, result, observer, context, NULL, NULL);
+    /* Copy before zeroing result: callers may reuse the inspected structure. */
+    struct installer_update_info inspected = *expected;
+    return execute(inspected.disk, &inspected, modes, result, observer, context, NULL, NULL, 0, -1, -1);
+}
+
+
+/* Telemetry is dispensable; final metadata is not. A stalled reader can never
+ * hold the storage lock: writes are atomic bounded lines with a finite drain. */
+static int worker_line(int final, const char *format, ...)
+{
+    char line[512];
+    va_list arguments;
+    va_start(arguments, format);
+    int size = vsnprintf(line, sizeof(line), format, arguments);
+    va_end(arguments);
+    if (size < 0 || (size_t)size >= sizeof(line)) return -EOVERFLOW;
+    for (unsigned retries = 0; ; ++retries) {
+        ssize_t count = write(STDOUT_FILENO, line, (size_t)size);
+        if (count == size) return 0;
+        if (count < 0 && errno == EINTR) continue;
+        if (count < 0 && (errno == EAGAIN || errno == EWOULDBLOCK) && final && retries < 20) {
+            struct pollfd descriptor = {.fd = STDOUT_FILENO, .events = POLLOUT};
+            (void)poll(&descriptor, 1, 100);
+            continue;
+        }
+        return count < 0 ? -errno : -EIO;
+    }
 }
 
 static void worker_progress(void *context, unsigned progress, const char *message)
 {
-    printf("progress\t%u\t%s\n", progress, message);
+    (void)worker_line(0, "progress\t%u\t%s\n", progress, message);
     const struct installer_update_info *info = context;
     char activity[512];
     if (info && info->activity.step && !installer_update_activity_encode(&info->activity, activity, sizeof(activity)))
-        puts(activity);
-    fflush(stdout);
+        (void)worker_line(0, "%s\n", activity);
 }
 
-static void worker_info(const struct installer_update_info *info)
+static int worker_info(const struct installer_update_info *info)
 {
-#define FIELD(name) printf("info\t%s\t%s\n", #name, info->name)
+    int result = 0;
+#define FIELD(name) if (!result) result = worker_line(1, "info\t%s\t%s\n", #name, info->name)
     FIELD(disk); FIELD(root_device); FIELD(esp_device); FIELD(root_uuid); FIELD(esp_uuid);
     FIELD(boot_file);
     FIELD(installed_version); FIELD(media_version); FIELD(profile); FIELD(installed_kernel);
     FIELD(media_kernel); FIELD(index_sha256); FIELD(database_sha256); FIELD(world_sha256); FIELD(pending);
 #undef FIELD
-    printf("info\tfree_bytes\t%llu\ninfo\trequired_bytes\t%llu\ninfo\tboot_modes\t%u\n",
-           (unsigned long long)info->free_bytes, (unsigned long long)info->required_bytes, info->boot_modes);
+    if (!result) result = worker_line(1, "info\tfree_bytes\t%llu\ninfo\trequired_bytes\t%llu\ninfo\tboot_modes\t%u\n",
+        (unsigned long long)info->free_bytes, (unsigned long long)info->required_bytes, info->boot_modes);
+    return result;
+}
+
+static int worker_index(const char *text, int *value)
+{
+    char *end;
+    errno = 0;
+    long number = strtol(text, &end, 10);
+    if (errno || !*text || *end || number < -1 || number > INT_MAX) return -EINVAL;
+    *value = (int)number;
+    return 0;
 }
 
 int installer_update_worker(int argc, char **argv)
 {
     struct installer_update_info info = {0};
-    int result;
+    int result = -EINVAL;
     setenv("PATH", "/usr/sbin:/usr/bin:/sbin:/bin", 1);
+    signal(SIGPIPE, SIG_IGN);
+    int flags = fcntl(STDOUT_FILENO, F_GETFL);
+    if (flags < 0 || fcntl(STDOUT_FILENO, F_SETFL, flags | O_NONBLOCK) < 0) return 1;
     if (argc == 4 && !strcmp(argv[2], "check")) {
         result = installer_update_check(argv[3], &info, worker_progress, &info);
     } else if (argc == 6 && !strcmp(argv[2], "check")) {
         result = installer_update_check_target(argv[3], argv[4], argv[5], &info, worker_progress, &info);
+    } else if (argc == 6 && !strcmp(argv[2], "check-index")) {
+        int root, esp;
+        result = worker_index(argv[4], &root);
+        if (!result) result = worker_index(argv[5], &esp);
+        if (!result) result = installer_update_check_indices(argv[3], root, esp, &info, worker_progress, &info);
     } else if (argc == 10 && !strcmp(argv[2], "apply")) {
         struct installer_update_info expected = {0};
-        if (strlen(argv[3]) >= sizeof(expected.disk) || strlen(argv[4]) != 36 || strlen(argv[5]) != 36 ||
-            strlen(argv[6]) != 64 || strlen(argv[7]) != 64 || strlen(argv[8]) != 64 ||
-            strlen(argv[9]) != 1 || *argv[9] < '0' || *argv[9] > '3') return 2;
-        strcpy(expected.disk, argv[3]); strcpy(expected.root_uuid, argv[4]); strcpy(expected.esp_uuid, argv[5]);
-        strcpy(expected.index_sha256, argv[6]); strcpy(expected.database_sha256, argv[7]);
-        strcpy(expected.world_sha256, argv[8]);
-        result = installer_update_apply(&expected, (unsigned)(*argv[9] - '0'), &info, worker_progress, &info);
-    } else return 2;
-    worker_info(&info);
-    if (result) printf("error\t%d\t%s\n", -result, info.failure[0] ? info.failure : N_("Update worker failed"));
-    fflush(stdout);
-    return result ? 1 : 0;
+        if (strlen(argv[3]) < sizeof(expected.disk) && strlen(argv[4]) == 36 && strlen(argv[5]) == 36 &&
+            strlen(argv[6]) == 64 && strlen(argv[7]) == 64 && strlen(argv[8]) == 64 &&
+            strlen(argv[9]) == 1 && *argv[9] >= '0' && *argv[9] <= '3') {
+            strcpy(expected.disk, argv[3]); strcpy(expected.root_uuid, argv[4]); strcpy(expected.esp_uuid, argv[5]);
+            strcpy(expected.index_sha256, argv[6]); strcpy(expected.database_sha256, argv[7]);
+            strcpy(expected.world_sha256, argv[8]);
+            result = installer_update_apply(&expected, (unsigned)(*argv[9] - '0'), &info, worker_progress, &info);
+        }
+    }
+    int output = worker_info(&info);
+    if (result && !output) output = worker_line(1, "error\t%d\t%s\n", -result,
+        info.failure[0] ? info.failure : N_("Update worker failed"));
+    if (!output) output = worker_line(1, "result\t%d\t%s\n", result ? -result : 0,
+        result ? N_("Update worker failed") : N_("Update session completed"));
+    return result || output ? 1 : 0;
 }

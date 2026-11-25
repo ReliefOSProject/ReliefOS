@@ -10,17 +10,30 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 static int progress_fd = -1;
 static struct installer_job_packet pending;
 static size_t pending_offset, pending_size;
 
+#ifndef INSTALLER_JOB_FINISH_TIMEOUT_MS
+#define INSTALLER_JOB_FINISH_TIMEOUT_MS 2000
+#endif
+
+static uint64_t monotonic_ms(void)
+{
+    struct timespec now;
+    if (clock_gettime(CLOCK_MONOTONIC, &now) < 0) return 0;
+    return (uint64_t)now.tv_sec * 1000u + (uint64_t)now.tv_nsec / 1000000u;
+}
+
 int installer_job_is_worker(void) { return progress_fd >= 0; }
 
 /* A partially written record stays intact until the parent has consumed it. */
 static int flush_packet(int wait)
 {
+    uint64_t start = monotonic_ms();
     while (pending_offset < pending_size) {
         ssize_t count = write(progress_fd, (char *)&pending + pending_offset,
                               pending_size - pending_offset);
@@ -28,9 +41,13 @@ static int flush_packet(int wait)
         if (count < 0 && errno == EINTR) continue;
         if (count < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
             if (!wait) return 1;
+            uint64_t now = monotonic_ms();
+            if (now < start || now - start >= INSTALLER_JOB_FINISH_TIMEOUT_MS) return -1;
             struct pollfd descriptor = {.fd = progress_fd, .events = POLLOUT};
             int result;
-            do { result = poll(&descriptor, 1, -1); } while (result < 0 && errno == EINTR);
+            int remaining = INSTALLER_JOB_FINISH_TIMEOUT_MS - (int)(now - start);
+            result = poll(&descriptor, 1, remaining);
+            if (result < 0 && errno == EINTR) continue;
             if (result > 0 && !(descriptor.revents & (POLLERR | POLLHUP | POLLNVAL))) continue;
         }
         return -1;
@@ -118,6 +135,7 @@ int installer_job_step(struct installer_job *job)
         budget -= (size_t)count;
         job->received += (size_t)count;
         if (job->received != sizeof(job->incoming)) continue;
+        if (job->complete || job->incoming.progress > 100) job->error = EPROTO;
         job->incoming.message[sizeof(job->incoming.message) - 1] = 0;
         job->incoming.detail[sizeof(job->incoming.detail) - 1] = 0;
         job->latest = job->incoming;
@@ -129,8 +147,17 @@ int installer_job_step(struct installer_job *job)
     }
     if (!job->exited) {
         pid_t result = waitpid(job->pid, &job->status, WNOHANG);
-        if (result == job->pid) job->exited = 1;
-        else if (result < 0 && errno != EINTR) { job->exited = 1; job->error = errno; }
+        if (result == job->pid) { job->exited = 1; job->exited_ms = monotonic_ms(); }
+        else if (result < 0 && errno != EINTR) {
+            job->exited = 1; job->exited_ms = monotonic_ms(); job->error = errno;
+        }
+    }
+    if (job->exited && !job->eof) {
+        uint64_t now = monotonic_ms();
+        if (now < job->exited_ms || now - job->exited_ms >= INSTALLER_JOB_FINISH_TIMEOUT_MS) {
+            job->eof = 1;
+            job->error = EPIPE;
+        }
     }
     if (!job->exited || !job->eof) return 1;
     close(job->fd); job->fd = -1;
@@ -138,4 +165,10 @@ int installer_job_step(struct installer_job *job)
         !WIFEXITED(job->status) || WEXITSTATUS(job->status))
         return job->error ? -job->error : -EIO;
     return 0;
+}
+
+int installer_job_request_stop(struct installer_job *job)
+{
+    if (!job || job->pid <= 0 || job->exited) return -EINVAL;
+    return kill(job->pid, SIGTERM) < 0 ? -errno : 0;
 }

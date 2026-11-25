@@ -985,6 +985,30 @@ size_t Process::errors_size() const
     return state ? state->errors_length : 0;
 }
 
+void Process::consume_output(size_t count)
+{
+    State *state = static_cast<State *>(state_);
+    if (!state || !count) return;
+    if (count > state->output_length) count = state->output_length;
+    state->output_length -= count;
+    if (state->output_data) {
+        memmove(state->output_data, state->output_data + count, state->output_length);
+        state->output_data[state->output_length] = 0;
+    }
+}
+
+void Process::consume_errors(size_t count)
+{
+    State *state = static_cast<State *>(state_);
+    if (!state || !count) return;
+    if (count > state->errors_length) count = state->errors_length;
+    state->errors_length -= count;
+    if (state->errors_data) {
+        memmove(state->errors_data, state->errors_data + count, state->errors_length);
+        state->errors_data[state->errors_length] = 0;
+    }
+}
+
 bool Process::truncated() const
 {
     const State *state = static_cast<const State *>(state_);
@@ -1042,6 +1066,13 @@ bool Process::cancel()
     if (!state || !state->active || !state->cancelable) return false;
     request_termination(state);
     return true;
+}
+
+bool Process::request_stop()
+{
+    State *state = static_cast<State *>(state_);
+    if (!state || !state->active || state->reaped || state->pid <= 0 || !state->cancelable) return false;
+    return kill(state->pid, SIGTERM) == 0;
 }
 
 } // namespace ra

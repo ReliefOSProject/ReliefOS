@@ -116,8 +116,9 @@ static ra::Process update_process;
 static struct installer_update_info update_info;
 static Fl_Text_Buffer *update_log_buffer;
 static Fl_Text_Display *update_log_display;
-static size_t update_stdout_offset, update_stderr_offset;
 static int update_job, update_checked, update_protocol_error;
+static int update_cancel_requested;
+static struct installer_update_session update_session;
 static char update_message[256];
 static struct installer_job install_job;
 static char installed_boot_file[128];
@@ -295,8 +296,9 @@ static void update_footer(void)
     else back_button->deactivate();
     if (primary_disabled()) primary_button->deactivate();
     else primary_button->activate();
-    if (installer_model_can_cancel((enum installer_page)page, install_success) &&
-        !ui_busy) cancel_button->activate();
+    cancel_button->copy_label(update_job == 1 ? T("Cancel check") : T("Cancel"));
+    if ((update_job == 1 && !update_cancel_requested) ||
+        (installer_model_can_cancel((enum installer_page)page, install_success) && !ui_busy)) cancel_button->activate();
     else cancel_button->deactivate();
 }
 
@@ -409,17 +411,19 @@ static void update_pump(void *)
     update_process.step(16384);
     const char *output = update_process.output();
     size_t length = update_process.output_size();
+    size_t update_stdout_offset = 0;
     while (update_stdout_offset < length) {
         const char *line = output + update_stdout_offset;
         const char *end = static_cast<const char *>(memchr(line, '\n', length - update_stdout_offset));
         if (!end) break;
         size_t bytes = static_cast<size_t>(end - line);
         char text[512];
-        if (bytes < sizeof(text)) {
+        if (bytes < sizeof(text) && !memchr(line, '\0', bytes)) {
             memcpy(text, line, bytes);
             text[bytes] = 0;
             unsigned value = progress_value;
-            int result = installer_update_decode(&update_info, &value, update_message, sizeof(update_message), text);
+            int result = installer_update_session_line(&update_session, &update_info, &value,
+                update_message, sizeof(update_message), text);
             if (result < 0) update_protocol_error = 1;
             if (result == 2 || result == 3) {
                 progress_value = value;
@@ -431,31 +435,47 @@ static void update_pump(void *)
                                                      sizeof(update_activity_text)))
                     update_protocol_error = 1;
             }
-        }
+        } else update_protocol_error = 1;
         update_stdout_offset += bytes + 1;
     }
+    update_process.consume_output(update_stdout_offset);
+    if (update_process.output_size() >= 512 || update_process.truncated()) {
+        update_protocol_error = 1;
+        update_process.consume_output(update_process.output_size());
+    }
     size_t errors = update_process.errors_size();
-    if (errors > update_stderr_offset) {
+    if (errors) {
         const char *logs = update_process.errors();
-        fwrite(logs + update_stderr_offset, 1, errors - update_stderr_offset, stderr);
-        update_stderr_offset = errors;
         if (update_log_buffer) {
-            size_t start = errors > 65536 ? errors - 65536 : 0;
-            while (start < errors && (static_cast<unsigned char>(logs[start]) & 0xc0) == 0x80) ++start;
-            update_log_buffer->text(logs + start);
+            update_log_buffer->append(logs);
+            if (update_log_buffer->length() > 65536) {
+                int start = update_log_buffer->length() - 65536;
+                while (start < update_log_buffer->length() &&
+                    (static_cast<unsigned char>(update_log_buffer->byte_at(start)) & 0xc0) == 0x80) ++start;
+                update_log_buffer->remove(0, start);
+            }
             if (update_log_display) {
                 update_log_display->insert_position(update_log_buffer->length());
                 update_log_display->show_insert_position();
             }
         }
+        update_process.consume_errors(errors);
     }
     refresh_status_widgets();
     if (update_process.running()) { Fl::repeat_timeout(0.08, update_pump); return; }
+    if (update_process.output_size()) update_protocol_error = 1;
+    int session_result = installer_update_session_finish(&update_session, &update_info);
     int checking = update_job == 1;
     update_job = 0;
     ui_busy = 0;
     install_running = 0;
-    if (update_process.exit_code() == 0 && !update_protocol_error && !update_info.error_number) {
+    if (checking && !update_protocol_error && (session_result == -ECANCELED ||
+        (update_cancel_requested && !session_result && update_process.exit_code() == 0))) {
+        update_checked = 0;
+        page = INSTALLER_PAGE_DISK;
+        memset(&update_info, 0, sizeof(update_info));
+        set_status(T("Update check canceled"), T("Select a disk or run the checks again."));
+    } else if (update_process.exit_code() == 0 && !update_protocol_error && !session_result) {
         if (checking) {
             update_checked = 1;
             fprintf(stderr, "[installer.elf] inspection complete\n");
@@ -473,7 +493,8 @@ static void update_pump(void *)
     } else {
         page = INSTALLER_PAGE_FINISH;
         install_success = 0;
-        int error = update_info.error_number ? update_info.error_number
+        int error = update_protocol_error || session_result == -EPROTO ? EPROTO
+            : update_info.error_number ? update_info.error_number
             : update_process.exec_error() ? update_process.exec_error() : EIO;
         char detail[128];
         snprintf(detail, sizeof(detail), "%s (%d)", strerror(error), error);
@@ -489,9 +510,10 @@ static void start_update_job(int applying)
     if (!applying) memset(&update_info, 0, sizeof(update_info));
     update_checked = 0;
     update_protocol_error = 0;
+    update_cancel_requested = 0;
+    memset(&update_session, 0, sizeof(update_session));
     memset(&update_info.activity, 0, sizeof(update_info.activity));
     update_activity_text[0] = 0;
-    update_stdout_offset = update_stderr_offset = 0;
     if (!update_log_buffer) update_log_buffer = new Fl_Text_Buffer();
     update_log_buffer->text("");
     char executable[PATH_MAX], modes[2] = {
@@ -505,24 +527,14 @@ static void start_update_job(int applying)
         return;
     }
     executable[bytes] = 0;
-    char root_uuid[37] = {0}, esp_uuid[37] = {0};
-    if (!applying) {
-        int error = 0;
-        if (installer_root_partition >= 0)
-            error = reliefos_block_partition_uuid(disks[selected_disk].path, installer_root_partition, root_uuid);
-        if (!error && installer_esp_partition >= 0)
-            error = reliefos_block_partition_uuid(disks[selected_disk].path, installer_esp_partition, esp_uuid);
-        if (error) {
-            set_error_status(T("Cannot identify the selected partitions"), error);
-            schedule_render();
-            return;
-        }
-    }
-    const char *check[] = {executable, "--update-worker", "check", disks[selected_disk].path, root_uuid, esp_uuid, NULL};
+    char root_index[16], esp_index[16];
+    snprintf(root_index, sizeof(root_index), "%d", installer_root_partition);
+    snprintf(esp_index, sizeof(esp_index), "%d", installer_esp_partition);
+    const char *check[] = {executable, "--update-worker", "check-index", disks[selected_disk].path, root_index, esp_index, NULL};
     const char *apply[] = {executable, "--update-worker", "apply", update_info.disk,
         update_info.root_uuid, update_info.esp_uuid, update_info.index_sha256, update_info.database_sha256,
         update_info.world_sha256, modes, NULL};
-    if (!update_process.start(applying ? apply : check, false, ra::AuthMode::Sudo, false)) {
+    if (!update_process.start(applying ? apply : check, false, ra::AuthMode::Sudo, !applying)) {
         page = INSTALLER_PAGE_FINISH;
         install_success = 0;
         set_status(T("Cannot start the update worker"), strerror(update_process.exec_error() ? update_process.exec_error() : EIO));
@@ -551,6 +563,16 @@ static void close_now(void)
 
 static void cancel_setup(Fl_Widget *, void *)
 {
+    if (update_job == 1) {
+        if (!update_cancel_requested && update_process.request_stop()) {
+            update_cancel_requested = 1;
+            copy_text(status_text, sizeof(status_text), T("Canceling the update check"));
+            copy_text(progress_text, sizeof(progress_text), T("Waiting for the check to release its resources."));
+            update_footer();
+            refresh_status_widgets();
+        }
+        return;
+    }
     if (ui_busy || !installer_model_can_cancel((enum installer_page)page, install_success)) return;
     if (page != INSTALLER_PAGE_FINISH &&
         fl_choice("%s", T("Keep configuring"), T("Exit installer"), NULL,

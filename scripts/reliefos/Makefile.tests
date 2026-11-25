@@ -119,6 +119,11 @@ test-build: sdk rootfs-raw $(HOST_RUNTIME_DEVELOPMENT_PRODUCTS) test-tools $(REL
 	+@$(call RELIEFOS_RUN_CONTRACT_TESTS,$(RELIEFOS_SELECTED_BUILD_TESTS))
 	@$(RELIEFOS_TEST_PYTHON) $(RELIEFOS_SRC)/tools/test_xorg_qemu.py --source-only
 
+# The signed Installer update fixtures use the real APK producer and installed
+# Bash. Require the managed tree explicitly so a clean `make test-build` has
+# the same inputs as CI after its image build.
+test-build: $(UPSTREAM_APK) $(APK_MANAGED_ROOT)/.apk-complete
+
 .PHONY: test-ci-validate test-ci-kernel test-ci-auth test-ci-pages
 test-ci-validate:
 	@$(RELIEFOS_TEST_PYTHON) '$(RELIEFOS_CI_SELECTOR)' --root '$(RELIEFOS_SRC)' --check

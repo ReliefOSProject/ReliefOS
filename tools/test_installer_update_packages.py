@@ -35,6 +35,7 @@ class UpdatePreflight(unittest.TestCase):
                      "target/home/test", "target/usr/share/external", "target/bin",
                      "target/usr/lib/reliefos", "target/var/lib/reliefos"):
             (cls.base / name).mkdir(parents=True, exist_ok=True)
+        (cls.base / "dev/null").touch()
         shutil.copy2(BUSYBOX, cls.base / "bin/busybox")
         for name in subprocess.check_output([BUSYBOX, "--list"], text=True).splitlines():
             if name != "busybox":
@@ -124,9 +125,16 @@ class UpdatePreflight(unittest.TestCase):
         return {str(path.relative_to(target)): hashlib.sha256(path.read_bytes()).hexdigest()
                 for path in target.rglob("*") if path.is_file() and not path.is_symlink()}
 
-    def transaction(self, mode="--check", expected=None, cache_readonly=False, readonly_tmp=False):
-        readonly = ('mount --bind "$1/target" "$1/target"; '
-                    'mount -o remount,bind,ro "$1/target"; ') if mode == "--check" else ""
+    def transaction(self, mode="--check", expected=None, cache_readonly=False, readonly_tmp=False,
+                    runtime_limit=None, owned_workspace=False):
+        # Give /target its own mount before making the live root read-only.
+        # Only apply may write it; /run is the sole writable live filesystem.
+        readonly = 'mount --bind "$1/target" "$1/target"; '
+        if mode == "--check":
+            readonly += 'mount -o remount,bind,ro "$1/target"; '
+        # The installation medium is immutable in every helper mode.
+        readonly += ('mount --bind "$1/newrepo" "$1/newrepo"; '
+                     'mount -o remount,bind,ro "$1/newrepo"; ')
         if cache_readonly:
             readonly += ('mount --bind "$1/target/usr/share/reliefos/apk/repository" '
                          '"$1/target/usr/share/reliefos/apk/repository"; '
@@ -134,18 +142,29 @@ class UpdatePreflight(unittest.TestCase):
         if readonly_tmp:
             readonly += ('mount --bind "$1/tmp" "$1/tmp"; '
                          'mount -o remount,bind,ro "$1/tmp"; ')
+        readonly += ('mount -t tmpfs -o size=' + str(runtime_limit or 16 * 1024**2)
+                     + ' tmpfs "$1/run"; ')
+        if owned_workspace:
+            readonly += ('mkdir -p "$1/run/owned-update"; mount -t tmpfs -o size='
+                         + str(runtime_limit or 16 * 1024**2)
+                         + ' tmpfs "$1/run/owned-update"; mount -o remount,ro "$1/run"; ')
+        readonly += 'mount -o remount,bind,ro "$1"; '
         result = subprocess.run([
             "unshare", "-Urmp", "--fork", "sh", "-eu", "-c",
             'mount --make-rprivate /; mount --bind "$1" "$1"; '
             # musl falls back to /proc/self/fd for fchmodat(AT_SYMLINK_NOFOLLOW)
             # on hosts without fchmodat2. Match the live guest's proc mount so
             # APK can restore setuid modes inside this private namespace.
-            'mount -t proc proc "$1/proc"; '
+            'mount -t proc proc "$1/proc"; mount --bind /dev/null "$1/dev/null"; '
+            'mkdir -p "$1/.oldroot"; '
             + readonly +
-            'cd "$1"; mkdir -p .oldroot; pivot_root . .oldroot; '
-            'shift; exec /bin/sh /sbin/update "$@"',
+            'cd "$1"; pivot_root . .oldroot; '
+            'shift; TMPDIR=' + ('/run/owned-update' if owned_workspace else '/run')
+            + ' exec /bin/sh /sbin/update "$@"',
             "sh", self.runner, mode, "/target", "/newrepo", *([expected] if expected else [])],
             text=True, capture_output=True, timeout=60)
+        self.assertFalse(list(self.runner.glob("*.apk")),
+                         "preflight downloaded package archives into the live root")
         return result
 
     def check(self):
@@ -165,6 +184,155 @@ class UpdatePreflight(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(self.target_snapshot(), before)
         self.assertFalse(list((self.runner / "run").glob("reliefos-update.*")))
+
+    def test_preflight_uses_the_supervisors_owned_planner_workspace(self):
+        # /run itself is read-only; only the supplied TMPDIR is writable.
+        before = self.target_snapshot()
+        result = self.transaction(runtime_limit=1024**2, owned_workspace=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.target_snapshot(), before)
+
+    def large_media_package(self):
+        # High entropy keeps the signed archive larger than the complete /run
+        # allowance. A fetch-to-tmpfs implementation cannot pass these cases.
+        self.package("reliefos-fixture", "2.0-r0", self.runner / "newrepo",
+                     payload={"usr/share/reliefos-fixture/data": os.urandom(2 * 1024**2).hex()})
+        self.index(self.runner / "newrepo")
+        archive = self.runner / "newrepo/reliefos-fixture-2.0-r0.apk"
+        self.assertGreater(archive.stat().st_size, 1024**2)
+        return archive
+
+    def test_preflight_streams_signed_archives_larger_than_runtime_tmpfs(self):
+        self.select_external_tag()
+        archive = self.large_media_package()
+        before = self.target_snapshot()
+        result = self.transaction(runtime_limit=1024**2)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(self.target_snapshot(), before)
+        self.assertIn("reliefos-fixture", result.stdout)
+        self.assertGreater(archive.stat().st_size, 1024**2)
+
+    def test_apply_streams_packages_and_caches_from_readonly_media(self):
+        archive = self.large_media_package()
+        result = self.transaction("--apply", runtime_limit=1024**2)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        cached = self.runner / "target/usr/share/reliefos/apk/repository" / archive.name
+        self.assertEqual(cached.read_bytes(), archive.read_bytes())
+        self.assertEqual((self.runner / "target/usr/share/reliefos-fixture/data").stat().st_size,
+                         4 * 1024**2)
+
+    def test_nonregular_archive_objects_are_rejected_without_blocking(self):
+        archive = self.runner / "newrepo/reliefos-fixture-2.0-r0.apk"
+        original = archive.read_bytes()
+        before = self.target_snapshot()
+        for kind in ("fifo", "symlink", "directory"):
+            with self.subTest(kind=kind):
+                archive.unlink()
+                if kind == "fifo":
+                    os.mkfifo(archive)
+                elif kind == "symlink":
+                    archive.symlink_to("../oldrepo/reliefos-fixture-1.0-r0.apk")
+                else:
+                    archive.mkdir()
+                result = self.transaction()
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("unsafe package file", result.stdout + result.stderr)
+                self.assertEqual(self.target_snapshot(), before)
+                if kind == "directory":
+                    archive.rmdir()
+                else:
+                    archive.unlink()
+                archive.write_bytes(original)
+
+    def test_oversized_archive_is_rejected_before_any_package_read(self):
+        archive = self.runner / "newrepo/reliefos-fixture-2.0-r0.apk"
+        with archive.open("wb") as stream:
+            stream.truncate(4 * 1024**3 + 1)
+        before = self.target_snapshot()
+        result = self.transaction()
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("size limit", result.stdout + result.stderr)
+        self.assertEqual(self.target_snapshot(), before)
+
+    def test_metadata_and_trust_key_fifos_are_rejected_without_blocking(self):
+        for relative in ("target/etc/apk/world", "target/lib/apk/db/installed", "target/etc/apk/arch",
+                         "newrepo/packages.adb", "target/etc/apk/keys/test.rsa.pub"):
+            with self.subTest(path=relative):
+                path = self.runner / relative
+                original = path.read_bytes()
+                path.unlink()
+                os.mkfifo(path)
+                result = self.transaction()
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("unsafe package file", result.stdout + result.stderr)
+                path.unlink()
+                path.write_bytes(original)
+
+    def test_oversized_planning_metadata_is_rejected_before_copy(self):
+        for relative, limit in (("target/etc/apk/world", 1024**2),
+                                ("target/lib/apk/db/installed", 64 * 1024**2),
+                                ("newrepo/packages.adb", 16 * 1024**2)):
+            with self.subTest(path=relative):
+                path = self.runner / relative
+                original = path.read_bytes()
+                with path.open("wb") as stream:
+                    stream.truncate(limit + 1)
+                result = self.transaction(runtime_limit=1024**2)
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("size limit", result.stdout + result.stderr)
+                path.write_bytes(original)
+
+    def test_signed_archive_not_matching_index_is_rejected_before_changes(self):
+        # A second valid signature does not make these bytes the archive
+        # selected by the signed index.
+        self.package("reliefos-fixture", "2.0-r0", self.runner / "oldrepo",
+                     payload={"usr/share/reliefos-fixture/version": "different signed content"})
+        shutil.copy2(self.runner / "oldrepo/reliefos-fixture-2.0-r0.apk",
+                     self.runner / "newrepo/reliefos-fixture-2.0-r0.apk")
+        before = self.target_snapshot()
+        for mode in ("--check", "--apply"):
+            with self.subTest(mode=mode):
+                result = self.transaction(mode)
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("ADB integrity error", result.stdout + result.stderr)
+                self.assertEqual(self.target_snapshot(), before)
+
+    def test_unselected_and_older_archive_identities_are_checked_before_caching(self):
+        # Neither version belongs to the target's world. Both are nevertheless
+        # part of the complete offline repository that apply will publish.
+        for version in ("1.0-r0", "2.0-r0"):
+            self.package("unused-extra", version, self.runner / "newrepo")
+        self.index(self.runner / "newrepo")
+        self.package("unused-extra", "1.0-r0", self.runner / "oldrepo",
+                     payload={"usr/share/unused-extra/version": "different signed content"})
+        shutil.copy2(self.runner / "oldrepo/unused-extra-1.0-r0.apk",
+                     self.runner / "newrepo/unused-extra-1.0-r0.apk")
+        before = self.target_snapshot()
+        for mode in ("--check", "--apply"):
+            with self.subTest(mode=mode):
+                result = self.transaction(mode)
+                self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("unused-extra-1.0-r0", result.stdout + result.stderr)
+                self.assertIn("ADB integrity error", result.stdout + result.stderr)
+                self.assertEqual(self.target_snapshot(), before)
+
+    def test_unindexed_signed_archive_is_not_published_to_offline_cache(self):
+        self.package("unused-extra", "1.0-r0", self.runner / "newrepo")
+        result = self.transaction("--apply")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        cache = self.runner / "target/usr/share/reliefos/apk/repository"
+        self.assertTrue((cache / "reliefos-fixture-2.0-r0.apk").is_file())
+        self.assertFalse((cache / "unused-extra-1.0-r0.apk").exists())
+
+    def test_missing_unselected_media_archive_is_rejected_before_changes(self):
+        self.package("unused-extra", "1.0-r0", self.runner / "newrepo")
+        self.index(self.runner / "newrepo")
+        (self.runner / "newrepo/unused-extra-1.0-r0.apk").unlink()
+        before = self.target_snapshot()
+        result = self.transaction("--apply")
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("unused-extra-1.0-r0", result.stdout + result.stderr)
+        self.assertEqual(self.target_snapshot(), before)
 
     def test_unsigned_index_is_rejected_before_target_changes(self):
         self.index(self.runner / "newrepo", signed=False)
@@ -631,8 +799,8 @@ result=$?
 if [ "${1:-}" = --root ] && [ "${2:-}" = /target ]; then
     case " $* " in
         *' upgrade '*)
-            if [ ! -e /tmp/failed-after-commit ]; then
-                touch /tmp/failed-after-commit
+            if [ ! -e /target/var/lib/reliefos/failed-after-commit ]; then
+                touch /target/var/lib/reliefos/failed-after-commit
                 echo 'ERROR: injected failure after APK committed' >&2
                 exit 42
             fi ;;
