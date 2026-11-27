@@ -1,0 +1,117 @@
+# Japanese translations for ReliefOS.
+# Copyright (C) 2026 ReliefOS contributors
+# This file is distributed under the same license as the ReliefOS project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ReliefOS 5.3.4\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-11-27 00:00+0000\n"
+"PO-Revision-Date: 2026-11-27 00:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+msgid "ReliefOS 5.3.4"
+msgstr "ReliefOS 5.3.4"
+
+msgid "更新内容"
+msgstr "変更内容"
+
+msgid ""
+"图形和 ncursesw 安装器统一为逐步向导，分别配置引导、分区、桌面和交换空间，并在写盘前显示安装摘要。IceWM 仍是默认桌面，可选离线安装实验性 XFCE "
+"或纯控制台；改进文件复制和安装进度，并记录失败阶段与文件。"
+msgstr ""
+"GUI 版と ncursesw 版のインストーラーを共通の手順に統一しました。ブート、パーティション、デスクトップ、スワップを個別に設定し、ディスク書き込み前に概要を表示します。既定は "
+"IceWM で、実験的な XFCE またはコンソールのみの構成もオフラインで選べます。ファイルコピーと進捗表示を改善し、失敗した段階やファイルを診断に記録します。"
+
+msgid "新安装 ISO 把桌面、控制台和 ESP 的安装载荷集中到只读 SquashFS，启动时挂到原有安装路径；安装器运行根仍可写，安装后的默认磁盘根仍为 ext4。"
+msgstr ""
+"新しいインストール ISO では、デスクトップ、コンソール、ESP のインストール用データを読み取り専用の SquashFS "
+"にまとめ、起動時に従来のパスへマウントします。インストーラーの実行ルートは書き込み可能で、インストール先の既定のルートは ext4 のままです。"
+
+msgid ""
+"重写安装器的离线更新：先只读预检再确认写入，分阶段监督 APK 事务和引导发布，保留已有桌面、外部软件包和受保护配置。在线更新改用原生 ``reliefos-"
+"update``，支持审阅、续传、失败修复及内核启动载荷回退。"
+msgstr ""
+"インストーラーのオフライン更新を刷新しました。書き込みの確認前に読み取り専用で事前検査し、APK "
+"処理とブートファイルの反映を段階ごとに監視します。既存のデスクトップ、外部パッケージ、保護された設定を保持します。オンライン更新はネイティブの ``reliefos-update`` "
+"に移行し、計画の確認、再開、修復、カーネル起動データのロールバックに対応します。"
+
+msgid ""
+"Xorg 镜像接入 VirtIO-GPU/VirGL 和新的 VMware SVGA II 路径，修复 XDM 在没有用户会话脚本时的选择逻辑；启用试验性 XFCE 的独立 D-Bus "
+"会话，并保留软件显示回退。"
+msgstr ""
+"Xorg イメージに VirtIO-GPU/VirGL と新しい VMware SVGA II の表示経路を統合しました。ユーザーのセッションスクリプトがない場合は XDM "
+"がシステムセッションを選びます。実験的な XFCE では独立した D-Bus セッションを開始し、ソフトウェア表示へのフォールバックも維持します。"
+
+msgid ""
+"增加 VirtIO 磁盘的安装、根设备识别及 initramfs 模块集成；修复模块冷插拔失败时 DHCP 不自启的问题。Taskmgr 使用稳定的进程描述符结束任务，Linux 程序可按需经 "
+"``linuxuname`` 启动。"
+msgstr ""
+"インストーラー、ルートデバイス検出、initramfs モジュールを VirtIO ディスクに対応させました。モジュールのコールドプラグに失敗しても DHCP "
+"が自動起動するよう修正しました。Taskmgr はタスク終了に安定したプロセス記述子を使い、Linux プログラムは必要に応じて ``linuxuname`` 経由で実行できます。"
+
+msgid ""
+"libbsd、dosfstools、e2fsprogs、util-linux 和 libmd 改用 Alpine 的签名 APK，运行配置统一提供实际的 CA 证书包；CI "
+"分组并行运行，复用构建缓存。"
+msgstr ""
+"libbsd、dosfstools、e2fsprogs、util-linux、libmd を Alpine の署名付き APK に移行し、すべての実行プロファイルに CA "
+"証明書バンドルを収録しました。CI は回帰テストをグループごとに並列実行し、ビルドキャッシュを再利用します。"
+
+msgid "破坏性更新"
+msgstr "破壊的変更"
+
+msgid ""
+"**是，涉及旧应用和自制安装介质。** 移除旧 windowd 程序和 browser 使用的 litehtml 子模块；调用旧程序入口的脚本或快捷方式应迁移到仍受支持的 X11 "
+"应用。自制安装介质的脚本必须适配独立 SquashFS 载荷；现有磁盘无需转换格式。"
+msgstr ""
+"**あり。旧アプリと独自インストールメディアに影響します。** 旧 windowd アプリと browser が使用していた litehtml "
+"サブモジュールを削除しました。旧コマンドを呼び出すスクリプトやショートカットは、対応している X11 アプリに移行してください。独自メディアを作成するスクリプトは、分離された SquashFS "
+"ペイロードへの対応が必要です。既存ディスクの形式変換は不要です。"
+
+msgid "更新与迁移注意事项"
+msgstr "更新・移行時の注意事項"
+
+msgid "本次为 **源码发布**，不附 ISO、VMDK、SDK 或 APK 二进制。源码构建前请递归同步子模块；计划更新前先备份用户文件和引导分区，检查磁盘空间与信任密钥。"
+msgstr ""
+"本版は **ソースリリース** です。ISO、VMDK、SDK、APK "
+"のバイナリーは付属しません。ソースからビルドする前にサブモジュールを再帰的に同期してください。更新前にユーザーファイルとブート用パーティションをバックアップし、空き容量と署名検証用の信頼鍵を確認してください。"
+
+msgid "离线更新不重新分区或更换桌面；在线更新的回退只覆盖内核、initramfs 和匹配模块，不撤销已提交的普通软件包。旧版若缺少本版需要的引导资源，应使用匹配的安装介质完成迁移。"
+msgstr ""
+"オフライン更新では再パーティションやデスクトップの変更を行いません。オンライン更新のロールバック対象はカーネル、initramfs "
+"と対応モジュールのみで、適用済みの一般パッケージは戻りません。古いインストールに必要な起動用ファイルがない場合は、対応するインストールメディアで移行してください。"
+
+msgid "XFCE 仍为实验性。QEMU 默认仍使用 AHCI；切换 VirtIO 磁盘需显式选择，且安装器不会在 4Kn 磁盘上执行新建分区或格式化。"
+msgstr ""
+"XFCE は引き続き実験的です。QEMU の既定は AHCI で、VirtIO ディスクは明示的な選択が必要です。また、4Kn "
+"の論理セクターを持つディスクに対して、インストーラーはパーティションの新規作成やフォーマットを行いません。"
+
+msgid "本次版本检查覆盖版本头、``VERSION_ID``、两仓的中英日文档和文档站点。未重新构建整版镜像或执行完整 QEMU 回归；**VMware 验证未完成**，未重新验证实体硬件。"
+msgstr ""
+"リリース時には生成したバージョンヘッダー、``VERSION_ID``、両リポジトリーの中英日マニュアルとドキュメントサイトを検証しました。リリース全体のイメージは再作成せず、QEMU "
+"の全回帰テストも再実行していません。 **VMware での検証は未完了** で、実機の再検証も未実施です。"
+
+msgid "开发者提示"
+msgstr "開発者向け情報"
+
+msgid ""
+"``configs/build-version`` 和 ``/etc/os-release`` 的 ``VERSION_ID`` 均为 **5.3.4**，生成数字字段为 "
+"**5/3/4**。内核提交固定为 ReliefNT v5.3.4；不要混用其他版本的模块或 initramfs。"
+msgstr ""
+"``configs/build-version`` と ``/etc/os-release`` の ``VERSION_ID`` はともに **5.3.4** で、数値フィールドは "
+"**5/3/4** です。カーネルは ReliefNT v5.3.4 に固定されています。別バージョンのモジュールや initramfs を混在させないでください。"
+
+msgid ""
+"发布范围为上一版本提交 ``e6079844756d023d16ca78715b8b3a9d299ac091`` 之后至本次版本提交，仅汇总 ReliefOS 主仓的有效更改；内核实现另见 "
+"ReliefNT 发布说明。"
+msgstr ""
+"対象は前回のバージョンコミット ``e6079844756d023d16ca78715b8b3a9d299ac091`` の直後から今回のバージョンコミットまでです。ReliefOS "
+"リポジトリーで有効な変更のみをまとめています。カーネルの実装変更は ReliefNT のリリースノートを参照してください。"
