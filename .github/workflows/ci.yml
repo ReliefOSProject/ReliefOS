@@ -2,9 +2,9 @@ name: ReliefOS CI
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, rewrite/new-os]
   push:
-    branches: [main]
+    branches: [main, rewrite/new-os]
   workflow_dispatch:
     inputs:
       installer_root_size_mib:
