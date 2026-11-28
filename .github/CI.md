@@ -2,13 +2,14 @@
 
 ```mermaid
 flowchart TD
-    A[PR / main push / manual run] --> B[Select checks]
+    A[PR / branch push / manual run] --> B[Select checks]
     A --> C[Workflow and orchestration checks]
     B --> D[Documentation: Sphinx 5 / 7 / 9]
     B --> L[Restore verified downloads and compiler cache]
     L --> E[Build images and Pages once]
     E --> F[Product and core regressions]
     B --> R[Isolated regressions: kernel / auth / pages]
+    B --> M[Migration: Ubuntu and Debian host entry]
     F --> G[Record commit and SHA-256 / upload products]
     G --> H[BIOS: disk / live / installer]
     G --> I[UEFI: disk / live / installer]
@@ -16,6 +17,7 @@ flowchart TD
     C --> J
     D --> J
     R --> J
+    M --> J
     H --> J
     I --> J
     J --> K[Deploy the verified Pages artifact on main]
@@ -31,8 +33,14 @@ workflows. Job dependencies form the native graph on the Actions run page.
 PRs changing only manuals run documentation checks without compiling images.
 README, PR template and maintenance workflow changes still run workflow checks.
 Unknown source paths require a full build. Shared build/version/kernel inputs
-also run the documentation compatibility matrix. Main pushes and manual runs
-always run all stages. Select **CI result** as the required branch check: it
+also run the documentation compatibility matrix. Pushes and manual runs run
+full product checks. Builds on `rewrite/new-os`, including source-changing PRs
+with that base, additionally require both Arch build-root jobs. They use the
+same `make arch-doctor`, `arch-fetch` and `arch-build` entry on Ubuntu 24.04 and
+Debian 13 userspace. The latter shares the Ubuntu runner's Linux kernel and
+Docker daemon; it is not a Debian boot test. The matrix verifies the production
+kernel and install bundle in the Arch root, not a migrated root filesystem.
+Select **CI result** as the required branch check: it
 fails for failed, cancelled, missing or unexpectedly skipped required jobs.
 
 `tools/ci.py changes` uses the actual PR base and checked-out merge commit,

@@ -9,10 +9,14 @@ ReliefOS build system (Linux Kbuild / Kconfig)
   make                 same as `make help`; never downloads or builds
   make help            this message
   make doctor          check host tools, target toolchain and third-party bits
-  make fetch           the only download stage: fetch and verify locked sources,
+  make fetch           explicit native download stage: fetch and verify locked sources,
                        parent and kernel checkout alike
   make fetch-check     probe every locked URL without downloading anything;
                        name the packages whose address answers 404 or nothing
+
+  make arch-doctor     check the generic Linux host for the isolated Arch build root
+  make arch-fetch      prepare the signed Arch toolchain and locked kernel downloads
+  make arch-build      build kernel and install bundle offline in the Arch root
 
   make defconfig       reset OS and ReliefNT configurations to their defaults
   make olddefconfig    resolve new symbols non-interactively, keep user choices
@@ -71,7 +75,8 @@ ReliefOS build system (Linux Kbuild / Kconfig)
 Variables
   ARCH=x86_64          only x86_64 is supported today; anything else is an error
   PROFILE=debug|release  compile policy; anything else is an error
-  O=PATH               output directory, default out/<arch>/<profile>
+  O=PATH               default out/<arch>/<profile>; arch-* uses out/arch-root/<arch>/<profile>
+  ARCH_JOBS=n          parallel Kbuild jobs in the Arch root (default: nproc)
   V=1                  echo the real command, its working directory and overrides
   QEMU_BOOT=uefi|bios   run firmware, default uefi
   QEMU_FIRMWARE=FILE   OVMF firmware for uefi; unused for bios

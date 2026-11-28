@@ -24,6 +24,37 @@ HTML 文档另需 Sphinx，见 :doc:`../process/documentation`。Sphinx 仅服�
 可通过 ``PLAYER_TARGET_BUILD=/绝对路径/out/x86_64/release sh tests/build/test-reliefplayer-mp4.sh``
 在 Linux 宿主上同时运行实际精简库和 musl 版本的解码/控制检查；这不等于来宾播放验证。
 
+迁移分支：隔离的 Arch 构建根
+============================
+
+在 x86_64 Linux 上可以通过本地 Docker 构建，无需在宿主安装 pacman、Arch 包或
+编译器。宿主需要 Bash、Git 2.31+、GNU Make 4.3+、coreutils、awk、sed 和
+util-linux（``flock``），以及可通过 Unix socket 访问的 Docker Engine 25+。
+例如 Debian 13 可安装 ``docker.io git make``；先按宿主发行版的说明配置
+Docker。以普通用户执行，不要使用 ``sudo make``。Docker daemon 对其使用者授予高权限，
+仅使用受信任的本地 daemon；目前不支持远端、rootless 或 userns-remap 模式。
+源码和 ``O`` 路径沿用 Kbuild 的字符限制，不支持空格。
+
+在仓库根目录依次运行::
+
+    git submodule update --init --recursive
+    make arch-doctor
+    make arch-fetch
+    make arch-build ARCH_JOBS=8
+
+``arch-doctor`` 只检查宿主条件，不下载、不创建输出；``make -n`` 可预览入口。
+``arch-fetch`` 使用摘要固定的官方 Arch 基础镜像和 pacman 签名验证准备工具链，
+并下载校验 ReliefNT 锁定的构建输入。Arch 软件仓库滚动更新；固定的是基础镜像，
+不是每次初次获取时的软件仓库快照。同一配方复用本地镜像。
+``arch-build`` 不拉镜像、不联网，沿用根 Makefile 的 ``kernel`` 目标。容器内用
+调用者的 UID/GID 编译，源码、Git 元数据和容器根是只读的；下载缓存保存在
+``O/downloads/``。默认 ``O=out/arch-root/x86_64/release``，也可为这三个命令
+指定同一个新目录。不要与原生 Kbuild 共享 ``O``。
+
+验证范围为 ``O/generated/system/kernel.sys``、``kernel.debug`` 和
+``O/kernel-install/install.bundle.json``。这是迁移用构建入口，尚不构建 glibc
+来宾用户态或 ISO；以下原生入口仍负责现有产品和启动验证。
+
 构建顺序
 ========
 

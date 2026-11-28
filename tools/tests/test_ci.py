@@ -22,7 +22,7 @@ class ScopeTests(unittest.TestCase):
 
     def test_documentation_only_skips_product_build(self):
         self.assertEqual(self.select(["Documentation/index.rst", "Documentation/locale/en/index.po"]),
-                         dict(build=False, docs=True, publish=False))
+                         dict(build=False, docs=True, publish=False, arch_root=False))
 
     def test_unknown_and_removed_source_paths_require_a_build(self):
         for path in ("userland/new.cpp", "old-source.c", "tools/ci.py", "scripts/ci/smoke.sh"):
@@ -32,11 +32,11 @@ class ScopeTests(unittest.TestCase):
     def test_shared_inputs_verify_both_consumers(self):
         for path in ("kernel/reliefnt", "Makefile", "configs/build-version", ".github/workflows/ci.yml"):
             with self.subTest(path=path):
-                self.assertEqual(self.select([path]), dict(build=True, docs=True, publish=False))
+                self.assertEqual(self.select([path]), dict(build=True, docs=True, publish=False, arch_root=False))
 
     def test_mixed_source_and_docs_changes_run_both(self):
         self.assertEqual(self.select(["Documentation/index.rst", "userland/app.c"]),
-                         dict(build=True, docs=True, publish=False))
+                         dict(build=True, docs=True, publish=False, arch_root=False))
 
     def test_pr_never_publishes_even_with_main_ref(self):
         result = ci.select_checks(["main.c"], event="pull_request", ref="refs/heads/main")
@@ -44,7 +44,14 @@ class ScopeTests(unittest.TestCase):
 
     def test_main_push_runs_all_checks_and_publishes(self):
         self.assertEqual(ci.select_checks([], event="push", ref="refs/heads/main"),
-                         dict(build=True, docs=True, publish=True))
+                         dict(build=True, docs=True, publish=True, arch_root=False))
+
+    def test_migration_build_requires_arch_matrix_but_never_publishes(self):
+        ref = "refs/heads/rewrite/new-os"
+        for event in ("push", "workflow_dispatch"):
+            with self.subTest(event=event):
+                self.assertEqual(ci.select_checks([], event=event, ref=ref),
+                                 dict(build=True, docs=True, publish=False, arch_root=True))
 
     def test_manual_run_requires_explicit_deployment(self):
         self.assertFalse(ci.select_checks([], event="workflow_dispatch", ref="refs/heads/main")["publish"])
@@ -72,7 +79,7 @@ class ScopeTests(unittest.TestCase):
             git("add", "-A")
             git("commit", "-q", "-m", "remove manual")
             event, output = root / "event.json", root / "output"
-            event.write_text(json.dumps({"pull_request": {"base": {"sha": base}}}))
+            event.write_text(json.dumps({"pull_request": {"base": {"sha": base, "ref": "rewrite/new-os"}}}))
 
             def selected():
                 output.write_text("")
@@ -83,13 +90,13 @@ class ScopeTests(unittest.TestCase):
                                         GITHUB_SHA=git("rev-parse", "HEAD"), GITHUB_OUTPUT=str(output)))
                 return dict(line.split("=", 1) for line in output.read_text().splitlines())
 
-            self.assertEqual(selected(), dict(build="false", docs="true", publish="false"))
+            self.assertEqual(selected(), dict(build="false", docs="true", publish="false", arch_root="false"))
             # Renaming source into the manuals must still select a build. The
             # newline also exercises Git's NUL-separated pathname transport.
             (root / "old-source.c").rename(root / "Documentation/renamed\nsource.rst")
             git("add", "-A", "--", "old-source.c", "Documentation")
             git("commit", "-q", "-m", "rename source")
-            self.assertEqual(selected(), dict(build="true", docs="true", publish="false"))
+            self.assertEqual(selected(), dict(build="true", docs="true", publish="false", arch_root="true"))
 
 
 class ArtifactTests(unittest.TestCase):
@@ -158,9 +165,12 @@ class ArtifactTests(unittest.TestCase):
 
 
 class GateTests(unittest.TestCase):
-    def needs(self, build=True, docs=True):
+    def needs(self, build=True, docs=True, arch_root=False):
         result = {name: {"result": "success"} for name in ci.STAGES}
-        result["changes"]["outputs"] = {"build": str(build).lower(), "docs": str(docs).lower(), "publish": "false"}
+        result["changes"]["outputs"] = {"build": str(build).lower(), "docs": str(docs).lower(),
+                                        "publish": "false", "arch_root": str(arch_root).lower()}
+        if not arch_root:
+            result["arch_root"]["result"] = "skipped"
         if not build:
             for name in ("build", "regressions", "smoke"):
                 result[name]["result"] = "skipped"
@@ -176,9 +186,16 @@ class GateTests(unittest.TestCase):
         for stage in ci.STAGES:
             for result in ("failure", "cancelled", "skipped"):
                 with self.subTest(stage=stage, result=result):
-                    needs = self.needs()
+                    needs = self.needs(arch_root=True)
                     needs[stage]["result"] = result
                     self.assertFalse(ci.summary(needs)[0])
+
+    def test_required_arch_matrix_cannot_be_substituted_by_legacy_build(self):
+        needs = self.needs(arch_root=True)
+        self.assertTrue(ci.summary(needs)[0])
+        for result in ("failure", "cancelled", "skipped", "missing"):
+            with self.subTest(result=result):
+                self.assertFalse(ci.summary({**needs, "arch_root": {"result": result}})[0])
 
     def test_missing_job_or_invalid_scope_fails_gate(self):
         needs = self.needs()

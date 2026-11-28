@@ -199,7 +199,8 @@ reliefnt-fetch:
 	    echo 'Initialize it with `git submodule update --init --recursive`, or point RELIEFNT_DIR at an existing checkout' >&2; \
 	    exit 0; \
 	fi; \
-	exec $(RELIEFNT_CONFIG_ENV) $(MAKE) -C '$(RELIEFNT_DIR)' fetch
+	exec $(RELIEFNT_CONFIG_ENV) $(MAKE) -C '$(RELIEFNT_DIR)' O='$(RELIEFNT_SUBBUILD_O)' \
+	    ARCH='$(ARCH)' PROFILE='$(PROFILE)' fetch
 
 # --- fetch-check delegation -------------------------------------------------
 # `make fetch-check` also probes the kernel checkout's locked URLs.  Probes

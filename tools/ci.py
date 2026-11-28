@@ -24,7 +24,8 @@ DOC_INPUTS = (
     "scripts/reliefos/Makefile.site", "tools/build/docs-page.sh", "tools/test_documentation.py",
     ".github/workflows/check-docs.yml", ".github/workflows/ci.yml", ".github/actions/",
 )
-STAGES = ("changes", "checks", "documentation", "build", "regressions", "smoke")
+STAGES = ("changes", "checks", "documentation", "build", "regressions", "smoke", "arch_root")
+MIGRATION_BRANCH = "rewrite/new-os"
 
 
 def matches(path, patterns):
@@ -32,13 +33,14 @@ def matches(path, patterns):
                for pattern in patterns)
 
 
-def select_checks(paths, *, event, ref, deploy=False):
+def select_checks(paths, *, event, ref, base_ref=None, deploy=False):
     """Only PRs may skip product builds; main and manual runs verify everything."""
     if deploy and (event != "workflow_dispatch" or ref != "refs/heads/main"):
         raise ValueError("Manual Pages deployment requires the main branch")
     publish = ref == "refs/heads/main" and (event == "push" or deploy)
     if event != "pull_request":
-        return dict(build=True, docs=True, publish=publish)
+        return dict(build=True, docs=True, publish=publish,
+                    arch_root=ref == f"refs/heads/{MIGRATION_BRANCH}")
     build = docs = False
     for path in paths:
         docs = docs or matches(path, DOC_INPUTS)
@@ -49,7 +51,7 @@ def select_checks(paths, *, event, ref, deploy=False):
                          ".github/workflows/sourcehut-sync.yml"}):
             continue
         build = True
-    return dict(build=build, docs=docs, publish=False)
+    return dict(build=build, docs=docs, publish=False, arch_root=build and base_ref == MIGRATION_BRANCH)
 
 
 def commit_sha(value):
@@ -66,14 +68,15 @@ def current_commit():
 def changes():
     event = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text())
     kind, ref = os.environ["GITHUB_EVENT_NAME"], os.environ["GITHUB_REF"]
-    paths = []
+    paths, base_ref = [], None
     if kind == "pull_request":
-        base = commit_sha(event["pull_request"]["base"]["sha"])
+        pr_base = event["pull_request"]["base"]
+        base, base_ref = commit_sha(pr_base["sha"]), pr_base["ref"]
         changed = subprocess.check_output([
             "git", "diff", "--name-only", "--no-renames", "-z", base, current_commit(), "--"])
         paths = [os.fsdecode(path) for path in changed.split(b"\0") if path]
     deploy = event.get("inputs", {}).get("deploy_pages", False) in (True, "true")
-    selected = select_checks(paths, event=kind, ref=ref, deploy=deploy)
+    selected = select_checks(paths, event=kind, ref=ref, base_ref=base_ref, deploy=deploy)
     output = "".join(f"{key}={str(value).lower()}\n" for key, value in selected.items())
     print(output, end="")
     with Path(os.environ["GITHUB_OUTPUT"]).open("a") as stream:
@@ -139,7 +142,9 @@ def verify_manifest(root, commit):
 def summary(needs):
     """A skipped required job is a failure, even if GitHub reports no failed jobs."""
     outputs = needs.get("changes", {}).get("outputs", {})
-    valid_scope = all(outputs.get(key) in {"true", "false"} for key in ("build", "docs", "publish"))
+    valid_scope = all(outputs.get(key) in {"true", "false"} for key in ("build", "docs", "publish", "arch_root"))
+    if outputs.get("arch_root") == "true":
+        valid_scope = valid_scope and outputs.get("build") == "true"
     if outputs.get("publish") == "true":
         valid_scope = valid_scope and outputs.get("build") == outputs.get("docs") == "true"
     required = {"changes", "checks"}
@@ -147,6 +152,8 @@ def summary(needs):
         required.add("documentation")
     if outputs.get("build") == "true":
         required.update(("build", "regressions", "smoke"))
+    if outputs.get("arch_root") == "true":
+        required.add("arch_root")
     passed = valid_scope and set(needs) == set(STAGES)
     lines = ["## ReliefOS CI", "", "| Stage | Required | Result |", "| --- | --- | --- |"]
     for name in STAGES:

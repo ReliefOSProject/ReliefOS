@@ -19,6 +19,13 @@ endif
 RELIEFOS_SRC := $(patsubst %/,%,$(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
 
 # --- user-facing variables --------------------------------------------------
+reliefos_arch_goals := arch-doctor arch-fetch arch-build
+reliefos_arch_goal := $(filter $(reliefos_arch_goals),$(MAKECMDGOALS))
+ifneq ($(reliefos_arch_goal),)
+ifneq ($(words $(MAKECMDGOALS)),1)
+$(error run each Arch build-root target in its own make invocation)
+endif
+endif
 # ARCH, PROFILE and O may come from the command line or from these defaults
 # only. An inherited environment value is ignored on purpose: an unrelated shell
 # setting must not silently change what gets built (plan section 6.2).
@@ -29,7 +36,7 @@ ifneq ($(origin PROFILE),command line)
 override PROFILE := release
 endif
 ifneq ($(origin O),command line)
-override O := $(RELIEFOS_SRC)/out/$(ARCH)/$(PROFILE)
+override O := $(RELIEFOS_SRC)/out/$(if $(reliefos_arch_goal),arch-root/)$(ARCH)/$(PROFILE)
 endif
 
 V ?= 0
@@ -167,7 +174,16 @@ export RELIEFOS_BUILD_OWNER
 # and refusing them would make `make -n` depend on unrelated builds), and goals
 # that write nothing at all -- a bare `make` and `make help` must keep working
 # while a build is running elsewhere, and must not create the output tree.
-reliefos_read_only_goals := help doctor
+# Arch entry points do not delegate to host Kbuild or take its PID-based lock.
+# Only the container can run native Kbuild in an owned Arch output directory.
+ifneq ($(filter-out help doctor $(reliefos_arch_goals),$(MAKECMDGOALS)),)
+ifneq ($(wildcard $(reliefos_O_absolute)/.reliefos-arch-root),)
+ifneq ($(reliefos_O_absolute),/reliefos-build)
+$(error '$(O)' is an Arch build output; use the arch targets or choose another O)
+endif
+endif
+endif
+reliefos_read_only_goals := help doctor $(reliefos_arch_goals)
 reliefos_lock_not_needed :=
 ifeq ($(MAKECMDGOALS),)
 reliefos_lock_not_needed := 1
@@ -214,6 +230,10 @@ doctor:
 	DEPS='$(RELIEFOS_DEPS_TOOL)' LOCK='$(RELIEFOS_LOCK)' CACHE='$(RELIEFOS_CACHE)' \
 	sh $(RELIEFOS_SRC)/scripts/doctor.sh
 
+.PHONY: $(reliefos_arch_goals)
+$(reliefos_arch_goals):
+	@bash '$(RELIEFOS_SRC)/tools/build/arch-root.sh' '$(@:arch-%=%)' '$(RELIEFOS_SRC)' '$(O)' '$(PROFILE)'
+
 clean:
 	@O='$(reliefos_O_absolute)' SRC='$(RELIEFOS_SRC)' KEEP_CONFIG=1 sh $(RELIEFOS_SRC)/scripts/clean.sh
 
@@ -241,7 +261,7 @@ gettext gettext-check: $(RELIEFOS_O_MARKER) $(RELIEFOS_DOCS_I18N_INPUTS)
 	    --output $(O)/Documentation/gettext $(if $(filter gettext-check,$@),--check)
 
 reliefos_run_only_goals := run-only run-installer-only run-iso-only
-reliefos_goals := $(filter-out help doctor clean distclean htmldocs gettext gettext-check,$(MAKECMDGOALS))
+reliefos_goals := $(filter-out help doctor clean distclean htmldocs gettext gettext-check $(reliefos_arch_goals),$(MAKECMDGOALS))
 reliefos_kbuild_goals := $(patsubst $(reliefos_O_absolute)/%,%,$(patsubst $(O)/%,%,$(reliefos_goals)))
 ifneq ($(strip $(reliefos_goals)),)
 .PHONY: $(reliefos_goals)

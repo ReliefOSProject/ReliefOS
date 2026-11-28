@@ -37,6 +37,7 @@ jobs:
       build: ${{ steps.scope.outputs.build }}
       docs: ${{ steps.scope.outputs.docs }}
       publish: ${{ steps.scope.outputs.publish }}
+      arch_root: ${{ steps.scope.outputs.arch_root }}
       test-groups: ${{ steps.groups.outputs.groups }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -82,7 +83,7 @@ jobs:
         run: '"$GOBIN/actionlint" -color'
       - name: Check CI scripts
         run: |
-          shellcheck scripts/ci/*.sh
+          shellcheck scripts/ci/*.sh tools/build/arch-root.sh
           python3 -m unittest discover -s tools/tests -p 'test_ci*.py' -v
 
   documentation:
@@ -352,9 +353,51 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
 
+  arch_root:
+    name: Arch build root (${{ matrix.host }})
+    needs: changes
+    if: needs.changes.outputs.arch_root == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [ubuntu-24.04, debian-13]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - name: Build the production kernel with the host entry point
+        env:
+          HOST_USERSPACE: ${{ matrix.host }}
+        run: |
+          launcher=()
+          if [[ "$HOST_USERSPACE" == debian-13 ]]; then
+            # Use Debian host tools with the runner's Linux kernel and local
+            # Docker daemon. Preserve workspace paths across both containers.
+            docker build --tag reliefos-ci-debian - <<'DOCKERFILE'
+          FROM docker.io/library/debian@sha256:8aa5a7bf5a1955bddbe7d74fcdd0b91ab30e74362a8b73af672b0481b35b44a0
+          RUN apt-get update && apt-get install -y --no-install-recommends docker-cli git make \
+              && rm -rf /var/lib/apt/lists/*
+          DOCKERFILE
+            launcher=(docker run --rm --pull=never --user "$(id -u):$(id -g)"
+              --group-add "$(stat -c %g /var/run/docker.sock)" --env HOME=/tmp
+              --mount type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock
+              --mount "type=bind,src=$PWD,dst=$PWD" --workdir "$PWD" reliefos-ci-debian)
+          fi
+          "${launcher[@]}" bash -euc '
+            for goal in arch-doctor arch-fetch arch-build; do
+              make O=out/ci-arch-root ARCH_JOBS=2 "$goal"
+            done
+          '
+          test -s out/ci-arch-root/generated/system/kernel.sys
+          test -s out/ci-arch-root/generated/system/kernel.debug
+          test -s out/ci-arch-root/kernel-install/install.bundle.json
+
   ci:
     name: CI result
-    needs: [changes, checks, documentation, build, regressions, smoke]
+    needs: [changes, checks, documentation, build, regressions, smoke, arch_root]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
